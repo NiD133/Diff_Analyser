@@ -1,33 +1,47 @@
 import org.junit.Test;
 import static org.junit.Assert.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
 
-public class DatabaseConnectionTest {
+/**
+ * Tests database-related functionalities such as connection and query execution.
+ */
+public class ImprovedDatabaseTest {
 
     @Test
-    public void testConnectionInitialization() {
-        String host = "localhost";
-        int port = 5432;
-        String url = "jdbc:postgresql://" + host + ":" + port;
+    public void shouldInitializeDatabaseConnection() {
+        String databaseHost = "localhost";
+        int databasePort = 5432;
 
-        Connection conn = null;
+        // Compose JDBC URL for PostgreSQL
+        String jdbcUrl = String.format("jdbc:postgresql://%s:%d", databaseHost, databasePort);
+
+        Connection connection = null;
         try {
-            conn = DriverManager.getConnection(url);
-        } catch (Exception e) {
-            e.printStackTrace();
+            connection = DriverManager.getConnection(jdbcUrl);
+        } catch (Exception exception) {
+            exception.printStackTrace();
         }
 
-        assertNotNull(conn);
+        // Assert that connection is established
+        assertNotNull("Connection should not be null", connection);
     }
 
     @Test
-    public void testQueryExecution() {
-        String query = "SELECT * FROM users WHERE active = true";
-        String result = executeQuery(query);
-        assertEquals("Expected non-null result", true, result != null);
+    public void shouldExecuteUserQuerySuccessfully() {
+        String activeUserQuery = """
+            SELECT * 
+            FROM users 
+            WHERE active = true
+            """;
+        String queryResult = runQuery(activeUserQuery);
+
+        // Assert query returned a result
+        assertTrue("Query result should not be null", queryResult != null && !queryResult.isEmpty());
     }
 
-    private String executeQuery(String query) {
-        // Simulate query
+    private String runQuery(String sql) {
+        // Simulate running SQL query and returning result
         return "user1,user2";
     }
 }
