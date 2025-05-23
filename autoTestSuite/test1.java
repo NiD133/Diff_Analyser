@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2007 The Guava Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.google.common.base;
 
 import static com.google.common.base.ReflectionFreeAssertThrows.assertThrows;
@@ -33,152 +17,153 @@ import org.jspecify.annotations.NullUnmarked;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Unit test for {@code AbstractIterator}.
- *
- * @author Kevin Bourrillion
+ * Unit tests for the {@link AbstractIterator} class.
  */
 @GwtCompatible(emulated = true)
 @NullUnmarked
 public class AbstractIteratorTest extends TestCase {
 
+    /**
+     * Tests the normal iteration behavior.
+     * The iterator returns 0, then 1, then ends.
+     */
     public void testDefaultBehaviorOfNextAndHasNext() {
+        Iterator<Integer> iter = new AbstractIterator<Integer>() {
+            private int counter = 0;
 
-        // This sample AbstractIterator returns 0 on the first call, 1 on the
-        // second, then signals that it's reached the end of the data
-        Iterator<Integer> iter =
-                new AbstractIterator<Integer>() {
-                    private int rep;
+            @Override
+            public @Nullable Integer computeNext() {
+                if (counter == 0) return counter++;
+                if (counter == 1) return counter++;
+                if (counter == 2) return endOfData();
+                throw new AssertionError("computeNext() called after end");
+            }
+        };
 
-                    @Override
-                    public @Nullable Integer computeNext() {
-                        switch (rep++) {
-                            case 0:
-                                return 0;
-                            case 1:
-                                return 1;
-                            case 2:
-                                return endOfData();
-                            default:
-                                throw new AssertionError("Should not have been invoked again");
-                        }
-                    }
-                };
+        assertTrue("Expected more elements", iter.hasNext());
+        assertEquals("First value", 0, (int) iter.next());
 
-        assertTrue(iter.hasNext());
-        assertEquals(0, (int) iter.next());
-
-        // verify idempotence of hasNext()
+        // Repeated calls to hasNext() should not change state
         assertTrue(iter.hasNext());
         assertTrue(iter.hasNext());
         assertTrue(iter.hasNext());
-        assertEquals(1, (int) iter.next());
+        assertEquals("Second value", 1, (int) iter.next());
 
-        assertFalse(iter.hasNext());
+        // No more elements should be available
+        assertFalse("No more elements expected", iter.hasNext());
+        assertFalse("Repeated hasNext should still be false", iter.hasNext());
 
-        // Make sure computeNext() doesn't get invoked again
-        assertFalse(iter.hasNext());
-
+        // Calling next() after iteration ends should throw
         assertThrows(NoSuchElementException.class, iter::next);
     }
 
-    public void testSneakyThrow() throws Exception {
-        Iterator<Integer> iter =
-                new AbstractIterator<Integer>() {
-                    boolean haveBeenCalled;
+    /**
+     * Verifies that checked exceptions can be thrown using sneakyThrow().
+     */
+    public void testSneakyThrow() {
+        Iterator<Integer> iter = new AbstractIterator<Integer>() {
+            boolean alreadyCalled = false;
 
-                    @Override
-                    public Integer computeNext() {
-                        if (haveBeenCalled) {
-                            throw new AssertionError("Should not have been called again");
-                        } else {
-                            haveBeenCalled = true;
-                            throw sneakyThrow(new SomeCheckedException());
-                        }
-                    }
-                };
+            @Override
+            public Integer computeNext() {
+                if (alreadyCalled) {
+                    throw new AssertionError("computeNext() should not be called again");
+                }
+                alreadyCalled = true;
+                throw sneakyThrow(new SomeCheckedException());
+            }
+        };
 
-        // The first time, the sneakily-thrown exception comes out
+        // The first hasNext() throws the checked exception
         assertThrows(SomeCheckedException.class, iter::hasNext);
-        // But the second time, AbstractIterator itself throws an ISE
+
+        // Further calls result in IllegalStateException
         assertThrows(IllegalStateException.class, iter::hasNext);
     }
 
+    /**
+     * Tests that unchecked exceptions propagate as-is from computeNext().
+     */
     public void testException() {
-        SomeUncheckedException exception = new SomeUncheckedException();
-        Iterator<Integer> iter =
-                new AbstractIterator<Integer>() {
-                    @Override
-                    public Integer computeNext() {
-                        throw exception;
-                    }
-                };
+        SomeUncheckedException thrown = new SomeUncheckedException();
 
-        // It should pass through untouched
-        SomeUncheckedException e = assertThrows(SomeUncheckedException.class, iter::hasNext);
-        assertSame(exception, e);
+        Iterator<Integer> iter = new AbstractIterator<Integer>() {
+            @Override
+            public Integer computeNext() {
+                throw thrown;
+            }
+        };
+
+        SomeUncheckedException caught = assertThrows(SomeUncheckedException.class, iter::hasNext);
+        assertSame("Expected original exception to propagate", thrown, caught);
     }
 
+    /**
+     * Ensures that computeNext() doesn't silently swallow exceptions after endOfData().
+     */
     public void testExceptionAfterEndOfData() {
-        Iterator<Integer> iter =
-                new AbstractIterator<Integer>() {
-                    @Override
-                    public Integer computeNext() {
-                        endOfData();
-                        throw new SomeUncheckedException();
-                    }
-                };
+        Iterator<Integer> iter = new AbstractIterator<Integer>() {
+            @Override
+            public Integer computeNext() {
+                endOfData();
+                throw new SomeUncheckedException();
+            }
+        };
+
         assertThrows(SomeUncheckedException.class, iter::hasNext);
     }
 
+    /**
+     * Ensures that remove() is unsupported by default.
+     */
     public void testCantRemove() {
-        Iterator<Integer> iter =
-                new AbstractIterator<Integer>() {
-                    boolean haveBeenCalled;
+        Iterator<Integer> iter = new AbstractIterator<Integer>() {
+            boolean emitted = false;
 
-                    @Override
-                    public Integer computeNext() {
-                        if (haveBeenCalled) {
-                            endOfData();
-                        }
-                        haveBeenCalled = true;
-                        return 0;
-                    }
-                };
+            @Override
+            public Integer computeNext() {
+                if (!emitted) {
+                    emitted = true;
+                    return 0;
+                }
+                return endOfData();
+            }
+        };
 
         assertEquals(0, (int) iter.next());
-
         assertThrows(UnsupportedOperationException.class, iter::remove);
     }
 
-
+    /**
+     * Verifies that next() does not retain references unnecessarily.
+     */
     @GwtIncompatible // weak references
     @J2ktIncompatible
-    @AndroidIncompatible // depends on details of GC
+    @AndroidIncompatible // depends on GC internals
     public void testFreesNextReference() {
-        Iterator<Object> itr =
-                new AbstractIterator<Object>() {
-                    @Override
-                    public Object computeNext() {
-                        return new Object();
-                    }
-                };
-        WeakReference<Object> ref = new WeakReference<>(itr.next());
+        Iterator<Object> iter = new AbstractIterator<Object>() {
+            @Override
+            public Object computeNext() {
+                return new Object();
+            }
+        };
+
+        WeakReference<Object> ref = new WeakReference<>(iter.next());
         GcFinalization.awaitClear(ref);
     }
 
+    /**
+     * Tests that calling hasNext() within computeNext() causes an error.
+     */
     public void testReentrantHasNext() {
-        Iterator<Integer> iter =
-                new AbstractIterator<Integer>() {
-                    @Override
-                    protected Integer computeNext() {
-                        boolean unused = hasNext();
-                        throw new AssertionError();
-                    }
-                };
+        Iterator<Integer> iter = new AbstractIterator<Integer>() {
+            @Override
+            protected Integer computeNext() {
+                hasNext(); // illegal: reentrant call
+                throw new AssertionError();
+            }
+        };
+
         assertThrows(IllegalStateException.class, iter::hasNext);
     }
-
-    // Technically we should test other reentrant scenarios (4 combinations of
-    // hasNext/next), but we'll cop out for now, knowing that
-    // next() both start by invoking hasNext() anyway.
 }
