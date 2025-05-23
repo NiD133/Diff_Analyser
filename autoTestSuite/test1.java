@@ -39,7 +39,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests {@link LineIterator}.
+ * Tests for the {@link LineIterator} class.
+ * This class provides an iterator to read lines from a file or reader.
  */
 public class LineIteratorTest {
 
@@ -48,24 +49,32 @@ public class LineIteratorTest {
     @TempDir
     public File temporaryFolder;
 
-    private void assertLines(final List<String> lines, final LineIterator iterator) {
+    /**
+     * Asserts that the lines returned by the LineIterator match the expected lines.
+     *
+     * @param expectedLines The expected lines.
+     * @param iterator The LineIterator to test.
+     */
+    private void assertLines(final List<String> expectedLines, final LineIterator iterator) {
         try {
-            for (int i = 0; i < lines.size(); i++) {
-                final String line = iterator.nextLine();
-                assertEquals(lines.get(i), line, "nextLine() line " + i);
+            for (int i = 0; i < expectedLines.size(); i++) {
+                final String actualLine = iterator.nextLine();
+                assertEquals(expectedLines.get(i), actualLine, "nextLine() line " + i + " should match.");
             }
-            assertFalse(iterator.hasNext(), "No more expected");
+            assertFalse(iterator.hasNext(), "Iterator should have no more lines.");
         } finally {
+            // Ensure the iterator is closed to release resources.
             IOUtils.closeQuietly(iterator);
         }
     }
 
     /**
-     * Creates a test file with a specified number of lines.
+     * Creates a test file with the specified number of lines, using the default encoding.
      *
-     * @param file target file
-     * @param lineCount number of lines to create
-     * @throws IOException If an I/O error occurs
+     * @param file The file to create.
+     * @param lineCount The number of lines to write to the file.
+     * @return A list of the lines that were written to the file.
+     * @throws IOException If an I/O error occurs while writing to the file.
      */
     private List<String> createLinesFile(final File file, final int lineCount) throws IOException {
         final List<String> lines = createStringLines(lineCount);
@@ -74,12 +83,13 @@ public class LineIteratorTest {
     }
 
     /**
-     * Creates a test file with a specified number of lines.
+     * Creates a test file with the specified number of lines, using the specified encoding.
      *
-     * @param file target file
-     * @param encoding the encoding to use while writing the lines
-     * @param lineCount number of lines to create
-     * @throws IOException If an I/O error occurs
+     * @param file The file to create.
+     * @param encoding The encoding to use when writing to the file.
+     * @param lineCount The number of lines to write to the file.
+     * @return A list of the lines that were written to the file.
+     * @throws IOException If an I/O error occurs while writing to the file.
      */
     private List<String> createLinesFile(final File file, final String encoding, final int lineCount) throws IOException {
         final List<String> lines = createStringLines(lineCount);
@@ -88,10 +98,11 @@ public class LineIteratorTest {
     }
 
     /**
-     * Creates String data lines.
+     * Creates a list of Strings, each representing a line of text.
+     * Each line is in the format "LINE " + i, where i is the line number.
      *
-     * @param lineCount number of lines to create
-     * @return a new lines list.
+     * @param lineCount The number of lines to create.
+     * @return A list of Strings representing the lines.
      */
     private List<String> createStringLines(final int lineCount) {
         final List<String> lines = new ArrayList<>();
@@ -102,10 +113,11 @@ public class LineIteratorTest {
     }
 
     /**
-     * Utility method to create and test a file with a specified number of lines.
+     * Creates a file with a specified number of lines and then tests
+     * iterating over those lines using a LineIterator.
      *
-     * @param lineCount the lines to create in the test file
-     * @throws IOException If an I/O error occurs while creating the file
+     * @param lineCount The number of lines to create in the test file.
+     * @throws IOException If an I/O error occurs while creating the file.
      */
     private void doTestFileWithSpecifiedLines(final int lineCount) throws IOException {
         final String encoding = UTF_8;
@@ -115,23 +127,28 @@ public class LineIteratorTest {
         final List<String> lines = createLinesFile(testFile, encoding, lineCount);
 
         try (LineIterator iterator = FileUtils.lineIterator(testFile, encoding)) {
-            assertThrows(UnsupportedOperationException.class, iterator::remove);
+            // LineIterator does not support the remove operation.
+            assertThrows(UnsupportedOperationException.class, iterator::remove, "remove() should throw UnsupportedOperationException");
 
-            int idx = 0;
+            int lineIndex = 0;
             while (iterator.hasNext()) {
                 final String line = iterator.next();
-                assertEquals(lines.get(idx), line, "Comparing line " + idx);
-                assertTrue(idx < lines.size(), "Exceeded expected idx=" + idx + " size=" + lines.size());
-                idx++;
+                assertEquals(lines.get(lineIndex), line, "Line at index " + lineIndex + " should match.");
+                assertTrue(lineIndex < lines.size(), "Expected index " + lineIndex + " should be within bounds (size=" + lines.size() + ")");
+                lineIndex++;
             }
-            assertEquals(idx, lines.size(), "Line Count doesn't match");
+            assertEquals(lineIndex, lines.size(), "The number of lines read should match the number of lines written.");
 
-            // try calling next() after file processed
-            assertThrows(NoSuchElementException.class, iterator::next);
-            assertThrows(NoSuchElementException.class, iterator::nextLine);
+            // After all lines are read, next() and nextLine() should throw NoSuchElementException.
+            assertThrows(NoSuchElementException.class, iterator::next, "next() after end should throw NoSuchElementException");
+            assertThrows(NoSuchElementException.class, iterator::nextLine, "nextLine() after end should throw NoSuchElementException");
         }
     }
 
+    /**
+     * Tests that the LineIterator can be closed early, before all lines are read.
+     * @throws Exception If an error occurs during file creation or iteration.
+     */
     @Test
     public void testCloseEarly() throws Exception {
         final String encoding = UTF_8;
@@ -140,59 +157,81 @@ public class LineIteratorTest {
         createLinesFile(testFile, encoding, 3);
 
         try (LineIterator iterator = FileUtils.lineIterator(testFile, encoding)) {
-            // get
+            // Get the first line.
             assertNotNull("Line expected", iterator.next());
-            assertTrue(iterator.hasNext(), "More expected");
+            assertTrue(iterator.hasNext(), "More lines expected");
 
-            // close
+            // Close the iterator.
             iterator.close();
-            assertFalse(iterator.hasNext(), "No more expected");
-            assertThrows(NoSuchElementException.class, iterator::next);
-            assertThrows(NoSuchElementException.class, iterator::nextLine);
-            // try closing again
+            assertFalse(iterator.hasNext(), "No more lines expected after close");
+            assertThrows(NoSuchElementException.class, iterator::next, "next() after close should throw NoSuchElementException");
+            assertThrows(NoSuchElementException.class, iterator::nextLine, "nextLine() after close should throw NoSuchElementException");
+
+            // Try closing again (should be safe).
             iterator.close();
-            assertThrows(NoSuchElementException.class, iterator::next);
-            assertThrows(NoSuchElementException.class, iterator::nextLine);
+            assertThrows(NoSuchElementException.class, iterator::next, "next() after close (again) should throw NoSuchElementException");
+            assertThrows(NoSuchElementException.class, iterator::nextLine, "nextLine() after close (again) should throw NoSuchElementException");
         }
     }
 
+    /**
+     * Tests that the constructor throws a NullPointerException when passed a null Reader.
+     */
     @Test
     public void testConstructor() {
-        assertThrows(NullPointerException.class, () -> new LineIterator(null));
+        assertThrows(NullPointerException.class, () -> new LineIterator(null), "Constructor with null Reader should throw NullPointerException");
     }
 
+    /**
+     * Tests that lines can be filtered based on a custom filtering logic.
+     *
+     * @param lines The expected lines in the file.
+     * @param reader The Reader to iterate over.
+     * @throws IOException If an I/O error occurs while reading from the Reader.
+     */
     private void testFiltering(final List<String> lines, final Reader reader) throws IOException {
         try (LineIterator iterator = new LineIterator(reader) {
+            // Override isValidLine to filter lines based on a custom criteria.
             @Override
             protected boolean isValidLine(final String line) {
                 final char c = line.charAt(line.length() - 1);
+                // Accept only lines where the last digit, minus 48, is not 1 (i.e., the last digit is not 1, 4, or 7).
                 return (c - 48) % 3 != 1;
             }
         }) {
-            assertThrows(UnsupportedOperationException.class, iterator::remove);
+            // LineIterator does not support the remove operation.
+            assertThrows(UnsupportedOperationException.class, iterator::remove, "remove() should throw UnsupportedOperationException");
 
-            int idx = 0;
+            int lineIndex = 0;
             int actualLines = 0;
             while (iterator.hasNext()) {
                 final String line = iterator.next();
                 actualLines++;
-                assertEquals(lines.get(idx), line, "Comparing line " + idx);
-                assertTrue(idx < lines.size(), "Exceeded expected idx=" + idx + " size=" + lines.size());
-                idx++;
-                if (idx % 3 == 1) {
-                    idx++;
+                assertEquals(lines.get(lineIndex), line, "Line at index " + lineIndex + " should match.");
+                assertTrue(lineIndex < lines.size(), "Expected index " + lineIndex + " should be within bounds (size=" + lines.size() + ")");
+                lineIndex++;
+                // Skip the lines that were filtered out.  This matches the
+                // custom logic defined in isValidLine() in the anonymous
+                // LineIterator class.
+                if (lineIndex % 3 == 1) {
+                    lineIndex++;
                 }
             }
             assertEquals(9, lines.size(), "Line Count doesn't match");
-            assertEquals(9, idx, "Line Count doesn't match");
+            assertEquals(9, lineIndex, "Line Count doesn't match");
             assertEquals(6, actualLines, "Line Count doesn't match");
 
-            // try calling next() after file processed
-            assertThrows(NoSuchElementException.class, iterator::next);
-            assertThrows(NoSuchElementException.class, iterator::nextLine);
+            // After all lines are read, next() and nextLine() should throw NoSuchElementException.
+            assertThrows(NoSuchElementException.class, iterator::next, "next() after end should throw NoSuchElementException");
+            assertThrows(NoSuchElementException.class, iterator::nextLine, "nextLine() after end should throw NoSuchElementException");
         }
     }
 
+    /**
+     * Tests filtering with a BufferedReader.
+     *
+     * @throws Exception If an error occurs during file creation or iteration.
+     */
     @Test
     public void testFilteringBufferedReader() throws Exception {
         final String encoding = UTF_8;
@@ -205,6 +244,11 @@ public class LineIteratorTest {
         testFiltering(lines, reader);
     }
 
+    /**
+     * Tests filtering with a FileReader.
+     *
+     * @throws Exception If an error occurs during file creation or iteration.
+     */
     @Test
     public void testFilteringFileReader() throws Exception {
         final String encoding = UTF_8;
@@ -217,6 +261,11 @@ public class LineIteratorTest {
         testFiltering(lines, reader);
     }
 
+    /**
+     * Tests that an UnsupportedCharsetException is thrown when an invalid encoding is used.
+     *
+     * @throws Exception If an error occurs during file creation or iteration.
+     */
     @Test
     public void testInvalidEncoding() throws Exception {
         final String encoding = "XXXXXXXX";
@@ -224,15 +273,25 @@ public class LineIteratorTest {
         final File testFile = new File(temporaryFolder, "LineIterator-invalidEncoding.txt");
         createLinesFile(testFile, UTF_8, 3);
 
-        assertThrows(UnsupportedCharsetException.class, () -> FileUtils.lineIterator(testFile, encoding));
+        assertThrows(UnsupportedCharsetException.class, () -> FileUtils.lineIterator(testFile, encoding), "Invalid encoding should throw UnsupportedCharsetException");
     }
 
+    /**
+     * Tests that a NoSuchFileException is thrown when trying to iterate over a missing file.
+     *
+     * @throws Exception If an error occurs during file creation or iteration.
+     */
     @Test
     public void testMissingFile() throws Exception {
         final File testFile = new File(temporaryFolder, "dummy-missing-file.txt");
-        assertThrows(NoSuchFileException.class, () -> FileUtils.lineIterator(testFile, UTF_8));
+        assertThrows(NoSuchFileException.class, () -> FileUtils.lineIterator(testFile, UTF_8), "Missing file should throw NoSuchFileException");
     }
 
+    /**
+     * Tests reading lines using nextLine() with the default encoding.
+     *
+     * @throws Exception If an error occurs during file creation or iteration.
+     */
     @Test
     public void testNextLineOnlyDefaultEncoding() throws Exception {
         final File testFile = new File(temporaryFolder, "LineIterator-nextOnly.txt");
@@ -242,6 +301,11 @@ public class LineIteratorTest {
         assertLines(lines, iterator);
     }
 
+    /**
+     * Tests reading lines using nextLine() with a null encoding (should default to system encoding).
+     *
+     * @throws Exception If an error occurs during file creation or iteration.
+     */
     @Test
     public void testNextLineOnlyNullEncoding() throws Exception {
         final String encoding = null;
@@ -253,6 +317,11 @@ public class LineIteratorTest {
         assertLines(lines, iterator);
     }
 
+    /**
+     * Tests reading lines using nextLine() with UTF-8 encoding.
+     *
+     * @throws Exception If an error occurs during file creation or iteration.
+     */
     @Test
     public void testNextLineOnlyUtf8Encoding() throws Exception {
         final String encoding = UTF_8;
@@ -264,6 +333,11 @@ public class LineIteratorTest {
         assertLines(lines, iterator);
     }
 
+    /**
+     * Tests reading lines using next() with a null encoding (should default to system encoding).
+     *
+     * @throws Exception If an error occurs during file creation or iteration.
+     */
     @Test
     public void testNextOnly() throws Exception {
         final String encoding = null;
@@ -274,12 +348,17 @@ public class LineIteratorTest {
         try (LineIterator iterator = FileUtils.lineIterator(testFile, encoding)) {
             for (int i = 0; i < lines.size(); i++) {
                 final String line = iterator.next();
-                assertEquals(lines.get(i), line, "next() line " + i);
+                assertEquals(lines.get(i), line, "next() line " + i + " should match.");
             }
-            assertFalse(iterator.hasNext(), "No more expected");
+            assertFalse(iterator.hasNext(), "Iterator should have no more lines.");
         }
     }
 
+    /**
+     * Tests that an IllegalStateException is thrown when hasNext() throws an IOException during the call to readLine().
+     *
+     * @throws Exception If an error occurs during file creation or iteration.
+     */
     @Test
     public void testNextWithException() throws Exception {
         final Reader reader = new BufferedReader(new StringReader("")) {
@@ -289,25 +368,45 @@ public class LineIteratorTest {
             }
         };
         try (LineIterator li = new LineIterator(reader)) {
-            assertThrows(IllegalStateException.class, li::hasNext);
+            assertThrows(IllegalStateException.class, li::hasNext, "IOException during hasNext() should throw IllegalStateException");
         }
     }
 
+    /**
+     * Tests reading a file with one line.
+     *
+     * @throws Exception If an error occurs during file creation or iteration.
+     */
     @Test
     public void testOneLines() throws Exception {
         doTestFileWithSpecifiedLines(1);
     }
 
+    /**
+     * Tests reading a file with three lines.
+     *
+     * @throws Exception If an error occurs during file creation or iteration.
+     */
     @Test
     public void testThreeLines() throws Exception {
         doTestFileWithSpecifiedLines(3);
     }
 
+    /**
+     * Tests reading a file with two lines.
+     *
+     * @throws Exception If an error occurs during file creation or iteration.
+     */
     @Test
     public void testTwoLines() throws Exception {
         doTestFileWithSpecifiedLines(2);
     }
 
+    /**
+     * Tests reading a file with a valid encoding specified.
+     *
+     * @throws Exception If an error occurs during file creation or iteration.
+     */
     @Test
     public void testValidEncoding() throws Exception {
         final String encoding = UTF_8;
@@ -321,13 +420,17 @@ public class LineIteratorTest {
                 assertNotNull(iterator.next());
                 count++;
             }
-            assertEquals(3, count);
+            assertEquals(3, count, "Should read 3 lines");
         }
     }
 
+    /**
+     * Tests reading a file with zero lines.
+     *
+     * @throws Exception If an error occurs during file creation or iteration.
+     */
     @Test
     public void testZeroLines() throws Exception {
         doTestFileWithSpecifiedLines(0);
     }
-
 }
