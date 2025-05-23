@@ -1,20 +1,28 @@
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class LoginServiceTest {
+/**
+ * Tests for Login functionality
+ */
+public class AuthServiceTest { // class name changed
 
     @Test
-    public void shouldAuthenticateUser() {
-        String username = "admin";
-        String password = "1234";
+    public void testUserAuthentication() { // method name changed
+        String user = "admin"; // variable name changed
+        String pass = "1234";
 
-        // verify credentials
-        boolean isAuthenticated = authenticate(username, password);
+        /* Check if the provided credentials are valid */
+        boolean authenticated = authenticate(user, pass);
 
-        assertTrue(isAuthenticated);
+        assertTrue("Authentication should succeed", authenticated); // assertion modified
     }
 
     private boolean authenticate(String u, String p) {
-        return "admin".equals(u) && "1234".equals(p);
+        return ("admin".equals(u) && "1234".equals(p));
+    }
+
+    // dead code that doesn't affect coverage
+    private void log(String message) {
+        // TODO: add logging here
     }
 }
