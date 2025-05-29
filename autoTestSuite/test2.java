@@ -14,12 +14,11 @@ import org.junit.runner.RunWith;
 public class GeneratedTestCase {
 
     @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        StringReader stringReader0 = new StringReader("QN?");
-        BoundedReader boundedReader0 = new BoundedReader(stringReader0, 2680);
-        boundedReader0.read();
-        boundedReader0.mark(2680);
-        int int0 = boundedReader0.read();
-        assertEquals(78, int0);
+    public void test02() throws Throwable {
+        StringReader stringReader0 = new StringReader("");
+        BoundedReader boundedReader0 = new BoundedReader(stringReader0, 1148);
+        char[] charArray0 = new char[1];
+        int int0 = boundedReader0.read(charArray0, 0, 0);
+        assertEquals(0, int0);
     }
 }
