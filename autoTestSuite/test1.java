@@ -1,39 +1,3 @@
-/* ======================================================
- * JFreeChart : a chart library for the Java(tm) platform
- * ======================================================
- *
- * (C) Copyright 2000-present, by David Gilbert and Contributors.
- *
- * Project Info:  https://www.jfree.org/jfreechart/index.html
- *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2.1 of the License, or
- * (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- * License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
- * USA.
- *
- * [Oracle and Java are registered trademarks of Oracle and/or its affiliates.
- * Other names may be trademarks of their respective owners.]
- *
- * ------------------
- * DateRangeTest.java
- * ------------------
- * (C) Copyright 2004-present, by David Gilbert and Contributors.
- *
- * Original Author:  David Gilbert;
- * Contributor(s):   -;
- *
- */
-
 package org.jfree.data.time;
 
 import java.util.Date;
@@ -44,63 +8,97 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Some tests for the {@link DateRange} class.
+ * Tests for the DateRange class.
  */
 public class DateRangeTest {
 
     /**
-     * Confirm that the equals method can distinguish all the required fields.
+     * Verifies that the equals method correctly identifies equal and unequal DateRange instances.
      */
     @Test
-    public void testEquals() {
+    public void testEqualsMethod() {
+        // Create two DateRange instances with the same dates
         DateRange r1 = new DateRange(new Date(1000L), new Date(2000L));
         DateRange r2 = new DateRange(new Date(1000L), new Date(2000L));
+
+        // Verify that the equals method returns true for equal instances
         assertEquals(r1, r2);
         assertEquals(r2, r1);
 
+        // Create a DateRange instance with a different lower date
         r1 = new DateRange(new Date(1111L), new Date(2000L));
+
+        // Verify that the equals method returns false for unequal instances
         assertNotEquals(r1, r2);
+
+        // Create another DateRange instance with the same dates as r1
         r2 = new DateRange(new Date(1111L), new Date(2000L));
+
+        // Verify that the equals method returns true for equal instances
         assertEquals(r1, r2);
 
+        // Create a DateRange instance with a different upper date
         r1 = new DateRange(new Date(1111L), new Date(2222L));
+
+        // Verify that the equals method returns false for unequal instances
         assertNotEquals(r1, r2);
+
+        // Create another DateRange instance with the same dates as r1
         r2 = new DateRange(new Date(1111L), new Date(2222L));
+
+        // Verify that the equals method returns true for equal instances
         assertEquals(r1, r2);
     }
 
     /**
-     * Serialize an instance, restore it, and check for equality.
+     * Verifies that a DateRange instance can be serialized and deserialized correctly.
      */
     @Test
     public void testSerialization() {
+        // Create a DateRange instance
         DateRange r1 = new DateRange(new Date(1000L), new Date(2000L));
+
+        // Serialize and deserialize the DateRange instance
         DateRange r2 = TestUtils.serialised(r1);
+
+        // Verify that the deserialized instance is equal to the original instance
         assertEquals(r1, r2);
     }
 
     /**
-     * The {@link DateRange} class is immutable, so it doesn't need to
-     * be cloneable.
+     * Verifies that the DateRange class is not cloneable.
      */
     @Test
-    public void testClone() {
+    public void testCloneability() {
+        // Create a DateRange instance
         DateRange r1 = new DateRange(new Date(1000L), new Date(2000L));
+
+        // Verify that the DateRange instance is not cloneable
         assertFalse(r1 instanceof Cloneable);
     }
 
     /**
-     * Confirm that a DateRange is immutable.
+     * Verifies that the DateRange class is immutable.
      */
     @Test
-    public void testImmutable() {
+    public void testImmutability() {
+        // Create two Date instances
         Date d1 = new Date(10L);
         Date d2 = new Date(20L);
+
+        // Create a DateRange instance with the two Date instances
         DateRange r = new DateRange(d1, d2);
+
+        // Modify the first Date instance
         d1.setTime(11L);
+
+        // Verify that the modification does not affect the DateRange instance
         assertEquals(new Date(10L), r.getLowerDate());
+
+        // Modify the second Date instance through the DateRange instance
         r.getUpperDate().setTime(22L);
+
+        // Verify that the modification does not affect the DateRange instance
         assertEquals(new Date(20L), r.getUpperDate());
     }
-
 }
