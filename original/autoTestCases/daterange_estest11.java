@@ -1,21 +1,22 @@
 package org.example;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class GeneratedTestCase {
+public class DateRangeTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        DateRange dateRange0 = new DateRange(0.0, 0.0);
-        Date date0 = dateRange0.getUpperDate();
-        assertEquals("Thu Jan 01 00:00:00 GMT 1970", date0.toString());
+    @Test
+    public void testGetUpperDateReturnsCorrectDate() {
+        // Arrange: Create a DateRange object with the same start and end values (0.0).
+        // This likely represents a date range spanning a single point in time.
+        DateRange dateRange = new DateRange(0.0, 0.0);
+
+        // Act: Retrieve the upper date (end date) from the DateRange object.
+        Date upperDate = dateRange.getUpperDate();
+
+        // Assert:  Check if the retrieved upper date matches the expected date,
+        // which should be January 1, 1970, 00:00:00 GMT, representing the epoch.
+        assertEquals("Thu Jan 01 00:00:00 GMT 1970", upperDate.toString());
     }
 }

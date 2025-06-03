@@ -1,18 +1,22 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test; // Using JUnit 5 for better readability
 
-public class GeneratedTestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals; // Using JUnit 5 assertions
+import org.apache.commons.io.ByteOrderMark; // Explicitly import the class under test
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        ByteOrderMark byteOrderMark0 = ByteOrderMark.UTF_8;
-        String string0 = byteOrderMark0.toString();
-        assertEquals("ByteOrderMark[UTF-8: 0xEF,0xBB,0xBF]", string0);
+
+class ByteOrderMarkTest { // Renamed class for clarity and to follow standard naming conventions
+
+    @Test
+    void testUTF8ByteOrderMarkToString() { // More descriptive test name
+        // Arrange: Create a ByteOrderMark instance for UTF-8
+        ByteOrderMark utf8Bom = ByteOrderMark.UTF_8;
+
+        // Act: Get the string representation of the ByteOrderMark
+        String bomString = utf8Bom.toString();
+
+        // Assert: Verify that the string representation is as expected
+        assertEquals("ByteOrderMark[UTF-8: 0xEF,0xBB,0xBF]", bomString, "The toString() method should return the expected string representation.");
     }
 }

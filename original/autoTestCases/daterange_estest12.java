@@ -1,21 +1,23 @@
 package org.example;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.jupiter.api.Test;  // Use JUnit 5 annotations
 import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
 
-public class GeneratedTestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals; // Use JUnit 5 assertions
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        DateRange dateRange0 = new DateRange(0.0, 0.0);
-        Date date0 = dateRange0.getLowerDate();
-        assertEquals("Thu Jan 01 00:00:00 GMT 1970", date0.toString());
+public class DateRangeTest { // More descriptive class name
+
+    @Test
+    public void testGetLowerDateReturnsCorrectDate() {  // Clearer method name
+        // Arrange: Create a DateRange object with a range starting at 0.0
+        DateRange dateRange = new DateRange(0.0, 10.0); // Give an upper bound for clarity
+
+        // Act: Get the lower date from the DateRange
+        Date lowerDate = dateRange.getLowerDate();
+
+        // Assert: Verify that the lower date is January 1, 1970 (the epoch)
+        // The comparison uses getTime() to compare the milliseconds since epoch, 
+        // which is more reliable and less dependent on locale settings for String representation.
+        assertEquals(0L, lowerDate.getTime(), "The lower date should be the epoch (Jan 1, 1970 00:00:00 GMT).");  // More specific assertion message
     }
 }

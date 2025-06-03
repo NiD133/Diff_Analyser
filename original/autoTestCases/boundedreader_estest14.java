@@ -1,24 +1,28 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class GeneratedTestCase {
+public class BoundedReaderExampleTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        StringReader stringReader0 = new StringReader("Mqy[$oy5nF");
-        BoundedReader boundedReader0 = new BoundedReader(stringReader0, 1601);
-        boundedReader0.mark(1601);
-        int int0 = boundedReader0.read();
-        assertEquals(77, int0);
+    @Test
+    public void testReadCharacterFromBoundedReader() throws IOException {
+        // Arrange: Define a string and create a StringReader from it.
+        String data = "Mqy[$oy5nF";
+        StringReader stringReader = new StringReader(data);
+
+        // Arrange: Create a BoundedReader with a maximum length of 1601 characters.
+        BoundedReader boundedReader = new BoundedReader(stringReader, 1601);
+
+        // Act: Mark the current position in the reader, allowing reset later.
+        boundedReader.mark(1601); // Mark the current position (beginning of the string).
+
+        // Act: Read the first character from the BoundedReader.
+        int firstCharacter = boundedReader.read();
+
+        // Assert: Verify that the first character read is 'M' (ASCII value 77).
+        assertEquals(77, firstCharacter);
     }
 }

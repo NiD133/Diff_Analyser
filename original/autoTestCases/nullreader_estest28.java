@@ -1,20 +1,23 @@
 package org.example;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test; // Changed import to JUnit 5
+import static org.junit.jupiter.api.Assertions.*; // Changed import to JUnit 5
 
-public class GeneratedTestCase {
+/**
+ * Test case for the NullReader class.  Specifically tests closing the reader
+ * and verifying the position is reset to zero.
+ */
+public class NullReaderTest { // Renamed class to follow naming conventions
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        NullReader nullReader0 = NullReader.INSTANCE;
-        nullReader0.close();
-        assertEquals(0L, nullReader0.getPosition());
+    @Test
+    void testCloseResetsPositionToZero() throws IOException { // Renamed method for clarity
+        // Arrange: Create an instance of NullReader
+        NullReader nullReader = NullReader.INSTANCE;
+
+        // Act: Close the NullReader
+        nullReader.close();
+
+        // Assert: Verify that the reader's position is now zero after closing.
+        assertEquals(0L, nullReader.getPosition(), "After closing, the position should be 0.");
     }
 }

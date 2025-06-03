@@ -1,21 +1,25 @@
 package org.example;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;  // Changed import to JUnit 5
+import static org.junit.jupiter.api.Assertions.*; // Changed import to JUnit 5
 
-public class GeneratedTestCase {
+// Removed EvoSuite specific imports as they aren't necessary for understanding the core test
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        NullReader nullReader0 = new NullReader((-1324L));
-        long long0 = nullReader0.getSize();
-        assertTrue(nullReader0.markSupported());
-        assertEquals((-1324L), long0);
+public class NullReaderTest { // Renamed class for better readability
+
+    @Test
+    void testGetSizeReturnsCorrectValue() { // Changed method name for clarity
+        // Arrange: Create a NullReader with a specific size.
+        long expectedSize = -1324L;
+        NullReader nullReader = new NullReader(expectedSize);
+
+        // Act: Get the size of the NullReader.
+        long actualSize = nullReader.getSize();
+
+        // Assert: Verify that the returned size matches the expected size.
+        assertEquals(expectedSize, actualSize, "The getSize() method should return the initially specified size.");
+
+        // Assert: Verify that the NullReader supports marking.
+        assertTrue(nullReader.markSupported(), "NullReader should support marking.");
     }
 }

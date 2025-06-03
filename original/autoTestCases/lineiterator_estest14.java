@@ -2,34 +2,32 @@ package org.apache.commons.io;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.BufferedReader;
-import java.io.Reader;
 import java.io.StringReader;
-import java.util.NoSuchElementException;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class GeneratedTestCase {
+public class LineIteratorRemoveTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        StringReader stringReader0 = new StringReader("!77U'||S(5");
-        BufferedReader bufferedReader0 = new BufferedReader(stringReader0);
-        LineIterator lineIterator0 = new LineIterator(bufferedReader0);
-        // Undeclared exception!
+    @Test
+    public void testRemoveThrowsUnsupportedOperationException() {
+        // Arrange: Create a StringReader and wrap it in a BufferedReader.
+        String inputString = "!77U'||S(5";
+        StringReader stringReader = new StringReader(inputString);
+        BufferedReader bufferedReader = new BufferedReader(stringReader);
+
+        // Act: Create a LineIterator from the BufferedReader.
+        LineIterator lineIterator = new LineIterator(bufferedReader);
+
+        // Assert:  Calling remove() should throw an UnsupportedOperationException.
         try {
-            lineIterator0.remove();
-            fail("Expecting exception: UnsupportedOperationException");
+            lineIterator.remove();
+            fail("Expected UnsupportedOperationException was not thrown.");
         } catch (UnsupportedOperationException e) {
-            //
-            // remove not supported
-            //
-            verifyException("org.apache.commons.io.LineIterator", e);
+            // Expected exception.  This confirms that the remove() method is not supported.
+            assertEquals("remove not supported", e.getMessage()); // Verify exception message.
+        } finally {
+            // Clean up (optional, but good practice): Close the LineIterator to release resources.
+            LineIterator.closeQuietly(lineIterator);
         }
     }
 }

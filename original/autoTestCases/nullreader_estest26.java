@@ -1,28 +1,31 @@
 package org.example;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test; // Updated import for JUnit 5
+import static org.junit.jupiter.api.Assertions.*; // Updated import for JUnit 5
 
-public class GeneratedTestCase {
+/**
+ * Test case for the NullReader class, specifically focusing on the 'mark' method.
+ * This test verifies that calling the 'mark' method on a NullReader instance configured
+ * to not support marking throws an UnsupportedOperationException.
+ */
+class NullReaderMarkUnsupportedTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        NullReader nullReader0 = new NullReader(10L, false, false);
-        // Undeclared exception!
-        try {
-            nullReader0.mark(1452);
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // mark() not supported
-            //
-            verifyException("org.example.NullReader", e);
-        }
+    @Test
+    void testMarkThrowsUnsupportedOperationException() {
+        // Arrange: Create a NullReader instance that does *not* support marking.
+        // The constructor arguments are:
+        //  - 10L:  The initial size (doesn't affect this test).
+        //  - false: Indicates that marking is *not* supported.
+        //  - false: Indicates that the reader does not throw EOFException at end.
+        NullReader nullReader = new NullReader(10L, false, false);
+
+        // Act and Assert:  Attempt to call the 'mark' method and assert that it throws
+        // an UnsupportedOperationException with the expected message.
+        UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () -> {
+            nullReader.mark(1452); //  1452 is the read limit, which doesn't matter in this test.
+        });
+
+        // Optionally, verify the exception message for even more robust testing.
+        assertEquals("mark() not supported", exception.getMessage());
     }
 }

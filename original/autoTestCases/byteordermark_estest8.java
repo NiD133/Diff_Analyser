@@ -1,25 +1,20 @@
-package org.apache.commons.io;
+import org.junit.jupiter.api.Test; // Using JUnit 5 for clarity and conciseness
+import static org.junit.jupiter.api.Assertions.*; // More readable assertions
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.apache.commons.io.ByteOrderMark;
 
-public class GeneratedTestCase {
+public class ByteOrderMarkConstructorNullBytesTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        ByteOrderMark byteOrderMark0 = null;
-        try {
-            byteOrderMark0 = new ByteOrderMark("pLt'", (int[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // bytes
-            //
-            verifyException("java.util.Objects", e);
-        }
+    @Test
+    void testConstructorWithNullBytesThrowsException() {
+        // Arrange: Prepare for the test.  We're testing the constructor of ByteOrderMark
+        //          when passed a null array for the byte representation.
+        String charsetName = "pLt'"; // Arbitrary charset name
+
+        // Act & Assert:  Execute the code under test and verify the outcome.
+        //                  We expect a NullPointerException to be thrown.
+        assertThrows(NullPointerException.class, () -> {
+            new ByteOrderMark(charsetName, (int[]) null);
+        }, "Expected a NullPointerException when constructing ByteOrderMark with null bytes.");
     }
 }

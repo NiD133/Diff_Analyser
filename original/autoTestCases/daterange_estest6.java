@@ -2,27 +2,30 @@ package org.example;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
 
-public class GeneratedTestCase {
+import org.jfree.data.Range;
+
+public class DateRangeTest {
 
     @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        DateRange dateRange0 = null;
+    public void testConstructorWithNullRangeThrowsException() {
+        // Arrange: Define the input (a null Range).
+        Range nullRange = null;
+
+        // Act: Attempt to create a DateRange object using the null Range.
         try {
-            dateRange0 = new DateRange((Range) null);
-            fail("Expecting exception: NullPointerException");
+            new DateRange(nullRange);
+
+            // Assert:  The code should NOT reach here.  If it does, the test fails because no exception was thrown.
+            fail("Expected NullPointerException to be thrown when constructing DateRange with a null Range.");
+
         } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.example.DateRange", e);
+            // Assert: Check that a NullPointerException was thrown as expected.
+            // The exception's message doesn't need to be checked in this simplified version.  We only care that the correct exception type was thrown.
+            // In real-world scenarios, you might check the exception message as well for more specific validation.
+
+            // Alternatively, if you need to assert specifically the exception was thrown by DateRange itself:
+            //assertTrue("Exception should be thrown by DateRange constructor", e.getStackTrace()[0].getClassName().equals("org.example.DateRange"));
         }
     }
 }

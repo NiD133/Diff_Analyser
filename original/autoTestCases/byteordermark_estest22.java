@@ -2,25 +2,22 @@ package org.apache.commons.io;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GeneratedTestCase {
+public class ByteOrderMarkConstructorTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        int[] intArray0 = new int[7];
-        ByteOrderMark byteOrderMark0 = null;
+    @Test(timeout = 1000) // Reduced timeout for clarity
+    public void testConstructor_EmptyCharsetName_ThrowsIllegalArgumentException() {
+        // Arrange: Define an array of integers representing the byte sequence.
+        int[] byteSequence = new int[7];
+
+        // Act & Assert:  Attempt to create a ByteOrderMark with an empty charset name and the byte sequence.
+        // Expect an IllegalArgumentException to be thrown because the charset name cannot be empty.
         try {
-            byteOrderMark0 = new ByteOrderMark("", intArray0);
-            fail("Expecting exception: IllegalArgumentException");
+            new ByteOrderMark("", byteSequence);
+            fail("Expected IllegalArgumentException for empty charset name.");
         } catch (IllegalArgumentException e) {
-            //
-            // No charsetName specified
-            //
-            verifyException("org.apache.commons.io.ByteOrderMark", e);
+            // Assert that the exception message is as expected.
+            assertEquals("No charsetName specified", e.getMessage());
         }
     }
 }

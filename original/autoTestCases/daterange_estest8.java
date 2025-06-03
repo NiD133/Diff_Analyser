@@ -2,29 +2,34 @@ package org.example;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
 import org.jfree.data.Range;
-import org.junit.runner.RunWith;
+import org.jfree.data.time.DateRange; // Corrected import
+import java.util.Calendar;
 
-public class GeneratedTestCase {
+public class UnderstandableDateRangeTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        MockDate mockDate0 = new MockDate(1, 785, (-574), (-1), 32, (-1));
-        MockDate mockDate1 = new MockDate(0, 0, 1);
-        DateRange dateRange0 = null;
+    @Test
+    public void testInvalidDateRangeConstruction() {
+        // Arrange: Create two dates where startDate is after endDate.
+        // Using Calendar for more readable date creation.
+        Calendar cal = Calendar.getInstance();
+        cal.set(1901, Calendar.AUGUST, 1); // August 1, 1901
+        Date startDate = cal.getTime();
+
+        cal.set(0, Calendar.JANUARY, 1); // January 1, 1900
+        Date endDate = cal.getTime();
+
+
+        // Act & Assert:  Attempting to create a DateRange with startDate > endDate
+        // should throw an IllegalArgumentException.
         try {
-            dateRange0 = new DateRange(mockDate0, mockDate1);
-            fail("Expecting exception: IllegalArgumentException");
+            new DateRange(startDate, endDate);
+            fail("Expected IllegalArgumentException due to invalid date range.");
         } catch (IllegalArgumentException e) {
-            //
-            // Range(double, double): require lower (-1.62865681E11) <= upper (-2.2089888E12).
-            //
-            verifyException("org.jfree.data.Range", e);
+            // Assert that the exception message is relevant to the problem.
+            assertTrue(e.getMessage().contains("Range(double, double): require lower"));
         }
     }
 }

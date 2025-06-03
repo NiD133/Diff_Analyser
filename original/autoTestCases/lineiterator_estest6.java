@@ -1,36 +1,33 @@
-package org.apache.commons.io;
-
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.Reader;
+import org.junit.jupiter.api.Test;  // Using JUnit 5 for clarity
+import static org.junit.jupiter.api.Assertions.*; //JUnit 5 Assertions
 import java.io.StringReader;
-import java.util.NoSuchElementException;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.io.IOException;
 
-public class GeneratedTestCase {
+import org.apache.commons.io.LineIterator;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        StringReader stringReader0 = new StringReader("DwHpo._Y&0~e=On_{");
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        LineIterator lineIterator1 = new LineIterator(stringReader0);
-        LineIterator.closeQuietly(lineIterator1);
-        // Undeclared exception!
-        try {
-            lineIterator0.hasNext();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // java.io.IOException: Stream closed
-            //
-            verifyException("org.apache.commons.io.LineIterator", e);
-        }
+class LineIteratorTest {
+
+    @Test
+    void testHasNextAfterCloseQuietlyOnAnotherIterator() throws IOException {
+        // Arrange: Create a StringReader and two LineIterators based on it
+        StringReader stringReader = new StringReader("Line 1\nLine 2\n");
+        LineIterator iterator1 = new LineIterator(stringReader);
+        LineIterator iterator2 = new LineIterator(stringReader);
+
+        // Act: Close the second iterator quietly (without throwing exceptions)
+        LineIterator.closeQuietly(iterator2);
+
+        // Assert:  Check if the first iterator throws an exception when hasNext() is called.
+        // The expectation is that closing iterator2 also closes the underlying StringReader.
+        // Therefore, iterator1 should throw an IllegalStateException when trying to access
+        // the closed StringReader via hasNext().
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            iterator1.hasNext();
+        });
+
+        // Optionally, assert the exception message:
+        assertEquals("java.io.IOException: Stream closed", exception.getMessage());
+
+
     }
 }

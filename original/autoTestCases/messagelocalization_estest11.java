@@ -1,20 +1,20 @@
 package org.example;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test; // Using JUnit 5's @Test
+import static org.junit.jupiter.api.Assertions.assertEquals; // Using JUnit 5's assertions
 
-public class GeneratedTestCase {
+public class MessageLocalizationTest { // Renamed class for clarity
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        String string0 = MessageLocalization.getMessage("writelength.can.only.be.called.in.a.contructed.pdfstream.inputstream.pdfwriter");
-        assertEquals("writeLength() can only be called in a contructed PdfStream(InputStream,PdfWriter).", string0);
+    @Test
+    void testGetMessage_ReturnsExpectedString() { // More descriptive test name
+        // Arrange: Define the key for the message we want to retrieve.
+        String messageKey = "writelength.can.only.be.called.in.a.contructed.pdfstream.inputstream.pdfwriter";
+
+        // Act: Retrieve the message using the MessageLocalization class.
+        String actualMessage = MessageLocalization.getMessage(messageKey);
+
+        // Assert: Verify that the retrieved message matches the expected message.
+        String expectedMessage = "writeLength() can only be called in a contructed PdfStream(InputStream,PdfWriter).";
+        assertEquals(expectedMessage, actualMessage, "The retrieved message should match the expected message."); // Added a message for better error reporting
     }
 }

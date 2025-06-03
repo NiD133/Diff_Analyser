@@ -1,38 +1,32 @@
 package org.apache.commons.io;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
+
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
 public class GeneratedTestCase {
 
     @Test
-    public void testNextWithException() throws Exception {
+    public void testNextWithException() {
+        // GIVEN: A reader that always throws an IOException when readLine() is called.
         final Reader reader = new BufferedReader(new StringReader("")) {
-
             @Override
             public String readLine() throws IOException {
-                throw new IOException("hasNext");
+                throw new IOException("Simulated read error");
             }
         };
+
+        // WHEN:  We create a LineIterator from the faulty reader and then attempt to check if there's a next line.
+        // THEN:  An IllegalStateException should be thrown, because the LineIterator catches the IOException from readLine()
+        //        and re-throws it wrapped in an IllegalStateException.
         try (LineIterator li = new LineIterator(reader)) {
-            assertThrows(IllegalStateException.class, li::hasNext);
+            assertThrows(IllegalStateException.class, li::hasNext,
+                    "Expected hasNext() to throw IllegalStateException when readLine() throws IOException.");
         }
     }
 }

@@ -1,19 +1,20 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test; // Using JUnit 5 annotations
+import static org.junit.jupiter.api.Assertions.*; // Using JUnit 5 assertions
 
-public class GeneratedTestCase {
+public class ByteOrderMarkComparisonTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        ByteOrderMark byteOrderMark0 = ByteOrderMark.UTF_16LE;
-        ByteOrderMark byteOrderMark1 = ByteOrderMark.UTF_32LE;
-        boolean boolean0 = byteOrderMark0.equals(byteOrderMark1);
-        assertFalse(boolean0);
+    @Test
+    void testUTF16LE_equals_UTF32LE_returnsFalse() {
+        // Arrange: Define two different ByteOrderMark constants.
+        ByteOrderMark utf16LE = ByteOrderMark.UTF_16LE;
+        ByteOrderMark utf32LE = ByteOrderMark.UTF_32LE;
+
+        // Act: Compare the two ByteOrderMark instances using the equals() method.
+        boolean areEqual = utf16LE.equals(utf32LE);
+
+        // Assert:  Ensure that the equals() method returns false, as the two marks are different.
+        assertFalse(areEqual, "UTF-16LE and UTF-32LE ByteOrderMarks should not be considered equal.");
     }
 }

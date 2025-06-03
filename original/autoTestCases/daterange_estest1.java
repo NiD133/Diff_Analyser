@@ -1,21 +1,24 @@
 package org.example;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test; // Use JUnit 5 for clarity and features
+import static org.junit.jupiter.api.Assertions.*; // Improved assertion style
 
+import java.util.Date;
+
+// No longer need EvoSuite annotations unless you are actively using EvoSuite features
+// @RunWith(EvoRunner.class)
+// @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useJEE = true)
 public class GeneratedTestCase {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        DateRange dateRange0 = new DateRange(0.0, 0.0);
-        long long0 = dateRange0.getUpperMillis();
-        assertEquals(0L, long0);
+    @Test
+    void testGetUpperMillisReturnsZeroForZeroRange() {
+        // Arrange: Create a DateRange with the same start and end values (0.0).
+        DateRange dateRange = new DateRange(0.0, 0.0);
+
+        // Act: Call the getUpperMillis() method to get the upper bound in milliseconds.
+        long upperMillis = dateRange.getUpperMillis();
+
+        // Assert: Verify that the upper bound in milliseconds is indeed 0.
+        assertEquals(0L, upperMillis, "The upper millis should be 0 for a range starting and ending at 0.0");
     }
 }

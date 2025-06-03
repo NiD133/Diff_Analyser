@@ -1,22 +1,25 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.*;
 
-public class GeneratedTestCase {
+public class BoundedReaderTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        StringReader stringReader0 = new StringReader("");
-        BoundedReader boundedReader0 = new BoundedReader(stringReader0, 1);
-        boundedReader0.reset();
+    @Test
+    public void testResetEmptyStringReader() throws IOException {
+        // Create a StringReader with an empty string.
+        StringReader stringReader = new StringReader("");
+
+        // Create a BoundedReader that wraps the StringReader and limits the read length to 1 character.
+        BoundedReader boundedReader = new BoundedReader(stringReader, 1);
+
+        // Reset the BoundedReader.  This should reset the underlying StringReader.
+        boundedReader.reset();
+
+        // The purpose of this test is to ensure that reset() works correctly with an empty StringReader.
+        // Since there's nothing to read, no assertions are really needed beyond confirming that the reset()
+        // method doesn't throw an exception. The call confirms that BoundedReader can handle reset on an empty reader.
     }
 }

@@ -2,25 +2,20 @@ package org.apache.commons.io;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GeneratedTestCase {
+public class ByteOrderMarkConstructorTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        int[] intArray0 = new int[0];
-        ByteOrderMark byteOrderMark0 = null;
+    @Test
+    public void testByteOrderMarkConstructorWithEmptyByteArray() {
         try {
-            byteOrderMark0 = new ByteOrderMark("N%W{9DrL", intArray0);
-            fail("Expecting exception: IllegalArgumentException");
+            // Attempt to create a ByteOrderMark with an empty byte array
+            // which is not allowed according to the class's documentation and contract.
+            new ByteOrderMark("SomeName", new int[0]);
+            fail("Expected IllegalArgumentException: Byte array cannot be empty."); // Explicitly state the expectation
+
         } catch (IllegalArgumentException e) {
-            //
-            // No bytes specified
-            //
-            verifyException("org.apache.commons.io.ByteOrderMark", e);
+            // Verify that the correct exception is thrown with a meaningful message.
+            assertEquals("No bytes specified", e.getMessage()); // Assert the error message for better clarity.
         }
     }
 }

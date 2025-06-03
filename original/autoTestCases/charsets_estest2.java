@@ -2,23 +2,49 @@ package org.apache.commons.io;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.SortedMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import sun.nio.cs.US_ASCII;
 
-public class GeneratedTestCase {
+/**
+ * Test cases for the {@link Charsets} utility class.  Focuses on testing the
+ * `toCharset` methods to ensure they handle null and default Charset behavior
+ * correctly.
+ */
+public class CharsetsTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        Charset charset0 = Charsets.toCharset((Charset) null);
-        Charset charset1 = Charsets.toCharset(charset0, (Charset) null);
-        assertEquals("UTF-8", charset1.toString());
-        assertNotNull(charset1);
+    /**
+     * Tests the `toCharset(Charset)` method when given a null Charset.
+     * It verifies that the method returns the default Charset (UTF-8) in this case.
+     */
+    @Test
+    public void testToCharset_NullCharset() {
+        // Arrange: Pass in a null Charset.
+        Charset inputCharset = null;
+
+        // Act: Call the toCharset method with the null Charset.
+        Charset resultCharset = Charsets.toCharset(inputCharset);
+
+        // Assert: Verify that the returned Charset is the default (UTF-8).
+        assertNotNull("The resulting Charset should not be null.", resultCharset);
+        assertEquals("The resulting Charset should be UTF-8.", "UTF-8", resultCharset.toString());
     }
+
+    /**
+     * Tests the `toCharset(Charset, Charset)` method when given a null Charset and a null default Charset.
+     * It verifies that the method returns the default Charset (UTF-8) in this case.
+     */
+    @Test
+    public void testToCharset_NullCharsetAndDefault() {
+        // Arrange: Pass in a null Charset and a null default Charset.
+        Charset inputCharset = null;
+        Charset defaultCharset = null;
+
+        // Act: Call the toCharset method with the null Charset and default.
+        Charset resultCharset = Charsets.toCharset(inputCharset, defaultCharset);
+
+        // Assert: Verify that the returned Charset is the default (UTF-8).
+        assertNotNull("The resulting Charset should not be null.", resultCharset);
+        assertEquals("The resulting Charset should be UTF-8.", "UTF-8", resultCharset.toString());
+    }
+
 }

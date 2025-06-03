@@ -2,29 +2,28 @@ package org.apache.commons.io;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.SortedMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import sun.nio.cs.US_ASCII;
 
-public class GeneratedTestCase {
+public class CharsetsTest {
 
     @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        Charsets charsets0 = new Charsets();
+    public void testToCharset_UnsupportedCharsetName() {
+        // Test case to verify that an UnsupportedCharsetException is thrown when
+        // an invalid or unsupported charset name is passed to Charsets.toCharset().
+
+        // Arrange: Define an invalid charset name and a Charset instance.  We are using a class name here
+        //  to ensure that the exception is not triggered by an illegal name format, but by an unsupported name.
+        String invalidCharsetName = "org.apache.commons.io.Charsets";
+        Charset existingCharset = Charset.forName("UTF-8");  // Using a valid charset for context.
+
+        // Act & Assert: Attempt to convert the invalid charset name and assert that an UnsupportedCharsetException is thrown.
         try {
-            Charsets.toCharset("org.apache.commons.io.Charsets", charsets0.UTF_8);
-            fail("Expecting exception: UnsupportedCharsetException");
+            Charsets.toCharset(invalidCharsetName, existingCharset);
+            fail("Expected UnsupportedCharsetException was not thrown.");
         } catch (UnsupportedCharsetException e) {
-            //
-            // org.apache.commons.io.Charsets
-            //
-            verifyException("java.nio.charset.Charset", e);
+            // Assert that the exception message contains the invalid charset name.
+            assertEquals("org.apache.commons.io.Charsets", e.getCharsetName());
         }
     }
 }

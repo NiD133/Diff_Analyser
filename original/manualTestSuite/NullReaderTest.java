@@ -30,9 +30,24 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests {@link NullReader}.
+ *
+ * <p>
+ *   This class provides test cases for the {@link NullReader} class, which is a
+ *   Reader that always returns a null character or -1 to signal the end of the stream.
+ *   The tests cover various aspects of the NullReader, including:
+ * </p>
+ * <ul>
+ *   <li>Handling EOFException when configured to throw it.</li>
+ *   <li>Mark and reset functionality (when supported).</li>
+ *   <li>Mark support and handling UnsupportedOperationException when mark is not supported.</li>
+ *   <li>Basic reading functionality.</li>
+ *   <li>Reading into character arrays.</li>
+ *   <li>Skipping characters.</li>
+ * </ul>
  */
 public class NullReaderTest {
 
+    // Custom NullReader implementation for testing processChar() and processChars() methods
     private static final class TestNullReader extends NullReader {
         TestNullReader(final int size) {
             super(size);
@@ -60,6 +75,12 @@ public class NullReaderTest {
     // Use the same message as in java.io.InputStream.reset() in OpenJDK 8.0.275-1.
     private static final String MARK_RESET_NOT_SUPPORTED = "mark/reset not supported";
 
+    /**
+     * Tests that an EOFException is thrown when the reader is configured to throw it
+     * and the end of the stream is reached.
+     *
+     * @throws Exception if an error occurs during the test.
+     */
     @Test
     public void testEOFException() throws Exception {
         try (Reader reader = new TestNullReader(2, false, true)) {
@@ -69,6 +90,13 @@ public class NullReaderTest {
         }
     }
 
+    /**
+     * Tests the mark and reset functionality of the NullReader.  It verifies that the reader
+     * can be marked, read from, reset to the marked position, and read again. It also verifies
+     * that an IOException is thrown when attempting to reset after exceeding the read limit.
+     *
+     * @throws Exception if an error occurs during the test.
+     */
     @Test
     public void testMarkAndReset() throws Exception {
         int position = 0;
@@ -108,6 +136,12 @@ public class NullReaderTest {
         }
     }
 
+    /**
+     * Tests the behavior when mark is not supported by the NullReader. It verifies that
+     * markSupported() returns false, and that mark() and reset() throw UnsupportedOperationException.
+     *
+     * @throws Exception if an error occurs during the test.
+     */
     @Test
     public void testMarkNotSupported() throws Exception {
         final Reader reader = new TestNullReader(100, false, true);
@@ -129,6 +163,13 @@ public class NullReaderTest {
         reader.close();
     }
 
+    /**
+     * Tests the basic read functionality of the NullReader.  It verifies that the reader
+     * returns the expected sequence of characters and that it returns -1 when the end of
+     * the stream is reached. It also checks for IOException when reading after EOF.
+     *
+     * @throws Exception if an error occurs during the test.
+     */
     @Test
     public void testRead() throws Exception {
         final int size = 5;
@@ -153,6 +194,13 @@ public class NullReaderTest {
         assertEquals(0, reader.getPosition(), "Available after close");
     }
 
+    /**
+     * Tests the read(char[]) method of the NullReader. It verifies that the reader
+     * reads the correct number of characters into the array and that the characters are
+     * the expected values. It also checks for EOF and IOException when reading after the end. Finally, it tests the overloaded method `read(char[], offset, length)`.
+     *
+     * @throws Exception if an error occurs during the test.
+     */
     @Test
     public void testReadCharArray() throws Exception {
         final char[] chars = new char[10];
@@ -192,11 +240,18 @@ public class NullReaderTest {
         final int lth    = 4;
         final int count5 = reader.read(chars, offset, lth);
         assertEquals(lth, count5, "Read 5");
-        for (int i = offset; i < lth; i++) {
+        for (int i = offset; i < offset + lth; i++) {
             assertEquals(i, chars[i], "Check Chars 3");
         }
     }
 
+    /**
+     * Tests the skip() method of the NullReader.  It verifies that the reader skips the
+     * correct number of characters and that it returns the correct value. It also
+     * checks for IOException when skipping after the end of file.
+     *
+     * @throws Exception if an error occurs during the test.
+     */
     @Test
     public void testSkip() throws Exception {
         try (Reader reader = new TestNullReader(10, true, false)) {

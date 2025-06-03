@@ -1,17 +1,26 @@
 package org.apache.commons.io;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Set;
-import java.util.SortedMap;
 import org.junit.jupiter.api.Test;
+import java.nio.charset.StandardCharsets;
 
-public class GeneratedTestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+/**
+ * Test case to verify the functionality of the {@link Charsets} utility class,
+ * specifically its US-ASCII charset constant.
+ */
+public class CharsetsUsAsciiTest { // Renamed the class for better clarity
 
     @Test
-    public void testUsAscii() {
-        assertEquals(StandardCharsets.US_ASCII.name(), Charsets.US_ASCII.name());
+    public void testUsAsciiConstant() {
+        // Arrange:  We are using predefined constants.  No explicit setup needed.
+
+        // Act: Retrieve the name of the US-ASCII charset from both classes.
+        String expectedCharsetName = StandardCharsets.US_ASCII.name();
+        String actualCharsetName = Charsets.US_ASCII.name();
+
+        // Assert: Verify that the names of the charsets are equal.
+        assertEquals(expectedCharsetName, actualCharsetName,
+                "The Charsets.US_ASCII constant should match the StandardCharsets.US_ASCII constant.");
     }
 }

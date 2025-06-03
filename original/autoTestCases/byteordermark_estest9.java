@@ -1,18 +1,22 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class GeneratedTestCase {
+/**
+ * This test case verifies the length of the UTF-16BE Byte Order Mark (BOM).
+ */
+public class ByteOrderMarkUTF16BETest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        ByteOrderMark byteOrderMark0 = ByteOrderMark.UTF_16BE;
-        int int0 = byteOrderMark0.length();
-        assertEquals(2, int0);
+    @Test
+    void testUTF16BELength() {
+        // Arrange: Create an instance of the UTF-16BE ByteOrderMark.
+        ByteOrderMark utf16BE = ByteOrderMark.UTF_16BE;
+
+        // Act: Get the length of the BOM.
+        int length = utf16BE.length();
+
+        // Assert: Verify that the length is 2 bytes.
+        assertEquals(2, length, "The length of UTF-16BE BOM should be 2.");
     }
 }

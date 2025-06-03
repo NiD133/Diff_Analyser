@@ -1,31 +1,33 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.SortedMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import sun.nio.cs.US_ASCII;
 
-public class GeneratedTestCase {
+/**
+ * Test class for {@link Charsets} focusing on error handling.  This provides
+ * more readable tests by explaining the purpose of each test.
+ */
+class CharsetsTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        Charset charset0 = Charsets.UTF_8;
-        // Undeclared exception!
-        try {
-            Charsets.toCharset("Tv&)_", charset0);
-            fail("Expecting exception: IllegalCharsetNameException");
-        } catch (IllegalCharsetNameException e) {
-            //
-            // Tv&)_
-            //
-            verifyException("java.nio.charset.Charset", e);
-        }
+    /**
+     * Tests that an {@link IllegalCharsetNameException} is thrown when attempting to
+     * convert an invalid charset name to a Charset using {@link Charsets#toCharset(String, Charset)}.
+     * Specifically, it tests the case where the charset name "Tv&)_" is used, which is
+     * not a valid charset name according to the Java specification. The UTF-8 charset
+     * is provided as a default charset in case the input string *was* a valid charset name.
+     */
+    @Test
+    void testToCharsetWithInvalidCharsetNameThrowsIllegalCharsetNameException() {
+        Charset defaultCharset = Charsets.UTF_8;
+        String invalidCharsetName = "Tv&)_";
+
+        Exception exception = assertThrows(IllegalCharsetNameException.class, () -> {
+            Charsets.toCharset(invalidCharsetName, defaultCharset);
+        });
+
+        // Optional: Verify the message of the exception, if it is important to your testing
+        // assertEquals("Tv&)_", exception.getMessage()); // The message might vary depending on the JVM
     }
 }

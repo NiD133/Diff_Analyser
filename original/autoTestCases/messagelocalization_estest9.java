@@ -1,20 +1,29 @@
 package org.example;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test; // Updated import for JUnit 5
+import static org.junit.jupiter.api.Assertions.*; // Updated import for JUnit 5
 
-public class GeneratedTestCase {
+/**
+ * Test class for the MessageLocalization class.
+ * This test specifically focuses on the behavior of the setLanguage method
+ * when provided with empty strings for both language and country code.
+ */
+public class MessageLocalizationTest { // Renamed class for clarity
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        boolean boolean0 = MessageLocalization.setLanguage("", "");
-        assertFalse(boolean0);
+    /**
+     * Tests the setLanguage method with empty strings for language and country.
+     *
+     * Expected behavior: The method should return false, indicating that
+     * setting the language to an empty string is not successful.
+     */
+    @Test
+    void testSetLanguageWithEmptyStrings() { // Renamed method for clarity
+        // Arrange: No setup needed as we are directly calling a static method.
+
+        // Act: Call the setLanguage method with empty strings.
+        boolean result = MessageLocalization.setLanguage("", "");
+
+        // Assert: Verify that the method returns false.
+        assertFalse(result, "Setting language with empty strings should return false.");
     }
 }

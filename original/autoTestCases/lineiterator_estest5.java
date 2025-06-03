@@ -1,36 +1,35 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.jupiter.api.Test; // Using JUnit 5 for better readability
+import static org.junit.jupiter.api.Assertions.*; // Using JUnit 5 Assertions
 import java.io.BufferedReader;
-import java.io.Reader;
+import java.io.IOException;
 import java.io.StringReader;
-import java.util.NoSuchElementException;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class GeneratedTestCase {
+public class LineIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        StringReader stringReader0 = new StringReader("org.apache.commons.io.LineIterator");
-        BufferedReader bufferedReader0 = new BufferedReader(stringReader0);
-        bufferedReader0.close();
-        LineIterator lineIterator0 = new LineIterator(bufferedReader0);
-        // Undeclared exception!
-        try {
-            lineIterator0.next();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // java.io.IOException: Stream closed
-            //
-            verifyException("org.apache.commons.io.LineIterator", e);
-        }
+    @Test
+    void testNextThrowsIllegalStateExceptionWhenReaderIsClosed() throws IOException {
+        // Arrange: Create a StringReader and wrap it in a BufferedReader.
+        String testString = "This is a test line.";
+        StringReader stringReader = new StringReader(testString);
+        BufferedReader bufferedReader = new BufferedReader(stringReader);
+
+        // Arrange: Create a LineIterator from the BufferedReader.
+        LineIterator lineIterator = new LineIterator(bufferedReader);
+
+        // Act: Close the BufferedReader.
+        bufferedReader.close();
+
+        // Assert: Calling next() on the LineIterator should throw an IllegalStateException.
+        assertThrows(IllegalStateException.class, () -> {
+            try {
+                lineIterator.next();
+            } catch (IllegalStateException e) {
+                // Assert that the exception message indicates the underlying IOException.
+                assertEquals("java.io.IOException: Stream closed", e.getMessage()); // Specific check
+                throw e; // Re-throw so the assertThrows can verify the exception type
+            }
+        }, "Expected IllegalStateException when calling next() after closing the reader.");
     }
 }

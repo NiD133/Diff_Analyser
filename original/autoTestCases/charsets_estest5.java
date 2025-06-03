@@ -1,22 +1,21 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.SortedMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import sun.nio.cs.US_ASCII;
+import static org.junit.Assert.assertNull;
 
-public class GeneratedTestCase {
+public class CharsetsTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Charset charset0 = Charsets.toCharset((String) null, (Charset) null);
-        assertNull(charset0);
+    @Test
+    public void testToCharset_NullName_ReturnsNull() {
+        // Arrange: No charset or name is provided (both are null).
+        String charsetName = null;
+        Charset defaultCharset = null;
+
+        // Act: Attempt to convert the null charset name to a Charset.
+        Charset result = Charsets.toCharset(charsetName, defaultCharset);
+
+        // Assert: The result should be null, as a null name should not produce a valid Charset.
+        assertNull(result);
     }
 }

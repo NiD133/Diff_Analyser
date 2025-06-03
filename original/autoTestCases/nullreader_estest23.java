@@ -1,28 +1,31 @@
 package org.example;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test; // Using JUnit 5 for readability
+import static org.junit.jupiter.api.Assertions.*; // Modern Assertions
 
-public class GeneratedTestCase {
+/**
+ * Test case for the NullReader class, specifically focusing on its reset() method.
+ */
+class NullReaderTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        NullReader nullReader0 = new NullReader(247L, false, false);
-        // Undeclared exception!
-        try {
-            nullReader0.reset();
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // reset() not supported
-            //
-            verifyException("org.example.NullReader", e);
-        }
+    /**
+     * Tests the behavior of the `reset()` method in the `NullReader` class.
+     * It verifies that calling `reset()` throws an `UnsupportedOperationException`
+     * when the `NullReader` is configured to not support the `reset` operation.
+     */
+    @Test
+    void testResetThrowsUnsupportedOperationException() {
+        // Arrange: Create a NullReader instance that doesn't support reset.
+        //          - The constructor arguments specify a length (247L),
+        //            and that reset and mark are not supported (both false).
+        NullReader nullReader = new NullReader(247L, false, false);
+
+        // Act & Assert:  Call the reset() method and assert that it throws the expected exception.
+        UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () -> {
+            nullReader.reset();
+        });
+
+        // Assert: Verify the exception message.  This ensures we caught the *correct* exception.
+        assertEquals("reset() not supported", exception.getMessage());
     }
 }

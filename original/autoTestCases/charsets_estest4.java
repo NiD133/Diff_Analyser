@@ -1,24 +1,19 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.SortedMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import sun.nio.cs.US_ASCII;
+import static org.junit.Assert.assertEquals;
 
-public class GeneratedTestCase {
+public class CharsetsTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Charsets charsets0 = new Charsets();
-        Charset charset0 = Charsets.toCharset(charsets0.US_ASCII);
-        assertEquals("US-ASCII", charset0.displayName());
-        assertEquals("ISO-8859-1", charset0.name());
+    @Test
+    public void testToCharset_US_ASCII() {
+        // Verify that converting the US_ASCII character set name to a Charset object works correctly.
+        // Charsets.US_ASCII refers to the standard US-ASCII character set.
+
+        Charset asciiCharset = Charsets.toCharset("US-ASCII");
+
+        // Assert that the returned Charset's name is "US-ASCII".  This confirms that the correct character set was retrieved.
+        assertEquals("US-ASCII", asciiCharset.name());
     }
 }

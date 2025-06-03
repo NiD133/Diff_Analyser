@@ -1,31 +1,28 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GeneratedTestCase {
+public class BoundedReaderTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        StringReader stringReader0 = new StringReader("");
-        BoundedReader boundedReader0 = new BoundedReader(stringReader0, 1);
-        boundedReader0.close();
-        try {
-            boundedReader0.mark(0);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Stream closed
-            //
-            verifyException("java.io.StringReader", e);
-        }
+    @Test
+    void testMarkAfterCloseThrowsIOException() throws IOException {
+        // Arrange: Create a StringReader with an empty string and a BoundedReader with a maximum length of 1.
+        StringReader stringReader = new StringReader("");
+        BoundedReader boundedReader = new BoundedReader(stringReader, 1);
+
+        // Act: Close the BoundedReader.  This also closes the underlying StringReader.
+        boundedReader.close();
+
+        // Assert: Attempting to call mark() on a closed reader should throw an IOException.
+        IOException exception = assertThrows(IOException.class, () -> {
+            boundedReader.mark(0); // Mark is not supported after closing the stream.
+        });
+
+        // Assert: Verify the exception message. This ensures the correct exception is thrown.
+        assertEquals("Stream closed", exception.getMessage());
     }
 }

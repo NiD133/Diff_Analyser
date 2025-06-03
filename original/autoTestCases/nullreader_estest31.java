@@ -1,21 +1,23 @@
 package org.example;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test; // Updated import for clarity and modern JUnit
+import static org.junit.jupiter.api.Assertions.*; // Updated import for clarity
 
-public class GeneratedTestCase {
+public class NullReaderTest { // Renamed class for better readability
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        NullReader nullReader0 = new NullReader((-1324L));
-        boolean boolean0 = nullReader0.markSupported();
-        assertEquals((-1324L), nullReader0.getSize());
-        assertTrue(boolean0);
+    @Test
+    void testMarkSupported_ReturnsTrue() { // More descriptive test name
+        // Arrange: Create a NullReader instance with a negative size (valid for NullReader).
+        long negativeSize = -1324L;
+        NullReader nullReader = new NullReader(negativeSize);
+
+        // Act: Call the markSupported() method.
+        boolean supportsMark = nullReader.markSupported();
+
+        // Assert: Verify that markSupported() returns true.
+        assertTrue(supportsMark, "NullReader should support mark() operation.");
+
+        // Assert: Verify the size is still as expected.  (Adding a check for state preservation)
+        assertEquals(negativeSize, nullReader.getSize(), "Size should remain unchanged.");
     }
 }

@@ -2,28 +2,33 @@ package org.apache.commons.io;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.SortedMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import sun.nio.cs.US_ASCII;
 
-public class GeneratedTestCase {
+public class CharsetsTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
+    @Test(expected = UnsupportedCharsetException.class)
+    public void testToCharset_UnsupportedCharsetName() {
+        // Test case to verify that Charsets.toCharset() throws UnsupportedCharsetException
+        // when given an invalid or unsupported charset name.
         try {
-            Charsets.toCharset("org.apache.commons.io.serialization.ObjectStreamClassPredicate");
-            fail("Expecting exception: UnsupportedCharsetException");
+            Charsets.toCharset("invalid-charset-name"); // Use a more descriptive, obviously invalid name
         } catch (UnsupportedCharsetException e) {
-            //
-            // org.apache.commons.io.serialization.ObjectStreamClassPredicate
-            //
-            verifyException("java.nio.charset.Charset", e);
+            // Expected exception, re-throw to satisfy the @Test(expected=...) annotation
+            throw e;
         }
     }
+
+    // Optional: Add a test case for a valid charset to showcase proper usage
+
+    @Test
+    public void testToCharset_ValidCharsetName() {
+        // Test case to verify that Charsets.toCharset() correctly returns a Charset object
+        // when given a valid charset name.
+        Charset utf8Charset = Charsets.toCharset("UTF-8");
+        assertNotNull(utf8Charset);
+        assertEquals("UTF-8", utf8Charset.name());
+    }
+
 }

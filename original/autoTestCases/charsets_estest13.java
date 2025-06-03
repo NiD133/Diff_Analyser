@@ -1,22 +1,23 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
 import java.util.SortedMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import sun.nio.cs.US_ASCII;
 
-public class GeneratedTestCase {
+// A more readable and understandable test case for Charsets.requiredCharsets()
+class CharsetsTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        SortedMap<String, Charset> sortedMap0 = Charsets.requiredCharsets();
-        assertFalse(sortedMap0.isEmpty());
+    @Test
+    void testRequiredCharsetsIsNotEmpty() {
+        // Arrange: No explicit setup needed, as we're testing a static method.
+
+        // Act: Call the method being tested.
+        SortedMap<String, Charset> availableCharsets = Charsets.requiredCharsets();
+
+        // Assert: Verify that the returned map is not empty.
+        // This ensures that the required charsets are indeed available.
+        assertFalse(availableCharsets.isEmpty(), "The requiredCharsets map should not be empty, indicating that the essential charsets are available.");
     }
 }

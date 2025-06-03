@@ -1,18 +1,24 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;  // Use JUnit 5 for clarity and conciseness
+import static org.junit.jupiter.api.Assertions.assertEquals; // Use JUnit 5 assertions
 
-public class GeneratedTestCase {
+/**
+ * This test case verifies that the {@link ByteOrderMark#getCharsetName()} method
+ * of the {@link ByteOrderMark} class returns the correct charset name for a given
+ * Byte Order Mark (BOM).
+ */
+class ByteOrderMarkCharsetNameTest { // More descriptive class name
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        ByteOrderMark byteOrderMark0 = ByteOrderMark.UTF_16BE;
-        String string0 = byteOrderMark0.getCharsetName();
-        assertEquals("UTF-16BE", string0);
+    @Test
+    void testUTF16BECharsetName() { // More descriptive method name
+        // Arrange:  Create a ByteOrderMark instance representing UTF-16BE.
+        ByteOrderMark utf16BE = ByteOrderMark.UTF_16BE;
+
+        // Act:  Retrieve the charset name associated with the UTF-16BE BOM.
+        String charsetName = utf16BE.getCharsetName();
+
+        // Assert: Verify that the retrieved charset name is "UTF-16BE".
+        assertEquals("UTF-16BE", charsetName, "The charset name should be UTF-16BE.");
     }
 }

@@ -2,27 +2,27 @@ package org.example;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GeneratedTestCase {
+import java.io.EOFException;
+
+public class NullReaderTest {
 
     @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        NullReader nullReader0 = new NullReader((-2271L), false, true);
-        nullReader0.skip((-2271L));
+    public void testReadPastEndOfNullReaderThrowsEOFException() throws Throwable {
+        // Arrange: Create a NullReader with a negative initial size, which is then skipped over.
+        // The 'markSupported' is set to false, and 'throwEofOnExhaustion' is set to true. This will trigger the desired EOFException.
+        NullReader nullReader = new NullReader((-2271L), false, true);
+
+        // Act: Skip past the initial negative size (effectively resetting the read pointer).
+        nullReader.skip((-2271L));  // Skipping a negative value effectively resets the counter.
+
+        // Assert: Attempting to read from the reader should now throw an EOFException because the reader is effectively exhausted.
         try {
-            nullReader0.read();
-            fail("Expecting exception: EOFException");
+            nullReader.read();
+            fail("Expected EOFException to be thrown, but it wasn't."); // Fail the test if no exception is thrown
         } catch (EOFException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.example.NullReader", e);
+            // Expected: The EOFException confirms that the reader has been exhausted.
+            // The original test just verifies that the exception is thrown, we don't need to check the message.
         }
     }
 }

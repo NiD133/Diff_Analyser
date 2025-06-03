@@ -1,38 +1,60 @@
 package org.apache.commons.io;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.BufferedReader;
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-public class GeneratedTestCase {
+public class LineIteratorExampleTest {
+
+    @TempDir
+    Path temporaryFolder; // JUnit 5 annotation for creating a temporary directory
+
+    // Helper method to create a file with specified lines
+    private File createLinesFile(Path filePath, String encoding, int numberOfLines) throws IOException {
+        List<String> lines = new ArrayList<>();
+        for (int i = 0; i < numberOfLines; i++) {
+            lines.add("Line " + i);
+        }
+
+        if (encoding == null) {
+            Files.write(filePath, lines); // Uses default charset
+        } else {
+            Files.write(filePath, lines, StandardCharsets.UTF_8); //example of a different encoding
+        }
+        return filePath.toFile();
+    }
 
     @Test
-    public void testNextOnly() throws Exception {
-        final String encoding = null;
-        final File testFile = new File(temporaryFolder, "LineIterator-nextOnly.txt");
-        final List<String> lines = createLinesFile(testFile, encoding, 3);
+    public void testLineIteratorNextOnly() throws IOException {
+        // GIVEN: A file with a few lines
+        String encoding = null; // Use default system encoding
+        Path testFilePath = temporaryFolder.resolve("testFile.txt"); // Resolve a path within the temp folder
+        File testFile = createLinesFile(testFilePath, encoding, 3);
+        List<String> expectedLines = Files.readAllLines(testFile.toPath());
+
+
+        // WHEN: Iterating through the file using LineIterator.next()
         try (LineIterator iterator = FileUtils.lineIterator(testFile, encoding)) {
-            for (int i = 0; i < lines.size(); i++) {
-                final String line = iterator.next();
-                assertEquals(lines.get(i), line, "next() line " + i);
+            // THEN: Each line should match the expected content
+            int lineNumber = 0;
+            while (iterator.hasNext()) {
+              String actualLine = iterator.next();
+              assertEquals(expectedLines.get(lineNumber), actualLine, "Line " + lineNumber + " should match.");
+              lineNumber++;
             }
-            assertFalse(iterator.hasNext(), "No more expected");
+
+
+            // THEN:  After reading all lines, hasNext() should return false.
+            assertFalse(iterator.hasNext(), "Iterator should have no more lines.");
         }
     }
 }

@@ -1,28 +1,21 @@
 package org.example;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.io.EOFException;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GeneratedTestCase {
+public class NullReaderTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        NullReader nullReader0 = new NullReader(0L, false, true);
-        char[] charArray0 = new char[2];
-        try {
-            nullReader0.read(charArray0);
-            fail("Expecting exception: EOFException");
-        } catch (EOFException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.example.NullReader", e);
-        }
+    @Test
+    void testReadBeyondEndOfFileThrowsEOFException() {
+        // Arrange:  Create a NullReader that pretends to have 0 bytes available and throws exceptions on close.
+        NullReader nullReader = new NullReader(0L, false, true);
+
+        // Act & Assert: Attempting to read from the reader should throw an EOFException.
+        char[] buffer = new char[2];
+        assertThrows(EOFException.class, () -> {
+            nullReader.read(buffer);
+        }, "Reading from a NullReader with 0 length should throw EOFException.");
     }
 }

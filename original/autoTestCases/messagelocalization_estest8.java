@@ -1,28 +1,22 @@
 package org.example;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test; // Using JUnit 5 annotations for better readability
+import static org.junit.jupiter.api.Assertions.*; // Using JUnit 5 assertions
 
-public class GeneratedTestCase {
+public class MessageLocalizationTest { // Renamed class for better clarity
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        // Undeclared exception!
-        try {
-            MessageLocalization.setLanguage((String) null, "No message found for /");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // The language cannot be null.
-            //
-            verifyException("org.example.MessageLocalization", e);
-        }
+    @Test
+    void testSetLanguageWithNullLanguageThrowsIllegalArgumentException() {
+        // Arrange: Define the invalid input (null language).
+        String language = null;
+        String messageKey = "No message found for /";
+
+        // Act & Assert:  Verify that an IllegalArgumentException is thrown when setting language to null.
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            MessageLocalization.setLanguage(language, messageKey);
+        });
+
+        // Assert:  Verify the exception message.  Optional, but improves test clarity.
+        assertEquals("The language cannot be null.", exception.getMessage());
     }
 }

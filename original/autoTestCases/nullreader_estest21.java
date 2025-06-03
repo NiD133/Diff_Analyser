@@ -1,20 +1,25 @@
 package org.example;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test; // Changed to JUnit 5
+import static org.junit.jupiter.api.Assertions.*; // Changed to JUnit 5
 
-public class GeneratedTestCase {
+public class NullReaderTest { // Renamed class for clarity
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        NullReader nullReader0 = NullReader.INSTANCE;
-        nullReader0.getPosition();
-        nullReader0.read();
+    @Test
+    void testReadFromNullReader() throws IOException { // Renamed and documented the test
+
+        // Arrange: Obtain an instance of the NullReader.
+        NullReader nullReader = NullReader.INSTANCE;
+
+        // Act: Call the getPosition() and read() methods on the NullReader.
+        long initialPosition = nullReader.getPosition();
+        int readResult = nullReader.read();
+
+        // Assert:  Because NullReader represents the end of a stream,
+        // we expect read() to return -1 (end-of-stream indicator).
+        // Also, verifying initial position after read to guarantee it doesn't change
+        assertEquals(-1, readResult, "Reading from NullReader should return -1 (end of stream).");
+        assertEquals(initialPosition, nullReader.getPosition(), "Reading shouldn't change the reader position.");
+
     }
 }

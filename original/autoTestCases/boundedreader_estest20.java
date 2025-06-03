@@ -1,23 +1,28 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GeneratedTestCase {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        StringReader stringReader0 = new StringReader("pI2");
-        BoundedReader boundedReader0 = new BoundedReader(stringReader0, (-2049));
-        int int0 = boundedReader0.read();
-        assertEquals((-1), int0);
+public class UnderstandableBoundedReaderTest {
+
+    @Test
+    public void testReadWithNegativeMaxLength() throws IOException {
+        // Arrange: Create a StringReader with some content.
+        String data = "pI2";
+        StringReader stringReader = new StringReader(data);
+
+        // Arrange: Create a BoundedReader with a negative maximum length.
+        //          This should effectively treat the reader as empty.
+        BoundedReader boundedReader = new BoundedReader(stringReader, -2049);
+
+        // Act: Attempt to read a character from the BoundedReader.
+        int result = boundedReader.read();
+
+        // Assert:  The read method should return -1, indicating the end of the stream
+        //          because the maximum length is negative (meaning no characters are allowed).
+        assertEquals("Reading from BoundedReader with negative length should return -1 (end of stream)", -1, result);
     }
 }

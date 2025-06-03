@@ -1,19 +1,23 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test; // Changed from junit.Test to junit.jupiter.api.Test for better readability/compatibility
+import static org.junit.jupiter.api.Assertions.*; // Changed import for JUnit 5 assertions
 
-public class GeneratedTestCase {
+public class ByteOrderMarkMatchesTest { // Renamed class for clarity
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        int[] intArray0 = new int[1];
-        ByteOrderMark byteOrderMark0 = ByteOrderMark.UTF_8;
-        boolean boolean0 = byteOrderMark0.matches(intArray0);
-        assertFalse(boolean0);
+    @Test
+    public void testUTF8DoesNotMatchEmptyArray() { // Renamed test method for clarity
+
+        // Arrange: Define a byte array (represented as an integer array here) with a single element, initialized to 0.
+        int[] byteArray = new int[1];
+
+        // Arrange: Get the UTF-8 Byte Order Mark.  This represents the expected starting bytes for a UTF-8 encoded file.
+        ByteOrderMark utf8Bom = ByteOrderMark.UTF_8;
+
+        // Act: Call the 'matches' method to check if the byte order mark matches the provided byte array.
+        boolean matches = utf8Bom.matches(byteArray);
+
+        // Assert: Verify that the byte order mark does *not* match the byte array. Because the array is filled with zeros and doesn't match the UTF-8 BOM.
+        assertFalse(matches, "UTF-8 Byte Order Mark should not match a byte array with only a zero value."); // Added a message to the assertion for better error reporting.
     }
 }

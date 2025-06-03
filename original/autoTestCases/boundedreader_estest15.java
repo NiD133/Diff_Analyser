@@ -1,25 +1,29 @@
-package org.apache.commons.io.input;
+import org.junit.jupiter.api.Test;  // Changed from JUnit 4 to JUnit 5 for better readability
+import static org.junit.jupiter.api.Assertions.*; // Changed for JUnit 5
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GeneratedTestCase {
+public class BoundedReaderTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        StringReader stringReader0 = new StringReader("CU6^Ejr;7S;Ndl FK8");
-        BoundedReader boundedReader0 = new BoundedReader(stringReader0, (-1821));
-        BoundedReader boundedReader1 = new BoundedReader(boundedReader0, 1);
-        boundedReader1.mark(0);
-        int int0 = boundedReader1.read();
-        assertEquals((-1), int0);
+    @Test
+    void testReadBeyondBounds() throws IOException {
+        // Arrange: Create a StringReader with some text.
+        String text = "CU6^Ejr;7S;Ndl FK8";
+        StringReader stringReader = new StringReader(text);
+
+        // Arrange: Create a BoundedReader that initially allows reading up to -1821 characters (effectively none).
+        // Then, create another BoundedReader wrapping the first, allowing reading up to 1 character.
+        BoundedReader boundedReaderWithNegativeLimit = new BoundedReader(stringReader, -1821);
+        BoundedReader boundedReader = new BoundedReader(boundedReaderWithNegativeLimit, 1);
+
+        // Act: Mark the current position. Although this has no effect due to the negative limit.
+        boundedReader.mark(0); // mark is effectively a no-op here
+
+        // Act: Attempt to read a character.  Since the initial BoundedReader effectively blocks all reads, the outer one does too.
+        int result = boundedReader.read();
+
+        // Assert: The read operation should return -1, indicating the end of the stream.  The initial bound of -1821 dominates.
+        assertEquals(-1, result);
     }
 }

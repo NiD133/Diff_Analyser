@@ -1,26 +1,58 @@
-package org.apache.commons.io;
+import org.junit.jupiter.api.Test; // Use JUnit 5 for clarity and modern features
+import static org.junit.jupiter.api.Assertions.*; // Static imports for assertions
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.Reader;
 import java.io.StringReader;
-import java.util.NoSuchElementException;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.apache.commons.io.LineIterator;
 
-public class GeneratedTestCase {
+class LineIteratorSimpleTest {  // More descriptive class name
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        StringReader stringReader0 = new StringReader("qA92@1;@bJJXiw\"");
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        String string0 = lineIterator0.next();
-        assertNotNull(string0);
+    @Test
+    void testNextReturnsLine() { // Clear method name describing the test's purpose
+        String testString = "This is a line of text.\nThis is another line.";
+        StringReader stringReader = new StringReader(testString);
+        LineIterator lineIterator = new LineIterator(stringReader);
+
+        try {
+            String firstLine = lineIterator.next();
+            assertEquals("This is a line of text.", firstLine, "The first line should be returned correctly.");
+
+            String secondLine = lineIterator.next();
+            assertEquals("This is another line.", secondLine, "The second line should be returned correctly.");
+
+        } finally {
+            LineIterator.closeQuietly(lineIterator); // Ensure resources are closed
+        }
     }
+
+    @Test
+    void testHasNextReturnsFalseWhenNoMoreLines() {
+        String testString = "Only one line here.";
+        StringReader stringReader = new StringReader(testString);
+        LineIterator lineIterator = new LineIterator(stringReader);
+
+        try {
+            lineIterator.next(); // Consume the line
+            assertFalse(lineIterator.hasNext(), "hasNext() should return false after the last line is read.");
+        } finally {
+            LineIterator.closeQuietly(lineIterator);
+        }
+    }
+
+    @Test
+    void testRemoveUnsupported() {
+        String testString = "Test line";
+        StringReader stringReader = new StringReader(testString);
+        LineIterator lineIterator = new LineIterator(stringReader);
+
+        assertThrows(UnsupportedOperationException.class, () -> lineIterator.remove(), "remove() should throw UnsupportedOperationException");
+
+        try {
+            LineIterator.closeQuietly(lineIterator);
+        } catch (Exception e) {
+            // Handle the exception appropriately.  In general, exceptions thrown by closeQuietly should be logged.
+            e.printStackTrace();
+        }
+
+    }
+
 }

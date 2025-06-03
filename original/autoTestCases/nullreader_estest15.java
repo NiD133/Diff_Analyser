@@ -1,28 +1,27 @@
 package org.example;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.jupiter.api.Test; // Using JUnit 5 for cleaner imports
+import static org.junit.jupiter.api.Assertions.*; // Using JUnit 5 assertions
 import java.io.EOFException;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GeneratedTestCase {
+/**
+ * Test case for the NullReader class. This test specifically focuses on
+ * verifying the EOFException behavior when attempting to read from a
+ * NullReader configured to immediately signal the end of the stream.
+ */
+class NullReaderTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        NullReader nullReader0 = new NullReader(0L, true, true);
-        char[] charArray0 = new char[7];
-        try {
-            nullReader0.read(charArray0, 0, 0);
-            fail("Expecting exception: EOFException");
-        } catch (EOFException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.example.NullReader", e);
-        }
+    @Test
+    void testReadEOFException() {
+        // Arrange: Create a NullReader that immediately returns EOF (length 0, throwEOF true).
+        NullReader nullReader = new NullReader(0L, true, true);
+
+        // Arrange: Prepare a character array to read into (although it won't be populated).
+        char[] charArray = new char[7];
+
+        // Act & Assert: Attempt to read 0 characters from the NullReader.  This *should* throw an EOFException.
+        assertThrows(EOFException.class, () -> {
+            nullReader.read(charArray, 0, 0); // Try to read 0 characters starting at index 0.
+        }, "Expected EOFException when reading from a NullReader configured to throw EOF immediately.");
     }
 }

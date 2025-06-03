@@ -2,18 +2,23 @@ package org.apache.commons.io;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GeneratedTestCase {
+public class ByteOrderMarkTest { // Renamed class for better clarity and relation to the subject
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        ByteOrderMark byteOrderMark0 = ByteOrderMark.UTF_16LE;
-        int[] intArray0 = new int[3];
-        boolean boolean0 = byteOrderMark0.matches(intArray0);
-        assertFalse(boolean0);
+    @Test
+    public void testUTF16LEDoesNotMatchArbitraryIntArray() {
+        // Arrange:  Create a ByteOrderMark for UTF-16LE encoding.
+        ByteOrderMark utf16LE = ByteOrderMark.UTF_16LE;
+
+        // Arrange:  Create an arbitrary integer array (filled with zeros in this case).
+        //           This array does NOT represent a UTF-16LE byte order mark.
+        int[] intArray = {0, 0, 0};
+
+        // Act: Call the 'matches' method to check if the ByteOrderMark matches the array.
+        boolean matches = utf16LE.matches(intArray);
+
+        // Assert:  Verify that the 'matches' method returns false, because the array
+        //           does not contain the correct byte sequence for a UTF-16LE ByteOrderMark.
+        assertFalse(matches);
     }
 }

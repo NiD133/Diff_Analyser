@@ -1,18 +1,20 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;  // Use JUnit 5 for clarity
+import static org.junit.jupiter.api.Assertions.*; // Use JUnit 5 assertions
 
-public class GeneratedTestCase {
+public class ByteOrderMarkTest {  // More descriptive class name
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        ByteOrderMark byteOrderMark0 = ByteOrderMark.UTF_8;
-        byte[] byteArray0 = byteOrderMark0.getBytes();
-        assertArrayEquals(new byte[] { (byte) (-17), (byte) (-69), (byte) (-65) }, byteArray0);
+    @Test
+    void testUTF8ByteOrderMarkBytes() { // More descriptive method name
+        // Arrange:  Define the byte order mark we're testing
+        ByteOrderMark utf8Bom = ByteOrderMark.UTF_8;
+
+        // Act: Get the byte representation of the UTF-8 BOM
+        byte[] bomBytes = utf8Bom.getBytes();
+
+        // Assert: Verify that the byte array matches the expected UTF-8 BOM byte sequence
+        byte[] expectedBytes = {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}; //Use hexadecimal for clarity
+        assertArrayEquals(expectedBytes, bomBytes, "The UTF-8 BOM bytes should match the expected sequence.");
     }
 }

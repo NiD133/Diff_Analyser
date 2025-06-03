@@ -1,19 +1,19 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class GeneratedTestCase {
+public class ByteOrderMarkTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        ByteOrderMark byteOrderMark0 = ByteOrderMark.UTF_8;
-        int[] intArray0 = byteOrderMark0.getRawBytes();
-        boolean boolean0 = byteOrderMark0.matches(intArray0);
-        assertTrue(boolean0);
+    @Test
+    void testUTF8MatchesItsOwnRawBytes() {
+        // Arrange: Get the UTF-8 byte order mark.
+        ByteOrderMark utf8Bom = ByteOrderMark.UTF_8;
+
+        // Act: Get the raw bytes representing the UTF-8 BOM.
+        int[] rawBytes = utf8Bom.getRawBytes();
+
+        // Assert: Verify that the UTF-8 BOM matches its own raw bytes.  This is a basic self-consistency check.
+        assertTrue(utf8Bom.matches(rawBytes), "The UTF-8 BOM should match its own raw byte representation.");
     }
 }

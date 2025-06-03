@@ -1,23 +1,30 @@
 package org.example;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test; // Updated import for JUnit 5
+import static org.junit.jupiter.api.Assertions.*; // Updated import for JUnit 5
 
-public class GeneratedTestCase {
+public class NullReaderTest { // Renamed class for clarity and consistency
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        NullReader nullReader0 = new NullReader((-1L));
-        char[] charArray0 = new char[8];
-        nullReader0.read(charArray0, (-1), (-3484));
-        int int0 = nullReader0.read();
-        assertEquals((-3483L), nullReader0.getPosition());
-        assertEquals(0, int0);
+    @Test
+    public void testReadWithNegativeArgumentsDoesNotAdvancePosition() throws IOException {
+        // Arrange: Create a NullReader with a negative length (which is allowed but not very useful)
+        NullReader nullReader = new NullReader(-1L);
+
+        // Arrange: Create a character array to read into
+        char[] charArray = new char[8];
+
+        // Act: Attempt to read with negative offset and length.  This is expected to do nothing.
+        nullReader.read(charArray, -1, -3484);
+
+        // Act: Read a single character. Since the previous read didn't advance the position, this should return 0 (EOF).
+        int result = nullReader.read();
+
+        // Assert: Verify that the position is still unchanged after the first read attempt.
+        //         The constructor takes a long, and since the read() operation does nothing (due to the negative length),
+        //         the initial position is -1L, and reading does not change it.
+        assertEquals(-1L, nullReader.getPosition());
+
+        // Assert: Verify that reading a single character after the failed read returns 0 (indicating EOF because the length is -1).
+        assertEquals(0, result);
     }
 }

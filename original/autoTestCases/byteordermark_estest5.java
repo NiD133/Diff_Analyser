@@ -1,18 +1,27 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class GeneratedTestCase {
+/**
+ * Test case for the {@link ByteOrderMark} class.
+ * This specific test focuses on retrieving a specific byte from the UTF-32LE Byte Order Mark.
+ */
+public class ByteOrderMark_UTF32LE_Test {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        ByteOrderMark byteOrderMark0 = ByteOrderMark.UTF_32LE;
-        int int0 = byteOrderMark0.get(2);
-        assertEquals(0, int0);
+    /**
+     * Tests that accessing the byte at index 2 of the UTF-32LE Byte Order Mark returns 0.
+     * This validates that the third byte of the UTF-32LE BOM is indeed zero.
+     */
+    @Test
+    public void testByteAtIndex2_UTF32LE_ReturnsZero() {
+        // Arrange: Obtain the UTF-32LE Byte Order Mark.
+        ByteOrderMark byteOrderMark = ByteOrderMark.UTF_32LE;
+
+        // Act: Retrieve the byte at index 2 (the third byte) of the Byte Order Mark.
+        int byteAtIndex2 = byteOrderMark.get(2);
+
+        // Assert: Verify that the byte at index 2 is equal to 0.
+        assertEquals(0, byteAtIndex2, "The byte at index 2 of UTF-32LE Byte Order Mark should be 0.");
     }
 }

@@ -1,37 +1,40 @@
 package org.apache.commons.io.input;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTimeout;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.BufferedReader;
-import java.io.File;
+
 import java.io.IOException;
-import java.io.LineNumberReader;
-import java.io.Reader;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.file.TempFile;
+
 import org.junit.jupiter.api.Test;
 
 public class GeneratedTestCase {
 
     @Test
     public void testMarkResetFromOffset1() throws IOException {
-        try (BoundedReader mr = new BoundedReader(sr, 3)) {
-            mr.mark(3);
-            mr.read();
-            mr.read();
-            mr.read();
-            assertEquals(-1, mr.read());
-            mr.reset();
-            mr.mark(1);
-            mr.read();
-            assertEquals(-1, mr.read());
+        // GIVEN: A BoundedReader wrapping a StringReader with a limit of 3 characters.
+        StringReader stringReader = new StringReader("abcde"); // The underlying reader with some content.
+        BoundedReader boundedReader = new BoundedReader(stringReader, 3); // Limits reading to the first 3 chars.
+
+        try (boundedReader) { // Ensure resources are closed properly.
+
+            // WHEN: We mark the reader, read past the limit, then reset and mark again.
+            boundedReader.mark(3); // Mark the current position (beginning).  The read limit from mark is 3.
+            boundedReader.read(); // Read 'a'.  Position is now at 'b'.
+            boundedReader.read(); // Read 'b'.  Position is now at 'c'.
+            boundedReader.read(); // Read 'c'.  Position is now at 'd' but reader is bounded, we should get -1
+
+            // THEN: Reading should return -1 because we've exceeded the bound.
+            assertEquals(-1, boundedReader.read(), "Should return -1 as we've exceeded the bound.");
+
+            // WHEN: We reset the reader to the mark and mark again with a smaller limit.
+            boundedReader.reset(); // Reset back to the position when mark(3) was called (beginning).
+            boundedReader.mark(1); // Mark again, but now with a limit of only 1 character.
+
+            // WHEN: Read one character
+            boundedReader.read();   //Read 'a'.
+
+            // THEN:  Reading again should return -1 because we've exceeded the bound of 1 character.
+            assertEquals(-1, boundedReader.read(), "Should return -1 as we've exceeded the new bound of 1.");
         }
     }
 }

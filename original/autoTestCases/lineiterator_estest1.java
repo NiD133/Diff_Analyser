@@ -1,26 +1,50 @@
-package org.apache.commons.io;
-
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.Reader;
+import org.junit.jupiter.api.Test; // Changed import to JUnit 5
+import static org.junit.jupiter.api.Assertions.*; // Changed import to JUnit 5
 import java.io.StringReader;
-import java.util.NoSuchElementException;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.apache.commons.io.LineIterator;
 
-public class GeneratedTestCase {
+class LineIteratorSimpleTest {  // Renamed class for clarity
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        StringReader stringReader0 = new StringReader(")DuFnfWZ&V3D_i");
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        String string0 = lineIterator0.nextLine();
-        assertEquals(")DuFnfWZ&V3D_i", string0);
+    @Test
+    void testNextLineReturnsSingleLine() throws Exception { // Renamed test method for clarity
+        // Arrange: Create a StringReader with a single line of text.
+        String testString = "This is a single line of text.";
+        StringReader stringReader = new StringReader(testString);
+
+        // Act: Create a LineIterator and retrieve the next line.
+        LineIterator lineIterator = new LineIterator(stringReader);
+        String line = lineIterator.nextLine();
+
+        // Assert: Verify that the retrieved line matches the original text.
+        assertEquals(testString, line, "The line read from the iterator should match the input string.");
+
+        // Ensure no more lines are available
+        assertFalse(lineIterator.hasNext(), "The iterator should have no more lines after reading the first one.");
+
+        // Clean up the iterator.  Important to release resources.
+        LineIterator.closeQuietly(lineIterator);
+
+        stringReader.close();
+
+    }
+
+    @Test
+    void testHasNextWithNoMoreLines() throws Exception{
+        String testString = "Just one Line";
+        StringReader stringReader = new StringReader(testString);
+        LineIterator lineIterator = new LineIterator(stringReader);
+        lineIterator.nextLine();
+
+        assertFalse(lineIterator.hasNext(), "The line iterator should return false");
+        LineIterator.closeQuietly(lineIterator);
+        stringReader.close();
+
+
+    }
+
+    @Test
+    void testCloseQuietlyNullCheck() {
+        // Test to make sure closeQuietly handles null without throwing error.
+        LineIterator.closeQuietly(null); // Should not throw an exception
     }
 }

@@ -1,18 +1,21 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class GeneratedTestCase {
+public class ByteOrderMarkTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        ByteOrderMark byteOrderMark0 = ByteOrderMark.UTF_8;
-        boolean boolean0 = byteOrderMark0.equals("ByteOrderMark[UTF-8: 0xEF,0xBB,0xBF]");
-        assertFalse(boolean0);
+    @Test
+    void testEquals_UTF8_withDifferentObjectType() {
+        // Arrange: We create a ByteOrderMark for UTF-8.
+        ByteOrderMark byteOrderMark = ByteOrderMark.UTF_8;
+
+        // Act: We compare the ByteOrderMark with a String object. The expected behavior is that the 'equals' method should return false
+        //      when comparing with an object of a different type.
+        boolean isEqual = byteOrderMark.equals("ByteOrderMark[UTF-8: 0xEF,0xBB,0xBF]");
+
+        // Assert: We assert that the result of the comparison is false.  A ByteOrderMark should not be equal to a String, even if the String's
+        //         content represents the ByteOrderMark's string representation.
+        assertFalse(isEqual, "A ByteOrderMark should not be equal to a String.");
     }
 }

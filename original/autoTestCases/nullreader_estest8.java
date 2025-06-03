@@ -1,22 +1,21 @@
 package org.example;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test; // Changed import to JUnit 5
+import static org.junit.jupiter.api.Assertions.*; // Changed import to JUnit 5
 
-public class GeneratedTestCase {
+public class NullReaderTest { // Renamed class for clarity
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        NullReader nullReader0 = new NullReader(1254L);
-        char[] charArray0 = new char[0];
-        int int0 = nullReader0.read(charArray0);
-        assertEquals(0, int0);
-        assertTrue(nullReader0.markSupported());
+    @Test
+    void testReadCharArray_WithEmptyArray_ReturnsZeroAndSupportsMark() throws IOException {
+        // Arrange: Create a NullReader and an empty character array.
+        NullReader nullReader = new NullReader(1254L);
+        char[] emptyCharArray = new char[0];
+
+        // Act: Read from the NullReader into the empty character array.
+        int bytesRead = nullReader.read(emptyCharArray);
+
+        // Assert:  Verify that the read method returns 0 (nothing was read) and that the NullReader supports marking.
+        assertEquals(0, bytesRead, "Reading into an empty array should return 0.");
+        assertTrue(nullReader.markSupported(), "NullReader should support marking.");
     }
 }

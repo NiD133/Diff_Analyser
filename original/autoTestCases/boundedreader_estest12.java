@@ -2,30 +2,26 @@ package org.apache.commons.io.input;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GeneratedTestCase {
+import java.io.IOException;
+import java.io.StringReader;
+
+
+public class BoundedReaderTest {
 
     @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        StringReader stringReader0 = new StringReader("SQ\"Rz~>o\"ggtg97eV");
-        BoundedReader boundedReader0 = new BoundedReader(stringReader0, (-585));
-        // Undeclared exception!
+    public void testMarkWithNegativeReadAheadLimit() {
+        // Arrange: Create a StringReader and a BoundedReader with a negative limit.
+        StringReader stringReader = new StringReader("Some test string");
+        BoundedReader boundedReader = new BoundedReader(stringReader, -585);
+
+        // Act & Assert: Attempting to mark the reader with a negative read-ahead limit should throw an IllegalArgumentException.
         try {
-            boundedReader0.mark((-585));
-            fail("Expecting exception: IllegalArgumentException");
+            boundedReader.mark(-585);
+            fail("Expected IllegalArgumentException was not thrown."); // This will fail the test if no exception is thrown.
         } catch (IllegalArgumentException e) {
-            //
-            // Read-ahead limit < 0
-            //
-            verifyException("java.io.StringReader", e);
+            // Assert that the exception message is what we expect. This strengthens the test.
+            assertEquals("Read-ahead limit < 0", e.getMessage());
         }
     }
 }

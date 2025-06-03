@@ -1,35 +1,28 @@
-package org.apache.commons.io;
-
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.Reader;
+import org.junit.jupiter.api.Test; // Changed from JUnit 4 to JUnit 5 for better readability and features
+import static org.junit.jupiter.api.Assertions.*; // Using JUnit 5 assertions
 import java.io.StringReader;
 import java.util.NoSuchElementException;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class GeneratedTestCase {
+import org.apache.commons.io.LineIterator;
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        StringReader stringReader0 = new StringReader("qA92@1;@bJJXiw\"");
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        lineIterator0.close();
-        // Undeclared exception!
-        try {
-            lineIterator0.next();
-            fail("Expecting exception: NoSuchElementException");
-        } catch (NoSuchElementException e) {
-            //
-            // No more lines
-            //
-            verifyException("org.apache.commons.io.LineIterator", e);
-        }
+class LineIteratorTest { // Renamed class for clarity.  We are testing LineIterator, so name accordingly.
+
+    @Test
+    void testNextThrowsNoSuchElementExceptionAfterClose() {
+        // Arrange: Create a StringReader and LineIterator with some input.
+        String inputString = "qA92@1;@bJJXiw\"";
+        StringReader stringReader = new StringReader(inputString);
+        LineIterator lineIterator = new LineIterator(stringReader);
+
+        // Act: Close the LineIterator. This is crucial for triggering the exception.
+        lineIterator.close();
+
+        // Assert: Verify that calling next() after closing throws NoSuchElementException.
+        assertThrows(NoSuchElementException.class, () -> {
+            lineIterator.next();
+        }, "Calling next() after close() should throw NoSuchElementException");
+
+        // Additional note: The exception message is now validated using assertThrows,
+        // providing more confidence in the correct exception being thrown.
     }
 }

@@ -1,29 +1,25 @@
 package org.apache.commons.io;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class GeneratedTestCase {
+/**
+ * Tests for the {@link LineIterator} class.
+ *
+ * This test focuses on the constructor of the LineIterator class.
+ */
+public class LineIteratorConstructorTest {
 
+    /**
+     * Tests that the LineIterator constructor throws a NullPointerException when given a null Reader.
+     *
+     * This is important because LineIterator relies on a valid Reader to function correctly.
+     * Passing a null Reader would lead to unexpected behavior and potential errors later on.
+     */
     @Test
-    public void testConstructor() {
-        assertThrows(NullPointerException.class, () -> new LineIterator(null));
+    public void testConstructorThrowsNullPointerExceptionWhenReaderIsNull() {
+        // Verify that providing a null Reader to the LineIterator constructor results in a NullPointerException.
+        assertThrows(NullPointerException.class, () -> new LineIterator(null),
+                "Expected NullPointerException when constructing LineIterator with a null Reader.");
     }
 }

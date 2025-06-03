@@ -2,22 +2,30 @@ package org.example;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
 import org.jfree.data.Range;
-import org.junit.runner.RunWith;
+import java.util.Date;
 
-public class GeneratedTestCase {
+public class UnderstandableDateRangeTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        Range range0 = Range.expandToInclude((Range) null, 1801.7621);
-        DateRange dateRange0 = new DateRange(range0);
-        long long0 = dateRange0.getLowerMillis();
-        assertEquals(1801L, dateRange0.getUpperMillis());
-        assertEquals(1801L, long0);
+    @Test
+    public void testDateRangeInitializationFromExpandedNullRange() {
+        // Arrange: Create a Range by expanding a null range to include 1801.7621.
+        //          This effectively creates a Range with both lower and upper bounds set to 1801.7621.
+        Range range = Range.expandToInclude(null, 1801.7621);
+
+        // Act: Create a DateRange object using the generated Range.  This DateRange
+        //      will represent a date range with its boundaries corresponding to the
+        //      numeric values of the Range object, treated as milliseconds since the epoch.
+        DateRange dateRange = new DateRange(range);
+
+        // Assert: Verify that the lower bound of the DateRange, expressed in milliseconds,
+        //         is equal to 1801.  We're expecting an integer truncation here since the
+        //         original value was 1801.7621.
+        assertEquals(1801L, dateRange.getLowerMillis());
+
+        // Assert: Verify that the upper bound of the DateRange, expressed in milliseconds,
+        //         is also equal to 1801.  This confirms that the DateRange was constructed
+        //         as expected from the Range object.
+        assertEquals(1801L, dateRange.getUpperMillis());
     }
 }

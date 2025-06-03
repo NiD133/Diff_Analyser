@@ -1,33 +1,36 @@
 package org.apache.commons.io.input;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTimeout;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.io.LineNumberReader;
-import java.io.Reader;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.file.TempFile;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 public class GeneratedTestCase {
 
+    private static final Duration TIMEOUT = Duration.ofSeconds(5); // Define a reasonable timeout
+    private static final int MAX_CHARACTERS_TO_READ = 3; // Maximum characters BoundedReader will allow.
+    private static final String TEST_STRING = "This is a test string.\nThis is the second line.";
     @Test
     public void testReadBytesEOF() {
-        assertTimeout(TIMEOUT, () -> {
-            final BoundedReader mr = new BoundedReader(sr, 3);
-            try (BufferedReader br = new BufferedReader(mr)) {
-                br.readLine();
-                br.readLine();
-            }
-        });
+        //GIVEN
+        StringReader stringReader = new StringReader(TEST_STRING);
+        BoundedReader boundedReader = new BoundedReader(stringReader, MAX_CHARACTERS_TO_READ);
+        BufferedReader bufferedReader = new BufferedReader(boundedReader);
+
+        //WHEN
+        Executable executable = () -> {
+            String firstLine = bufferedReader.readLine();
+            String secondLine = bufferedReader.readLine(); // Expect this to return null as BoundedReader has reached its limit.
+            bufferedReader.close();
+        };
+
+        //THEN
+        assertTimeout(TIMEOUT, executable);
     }
 }

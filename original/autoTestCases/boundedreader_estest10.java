@@ -1,31 +1,28 @@
-package org.apache.commons.io.input;
-
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.jupiter.api.Test; // Changed to JUnit 5
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GeneratedTestCase {
+import static org.junit.jupiter.api.Assertions.*; // Changed to JUnit 5
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        StringReader stringReader0 = new StringReader("");
-        BoundedReader boundedReader0 = new BoundedReader(stringReader0, 2140);
-        boundedReader0.close();
-        try {
-            boundedReader0.read();
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Stream closed
-            //
-            verifyException("java.io.StringReader", e);
-        }
+class BoundedReaderTest {
+
+    @Test
+    void testReadAfterClose() throws IOException {
+        // Arrange: Create an empty StringReader and a BoundedReader wrapping it.
+        StringReader stringReader = new StringReader("");
+        BoundedReader boundedReader = new BoundedReader(stringReader, 2140);
+
+        // Act: Close the BoundedReader.  This should also close the underlying StringReader.
+        boundedReader.close();
+
+        // Assert: Attempting to read from the closed BoundedReader should throw an IOException.
+        //          Specifically, the StringReader, which is now closed, will throw the exception.
+        IOException exception = assertThrows(IOException.class, () -> {
+            boundedReader.read();
+        });
+
+        // Assert: Verify that the exception message is "Stream closed". This confirms that the
+        // underlying stream was indeed closed.  This is optional but a good practice.
+        assertEquals("Stream closed", exception.getMessage());
     }
 }

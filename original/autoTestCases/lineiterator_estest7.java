@@ -1,32 +1,24 @@
-package org.apache.commons.io;
-
+import org.apache.commons.io.LineIterator;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.NoSuchElementException;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class GeneratedTestCase {
+public class LineIteratorNullReaderTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        LineIterator lineIterator0 = null;
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithNullReaderThrowsException() {
+        // Arrange: No need to arrange, we are testing the constructor itself.
+
+        // Act: Attempt to create a LineIterator with a null Reader.  This should throw an exception.
         try {
-            lineIterator0 = new LineIterator((Reader) null);
-            fail("Expecting exception: NullPointerException");
+            new LineIterator(null); // This should throw the NullPointerException
+            fail("Expected NullPointerException was not thrown."); // If it gets here, the test failed.
         } catch (NullPointerException e) {
-            //
-            // reader
-            //
-            verifyException("java.util.Objects", e);
+            // Assert:  The exception is caught, verify the message is appropriate
+            assertEquals("reader", e.getMessage());
+            // Optionally print the stack trace for debugging
+            //e.printStackTrace();  // Comment out in production code
+
+            // Test passes because the expected exception was thrown.
         }
     }
 }

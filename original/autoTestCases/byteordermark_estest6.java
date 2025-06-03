@@ -1,18 +1,28 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class GeneratedTestCase {
+/**
+ * Test class to verify the behavior of the {@link ByteOrderMark} class.
+ * This class focuses on testing specific aspects of ByteOrderMark retrieval.
+ */
+public class ByteOrderMarkTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        ByteOrderMark byteOrderMark0 = ByteOrderMark.UTF_32LE;
-        int int0 = byteOrderMark0.get(1);
-        assertEquals(254, int0);
+    /**
+     * Tests that the second byte (index 1) of the UTF-32LE Byte Order Mark is correctly retrieved.
+     * The UTF-32LE byte order mark is represented as {0xFF, 0xFE, 0x00, 0x00}.
+     * Therefore, accessing the byte at index 1 should return 0xFE (254 in decimal).
+     */
+    @Test
+    public void testGetByteAtIndexOneForUTF32LE() {
+        // Arrange: Create a ByteOrderMark instance for UTF-32LE.
+        ByteOrderMark byteOrderMark = ByteOrderMark.UTF_32LE;
+
+        // Act: Retrieve the byte at index 1 of the ByteOrderMark.
+        int byteAtIndexOne = byteOrderMark.get(1);
+
+        // Assert: Verify that the retrieved byte is equal to 254 (0xFE).
+        assertEquals(254, byteAtIndexOne, "The second byte of UTF-32LE should be 254 (0xFE).");
     }
 }

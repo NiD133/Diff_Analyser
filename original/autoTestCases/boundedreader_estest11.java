@@ -1,30 +1,27 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.io.IOException;
 
-public class GeneratedTestCase {
+import static org.junit.Assert.*;
+
+public class BoundedReaderTest {
 
     @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        BoundedReader boundedReader0 = new BoundedReader((Reader) null, 0);
-        // Undeclared exception!
+    public void testMark_WithNullReader_ThrowsNullPointerException() {
+        // Arrange: Create a BoundedReader with a null Reader and a limit of 0.
+        BoundedReader boundedReader = new BoundedReader(null, 0);
+
+        // Act & Assert: Attempting to call mark() on the BoundedReader should throw a NullPointerException.
         try {
-            boundedReader0.mark(0);
-            fail("Expecting exception: NullPointerException");
+            boundedReader.mark(0); // Attempt to mark the current position
+            fail("Expected NullPointerException, but no exception was thrown."); // Fail the test if no exception is thrown.
         } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.input.BoundedReader", e);
+            // Expected exception caught. Test passes.
+            // Optionally, you can add assertions here to check the exception's message or other properties.
+            // However, the EvoSuite generated test doesn't include a message check, so we'll omit it here for consistency with the original test.
         }
     }
 }

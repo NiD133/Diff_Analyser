@@ -1,24 +1,21 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.jupiter.api.Test; // Use JUnit 5
+import static org.junit.jupiter.api.Assertions.*; // More concise assertions
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.SortedMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import sun.nio.cs.US_ASCII;
 
-public class GeneratedTestCase {
+class CharsetsTest { // Renamed class for clarity (reflecting what's being tested)
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Charset charset0 = Charsets.UTF_8;
-        Charset charset1 = Charsets.toCharset((Charset) null, charset0);
-        assertNotNull(charset1);
-        assertEquals("UTF-8", charset1.toString());
+    @Test
+    void testToCharsetWithNullCharsetUsesDefault() {
+        // Arrange: Define a default charset
+        Charset defaultCharset = Charsets.UTF_8;
+
+        // Act: Call the method being tested with a null charset and the default
+        Charset resultCharset = Charsets.toCharset(null, defaultCharset);
+
+        // Assert: Verify that the result is the default charset
+        assertNotNull(resultCharset, "Result should not be null."); // Clear message
+        assertEquals(defaultCharset, resultCharset, "Should return the default charset when null is provided."); // More descriptive message
     }
 }

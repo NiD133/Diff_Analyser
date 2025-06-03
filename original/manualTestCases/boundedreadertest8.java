@@ -1,37 +1,45 @@
 package org.apache.commons.io.input;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTimeout;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.LineNumberReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.file.TempFile;
 import org.junit.jupiter.api.Test;
 
-public class GeneratedTestCase {
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class BoundedReaderTest {
 
     @Test
     public void testMarkResetMarkMore() throws IOException {
-        try (BoundedReader mr = new BoundedReader(sr, 3)) {
-            mr.mark(4);
-            mr.read();
-            mr.read();
-            mr.read();
-            mr.reset();
-            mr.read();
-            mr.read();
-            mr.read();
-            assertEquals(-1, mr.read());
+        // Input string for the reader
+        String inputString = "abcde";
+
+        // Create a StringReader from the input string.  This will be wrapped by our BoundedReader.
+        StringReader stringReader = new StringReader(inputString);
+
+        // Create a BoundedReader that allows reading a maximum of 3 characters.
+        try (BoundedReader boundedReader = new BoundedReader(stringReader, 3)) {
+
+            // Mark the current position. The readAheadLimit is set to 4, which is larger than the bound, so it should be okay
+            boundedReader.mark(4);
+
+            // Read three characters ('a', 'b', 'c'). The current position is now after 'c'.
+            boundedReader.read(); // Reads 'a'
+            boundedReader.read(); // Reads 'b'
+            boundedReader.read(); // Reads 'c'
+
+            // Reset the reader to the marked position (before 'a').
+            boundedReader.reset();
+
+            // Read three characters again ('a', 'b', 'c').
+            boundedReader.read(); // Reads 'a'
+            boundedReader.read(); // Reads 'b'
+            boundedReader.read(); // Reads 'c'
+
+            // Attempt to read another character.  The BoundedReader is exhausted (reached its limit of 3 characters),
+            // so it should return -1 (end of stream).
+            assertEquals(-1, boundedReader.read(), "Should return -1 as the BoundedReader is exhausted.");
         }
     }
 }

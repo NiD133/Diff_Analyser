@@ -1,22 +1,23 @@
 package org.example;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.jupiter.api.Test; // Using JUnit 5 for better readability and features
+import static org.junit.jupiter.api.Assertions.*; // Updated assertions
 import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
 
 public class GeneratedTestCase {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        DateRange dateRange0 = new DateRange();
-        long long0 = dateRange0.getLowerMillis();
-        assertEquals(1L, dateRange0.getUpperMillis());
-        assertEquals(0L, long0);
+    @Test
+    void testDefaultDateRangeLowerBound() {
+        // Arrange: Create a DateRange object with default constructor (representing a default range).
+        DateRange dateRange = new DateRange();
+
+        // Act: Get the lower bound (in milliseconds) of the date range.
+        long lowerBoundMillis = dateRange.getLowerMillis();
+
+        // Assert: Verify that the lower bound is 0 milliseconds (epoch start).
+        assertEquals(0L, lowerBoundMillis, "The lower bound of a default DateRange should be 0 milliseconds (epoch start).");
+
+        // Additionally, verify that the upper bound is 1 (to ensure the DateRange is initialized correctly).
+        assertEquals(1L, dateRange.getUpperMillis(), "The upper bound of a default DateRange should be 1 millisecond.");
     }
 }

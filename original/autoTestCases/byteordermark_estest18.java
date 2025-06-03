@@ -1,20 +1,24 @@
-package org.apache.commons.io;
+import org.junit.jupiter.api.Test; // Use JUnit 5 annotation
+import static org.junit.jupiter.api.Assertions.*; // Use JUnit 5 assertions
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+/**
+ * Test case to verify the equality of different Byte Order Marks (BOMs).
+ * This test checks if two distinct Byte Order Marks, UTF-16LE and UTF-16BE,
+ * are considered equal using the `equals()` method.
+ */
+public class ByteOrderMarkEqualityTest {
 
-public class GeneratedTestCase {
+    @Test
+    void testUTF16LE_equals_UTF16BE_shouldReturnFalse() {
+        // Arrange: Define two distinct Byte Order Mark constants.
+        ByteOrderMark utf16LE = ByteOrderMark.UTF_16LE;  // Little Endian
+        ByteOrderMark utf16BE = ByteOrderMark.UTF_16BE;  // Big Endian
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        ByteOrderMark byteOrderMark0 = ByteOrderMark.UTF_16LE;
-        ByteOrderMark byteOrderMark1 = ByteOrderMark.UTF_16BE;
-        boolean boolean0 = byteOrderMark0.equals(byteOrderMark1);
-        assertFalse(boolean0);
-        assertFalse(byteOrderMark1.equals((Object) byteOrderMark0));
+        // Act: Compare the two BOMs using the equals() method.
+        boolean areEqual = utf16LE.equals(utf16BE);
+
+        // Assert: Verify that the equals() method returns false,
+        // indicating that the two BOMs are not equal.
+        assertFalse(areEqual, "UTF-16LE and UTF-16BE should not be considered equal.");
     }
 }

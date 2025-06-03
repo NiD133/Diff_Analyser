@@ -2,35 +2,40 @@ package org.apache.commons.io;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.Reader;
+import static org.mockito.Mockito.*; // Consider removing this if mockito isn't directly used in this example
 import java.io.StringReader;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class GeneratedTestCase {
+public class LineIteratorTest {
 
     @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        StringReader stringReader0 = new StringReader(")!PsaWEtKc");
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        Consumer<Object> consumer0 = (Consumer<Object>) mock(Consumer.class, new ViolatedAssumptionAnswer());
-        lineIterator0.forEachRemaining(consumer0);
-        // Undeclared exception!
+    public void testNextLineAfterForEachRemainingThrowsNoSuchElementException() throws Throwable {
+        // Arrange: Create a StringReader with some sample text.
+        String testString = ")!PsaWEtKc";
+        StringReader stringReader = new StringReader(testString);
+
+        // Act: Create a LineIterator from the StringReader.
+        LineIterator lineIterator = new LineIterator(stringReader);
+
+        // Act: Use forEachRemaining to consume all lines in the iterator.
+        //      We're mocking the Consumer to avoid needing to actually process the lines.
+        @SuppressWarnings("unchecked") // Suppress unchecked cast warning for the mocked Consumer
+        Consumer<Object> consumer = (Consumer<Object>) mock(Consumer.class); // Use explicit cast if needed
+
+        // Call the `forEachRemaining` method, which should exhaust the iterator
+        lineIterator.forEachRemaining(consumer);
+
+        // Assert: After consuming all lines, calling nextLine() should throw a NoSuchElementException.
         try {
-            lineIterator0.nextLine();
-            fail("Expecting exception: NoSuchElementException");
+            lineIterator.nextLine();
+            fail("Expected NoSuchElementException to be thrown.");
         } catch (NoSuchElementException e) {
-            //
-            // No more lines
-            //
-            verifyException("org.apache.commons.io.LineIterator", e);
+            // Assert that the exception message is "No more lines" (or similar, depending on implementation).
+            assertEquals("No more lines", e.getMessage()); // Check exception message
+        } finally {
+            // Ensure the LineIterator is closed properly.  This is important to prevent resource leaks.
+            LineIterator.closeQuietly(lineIterator); // Add closing
         }
     }
 }

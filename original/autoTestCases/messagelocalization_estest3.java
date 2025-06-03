@@ -1,29 +1,34 @@
 package org.example;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.jupiter.api.Test; // Using JUnit 5 for clarity
+import static org.junit.jupiter.api.Assertions.*; // JUnit 5 assertions
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GeneratedTestCase {
+public class MessageLocalizationTest {  // More descriptive class name
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        StringReader stringReader0 = new StringReader("D4^H:#)~mLrzX&|");
-        stringReader0.close();
+    @Test
+    void testSetMessagesWithClosedReader() { // More descriptive method name
+
+        // Arrange: Create a StringReader and immediately close it.
+        StringReader reader = new StringReader("D4^H:#)~mLrzX&|");
         try {
-            MessageLocalization.setMessages(stringReader0);
-            fail("Expecting exception: IOException");
+            reader.close();
         } catch (IOException e) {
-            //
-            // Stream closed
-            //
-            verifyException("java.io.StringReader", e);
+            fail("Unexpected IOException while closing reader: " + e.getMessage());
         }
+
+        // Act & Assert: Attempting to set messages from the closed reader should throw an IOException.
+        assertThrows(IOException.class, () -> {
+            MessageLocalization.setMessages(reader);
+        }, "Expected IOException due to closed reader, but no exception was thrown.");
+
+        // (Optional) Assert specific error message. Can make the test more robust
+        // try {
+        //     MessageLocalization.setMessages(reader);
+        //     fail("Expected IOException");
+        // } catch (IOException e) {
+        //     assertEquals("Stream closed", e.getMessage());
+        // }
     }
 }

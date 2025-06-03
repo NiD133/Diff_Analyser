@@ -1,30 +1,27 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GeneratedTestCase {
+import static org.junit.Assert.fail;
+
+public class BoundedReaderTest {
 
     @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        BoundedReader boundedReader0 = new BoundedReader((Reader) null, 0);
-        // Undeclared exception!
+    public void testCloseWithNullReader() {
+        // Arrange: Create a BoundedReader with a null underlying reader and a zero limit.
+        BoundedReader boundedReader = new BoundedReader(null, 0);
+
+        // Act: Attempt to close the BoundedReader.  We expect a NullPointerException because
+        // the underlying reader is null.
         try {
-            boundedReader0.close();
-            fail("Expecting exception: NullPointerException");
+            boundedReader.close();
+            fail("Expected NullPointerException when closing BoundedReader with null reader.");
         } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.input.BoundedReader", e);
+            // Assert:  The NullPointerException is caught, indicating the expected behavior.
+            // No further assertion needed, as the catch block indicates success. The specific message
+            // of the exception isn't critical to this test.
         }
     }
 }

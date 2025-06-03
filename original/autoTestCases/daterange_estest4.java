@@ -1,22 +1,23 @@
 package org.example;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test; // Modern JUnit 5 annotation
+import static org.junit.jupiter.api.Assertions.*; // Modern JUnit 5 assertions
 
-public class GeneratedTestCase {
+public class DateRangeTest { // Renamed class for clarity, making it a test class
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        DateRange dateRange0 = new DateRange((-1157.7534), (-1157.7534));
-        long long0 = dateRange0.getLowerMillis();
-        assertEquals((-1157L), long0);
-        assertEquals((-1157L), dateRange0.getUpperMillis());
+    @Test
+    void testGetLowerMillisForSameDates() {
+        // Arrange: Create a DateRange object with the same start and end dates.
+        double sameDateValue = -1157.7534;
+        DateRange dateRange = new DateRange(sameDateValue, sameDateValue);
+
+        // Act: Get the lower millisecond value from the DateRange object.
+        long lowerMillis = dateRange.getLowerMillis();
+
+        // Assert: Verify that the lower millisecond value is as expected (truncated double).
+        assertEquals(-1157L, lowerMillis, "The lower millisecond value should be -1157.");
+
+        // Assert: Verify that the upper millisecond value is also the same (as the dates are the same).
+        assertEquals(-1157L, dateRange.getUpperMillis(), "The upper millisecond value should also be -1157.");
     }
 }

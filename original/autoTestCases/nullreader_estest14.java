@@ -1,21 +1,19 @@
 package org.example;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;  // Use JUnit 5 for clarity and modern features
+import static org.junit.jupiter.api.Assertions.*; // Modern assertion style
 
-public class GeneratedTestCase {
+class NullReaderTest {  // More descriptive class name
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        NullReader nullReader0 = new NullReader((-961L));
-        nullReader0.read();
-        long long0 = nullReader0.getPosition();
-        assertEquals(1L, long0);
+    @Test
+    void testGetPositionAfterRead() throws IOException {  // More descriptive test name
+        // Arrange: Create a NullReader that simulates reading from a stream with a specified size.
+        NullReader nullReader = new NullReader(-961L); // The size doesn't really matter for this test.
+
+        // Act: Read a single character from the NullReader. This advances the position.
+        nullReader.read();
+
+        // Assert: Verify that the position of the reader has been incremented to 1 after the read operation.
+        assertEquals(1L, nullReader.getPosition(), "The reader's position should be 1 after reading one character.");
     }
 }

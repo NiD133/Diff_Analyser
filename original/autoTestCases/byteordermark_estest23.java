@@ -1,20 +1,20 @@
-package org.apache.commons.io;
+import org.junit.jupiter.api.Test;  // Modern JUnit import
+import static org.junit.jupiter.api.Assertions.*; // Modern JUnit Assertions
+import org.apache.commons.io.ByteOrderMark;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+public class ByteOrderMarkTest {
 
-public class GeneratedTestCase {
+    @Test
+    public void testUTF8MatchesItsOwnBytes() {
+        // Arrange: Create a UTF-8 ByteOrderMark and get its raw bytes
+        ByteOrderMark utf8Bom = ByteOrderMark.UTF_8;
+        int[] utf8Bytes = utf8Bom.getRawBytes();
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        ByteOrderMark byteOrderMark0 = ByteOrderMark.UTF_8;
-        int[] intArray0 = byteOrderMark0.getRawBytes();
-        ByteOrderMark byteOrderMark1 = new ByteOrderMark("ByteOrderMark[UTF-8: 0xEF,0xBB,0xBF]", intArray0);
-        boolean boolean0 = byteOrderMark1.matches(intArray0);
-        assertTrue(boolean0);
+        // Act: Create a new ByteOrderMark using the same label and byte sequence, then check if it matches those bytes
+        ByteOrderMark customBom = new ByteOrderMark("Custom UTF-8 BOM", utf8Bytes); // More descriptive label
+        boolean matches = customBom.matches(utf8Bytes);
+
+        // Assert:  Verify that the ByteOrderMark matches the byte sequence it was created with.
+        assertTrue(matches, "The ByteOrderMark should match its own raw bytes.");
     }
 }

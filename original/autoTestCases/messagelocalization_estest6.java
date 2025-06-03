@@ -1,20 +1,20 @@
 package org.example;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test; // Changed to JUnit 5 for clarity and modern syntax
+import static org.junit.jupiter.api.Assertions.*; // Updated assertions
 
-public class GeneratedTestCase {
+public class MessageLocalizationTest { // Renamed class for better readability
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        boolean boolean0 = MessageLocalization.setLanguage("en", (String) null);
-        assertTrue(boolean0);
+    @Test
+    void testSetLanguageWithNullCountry() { // Renamed method for better clarity
+        // Arrange:  Define the expected behavior - setting the language to "en" should succeed.
+        String language = "en";
+        String country = null;
+
+        // Act: Call the method under test, capturing the result.
+        boolean result = MessageLocalization.setLanguage(language, country);
+
+        // Assert: Verify that the method returns true, indicating success.
+        assertTrue(result, "Setting the language to 'en' with null country should succeed."); // Added a message for better failure analysis
     }
 }

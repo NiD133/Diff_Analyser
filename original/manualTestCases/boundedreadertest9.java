@@ -1,33 +1,41 @@
 package org.apache.commons.io.input;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTimeout;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.BufferedReader;
-import java.io.File;
+
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.file.TempFile;
+
 import org.junit.jupiter.api.Test;
 
 public class GeneratedTestCase {
 
     @Test
     public void testMarkResetWithMarkOutsideBoundedReaderMax() throws IOException {
-        try (BoundedReader mr = new BoundedReader(sr, 3)) {
-            mr.mark(4);
-            mr.read();
-            mr.read();
-            mr.read();
-            assertEquals(-1, mr.read());
-        }
+        // GIVEN: A string to read from and the maximum length the BoundedReader will allow.
+        String inputString = "abc";
+        int maxLength = 3;
+
+        // AND: Create a StringReader from the input string.
+        Reader stringReader = new StringReader(inputString);
+
+        // AND: Create a BoundedReader wrapping the StringReader, limiting the read length.
+        //      The BoundedReader will only read up to 'maxLength' characters.
+        try (BoundedReader boundedReader = new BoundedReader(stringReader, maxLength)) {
+
+            // WHEN: Mark a position beyond the BoundedReader's maximum allowed length.
+            //       Attempting to mark at a position outside the bounds of the BoundedReader
+            //       should still allow us to read up to the maximum length.
+            boundedReader.mark(4);  // Mark position 4 (which is past the end of "abc")
+
+            // AND: Read characters from the BoundedReader until it reaches the end of the bounded region.
+            boundedReader.read(); // Read 'a'
+            boundedReader.read(); // Read 'b'
+            boundedReader.read(); // Read 'c'
+
+            // THEN: Ensure that attempting to read beyond the bounded region returns -1,
+            //       indicating the end of the stream.
+            assertEquals(-1, boundedReader.read(), "Should return -1 when trying to read past the bounded length.");
+        } // try-with-resources ensures the BoundedReader is closed.
     }
 }
