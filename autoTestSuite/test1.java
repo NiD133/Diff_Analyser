@@ -1,106 +1,80 @@
-/* ======================================================
- * JFreeChart : a chart library for the Java(tm) platform
- * ======================================================
- *
- * (C) Copyright 2000-present, by David Gilbert and Contributors.
- *
- * Project Info:  https://www.jfree.org/jfreechart/index.html
- *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2.1 of the License, or
- * (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- * License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
- * USA.
- *
- * [Oracle and Java are registered trademarks of Oracle and/or its affiliates.
- * Other names may be trademarks of their respective owners.]
- *
- * ------------------
- * DateRangeTest.java
- * ------------------
- * (C) Copyright 2004-present, by David Gilbert and Contributors.
- *
- * Original Author:  David Gilbert;
- * Contributor(s):   -;
- *
- */
-
 package org.jfree.data.time;
 
 import java.util.Date;
-
 import org.jfree.chart.TestUtils;
 import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Some tests for the {@link DateRange} class.
+ * Unit tests for the {@link DateRange} class.
  */
 public class DateRangeTest {
 
     /**
-     * Confirm that the equals method can distinguish all the required fields.
+     * Tests the equals method to ensure it correctly identifies equal and unequal DateRange objects.
      */
     @Test
     public void testEquals() {
-        DateRange r1 = new DateRange(new Date(1000L), new Date(2000L));
-        DateRange r2 = new DateRange(new Date(1000L), new Date(2000L));
-        assertEquals(r1, r2);
-        assertEquals(r2, r1);
+        // Create two identical DateRange objects and verify they are equal
+        DateRange range1 = new DateRange(new Date(1000L), new Date(2000L));
+        DateRange range2 = new DateRange(new Date(1000L), new Date(2000L));
+        assertEquals(range1, range2);
+        assertEquals(range2, range1);
 
-        r1 = new DateRange(new Date(1111L), new Date(2000L));
-        assertNotEquals(r1, r2);
-        r2 = new DateRange(new Date(1111L), new Date(2000L));
-        assertEquals(r1, r2);
+        // Modify the start date of range1 and verify they are not equal
+        range1 = new DateRange(new Date(1111L), new Date(2000L));
+        assertNotEquals(range1, range2);
 
-        r1 = new DateRange(new Date(1111L), new Date(2222L));
-        assertNotEquals(r1, r2);
-        r2 = new DateRange(new Date(1111L), new Date(2222L));
-        assertEquals(r1, r2);
+        // Update range2 to match range1 and verify they are equal again
+        range2 = new DateRange(new Date(1111L), new Date(2000L));
+        assertEquals(range1, range2);
+
+        // Modify the end date of range1 and verify they are not equal
+        range1 = new DateRange(new Date(1111L), new Date(2222L));
+        assertNotEquals(range1, range2);
+
+        // Update range2 to match range1 and verify they are equal again
+        range2 = new DateRange(new Date(1111L), new Date(2222L));
+        assertEquals(range1, range2);
     }
 
     /**
-     * Serialize an instance, restore it, and check for equality.
+     * Tests serialization and deserialization of a DateRange object to ensure equality is maintained.
      */
     @Test
     public void testSerialization() {
-        DateRange r1 = new DateRange(new Date(1000L), new Date(2000L));
-        DateRange r2 = TestUtils.serialised(r1);
-        assertEquals(r1, r2);
+        // Serialize and deserialize a DateRange object, then verify equality
+        DateRange original = new DateRange(new Date(1000L), new Date(2000L));
+        DateRange deserialized = TestUtils.serialised(original);
+        assertEquals(original, deserialized);
     }
 
     /**
-     * The {@link DateRange} class is immutable, so it doesn't need to
-     * be cloneable.
+     * Verifies that the DateRange class is not cloneable, as it is immutable.
      */
     @Test
     public void testClone() {
-        DateRange r1 = new DateRange(new Date(1000L), new Date(2000L));
-        assertFalse(r1 instanceof Cloneable);
+        // Check that DateRange does not implement Cloneable
+        DateRange range = new DateRange(new Date(1000L), new Date(2000L));
+        assertFalse(range instanceof Cloneable);
     }
 
     /**
-     * Confirm that a DateRange is immutable.
+     * Confirms that DateRange is immutable by ensuring changes to input dates do not affect the DateRange.
      */
     @Test
     public void testImmutable() {
-        Date d1 = new Date(10L);
-        Date d2 = new Date(20L);
-        DateRange r = new DateRange(d1, d2);
-        d1.setTime(11L);
-        assertEquals(new Date(10L), r.getLowerDate());
-        r.getUpperDate().setTime(22L);
-        assertEquals(new Date(20L), r.getUpperDate());
-    }
+        // Create a DateRange with specific start and end dates
+        Date startDate = new Date(10L);
+        Date endDate = new Date(20L);
+        DateRange range = new DateRange(startDate, endDate);
 
+        // Modify the original start date and verify the DateRange is unaffected
+        startDate.setTime(11L);
+        assertEquals(new Date(10L), range.getLowerDate());
+
+        // Attempt to modify the end date through the DateRange and verify it is unaffected
+        range.getUpperDate().setTime(22L);
+        assertEquals(new Date(20L), range.getUpperDate());
+    }
 }
