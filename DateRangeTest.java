@@ -1,106 +1,100 @@
-/* ======================================================
- * JFreeChart : a chart library for the Java(tm) platform
- * ======================================================
- *
- * (C) Copyright 2000-present, by David Gilbert and Contributors.
- *
- * Project Info:  https://www.jfree.org/jfreechart/index.html
- *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2.1 of the License, or
- * (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- * License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
- * USA.
- *
- * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
- * Other names may be trademarks of their respective owners.]
- *
- * ------------------
- * DateRangeTest.java
- * ------------------
- * (C) Copyright 2004-present, by David Gilbert and Contributors.
- *
- * Original Author:  David Gilbert;
- * Contributor(s):   -;
- *
- */
-
 package org.jfree.data.time;
 
-import java.util.Date;
-
 import org.jfree.chart.TestUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Some tests for the {@link DateRange} class.
+ * Tests for the {@link DateRange} class.  The goal is to ensure the class
+ * behaves as expected regarding equality, serialization, immutability and cloneability.
  */
 public class DateRangeTest {
 
-    /**
-     * Confirm that the equals method can distinguish all the required fields.
-     */
     @Test
+    @DisplayName("Test equality of DateRange objects")
     public void testEquals() {
-        DateRange r1 = new DateRange(new Date(1000L), new Date(2000L));
-        DateRange r2 = new DateRange(new Date(1000L), new Date(2000L));
-        assertEquals(r1, r2);
-        assertEquals(r2, r1);
+        // Arrange: Create two DateRange objects with the same start and end dates
+        Date startDate = new Date(1000L);
+        Date endDate = new Date(2000L);
+        DateRange dateRange1 = new DateRange(startDate, endDate);
+        DateRange dateRange2 = new DateRange(startDate, endDate);
 
-        r1 = new DateRange(new Date(1111L), new Date(2000L));
-        assertNotEquals(r1, r2);
-        r2 = new DateRange(new Date(1111L), new Date(2000L));
-        assertEquals(r1, r2);
+        // Assert: The two DateRange objects should be equal
+        assertEquals(dateRange1, dateRange2, "DateRange objects with same start and end dates should be equal");
+        assertEquals(dateRange2, dateRange1, "Equality should be symmetric");
 
-        r1 = new DateRange(new Date(1111L), new Date(2222L));
-        assertNotEquals(r1, r2);
-        r2 = new DateRange(new Date(1111L), new Date(2222L));
-        assertEquals(r1, r2);
+        // Act: Modify the start date of the first DateRange
+        Date modifiedStartDate = new Date(1111L);
+        dateRange1 = new DateRange(modifiedStartDate, endDate);
+
+        // Assert: The DateRange objects should no longer be equal
+        assertNotEquals(dateRange1, dateRange2, "DateRange objects with different start dates should not be equal");
+
+        // Act: Update the second DateRange to have the same start date as the first
+        dateRange2 = new DateRange(modifiedStartDate, endDate);
+
+        // Assert: The DateRange objects should now be equal
+        assertEquals(dateRange1, dateRange2, "DateRange objects with same start and end dates should be equal");
+
+        // Act: Modify the end date of the first DateRange
+        Date modifiedEndDate = new Date(2222L);
+        dateRange1 = new DateRange(modifiedStartDate, modifiedEndDate);
+
+        // Assert: The DateRange objects should no longer be equal
+        assertNotEquals(dateRange1, dateRange2, "DateRange objects with different end dates should not be equal");
+
+        // Act: Update the second DateRange to have the same end date as the first
+        dateRange2 = new DateRange(modifiedStartDate, modifiedEndDate);
+
+        // Assert: The DateRange objects should now be equal
+        assertEquals(dateRange1, dateRange2, "DateRange objects with same start and end dates should be equal");
     }
 
-    /**
-     * Serialize an instance, restore it, and check for equality.
-     */
     @Test
+    @DisplayName("Test serialization and deserialization of a DateRange object")
     public void testSerialization() {
-        DateRange r1 = new DateRange(new Date(1000L), new Date(2000L));
-        DateRange r2 = TestUtils.serialised(r1);
-        assertEquals(r1, r2);
+        // Arrange: Create a DateRange object
+        Date startDate = new Date(1000L);
+        Date endDate = new Date(2000L);
+        DateRange originalDateRange = new DateRange(startDate, endDate);
+
+        // Act: Serialize and deserialize the DateRange object
+        DateRange deserializedDateRange = TestUtils.serialised(originalDateRange);
+
+        // Assert: The original and deserialized DateRange objects should be equal
+        assertEquals(originalDateRange, deserializedDateRange, "The deserialized DateRange object should be equal to the original");
     }
 
-    /**
-     * The {@link DateRange} class is immutable, so it doesn't need to
-     * be cloneable.
-     */
     @Test
+    @DisplayName("DateRange should not be cloneable")
     public void testClone() {
-        DateRange r1 = new DateRange(new Date(1000L), new Date(2000L));
-        assertFalse(r1 instanceof Cloneable);
+        // Arrange: Create a DateRange object
+        Date startDate = new Date(1000L);
+        Date endDate = new Date(2000L);
+        DateRange dateRange = new DateRange(startDate, endDate);
+
+        // Assert: DateRange should NOT implement the Cloneable interface
+        assertFalse(dateRange instanceof Cloneable, "DateRange should not implement the Cloneable interface");
     }
 
-    /**
-     * Confirm that a DateRange is immutable.
-     */
     @Test
+    @DisplayName("Test immutability of DateRange")
     public void testImmutable() {
-        Date d1 = new Date(10L);
-        Date d2 = new Date(20L);
-        DateRange r = new DateRange(d1, d2);
-        d1.setTime(11L);
-        assertEquals(new Date(10L), r.getLowerDate());
-        r.getUpperDate().setTime(22L);
-        assertEquals(new Date(20L), r.getUpperDate());
-    }
+        // Arrange: Create Date objects and a DateRange object
+        Date initialStartDate = new Date(10L);
+        Date initialEndDate = new Date(20L);
+        DateRange dateRange = new DateRange(initialStartDate, initialEndDate);
 
+        // Act: Modify the original Date objects after creating the DateRange
+        initialStartDate.setTime(11L); // Mutate the original Date object
+        dateRange.getUpperDate().setTime(22L); // Attempt to mutate the Date object obtained from the DateRange
+
+        // Assert: The DateRange object should remain unchanged (immutable)
+        assertEquals(new Date(10L), dateRange.getLowerDate(), "Lower date should not be affected by external modification");
+        assertEquals(new Date(20L), dateRange.getUpperDate(), "Upper date should not be affected by external modification");
+    }
 }
