@@ -1,20 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.apache.commons.lang3;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -27,87 +10,64 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests {@link ArraySorter}.
  */
-class ArraySorterTest extends AbstractLangTest {
+public class ArraySorterTest {
 
     @Test
-    void testSortByteArray() {
-        final byte[] array1 = {2, 1};
-        final byte[] array2 = array1.clone();
-        Arrays.sort(array1);
-        assertArrayEquals(array1, ArraySorter.sort(array2));
-        assertNull(ArraySorter.sort((byte[]) null));
-    }
+    void testSortPrimitives() {
+        // Test cases for primitive types
+        Object[][] testCases = {
+            {new byte[]{2, 1}, new byte[]{1, 2}},
+            {new char[]{2, 1}, new char[]{1, 2}},
+            {new double[]{2, 1}, new double[]{1, 2}},
+            {new float[]{2, 1}, new float[]{1, 2}},
+            {new int[]{2, 1}, new int[]{1, 2}},
+            {new long[]{2, 1}, new long[]{1, 2}},
+            {new short[]{2, 1}, new short[]{1, 2}}
+        };
 
-    @Test
-    void testSortCharArray() {
-        final char[] array1 = {2, 1};
-        final char[] array2 = array1.clone();
-        Arrays.sort(array1);
-        assertArrayEquals(array1, ArraySorter.sort(array2));
-        assertNull(ArraySorter.sort((char[]) null));
-    }
+        for (Object[] testCase : testCases) {
+            Comparable[] unsorted = (Comparable[]) testCase[0];
+            Comparable[] expected = (Comparable[]) testCase[1];
 
-    @Test
-    void testSortComparable() {
-        final String[] array1 = ArrayUtils.toArray("foo", "bar");
-        final String[] array2 = array1.clone();
-        Arrays.sort(array1);
-        assertArrayEquals(array1, ArraySorter.sort(array2, String::compareTo));
-        assertNull(ArraySorter.sort((String[]) null));
-    }
+            Comparable[] cloned = cloneArray(unsorted);
+            Arrays.sort(cloned);
 
-    @Test
-    void testSortDoubleArray() {
-        final double[] array1 = {2, 1};
-        final double[] array2 = array1.clone();
-        Arrays.sort(array1);
-        assertArrayEquals(array1, ArraySorter.sort(array2));
-        assertNull(ArraySorter.sort((double[]) null));
-    }
+            assertArrayEquals(expected, cloned);
 
-    @Test
-    void testSortFloatArray() {
-        final float[] array1 = {2, 1};
-        final float[] array2 = array1.clone();
-        Arrays.sort(array1);
-        assertArrayEquals(array1, ArraySorter.sort(array2));
-        assertNull(ArraySorter.sort((float[]) null));
-    }
+            // Test null case for each primitive type
+            Object sortedArray = ArraySorter.sort(unsorted);
+            assertArrayEquals(cloned, sortedArray);
 
-    @Test
-    void testSortIntArray() {
-        final int[] array1 = {2, 1};
-        final int[] array2 = array1.clone();
-        Arrays.sort(array1);
-        assertArrayEquals(array1, ArraySorter.sort(array2));
-        assertNull(ArraySorter.sort((int[]) null));
-    }
-
-    @Test
-    void testSortLongArray() {
-        final long[] array1 = {2, 1};
-        final long[] array2 = array1.clone();
-        Arrays.sort(array1);
-        assertArrayEquals(array1, ArraySorter.sort(array2));
-        assertNull(ArraySorter.sort((long[]) null));
+            // Check null input returns null
+            assertNull(ArraySorter.sort(null));
+        }
     }
 
     @Test
     void testSortObjects() {
-        final String[] array1 = ArrayUtils.toArray("foo", "bar");
-        final String[] array2 = array1.clone();
-        Arrays.sort(array1);
-        assertArrayEquals(array1, ArraySorter.sort(array2));
+        // Test case for object array
+        String[] array = {"foo", "bar"};
+        String[] expected = {"bar", "foo"};
+
+        String[] cloned = array.clone();
+        Arrays.sort(cloned);
+
+        assertArrayEquals(expected, cloned);
+
+        // Test ArraySorter with default comparator
+        String[] sortedArray = ArraySorter.sort(array);
+        assertArrayEquals(cloned, sortedArray);
+
+        // Test ArraySorter with custom comparator
+        String[] sortedArrayWithComparator = ArraySorter.sort(array, String::compareTo);
+        assertArrayEquals(cloned, sortedArrayWithComparator);
+
+        // Check null input returns null
         assertNull(ArraySorter.sort((String[]) null));
     }
 
-    @Test
-    void testSortShortArray() {
-        final short[] array1 = {2, 1};
-        final short[] array2 = array1.clone();
-        Arrays.sort(array1);
-        assertArrayEquals(array1, ArraySorter.sort(array2));
-        assertNull(ArraySorter.sort((short[]) null));
+    @SuppressWarnings("unchecked")
+    private <T extends Comparable<T>> T[] cloneArray(T[] array) {
+        return (T[]) array.clone();
     }
-
 }
