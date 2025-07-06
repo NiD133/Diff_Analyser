@@ -1,24 +1,37 @@
 package org.jsoup.helper;
 
 import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class CookieUtilTest {
 
-    @Test void parseCookie() {
-        HttpConnection.Response res = new HttpConnection.Response();
+    private static final String COOKIE_WITH_DOMAIN_AND_PATH = "foo=bar qux; Domain=.example.com; Path=/; Secure";
+    private static final String COOKIE_WITHOUT_DOMAIN_AND_PATH = "bar=foo qux";
+    private static final String COOKIE_WITHOUT_NAME = "=bar; Domain=.example.com; Path=/; Secure";
+    private static final String COOKIE_WITHOUT_NAME_AND_VALUE = "; Domain=.example.com; Path=/";
+    private static final String EMPTY_COOKIE = "";
+    private static final String NULL_COOKIE = null;
 
-        CookieUtil.parseCookie("foo=bar qux; Domain=.example.com; Path=/; Secure", res);
-        CookieUtil.parseCookie("bar=foo qux", res);
-        CookieUtil.parseCookie("=bar; Domain=.example.com; Path=/; Secure", res);
-        CookieUtil.parseCookie("; Domain=.example.com; Path=/", res);
-        CookieUtil.parseCookie("", res);
-        CookieUtil.parseCookie(null, res);
+    @Test
+    void testParseCookieHandlesVariousCookieFormats() {
+        HttpConnection.Response response = new HttpConnection.Response();
 
-        assertEquals(3, res.cookies().size());
-        assertEquals("bar qux", res.cookies.get("foo"));
-        assertEquals("foo qux", res.cookies.get("bar"));
-        assertEquals(".example.com", res.cookies.get("; Domain")); // no actual cookie name or val
+        // Parse cookies with different formats
+        CookieUtil.parseCookie(COOKIE_WITH_DOMAIN_AND_PATH, response);
+        CookieUtil.parseCookie(COOKIE_WITHOUT_DOMAIN_AND_PATH, response);
+        CookieUtil.parseCookie(COOKIE_WITHOUT_NAME, response);
+        CookieUtil.parseCookie(COOKIE_WITHOUT_NAME_AND_VALUE, response);
+        CookieUtil.parseCookie(EMPTY_COOKIE, response);
+        CookieUtil.parseCookie(NULL_COOKIE, response);
+
+        // Assert the number of cookies parsed
+        assertEquals(3, response.cookies().size(), "Expected 3 cookies to be parsed");
+
+        // Assert specific cookie values
+        assertEquals("bar qux", response.cookies.get("foo"), "Expected 'foo' cookie to have value 'bar qux'");
+        assertEquals("foo qux", response.cookies.get("bar"), "Expected 'bar' cookie to have value 'foo qux'");
+        
+        // Assert handling of cookies without a name
+        assertEquals(".example.com", response.cookies.get("; Domain"), "Expected cookie with no name to have domain '.example.com'");
     }
 }

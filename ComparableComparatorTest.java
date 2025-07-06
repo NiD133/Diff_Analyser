@@ -21,34 +21,54 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Tests for ComparableComparator.
+ * Unit tests for the {@link ComparableComparator} class.
  */
 @SuppressWarnings("boxing")
 class ComparableComparatorTest extends AbstractComparatorTest<Integer> {
 
+    /**
+     * Provides a list of integers in natural order for testing.
+     *
+     * @return a list of integers from 1 to 5 in ascending order.
+     */
     @Override
     public List<Integer> getComparableObjectsOrdered() {
-        final List<Integer> list = new LinkedList<>();
-        list.add(1);
-        list.add(2);
-        list.add(3);
-        list.add(4);
-        list.add(5);
-        return list;
+        List<Integer> orderedList = new LinkedList<>();
+        orderedList.add(1);
+        orderedList.add(2);
+        orderedList.add(3);
+        orderedList.add(4);
+        orderedList.add(5);
+        return orderedList;
     }
 
+    /**
+     * Returns the compatibility version of the test.
+     *
+     * @return the version string "4".
+     */
     @Override
     public String getCompatibilityVersion() {
         return "4";
     }
 
+    /**
+     * Creates an instance of {@link ComparableComparator} for testing.
+     *
+     * @return a new instance of ComparableComparator.
+     */
     @Override
     public Comparator<Integer> makeObject() {
         return new ComparableComparator<>();
     }
 
-//    void testCreate() throws Exception {
-//        writeExternalFormToDisk((java.io.Serializable) makeObject(), "src/test/resources/data/test/ComparableComparator.version4.obj");
-//    }
-
+    // Uncomment and implement this test if serialization testing is required.
+    /*
+    @Test
+    public void testCreate() throws Exception {
+        // Serialize the comparator and write it to a file for compatibility testing.
+        writeExternalFormToDisk((java.io.Serializable) makeObject(), 
+            "src/test/resources/data/test/ComparableComparator.version4.obj");
+    }
+    */
 }
