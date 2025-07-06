@@ -36,39 +36,49 @@ class StreamCompressorTest {
 
     @Test
     void testCreateDataOutputCompressor() throws IOException {
+        // Test the creation of a StreamCompressor with a DataOutputStream and a high compression level
         final DataOutput dataOutputStream = new DataOutputStream(new ByteArrayOutputStream());
         try (StreamCompressor streamCompressor = StreamCompressor.create(dataOutputStream, new Deflater(9))) {
-            assertNotNull(streamCompressor);
+            assertNotNull(streamCompressor, "StreamCompressor should be successfully created");
         }
     }
 
     @Test
     void testDeflatedEntries() throws Exception {
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (StreamCompressor sc = StreamCompressor.create(baos)) {
-            sc.deflate(new ByteArrayInputStream("AAAAAABBBBBB".getBytes()), ZipEntry.DEFLATED);
-            assertEquals(12, sc.getBytesRead());
-            assertEquals(8, sc.getBytesWrittenForLastEntry());
-            assertEquals(3299542, sc.getCrc32());
+        // Test deflating a string and verify the compressed output and CRC32 checksum
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try (StreamCompressor streamCompressor = StreamCompressor.create(outputStream)) {
+            String inputString = "AAAAAABBBBBB";
+            streamCompressor.deflate(new ByteArrayInputStream(inputString.getBytes()), ZipEntry.DEFLATED);
 
-            final byte[] actuals = baos.toByteArray();
-            final byte[] expected = { 115, 116, 4, 1, 39, 48, 0, 0 };
-            // Note that this test really asserts stuff about the java Deflater, which might be a little bit brittle
-            assertArrayEquals(expected, actuals);
+            // Verify the number of bytes read and written
+            assertEquals(inputString.length(), streamCompressor.getBytesRead(), "Bytes read should match input length");
+            assertEquals(8, streamCompressor.getBytesWrittenForLastEntry(), "Bytes written should match expected compressed size");
+            assertEquals(3299542, streamCompressor.getCrc32(), "CRC32 checksum should match expected value");
+
+            // Verify the compressed output
+            final byte[] actualCompressedData = outputStream.toByteArray();
+            final byte[] expectedCompressedData = { 115, 116, 4, 1, 39, 48, 0, 0 };
+            assertArrayEquals(expectedCompressedData, actualCompressedData, "Compressed data should match expected output");
         }
     }
 
     @Test
     void testStoredEntries() throws Exception {
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (StreamCompressor sc = StreamCompressor.create(baos)) {
-            sc.deflate(new ByteArrayInputStream("A".getBytes()), ZipEntry.STORED);
-            sc.deflate(new ByteArrayInputStream("BAD".getBytes()), ZipEntry.STORED);
-            assertEquals(3, sc.getBytesRead());
-            assertEquals(3, sc.getBytesWrittenForLastEntry());
-            assertEquals(344750961, sc.getCrc32());
-            sc.deflate(new ByteArrayInputStream("CAFE".getBytes()), ZipEntry.STORED);
-            assertEquals("ABADCAFE", baos.toString());
+        // Test storing entries without compression and verify the output and CRC32 checksum
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try (StreamCompressor streamCompressor = StreamCompressor.create(outputStream)) {
+            streamCompressor.deflate(new ByteArrayInputStream("A".getBytes()), ZipEntry.STORED);
+            streamCompressor.deflate(new ByteArrayInputStream("BAD".getBytes()), ZipEntry.STORED);
+
+            // Verify the number of bytes read and written
+            assertEquals(3, streamCompressor.getBytesRead(), "Bytes read should match total input length");
+            assertEquals(3, streamCompressor.getBytesWrittenForLastEntry(), "Bytes written should match last entry size");
+            assertEquals(344750961, streamCompressor.getCrc32(), "CRC32 checksum should match expected value");
+
+            // Verify the stored output
+            streamCompressor.deflate(new ByteArrayInputStream("CAFE".getBytes()), ZipEntry.STORED);
+            assertEquals("ABADCAFE", outputStream.toString(), "Stored output should match expected concatenated string");
         }
     }
 }
