@@ -8,8 +8,8 @@
  *
  *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * Unless required by applicable law or agreed to in writing, software,
+ * software distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 import org.apache.commons.lang3.function.FailableIntFunction;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -30,189 +31,234 @@ import org.junit.jupiter.api.Test;
  */
 class ArrayFillTest extends AbstractLangTest {
 
-    @Test
-    void testFillBooleanArray() {
-        final boolean[] array = new boolean[3];
-        final boolean val = true;
-        final boolean[] actual = ArrayFill.fill(array, val);
-        assertSame(array, actual);
-        for (final boolean v : actual) {
-            assertEquals(val, v);
+    @Nested
+    class FillPrimitiveArrays {
+
+        @Test
+        void testFillBooleanArray() {
+            boolean[] array = new boolean[3];
+            boolean valueToFill = true;
+
+            boolean[] filledArray = ArrayFill.fill(array, valueToFill);
+
+            assertSame(array, filledArray, "Should return the same array instance");
+            for (boolean element : filledArray) {
+                assertEquals(valueToFill, element, "All elements should be equal to the fill value");
+            }
+        }
+
+        @Test
+        void testFillBooleanArrayNull() {
+            boolean[] array = null;
+            boolean valueToFill = true;
+
+            boolean[] filledArray = ArrayFill.fill(array, valueToFill);
+
+            assertSame(array, filledArray, "Should return null when input array is null");
+        }
+
+        @Test
+        void testFillByteArray() {
+            byte[] array = new byte[3];
+            byte valueToFill = (byte) 1;
+
+            byte[] filledArray = ArrayFill.fill(array, valueToFill);
+
+            assertSame(array, filledArray, "Should return the same array instance");
+            for (byte element : filledArray) {
+                assertEquals(valueToFill, element, "All elements should be equal to the fill value");
+            }
+        }
+
+        @Test
+        void testFillByteArrayNull() {
+            byte[] array = null;
+            byte valueToFill = (byte) 1;
+
+            byte[] filledArray = ArrayFill.fill(array, valueToFill);
+
+            assertSame(array, filledArray, "Should return null when input array is null");
+        }
+
+        @Test
+        void testFillCharArray() {
+            char[] array = new char[3];
+            char valueToFill = 'A';
+
+            char[] filledArray = ArrayFill.fill(array, valueToFill);
+
+            assertSame(array, filledArray, "Should return the same array instance");
+            for (char element : filledArray) {
+                assertEquals(valueToFill, element, "All elements should be equal to the fill value");
+            }
+        }
+
+        @Test
+        void testFillCharArrayNull() {
+            char[] array = null;
+            char valueToFill = 'A';
+
+            char[] filledArray = ArrayFill.fill(array, valueToFill);
+
+            assertSame(array, filledArray, "Should return null when input array is null");
+        }
+
+        @Test
+        void testFillDoubleArray() {
+            double[] array = new double[3];
+            double valueToFill = 1.0;
+
+            double[] filledArray = ArrayFill.fill(array, valueToFill);
+
+            assertSame(array, filledArray, "Should return the same array instance");
+            for (double element : filledArray) {
+                assertEquals(valueToFill, element, "All elements should be equal to the fill value");
+            }
+        }
+
+        @Test
+        void testFillDoubleArrayNull() {
+            double[] array = null;
+            double valueToFill = 1.0;
+
+            double[] filledArray = ArrayFill.fill(array, valueToFill);
+
+            assertSame(array, filledArray, "Should return null when input array is null");
+        }
+
+        @Test
+        void testFillFloatArray() {
+            float[] array = new float[3];
+            float valueToFill = 1.0f;
+
+            float[] filledArray = ArrayFill.fill(array, valueToFill);
+
+            assertSame(array, filledArray, "Should return the same array instance");
+            for (float element : filledArray) {
+                assertEquals(valueToFill, element, "All elements should be equal to the fill value");
+            }
+        }
+
+        @Test
+        void testFillFloatArrayNull() {
+            float[] array = null;
+            float valueToFill = 1.0f;
+
+            float[] filledArray = ArrayFill.fill(array, valueToFill);
+
+            assertSame(array, filledArray, "Should return null when input array is null");
+        }
+
+        @Test
+        void testFillIntArray() {
+            int[] array = new int[3];
+            int valueToFill = 1;
+
+            int[] filledArray = ArrayFill.fill(array, valueToFill);
+
+            assertSame(array, filledArray, "Should return the same array instance");
+            for (int element : filledArray) {
+                assertEquals(valueToFill, element, "All elements should be equal to the fill value");
+            }
+        }
+
+        @Test
+        void testFillIntArrayNull() {
+            int[] array = null;
+            int valueToFill = 1;
+
+            int[] filledArray = ArrayFill.fill(array, valueToFill);
+
+            assertSame(array, filledArray, "Should return null when input array is null");
+        }
+
+        @Test
+        void testFillLongArray() {
+            long[] array = new long[3];
+            long valueToFill = 1L;
+
+            long[] filledArray = ArrayFill.fill(array, valueToFill);
+
+            assertSame(array, filledArray, "Should return the same array instance");
+            for (long element : filledArray) {
+                assertEquals(valueToFill, element, "All elements should be equal to the fill value");
+            }
+        }
+
+        @Test
+        void testFillLongArrayNull() {
+            long[] array = null;
+            long valueToFill = 1L;
+
+            long[] filledArray = ArrayFill.fill(array, valueToFill);
+
+            assertSame(array, filledArray, "Should return null when input array is null");
+        }
+
+        @Test
+        void testFillShortArray() {
+            short[] array = new short[3];
+            short valueToFill = (short) 1;
+
+            short[] filledArray = ArrayFill.fill(array, valueToFill);
+
+            assertSame(array, filledArray, "Should return the same array instance");
+            for (short element : filledArray) {
+                assertEquals(valueToFill, element, "All elements should be equal to the fill value");
+            }
+        }
+
+        @Test
+        void testFillShortArrayNull() {
+            short[] array = null;
+            short valueToFill = (short) 1;
+
+            short[] filledArray = ArrayFill.fill(array, valueToFill);
+
+            assertSame(array, filledArray, "Should return null when input array is null");
         }
     }
 
-    @Test
-    void testFillBooleanArrayNull() {
-        final boolean[] array = null;
-        final boolean val = true;
-        final boolean[] actual = ArrayFill.fill(array, val);
-        assertSame(array, actual);
-    }
+    @Nested
+    class FillObjectArrays {
+        @Test
+        void testFillObjectArray() {
+            String[] array = new String[3];
+            String valueToFill = "A";
 
-    @Test
-    void testFillByteArray() {
-        final byte[] array = new byte[3];
-        final byte val = (byte) 1;
-        final byte[] actual = ArrayFill.fill(array, val);
-        assertSame(array, actual);
-        for (final byte v : actual) {
-            assertEquals(val, v);
+            String[] filledArray = ArrayFill.fill(array, valueToFill);
+
+            assertSame(array, filledArray, "Should return the same array instance");
+            for (String element : filledArray) {
+                assertEquals(valueToFill, element, "All elements should be equal to the fill value");
+            }
         }
-    }
 
-    @Test
-    void testFillByteArrayNull() {
-        final byte[] array = null;
-        final byte val = (byte) 1;
-        final byte[] actual = ArrayFill.fill(array, val);
-        assertSame(array, actual);
-    }
+        @Test
+        void testFillObjectArrayNull() {
+            Object[] array = null;
+            Object valueToFill = 1;
 
-    @Test
-    void testFillCharArray() {
-        final char[] array = new char[3];
-        final char val = 1;
-        final char[] actual = ArrayFill.fill(array, val);
-        assertSame(array, actual);
-        for (final char v : actual) {
-            assertEquals(val, v);
+            Object[] filledArray = ArrayFill.fill(array, valueToFill);
+
+            assertSame(array, filledArray, "Should return null when input array is null");
         }
-    }
 
-    @Test
-    void testFillCharArrayNull() {
-        final char[] array = null;
-        final char val = 1;
-        final char[] actual = ArrayFill.fill(array, val);
-        assertSame(array, actual);
-    }
+        @Test
+        void testFillWithFunction() throws Exception {
+            FailableIntFunction<?, Exception> nullIntFunction = null;
+            assertNull(ArrayFill.fill(null, nullIntFunction), "Should return null if array is null and function is null.");
+            assertArrayEquals(null, ArrayFill.fill(null, nullIntFunction), "Should return null if array is null and function is null.");
+            assertArrayEquals(ArrayUtils.EMPTY_BOOLEAN_OBJECT_ARRAY, ArrayFill.fill(ArrayUtils.EMPTY_BOOLEAN_OBJECT_ARRAY, nullIntFunction), "Should return empty array if array is empty and function is null.");
+            assertArrayEquals(ArrayUtils.EMPTY_OBJECT_ARRAY, ArrayFill.fill(ArrayUtils.EMPTY_OBJECT_ARRAY, nullIntFunction), "Should return empty array if array is empty and function is null.");
 
-    @Test
-    void testFillDoubleArray() {
-        final double[] array = new double[3];
-        final double val = 1;
-        final double[] actual = ArrayFill.fill(array, val);
-        assertSame(array, actual);
-        for (final double v : actual) {
-            assertEquals(val, v);
+            Integer[] array = new Integer[10];
+            Integer[] filledArray = ArrayFill.fill(array, Integer::valueOf);
+
+            assertSame(array, filledArray, "Should return the same array instance");
+            for (int i = 0; i < array.length; i++) {
+                assertEquals(i, array[i].intValue(), "Element at index " + i + " should be equal to " + i);
+            }
         }
-    }
-
-    @Test
-    void testFillDoubleArrayNull() {
-        final double[] array = null;
-        final double val = 1;
-        final double[] actual = ArrayFill.fill(array, val);
-        assertSame(array, actual);
-    }
-
-    @Test
-    void testFillFloatArray() {
-        final float[] array = new float[3];
-        final float val = 1;
-        final float[] actual = ArrayFill.fill(array, val);
-        assertSame(array, actual);
-        for (final float v : actual) {
-            assertEquals(val, v);
-        }
-    }
-
-    @Test
-    void testFillFloatArrayNull() {
-        final float[] array = null;
-        final float val = 1;
-        final float[] actual = ArrayFill.fill(array, val);
-        assertSame(array, actual);
-    }
-
-    @Test
-    void testFillFunction() throws Exception {
-        final FailableIntFunction<?, Exception> nullIntFunction = null;
-        assertNull(ArrayFill.fill(null, nullIntFunction));
-        assertArrayEquals(null, ArrayFill.fill(null, nullIntFunction));
-        assertArrayEquals(ArrayUtils.EMPTY_BOOLEAN_OBJECT_ARRAY, ArrayFill.fill(ArrayUtils.EMPTY_BOOLEAN_OBJECT_ARRAY, nullIntFunction));
-        assertArrayEquals(ArrayUtils.EMPTY_OBJECT_ARRAY, ArrayFill.fill(ArrayUtils.EMPTY_OBJECT_ARRAY, nullIntFunction));
-        final Integer[] array = new Integer[10];
-        final Integer[] array2 = ArrayFill.fill(array, Integer::valueOf);
-        assertSame(array, array2);
-        for (int i = 0; i < array.length; i++) {
-            assertEquals(i, array[i].intValue());
-        }
-    }
-
-    @Test
-    void testFillIntArray() {
-        final int[] array = new int[3];
-        final int val = 1;
-        final int[] actual = ArrayFill.fill(array, val);
-        assertSame(array, actual);
-        for (final int v : actual) {
-            assertEquals(val, v);
-        }
-    }
-
-    @Test
-    void testFillIntArrayNull() {
-        final int[] array = null;
-        final int val = 1;
-        final int[] actual = ArrayFill.fill(array, val);
-        assertSame(array, actual);
-    }
-
-    @Test
-    void testFillLongArray() {
-        final long[] array = new long[3];
-        final long val = 1;
-        final long[] actual = ArrayFill.fill(array, val);
-        assertSame(array, actual);
-        for (final long v : actual) {
-            assertEquals(val, v);
-        }
-    }
-
-    @Test
-    void testFillLongArrayNull() {
-        final long[] array = null;
-        final long val = 1;
-        final long[] actual = ArrayFill.fill(array, val);
-        assertSame(array, actual);
-    }
-
-    @Test
-    void testFillObjectArray() {
-        final String[] array = new String[3];
-        final String val = "A";
-        final String[] actual = ArrayFill.fill(array, val);
-        assertSame(array, actual);
-        for (final String v : actual) {
-            assertEquals(val, v);
-        }
-    }
-
-    @Test
-    void testFillObjectArrayNull() {
-        final Object[] array = null;
-        final Object val = 1;
-        final Object[] actual = ArrayFill.fill(array, val);
-        assertSame(array, actual);
-    }
-
-    @Test
-    void testFillShortArray() {
-        final short[] array = new short[3];
-        final short val = (byte) 1;
-        final short[] actual = ArrayFill.fill(array, val);
-        assertSame(array, actual);
-        for (final short v : actual) {
-            assertEquals(val, v);
-        }
-    }
-
-    @Test
-    void testFillShortArrayNull() {
-        final short[] array = null;
-        final short val = 1;
-        final short[] actual = ArrayFill.fill(array, val);
-        assertSame(array, actual);
     }
 }

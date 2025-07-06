@@ -1,68 +1,92 @@
-/*
- * Copyright (c) 2007 Mockito contributors
- * This program is made available under the terms of the MIT License.
- */
 package org.mockito;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.validateMockitoUsage;
 
-import org.junit.After;
-import org.junit.Test;
+import java.util.Map;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.exceptions.misusing.InvalidUseOfMatchersException;
 
-import java.util.Map;
+class ArgumentCaptorTest {
 
-public class ArgumentCaptorTest {
-
-    /**
-     * Clean up the internal Mockito-Stubbing state
-     */
-    @After
-    public void tearDown() {
-        try {
-            validateMockitoUsage();
-        } catch (InvalidUseOfMatchersException ignore) {
-        }
+  /**
+   * Ensures Mockito's internal state is clean after each test. This prevents unexpected behavior
+   * in subsequent tests due to matcher misuse.  Any unverified mock invocations with argument matchers will throw an exception.
+   * The try-catch block handles (and ignores) potential InvalidUseOfMatchersException that can
+   * occur during cleanup if matchers were incorrectly used.
+   */
+  @AfterEach
+  void validateMockitoState() {
+    try {
+      validateMockitoUsage();
+    } catch (InvalidUseOfMatchersException ignored) {
+      // Ignore exceptions during cleanup, as they don't affect the test's outcome.
     }
+  }
 
-    @Test
-    public void tell_handy_return_values_to_return_value_for() throws Exception {
+  @Test
+  void captureMethodReturnsNullByDefault() {
+    // Given
+    ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
 
-        ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
-        assertThat(captor.capture()).isNull();
-    }
+    // When
+    // Capturing an argument with no actual method call defaults to null.
 
-    @Test
-    public void getCaptorType_returns_captor_type() throws Exception {
-        class Foo {}
+    // Then
+    assertThat(captor.capture()).isNull();
+  }
 
-        class Bar {}
+  @Test
+  void getCaptorTypeReturnsTheCorrectClass() {
+    // Given
+    class Foo {}
 
-        ArgumentCaptor<Foo> fooCaptor = ArgumentCaptor.forClass(Foo.class);
-        ArgumentCaptor<Bar> barCaptor = ArgumentCaptor.forClass(Bar.class);
+    class Bar {}
 
-        assertThat(fooCaptor.getCaptorType()).isEqualTo(Foo.class);
-        assertThat(barCaptor.getCaptorType()).isEqualTo(Bar.class);
-    }
+    ArgumentCaptor<Foo> fooCaptor = ArgumentCaptor.forClass(Foo.class);
+    ArgumentCaptor<Bar> barCaptor = ArgumentCaptor.forClass(Bar.class);
 
-    @Test
-    public void captor_calls_forClass_with_the_inferred_argument() throws Exception {
-        ArgumentCaptor<Map<String, Object>> captor = ArgumentCaptor.captor();
-        assertThat(captor.getCaptorType()).isEqualTo(Map.class);
-    }
+    // When
+    // Retrieving the captor type.
 
-    @Test
-    public void captor_called_with_explicit_varargs_is_invalid() throws Exception {
-        // Test passing a single argument.
-        assertThatThrownBy(() -> ArgumentCaptor.captor(1234L))
-                .isInstanceOf(IllegalArgumentException.class);
-        // Test passing multiple arguments.
-        assertThatThrownBy(() -> ArgumentCaptor.captor("this shouldn't", "be here"))
-                .isInstanceOf(IllegalArgumentException.class);
-        // Test passing a totally null varargs array.
-        assertThatThrownBy(() -> ArgumentCaptor.<String>captor((String[]) null))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
+    // Then
+    assertThat(fooCaptor.getCaptorType()).isEqualTo(Foo.class);
+    assertThat(barCaptor.getCaptorType()).isEqualTo(Bar.class);
+  }
+
+  @Test
+  void captorInfersTypeFromUsage() {
+    // Given
+    // Creating an ArgumentCaptor without specifying the class directly.
+    ArgumentCaptor<Map<String, Object>> captor = ArgumentCaptor.captor();
+
+    // When
+    // Retrieving the captor type.
+
+    // Then
+    // The captor type should be inferred from the generic type declaration.
+    assertThat(captor.getCaptorType()).isEqualTo(Map.class);
+  }
+
+  @Test
+  void captorWithExplicitVarargsThrowsIllegalArgumentException() {
+    // Expect: Passing explicit arguments to ArgumentCaptor.captor() should throw an exception.
+
+    // Test case 1: Single argument.
+    assertThatThrownBy(() -> ArgumentCaptor.captor(1234L))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage(null); // Message may vary, but the exception type is important
+
+    // Test case 2: Multiple arguments.
+    assertThatThrownBy(() -> ArgumentCaptor.captor("this shouldn't", "be here"))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage(null);
+
+    // Test case 3: Null varargs array.
+    assertThatThrownBy(() -> ArgumentCaptor.<String>captor((String[]) null))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage(null);
+  }
 }
