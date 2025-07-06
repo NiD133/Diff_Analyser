@@ -10,55 +10,68 @@ import static org.junit.jupiter.api.Assertions.*;
 public class LeafNodeTest {
 
     @Test
-    public void doesNotGetAttributesTooEasily() {
-        // test to make sure we're not setting attributes on all nodes right away
-        String body = "<p>One <!-- Two --> Three<![CDATA[Four]]></p>";
-        Document doc = Jsoup.parse(body);
-        assertTrue(hasAnyAttributes(doc)); // should have one - the base uri on the doc
+    public void testAttributeHandlingInNodes() {
+        // Test to ensure attributes are not prematurely set on nodes
+        String htmlContent = "<p>One <!-- Two --> Three<![CDATA[Four]]></p>";
+        Document document = Jsoup.parse(htmlContent);
 
-        Element html = doc.child(0);
-        assertFalse(hasAnyAttributes(html));
+        // Initially, only the document should have attributes (base URI)
+        assertTrue(hasAnyAttributes(document));
 
-        String s = doc.outerHtml();
-        assertFalse(hasAnyAttributes(html));
+        Element htmlElement = document.child(0);
+        assertFalse(hasAnyAttributes(htmlElement));
 
-        Elements els = doc.select("p");
-        Element p = els.first();
-        assertEquals(1, els.size());
-        assertFalse(hasAnyAttributes(html));
+        // Check that outerHtml does not affect attributes
+        String outerHtml = document.outerHtml();
+        assertFalse(hasAnyAttributes(htmlElement));
 
-        els = doc.select("p.none");
-        assertFalse(hasAnyAttributes(html));
+        // Select the <p> element and verify its attributes
+        Elements paragraphElements = document.select("p");
+        Element paragraph = paragraphElements.first();
+        assertEquals(1, paragraphElements.size());
+        assertFalse(hasAnyAttributes(htmlElement));
 
-        String id = p.id();
-        assertEquals("", id);
-        assertFalse(p.hasClass("Foobs"));
-        assertFalse(hasAnyAttributes(html));
+        // Ensure no attributes are added when selecting non-existent elements
+        Elements nonExistentElements = document.select("p.none");
+        assertFalse(hasAnyAttributes(htmlElement));
 
-        p.addClass("Foobs");
-        assertTrue(p.hasClass("Foobs"));
-        assertTrue(hasAnyAttributes(html));
-        assertTrue(hasAnyAttributes(p));
+        // Verify initial state of the <p> element
+        String paragraphId = paragraph.id();
+        assertEquals("", paragraphId);
+        assertFalse(paragraph.hasClass("Foobs"));
+        assertFalse(hasAnyAttributes(htmlElement));
 
-        Attributes attributes = p.attributes();
-        assertTrue(attributes.hasKey("class"));
-        p.clearAttributes();
-        assertFalse(hasAnyAttributes(p));
-        assertFalse(hasAnyAttributes(html));
-        assertFalse(attributes.hasKey("class"));
+        // Add a class to the <p> element and verify attributes
+        paragraph.addClass("Foobs");
+        assertTrue(paragraph.hasClass("Foobs"));
+        assertTrue(hasAnyAttributes(htmlElement));
+        assertTrue(hasAnyAttributes(paragraph));
+
+        // Check attributes directly and clear them
+        Attributes paragraphAttributes = paragraph.attributes();
+        assertTrue(paragraphAttributes.hasKey("class"));
+        paragraph.clearAttributes();
+        assertFalse(hasAnyAttributes(paragraph));
+        assertFalse(hasAnyAttributes(htmlElement));
+        assertFalse(paragraphAttributes.hasKey("class"));
     }
 
+    /**
+     * Helper method to determine if a node or any of its children have attributes.
+     *
+     * @param node the node to check
+     * @return true if any attributes are found, false otherwise
+     */
     private boolean hasAnyAttributes(Node node) {
-        final boolean[] found = new boolean[1];
+        final boolean[] foundAttributes = new boolean[1];
         node.filter(new NodeFilter() {
             @Override
             public FilterResult head(Node node, int depth) {
                 if (node.hasAttributes()) {
-                    found[0] = true;
+                    foundAttributes[0] = true;
                     return FilterResult.STOP;
-                } else {
-                    return FilterResult.CONTINUE;
                 }
+                return FilterResult.CONTINUE;
             }
 
             @Override
@@ -66,6 +79,6 @@ public class LeafNodeTest {
                 return FilterResult.CONTINUE;
             }
         });
-        return found[0];
+        return foundAttributes[0];
     }
 }
