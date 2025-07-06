@@ -27,36 +27,68 @@ import org.junit.jupiter.api.Test;
  */
 class DecoderExceptionTest {
 
-    private static final String MSG = "TEST";
+    private static final String TEST_MESSAGE = "TEST";
+    private static final Throwable THROWABLE_CAUSE = new Exception();
 
-    private static final Throwable t = new Exception();
-
+    /**
+     * Test that the DecoderException constructor without parameters sets the message and cause correctly.
+     */
     @Test
-    void testConstructor0() {
-        final DecoderException e = new DecoderException();
-        assertNull(e.getMessage());
-        assertNull(e.getCause());
+    void testDefaultConstructor() {
+        // Arrange and Act
+        final DecoderException exception = new DecoderException();
+
+        // Assert
+        assertNull(exception.getMessage());
+        assertNull(exception.getCause());
     }
 
+    /**
+     * Test that the DecoderException constructor with a message sets the message and cause correctly.
+     */
     @Test
-    void testConstructorString() {
-        final DecoderException e = new DecoderException(MSG);
-        assertEquals(MSG, e.getMessage());
-        assertNull(e.getCause());
+    void testMessageConstructor() {
+        // Arrange
+        final String expectedMessage = TEST_MESSAGE;
+
+        // Act
+        final DecoderException exception = new DecoderException(expectedMessage);
+
+        // Assert
+        assertEquals(expectedMessage, exception.getMessage());
+        assertNull(exception.getCause());
     }
 
+    /**
+     * Test that the DecoderException constructor with a message and a cause sets the message and cause correctly.
+     */
     @Test
-    void testConstructorStringThrowable() {
-        final DecoderException e = new DecoderException(MSG, t);
-        assertEquals(MSG, e.getMessage());
-        assertEquals(t, e.getCause());
+    void testMessageAndCauseConstructor() {
+        // Arrange
+        final String expectedMessage = TEST_MESSAGE;
+        final Throwable expectedCause = THROWABLE_CAUSE;
+
+        // Act
+        final DecoderException exception = new DecoderException(expectedMessage, expectedCause);
+
+        // Assert
+        assertEquals(expectedMessage, exception.getMessage());
+        assertEquals(expectedCause, exception.getCause());
     }
 
+    /**
+     * Test that the DecoderException constructor with a cause sets the message and cause correctly.
+     */
     @Test
-    void testConstructorThrowable() {
-        final DecoderException e = new DecoderException(t);
-        assertEquals(t.getClass().getName(), e.getMessage());
-        assertEquals(t, e.getCause());
-    }
+    void testCauseConstructor() {
+        // Arrange
+        final Throwable expectedCause = THROWABLE_CAUSE;
 
+        // Act
+        final DecoderException exception = new DecoderException(expectedCause);
+
+        // Assert
+        assertEquals(expectedCause.getClass().getName(), exception.getMessage());
+        assertEquals(expectedCause, exception.getCause());
+    }
 }
