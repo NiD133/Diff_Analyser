@@ -24,45 +24,51 @@ import java.util.List;
 
 import org.apache.commons.codec.language.DoubleMetaphone;
 import org.apache.commons.codec.language.Soundex;
-import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test cases for the StingEncoderComparator.
+ * Test cases for the StringEncoderComparator.
  */
 class StringEncoderComparatorTest {
 
-    @SuppressWarnings("unchecked") // cannot easily avoid this warning
     @Test
-    void testComparatorWithDoubleMetaphone() throws Exception {
-        final StringEncoderComparator sCompare = new StringEncoderComparator(new DoubleMetaphone());
+    void testComparatorWithDoubleMetaphoneSortsCorrectly() {
+        // Arrange
+        final StringEncoderComparator comparator = new StringEncoderComparator(new DoubleMetaphone());
+        final List<String> names = Arrays.asList("Jordan", "Sosa", "Prior", "Pryor");
+        final List<String> expectedSortedNames = Arrays.asList("Jordan", "Prior", "Pryor", "Sosa");
 
-        final String[] testArray = { "Jordan", "Sosa", "Prior", "Pryor" };
-        final List<String> testList = Arrays.asList(testArray);
+        // Act
+        names.sort(comparator);
 
-        final String[] controlArray = { "Jordan", "Prior", "Pryor", "Sosa" };
-
-        testList.sort(sCompare); // unchecked
-
-        final String[] resultArray = testList.toArray(ArrayUtils.EMPTY_STRING_ARRAY);
-
-        for (int i = 0; i < resultArray.length; i++) {
-            assertEquals(controlArray[i], resultArray[i], "Result Array not Equal to Control Array at index: " + i);
-        }
+        // Assert
+        assertEquals(expectedSortedNames, names, "The list of names was not sorted correctly using DoubleMetaphone.");
     }
 
     @Test
-    void testComparatorWithDoubleMetaphoneAndInvalidInput() throws Exception {
-        final StringEncoderComparator sCompare = new StringEncoderComparator(new DoubleMetaphone());
+    void testComparatorWithDoubleMetaphoneHandlesInvalidInputGracefully() {
+        // Arrange
+        final StringEncoderComparator comparator = new StringEncoderComparator(new DoubleMetaphone());
 
-        final int compare = sCompare.compare(Double.valueOf(3.0d), Long.valueOf(3));
-        assertEquals(0, compare, "Trying to compare objects that make no sense to the underlying encoder" + " should return a zero compare code");
+        // Act
+        // Comparing unrelated object types should return 0, indicating they are considered equal for sorting purposes.
+        final int comparisonResult = comparator.compare(Double.valueOf(3.0d), Long.valueOf(3));
+
+        // Assert
+        assertEquals(0, comparisonResult,
+                "Comparing objects of incompatible types should return 0 (equal) to avoid exceptions.");
     }
 
     @Test
-    void testComparatorWithSoundex() throws Exception {
-        final StringEncoderComparator sCompare = new StringEncoderComparator(new Soundex());
+    void testComparatorWithSoundexComparesStringsWithSameSoundexAsEqual() {
+        // Arrange
+        final StringEncoderComparator comparator = new StringEncoderComparator(new Soundex());
 
-        assertEquals(0, sCompare.compare("O'Brien", "O'Brian"), "O'Brien and O'Brian didn't come out with the same Soundex, something must be wrong here");
+        // Act
+        final int comparisonResult = comparator.compare("O'Brien", "O'Brian");
+
+        // Assert
+        assertEquals(0, comparisonResult,
+                "Strings with the same Soundex encoding should be considered equal by the comparator.");
     }
 }
