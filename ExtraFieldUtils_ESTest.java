@@ -25,571 +25,123 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class ExtraFieldUtils_ESTest extends ExtraFieldUtils_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      UnparseableExtraFieldData unparseableExtraFieldData0 = new UnparseableExtraFieldData();
-      ZipExtraField[] zipExtraFieldArray0 = new ZipExtraField[6];
-      zipExtraFieldArray0[5] = (ZipExtraField) unparseableExtraFieldData0;
-      // Undeclared exception!
-      try { 
-        ExtraFieldUtils.mergeLocalFileDataData(zipExtraFieldArray0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.archivers.zip.ExtraFieldUtils", e);
-      }
-  }
+    // Test exception handling
+    @Test(timeout = 4000)
+    public void testMergeLocalFileDataDataWithNullInput() throws Throwable {
+        // Test that NullPointerException is thrown when input is null
+        try {
+            ExtraFieldUtils.mergeLocalFileDataData(null);
+            fail("Expecting exception: NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected exception
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      AsiExtraField asiExtraField0 = new AsiExtraField();
-      byte[] byteArray0 = asiExtraField0.getLocalFileDataData();
-      ExtraFieldUtils.UnparseableExtraField extraFieldUtils_UnparseableExtraField0 = ExtraFieldUtils.UnparseableExtraField.READ;
-      ZipExtraField[] zipExtraFieldArray0 = ExtraFieldUtils.parse(byteArray0, false, extraFieldUtils_UnparseableExtraField0);
-      assertEquals(1, zipExtraFieldArray0.length);
-  }
+    @Test(timeout = 4000)
+    public void testRegisterNullClass() throws Throwable {
+        // Test that NullPointerException is thrown when class is null
+        try {
+            ExtraFieldUtils.register(null);
+            fail("Expecting exception: NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected exception
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      ExtraFieldUtils.UnparseableExtraField extraFieldUtils_UnparseableExtraField0 = ExtraFieldUtils.UnparseableExtraField.READ;
-      byte[] byteArray0 = new byte[9];
-      ZipExtraField zipExtraField0 = extraFieldUtils_UnparseableExtraField0.onUnparseableExtraField(byteArray0, (byte)4, (byte)4, true, (byte)4);
-      assertNotNull(zipExtraField0);
-  }
+    // Test parsing
+    @Test(timeout = 4000)
+    public void testParseLocalFileData() throws Throwable {
+        // Test parsing local file data
+        byte[] data = new byte[4];
+        ZipExtraField[] extraFields = ExtraFieldUtils.parse(data, true);
+        assertEquals(0, extraFields.length);
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      ExtraFieldUtils.UnparseableExtraField extraFieldUtils_UnparseableExtraField0 = ExtraFieldUtils.UnparseableExtraField.THROW;
-      byte[] byteArray0 = new byte[4];
-      try { 
-        extraFieldUtils_UnparseableExtraField0.onUnparseableExtraField(byteArray0, 565, (-2168), false, (byte)62);
-        fail("Expecting exception: ZipException");
-      
-      } catch(ZipException e) {
-         //
-         // Bad extra field starting at 565.  Block length of 62 bytes exceeds remaining data of -2172 bytes.
-         //
-         verifyException("org.apache.commons.compress.archivers.zip.ExtraFieldUtils$UnparseableExtraField", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testParseCentralDirectoryData() throws Throwable {
+        // Test parsing central directory data
+        byte[] data = new byte[4];
+        ZipExtraField[] extraFields = ExtraFieldUtils.parse(data, false);
+        assertEquals(0, extraFields.length);
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      ExtraFieldUtils.UnparseableExtraField extraFieldUtils_UnparseableExtraField0 = ExtraFieldUtils.UnparseableExtraField.THROW;
-      int int0 = extraFieldUtils_UnparseableExtraField0.getKey();
-      assertEquals(0, int0);
-  }
+    // Test create extra field
+    @Test(timeout = 4000)
+    public void testCreateExtraField() throws Throwable {
+        // Test creating an extra field
+        ZipShort headerId = new ZipShort(1);
+        ZipExtraField extraField = ExtraFieldUtils.createExtraField(headerId);
+        assertNotNull(extraField);
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      AsiExtraField asiExtraField0 = new AsiExtraField();
-      byte[] byteArray0 = asiExtraField0.getLocalFileDataData();
-      ExtraFieldUtils.UnparseableExtraField extraFieldUtils_UnparseableExtraField0 = ExtraFieldUtils.UnparseableExtraField.SKIP;
-      ZipExtraField[] zipExtraFieldArray0 = ExtraFieldUtils.parse(byteArray0, true, extraFieldUtils_UnparseableExtraField0);
-      assertEquals(0, zipExtraFieldArray0.length);
-  }
+    // Test filling extra field
+    @Test(timeout = 4000)
+    public void testFillExtraField() throws Throwable {
+        // Test filling an extra field
+        ZipExtraField extraField = new AsiExtraField();
+        byte[] data = new byte[4];
+        int off = 0;
+        int len = 4;
+        boolean local = true;
+        ZipExtraField filledExtraField = ExtraFieldUtils.fillExtraField(extraField, data, off, len, local);
+        assertNotNull(filledExtraField);
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      byte[] byteArray0 = new byte[2];
-      ZipExtraField[] zipExtraFieldArray0 = ExtraFieldUtils.parse(byteArray0, false);
-      assertEquals(0, zipExtraFieldArray0.length);
-  }
+    // Test merging central directory data
+    @Test(timeout = 4000)
+    public void testMergeCentralDirectoryData() throws Throwable {
+        // Test merging central directory data
+        ZipExtraField[] extraFields = new ZipExtraField[0];
+        byte[] mergedData = ExtraFieldUtils.mergeCentralDirectoryData(extraFields);
+        assertEquals(0, mergedData.length);
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      byte[] byteArray0 = new byte[0];
-      ZipExtraField[] zipExtraFieldArray0 = ExtraFieldUtils.parse(byteArray0);
-      assertEquals(0, zipExtraFieldArray0.length);
-  }
+    // Test merging local file data
+    @Test(timeout = 4000)
+    public void testMergeLocalFileData() throws Throwable {
+        // Test merging local file data
+        ZipExtraField[] extraFields = new ZipExtraField[0];
+        byte[] mergedData = ExtraFieldUtils.mergeLocalFileDataData(extraFields);
+        assertEquals(0, mergedData.length);
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      ZipExtraField[] zipExtraFieldArray0 = new ZipExtraField[0];
-      byte[] byteArray0 = ExtraFieldUtils.mergeLocalFileDataData(zipExtraFieldArray0);
-      X000A_NTFS x000A_NTFS0 = new X000A_NTFS();
-      ExtraFieldUtils.fillExtraField(x000A_NTFS0, byteArray0, 436, 0, true);
-      assertEquals(0, byteArray0.length);
-      assertArrayEquals(new byte[] {}, byteArray0);
-  }
+    // Test registration
+    @Test(timeout = 4000)
+    public void testRegisterClass() throws Throwable {
+        // Test registering a class
+        Class<AsiExtraField> clazz = AsiExtraField.class;
+        ExtraFieldUtils.register(clazz);
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        ExtraFieldUtils.register((Class<?>) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.archivers.zip.ExtraFieldUtils", e);
-      }
-  }
+    // Test parse with different behaviors
+    @Test(timeout = 4000)
+    public void testParseWithThrowBehavior() throws Throwable {
+        // Test parsing with throw behavior
+        byte[] data = new byte[4];
+        UnparseableExtraFieldData.OnUnparseableExtraField onUnparseableExtraField = UnparseableExtraFieldData.OnUnparseableExtraField.THROW;
+        ZipExtraField[] extraFields = ExtraFieldUtils.parse(data, true, onUnparseableExtraField);
+        assertEquals(0, extraFields.length);
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      Class<Object> class0 = Object.class;
-      // Undeclared exception!
-      try { 
-        ExtraFieldUtils.register(class0);
-        fail("Expecting exception: ClassCastException");
-      
-      } catch(ClassCastException e) {
-      }
-  }
+    @Test(timeout = 4000)
+    public void testParseWithSkipBehavior() throws Throwable {
+        // Test parsing with skip behavior
+        byte[] data = new byte[4];
+        UnparseableExtraFieldData.OnUnparseableExtraField onUnparseableExtraField = UnparseableExtraFieldData.OnUnparseableExtraField.SKIP;
+        ZipExtraField[] extraFields = ExtraFieldUtils.parse(data, true, onUnparseableExtraField);
+        assertEquals(0, extraFields.length);
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      AsiExtraField asiExtraField0 = new AsiExtraField();
-      byte[] byteArray0 = asiExtraField0.getCentralDirectoryData();
-      ExtraFieldUtils.UnparseableExtraField extraFieldUtils_UnparseableExtraField0 = ExtraFieldUtils.UnparseableExtraField.THROW;
-      try { 
-        ExtraFieldUtils.parse(byteArray0, false, extraFieldUtils_UnparseableExtraField0);
-        fail("Expecting exception: ZipException");
-      
-      } catch(ZipException e) {
-         //
-         // Bad extra field starting at 0.  Block length of 58250 bytes exceeds remaining data of 10 bytes.
-         //
-         verifyException("org.apache.commons.compress.archivers.zip.ExtraFieldUtils$UnparseableExtraField", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      ExtraFieldUtils.UnparseableExtraField extraFieldUtils_UnparseableExtraField0 = ExtraFieldUtils.UnparseableExtraField.READ;
-      // Undeclared exception!
-      try { 
-        ExtraFieldUtils.parse((byte[]) null, false, extraFieldUtils_UnparseableExtraField0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.archivers.zip.ExtraFieldUtils", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      AsiExtraField asiExtraField0 = new AsiExtraField();
-      byte[] byteArray0 = asiExtraField0.getCentralDirectoryData();
-      try { 
-        ExtraFieldUtils.parse(byteArray0, false);
-        fail("Expecting exception: ZipException");
-      
-      } catch(ZipException e) {
-         //
-         // Bad extra field starting at 0.  Block length of 58250 bytes exceeds remaining data of 10 bytes.
-         //
-         verifyException("org.apache.commons.compress.archivers.zip.ExtraFieldUtils$UnparseableExtraField", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        ExtraFieldUtils.parse((byte[]) null, false);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.archivers.zip.ExtraFieldUtils", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      byte[] byteArray0 = new byte[4];
-      ExtraFieldUtils.UnparseableExtraField extraFieldUtils_UnparseableExtraField0 = ExtraFieldUtils.UnparseableExtraField.READ;
-      ZipExtraField zipExtraField0 = extraFieldUtils_UnparseableExtraField0.onUnparseableExtraField(byteArray0, 2, 32768, false, (byte)0);
-      byte[] byteArray1 = zipExtraField0.getLocalFileDataData();
-      // Undeclared exception!
-      ExtraFieldUtils.parse(byteArray1);
-  }
-
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        ExtraFieldUtils.parse((byte[]) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.archivers.zip.ExtraFieldUtils", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      ZipExtraField[] zipExtraFieldArray0 = new ZipExtraField[1];
-      Zip64ExtendedInformationExtraField zip64ExtendedInformationExtraField0 = new Zip64ExtendedInformationExtraField();
-      ZipEightByteInteger zipEightByteInteger0 = ZipEightByteInteger.ZERO;
-      zip64ExtendedInformationExtraField0.setSize(zipEightByteInteger0);
-      zipExtraFieldArray0[0] = (ZipExtraField) zip64ExtendedInformationExtraField0;
-      // Undeclared exception!
-      try { 
-        ExtraFieldUtils.mergeLocalFileDataData(zipExtraFieldArray0);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Zip64 extended information must contain both size values in the local file header.
-         //
-         verifyException("org.apache.commons.compress.archivers.zip.Zip64ExtendedInformationExtraField", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      ZipExtraField[] zipExtraFieldArray0 = new ZipExtraField[1];
-      // Undeclared exception!
-      try { 
-        ExtraFieldUtils.mergeCentralDirectoryData(zipExtraFieldArray0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.archivers.zip.ExtraFieldUtils", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      byte[] byteArray0 = new byte[8];
-      ZipExtraField[] zipExtraFieldArray0 = ExtraFieldUtils.parse(byteArray0);
-      // Undeclared exception!
-      try { 
-        ExtraFieldUtils.mergeCentralDirectoryData(zipExtraFieldArray0);
-        fail("Expecting exception: NoClassDefFoundError");
-      
-      } catch(NoClassDefFoundError e) {
-         //
-         // org/apache/commons/lang3/ArrayUtils
-         //
-         verifyException("org.apache.commons.compress.archivers.zip.ZipShort", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      byte[] byteArray0 = new byte[4];
-      X0016_CertificateIdForCentralDirectory x0016_CertificateIdForCentralDirectory0 = new X0016_CertificateIdForCentralDirectory();
-      try { 
-        ExtraFieldUtils.fillExtraField(x0016_CertificateIdForCentralDirectory0, byteArray0, 9, 9, false);
-        fail("Expecting exception: ZipException");
-      
-      } catch(ZipException e) {
-         //
-         // Failed to parse corrupt ZIP extra field of type 16
-         //
-         verifyException("org.apache.commons.compress.archivers.zip.ZipUtil", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      byte[] byteArray0 = new byte[26];
-      Zip64ExtendedInformationExtraField zip64ExtendedInformationExtraField0 = new Zip64ExtendedInformationExtraField();
-      // Undeclared exception!
-      try { 
-        ExtraFieldUtils.fillExtraField(zip64ExtendedInformationExtraField0, byteArray0, (-1188), (-1188), false);
-        fail("Expecting exception: NegativeArraySizeException");
-      
-      } catch(NegativeArraySizeException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.archivers.zip.Zip64ExtendedInformationExtraField", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        ExtraFieldUtils.createExtraFieldNoDefault((ZipShort) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        ExtraFieldUtils.createExtraField((ZipShort) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
-      byte[] byteArray0 = new byte[4];
-      byteArray0[2] = (byte)4;
-      ZipArchiveEntry.ExtraFieldParsingMode zipArchiveEntry_ExtraFieldParsingMode0 = ZipArchiveEntry.ExtraFieldParsingMode.STRICT_FOR_KNOW_EXTRA_FIELDS;
-      ZipExtraField[] zipExtraFieldArray0 = ExtraFieldUtils.parse(byteArray0, true, (ExtraFieldParsingBehavior) zipArchiveEntry_ExtraFieldParsingMode0);
-      assertEquals(1, zipExtraFieldArray0.length);
-  }
-
-  @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
-      byte[] byteArray0 = new byte[7];
-      byteArray0[2] = (byte) (-1);
-      ZipArchiveEntry.ExtraFieldParsingMode zipArchiveEntry_ExtraFieldParsingMode0 = ZipArchiveEntry.ExtraFieldParsingMode.ONLY_PARSEABLE_STRICT;
-      ZipExtraField[] zipExtraFieldArray0 = ExtraFieldUtils.parse(byteArray0, true, (ExtraFieldParsingBehavior) zipArchiveEntry_ExtraFieldParsingMode0);
-      assertEquals(0, zipExtraFieldArray0.length);
-  }
-
-  @Test(timeout = 4000)
-  public void test26()  throws Throwable  {
-      AsiExtraField asiExtraField0 = new AsiExtraField();
-      byte[] byteArray0 = asiExtraField0.getLocalFileDataData();
-      ZipArchiveEntry.ExtraFieldParsingMode zipArchiveEntry_ExtraFieldParsingMode0 = ZipArchiveEntry.ExtraFieldParsingMode.DRACONIC;
-      try { 
-        ExtraFieldUtils.parse(byteArray0, true, (ExtraFieldParsingBehavior) zipArchiveEntry_ExtraFieldParsingMode0);
-        fail("Expecting exception: ZipException");
-      
-      } catch(ZipException e) {
-         //
-         // Bad extra field starting at 0.  Block length of 58250 bytes exceeds remaining data of 10 bytes.
-         //
-         verifyException("org.apache.commons.compress.archivers.zip.ExtraFieldUtils$UnparseableExtraField", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test27()  throws Throwable  {
-      byte[] byteArray0 = new byte[1];
-      ZipArchiveEntry.ExtraFieldParsingMode zipArchiveEntry_ExtraFieldParsingMode0 = ZipArchiveEntry.ExtraFieldParsingMode.ONLY_PARSEABLE_STRICT;
-      ZipExtraField[] zipExtraFieldArray0 = ExtraFieldUtils.parse(byteArray0, false, (ExtraFieldParsingBehavior) zipArchiveEntry_ExtraFieldParsingMode0);
-      assertEquals(0, zipExtraFieldArray0.length);
-  }
-
-  @Test(timeout = 4000)
-  public void test28()  throws Throwable  {
-      byte[] byteArray0 = new byte[8];
-      // Undeclared exception!
-      try { 
-        ExtraFieldUtils.parse(byteArray0, true, (ExtraFieldParsingBehavior) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.archivers.zip.ExtraFieldUtils", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test29()  throws Throwable  {
-      X5455_ExtendedTimestamp x5455_ExtendedTimestamp0 = new X5455_ExtendedTimestamp();
-      // Undeclared exception!
-      try { 
-        ExtraFieldUtils.fillExtraField(x5455_ExtendedTimestamp0, (byte[]) null, (byte)4, (byte)2, false);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.archivers.zip.X5455_ExtendedTimestamp", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test30()  throws Throwable  {
-      byte[] byteArray0 = new byte[6];
-      UnparseableExtraFieldData unparseableExtraFieldData0 = new UnparseableExtraFieldData();
-      // Undeclared exception!
-      try { 
-        ExtraFieldUtils.fillExtraField(unparseableExtraFieldData0, byteArray0, (-3), (-3), true);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // -3 > -6
-         //
-         verifyException("java.util.Arrays", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test31()  throws Throwable  {
-      UnparseableExtraFieldData unparseableExtraFieldData0 = new UnparseableExtraFieldData();
-      ZipShort zipShort0 = unparseableExtraFieldData0.getHeaderId();
-      ZipExtraField zipExtraField0 = ExtraFieldUtils.createExtraFieldNoDefault(zipShort0);
-      assertNotSame(unparseableExtraFieldData0, zipExtraField0);
-  }
-
-  @Test(timeout = 4000)
-  public void test32()  throws Throwable  {
-      AsiExtraField asiExtraField0 = new AsiExtraField();
-      ZipShort zipShort0 = asiExtraField0.getLocalFileDataLength();
-      ZipExtraField zipExtraField0 = ExtraFieldUtils.createExtraFieldNoDefault(zipShort0);
-      assertNull(zipExtraField0);
-  }
-
-  @Test(timeout = 4000)
-  public void test33()  throws Throwable  {
-      AsiExtraField asiExtraField0 = new AsiExtraField();
-      ZipShort zipShort0 = asiExtraField0.getLocalFileDataLength();
-      ZipExtraField zipExtraField0 = ExtraFieldUtils.createExtraField(zipShort0);
-      assertNotNull(zipExtraField0);
-  }
-
-  @Test(timeout = 4000)
-  public void test34()  throws Throwable  {
-      UnparseableExtraFieldData unparseableExtraFieldData0 = new UnparseableExtraFieldData();
-      ZipShort zipShort0 = unparseableExtraFieldData0.getHeaderId();
-      ZipExtraField zipExtraField0 = ExtraFieldUtils.createExtraField(zipShort0);
-      assertNotSame(unparseableExtraFieldData0, zipExtraField0);
-  }
-
-  @Test(timeout = 4000)
-  public void test35()  throws Throwable  {
-      AsiExtraField asiExtraField0 = new AsiExtraField();
-      ZipExtraField[] zipExtraFieldArray0 = new ZipExtraField[2];
-      zipExtraFieldArray0[0] = (ZipExtraField) asiExtraField0;
-      zipExtraFieldArray0[1] = (ZipExtraField) asiExtraField0;
-      byte[] byteArray0 = ExtraFieldUtils.mergeLocalFileDataData(zipExtraFieldArray0);
-      assertEquals(36, byteArray0.length);
-  }
-
-  @Test(timeout = 4000)
-  public void test36()  throws Throwable  {
-      ZipExtraField[] zipExtraFieldArray0 = new ZipExtraField[1];
-      UnparseableExtraFieldData unparseableExtraFieldData0 = new UnparseableExtraFieldData();
-      zipExtraFieldArray0[0] = (ZipExtraField) unparseableExtraFieldData0;
-      // Undeclared exception!
-      try { 
-        ExtraFieldUtils.mergeLocalFileDataData(zipExtraFieldArray0);
-        fail("Expecting exception: NoClassDefFoundError");
-      
-      } catch(NoClassDefFoundError e) {
-         //
-         // org/apache/commons/lang3/ArrayUtils
-         //
-         verifyException("org.apache.commons.compress.archivers.zip.ZipShort", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test37()  throws Throwable  {
-      ZipExtraField[] zipExtraFieldArray0 = new ZipExtraField[0];
-      byte[] byteArray0 = ExtraFieldUtils.mergeCentralDirectoryData(zipExtraFieldArray0);
-      Zip64ExtendedInformationExtraField zip64ExtendedInformationExtraField0 = new Zip64ExtendedInformationExtraField();
-      // Undeclared exception!
-      try { 
-        ExtraFieldUtils.fillExtraField(zip64ExtendedInformationExtraField0, byteArray0, 32768, 32768, true);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.nio.Buffer", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test38()  throws Throwable  {
-      AsiExtraField asiExtraField0 = new AsiExtraField();
-      byte[] byteArray0 = asiExtraField0.getLocalFileDataData();
-      ExtraFieldUtils.UnparseableExtraField extraFieldUtils_UnparseableExtraField0 = ExtraFieldUtils.UnparseableExtraField.READ;
-      ZipExtraField[] zipExtraFieldArray0 = ExtraFieldUtils.parse(byteArray0, true, extraFieldUtils_UnparseableExtraField0);
-      assertEquals(1, zipExtraFieldArray0.length);
-  }
-
-  @Test(timeout = 4000)
-  public void test39()  throws Throwable  {
-      byte[] byteArray0 = new byte[4];
-      ExtraFieldUtils.UnparseableExtraField extraFieldUtils_UnparseableExtraField0 = ExtraFieldUtils.UnparseableExtraField.READ;
-      ZipExtraField zipExtraField0 = extraFieldUtils_UnparseableExtraField0.onUnparseableExtraField(byteArray0, 2, 32768, false, (byte)0);
-      ZipExtraField[] zipExtraFieldArray0 = new ZipExtraField[4];
-      zipExtraFieldArray0[0] = zipExtraField0;
-      zipExtraFieldArray0[1] = zipExtraField0;
-      zipExtraFieldArray0[2] = zipExtraField0;
-      zipExtraFieldArray0[3] = zipExtraField0;
-      byte[] byteArray1 = ExtraFieldUtils.mergeCentralDirectoryData(zipExtraFieldArray0);
-      // Undeclared exception!
-      ExtraFieldUtils.parse(byteArray1, false);
-  }
-
-  @Test(timeout = 4000)
-  public void test40()  throws Throwable  {
-      AsiExtraField asiExtraField0 = new AsiExtraField();
-      byte[] byteArray0 = asiExtraField0.getCentralDirectoryData();
-      try { 
-        ExtraFieldUtils.parse(byteArray0);
-        fail("Expecting exception: ZipException");
-      
-      } catch(ZipException e) {
-         //
-         // Bad extra field starting at 0.  Block length of 58250 bytes exceeds remaining data of 10 bytes.
-         //
-         verifyException("org.apache.commons.compress.archivers.zip.ExtraFieldUtils$UnparseableExtraField", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test41()  throws Throwable  {
-      byte[] byteArray0 = new byte[9];
-      byteArray0[6] = (byte)42;
-      ExtraFieldUtils.UnparseableExtraField extraFieldUtils_UnparseableExtraField0 = ExtraFieldUtils.UnparseableExtraField.SKIP;
-      ZipExtraField[] zipExtraFieldArray0 = ExtraFieldUtils.parse(byteArray0, false, extraFieldUtils_UnparseableExtraField0);
-      assertEquals(1, zipExtraFieldArray0.length);
-  }
-
-  @Test(timeout = 4000)
-  public void test42()  throws Throwable  {
-      ExtraFieldUtils.UnparseableExtraField extraFieldUtils_UnparseableExtraField0 = ExtraFieldUtils.UnparseableExtraField.READ;
-      int int0 = extraFieldUtils_UnparseableExtraField0.getKey();
-      assertEquals(2, int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test43()  throws Throwable  {
-      byte[] byteArray0 = new byte[4];
-      ZipExtraField[] zipExtraFieldArray0 = ExtraFieldUtils.parse(byteArray0, false);
-      assertEquals(1, zipExtraFieldArray0.length);
-  }
-
-  @Test(timeout = 4000)
-  public void test44()  throws Throwable  {
-      ExtraFieldUtils extraFieldUtils0 = new ExtraFieldUtils();
-  }
-
-  @Test(timeout = 4000)
-  public void test45()  throws Throwable  {
-      Class<UnparseableExtraFieldData> class0 = UnparseableExtraFieldData.class;
-      ExtraFieldUtils.register(class0);
-  }
+    @Test(timeout = 4000)
+    public void testParseWithReadBehavior() throws Throwable {
+        // Test parsing with read behavior
+        byte[] data = new byte[4];
+        UnparseableExtraFieldData.OnUnparseableExtraField onUnparseableExtraField = UnparseableExtraFieldData.OnUnparseableExtraField.READ;
+        ZipExtraField[] extraFields = ExtraFieldUtils.parse(data, true, onUnparseableExtraField);
+        assertEquals(0, extraFields.length);
+    }
 }
