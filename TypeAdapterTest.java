@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2022 Google Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.google.gson;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -26,16 +10,19 @@ import java.io.StringReader;
 import org.junit.Test;
 
 public class TypeAdapterTest {
-  @Test
-  public void testNullSafe() throws IOException {
-    TypeAdapter<String> adapter = assertionErrorAdapter.nullSafe();
 
-    assertThat(adapter.toJson(null)).isEqualTo("null");
-    assertThat(adapter.fromJson("null")).isNull();
+  // Test to ensure nullSafe() method handles null values correctly
+  @Test
+  public void testNullSafeHandlesNullValues() throws IOException {
+    TypeAdapter<String> nullSafeAdapter = assertionErrorAdapter.nullSafe();
+
+    assertThat(nullSafeAdapter.toJson(null)).isEqualTo("null");
+    assertThat(nullSafeAdapter.fromJson("null")).isNull();
   }
 
+  // Test to ensure nullSafe() returns the same instance when called multiple times
   @Test
-  public void testNullSafe_ReturningSameInstanceOnceNullSafe() {
+  public void testNullSafeReturnsSameInstance() {
     TypeAdapter<?> nullSafeAdapter = assertionErrorAdapter.nullSafe();
 
     assertThat(nullSafeAdapter.nullSafe()).isSameInstanceAs(nullSafeAdapter);
@@ -43,86 +30,79 @@ public class TypeAdapterTest {
     assertThat(nullSafeAdapter.nullSafe().nullSafe().nullSafe()).isSameInstanceAs(nullSafeAdapter);
   }
 
+  // Test to verify the toString() method of nullSafe() returns the expected string
   @Test
-  public void testNullSafe_ToString() {
+  public void testNullSafeToString() {
     TypeAdapter<?> adapter = assertionErrorAdapter;
 
     assertThat(adapter.toString()).isEqualTo("assertionErrorAdapter");
-    assertThat(adapter.nullSafe().toString())
-        .isEqualTo("NullSafeTypeAdapter[assertionErrorAdapter]");
-    assertThat(adapter.nullSafe().nullSafe().toString())
-        .isEqualTo("NullSafeTypeAdapter[assertionErrorAdapter]");
+    assertThat(adapter.nullSafe().toString()).isEqualTo("NullSafeTypeAdapter[assertionErrorAdapter]");
+    assertThat(adapter.nullSafe().nullSafe().toString()).isEqualTo("NullSafeTypeAdapter[assertionErrorAdapter]");
   }
 
-  private static final TypeAdapter<String> assertionErrorAdapter =
-      new TypeAdapter<>() {
-        @Override
-        public void write(JsonWriter out, String value) {
-          throw new AssertionError("unexpected call");
-        }
+  // Custom TypeAdapter that throws AssertionError for unexpected calls
+  private static final TypeAdapter<String> assertionErrorAdapter = new TypeAdapter<>() {
+    @Override
+    public void write(JsonWriter out, String value) {
+      throw new AssertionError("unexpected call");
+    }
 
-        @Override
-        public String read(JsonReader in) {
-          throw new AssertionError("unexpected call");
-        }
+    @Override
+    public String read(JsonReader in) {
+      throw new AssertionError("unexpected call");
+    }
 
-        @Override
-        public String toString() {
-          return "assertionErrorAdapter";
-        }
-      };
+    @Override
+    public String toString() {
+      return "assertionErrorAdapter";
+    }
+  };
 
-  /**
-   * Tests behavior when {@link TypeAdapter#write(JsonWriter, Object)} manually throws {@link
-   * IOException} which is not caused by writer usage.
-   */
+  // Test to verify behavior when write() method throws IOException
   @Test
-  public void testToJson_ThrowingIOException() {
-    IOException exception = new IOException("test");
-    TypeAdapter<Integer> adapter =
-        new TypeAdapter<>() {
-          @Override
-          public void write(JsonWriter out, Integer value) throws IOException {
-            throw exception;
-          }
+  public void testToJsonThrowsIOException() {
+    IOException testException = new IOException("test");
+    TypeAdapter<Integer> adapter = new TypeAdapter<>() {
+      @Override
+      public void write(JsonWriter out, Integer value) throws IOException {
+        throw testException;
+      }
 
-          @Override
-          public Integer read(JsonReader in) {
-            throw new AssertionError("not needed by this test");
-          }
-        };
+      @Override
+      public Integer read(JsonReader in) {
+        throw new AssertionError("not needed by this test");
+      }
+    };
 
-    JsonIOException e = assertThrows(JsonIOException.class, () -> adapter.toJson(1));
-    assertThat(e).hasCauseThat().isEqualTo(exception);
+    JsonIOException jsonIOException = assertThrows(JsonIOException.class, () -> adapter.toJson(1));
+    assertThat(jsonIOException).hasCauseThat().isEqualTo(testException);
 
-    e = assertThrows(JsonIOException.class, () -> adapter.toJsonTree(1));
-    assertThat(e).hasCauseThat().isEqualTo(exception);
+    jsonIOException = assertThrows(JsonIOException.class, () -> adapter.toJsonTree(1));
+    assertThat(jsonIOException).hasCauseThat().isEqualTo(testException);
   }
 
-  private static final TypeAdapter<String> adapter =
-      new TypeAdapter<>() {
-        @Override
-        public void write(JsonWriter out, String value) throws IOException {
-          out.value(value);
-        }
+  // A simple TypeAdapter for String that writes and reads JSON values
+  private static final TypeAdapter<String> simpleStringAdapter = new TypeAdapter<>() {
+    @Override
+    public void write(JsonWriter out, String value) throws IOException {
+      out.value(value);
+    }
 
-        @Override
-        public String read(JsonReader in) throws IOException {
-          return in.nextString();
-        }
-      };
+    @Override
+    public String read(JsonReader in) throws IOException {
+      return in.nextString();
+    }
+  };
 
-  // Note: This test just verifies the current behavior; it is a bit questionable
-  // whether that behavior is actually desired
+  // Test to verify behavior when JSON has trailing data (using Reader)
   @Test
-  public void testFromJson_Reader_TrailingData() throws IOException {
-    assertThat(adapter.fromJson(new StringReader("\"a\"1"))).isEqualTo("a");
+  public void testFromJsonReaderWithTrailingData() throws IOException {
+    assertThat(simpleStringAdapter.fromJson(new StringReader("\"a\"1"))).isEqualTo("a");
   }
 
-  // Note: This test just verifies the current behavior; it is a bit questionable
-  // whether that behavior is actually desired
+  // Test to verify behavior when JSON has trailing data (using String)
   @Test
-  public void testFromJson_String_TrailingData() throws IOException {
-    assertThat(adapter.fromJson("\"a\"1")).isEqualTo("a");
+  public void testFromJsonStringWithTrailingData() throws IOException {
+    assertThat(simpleStringAdapter.fromJson("\"a\"1")).isEqualTo("a");
   }
 }

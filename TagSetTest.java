@@ -1,4 +1,5 @@
 package org.jsoup.parser;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -8,178 +9,221 @@ import static org.jsoup.parser.Parser.NamespaceHtml;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TagSetTest {
-    @Test void canRetrieveNewTagsSensitive() {
-        Document doc = Jsoup.parse("<div><p>One</p></div>", "", Parser.htmlParser().settings(ParseSettings.preserveCase));
-        TagSet tags = doc.parser().tagSet();
-        // should be the full html set
-        Tag meta = tags.get("meta", NamespaceHtml);
-        assertNotNull(meta);
-        assertTrue(meta.isKnownTag());
 
-        Element p = doc.expectFirst("p");
-        assertTrue(p.tag().isKnownTag());
+    @Test
+    void testRetrieveNewTagsWithCaseSensitivity() {
+        // Parse HTML with case sensitivity preserved
+        Document document = Jsoup.parse("<div><p>One</p></div>", "", Parser.htmlParser().settings(ParseSettings.preserveCase));
+        TagSet tagSet = document.parser().tagSet();
 
-        assertNull(tags.get("FOO", NamespaceHtml));
-        p.tagName("FOO");
-        Tag foo = p.tag();
-        assertEquals("FOO", foo.name());
-        assertEquals("foo", foo.normalName());
-        assertEquals(NamespaceHtml, foo.namespace());
-        assertFalse(foo.isKnownTag());
+        // Verify that 'meta' is a known tag
+        Tag metaTag = tagSet.get("meta", NamespaceHtml);
+        assertNotNull(metaTag);
+        assertTrue(metaTag.isKnownTag());
 
-        assertSame(foo, tags.get("FOO", NamespaceHtml));
-        assertSame(foo, tags.valueOf("FOO", NamespaceHtml));
-        assertNull(tags.get("FOO", "SomeOtherNamespace"));
+        // Verify that 'p' is a known tag
+        Element paragraph = document.expectFirst("p");
+        assertTrue(paragraph.tag().isKnownTag());
+
+        // Verify behavior with unknown tags
+        assertNull(tagSet.get("FOO", NamespaceHtml));
+        paragraph.tagName("FOO");
+        Tag fooTag = paragraph.tag();
+        assertEquals("FOO", fooTag.name());
+        assertEquals("foo", fooTag.normalName());
+        assertEquals(NamespaceHtml, fooTag.namespace());
+        assertFalse(fooTag.isKnownTag());
+
+        // Verify that the new tag is retrievable
+        assertSame(fooTag, tagSet.get("FOO", NamespaceHtml));
+        assertSame(fooTag, tagSet.valueOf("FOO", NamespaceHtml));
+        assertNull(tagSet.get("FOO", "SomeOtherNamespace"));
     }
 
-    @Test void canRetrieveNewTagsInsensitive() {
-        Document doc = Jsoup.parse("<div><p>One</p></div>");
-        TagSet tags = doc.parser().tagSet();
-        // should be the full html set
-        Tag meta = tags.get("meta", NamespaceHtml);
-        assertNotNull(meta);
-        assertTrue(meta.isKnownTag());
+    @Test
+    void testRetrieveNewTagsWithoutCaseSensitivity() {
+        // Parse HTML without preserving case sensitivity
+        Document document = Jsoup.parse("<div><p>One</p></div>");
+        TagSet tagSet = document.parser().tagSet();
 
-        Element p = doc.expectFirst("p");
-        assertTrue(p.tag().isKnownTag());
+        // Verify that 'meta' is a known tag
+        Tag metaTag = tagSet.get("meta", NamespaceHtml);
+        assertNotNull(metaTag);
+        assertTrue(metaTag.isKnownTag());
 
-        assertNull(tags.get("FOO", NamespaceHtml));
-        p.tagName("FOO");
-        Tag foo = p.tag();
-        assertEquals("foo", foo.name());
-        assertEquals("foo", foo.normalName());
-        assertEquals(NamespaceHtml, foo.namespace());
-        assertFalse(foo.isKnownTag());
+        // Verify that 'p' is a known tag
+        Element paragraph = document.expectFirst("p");
+        assertTrue(paragraph.tag().isKnownTag());
 
-        assertSame(foo, tags.get("foo", NamespaceHtml));
-        assertSame(foo, tags.valueOf("FOO", NamespaceHtml, doc.parser().settings()));
-        assertNull(tags.get("foo", "SomeOtherNamespace"));
+        // Verify behavior with unknown tags
+        assertNull(tagSet.get("FOO", NamespaceHtml));
+        paragraph.tagName("FOO");
+        Tag fooTag = paragraph.tag();
+        assertEquals("foo", fooTag.name());
+        assertEquals("foo", fooTag.normalName());
+        assertEquals(NamespaceHtml, fooTag.namespace());
+        assertFalse(fooTag.isKnownTag());
+
+        // Verify that the new tag is retrievable
+        assertSame(fooTag, tagSet.get("foo", NamespaceHtml));
+        assertSame(fooTag, tagSet.valueOf("FOO", NamespaceHtml, document.parser().settings()));
+        assertNull(tagSet.get("foo", "SomeOtherNamespace"));
     }
 
-    @Test void supplyCustomTagSet() {
-        TagSet tags = TagSet.Html();
-        tags.valueOf("custom", NamespaceHtml).set(Tag.PreserveWhitespace).set(Tag.Block);
-        Parser parser = Parser.htmlParser().tagSet(tags);
+    @Test
+    void testCustomTagSet() {
+        // Create a custom TagSet and configure a custom tag
+        TagSet tagSet = TagSet.Html();
+        tagSet.valueOf("custom", NamespaceHtml).set(Tag.PreserveWhitespace).set(Tag.Block);
+        Parser parser = Parser.htmlParser().tagSet(tagSet);
 
-        Document doc = Jsoup.parse("<body><custom>\n\nFoo\n Bar</custom></body>", parser);
-        Element custom = doc.expectFirst("custom");
-        assertTrue(custom.tag().preserveWhitespace());
-        assertTrue(custom.tag().isBlock());
-        assertEquals("<custom>\n" +
-            "\n" +
-            "Foo\n" +
-            " Bar" +
-            "</custom>", custom.outerHtml());
+        // Parse HTML with the custom tag
+        Document document = Jsoup.parse("<body><custom>\n\nFoo\n Bar</custom></body>", parser);
+        Element customElement = document.expectFirst("custom");
+
+        // Verify custom tag properties
+        assertTrue(customElement.tag().preserveWhitespace());
+        assertTrue(customElement.tag().isBlock());
+        assertEquals("<custom>\n\nFoo\n Bar</custom>", customElement.outerHtml());
     }
 
-    @Test void knownTags() {
-        // tests that tags explicitly inserted via .add are 'known'; those that come implicitly via valueOf are not
-        TagSet tags = TagSet.Html();
-        Tag custom = new Tag("custom");
-        assertEquals("custom", custom.name());
-        assertEquals(NamespaceHtml, custom.namespace());
-        assertFalse(custom.isKnownTag()); // not yet
+    @Test
+    void testKnownTags() {
+        // Test known and unknown tags in a TagSet
+        TagSet tagSet = TagSet.Html();
+        Tag customTag = new Tag("custom");
+        assertEquals("custom", customTag.name());
+        assertEquals(NamespaceHtml, customTag.namespace());
+        assertFalse(customTag.isKnownTag());
 
-        Tag br = tags.get("br", NamespaceHtml);
-        assertNotNull(br);
-        assertTrue(br.isKnownTag());
-        assertSame(br, tags.valueOf("br", NamespaceHtml));
+        // Verify known tag behavior
+        Tag brTag = tagSet.get("br", NamespaceHtml);
+        assertNotNull(brTag);
+        assertTrue(brTag.isKnownTag());
+        assertSame(brTag, tagSet.valueOf("br", NamespaceHtml));
 
-        Tag foo = tags.valueOf("foo", NamespaceHtml);
-        assertFalse(foo.isKnownTag());
+        // Verify unknown tag behavior
+        Tag fooTag = tagSet.valueOf("foo", NamespaceHtml);
+        assertFalse(fooTag.isKnownTag());
 
-        tags.add(custom);
-        assertTrue(custom.isKnownTag());
-        assertSame(custom, tags.get("custom", NamespaceHtml));
-        assertSame(custom, tags.valueOf("custom", NamespaceHtml));
-        Tag capCustom = tags.valueOf("Custom", NamespaceHtml);
-        assertTrue(capCustom.isKnownTag()); // cloned from a known tag, so is still known
+        // Add custom tag and verify it becomes known
+        tagSet.add(customTag);
+        assertTrue(customTag.isKnownTag());
+        assertSame(customTag, tagSet.get("custom", NamespaceHtml));
+        assertSame(customTag, tagSet.valueOf("custom", NamespaceHtml));
+        Tag capCustomTag = tagSet.valueOf("Custom", NamespaceHtml);
+        assertTrue(capCustomTag.isKnownTag());
 
-        // known if set or clear called
-        Tag c1 = new Tag("bar");
-        assertFalse(c1.isKnownTag());
-        c1.set(Tag.Block);
-        assertTrue(c1.isKnownTag());
-        c1.clear(Tag.Block);
-        assertTrue(c1.isKnownTag());
-        c1.clear(Tag.Known);
-        assertFalse(c1.isKnownTag());
+        // Test known tag status with set and clear operations
+        Tag barTag = new Tag("bar");
+        assertFalse(barTag.isKnownTag());
+        barTag.set(Tag.Block);
+        assertTrue(barTag.isKnownTag());
+        barTag.clear(Tag.Block);
+        assertTrue(barTag.isKnownTag());
+        barTag.clear(Tag.Known);
+        assertFalse(barTag.isKnownTag());
     }
 
-    @Test void canCustomizeAll() {
-        TagSet tags = TagSet.Html();
-        tags.onNewTag(tag -> tag.set(Tag.SelfClose));
-        assertTrue(tags.get("script", NamespaceHtml).is(Tag.SelfClose));
-        assertTrue(tags.valueOf("SCRIPT", NamespaceHtml).is(Tag.SelfClose));
-        assertTrue(tags.valueOf("custom", NamespaceHtml).is(Tag.SelfClose));
+    @Test
+    void testCustomizeAllTags() {
+        // Customize all new tags to be self-closing
+        TagSet tagSet = TagSet.Html();
+        tagSet.onNewTag(tag -> tag.set(Tag.SelfClose));
 
-        Tag foo = new Tag("foo", NamespaceHtml);
-        assertFalse(foo.is(Tag.SelfClose));
-        tags.add(foo);
-        assertTrue(foo.is(Tag.SelfClose));
+        // Verify customization
+        assertTrue(tagSet.get("script", NamespaceHtml).is(Tag.SelfClose));
+        assertTrue(tagSet.valueOf("SCRIPT", NamespaceHtml).is(Tag.SelfClose));
+        assertTrue(tagSet.valueOf("custom", NamespaceHtml).is(Tag.SelfClose));
+
+        // Verify that added tags are also customized
+        Tag fooTag = new Tag("foo", NamespaceHtml);
+        assertFalse(fooTag.is(Tag.SelfClose));
+        tagSet.add(fooTag);
+        assertTrue(fooTag.is(Tag.SelfClose));
     }
 
-    @Test void canCustomizeSome() {
-        TagSet tags = TagSet.Html();
-        tags.onNewTag(tag -> {
+    @Test
+    void testCustomizeSomeTags() {
+        // Customize only unknown tags to be self-closing
+        TagSet tagSet = TagSet.Html();
+        tagSet.onNewTag(tag -> {
             if (!tag.isKnownTag()) {
                 tag.set(Tag.SelfClose);
             }
         });
-        assertFalse(tags.valueOf("script", NamespaceHtml).is(Tag.SelfClose));
-        assertFalse(tags.valueOf("SCRIPT", NamespaceHtml).is(Tag.SelfClose));
-        assertTrue(tags.valueOf("custom-tag", NamespaceHtml).is(Tag.SelfClose));
+
+        // Verify customization
+        assertFalse(tagSet.valueOf("script", NamespaceHtml).is(Tag.SelfClose));
+        assertFalse(tagSet.valueOf("SCRIPT", NamespaceHtml).is(Tag.SelfClose));
+        assertTrue(tagSet.valueOf("custom-tag", NamespaceHtml).is(Tag.SelfClose));
     }
 
-    @Test void canParseWithCustomization() {
-        // really would use tag.valueOf("script"); just a test example here
+    @Test
+    void testParseWithCustomization() {
+        // Customize 'script' tag to be self-closing during parsing
         Parser parser = Parser.htmlParser();
         parser.tagSet().onNewTag(tag -> {
-            if (tag.normalName().equals("script"))
+            if (tag.normalName().equals("script")) {
                 tag.set(Tag.SelfClose);
+            }
         });
 
-        Document doc = Jsoup.parse("<script />Text", parser);
-        assertEquals("<html>\n <head>\n  <script></script>\n </head>\n <body>Text</body>\n</html>", doc.html());
-        // self closing bit still produces valid HTML
+        // Parse HTML and verify result
+        Document document = Jsoup.parse("<script />Text", parser);
+        assertEquals("<html>\n <head>\n  <script></script>\n </head>\n <body>Text</body>\n</html>", document.html());
     }
 
-    @Test void canParseWithGeneralCustomization() {
+    @Test
+    void testParseWithGeneralCustomization() {
+        // Customize all unknown tags to be self-closing during parsing
         Parser parser = Parser.htmlParser();
         parser.tagSet().onNewTag(tag -> {
-            if (!tag.isKnownTag())
+            if (!tag.isKnownTag()) {
                 tag.set(Tag.SelfClose);
+            }
         });
 
-        Document doc = Jsoup.parse("<custom-data />Bar <script />Text", parser);
-        assertEquals("<custom-data></custom-data>Bar\n<script>Text</script>", doc.body().html());
+        // Parse HTML and verify result
+        Document document = Jsoup.parse("<custom-data />Bar <script />Text", parser);
+        assertEquals("<custom-data></custom-data>Bar\n<script>Text</script>", document.body().html());
     }
 
-    @Test void supportsMultipleCustomizers() {
-        TagSet tags = TagSet.Html();
-        tags.onNewTag(tag -> {
-            if (tag.normalName().equals("script"))
+    @Test
+    void testMultipleCustomizers() {
+        // Apply multiple customizers to the TagSet
+        TagSet tagSet = TagSet.Html();
+        tagSet.onNewTag(tag -> {
+            if (tag.normalName().equals("script")) {
                 tag.set(Tag.SelfClose);
+            }
         });
-        tags.onNewTag(tag -> {
-            if (!tag.isKnownTag())
+        tagSet.onNewTag(tag -> {
+            if (!tag.isKnownTag()) {
                 tag.set(Tag.RcData);
+            }
         });
 
-        assertTrue(tags.valueOf("script", NamespaceHtml).is(Tag.SelfClose));
-        assertFalse(tags.valueOf("script", NamespaceHtml).is(Tag.RcData));
-        assertTrue(tags.valueOf("custom-tag", NamespaceHtml).is(Tag.RcData));
+        // Verify customizations
+        assertTrue(tagSet.valueOf("script", NamespaceHtml).is(Tag.SelfClose));
+        assertFalse(tagSet.valueOf("script", NamespaceHtml).is(Tag.RcData));
+        assertTrue(tagSet.valueOf("custom-tag", NamespaceHtml).is(Tag.RcData));
     }
 
-    @Test void customizersArePreservedInSource() {
-        TagSet source = TagSet.Html();
-        source.onNewTag(tag -> tag.set(Tag.RcData));
-        TagSet copy = new TagSet(source);
-        assertTrue(copy.valueOf("script", NamespaceHtml).is(Tag.RcData));
-        assertTrue(source.valueOf("script", NamespaceHtml).is(Tag.RcData));
+    @Test
+    void testCustomizersPreservedInSource() {
+        // Verify that customizers are preserved when copying a TagSet
+        TagSet sourceTagSet = TagSet.Html();
+        sourceTagSet.onNewTag(tag -> tag.set(Tag.RcData));
+        TagSet copiedTagSet = new TagSet(sourceTagSet);
 
-        copy.onNewTag(tag -> tag.set(Tag.Void));
-        assertTrue(copy.valueOf("custom-tag", NamespaceHtml).is(Tag.Void));
-        assertFalse(source.valueOf("custom-tag", NamespaceHtml).is(Tag.Void));
+        // Verify customizations in both source and copy
+        assertTrue(copiedTagSet.valueOf("script", NamespaceHtml).is(Tag.RcData));
+        assertTrue(sourceTagSet.valueOf("script", NamespaceHtml).is(Tag.RcData));
+
+        // Verify that additional customizations in the copy do not affect the source
+        copiedTagSet.onNewTag(tag -> tag.set(Tag.Void));
+        assertTrue(copiedTagSet.valueOf("custom-tag", NamespaceHtml).is(Tag.Void));
+        assertFalse(sourceTagSet.valueOf("custom-tag", NamespaceHtml).is(Tag.Void));
     }
 }
