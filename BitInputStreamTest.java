@@ -29,248 +29,289 @@ import org.junit.jupiter.api.Test;
 
 class BitInputStreamTest {
 
-    private ByteArrayInputStream getStream() {
-        return new ByteArrayInputStream(new byte[] { (byte) 0xF8, // 11111000
-                0x40, // 01000000
-                0x01, // 00000001
-                0x2F }); // 00101111
-    }
-
-    @Test
-    void testAlignWithByteBoundaryWhenAtBoundary() throws Exception {
-        try (BitInputStream bis = new BitInputStream(getStream(), ByteOrder.LITTLE_ENDIAN)) {
-            assertEquals(0xF8, bis.readBits(8));
-            bis.alignWithByteBoundary();
-            assertEquals(0, bis.readBits(4));
-        }
-    }
-
-    @Test
-    void testAlignWithByteBoundaryWhenNotAtBoundary() throws Exception {
-        try (BitInputStream bis = new BitInputStream(getStream(), ByteOrder.LITTLE_ENDIAN)) {
-            assertEquals(0x08, bis.readBits(4));
-            assertEquals(4, bis.bitsCached());
-            bis.alignWithByteBoundary();
-            assertEquals(0, bis.bitsCached());
-            assertEquals(0, bis.readBits(4));
-        }
-    }
-
-    @Test
-    void testAvailableWithCache() throws Exception {
-        try (BitInputStream bis = new BitInputStream(getStream(), ByteOrder.LITTLE_ENDIAN)) {
-            assertEquals(0x08, bis.readBits(4));
-            assertEquals(28, bis.bitsAvailable());
-        }
-    }
-
-    @Test
-    void testAvailableWithoutCache() throws Exception {
-        try (BitInputStream bis = new BitInputStream(getStream(), ByteOrder.LITTLE_ENDIAN)) {
-            assertEquals(32, bis.bitsAvailable());
-        }
-    }
-
-    @Test
-    void testBigEndianWithOverflow() throws Exception {
-        final ByteArrayInputStream in = new ByteArrayInputStream(new byte[] { 87, // 01010111
-                45, // 00101101
-                66, // 01000010
-                15, // 00001111
-                90, // 01011010
-                29, // 00011101
-                88, // 01011000
-                61, // 00111101
-                33, // 00100001
-                74 // 01001010
-        });
-        try (BitInputStream bin = new BitInputStream(in, ByteOrder.BIG_ENDIAN)) {
-            assertEquals(10, // 01010
-                    bin.readBits(5));
-            assertEquals(8274274654740644818L, // 111-00101101-01000010-00001111-01011010-00011101-01011000-00111101-0010
-                    bin.readBits(63));
-            assertEquals(330, // 0001-01001010
-                    bin.readBits(12));
-            assertEquals(-1, bin.readBits(1));
-        }
-    }
-
-    @Test
-    void testClearBitCache() throws IOException {
-        try (BitInputStream bis = new BitInputStream(getStream(), ByteOrder.LITTLE_ENDIAN)) {
-            assertEquals(0x08, bis.readBits(4));
-            bis.clearBitCache();
-            assertEquals(0, bis.readBits(1));
-        }
-    }
-
-    @Test
-    void testEOF() throws IOException {
-        try (BitInputStream bis = new BitInputStream(getStream(), ByteOrder.LITTLE_ENDIAN)) {
-            assertEquals(0x2f0140f8, bis.readBits(30));
-            assertEquals(-1, bis.readBits(3));
-        }
-    }
-
     /**
-     * @see "https://issues.apache.org/jira/browse/COMPRESS-363"
+     * Creates a ByteArrayInputStream with a pre-defined byte array for testing.
+     * The byte array represents the bit sequence 11111000 01000000 00000001 00101111.
+     *
+     * @return ByteArrayInputStream containing the test data.
      */
+    private ByteArrayInputStream createTestInputStream() {
+        return new ByteArrayInputStream(new byte[] { (byte) 0xF8, 0x40, 0x01, 0x2F });
+    }
+
     @Test
-    void testLittleEndianWithOverflow() throws Exception {
-        final ByteArrayInputStream in = new ByteArrayInputStream(new byte[] { 87, // 01010111
-                45, // 00101101
-                66, // 01000010
-                15, // 00001111
-                90, // 01011010
-                29, // 00011101
-                88, // 01011000
-                61, // 00111101
-                33, // 00100001
-                74 // 01001010
-        });
+    void testAlignWithByteBoundaryWhenAlreadyAligned() throws Exception {
+        // Arrange
+        try (BitInputStream bis = new BitInputStream(createTestInputStream(), ByteOrder.LITTLE_ENDIAN)) {
+            // Read a full byte, placing the stream at a byte boundary.
+            assertEquals(0xF8, bis.readBits(8), "Should read the first byte correctly");
+
+            // Act
+            bis.alignWithByteBoundary();
+
+            // Assert
+            // After aligning, reading 4 bits should return 0 (as we're at the byte boundary)
+            assertEquals(0, bis.readBits(4), "Should return 0 after aligning to byte boundary");
+        }
+    }
+
+    @Test
+    void testAlignWithByteBoundaryWhenNotAligned() throws Exception {
+        // Arrange
+        try (BitInputStream bis = new BitInputStream(createTestInputStream(), ByteOrder.LITTLE_ENDIAN)) {
+            // Read 4 bits, leaving the stream unaligned.
+            assertEquals(0x08, bis.readBits(4), "Should read the first 4 bits correctly");
+            assertEquals(4, bis.bitsCached(), "Should have 4 bits cached");
+
+            // Act
+            bis.alignWithByteBoundary();
+
+            // Assert
+            assertEquals(0, bis.bitsCached(), "Cache should be cleared after aligning");
+            // After aligning, reading 4 bits should return 0 (the remaining bits of the current byte).
+            assertEquals(0, bis.readBits(4), "Should return 0 after aligning to byte boundary");
+        }
+    }
+
+    @Test
+    void testBitsAvailableWithCachedBits() throws Exception {
+        // Arrange
+        try (BitInputStream bis = new BitInputStream(createTestInputStream(), ByteOrder.LITTLE_ENDIAN)) {
+            // Read 4 bits, caching them.
+            assertEquals(0x08, bis.readBits(4), "Should read the first 4 bits correctly");
+
+            // Act & Assert
+            // The number of available bits should be the initial size minus the bits already read.
+            assertEquals(28, bis.bitsAvailable(), "Should have 28 bits available");
+        }
+    }
+
+    @Test
+    void testBitsAvailableWithoutCachedBits() throws Exception {
+        // Arrange
+        try (BitInputStream bis = new BitInputStream(createTestInputStream(), ByteOrder.LITTLE_ENDIAN)) {
+
+            // Act & Assert
+            // The number of available bits should be the total number of bits in the stream.
+            assertEquals(32, bis.bitsAvailable(), "Should have 32 bits available");
+        }
+    }
+
+    @Test
+    void testBigEndianReadWithOverflow() throws Exception {
+        // Arrange
+        byte[] inputBytes = { 87, 45, 66, 15, 90, 29, 88, 61, 33, 74 };
+        ByteArrayInputStream in = new ByteArrayInputStream(inputBytes);
+
+        try (BitInputStream bin = new BitInputStream(in, ByteOrder.BIG_ENDIAN)) {
+            // Act & Assert
+            assertEquals(10, bin.readBits(5), "Should read the first 5 bits correctly");
+            assertEquals(8274274654740644818L, bin.readBits(63), "Should read the next 63 bits correctly");
+            assertEquals(330, bin.readBits(12), "Should read the next 12 bits correctly");
+            assertEquals(-1, bin.readBits(1), "Should return -1 when reaching the end of the stream");
+        }
+    }
+
+    @Test
+    void testClearBitCacheResetsCachedBits() throws IOException {
+        // Arrange
+        try (BitInputStream bis = new BitInputStream(createTestInputStream(), ByteOrder.LITTLE_ENDIAN)) {
+            // Read some bits to populate the cache.
+            assertEquals(0x08, bis.readBits(4), "Should read the first 4 bits correctly");
+
+            // Act
+            bis.clearBitCache();
+
+            // Assert
+            // After clearing the cache, reading 1 bit should return the next bit from the underlying stream.
+            assertEquals(0, bis.readBits(1), "Should return the next bit after clearing the cache");
+        }
+    }
+
+    @Test
+    void testEndOfFileIsReachedAfterReadingAllBits() throws IOException {
+        // Arrange
+        try (BitInputStream bis = new BitInputStream(createTestInputStream(), ByteOrder.LITTLE_ENDIAN)) {
+            // Act & Assert
+            // Read all 32 bits.
+            assertEquals(0x2f0140f8, bis.readBits(30), "Should read 30 bits correctly.");
+            // Attempt to read more bits than available.
+            assertEquals(-1, bis.readBits(3), "Should return -1 when reaching the end of the stream");
+        }
+    }
+
+    @Test
+    void testLittleEndianReadWithOverflow() throws Exception {
+        // Arrange
+        byte[] inputBytes = { 87, 45, 66, 15, 90, 29, 88, 61, 33, 74 };
+        ByteArrayInputStream in = new ByteArrayInputStream(inputBytes);
+
         try (BitInputStream bin = new BitInputStream(in, ByteOrder.LITTLE_ENDIAN)) {
-            assertEquals(23, // 10111
-                    bin.readBits(5));
-            assertEquals(714595605644185962L, // 0001-00111101-01011000-00011101-01011010-00001111-01000010-00101101-010
-                    bin.readBits(63));
-            assertEquals(1186, // 01001010-0010
-                    bin.readBits(12));
-            assertEquals(-1, bin.readBits(1));
+            // Act & Assert
+            assertEquals(23, bin.readBits(5), "Should read the first 5 bits correctly");
+            assertEquals(714595605644185962L, bin.readBits(63), "Should read the next 63 bits correctly");
+            assertEquals(1186, bin.readBits(12), "Should read the next 12 bits correctly");
+            assertEquals(-1, bin.readBits(1), "Should return -1 when reaching the end of the stream");
         }
     }
 
     @Test
     void testReading17BitsInBigEndian() throws IOException {
-        try (BitInputStream bis = new BitInputStream(getStream(), ByteOrder.BIG_ENDIAN)) {
+        // Arrange
+        try (BitInputStream bis = new BitInputStream(createTestInputStream(), ByteOrder.BIG_ENDIAN)) {
+            // Act & Assert
             // 1-11110000-10000000
-            assertEquals(0x0001f080, bis.readBits(17));
+            assertEquals(0x0001f080, bis.readBits(17), "Should read 17 bits correctly in Big Endian");
         }
     }
 
     @Test
     void testReading17BitsInLittleEndian() throws IOException {
-        try (BitInputStream bis = new BitInputStream(getStream(), ByteOrder.LITTLE_ENDIAN)) {
-            assertEquals(0x000140f8, bis.readBits(17));
+        // Arrange
+        try (BitInputStream bis = new BitInputStream(createTestInputStream(), ByteOrder.LITTLE_ENDIAN)) {
+            // Act & Assert
+            assertEquals(0x000140f8, bis.readBits(17), "Should read 17 bits correctly in Little Endian");
         }
     }
 
     @Test
     void testReading24BitsInBigEndian() throws IOException {
-        try (BitInputStream bis = new BitInputStream(getStream(), ByteOrder.BIG_ENDIAN)) {
-            assertEquals(0x00f84001, bis.readBits(24));
+        // Arrange
+        try (BitInputStream bis = new BitInputStream(createTestInputStream(), ByteOrder.BIG_ENDIAN)) {
+            // Act & Assert
+            assertEquals(0x00f84001, bis.readBits(24), "Should read 24 bits correctly in Big Endian");
         }
     }
 
     @Test
     void testReading24BitsInLittleEndian() throws IOException {
-        try (BitInputStream bis = new BitInputStream(getStream(), ByteOrder.LITTLE_ENDIAN)) {
-            assertEquals(0x000140f8, bis.readBits(24));
+        // Arrange
+        try (BitInputStream bis = new BitInputStream(createTestInputStream(), ByteOrder.LITTLE_ENDIAN)) {
+            // Act & Assert
+            assertEquals(0x000140f8, bis.readBits(24), "Should read 24 bits correctly in Little Endian");
         }
     }
 
     @Test
     void testReading30BitsInBigEndian() throws IOException {
-        try (BitInputStream bis = new BitInputStream(getStream(), ByteOrder.BIG_ENDIAN)) {
+        // Arrange
+        try (BitInputStream bis = new BitInputStream(createTestInputStream(), ByteOrder.BIG_ENDIAN)) {
+            // Act & Assert
             // 111110-00010000-00000000-01001011
-            assertEquals(0x3e10004b, bis.readBits(30));
+            assertEquals(0x3e10004b, bis.readBits(30), "Should read 30 bits correctly in Big Endian");
         }
     }
 
     @Test
     void testReading30BitsInLittleEndian() throws IOException {
-        try (BitInputStream bis = new BitInputStream(getStream(), ByteOrder.LITTLE_ENDIAN)) {
-            assertEquals(0x2f0140f8, bis.readBits(30));
+        // Arrange
+        try (BitInputStream bis = new BitInputStream(createTestInputStream(), ByteOrder.LITTLE_ENDIAN)) {
+            // Act & Assert
+            assertEquals(0x2f0140f8, bis.readBits(30), "Should read 30 bits correctly in Little Endian");
         }
     }
 
     @Test
     void testReading31BitsInBigEndian() throws IOException {
-        try (BitInputStream bis = new BitInputStream(getStream(), ByteOrder.BIG_ENDIAN)) {
+        // Arrange
+        try (BitInputStream bis = new BitInputStream(createTestInputStream(), ByteOrder.BIG_ENDIAN)) {
+            // Act & Assert
             // 1111100-00100000-00000000-10010111
-            assertEquals(0x7c200097, bis.readBits(31));
+            assertEquals(0x7c200097, bis.readBits(31), "Should read 31 bits correctly in Big Endian");
         }
     }
 
     @Test
     void testReading31BitsInLittleEndian() throws IOException {
-        try (BitInputStream bis = new BitInputStream(getStream(), ByteOrder.LITTLE_ENDIAN)) {
-            assertEquals(0x2f0140f8, bis.readBits(31));
+        // Arrange
+        try (BitInputStream bis = new BitInputStream(createTestInputStream(), ByteOrder.LITTLE_ENDIAN)) {
+            // Act & Assert
+            assertEquals(0x2f0140f8, bis.readBits(31), "Should read 31 bits correctly in Little Endian");
         }
     }
 
     @Test
-    void testReadingOneBitFromEmptyStream() throws Exception {
+    void testReadingOneBitFromEmptyStreamReturnsMinusOne() throws Exception {
+        // Arrange
         try (BitInputStream bis = new BitInputStream(new ByteArrayInputStream(ByteUtils.EMPTY_BYTE_ARRAY), ByteOrder.LITTLE_ENDIAN)) {
-            assertEquals(-1, bis.readBit(), "next bit");
-            assertEquals(-1, bis.readBit(), "next bit");
-            assertEquals(-1, bis.readBit(), "next bit");
+            // Act & Assert
+            assertEquals(-1, bis.readBit(), "First bit should be -1 (EOF)");
+            assertEquals(-1, bis.readBit(), "Second bit should be -1 (EOF)");
+            assertEquals(-1, bis.readBit(), "Third bit should be -1 (EOF)");
         }
     }
 
     @Test
-    void testReadingOneBitInBigEndian() throws Exception {
-        try (BitInputStream bis = new BitInputStream(new ByteArrayInputStream(new byte[] { (byte) 0xEA, 0x03 }), ByteOrder.BIG_ENDIAN)) {
+    void testReadingOneBitInBigEndianOrder() throws Exception {
+        // Arrange
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(new byte[] { (byte) 0xEA, 0x03 }); // 0xEA = 11101010, 0x03 = 00000011
+        try (BitInputStream bis = new BitInputStream(inputStream, ByteOrder.BIG_ENDIAN)) {
+            // Act & Assert
+            assertEquals(1, bis.readBit(), "bit 0 should be 1");
+            assertEquals(1, bis.readBit(), "bit 1 should be 1");
+            assertEquals(1, bis.readBit(), "bit 2 should be 1");
+            assertEquals(0, bis.readBit(), "bit 3 should be 0");
+            assertEquals(1, bis.readBit(), "bit 4 should be 1");
+            assertEquals(0, bis.readBit(), "bit 5 should be 0");
+            assertEquals(1, bis.readBit(), "bit 6 should be 1");
+            assertEquals(0, bis.readBit(), "bit 7 should be 0");
 
-            assertEquals(1, bis.readBit(), "bit 0");
-            assertEquals(1, bis.readBit(), "bit 1");
-            assertEquals(1, bis.readBit(), "bit 2");
-            assertEquals(0, bis.readBit(), "bit 3");
-            assertEquals(1, bis.readBit(), "bit 4");
-            assertEquals(0, bis.readBit(), "bit 5");
-            assertEquals(1, bis.readBit(), "bit 6");
-            assertEquals(0, bis.readBit(), "bit 7");
+            assertEquals(0, bis.readBit(), "bit 8 should be 0");
+            assertEquals(0, bis.readBit(), "bit 9 should be 0");
+            assertEquals(0, bis.readBit(), "bit 10 should be 0");
+            assertEquals(0, bis.readBit(), "bit 11 should be 0");
+            assertEquals(0, bis.readBit(), "bit 12 should be 0");
+            assertEquals(0, bis.readBit(), "bit 13 should be 0");
+            assertEquals(1, bis.readBit(), "bit 14 should be 1");
+            assertEquals(1, bis.readBit(), "bit 15 should be 1");
 
-            assertEquals(0, bis.readBit(), "bit 8");
-            assertEquals(0, bis.readBit(), "bit 9");
-            assertEquals(0, bis.readBit(), "bit 10");
-            assertEquals(0, bis.readBit(), "bit 11");
-            assertEquals(0, bis.readBit(), "bit 12");
-            assertEquals(0, bis.readBit(), "bit 13");
-            assertEquals(1, bis.readBit(), "bit 14");
-            assertEquals(1, bis.readBit(), "bit 15");
-
-            assertEquals(-1, bis.readBit(), "next bit");
+            assertEquals(-1, bis.readBit(), "next bit should be -1 (EOF)");
         }
     }
 
     @Test
-    void testReadingOneBitInLittleEndian() throws Exception {
-        try (BitInputStream bis = new BitInputStream(new ByteArrayInputStream(new byte[] { (byte) 0xEA, 0x03 }), ByteOrder.LITTLE_ENDIAN)) {
+    void testReadingOneBitInLittleEndianOrder() throws Exception {
+        // Arrange
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(new byte[] { (byte) 0xEA, 0x03 }); // 0xEA = 11101010, 0x03 = 00000011
+        try (BitInputStream bis = new BitInputStream(inputStream, ByteOrder.LITTLE_ENDIAN)) {
+            // Act & Assert
+            assertEquals(0, bis.readBit(), "bit 0 should be 0");
+            assertEquals(1, bis.readBit(), "bit 1 should be 1");
+            assertEquals(0, bis.readBit(), "bit 2 should be 0");
+            assertEquals(1, bis.readBit(), "bit 3 should be 1");
+            assertEquals(0, bis.readBit(), "bit 4 should be 0");
+            assertEquals(1, bis.readBit(), "bit 5 should be 1");
+            assertEquals(1, bis.readBit(), "bit 6 should be 1");
+            assertEquals(1, bis.readBit(), "bit 7 should be 1");
 
-            assertEquals(0, bis.readBit(), "bit 0");
-            assertEquals(1, bis.readBit(), "bit 1");
-            assertEquals(0, bis.readBit(), "bit 2");
-            assertEquals(1, bis.readBit(), "bit 3");
-            assertEquals(0, bis.readBit(), "bit 4");
-            assertEquals(1, bis.readBit(), "bit 5");
-            assertEquals(1, bis.readBit(), "bit 6");
-            assertEquals(1, bis.readBit(), "bit 7");
+            assertEquals(1, bis.readBit(), "bit 8 should be 1");
+            assertEquals(1, bis.readBit(), "bit 9 should be 1");
+            assertEquals(0, bis.readBit(), "bit 10 should be 0");
+            assertEquals(0, bis.readBit(), "bit 11 should be 0");
+            assertEquals(0, bis.readBit(), "bit 12 should be 0");
+            assertEquals(0, bis.readBit(), "bit 13 should be 0");
+            assertEquals(0, bis.readBit(), "bit 14 should be 0");
+            assertEquals(0, bis.readBit(), "bit 15 should be 0");
 
-            assertEquals(1, bis.readBit(), "bit 8");
-            assertEquals(1, bis.readBit(), "bit 9");
-            assertEquals(0, bis.readBit(), "bit 10");
-            assertEquals(0, bis.readBit(), "bit 11");
-            assertEquals(0, bis.readBit(), "bit 12");
-            assertEquals(0, bis.readBit(), "bit 13");
-            assertEquals(0, bis.readBit(), "bit 14");
-            assertEquals(0, bis.readBit(), "bit 15");
-
-            assertEquals(-1, bis.readBit(), "next bit");
+            assertEquals(-1, bis.readBit(), "next bit should be -1 (EOF)");
         }
     }
 
     @Test
-    void testShouldNotAllowReadingOfANegativeAmountOfBits() throws IOException {
-        try (BitInputStream bis = new BitInputStream(getStream(), ByteOrder.LITTLE_ENDIAN)) {
-            assertThrows(IOException.class, () -> bis.readBits(-1));
+    void testThrowsExceptionWhenReadingNegativeAmountOfBits() throws IOException {
+        // Arrange
+        try (BitInputStream bis = new BitInputStream(createTestInputStream(), ByteOrder.LITTLE_ENDIAN)) {
+            // Act & Assert
+            assertThrows(IOException.class, () -> bis.readBits(-1), "Should throw IOException when reading a negative number of bits");
         }
     }
 
     @Test
-    void testShouldNotAllowReadingOfMoreThan63BitsAtATime() throws IOException {
-        try (BitInputStream bis = new BitInputStream(getStream(), ByteOrder.LITTLE_ENDIAN)) {
-            assertThrows(IOException.class, () -> bis.readBits(64));
+    void testThrowsExceptionWhenReadingMoreThan63BitsAtATime() throws IOException {
+        // Arrange
+        try (BitInputStream bis = new BitInputStream(createTestInputStream(), ByteOrder.LITTLE_ENDIAN)) {
+            // Act & Assert
+            assertThrows(IOException.class, () -> bis.readBits(64), "Should throw IOException when reading more than 63 bits");
         }
     }
-
 }
