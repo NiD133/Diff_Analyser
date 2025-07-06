@@ -8,7 +8,7 @@
  *
  *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
+ * Unless required by applicable law or agreed to in writing, software,
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
@@ -31,15 +31,19 @@ import org.apache.commons.collections4.Bag;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.collection.AbstractCollectionTest;
 import org.apache.commons.collections4.functors.NonePredicate;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
  * Test class for {@link CollectionBag}.
  * <p>
- * Note: This test is mainly for serialization support, the CollectionBag decorator
- * is extensively used and tested in AbstractBagTest.
+ * Note: This test focuses primarily on serialization and specific edge cases of CollectionBag.
+ * Extensive general Bag functionality is covered in AbstractBagTest.
  */
 public class CollectionBagTest<T> extends AbstractCollectionTest<T> {
+
+    private CollectionBag<Predicate<Object>> collectionBagOfPredicateOfObject;
+    private TreeBag<Predicate<Object>> treeBagOfPredicateOfObject;
 
     @Override
     public String getCompatibilityVersion() {
@@ -78,54 +82,69 @@ public class CollectionBagTest<T> extends AbstractCollectionTest<T> {
         return CollectionBag.collectionBag(new HashBag<>());
     }
 
-    @Test
-    void testAdd_Predicate_ComparatorCustom() throws Throwable {
-        final TreeBag<Predicate<Object>> treeBagOfPredicateOfObject = new TreeBag<>(Comparator.comparing(Predicate::toString));
-        final CollectionBag<Predicate<Object>> collectionBagOfPredicateOfObject = new CollectionBag<>(treeBagOfPredicateOfObject);
-        collectionBagOfPredicateOfObject.add(NonePredicate.nonePredicate(collectionBagOfPredicateOfObject), 24);
+    @BeforeEach
+    public void setup() {
+        treeBagOfPredicateOfObject = new TreeBag<>();
+        collectionBagOfPredicateOfObject = new CollectionBag<>(treeBagOfPredicateOfObject);
     }
 
     @Test
-    void testAdd_Predicate_ComparatorDefault() throws Throwable {
-        final TreeBag<Predicate<Object>> treeBagOfPredicateOfObject = new TreeBag<>();
-        final CollectionBag<Predicate<Object>> collectionBagOfPredicateOfObject = new CollectionBag<>(treeBagOfPredicateOfObject);
-        assertThrows(ClassCastException.class, () -> collectionBagOfPredicateOfObject.add(NonePredicate.nonePredicate(collectionBagOfPredicateOfObject), 24));
+    void testAdd_Predicate_ComparatorCustom() {
+        // Given
+        treeBagOfPredicateOfObject = new TreeBag<>(Comparator.comparing(Predicate::toString));
+        collectionBagOfPredicateOfObject = new CollectionBag<>(treeBagOfPredicateOfObject);
+        final Predicate<Object> predicate = NonePredicate.nonePredicate(collectionBagOfPredicateOfObject);
+
+        // When
+        collectionBagOfPredicateOfObject.add(predicate, 24);
+
+        // Then: No exception is thrown.  The bag allows Predicates because a custom comparator is provided.
+        assertEquals(24, collectionBagOfPredicateOfObject.getCount(predicate));
     }
 
-//    void testCreate() throws Exception {
-//        resetEmpty();
-//        writeExternalFormToDisk((java.io.Serializable) getCollection(), "src/test/resources/data/test/CollectionBag.emptyCollection.version4.obj");
-//        resetFull();
-//        writeExternalFormToDisk((java.io.Serializable) getCollection(), "src/test/resources/data/test/CollectionBag.fullCollection.version4.obj");
-//    }
+    @Test
+    void testAdd_Predicate_ComparatorDefault() {
+        // Given:  A TreeBag without a custom comparator for Predicates.
+        final Predicate<Object> predicate = NonePredicate.nonePredicate(collectionBagOfPredicateOfObject);
+
+        // When/Then:  Adding a Predicate without a comparator causes a ClassCastException because TreeBag needs to compare the elements.
+        assertThrows(ClassCastException.class, () -> collectionBagOfPredicateOfObject.add(predicate, 24),
+                "Expected ClassCastException when adding Predicate to TreeBag without a comparator.");
+    }
 
     /**
-     * Compares the current serialized form of the Bag
-     * against the canonical version in SCM.
+     * Compares the current serialized form of an empty Bag
+     * against the canonical version in SCM.  This verifies that the serialized
+     * form of the class has not changed in a way that breaks backwards compatibility.
      */
     @Test
     void testEmptyBagCompatibility() throws IOException, ClassNotFoundException {
-        // test to make sure the canonical form has been preserved
+        // Given
         final Bag<T> bag = makeObject();
+
+        // When/Then
         if (bag instanceof Serializable && !skipSerializedCanonicalTests() && isTestSerialization()) {
             final Bag<?> bag2 = (Bag<?>) readExternalFormFromDisk(getCanonicalEmptyCollectionName(bag));
-            assertTrue(bag2.isEmpty(), "Bag is empty");
-            assertEquals(bag, bag2);
+            assertTrue(bag2.isEmpty(), "Bag should be empty after deserialization.");
+            assertEquals(bag, bag2, "Deserialized bag should be equal to the original.");
         }
     }
 
     /**
-     * Compares the current serialized form of the Bag
-     * against the canonical version in SCM.
+     * Compares the current serialized form of a full Bag
+     * against the canonical version in SCM. This verifies that the serialized
+     * form of the class has not changed in a way that breaks backwards compatibility.
      */
     @Test
     void testFullBagCompatibility() throws IOException, ClassNotFoundException {
-        // test to make sure the canonical form has been preserved
+        // Given
         final Bag<T> bag = (Bag<T>) makeFullCollection();
+
+        // When/Then
         if (bag instanceof Serializable && !skipSerializedCanonicalTests() && isTestSerialization()) {
             final Bag<?> bag2 = (Bag<?>) readExternalFormFromDisk(getCanonicalFullCollectionName(bag));
-            assertEquals(bag.size(), bag2.size(), "Bag is the right size");
-            assertEquals(bag, bag2);
+            assertEquals(bag.size(), bag2.size(), "Deserialized bag should have the same size as the original.");
+            assertEquals(bag, bag2, "Deserialized bag should be equal to the original.");
         }
     }
 }
