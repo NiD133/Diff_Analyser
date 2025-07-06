@@ -1,19 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.apache.commons.collections4.bag;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,10 +18,9 @@ import org.apache.commons.collections4.functors.NonePredicate;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test class for {@link CollectionBag}.
+ * Tests for the {@link CollectionBag} class, focusing on serialization support and Collection contract compliance.
  * <p>
- * Note: This test is mainly for serialization support, the CollectionBag decorator
- * is extensively used and tested in AbstractBagTest.
+ * Note: This test class is mainly for serialization support, as the CollectionBag decorator is extensively used and tested in AbstractBagTest.
  */
 public class CollectionBagTest<T> extends AbstractCollectionTest<T> {
 
@@ -52,9 +35,7 @@ public class CollectionBagTest<T> extends AbstractCollectionTest<T> {
     }
 
     /**
-     * Returns an empty List for use in modification testing.
-     *
-     * @return a confirmed empty collection
+     * Creates an empty List for modification testing.
      */
     @Override
     public Collection<T> makeConfirmedCollection() {
@@ -62,9 +43,7 @@ public class CollectionBagTest<T> extends AbstractCollectionTest<T> {
     }
 
     /**
-     * Returns a full Set for use in modification testing.
-     *
-     * @return a confirmed full collection
+     * Creates a full Set for modification testing.
      */
     @Override
     public Collection<T> makeConfirmedFullCollection() {
@@ -73,58 +52,74 @@ public class CollectionBagTest<T> extends AbstractCollectionTest<T> {
         return set;
     }
 
+    /**
+     * Creates a CollectionBag instance for testing.
+     */
     @Override
     public Bag<T> makeObject() {
         return CollectionBag.collectionBag(new HashBag<>());
     }
 
-    @Test
-    void testAdd_Predicate_ComparatorCustom() throws Throwable {
-        final TreeBag<Predicate<Object>> treeBagOfPredicateOfObject = new TreeBag<>(Comparator.comparing(Predicate::toString));
-        final CollectionBag<Predicate<Object>> collectionBagOfPredicateOfObject = new CollectionBag<>(treeBagOfPredicateOfObject);
-        collectionBagOfPredicateOfObject.add(NonePredicate.nonePredicate(collectionBagOfPredicateOfObject), 24);
-    }
-
-    @Test
-    void testAdd_Predicate_ComparatorDefault() throws Throwable {
-        final TreeBag<Predicate<Object>> treeBagOfPredicateOfObject = new TreeBag<>();
-        final CollectionBag<Predicate<Object>> collectionBagOfPredicateOfObject = new CollectionBag<>(treeBagOfPredicateOfObject);
-        assertThrows(ClassCastException.class, () -> collectionBagOfPredicateOfObject.add(NonePredicate.nonePredicate(collectionBagOfPredicateOfObject), 24));
-    }
-
-//    void testCreate() throws Exception {
-//        resetEmpty();
-//        writeExternalFormToDisk((java.io.Serializable) getCollection(), "src/test/resources/data/test/CollectionBag.emptyCollection.version4.obj");
-//        resetFull();
-//        writeExternalFormToDisk((java.io.Serializable) getCollection(), "src/test/resources/data/test/CollectionBag.fullCollection.version4.obj");
-//    }
-
     /**
-     * Compares the current serialized form of the Bag
-     * against the canonical version in SCM.
+     * Tests the add operation with a custom comparator.
      */
     @Test
-    void testEmptyBagCompatibility() throws IOException, ClassNotFoundException {
-        // test to make sure the canonical form has been preserved
+    void testAddWithCustomComparator() throws Throwable {
+        // Create a tree bag with a custom comparator
+        final TreeBag<Predicate<Object>> treeBag = new TreeBag<>(Comparator.comparing(Predicate::toString));
+        final CollectionBag<Predicate<Object>> collectionBag = new CollectionBag<>(treeBag);
+
+        // Add an element to the collection bag
+        collectionBag.add(NonePredicate.nonePredicate(collectionBag), 24);
+    }
+
+    /**
+     * Tests the add operation with the default comparator.
+     */
+    @Test
+    void testAddWithDefaultComparator() throws Throwable {
+        // Create a tree bag with the default comparator
+        final TreeBag<Predicate<Object>> treeBag = new TreeBag<>();
+        final CollectionBag<Predicate<Object>> collectionBag = new CollectionBag<>(treeBag);
+
+        // Verify that adding an element throws a ClassCastException
+        assertThrows(ClassCastException.class, () -> collectionBag.add(NonePredicate.nonePredicate(collectionBag), 24));
+    }
+
+    /**
+     * Tests the serialization of an empty CollectionBag.
+     */
+    @Test
+    void testEmptyBagSerialization() throws IOException, ClassNotFoundException {
+        // Create an empty collection bag
         final Bag<T> bag = makeObject();
+
+        // Check if the bag is serializable and if serialization tests are enabled
         if (bag instanceof Serializable && !skipSerializedCanonicalTests() && isTestSerialization()) {
+            // Read the serialized form of the bag from disk
             final Bag<?> bag2 = (Bag<?>) readExternalFormFromDisk(getCanonicalEmptyCollectionName(bag));
-            assertTrue(bag2.isEmpty(), "Bag is empty");
+
+            // Verify that the deserialized bag is empty and equal to the original bag
+            assertTrue(bag2.isEmpty());
             assertEquals(bag, bag2);
         }
     }
 
     /**
-     * Compares the current serialized form of the Bag
-     * against the canonical version in SCM.
+     * Tests the serialization of a full CollectionBag.
      */
     @Test
-    void testFullBagCompatibility() throws IOException, ClassNotFoundException {
-        // test to make sure the canonical form has been preserved
+    void testFullBagSerialization() throws IOException, ClassNotFoundException {
+        // Create a full collection bag
         final Bag<T> bag = (Bag<T>) makeFullCollection();
+
+        // Check if the bag is serializable and if serialization tests are enabled
         if (bag instanceof Serializable && !skipSerializedCanonicalTests() && isTestSerialization()) {
+            // Read the serialized form of the bag from disk
             final Bag<?> bag2 = (Bag<?>) readExternalFormFromDisk(getCanonicalFullCollectionName(bag));
-            assertEquals(bag.size(), bag2.size(), "Bag is the right size");
+
+            // Verify that the deserialized bag has the same size and is equal to the original bag
+            assertEquals(bag.size(), bag2.size());
             assertEquals(bag, bag2);
         }
     }
