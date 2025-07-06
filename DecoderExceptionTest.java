@@ -23,40 +23,51 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests {@link DecoderException}.
+ * Tests for the {@link DecoderException} class, ensuring its constructors behave as expected.
  */
 class DecoderExceptionTest {
 
-    private static final String MSG = "TEST";
-
-    private static final Throwable t = new Exception();
+    private static final String TEST_MESSAGE = "Test Decoder Exception Message";
+    private static final Throwable TEST_CAUSE = new Exception("Test Cause Exception");
 
     @Test
-    void testConstructor0() {
-        final DecoderException e = new DecoderException();
-        assertNull(e.getMessage());
-        assertNull(e.getCause());
+    void testDefaultConstructor() {
+        // Arrange: Create a DecoderException using the default constructor.
+        final DecoderException exception = new DecoderException();
+
+        // Act & Assert: Verify that the message and cause are null.
+        assertNull(exception.getMessage(), "Default constructor should create an exception with a null message.");
+        assertNull(exception.getCause(), "Default constructor should create an exception with a null cause.");
     }
 
     @Test
-    void testConstructorString() {
-        final DecoderException e = new DecoderException(MSG);
-        assertEquals(MSG, e.getMessage());
-        assertNull(e.getCause());
+    void testConstructorWithMessage() {
+        // Arrange: Create a DecoderException with a message.
+        final DecoderException exception = new DecoderException(TEST_MESSAGE);
+
+        // Act & Assert: Verify that the message is set correctly and the cause is null.
+        assertEquals(TEST_MESSAGE, exception.getMessage(), "Constructor with message should set the message correctly.");
+        assertNull(exception.getCause(), "Constructor with message should create an exception with a null cause.");
     }
 
     @Test
-    void testConstructorStringThrowable() {
-        final DecoderException e = new DecoderException(MSG, t);
-        assertEquals(MSG, e.getMessage());
-        assertEquals(t, e.getCause());
+    void testConstructorWithMessageAndCause() {
+        // Arrange: Create a DecoderException with a message and a cause.
+        final DecoderException exception = new DecoderException(TEST_MESSAGE, TEST_CAUSE);
+
+        // Act & Assert: Verify that the message and cause are set correctly.
+        assertEquals(TEST_MESSAGE, exception.getMessage(), "Constructor with message and cause should set the message correctly.");
+        assertEquals(TEST_CAUSE, exception.getCause(), "Constructor with message and cause should set the cause correctly.");
     }
 
     @Test
-    void testConstructorThrowable() {
-        final DecoderException e = new DecoderException(t);
-        assertEquals(t.getClass().getName(), e.getMessage());
-        assertEquals(t, e.getCause());
+    void testConstructorWithCause() {
+        // Arrange: Create a DecoderException with a cause.
+        final DecoderException exception = new DecoderException(TEST_CAUSE);
+
+        // Act & Assert: Verify that the message is the cause's class name and the cause is set correctly.
+        assertEquals(TEST_CAUSE.getClass().getName(), exception.getMessage(), "Constructor with cause should set the message to the cause's class name.");
+        assertEquals(TEST_CAUSE, exception.getCause(), "Constructor with cause should set the cause correctly.");
     }
 
 }
