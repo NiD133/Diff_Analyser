@@ -6,125 +6,114 @@ import org.jsoup.parser.Parser;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AttributeTest {
-
     @Test
-    public void testHtmlEncoding() {
+    public void html() {
         Attribute attr = new Attribute("key", "value &");
-        String expectedHtml = "key=\"value &amp;\"";
-        assertEquals(expectedHtml, attr.html(), "HTML encoding of attribute value failed");
-        assertEquals(attr.html(), attr.toString(), "HTML and toString representations should match");
+        assertEquals("key=\"value &amp;\"", attr.html());
+        assertEquals(attr.html(), attr.toString());
     }
 
     @Test
-    public void testHtmlWithSpecialCharacters() {
+    public void htmlWithLtAndGtInValue() {
         Attribute attr = new Attribute("key", "<value>");
-        String expectedHtml = "key=\"&lt;value&gt;\"";
-        assertEquals(expectedHtml, attr.html(), "HTML encoding of special characters failed");
+        assertEquals("key=\"&lt;value&gt;\"", attr.html());
     }
 
-    @Test
-    public void testSupplementaryCharacterInKeyAndValue() {
-        String supplementaryChar = new String(Character.toChars(135361));
-        Attribute attr = new Attribute(supplementaryChar, "A" + supplementaryChar + "B");
-        String expectedHtml = supplementaryChar + "=\"A" + supplementaryChar + "B\"";
-        assertEquals(expectedHtml, attr.html(), "Handling of supplementary characters failed");
-        assertEquals(attr.html(), attr.toString(), "HTML and toString representations should match");
+    @Test public void testWithSupplementaryCharacterInAttributeKeyAndValue() {
+        String s = new String(Character.toChars(135361));
+        Attribute attr = new Attribute(s, "A" + s + "B");
+        assertEquals(s + "=\"A" + s + "B\"", attr.html());
+        assertEquals(attr.html(), attr.toString());
     }
 
-    @Test
-    public void testKeyValidationNotEmpty() {
-        assertThrows(IllegalArgumentException.class, () -> new Attribute(" ", "Check"), "Empty key should throw IllegalArgumentException");
+    @Test public void validatesKeysNotEmpty() {
+        assertThrows(IllegalArgumentException.class, () -> new Attribute(" ", "Check"));
     }
 
-    @Test
-    public void testKeyValidationNotEmptyViaSet() {
+    @Test public void validatesKeysNotEmptyViaSet() {
         assertThrows(IllegalArgumentException.class, () -> {
             Attribute attr = new Attribute("One", "Check");
             attr.setKey(" ");
-        }, "Setting an empty key should throw IllegalArgumentException");
+        });
     }
 
-    @Test
-    public void testBooleanAttributesHaveEmptyStringValues() {
+    @Test public void booleanAttributesAreEmptyStringValues() {
         Document doc = Jsoup.parse("<div hidden>");
         Attributes attributes = doc.body().child(0).attributes();
-        assertEquals("", attributes.get("hidden"), "Boolean attribute should have an empty string value");
+        assertEquals("", attributes.get("hidden"));
 
         Attribute first = attributes.iterator().next();
-        assertEquals("hidden", first.getKey(), "Attribute key mismatch");
-        assertEquals("", first.getValue(), "Boolean attribute value should be empty");
-        assertFalse(first.hasDeclaredValue(), "Boolean attribute should not have a declared value");
-        assertTrue(Attribute.isBooleanAttribute(first.getKey()), "Attribute should be recognized as boolean");
+        assertEquals("hidden", first.getKey());
+        assertEquals("", first.getValue());
+        assertFalse(first.hasDeclaredValue());
+        assertTrue(Attribute.isBooleanAttribute(first.getKey()));
     }
 
-    @Test
-    public void testSettersOnOrphanAttribute() {
+    @Test public void settersOnOrphanAttribute() {
         Attribute attr = new Attribute("one", "two");
         attr.setKey("three");
         String oldVal = attr.setValue("four");
-        assertEquals("two", oldVal, "Old value mismatch");
-        assertEquals("three", attr.getKey(), "Key mismatch after setting new key");
-        assertEquals("four", attr.getValue(), "Value mismatch after setting new value");
-        assertNull(attr.parent, "Orphan attribute should not have a parent");
+        assertEquals("two", oldVal);
+        assertEquals("three", attr.getKey());
+        assertEquals("four", attr.getValue());
+        assertNull(attr.parent);
     }
 
-    @Test
-    public void testSettersAfterParentRemoval() {
+    @Test void settersAfterParentRemoval() {
+        // tests key and value set on a retained attribute after disconnected from parent
         Attributes attrs = new Attributes();
         attrs.put("foo", "bar");
         Attribute attr = attrs.attribute("foo");
-        assertNotNull(attr, "Attribute should not be null");
+        assertNotNull(attr);
         attrs.remove("foo");
-        assertEquals("foo", attr.getKey(), "Key mismatch after parent removal");
-        assertEquals("bar", attr.getValue(), "Value mismatch after parent removal");
+        assertEquals("foo", attr.getKey());
+        assertEquals("bar", attr.getValue());
         attr.setKey("new");
         attr.setValue("newer");
-        assertEquals("new", attr.getKey(), "Key mismatch after setting new key");
-        assertEquals("newer", attr.getValue(), "Value mismatch after setting new value");
+        assertEquals("new", attr.getKey());
+        assertEquals("newer", attr.getValue());
     }
 
-    @Test
-    public void testHasValue() {
+    @Test public void hasValue() {
         Attribute a1 = new Attribute("one", "");
         Attribute a2 = new Attribute("two", null);
         Attribute a3 = new Attribute("thr", "thr");
 
-        assertTrue(a1.hasDeclaredValue(), "Attribute with empty string should have a declared value");
-        assertFalse(a2.hasDeclaredValue(), "Attribute with null value should not have a declared value");
-        assertTrue(a3.hasDeclaredValue(), "Attribute with non-empty value should have a declared value");
+        assertTrue(a1.hasDeclaredValue());
+        assertFalse(a2.hasDeclaredValue());
+        assertTrue(a3.hasDeclaredValue());
     }
 
-    @Test
-    public void testSetValueToNull() {
+    @Test public void canSetValueToNull() {
         Attribute attr = new Attribute("one", "val");
         String oldVal = attr.setValue(null);
-        assertEquals("one", attr.html(), "HTML representation mismatch after setting value to null");
-        assertEquals("val", oldVal, "Old value mismatch after setting value to null");
+        assertEquals("one", attr.html());
+        assertEquals("val", oldVal);
 
         oldVal = attr.setValue("foo");
-        assertEquals("", oldVal, "Old value should be empty string after setting new value");
+        assertEquals("", oldVal); // string, not null
     }
 
-    @Test
-    public void testBooleanAttributesCaseInsensitivity() {
-        assertTrue(Attribute.isBooleanAttribute("required"), "Boolean attribute should be recognized");
-        assertTrue(Attribute.isBooleanAttribute("REQUIRED"), "Boolean attribute should be case insensitive");
-        assertTrue(Attribute.isBooleanAttribute("rEQUIREd"), "Boolean attribute should be case insensitive");
-        assertFalse(Attribute.isBooleanAttribute("random string"), "Non-boolean attribute should not be recognized");
+    @Test void booleanAttributesAreNotCaseSensitive() {
+        // https://github.com/jhy/jsoup/issues/1656
+        assertTrue(Attribute.isBooleanAttribute("required"));
+        assertTrue(Attribute.isBooleanAttribute("REQUIRED"));
+        assertTrue(Attribute.isBooleanAttribute("rEQUIREd"));
+        assertFalse(Attribute.isBooleanAttribute("random string"));
 
         String html = "<a href=autofocus REQUIRED>One</a>";
         Document doc = Jsoup.parse(html);
-        assertEquals("<a href=\"autofocus\" required>One</a>", doc.selectFirst("a").outerHtml(), "HTML parsing mismatch");
+        assertEquals("<a href=\"autofocus\" required>One</a>", doc.selectFirst("a").outerHtml());
 
         Document doc2 = Jsoup.parse(html, Parser.htmlParser().settings(ParseSettings.preserveCase));
-        assertEquals("<a href=\"autofocus\" REQUIRED>One</a>", doc2.selectFirst("a").outerHtml(), "HTML parsing with preserved case mismatch");
+        assertEquals("<a href=\"autofocus\" REQUIRED>One</a>", doc2.selectFirst("a").outerHtml());
     }
 
-    @Test
-    public void testOrphanNamespace() {
+    @Test void orphanNamespace() {
         Attribute attr = new Attribute("one", "two");
-        assertEquals("", attr.namespace(), "Orphan attribute should have an empty namespace");
+        assertEquals("", attr.namespace());
     }
 }
