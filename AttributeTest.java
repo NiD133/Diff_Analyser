@@ -4,152 +4,116 @@ import org.jsoup.Jsoup;
 import org.jsoup.parser.ParseSettings;
 import org.jsoup.parser.Parser;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AttributeTest {
-
     @Test
-    @DisplayName("Attribute.html() should return properly HTML-escaped string")
-    void html() {
-        Attribute attribute = new Attribute("key", "value &");
-        String expectedHtml = "key=\"value &amp;\"";
-
-        assertEquals(expectedHtml, attribute.html());
-        assertEquals(attribute.html(), attribute.toString(), "html() and toString() should return the same value");
+    public void html() {
+        Attribute attr = new Attribute("key", "value &");
+        assertEquals("key=\"value &amp;\"", attr.html());
+        assertEquals(attr.html(), attr.toString());
     }
 
     @Test
-    @DisplayName("Attribute.html() should escape less than and greater than symbols")
-    void htmlWithLtAndGtInValue() {
-        Attribute attribute = new Attribute("key", "<value>");
-        String expectedHtml = "key=\"&lt;value&gt;\"";
-
-        assertEquals(expectedHtml, attribute.html());
+    public void htmlWithLtAndGtInValue() {
+        Attribute attr = new Attribute("key", "<value>");
+        assertEquals("key=\"&lt;value&gt;\"", attr.html());
     }
 
-    @Test
-    @DisplayName("Attribute should handle supplementary characters in key and value")
-    void testWithSupplementaryCharacterInAttributeKeyAndValue() {
-        String supplementaryChar = new String(Character.toChars(135361));
-        Attribute attribute = new Attribute(supplementaryChar, "A" + supplementaryChar + "B");
-        String expectedHtml = supplementaryChar + "=\"A" + supplementaryChar + "B\"";
-
-        assertEquals(expectedHtml, attribute.html());
-        assertEquals(attribute.html(), attribute.toString(), "html() and toString() should return the same value");
+    @Test public void testWithSupplementaryCharacterInAttributeKeyAndValue() {
+        String s = new String(Character.toChars(135361));
+        Attribute attr = new Attribute(s, "A" + s + "B");
+        assertEquals(s + "=\"A" + s + "B\"", attr.html());
+        assertEquals(attr.html(), attr.toString());
     }
 
-    @Test
-    @DisplayName("Constructor should throw IllegalArgumentException when key is empty")
-    void validatesKeysNotEmpty() {
-        assertThrows(IllegalArgumentException.class, () -> new Attribute(" ", "Check"),
-            "Should throw exception when key is empty");
+    @Test public void validatesKeysNotEmpty() {
+        assertThrows(IllegalArgumentException.class, () -> new Attribute(" ", "Check"));
     }
 
-    @Test
-    @DisplayName("setKey() should throw IllegalArgumentException when key is empty")
-    void validatesKeysNotEmptyViaSet() {
+    @Test public void validatesKeysNotEmptyViaSet() {
         assertThrows(IllegalArgumentException.class, () -> {
-            Attribute attribute = new Attribute("One", "Check");
-            attribute.setKey(" ");
-        }, "Should throw exception when key is set to empty");
+            Attribute attr = new Attribute("One", "Check");
+            attr.setKey(" ");
+        });
     }
 
-    @Test
-    @DisplayName("Boolean attributes should have empty string values")
-    void booleanAttributesAreEmptyStringValues() {
-        Document document = Jsoup.parse("<div hidden>");
-        Attributes attributes = document.body().child(0).attributes();
+    @Test public void booleanAttributesAreEmptyStringValues() {
+        Document doc = Jsoup.parse("<div hidden>");
+        Attributes attributes = doc.body().child(0).attributes();
+        assertEquals("", attributes.get("hidden"));
 
-        assertEquals("", attributes.get("hidden"), "Boolean attribute should have empty string value");
-
-        Attribute firstAttribute = attributes.iterator().next();
-        assertEquals("hidden", firstAttribute.getKey());
-        assertEquals("", firstAttribute.getValue());
-        assertFalse(firstAttribute.hasDeclaredValue());
-        assertTrue(Attribute.isBooleanAttribute(firstAttribute.getKey()));
+        Attribute first = attributes.iterator().next();
+        assertEquals("hidden", first.getKey());
+        assertEquals("", first.getValue());
+        assertFalse(first.hasDeclaredValue());
+        assertTrue(Attribute.isBooleanAttribute(first.getKey()));
     }
 
-    @Test
-    @DisplayName("Setters on orphan attribute should work correctly")
-    void settersOnOrphanAttribute() {
-        Attribute attribute = new Attribute("one", "two");
-
-        attribute.setKey("three");
-        String oldValue = attribute.setValue("four");
-
-        assertEquals("two", oldValue, "Old value should be returned");
-        assertEquals("three", attribute.getKey());
-        assertEquals("four", attribute.getValue());
-        assertNull(attribute.parent, "Parent should be null");
+    @Test public void settersOnOrphanAttribute() {
+        Attribute attr = new Attribute("one", "two");
+        attr.setKey("three");
+        String oldVal = attr.setValue("four");
+        assertEquals("two", oldVal);
+        assertEquals("three", attr.getKey());
+        assertEquals("four", attr.getValue());
+        assertNull(attr.parent);
     }
 
-    @Test
-    @DisplayName("Setters after parent removal should work correctly")
-    void settersAfterParentRemoval() {
-        Attributes attributes = new Attributes();
-        attributes.put("foo", "bar");
-        Attribute attribute = attributes.attribute("foo");
-        assertNotNull(attribute);
-
-        attributes.remove("foo");
-
-        assertEquals("foo", attribute.getKey());
-        assertEquals("bar", attribute.getValue());
-
-        attribute.setKey("new");
-        attribute.setValue("newer");
-
-        assertEquals("new", attribute.getKey());
-        assertEquals("newer", attribute.getValue());
+    @Test void settersAfterParentRemoval() {
+        // tests key and value set on a retained attribute after disconnected from parent
+        Attributes attrs = new Attributes();
+        attrs.put("foo", "bar");
+        Attribute attr = attrs.attribute("foo");
+        assertNotNull(attr);
+        attrs.remove("foo");
+        assertEquals("foo", attr.getKey());
+        assertEquals("bar", attr.getValue());
+        attr.setKey("new");
+        attr.setValue("newer");
+        assertEquals("new", attr.getKey());
+        assertEquals("newer", attr.getValue());
     }
 
-    @Test
-    @DisplayName("hasValue() should return correct value based on attribute value")
-    void hasValue() {
-        Attribute attribute1 = new Attribute("one", "");
-        Attribute attribute2 = new Attribute("two", null);
-        Attribute attribute3 = new Attribute("thr", "thr");
+    @Test public void hasValue() {
+        Attribute a1 = new Attribute("one", "");
+        Attribute a2 = new Attribute("two", null);
+        Attribute a3 = new Attribute("thr", "thr");
 
-        assertTrue(attribute1.hasDeclaredValue(), "Empty string should be considered as having a value");
-        assertFalse(attribute2.hasDeclaredValue(), "Null should be considered as not having a value");
-        assertTrue(attribute3.hasDeclaredValue());
+        assertTrue(a1.hasDeclaredValue());
+        assertFalse(a2.hasDeclaredValue());
+        assertTrue(a3.hasDeclaredValue());
     }
 
-    @Test
-    @DisplayName("canSetValueToNull() should set value to null and return the old value")
-    void canSetValueToNull() {
-        Attribute attribute = new Attribute("one", "val");
-        String oldValue = attribute.setValue(null);
+    @Test public void canSetValueToNull() {
+        Attribute attr = new Attribute("one", "val");
+        String oldVal = attr.setValue(null);
+        assertEquals("one", attr.html());
+        assertEquals("val", oldVal);
 
-        assertEquals("one", attribute.html());
-        assertEquals("val", oldValue, "Old value should be returned");
-
-        oldValue = attribute.setValue("foo");
-        assertEquals("", oldValue, "Empty string should be returned for null values");
+        oldVal = attr.setValue("foo");
+        assertEquals("", oldVal); // string, not null
     }
 
-    @Test
-    @DisplayName("booleanAttributesAreNotCaseSensitive() - Boolean attributes should be case-insensitive")
-    void booleanAttributesAreNotCaseSensitive() {
+    @Test void booleanAttributesAreNotCaseSensitive() {
+        // https://github.com/jhy/jsoup/issues/1656
         assertTrue(Attribute.isBooleanAttribute("required"));
         assertTrue(Attribute.isBooleanAttribute("REQUIRED"));
         assertTrue(Attribute.isBooleanAttribute("rEQUIREd"));
         assertFalse(Attribute.isBooleanAttribute("random string"));
 
         String html = "<a href=autofocus REQUIRED>One</a>";
-        Document document = Jsoup.parse(html);
-        assertEquals("<a href=\"autofocus\" required>One</a>", document.selectFirst("a").outerHtml());
+        Document doc = Jsoup.parse(html);
+        assertEquals("<a href=\"autofocus\" required>One</a>", doc.selectFirst("a").outerHtml());
 
-        Document document2 = Jsoup.parse(html, Parser.htmlParser().settings(ParseSettings.preserveCase));
-        assertEquals("<a href=\"autofocus\" REQUIRED>One</a>", document2.selectFirst("a").outerHtml());
+        Document doc2 = Jsoup.parse(html, Parser.htmlParser().settings(ParseSettings.preserveCase));
+        assertEquals("<a href=\"autofocus\" REQUIRED>One</a>", doc2.selectFirst("a").outerHtml());
     }
 
-    @Test
-    @DisplayName("orphanNamespace() - Namespace should be empty for an orphan attribute")
-    void orphanNamespace() {
-        Attribute attribute = new Attribute("one", "two");
-        assertEquals("", attribute.namespace());
+    @Test void orphanNamespace() {
+        Attribute attr = new Attribute("one", "two");
+        assertEquals("", attr.namespace());
     }
 }
