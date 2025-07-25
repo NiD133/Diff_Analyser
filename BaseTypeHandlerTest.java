@@ -1,18 +1,3 @@
-/*
- *    Copyright 2009-2022 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       https://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
 package org.apache.ibatis.type;
 
 import java.sql.CallableStatement;
@@ -24,29 +9,70 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+/**
+ * Abstract test class for testing implementations of {@link BaseTypeHandler}.
+ * This class provides a common setup for mocking SQL-related objects and
+ * defines abstract methods for specific test cases that subclasses must implement.
+ */
 @ExtendWith(MockitoExtension.class)
 abstract class BaseTypeHandlerTest {
 
+  // Mocked SQL objects to be used in test cases
   @Mock
-  protected ResultSet rs;
+  protected ResultSet resultSet;
   @Mock
-  protected PreparedStatement ps;
+  protected PreparedStatement preparedStatement;
   @Mock
-  protected CallableStatement cs;
+  protected CallableStatement callableStatement;
   @Mock
-  protected ResultSetMetaData rsmd;
+  protected ResultSetMetaData resultSetMetaData;
 
-  public abstract void shouldSetParameter() throws Exception;
+  /**
+   * Test case for setting a parameter in a {@link PreparedStatement}.
+   * Subclasses should implement this method to verify the correct behavior
+   * of the {@link BaseTypeHandler#setParameter} method.
+   */
+  public abstract void testSetParameter() throws Exception;
 
-  public abstract void shouldGetResultFromResultSetByName() throws Exception;
+  /**
+   * Test case for retrieving a result from a {@link ResultSet} by column name.
+   * Subclasses should implement this method to verify the correct behavior
+   * of the {@link BaseTypeHandler#getResult(ResultSet, String)} method.
+   */
+  public abstract void testGetResultFromResultSetByName() throws Exception;
 
-  public abstract void shouldGetResultNullFromResultSetByName() throws Exception;
+  /**
+   * Test case for handling null results from a {@link ResultSet} by column name.
+   * Subclasses should implement this method to verify the correct behavior
+   * of handling null values in the {@link BaseTypeHandler#getResult(ResultSet, String)} method.
+   */
+  public abstract void testGetResultNullFromResultSetByName() throws Exception;
 
-  public abstract void shouldGetResultFromResultSetByPosition() throws Exception;
+  /**
+   * Test case for retrieving a result from a {@link ResultSet} by column index.
+   * Subclasses should implement this method to verify the correct behavior
+   * of the {@link BaseTypeHandler#getResult(ResultSet, int)} method.
+   */
+  public abstract void testGetResultFromResultSetByPosition() throws Exception;
 
-  public abstract void shouldGetResultNullFromResultSetByPosition() throws Exception;
+  /**
+   * Test case for handling null results from a {@link ResultSet} by column index.
+   * Subclasses should implement this method to verify the correct behavior
+   * of handling null values in the {@link BaseTypeHandler#getResult(ResultSet, int)} method.
+   */
+  public abstract void testGetResultNullFromResultSetByPosition() throws Exception;
 
-  public abstract void shouldGetResultFromCallableStatement() throws Exception;
+  /**
+   * Test case for retrieving a result from a {@link CallableStatement}.
+   * Subclasses should implement this method to verify the correct behavior
+   * of the {@link BaseTypeHandler#getResult(CallableStatement, int)} method.
+   */
+  public abstract void testGetResultFromCallableStatement() throws Exception;
 
-  public abstract void shouldGetResultNullFromCallableStatement() throws Exception;
+  /**
+   * Test case for handling null results from a {@link CallableStatement}.
+   * Subclasses should implement this method to verify the correct behavior
+   * of handling null values in the {@link BaseTypeHandler#getResult(CallableStatement, int)} method.
+   */
+  public abstract void testGetResultNullFromCallableStatement() throws Exception;
 }
