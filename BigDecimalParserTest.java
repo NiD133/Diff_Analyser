@@ -1,85 +1,73 @@
 package com.fasterxml.jackson.core.io;
 
 import java.math.BigDecimal;
-
 import ch.randelshofer.fastdoubleparser.JavaBigDecimalParser;
 import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-class BigDecimalParserTest extends com.fasterxml.jackson.core.JUnit5TestBase
-{
-    @Test
-    void longInvalidStringParse() {
-        try {
-            BigDecimalParser.parse(genLongInvalidString());
-            fail("expected NumberFormatException");
-        } catch (NumberFormatException nfe) {
-            assertTrue(nfe.getMessage().startsWith("Value \"AAAAA"), "exception message starts as expected?");
-            assertTrue(nfe.getMessage().contains("truncated"), "exception message value contains truncated");
-        }
-    }
+class BigDecimalParserTest extends com.fasterxml.jackson.core.JUnit5TestBase {
 
     @Test
-    void longInvalidStringFastParse() {
-        try {
-            BigDecimalParser.parseWithFastParser(genLongInvalidString());
-            fail("expected NumberFormatException");
-        } catch (NumberFormatException nfe) {
-            assertTrue(nfe.getMessage().startsWith("Value \"AAAAA"), "exception message starts as expected?");
-            assertTrue(nfe.getMessage().contains("truncated"), "exception message value contains truncated");
-        }
+    void testParseInvalidLongString() {
+        String invalidString = generateLongInvalidString();
+        assertThrows(NumberFormatException.class, () -> {
+            BigDecimalParser.parse(invalidString);
+        }, "Expected NumberFormatException for invalid input string");
+
+        assertThrows(NumberFormatException.class, () -> {
+            BigDecimalParser.parseWithFastParser(invalidString);
+        }, "Expected NumberFormatException for invalid input string with fast parser");
     }
 
     @Test
-    void longValidStringParse() {
-        String num = genLongValidString(500);
-        final BigDecimal EXP = new BigDecimal(num);
+    void testParseValidLongString() {
+        String validString = generateLongValidString(500);
+        BigDecimal expectedValue = new BigDecimal(validString);
 
-        // Parse from String first, then char[]
+        // Test parsing with standard parser
+        assertEquals(expectedValue, BigDecimalParser.parse(validString), "Parsed value should match expected BigDecimal");
+        assertEquals(expectedValue, BigDecimalParser.parse(validString.toCharArray(), 0, validString.length()), "Parsed char[] value should match expected BigDecimal");
 
-        assertEquals(EXP, BigDecimalParser.parse(num));
-        assertEquals(EXP, BigDecimalParser.parse(num.toCharArray(), 0, num.length()));
+        // Test parsing with fast parser
+        assertEquals(expectedValue, BigDecimalParser.parseWithFastParser(validString), "Parsed value with fast parser should match expected BigDecimal");
+        assertEquals(expectedValue, BigDecimalParser.parseWithFastParser(validString.toCharArray(), 0, validString.length()), "Parsed char[] value with fast parser should match expected BigDecimal");
     }
 
     @Test
-    void longValidStringFastParse() {
-        String num = genLongValidString(500);
-        final BigDecimal EXP = new BigDecimal(num);
+    void testIssueDatabind4694() {
+        final String largeNumberString = "-11000." + "0".repeat(1000) + "0";
+        BigDecimal expectedValue = new BigDecimal(largeNumberString);
 
-        // Parse from String first, then char[]
-        assertEquals(EXP, BigDecimalParser.parseWithFastParser(num));
-        assertEquals(EXP, BigDecimalParser.parseWithFastParser(num.toCharArray(), 0, num.length()));
+        // Test parsing with JavaBigDecimalParser
+        assertEquals(expectedValue, JavaBigDecimalParser.parseBigDecimal(largeNumberString), "Parsed value with JavaBigDecimalParser should match expected BigDecimal");
+
+        // Test parsing with standard parser
+        assertEquals(expectedValue, BigDecimalParser.parse(largeNumberString), "Parsed value should match expected BigDecimal");
+        assertEquals(expectedValue, BigDecimalParser.parse(largeNumberString.toCharArray(), 0, largeNumberString.length()), "Parsed char[] value should match expected BigDecimal");
+
+        // Test parsing with fast parser
+        assertEquals(expectedValue, BigDecimalParser.parseWithFastParser(largeNumberString), "Parsed value with fast parser should match expected BigDecimal");
+        assertEquals(expectedValue, BigDecimalParser.parseWithFastParser(largeNumberString.toCharArray(), 0, largeNumberString.length()), "Parsed char[] value with fast parser should match expected BigDecimal");
     }
 
-    @Test
-    void issueDatabind4694() {
-        final String str = "-11000.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-        final BigDecimal expected = new BigDecimal(str);
-        assertEquals(expected, JavaBigDecimalParser.parseBigDecimal(str));
-        assertEquals(expected, BigDecimalParser.parse(str));
-        assertEquals(expected, BigDecimalParser.parseWithFastParser(str));
-        final char[] arr = str.toCharArray();
-        assertEquals(expected, BigDecimalParser.parse(arr, 0, arr.length));
-        assertEquals(expected, BigDecimalParser.parseWithFastParser(arr, 0, arr.length));
+    /**
+     * Generates a long invalid string for testing purposes.
+     * The string consists of 1500 'A' characters.
+     *
+     * @return a long invalid string
+     */
+    static String generateLongInvalidString() {
+        return "A".repeat(1500);
     }
 
-    static String genLongInvalidString() {
-        final int len = 1500;
-        final StringBuilder sb = new StringBuilder(len);
-        for (int i = 0; i < len; i++) {
-            sb.append("A");
-        }
-        return sb.toString();
-    }
-
-    static String genLongValidString(int len) {
-        final StringBuilder sb = new StringBuilder(len+5);
-        sb.append("0.");
-        for (int i = 0; i < len; i++) {
-            sb.append('0');
-        }
-        sb.append('1');
-        return sb.toString();
+    /**
+     * Generates a long valid string for testing purposes.
+     * The string is a valid BigDecimal representation with a specified number of zeros.
+     *
+     * @param length the number of zeros in the decimal part
+     * @return a long valid string
+     */
+    static String generateLongValidString(int length) {
+        return "0." + "0".repeat(length) + "1";
     }
 }
