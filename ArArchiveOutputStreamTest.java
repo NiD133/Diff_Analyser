@@ -36,37 +36,28 @@ class ArArchiveOutputStreamTest extends AbstractTest {
 
     @Test
     void testLongFileNamesCauseExceptionByDefault() throws IOException {
-        // Test that an exception is thrown when a long file name is used with the default settings
-        final ArArchiveOutputStream outputStreamReference;
+        final ArArchiveOutputStream ref;
         try (ArArchiveOutputStream outputStream = new ArArchiveOutputStream(new ByteArrayOutputStream())) {
-            outputStreamReference = outputStream;
-            final ArArchiveEntry longNameEntry = new ArArchiveEntry("this_is_a_long_name.txt", 0);
-            
-            // Expect an IOException due to the long file name
-            final IOException exception = assertThrows(IOException.class, () -> outputStream.putArchiveEntry(longNameEntry));
-            assertTrue(exception.getMessage().startsWith("File name too long"));
+            ref = outputStream;
+            final ArArchiveEntry ae = new ArArchiveEntry("this_is_a_long_name.txt", 0);
+            final IOException ex = assertThrows(IOException.class, () -> outputStream.putArchiveEntry(ae));
+            assertTrue(ex.getMessage().startsWith("File name too long"));
         }
-        // Ensure the output stream is closed after the operation
-        assertTrue(outputStreamReference.isClosed());
+        assertTrue(ref.isClosed());
     }
 
     @Test
     void testLongFileNamesWorkUsingBSDDialect() throws Exception {
-        // Test that long file names are supported when using the BSD dialect
-        final File tempFile = createTempFile();
-        try (ArArchiveOutputStream outputStream = new ArArchiveOutputStream(Files.newOutputStream(tempFile.toPath()))) {
+        final File file = createTempFile();
+        try (ArArchiveOutputStream outputStream = new ArArchiveOutputStream(Files.newOutputStream(file.toPath()))) {
             outputStream.setLongFileMode(ArArchiveOutputStream.LONGFILE_BSD);
-            final ArArchiveEntry longNameEntry = new ArArchiveEntry("this_is_a_long_name.txt", 14);
-            
-            // Add the entry and write data to it
-            outputStream.putArchiveEntry(longNameEntry);
+            final ArArchiveEntry ae = new ArArchiveEntry("this_is_a_long_name.txt", 14);
+            outputStream.putArchiveEntry(ae);
             outputStream.write(new byte[] { 'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\n' });
             outputStream.closeArchiveEntry();
-            
-            // Verify the archive content
-            final List<String> expectedFileNames = new ArrayList<>();
-            expectedFileNames.add("this_is_a_long_name.txt");
-            checkArchiveContent(tempFile, expectedFileNames);
+            final List<String> expected = new ArrayList<>();
+            expected.add("this_is_a_long_name.txt");
+            checkArchiveContent(file, expected);
         }
     }
 }
