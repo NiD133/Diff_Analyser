@@ -26,98 +26,162 @@ import static org.mockito.Mockito.when;
 
 import java.sql.Array;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.CallableStatement;
 import java.sql.Types;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-class ArrayTypeHandlerTest extends BaseTypeHandlerTest {
+class ArrayTypeHandlerTest {
 
-  private static final TypeHandler<Object> TYPE_HANDLER = new ArrayTypeHandler();
+  private TypeHandler<Object> typeHandler;
 
+  @Mock
+  PreparedStatement preparedStatement;
+  @Mock
+  ResultSet resultSet;
+  @Mock
+  CallableStatement callableStatement;
   @Mock
   Array mockArray;
 
-  @Override
-  @Test
-  public void shouldSetParameter() throws Exception {
-    TYPE_HANDLER.setParameter(ps, 1, mockArray, null);
-    verify(ps).setArray(1, mockArray);
+  @BeforeEach
+  void setup() {
+    MockitoAnnotations.openMocks(this);
+    typeHandler = new ArrayTypeHandler();
   }
 
   @Test
-  void shouldSetStringArrayParameter() throws Exception {
+  void shouldSetParameterWithArray() throws Exception {
+    // When
+    typeHandler.setParameter(preparedStatement, 1, mockArray, null);
+
+    // Then
+    verify(preparedStatement).setArray(1, mockArray);
+  }
+
+  @Test
+  void shouldSetParameterWithStringArray() throws Exception {
+    // Given
     Connection connection = mock(Connection.class);
-    when(ps.getConnection()).thenReturn(connection);
+    when(preparedStatement.getConnection()).thenReturn(connection);
 
     Array array = mock(Array.class);
     when(connection.createArrayOf(anyString(), any(String[].class))).thenReturn(array);
 
-    TYPE_HANDLER.setParameter(ps, 1, new String[] { "Hello World" }, JdbcType.ARRAY);
-    verify(ps).setArray(1, array);
+    String[] testArray = { "Hello World" };
+
+    // When
+    typeHandler.setParameter(preparedStatement, 1, testArray, JdbcType.ARRAY);
+
+    // Then
+    verify(preparedStatement).setArray(1, array);
     verify(array).free();
   }
 
   @Test
-  void shouldSetNullParameter() throws Exception {
-    TYPE_HANDLER.setParameter(ps, 1, null, JdbcType.ARRAY);
-    verify(ps).setNull(1, Types.ARRAY);
+  void shouldSetParameterWithNull() throws Exception {
+    // When
+    typeHandler.setParameter(preparedStatement, 1, null, JdbcType.ARRAY);
+
+    // Then
+    verify(preparedStatement).setNull(1, Types.ARRAY);
   }
 
   @Test
-  void shouldFailForNonArrayParameter() {
-    assertThrows(TypeException.class, () -> TYPE_HANDLER.setParameter(ps, 1, "unsupported parameter type", null));
+  void shouldThrowExceptionForNonArrayParameter() {
+    // When
+    assertThrows(TypeException.class, () -> typeHandler.setParameter(preparedStatement, 1, "unsupported parameter type", null));
   }
 
-  @Override
   @Test
-  public void shouldGetResultFromResultSetByName() throws Exception {
-    when(rs.getArray("column")).thenReturn(mockArray);
-    String[] stringArray = { "a", "b" };
-    when(mockArray.getArray()).thenReturn(stringArray);
-    assertEquals(stringArray, TYPE_HANDLER.getResult(rs, "column"));
+  void shouldGetResultFromStringColumnName() throws Exception {
+    // Given
+    String columnName = "column";
+    String[] expectedArray = { "a", "b" };
+    when(resultSet.getArray(columnName)).thenReturn(mockArray);
+    when(mockArray.getArray()).thenReturn(expectedArray);
+
+    // When
+    Object actualArray = typeHandler.getResult(resultSet, columnName);
+
+    // Then
+    assertEquals(expectedArray, actualArray);
     verify(mockArray).free();
   }
 
-  @Override
   @Test
-  public void shouldGetResultNullFromResultSetByName() throws Exception {
-    when(rs.getArray("column")).thenReturn(null);
-    assertNull(TYPE_HANDLER.getResult(rs, "column"));
+  void shouldGetNullResultFromStringColumnName() throws Exception {
+    // Given
+    String columnName = "column";
+    when(resultSet.getArray(columnName)).thenReturn(null);
+
+    // When
+    Object result = typeHandler.getResult(resultSet, columnName);
+
+    // Then
+    assertNull(result);
   }
 
-  @Override
   @Test
-  public void shouldGetResultFromResultSetByPosition() throws Exception {
-    when(rs.getArray(1)).thenReturn(mockArray);
-    String[] stringArray = { "a", "b" };
-    when(mockArray.getArray()).thenReturn(stringArray);
-    assertEquals(stringArray, TYPE_HANDLER.getResult(rs, 1));
+  void shouldGetResultFromIntColumnIndex() throws Exception {
+    // Given
+    int columnIndex = 1;
+    String[] expectedArray = { "a", "b" };
+    when(resultSet.getArray(columnIndex)).thenReturn(mockArray);
+    when(mockArray.getArray()).thenReturn(expectedArray);
+
+    // When
+    Object actualArray = typeHandler.getResult(resultSet, columnIndex);
+
+    // Then
+    assertEquals(expectedArray, actualArray);
     verify(mockArray).free();
   }
 
-  @Override
   @Test
-  public void shouldGetResultNullFromResultSetByPosition() throws Exception {
-    when(rs.getArray(1)).thenReturn(null);
-    assertNull(TYPE_HANDLER.getResult(rs, 1));
+  void shouldGetNullResultFromIntColumnIndex() throws Exception {
+    // Given
+    int columnIndex = 1;
+    when(resultSet.getArray(columnIndex)).thenReturn(null);
+
+    // When
+    Object result = typeHandler.getResult(resultSet, columnIndex);
+
+    // Then
+    assertNull(result);
   }
 
-  @Override
   @Test
-  public void shouldGetResultFromCallableStatement() throws Exception {
-    when(cs.getArray(1)).thenReturn(mockArray);
-    String[] stringArray = { "a", "b" };
-    when(mockArray.getArray()).thenReturn(stringArray);
-    assertEquals(stringArray, TYPE_HANDLER.getResult(cs, 1));
-    verify(mockArray).free();
+  void shouldGetResultFromCallableStatementIndex() throws Exception {
+      // Given
+      int columnIndex = 1;
+      String[] expectedArray = { "a", "b" };
+      when(callableStatement.getArray(columnIndex)).thenReturn(mockArray);
+      when(mockArray.getArray()).thenReturn(expectedArray);
+
+      // When
+      Object actualArray = typeHandler.getResult(callableStatement, columnIndex);
+
+      // Then
+      assertEquals(expectedArray, actualArray);
+      verify(mockArray).free();
   }
 
-  @Override
   @Test
-  public void shouldGetResultNullFromCallableStatement() throws Exception {
-    when(cs.getArray(1)).thenReturn(null);
-    assertNull(TYPE_HANDLER.getResult(cs, 1));
-  }
+  void shouldGetNullResultFromCallableStatementIndex() throws Exception {
+      // Given
+      int columnIndex = 1;
+      when(callableStatement.getArray(columnIndex)).thenReturn(null);
 
+      // When
+      Object result = typeHandler.getResult(callableStatement, columnIndex);
+
+      // Then
+      assertNull(result);
+  }
 }
