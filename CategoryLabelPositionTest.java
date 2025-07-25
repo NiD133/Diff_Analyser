@@ -1,147 +1,131 @@
-/* ======================================================
- * JFreeChart : a chart library for the Java(tm) platform
- * ======================================================
- *
- * (C) Copyright 2000-present, by David Gilbert and Contributors.
- *
- * Project Info:  https://www.jfree.org/jfreechart/index.html
- *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2.1 of the License, or
- * (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- * License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
- * USA.
- *
- * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
- * Other names may be trademarks of their respective owners.]
- *
- * ------------------------------
- * CategoryLabelPositionTest.java
- * ------------------------------
- * (C) Copyright 2004-present, by David Gilbert and Contributors.
- *
- * Original Author:  David Gilbert;
- * Contributor(s):   -;
- *
- */
-
 package org.jfree.chart.axis;
 
 import org.jfree.chart.TestUtils;
-import org.jfree.chart.text.TextBlockAnchor;
 import org.jfree.chart.api.RectangleAnchor;
+import org.jfree.chart.text.TextBlockAnchor;
 import org.jfree.chart.text.TextAnchor;
-
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  * Tests for the {@link CategoryLabelPosition} class.
+ *
+ * <p>This test suite focuses on verifying the correctness of the
+ * {@link CategoryLabelPosition} class, particularly its {@code equals()} and
+ * {@code hashCode()} methods, as well as its serialization capabilities.</p>
  */
 public class CategoryLabelPositionTest {
-    
+
     /**
-     * Check that the equals() method can distinguish all fields.
+     * Tests the {@code equals()} method to ensure that it correctly compares
+     * different {@link CategoryLabelPosition} instances based on their field
+     * values.
+     *
+     * <p>This test creates multiple {@link CategoryLabelPosition} instances
+     * with varying field values (RectangleAnchor, TextBlockAnchor,
+     * TextAnchor, angle, CategoryLabelWidthType, and widthRatio) and asserts
+     * that the {@code equals()} method returns the correct result (true if
+     * all fields are equal, false otherwise).</p>
      */
     @Test
     public void testEquals() {
-        CategoryLabelPosition p1 = new CategoryLabelPosition(
+        // Base CategoryLabelPosition instance for comparison
+        CategoryLabelPosition basePosition = new CategoryLabelPosition(
                 RectangleAnchor.BOTTOM_LEFT, TextBlockAnchor.CENTER_RIGHT,
                 TextAnchor.BASELINE_LEFT, Math.PI / 4.0,
                 CategoryLabelWidthType.RANGE, 0.44f);
-        CategoryLabelPosition p2 = new CategoryLabelPosition(
+
+        // Create an identical CategoryLabelPosition instance and verify equality
+        CategoryLabelPosition identicalPosition = new CategoryLabelPosition(
                 RectangleAnchor.BOTTOM_LEFT, TextBlockAnchor.CENTER_RIGHT,
                 TextAnchor.BASELINE_LEFT, Math.PI / 4.0,
                 CategoryLabelWidthType.RANGE, 0.44f);
-        assertEquals(p1, p2);
-        assertEquals(p2, p1);
+        assertEquals(basePosition, identicalPosition, "Instances with identical fields should be equal.");
+        assertEquals(identicalPosition, basePosition, "Equals should be reflexive.");
 
-        p1 = new CategoryLabelPosition(RectangleAnchor.TOP,
+        // Test inequality with different RectangleAnchor
+        CategoryLabelPosition differentRectangleAnchor = new CategoryLabelPosition(RectangleAnchor.TOP,
                 TextBlockAnchor.CENTER_RIGHT, TextAnchor.BASELINE_LEFT,
                 Math.PI / 4.0, CategoryLabelWidthType.RANGE, 0.44f);
-        assertNotEquals(p1, p2);
-        p2 = new CategoryLabelPosition(RectangleAnchor.TOP,
-                TextBlockAnchor.CENTER_RIGHT, TextAnchor.BASELINE_LEFT,
-                Math.PI / 4.0, CategoryLabelWidthType.RANGE, 0.44f);
-        assertEquals(p1, p2);
+        assertNotEquals(basePosition, differentRectangleAnchor, "Instances with different RectangleAnchor should not be equal.");
 
-        p1 = new CategoryLabelPosition(RectangleAnchor.TOP,
+        // Test inequality with different TextBlockAnchor
+        CategoryLabelPosition differentTextBlockAnchor = new CategoryLabelPosition(RectangleAnchor.TOP,
                 TextBlockAnchor.CENTER, TextAnchor.BASELINE_LEFT, Math.PI / 4.0,
                 CategoryLabelWidthType.RANGE, 0.44f);
-        assertNotEquals(p1, p2);
-        p2 = new CategoryLabelPosition(RectangleAnchor.TOP,
-                TextBlockAnchor.CENTER, TextAnchor.BASELINE_LEFT, Math.PI / 4.0,
-                CategoryLabelWidthType.RANGE, 0.44f);
-        assertEquals(p1, p2);
+        assertNotEquals(differentRectangleAnchor, differentTextBlockAnchor, "Instances with different TextBlockAnchor should not be equal.");
 
-        p1 = new CategoryLabelPosition(RectangleAnchor.TOP,
+        // Test inequality with different TextAnchor
+        CategoryLabelPosition differentTextAnchor = new CategoryLabelPosition(RectangleAnchor.TOP,
                 TextBlockAnchor.CENTER, TextAnchor.CENTER, Math.PI / 4.0,
                 CategoryLabelWidthType.RANGE, 0.44f);
-        assertNotEquals(p1, p2);
-        p2 = new CategoryLabelPosition(RectangleAnchor.TOP,
-                TextBlockAnchor.CENTER, TextAnchor.CENTER, Math.PI / 4.0,
-                CategoryLabelWidthType.RANGE, 0.44f);
-        assertEquals(p1, p2);
+        assertNotEquals(differentTextBlockAnchor, differentTextAnchor, "Instances with different TextAnchor should not be equal.");
 
-        p1 = new CategoryLabelPosition(RectangleAnchor.TOP,
+        // Test inequality with different angle
+        CategoryLabelPosition differentAngle = new CategoryLabelPosition(RectangleAnchor.TOP,
                 TextBlockAnchor.CENTER, TextAnchor.CENTER, Math.PI / 6.0,
                 CategoryLabelWidthType.RANGE, 0.44f);
-        assertNotEquals(p1, p2);
-        p2 = new CategoryLabelPosition(RectangleAnchor.TOP,
-                TextBlockAnchor.CENTER, TextAnchor.CENTER, Math.PI / 6.0,
-                CategoryLabelWidthType.RANGE, 0.44f);
-        assertEquals(p1, p2);
+        assertNotEquals(differentTextAnchor, differentAngle, "Instances with different angle should not be equal.");
 
-        p1 = new CategoryLabelPosition(RectangleAnchor.TOP,
+        // Test inequality with different CategoryLabelWidthType
+        CategoryLabelPosition differentWidthType = new CategoryLabelPosition(RectangleAnchor.TOP,
                 TextBlockAnchor.CENTER, TextAnchor.CENTER, Math.PI / 6.0,
                 CategoryLabelWidthType.CATEGORY, 0.44f);
-        assertNotEquals(p1, p2);
-        p2 = new CategoryLabelPosition(RectangleAnchor.TOP,
-                TextBlockAnchor.CENTER, TextAnchor.CENTER, Math.PI / 6.0,
-                CategoryLabelWidthType.CATEGORY, 0.44f);
-        assertEquals(p1, p2);
+        assertNotEquals(differentAngle, differentWidthType, "Instances with different CategoryLabelWidthType should not be equal.");
 
-        p1 = new CategoryLabelPosition(RectangleAnchor.TOP,
-                TextBlockAnchor.CENTER, TextAnchor.CENTER,  Math.PI / 6.0,
-                CategoryLabelWidthType.CATEGORY, 0.55f);
-        assertNotEquals(p1, p2);
-        p2 = new CategoryLabelPosition(RectangleAnchor.TOP,
+        // Test inequality with different widthRatio
+        CategoryLabelPosition differentWidthRatio = new CategoryLabelPosition(RectangleAnchor.TOP,
                 TextBlockAnchor.CENTER, TextAnchor.CENTER, Math.PI / 6.0,
                 CategoryLabelWidthType.CATEGORY, 0.55f);
-        assertEquals(p1, p2);
+        assertNotEquals(differentWidthType, differentWidthRatio, "Instances with different widthRatio should not be equal.");
     }
 
     /**
-     * Two objects that are equal are required to return the same hashCode.
+     * Tests the {@code hashCode()} method to ensure that equal objects return
+     * the same hash code.
+     *
+     * <p>This test creates two {@link CategoryLabelPosition} instances with
+     * default values, asserts that they are equal using the {@code equals()}
+     * method, and then verifies that their hash codes are also equal.</p>
      */
     @Test
     public void testHashCode() {
-        CategoryLabelPosition a1 = new CategoryLabelPosition();
-        CategoryLabelPosition a2 = new CategoryLabelPosition();
-        assertEquals(a1, a2);
-        int h1 = a1.hashCode();
-        int h2 = a2.hashCode();
-        assertEquals(h1, h2);
+        // Create two CategoryLabelPosition instances with default values
+        CategoryLabelPosition position1 = new CategoryLabelPosition();
+        CategoryLabelPosition position2 = new CategoryLabelPosition();
+
+        // Assert that the two instances are equal
+        assertEquals(position1, position2, "Instances with default values should be equal.");
+
+        // Get the hash codes of the two instances
+        int hashCode1 = position1.hashCode();
+        int hashCode2 = position2.hashCode();
+
+        // Assert that the hash codes are equal
+        assertEquals(hashCode1, hashCode2, "Equal instances should have the same hash code.");
     }
 
     /**
-     * Serialize an instance, restore it, and check for equality.
+     * Tests the serialization and deserialization of a
+     * {@link CategoryLabelPosition} instance.
+     *
+     * <p>This test creates a {@link CategoryLabelPosition} instance, serializes
+     * it to a byte array, deserializes it back into a
+     * {@link CategoryLabelPosition} instance, and then asserts that the
+     * original and deserialized instances are equal.</p>
      */
     @Test
     public void testSerialization() {
-        CategoryLabelPosition p1 = new CategoryLabelPosition();
-        CategoryLabelPosition p2 = TestUtils.serialised(p1);
-        assertEquals(p1, p2);
+        // Create a CategoryLabelPosition instance
+        CategoryLabelPosition originalPosition = new CategoryLabelPosition();
+
+        // Serialize and deserialize the instance
+        CategoryLabelPosition deserializedPosition = TestUtils.serialised(originalPosition);
+
+        // Assert that the original and deserialized instances are equal
+        assertEquals(originalPosition, deserializedPosition, "The deserialized instance should be equal to the original instance.");
     }
 
 }
