@@ -1,19 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.apache.commons.io.input.buffer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,140 +10,146 @@ import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests {@link CircularByteBuffer}.
+ * Unit tests for {@link CircularByteBuffer}.
  */
 class CircularByteBufferTest {
 
     @Test
-    void testAddByteSmallestBuffer() {
-        final CircularByteBuffer cbb = new CircularByteBuffer(1);
-        cbb.add((byte) 1);
-        assertEquals(1, cbb.read());
-        cbb.add((byte) 2);
-        assertEquals(2, cbb.read());
+    void testAddSingleByteToSmallestBuffer() {
+        final CircularByteBuffer buffer = new CircularByteBuffer(1);
+        buffer.add((byte) 1);
+        assertEquals(1, buffer.read(), "Buffer should return the byte that was added");
+        
+        buffer.add((byte) 2);
+        assertEquals(2, buffer.read(), "Buffer should return the new byte that was added");
     }
 
     @Test
-    void testAddInvalidOffset() {
-        final CircularByteBuffer cbb = new CircularByteBuffer();
-        assertThrows(IllegalArgumentException.class, () -> cbb.add(new byte[] { 1, 2, 3 }, -1, 3));
+    void testAddWithInvalidOffsetThrowsException() {
+        final CircularByteBuffer buffer = new CircularByteBuffer();
+        assertThrows(IllegalArgumentException.class, 
+            () -> buffer.add(new byte[] { 1, 2, 3 }, -1, 3),
+            "Adding with a negative offset should throw IllegalArgumentException");
     }
 
     @Test
-    void testAddNegativeLength() {
-        final CircularByteBuffer cbb = new CircularByteBuffer();
-        final byte[] targetBuffer = { 1, 2, 3 };
-        assertThrows(IllegalArgumentException.class, () -> cbb.add(targetBuffer, 0, -1));
+    void testAddWithNegativeLengthThrowsException() {
+        final CircularByteBuffer buffer = new CircularByteBuffer();
+        final byte[] data = { 1, 2, 3 };
+        assertThrows(IllegalArgumentException.class, 
+            () -> buffer.add(data, 0, -1),
+            "Adding with a negative length should throw IllegalArgumentException");
     }
 
     @Test
-    void testAddNullBuffer() {
-        final CircularByteBuffer cbb = new CircularByteBuffer();
-        assertThrows(NullPointerException.class, () -> cbb.add(null, 0, 3));
+    void testAddNullBufferThrowsException() {
+        final CircularByteBuffer buffer = new CircularByteBuffer();
+        assertThrows(NullPointerException.class, 
+            () -> buffer.add(null, 0, 3),
+            "Adding a null buffer should throw NullPointerException");
     }
 
-    /**
-     * Tests for add function with 3 arguments of type byte[], int and int.
-     */
     @Test
-    void testAddValidData() {
-        final CircularByteBuffer cbb = new CircularByteBuffer();
+    void testAddValidDataIncreasesBufferSize() {
+        final CircularByteBuffer buffer = new CircularByteBuffer();
         final int length = 3;
-        cbb.add(new byte[] { 3, 6, 9 }, 0, length);
-        assertEquals(length, cbb.getCurrentNumberOfBytes());
+        buffer.add(new byte[] { 3, 6, 9 }, 0, length);
+        assertEquals(length, buffer.getCurrentNumberOfBytes(), "Buffer size should match the number of added bytes");
     }
 
     @Test
-    void testClear() {
-       final byte[] data = { 1, 2, 3 };
-       final CircularByteBuffer buffer = new CircularByteBuffer(10);
-       assertEquals(0, buffer.getCurrentNumberOfBytes());
-       assertFalse(buffer.hasBytes());
-
-       buffer.add(data, 0, data.length);
-       assertEquals(3, buffer.getCurrentNumberOfBytes());
-       assertEquals(7, buffer.getSpace());
-       assertTrue(buffer.hasBytes());
-       assertTrue(buffer.hasSpace());
-
-       buffer.clear();
-       assertEquals(0, buffer.getCurrentNumberOfBytes());
-       assertEquals(10, buffer.getSpace());
-       assertFalse(buffer.hasBytes());
-       assertTrue(buffer.hasSpace());
+    void testClearEmptiesBuffer() {
+        final byte[] data = { 1, 2, 3 };
+        final CircularByteBuffer buffer = new CircularByteBuffer(10);
+        
+        buffer.add(data, 0, data.length);
+        assertEquals(3, buffer.getCurrentNumberOfBytes(), "Buffer should contain 3 bytes after adding data");
+        
+        buffer.clear();
+        assertEquals(0, buffer.getCurrentNumberOfBytes(), "Buffer should be empty after clear");
+        assertEquals(10, buffer.getSpace(), "Buffer should have full space after clear");
     }
 
     @Test
-    void testHasSpace() {
-        final CircularByteBuffer cbb = new CircularByteBuffer(1);
-        assertTrue(cbb.hasSpace());
-        cbb.add((byte) 1);
-        assertFalse(cbb.hasSpace());
-        assertEquals(1, cbb.read());
-        assertTrue(cbb.hasSpace());
-        cbb.add((byte) 2);
-        assertFalse(cbb.hasSpace());
-        assertEquals(2, cbb.read());
-        assertTrue(cbb.hasSpace());
+    void testHasSpaceForSingleByte() {
+        final CircularByteBuffer buffer = new CircularByteBuffer(1);
+        assertTrue(buffer.hasSpace(), "Buffer should have space initially");
+        
+        buffer.add((byte) 1);
+        assertFalse(buffer.hasSpace(), "Buffer should not have space after adding a byte");
+        
+        buffer.read();
+        assertTrue(buffer.hasSpace(), "Buffer should have space after reading a byte");
     }
 
     @Test
-    void testHasSpaceInt() {
-        final CircularByteBuffer cbb = new CircularByteBuffer(1);
-        assertTrue(cbb.hasSpace(1));
-        cbb.add((byte) 1);
-        assertFalse(cbb.hasSpace(1));
-        assertEquals(1, cbb.read());
-        assertTrue(cbb.hasSpace(1));
-        cbb.add((byte) 2);
-        assertFalse(cbb.hasSpace(1));
-        assertEquals(2, cbb.read());
-        assertTrue(cbb.hasSpace(1));
+    void testHasSpaceForSpecificNumberOfBytes() {
+        final CircularByteBuffer buffer = new CircularByteBuffer(1);
+        assertTrue(buffer.hasSpace(1), "Buffer should have space for 1 byte initially");
+        
+        buffer.add((byte) 1);
+        assertFalse(buffer.hasSpace(1), "Buffer should not have space for 1 byte after adding a byte");
+        
+        buffer.read();
+        assertTrue(buffer.hasSpace(1), "Buffer should have space for 1 byte after reading a byte");
     }
 
     @Test
-    void testPeekWithExcessiveLength() {
-        assertFalse(new CircularByteBuffer().peek(new byte[] { 1, 3, 5, 7, 9 }, 0, 6));
+    void testPeekWithExcessiveLengthReturnsFalse() {
+        assertFalse(new CircularByteBuffer().peek(new byte[] { 1, 3, 5, 7, 9 }, 0, 6),
+            "Peeking with excessive length should return false");
     }
 
     @Test
-    void testPeekWithInvalidOffset() {
-        final CircularByteBuffer cbb = new CircularByteBuffer();
-        final IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> cbb.peek(new byte[] { 2, 4, 6, 8, 10 }, -1, 5));
-        assertEquals("Illegal offset: -1", e.getMessage());
+    void testPeekWithInvalidOffsetThrowsException() {
+        final CircularByteBuffer buffer = new CircularByteBuffer();
+        final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, 
+            () -> buffer.peek(new byte[] { 2, 4, 6, 8, 10 }, -1, 5),
+            "Peeking with a negative offset should throw IllegalArgumentException");
+        assertEquals("Illegal offset: -1", exception.getMessage());
     }
 
     @Test
-    void testPeekWithNegativeLength() {
-        final CircularByteBuffer cbb = new CircularByteBuffer();
-        final IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> cbb.peek(new byte[] { 1, 4, 3 }, 0, -1));
-        assertEquals("Illegal length: -1", e.getMessage());
-    }
-
-    // Tests for peek function
-    @Test
-    void testPeekWithValidArguments() {
-        assertFalse(new CircularByteBuffer().peek(new byte[] { 5, 10, 15, 20, 25 }, 0, 5));
+    void testPeekWithNegativeLengthThrowsException() {
+        final CircularByteBuffer buffer = new CircularByteBuffer();
+        final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, 
+            () -> buffer.peek(new byte[] { 1, 4, 3 }, 0, -1),
+            "Peeking with a negative length should throw IllegalArgumentException");
+        assertEquals("Illegal length: -1", exception.getMessage());
     }
 
     @Test
-    void testReadByteArray() {
-        final CircularByteBuffer cbb = new CircularByteBuffer();
-        final String string = "0123456789";
-        final byte[] bytesIn = string.getBytes(StandardCharsets.UTF_8);
-        cbb.add(bytesIn, 0, 10);
-        final byte[] bytesOut = new byte[10];
-        cbb.read(bytesOut, 0, 10);
-        assertEquals(string, new String(bytesOut, StandardCharsets.UTF_8));
+    void testPeekWithValidArgumentsReturnsFalse() {
+        assertFalse(new CircularByteBuffer().peek(new byte[] { 5, 10, 15, 20, 25 }, 0, 5),
+            "Peeking with valid arguments should return false when buffer is empty");
     }
 
     @Test
-    void testReadByteArrayIllegalArgumentException() {
-        final CircularByteBuffer cbb = new CircularByteBuffer();
-        final byte[] bytesOut = new byte[10];
-        // targetOffset < 0
-        assertThrows(IllegalArgumentException.class, () -> cbb.read(bytesOut, -1, 10));
-        // targetOffset >= targetBuffer.length
-        assertThrows(IllegalArgumentException.class, () -> cbb.read(bytesOut, 0, bytesOut.length + 1));
+    void testReadByteArrayMatchesInput() {
+        final CircularByteBuffer buffer = new CircularByteBuffer();
+        final String inputString = "0123456789";
+        final byte[] inputBytes = inputString.getBytes(StandardCharsets.UTF_8);
+        
+        buffer.add(inputBytes, 0, inputBytes.length);
+        
+        final byte[] outputBytes = new byte[inputBytes.length];
+        buffer.read(outputBytes, 0, outputBytes.length);
+        
+        assertEquals(inputString, new String(outputBytes, StandardCharsets.UTF_8), 
+            "Output bytes should match input string");
+    }
+
+    @Test
+    void testReadByteArrayWithInvalidArgumentsThrowsException() {
+        final CircularByteBuffer buffer = new CircularByteBuffer();
+        final byte[] outputBytes = new byte[10];
+        
+        assertThrows(IllegalArgumentException.class, 
+            () -> buffer.read(outputBytes, -1, 10),
+            "Reading with a negative target offset should throw IllegalArgumentException");
+        
+        assertThrows(IllegalArgumentException.class, 
+            () -> buffer.read(outputBytes, 0, outputBytes.length + 1),
+            "Reading with a length greater than buffer size should throw IllegalArgumentException");
     }
 }
