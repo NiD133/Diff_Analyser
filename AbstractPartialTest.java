@@ -1,160 +1,164 @@
-/*
- *  Copyright 2001-2005 Stephen Colebourne
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
 package org.joda.time;
-
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 import org.joda.time.base.AbstractPartial;
 import org.joda.time.chrono.BuddhistChronology;
 import org.joda.time.chrono.ISOChronology;
 import org.joda.time.field.AbstractPartialFieldProperty;
+import org.joda.time.format.DateTimeFormatter;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
- * This class is a Junit unit test for YearMonthDay.
- *
- * @author Stephen Colebourne
+ * Unit tests for {@link AbstractPartial}.
  */
-public class TestAbstractPartial extends TestCase {
+public class TestAbstractPartial {
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-    
-    private long TEST_TIME_NOW =
-            (31L + 28L + 31L + 30L + 31L + 9L -1L) * DateTimeConstants.MILLIS_PER_DAY;
-            
-    private long TEST_TIME1 =
-        (31L + 28L + 31L + 6L -1L) * DateTimeConstants.MILLIS_PER_DAY
-        + 12L * DateTimeConstants.MILLIS_PER_HOUR
-        + 24L * DateTimeConstants.MILLIS_PER_MINUTE;
-        
-    private long TEST_TIME2 =
-        (365L + 31L + 28L + 31L + 30L + 7L -1L) * DateTimeConstants.MILLIS_PER_DAY
-        + 14L * DateTimeConstants.MILLIS_PER_HOUR
-        + 28L * DateTimeConstants.MILLIS_PER_MINUTE;
-        
-    private DateTimeZone zone = null;
+    private DateTimeZone originalTimeZone;
+    private long testTimeNow;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestAbstractPartial.class);
-    }
-
-    public TestAbstractPartial(String name) {
-        super(name);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        zone = DateTimeZone.getDefault();
+    @Before
+    public void setUp() {
+        DateTimeUtils.setCurrentMillisFixed(getTestTimeNow());
+        originalTimeZone = DateTimeZone.getDefault();
         DateTimeZone.setDefault(DateTimeZone.UTC);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() {
         DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(zone);
-        zone = null;
+        DateTimeZone.setDefault(originalTimeZone);
     }
 
-    //-----------------------------------------------------------------------
-    public void testGetValue() throws Throwable {
-        MockPartial mock = new MockPartial();
-        assertEquals(1970, mock.getValue(0));
-        assertEquals(1, mock.getValue(1));
-        
-        try {
-            mock.getValue(-1);
-            fail();
-        } catch (IndexOutOfBoundsException ex) {}
-        try {
-            mock.getValue(2);
-            fail();
-        } catch (IndexOutOfBoundsException ex) {}
-    }
-
-    public void testGetValues() throws Throwable {
-        MockPartial mock = new MockPartial();
-        int[] vals = mock.getValues();
-        assertEquals(2, vals.length);
-        assertEquals(1970, vals[0]);
-        assertEquals(1, vals[1]);
-    }
-
-    public void testGetField() throws Throwable {
-        MockPartial mock = new MockPartial();
-        assertEquals(BuddhistChronology.getInstanceUTC().year(), mock.getField(0));
-        assertEquals(BuddhistChronology.getInstanceUTC().monthOfYear(), mock.getField(1));
-        
-        try {
-            mock.getField(-1);
-            fail();
-        } catch (IndexOutOfBoundsException ex) {}
-        try {
-            mock.getField(2);
-            fail();
-        } catch (IndexOutOfBoundsException ex) {}
-    }
-
-    public void testGetFieldType() throws Throwable {
-        MockPartial mock = new MockPartial();
-        assertEquals(DateTimeFieldType.year(), mock.getFieldType(0));
-        assertEquals(DateTimeFieldType.monthOfYear(), mock.getFieldType(1));
-        
-        try {
-            mock.getFieldType(-1);
-            fail();
-        } catch (IndexOutOfBoundsException ex) {}
-        try {
-            mock.getFieldType(2);
-            fail();
-        } catch (IndexOutOfBoundsException ex) {}
-    }
-
-    public void testGetFieldTypes() throws Throwable {
-        MockPartial mock = new MockPartial();
-        DateTimeFieldType[] vals = mock.getFieldTypes();
-        assertEquals(2, vals.length);
-        assertEquals(DateTimeFieldType.year(), vals[0]);
-        assertEquals(DateTimeFieldType.monthOfYear(), vals[1]);
-    }
-
-    public void testGetPropertyEquals() throws Throwable {
-        MockProperty0 prop0 = new MockProperty0();
-        assertEquals(true, prop0.equals(prop0));
-        assertEquals(true, prop0.equals(new MockProperty0()));
-        assertEquals(false, prop0.equals(new MockProperty1()));
-        assertEquals(false, prop0.equals(new MockProperty0Val()));
-        assertEquals(false, prop0.equals(new MockProperty0Field()));
-        assertEquals(false, prop0.equals(new MockProperty0Chrono()));
-        assertEquals(false, prop0.equals(""));
-        assertEquals(false, prop0.equals(null));
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockPartial extends AbstractPartial {
-        
-        int[] val = new int[] {1970, 1};
-        
-        MockPartial() {
-            super();
+    private long getTestTimeNow() {
+        if (testTimeNow == 0) {
+            testTimeNow = (31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
         }
+        return testTimeNow;
+    }
+
+    /**
+     * Tests that the getValue method returns the correct value for a given index.
+     */
+    @Test
+    public void testGetValue() {
+        MockPartial mockPartial = new MockPartial();
+        assertEquals(1970, mockPartial.getValue(0));
+        assertEquals(1, mockPartial.getValue(1));
+
+        // Test that IndexOutOfBoundsException is thrown for invalid indices
+        try {
+            mockPartial.getValue(-1);
+            fail("Expected IndexOutOfBoundsException for index -1");
+        } catch (IndexOutOfBoundsException e) {
+            // Expected
+        }
+
+        try {
+            mockPartial.getValue(2);
+            fail("Expected IndexOutOfBoundsException for index 2");
+        } catch (IndexOutOfBoundsException e) {
+            // Expected
+        }
+    }
+
+    /**
+     * Tests that the getValues method returns the correct values for all indices.
+     */
+    @Test
+    public void testGetValues() {
+        MockPartial mockPartial = new MockPartial();
+        int[] values = mockPartial.getValues();
+        assertEquals(2, values.length);
+        assertEquals(1970, values[0]);
+        assertEquals(1, values[1]);
+    }
+
+    /**
+     * Tests that the getField method returns the correct field for a given index.
+     */
+    @Test
+    public void testGetField() {
+        MockPartial mockPartial = new MockPartial();
+        assertEquals(BuddhistChronology.getInstanceUTC().year(), mockPartial.getField(0));
+        assertEquals(BuddhistChronology.getInstanceUTC().monthOfYear(), mockPartial.getField(1));
+
+        // Test that IndexOutOfBoundsException is thrown for invalid indices
+        try {
+            mockPartial.getField(-1);
+            fail("Expected IndexOutOfBoundsException for index -1");
+        } catch (IndexOutOfBoundsException e) {
+            // Expected
+        }
+
+        try {
+            mockPartial.getField(2);
+            fail("Expected IndexOutOfBoundsException for index 2");
+        } catch (IndexOutOfBoundsException e) {
+            // Expected
+        }
+    }
+
+    /**
+     * Tests that the getFieldType method returns the correct field type for a given index.
+     */
+    @Test
+    public void testGetFieldType() {
+        MockPartial mockPartial = new MockPartial();
+        assertEquals(DateTimeFieldType.year(), mockPartial.getFieldType(0));
+        assertEquals(DateTimeFieldType.monthOfYear(), mockPartial.getFieldType(1));
+
+        // Test that IndexOutOfBoundsException is thrown for invalid indices
+        try {
+            mockPartial.getFieldType(-1);
+            fail("Expected IndexOutOfBoundsException for index -1");
+        } catch (IndexOutOfBoundsException e) {
+            // Expected
+        }
+
+        try {
+            mockPartial.getFieldType(2);
+            fail("Expected IndexOutOfBoundsException for index 2");
+        } catch (IndexOutOfBoundsException e) {
+            // Expected
+        }
+    }
+
+    /**
+     * Tests that the getFieldTypes method returns the correct field types for all indices.
+     */
+    @Test
+    public void testGetFieldTypes() {
+        MockPartial mockPartial = new MockPartial();
+        DateTimeFieldType[] fieldTypes = mockPartial.getFieldTypes();
+        assertEquals(2, fieldTypes.length);
+        assertEquals(DateTimeFieldType.year(), fieldTypes[0]);
+        assertEquals(DateTimeFieldType.monthOfYear(), fieldTypes[1]);
+    }
+
+    /**
+     * Tests that the equals method returns true for equal objects and false for unequal objects.
+     */
+    @Test
+    public void testGetPropertyEquals() {
+        MockProperty0 property0 = new MockProperty0();
+        assertTrue(property0.equals(property0));
+        assertTrue(property0.equals(new MockProperty0()));
+        assertFalse(property0.equals(new MockProperty1()));
+        assertFalse(property0.equals(new MockProperty0Val()));
+        assertFalse(property0.equals(new MockProperty0Field()));
+        assertFalse(property0.equals(new MockProperty0Chrono()));
+        assertFalse(property0.equals(""));
+        assertFalse(property0.equals(null));
+    }
+
+    // Mock classes
+
+    static class MockPartial extends AbstractPartial {
+
+        private int[] values = {1970, 1};
 
         @Override
         protected DateTimeField getField(int index, Chronology chrono) {
@@ -168,66 +172,85 @@ public class TestAbstractPartial extends TestCase {
             }
         }
 
+        @Override
         public int size() {
             return 2;
         }
-        
+
+        @Override
         public int getValue(int index) {
-            return val[index];
+            return values[index];
         }
 
+        @Override
         public void setValue(int index, int value) {
-            val[index] = value;
+            values[index] = value;
         }
 
+        @Override
         public Chronology getChronology() {
             return BuddhistChronology.getInstanceUTC();
         }
     }
-    
+
     static class MockProperty0 extends AbstractPartialFieldProperty {
-        MockPartial partial = new MockPartial();
+
+        private MockPartial partial = new MockPartial();
+
         @Override
         public DateTimeField getField() {
             return partial.getField(0);
         }
+
         @Override
         public ReadablePartial getReadablePartial() {
             return partial;
         }
+
         @Override
         public int get() {
             return partial.getValue(0);
         }
     }
+
     static class MockProperty1 extends AbstractPartialFieldProperty {
-        MockPartial partial = new MockPartial();
+
+        private MockPartial partial = new MockPartial();
+
         @Override
         public DateTimeField getField() {
             return partial.getField(1);
         }
+
         @Override
         public ReadablePartial getReadablePartial() {
             return partial;
         }
+
         @Override
         public int get() {
             return partial.getValue(1);
         }
     }
+
     static class MockProperty0Field extends MockProperty0 {
+
         @Override
         public DateTimeField getField() {
             return BuddhistChronology.getInstanceUTC().hourOfDay();
         }
     }
+
     static class MockProperty0Val extends MockProperty0 {
+
         @Override
         public int get() {
             return 99;
         }
     }
+
     static class MockProperty0Chrono extends MockProperty0 {
+
         @Override
         public ReadablePartial getReadablePartial() {
             return new MockPartial() {
