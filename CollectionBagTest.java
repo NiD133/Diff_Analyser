@@ -36,8 +36,8 @@ import org.junit.jupiter.api.Test;
 /**
  * Test class for {@link CollectionBag}.
  * <p>
- * Note: This test is mainly for serialization support, the CollectionBag decorator
- * is extensively used and tested in AbstractBagTest.
+ * This test class focuses on serialization support for the CollectionBag decorator.
+ * The CollectionBag is extensively used and tested in AbstractBagTest.
  */
 public class CollectionBagTest<T> extends AbstractCollectionTest<T> {
 
@@ -52,7 +52,7 @@ public class CollectionBagTest<T> extends AbstractCollectionTest<T> {
     }
 
     /**
-     * Returns an empty List for use in modification testing.
+     * Provides an empty collection for modification testing.
      *
      * @return a confirmed empty collection
      */
@@ -62,15 +62,15 @@ public class CollectionBagTest<T> extends AbstractCollectionTest<T> {
     }
 
     /**
-     * Returns a full Set for use in modification testing.
+     * Provides a full collection for modification testing.
      *
      * @return a confirmed full collection
      */
     @Override
     public Collection<T> makeConfirmedFullCollection() {
-        final Collection<T> set = makeConfirmedCollection();
-        set.addAll(Arrays.asList(getFullElements()));
-        return set;
+        final Collection<T> collection = makeConfirmedCollection();
+        collection.addAll(Arrays.asList(getFullElements()));
+        return collection;
     }
 
     @Override
@@ -78,54 +78,49 @@ public class CollectionBagTest<T> extends AbstractCollectionTest<T> {
         return CollectionBag.collectionBag(new HashBag<>());
     }
 
-    @Test
-    void testAdd_Predicate_ComparatorCustom() throws Throwable {
-        final TreeBag<Predicate<Object>> treeBagOfPredicateOfObject = new TreeBag<>(Comparator.comparing(Predicate::toString));
-        final CollectionBag<Predicate<Object>> collectionBagOfPredicateOfObject = new CollectionBag<>(treeBagOfPredicateOfObject);
-        collectionBagOfPredicateOfObject.add(NonePredicate.nonePredicate(collectionBagOfPredicateOfObject), 24);
-    }
-
-    @Test
-    void testAdd_Predicate_ComparatorDefault() throws Throwable {
-        final TreeBag<Predicate<Object>> treeBagOfPredicateOfObject = new TreeBag<>();
-        final CollectionBag<Predicate<Object>> collectionBagOfPredicateOfObject = new CollectionBag<>(treeBagOfPredicateOfObject);
-        assertThrows(ClassCastException.class, () -> collectionBagOfPredicateOfObject.add(NonePredicate.nonePredicate(collectionBagOfPredicateOfObject), 24));
-    }
-
-//    void testCreate() throws Exception {
-//        resetEmpty();
-//        writeExternalFormToDisk((java.io.Serializable) getCollection(), "src/test/resources/data/test/CollectionBag.emptyCollection.version4.obj");
-//        resetFull();
-//        writeExternalFormToDisk((java.io.Serializable) getCollection(), "src/test/resources/data/test/CollectionBag.fullCollection.version4.obj");
-//    }
-
     /**
-     * Compares the current serialized form of the Bag
-     * against the canonical version in SCM.
+     * Test adding elements with a custom comparator.
      */
     @Test
-    void testEmptyBagCompatibility() throws IOException, ClassNotFoundException {
-        // test to make sure the canonical form has been preserved
+    void testAddWithCustomComparator() throws Throwable {
+        final TreeBag<Predicate<Object>> treeBag = new TreeBag<>(Comparator.comparing(Predicate::toString));
+        final CollectionBag<Predicate<Object>> collectionBag = new CollectionBag<>(treeBag);
+        collectionBag.add(NonePredicate.nonePredicate(collectionBag), 24);
+    }
+
+    /**
+     * Test adding elements with the default comparator, expecting a ClassCastException.
+     */
+    @Test
+    void testAddWithDefaultComparator() throws Throwable {
+        final TreeBag<Predicate<Object>> treeBag = new TreeBag<>();
+        final CollectionBag<Predicate<Object>> collectionBag = new CollectionBag<>(treeBag);
+        assertThrows(ClassCastException.class, () -> collectionBag.add(NonePredicate.nonePredicate(collectionBag), 24));
+    }
+
+    /**
+     * Compares the current serialized form of the Bag against the canonical version in SCM.
+     */
+    @Test
+    void testEmptyBagSerializationCompatibility() throws IOException, ClassNotFoundException {
         final Bag<T> bag = makeObject();
         if (bag instanceof Serializable && !skipSerializedCanonicalTests() && isTestSerialization()) {
-            final Bag<?> bag2 = (Bag<?>) readExternalFormFromDisk(getCanonicalEmptyCollectionName(bag));
-            assertTrue(bag2.isEmpty(), "Bag is empty");
-            assertEquals(bag, bag2);
+            final Bag<?> deserializedBag = (Bag<?>) readExternalFormFromDisk(getCanonicalEmptyCollectionName(bag));
+            assertTrue(deserializedBag.isEmpty(), "Deserialized bag should be empty");
+            assertEquals(bag, deserializedBag, "Deserialized bag should match the original");
         }
     }
 
     /**
-     * Compares the current serialized form of the Bag
-     * against the canonical version in SCM.
+     * Compares the current serialized form of the Bag against the canonical version in SCM.
      */
     @Test
-    void testFullBagCompatibility() throws IOException, ClassNotFoundException {
-        // test to make sure the canonical form has been preserved
+    void testFullBagSerializationCompatibility() throws IOException, ClassNotFoundException {
         final Bag<T> bag = (Bag<T>) makeFullCollection();
         if (bag instanceof Serializable && !skipSerializedCanonicalTests() && isTestSerialization()) {
-            final Bag<?> bag2 = (Bag<?>) readExternalFormFromDisk(getCanonicalFullCollectionName(bag));
-            assertEquals(bag.size(), bag2.size(), "Bag is the right size");
-            assertEquals(bag, bag2);
+            final Bag<?> deserializedBag = (Bag<?>) readExternalFormFromDisk(getCanonicalFullCollectionName(bag));
+            assertEquals(bag.size(), deserializedBag.size(), "Deserialized bag should have the same size");
+            assertEquals(bag, deserializedBag, "Deserialized bag should match the original");
         }
     }
 }
