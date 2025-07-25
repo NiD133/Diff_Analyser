@@ -24,29 +24,70 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+/**
+ * Base test class for type handlers.
+ */
 @ExtendWith(MockitoExtension.class)
-abstract class BaseTypeHandlerTest {
+public abstract class BaseTypeHandlerTest {
 
   @Mock
-  protected ResultSet rs;
+  protected ResultSet mockResultSet;
+
   @Mock
-  protected PreparedStatement ps;
+  protected PreparedStatement mockPreparedStatement;
+
   @Mock
-  protected CallableStatement cs;
+  protected CallableStatement mockCallableStatement;
+
   @Mock
-  protected ResultSetMetaData rsmd;
+  protected ResultSetMetaData mockResultSetMetaData;
 
-  public abstract void shouldSetParameter() throws Exception;
+  /**
+   * Tests setting a parameter in a prepared statement.
+   * 
+   * @throws Exception if an error occurs during testing
+   */
+  public abstract void testSetParameter() throws Exception;
 
-  public abstract void shouldGetResultFromResultSetByName() throws Exception;
+  /**
+   * Tests getting a result from a result set by column name.
+   * 
+   * @throws Exception if an error occurs during testing
+   */
+  public abstract void testGetResultFromResultSetByColumnName() throws Exception;
 
-  public abstract void shouldGetResultNullFromResultSetByName() throws Exception;
+  /**
+   * Tests getting a null result from a result set by column name.
+   * 
+   * @throws Exception if an error occurs during testing
+   */
+  public abstract void testGetNullResultFromResultSetByColumnName() throws Exception;
 
-  public abstract void shouldGetResultFromResultSetByPosition() throws Exception;
+  /**
+   * Tests getting a result from a result set by column index.
+   * 
+   * @throws Exception if an error occurs during testing
+   */
+  public abstract void testGetResultFromResultSetByColumnIndex() throws Exception;
 
-  public abstract void shouldGetResultNullFromResultSetByPosition() throws Exception;
+  /**
+   * Tests getting a null result from a result set by column index.
+   * 
+   * @throws Exception if an error occurs during testing
+   */
+  public abstract void testGetNullResultFromResultSetByColumnIndex() throws Exception;
 
-  public abstract void shouldGetResultFromCallableStatement() throws Exception;
+  /**
+   * Tests getting a result from a callable statement.
+   * 
+   * @throws Exception if an error occurs during testing
+   */
+  public abstract void testGetResultFromCallableStatement() throws Exception;
 
-  public abstract void shouldGetResultNullFromCallableStatement() throws Exception;
+  /**
+   * Tests getting a null result from a callable statement.
+   * 
+   * @throws Exception if an error occurs during testing
+   */
+  public abstract void testGetNullResultFromCallableStatement() throws Exception;
 }
