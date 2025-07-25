@@ -1,23 +1,10 @@
-/*
- * Copyright (C) 2007 The Guava Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.google.common.collect;
 
 import static com.google.common.collect.ReflectionFreeAssertThrows.assertThrows;
 import static com.google.common.collect.SneakyThrows.sneakyThrow;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
@@ -28,31 +15,31 @@ import com.google.common.testing.GcFinalization;
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Unit test for {@code AbstractIterator}.
- *
- * @author Kevin Bourrillion
+ * Unit tests for {@link AbstractIterator}.  These tests focus on verifying the core contract
+ * of AbstractIterator, especially around `computeNext()` and `endOfData()`.
  */
-@SuppressWarnings("serial") // No serialization is used in this test
 @GwtCompatible(emulated = true)
 @NullMarked
-public class AbstractIteratorTest extends TestCase {
+@RunWith(JUnit4.class)
+public class AbstractIteratorTest {
 
-  public void testDefaultBehaviorOfNextAndHasNext() {
-
-    // This sample AbstractIterator returns 0 on the first call, 1 on the
-    // second, then signals that it's reached the end of the data
-    Iterator<Integer> iter =
+  @Test
+  public void testNextAndHasNext_defaultBehavior_returnsSequenceAndThenEmpty() {
+    // Arrange: Define an AbstractIterator that returns 0, then 1, then signals endOfData.
+    Iterator<Integer> iterator =
         new AbstractIterator<Integer>() {
-          private int rep;
+          private int callCount;
 
           @Override
-          public @Nullable Integer computeNext() {
-            switch (rep++) {
+          protected @Nullable Integer computeNext() {
+            switch (callCount++) {
               case 0:
                 return 0;
               case 1:
@@ -60,40 +47,39 @@ public class AbstractIteratorTest extends TestCase {
               case 2:
                 return endOfData();
               default:
-                throw new AssertionError("Should not have been invoked again");
+                throw new AssertionError("computeNext() called more than expected");
             }
           }
         };
 
-    assertTrue(iter.hasNext());
-    assertEquals(0, (int) iter.next());
+    // Act & Assert: Verify the sequence of hasNext() and next() calls.
+    assertTrue(iterator.hasNext());
+    assertEquals(Integer.valueOf(0), iterator.next());
 
-    // verify idempotence of hasNext()
-    assertTrue(iter.hasNext());
-    assertTrue(iter.hasNext());
-    assertTrue(iter.hasNext());
-    assertEquals(1, (int) iter.next());
+    // hasNext() should be idempotent (multiple calls should return the same value).
+    assertTrue(iterator.hasNext());
+    assertTrue(iterator.hasNext());
+    assertEquals(Integer.valueOf(1), iterator.next());
 
-    assertFalse(iter.hasNext());
+    assertFalse(iterator.hasNext());
 
-    // Make sure computeNext() doesn't get invoked again
-    assertFalse(iter.hasNext());
+    // After endOfData() is called, hasNext() should consistently return false.
+    assertFalse(iterator.hasNext());
 
-    assertThrows(NoSuchElementException.class, iter::next);
+    // Calling next() after endOfData() should throw NoSuchElementException.
+    assertThrows(NoSuchElementException.class, iterator::next);
   }
 
-  public void testDefaultBehaviorOfPeek() {
-    /*
-     * This sample AbstractIterator returns 0 on the first call, 1 on the
-     * second, then signals that it's reached the end of the data
-     */
-    AbstractIterator<Integer> iter =
+  @Test
+  public void testPeek_defaultBehavior_returnsNextElementWithoutAdvancing() {
+    // Arrange: Define an AbstractIterator that returns 0, then 1, then signals endOfData.
+    AbstractIterator<Integer> iterator =
         new AbstractIterator<Integer>() {
-          private int rep;
+          private int callCount;
 
           @Override
-          public @Nullable Integer computeNext() {
-            switch (rep++) {
+          protected @Nullable Integer computeNext() {
+            switch (callCount++) {
               case 0:
                 return 0;
               case 1:
@@ -101,153 +87,168 @@ public class AbstractIteratorTest extends TestCase {
               case 2:
                 return endOfData();
               default:
-                throw new AssertionError("Should not have been invoked again");
+                throw new AssertionError("computeNext() called more than expected");
             }
           }
         };
 
-    assertEquals(0, (int) iter.peek());
-    assertEquals(0, (int) iter.peek());
-    assertTrue(iter.hasNext());
-    assertEquals(0, (int) iter.peek());
-    assertEquals(0, (int) iter.next());
+    // Act & Assert: Verify peek() returns the next element without advancing the iterator.
+    assertEquals(Integer.valueOf(0), iterator.peek());
+    assertEquals(Integer.valueOf(0), iterator.peek()); // peek() can be called multiple times.
+    assertTrue(iterator.hasNext()); // Calling peek() should not affect hasNext().
+    assertEquals(Integer.valueOf(0), iterator.peek());
+    assertEquals(Integer.valueOf(0), iterator.next()); // next() advances the iterator.
 
-    assertEquals(1, (int) iter.peek());
-    assertEquals(1, (int) iter.next());
+    assertEquals(Integer.valueOf(1), iterator.peek());
+    assertEquals(Integer.valueOf(1), iterator.next());
 
-    /*
-     * We test peek() after various calls to make sure that one bad call doesn't interfere with its
-     * ability to throw the correct exception in the future.
-     */
-    assertThrows(NoSuchElementException.class, iter::peek);
-    assertThrows(NoSuchElementException.class, iter::peek);
-    assertThrows(NoSuchElementException.class, iter::next);
-    assertThrows(NoSuchElementException.class, iter::peek);
+    // peek() and next() should throw NoSuchElementException after endOfData().
+    assertThrows(NoSuchElementException.class, iterator::peek);
+    assertThrows(NoSuchElementException.class, iterator::peek);
+    assertThrows(NoSuchElementException.class, iterator::next);
+    assertThrows(NoSuchElementException.class, iterator::peek);
   }
-
 
   @J2ktIncompatible // weak references, details of GC
   @GwtIncompatible // weak references
   @AndroidIncompatible // depends on details of GC
-  public void testFreesNextReference() {
-    Iterator<Object> itr =
+  @Test
+  public void testFreesNextReference_allowsGarbageCollection() {
+    // Arrange: Create an AbstractIterator that always returns a new Object.
+    Iterator<Object> iterator =
         new AbstractIterator<Object>() {
           @Override
-          public Object computeNext() {
+          protected Object computeNext() {
             return new Object();
           }
         };
-    WeakReference<Object> ref = new WeakReference<>(itr.next());
+
+    // Act: Get the next object and create a weak reference to it.
+    WeakReference<Object> ref = new WeakReference<>(iterator.next());
+
+    // Assert:  Ensure that the object is garbage collected.  This relies on GC finalization, so
+    // it might be flaky if the GC doesn't run.
     GcFinalization.awaitClear(ref);
   }
 
-  public void testDefaultBehaviorOfPeekForEmptyIteration() {
-
-    AbstractIterator<Integer> empty =
+  @Test
+  public void testPeek_emptyIteration_throwsNoSuchElementException() {
+    // Arrange: Define an AbstractIterator that immediately calls endOfData.
+    AbstractIterator<Integer> emptyIterator =
         new AbstractIterator<Integer>() {
-          private boolean alreadyCalledEndOfData;
+          private boolean endOfDataCalled;
 
           @Override
-          public @Nullable Integer computeNext() {
-            if (alreadyCalledEndOfData) {
-              fail("Should not have been invoked again");
+          protected @Nullable Integer computeNext() {
+            if (endOfDataCalled) {
+              throw new AssertionError("computeNext() called more than expected");
             }
-            alreadyCalledEndOfData = true;
+            endOfDataCalled = true;
             return endOfData();
           }
         };
 
-    /*
-     * We test multiple calls to peek() to make sure that one bad call doesn't interfere with its
-     * ability to throw the correct exception in the future.
-     */
-    assertThrows(NoSuchElementException.class, empty::peek);
-    assertThrows(NoSuchElementException.class, empty::peek);
+    // Act & Assert: peek() should throw NoSuchElementException on an empty iterator.
+    assertThrows(NoSuchElementException.class, emptyIterator::peek);
+    assertThrows(NoSuchElementException.class, emptyIterator::peek); // Multiple calls should still throw.
   }
 
-  public void testSneakyThrow() throws Exception {
-    Iterator<Integer> iter =
+  @Test
+  public void testSneakyThrow_checkedException_propagatesCorrectlyThenThrowsISE() {
+    // Arrange: Define an AbstractIterator that throws a checked exception using sneakyThrow.
+    Iterator<Integer> iterator =
         new AbstractIterator<Integer>() {
-          boolean haveBeenCalled;
+          private boolean computeNextCalled;
 
           @Override
-          public Integer computeNext() {
-            if (haveBeenCalled) {
-              throw new AssertionError("Should not have been called again");
-            } else {
-              haveBeenCalled = true;
-              throw sneakyThrow(new SomeCheckedException());
+          protected Integer computeNext() {
+            if (computeNextCalled) {
+              throw new AssertionError("computeNext() called more than expected");
             }
+            computeNextCalled = true;
+            throw sneakyThrow(new SomeCheckedException());
           }
         };
 
-    // The first time, the sneakily-thrown exception comes out
-    assertThrows(SomeCheckedException.class, iter::hasNext);
-    // But the second time, AbstractIterator itself throws an ISE
-    assertThrows(IllegalStateException.class, iter::hasNext);
+    // Act & Assert: The first call to hasNext() should propagate the sneaky-thrown exception.
+    assertThrows(SomeCheckedException.class, iterator::hasNext);
+
+    // Subsequent calls to hasNext() should throw IllegalStateException because the iterator is now in a failed state.
+    assertThrows(IllegalStateException.class, iterator::hasNext);
   }
 
-  public void testException() {
+  @Test
+  public void testException_uncheckedException_propagatesUnchanged() {
+    // Arrange: Define an AbstractIterator that throws an unchecked exception.
     SomeUncheckedException exception = new SomeUncheckedException();
-    Iterator<Integer> iter =
+    Iterator<Integer> iterator =
         new AbstractIterator<Integer>() {
           @Override
-          public Integer computeNext() {
+          protected Integer computeNext() {
             throw exception;
           }
         };
 
-    // It should pass through untouched
-    SomeUncheckedException e = assertThrows(SomeUncheckedException.class, iter::hasNext);
-    assertSame(exception, e);
+    // Act: Call hasNext() and capture the exception.
+    SomeUncheckedException caughtException = assertThrows(SomeUncheckedException.class, iterator::hasNext);
+
+    // Assert: The exception thrown by hasNext() should be the same instance as the one thrown by computeNext().
+    assertSame(exception, caughtException);
   }
 
-  public void testExceptionAfterEndOfData() {
-    Iterator<Integer> iter =
+  @Test
+  public void testExceptionAfterEndOfData_uncheckedException_propagatesUnchanged() {
+    // Arrange: Define an AbstractIterator that calls endOfData() then throws an unchecked exception.
+    Iterator<Integer> iterator =
         new AbstractIterator<Integer>() {
           @Override
-          public Integer computeNext() {
+          protected Integer computeNext() {
             endOfData();
             throw new SomeUncheckedException();
           }
         };
-    assertThrows(SomeUncheckedException.class, iter::hasNext);
+
+    // Act & Assert:  The exception thrown by hasNext() should be the SomeUncheckedException
+    assertThrows(SomeUncheckedException.class, iterator::hasNext);
   }
 
-  @SuppressWarnings("DoNotCall")
-  public void testCantRemove() {
-    Iterator<Integer> iter =
+  @Test
+  public void testRemove_unsupportedOperation() {
+    // Arrange: Define an AbstractIterator.
+    Iterator<Integer> iterator =
         new AbstractIterator<Integer>() {
-          boolean haveBeenCalled;
+          private boolean computeNextCalled;
 
           @Override
-          public Integer computeNext() {
-            if (haveBeenCalled) {
-              endOfData();
+          protected Integer computeNext() {
+            if (computeNextCalled) {
+              return endOfData();
             }
-            haveBeenCalled = true;
+            computeNextCalled = true;
             return 0;
           }
         };
 
-    assertEquals(0, (int) iter.next());
+    // Act: Call next() to advance the iterator.
+    assertEquals(Integer.valueOf(0), iterator.next());
 
-    assertThrows(UnsupportedOperationException.class, iter::remove);
+    // Assert: remove() should throw UnsupportedOperationException because AbstractIterator doesn't implement it.
+    assertThrows(UnsupportedOperationException.class, iterator::remove);
   }
 
-  public void testReentrantHasNext() {
-    Iterator<Integer> iter =
+  @Test
+  public void testReentrantHasNext_throwsIllegalStateException() {
+    // Arrange: Define an AbstractIterator where computeNext() calls hasNext().
+    Iterator<Integer> iterator =
         new AbstractIterator<Integer>() {
           @Override
           protected Integer computeNext() {
-            boolean unused = hasNext();
-            throw new AssertionError();
+            boolean unused = hasNext(); // Reentrant call to hasNext().
+            throw new AssertionError("Should not reach this point");
           }
         };
-    assertThrows(IllegalStateException.class, iter::hasNext);
-  }
 
-  // Technically we should test other reentrant scenarios (9 combinations of
-  // hasNext/next/peek), but we'll cop out for now, knowing that peek() and
-  // next() both start by invoking hasNext() anyway.
+    // Act & Assert: hasNext() should throw IllegalStateException due to the reentrant call.
+    assertThrows(IllegalStateException.class, iterator::hasNext);
+  }
 }
