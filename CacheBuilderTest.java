@@ -25,25 +25,53 @@ import org.apache.ibatis.builder.InitializingObject;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.CacheException;
 import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class CacheBuilderTest {
 
   @Test
-  void initializing() {
-    InitializingCache cache = unwrap(new CacheBuilder("test").implementation(InitializingCache.class).build());
+  @DisplayName("Should call initialize method on cache implementation if it implements InitializingObject")
+  void shouldCallInitializeOnCacheImplementation() {
+    // Given
+    CacheBuilder cacheBuilder = new CacheBuilder("test")
+        .implementation(InitializingCache.class);
 
-    Assertions.assertThat(cache.initialized).isTrue();
+    // When
+    Cache cache = cacheBuilder.build();
+    InitializingCache initializingCache = unwrap(cache);
+
+    // Then
+    then(initializingCache.initialized).isTrue();
   }
 
   @Test
-  void initializingFailure() {
-    when(() -> new CacheBuilder("test").implementation(InitializingFailureCache.class).build());
-    then(caughtException()).isInstanceOf(CacheException.class).hasMessage(
-        "Failed cache initialization for 'test' on 'org.apache.ibatis.mapping.CacheBuilderTest$InitializingFailureCache'");
+  @DisplayName("Should throw CacheException if cache implementation throws exception during initialization")
+  void shouldThrowCacheExceptionIfInitializationFails() {
+    // Given
+    CacheBuilder cacheBuilder = new CacheBuilder("test")
+        .implementation(InitializingFailureCache.class);
+
+    // When
+    when(cacheBuilder::build);
+
+    // Then
+    then(caughtException())
+        .isInstanceOf(CacheException.class)
+        .hasMessage(
+            "Failed cache initialization for 'test' on 'org.apache.ibatis.mapping.CacheBuilderTest$InitializingFailureCache'");
   }
 
+  /**
+   * Helper method to access the delegate field of a Cache object.  This is necessary to get a hold of the
+   * actual PerpetualCache instance that is wrapped by the CacheBuilder.  This is a bit of a hack, but it's
+   * the easiest way to verify that the initialize method is being called correctly.
+   *
+   * @param cache The cache object to unwrap.
+   * @param <T>   The type of the delegate object.
+   * @return The delegate object.
+   * @throws IllegalStateException If the delegate field cannot be accessed.
+   */
   @SuppressWarnings("unchecked")
   private <T> T unwrap(Cache cache) {
     Field field;
@@ -62,6 +90,10 @@ class CacheBuilderTest {
     }
   }
 
+  /**
+   * A simple cache implementation that implements the InitializingObject interface.  This is used to verify
+   * that the CacheBuilder is calling the initialize method on the cache implementation.
+   */
   private static class InitializingCache extends PerpetualCache implements InitializingObject {
 
     private boolean initialized;
@@ -77,6 +109,10 @@ class CacheBuilderTest {
 
   }
 
+  /**
+   * A cache implementation that throws an exception during initialization. This is used to verify that the
+   * CacheBuilder is handling exceptions correctly.
+   */
   private static class InitializingFailureCache extends PerpetualCache implements InitializingObject {
 
     public InitializingFailureCache(String id) {
