@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (c) 2015 MITRE
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License, Version 2.0 which
+ * accompanies this distribution and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0.txt
+ ******************************************************************************/
+
 package org.locationtech.spatial4j.io;
 
 import org.locationtech.spatial4j.context.SpatialContext;
@@ -7,77 +15,44 @@ import org.junit.Test;
 
 import java.io.*;
 import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
 public class BinaryCodecTest extends BaseRoundTripTest<SpatialContext> {
 
-  private static final SpatialContext SPATIAL_CONTEXT = SpatialContext.GEO;
-
   @Override
   public SpatialContext initContext() {
-    return SPATIAL_CONTEXT;
+    return SpatialContext.GEO;
   }
 
   @Test
-  public void testRectangleRoundTrip() throws IOException {
-    // Given
-    String wkt = "ENVELOPE(-10, 180, 42.3, 0)";
-    Shape rectangle = wkt(wkt);
-
-    // When
-    assertRoundTrip(rectangle);
-
-    // Then (assertRoundTrip handles the assertion)
+  public void testRect() throws Exception {
+    assertRoundTrip(wkt("ENVELOPE(-10, 180, 42.3, 0)"));
   }
 
   @Test
-  public void testCircleRoundTrip() throws IOException {
-    // Given
-    String wkt = "BUFFER(POINT(-10 30), 5.2)";
-    Shape circle = wkt(wkt);
-
-    // When
-    assertRoundTrip(circle);
-
-    // Then (assertRoundTrip handles the assertion)
+  public void testCircle() throws Exception {
+    assertRoundTrip(wkt("BUFFER(POINT(-10 30), 5.2)"));
   }
 
   @Test
-  public void testShapeCollectionRoundTrip() throws IOException {
-    // Given
-    List<Shape> shapes = Arrays.asList(
-        randomShape(),
-        randomShape(),
-        randomShape()
+  public void testCollection() throws Exception {
+    ShapeCollection<Shape> s = ctx.makeCollection(
+        Arrays.asList(
+            randomShape(),
+            randomShape(),
+            randomShape()
+        )
     );
-    ShapeCollection<Shape> shapeCollection = ctx.makeCollection(shapes);
-
-    // When
-    assertRoundTrip(shapeCollection);
-
-    // Then (assertRoundTrip handles the assertion)
+    assertRoundTrip(s);
   }
 
   @Override
-  protected void assertRoundTrip(Shape originalShape, boolean andEquals) throws IOException {
-    // Given
-    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
-
-    // When
-    binaryCodec.writeShape(dataOutputStream, originalShape);
-
-    // Prepare for reading the shape back
-    ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-    DataInputStream dataInputStream = new DataInputStream(byteArrayInputStream);
-
-    // Read the shape back
-    Shape readShape = binaryCodec.readShape(dataInputStream);
-
-    // Then
-    assertEquals("The shape read back should be equal to the original shape", originalShape, readShape);
+  protected void assertRoundTrip(Shape shape, boolean andEquals) throws IOException {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    binaryCodec.writeShape(new DataOutputStream(baos), shape);
+    ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+    assertEquals(shape, binaryCodec.readShape(new DataInputStream(bais)));
   }
 
 }
