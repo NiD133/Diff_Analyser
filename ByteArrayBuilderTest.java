@@ -2,7 +2,6 @@ package com.fasterxml.jackson.core.util;
 
 import java.nio.charset.StandardCharsets;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -15,80 +14,62 @@ import static org.junit.jupiter.api.Assertions.*;
 class ByteArrayBuilderTest extends com.fasterxml.jackson.core.JUnit5TestBase
 {
     @Test
-    @DisplayName("Test simple byte array building")
-    void testSimpleByteArrayBuilding() throws Exception
+    void simple() throws Exception
     {
-        // Arrange: Create a ByteArrayBuilder with an initial capacity of 20 bytes.
-        ByteArrayBuilder byteArrayBuilder = new ByteArrayBuilder(null, 20);
+        ByteArrayBuilder b = new ByteArrayBuilder(null, 20);
+        assertArrayEquals(new byte[0], b.toByteArray());
 
-        // Assert: Initially, the byte array should be empty.
-        assertArrayEquals(new byte[0], byteArrayBuilder.toByteArray(), "Initial byte array should be empty.");
+        b.write((byte) 0);
+        b.append(1);
 
-        // Act: Write some bytes to the builder.
-        byteArrayBuilder.write((byte) 0);
-        byteArrayBuilder.append(1);
-
-        // Act: Write a larger byte array.
-        byte[] data = new byte[98];
-        for (int i = 0; i < data.length; ++i) {
-            data[i] = (byte) (2 + i);
+        byte[] foo = new byte[98];
+        for (int i = 0; i < foo.length; ++i) {
+            foo[i] = (byte) (2 + i);
         }
-        byteArrayBuilder.write(data);
+        b.write(foo);
 
-        // Act: Retrieve the built byte array.
-        byte[] result = byteArrayBuilder.toByteArray();
-
-        // Assert: Verify the size and contents of the built array.
-        assertEquals(100, result.length, "Byte array should have a length of 100.");
+        byte[] result = b.toByteArray();
+        assertEquals(100, result.length);
         for (int i = 0; i < 100; ++i) {
-            assertEquals(i, result[i], "Byte at index " + i + " should be " + i + ".");
+            assertEquals(i, result[i]);
         }
 
-        // Act: Release resources.
-        byteArrayBuilder.release();
-        byteArrayBuilder.close();
+        b.release();
+        b.close();
     }
 
+    // [core#1195]: Try to verify that BufferRecycler instance is indeed reused
     @Test
-    @DisplayName("Test BufferRecycler reuse")
-    void testBufferRecyclerReuse() throws Exception
+    void bufferRecyclerReuse() throws Exception
     {
-        // Arrange: Create a JsonFactory and a BufferRecycler.
-        JsonFactory jsonFactory = new JsonFactory();
-        BufferRecycler bufferRecycler = new BufferRecycler()
+        JsonFactory f = new JsonFactory();
+        BufferRecycler br = new BufferRecycler()
                 // need to link with some pool
                 .withPool(JsonRecyclerPools.newBoundedPool(3));
 
-        // Act & Assert: Use try-with-resources to ensure ByteArrayBuilder and JsonGenerator are closed.
-        try (ByteArrayBuilder byteArrayBuilder = new ByteArrayBuilder(bufferRecycler, 20)) {
-            // Assert: The ByteArrayBuilder should use the provided BufferRecycler.
-            assertSame(bufferRecycler, byteArrayBuilder.bufferRecycler(), "ByteArrayBuilder should use provided BufferRecycler.");
+        try (ByteArrayBuilder bab = new ByteArrayBuilder(br, 20)) {
+            assertSame(br, bab.bufferRecycler());
 
-            try (JsonGenerator jsonGenerator = jsonFactory.createGenerator(byteArrayBuilder)) {
-                // Assert: The JsonGenerator's IOContext should also use the same BufferRecycler.
-                IOContext ioContext = ((GeneratorBase) jsonGenerator).ioContext();
-                assertSame(bufferRecycler, ioContext.bufferRecycler(), "IOContext should use the same BufferRecycler.");
-                assertTrue(ioContext.bufferRecycler().isLinkedWithPool(), "BufferRecycler should be linked with pool.");
+            try (JsonGenerator g = f.createGenerator(bab)) {
+                IOContext ioCtxt = ((GeneratorBase) g).ioContext();
+                assertSame(br, ioCtxt.bufferRecycler());
+                assertTrue(ioCtxt.bufferRecycler().isLinkedWithPool());
 
-                // Act: Write an empty JSON array.
-                jsonGenerator.writeStartArray();
-                jsonGenerator.writeEndArray();
+                g.writeStartArray();
+                g.writeEndArray();
             }
 
-            // Assert: Generator.close() should NOT release buffer recycler
-            assertTrue(bufferRecycler.isLinkedWithPool(), "BufferRecycler should still be linked with pool after Generator close.");
+            // Generator.close() should NOT release buffer recycler
+            assertTrue(br.isLinkedWithPool());
 
-            // Act: Get the cleared and released byte array.
-            byte[] result = byteArrayBuilder.getClearAndRelease();
-            assertEquals("[]", new String(result, StandardCharsets.UTF_8), "Result should be an empty JSON array.");
+            byte[] result = bab.getClearAndRelease();
+            assertEquals("[]", new String(result, StandardCharsets.UTF_8));
         }
-        // Assert: Nor accessing contents
-        assertTrue(bufferRecycler.isLinkedWithPool(), "BufferRecycler should still be linked with pool after accessing contents.");
+        // Nor accessing contents
+        assertTrue(br.isLinkedWithPool());
 
-        // Act: Explicitly release the BufferRecycler.
-        bufferRecycler.releaseToPool();
-
-        // Assert: The BufferRecycler should no longer be linked with the pool after explicit release.
-        assertFalse(bufferRecycler.isLinkedWithPool(), "BufferRecycler should no longer be linked with pool after explicit release.");
+        // only explicit release does
+        br.releaseToPool();
+        assertFalse(br.isLinkedWithPool());
     }
 }
