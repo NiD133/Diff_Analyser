@@ -9,64 +9,38 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AttributeTest {
-
-    /**
-     * Tests HTML representation of an attribute with special characters in its value.
-     */
     @Test
-    public void testHtmlWithSpecialCharactersInValue() {
+    public void html() {
         Attribute attr = new Attribute("key", "value &");
-        String expectedHtml = "key=\"value &amp;\"";
-        assertEquals(expectedHtml, attr.html());
+        assertEquals("key=\"value &amp;\"", attr.html());
         assertEquals(attr.html(), attr.toString());
     }
 
-    /**
-     * Tests HTML representation of an attribute with special characters in its value.
-     */
     @Test
-    public void testHtmlWithLtAndGtInValue() {
+    public void htmlWithLtAndGtInValue() {
         Attribute attr = new Attribute("key", "<value>");
-        String expectedHtml = "key=\"&lt;value&gt;\"";
-        assertEquals(expectedHtml, attr.html());
+        assertEquals("key=\"&lt;value&gt;\"", attr.html());
     }
 
-    /**
-     * Tests attribute creation with a supplementary character in the key and value.
-     */
-    @Test
-    public void testAttributeWithSupplementaryCharacter() {
-        String supplementaryChar = new String(Character.toChars(135361));
-        Attribute attr = new Attribute(supplementaryChar, "A" + supplementaryChar + "B");
-        String expectedHtml = supplementaryChar + "=\"A" + supplementaryChar + "B\"";
-        assertEquals(expectedHtml, attr.html());
+    @Test public void testWithSupplementaryCharacterInAttributeKeyAndValue() {
+        String s = new String(Character.toChars(135361));
+        Attribute attr = new Attribute(s, "A" + s + "B");
+        assertEquals(s + "=\"A" + s + "B\"", attr.html());
         assertEquals(attr.html(), attr.toString());
     }
 
-    /**
-     * Tests validation of attribute keys for emptiness.
-     */
-    @Test
-    public void testValidationOfEmptyKeys() {
+    @Test public void validatesKeysNotEmpty() {
         assertThrows(IllegalArgumentException.class, () -> new Attribute(" ", "Check"));
     }
 
-    /**
-     * Tests validation of attribute keys for emptiness via the setKey method.
-     */
-    @Test
-    public void testValidationOfEmptyKeysViaSet() {
+    @Test public void validatesKeysNotEmptyViaSet() {
         assertThrows(IllegalArgumentException.class, () -> {
             Attribute attr = new Attribute("One", "Check");
             attr.setKey(" ");
         });
     }
 
-    /**
-     * Tests boolean attributes having empty string values.
-     */
-    @Test
-    public void testBooleanAttributes() {
+    @Test public void booleanAttributesAreEmptyStringValues() {
         Document doc = Jsoup.parse("<div hidden>");
         Attributes attributes = doc.body().child(0).attributes();
         assertEquals("", attributes.get("hidden"));
@@ -78,11 +52,7 @@ public class AttributeTest {
         assertTrue(Attribute.isBooleanAttribute(first.getKey()));
     }
 
-    /**
-     * Tests setting attribute key and value on an orphan attribute.
-     */
-    @Test
-    public void testSettersOnOrphanAttribute() {
+    @Test public void settersOnOrphanAttribute() {
         Attribute attr = new Attribute("one", "two");
         attr.setKey("three");
         String oldVal = attr.setValue("four");
@@ -92,11 +62,8 @@ public class AttributeTest {
         assertNull(attr.parent);
     }
 
-    /**
-     * Tests setting attribute key and value after parent removal.
-     */
-    @Test
-    public void testSettersAfterParentRemoval() {
+    @Test void settersAfterParentRemoval() {
+        // tests key and value set on a retained attribute after disconnected from parent
         Attributes attrs = new Attributes();
         attrs.put("foo", "bar");
         Attribute attr = attrs.attribute("foo");
@@ -110,11 +77,7 @@ public class AttributeTest {
         assertEquals("newer", attr.getValue());
     }
 
-    /**
-     * Tests the hasValue method for attributes with and without declared values.
-     */
-    @Test
-    public void testHasValue() {
+    @Test public void hasValue() {
         Attribute a1 = new Attribute("one", "");
         Attribute a2 = new Attribute("two", null);
         Attribute a3 = new Attribute("thr", "thr");
@@ -124,11 +87,7 @@ public class AttributeTest {
         assertTrue(a3.hasDeclaredValue());
     }
 
-    /**
-     * Tests setting attribute value to null.
-     */
-    @Test
-    public void testSetValueToNull() {
+    @Test public void canSetValueToNull() {
         Attribute attr = new Attribute("one", "val");
         String oldVal = attr.setValue(null);
         assertEquals("one", attr.html());
@@ -138,11 +97,8 @@ public class AttributeTest {
         assertEquals("", oldVal); // string, not null
     }
 
-    /**
-     * Tests boolean attributes for case insensitivity.
-     */
-    @Test
-    public void testBooleanAttributesCaseInsensitivity() {
+    @Test void booleanAttributesAreNotCaseSensitive() {
+        // https://github.com/jhy/jsoup/issues/1656
         assertTrue(Attribute.isBooleanAttribute("required"));
         assertTrue(Attribute.isBooleanAttribute("REQUIRED"));
         assertTrue(Attribute.isBooleanAttribute("rEQUIREd"));
@@ -156,11 +112,7 @@ public class AttributeTest {
         assertEquals("<a href=\"autofocus\" REQUIRED>One</a>", doc2.selectFirst("a").outerHtml());
     }
 
-    /**
-     * Tests the namespace of an orphan attribute.
-     */
-    @Test
-    public void testOrphanNamespace() {
+    @Test void orphanNamespace() {
         Attribute attr = new Attribute("one", "two");
         assertEquals("", attr.namespace());
     }
