@@ -1,98 +1,124 @@
+/* ======================================================
+ * JFreeChart : a chart library for the Java(tm) platform
+ * ======================================================
+ *
+ * (C) Copyright 2000-present, by David Gilbert and Contributors.
+ *
+ * Project Info:  https://www.jfree.org/jfreechart/index.html
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ *
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
+ *
+ * ---------------------------
+ * CategoryItemEntityTest.java
+ * ---------------------------
+ * (C) Copyright 2004-present, by David Gilbert and Contributors.
+ *
+ * Original Author:  David Gilbert;
+ * Contributor(s):   -;
+ *
+ */
+
 package org.jfree.chart.entity;
 
 import java.awt.geom.Rectangle2D;
 
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.internal.CloneUtils;
+
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for the {@link CategoryItemEntity} class.  These tests verify the
- * equals method, cloning, and serialization.
+ * Tests for the {@link CategoryItemEntity} class.
  */
 public class CategoryItemEntityTest {
 
-    private DefaultCategoryDataset<String, String> dataset;
-    private CategoryItemEntity<String, String> entity;
-
-    @BeforeEach
-    public void setUp() {
-        // Create a sample dataset for use in the tests
-        dataset = new DefaultCategoryDataset<>();
-        dataset.addValue(1.0, "Row1", "Column1");
-        dataset.addValue(2.0, "Row1", "Column2");
-        dataset.addValue(3.0, "Row2", "Column1");
-        dataset.addValue(4.0, "Row2", "Column2");
-
-        // Create a sample CategoryItemEntity for use in the tests
-        entity = new CategoryItemEntity<>(
-                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0),
-                "ToolTipText",
-                "URLText",
-                dataset,
-                "Row2",
-                "Column2"
-        );
-    }
-
     /**
-     * Confirms that the equals method distinguishes all relevant fields.
+     * Confirm that the equals method can distinguish all the required fields.
      */
     @Test
     public void testEquals() {
-        CategoryItemEntity<String, String> equalEntity = new CategoryItemEntity<>(
-                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0),
-                "ToolTipText",
-                "URLText",
-                dataset,
-                "Row2",
-                "Column2"
-        );
-        assertEquals(entity, equalEntity, "Entities should be equal when all fields match.");
+        DefaultCategoryDataset<String, String> d = new DefaultCategoryDataset<>();
+        d.addValue(1.0, "R1", "C1");
+        d.addValue(2.0, "R1", "C2");
+        d.addValue(3.0, "R2", "C1");
+        d.addValue(4.0, "R2", "C2");
+        CategoryItemEntity<String, String> e1 = new CategoryItemEntity<>(
+                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0), "ToolTip", "URL", d, 
+                "R2", "C2");
+        CategoryItemEntity<String, String> e2 = new CategoryItemEntity<>(
+                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0), "ToolTip", "URL", d, 
+                "R2", "C2");
+        assertEquals(e1, e2);
 
-        // Test inequality with different area
-        equalEntity.setArea(new Rectangle2D.Double(4.0, 3.0, 2.0, 1.0));
-        assertNotEquals(entity, equalEntity, "Entities should not be equal with different areas.");
-        equalEntity.setArea(new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0)); // Reset for next test
-        assertEquals(entity, equalEntity);
+        e1.setArea(new Rectangle2D.Double(4.0, 3.0, 2.0, 1.0));
+        assertNotEquals(e1, e2);
+        e2.setArea(new Rectangle2D.Double(4.0, 3.0, 2.0, 1.0));
+        assertEquals(e1, e2);
 
+        e1.setToolTipText("New ToolTip");
+        assertNotEquals(e1, e2);
+        e2.setToolTipText("New ToolTip");
+        assertEquals(e1, e2);
 
-        // Test inequality with different tooltip
-        equalEntity.setToolTipText("Different ToolTip");
-        assertNotEquals(entity, equalEntity, "Entities should not be equal with different tooltips.");
-        equalEntity.setToolTipText("ToolTipText"); // Reset
-        assertEquals(entity, equalEntity);
-
-        // Test inequality with different URL
-        equalEntity.setURLText("Different URL");
-        assertNotEquals(entity, equalEntity, "Entities should not be equal with different URLs.");
-        equalEntity.setURLText("URLText"); // Reset
-        assertEquals(entity, equalEntity);
+        e1.setURLText("New URL");
+        assertNotEquals(e1, e2);
+        e2.setURLText("New URL");
+        assertEquals(e1, e2);
     }
 
     /**
-     * Confirms that cloning produces a new object with the same field values.
+     * Confirm that cloning works.
      */
     @Test
     public void testCloning() throws CloneNotSupportedException {
-        CategoryItemEntity<String, String> clonedEntity = CloneUtils.clone(entity);
-
-        assertNotSame(entity, clonedEntity, "Cloned entity should be a different object.");
-        assertSame(entity.getClass(), clonedEntity.getClass(), "Cloned entity should be of the same class.");
-        assertEquals(entity, clonedEntity, "Cloned entity should be equal to the original.");
+        DefaultCategoryDataset<String, String> d = new DefaultCategoryDataset<>();
+        d.addValue(1.0, "R1", "C1");
+        d.addValue(2.0, "R1", "C2");
+        d.addValue(3.0, "R2", "C1");
+        d.addValue(4.0, "R2", "C2");
+        CategoryItemEntity<String, String> e1 = new CategoryItemEntity<>(
+                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0), "ToolTip", "URL", d, 
+                "R2", "C2");
+        CategoryItemEntity<String, String> e2 = CloneUtils.clone(e1);
+        assertNotSame(e1, e2);
+        assertSame(e1.getClass(), e2.getClass());
+        assertEquals(e1, e2);
     }
 
     /**
-     * Confirms that serialization and deserialization produce an equal object.
+     * Serialize an instance, restore it, and check for equality.
      */
     @Test
     public void testSerialization() {
-        CategoryItemEntity<String, String> deserializedEntity = TestUtils.serialised(entity);
-        assertEquals(entity, deserializedEntity, "Deserialized entity should be equal to the original.");
+        DefaultCategoryDataset<String, String> d = new DefaultCategoryDataset<>();
+        d.addValue(1.0, "R1", "C1");
+        d.addValue(2.0, "R1", "C2");
+        d.addValue(3.0, "R2", "C1");
+        d.addValue(4.0, "R2", "C2");
+        CategoryItemEntity<String, String> e1 = new CategoryItemEntity<>(
+                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0), "ToolTip", "URL", d, 
+                "R2", "C2");
+        CategoryItemEntity<String, String> e2 = TestUtils.serialised(e1);
+        assertEquals(e1, e2);
     }
 
 }
