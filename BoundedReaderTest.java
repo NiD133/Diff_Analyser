@@ -40,11 +40,6 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests {@link BoundedReader}.
- *
- * <p>
- *   This class contains test cases for verifying the behavior of the {@link BoundedReader} class,
- *   which limits the number of characters that can be read from an underlying reader.
- * </p>
  */
 class BoundedReaderTest {
 
@@ -58,46 +53,32 @@ class BoundedReaderTest {
 
     private final Reader shortReader = new BufferedReader(new StringReader("01"));
 
-    /**
-     * Tests that the {@link BoundedReader} closes the underlying reader when it is closed.
-     * @throws IOException If an I/O error occurs.
-     */
     @Test
     void testCloseTest() throws IOException {
         final AtomicBoolean closed = new AtomicBoolean();
-        Reader sr = new BufferedReader(new StringReader("01234567890")) { // Use local variable to avoid shadowing
+        try (Reader sr = new BufferedReader(new StringReader("01234567890")) {
             @Override
             public void close() throws IOException {
                 closed.set(true);
                 super.close();
             }
-        };
+        }) {
 
-        try (BoundedReader mr = new BoundedReader(sr, 3)) {
-            // The try-with-resources block ensures that mr is closed.
+            try (BoundedReader mr = new BoundedReader(sr, 3)) {
+                // nothing
+            }
         }
-
-        assertTrue(closed.get(), "Underlying reader should be closed when BoundedReader is closed.");
+        assertTrue(closed.get());
     }
 
-    /**
-     * Helper method to test {@link LineNumberReader} with a {@link BoundedReader}.
-     * @param source The source reader to use.
-     * @throws IOException If an I/O error occurs.
-     */
     private void testLineNumberReader(final Reader source) throws IOException {
         try (LineNumberReader reader = new LineNumberReader(new BoundedReader(source, 10_000_000))) {
             while (reader.readLine() != null) {
-                // noop: Reads lines until the end of the stream is reached
+                // noop
             }
         }
     }
 
-    /**
-     * Helper method to test {@link LineNumberReader} and reading from a file, specifically focusing on the last line.
-     * @param data The data to write to the file.
-     * @throws IOException If an I/O error occurs.
-     */
     void testLineNumberReaderAndFileReaderLastLine(final String data) throws IOException {
         try (TempFile path = TempFile.create(getClass().getSimpleName(), ".txt")) {
             final File file = path.toFile();
@@ -108,42 +89,26 @@ class BoundedReaderTest {
         }
     }
 
-    /**
-     * Tests {@link LineNumberReader} with a file ending without a newline character.
-     */
     @Test
     void testLineNumberReaderAndFileReaderLastLineEolNo() {
         assertTimeout(TIMEOUT, () -> testLineNumberReaderAndFileReaderLastLine(STRING_END_NO_EOL));
     }
 
-    /**
-     * Tests {@link LineNumberReader} with a file ending with a newline character.
-     */
     @Test
     void testLineNumberReaderAndFileReaderLastLineEolYes() {
         assertTimeout(TIMEOUT, () -> testLineNumberReaderAndFileReaderLastLine(STRING_END_EOL));
     }
 
-    /**
-     * Tests {@link LineNumberReader} with a string ending without a newline character.
-     */
     @Test
     void testLineNumberReaderAndStringReaderLastLineEolNo() {
         assertTimeout(TIMEOUT, () -> testLineNumberReader(new StringReader(STRING_END_NO_EOL)));
     }
 
-    /**
-     * Tests {@link LineNumberReader} with a string ending with a newline character.
-     */
     @Test
     void testLineNumberReaderAndStringReaderLastLineEolYes() {
         assertTimeout(TIMEOUT, () -> testLineNumberReader(new StringReader(STRING_END_EOL)));
     }
 
-    /**
-     * Tests the {@link BoundedReader#mark(int)} and {@link BoundedReader#reset()} methods.
-     * @throws IOException If an I/O error occurs.
-     */
     @Test
     void testMarkReset() throws IOException {
         try (BoundedReader mr = new BoundedReader(sr, 3)) {
@@ -155,14 +120,10 @@ class BoundedReaderTest {
             mr.read();
             mr.read();
             mr.read();
-            assertEquals(-1, mr.read(), "End of stream should be reached after reading 3 characters after reset.");
+            assertEquals(-1, mr.read());
         }
     }
 
-    /**
-     * Tests mark and reset functionality when marking from an offset.
-     * @throws IOException
-     */
     @Test
     void testMarkResetFromOffset1() throws IOException {
         try (BoundedReader mr = new BoundedReader(sr, 3)) {
@@ -170,18 +131,14 @@ class BoundedReaderTest {
             mr.read();
             mr.read();
             mr.read();
-            assertEquals(-1, mr.read(), "End of stream should be reached after reading 3 chars");
+            assertEquals(-1, mr.read());
             mr.reset();
             mr.mark(1);
             mr.read();
-            assertEquals(-1, mr.read(), "End of stream should be reached after reading 1 char");
+            assertEquals(-1, mr.read());
         }
     }
 
-    /**
-     * Tests mark and reset where the mark limit is more than what's left.
-     * @throws IOException
-     */
     @Test
     void testMarkResetMarkMore() throws IOException {
         try (BoundedReader mr = new BoundedReader(sr, 3)) {
@@ -193,14 +150,10 @@ class BoundedReaderTest {
             mr.read();
             mr.read();
             mr.read();
-            assertEquals(-1, mr.read(), "End of stream should be reached after reading 3 characters after reset.");
+            assertEquals(-1, mr.read());
         }
     }
 
-    /**
-     * Tests marking beyond the boundary.
-     * @throws IOException
-     */
     @Test
     void testMarkResetWithMarkOutsideBoundedReaderMax() throws IOException {
         try (BoundedReader mr = new BoundedReader(sr, 3)) {
@@ -208,14 +161,10 @@ class BoundedReaderTest {
             mr.read();
             mr.read();
             mr.read();
-            assertEquals(-1, mr.read(), "End of stream should be reached after reading 3 chars");
+            assertEquals(-1, mr.read());
         }
     }
 
-    /**
-     * Tests that mark works correctly when marking after an initial offset.
-     * @throws IOException
-     */
     @Test
     void testMarkResetWithMarkOutsideBoundedReaderMaxAndInitialOffset() throws IOException {
         try (BoundedReader mr = new BoundedReader(sr, 3)) {
@@ -223,13 +172,10 @@ class BoundedReaderTest {
             mr.mark(3);
             mr.read();
             mr.read();
-            assertEquals(-1, mr.read(), "End of stream should be reached after reading 3 chars");
+            assertEquals(-1, mr.read());
         }
     }
 
-    /**
-     * Tests reading bytes until EOF is reached.
-     */
     @Test
     void testReadBytesEOF() {
         assertTimeout(TIMEOUT, () -> {
@@ -241,79 +187,59 @@ class BoundedReaderTest {
         });
     }
 
-    /**
-     * Tests reading multiple characters into a character array.
-     * @throws IOException If an I/O error occurs.
-     */
     @Test
     void testReadMulti() throws IOException {
         try (BoundedReader mr = new BoundedReader(sr, 3)) {
             final char[] cbuf = new char[4];
             Arrays.fill(cbuf, 'X');
             final int read = mr.read(cbuf, 0, 4);
-            assertEquals(3, read, "Should read 3 characters.");
-            assertEquals('0', cbuf[0], "First character should be '0'.");
-            assertEquals('1', cbuf[1], "Second character should be '1'.");
-            assertEquals('2', cbuf[2], "Third character should be '2'.");
-            assertEquals('X', cbuf[3], "Fourth character should remain 'X'.");
+            assertEquals(3, read);
+            assertEquals('0', cbuf[0]);
+            assertEquals('1', cbuf[1]);
+            assertEquals('2', cbuf[2]);
+            assertEquals('X', cbuf[3]);
         }
     }
 
-    /**
-     * Tests reading multiple characters into a character array with an offset.
-     * @throws IOException If an I/O error occurs.
-     */
     @Test
     void testReadMultiWithOffset() throws IOException {
         try (BoundedReader mr = new BoundedReader(sr, 3)) {
             final char[] cbuf = new char[4];
             Arrays.fill(cbuf, 'X');
             final int read = mr.read(cbuf, 1, 2);
-            assertEquals(2, read, "Should read 2 characters.");
-            assertEquals('X', cbuf[0], "First character should remain 'X'.");
-            assertEquals('0', cbuf[1], "Second character should be '0'.");
-            assertEquals('1', cbuf[2], "Third character should be '1'.");
-            assertEquals('X', cbuf[3], "Fourth character should remain 'X'.");
+            assertEquals(2, read);
+            assertEquals('X', cbuf[0]);
+            assertEquals('0', cbuf[1]);
+            assertEquals('1', cbuf[2]);
+            assertEquals('X', cbuf[3]);
         }
     }
 
-    /**
-     * Tests reading until the end of the bounded reader.
-     * @throws IOException If an I/O error occurs.
-     */
     @Test
     void testReadTillEnd() throws IOException {
         try (BoundedReader mr = new BoundedReader(sr, 3)) {
             mr.read();
             mr.read();
             mr.read();
-            assertEquals(-1, mr.read(), "End of stream should be reached after reading 3 characters.");
+            assertEquals(-1, mr.read());
         }
     }
 
-    /**
-     * Tests the behavior of the {@link BoundedReader} with a short reader.
-     * @throws IOException If an I/O error occurs.
-     */
     @Test
     void testShortReader() throws IOException {
         try (BoundedReader mr = new BoundedReader(shortReader, 3)) {
             mr.read();
             mr.read();
-            assertEquals(-1, mr.read(), "End of stream should be reached after reading 2 characters.");
+            assertEquals(-1, mr.read());
         }
     }
 
-    /**
-     * Tests the {@link BoundedReader#skip(long)} method.
-     * @throws IOException If an I/O error occurs.
-     */
     @Test
     void testSkipTest() throws IOException {
         try (BoundedReader mr = new BoundedReader(sr, 3)) {
             mr.skip(2);
             mr.read();
-            assertEquals(-1, mr.read(), "End of stream should be reached after skipping 2 characters and reading 1.");
+            assertEquals(-1, mr.read());
         }
     }
 }
