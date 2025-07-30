@@ -26,86 +26,64 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * Unit tests for {@link CountingPathVisitor}.
+ * Tests {@link CountingPathVisitor}.
  */
 class CountingPathVisitorTest extends TestArguments {
 
-    /**
-     * Verifies that the visitor starts with zero counts.
-     *
-     * @param visitor the CountingPathVisitor instance to check.
-     */
-    private void verifyInitialCountsAreZero(final CountingPathVisitor visitor) {
+    private void checkZeroCounts(final CountingPathVisitor visitor) {
         Assertions.assertEquals(CountingPathVisitor.withLongCounters(), visitor);
         Assertions.assertEquals(CountingPathVisitor.withBigIntegerCounters(), visitor);
     }
 
     /**
-     * Tests counting in an empty directory.
-     *
-     * @param visitor the CountingPathVisitor instance to use.
-     * @throws IOException if an I/O error occurs.
+     * Tests an empty folder.
      */
     @ParameterizedTest
     @MethodSource("countingPathVisitors")
-    void testCountInEmptyDirectory(final CountingPathVisitor visitor) throws IOException {
-        verifyInitialCountsAreZero(visitor);
+    void testCountEmptyFolder(final CountingPathVisitor visitor) throws IOException {
+        checkZeroCounts(visitor);
         try (TempDirectory tempDir = TempDirectory.create(getClass().getCanonicalName())) {
             assertCounts(1, 0, 0, PathUtils.visitFileTree(visitor, tempDir.get()));
         }
     }
 
     /**
-     * Tests counting in a directory with one file of size 0.
-     *
-     * @param visitor the CountingPathVisitor instance to use.
-     * @throws IOException if an I/O error occurs.
+     * Tests a directory with one file of size 0.
      */
     @ParameterizedTest
     @MethodSource("countingPathVisitors")
-    void testCountInDirectoryWithOneFileSizeZero(final CountingPathVisitor visitor) throws IOException {
-        verifyInitialCountsAreZero(visitor);
+    void testCountFolders1FileSize0(final CountingPathVisitor visitor) throws IOException {
+        checkZeroCounts(visitor);
         assertCounts(1, 1, 0, PathUtils.visitFileTree(visitor,
                 "src/test/resources/org/apache/commons/io/dirs-1-file-size-0"));
     }
 
     /**
-     * Tests counting in a directory with one file of size 1.
-     *
-     * @param visitor the CountingPathVisitor instance to use.
-     * @throws IOException if an I/O error occurs.
+     * Tests a directory with one file of size 1.
      */
     @ParameterizedTest
     @MethodSource("countingPathVisitors")
-    void testCountInDirectoryWithOneFileSizeOne(final CountingPathVisitor visitor) throws IOException {
-        verifyInitialCountsAreZero(visitor);
+    void testCountFolders1FileSize1(final CountingPathVisitor visitor) throws IOException {
+        checkZeroCounts(visitor);
         assertCounts(1, 1, 1, PathUtils.visitFileTree(visitor,
                 "src/test/resources/org/apache/commons/io/dirs-1-file-size-1"));
     }
 
     /**
-     * Tests counting in a directory with two subdirectories, each containing one file of size 1.
-     *
-     * @param visitor the CountingPathVisitor instance to use.
-     * @throws IOException if an I/O error occurs.
+     * Tests a directory with two subdirectories, each containing one file of size 1.
      */
     @ParameterizedTest
     @MethodSource("countingPathVisitors")
-    void testCountInDirectoryWithTwoFilesSizeTwo(final CountingPathVisitor visitor) throws IOException {
-        verifyInitialCountsAreZero(visitor);
+    void testCountFolders2FileSize2(final CountingPathVisitor visitor) throws IOException {
+        checkZeroCounts(visitor);
         assertCounts(3, 2, 2, PathUtils.visitFileTree(visitor,
                 "src/test/resources/org/apache/commons/io/dirs-2-file-size-2"));
     }
 
-    /**
-     * Tests the toString method of the CountingPathVisitor.
-     *
-     * @param visitor the CountingPathVisitor instance to test.
-     */
     @ParameterizedTest
     @MethodSource("countingPathVisitors")
-    void testToStringMethod(final CountingPathVisitor visitor) {
-        // Ensure the toString method does not throw an exception
+    void testToString(final CountingPathVisitor visitor) {
+        // Make sure it does not blow up
         visitor.toString();
     }
 }
