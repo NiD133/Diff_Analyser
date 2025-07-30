@@ -1,18 +1,3 @@
-/*
- *    Copyright 2009-2024 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       https://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
 package org.apache.ibatis.cache;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,81 +14,89 @@ import org.junit.jupiter.api.Test;
 class SerializedCacheTest {
 
   @Test
-  void shouldDemonstrateSerializedObjectAreEqual() {
+  void testSerializedObjectsEquality() {
+    // Create a SerializedCache with a PerpetualCache as the delegate
     SerializedCache cache = new SerializedCache(new PerpetualCache("default"));
+    
+    // Add CachingObject instances to the cache
     for (int i = 0; i < 5; i++) {
       cache.putObject(i, new CachingObject(i));
     }
+    
+    // Verify that the objects retrieved from the cache are equal to the original objects
     for (int i = 0; i < 5; i++) {
-      assertEquals(new CachingObject(i), cache.getObject(i));
+      assertEquals(new CachingObject(i), cache.getObject(i), "Cached object should be equal to the original");
     }
   }
 
   @Test
-  void shouldDemonstrateNullsAreSerializable() {
+  void testNullValuesAreSerializable() {
+    // Create a SerializedCache with a PerpetualCache as the delegate
     SerializedCache cache = new SerializedCache(new PerpetualCache("default"));
+    
+    // Add null values to the cache
     for (int i = 0; i < 5; i++) {
       cache.putObject(i, null);
     }
+    
+    // Verify that the cache returns null for the keys
     for (int i = 0; i < 5; i++) {
-      assertNull(cache.getObject(i));
+      assertNull(cache.getObject(i), "Cached value should be null");
     }
   }
 
   @Test
-  void throwExceptionWhenTryingToCacheNonSerializableObject() {
+  void testExceptionForNonSerializableObject() {
+    // Create a SerializedCache with a PerpetualCache as the delegate
     SerializedCache cache = new SerializedCache(new PerpetualCache("default"));
-    assertThrows(CacheException.class, () -> cache.putObject(0, new CachingObjectWithoutSerializable(0)));
+    
+    // Verify that attempting to cache a non-serializable object throws a CacheException
+    assertThrows(CacheException.class, () -> cache.putObject(0, new NonSerializableCachingObject(0)),
+        "Putting a non-serializable object should throw CacheException");
   }
 
+  // Serializable object for caching
   static class CachingObject implements Serializable {
     private static final long serialVersionUID = 1L;
-    int x;
+    private final int value;
 
-    public CachingObject(int x) {
-      this.x = x;
+    public CachingObject(int value) {
+      this.value = value;
     }
 
     @Override
     public boolean equals(Object o) {
-      if (this == o) {
-        return true;
-      }
-      if (o == null || getClass() != o.getClass()) {
-        return false;
-      }
-      CachingObject obj = (CachingObject) o;
-      return x == obj.x;
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      CachingObject that = (CachingObject) o;
+      return value == that.value;
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(x);
+      return Objects.hash(value);
     }
   }
 
-  static class CachingObjectWithoutSerializable {
-    int x;
+  // Non-serializable object for testing exception
+  static class NonSerializableCachingObject {
+    private final int value;
 
-    public CachingObjectWithoutSerializable(int x) {
-      this.x = x;
+    public NonSerializableCachingObject(int value) {
+      this.value = value;
     }
 
     @Override
     public boolean equals(Object o) {
-      if (this == o) {
-        return true;
-      }
-      if (o == null || getClass() != o.getClass()) {
-        return false;
-      }
-      CachingObjectWithoutSerializable obj = (CachingObjectWithoutSerializable) o;
-      return x == obj.x;
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      NonSerializableCachingObject that = (NonSerializableCachingObject) o;
+      return value == that.value;
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(x);
+      return Objects.hash(value);
     }
   }
 }
