@@ -27,58 +27,39 @@ import org.junit.jupiter.api.Test;
 class CpioUtilTest {
 
     @Test
-    void shouldThrowUnsupportedOperationExceptionWhenByteArrayLengthIsInvalid() {
-        // Test that byteArray2long throws an exception for invalid byte array length
-        assertThrows(UnsupportedOperationException.class, () -> 
-            CpioUtil.byteArray2long(new byte[1], true)
-        );
+    void testByteArray2longThrowsUnsupportedOperationException() {
+        assertThrows(UnsupportedOperationException.class, () -> CpioUtil.byteArray2long(new byte[1], true));
+
     }
 
     @Test
-    void shouldThrowUnsupportedOperationExceptionForInvalidLongToByteArrayConversionWithPositiveLength() {
-        // Test that long2byteArray throws an exception for invalid length
-        assertThrows(UnsupportedOperationException.class, () -> 
-            CpioUtil.long2byteArray(0L, 1021, false)
-        );
+    void testLong2byteArrayWithPositiveThrowsUnsupportedOperationException() {
+        assertThrows(UnsupportedOperationException.class, () -> CpioUtil.long2byteArray(0L, 1021, false));
     }
 
     @Test
-    void shouldThrowUnsupportedOperationExceptionForInvalidLongToByteArrayConversionWithZeroLength() {
-        // Test that long2byteArray throws an exception for zero length
-        assertThrows(UnsupportedOperationException.class, () -> 
-            CpioUtil.long2byteArray(0L, 0, false)
-        );
+    void testLong2byteArrayWithZeroThrowsUnsupportedOperationException() {
+        assertThrows(UnsupportedOperationException.class, () -> CpioUtil.long2byteArray(0L, 0, false));
     }
 
     @Test
-    void shouldConvertOldBinaryMagicToByteArrayWithoutSwapping() {
-        // Test conversion of MAGIC_OLD_BINARY to byte array without swapping
-        byte[] expected = new byte[] { (byte) 0xc7, 0x71 };
-        byte[] actual = CpioUtil.long2byteArray(CpioConstants.MAGIC_OLD_BINARY, 2, false);
-        assertArrayEquals(expected, actual);
+    void testOldBinMagic2ByteArrayNotSwapped() {
+        assertArrayEquals(new byte[] { (byte) 0xc7, 0x71 }, CpioUtil.long2byteArray(CpioConstants.MAGIC_OLD_BINARY, 2, false));
     }
 
     @Test
-    void shouldConvertOldBinaryMagicToByteArrayWithSwapping() {
-        // Test conversion of MAGIC_OLD_BINARY to byte array with swapping
-        byte[] expected = new byte[] { 0x71, (byte) 0xc7 };
-        byte[] actual = CpioUtil.long2byteArray(CpioConstants.MAGIC_OLD_BINARY, 2, true);
-        assertArrayEquals(expected, actual);
+    void testOldBinMagic2ByteArraySwapped() {
+        assertArrayEquals(new byte[] { 0x71, (byte) 0xc7, }, CpioUtil.long2byteArray(CpioConstants.MAGIC_OLD_BINARY, 2, true));
     }
 
     @Test
-    void shouldConvertByteArrayToOldBinaryMagicWithoutSwapping() {
-        // Test conversion of byte array to MAGIC_OLD_BINARY without swapping
-        long expected = CpioConstants.MAGIC_OLD_BINARY;
-        long actual = CpioUtil.byteArray2long(new byte[] { (byte) 0xc7, 0x71 }, false);
-        assertEquals(expected, actual);
+    void testOldBinMagicFromByteArrayNotSwapped() {
+        assertEquals(CpioConstants.MAGIC_OLD_BINARY, CpioUtil.byteArray2long(new byte[] { (byte) 0xc7, 0x71 }, false));
     }
 
     @Test
-    void shouldConvertByteArrayToOldBinaryMagicWithSwapping() {
-        // Test conversion of byte array to MAGIC_OLD_BINARY with swapping
-        long expected = CpioConstants.MAGIC_OLD_BINARY;
-        long actual = CpioUtil.byteArray2long(new byte[] { 0x71, (byte) 0xc7 }, true);
-        assertEquals(expected, actual);
+    void testOldBinMagicFromByteArraySwapped() {
+        assertEquals(CpioConstants.MAGIC_OLD_BINARY, CpioUtil.byteArray2long(new byte[] { 0x71, (byte) 0xc7 }, true));
     }
+
 }
