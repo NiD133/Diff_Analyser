@@ -1,19 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.apache.commons.collections4.sequence;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,55 +17,45 @@ class SequencesComparatorTest {
 
     private static final class ExecutionVisitor<T> implements CommandVisitor<T> {
 
-        private List<T> v;
-        private int index;
+        private List<T> elements;
+        private int currentIndex;
 
-        public String getString() {
+        public String getConcatenatedString() {
             final StringBuilder buffer = new StringBuilder();
-            for (final T c : v) {
-                buffer.append(c);
+            for (final T element : elements) {
+                buffer.append(element);
             }
             return buffer.toString();
         }
 
-        public void setList(final List<T> array) {
-            v = new ArrayList<>(array);
-            index = 0;
+        public void setElements(final List<T> elements) {
+            this.elements = new ArrayList<>(elements);
+            this.currentIndex = 0;
         }
 
         @Override
         public void visitDeleteCommand(final T object) {
-            v.remove(index);
+            elements.remove(currentIndex);
         }
 
         @Override
         public void visitInsertCommand(final T object) {
-            v.add(index++, object);
+            elements.add(currentIndex++, object);
         }
 
         @Override
         public void visitKeepCommand(final T object) {
-            ++index;
+            ++currentIndex;
         }
-
     }
-    private List<String> before;
-    private List<String> after;
 
-    private int[]        length;
-
-    private List<Character> sequence(final String string) {
-        final List<Character> list = new ArrayList<>();
-        for (int i = 0; i < string.length(); ++i) {
-            list.add(Character.valueOf(string.charAt(i)));
-        }
-        return list;
-    }
+    private List<String> initialStrings;
+    private List<String> targetStrings;
+    private int[] expectedModificationCounts;
 
     @BeforeEach
     public void setUp() {
-
-        before = Arrays.asList(
+        initialStrings = Arrays.asList(
             "bottle",
             "nematode knowledge",
             StringUtils.EMPTY,
@@ -90,9 +64,10 @@ class SequencesComparatorTest {
             "ABCABBA",
             "glop glop",
             "coq",
-            "spider-man");
+            "spider-man"
+        );
 
-        after = Arrays.asList(
+        targetStrings = Arrays.asList(
             "noodle",
             "empty bottle",
             StringUtils.EMPTY,
@@ -101,9 +76,10 @@ class SequencesComparatorTest {
             "CBABAC",
             "pas glop pas glop",
             "ane",
-            "klingon");
+            "klingon"
+        );
 
-        length = new int[] {
+        expectedModificationCounts = new int[] {
             6,
             16,
             0,
@@ -114,124 +90,102 @@ class SequencesComparatorTest {
             6,
             13
         };
-
     }
 
     @AfterEach
     public void tearDown() {
-        before = null;
-        after  = null;
-        length = null;
+        initialStrings = null;
+        targetStrings = null;
+        expectedModificationCounts = null;
+    }
+
+    private List<Character> convertStringToCharacterList(final String string) {
+        final List<Character> characterList = new ArrayList<>();
+        for (int i = 0; i < string.length(); ++i) {
+            characterList.add(Character.valueOf(string.charAt(i)));
+        }
+        return characterList;
     }
 
     @Test
-    void testExecution() {
-        final ExecutionVisitor<Character> ev = new ExecutionVisitor<>();
-        for (int i = 0; i < before.size(); ++i) {
-            ev.setList(sequence(before.get(i)));
-            new SequencesComparator<>(sequence(before.get(i)),
-                    sequence(after.get(i))).getScript().visit(ev);
-            assertEquals(after.get(i), ev.getString());
+    void testTransformationExecution() {
+        final ExecutionVisitor<Character> visitor = new ExecutionVisitor<>();
+        for (int i = 0; i < initialStrings.size(); ++i) {
+            visitor.setElements(convertStringToCharacterList(initialStrings.get(i)));
+            new SequencesComparator<>(
+                convertStringToCharacterList(initialStrings.get(i)),
+                convertStringToCharacterList(targetStrings.get(i))
+            ).getScript().visit(visitor);
+            assertEquals(targetStrings.get(i), visitor.getConcatenatedString());
         }
     }
 
     @Test
-    void testLength() {
-        for (int i = 0; i < before.size(); ++i) {
-            final SequencesComparator<Character> comparator =
-                    new SequencesComparator<>(sequence(before.get(i)),
-                            sequence(after.get(i)));
-            assertEquals(length[i], comparator.getScript().getModifications());
+    void testModificationCount() {
+        for (int i = 0; i < initialStrings.size(); ++i) {
+            final SequencesComparator<Character> comparator = new SequencesComparator<>(
+                convertStringToCharacterList(initialStrings.get(i)),
+                convertStringToCharacterList(targetStrings.get(i))
+            );
+            assertEquals(expectedModificationCounts[i], comparator.getScript().getModifications());
         }
     }
 
     @Test
-    void testMinimal() {
-        final String[] shadokAlph = {
-            "GA",
-            "BU",
-            "ZO",
-            "MEU"
-        };
-        final List<String> sentenceBefore = new ArrayList<>();
-        final List<String> sentenceAfter  = new ArrayList<>();
-        sentenceBefore.add(shadokAlph[0]);
-        sentenceBefore.add(shadokAlph[2]);
-        sentenceBefore.add(shadokAlph[3]);
-        sentenceBefore.add(shadokAlph[1]);
-        sentenceBefore.add(shadokAlph[0]);
-        sentenceBefore.add(shadokAlph[0]);
-        sentenceBefore.add(shadokAlph[2]);
-        sentenceBefore.add(shadokAlph[1]);
-        sentenceBefore.add(shadokAlph[3]);
-        sentenceBefore.add(shadokAlph[0]);
-        sentenceBefore.add(shadokAlph[2]);
-        sentenceBefore.add(shadokAlph[1]);
-        sentenceBefore.add(shadokAlph[3]);
-        sentenceBefore.add(shadokAlph[2]);
-        sentenceBefore.add(shadokAlph[2]);
-        sentenceBefore.add(shadokAlph[0]);
-        sentenceBefore.add(shadokAlph[1]);
-        sentenceBefore.add(shadokAlph[3]);
-        sentenceBefore.add(shadokAlph[0]);
-        sentenceBefore.add(shadokAlph[3]);
+    void testMinimalModifications() {
+        final String[] shadokAlphabet = {"GA", "BU", "ZO", "MEU"};
+        final List<String> sentenceBefore = new ArrayList<>(Arrays.asList(
+            "GA", "ZO", "MEU", "BU", "GA", "GA", "ZO", "BU", "MEU", "GA", "ZO", "BU", "MEU", "ZO", "ZO", "GA", "BU", "MEU", "GA", "MEU"
+        ));
 
         final Random random = new Random(4564634237452342L);
 
-        for (int nbCom = 0; nbCom <= 40; nbCom += 5) {
-            sentenceAfter.clear();
-            sentenceAfter.addAll(sentenceBefore);
-            for (int i = 0; i < nbCom; i++) {
+        for (int maxModifications = 0; maxModifications <= 40; maxModifications += 5) {
+            final List<String> sentenceAfter = new ArrayList<>(sentenceBefore);
+            for (int i = 0; i < maxModifications; i++) {
                 if (random.nextInt(2) == 0) {
-                    sentenceAfter.add(random.nextInt(sentenceAfter.size() + 1), shadokAlph[random.nextInt(4)]);
+                    sentenceAfter.add(random.nextInt(sentenceAfter.size() + 1), shadokAlphabet[random.nextInt(4)]);
                 } else {
                     sentenceAfter.remove(random.nextInt(sentenceAfter.size()));
                 }
             }
 
             final SequencesComparator<String> comparator = new SequencesComparator<>(sentenceBefore, sentenceAfter);
-            assertTrue(comparator.getScript().getModifications() <= nbCom);
+            assertTrue(comparator.getScript().getModifications() <= maxModifications);
         }
     }
 
     @Test
-    void testShadok() {
-        final int lgMax = 5;
-        final String[] shadokAlph = {
-            "GA",
-            "BU",
-            "ZO",
-            "MEU"
-        };
+    void testShadokSentences() {
+        final int maxLength = 5;
+        final String[] shadokAlphabet = {"GA", "BU", "ZO", "MEU"};
         List<List<String>> shadokSentences = new ArrayList<>();
-        for (int lg = 0; lg < lgMax; ++lg) {
-            final List<List<String>> newTab = new ArrayList<>();
-            newTab.add(new ArrayList<>());
-            for (final String element : shadokAlph) {
+        for (int length = 0; length < maxLength; ++length) {
+            final List<List<String>> newSentences = new ArrayList<>();
+            newSentences.add(new ArrayList<>());
+            for (final String element : shadokAlphabet) {
                 for (final List<String> sentence : shadokSentences) {
                     final List<String> newSentence = new ArrayList<>(sentence);
                     newSentence.add(element);
-                    newTab.add(newSentence);
+                    newSentences.add(newSentence);
                 }
             }
-            shadokSentences = newTab;
+            shadokSentences = newSentences;
         }
 
-        final ExecutionVisitor<String> ev = new ExecutionVisitor<>();
+        final ExecutionVisitor<String> visitor = new ExecutionVisitor<>();
 
-        for (final List<String> element : shadokSentences) {
-            for (final List<String> shadokSentence : shadokSentences) {
-                ev.setList(element);
-                new SequencesComparator<>(element,
-                        shadokSentence).getScript().visit(ev);
+        for (final List<String> sentence1 : shadokSentences) {
+            for (final List<String> sentence2 : shadokSentences) {
+                visitor.setElements(sentence1);
+                new SequencesComparator<>(sentence1, sentence2).getScript().visit(visitor);
 
-                final StringBuilder concat = new StringBuilder();
-                for (final String s : shadokSentence) {
-                    concat.append(s);
+                final StringBuilder concatenatedSentence2 = new StringBuilder();
+                for (final String s : sentence2) {
+                    concatenatedSentence2.append(s);
                 }
-                assertEquals(concat.toString(), ev.getString());
+                assertEquals(concatenatedSentence2.toString(), visitor.getConcatenatedString());
             }
         }
     }
-
 }
