@@ -1,3 +1,19 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.commons.collections4.set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,26 +30,21 @@ import org.apache.commons.collections4.set.CompositeSet.SetMutator;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test suite for the {@link CompositeSet} implementation.
+ * Extension of {@link AbstractSetTest} for exercising the
+ * {@link CompositeSet} implementation.
  */
 public class CompositeSetTest<E> extends AbstractSetTest<E> {
 
-    /**
-     * Builds a set containing elements "1" and "2".
-     */
     @SuppressWarnings("unchecked")
-    public Set<E> buildSetOne() {
+    public Set<E> buildOne() {
         final HashSet<E> set = new HashSet<>();
         set.add((E) "1");
         set.add((E) "2");
         return set;
     }
 
-    /**
-     * Builds a set containing elements "3" and "4".
-     */
     @SuppressWarnings("unchecked")
-    public Set<E> buildSetTwo() {
+    public Set<E> buildTwo() {
         final HashSet<E> set = new HashSet<>();
         set.add((E) "3");
         set.add((E) "4");
@@ -53,97 +64,75 @@ public class CompositeSetTest<E> extends AbstractSetTest<E> {
     @Override
     public CompositeSet<E> makeObject() {
         final HashSet<E> contained = new HashSet<>();
-        final CompositeSet<E> compositeSet = new CompositeSet<>(contained);
-        compositeSet.setMutator(new EmptySetMutator<>(contained));
-        return compositeSet;
+        final CompositeSet<E> set = new CompositeSet<>(contained);
+        set.setMutator(new EmptySetMutator<>(contained));
+        return set;
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    void testAddCompositedSets() {
-        final Set<E> setOne = buildSetOne();
-        final Set<E> setTwo = buildSetTwo();
-        final CompositeSet<E> compositeSet = new CompositeSet<>();
-        
-        // Add sets to the composite
-        compositeSet.addComposited(setOne, setTwo);
-        
-        // Test adding null sets
-        compositeSet.addComposited((Set<E>) null);
-        compositeSet.addComposited((Set<E>[]) null);
-        compositeSet.addComposited(null, null);
-        compositeSet.addComposited(null, null, null);
-        
-        // Create another composite set for comparison
-        final CompositeSet<E> compositeSet2 = new CompositeSet<>(buildSetOne());
-        compositeSet2.addComposited(buildSetTwo());
-        
-        // Assert equality of composite sets
-        assertEquals(compositeSet, compositeSet2);
-        
-        // Test adding sets with elements
-        final HashSet<E> setThree = new HashSet<>();
-        setThree.add((E) "1");
-        setThree.add((E) "2");
-        setThree.add((E) "3");
-        
-        final HashSet<E> setFour = new HashSet<>();
-        setFour.add((E) "4");
-        
-        final CompositeSet<E> compositeSet3 = new CompositeSet<>(setThree);
-        compositeSet3.addComposited(setFour);
-        
-        // Assert equality of composite sets
-        assertEquals(compositeSet, compositeSet3);
-        
-        // Test unsupported operation exception
-        assertThrows(UnsupportedOperationException.class, () -> compositeSet.addComposited(setThree),
+    void testAddComposited() {
+        final Set<E> one = buildOne();
+        final Set<E> two = buildTwo();
+        final CompositeSet<E> set = new CompositeSet<>();
+        set.addComposited(one, two);
+        set.addComposited((Set<E>) null);
+        set.addComposited((Set<E>[]) null);
+        set.addComposited(null, null);
+        set.addComposited(null, null, null);
+        final CompositeSet<E> set2 = new CompositeSet<>(buildOne());
+        set2.addComposited(buildTwo());
+        assertEquals(set, set2);
+        final HashSet<E> set3 = new HashSet<>();
+        set3.add((E) "1");
+        set3.add((E) "2");
+        set3.add((E) "3");
+        final HashSet<E> set4 = new HashSet<>();
+        set4.add((E) "4");
+        final CompositeSet<E> set5 = new CompositeSet<>(set3);
+        set5.addComposited(set4);
+        assertEquals(set, set5);
+        assertThrows(UnsupportedOperationException.class, () -> set.addComposited(set3),
                 "Expecting UnsupportedOperationException.");
     }
 
     @Test
     @SuppressWarnings("unchecked")
     void testAddCompositedCollision() {
-        final HashSet<E> setOne = new HashSet<>();
-        setOne.add((E) "1");
-        setOne.add((E) "2");
-        setOne.add((E) "3");
-        
-        final HashSet<E> setTwo = new HashSet<>();
-        setTwo.add((E) "4");
-        
-        final CompositeSet<E> compositeSet = new CompositeSet<>(setOne);
-        
-        // Test unsupported operation exception for collisions
-        assertThrows(UnsupportedOperationException.class, () -> compositeSet.addComposited(setOne, buildSetOne()),
+        final HashSet<E> set1 = new HashSet<>();
+        set1.add((E) "1");
+        set1.add((E) "2");
+        set1.add((E) "3");
+        final HashSet<E> set2 = new HashSet<>();
+        set2.add((E) "4");
+        final CompositeSet<E> set3 = new CompositeSet<>(set1);
+        assertThrows(UnsupportedOperationException.class, () -> set3.addComposited(set1, buildOne()),
                 "Expecting UnsupportedOperationException.");
-        assertThrows(UnsupportedOperationException.class, () -> compositeSet.addComposited(setOne, buildSetOne(), buildSetTwo()),
+        assertThrows(UnsupportedOperationException.class, () -> set3.addComposited(set1, buildOne(), buildTwo()),
                 "Expecting UnsupportedOperationException.");
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    void testContainsElement() {
-        final CompositeSet<E> compositeSet = new CompositeSet<>(buildSetOne(), buildSetTwo());
-        assertTrue(compositeSet.contains("1"));
+    void testContains() {
+        final CompositeSet<E> set = new CompositeSet<>(buildOne(), buildTwo());
+        assertTrue(set.contains("1"));
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    void testContainsAllElements() {
-        final CompositeSet<E> compositeSet = new CompositeSet<>(buildSetOne(), buildSetTwo());
-        assertFalse(compositeSet.containsAll(null));
+    void testContainsAll() {
+        final CompositeSet<E> set = new CompositeSet<>(buildOne(), buildTwo());
+        assertFalse(set.containsAll(null));
     }
 
     @Test
     @SuppressWarnings("unchecked")
     void testFailedCollisionResolution() {
-        final Set<E> setOne = buildSetOne();
-        final Set<E> setTwo = buildSetTwo();
-        final CompositeSet<E> compositeSet = new CompositeSet<>(setOne, setTwo);
-        
-        // Set a mutator that throws UnsupportedOperationException
-        compositeSet.setMutator(new SetMutator<E>() {
+        final Set<E> one = buildOne();
+        final Set<E> two = buildTwo();
+        final CompositeSet<E> set = new CompositeSet<>(one, two);
+        set.setMutator(new SetMutator<E>() {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -161,52 +150,54 @@ public class CompositeSetTest<E> extends AbstractSetTest<E> {
             @Override
             public void resolveCollision(final CompositeSet<E> comp, final Set<E> existing,
                 final Set<E> added, final Collection<E> intersects) {
-                // No operation
+                //noop
             }
         });
 
-        final HashSet<E> setThree = new HashSet<>();
-        setThree.add((E) "1");
-        
-        // Test illegal argument exception for collision
-        assertThrows(IllegalArgumentException.class, () -> compositeSet.addComposited(setThree),
+        final HashSet<E> three = new HashSet<>();
+        three.add((E) "1");
+        assertThrows(IllegalArgumentException.class, () -> set.addComposited(three),
                 "IllegalArgumentException should have been thrown");
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    void testRemoveAllElements() {
-        final CompositeSet<E> compositeSet = new CompositeSet<>(buildSetOne(), buildSetTwo());
-        assertFalse(compositeSet.removeAll(null));
+    void testRemoveAll() {
+        final CompositeSet<E> set = new CompositeSet<>(buildOne(), buildTwo());
+        assertFalse(set.removeAll(null));
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    void testRemoveCompositedElement() {
-        final Set<E> setOne = buildSetOne();
-        final Set<E> setTwo = buildSetTwo();
-        final CompositeSet<E> compositeSet = new CompositeSet<>(setOne, setTwo);
-        
-        // Remove elements and assert their absence
-        compositeSet.remove("1");
-        assertFalse(setOne.contains("1"));
+    void testRemoveComposited() {
+        final Set<E> one = buildOne();
+        final Set<E> two = buildTwo();
+        final CompositeSet<E> set = new CompositeSet<>(one, two);
+        set.remove("1");
+        assertFalse(one.contains("1"));
 
-        compositeSet.remove("3");
-        assertFalse(setOne.contains("3"));
+        set.remove("3");
+        assertFalse(one.contains("3"));
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    void testRemoveUnderlyingElement() {
-        final Set<E> setOne = buildSetOne();
-        final Set<E> setTwo = buildSetTwo();
-        final CompositeSet<E> compositeSet = new CompositeSet<>(setOne, setTwo);
-        
-        // Remove elements from underlying sets and assert their absence
-        setOne.remove("1");
-        assertFalse(compositeSet.contains("1"));
+    void testRemoveUnderlying() {
+        final Set<E> one = buildOne();
+        final Set<E> two = buildTwo();
+        final CompositeSet<E> set = new CompositeSet<>(one, two);
+        one.remove("1");
+        assertFalse(set.contains("1"));
 
-        setTwo.remove("3");
-        assertFalse(compositeSet.contains("3"));
+        two.remove("3");
+        assertFalse(set.contains("3"));
     }
+
+//    void testCreate() throws Exception {
+//        resetEmpty();
+//        writeExternalFormToDisk((java.io.Serializable) getCollection(), "src/test/resources/data/test/CompositeSet.emptyCollection.version4.obj");
+//        resetFull();
+//        writeExternalFormToDisk((java.io.Serializable) getCollection(), "src/test/resources/data/test/CompositeSet.fullCollection.version4.obj");
+//    }
+
 }
