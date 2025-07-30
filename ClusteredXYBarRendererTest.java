@@ -1,139 +1,172 @@
+/* ======================================================
+ * JFreeChart : a chart library for the Java(tm) platform
+ * ======================================================
+ *
+ * (C) Copyright 2000-present, by David Gilbert and Contributors.
+ *
+ * Project Info:  https://www.jfree.org/jfreechart/index.html
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ *
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
+ *
+ * -------------------------------
+ * ClusteredXYBarRendererTest.java
+ * -------------------------------
+ * (C) Copyright 2003-present, by David Gilbert and Contributors.
+ *
+ * Original Author:  David Gilbert;
+ * Contributor(s):   -;
+ *
+ */
+
 package org.jfree.chart.renderer.xy;
 
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.internal.CloneUtils;
 import org.jfree.chart.api.PublicCloneable;
+
 import org.jfree.data.Range;
 import org.jfree.data.xy.DefaultIntervalXYDataset;
 import org.jfree.data.xy.XYDataset;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for the {@link ClusteredXYBarRenderer} class.  This test suite
- * focuses on verifying the core functionality of the renderer, including
- * equality checks, cloning, serialization, and domain bounds calculation.
+ * Tests for the {@link ClusteredXYBarRenderer} class.
  */
 public class ClusteredXYBarRendererTest {
 
-    private static final double EPSILON = 0.0000000001;
-
+    /**
+     * Check that the equals() method distinguishes all fields.
+     */
     @Test
-    @DisplayName("Test equals() method")
     public void testEquals() {
-        // Two default renderers should be equal
-        ClusteredXYBarRenderer renderer1 = new ClusteredXYBarRenderer();
-        ClusteredXYBarRenderer renderer2 = new ClusteredXYBarRenderer();
-        assertEquals(renderer1, renderer2, "Two default renderers should be equal.");
+        ClusteredXYBarRenderer r1 = new ClusteredXYBarRenderer();
+        ClusteredXYBarRenderer r2 = new ClusteredXYBarRenderer();
+        assertEquals(r1, r2);
+        assertEquals(r2, r1);
 
-        // Different margin should make them unequal
-        renderer1 = new ClusteredXYBarRenderer(1.2, false);
-        assertNotEquals(renderer1, renderer2, "Renderers with different margin should not be equal.");
-        renderer2 = new ClusteredXYBarRenderer(1.2, false);
-        assertEquals(renderer1, renderer2, "Renderers with same margin should be equal.");
+        r1 = new ClusteredXYBarRenderer(1.2, false);
+        assertNotEquals(r1, r2);
+        r2 = new ClusteredXYBarRenderer(1.2, false);
+        assertEquals(r1, r2);
 
-        // Different centerBarAtStartValue should make them unequal
-        renderer1 = new ClusteredXYBarRenderer(1.2, true);
-        assertNotEquals(renderer1, renderer2, "Renderers with different centerBarAtStartValue should not be equal.");
-        renderer2 = new ClusteredXYBarRenderer(1.2, true);
-        assertEquals(renderer1, renderer2, "Renderers with same centerBarAtStartValue should be equal.");
-    }
-
-    @Test
-    @DisplayName("Test hashCode() method")
-    public void testHashcode() {
-        // Equal objects must have the same hashcode
-        ClusteredXYBarRenderer renderer1 = new ClusteredXYBarRenderer();
-        ClusteredXYBarRenderer renderer2 = new ClusteredXYBarRenderer();
-        assertEquals(renderer1, renderer2, "Renderers should be equal.");
-        assertEquals(renderer1.hashCode(), renderer2.hashCode(), "Equal renderers should have the same hashcode.");
-    }
-
-    @Test
-    @DisplayName("Test cloning")
-    public void testCloning() throws CloneNotSupportedException {
-        // Verify that cloning creates a new object with the same state
-        ClusteredXYBarRenderer renderer1 = new ClusteredXYBarRenderer();
-        ClusteredXYBarRenderer renderer2 = CloneUtils.clone(renderer1);
-
-        assertNotSame(renderer1, renderer2, "The cloned object should be a different instance.");
-        assertEquals(renderer1.getClass(), renderer2.getClass(), "The cloned object should be of the same class.");
-        assertEquals(renderer1, renderer2, "The cloned object should be equal to the original.");
-    }
-
-    @Test
-    @DisplayName("Test PublicCloneable interface")
-    public void testPublicCloneable() {
-        // Verify that the class implements the PublicCloneable interface
-        ClusteredXYBarRenderer renderer = new ClusteredXYBarRenderer();
-        assertTrue(renderer instanceof PublicCloneable, "ClusteredXYBarRenderer should implement PublicCloneable.");
-    }
-
-    @Test
-    @DisplayName("Test serialization")
-    public void testSerialization() {
-        // Verify that an instance can be serialized and deserialized without data loss
-        ClusteredXYBarRenderer renderer1 = new ClusteredXYBarRenderer();
-        ClusteredXYBarRenderer renderer2 = TestUtils.serialised(renderer1);
-        assertEquals(renderer1, renderer2, "The serialized and deserialized objects should be equal.");
-    }
-
-    @Test
-    @DisplayName("Test findDomainBounds() method")
-    public void testFindDomainBounds() {
-        // Test the findDomainBounds() method with and without the centerBarAtStartValue flag
-
-        XYDataset<String> dataset = createSampleDataset1();
-
-        // Default renderer
-        AbstractXYItemRenderer renderer = new ClusteredXYBarRenderer();
-        Range range = renderer.findDomainBounds(dataset);
-        assertNotNull(range, "Domain bounds should not be null for non-empty dataset.");
-        assertEquals(0.9, range.getLowerBound(), EPSILON, "Lower bound of domain range is incorrect.");
-        assertEquals(13.1, range.getUpperBound(), EPSILON, "Upper bound of domain range is incorrect.");
-
-        // Renderer with centerBarAtStartValue = true
-        renderer = new ClusteredXYBarRenderer(0.0, true);
-        range = renderer.findDomainBounds(dataset);
-        assertNotNull(range, "Domain bounds should not be null for non-empty dataset.");
-        assertEquals(0.8, range.getLowerBound(), EPSILON, "Lower bound of domain range is incorrect with centerBarAtStartValue=true.");
-        assertEquals(13.0, range.getUpperBound(), EPSILON, "Upper bound of domain range is incorrect with centerBarAtStartValue=true.");
-
-        // Test with a null dataset
-        assertNull(renderer.findDomainBounds(null), "Domain bounds should be null for a null dataset.");
+        r1 = new ClusteredXYBarRenderer(1.2, true);
+        assertNotEquals(r1, r2);
+        r2 = new ClusteredXYBarRenderer(1.2, true);
+        assertEquals(r1, r2);
     }
 
     /**
-     * Creates a sample dataset for testing. This dataset contains two series with three data points each,
-     * including start and end values for both X and Y axes.
+     * Two objects that are equal are required to return the same hashCode.
+     */
+    @Test
+    public void testHashcode() {
+        ClusteredXYBarRenderer r1 = new ClusteredXYBarRenderer();
+        ClusteredXYBarRenderer r2 = new ClusteredXYBarRenderer();
+        assertEquals(r1, r2);
+        int h1 = r1.hashCode();
+        int h2 = r2.hashCode();
+        assertEquals(h1, h2);
+    }
+
+    /**
+     * Confirm that cloning works.
+     */
+    @Test
+    public void testCloning() throws CloneNotSupportedException {
+        ClusteredXYBarRenderer r1 = new ClusteredXYBarRenderer();
+        ClusteredXYBarRenderer r2 = CloneUtils.clone(r1);
+        assertNotSame(r1, r2);
+        assertSame(r1.getClass(), r2.getClass());
+        assertEquals(r1, r2);
+    }
+
+    /**
+     * Verify that this class implements {@link PublicCloneable}.
+     */
+    @Test
+    public void testPublicCloneable() {
+        ClusteredXYBarRenderer r1 = new ClusteredXYBarRenderer();
+        assertTrue(r1 instanceof PublicCloneable);
+    }
+
+    /**
+     * Serialize an instance, restore it, and check for equality.
+     */
+    @Test
+    public void testSerialization() {
+        ClusteredXYBarRenderer r1 = new ClusteredXYBarRenderer();
+        ClusteredXYBarRenderer r2 = TestUtils.serialised(r1);
+        assertEquals(r1, r2);
+    }
+
+    private static final double EPSILON = 0.0000000001;
+
+    /**
+     * Some checks for the findDomainBounds() method (which requires special
+     * handling when the centerBarAtStartValue flag is set to true).
+     */
+    @Test
+    public void testFindDomainBounds() {
+        AbstractXYItemRenderer renderer = new ClusteredXYBarRenderer();
+        XYDataset<String> dataset = createSampleDataset1();
+        Range r = renderer.findDomainBounds(dataset);
+        assertEquals(0.9, r.getLowerBound(), EPSILON);
+        assertEquals(13.1, r.getUpperBound(), EPSILON);
+
+        renderer = new ClusteredXYBarRenderer(0.0, true);
+        r = renderer.findDomainBounds(dataset);
+        assertEquals(0.8, r.getLowerBound(), EPSILON);
+        assertEquals(13.0, r.getUpperBound(), EPSILON);
+
+        // check that a null dataset returns null bounds
+        assertNull(renderer.findDomainBounds(null));
+    }
+
+    /**
+     * Creates a sample dataset for testing.
      *
      * @return A sample dataset.
      */
-    private DefaultIntervalXYDataset<String> createSampleDataset1() {
-        DefaultIntervalXYDataset<String> dataset = new DefaultIntervalXYDataset<>();
-
-        // Series 1 data
+    public DefaultIntervalXYDataset<String> createSampleDataset1() {
+        DefaultIntervalXYDataset<String> d = new DefaultIntervalXYDataset<>();
         double[] x1 = new double[] {1.0, 2.0, 3.0};
         double[] x1Start = new double[] {0.9, 1.9, 2.9};
         double[] x1End = new double[] {1.1, 2.1, 3.1};
         double[] y1 = new double[] {4.0, 5.0, 6.0};
         double[] y1Start = new double[] {1.09, 2.09, 3.09};
         double[] y1End = new double[] {1.11, 2.11, 3.11};
-        double[][] data1 = new double[][] {x1, x1Start, x1End, y1, y1Start, y1End};
-        dataset.addSeries("S1", data1);
+        double[][] data1 = new double[][] {x1, x1Start, x1End, y1, y1Start,
+                y1End};
+        d.addSeries("S1", data1);
 
-        // Series 2 data
         double[] x2 = new double[] {11.0, 12.0, 13.0};
         double[] x2Start = new double[] {10.9, 11.9, 12.9};
         double[] x2End = new double[] {11.1, 12.1, 13.1};
         double[] y2 = new double[] {14.0, 15.0, 16.0};
         double[] y2Start = new double[] {11.09, 12.09, 13.09};
         double[] y2End = new double[] {11.11, 12.11, 13.11};
-        double[][] data2 = new double[][] {x2, x2Start, x2End, y2, y2Start, y2End};
-        dataset.addSeries("S2", data2);
-
-        return dataset;
+        double[][] data2 = new double[][] {x2, x2Start, x2End, y2, y2Start,
+                y2End};
+        d.addSeries("S2", data2);
+        return d;
     }
+
 }
