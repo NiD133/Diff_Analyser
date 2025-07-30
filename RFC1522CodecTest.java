@@ -27,10 +27,13 @@ import org.apache.commons.codec.DecoderException;
 import org.junit.jupiter.api.Test;
 
 /**
- * RFC 1522 compliant codec test cases
+ * Test suite for the RFC 1522 compliant codec.
  */
 class RFC1522CodecTest {
 
+    /**
+     * A test implementation of RFC1522Codec for testing purposes.
+     */
     static class RFC1522TestCodec extends RFC1522Codec {
 
         RFC1522TestCodec() {
@@ -39,11 +42,13 @@ class RFC1522CodecTest {
 
         @Override
         protected byte[] doDecoding(final byte[] bytes) {
+            // No actual decoding logic for test purposes
             return bytes;
         }
 
         @Override
         protected byte[] doEncoding(final byte[] bytes) {
+            // No actual encoding logic for test purposes
             return bytes;
         }
 
@@ -51,34 +56,52 @@ class RFC1522CodecTest {
         protected String getEncoding() {
             return "T";
         }
-
     }
 
-    private void assertExpectedDecoderException(final String s) {
-        assertThrows(DecoderException.class, () -> new RFC1522TestCodec().decodeText(s));
+    /**
+     * Helper method to assert that decoding a given string throws a DecoderException.
+     *
+     * @param input the input string to decode
+     */
+    private void assertDecoderExceptionThrown(final String input) {
+        assertThrows(DecoderException.class, () -> new RFC1522TestCodec().decodeText(input));
     }
 
+    /**
+     * Tests decoding of various invalid input strings.
+     */
     @Test
-    void testDecodeInvalid() throws Exception {
-        assertExpectedDecoderException("whatever");
-        assertExpectedDecoderException("=?");
-        assertExpectedDecoderException("?=");
-        assertExpectedDecoderException("==");
-        assertExpectedDecoderException("=??=");
-        assertExpectedDecoderException("=?stuff?=");
-        assertExpectedDecoderException("=?UTF-8??=");
-        assertExpectedDecoderException("=?UTF-8?stuff?=");
-        assertExpectedDecoderException("=?UTF-8?T?stuff");
-        assertExpectedDecoderException("=??T?stuff?=");
-        assertExpectedDecoderException("=?UTF-8??stuff?=");
-        assertExpectedDecoderException("=?UTF-8?W?stuff?=");
+    void testDecodeInvalidInputs() throws Exception {
+        // Invalid encoded strings that should throw DecoderException
+        String[] invalidInputs = {
+            "whatever",
+            "=?",
+            "?=",
+            "==",
+            "=??=",
+            "=?stuff?=",
+            "=?UTF-8??=",
+            "=?UTF-8?stuff?=",
+            "=?UTF-8?T?stuff",
+            "=??T?stuff?=",
+            "=?UTF-8??stuff?=",
+            "=?UTF-8?W?stuff?="
+        };
+
+        for (String input : invalidInputs) {
+            assertDecoderExceptionThrown(input);
+        }
     }
 
+    /**
+     * Tests encoding and decoding with null input.
+     */
     @Test
-    void testNullInput() throws Exception {
+    void testNullInputHandling() throws Exception {
         final RFC1522TestCodec testCodec = new RFC1522TestCodec();
+        
+        // Ensure null input returns null without exceptions
         assertNull(testCodec.decodeText(null));
         assertNull(testCodec.encodeText(null, CharEncoding.UTF_8));
     }
-
 }
