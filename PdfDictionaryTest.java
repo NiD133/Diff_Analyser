@@ -45,53 +45,73 @@ package com.itextpdf.text.pdf;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Unit tests for the PdfDictionary class.
+ */
 public class PdfDictionaryTest {
+
+    /**
+     * Test that PdfDictionary.get() returns null if the key is null.
+     */
     @Test
-    public void pdfDictionaryGetReturnsNullIfKeyIsNull() {
+    public void testGetReturnsNullIfKeyIsNull() {
         PdfDictionary dictionary = new PdfDictionary();
 
         PdfObject value = dictionary.get(null);
 
-        Assert.assertNull(value);
+        Assert.assertNull("Expected null when getting value with null key", value);
     }
 
+    /**
+     * Test that PdfDictionary.contains() returns false if the key is null.
+     */
     @Test
-    public void pdfDictionaryContainsReturnsFalseIfKeyIsNull() {
+    public void testContainsReturnsFalseIfKeyIsNull() {
         PdfDictionary dictionary = new PdfDictionary();
 
-        boolean contained = dictionary.contains(null);
+        boolean isContained = dictionary.contains(null);
 
-        Assert.assertFalse(contained);
+        Assert.assertFalse("Expected false when checking contains with null key", isContained);
     }
 
+    /**
+     * Test that PdfDictionary.remove() does nothing if the key is null.
+     */
     @Test
-    public void pdfDictionaryRemoveDoesNothingIfKeyIsNull() {
+    public void testRemoveDoesNothingIfKeyIsNull() {
         PdfDictionary dictionary = new PdfDictionary();
 
+        // Attempt to remove an entry with a null key; should not throw an exception
         dictionary.remove(null);
     }
 
+    /**
+     * Test that PdfDictionary.put() throws IllegalArgumentException if the key is null.
+     */
     @Test
-    public void pdfDictionaryPutThrowsExceptionIfKeyIsNull() {
+    public void testPutThrowsExceptionIfKeyIsNull() {
         PdfDictionary dictionary = new PdfDictionary();
 
         try {
             dictionary.put(null, new PdfName("null"));
-            Assert.fail("IllegalArgumentException expected");
+            Assert.fail("Expected IllegalArgumentException when putting with null key");
         } catch (IllegalArgumentException e) {
-            Assert.assertEquals(e.getMessage(), "key is null.");
+            Assert.assertEquals("key is null.", e.getMessage());
         }
     }
 
+    /**
+     * Test that PdfDictionary.putEx() throws IllegalArgumentException if the key is null.
+     */
     @Test
-    public void pdfDictionaryPutExThrowsExceptionIfKeyIsNull() {
+    public void testPutExThrowsExceptionIfKeyIsNull() {
         PdfDictionary dictionary = new PdfDictionary();
 
         try {
             dictionary.putEx(null, new PdfName("null"));
-            Assert.fail("IllegalArgumentException expected");
+            Assert.fail("Expected IllegalArgumentException when putting with null key");
         } catch (IllegalArgumentException e) {
-            Assert.assertEquals(e.getMessage(), "key is null.");
+            Assert.assertEquals("key is null.", e.getMessage());
         }
     }
 }
