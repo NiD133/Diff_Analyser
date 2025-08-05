@@ -43,30 +43,37 @@
  */
 package com.itextpdf.text.error_messages;
 
-
-import junit.framework.Assert;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 /**
- * @author kevin
+ * Tests for the {@link MessageLocalization} class, focusing on message formatting and parameter substitution.
  */
 public class MessageLocalizationTest {
 
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
+    /**
+     * Verifies that when a Windows-style file path (containing backslashes) is used as a parameter,
+     * the backslashes are correctly preserved in the final composed message.
+     * <p>
+     * This is an important edge case, as backslashes can sometimes be misinterpreted as escape
+     * characters by string formatting mechanisms.
+     */
     @Test
-    public void testBackslashes() throws Exception{
-        String testPath = "C:\\test\\file.txt";
-        String rslt = MessageLocalization.getComposedMessage("1.not.found.as.file.or.resource", testPath);
-        Assert.assertTrue("Result doesn't contain the test path", rslt.contains(testPath));
+    public void getComposedMessage_withWindowsPathParameter_preservesBackslashes() {
+        // Arrange
+        String messageKey = "1.not.found.as.file.or.resource";
+        String pathWithBackslashes = "C:\\test\\file.txt";
+
+        // The message template for the key is "{1} not found as file or resource."
+        // We expect the path to be substituted directly without modification.
+        String expectedMessage = "C:\\test\\file.txt not found as file or resource.";
+
+        // Act
+        String actualMessage = MessageLocalization.getComposedMessage(messageKey, pathWithBackslashes);
+
+        // Assert
+        assertEquals("The composed message should include the path parameter with backslashes intact.",
+                expectedMessage, actualMessage);
     }
 }
