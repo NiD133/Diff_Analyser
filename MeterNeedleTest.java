@@ -36,14 +36,18 @@
 
 package org.jfree.chart.plot.compass;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Stroke;
-import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  * Tests for the {@link MeterNeedle} class.
@@ -51,49 +55,124 @@ import static org.junit.jupiter.api.Assertions.*;
 public class MeterNeedleTest {
 
     /**
-     * Check that the equals() method can distinguish all fields.
+     * A collection of tests for the equals() and hashCode() contract.
      */
-    @Test
-    public void testEquals() {
-        MeterNeedle n1 = new LineNeedle();
-        MeterNeedle n2 = new LineNeedle();
-        assertEquals(n1, n2);
+    @Nested
+    @DisplayName("The equals() and hashCode() contract")
+    class EqualsAndHashCode {
 
-        n1.setFillPaint(new GradientPaint(1.0f, 2.0f, Color.RED, 3.0f, 4.0f, Color.BLUE));
-        assertNotEquals(n1, n2);
-        n2.setFillPaint(new GradientPaint(1.0f, 2.0f, Color.RED, 3.0f, 4.0f, Color.BLUE));
-        assertEquals(n1, n2);
+        private MeterNeedle needle1;
+        private MeterNeedle needle2;
 
-        n1.setOutlinePaint(new GradientPaint(5.0f, 6.0f, Color.RED, 7.0f, 8.0f, Color.BLUE));
-        assertNotEquals(n1, n2);
-        n2.setOutlinePaint(new GradientPaint(5.0f, 6.0f, Color.RED, 7.0f, 8.0f, Color.BLUE));
-        assertEquals(n1, n2);
+        @BeforeEach
+        void setUp() {
+            // Use a concrete implementation to test the abstract class's logic
+            this.needle1 = new LineNeedle();
+            this.needle2 = new LineNeedle();
+        }
 
-        n1.setHighlightPaint(new GradientPaint(9.0f, 0.0f, Color.RED, 1.0f, 2.0f, Color.BLUE));
-        assertNotEquals(n1, n2);
-        n2.setHighlightPaint(new GradientPaint(9.0f, 0.0f, Color.RED, 1.0f, 2.0f, Color.BLUE));
-        assertEquals(n1, n2);
+        @Test
+        @DisplayName("should hold for two default instances")
+        void twoDefaultInstancesShouldBeEqual() {
+            assertEquals(needle1, needle2, "Two default LineNeedle instances should be equal.");
+            assertEquals(needle1.hashCode(), needle2.hashCode(), "Hash codes should be equal for equal objects.");
+        }
 
-        Stroke s = new BasicStroke(1.23f);
-        n1.setOutlineStroke(s);
-        assertNotEquals(n1, n2);
-        n2.setOutlineStroke(s);
-        assertEquals(n1, n2);
+        @Test
+        @DisplayName("should be false when comparing to a different object type")
+        void equalsShouldReturnFalseForDifferentType() {
+            assertNotEquals("A string", needle1, "Equals should return false for different types.");
+        }
 
-        n1.setRotateX(1.23);
-        assertNotEquals(n1, n2);
-        n2.setRotateX(1.23);
-        assertEquals(n1, n2);
+        @Test
+        @DisplayName("should differentiate based on fillPaint")
+        void equalsShouldDifferentiateByFillPaint() {
+            // Arrange
+            needle1.setFillPaint(new GradientPaint(1f, 2f, Color.RED, 3f, 4f, Color.BLUE));
 
-        n1.setRotateY(4.56);
-        assertNotEquals(n1, n2);
-        n2.setRotateY(4.56);
-        assertEquals(n1, n2);
+            // Act & Assert
+            assertNotEquals(needle1, needle2);
+            assertNotEquals(needle1.hashCode(), needle2.hashCode());
 
-        n1.setSize(11);
-        assertNotEquals(n1, n2);
-        n2.setSize(11);
-        assertEquals(n1, n2);
+            // Arrange
+            needle2.setFillPaint(new GradientPaint(1f, 2f, Color.RED, 3f, 4f, Color.BLUE));
+
+            // Act & Assert
+            assertEquals(needle1, needle2);
+            assertEquals(needle1.hashCode(), needle2.hashCode());
+        }
+
+        @Test
+        @DisplayName("should differentiate based on outlinePaint")
+        void equalsShouldDifferentiateByOutlinePaint() {
+            needle1.setOutlinePaint(new GradientPaint(5f, 6f, Color.YELLOW, 7f, 8f, Color.GREEN));
+            assertNotEquals(needle1, needle2);
+            assertNotEquals(needle1.hashCode(), needle2.hashCode());
+
+            needle2.setOutlinePaint(new GradientPaint(5f, 6f, Color.YELLOW, 7f, 8f, Color.GREEN));
+            assertEquals(needle1, needle2);
+            assertEquals(needle1.hashCode(), needle2.hashCode());
+        }
+
+        @Test
+        @DisplayName("should differentiate based on highlightPaint")
+        void equalsShouldDifferentiateByHighlightPaint() {
+            needle1.setHighlightPaint(new GradientPaint(9f, 0f, Color.ORANGE, 1f, 2f, Color.CYAN));
+            assertNotEquals(needle1, needle2);
+            assertNotEquals(needle1.hashCode(), needle2.hashCode());
+
+            needle2.setHighlightPaint(new GradientPaint(9f, 0f, Color.ORANGE, 1f, 2f, Color.CYAN));
+            assertEquals(needle1, needle2);
+            assertEquals(needle1.hashCode(), needle2.hashCode());
+        }
+
+        @Test
+        @DisplayName("should differentiate based on outlineStroke")
+        void equalsShouldDifferentiateByOutlineStroke() {
+            Stroke stroke = new BasicStroke(1.23f);
+            needle1.setOutlineStroke(stroke);
+            assertNotEquals(needle1, needle2);
+            assertNotEquals(needle1.hashCode(), needle2.hashCode());
+
+            needle2.setOutlineStroke(stroke);
+            assertEquals(needle1, needle2);
+            assertEquals(needle1.hashCode(), needle2.hashCode());
+        }
+
+        @Test
+        @DisplayName("should differentiate based on rotateX")
+        void equalsShouldDifferentiateByRotateX() {
+            needle1.setRotateX(1.23);
+            assertNotEquals(needle1, needle2);
+            assertNotEquals(needle1.hashCode(), needle2.hashCode());
+
+            needle2.setRotateX(1.23);
+            assertEquals(needle1, needle2);
+            assertEquals(needle1.hashCode(), needle2.hashCode());
+        }
+
+        @Test
+        @DisplayName("should differentiate based on rotateY")
+        void equalsShouldDifferentiateByRotateY() {
+            needle1.setRotateY(4.56);
+            assertNotEquals(needle1, needle2);
+            assertNotEquals(needle1.hashCode(), needle2.hashCode());
+
+            needle2.setRotateY(4.56);
+            assertEquals(needle1, needle2);
+            assertEquals(needle1.hashCode(), needle2.hashCode());
+        }
+
+        @Test
+        @DisplayName("should differentiate based on size")
+        void equalsShouldDifferentiateBySize() {
+            needle1.setSize(11);
+            assertNotEquals(needle1, needle2);
+            assertNotEquals(needle1.hashCode(), needle2.hashCode());
+
+            needle2.setSize(11);
+            assertEquals(needle1, needle2);
+            assertEquals(needle1.hashCode(), needle2.hashCode());
+        }
     }
-
 }
