@@ -1,6 +1,26 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.commons.lang3.reflect;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
@@ -15,114 +35,130 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit tests for the {@link ConstructorUtils} class.
+ * Tests ConstructorUtils
  */
 public class ConstructorUtilsTest extends AbstractLangTest {
-
-    // Test classes for constructor testing
-    private static class BaseClass {}
-
-    static class PrivateClass {
-        public static class PublicInnerClass {
-            public PublicInnerClass() {}
-        }
-        public PrivateClass() {}
+    private static class BaseClass {
     }
 
-    private static final class SubClass extends BaseClass {}
+    static class PrivateClass {
+        @SuppressWarnings("unused")
+        public static class PublicInnerClass {
+            public PublicInnerClass() {
+            }
+        }
+
+        @SuppressWarnings("unused")
+        public PrivateClass() {
+        }
+    }
+
+    private static final class SubClass extends BaseClass {
+    }
 
     public static class TestBean {
-        private final String description;
+        private final String toString;
         final String[] varArgs;
 
         public TestBean() {
-            description = "()";
+            toString = "()";
             varArgs = null;
         }
 
-        public TestBean(final BaseClass bc, final String... args) {
-            description = "(BaseClass, String...)";
-            varArgs = args;
+        public TestBean(final BaseClass bc, final String... s) {
+            toString = "(BaseClass, String...)";
+            varArgs = s;
         }
 
         public TestBean(final double d) {
-            description = "(double)";
+            toString = "(double)";
             varArgs = null;
         }
 
         public TestBean(final int i) {
-            description = "(int)";
+            toString = "(int)";
             varArgs = null;
         }
 
         public TestBean(final Integer i) {
-            description = "(Integer)";
+            toString = "(Integer)";
             varArgs = null;
         }
 
         public TestBean(final Integer first, final int... args) {
-            description = "(Integer, int...)";
-            varArgs = Arrays.stream(args).mapToObj(String::valueOf).toArray(String[]::new);
+            toString = "(Integer, String...)";
+            varArgs = new String[args.length];
+            for (int i = 0; i < args.length; ++i) {
+                varArgs[i] = Integer.toString(args[i]);
+            }
         }
 
-        public TestBean(final Integer i, final String... args) {
-            description = "(Integer, String...)";
-            varArgs = args;
+        public TestBean(final Integer i, final String... s) {
+            toString = "(Integer, String...)";
+            varArgs = s;
         }
 
         public TestBean(final Object o) {
-            description = "(Object)";
+            toString = "(Object)";
             varArgs = null;
         }
 
         public TestBean(final String s) {
-            description = "(String)";
+            toString = "(String)";
             varArgs = null;
         }
 
-        public TestBean(final String... args) {
-            description = "(String...)";
-            varArgs = args;
+        public TestBean(final String... s) {
+            toString = "(String...)";
+            varArgs = s;
         }
 
         @Override
         public String toString() {
-            return description;
+            return toString;
         }
 
-        void verify(final String expectedDescription, final String[] expectedArgs) {
-            assertEquals(expectedDescription, description);
-            assertArrayEquals(expectedArgs, varArgs);
+        void verify(final String str, final String[] args) {
+            assertEquals(str, toString);
+            assertArrayEquals(args, varArgs);
         }
     }
 
-    private final Map<Class<?>, Class<?>[]> classCache = new HashMap<>();
+    private final Map<Class<?>, Class<?>[]> classCache;
+
+    public ConstructorUtilsTest() {
+        classCache = new HashMap<>();
+    }
+
+    private void expectMatchingAccessibleConstructorParameterTypes(final Class<?> cls, final Class<?>[] requestTypes, final Class<?>[] actualTypes) {
+        final Constructor<?> c = ConstructorUtils.getMatchingAccessibleConstructor(cls, requestTypes);
+        assertArrayEquals(actualTypes, c.getParameterTypes(), toString(c.getParameterTypes()) + " not equals " + toString(actualTypes));
+    }
 
     @BeforeEach
     public void setUp() {
         classCache.clear();
     }
 
-    private Class<?>[] getCachedClassArray(final Class<?> clazz) {
-        return classCache.computeIfAbsent(clazz, k -> new Class<?>[] { clazz });
-    }
-
-    private void verifyMatchingAccessibleConstructor(final Class<?> cls, final Class<?>[] requestTypes, final Class<?>[] expectedTypes) {
-        final Constructor<?> constructor = ConstructorUtils.getMatchingAccessibleConstructor(cls, requestTypes);
-        assertArrayEquals(expectedTypes, constructor.getParameterTypes(), 
-            "Expected: " + Arrays.toString(expectedTypes) + ", but got: " + Arrays.toString(constructor.getParameterTypes()));
+    private Class<?>[] singletonArray(final Class<?> c) {
+        Class<?>[] result = classCache.get(c);
+        if (result == null) {
+            result = new Class[] { c };
+            classCache.put(c, result);
+        }
+        return result;
     }
 
     @Test
-    void testConstructorInstantiation() throws Exception {
+    void testConstructor() throws Exception {
         assertNotNull(MethodUtils.class.getConstructor().newInstance());
     }
 
     @Test
     void testGetAccessibleConstructor() throws Exception {
-        assertNotNull(ConstructorUtils.getAccessibleConstructor(Object.class.getConstructor()));
-        assertNull(ConstructorUtils.getAccessibleConstructor(PrivateClass.class.getConstructor()));
-        assertNull(ConstructorUtils.getAccessibleConstructor(PrivateClass.PublicInnerClass.class.getConstructor()));
+        assertNotNull(ConstructorUtils.getAccessibleConstructor(Object.class.getConstructor(ArrayUtils.EMPTY_CLASS_ARRAY)));
+        assertNull(ConstructorUtils.getAccessibleConstructor(PrivateClass.class.getConstructor(ArrayUtils.EMPTY_CLASS_ARRAY)));
+        assertNull(ConstructorUtils.getAccessibleConstructor(PrivateClass.PublicInnerClass.class));
     }
 
     @Test
@@ -132,27 +168,28 @@ public class ConstructorUtilsTest extends AbstractLangTest {
     }
 
     @Test
-    void testGetMatchingAccessibleConstructor() {
-        verifyMatchingAccessibleConstructor(TestBean.class, ArrayUtils.EMPTY_CLASS_ARRAY, ArrayUtils.EMPTY_CLASS_ARRAY);
-        verifyMatchingAccessibleConstructor(TestBean.class, null, ArrayUtils.EMPTY_CLASS_ARRAY);
-        verifyMatchingAccessibleConstructor(TestBean.class, getCachedClassArray(String.class), getCachedClassArray(String.class));
-        verifyMatchingAccessibleConstructor(TestBean.class, getCachedClassArray(Object.class), getCachedClassArray(Object.class));
-        verifyMatchingAccessibleConstructor(TestBean.class, getCachedClassArray(Boolean.class), getCachedClassArray(Object.class));
-        verifyMatchingAccessibleConstructor(TestBean.class, getCachedClassArray(Byte.class), getCachedClassArray(int.class));
-        verifyMatchingAccessibleConstructor(TestBean.class, getCachedClassArray(Byte.TYPE), getCachedClassArray(int.class));
-        verifyMatchingAccessibleConstructor(TestBean.class, getCachedClassArray(Short.class), getCachedClassArray(int.class));
-        verifyMatchingAccessibleConstructor(TestBean.class, getCachedClassArray(Short.TYPE), getCachedClassArray(int.class));
-        verifyMatchingAccessibleConstructor(TestBean.class, getCachedClassArray(Character.class), getCachedClassArray(int.class));
-        verifyMatchingAccessibleConstructor(TestBean.class, getCachedClassArray(Character.TYPE), getCachedClassArray(int.class));
-        verifyMatchingAccessibleConstructor(TestBean.class, getCachedClassArray(Integer.class), getCachedClassArray(Integer.class));
-        verifyMatchingAccessibleConstructor(TestBean.class, getCachedClassArray(Integer.TYPE), getCachedClassArray(int.class));
-        verifyMatchingAccessibleConstructor(TestBean.class, getCachedClassArray(Long.class), getCachedClassArray(double.class));
-        verifyMatchingAccessibleConstructor(TestBean.class, getCachedClassArray(Long.TYPE), getCachedClassArray(double.class));
-        verifyMatchingAccessibleConstructor(TestBean.class, getCachedClassArray(Float.class), getCachedClassArray(double.class));
-        verifyMatchingAccessibleConstructor(TestBean.class, getCachedClassArray(Float.TYPE), getCachedClassArray(double.class));
-        verifyMatchingAccessibleConstructor(TestBean.class, getCachedClassArray(Double.class), getCachedClassArray(double.class));
-        verifyMatchingAccessibleConstructor(TestBean.class, getCachedClassArray(Double.TYPE), getCachedClassArray(double.class));
-        verifyMatchingAccessibleConstructor(TestBean.class, new Class<?>[] { SubClass.class, String[].class }, new Class<?>[] { BaseClass.class, String[].class });
+    void testGetMatchingAccessibleMethod() {
+        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, ArrayUtils.EMPTY_CLASS_ARRAY, ArrayUtils.EMPTY_CLASS_ARRAY);
+        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, null, ArrayUtils.EMPTY_CLASS_ARRAY);
+        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(String.class), singletonArray(String.class));
+        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Object.class), singletonArray(Object.class));
+        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Boolean.class), singletonArray(Object.class));
+        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Byte.class), singletonArray(Integer.TYPE));
+        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Byte.TYPE), singletonArray(Integer.TYPE));
+        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Short.class), singletonArray(Integer.TYPE));
+        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Short.TYPE), singletonArray(Integer.TYPE));
+        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Character.class), singletonArray(Integer.TYPE));
+        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Character.TYPE), singletonArray(Integer.TYPE));
+        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Integer.class), singletonArray(Integer.class));
+        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Integer.TYPE), singletonArray(Integer.TYPE));
+        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Long.class), singletonArray(Double.TYPE));
+        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Long.TYPE), singletonArray(Double.TYPE));
+        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Float.class), singletonArray(Double.TYPE));
+        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Float.TYPE), singletonArray(Double.TYPE));
+        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Double.class), singletonArray(Double.TYPE));
+        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Double.TYPE), singletonArray(Double.TYPE));
+        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, new Class<?>[] { SubClass.class, String[].class },
+                new Class<?>[] { BaseClass.class, String[].class });
     }
 
     @Test
@@ -167,11 +204,11 @@ public class ConstructorUtilsTest extends AbstractLangTest {
         assertEquals("(int)", ConstructorUtils.invokeConstructor(TestBean.class, NumberUtils.BYTE_ONE).toString());
         assertEquals("(double)", ConstructorUtils.invokeConstructor(TestBean.class, NumberUtils.LONG_ONE).toString());
         assertEquals("(double)", ConstructorUtils.invokeConstructor(TestBean.class, NumberUtils.DOUBLE_ONE).toString());
-
         ConstructorUtils.invokeConstructor(TestBean.class, NumberUtils.INTEGER_ONE).verify("(Integer)", null);
         ConstructorUtils.invokeConstructor(TestBean.class, "a", "b").verify("(String...)", new String[] { "a", "b" });
         ConstructorUtils.invokeConstructor(TestBean.class, NumberUtils.INTEGER_ONE, "a", "b").verify("(Integer, String...)", new String[] { "a", "b" });
-        ConstructorUtils.invokeConstructor(TestBean.class, new SubClass(), new String[] { "a", "b" }).verify("(BaseClass, String...)", new String[] { "a", "b" });
+        ConstructorUtils.invokeConstructor(TestBean.class, new SubClass(), new String[] { "a", "b" }).verify("(BaseClass, String...)",
+                new String[] { "a", "b" });
     }
 
     @Test
@@ -181,7 +218,8 @@ public class ConstructorUtilsTest extends AbstractLangTest {
         assertEquals("(String)", ConstructorUtils.invokeExactConstructor(TestBean.class, "").toString());
         assertEquals("(Object)", ConstructorUtils.invokeExactConstructor(TestBean.class, new Object()).toString());
         assertEquals("(Integer)", ConstructorUtils.invokeExactConstructor(TestBean.class, NumberUtils.INTEGER_ONE).toString());
-        assertEquals("(double)", ConstructorUtils.invokeExactConstructor(TestBean.class, new Object[] { NumberUtils.DOUBLE_ONE }, new Class[] { Double.TYPE }).toString());
+        assertEquals("(double)",
+                ConstructorUtils.invokeExactConstructor(TestBean.class, new Object[] { NumberUtils.DOUBLE_ONE }, new Class[] { Double.TYPE }).toString());
 
         assertThrows(NoSuchMethodException.class, () -> ConstructorUtils.invokeExactConstructor(TestBean.class, NumberUtils.BYTE_ONE));
         assertThrows(NoSuchMethodException.class, () -> ConstructorUtils.invokeExactConstructor(TestBean.class, NumberUtils.LONG_ONE));
@@ -189,13 +227,19 @@ public class ConstructorUtilsTest extends AbstractLangTest {
     }
 
     @Test
-    void testNullArgumentHandling() {
-        verifyMatchingAccessibleConstructor(MutableObject.class, getCachedClassArray(null), getCachedClassArray(Object.class));
+    void testNullArgument() {
+        expectMatchingAccessibleConstructorParameterTypes(MutableObject.class, singletonArray(null), singletonArray(Object.class));
     }
 
     @Test
     void testVarArgsUnboxing() throws Exception {
         final TestBean testBean = ConstructorUtils.invokeConstructor(TestBean.class, Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3));
+
         assertArrayEquals(new String[] { "2", "3" }, testBean.varArgs);
     }
+
+    private String toString(final Class<?>[] c) {
+        return Arrays.asList(c).toString();
+    }
+
 }
