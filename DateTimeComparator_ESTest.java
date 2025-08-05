@@ -17,180 +17,134 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class DateTimeComparator_ESTest extends DateTimeComparator_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      DateTimeComparator dateTimeComparator0 = DateTimeComparator.getDateOnlyInstance();
-      // Undeclared exception!
-      try { 
-        dateTimeComparator0.compare((Object) null, "DateTimeComparator[dayOfYear-]");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid format: \"DateTimeComparator[dayOfYear-]\"
-         //
-         verifyException("org.joda.time.format.DateTimeParserBucket", e);
-      }
-  }
+    // Tests for comparator instance creation
+    @Test(timeout = 4000)
+    public void test_createComparatorWithLowerAndUpperLimit() {
+        DateTimeFieldType fieldType = DateTimeFieldType.dayOfYear();
+        DateTimeComparator comparator = DateTimeComparator.getInstance(fieldType, fieldType);
+        assertNotNull(comparator);
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfEra();
-      DateTimeComparator dateTimeComparator0 = DateTimeComparator.getInstance(dateTimeFieldType0);
-      DateTimeFieldType dateTimeFieldType1 = dateTimeComparator0.getLowerLimit();
-      assertNotNull(dateTimeFieldType1);
-      assertEquals("yearOfEra", dateTimeFieldType1.toString());
-  }
+    @Test(timeout = 4000)
+    public void test_createComparatorWithNullLimits() {
+        DateTimeComparator comparator = DateTimeComparator.getInstance(null, null);
+        assertNotNull(comparator);
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.dayOfYear();
-      DateTimeComparator dateTimeComparator0 = DateTimeComparator.getInstance(dateTimeFieldType0, (DateTimeFieldType) null);
-      assertNotNull(dateTimeComparator0);
-  }
+    @Test(timeout = 4000)
+    public void test_createComparatorWithLowerLimitOnly() {
+        DateTimeFieldType fieldType = DateTimeFieldType.dayOfYear();
+        DateTimeComparator comparator = DateTimeComparator.getInstance(fieldType, null);
+        assertNotNull(comparator);
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      DateTimeComparator dateTimeComparator0 = DateTimeComparator.getInstance((DateTimeFieldType) null, (DateTimeFieldType) null);
-      assertNotNull(dateTimeComparator0);
-  }
+    @Test(timeout = 4000)
+    public void test_createComparatorWithUpperLimitOnly() {
+        DateTimeFieldType fieldType = DateTimeFieldType.monthOfYear();
+        DateTimeComparator comparator = DateTimeComparator.getInstance(null, fieldType);
+        assertNotNull(comparator);
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      DateTimeComparator dateTimeComparator0 = DateTimeComparator.getTimeOnlyInstance();
-      String string0 = dateTimeComparator0.toString();
-      assertEquals("DateTimeComparator[-dayOfYear]", string0);
-  }
+    // Tests for getLimit methods
+    @Test(timeout = 4000)
+    public void test_getLowerLimitReturnsExpectedField() {
+        DateTimeFieldType fieldType = DateTimeFieldType.yearOfEra();
+        DateTimeComparator comparator = DateTimeComparator.getInstance(fieldType);
+        assertEquals(fieldType, comparator.getLowerLimit());
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.weekyearOfCentury();
-      DateTimeComparator dateTimeComparator0 = DateTimeComparator.getInstance(dateTimeFieldType0, dateTimeFieldType0);
-      String string0 = dateTimeComparator0.toString();
-      assertEquals("DateTimeComparator[weekyearOfCentury]", string0);
-  }
+    @Test(timeout = 4000)
+    public void test_getUpperLimitReturnsNullForSingleFieldComparator() {
+        DateTimeFieldType fieldType = DateTimeFieldType.dayOfYear();
+        DateTimeComparator comparator = DateTimeComparator.getInstance(fieldType);
+        assertNull(comparator.getUpperLimit());
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      DateTimeComparator dateTimeComparator0 = DateTimeComparator.getInstance();
-      String string0 = dateTimeComparator0.toString();
-      assertEquals("DateTimeComparator[]", string0);
-  }
+    @Test(timeout = 4000)
+    public void test_timeOnlyComparatorUpperLimitIsDayOfYear() {
+        DateTimeComparator comparator = DateTimeComparator.getTimeOnlyInstance();
+        assertEquals("dayOfYear", comparator.getUpperLimit().toString());
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      DateTimeComparator dateTimeComparator0 = DateTimeComparator.getInstance();
-      dateTimeComparator0.hashCode();
-  }
+    @Test(timeout = 4000)
+    public void test_timeOnlyComparatorLowerLimitIsNull() {
+        DateTimeComparator comparator = DateTimeComparator.getTimeOnlyInstance();
+        assertNull(comparator.getLowerLimit());
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      DateTimeComparator dateTimeComparator0 = DateTimeComparator.getTimeOnlyInstance();
-      DateTimeComparator dateTimeComparator1 = DateTimeComparator.getInstance();
-      boolean boolean0 = dateTimeComparator1.equals(dateTimeComparator0);
-      assertFalse(boolean0);
-  }
+    // Tests for toString()
+    @Test(timeout = 4000)
+    public void test_toStringTimeOnlyInstance() {
+        assertEquals("DateTimeComparator[-dayOfYear]", 
+            DateTimeComparator.getTimeOnlyInstance().toString());
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      DateTimeComparator dateTimeComparator0 = DateTimeComparator.getTimeOnlyInstance();
-      DateTimeComparator dateTimeComparator1 = DateTimeComparator.getInstance();
-      boolean boolean0 = dateTimeComparator0.equals(dateTimeComparator1);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void test_toStringDateOnlyInstance() {
+        assertEquals("DateTimeComparator[dayOfYear-]", 
+            DateTimeComparator.getDateOnlyInstance().toString());
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      DateTimeComparator dateTimeComparator0 = DateTimeComparator.getInstance();
-      DateTimeComparator dateTimeComparator1 = DateTimeComparator.getDateOnlyInstance();
-      boolean boolean0 = dateTimeComparator0.equals(dateTimeComparator1);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void test_toStringAllFieldsComparator() {
+        assertEquals("DateTimeComparator[]", 
+            DateTimeComparator.getInstance().toString());
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      DateTimeComparator dateTimeComparator0 = DateTimeComparator.getTimeOnlyInstance();
-      boolean boolean0 = dateTimeComparator0.equals(dateTimeComparator0);
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void test_toStringCustomComparator() {
+        DateTimeFieldType fieldType = DateTimeFieldType.weekyearOfCentury();
+        DateTimeComparator comparator = DateTimeComparator.getInstance(fieldType, fieldType);
+        assertEquals("DateTimeComparator[weekyearOfCentury]", comparator.toString());
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      DateTimeComparator dateTimeComparator0 = DateTimeComparator.getTimeOnlyInstance();
-      Object object0 = new Object();
-      boolean boolean0 = dateTimeComparator0.equals(object0);
-      assertFalse(boolean0);
-  }
+    // Tests for equals() and hashCode()
+    @Test(timeout = 4000)
+    public void test_equalsSameInstanceReturnsTrue() {
+        DateTimeComparator comparator = DateTimeComparator.getTimeOnlyInstance();
+        assertTrue(comparator.equals(comparator));
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      DateTimeComparator dateTimeComparator0 = DateTimeComparator.getTimeOnlyInstance();
-      int int0 = dateTimeComparator0.compare((Object) null, (Object) null);
-      assertEquals(0, int0);
-  }
+    @Test(timeout = 4000)
+    public void test_equalsDifferentTypeReturnsFalse() {
+        DateTimeComparator comparator = DateTimeComparator.getTimeOnlyInstance();
+        assertFalse(comparator.equals(new Object()));
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.monthOfYear();
-      DateTimeComparator dateTimeComparator0 = DateTimeComparator.getInstance((DateTimeFieldType) null, dateTimeFieldType0);
-      assertNotNull(dateTimeComparator0);
-  }
+    @Test(timeout = 4000)
+    public void test_equalsDifferentComparatorsReturnFalse() {
+        DateTimeComparator timeComparator = DateTimeComparator.getTimeOnlyInstance();
+        DateTimeComparator dateComparator = DateTimeComparator.getDateOnlyInstance();
+        DateTimeComparator allFieldsComparator = DateTimeComparator.getInstance();
+        
+        assertFalse(timeComparator.equals(dateComparator));
+        assertFalse(timeComparator.equals(allFieldsComparator));
+        assertFalse(dateComparator.equals(allFieldsComparator));
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.dayOfYear();
-      DateTimeComparator dateTimeComparator0 = DateTimeComparator.getInstance(dateTimeFieldType0, dateTimeFieldType0);
-      assertNotNull(dateTimeComparator0);
-  }
+    @Test(timeout = 4000)
+    public void test_hashCodeDoesNotThrowException() {
+        DateTimeComparator.getInstance().hashCode();
+        DateTimeComparator.getDateOnlyInstance().hashCode();
+        
+        DateTimeFieldType fieldType = DateTimeFieldType.dayOfMonth();
+        new DateTimeComparator(fieldType, fieldType).hashCode();
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.dayOfYear();
-      DateTimeComparator dateTimeComparator0 = DateTimeComparator.getInstance((DateTimeFieldType) null, dateTimeFieldType0);
-      assertNotNull(dateTimeComparator0);
-  }
+    // Tests for compare() method
+    @Test(timeout = 4000)
+    public void test_compareTwoNullsReturnsZero() {
+        assertEquals(0, DateTimeComparator.getTimeOnlyInstance().compare(null, null));
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      DateTimeComparator dateTimeComparator0 = DateTimeComparator.getTimeOnlyInstance();
-      DateTimeFieldType dateTimeFieldType0 = dateTimeComparator0.getUpperLimit();
-      assertEquals("dayOfYear", dateTimeFieldType0.toString());
-  }
-
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.dayOfMonth();
-      DateTimeComparator dateTimeComparator0 = new DateTimeComparator(dateTimeFieldType0, dateTimeFieldType0);
-      dateTimeComparator0.hashCode();
-  }
-
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.dayOfYear();
-      DateTimeComparator dateTimeComparator0 = DateTimeComparator.getInstance(dateTimeFieldType0);
-      DateTimeFieldType dateTimeFieldType1 = dateTimeComparator0.getUpperLimit();
-      assertNull(dateTimeFieldType1);
-  }
-
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      DateTimeComparator dateTimeComparator0 = DateTimeComparator.getInstance();
-      DateTimeComparator dateTimeComparator1 = DateTimeComparator.getDateOnlyInstance();
-      boolean boolean0 = dateTimeComparator1.equals(dateTimeComparator0);
-      assertFalse(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      DateTimeComparator dateTimeComparator0 = DateTimeComparator.getDateOnlyInstance();
-      String string0 = dateTimeComparator0.toString();
-      assertEquals("DateTimeComparator[dayOfYear-]", string0);
-  }
-
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      DateTimeComparator dateTimeComparator0 = DateTimeComparator.getTimeOnlyInstance();
-      DateTimeFieldType dateTimeFieldType0 = dateTimeComparator0.getLowerLimit();
-      assertNull(dateTimeFieldType0);
-  }
+    @Test(timeout = 4000)
+    public void test_compareInvalidStringThrowsException() {
+        DateTimeComparator comparator = DateTimeComparator.getDateOnlyInstance();
+        try {
+            comparator.compare(null, "DateTimeComparator[dayOfYear-]");
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            verifyException("org.joda.time.format.DateTimeParserBucket", e);
+        }
+    }
 }
