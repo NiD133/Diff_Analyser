@@ -20,592 +20,260 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class AtomicDoubleArray_ESTest extends AtomicDoubleArray_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(1027);
-      boolean boolean0 = atomicDoubleArray0.compareAndSet(1025, 0.0, 1027);
-      assertEquals(1027, atomicDoubleArray0.length());
-      assertTrue(boolean0);
-  }
+    // Identity operator for reuse in multiple tests
+    private static final DoubleUnaryOperator identityOperator = DoubleUnaryOperator.identity();
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      double[] doubleArray0 = new double[9];
-      doubleArray0[0] = (-1583.803774);
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      boolean boolean0 = atomicDoubleArray0.weakCompareAndSet(0, 0.0, 690.74034879);
-      assertFalse(boolean0);
-  }
+    // Tests for basic operations: constructor, length, get, set
+    @Test(timeout = 4000)
+    public void length_returnsCorrectSize() {
+        AtomicDoubleArray array = new AtomicDoubleArray(1027);
+        assertEquals(1027, array.length());
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      double[] doubleArray0 = new double[12];
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      double double0 = atomicDoubleArray0.getAndAdd(4, 4);
-      assertEquals(0.0, double0, 0.01);
-      
-      DoubleUnaryOperator doubleUnaryOperator0 = DoubleUnaryOperator.identity();
-      double double1 = atomicDoubleArray0.updateAndGet(4, doubleUnaryOperator0);
-      assertEquals(4.0, double1, 0.01);
-  }
+    @Test(timeout = 4000)
+    public void length_emptyArray_returnsZero() {
+        double[] empty = new double[0];
+        AtomicDoubleArray array = new AtomicDoubleArray(empty);
+        assertEquals(0, array.length());
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(993);
-      DoubleUnaryOperator doubleUnaryOperator0 = DoubleUnaryOperator.identity();
-      double double0 = atomicDoubleArray0.getAndAdd(75, (-692.410613387175));
-      assertEquals(0.0, double0, 0.01);
-      
-      double double1 = atomicDoubleArray0.updateAndGet(75, doubleUnaryOperator0);
-      assertEquals(993, atomicDoubleArray0.length());
-      assertEquals((-692.410613387175), double1, 0.01);
-  }
+    @Test(timeout = 4000)
+    public void get_initialValue_returnsZero() {
+        AtomicDoubleArray array = new AtomicDoubleArray(10);
+        assertEquals(0.0, array.get(5), 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      double[] doubleArray0 = new double[0];
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      int int0 = atomicDoubleArray0.length();
-      assertEquals(0, int0);
-  }
+    @Test(timeout = 4000)
+    public void set_updatesValueCorrectly() {
+        double[] initial = new double[8];
+        AtomicDoubleArray array = new AtomicDoubleArray(initial);
+        array.set(2, 2358.26006);
+        assertEquals(2358.26006, array.get(2), 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(1027);
-      atomicDoubleArray0.getAndSet(5, 1027);
-      DoubleUnaryOperator doubleUnaryOperator0 = DoubleUnaryOperator.identity();
-      double double0 = atomicDoubleArray0.getAndUpdate(5, doubleUnaryOperator0);
-      assertEquals(1027.0, double0, 0.01);
-      assertEquals(1027, atomicDoubleArray0.length());
-  }
+    @Test(timeout = 4000)
+    public void lazySet_updatesValue() {
+        double[] initial = new double[8];
+        AtomicDoubleArray array = new AtomicDoubleArray(initial);
+        array.lazySet(0, 0.0);
+        assertEquals(0.0, array.get(0), 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      double[] doubleArray0 = new double[9];
-      doubleArray0[0] = (-1583.803774);
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      DoubleUnaryOperator doubleUnaryOperator0 = DoubleUnaryOperator.identity();
-      double double0 = atomicDoubleArray0.getAndUpdate(0, doubleUnaryOperator0);
-      assertEquals((-1583.803774), double0, 0.01);
-  }
+    // Tests for compare-and-set operations
+    @Test(timeout = 4000)
+    public void compareAndSet_successWhenExpectedValueMatches() {
+        AtomicDoubleArray array = new AtomicDoubleArray(1027);
+        boolean result = array.compareAndSet(1025, 0.0, 1027);
+        assertTrue(result);
+        assertEquals(1027.0, array.get(1025), 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      double[] doubleArray0 = new double[4];
-      doubleArray0[1] = 540.0;
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      double double0 = atomicDoubleArray0.getAndSet(1, 2806.574374631918);
-      assertEquals(540.0, double0, 0.01);
-  }
+    @Test(timeout = 4000)
+    public void compareAndSet_failsWhenExpectedValueDiffers() {
+        double[] initial = { -1583.803774 };
+        AtomicDoubleArray array = new AtomicDoubleArray(initial);
+        boolean result = array.compareAndSet(0, 0.0, 690.74034879);
+        assertFalse(result);
+        assertEquals(-1583.803774, array.get(0), 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      double[] doubleArray0 = new double[9];
-      doubleArray0[0] = (-1583.803774);
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      double double0 = atomicDoubleArray0.getAndSet(0, (-1710.836556));
-      assertEquals((-1583.803774), double0, 0.01);
-  }
+    @Test(timeout = 4000)
+    public void weakCompareAndSet_succeedsWhenValueMatches() {
+        double[] initial = new double[9];
+        AtomicDoubleArray array = new AtomicDoubleArray(initial);
+        boolean result = array.weakCompareAndSet(0, 0.0, -1.0);
+        assertTrue(result);
+        assertEquals(-1.0, array.get(0), 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      double[] doubleArray0 = new double[8];
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      double double0 = atomicDoubleArray0.addAndGet(0, 1775.31884);
-      assertEquals(1775.31884, double0, 0.01);
-      
-      double double1 = atomicDoubleArray0.getAndAdd(0, 0.0);
-      assertEquals(1775.31884, double1, 0.01);
-  }
+    // Tests for getAndSet
+    @Test(timeout = 4000)
+    public void getAndSet_returnsPreviousValue() {
+        double[] initial = { 0, 540.0 };
+        AtomicDoubleArray array = new AtomicDoubleArray(initial);
+        double prev = array.getAndSet(1, 2806.574374631918);
+        assertEquals(540.0, prev, 0.01);
+        assertEquals(2806.574374631918, array.get(1), 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(3813);
-      DoubleBinaryOperator doubleBinaryOperator0 = mock(DoubleBinaryOperator.class, new ViolatedAssumptionAnswer());
-      doReturn((-558.4039384)).when(doubleBinaryOperator0).applyAsDouble(anyDouble() , anyDouble());
-      double double0 = atomicDoubleArray0.getAndAccumulate(1661, 1.0, doubleBinaryOperator0);
-      assertEquals(0.0, double0, 0.01);
-      
-      double double1 = atomicDoubleArray0.getAndAdd(1661, 0.0);
-      assertEquals((-558.4039384), double1, 0.01);
-      assertEquals(3813, atomicDoubleArray0.length());
-  }
+    @Test(timeout = 4000)
+    public void getAndSet_updatesValue() {
+        double[] initial = { -1583.803774 };
+        AtomicDoubleArray array = new AtomicDoubleArray(initial);
+        double prev = array.getAndSet(0, -1710.836556);
+        assertEquals(-1583.803774, prev, 0.01);
+        assertEquals(-1710.836556, array.get(0), 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      double[] doubleArray0 = new double[6];
-      doubleArray0[1] = 354.258;
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      DoubleBinaryOperator doubleBinaryOperator0 = mock(DoubleBinaryOperator.class, new ViolatedAssumptionAnswer());
-      doReturn((-1.0)).when(doubleBinaryOperator0).applyAsDouble(anyDouble() , anyDouble());
-      double double0 = atomicDoubleArray0.getAndAccumulate(1, (-2032.2), doubleBinaryOperator0);
-      assertEquals(354.258, double0, 0.01);
-  }
+    // Tests for addition operations
+    @Test(timeout = 4000)
+    public void getAndAdd_returnsPreviousValueAndUpdates() {
+        double[] initial = new double[12];
+        AtomicDoubleArray array = new AtomicDoubleArray(initial);
+        double prev = array.getAndAdd(4, 4.0);
+        assertEquals(0.0, prev, 0.01);
+        assertEquals(4.0, array.get(4), 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      double[] doubleArray0 = new double[9];
-      doubleArray0[0] = (-1583.803774);
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      DoubleBinaryOperator doubleBinaryOperator0 = mock(DoubleBinaryOperator.class, new ViolatedAssumptionAnswer());
-      doReturn(0.0).when(doubleBinaryOperator0).applyAsDouble(anyDouble() , anyDouble());
-      double double0 = atomicDoubleArray0.getAndAccumulate(0, (-1583.803774), doubleBinaryOperator0);
-      assertEquals((-1583.803774), double0, 0.01);
-  }
+    @Test(timeout = 4000)
+    public void addAndGet_returnsUpdatedValue() {
+        double[] initial = new double[8];
+        AtomicDoubleArray array = new AtomicDoubleArray(initial);
+        double updated = array.addAndGet(0, 1775.31884);
+        assertEquals(1775.31884, updated, 0.01);
+        assertEquals(1775.31884, array.get(0), 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      double[] doubleArray0 = new double[6];
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      DoubleBinaryOperator doubleBinaryOperator0 = mock(DoubleBinaryOperator.class, new ViolatedAssumptionAnswer());
-      doReturn((-1.0)).when(doubleBinaryOperator0).applyAsDouble(anyDouble() , anyDouble());
-      double double0 = atomicDoubleArray0.getAndAccumulate(1, (-2032.2), doubleBinaryOperator0);
-      assertEquals(0.0, double0, 0.01);
-      
-      double double1 = atomicDoubleArray0.get(1);
-      assertEquals((-1.0), double1, 0.01);
-  }
+    @Test(timeout = 4000)
+    public void addAndGet_withNegativeIncrement_updatesCorrectly() {
+        double[] initial = { -970.960157577528 };
+        AtomicDoubleArray array = new AtomicDoubleArray(initial);
+        double updated = array.addAndGet(0, 0.0);
+        assertEquals(-970.960157577528, updated, 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      double[] doubleArray0 = new double[8];
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      double double0 = atomicDoubleArray0.addAndGet(0, 0.0);
-      assertEquals(0.0, double0, 0.01);
-  }
+    // Tests for update operations (getAndUpdate, updateAndGet)
+    @Test(timeout = 4000)
+    public void getAndUpdate_returnsPreviousValue() {
+        double[] initial = { -1583.803774 };
+        AtomicDoubleArray array = new AtomicDoubleArray(initial);
+        double prev = array.getAndUpdate(0, identityOperator);
+        assertEquals(-1583.803774, prev, 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      double[] doubleArray0 = new double[6];
-      doubleArray0[0] = (-970.960157577528);
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      double double0 = atomicDoubleArray0.addAndGet(0, 0.0);
-      assertEquals((-970.960157577528), double0, 0.01);
-  }
+    @Test(timeout = 4000)
+    public void updateAndGet_appliesOperator() {
+        double[] initial = new double[12];
+        AtomicDoubleArray array = new AtomicDoubleArray(initial);
+        array.getAndAdd(4, 4.0); // Set to 4.0
+        double result = array.updateAndGet(4, identityOperator);
+        assertEquals(4.0, result, 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      double[] doubleArray0 = new double[9];
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      DoubleBinaryOperator doubleBinaryOperator0 = mock(DoubleBinaryOperator.class, new ViolatedAssumptionAnswer());
-      doReturn((double)0).when(doubleBinaryOperator0).applyAsDouble(anyDouble() , anyDouble());
-      double double0 = atomicDoubleArray0.accumulateAndGet(0, 1814.345964, doubleBinaryOperator0);
-      assertEquals(0.0, double0, 0.01);
-  }
+    @Test(timeout = 4000)
+    public void updateAndGet_afterAdd_appliesIdentityCorrectly() {
+        AtomicDoubleArray array = new AtomicDoubleArray(993);
+        array.getAndAdd(75, -692.410613387175);
+        double result = array.updateAndGet(75, identityOperator);
+        assertEquals(-692.410613387175, result, 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      double[] doubleArray0 = new double[9];
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      DoubleBinaryOperator doubleBinaryOperator0 = mock(DoubleBinaryOperator.class, new ViolatedAssumptionAnswer());
-      doReturn(1.0).when(doubleBinaryOperator0).applyAsDouble(anyDouble() , anyDouble());
-      double double0 = atomicDoubleArray0.accumulateAndGet(0, 0.0, doubleBinaryOperator0);
-      assertEquals(1.0, double0, 0.01);
-  }
+    // Tests for accumulate operations
+    @Test(timeout = 4000)
+    public void getAndAccumulate_returnsPreviousValue() {
+        double[] initial = { 354.258 };
+        AtomicDoubleArray array = new AtomicDoubleArray(initial);
+        DoubleBinaryOperator mockOperator = mock(DoubleBinaryOperator.class);
+        when(mockOperator.applyAsDouble(anyDouble(), anyDouble())).thenReturn(-1.0);
 
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(3740);
-      DoubleBinaryOperator doubleBinaryOperator0 = mock(DoubleBinaryOperator.class, new ViolatedAssumptionAnswer());
-      doReturn((-1.0)).when(doubleBinaryOperator0).applyAsDouble(anyDouble() , anyDouble());
-      double double0 = atomicDoubleArray0.accumulateAndGet(67, 3740, doubleBinaryOperator0);
-      assertEquals((-1.0), double0, 0.01);
-      assertEquals(3740, atomicDoubleArray0.length());
-  }
+        double prev = array.getAndAccumulate(1, -2032.2, mockOperator);
+        assertEquals(354.258, prev, 0.01);
+        assertEquals(-1.0, array.get(1), 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(93);
-      // Undeclared exception!
-      try { 
-        atomicDoubleArray0.weakCompareAndSet(93, 93, 93);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // index 93
-         //
-         verifyException("java.util.concurrent.atomic.AtomicLongArray", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void accumulateAndGet_appliesOperator() {
+        double[] initial = new double[9];
+        AtomicDoubleArray array = new AtomicDoubleArray(initial);
+        DoubleBinaryOperator mockOperator = mock(DoubleBinaryOperator.class);
+        when(mockOperator.applyAsDouble(anyDouble(), anyDouble())).thenReturn(1.0);
 
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(1109);
-      // Undeclared exception!
-      try { 
-        atomicDoubleArray0.updateAndGet(156, (DoubleUnaryOperator) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.google.common.util.concurrent.AtomicDoubleArray", e);
-      }
-  }
+        double result = array.accumulateAndGet(0, 0.0, mockOperator);
+        assertEquals(1.0, result, 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(2924);
-      DoubleUnaryOperator doubleUnaryOperator0 = DoubleUnaryOperator.identity();
-      // Undeclared exception!
-      try { 
-        atomicDoubleArray0.updateAndGet(2924, doubleUnaryOperator0);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // index 2924
-         //
-         verifyException("java.util.concurrent.atomic.AtomicLongArray", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void accumulateAndGet_withCustomOperator_updatesValue() {
+        AtomicDoubleArray array = new AtomicDoubleArray(3740);
+        DoubleBinaryOperator mockOperator = mock(DoubleBinaryOperator.class);
+        when(mockOperator.applyAsDouble(anyDouble(), anyDouble())).thenReturn(-1.0);
 
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(3813);
-      atomicDoubleArray0.toString();
-      atomicDoubleArray0.toString();
-      // Undeclared exception!
-      atomicDoubleArray0.toString();
-  }
+        double result = array.accumulateAndGet(67, 3740.0, mockOperator);
+        assertEquals(-1.0, result, 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
-      double[] doubleArray0 = new double[1];
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      // Undeclared exception!
-      try { 
-        atomicDoubleArray0.set(1102, 1102);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // index 1102
-         //
-         verifyException("java.util.concurrent.atomic.AtomicLongArray", e);
-      }
-  }
+    // Tests for toString
+    @Test(timeout = 4000)
+    public void toString_emptyArray_returnsEmptyBrackets() {
+        double[] initial = new double[0];
+        AtomicDoubleArray array = new AtomicDoubleArray(initial);
+        assertEquals("[]", array.toString());
+    }
 
-  @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(600);
-      // Undeclared exception!
-      try { 
-        atomicDoubleArray0.lazySet(600, 600);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // index 600
-         //
-         verifyException("java.util.concurrent.atomic.AtomicLongArray", e);
-      }
-  }
+    // Negative tests for exceptions
+    @Test(timeout = 4000, expected = IndexOutOfBoundsException.class)
+    public void weakCompareAndSet_invalidIndex_throwsException() {
+        AtomicDoubleArray array = new AtomicDoubleArray(93);
+        array.weakCompareAndSet(93, 93, 93);
+    }
 
-  @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(19);
-      // Undeclared exception!
-      try { 
-        atomicDoubleArray0.getAndUpdate(4, (DoubleUnaryOperator) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.google.common.util.concurrent.AtomicDoubleArray", e);
-      }
-  }
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void updateAndGet_nullOperator_throwsException() {
+        AtomicDoubleArray array = new AtomicDoubleArray(1109);
+        array.updateAndGet(156, null);
+    }
 
-  @Test(timeout = 4000)
-  public void test26()  throws Throwable  {
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(1027);
-      DoubleUnaryOperator doubleUnaryOperator0 = DoubleUnaryOperator.identity();
-      // Undeclared exception!
-      try { 
-        atomicDoubleArray0.getAndUpdate(1027, doubleUnaryOperator0);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // index 1027
-         //
-         verifyException("java.util.concurrent.atomic.AtomicLongArray", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void getAndSet_invalidIndex_throwsException() {
+        AtomicDoubleArray array = new AtomicDoubleArray(3);
+        try {
+            array.getAndSet(3, 3.0);
+            fail("Expected IndexOutOfBoundsException");
+        } catch (IndexOutOfBoundsException e) {
+            assertTrue(e.getMessage().contains("index 3"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test27()  throws Throwable  {
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(3);
-      // Undeclared exception!
-      try { 
-        atomicDoubleArray0.getAndSet(3, 3);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // index 3
-         //
-         verifyException("java.util.concurrent.atomic.AtomicLongArray", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void getAndAccumulate_nullOperator_throwsException() {
+        AtomicDoubleArray array = new AtomicDoubleArray(3);
+        try {
+            array.getAndAccumulate(3, 3.0, null);
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test28()  throws Throwable  {
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(3);
-      // Undeclared exception!
-      try { 
-        atomicDoubleArray0.getAndAccumulate(3, 3, (DoubleBinaryOperator) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.google.common.base.Preconditions", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void constructor_nullArray_throwsException() {
+        try {
+            new AtomicDoubleArray((double[]) null);
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test29()  throws Throwable  {
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(8);
-      DoubleBinaryOperator doubleBinaryOperator0 = mock(DoubleBinaryOperator.class, new ViolatedAssumptionAnswer());
-      // Undeclared exception!
-      try { 
-        atomicDoubleArray0.getAndAccumulate(8, 8, doubleBinaryOperator0);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // index 8
-         //
-         verifyException("java.util.concurrent.atomic.AtomicLongArray", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void constructor_negativeLength_throwsException() {
+        try {
+            new AtomicDoubleArray(-1);
+            fail("Expected NegativeArraySizeException");
+        } catch (NegativeArraySizeException e) {
+            // Expected
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test30()  throws Throwable  {
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(93);
-      // Undeclared exception!
-      try { 
-        atomicDoubleArray0.get(93);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // index 93
-         //
-         verifyException("java.util.concurrent.atomic.AtomicLongArray", e);
-      }
-  }
+    // Additional edge cases
+    @Test(timeout = 4000)
+    public void addAndGet_thenGet_returnsUpdatedValue() {
+        double[] initial = new double[8];
+        AtomicDoubleArray array = new AtomicDoubleArray(initial);
+        array.addAndGet(0, 1775.31884);
+        double value = array.get(0);
+        assertEquals(1775.31884, value, 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test31()  throws Throwable  {
-      double[] doubleArray0 = new double[0];
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      // Undeclared exception!
-      try { 
-        atomicDoubleArray0.compareAndSet(44, 44, 44);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // index 44
-         //
-         verifyException("java.util.concurrent.atomic.AtomicLongArray", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void getAndAccumulate_afterAdd_returnsCorrectValue() {
+        double[] initial = new double[8];
+        AtomicDoubleArray array = new AtomicDoubleArray(initial);
+        DoubleBinaryOperator mockOperator = mock(DoubleBinaryOperator.class);
+        when(mockOperator.applyAsDouble(anyDouble(), anyDouble())).thenReturn(-1.0);
 
-  @Test(timeout = 4000)
-  public void test32()  throws Throwable  {
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(2363);
-      // Undeclared exception!
-      try { 
-        atomicDoubleArray0.addAndGet(2363, 2363);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // index 2363
-         //
-         verifyException("java.util.concurrent.atomic.AtomicLongArray", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test33()  throws Throwable  {
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(3740);
-      DoubleBinaryOperator doubleBinaryOperator0 = mock(DoubleBinaryOperator.class, new ViolatedAssumptionAnswer());
-      // Undeclared exception!
-      try { 
-        atomicDoubleArray0.accumulateAndGet(3740, 3740, doubleBinaryOperator0);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // index 3740
-         //
-         verifyException("java.util.concurrent.atomic.AtomicLongArray", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test34()  throws Throwable  {
-      AtomicDoubleArray atomicDoubleArray0 = null;
-      try {
-        atomicDoubleArray0 = new AtomicDoubleArray((double[]) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.google.common.util.concurrent.AtomicDoubleArray", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test35()  throws Throwable  {
-      AtomicDoubleArray atomicDoubleArray0 = null;
-      try {
-        atomicDoubleArray0 = new AtomicDoubleArray((-1));
-        fail("Expecting exception: NegativeArraySizeException");
-      
-      } catch(NegativeArraySizeException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.util.concurrent.atomic.AtomicLongArray", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test36()  throws Throwable  {
-      double[] doubleArray0 = new double[12];
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      DoubleUnaryOperator doubleUnaryOperator0 = DoubleUnaryOperator.identity();
-      double double0 = atomicDoubleArray0.updateAndGet(4, doubleUnaryOperator0);
-      assertEquals(0.0, double0, 0.01);
-  }
-
-  @Test(timeout = 4000)
-  public void test37()  throws Throwable  {
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(1027);
-      DoubleUnaryOperator doubleUnaryOperator0 = DoubleUnaryOperator.identity();
-      double double0 = atomicDoubleArray0.getAndUpdate(5, doubleUnaryOperator0);
-      assertEquals(1027, atomicDoubleArray0.length());
-      assertEquals(0.0, double0, 0.01);
-  }
-
-  @Test(timeout = 4000)
-  public void test38()  throws Throwable  {
-      double[] doubleArray0 = new double[2];
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      int int0 = atomicDoubleArray0.length();
-      assertEquals(2, int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test39()  throws Throwable  {
-      double[] doubleArray0 = new double[8];
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      // Undeclared exception!
-      try { 
-        atomicDoubleArray0.accumulateAndGet(1953, 1953, (DoubleBinaryOperator) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.google.common.base.Preconditions", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test40()  throws Throwable  {
-      double[] doubleArray0 = new double[0];
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      String string0 = atomicDoubleArray0.toString();
-      assertEquals("[]", string0);
-  }
-
-  @Test(timeout = 4000)
-  public void test41()  throws Throwable  {
-      double[] doubleArray0 = new double[8];
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      DoubleBinaryOperator doubleBinaryOperator0 = mock(DoubleBinaryOperator.class, new ViolatedAssumptionAnswer());
-      doReturn((-1.0)).when(doubleBinaryOperator0).applyAsDouble(anyDouble() , anyDouble());
-      double double0 = atomicDoubleArray0.getAndAccumulate(0, 1303.997034846174, doubleBinaryOperator0);
-      assertEquals(0.0, double0, 0.01);
-      
-      boolean boolean0 = atomicDoubleArray0.compareAndSet(0, 0.0, 0.0);
-      assertFalse(boolean0);
-      assertEquals(8, atomicDoubleArray0.length());
-  }
-
-  @Test(timeout = 4000)
-  public void test42()  throws Throwable  {
-      double[] doubleArray0 = new double[8];
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      atomicDoubleArray0.lazySet(0, 0.0);
-      assertEquals(8, atomicDoubleArray0.length());
-  }
-
-  @Test(timeout = 4000)
-  public void test43()  throws Throwable  {
-      double[] doubleArray0 = new double[6];
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      atomicDoubleArray0.get(1);
-      assertEquals(6, atomicDoubleArray0.length());
-  }
-
-  @Test(timeout = 4000)
-  public void test44()  throws Throwable  {
-      double[] doubleArray0 = new double[8];
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      atomicDoubleArray0.set(2, 2358.26006);
-      assertEquals(8, atomicDoubleArray0.length());
-  }
-
-  @Test(timeout = 4000)
-  public void test45()  throws Throwable  {
-      double[] doubleArray0 = new double[9];
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      // Undeclared exception!
-      try { 
-        atomicDoubleArray0.getAndAdd((-200), (-198.0));
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // index -200
-         //
-         verifyException("java.util.concurrent.atomic.AtomicLongArray", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test46()  throws Throwable  {
-      double[] doubleArray0 = new double[8];
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      double double0 = atomicDoubleArray0.addAndGet(0, 1775.31884);
-      assertEquals(1775.31884, double0, 0.01);
-      
-      double double1 = atomicDoubleArray0.get(0);
-      assertEquals(8, atomicDoubleArray0.length());
-      assertEquals(1775.31884, double1, 0.01);
-  }
-
-  @Test(timeout = 4000)
-  public void test47()  throws Throwable  {
-      double[] doubleArray0 = new double[9];
-      AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-      boolean boolean0 = atomicDoubleArray0.weakCompareAndSet(0, 0, (-1.0));
-      assertEquals(9, atomicDoubleArray0.length());
-      assertTrue(boolean0);
-  }
+        array.getAndAccumulate(0, 1303.997034846174, mockOperator);
+        boolean result = array.compareAndSet(0, 0.0, 0.0); // Should fail because value is now -1.0
+        assertFalse(result);
+    }
 }
