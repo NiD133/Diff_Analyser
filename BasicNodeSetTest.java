@@ -21,83 +21,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Element;
 
 /**
- * Test BasicNodeSet
+ * Tests for the {@link BasicNodeSet} class, verifying its behavior as a
+ * collection of JXPath {@link Pointer} objects.
  */
+@DisplayName("BasicNodeSet")
 class BasicNodeSetTest extends AbstractJXPathTest {
 
-    /** JXPathContext */
-    protected JXPathContext context;
-    /** BasicNodeSet */
-    protected BasicNodeSet nodeSet;
-
-    /**
-     * Add the pointers for the specified path to {@code nodeSet}.
-     *
-     * @param xpath
-     */
-    protected void addPointers(final String xpath) {
-        for (final Iterator<Pointer> iter = context.iteratePointers(xpath); iter.hasNext();) {
-            nodeSet.add(iter.next());
-        }
-        nudge();
-    }
-
-    /**
-     * Do assertions on DOM element names.
-     *
-     * @param names    List of expected names
-     * @param elements List of DOM elements
-     */
-    protected void assertElementNames(final List names, final List elements) {
-        assertEquals(names.size(), elements.size());
-        final Iterator nameIter = names.iterator();
-        final Iterator elementIter = elements.iterator();
-        while (elementIter.hasNext()) {
-            assertEquals(nameIter.next(), ((Element) elementIter.next()).getTagName());
-        }
-    }
-
-    /**
-     * Do assertions on DOM element values.
-     *
-     * @param values   List of expected values
-     * @param elements List of DOM elements
-     */
-    protected void assertElementValues(final List values, final List elements) {
-        assertEquals(values.size(), elements.size());
-        final Iterator valueIter = values.iterator();
-        final Iterator elementIter = elements.iterator();
-        while (elementIter.hasNext()) {
-            assertEquals(valueIter.next(), ((Element) elementIter.next()).getFirstChild().getNodeValue());
-        }
-    }
-
-    /**
-     * "Nudge" the nodeSet.
-     */
-    protected void nudge() {
-        nodeSet.getPointers();
-        nodeSet.getValues();
-        nodeSet.getNodes();
-    }
-
-    /**
-     * Remove the pointers for the specified path from {@code nodeSet}.
-     *
-     * @param xpath
-     */
-    protected void removePointers(final String xpath) {
-        for (final Iterator<Pointer> iter = context.iteratePointers(xpath); iter.hasNext();) {
-            nodeSet.remove(iter.next());
-        }
-        nudge();
-    }
+    private JXPathContext context;
+    private BasicNodeSet nodeSet;
 
     @Override
     @BeforeEach
@@ -108,40 +47,162 @@ class BasicNodeSetTest extends AbstractJXPathTest {
     }
 
     /**
-     * Test adding pointers.
+     * Tests that adding pointers correctly updates the node set's internal state,
+     * including the derived lists of nodes and values.
      */
     @Test
-    void testAdd() {
-        addPointers("/bean/integers");
-        assertEquals(list("/bean/integers[1]", "/bean/integers[2]", "/bean/integers[3]", "/bean/integers[4]").toString(), nodeSet.getPointers().toString());
-        assertEquals(list(Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3), Integer.valueOf(4)), nodeSet.getValues());
-        assertEquals(list(Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3), Integer.valueOf(4)), nodeSet.getNodes());
+    void testAddPointersUpdatesStateCorrectly() {
+        // Arrange
+        final String xpath = "/bean/integers";
+        final List<String> expectedPointerStrings = List.of(
+                "/bean/integers[1]",
+                "/bean/integers[2]",
+                "/bean/integers[3]",
+                "/bean/integers[4]"
+        );
+        final List<Integer> expectedValues = List.of(1, 2, 3, 4);
+
+        // Act
+        addPointers(xpath);
+
+        // Assert
+        final List<String> actualPointerStrings = nodeSet.getPointers().stream()
+                .map(Object::toString)
+                .collect(Collectors.toList());
+
+        assertEquals(expectedPointerStrings, actualPointerStrings);
+        assertEquals(expectedValues, nodeSet.getValues());
+        assertEquals(expectedValues, nodeSet.getNodes());
     }
 
     /**
-     * Demonstrate when nodes != values: in XML models.
+     * Tests that removing a pointer correctly updates the node set's internal state.
      */
     @Test
-    void testNodes() {
-        addPointers("/document/vendor/contact");
-        assertEquals(
-                list("/document/vendor[1]/contact[1]", "/document/vendor[1]/contact[2]", "/document/vendor[1]/contact[3]", "/document/vendor[1]/contact[4]")
-                        .toString(),
-                nodeSet.getPointers().toString());
-        assertEquals(list("John", "Jack", "Jim", "Jack Black"), nodeSet.getValues());
-        assertElementNames(list("contact", "contact", "contact", "contact"), nodeSet.getNodes());
-        assertElementValues(list("John", "Jack", "Jim", "Jack Black"), nodeSet.getNodes());
+    void testRemovePointerUpdatesStateCorrectly() {
+        // Arrange
+        addPointers("/bean/integers"); // Add all integers first
+        final String xpathToRemove = "/bean/integers[4]";
+        final List<String> expectedPointerStrings = List.of(
+                "/bean/integers[1]",
+                "/bean/integers[2]",
+                "/bean/integers[3]"
+        );
+        final List<Integer> expectedValues = List.of(1, 2, 3);
+
+        // Act
+        removePointers(xpathToRemove);
+
+        // Assert
+        final List<String> actualPointerStrings = nodeSet.getPointers().stream()
+                .map(Object::toString)
+                .collect(Collectors.toList());
+
+        assertEquals(expectedPointerStrings, actualPointerStrings);
+        assertEquals(expectedValues, nodeSet.getValues());
+        assertEquals(expectedValues, nodeSet.getNodes());
     }
 
     /**
-     * Test removing a pointer.
+     * Verifies that for XML documents, getNodes() returns DOM Elements,
+     * while getValues() returns their text content. This demonstrates a key
+     * distinction in how BasicNodeSet handles different data models.
      */
     @Test
-    void testRemove() {
-        addPointers("/bean/integers");
-        removePointers("/bean/integers[4]");
-        assertEquals(list("/bean/integers[1]", "/bean/integers[2]", "/bean/integers[3]").toString(), nodeSet.getPointers().toString());
-        assertEquals(list(Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3)), nodeSet.getValues());
-        assertEquals(list(Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3)), nodeSet.getNodes());
+    @SuppressWarnings("unchecked")
+    void testGetNodesForXmlReturnsElementsAndGetValuesReturnsTextContent() {
+        // Arrange
+        final String xpath = "/document/vendor/contact";
+        addPointers(xpath);
+
+        final List<String> expectedPointerStrings = List.of(
+                "/document/vendor[1]/contact[1]",
+                "/document/vendor[1]/contact[2]",
+                "/document/vendor[1]/contact[3]",
+                "/document/vendor[1]/contact[4]"
+        );
+        final List<String> expectedValues = List.of("John", "Jack", "Jim", "Jack Black");
+        final List<String> expectedElementNames = List.of("contact", "contact", "contact", "contact");
+
+        // Act
+        // The SUT's getNodes() returns a raw List, requiring a cast.
+        final List<Element> actualNodes = (List<Element>) nodeSet.getNodes();
+        final List<String> actualPointerStrings = nodeSet.getPointers().stream()
+                .map(Object::toString)
+                .collect(Collectors.toList());
+
+        // Assert
+        assertEquals(expectedPointerStrings, actualPointerStrings, "Pointers should match");
+        assertEquals(expectedValues, nodeSet.getValues(), "Values should be the text content of elements");
+        assertElementTagNames(expectedElementNames, actualNodes);
+        assertElementTextContent(expectedValues, actualNodes);
+    }
+
+    // -----------------------------------------------------------------------
+    // Helper Methods
+    // -----------------------------------------------------------------------
+
+    /**
+     * Finds all pointers matching the given XPath and adds them to the node set.
+     *
+     * @param xpath The XPath expression to evaluate.
+     */
+    private void addPointers(final String xpath) {
+        for (final Iterator<Pointer> iter = context.iteratePointers(xpath); iter.hasNext();) {
+            nodeSet.add(iter.next());
+        }
+        // After modification, force the internal caches to be re-evaluated.
+        updateInternalCaches();
+    }
+
+    /**
+     * Finds all pointers matching the given XPath and removes them from the node set.
+     *
+     * @param xpath The XPath expression to evaluate.
+     */
+    private void removePointers(final String xpath) {
+        for (final Iterator<Pointer> iter = context.iteratePointers(xpath); iter.hasNext();) {
+            nodeSet.remove(iter.next());
+        }
+        // After modification, force the internal caches to be re-evaluated.
+        updateInternalCaches();
+    }
+
+    /**
+     * Forces the re-computation of the lazily-initialized caches within the
+     * BasicNodeSet. This is necessary after adding or removing pointers to
+     * ensure that subsequent calls to getPointers(), getValues(), and getNodes()
+     * reflect the changes.
+     */
+    private void updateInternalCaches() {
+        nodeSet.getPointers();
+        nodeSet.getValues();
+        nodeSet.getNodes();
+    }
+
+    /**
+     * Asserts that a list of DOM elements has the expected tag names.
+     *
+     * @param expectedTagNames The list of expected tag names.
+     * @param actualElements   The list of DOM {@link Element}s to check.
+     */
+    private void assertElementTagNames(final List<String> expectedTagNames, final List<Element> actualElements) {
+        final List<String> actualTagNames = actualElements.stream()
+                .map(Element::getTagName)
+                .collect(Collectors.toList());
+        assertEquals(expectedTagNames, actualTagNames, "Element tag names should match");
+    }
+
+    /**
+     * Asserts that a list of DOM elements has the expected text content.
+     *
+     * @param expectedText   The list of expected text values.
+     * @param actualElements The list of DOM {@link Element}s to check.
+     */
+    private void assertElementTextContent(final List<String> expectedText, final List<Element> actualElements) {
+        final List<String> actualText = actualElements.stream()
+                .map(element -> element.getFirstChild().getNodeValue())
+                .collect(Collectors.toList());
+        assertEquals(expectedText, actualText, "Element text content should match");
     }
 }
