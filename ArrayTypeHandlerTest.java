@@ -1,3 +1,18 @@
+/*
+ *    Copyright 2009-2024 the original author or authors.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package org.apache.ibatis.type;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,125 +33,91 @@ import org.mockito.Mock;
 
 class ArrayTypeHandlerTest extends BaseTypeHandlerTest {
 
-  private static final TypeHandler<Object> ARRAY_TYPE_HANDLER = new ArrayTypeHandler();
+  private static final TypeHandler<Object> TYPE_HANDLER = new ArrayTypeHandler();
 
   @Mock
-  private Array mockArray;
+  Array mockArray;
 
-  /**
-   * Test setting a non-null array parameter in a PreparedStatement.
-   */
   @Override
   @Test
-  public void testSetNonNullArrayParameter() throws Exception {
-    ARRAY_TYPE_HANDLER.setParameter(ps, 1, mockArray, null);
+  public void shouldSetParameter() throws Exception {
+    TYPE_HANDLER.setParameter(ps, 1, mockArray, null);
     verify(ps).setArray(1, mockArray);
   }
 
-  /**
-   * Test setting a String array parameter in a PreparedStatement.
-   */
   @Test
-  void testSetStringArrayParameter() throws Exception {
-    Connection mockConnection = mock(Connection.class);
-    when(ps.getConnection()).thenReturn(mockConnection);
+  void shouldSetStringArrayParameter() throws Exception {
+    Connection connection = mock(Connection.class);
+    when(ps.getConnection()).thenReturn(connection);
 
-    Array mockArray = mock(Array.class);
-    when(mockConnection.createArrayOf(anyString(), any(String[].class))).thenReturn(mockArray);
+    Array array = mock(Array.class);
+    when(connection.createArrayOf(anyString(), any(String[].class))).thenReturn(array);
 
-    ARRAY_TYPE_HANDLER.setParameter(ps, 1, new String[] { "Hello World" }, JdbcType.ARRAY);
-    verify(ps).setArray(1, mockArray);
-    verify(mockArray).free();
+    TYPE_HANDLER.setParameter(ps, 1, new String[] { "Hello World" }, JdbcType.ARRAY);
+    verify(ps).setArray(1, array);
+    verify(array).free();
   }
 
-  /**
-   * Test setting a null array parameter in a PreparedStatement.
-   */
   @Test
-  void testSetNullArrayParameter() throws Exception {
-    ARRAY_TYPE_HANDLER.setParameter(ps, 1, null, JdbcType.ARRAY);
+  void shouldSetNullParameter() throws Exception {
+    TYPE_HANDLER.setParameter(ps, 1, null, JdbcType.ARRAY);
     verify(ps).setNull(1, Types.ARRAY);
   }
 
-  /**
-   * Test setting a non-array parameter throws a TypeException.
-   */
   @Test
-  void testSetNonArrayParameterThrowsException() {
-    assertThrows(TypeException.class, () -> 
-      ARRAY_TYPE_HANDLER.setParameter(ps, 1, "unsupported parameter type", null)
-    );
+  void shouldFailForNonArrayParameter() {
+    assertThrows(TypeException.class, () -> TYPE_HANDLER.setParameter(ps, 1, "unsupported parameter type", null));
   }
 
-  /**
-   * Test getting a result from a ResultSet by column name.
-   */
   @Override
   @Test
-  public void testGetResultFromResultSetByName() throws Exception {
+  public void shouldGetResultFromResultSetByName() throws Exception {
     when(rs.getArray("column")).thenReturn(mockArray);
-    String[] expectedArray = { "a", "b" };
-    when(mockArray.getArray()).thenReturn(expectedArray);
-
-    assertEquals(expectedArray, ARRAY_TYPE_HANDLER.getResult(rs, "column"));
+    String[] stringArray = { "a", "b" };
+    when(mockArray.getArray()).thenReturn(stringArray);
+    assertEquals(stringArray, TYPE_HANDLER.getResult(rs, "column"));
     verify(mockArray).free();
   }
 
-  /**
-   * Test getting a null result from a ResultSet by column name.
-   */
   @Override
   @Test
-  public void testGetNullResultFromResultSetByName() throws Exception {
+  public void shouldGetResultNullFromResultSetByName() throws Exception {
     when(rs.getArray("column")).thenReturn(null);
-    assertNull(ARRAY_TYPE_HANDLER.getResult(rs, "column"));
+    assertNull(TYPE_HANDLER.getResult(rs, "column"));
   }
 
-  /**
-   * Test getting a result from a ResultSet by column index.
-   */
   @Override
   @Test
-  public void testGetResultFromResultSetByPosition() throws Exception {
+  public void shouldGetResultFromResultSetByPosition() throws Exception {
     when(rs.getArray(1)).thenReturn(mockArray);
-    String[] expectedArray = { "a", "b" };
-    when(mockArray.getArray()).thenReturn(expectedArray);
-
-    assertEquals(expectedArray, ARRAY_TYPE_HANDLER.getResult(rs, 1));
+    String[] stringArray = { "a", "b" };
+    when(mockArray.getArray()).thenReturn(stringArray);
+    assertEquals(stringArray, TYPE_HANDLER.getResult(rs, 1));
     verify(mockArray).free();
   }
 
-  /**
-   * Test getting a null result from a ResultSet by column index.
-   */
   @Override
   @Test
-  public void testGetNullResultFromResultSetByPosition() throws Exception {
+  public void shouldGetResultNullFromResultSetByPosition() throws Exception {
     when(rs.getArray(1)).thenReturn(null);
-    assertNull(ARRAY_TYPE_HANDLER.getResult(rs, 1));
+    assertNull(TYPE_HANDLER.getResult(rs, 1));
   }
 
-  /**
-   * Test getting a result from a CallableStatement by column index.
-   */
   @Override
   @Test
-  public void testGetResultFromCallableStatement() throws Exception {
+  public void shouldGetResultFromCallableStatement() throws Exception {
     when(cs.getArray(1)).thenReturn(mockArray);
-    String[] expectedArray = { "a", "b" };
-    when(mockArray.getArray()).thenReturn(expectedArray);
-
-    assertEquals(expectedArray, ARRAY_TYPE_HANDLER.getResult(cs, 1));
+    String[] stringArray = { "a", "b" };
+    when(mockArray.getArray()).thenReturn(stringArray);
+    assertEquals(stringArray, TYPE_HANDLER.getResult(cs, 1));
     verify(mockArray).free();
   }
 
-  /**
-   * Test getting a null result from a CallableStatement by column index.
-   */
   @Override
   @Test
-  public void testGetNullResultFromCallableStatement() throws Exception {
+  public void shouldGetResultNullFromCallableStatement() throws Exception {
     when(cs.getArray(1)).thenReturn(null);
-    assertNull(ARRAY_TYPE_HANDLER.getResult(cs, 1));
+    assertNull(TYPE_HANDLER.getResult(cs, 1));
   }
+
 }
