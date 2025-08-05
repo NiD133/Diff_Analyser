@@ -37,97 +37,69 @@ import org.jspecify.annotations.NullUnmarked;
 @NullUnmarked
 public final class ListeningExecutorServiceTest extends TestCase {
 
-  // Test constants for timeout durations
-  private static final Duration TIMEOUT_DURATION_INVOKE_ANY = Duration.ofSeconds(7);
-  private static final Duration TIMEOUT_DURATION_INVOKE_ALL = Duration.ofDays(365);
-  private static final Duration TIMEOUT_DURATION_AWAIT_TERMINATION = Duration.ofMinutes(144);
-
   private Collection<? extends Callable<?>> recordedTasks;
   private long recordedTimeout;
   private TimeUnit recordedTimeUnit;
 
-  private ListeningExecutorService executorService;
+  private final ListeningExecutorService executorService = new FakeExecutorService();
 
-  @Override
-  protected void setUp() {
-    executorService = new FakeExecutorService();
-  }
-
-  /**
-   * Tests that {@link ListeningExecutorService#invokeAny(Collection, Duration)}
-   * correctly handles timeout conversion and task execution.
-   */
-  public void testInvokeAnyWithDurationTimeout() throws Exception {
+  public void testInvokeAny() throws Exception {
     Set<Callable<String>> tasks = Collections.singleton(() -> "invokeAny");
 
-    String result = executorService.invokeAny(tasks, TIMEOUT_DURATION_INVOKE_ANY);
+    String result = executorService.invokeAny(tasks, Duration.ofSeconds(7));
 
     assertThat(result).isEqualTo("invokeAny");
-    assertRecordedTasks(tasks);
-    assertRecordedTimeout(TIMEOUT_DURATION_INVOKE_ANY);
+    assertThat(recordedTasks).isSameInstanceAs(tasks);
+    assertThat(recordedTimeUnit).isEqualTo(NANOSECONDS);
+    assertThat(Duration.ofNanos(recordedTimeout)).isEqualTo(Duration.ofSeconds(7));
   }
 
-  /**
-   * Tests that {@link ListeningExecutorService#invokeAll(Collection, Duration)}
-   * correctly handles timeout conversion and returns completed futures.
-   */
-  public void testInvokeAllWithDurationTimeout() throws Exception {
+  public void testInvokeAll() throws Exception {
     Set<Callable<String>> tasks = Collections.singleton(() -> "invokeAll");
 
-    List<Future<String>> result = executorService.invokeAll(tasks, TIMEOUT_DURATION_INVOKE_ALL);
+    List<Future<String>> result = executorService.invokeAll(tasks, Duration.ofDays(365));
 
     assertThat(result).hasSize(1);
     assertThat(Futures.getDone(result.get(0))).isEqualTo("invokeAll");
-    assertRecordedTasks(tasks);
-    assertRecordedTimeout(TIMEOUT_DURATION_INVOKE_ALL);
+    assertThat(recordedTasks).isSameInstanceAs(tasks);
+    assertThat(recordedTimeUnit).isEqualTo(NANOSECONDS);
+    assertThat(Duration.ofNanos(recordedTimeout)).isEqualTo(Duration.ofDays(365));
   }
 
-  /**
-   * Tests that {@link ListeningExecutorService#awaitTermination(Duration)}
-   * correctly converts the timeout duration.
-   */
-  public void testAwaitTerminationWithDurationTimeout() throws Exception {
-    boolean result = executorService.awaitTermination(TIMEOUT_DURATION_AWAIT_TERMINATION);
+  public void testAwaitTermination() throws Exception {
+    boolean result = executorService.awaitTermination(Duration.ofMinutes(144));
 
     assertThat(result).isTrue();
-    assertRecordedTimeout(TIMEOUT_DURATION_AWAIT_TERMINATION);
-  }
-
-  // Helper assertion methods
-  private void assertRecordedTasks(Collection<? extends Callable<?>> expectedTasks) {
-    assertThat(recordedTasks).isSameInstanceAs(expectedTasks);
-  }
-
-  private void assertRecordedTimeout(Duration expectedDuration) {
     assertThat(recordedTimeUnit).isEqualTo(NANOSECONDS);
-    assertThat(recordedTimeout).isEqualTo(expectedDuration.toNanos());
+    assertThat(Duration.ofNanos(recordedTimeout)).isEqualTo(Duration.ofMinutes(144));
   }
 
-  /**
-   * Fake executor service that records parameters and returns results for testing.
-   * 
-   * <p>This implementation captures:
-   * <ul>
-   *   <li>The tasks collection passed to invokeAny/invokeAll</li>
-   *   <li>The timeout parameters passed to methods</li>
-   * </ul>
-   * 
-   * <p>It returns successful futures with the task results for testing purposes.
-   */
   private class FakeExecutorService extends AbstractListeningExecutorService {
     @Override
     public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
         throws InterruptedException, ExecutionException, TimeoutException {
-      recordParameters(tasks, timeout, unit);
-      return executeSingleTask(tasks);
+      recordedTasks = tasks;
+      recordedTimeout = timeout;
+      recordedTimeUnit = unit;
+      try {
+        return tasks.iterator().next().call();
+      } catch (Exception e) {
+        throw new ExecutionException(e);
+      }
     }
 
     @Override
     public <T> List<Future<T>> invokeAll(
         Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
         throws InterruptedException {
-      recordParameters(tasks, timeout, unit);
-      return createFutureListForSingleTask(tasks);
+      recordedTasks = tasks;
+      recordedTimeout = timeout;
+      recordedTimeUnit = unit;
+      try {
+        return Collections.singletonList(immediateFuture(tasks.iterator().next().call()));
+      } catch (Exception e) {
+        return Collections.singletonList(immediateFailedFuture(e));
+      }
     }
 
     @Override
@@ -137,30 +109,6 @@ public final class ListeningExecutorServiceTest extends TestCase {
       return true;
     }
 
-    // Helper methods for FakeExecutorService
-    private void recordParameters(Collection<? extends Callable<?>> tasks, long timeout, TimeUnit unit) {
-      recordedTasks = tasks;
-      recordedTimeout = timeout;
-      recordedTimeUnit = unit;
-    }
-
-    private <T> T executeSingleTask(Collection<? extends Callable<T>> tasks) throws ExecutionException {
-      try {
-        return tasks.iterator().next().call();
-      } catch (Exception e) {
-        throw new ExecutionException(e);
-      }
-    }
-
-    private <T> List<Future<T>> createFutureListForSingleTask(Collection<? extends Callable<T>> tasks) {
-      try {
-        return Collections.singletonList(immediateFuture(tasks.iterator().next().call()));
-      } catch (Exception e) {
-        return Collections.singletonList(immediateFailedFuture(e));
-      }
-    }
-
-    // Unimplemented methods
     @Override
     public void execute(Runnable runnable) {
       throw new UnsupportedOperationException();
