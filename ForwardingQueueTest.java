@@ -36,16 +36,23 @@ import org.jspecify.annotations.Nullable;
 /**
  * Tests for {@code ForwardingQueue}.
  *
+ * <p>This test suite verifies that ForwardingQueue properly delegates method calls
+ * and that the standard implementations work correctly.
+ *
  * @author Robert Konigsberg
  * @author Louis Wasserman
  */
 @NullUnmarked
 public class ForwardingQueueTest extends TestCase {
 
-  static final class StandardImplForwardingQueue<T> extends ForwardingQueue<T> {
+  /**
+   * A test implementation of ForwardingQueue that uses all the standard method implementations.
+   * This helps verify that the standard implementations provided by ForwardingQueue work correctly.
+   */
+  static final class QueueWithStandardImplementations<T> extends ForwardingQueue<T> {
     private final Queue<T> backingQueue;
 
-    StandardImplForwardingQueue(Queue<T> backingQueue) {
+    QueueWithStandardImplementations(Queue<T> backingQueue) {
       this.backingQueue = backingQueue;
     }
 
@@ -54,6 +61,7 @@ public class ForwardingQueueTest extends TestCase {
       return backingQueue;
     }
 
+    // Collection methods using standard implementations
     @Override
     public boolean addAll(Collection<? extends T> collection) {
       return standardAddAll(collection);
@@ -104,9 +112,10 @@ public class ForwardingQueueTest extends TestCase {
       return standardToString();
     }
 
+    // Queue methods using standard implementations
     @Override
-    public boolean offer(T o) {
-      return standardOffer(o);
+    public boolean offer(T element) {
+      return standardOffer(element);
     }
 
     @Override
@@ -124,40 +133,66 @@ public class ForwardingQueueTest extends TestCase {
   public static Test suite() {
     TestSuite suite = new TestSuite();
 
+    // Add unit tests from this class
     suite.addTestSuite(ForwardingQueueTest.class);
-    suite.addTest(
-        QueueTestSuiteBuilder.using(
-                new TestStringQueueGenerator() {
-
-                  @Override
-                  protected Queue<String> create(String[] elements) {
-                    return new StandardImplForwardingQueue<>(new LinkedList<>(asList(elements)));
-                  }
-                })
-            .named("ForwardingQueue[LinkedList] with standard implementations")
-            .withFeatures(
-                CollectionSize.ANY,
-                CollectionFeature.ALLOWS_NULL_VALUES,
-                CollectionFeature.GENERAL_PURPOSE)
-            .createTestSuite());
+    
+    // Add comprehensive Queue contract tests using a ForwardingQueue with standard implementations
+    suite.addTest(createStandardImplementationTests());
 
     return suite;
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
-  public void testForwarding() {
-    new ForwardingWrapperTester()
-        .testForwarding(
-            Queue.class,
-            new Function<Queue, Queue>() {
-              @Override
-              public Queue apply(Queue delegate) {
-                return wrap(delegate);
-              }
-            });
+  /**
+   * Creates a comprehensive test suite that verifies ForwardingQueue with standard implementations
+   * behaves correctly as a Queue by testing it against the full Queue contract.
+   */
+  private static Test createStandardImplementationTests() {
+    return QueueTestSuiteBuilder.using(new StringQueueGeneratorWithStandardImplementations())
+        .named("ForwardingQueue[LinkedList] with standard implementations")
+        .withFeatures(
+            CollectionSize.ANY,
+            CollectionFeature.ALLOWS_NULL_VALUES,
+            CollectionFeature.GENERAL_PURPOSE)
+        .createTestSuite();
   }
 
-  private static <T> Queue<T> wrap(Queue<T> delegate) {
+  /**
+   * Generator that creates ForwardingQueue instances with standard implementations
+   * backed by LinkedList for testing purposes.
+   */
+  private static class StringQueueGeneratorWithStandardImplementations extends TestStringQueueGenerator {
+    @Override
+    protected Queue<String> create(String[] elements) {
+      Queue<String> backingQueue = new LinkedList<>(asList(elements));
+      return new QueueWithStandardImplementations<>(backingQueue);
+    }
+  }
+
+  /**
+   * Tests that ForwardingQueue properly forwards all method calls to its delegate.
+   * This uses ForwardingWrapperTester to verify that every Queue method is correctly forwarded.
+   */
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  public void testMethodForwardingBehavior() {
+    new ForwardingWrapperTester()
+        .testForwarding(Queue.class, new QueueWrapperFunction());
+  }
+
+  /**
+   * Function that wraps a Queue in a basic ForwardingQueue for forwarding tests.
+   */
+  private static class QueueWrapperFunction implements Function<Queue, Queue> {
+    @Override
+    public Queue apply(Queue delegate) {
+      return createBasicForwardingQueue(delegate);
+    }
+  }
+
+  /**
+   * Creates a basic ForwardingQueue that simply forwards all calls to the delegate
+   * without using any standard implementations.
+   */
+  private static <T> Queue<T> createBasicForwardingQueue(Queue<T> delegate) {
     return new ForwardingQueue<T>() {
       @Override
       protected Queue<T> delegate() {
