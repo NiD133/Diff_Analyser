@@ -19,60 +19,66 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.joda.time.DateTimeZone;
-import static org.junit.Assert.*;
 
-public class TestCachedDateTimeZone {
+/**
+ * Test cases for FixedDateTimeZone.
+ *
+ * @author Stephen Colebourne
+ */
+public class TestCachedDateTimeZone extends TestCase {
 
-    private DateTimeZone originalDateTimeZone;
+    public static void main(String[] args) {
+        junit.textui.TestRunner.run(suite());
+    }
 
-    @Before
-    public void setUp() {
-        // Save original time zone to restore later
+    public static TestSuite suite() {
+        return new TestSuite(TestCachedDateTimeZone.class);
+    }
+
+    private DateTimeZone originalDateTimeZone = null;
+
+    public TestCachedDateTimeZone(String name) {
+        super(name);
+    }
+
+    @Override
+    protected void setUp() throws Exception {
         originalDateTimeZone = DateTimeZone.getDefault();
-        // Set UTC as default for consistent test environment
         DateTimeZone.setDefault(DateTimeZone.UTC);
     }
 
-    @After
-    public void tearDown() {
-        // Restore original default time zone
+    @Override
+    protected void tearDown() throws Exception {
         DateTimeZone.setDefault(originalDateTimeZone);
     }
 
-    @Test
-    public void forZone_returnsSameInstanceForSameZone() {
-        // Verify caching behavior: requesting same zone returns cached instance
+    public void test_caching() throws Exception {
         CachedDateTimeZone zone1 = CachedDateTimeZone.forZone(DateTimeZone.forID("Europe/Paris"));
         CachedDateTimeZone zone2 = CachedDateTimeZone.forZone(DateTimeZone.forID("Europe/Paris"));
-        
-        assertSame("Subsequent requests for same zone should return cached instance", zone1, zone2);
+        assertSame(zone1, zone2);
     }
 
-    @Test
-    public void serialization_deserialization_producesEqualInstance() throws Exception {
-        // Setup: Create zone instance to serialize
-        CachedDateTimeZone originalZone = CachedDateTimeZone.forZone(DateTimeZone.forID("Europe/Paris"));
+    //-----------------------------------------------------------------------
+    public void testSerialization() throws Exception {
+        CachedDateTimeZone test = CachedDateTimeZone.forZone(DateTimeZone.forID("Europe/Paris"));
         
-        // Serialization
-        byte[] serializedBytes;
-        try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-             ObjectOutputStream objectStream = new ObjectOutputStream(byteStream)) {
-            objectStream.writeObject(originalZone);
-            serializedBytes = byteStream.toByteArray();
-        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(test);
+        oos.close();
+        byte[] bytes = baos.toByteArray();
         
-        // Deserialization
-        CachedDateTimeZone deserializedZone;
-        try (ByteArrayInputStream inputByteStream = new ByteArrayInputStream(serializedBytes);
-             ObjectInputStream objectInputStream = new ObjectInputStream(inputByteStream)) {
-            deserializedZone = (CachedDateTimeZone) objectInputStream.readObject();
-        }
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        CachedDateTimeZone result = (CachedDateTimeZone) ois.readObject();
+        ois.close();
         
-        // Verify deserialized instance matches original
-        assertEquals("Deserialized instance should be equal to original", originalZone, deserializedZone);
+        assertEquals(test, result);
     }
+
 }
