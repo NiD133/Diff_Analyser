@@ -12,86 +12,143 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class DeprecatedAttributes_ESTest extends DeprecatedAttributes_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test0()  throws Throwable  {
-      DeprecatedAttributes.Builder deprecatedAttributes_Builder0 = DeprecatedAttributes.builder();
-      deprecatedAttributes_Builder0.setForRemoval(true);
-      DeprecatedAttributes deprecatedAttributes0 = deprecatedAttributes_Builder0.get();
-      boolean boolean0 = deprecatedAttributes0.isForRemoval();
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testForRemovalFlag_WhenSetToTrue_ShouldReturnTrue() throws Throwable {
+        // Given: A builder with forRemoval set to true
+        DeprecatedAttributes.Builder builder = DeprecatedAttributes.builder();
+        builder.setForRemoval(true);
+        
+        // When: Building the DeprecatedAttributes
+        DeprecatedAttributes deprecatedAttributes = builder.get();
+        
+        // Then: isForRemoval should return true
+        boolean isForRemoval = deprecatedAttributes.isForRemoval();
+        assertTrue("Expected forRemoval to be true", isForRemoval);
+    }
 
-  @Test(timeout = 4000)
-  public void test1()  throws Throwable  {
-      DeprecatedAttributes.Builder deprecatedAttributes_Builder0 = DeprecatedAttributes.builder();
-      DeprecatedAttributes.Builder deprecatedAttributes_Builder1 = deprecatedAttributes_Builder0.setSince("+,ygu");
-      DeprecatedAttributes deprecatedAttributes0 = deprecatedAttributes_Builder1.get();
-      String string0 = deprecatedAttributes0.getSince();
-      assertEquals("", deprecatedAttributes0.getDescription());
-      assertFalse(deprecatedAttributes0.isForRemoval());
-      assertEquals("+,ygu", string0);
-  }
+    @Test(timeout = 4000)
+    public void testSinceVersion_WhenSet_ShouldReturnCorrectValue() throws Throwable {
+        // Given: A builder with a specific since version
+        String expectedSinceVersion = "+,ygu";
+        DeprecatedAttributes.Builder builder = DeprecatedAttributes.builder();
+        
+        // When: Setting the since version and building
+        DeprecatedAttributes.Builder builderWithSince = builder.setSince(expectedSinceVersion);
+        DeprecatedAttributes deprecatedAttributes = builderWithSince.get();
+        
+        // Then: getSince should return the expected version
+        String actualSinceVersion = deprecatedAttributes.getSince();
+        assertEquals("Since version should match", expectedSinceVersion, actualSinceVersion);
+        
+        // And: Other properties should have default values
+        assertEquals("Description should be empty by default", "", deprecatedAttributes.getDescription());
+        assertFalse("ForRemoval should be false by default", deprecatedAttributes.isForRemoval());
+    }
 
-  @Test(timeout = 4000)
-  public void test2()  throws Throwable  {
-      DeprecatedAttributes.Builder deprecatedAttributes_Builder0 = DeprecatedAttributes.builder();
-      deprecatedAttributes_Builder0.setDescription("RSb&;Wj}.&C.b S?5");
-      DeprecatedAttributes deprecatedAttributes0 = deprecatedAttributes_Builder0.get();
-      String string0 = deprecatedAttributes0.getDescription();
-      assertEquals("", deprecatedAttributes0.getSince());
-      assertFalse(deprecatedAttributes0.isForRemoval());
-      assertEquals("RSb&;Wj}.&C.b S?5", string0);
-  }
+    @Test(timeout = 4000)
+    public void testDescription_WhenSet_ShouldReturnCorrectValue() throws Throwable {
+        // Given: A builder with a specific description
+        String expectedDescription = "RSb&;Wj}.&C.b S?5";
+        DeprecatedAttributes.Builder builder = DeprecatedAttributes.builder();
+        builder.setDescription(expectedDescription);
+        
+        // When: Building the DeprecatedAttributes
+        DeprecatedAttributes deprecatedAttributes = builder.get();
+        
+        // Then: getDescription should return the expected description
+        String actualDescription = deprecatedAttributes.getDescription();
+        assertEquals("Description should match", expectedDescription, actualDescription);
+        
+        // And: Other properties should have default values
+        assertEquals("Since should be empty by default", "", deprecatedAttributes.getSince());
+        assertFalse("ForRemoval should be false by default", deprecatedAttributes.isForRemoval());
+    }
 
-  @Test(timeout = 4000)
-  public void test3()  throws Throwable  {
-      DeprecatedAttributes.Builder deprecatedAttributes_Builder0 = DeprecatedAttributes.builder();
-      deprecatedAttributes_Builder0.setSince("x-qz[]");
-      DeprecatedAttributes deprecatedAttributes0 = deprecatedAttributes_Builder0.get();
-      String string0 = deprecatedAttributes0.toString();
-      assertEquals("Deprecated since x-qz[]", string0);
-  }
+    @Test(timeout = 4000)
+    public void testToString_WithSinceVersion_ShouldFormatCorrectly() throws Throwable {
+        // Given: A DeprecatedAttributes with only since version set
+        String sinceVersion = "x-qz[]";
+        DeprecatedAttributes.Builder builder = DeprecatedAttributes.builder();
+        builder.setSince(sinceVersion);
+        DeprecatedAttributes deprecatedAttributes = builder.get();
+        
+        // When: Converting to string
+        String stringRepresentation = deprecatedAttributes.toString();
+        
+        // Then: Should format as "Deprecated since <version>"
+        assertEquals("String format should include since version", 
+                     "Deprecated since " + sinceVersion, stringRepresentation);
+    }
 
-  @Test(timeout = 4000)
-  public void test4()  throws Throwable  {
-      DeprecatedAttributes.Builder deprecatedAttributes_Builder0 = DeprecatedAttributes.builder();
-      deprecatedAttributes_Builder0.setForRemoval(true);
-      DeprecatedAttributes deprecatedAttributes0 = deprecatedAttributes_Builder0.get();
-      String string0 = deprecatedAttributes0.toString();
-      assertEquals("Deprecated for removal", string0);
-  }
+    @Test(timeout = 4000)
+    public void testToString_WithForRemovalTrue_ShouldFormatCorrectly() throws Throwable {
+        // Given: A DeprecatedAttributes marked for removal
+        DeprecatedAttributes.Builder builder = DeprecatedAttributes.builder();
+        builder.setForRemoval(true);
+        DeprecatedAttributes deprecatedAttributes = builder.get();
+        
+        // When: Converting to string
+        String stringRepresentation = deprecatedAttributes.toString();
+        
+        // Then: Should format as "Deprecated for removal"
+        assertEquals("String format should indicate removal", 
+                     "Deprecated for removal", stringRepresentation);
+    }
 
-  @Test(timeout = 4000)
-  public void test5()  throws Throwable  {
-      DeprecatedAttributes deprecatedAttributes0 = DeprecatedAttributes.DEFAULT;
-      String string0 = deprecatedAttributes0.getDescription();
-      assertEquals("", string0);
-  }
+    @Test(timeout = 4000)
+    public void testDefaultInstance_Description_ShouldBeEmpty() throws Throwable {
+        // Given: The default DeprecatedAttributes instance
+        DeprecatedAttributes defaultInstance = DeprecatedAttributes.DEFAULT;
+        
+        // When: Getting the description
+        String description = defaultInstance.getDescription();
+        
+        // Then: Should be empty string
+        assertEquals("Default description should be empty", "", description);
+    }
 
-  @Test(timeout = 4000)
-  public void test6()  throws Throwable  {
-      DeprecatedAttributes deprecatedAttributes0 = DeprecatedAttributes.DEFAULT;
-      boolean boolean0 = deprecatedAttributes0.isForRemoval();
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testDefaultInstance_ForRemoval_ShouldBeFalse() throws Throwable {
+        // Given: The default DeprecatedAttributes instance
+        DeprecatedAttributes defaultInstance = DeprecatedAttributes.DEFAULT;
+        
+        // When: Checking if for removal
+        boolean isForRemoval = defaultInstance.isForRemoval();
+        
+        // Then: Should be false
+        assertFalse("Default forRemoval should be false", isForRemoval);
+    }
 
-  @Test(timeout = 4000)
-  public void test7()  throws Throwable  {
-      DeprecatedAttributes deprecatedAttributes0 = DeprecatedAttributes.DEFAULT;
-      String string0 = deprecatedAttributes0.getSince();
-      assertEquals("", string0);
-  }
+    @Test(timeout = 4000)
+    public void testDefaultInstance_Since_ShouldBeEmpty() throws Throwable {
+        // Given: The default DeprecatedAttributes instance
+        DeprecatedAttributes defaultInstance = DeprecatedAttributes.DEFAULT;
+        
+        // When: Getting the since version
+        String sinceVersion = defaultInstance.getSince();
+        
+        // Then: Should be empty string
+        assertEquals("Default since version should be empty", "", sinceVersion);
+    }
 
-  @Test(timeout = 4000)
-  public void test8()  throws Throwable  {
-      DeprecatedAttributes.Builder deprecatedAttributes_Builder0 = DeprecatedAttributes.builder();
-      deprecatedAttributes_Builder0.setDescription(",");
-      DeprecatedAttributes deprecatedAttributes0 = deprecatedAttributes_Builder0.get();
-      String string0 = deprecatedAttributes0.toString();
-      assertEquals("Deprecated: ,", string0);
-      assertEquals(",", deprecatedAttributes0.getDescription());
-  }
+    @Test(timeout = 4000)
+    public void testToString_WithDescription_ShouldFormatCorrectly() throws Throwable {
+        // Given: A DeprecatedAttributes with only description set
+        String description = ",";
+        DeprecatedAttributes.Builder builder = DeprecatedAttributes.builder();
+        builder.setDescription(description);
+        DeprecatedAttributes deprecatedAttributes = builder.get();
+        
+        // When: Converting to string
+        String stringRepresentation = deprecatedAttributes.toString();
+        
+        // Then: Should format as "Deprecated: <description>"
+        assertEquals("String format should include description", 
+                     "Deprecated: " + description, stringRepresentation);
+        assertEquals("Description should match", description, deprecatedAttributes.getDescription());
+    }
 }
