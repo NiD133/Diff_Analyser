@@ -43,33 +43,41 @@
  */
 package com.itextpdf.text.pdf.parser;
 
-import junit.framework.Assert;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 /**
- * @author kevin
+ * Tests the cross product operation between {@link Vector} and {@link Matrix}.
  */
 public class VectorTest {
 
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
+    /**
+     * Tests the cross product operation of a vector with a matrix.
+     * <p>
+     * The operation is defined as: vector (x,y,z) multiplied by matrix M.
+     * This test verifies the result matches the expected vector components.
+     */
     @Test
     public void testCrossVector() {
-        Vector v = new Vector(2, 3, 4);
-        Matrix m = new Matrix(5, 6, 7, 8, 9, 10);
-        Vector shouldBe = new Vector(67, 76, 4);
+        // Create input vector: (2, 3, 4)
+        Vector vector = new Vector(2, 3, 4);
         
-        Vector rslt = v.cross(m);
-        Assert.assertEquals(shouldBe, rslt);
+        // Create transformation matrix (6 elements represent 3x2 matrix)
+        Matrix matrix = new Matrix(5, 6, 7, 8, 9, 10);
+        
+        // Perform cross product: vector cross matrix
+        Vector result = vector.cross(matrix);
+        
+        // Verify each component of resulting vector
+        final float delta = 0.0f;  // Using 0 delta since values are integers
+        
+        // Expected vector: (67, 76, 4)
+        assertEquals("X-component of cross product is incorrect", 
+            67, result.get(Vector.I1), delta);
+        assertEquals("Y-component of cross product is incorrect", 
+            76, result.get(Vector.I2), delta);
+        assertEquals("Z-component of cross product is incorrect", 
+            4, result.get(Vector.I3), delta);
     }
-
 }
