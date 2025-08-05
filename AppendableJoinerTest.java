@@ -37,9 +37,6 @@ import org.junit.jupiter.params.provider.ValueSource;
  */
 class AppendableJoinerTest {
 
-    /**
-     * Test fixture class that demonstrates custom rendering behavior.
-     */
     static class Fixture {
 
         private final String name;
@@ -49,8 +46,7 @@ class AppendableJoinerTest {
         }
 
         /**
-         * Renders this fixture to an Appendable.
-         * Example: renders "name" as "name!"
+         * Renders myself onto an Appendable to avoid creating intermediary strings.
          */
         void render(final Appendable appendable) throws IOException {
             appendable.append(name);
@@ -59,116 +55,88 @@ class AppendableJoinerTest {
     }
 
     @Test
-    void builderFactory_always_returnsNewInstance() {
-        assertNotSame(AppendableJoiner.builder(), AppendableJoiner.builder());
-    }
-
-    @Test
-    void defaultBuilder_shouldJoinElementsWithoutPrefixSuffixOrDelimiter() {
-        // Create default joiner (no prefix, suffix, delimiter)
-        final Builder<Object> builder = AppendableJoiner.builder();
-        final AppendableJoiner<Object> joiner = builder.get();
-        
-        final StringBuilder sb = new StringBuilder("A");
-        joiner.join(sb, "B", "C");
-        assertEquals("ABC", sb.toString());
-        
-        sb.append("1");
-        joiner.join(sb, Arrays.asList("D", "E"));
-        assertEquals("ABC1DE", sb.toString());
-    }
-
-    @Test
-    void builderWithAllProperties_shouldCorrectlyJoinElements() {
-        // Configure joiner with all properties: prefix, suffix, delimiter, custom appender
+    void testAllBuilderPropertiesStringBuilder() {
+        // @formatter:off
         final AppendableJoiner<Object> joiner = AppendableJoiner.builder()
                 .setPrefix("<")
                 .setDelimiter(".")
                 .setSuffix(">")
                 .setElementAppender((a, e) -> a.append(String.valueOf(e)))
                 .get();
-        
-        final StringBuilder sb = new StringBuilder("A");
-        joiner.join(sb, "B", "C");
-        assertEquals("A<B.C>", sb.toString());
-        
-        sb.append("1");
-        joiner.join(sb, Arrays.asList("D", "E"));
-        assertEquals("A<B.C>1<D.E>", sb.toString());
+        // @formatter:on
+        final StringBuilder sbuilder = new StringBuilder("A");
+        assertEquals("A<B.C>", joiner.join(sbuilder, "B", "C").toString());
+        sbuilder.append("1");
+        assertEquals("A<B.C>1<D.E>", joiner.join(sbuilder, Arrays.asList("D", "E")).toString());
     }
 
     @Test
-    void customElementAppenderWithPrefixDelimiterSuffix_shouldRenderCorrectly() {
-        // Configure joiner with custom element rendering (adds pipe before each element)
+    void testBuildDefaultStringBuilder() {
+        final Builder<Object> builder = AppendableJoiner.builder();
+        assertNotSame(builder.get(), builder.get());
+        final AppendableJoiner<Object> joiner = builder.get();
+        final StringBuilder sbuilder = new StringBuilder("A");
+        assertEquals("ABC", joiner.join(sbuilder, "B", "C").toString());
+        sbuilder.append("1");
+        assertEquals("ABC1DE", joiner.join(sbuilder, "D", "E").toString());
+    }
+
+    @Test
+    void testBuilder() {
+        assertNotSame(AppendableJoiner.builder(), AppendableJoiner.builder());
+    }
+
+    @SuppressWarnings("deprecation") // Test own StrBuilder
+    @ParameterizedTest
+    @ValueSource(classes = { StringBuilder.class, StringBuffer.class, StringWriter.class, StrBuilder.class, TextStringBuilder.class })
+    void testDelimiterAppendable(final Class<? extends Appendable> clazz) throws Exception {
+        final AppendableJoiner<Object> joiner = AppendableJoiner.builder().setDelimiter(".").get();
+        final Appendable sbuilder = clazz.newInstance();
+        sbuilder.append("A");
+        // throws IOException
+        assertEquals("AB.C", joiner.joinA(sbuilder, "B", "C").toString());
+        sbuilder.append("1");
+        // throws IOException
+        assertEquals("AB.C1D.E", joiner.joinA(sbuilder, Arrays.asList("D", "E")).toString());
+    }
+
+    @Test
+    void testDelimiterStringBuilder() {
+        final AppendableJoiner<Object> joiner = AppendableJoiner.builder().setDelimiter(".").get();
+        final StringBuilder sbuilder = new StringBuilder("A");
+        // does not throw IOException
+        assertEquals("AB.C", joiner.join(sbuilder, "B", "C").toString());
+        sbuilder.append("1");
+        // does not throw IOException
+        assertEquals("AB.C1D.E", joiner.join(sbuilder, Arrays.asList("D", "E")).toString());
+    }
+
+    @Test
+    void testToCharSequenceStringBuilder1() {
+        // @formatter:off
         final AppendableJoiner<Object> joiner = AppendableJoiner.builder()
                 .setPrefix("<")
                 .setDelimiter(".")
                 .setSuffix(">")
                 .setElementAppender((a, e) -> a.append("|").append(Objects.toString(e)))
                 .get();
-        
-        final StringBuilder sb = new StringBuilder("A");
-        joiner.join(sb, "B", "C");
-        assertEquals("A<|B.|C>", sb.toString());
-        
-        sb.append("1");
-        joiner.join(sb, Arrays.asList("D", "E"));
-        assertEquals("A<|B.|C>1<|D.|E>", sb.toString());
+        // @formatter:on
+        final StringBuilder sbuilder = new StringBuilder("A");
+        assertEquals("A<|B.|C>", joiner.join(sbuilder, "B", "C").toString());
+        sbuilder.append("1");
+        assertEquals("A<|B.|C>1<|D.|E>", joiner.join(sbuilder, Arrays.asList("D", "E")).toString());
     }
 
     @Test
-    void customElementAppenderWithRenderMethod_shouldUseFixtureRendering() {
-        // Configure joiner to use custom render method from Fixture class
+    void testToCharSequenceStringBuilder2() {
+        // @formatter:off
         final AppendableJoiner<Fixture> joiner = AppendableJoiner.<Fixture>builder()
                 .setElementAppender((a, e) -> e.render(a))
                 .get();
-        
-        final StringBuilder sb = new StringBuilder("[");
-        joiner.join(sb, new Fixture("B"), new Fixture("C"));
-        assertEquals("[B!C!", sb.toString());
-        
-        sb.append("]");
-        joiner.join(sb, Arrays.asList(new Fixture("D"), new Fixture("E")));
-        assertEquals("[B!C!]D!E!", sb.toString());
-    }
-
-    @Test
-    void delimiter_shouldSeparateElementsWhenUsedWithStringBuilder() {
-        final AppendableJoiner<Object> joiner = AppendableJoiner.builder()
-                .setDelimiter(".")
-                .get();
-        
-        final StringBuilder sb = new StringBuilder("A");
-        joiner.join(sb, "B", "C");
-        assertEquals("AB.C", sb.toString());
-        
-        sb.append("1");
-        joiner.join(sb, Arrays.asList("D", "E"));
-        assertEquals("AB.C1D.E", sb.toString());
-    }
-
-    @SuppressWarnings("deprecation") // Test own StrBuilder
-    @ParameterizedTest(name = "Appendable type: {0}")
-    @ValueSource(classes = { 
-        StringBuilder.class, 
-        StringBuffer.class, 
-        StringWriter.class, 
-        StrBuilder.class, 
-        TextStringBuilder.class 
-    })
-    void delimiter_shouldSeparateElementsForAllAppendableTypes(Class<? extends Appendable> clazz) 
-            throws Exception {
-        final AppendableJoiner<Object> joiner = AppendableJoiner.builder()
-                .setDelimiter(".")
-                .get();
-        
-        final Appendable appendable = clazz.newInstance();
-        appendable.append("A");
-        joiner.joinA(appendable, "B", "C");
-        assertEquals("AB.C", appendable.toString());
-        
-        appendable.append("1");
-        joiner.joinA(appendable, Arrays.asList("D", "E"));
-        assertEquals("AB.C1D.E", appendable.toString());
+        // @formatter:on
+        final StringBuilder sbuilder = new StringBuilder("[");
+        assertEquals("[B!C!", joiner.join(sbuilder, new Fixture("B"), new Fixture("C")).toString());
+        sbuilder.append("]");
+        assertEquals("[B!C!]D!E!", joiner.join(sbuilder, Arrays.asList(new Fixture("D"), new Fixture("E"))).toString());
     }
 }
