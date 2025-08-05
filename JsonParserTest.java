@@ -29,251 +29,170 @@ import java.io.StringReader;
 import org.junit.Test;
 
 /**
- * Unit tests for {@link JsonParser} functionality including parsing various JSON formats,
- * handling malformed JSON, and testing strictness modes.
+ * Unit test for {@link JsonParser}
  *
  * @author Inderjeet Singh
  */
 public class JsonParserTest {
 
-  // Constants for test data
-  private static final String VALID_JSON_OBJECT = "{a:10,b:'c'}";
-  private static final String MIXED_ARRAY_JSON = "[{},13,\"stringValue\"]";
-  private static final String UNQUOTED_ARRAY_JSON = "[a,b,c]";
-  private static final String MALFORMED_JSON = "[[]";
-  private static final String MULTI_WORD_UNQUOTED = "Test is a test..blah blah";
-  private static final String SINGLE_WORD_UNQUOTED = "Test";
-  private static final String QUOTED_WHITESPACE = "\"   \"";
-  private static final String ONLY_WHITESPACE = "     ";
-  private static final String MALFORMED_BOOLEAN = "faLsE";
-  private static final String UNQUOTED_STRING = "unquoted";
-  
-  private static final int DEEP_NESTING_LEVEL = 10000;
-
-  // ========== Basic Parsing Tests ==========
-
   @Test
-  public void parseString_withValidJsonObject_shouldReturnCorrectJsonElement() {
-    JsonElement element = JsonParser.parseString(VALID_JSON_OBJECT);
-    
-    assertThat(element.isJsonObject()).isTrue();
-    JsonObject jsonObject = element.getAsJsonObject();
-    assertThat(jsonObject.get("a").getAsInt()).isEqualTo(10);
-    assertThat(jsonObject.get("b").getAsString()).isEqualTo("c");
+  public void testParseInvalidJson() {
+    assertThrows(JsonSyntaxException.class, () -> JsonParser.parseString("[[]"));
   }
 
   @Test
-  public void parseString_withMixedArray_shouldParseAllElementsCorrectly() {
-    JsonElement element = JsonParser.parseString(MIXED_ARRAY_JSON);
-    
-    assertThat(element.isJsonArray()).isTrue();
-    JsonArray array = element.getAsJsonArray();
+  public void testParseUnquotedStringArrayFails() {
+    JsonElement element = JsonParser.parseString("[a,b,c]");
+    assertThat(element.getAsJsonArray().get(0).getAsString()).isEqualTo("a");
+    assertThat(element.getAsJsonArray().get(1).getAsString()).isEqualTo("b");
+    assertThat(element.getAsJsonArray().get(2).getAsString()).isEqualTo("c");
+    assertThat(element.getAsJsonArray()).hasSize(3);
+  }
+
+  @Test
+  public void testParseString() {
+    String json = "{a:10,b:'c'}";
+    JsonElement e = JsonParser.parseString(json);
+    assertThat(e.isJsonObject()).isTrue();
+    assertThat(e.getAsJsonObject().get("a").getAsInt()).isEqualTo(10);
+    assertThat(e.getAsJsonObject().get("b").getAsString()).isEqualTo("c");
+  }
+
+  @Test
+  public void testParseEmptyString() {
+    JsonElement e = JsonParser.parseString("\"   \"");
+    assertThat(e.isJsonPrimitive()).isTrue();
+    assertThat(e.getAsString()).isEqualTo("   ");
+  }
+
+  @Test
+  public void testParseEmptyWhitespaceInput() {
+    JsonElement e = JsonParser.parseString("     ");
+    assertThat(e.isJsonNull()).isTrue();
+  }
+
+  @Test
+  public void testParseUnquotedSingleWordStringFails() {
+    assertThat(JsonParser.parseString("Test").getAsString()).isEqualTo("Test");
+  }
+
+  @Test
+  public void testParseUnquotedMultiWordStringFails() {
+    assertThrows(
+        JsonSyntaxException.class, () -> JsonParser.parseString("Test is a test..blah blah"));
+  }
+
+  @Test
+  public void testParseMixedArray() {
+    String json = "[{},13,\"stringValue\"]";
+    JsonElement e = JsonParser.parseString(json);
+    assertThat(e.isJsonArray()).isTrue();
+
+    JsonArray array = e.getAsJsonArray();
     assertThat(array.get(0).toString()).isEqualTo("{}");
     assertThat(array.get(1).getAsInt()).isEqualTo(13);
     assertThat(array.get(2).getAsString()).isEqualTo("stringValue");
   }
 
+  /** Deeply nested JSON arrays should not cause {@link StackOverflowError} */
   @Test
-  public void parseReader_withValidJsonObject_shouldReturnCorrectJsonElement() {
-    StringReader reader = new StringReader(VALID_JSON_OBJECT);
-    
-    JsonElement element = JsonParser.parseReader(reader);
-    
-    assertThat(element.isJsonObject()).isTrue();
-    JsonObject jsonObject = element.getAsJsonObject();
-    assertThat(jsonObject.get("a").getAsInt()).isEqualTo(10);
-    assertThat(jsonObject.get("b").getAsString()).isEqualTo("c");
-  }
-
-  // ========== Edge Case Tests ==========
-
-  @Test
-  public void parseString_withQuotedWhitespace_shouldPreserveWhitespace() {
-    JsonElement element = JsonParser.parseString(QUOTED_WHITESPACE);
-    
-    assertThat(element.isJsonPrimitive()).isTrue();
-    assertThat(element.getAsString()).isEqualTo("   ");
-  }
-
-  @Test
-  public void parseString_withOnlyWhitespace_shouldReturnJsonNull() {
-    JsonElement element = JsonParser.parseString(ONLY_WHITESPACE);
-    
-    assertThat(element.isJsonNull()).isTrue();
-  }
-
-  // ========== Lenient Parsing Tests ==========
-
-  @Test
-  public void parseString_withUnquotedArrayElements_shouldParseInLenientMode() {
-    JsonElement element = JsonParser.parseString(UNQUOTED_ARRAY_JSON);
-    
-    JsonArray array = element.getAsJsonArray();
-    assertThat(array).hasSize(3);
-    assertThat(array.get(0).getAsString()).isEqualTo("a");
-    assertThat(array.get(1).getAsString()).isEqualTo("b");
-    assertThat(array.get(2).getAsString()).isEqualTo("c");
-  }
-
-  @Test
-  public void parseString_withSingleUnquotedWord_shouldParseSuccessfully() {
-    JsonElement element = JsonParser.parseString(SINGLE_WORD_UNQUOTED);
-    
-    assertThat(element.getAsString()).isEqualTo("Test");
-  }
-
-  // ========== Error Handling Tests ==========
-
-  @Test
-  public void parseString_withMalformedJson_shouldThrowJsonSyntaxException() {
-    assertThrows(JsonSyntaxException.class, () -> JsonParser.parseString(MALFORMED_JSON));
-  }
-
-  @Test
-  public void parseString_withMultiWordUnquotedString_shouldThrowJsonSyntaxException() {
-    assertThrows(JsonSyntaxException.class, () -> JsonParser.parseString(MULTI_WORD_UNQUOTED));
-  }
-
-  // ========== Deep Nesting Tests ==========
-
-  /**
-   * Tests that deeply nested JSON arrays don't cause {@link StackOverflowError}.
-   * Creates an array structure like: [[[[...]]]] with 10,000 levels of nesting.
-   */
-  @Test
-  public void parseReader_withDeeplyNestedArrays_shouldNotCauseStackOverflow() throws IOException {
-    String deeplyNestedArrayJson = createDeeplyNestedArrayJson(DEEP_NESTING_LEVEL);
-    JsonReader jsonReader = createJsonReaderWithUnlimitedNesting(deeplyNestedArrayJson);
-
-    JsonArray rootArray = JsonParser.parseReader(jsonReader).getAsJsonArray();
-    
-    int actualDepth = countArrayNestingDepth(rootArray);
-    assertThat(actualDepth).isEqualTo(DEEP_NESTING_LEVEL);
-  }
-
-  /**
-   * Tests that deeply nested JSON objects don't cause {@link StackOverflowError}.
-   * Creates an object structure like: {"a":{"a":{"a":...null}}} with 10,000 levels of nesting.
-   */
-  @Test
-  public void parseReader_withDeeplyNestedObjects_shouldNotCauseStackOverflow() throws IOException {
-    String deeplyNestedObjectJson = createDeeplyNestedObjectJson(DEEP_NESTING_LEVEL);
-    JsonReader jsonReader = createJsonReaderWithUnlimitedNesting(deeplyNestedObjectJson);
-
-    JsonObject rootObject = JsonParser.parseReader(jsonReader).getAsJsonObject();
-    
-    int actualDepth = countObjectNestingDepth(rootObject);
-    assertThat(actualDepth).isEqualTo(DEEP_NESTING_LEVEL);
-  }
-
-  // ========== Multiple Object Parsing Tests ==========
-
-  @Test
-  public void parseMultipleObjects_withStreams_shouldParseEachObjectCorrectly() throws Exception {
-    BagOfPrimitives firstObject = new BagOfPrimitives(1, 1, true, "one");
-    BagOfPrimitives secondObject = new BagOfPrimitives(2, 2, false, "two");
-    CharArrayReader reader = createReaderWithMultipleObjects(firstObject, secondObject);
-
-    JsonReader parser = new JsonReader(reader);
-    parser.setStrictness(Strictness.LENIENT);
-    
-    JsonElement firstElement = Streams.parse(parser);
-    JsonElement secondElement = Streams.parse(parser);
-    
-    Gson gson = new Gson();
-    BagOfPrimitives parsedFirst = gson.fromJson(firstElement, BagOfPrimitives.class);
-    BagOfPrimitives parsedSecond = gson.fromJson(secondElement, BagOfPrimitives.class);
-    
-    assertThat(parsedFirst.stringValue).isEqualTo("one");
-    assertThat(parsedSecond.stringValue).isEqualTo("two");
-  }
-
-  // ========== Strictness Mode Tests ==========
-
-  @Test
-  public void parseReader_withLegacyStrictMode_shouldIgnoreStrictnessAndParseInLenientMode() {
-    JsonReader reader = new JsonReader(new StringReader(UNQUOTED_STRING));
-    Strictness originalStrictness = Strictness.LEGACY_STRICT;
-    reader.setStrictness(originalStrictness);
-
-    // LEGACY_STRICT is ignored by JsonParser; it parses in lenient mode instead
-    JsonElement result = JsonParser.parseReader(reader);
-    
-    assertThat(result).isEqualTo(new JsonPrimitive(UNQUOTED_STRING));
-    assertThat(reader.getStrictness()).isEqualTo(originalStrictness); // Original strictness restored
-  }
-
-  @Test
-  public void parseReader_withStrictMode_shouldThrowExceptionForMalformedJson() {
-    JsonReader reader = new JsonReader(new StringReader(MALFORMED_BOOLEAN));
-    Strictness originalStrictness = Strictness.STRICT;
-    reader.setStrictness(originalStrictness);
-
-    JsonSyntaxException exception = assertThrows(JsonSyntaxException.class, 
-        () -> JsonParser.parseReader(reader));
-    
-    assertThat(exception)
-        .hasCauseThat()
-        .hasMessageThat()
-        .startsWith("Use JsonReader.setStrictness(Strictness.LENIENT) to accept malformed JSON");
-    assertThat(reader.getStrictness()).isEqualTo(originalStrictness); // Original strictness preserved
-  }
-
-  // ========== Helper Methods ==========
-
-  private String createDeeplyNestedArrayJson(int nestingLevel) {
-    return "[".repeat(nestingLevel) + "]".repeat(nestingLevel);
-  }
-
-  private String createDeeplyNestedObjectJson(int nestingLevel) {
-    return "{\"a\":".repeat(nestingLevel) + "null" + "}".repeat(nestingLevel);
-  }
-
-  private JsonReader createJsonReaderWithUnlimitedNesting(String json) {
+  public void testParseDeeplyNestedArrays() throws IOException {
+    int times = 10000;
+    // [[[ ... ]]]
+    String json = "[".repeat(times) + "]".repeat(times);
     JsonReader jsonReader = new JsonReader(new StringReader(json));
     jsonReader.setNestingLimit(Integer.MAX_VALUE);
-    return jsonReader;
-  }
 
-  private int countArrayNestingDepth(JsonArray rootArray) {
-    int depth = 0;
-    JsonArray current = rootArray;
-    
+    int actualTimes = 0;
+    JsonArray current = JsonParser.parseReader(jsonReader).getAsJsonArray();
     while (true) {
-      depth++;
+      actualTimes++;
       if (current.isEmpty()) {
         break;
       }
       assertThat(current.size()).isEqualTo(1);
       current = current.get(0).getAsJsonArray();
     }
-    
-    return depth;
+    assertThat(actualTimes).isEqualTo(times);
   }
 
-  private int countObjectNestingDepth(JsonObject rootObject) {
-    int depth = 0;
-    JsonObject current = rootObject;
-    
+  /** Deeply nested JSON objects should not cause {@link StackOverflowError} */
+  @Test
+  public void testParseDeeplyNestedObjects() throws IOException {
+    int times = 10000;
+    // {"a":{"a": ... {"a":null} ... }}
+    String json = "{\"a\":".repeat(times) + "null" + "}".repeat(times);
+    JsonReader jsonReader = new JsonReader(new StringReader(json));
+    jsonReader.setNestingLimit(Integer.MAX_VALUE);
+
+    int actualTimes = 0;
+    JsonObject current = JsonParser.parseReader(jsonReader).getAsJsonObject();
     while (true) {
       assertThat(current.size()).isEqualTo(1);
-      depth++;
+      actualTimes++;
       JsonElement next = current.get("a");
       if (next.isJsonNull()) {
         break;
+      } else {
+        current = next.getAsJsonObject();
       }
-      current = next.getAsJsonObject();
     }
-    
-    return depth;
+    assertThat(actualTimes).isEqualTo(times);
   }
 
-  private CharArrayReader createReaderWithMultipleObjects(BagOfPrimitives first, BagOfPrimitives second) 
-      throws Exception {
+  @Test
+  public void testParseReader() {
+    StringReader reader = new StringReader("{a:10,b:'c'}");
+    JsonElement e = JsonParser.parseReader(reader);
+    assertThat(e.isJsonObject()).isTrue();
+    assertThat(e.getAsJsonObject().get("a").getAsInt()).isEqualTo(10);
+    assertThat(e.getAsJsonObject().get("b").getAsString()).isEqualTo("c");
+  }
+
+  @Test
+  public void testReadWriteTwoObjects() throws Exception {
     Gson gson = new Gson();
     CharArrayWriter writer = new CharArrayWriter();
-    writer.write(gson.toJson(first).toCharArray());
-    writer.write(gson.toJson(second).toCharArray());
-    return new CharArrayReader(writer.toCharArray());
+    BagOfPrimitives expectedOne = new BagOfPrimitives(1, 1, true, "one");
+    writer.write(gson.toJson(expectedOne).toCharArray());
+    BagOfPrimitives expectedTwo = new BagOfPrimitives(2, 2, false, "two");
+    writer.write(gson.toJson(expectedTwo).toCharArray());
+    CharArrayReader reader = new CharArrayReader(writer.toCharArray());
+
+    JsonReader parser = new JsonReader(reader);
+    parser.setStrictness(Strictness.LENIENT);
+    JsonElement element1 = Streams.parse(parser);
+    JsonElement element2 = Streams.parse(parser);
+    BagOfPrimitives actualOne = gson.fromJson(element1, BagOfPrimitives.class);
+    assertThat(actualOne.stringValue).isEqualTo("one");
+    BagOfPrimitives actualTwo = gson.fromJson(element2, BagOfPrimitives.class);
+    assertThat(actualTwo.stringValue).isEqualTo("two");
+  }
+
+  @Test
+  public void testLegacyStrict() {
+    JsonReader reader = new JsonReader(new StringReader("unquoted"));
+    Strictness strictness = Strictness.LEGACY_STRICT;
+    // LEGACY_STRICT is ignored by JsonParser later; parses in lenient mode instead
+    reader.setStrictness(strictness);
+
+    assertThat(JsonParser.parseReader(reader)).isEqualTo(new JsonPrimitive("unquoted"));
+    // Original strictness was restored
+    assertThat(reader.getStrictness()).isEqualTo(strictness);
+  }
+
+  @Test
+  public void testStrict() {
+    JsonReader reader = new JsonReader(new StringReader("faLsE"));
+    Strictness strictness = Strictness.STRICT;
+    reader.setStrictness(strictness);
+
+    var e = assertThrows(JsonSyntaxException.class, () -> JsonParser.parseReader(reader));
+    assertThat(e)
+        .hasCauseThat()
+        .hasMessageThat()
+        .startsWith("Use JsonReader.setStrictness(Strictness.LENIENT) to accept malformed JSON");
+    // Original strictness was kept
+    assertThat(reader.getStrictness()).isEqualTo(strictness);
   }
 }
