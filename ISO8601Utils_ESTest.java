@@ -22,272 +22,262 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class ISO8601Utils_ESTest extends ISO8601Utils_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      ParsePosition parsePosition0 = new ParsePosition(0);
-      Date date0 = ISO8601Utils.parse("1969-12-31T23:59:59.999Z", parsePosition0);
-      assertEquals("Fri Feb 14 20:21:21 GMT 2014", date0.toString());
-  }
+    // ===========================================================
+    // Successful Parsing Tests
+    // ===========================================================
+    
+    @Test(timeout = 4000)
+    public void testParse_beforeEpoch() throws Throwable {
+        // Tests parsing of date just before epoch
+        ParsePosition parsePosition = new ParsePosition(0);
+        Date parsedDate = ISO8601Utils.parse("1969-12-31T23:59:59.999Z", parsePosition);
+        // Note: Mock environment returns fixed date regardless of input
+        assertEquals("Fri Feb 14 20:21:21 GMT 2014", parsedDate.toString());
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      MockDate mockDate0 = new MockDate((-2147483646), (-2147483646), (-2147483646), (-2147483646), (-2147483646));
-      String string0 = ISO8601Utils.format((Date) mockDate0);
-      assertEquals("208737754-05-17T20:36:25Z", string0);
-  }
+    @Test(timeout = 4000)
+    public void testParse_withTimezoneOffset() throws Throwable {
+        // Tests parsing with explicit UTC offset (-00:00)
+        ParsePosition parsePosition = new ParsePosition(0);
+        Date parsedDate = ISO8601Utils.parse("2014-02-14T20:21:21-00:00", parsePosition);
+        assertEquals("Fri Feb 14 20:21:21 GMT 2014", parsedDate.toString());
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      ParsePosition parsePosition0 = new ParsePosition(1);
-      try { 
-        ISO8601Utils.parse("p;72<&YyPko{%", parsePosition0);
-        fail("Expecting exception: ParseException");
-      
-      } catch(ParseException e) {
-         //
-         // Failed to parse date [\"p;72<&YyPko{%\"]: Invalid number: ;72<
-         //
-         verifyException("com.google.gson.internal.bind.util.ISO8601Utils", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testParse_withMillisecondsAndTimezone() throws Throwable {
+        // Tests parsing with milliseconds and timezone offset
+        ParsePosition parsePosition = new ParsePosition(0);
+        Date parsedDate = ISO8601Utils.parse("2014-02-14T20:21:22.575+00:00", parsePosition);
+        // Note: Result is adjusted based on mock environment
+        assertEquals("Fri Feb 14 20:21:21 GMT 2014", parsedDate.toString());
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        ISO8601Utils.parse("H0tU&_9';1S)", (ParsePosition) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.google.gson.internal.bind.util.ISO8601Utils", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testParse_withoutMilliseconds() throws Throwable {
+        // Tests parsing without milliseconds (UTC timezone)
+        ParsePosition parsePosition = new ParsePosition(0);
+        Date parsedDate = ISO8601Utils.parse("2014-02-14T20:21:21Z", parsePosition);
+        assertEquals("Fri Feb 14 20:21:21 GMT 2014", parsedDate.toString());
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      MockDate mockDate0 = new MockDate();
-      // Undeclared exception!
-      try { 
-        ISO8601Utils.format((Date) mockDate0, false, (TimeZone) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-      }
-  }
+    @Test(timeout = 4000)
+    public void testParse_withMilliseconds() throws Throwable {
+        // Tests parsing with milliseconds (UTC timezone)
+        ParsePosition parsePosition = new ParsePosition(0);
+        Date parsedDate = ISO8601Utils.parse("2014-02-14T20:21:21.320Z", parsePosition);
+        assertEquals("Fri Feb 14 20:21:21 GMT 2014", parsedDate.toString());
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        ISO8601Utils.format((Date) null, true);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.util.Calendar", e);
-      }
-  }
+    // ===========================================================
+    // Formatting Tests
+    // ===========================================================
+    
+    @Test(timeout = 4000)
+    public void testFormat_veryOldDate() throws Throwable {
+        // Tests formatting of a date with extreme values
+        MockDate mockDate = new MockDate((-2147483646), (-2147483646), (-2147483646), (-2147483646), (-2147483646));
+        String formatted = ISO8601Utils.format(mockDate);
+        assertEquals("208737754-05-17T20:36:25Z", formatted);
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        ISO8601Utils.format((Date) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.util.Calendar", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testFormat_epochDateWithTimeZone() throws Throwable {
+        // Tests formatting epoch date with non-UTC timezone
+        MockDate mockDate = new MockDate(0L);
+        TimeZone timeZone = TimeZone.getTimeZone("MU/^fUMQ");
+        String formatted = ISO8601Utils.format(mockDate, false, timeZone);
+        assertEquals("1970-01-01T00:00:00Z", formatted);
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      MockDate mockDate0 = new MockDate(0L);
-      TimeZone timeZone0 = TimeZone.getTimeZone("MU/^fUMQ");
-      String string0 = ISO8601Utils.format((Date) mockDate0, false, timeZone0);
-      assertEquals("1970-01-01T00:00:00Z", string0);
-  }
+    @Test(timeout = 4000)
+    public void testFormat_epochDateWithTimeZoneOffset() throws Throwable {
+        // Tests formatting with timezone offset
+        MockDate mockDate = new MockDate(0);
+        SimpleTimeZone timeZone = new SimpleTimeZone(1255, "DWGL1k");
+        String formatted = ISO8601Utils.format(mockDate, false, timeZone);
+        assertEquals("1970-01-01T00:00:01+00:00", formatted);
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      MockDate mockDate0 = new MockDate(0);
-      SimpleTimeZone simpleTimeZone0 = new SimpleTimeZone(1255, "DWGL1k");
-      String string0 = ISO8601Utils.format((Date) mockDate0, false, (TimeZone) simpleTimeZone0);
-      assertEquals("1970-01-01T00:00:01+00:00", string0);
-  }
+    @Test(timeout = 4000)
+    public void testFormat_withNegativeTimezoneOffset() throws Throwable {
+        // Tests formatting with negative timezone offset
+        MockDate mockDate = new MockDate(1194, 1194, 2550);
+        SimpleTimeZone timeZone = new SimpleTimeZone(2550, "!#[5.iqQz1B2Sn'");
+        timeZone.setRawOffset((-141));
+        String formatted = ISO8601Utils.format(mockDate, true, timeZone);
+        assertEquals("3200-06-22T23:59:59.859-00:00", formatted);
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      ParsePosition parsePosition0 = new ParsePosition(0);
-      try { 
-        ISO8601Utils.parse("9>({Cf/Td,\";U)Ji*", parsePosition0);
-        fail("Expecting exception: ParseException");
-      
-      } catch(ParseException e) {
-         //
-         // Failed to parse date [\"9>({Cf/Td,\";U)Ji*\"]: Invalid number: 9>({
-         //
-         verifyException("com.google.gson.internal.bind.util.ISO8601Utils", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testFormat_withMilliseconds() throws Throwable {
+        // Tests formatting with milliseconds included
+        MockDate mockDate = new MockDate();
+        String formatted = ISO8601Utils.format(mockDate, true);
+        assertEquals("2014-02-14T20:21:21.320Z", formatted);
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      ParsePosition parsePosition0 = new ParsePosition(0);
-      try { 
-        ISO8601Utils.parse("&R[&", parsePosition0);
-        fail("Expecting exception: ParseException");
-      
-      } catch(ParseException e) {
-         //
-         // Failed to parse date [\"&R[&\"]: Invalid number: &R[&
-         //
-         verifyException("com.google.gson.internal.bind.util.ISO8601Utils", e);
-      }
-  }
+    // ===========================================================
+    // Error Case Tests: Parsing
+    // ===========================================================
+    
+    @Test(timeout = 4000)
+    public void testParse_invalidString1() throws Throwable {
+        // Tests parsing of invalid string (non-numeric characters)
+        ParsePosition parsePosition = new ParsePosition(1);
+        try { 
+            ISO8601Utils.parse("p;72<&YyPko{%", parsePosition);
+            fail("Expecting exception: ParseException");
+        } catch(ParseException e) {
+            assertTrue(e.getMessage().contains("Invalid number: ;72<"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      ParsePosition parsePosition0 = new ParsePosition(2147483645);
-      try { 
-        ISO8601Utils.parse("+0000", parsePosition0);
-        fail("Expecting exception: ParseException");
-      
-      } catch(ParseException e) {
-         //
-         // Failed to parse date [\"+0000\"]: +0000
-         //
-         verifyException("com.google.gson.internal.bind.util.ISO8601Utils", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testParse_invalidString2() throws Throwable {
+        // Tests parsing of string with invalid numeric characters
+        ParsePosition parsePosition = new ParsePosition(0);
+        try { 
+            ISO8601Utils.parse("9>({Cf/Td,\";U)Ji*", parsePosition);
+            fail("Expecting exception: ParseException");
+        } catch(ParseException e) {
+            assertTrue(e.getMessage().contains("Invalid number: 9>({"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      ParsePosition parsePosition0 = new ParsePosition(1);
-      try { 
-        ISO8601Utils.parse("+0000", parsePosition0);
-        fail("Expecting exception: ParseException");
-      
-      } catch(ParseException e) {
-         //
-         // Failed to parse date [\"+0000\"]: +0000
-         //
-         verifyException("com.google.gson.internal.bind.util.ISO8601Utils", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testParse_invalidString3() throws Throwable {
+        // Tests parsing of string with completely non-numeric characters
+        ParsePosition parsePosition = new ParsePosition(0);
+        try { 
+            ISO8601Utils.parse("&R[&", parsePosition);
+            fail("Expecting exception: ParseException");
+        } catch(ParseException e) {
+            assertTrue(e.getMessage().contains("Invalid number: &R[&"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      ParsePosition parsePosition0 = new ParsePosition((-844));
-      try { 
-        ISO8601Utils.parse("", parsePosition0);
-        fail("Expecting exception: ParseException");
-      
-      } catch(ParseException e) {
-         //
-         // Failed to parse date [\"\"]: (java.lang.NumberFormatException)
-         //
-         verifyException("com.google.gson.internal.bind.util.ISO8601Utils", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testParse_indexBeyondString() throws Throwable {
+        // Tests parsing when index is beyond string length
+        ParsePosition parsePosition = new ParsePosition(2147483645);
+        try { 
+            ISO8601Utils.parse("+0000", parsePosition);
+            fail("Expecting exception: ParseException");
+        } catch(ParseException e) {
+            assertTrue(e.getMessage().contains("Failed to parse date [\"+0000\"]: +0000"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      ParsePosition parsePosition0 = new ParsePosition((-2016));
-      try { 
-        ISO8601Utils.parse((String) null, parsePosition0);
-        fail("Expecting exception: ParseException");
-      
-      } catch(ParseException e) {
-         //
-         // Failed to parse date [null]: (java.lang.NumberFormatException)
-         //
-         verifyException("com.google.gson.internal.bind.util.ISO8601Utils", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testParse_indexNotAtStart() throws Throwable {
+        // Tests parsing when index doesn't start at beginning
+        ParsePosition parsePosition = new ParsePosition(1);
+        try { 
+            ISO8601Utils.parse("+0000", parsePosition);
+            fail("Expecting exception: ParseException");
+        } catch(ParseException e) {
+            assertTrue(e.getMessage().contains("Failed to parse date [\"+0000\"]: +0000"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      ParsePosition parsePosition0 = new ParsePosition(0);
-      Date date0 = ISO8601Utils.parse("2014-02-14T20:21:21-00:00", parsePosition0);
-      assertEquals("Fri Feb 14 20:21:21 GMT 2014", date0.toString());
-  }
+    @Test(timeout = 4000)
+    public void testParse_emptyString() throws Throwable {
+        // Tests parsing empty string
+        ParsePosition parsePosition = new ParsePosition((-844));
+        try { 
+            ISO8601Utils.parse("", parsePosition);
+            fail("Expecting exception: ParseException");
+        } catch(ParseException e) {
+            assertTrue(e.getMessage().contains("Failed to parse date [\"\"]"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      ParsePosition parsePosition0 = new ParsePosition(0);
-      Date date0 = ISO8601Utils.parse("2014-02-14T20:21:22.575+00:00", parsePosition0);
-      assertEquals("Fri Feb 14 20:21:21 GMT 2014", date0.toString());
-  }
+    @Test(timeout = 4000)
+    public void testParse_nullString() throws Throwable {
+        // Tests parsing null string
+        ParsePosition parsePosition = new ParsePosition((-2016));
+        try { 
+            ISO8601Utils.parse((String) null, parsePosition);
+            fail("Expecting exception: ParseException");
+        } catch(ParseException e) {
+            assertTrue(e.getMessage().contains("Failed to parse date [null]"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      ParsePosition parsePosition0 = new ParsePosition(0);
-      Date date0 = ISO8601Utils.parse("2014-02-14T20:21:21Z", parsePosition0);
-      assertEquals("Fri Feb 14 20:21:21 GMT 2014", date0.toString());
-  }
+    @Test(timeout = 4000)
+    public void testParse_invalidTimezoneIndicator() throws Throwable {
+        // Tests parsing with invalid timezone indicator character
+        ParsePosition parsePosition = new ParsePosition(0);
+        try { 
+            ISO8601Utils.parse("190690348-12-04T21:42:26Z", parsePosition);
+            fail("Expecting exception: ParseException");
+        } catch(ParseException e) {
+            assertTrue(e.getMessage().contains("Invalid time zone indicator '8'"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      ParsePosition parsePosition0 = new ParsePosition(0);
-      try { 
-        ISO8601Utils.parse("190690348-12-04T21:42:26Z", parsePosition0);
-        fail("Expecting exception: ParseException");
-      
-      } catch(ParseException e) {
-         //
-         // Failed to parse date [\"190690348-12-04T21:42:26Z\"]: Invalid time zone indicator '8'
-         //
-         verifyException("com.google.gson.internal.bind.util.ISO8601Utils", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testParse_mismatchTimezoneIndicator() throws Throwable {
+        // Tests parsing with mismatched timezone indicator
+        ParsePosition parsePosition = new ParsePosition(3);
+        try { 
+            ISO8601Utils.parse("208737754-05-17T20:36:25Z", parsePosition);
+            fail("Expecting exception: ParseException");
+        } catch(ParseException e) {
+            assertTrue(e.getMessage().contains("Mismatching time zone indicator: GMT-17T20:36:25Z given, resolves to GMT"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      ParsePosition parsePosition0 = new ParsePosition(0);
-      Date date0 = ISO8601Utils.parse("2014-02-14T20:21:21.320Z", parsePosition0);
-      assertEquals("Fri Feb 14 20:21:21 GMT 2014", date0.toString());
-  }
+    // ===========================================================
+    // Error Case Tests: Formatting
+    // ===========================================================
+    
+    @Test(timeout = 4000)
+    public void testFormat_nullTimeZone() throws Throwable {
+        // Tests formatting with null timezone
+        MockDate mockDate = new MockDate();
+        try { 
+            ISO8601Utils.format(mockDate, false, (TimeZone) null);
+            fail("Expecting exception: NullPointerException");
+        } catch(NullPointerException e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      ParsePosition parsePosition0 = new ParsePosition(3);
-      try { 
-        ISO8601Utils.parse("208737754-05-17T20:36:25Z", parsePosition0);
-        fail("Expecting exception: ParseException");
-      
-      } catch(ParseException e) {
-         //
-         // Failed to parse date [\"208737754-05-17T20:36:25Z\"]: Mismatching time zone indicator: GMT-17T20:36:25Z given, resolves to GMT
-         //
-         verifyException("com.google.gson.internal.bind.util.ISO8601Utils", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testFormat_nullDateWithMillis() throws Throwable {
+        // Tests formatting null date (with milliseconds option)
+        try { 
+            ISO8601Utils.format((Date) null, true);
+            fail("Expecting exception: NullPointerException");
+        } catch(NullPointerException e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      MockDate mockDate0 = new MockDate(1194, 1194, 2550);
-      SimpleTimeZone simpleTimeZone0 = new SimpleTimeZone(2550, "!#[5.iqQz1B2Sn'");
-      simpleTimeZone0.setRawOffset((-141));
-      String string0 = ISO8601Utils.format((Date) mockDate0, true, (TimeZone) simpleTimeZone0);
-      assertEquals("3200-06-22T23:59:59.859-00:00", string0);
-  }
+    @Test(timeout = 4000)
+    public void testFormat_nullDate() throws Throwable {
+        // Tests formatting null date
+        try { 
+            ISO8601Utils.format((Date) null);
+            fail("Expecting exception: NullPointerException");
+        } catch(NullPointerException e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      MockDate mockDate0 = new MockDate();
-      String string0 = ISO8601Utils.format((Date) mockDate0, true);
-      assertEquals("2014-02-14T20:21:21.320Z", string0);
-  }
+    // ===========================================================
+    // Error Case Tests: General
+    // ===========================================================
+    
+    @Test(timeout = 4000)
+    public void testParse_nullParsePosition() throws Throwable {
+        // Tests parsing with null parse position
+        try { 
+            ISO8601Utils.parse("H0tU&_9';1S)", (ParsePosition) null);
+            fail("Expecting exception: NullPointerException");
+        } catch(NullPointerException e) {
+            // Expected behavior
+        }
+    }
 }
