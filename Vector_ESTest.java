@@ -14,254 +14,310 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) 
-@EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, 
-                     resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class Vector_ESTest extends Vector_ESTest_scaffolding {
 
-    // Basic Operations Tests
-    @Test(timeout = 4000)
-    public void length_zeroVector_returnsZero() {
-        Vector vector = new Vector(0.0F, 0.0F, 0.0F);
-        float length = vector.length();
-        assertEquals(0.0F, length, 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      Vector vector0 = new Vector((-528.75F), (-528.75F), 1.0F);
+      float float0 = vector0.dot(vector0);
+      assertEquals(559154.1F, float0, 0.01F);
+  }
 
-    @Test(timeout = 4000)
-    public void lengthSquared_zeroVector_returnsZero() {
-        Vector vector = new Vector(0.0F, 0.0F, 0.0F);
-        float lengthSquared = vector.lengthSquared();
-        assertEquals(0.0F, lengthSquared, 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      Vector vector0 = new Vector(0.0F, 0.0F, 0.0F);
+      Vector vector1 = new Vector(1103.0195F, 0.0F, 8.0F);
+      float float0 = vector0.dot(vector1);
+      assertEquals(0.0F, float0, 0.01F);
+      assertEquals(1103.0486F, vector1.length(), 0.01F);
+  }
 
-    @Test(timeout = 4000)
-    public void get_index0_returnsXComponent() {
-        Vector vector = new Vector(0.0F, 0.0F, 0.0F);
-        float x = vector.get(0);
-        assertEquals(0.0F, x, 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      Vector vector0 = new Vector(0.0F, 0.0F, 0.0F);
+      Vector vector1 = new Vector((-1465.0F), (-1465.0F), 1);
+      Vector vector2 = vector0.subtract(vector1);
+      Matrix matrix0 = new Matrix(490.69257F, (-667.658F), (-1.0F), 0.0F, (-1465.0F), 0.0F);
+      Vector vector3 = vector2.cross(matrix0);
+      Vector vector4 = vector3.multiply(8);
+      assertEquals(9710969.0F, vector4.length(), 0.01F);
+  }
 
-    @Test(timeout = 4000)
-    public void get_index1_returnsYComponent() {
-        Vector vector = new Vector(1864.694F, -105.0F, -1351.098F);
-        float y = vector.get(1);
-        assertEquals(-105.0F, y, 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      Vector vector0 = new Vector((-2905.637F), (-2905.637F), (-1.0F));
+      Vector vector1 = new Vector(0, (-444.7289F), (-3839.2217F));
+      Vector vector2 = vector0.cross(vector1);
+      Vector vector3 = vector0.subtract(vector2);
+      assertEquals(1.5828617E7F, vector3.length(), 0.01F);
+  }
 
-    @Test(timeout = 4000)
-    public void get_invalidIndex_throwsArrayIndexOutOfBoundsException() {
-        Vector vector = new Vector(0.0F, 0.0F, 0.0F);
-        try {
-            vector.get(360);
-            fail("Expected ArrayIndexOutOfBoundsException");
-        } catch(ArrayIndexOutOfBoundsException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      Vector vector0 = new Vector(0.0F, 0.0F, 0.0F);
+      Vector vector1 = vector0.normalize();
+      Matrix matrix0 = new Matrix(135.0858F, 0.0F, 2, 0, 0.0F, (-1.0F));
+      Vector vector2 = vector1.cross(matrix0);
+      assertTrue(vector2.equals((Object)vector1));
+      assertEquals(0.0F, vector0.length(), 0.01F);
+  }
 
-    @Test(timeout = 4000)
-    public void toString_returnsCommaSeparatedComponents() {
-        Vector vector = new Vector(-2905.637F, -2905.637F, -1.0F);
-        String result = vector.toString();
-        assertEquals("-2905.637,-2905.637,-1.0", result);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      Vector vector0 = new Vector(0.0F, 0.0F, 0.0F);
+      Matrix matrix0 = new Matrix(135.0858F, 0.0F, 2, 0, 0.0F, (-1.0F));
+      Vector vector1 = vector0.cross(matrix0);
+      assertTrue(vector1.equals((Object)vector0));
+  }
 
-    @Test(timeout = 4000)
-    public void hashCode_calculatesHashBasedOnComponents() {
-        Vector vector = new Vector(-2905.637F, -2905.637F, -1.0F);
-        vector.hashCode();  // Verify no exception
-        assertEquals(4109.191F, vector.length(), 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      Vector vector0 = new Vector(0.0F, 0.0F, 742.77F);
+      Vector vector1 = vector0.multiply(0.0F);
+      assertEquals(0.0F, vector1.length(), 0.01F);
+      assertEquals(742.77F, vector0.length(), 0.01F);
+  }
 
-    // Dot Product Tests
-    @Test(timeout = 4000)
-    public void dotProduct_withSelf_returnsSumOfSquares() {
-        Vector vector = new Vector(-528.75F, -528.75F, 1.0F);
-        float result = vector.dot(vector);
-        assertEquals(559154.1F, result, 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      Vector vector0 = new Vector((-1465.0F), (-1465.0F), 1);
+      float float0 = vector0.lengthSquared();
+      assertEquals(4292451.0F, float0, 0.01F);
+  }
 
-    @Test(timeout = 4000)
-    public void dotProduct_zeroVectorWithNonZeroVector_returnsZero() {
-        Vector zeroVector = new Vector(0.0F, 0.0F, 0.0F);
-        Vector nonZeroVector = new Vector(1103.0195F, 0.0F, 8.0F);
-        float result = zeroVector.dot(nonZeroVector);
-        assertEquals(0.0F, result, 0.01F);
-        assertEquals(1103.0486F, nonZeroVector.length(), 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      Vector vector0 = new Vector((-1465.0F), (-1465.0F), 1);
+      float float0 = vector0.length();
+      assertEquals(2071.823F, float0, 0.01F);
+  }
 
-    @Test(timeout = 4000)
-    public void dotProduct_orthogonalVectorsWithOppositeZ_returnsNegative2() {
-        Vector v1 = new Vector(0.0F, 0.0F, -1.0F);
-        Vector v2 = new Vector(0.0F, -1.0F, 2);
-        float result = v1.dot(v2);
-        assertEquals(-2.0F, result, 0.01F);
-        assertEquals(5.0F, v2.lengthSquared(), 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      Vector vector0 = new Vector(0.0F, 0.0F, 0.0F);
+      Vector vector1 = new Vector((-1465.0F), (-1465.0F), 1);
+      Vector vector2 = vector0.subtract(vector1);
+      float float0 = vector2.get(0);
+      assertEquals(2071.823F, vector2.length(), 0.01F);
+      assertEquals(1465.0F, float0, 0.01F);
+  }
 
-    @Test(timeout = 4000)
-    public void dotProduct_nullVector_throwsNullPointerException() {
-        Vector vector = new Vector(4, 3, 8);
-        try {
-            vector.dot(null);
-            fail("Expected NullPointerException");
-        } catch(NullPointerException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      Vector vector0 = new Vector(1864.694F, (-105.0F), (-1351.098F));
+      float float0 = vector0.get(1);
+      assertEquals(5313574.5F, vector0.lengthSquared(), 0.01F);
+      assertEquals((-105.0F), float0, 0.01F);
+  }
 
-    // Cross Product Tests
-    @Test(timeout = 4000)
-    public void crossProduct_withSelf_returnsZeroVector() {
-        Vector vector = new Vector(-2905.637F, -2905.637F, -1.0F);
-        Vector result = vector.cross(vector);
-        assertEquals(0.0F, result.length(), 0.01F);
-        assertEquals(4109.191F, vector.length(), 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      Vector vector0 = new Vector(0.0F, 0.0F, 742.77F);
+      float float0 = vector0.dot(vector0);
+      assertEquals(551707.3F, float0, 0.01F);
+  }
 
-    @Test(timeout = 4000)
-    public void crossProduct_zeroVectorWithMatrix_returnsZeroVector() {
-        Vector zeroVector = new Vector(0.0F, 0.0F, 0.0F);
-        Matrix matrix = new Matrix(135.0858F, 0.0F, 2, 0, 0.0F, -1.0F);
-        Vector result = zeroVector.cross(matrix);
-        assertTrue(result.equals(zeroVector));
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      Vector vector0 = new Vector(0.0F, 0.0F, (-1.0F));
+      Vector vector1 = new Vector(0.0F, (-1.0F), 2);
+      float float0 = vector0.dot(vector1);
+      assertEquals((-2.0F), float0, 0.01F);
+      assertEquals(5.0F, vector1.lengthSquared(), 0.01F);
+  }
 
-    @Test(timeout = 4000)
-    public void crossProduct_withMatrixAfterSubtract_producesExpectedLength() {
-        Vector zeroVector = new Vector(0.0F, 0.0F, 0.0F);
-        Vector vector = new Vector(-1465.0F, -1465.0F, 1);
-        Vector subtracted = zeroVector.subtract(vector);
-        Matrix matrix = new Matrix(490.69257F, -667.658F, -1.0F, 0.0F, -1465.0F, 0.0F);
-        Vector result = subtracted.cross(matrix).multiply(8);
-        assertEquals(9710969.0F, result.length(), 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      Vector vector0 = new Vector((-2905.637F), (-2905.637F), (-1.0F));
+      Vector vector1 = new Vector(0, (-444.7289F), (-3839.2217F));
+      Vector vector2 = vector0.cross(vector1);
+      Vector vector3 = vector2.cross(vector1);
+      Vector vector4 = vector3.cross(vector0);
+      Vector vector5 = vector4.cross(vector3);
+      Vector vector6 = vector5.normalize();
+      assertEquals(0.0F, vector6.length(), 0.01F);
+      assertEquals(4.2085848E26F, vector4.lengthSquared(), 0.01F);
+  }
 
-    @Test(timeout = 4000)
-    public void crossProduct_chainOperations_producesExpectedResults() {
-        Vector v1 = new Vector(-2905.637F, -2905.637F, -1.0F);
-        Vector v2 = new Vector(0, -444.7289F, -3839.2217F);
-        Vector cross1 = v1.cross(v2);
-        Vector subtract = v1.subtract(cross1);
-        Vector cross2 = subtract.cross(v2);
-        Vector cross3 = cross2.cross(v1);
-        Vector cross4 = cross3.cross(cross1);
-        Vector normalized = cross4.normalize();
-        
-        assertEquals(0.0F, normalized.length(), 0.01F);
-        assertEquals(4.2085848E26F, cross3.lengthSquared(), 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      Vector vector0 = new Vector(0.0F, 0.0F, 0.0F);
+      Matrix matrix0 = new Matrix();
+      Vector vector1 = vector0.cross(matrix0);
+      assertTrue(vector1.equals((Object)vector0));
+  }
 
-    @Test(timeout = 4000)
-    public void crossProduct_nullVector_throwsNullPointerException() {
-        Vector vector = new Vector(-557.00323F, -557.00323F, -557.00323F);
-        try {
-            vector.cross((Vector) null);
-            fail("Expected NullPointerException");
-        } catch(NullPointerException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      Vector vector0 = new Vector((-2350.2F), (-2350.2F), (-2350.2F));
+      // Undeclared exception!
+      try { 
+        vector0.subtract((Vector) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.itextpdf.text.pdf.parser.Vector", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void crossProduct_nullMatrix_throwsNullPointerException() {
-        Vector vector = new Vector(-557.00323F, -557.00323F, -557.00323F);
-        try {
-            vector.cross((Matrix) null);
-            fail("Expected NullPointerException");
-        } catch(NullPointerException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      Vector vector0 = new Vector(0.0F, 0.0F, 0.0F);
+      // Undeclared exception!
+      try { 
+        vector0.get(360);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 360
+         //
+         verifyException("com.itextpdf.text.pdf.parser.Vector", e);
+      }
+  }
 
-    // Vector Arithmetic Tests
-    @Test(timeout = 4000)
-    public void subtract_sameVector_returnsZeroVector() {
-        Vector vector = new Vector(-2905.637F, -2905.637F, -1.0F);
-        Vector result = vector.subtract(vector);
-        assertEquals(0.0F, result.length(), 0.01F);
-        assertEquals(1.6885452E7F, vector.lengthSquared(), 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      Vector vector0 = new Vector(4, 3, 8);
+      // Undeclared exception!
+      try { 
+        vector0.dot((Vector) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.itextpdf.text.pdf.parser.Vector", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void subtract_negativeVectorFromZero_returnsPositiveVector() {
-        Vector zeroVector = new Vector(0.0F, 0.0F, 0.0F);
-        Vector negativeVector = new Vector(-1465.0F, -1465.0F, 1);
-        Vector result = zeroVector.subtract(negativeVector);
-        assertEquals(1465.0F, result.get(0), 0.01F);
-        assertEquals(2071.823F, result.length(), 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      Vector vector0 = new Vector((-557.00323F), (-557.00323F), (-557.00323F));
+      // Undeclared exception!
+      try { 
+        vector0.cross((Vector) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.itextpdf.text.pdf.parser.Vector", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void subtract_nullVector_throwsNullPointerException() {
-        Vector vector = new Vector(-2350.2F, -2350.2F, -2350.2F);
-        try {
-            vector.subtract(null);
-            fail("Expected NullPointerException");
-        } catch(NullPointerException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      Vector vector0 = new Vector((-557.00323F), (-557.00323F), (-557.00323F));
+      // Undeclared exception!
+      try { 
+        vector0.cross((Matrix) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.itextpdf.text.pdf.parser.Vector", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void multiply_byZero_producesZeroVector() {
-        Vector vector = new Vector(0.0F, 0.0F, 742.77F);
-        Vector result = vector.multiply(0.0F);
-        assertEquals(0.0F, result.length(), 0.01F);
-        assertEquals(742.77F, vector.length(), 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      Vector vector0 = new Vector(0.0F, 0.0F, 0.0F);
+      float float0 = vector0.length();
+      assertEquals(0.0F, float0, 0.01F);
+  }
 
-    // Normalization Tests
-    @Test(timeout = 4000)
-    public void normalize_zeroVector_returnsZeroVector() {
-        Vector zeroVector = new Vector(0.0F, 0.0F, 0.0F);
-        Vector normalized = zeroVector.normalize();
-        Matrix matrix = new Matrix(135.0858F, 0.0F, 2, 0, 0.0F, -1.0F);
-        Vector result = normalized.cross(matrix);
-        assertTrue(result.equals(normalized));
-        assertEquals(0.0F, zeroVector.length(), 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      Vector vector0 = new Vector(0.0F, 0.0F, 0.0F);
+      float float0 = vector0.lengthSquared();
+      assertEquals(0.0F, float0, 0.01F);
+  }
 
-    // Equality Tests
-    @Test(timeout = 4000)
-    public void equals_sameObject_returnsTrue() {
-        Vector vector = new Vector(0.0F, 0.0F, 0.0F);
-        boolean result = vector.equals(vector);
-        assertTrue(result);
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      Vector vector0 = new Vector(0.0F, 0.0F, 3.3516045F);
+      Matrix matrix0 = new Matrix(0.0F, 0);
+      Vector vector1 = vector0.cross(matrix0);
+      boolean boolean0 = vector0.equals(vector1);
+      assertTrue(boolean0);
+      assertEquals(11.233253F, vector0.lengthSquared(), 0.01F);
+  }
 
-    @Test(timeout = 4000)
-    public void equals_differentZComponents_returnsFalse() {
-        Vector v1 = new Vector(0.0F, 0.0F, 3.3516045F);
-        Vector v2 = new Vector(0.0F, 0.0F, 1);
-        boolean result = v1.equals(v2);
-        assertFalse(result);
-        assertEquals(1.0F, v2.length(), 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      Vector vector0 = new Vector(0.0F, 0.0F, 0.0F);
+      Object object0 = new Object();
+      boolean boolean0 = vector0.equals(object0);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void equals_nullObject_returnsFalse() {
-        Vector vector = new Vector(-80.165F, -80.165F, -80.165F);
-        boolean result = vector.equals(null);
-        assertFalse(result);
-        assertEquals(19279.281F, vector.lengthSquared(), 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      Vector vector0 = new Vector((-80.165F), (-80.165F), (-80.165F));
+      boolean boolean0 = vector0.equals((Object) null);
+      assertFalse(boolean0);
+      assertEquals(19279.281F, vector0.lengthSquared(), 0.01F);
+  }
 
-    @Test(timeout = 4000)
-    public void equals_nonVectorObject_returnsFalse() {
-        Vector vector = new Vector(0.0F, 0.0F, 0.0F);
-        Object obj = new Object();
-        boolean result = vector.equals(obj);
-        assertFalse(result);
-    }
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      Vector vector0 = new Vector(0.0F, 0.0F, 0.0F);
+      boolean boolean0 = vector0.equals(vector0);
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void equals_afterMatrixCrossProduct_returnsTrue() {
-        Vector vector = new Vector(0.0F, 0.0F, 3.3516045F);
-        Matrix matrix = new Matrix(0.0F, 0);
-        Vector result = vector.cross(matrix);
-        boolean equals = vector.equals(result);
-        assertTrue(equals);
-        assertEquals(11.233253F, vector.lengthSquared(), 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      Vector vector0 = new Vector(0.0F, 0.0F, 3.3516045F);
+      Vector vector1 = new Vector(0.0F, 0.0F, 1);
+      boolean boolean0 = vector0.equals(vector1);
+      assertEquals(1.0F, vector1.length(), 0.01F);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      Vector vector0 = new Vector((-2905.637F), (-2905.637F), (-1.0F));
+      Vector vector1 = vector0.cross(vector0);
+      assertEquals(4109.191F, vector0.length(), 0.01F);
+      assertEquals(0.0F, vector1.length(), 0.01F);
+  }
+
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      Vector vector0 = new Vector(0.0F, 0.0F, 0.0F);
+      float float0 = vector0.get(0);
+      assertEquals(0.0F, float0, 0.01F);
+  }
+
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      Vector vector0 = new Vector((-2905.637F), (-2905.637F), (-1.0F));
+      Vector vector1 = vector0.subtract(vector0);
+      assertEquals(1.6885452E7F, vector0.lengthSquared(), 0.01F);
+      assertEquals(0.0F, vector1.length(), 0.01F);
+  }
+
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      Vector vector0 = new Vector((-2905.637F), (-2905.637F), (-1.0F));
+      vector0.hashCode();
+      assertEquals(4109.191F, vector0.length(), 0.01F);
+  }
+
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      Vector vector0 = new Vector((-2905.637F), (-2905.637F), (-1.0F));
+      String string0 = vector0.toString();
+      assertEquals("-2905.637,-2905.637,-1.0", string0);
+  }
 }
