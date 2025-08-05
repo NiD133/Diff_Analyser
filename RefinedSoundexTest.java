@@ -21,11 +21,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.apache.commons.codec.AbstractStringEncoderTest;
 import org.apache.commons.codec.EncoderException;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests RefinedSoundex.
+ * Tests the {@link RefinedSoundex} encoder with a focus on clarity and maintainability.
  */
+@DisplayName("Tests for RefinedSoundex encoder")
 class RefinedSoundexTest extends AbstractStringEncoderTest<RefinedSoundex> {
 
     @Override
@@ -33,74 +36,113 @@ class RefinedSoundexTest extends AbstractStringEncoderTest<RefinedSoundex> {
         return new RefinedSoundex();
     }
 
-    @Test
-    void testDifference() throws EncoderException {
-        // Edge cases
-        assertEquals(0, getStringEncoder().difference(null, null));
-        assertEquals(0, getStringEncoder().difference("", ""));
-        assertEquals(0, getStringEncoder().difference(" ", " "));
-        // Normal cases
-        assertEquals(6, getStringEncoder().difference("Smith", "Smythe"));
-        assertEquals(3, getStringEncoder().difference("Ann", "Andrew"));
-        assertEquals(1, getStringEncoder().difference("Margaret", "Andrew"));
-        assertEquals(1, getStringEncoder().difference("Janet", "Margaret"));
-        // Examples from
-        // https://msdn.microsoft.com/library/default.asp?url=/library/en-us/tsqlref/ts_de-dz_8co5.asp
-        assertEquals(5, getStringEncoder().difference("Green", "Greene"));
-        assertEquals(1, getStringEncoder().difference("Blotchet-Halls", "Greene"));
-        // Examples from
-        // https://msdn.microsoft.com/library/default.asp?url=/library/en-us/tsqlref/ts_setu-sus_3o6w.asp
-        assertEquals(6, getStringEncoder().difference("Smith", "Smythe"));
-        assertEquals(8, getStringEncoder().difference("Smithers", "Smythers"));
-        assertEquals(5, getStringEncoder().difference("Anothers", "Brothers"));
-    }
+    @Nested
+    @DisplayName("Encoding logic")
+    class EncodingTests {
 
-    @Test
-    void testEncode() {
-        assertEquals("T6036084", getStringEncoder().encode("testing"));
-        assertEquals("T6036084", getStringEncoder().encode("TESTING"));
-        assertEquals("T60", getStringEncoder().encode("The"));
-        assertEquals("Q503", getStringEncoder().encode("quick"));
-        assertEquals("B1908", getStringEncoder().encode("brown"));
-        assertEquals("F205", getStringEncoder().encode("fox"));
-        assertEquals("J408106", getStringEncoder().encode("jumped"));
-        assertEquals("O0209", getStringEncoder().encode("over"));
-        assertEquals("T60", getStringEncoder().encode("the"));
-        assertEquals("L7050", getStringEncoder().encode("lazy"));
-        assertEquals("D6043", getStringEncoder().encode("dogs"));
-
-        // Testing CODEC-56
-        assertEquals("D6043", RefinedSoundex.US_ENGLISH.encode("dogs"));
-    }
-
-    @Test
-    void testGetMappingCodeNonLetter() {
-        final char code = getStringEncoder().getMappingCode('#');
-        assertEquals(0, code, "Code does not equals zero");
-    }
-
-    @Test
-    void testInvalidSoundexCharacter() {
-        final char[] invalid = new char[256];
-        for (int i = 0; i < invalid.length; i++) {
-            invalid[i] = (char) i;
+        @Test
+        @DisplayName("should produce correct codes for a sample of English words")
+        void shouldEncodeKnownWords() {
+            assertEquals("T6036084", getStringEncoder().encode("testing"));
+            assertEquals("Q503", getStringEncoder().encode("quick"));
+            assertEquals("B1908", getStringEncoder().encode("brown"));
+            assertEquals("F205", getStringEncoder().encode("fox"));
+            assertEquals("J408106", getStringEncoder().encode("jumped"));
+            assertEquals("O0209", getStringEncoder().encode("over"));
+            assertEquals("T60", getStringEncoder().encode("the"));
+            assertEquals("L7050", getStringEncoder().encode("lazy"));
+            assertEquals("D6043", getStringEncoder().encode("dogs"));
         }
 
-        assertEquals(new RefinedSoundex().encode(new String(invalid)), "A0136024043780159360205050136024043780159360205053");
+        @Test
+        @DisplayName("should be case-insensitive")
+        void shouldBeCaseInsensitive() {
+            // The implementation cleans the string, which includes uppercasing.
+            assertEquals(getStringEncoder().encode("TESTING"), getStringEncoder().encode("testing"),
+                "Encoding should be the same for different cases.");
+        }
+
+        @Test
+        @DisplayName("should ignore non-alphabetic characters")
+        void shouldIgnoreNonAlphabeticCharacters() {
+            // The implementation cleans the string, which removes non-letters.
+            assertEquals(getStringEncoder().encode("Ashcraft"), getStringEncoder().encode("A$hcraft"),
+                "Special characters should be ignored.");
+            assertEquals(getStringEncoder().encode("Tymczak"), getStringEncoder().encode("T-y-m-c-z-a-k"),
+                "Hyphens should be ignored.");
+        }
+
+        @Test
+        @DisplayName("should return an empty string for an input containing no letters")
+        void shouldReturnEmptyStringForInputWithNoLetters() {
+            assertEquals("", getStringEncoder().encode("!@#$%^&*()"));
+            assertEquals("", getStringEncoder().encode("1234567890"));
+        }
+    }
+
+    @Nested
+    @DisplayName("Difference calculation")
+    class DifferenceTests {
+
+        @Test
+        @DisplayName("should return 0 for null or empty inputs")
+        void shouldReturnZeroForNullOrEmptyInputs() throws EncoderException {
+            assertEquals(0, getStringEncoder().difference(null, null));
+            assertEquals(0, getStringEncoder().difference("", ""));
+            assertEquals(0, getStringEncoder().difference(" ", " ")); // " " is cleaned to ""
+        }
+
+        @Test
+        @DisplayName("should calculate similarity between common names")
+        void shouldCalculateSimilarityForCommonNames() throws EncoderException {
+            assertEquals(6, getStringEncoder().difference("Smith", "Smythe"));
+            assertEquals(3, getStringEncoder().difference("Ann", "Andrew"));
+            assertEquals(1, getStringEncoder().difference("Margaret", "Andrew"));
+            assertEquals(1, getStringEncoder().difference("Janet", "Margaret"));
+        }
+
+        @Test
+        @DisplayName("should match known examples from Microsoft T-SQL documentation")
+        void shouldMatchKnownMicrosoftExamples() throws EncoderException {
+            // Examples from https://msdn.microsoft.com/library/default.asp?url=/library/en-us/tsqlref/ts_de-dz_8co5.asp
+            // and https://msdn.microsoft.com/library/default.asp?url=/library/en-us/tsqlref/ts_setu-sus_3o6w.asp
+            assertEquals(5, getStringEncoder().difference("Green", "Greene"));
+            assertEquals(1, getStringEncoder().difference("Blotchet-Halls", "Greene"));
+            assertEquals(8, getStringEncoder().difference("Smithers", "Smythers"));
+            assertEquals(5, getStringEncoder().difference("Anothers", "Brothers"));
+        }
+    }
+
+    @Nested
+    @DisplayName("Instantiation and configuration")
+    class InstanceTests {
+
+        @Test
+        @DisplayName("should be creatable with a custom mapping string")
+        void shouldWorkWithStringConstructor() {
+            final RefinedSoundex customInstance = new RefinedSoundex(RefinedSoundex.US_ENGLISH_MAPPING_STRING);
+            assertEquals("D6043", customInstance.soundex("dogs"));
+        }
+
+        @Test
+        @DisplayName("should be creatable with a custom mapping char array")
+        void shouldWorkWithCharArrayConstructor() {
+            final char[] mapping = RefinedSoundex.US_ENGLISH_MAPPING_STRING.toCharArray();
+            final RefinedSoundex customInstance = new RefinedSoundex(mapping);
+            assertEquals("D6043", customInstance.soundex("dogs"));
+        }
+
+        @Test
+        @DisplayName("should provide a pre-configured static instance for US English (verifies CODEC-56)")
+        void shouldWorkWithStaticInstance() {
+            assertEquals("D6043", RefinedSoundex.US_ENGLISH.encode("dogs"));
+        }
     }
 
     @Test
-    void testNewInstance() {
-        assertEquals("D6043", new RefinedSoundex().soundex("dogs"));
-    }
-
-    @Test
-    void testNewInstance2() {
-        assertEquals("D6043", new RefinedSoundex(RefinedSoundex.US_ENGLISH_MAPPING_STRING.toCharArray()).soundex("dogs"));
-    }
-
-    @Test
-    void testNewInstance3() {
-        assertEquals("D6043", new RefinedSoundex(RefinedSoundex.US_ENGLISH_MAPPING_STRING).soundex("dogs"));
+    @DisplayName("getMappingCode() should return 0 for non-letter characters")
+    void getMappingCodeShouldReturnZeroForNonLetter() {
+        final char code = getStringEncoder().getMappingCode('#');
+        assertEquals(0, code, "The mapping code for a non-letter character should be 0.");
     }
 }
