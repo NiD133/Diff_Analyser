@@ -22,333 +22,321 @@ import org.jfree.chart.entity.StandardEntityCollection;
 import org.jfree.chart.plot.PlotRenderingInfo;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, 
+useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class PlotRenderingInfo_ESTest extends PlotRenderingInfo_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
-      Rectangle rectangle0 = new Rectangle((-352), 0);
-      plotRenderingInfo0.setDataArea(rectangle0);
-      plotRenderingInfo0.hashCode();
-  }
+    // Test Cases for hashCode()
+    @Test(timeout = 4000)
+    public void hashCodeChangesAfterSettingDataArea()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = chartRenderingInfo.getPlotInfo();
+        Rectangle dataArea = new Rectangle(-352, 0);
+        plotInfo.setDataArea(dataArea);
+        plotInfo.hashCode(); // Should not throw exception
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
-      Point point0 = new Point(4047, 4047);
-      Line2D.Float line2D_Float0 = new Line2D.Float(point0, point0);
-      Rectangle2D rectangle2D0 = line2D_Float0.getBounds2D();
-      plotRenderingInfo0.setPlotArea(rectangle2D0);
-      plotRenderingInfo0.hashCode();
-  }
+    @Test(timeout = 4000)
+    public void hashCodeChangesAfterSettingPlotArea()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = chartRenderingInfo.getPlotInfo();
+        Point point = new Point(4047, 4047);
+        Line2D.Float line = new Line2D.Float(point, point);
+        Rectangle2D plotArea = line.getBounds2D();
+        plotInfo.setPlotArea(plotArea);
+        plotInfo.hashCode(); // Should not throw exception
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
-      PlotRenderingInfo plotRenderingInfo1 = new PlotRenderingInfo(chartRenderingInfo0);
-      plotRenderingInfo0.addSubplotInfo(plotRenderingInfo1);
-      PlotRenderingInfo plotRenderingInfo2 = plotRenderingInfo0.getSubplotInfo(0);
-      assertFalse(plotRenderingInfo2.equals((Object)plotRenderingInfo0));
-  }
+    // Test Cases for Subplot Management
+    @Test(timeout = 4000)
+    public void getSubplotInfoReturnsAddedSubplot()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo mainPlotInfo = chartRenderingInfo.getPlotInfo();
+        PlotRenderingInfo subPlotInfo = new PlotRenderingInfo(chartRenderingInfo);
+        mainPlotInfo.addSubplotInfo(subPlotInfo);
+        PlotRenderingInfo retrieved = mainPlotInfo.getSubplotInfo(0);
+        assertNotSame("Retrieved subplot should be different from main plot", 
+                     mainPlotInfo, retrieved);
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo(chartRenderingInfo0);
-      plotRenderingInfo0.addSubplotInfo(plotRenderingInfo0);
-      PlotRenderingInfo plotRenderingInfo1 = plotRenderingInfo0.getSubplotInfo(0);
-      assertEquals(1, plotRenderingInfo1.getSubplotCount());
-  }
+    @Test(timeout = 4000)
+    public void addSubplotInfoIncreasesSubplotCount()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = new PlotRenderingInfo(chartRenderingInfo);
+        plotInfo.addSubplotInfo(plotInfo);
+        PlotRenderingInfo subplot = plotInfo.getSubplotInfo(0);
+        assertEquals("Subplot count should be 1", 1, subplot.getSubplotCount());
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      Rectangle rectangle0 = new Rectangle();
-      PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo(chartRenderingInfo0);
-      plotRenderingInfo0.setPlotArea(rectangle0);
-      Rectangle2D rectangle2D0 = plotRenderingInfo0.getPlotArea();
-      assertEquals(0.0, rectangle2D0.getMaxY(), 0.01);
-  }
+    @Test(timeout = 4000)
+    public void getSubplotCountInitiallyZero()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = new PlotRenderingInfo(chartRenderingInfo);
+        assertEquals("Initial subplot count should be 0", 0, plotInfo.getSubplotCount());
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo((EntityCollection) null);
-      PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
-      Dimension dimension0 = new Dimension(1595, 2);
-      Rectangle rectangle0 = new Rectangle(dimension0);
-      plotRenderingInfo0.setPlotArea(rectangle0);
-      Rectangle2D rectangle2D0 = plotRenderingInfo0.getPlotArea();
-      assertEquals(1595.0, rectangle2D0.getWidth(), 0.01);
-  }
+    @Test(timeout = 4000)
+    public void getSubplotCountAfterAddingSubplot()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = chartRenderingInfo.getPlotInfo();
+        plotInfo.addSubplotInfo(plotInfo);
+        assertEquals("Subplot count should be 1 after addition", 
+                     1, plotInfo.getSubplotCount());
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo((ChartRenderingInfo) null);
-      ChartRenderingInfo chartRenderingInfo0 = plotRenderingInfo0.getOwner();
-      assertNull(chartRenderingInfo0);
-  }
+    @Test(timeout = 4000, expected = IndexOutOfBoundsException.class)
+    public void getSubplotInfoThrowsForInvalidIndex()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = chartRenderingInfo.getPlotInfo();
+        plotInfo.getSubplotInfo(1); // Should throw IndexOutOfBoundsException
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo(chartRenderingInfo0);
-      plotRenderingInfo0.setDataArea((Rectangle2D) null);
-      Rectangle2D rectangle2D0 = plotRenderingInfo0.getDataArea();
-      assertNull(rectangle2D0);
-  }
+    // Test Cases for Plot Area Management
+    @Test(timeout = 4000)
+    public void setAndGetPlotArea()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        Rectangle plotArea = new Rectangle();
+        PlotRenderingInfo plotInfo = new PlotRenderingInfo(chartRenderingInfo);
+        plotInfo.setPlotArea(plotArea);
+        Rectangle2D retrieved = plotInfo.getPlotArea();
+        assertEquals("Plot area maxY should match", 0.0, retrieved.getMaxY(), 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
-      Rectangle rectangle0 = new Rectangle(0, 37, 4281, 0);
-      plotRenderingInfo0.setDataArea(rectangle0);
-      Rectangle2D rectangle2D0 = plotRenderingInfo0.getDataArea();
-      assertEquals(0.0, rectangle2D0.getHeight(), 0.01);
-  }
+    @Test(timeout = 4000)
+    public void setAndGetPlotAreaWithSpecificDimensions()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo((EntityCollection) null);
+        PlotRenderingInfo plotInfo = chartRenderingInfo.getPlotInfo();
+        Dimension dim = new Dimension(1595, 2);
+        Rectangle plotArea = new Rectangle(dim);
+        plotInfo.setPlotArea(plotArea);
+        Rectangle2D retrieved = plotInfo.getPlotArea();
+        assertEquals("Plot area width should match", 1595.0, retrieved.getWidth(), 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo((ChartRenderingInfo) null);
-      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double((-452.97088092026), (-452.97088092026), (-452.97088092026), (-452.97088092026));
-      plotRenderingInfo0.setDataArea(rectangle2D_Double0);
-      Rectangle2D.Double rectangle2D_Double1 = (Rectangle2D.Double)plotRenderingInfo0.getDataArea();
-      assertEquals((-452.97088092026), rectangle2D_Double1.height, 0.01);
-  }
+    @Test(timeout = 4000)
+    public void getPlotAreaInitiallyNull()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = new PlotRenderingInfo(chartRenderingInfo);
+        assertNull("Plot area should be null initially", plotInfo.getPlotArea());
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo(chartRenderingInfo0);
-      Line2D.Float line2D_Float0 = new Line2D.Float(0.0F, (-1725.4F), 0.0F, 1.0F);
-      Rectangle rectangle0 = line2D_Float0.getBounds();
-      plotRenderingInfo0.setDataArea(rectangle0);
-      Rectangle2D rectangle2D0 = plotRenderingInfo0.getDataArea();
-      assertEquals((-1726.0), rectangle2D0.getY(), 0.01);
-  }
+    // Test Cases for Data Area Management
+    @Test(timeout = 4000)
+    public void setDataAreaToNull()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = new PlotRenderingInfo(chartRenderingInfo);
+        plotInfo.setDataArea((Rectangle2D) null);
+        assertNull("Data area should be null after explicit set", plotInfo.getDataArea());
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      Rectangle rectangle0 = new Rectangle(1173, 1173);
-      PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
-      plotRenderingInfo0.setDataArea(rectangle0);
-      Rectangle rectangle1 = (Rectangle)plotRenderingInfo0.getDataArea();
-      assertEquals(0, rectangle1.y);
-  }
+    @Test(timeout = 4000)
+    public void setAndGetDataArea()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = chartRenderingInfo.getPlotInfo();
+        Rectangle dataArea = new Rectangle(0, 37, 4281, 0);
+        plotInfo.setDataArea(dataArea);
+        Rectangle2D retrieved = plotInfo.getDataArea();
+        assertEquals("Data area height should be 0", 0.0, retrieved.getHeight(), 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
-      Rectangle rectangle0 = new Rectangle((-352), 0);
-      plotRenderingInfo0.setDataArea(rectangle0);
-      Rectangle2D rectangle2D0 = plotRenderingInfo0.getDataArea();
-      assertEquals(0.0, rectangle2D0.getX(), 0.01);
-  }
+    @Test(timeout = 4000)
+    public void setAndGetDataAreaWithNegativeValues()  throws Throwable  {
+        PlotRenderingInfo plotInfo = new PlotRenderingInfo((ChartRenderingInfo) null);
+        Rectangle2D.Double dataArea = new Rectangle2D.Double(-452.97, -452.97, -452.97, -452.97);
+        plotInfo.setDataArea(dataArea);
+        Rectangle2D.Double retrieved = (Rectangle2D.Double) plotInfo.getDataArea();
+        assertEquals("Data area height should match", -452.97, retrieved.height, 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo(chartRenderingInfo0);
-      plotRenderingInfo0.addSubplotInfo((PlotRenderingInfo) null);
-      Point2D.Double point2D_Double0 = new Point2D.Double();
-      // Undeclared exception!
-      try { 
-        plotRenderingInfo0.getSubplotIndex(point2D_Double0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.jfree.chart.plot.PlotRenderingInfo", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void setDataAreaFromLineBounds()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = new PlotRenderingInfo(chartRenderingInfo);
+        Line2D.Float line = new Line2D.Float(0.0F, -1725.4F, 0.0F, 1.0F);
+        Rectangle dataArea = line.getBounds();
+        plotInfo.setDataArea(dataArea);
+        Rectangle2D retrieved = plotInfo.getDataArea();
+        assertEquals("Data area Y should match", -1726.0, retrieved.getY(), 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo((ChartRenderingInfo) null);
-      // Undeclared exception!
-      try { 
-        plotRenderingInfo0.getSubplotIndex((Point2D) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Null 'source' argument.
-         //
-         verifyException("org.jfree.chart.internal.Args", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void setAndGetDataAreaWithRectangle()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        Rectangle dataArea = new Rectangle(1173, 1173);
+        PlotRenderingInfo plotInfo = chartRenderingInfo.getPlotInfo();
+        plotInfo.setDataArea(dataArea);
+        Rectangle retrieved = (Rectangle) plotInfo.getDataArea();
+        assertEquals("Data area Y should be 0", 0, retrieved.y);
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo(chartRenderingInfo0);
-      int int0 = plotRenderingInfo0.getSubplotCount();
-      assertEquals(0, int0);
-  }
+    @Test(timeout = 4000)
+    public void setAndGetDataAreaWithNegativeX()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = chartRenderingInfo.getPlotInfo();
+        Rectangle dataArea = new Rectangle(-352, 0);
+        plotInfo.setDataArea(dataArea);
+        Rectangle2D retrieved = plotInfo.getDataArea();
+        assertEquals("Data area X should be -352", -352.0, retrieved.getX(), 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
-      PlotRenderingInfo plotRenderingInfo1 = new PlotRenderingInfo(chartRenderingInfo0);
-      plotRenderingInfo1.addSubplotInfo(plotRenderingInfo0);
-      plotRenderingInfo1.clone();
-      assertEquals(1, plotRenderingInfo1.getSubplotCount());
-  }
+    @Test(timeout = 4000)
+    public void setAndGetDataAreaFromLine2D()  throws Throwable  {
+        Point2D.Double point = new Point2D.Double(1994.172678354, -1.0);
+        Line2D.Float line = new Line2D.Float(point, point);
+        Rectangle2D dataArea = line.getBounds2D();
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = chartRenderingInfo.getPlotInfo();
+        plotInfo.setDataArea(dataArea);
+        Rectangle2D retrieved = plotInfo.getDataArea();
+        assertEquals("Data area maxY should match", -1.0, retrieved.getMaxY(), 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo(chartRenderingInfo0);
-      plotRenderingInfo0.setDataArea((Rectangle2D) null);
-      Object object0 = plotRenderingInfo0.clone();
-      assertNotSame(object0, plotRenderingInfo0);
-  }
+    // Test Cases for Owner Reference
+    @Test(timeout = 4000)
+    public void getOwnerWhenConstructedWithNull()  throws Throwable  {
+        PlotRenderingInfo plotInfo = new PlotRenderingInfo((ChartRenderingInfo) null);
+        assertNull("Owner should be null when constructed with null", 
+                  plotInfo.getOwner());
+    }
 
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      StandardEntityCollection standardEntityCollection0 = new StandardEntityCollection();
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo(standardEntityCollection0);
-      PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
-      Rectangle2D rectangle2D0 = plotRenderingInfo0.getDataArea();
-      plotRenderingInfo0.setPlotArea(rectangle2D0);
-      Object object0 = plotRenderingInfo0.clone();
-      assertNotSame(object0, plotRenderingInfo0);
-  }
+    @Test(timeout = 4000)
+    public void getOwnerReturnsCorrectReference()  throws Throwable  {
+        StandardEntityCollection entities = new StandardEntityCollection();
+        ChartRenderingInfo chartInfo = new ChartRenderingInfo(entities);
+        PlotRenderingInfo plotInfo = new PlotRenderingInfo(chartInfo);
+        ChartRenderingInfo owner = plotInfo.getOwner();
+        assertSame("Owner should match constructor argument", chartInfo, owner);
+    }
 
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
-      PlotRenderingInfo plotRenderingInfo1 = new PlotRenderingInfo(chartRenderingInfo0);
-      assertTrue(plotRenderingInfo1.equals((Object)plotRenderingInfo0));
-      
-      plotRenderingInfo1.addSubplotInfo(plotRenderingInfo0);
-      boolean boolean0 = plotRenderingInfo0.equals(plotRenderingInfo1);
-      assertFalse(plotRenderingInfo1.equals((Object)plotRenderingInfo0));
-      assertFalse(boolean0);
-  }
+    // Test Cases for Subplot Index Handling
+    @Test(timeout = 4000)
+    public void getSubplotIndexWhenPointNotInSubplot()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = new PlotRenderingInfo(chartRenderingInfo);
+        plotInfo.addSubplotInfo(plotInfo);
+        Point point = new Point();
+        int index = plotInfo.getSubplotIndex(point);
+        assertEquals("Should return -1 when point not in subplot", -1, index);
+    }
 
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      StandardEntityCollection standardEntityCollection0 = new StandardEntityCollection();
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo(standardEntityCollection0);
-      PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
-      PlotRenderingInfo plotRenderingInfo1 = new PlotRenderingInfo(chartRenderingInfo0);
-      Rectangle2D rectangle2D0 = plotRenderingInfo1.getDataArea();
-      assertTrue(plotRenderingInfo1.equals((Object)plotRenderingInfo0));
-      
-      plotRenderingInfo0.setPlotArea(rectangle2D0);
-      boolean boolean0 = plotRenderingInfo1.equals(plotRenderingInfo0);
-      assertFalse(plotRenderingInfo1.equals((Object)plotRenderingInfo0));
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void getSubplotIndexThrowsForNullPoint()  throws Throwable  {
+        PlotRenderingInfo plotInfo = new PlotRenderingInfo((ChartRenderingInfo) null);
+        try {
+            plotInfo.getSubplotIndex((Point2D) null);
+            fail("Expected IllegalArgumentException for null point");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Exception message should match", 
+                         "Null 'source' argument.", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo(chartRenderingInfo0);
-      Point point0 = new Point(7, 0);
-      Dimension dimension0 = new Dimension();
-      Rectangle rectangle0 = new Rectangle(point0, dimension0);
-      plotRenderingInfo0.setDataArea(rectangle0);
-      PlotRenderingInfo plotRenderingInfo1 = chartRenderingInfo0.getPlotInfo();
-      boolean boolean0 = plotRenderingInfo0.equals(plotRenderingInfo1);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void getSubplotIndexThrowsWhenSubplotInfoContainsNull()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = new PlotRenderingInfo(chartRenderingInfo);
+        plotInfo.addSubplotInfo((PlotRenderingInfo) null);
+        Point2D.Double point = new Point2D.Double();
+        try {
+            plotInfo.getSubplotIndex(point);
+            fail("Expected NullPointerException when subplot info contains null");
+        } catch (NullPointerException e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      StandardEntityCollection standardEntityCollection0 = new StandardEntityCollection();
-      PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo(chartRenderingInfo0);
-      boolean boolean0 = plotRenderingInfo0.equals(standardEntityCollection0);
-      assertFalse(boolean0);
-  }
+    // Test Cases for Cloning
+    @Test(timeout = 4000)
+    public void cloneAfterAddingSubplot()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo mainPlotInfo = chartRenderingInfo.getPlotInfo();
+        PlotRenderingInfo subPlotInfo = new PlotRenderingInfo(chartRenderingInfo);
+        mainPlotInfo.addSubplotInfo(subPlotInfo);
+        mainPlotInfo.clone(); // Should not throw exception
+    }
 
-  @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
-      boolean boolean0 = plotRenderingInfo0.equals(plotRenderingInfo0);
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void cloneWhenDataAreaIsNull()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = new PlotRenderingInfo(chartRenderingInfo);
+        plotInfo.setDataArea((Rectangle2D) null);
+        Object clone = plotInfo.clone();
+        assertNotSame("Clone should be different object", plotInfo, clone);
+    }
 
-  @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
-      PlotRenderingInfo plotRenderingInfo1 = new PlotRenderingInfo(chartRenderingInfo0);
-      boolean boolean0 = plotRenderingInfo0.equals(plotRenderingInfo1);
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void cloneWhenPlotAreaIsSetToDataArea()  throws Throwable  {
+        StandardEntityCollection entities = new StandardEntityCollection();
+        ChartRenderingInfo chartInfo = new ChartRenderingInfo(entities);
+        PlotRenderingInfo plotInfo = chartInfo.getPlotInfo();
+        Rectangle2D dataArea = plotInfo.getDataArea();
+        plotInfo.setPlotArea(dataArea);
+        Object clone = plotInfo.clone();
+        assertNotSame("Clone should be different object", plotInfo, clone);
+    }
 
-  @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo(chartRenderingInfo0);
-      Point point0 = new Point();
-      plotRenderingInfo0.addSubplotInfo(plotRenderingInfo0);
-      int int0 = plotRenderingInfo0.getSubplotIndex(point0);
-      assertEquals((-1), int0);
-  }
+    // Test Cases for Equality
+    @Test(timeout = 4000)
+    public void equalsReflexivity()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = chartRenderingInfo.getPlotInfo();
+        assertTrue("Object should equal itself", plotInfo.equals(plotInfo));
+    }
 
-  @Test(timeout = 4000)
-  public void test26()  throws Throwable  {
-      Point2D.Double point2D_Double0 = new Point2D.Double(1994.172678354, (-1.0));
-      Line2D.Float line2D_Float0 = new Line2D.Float(point2D_Double0, point2D_Double0);
-      Rectangle2D rectangle2D0 = line2D_Float0.getBounds2D();
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
-      plotRenderingInfo0.setDataArea(rectangle2D0);
-      Rectangle2D rectangle2D1 = plotRenderingInfo0.getDataArea();
-      assertEquals((-1.0), rectangle2D1.getMaxY(), 0.01);
-  }
+    @Test(timeout = 4000)
+    public void equalsForNewInstances()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo1 = new PlotRenderingInfo(chartRenderingInfo);
+        PlotRenderingInfo plotInfo2 = new PlotRenderingInfo(chartRenderingInfo);
+        assertTrue("New instances with same owner should be equal", 
+                  plotInfo1.equals(plotInfo2));
+    }
 
-  @Test(timeout = 4000)
-  public void test27()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo(chartRenderingInfo0);
-      Rectangle2D rectangle2D0 = plotRenderingInfo0.getPlotArea();
-      assertNull(rectangle2D0);
-  }
+    @Test(timeout = 4000)
+    public void equalsAfterAddingSubplot()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo1 = chartRenderingInfo.getPlotInfo();
+        PlotRenderingInfo plotInfo2 = new PlotRenderingInfo(chartRenderingInfo);
+        assertTrue("Initially equal", plotInfo1.equals(plotInfo2));
+        
+        plotInfo2.addSubplotInfo(plotInfo1);
+        assertFalse("Should not be equal after adding subplot", 
+                   plotInfo1.equals(plotInfo2));
+    }
 
-  @Test(timeout = 4000)
-  public void test28()  throws Throwable  {
-      StandardEntityCollection standardEntityCollection0 = new StandardEntityCollection();
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo(standardEntityCollection0);
-      PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo(chartRenderingInfo0);
-      ChartRenderingInfo chartRenderingInfo1 = plotRenderingInfo0.getOwner();
-      assertSame(chartRenderingInfo0, chartRenderingInfo1);
-  }
+    @Test(timeout = 4000)
+    public void equalsAfterSettingPlotArea()  throws Throwable  {
+        StandardEntityCollection entities = new StandardEntityCollection();
+        ChartRenderingInfo chartInfo = new ChartRenderingInfo(entities);
+        PlotRenderingInfo plotInfo1 = chartInfo.getPlotInfo();
+        PlotRenderingInfo plotInfo2 = new PlotRenderingInfo(chartInfo);
+        assertTrue("Initially equal", plotInfo1.equals(plotInfo2));
+        
+        Rectangle2D dataArea = plotInfo2.getDataArea();
+        plotInfo1.setPlotArea(dataArea);
+        assertFalse("Should not be equal after setting plot area", 
+                   plotInfo2.equals(plotInfo1));
+    }
 
-  @Test(timeout = 4000)
-  public void test29()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
-      plotRenderingInfo0.addSubplotInfo(plotRenderingInfo0);
-      int int0 = plotRenderingInfo0.getSubplotCount();
-      assertEquals(1, int0);
-  }
+    @Test(timeout = 4000)
+    public void equalsAfterSettingDataArea()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo1 = new PlotRenderingInfo(chartRenderingInfo);
+        Point point = new Point(7, 0);
+        Dimension dim = new Dimension();
+        Rectangle dataArea = new Rectangle(point, dim);
+        plotInfo1.setDataArea(dataArea);
+        PlotRenderingInfo plotInfo2 = chartRenderingInfo.getPlotInfo();
+        assertFalse("Should not be equal after setting data area", 
+                   plotInfo1.equals(plotInfo2));
+    }
 
-  @Test(timeout = 4000)
-  public void test30()  throws Throwable  {
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-      PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
-      // Undeclared exception!
-      try { 
-        plotRenderingInfo0.getSubplotInfo(1);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-      }
-  }
+    @Test(timeout = 4000)
+    public void equalsWithDifferentClass()  throws Throwable  {
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = new PlotRenderingInfo(chartRenderingInfo);
+        StandardEntityCollection otherObject = new StandardEntityCollection();
+        assertFalse("Should not equal object of different class", 
+                   plotInfo.equals(otherObject));
+    }
 }
