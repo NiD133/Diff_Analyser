@@ -37,14 +37,6 @@ import org.junit.jupiter.params.provider.MethodSource;
  */
 class FileTimesTest {
 
-    // Test data providers
-
-    /**
-     * Provides test cases for NTFS time conversions with boundary values.
-     * Each argument contains:
-     *   instant: ISO timestamp string
-     *   ntfsTime: Expected NTFS time value in 100-nanosecond units
-     */
     public static Stream<Arguments> fileTimeNanoUnitsToNtfsProvider() {
         // @formatter:off
         return Stream.of(
@@ -78,12 +70,6 @@ class FileTimesTest {
         // @formatter:on
     }
 
-    /**
-     * Provides test cases for basic NTFS time conversions.
-     * Each argument contains:
-     *   instant: ISO timestamp string
-     *   fileTime: Expected FileTime representation
-     */
     public static Stream<Arguments> fileTimeToNtfsProvider() {
         // @formatter:off
         return Stream.of(
@@ -93,12 +79,6 @@ class FileTimesTest {
         // @formatter:on
     }
 
-    /**
-     * Provides test cases for Unix time validation.
-     * Each argument contains:
-     *   instant: ISO timestamp string
-     *   isValidUnixTime: Whether the time fits in standard Unix time range
-     */
     public static Stream<Arguments> isUnixFileTimeProvider() {
         // @formatter:off
         return Stream.of(
@@ -111,279 +91,186 @@ class FileTimesTest {
         // @formatter:on
     }
 
-    // Conversion tests: Date ↔ FileTime
-
-    /**
-     * Tests {@link FileTimes#toFileTime(Date)} conversion.
-     */
     @ParameterizedTest
     @MethodSource("fileTimeNanoUnitsToNtfsProvider")
-    void convertDateToFileTime_ValidDate_ReturnsCorrectFileTime(String instant, long ignored) {
+    void testDateToFileTime(final String instant, final long ignored) {
         final Instant parsedInstant = Instant.parse(instant);
         final FileTime parsedFileTime = FileTime.from(parsedInstant);
         final Date parsedDate = Date.from(parsedInstant);
         assertEquals(parsedFileTime.toMillis(), FileTimes.toFileTime(parsedDate).toMillis());
     }
 
-    /**
-     * Tests {@link FileTimes#toDate(FileTime)} conversion.
-     */
     @ParameterizedTest
     @MethodSource("fileTimeNanoUnitsToNtfsProvider")
-    void convertFileTimeToDate_ValidFileTime_ReturnsCorrectDate(String instant, long ignored) {
+    void testDateToNtfsTime(final String instantStr, final long ntfsTime) {
+        final long ntfsMillis = Math.floorDiv(ntfsTime, FileTimes.HUNDRED_NANOS_PER_MILLISECOND) * FileTimes.HUNDRED_NANOS_PER_MILLISECOND;
+        final Instant instant = Instant.parse(instantStr);
+        final Date parsed = Date.from(instant);
+        final long ntfsTime2 = FileTimes.toNtfsTime(parsed);
+        if (ntfsTime2 == Long.MIN_VALUE || ntfsTime2 == Long.MAX_VALUE) {
+            // toNtfsTime returns max long instead of overflowing
+        } else {
+            assertEquals(ntfsMillis, ntfsTime2);
+            assertEquals(ntfsMillis, FileTimes.toNtfsTime(parsed.getTime()));
+            assertEquals(ntfsMillis, FileTimes.toNtfsTime(FileTimes.ntfsTimeToInstant(ntfsTime).toEpochMilli()));
+        }
+        assertEquals(ntfsTime, FileTimes.toNtfsTime(FileTimes.ntfsTimeToInstant(ntfsTime)));
+    }
+
+    @Test
+    void testEpoch() {
+        assertEquals(0, FileTimes.EPOCH.toMillis());
+    }
+
+    @ParameterizedTest
+    @MethodSource("fileTimeNanoUnitsToNtfsProvider")
+    void testFileTimeToDate(final String instant, final long ignored) {
         final Instant parsedInstant = Instant.parse(instant);
         final FileTime parsedFileTime = FileTime.from(parsedInstant);
         final Date parsedDate = Date.from(parsedInstant);
         assertEquals(parsedDate, FileTimes.toDate(parsedFileTime));
     }
 
-    /**
-     * Tests {@link FileTimes#toFileTime(Date)} with null input.
-     */
-    @Test
-    void convertDateToFileTime_NullInput_ReturnsNull() {
-        assertNull(FileTimes.toFileTime(null));
-    }
-
-    /**
-     * Tests {@link FileTimes#toDate(FileTime)} with null input.
-     */
-    @Test
-    void convertFileTimeToDate_NullInput_ReturnsNull() {
-        assertNull(FileTimes.toDate(null));
-    }
-
-    // Conversion tests: NTFS time ↔ Date/FileTime
-
-    /**
-     * Tests {@link FileTimes#toNtfsTime(Date)} conversion.
-     */
-    @ParameterizedTest
-    @MethodSource("fileTimeNanoUnitsToNtfsProvider")
-    void convertDateToNtfsTime_ValidDate_ReturnsCorrectNtfsTime(String instantStr, long expectedNtfsTime) {
-        final long expectedNtfsMillis = Math.floorDiv(expectedNtfsTime, FileTimes.HUNDRED_NANOS_PER_MILLISECOND) 
-            * FileTimes.HUNDRED_NANOS_PER_MILLISECOND;
-        final Instant instant = Instant.parse(instantStr);
-        final Date parsedDate = Date.from(instant);
-        final long actualNtfsTime = FileTimes.toNtfsTime(parsedDate);
-        
-        if (actualNtfsTime == Long.MIN_VALUE || actualNtfsTime == Long.MAX_VALUE) {
-            // Handle edge cases where conversion would overflow
-        } else {
-            assertEquals(expectedNtfsMillis, actualNtfsTime);
-            assertEquals(expectedNtfsMillis, FileTimes.toNtfsTime(parsedDate.getTime()));
-            assertEquals(expectedNtfsMillis, FileTimes.toNtfsTime(
-                FileTimes.ntfsTimeToInstant(expectedNtfsTime).toEpochMilli()));
-        }
-        assertEquals(expectedNtfsTime, FileTimes.toNtfsTime(
-            FileTimes.ntfsTimeToInstant(expectedNtfsTime)));
-    }
-
-    /**
-     * Tests {@link FileTimes#toNtfsTime(FileTime)} conversion.
-     */
-    @ParameterizedTest
-    @MethodSource("fileTimeNanoUnitsToNtfsProvider")
-    void convertFileTimeToNtfsTime_ValidFileTime_ReturnsCorrectValue(String instant, long expectedNtfsTime) {
-        final FileTime parsed = FileTime.from(Instant.parse(instant));
-        assertEquals(expectedNtfsTime, FileTimes.toNtfsTime(parsed));
-    }
-
-    /**
-     * Tests {@link FileTimes#ntfsTimeToFileTime(long)} conversion.
-     */
-    @ParameterizedTest
-    @MethodSource("fileTimeNanoUnitsToNtfsProvider")
-    void convertNtfsTimeToFileTime_ValidValue_ReturnsCorrectFileTime(String instantStr, long ntfsTime) {
-        final Instant expectedInstant = Instant.parse(instantStr);
-        final FileTime expectedFileTime = FileTime.from(expectedInstant);
-        assertEquals(expectedInstant, FileTimes.ntfsTimeToInstant(ntfsTime));
-        assertEquals(expectedFileTime, FileTimes.ntfsTimeToFileTime(ntfsTime));
-    }
-
-    /**
-     * Tests {@link FileTimes#ntfsTimeToDate(long)} conversion.
-     */
-    @ParameterizedTest
-    @MethodSource("fileTimeNanoUnitsToNtfsProvider")
-    void convertNtfsTimeToDate_ValidValue_ReturnsCorrectDate(String instant, long ntfsTime) {
-        assertEquals(Instant.parse(instant).toEpochMilli(), 
-            FileTimes.ntfsTimeToDate(ntfsTime).toInstant().toEpochMilli());
-    }
-
-    /**
-     * Tests round-trip conversion: FileTime → NTFS → FileTime.
-     */
+    //@Disabled
     @ParameterizedTest
     @MethodSource("fileTimeToNtfsProvider")
-    void fileTimeToNtfsTimeAndBack_RoundTrip_ReturnsOriginalValue(String instantStr, FileTime fileTime) {
+    void testFileTimeToNtfsTime(final String instantStr, final FileTime fileTime) {
         final Instant instant = Instant.parse(instantStr);
         final FileTime parsed = FileTime.from(instant);
         assertEquals(instant, parsed.toInstant());
         assertEquals(fileTime, FileTimes.ntfsTimeToFileTime(FileTimes.toNtfsTime(parsed)));
     }
 
-    // Unix time tests
-
-    /**
-     * Tests {@link FileTimes#fromUnixTime(long)} conversion.
-     */
     @ParameterizedTest
     @MethodSource("fileTimeNanoUnitsToNtfsProvider")
-    void convertUnixTimeToFileTime_ValidValue_ReturnsCorrectFileTime(String instant, long ntfsTime) {
+    void testFileTimeToNtfsTime(final String instant, final long ntfsTime) {
+        final FileTime parsed = FileTime.from(Instant.parse(instant));
+        assertEquals(ntfsTime, FileTimes.toNtfsTime(parsed));
+    }
+
+    @ParameterizedTest
+    @MethodSource("fileTimeNanoUnitsToNtfsProvider")
+    void testFromUnixTime(final String instant, final long ntfsTime) {
         final long epochSecond = Instant.parse(instant).getEpochSecond();
         assertEquals(epochSecond, FileTimes.fromUnixTime(epochSecond).to(TimeUnit.SECONDS));
     }
 
-    /**
-     * Tests {@link FileTimes#isUnixTime(FileTime)} validation.
-     */
     @ParameterizedTest
     @MethodSource("isUnixFileTimeProvider")
-    void validateUnixTime_WithFileTime_ReturnsCorrectValidation(String instant, boolean isValidUnixTime) {
-        assertEquals(isValidUnixTime, FileTimes.isUnixTime(FileTime.from(Instant.parse(instant))));
+    void testIsUnixTime(final String instant, final boolean isUnixTime) {
+        assertEquals(isUnixTime, FileTimes.isUnixTime(FileTime.from(Instant.parse(instant))));
     }
 
-    /**
-     * Tests {@link FileTimes#isUnixTime(long)} validation.
-     */
-    @ParameterizedTest
-    @MethodSource("isUnixFileTimeProvider")
-    void validateUnixTime_WithEpochSeconds_ReturnsCorrectValidation(String instant, boolean isValidUnixTime) {
-        assertEquals(isValidUnixTime, FileTimes.isUnixTime(Instant.parse(instant).getEpochSecond()));
-    }
-
-    /**
-     * Tests {@link FileTimes#isUnixTime(FileTime)} with null input.
-     */
-    @Test
-    void validateUnixTime_NullFileTime_ReturnsTrue() {
+    void testIsUnixTimeFileTimeNull() {
         assertTrue(FileTimes.isUnixTime(null));
     }
 
-    /**
-     * Tests {@link FileTimes#toUnixTime(FileTime)} conversion.
-     */
     @ParameterizedTest
     @MethodSource("isUnixFileTimeProvider")
-    void convertFileTimeToUnixTime_ValidValue_ReturnsCorrectValue(String instant, boolean ignored) {
-        final FileTime fileTime = FileTime.from(Instant.parse(instant));
-        assertEquals(FileTimes.isUnixTime(fileTime), 
-            FileTimes.isUnixTime(FileTimes.toUnixTime(fileTime)));
+    void testIsUnixTimeLong(final String instant, final boolean isUnixTime) {
+        assertEquals(isUnixTime, FileTimes.isUnixTime(Instant.parse(instant).getEpochSecond()));
     }
 
-    // Epoch constant test
-
-    /**
-     * Tests {@link FileTimes#EPOCH} constant value.
-     */
     @Test
-    void epochConstant_ShouldRepresentUnixEpoch() {
-        assertEquals(0, FileTimes.EPOCH.toMillis());
+    void testMaxJavaTime() {
+        final long javaTime = Long.MAX_VALUE;
+        final Instant instant = Instant.ofEpochMilli(javaTime);
+        assertEquals(javaTime, instant.toEpochMilli()); // sanity check
+        final long ntfsTime = FileTimes.toNtfsTime(javaTime);
+        final Instant instant2 = FileTimes.ntfsTimeToInstant(ntfsTime);
+        if (ntfsTime == Long.MAX_VALUE) {
+            // toNtfsTime returns max long instead of overflowing
+        } else {
+            assertEquals(javaTime, instant2.toEpochMilli());
+        }
     }
 
-    // Arithmetic operation tests
+    @ParameterizedTest
+    @MethodSource("fileTimeNanoUnitsToNtfsProvider")
+    void testMaxJavaTimeParam(final String instantStr, final long javaTime) {
+        // final long javaTime = Long.MAX_VALUE;
+        final Instant instant = Instant.ofEpochMilli(javaTime);
+        assertEquals(javaTime, instant.toEpochMilli()); // sanity check
+        final long ntfsTime = FileTimes.toNtfsTime(javaTime);
+        final Instant instant2 = FileTimes.ntfsTimeToInstant(ntfsTime);
+        if (ntfsTime == Long.MIN_VALUE || ntfsTime == Long.MAX_VALUE) {
+            // toNtfsTime returns min or max long instead of overflowing
+        } else {
+            assertEquals(javaTime, instant2.toEpochMilli());
+        }
+    }
 
-    /**
-     * Tests {@link FileTimes#minusMillis(FileTime, long)}.
-     */
     @Test
-    void subtractMillisFromFileTime_ReturnsCorrectResult() {
+    void testMinusMillis() {
         final int millis = 2;
-        assertEquals(Instant.EPOCH.minusMillis(millis), 
-            FileTimes.minusMillis(FileTimes.EPOCH, millis).toInstant());
+        assertEquals(Instant.EPOCH.minusMillis(millis), FileTimes.minusMillis(FileTimes.EPOCH, millis).toInstant());
         assertEquals(Instant.EPOCH, FileTimes.minusMillis(FileTimes.EPOCH, 0).toInstant());
     }
 
-    /**
-     * Tests {@link FileTimes#minusNanos(FileTime, long)}.
-     */
     @Test
-    void subtractNanosFromFileTime_ReturnsCorrectResult() {
-        final int nanos = 2;
-        assertEquals(Instant.EPOCH.minusNanos(nanos), 
-            FileTimes.minusNanos(FileTimes.EPOCH, nanos).toInstant());
+    void testMinusNanos() {
+        final int millis = 2;
+        assertEquals(Instant.EPOCH.minusNanos(millis), FileTimes.minusNanos(FileTimes.EPOCH, millis).toInstant());
         assertEquals(Instant.EPOCH, FileTimes.minusNanos(FileTimes.EPOCH, 0).toInstant());
     }
 
-    /**
-     * Tests {@link FileTimes#minusSeconds(FileTime, long)}.
-     */
     @Test
-    void subtractSecondsFromFileTime_ReturnsCorrectResult() {
+    void testMinusSeconds() {
         final int seconds = 2;
-        assertEquals(Instant.EPOCH.minusSeconds(seconds), 
-            FileTimes.minusSeconds(FileTimes.EPOCH, seconds).toInstant());
+        assertEquals(Instant.EPOCH.minusSeconds(seconds), FileTimes.minusSeconds(FileTimes.EPOCH, seconds).toInstant());
         assertEquals(Instant.EPOCH, FileTimes.minusSeconds(FileTimes.EPOCH, 0).toInstant());
     }
 
-    /**
-     * Tests {@link FileTimes#plusMillis(FileTime, long)}.
-     */
+    @ParameterizedTest
+    @MethodSource("fileTimeNanoUnitsToNtfsProvider")
+    void testNtfsTimeToDate(final String instant, final long ntfsTime) {
+        assertEquals(Instant.parse(instant).toEpochMilli(), FileTimes.ntfsTimeToDate(ntfsTime).toInstant().toEpochMilli());
+    }
+
+    @ParameterizedTest
+    @MethodSource("fileTimeNanoUnitsToNtfsProvider")
+    void testNtfsTimeToFileTime(final String instantStr, final long ntfsTime) {
+        final Instant instant = Instant.parse(instantStr);
+        final FileTime fileTime = FileTime.from(instant);
+        assertEquals(instant, fileTime.toInstant()); // sanity check
+        assertEquals(instant, FileTimes.ntfsTimeToInstant(ntfsTime));
+        assertEquals(fileTime, FileTimes.ntfsTimeToFileTime(ntfsTime));
+    }
+
     @Test
-    void addMillisToFileTime_ReturnsCorrectResult() {
+    void testNullDateToNullFileTime() {
+        assertNull(FileTimes.toFileTime(null));
+    }
+
+    @Test
+    void testNullFileTimeToNullDate() {
+        assertNull(FileTimes.toDate(null));
+    }
+
+    @Test
+    void testPlusMinusMillis() {
         final int millis = 2;
-        assertEquals(Instant.EPOCH.plusMillis(millis), 
-            FileTimes.plusMillis(FileTimes.EPOCH, millis).toInstant());
+        assertEquals(Instant.EPOCH.plusMillis(millis), FileTimes.plusMillis(FileTimes.EPOCH, millis).toInstant());
         assertEquals(Instant.EPOCH, FileTimes.plusMillis(FileTimes.EPOCH, 0).toInstant());
     }
 
-    /**
-     * Tests {@link FileTimes#plusNanos(FileTime, long)}.
-     */
     @Test
-    void addNanosToFileTime_ReturnsCorrectResult() {
-        final int nanos = 2;
-        assertEquals(Instant.EPOCH.plusNanos(nanos), 
-            FileTimes.plusNanos(FileTimes.EPOCH, nanos).toInstant());
+    void testPlusNanos() {
+        final int millis = 2;
+        assertEquals(Instant.EPOCH.plusNanos(millis), FileTimes.plusNanos(FileTimes.EPOCH, millis).toInstant());
         assertEquals(Instant.EPOCH, FileTimes.plusNanos(FileTimes.EPOCH, 0).toInstant());
     }
 
-    /**
-     * Tests {@link FileTimes#plusSeconds(FileTime, long)}.
-     */
     @Test
-    void addSecondsToFileTime_ReturnsCorrectResult() {
+    void testPlusSeconds() {
         final int seconds = 2;
-        assertEquals(Instant.EPOCH.plusSeconds(seconds), 
-            FileTimes.plusSeconds(FileTimes.EPOCH, seconds).toInstant());
+        assertEquals(Instant.EPOCH.plusSeconds(seconds), FileTimes.plusSeconds(FileTimes.EPOCH, seconds).toInstant());
         assertEquals(Instant.EPOCH, FileTimes.plusSeconds(FileTimes.EPOCH, 0).toInstant());
     }
 
-    // Boundary value tests
-
-    /**
-     * Tests {@link FileTimes#toNtfsTime(long)} with maximum Java time value.
-     */
-    @Test
-    void convertMaxJavaTimeToNtfsTime_HandlesBoundary() {
-        final long javaTime = Long.MAX_VALUE;
-        final Instant instant = Instant.ofEpochMilli(javaTime);
-        assertEquals(javaTime, instant.toEpochMilli());
-        final long ntfsTime = FileTimes.toNtfsTime(javaTime);
-        final Instant convertedInstant = FileTimes.ntfsTimeToInstant(ntfsTime);
-        if (ntfsTime == Long.MAX_VALUE) {
-            // Handles overflow by returning max value
-        } else {
-            assertEquals(javaTime, convertedInstant.toEpochMilli());
-        }
-    }
-
-    /**
-     * Tests NTFS conversion with boundary values from parameterized source.
-     */
     @ParameterizedTest
-    @MethodSource("fileTimeNanoUnitsToNtfsProvider")
-    void convertNtfsTimeWithBoundaryValues_HandlesEdgeCases(String instantStr, long ntfsTime) {
-        final Instant instant = Instant.ofEpochMilli(ntfsTime); // Note: ntfsTime != epoch millis!
-        final long javaTime = instant.toEpochMilli();
-        final long convertedNtfsTime = FileTimes.toNtfsTime(javaTime);
-        final Instant convertedInstant = FileTimes.ntfsTimeToInstant(convertedNtfsTime);
-        
-        if (convertedNtfsTime == Long.MIN_VALUE || convertedNtfsTime == Long.MAX_VALUE) {
-            // Handles overflow by returning min/max values
-        } else {
-            assertEquals(javaTime, convertedInstant.toEpochMilli());
-        }
+    @MethodSource("isUnixFileTimeProvider")
+    void testToUnixTime(final String instant, final boolean isUnixTime) {
+        assertEquals(isUnixTime, FileTimes.isUnixTime(FileTimes.toUnixTime(FileTime.from(Instant.parse(instant)))));
     }
 }
