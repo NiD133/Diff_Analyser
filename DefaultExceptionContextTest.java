@@ -28,9 +28,6 @@ import org.junit.jupiter.api.Test;
  */
 class DefaultExceptionContextTest extends AbstractExceptionContextTest<DefaultExceptionContext> {
 
-    /**
-     * Sets up a new DefaultExceptionContext before each test.
-     */
     @Override
     @BeforeEach
     public void setUp() throws Exception {
@@ -38,58 +35,36 @@ class DefaultExceptionContextTest extends AbstractExceptionContextTest<DefaultEx
         super.setUp();
     }
 
-    /**
-     * Tests that the formatted exception message includes the base message and context labels.
-     */
     @Test
-    void testFormattedExceptionMessageWithContextValues() {
+    void testFormattedExceptionMessageExceptionHandling() {
         exceptionContext = new DefaultExceptionContext();
-        final String contextLabel1 = "contextLabel1";
-        final String contextLabel2 = "contextLabel2";
-
-        // Add context values that throw exceptions when converted to string
-        exceptionContext.addContextValue(contextLabel1, new ObjectToStringRuntimeException(contextLabel1));
-        exceptionContext.addContextValue(contextLabel2, new ObjectToStringRuntimeException(contextLabel2));
-
-        // Retrieve the formatted exception message
-        final String formattedMessage = exceptionContext.getFormattedExceptionMessage(TEST_MESSAGE);
-
-        // Verify that the formatted message starts with the base message and contains both context labels
-        assertTrue(formattedMessage.startsWith(TEST_MESSAGE), "Formatted message should start with the base message.");
-        assertTrue(formattedMessage.contains(contextLabel1), "Formatted message should contain the first context label.");
-        assertTrue(formattedMessage.contains(contextLabel2), "Formatted message should contain the second context label.");
+        final String label1 = "throws 1";
+        final String label2 = "throws 2";
+        exceptionContext.addContextValue(label1, new ObjectToStringRuntimeException(label1));
+        exceptionContext.addContextValue(label2, new ObjectToStringRuntimeException(label2));
+        final String message = exceptionContext.getFormattedExceptionMessage(TEST_MESSAGE);
+        assertTrue(message.startsWith(TEST_MESSAGE));
+        assertTrue(message.contains(label1));
+        assertTrue(message.contains(label2));
     }
 
-    /**
-     * Tests that a null base message returns an empty formatted message.
-     */
     @Test
-    void testFormattedExceptionMessageWithNullBaseMessage() {
+    void testFormattedExceptionMessageNull() {
         exceptionContext = new DefaultExceptionContext();
-
-        // Verify that a null base message returns an empty string
-        assertEquals("", exceptionContext.getFormattedExceptionMessage(null), "Formatted message should be empty for null base message.");
+        assertEquals("", exceptionContext.getFormattedExceptionMessage(null));
     }
 
-    /**
-     * Tests that the formatted exception message includes context labels even if their values are null.
-     */
     @Test
-    void testFormattedExceptionMessageWithNullContextValues() {
+    void testFormattedExceptionMessageNullValue() {
         exceptionContext = new DefaultExceptionContext();
-        final String contextLabel1 = "contextLabel1";
-        final String contextLabel2 = "contextLabel2";
-
-        // Add context values that are null
-        exceptionContext.addContextValue(contextLabel1, null);
-        exceptionContext.addContextValue(contextLabel2, null);
-
-        // Retrieve the formatted exception message
-        final String formattedMessage = exceptionContext.getFormattedExceptionMessage(TEST_MESSAGE);
-
-        // Verify that the formatted message starts with the base message and contains both context labels
-        assertTrue(formattedMessage.startsWith(TEST_MESSAGE), "Formatted message should start with the base message.");
-        assertTrue(formattedMessage.contains(contextLabel1), "Formatted message should contain the first context label.");
-        assertTrue(formattedMessage.contains(contextLabel2), "Formatted message should contain the second context label.");
+        final String label1 = "throws 1";
+        final String label2 = "throws 2";
+        exceptionContext.addContextValue(label1, null);
+        exceptionContext.addContextValue(label2, null);
+        final String message = exceptionContext.getFormattedExceptionMessage(TEST_MESSAGE);
+        assertTrue(message.startsWith(TEST_MESSAGE));
+        assertTrue(message.contains(label1));
+        assertTrue(message.contains(label2));
     }
+
 }
