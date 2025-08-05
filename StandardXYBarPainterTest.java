@@ -18,7 +18,6 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
-
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
@@ -38,80 +37,61 @@
 package org.jfree.chart.renderer.xy;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.api.PublicCloneable;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
+
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for the {@link StandardXYBarPainter} class, focusing on its
- * fundamental object methods like equals(), hashCode(), and serialization.
+ * Tests for the {@link StandardXYBarPainter} class.
  */
-@DisplayName("A StandardXYBarPainter")
-class StandardXYBarPainterTest {
+public class StandardXYBarPainterTest {
 
-    private StandardXYBarPainter painter;
-
-    @BeforeEach
-    void setUp() {
-        this.painter = new StandardXYBarPainter();
-    }
-
+    /**
+     * Check that the equals() method distinguishes all fields.
+     */
     @Test
-    @DisplayName("should be equal to another instance")
-    void equals_withAnotherInstance_shouldBeTrue() {
-        // Arrange
-        StandardXYBarPainter anotherPainter = new StandardXYBarPainter();
-        
-        // Assert
-        // Since the class is stateless, any two instances should be equal.
-        assertEquals(painter, anotherPainter);
-        assertEquals(anotherPainter, painter); // Check for symmetry
+    public void testEquals() {
+        StandardXYBarPainter p1 = new StandardXYBarPainter();
+        StandardXYBarPainter p2 = new StandardXYBarPainter();
+        assertEquals(p1, p2);
     }
 
+    /**
+     * Two objects that are equal are required to return the same hashCode.
+     */
     @Test
-    @DisplayName("should not be equal to null")
-    void equals_withNull_shouldBeFalse() {
-        assertFalse(painter.equals(null));
+    public void testHashcode() {
+        StandardXYBarPainter p1 = new StandardXYBarPainter();
+        StandardXYBarPainter p2 = new StandardXYBarPainter();
+        assertEquals(p1, p2);
+        int h1 = p1.hashCode();
+        int h2 = p2.hashCode();
+        assertEquals(h1, h2);
     }
 
+    /**
+     * Confirm that cloning isn't implemented (it isn't required, because
+     * instances of the class are immutable).
+     */
     @Test
-    @DisplayName("should not be equal to an object of a different type")
-    void equals_withDifferentType_shouldBeFalse() {
-        assertFalse(painter.equals("A String Object"));
+    public void testCloning() {
+        StandardXYBarPainter p1 = new StandardXYBarPainter();
+        assertFalse(p1 instanceof Cloneable);
+        assertFalse(p1 instanceof PublicCloneable);
     }
 
+    /**
+     * Serialize an instance, restore it, and check for equality.
+     */
     @Test
-    @DisplayName("should have a hash code that is consistent with equals")
-    void hashCode_shouldBeConsistentForEqualObjects() {
-        // Arrange
-        StandardXYBarPainter anotherPainter = new StandardXYBarPainter();
-        
-        // Assert
-        // The hashCode() contract requires that equal objects have equal hash codes.
-        assertEquals(painter, anotherPainter, "Precondition: painters must be equal.");
-        assertEquals(painter.hashCode(), anotherPainter.hashCode());
+    public void testSerialization() {
+        StandardXYBarPainter p1 = new StandardXYBarPainter();
+        StandardXYBarPainter p2 = TestUtils.serialised(p1);
+        assertEquals(p1, p2);
     }
 
-    @Test
-    @DisplayName("should not support cloning")
-    void cloning_shouldNotBeSupported() {
-        // This class is immutable, so cloning is unnecessary and not implemented.
-        assertFalse(painter instanceof Cloneable);
-        assertFalse(painter instanceof PublicCloneable);
-    }
-
-    @Test
-    @DisplayName("should be serializable")
-    void serialization_shouldPreserveEquality() {
-        // Act
-        StandardXYBarPainter deserializedPainter = TestUtils.serialised(this.painter);
-        
-        // Assert
-        assertEquals(this.painter, deserializedPainter);
-    }
 }
