@@ -18,7 +18,7 @@ package org.apache.ibatis.logging;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.Reader;
-
+import java.util.stream.Stream;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.logging.commons.JakartaCommonsLoggingImpl;
 import org.apache.ibatis.logging.jdk14.Jdk14LoggingImpl;
@@ -28,88 +28,73 @@ import org.apache.ibatis.logging.nologging.NoLoggingImpl;
 import org.apache.ibatis.logging.slf4j.Slf4jImpl;
 import org.apache.ibatis.logging.stdout.StdOutImpl;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class LogFactoryTest {
 
-  @AfterAll
-  static void restore() {
+  /**
+   * Resets the LogFactory to its default state (SLF4J) after each test.
+   * This is crucial because tests modify the global static state of the factory.
+   */
+  @AfterEach
+  void resetLogFactoryToDefault() {
     LogFactory.useSlf4jLogging();
   }
 
-  @Test
-  void shouldUseCommonsLogging() {
-    LogFactory.useCommonsLogging();
-    Log log = LogFactory.getLog(Object.class);
-    logSomething(log);
-    assertEquals(log.getClass().getName(), JakartaCommonsLoggingImpl.class.getName());
+  @ParameterizedTest(name = "should use {0}")
+  @MethodSource("logImplementations")
+  void shouldSelectCorrectLogImplementationProgrammatically(String implementationName, Runnable setImplementation,
+      Class<? extends Log> expectedLogClass) {
+    // Arrange
+    setImplementation.run();
+
+    // Act
+    Log log = LogFactory.getLog(LogFactoryTest.class);
+    logSmokeTest(log);
+
+    // Assert
+    assertEquals(expectedLogClass, log.getClass());
+  }
+
+  private static Stream<Arguments> logImplementations() {
+    return Stream.of(
+        Arguments.of("SLF4J", (Runnable) LogFactory::useSlf4jLogging, Slf4jImpl.class),
+        Arguments.of("Jakarta Commons Logging", (Runnable) LogFactory::useCommonsLogging, JakartaCommonsLoggingImpl.class),
+        Arguments.of("Log4J", (Runnable) LogFactory::useLog4JLogging, Log4jImpl.class),
+        Arguments.of("Log4J2", (Runnable) LogFactory::useLog4J2Logging, Log4j2Impl.class),
+        Arguments.of("JDK Logging", (Runnable) LogFactory::useJdkLogging, Jdk14LoggingImpl.class),
+        Arguments.of("Standard Out", (Runnable) LogFactory::useStdOutLogging, StdOutImpl.class),
+        Arguments.of("No Logging", (Runnable) LogFactory::useNoLogging, NoLoggingImpl.class)
+    );
   }
 
   @Test
-  void shouldUseLog4J() {
-    LogFactory.useLog4JLogging();
-    Log log = LogFactory.getLog(Object.class);
-    logSomething(log);
-    assertEquals(log.getClass().getName(), Log4jImpl.class.getName());
-  }
-
-  @Test
-  void shouldUseLog4J2() {
-    LogFactory.useLog4J2Logging();
-    Log log = LogFactory.getLog(Object.class);
-    logSomething(log);
-    assertEquals(log.getClass().getName(), Log4j2Impl.class.getName());
-  }
-
-  @Test
-  void shouldUseJdKLogging() {
-    LogFactory.useJdkLogging();
-    Log log = LogFactory.getLog(Object.class);
-    logSomething(log);
-    assertEquals(log.getClass().getName(), Jdk14LoggingImpl.class.getName());
-  }
-
-  @Test
-  void shouldUseSlf4j() {
-    LogFactory.useSlf4jLogging();
-    Log log = LogFactory.getLog(Object.class);
-    logSomething(log);
-    assertEquals(log.getClass().getName(), Slf4jImpl.class.getName());
-  }
-
-  @Test
-  void shouldUseStdOut() {
-    LogFactory.useStdOutLogging();
-    Log log = LogFactory.getLog(Object.class);
-    logSomething(log);
-    assertEquals(log.getClass().getName(), StdOutImpl.class.getName());
-  }
-
-  @Test
-  void shouldUseNoLogging() {
-    LogFactory.useNoLogging();
-    Log log = LogFactory.getLog(Object.class);
-    logSomething(log);
-    assertEquals(log.getClass().getName(), NoLoggingImpl.class.getName());
-  }
-
-  @Test
-  void shouldReadLogImplFromSettings() throws Exception {
+  void shouldSelectLogImplFromMybatisConfiguration() throws Exception {
+    // Arrange
     try (Reader reader = Resources.getResourceAsReader("org/apache/ibatis/logging/mybatis-config.xml")) {
+      // Act: Building the factory from a config file that specifies NoLoggingImpl
       new SqlSessionFactoryBuilder().build(reader);
     }
 
-    Log log = LogFactory.getLog(Object.class);
-    log.debug("Debug message.");
-    assertEquals(log.getClass().getName(), NoLoggingImpl.class.getName());
+    Log log = LogFactory.getLog(LogFactoryTest.class);
+    log.debug("Debug message after configuration.");
+
+    // Assert
+    assertEquals(NoLoggingImpl.class, log.getClass());
   }
 
-  private void logSomething(Log log) {
+  /**
+   * A simple smoke test to ensure the log methods can be called without throwing an exception.
+   * @param log The logger instance to test.
+   */
+  private void logSmokeTest(Log log) {
     log.warn("Warning message.");
     log.debug("Debug message.");
     log.error("Error message.");
     log.error("Error with Exception.", new Exception("Test exception."));
   }
-
 }
