@@ -30,35 +30,49 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.compress.AbstractTest;
-import org.apache.commons.compress.archivers.ArchiveException;
 import org.junit.jupiter.api.Test;
 
 class ArArchiveOutputStreamTest extends AbstractTest {
 
     @Test
     void testLongFileNamesCauseExceptionByDefault() throws IOException {
-        final ArArchiveOutputStream ref;
+        // Test that long file names cause an exception by default
+        final ArArchiveOutputStream outputStreamReference;
         try (ArArchiveOutputStream outputStream = new ArArchiveOutputStream(new ByteArrayOutputStream())) {
-            ref = outputStream;
-            final ArArchiveEntry ae = new ArArchiveEntry("this_is_a_long_name.txt", 0);
-            final IOException ex = assertThrows(ArchiveException.class, () -> outputStream.putArchiveEntry(ae));
-            assertTrue(ex.getMessage().startsWith("File name too long"));
+            outputStreamReference = outputStream;
+            
+            // Create an archive entry with a long file name
+            final ArArchiveEntry longNameEntry = new ArArchiveEntry("this_is_a_long_name.txt", 0);
+            
+            // Expect an IOException when trying to add the entry
+            final IOException exception = assertThrows(IOException.class, () -> outputStream.putArchiveEntry(longNameEntry));
+            assertTrue(exception.getMessage().startsWith("File name too long"));
         }
-        assertTrue(ref.isClosed());
+        
+        // Ensure the output stream is closed after the operation
+        assertTrue(outputStreamReference.isClosed());
     }
 
     @Test
     void testLongFileNamesWorkUsingBSDDialect() throws Exception {
-        final File file = createTempFile();
-        try (ArArchiveOutputStream outputStream = new ArArchiveOutputStream(Files.newOutputStream(file.toPath()))) {
+        // Test that long file names work when using the BSD dialect
+        final File tempFile = createTempFile();
+        try (ArArchiveOutputStream outputStream = new ArArchiveOutputStream(Files.newOutputStream(tempFile.toPath()))) {
+            // Set the long file mode to BSD
             outputStream.setLongFileMode(ArArchiveOutputStream.LONGFILE_BSD);
-            final ArArchiveEntry ae = new ArArchiveEntry("this_is_a_long_name.txt", 14);
-            outputStream.putArchiveEntry(ae);
+            
+            // Create an archive entry with a long file name
+            final ArArchiveEntry longNameEntry = new ArArchiveEntry("this_is_a_long_name.txt", 14);
+            outputStream.putArchiveEntry(longNameEntry);
+            
+            // Write some content to the archive entry
             outputStream.write(new byte[] { 'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\n' });
             outputStream.closeArchiveEntry();
-            final List<String> expected = new ArrayList<>();
-            expected.add("this_is_a_long_name.txt");
-            checkArchiveContent(file, expected);
+            
+            // Verify the archive content
+            final List<String> expectedFileNames = new ArrayList<>();
+            expectedFileNames.add("this_is_a_long_name.txt");
+            checkArchiveContent(tempFile, expectedFileNames);
         }
     }
 }
