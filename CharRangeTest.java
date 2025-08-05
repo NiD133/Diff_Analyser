@@ -37,278 +37,341 @@ import org.junit.jupiter.api.Test;
  */
 class CharRangeTest extends AbstractLangTest {
 
-    // Tests for class structure
     @Test
-    void classModifiers_ShouldBeFinalPackagePrivate() {
-        assertFalse(Modifier.isPublic(CharRange.class.getModifiers()), "Class should not be public");
-        assertTrue(Modifier.isFinal(CharRange.class.getModifiers()), "Class should be final");
-    }
-
-    // Tests for factory methods and accessors
-    @Test
-    void factoryMethodIs_ShouldCreateSingleCharacterRange() {
-        final CharRange range = CharRange.is('a');
-        assertEquals('a', range.getStart());
-        assertEquals('a', range.getEnd());
-        assertFalse(range.isNegated());
-        assertEquals("a", range.toString());
+    void testClass() {
+        // class changed to non-public in 3.0
+        assertFalse(Modifier.isPublic(CharRange.class.getModifiers()));
+        assertTrue(Modifier.isFinal(CharRange.class.getModifiers()));
     }
 
     @Test
-    void factoryMethodIsIn_WithNormalOrder_ShouldCreateRange() {
-        final CharRange range = CharRange.isIn('a', 'e');
-        assertEquals('a', range.getStart());
-        assertEquals('e', range.getEnd());
-        assertFalse(range.isNegated());
-        assertEquals("a-e", range.toString());
+    void testConstructorAccessors_is() {
+        final CharRange rangea = CharRange.is('a');
+        assertEquals('a', rangea.getStart());
+        assertEquals('a', rangea.getEnd());
+        assertFalse(rangea.isNegated());
+        assertEquals("a", rangea.toString());
     }
 
     @Test
-    void factoryMethodIsIn_WithReversedOrder_ShouldNormalizeRange() {
-        final CharRange range = CharRange.isIn('e', 'a');
-        assertEquals('a', range.getStart());
-        assertEquals('e', range.getEnd());
-        assertFalse(range.isNegated());
-        assertEquals("a-e", range.toString());
+    void testConstructorAccessors_isIn_Normal() {
+        final CharRange rangea = CharRange.isIn('a', 'e');
+        assertEquals('a', rangea.getStart());
+        assertEquals('e', rangea.getEnd());
+        assertFalse(rangea.isNegated());
+        assertEquals("a-e", rangea.toString());
     }
 
     @Test
-    void factoryMethodIsIn_WithSameCharacter_ShouldCreateSingleCharRange() {
-        final CharRange range = CharRange.isIn('a', 'a');
-        assertEquals('a', range.getStart());
-        assertEquals('a', range.getEnd());
-        assertFalse(range.isNegated());
-        assertEquals("a", range.toString());
+    void testConstructorAccessors_isIn_Reversed() {
+        final CharRange rangea = CharRange.isIn('e', 'a');
+        assertEquals('a', rangea.getStart());
+        assertEquals('e', rangea.getEnd());
+        assertFalse(rangea.isNegated());
+        assertEquals("a-e", rangea.toString());
     }
 
     @Test
-    void factoryMethodIsNot_ShouldCreateNegatedSingleCharRange() {
-        final CharRange range = CharRange.isNot('a');
-        assertEquals('a', range.getStart());
-        assertEquals('a', range.getEnd());
-        assertTrue(range.isNegated());
-        assertEquals("^a", range.toString());
+    void testConstructorAccessors_isIn_Same() {
+        final CharRange rangea = CharRange.isIn('a', 'a');
+        assertEquals('a', rangea.getStart());
+        assertEquals('a', rangea.getEnd());
+        assertFalse(rangea.isNegated());
+        assertEquals("a", rangea.toString());
     }
 
     @Test
-    void factoryMethodIsNotIn_WithNormalOrder_ShouldCreateNegatedRange() {
-        final CharRange range = CharRange.isNotIn('a', 'e');
-        assertEquals('a', range.getStart());
-        assertEquals('e', range.getEnd());
-        assertTrue(range.isNegated());
-        assertEquals("^a-e", range.toString());
+    void testConstructorAccessors_isNot() {
+        final CharRange rangea = CharRange.isNot('a');
+        assertEquals('a', rangea.getStart());
+        assertEquals('a', rangea.getEnd());
+        assertTrue(rangea.isNegated());
+        assertEquals("^a", rangea.toString());
     }
 
     @Test
-    void factoryMethodIsNotIn_WithReversedOrder_ShouldNormalizeNegatedRange() {
-        final CharRange range = CharRange.isNotIn('e', 'a');
-        assertEquals('a', range.getStart());
-        assertEquals('e', range.getEnd());
-        assertTrue(range.isNegated());
-        assertEquals("^a-e", range.toString());
+    void testConstructorAccessors_isNotIn_Normal() {
+        final CharRange rangea = CharRange.isNotIn('a', 'e');
+        assertEquals('a', rangea.getStart());
+        assertEquals('e', rangea.getEnd());
+        assertTrue(rangea.isNegated());
+        assertEquals("^a-e", rangea.toString());
     }
 
     @Test
-    void factoryMethodIsNotIn_WithSameCharacter_ShouldCreateNegatedSingleCharRange() {
-        final CharRange range = CharRange.isNotIn('a', 'a');
-        assertEquals('a', range.getStart());
-        assertEquals('a', range.getEnd());
-        assertTrue(range.isNegated());
-        assertEquals("^a", range.toString());
+    void testConstructorAccessors_isNotIn_Reversed() {
+        final CharRange rangea = CharRange.isNotIn('e', 'a');
+        assertEquals('a', rangea.getStart());
+        assertEquals('e', rangea.getEnd());
+        assertTrue(rangea.isNegated());
+        assertEquals("^a-e", rangea.toString());
     }
 
-    // Tests for contains(char)
     @Test
-    void containsChar_WithSingleCharRange_ShouldContainOnlyExactChar() {
-        final CharRange range = CharRange.is('c');
+    void testConstructorAccessors_isNotIn_Same() {
+        final CharRange rangea = CharRange.isNotIn('a', 'a');
+        assertEquals('a', rangea.getStart());
+        assertEquals('a', rangea.getEnd());
+        assertTrue(rangea.isNegated());
+        assertEquals("^a", rangea.toString());
+    }
+
+    @Test
+    void testContains_Char() {
+        CharRange range = CharRange.is('c');
         assertFalse(range.contains('b'));
         assertTrue(range.contains('c'));
         assertFalse(range.contains('d'));
-    }
+        assertFalse(range.contains('e'));
 
-    @Test
-    void containsChar_WithCharRange_ShouldContainCharsInRange() {
-        final CharRange range = CharRange.isIn('c', 'd');
+        range = CharRange.isIn('c', 'd');
         assertFalse(range.contains('b'));
         assertTrue(range.contains('c'));
         assertTrue(range.contains('d'));
         assertFalse(range.contains('e'));
-    }
 
-    @Test
-    void containsChar_WithReversedCharRange_ShouldNormalizeAndContainChars() {
-        final CharRange range = CharRange.isIn('d', 'c'); // Reversed order
+        range = CharRange.isIn('d', 'c');
         assertFalse(range.contains('b'));
         assertTrue(range.contains('c'));
         assertTrue(range.contains('d'));
         assertFalse(range.contains('e'));
-    }
 
-    @Test
-    void containsChar_WithNegatedRange_ShouldContainCharsOutsideRange() {
-        final CharRange range = CharRange.isNotIn('c', 'd');
+        range = CharRange.isNotIn('c', 'd');
         assertTrue(range.contains('b'));
         assertFalse(range.contains('c'));
         assertFalse(range.contains('d'));
         assertTrue(range.contains('e'));
-        assertTrue(range.contains((char) 0), "Should contain min char");
-        assertTrue(range.contains(Character.MAX_VALUE), "Should contain max char");
-    }
-
-    // Tests for contains(CharRange)
-    @Test
-    void containsCharRange_WithIdenticalRange_ShouldReturnTrue() {
-        final CharRange range = CharRange.is('c');
-        final CharRange identicalRange = CharRange.is('c');
-        assertTrue(range.contains(identicalRange));
+        assertTrue(range.contains((char) 0));
+        assertTrue(range.contains(Character.MAX_VALUE));
     }
 
     @Test
-    void containsCharRange_WithSubsetRange_ShouldReturnTrue() {
-        final CharRange container = CharRange.isIn('b', 'd');
-        final CharRange subset = CharRange.is('c');
-        assertTrue(container.contains(subset));
+    void testContains_Charrange() {
+        final CharRange a = CharRange.is('a');
+        final CharRange b = CharRange.is('b');
+        final CharRange c = CharRange.is('c');
+        final CharRange c2 = CharRange.is('c');
+        final CharRange d = CharRange.is('d');
+        final CharRange e = CharRange.is('e');
+        final CharRange cd = CharRange.isIn('c', 'd');
+        final CharRange bd = CharRange.isIn('b', 'd');
+        final CharRange bc = CharRange.isIn('b', 'c');
+        final CharRange ab = CharRange.isIn('a', 'b');
+        final CharRange de = CharRange.isIn('d', 'e');
+        final CharRange ef = CharRange.isIn('e', 'f');
+        final CharRange ae = CharRange.isIn('a', 'e');
+
+        // normal/normal
+        assertFalse(c.contains(b));
+        assertTrue(c.contains(c));
+        assertTrue(c.contains(c2));
+        assertFalse(c.contains(d));
+
+        assertFalse(c.contains(cd));
+        assertFalse(c.contains(bd));
+        assertFalse(c.contains(bc));
+        assertFalse(c.contains(ab));
+        assertFalse(c.contains(de));
+
+        assertTrue(cd.contains(c));
+        assertTrue(bd.contains(c));
+        assertTrue(bc.contains(c));
+        assertFalse(ab.contains(c));
+        assertFalse(de.contains(c));
+
+        assertTrue(ae.contains(b));
+        assertTrue(ae.contains(ab));
+        assertTrue(ae.contains(bc));
+        assertTrue(ae.contains(cd));
+        assertTrue(ae.contains(de));
+
+        final CharRange notb = CharRange.isNot('b');
+        final CharRange notc = CharRange.isNot('c');
+        final CharRange notd = CharRange.isNot('d');
+        final CharRange notab = CharRange.isNotIn('a', 'b');
+        final CharRange notbc = CharRange.isNotIn('b', 'c');
+        final CharRange notbd = CharRange.isNotIn('b', 'd');
+        final CharRange notcd = CharRange.isNotIn('c', 'd');
+        final CharRange notde = CharRange.isNotIn('d', 'e');
+        final CharRange notae = CharRange.isNotIn('a', 'e');
+        final CharRange all = CharRange.isIn((char) 0, Character.MAX_VALUE);
+        final CharRange allbutfirst = CharRange.isIn((char) 1, Character.MAX_VALUE);
+
+        // normal/negated
+        assertFalse(c.contains(notc));
+        assertFalse(c.contains(notbd));
+        assertTrue(all.contains(notc));
+        assertTrue(all.contains(notbd));
+        assertFalse(allbutfirst.contains(notc));
+        assertFalse(allbutfirst.contains(notbd));
+
+        // negated/normal
+        assertTrue(notc.contains(a));
+        assertTrue(notc.contains(b));
+        assertFalse(notc.contains(c));
+        assertTrue(notc.contains(d));
+        assertTrue(notc.contains(e));
+
+        assertTrue(notc.contains(ab));
+        assertFalse(notc.contains(bc));
+        assertFalse(notc.contains(bd));
+        assertFalse(notc.contains(cd));
+        assertTrue(notc.contains(de));
+        assertFalse(notc.contains(ae));
+        assertFalse(notc.contains(all));
+        assertFalse(notc.contains(allbutfirst));
+
+        assertTrue(notbd.contains(a));
+        assertFalse(notbd.contains(b));
+        assertFalse(notbd.contains(c));
+        assertFalse(notbd.contains(d));
+        assertTrue(notbd.contains(e));
+
+        assertTrue(notcd.contains(ab));
+        assertFalse(notcd.contains(bc));
+        assertFalse(notcd.contains(bd));
+        assertFalse(notcd.contains(cd));
+        assertFalse(notcd.contains(de));
+        assertFalse(notcd.contains(ae));
+        assertTrue(notcd.contains(ef));
+        assertFalse(notcd.contains(all));
+        assertFalse(notcd.contains(allbutfirst));
+
+        // negated/negated
+        assertFalse(notc.contains(notb));
+        assertTrue(notc.contains(notc));
+        assertFalse(notc.contains(notd));
+
+        assertFalse(notc.contains(notab));
+        assertTrue(notc.contains(notbc));
+        assertTrue(notc.contains(notbd));
+        assertTrue(notc.contains(notcd));
+        assertFalse(notc.contains(notde));
+
+        assertFalse(notbd.contains(notb));
+        assertFalse(notbd.contains(notc));
+        assertFalse(notbd.contains(notd));
+
+        assertFalse(notbd.contains(notab));
+        assertFalse(notbd.contains(notbc));
+        assertTrue(notbd.contains(notbd));
+        assertFalse(notbd.contains(notcd));
+        assertFalse(notbd.contains(notde));
+        assertTrue(notbd.contains(notae));
     }
 
     @Test
-    void containsCharRange_WithNonOverlappingRange_ShouldReturnFalse() {
-        final CharRange range1 = CharRange.is('a');
-        final CharRange range2 = CharRange.is('b');
-        assertFalse(range1.contains(range2));
-    }
-
-    @Test
-    void containsCharRange_WithNegatedContainerAndNormalRange_ShouldReturnFalse() {
-        final CharRange negated = CharRange.isNot('c');
-        final CharRange normal = CharRange.is('a');
-        assertFalse(negated.contains(normal), "Negated container should not contain normal range");
-    }
-
-    @Test
-    void containsCharRange_WithUniversalContainerAndNegatedRange_ShouldReturnTrue() {
-        final CharRange universal = CharRange.isIn((char) 0, Character.MAX_VALUE);
-        final CharRange negated = CharRange.isNot('c');
-        assertTrue(universal.contains(negated));
-    }
-
-    @Test
-    void containsCharRange_WithNegatedRangeAndPartialOverlap_ShouldReturnFalse() {
-        final CharRange negated = CharRange.isNotIn('b', 'd');
-        final CharRange normal = CharRange.isIn('a', 'b');
-        assertFalse(negated.contains(normal), "Negated range should not contain partially overlapping range");
-    }
-
-    @Test
-    void containsCharRange_WithNullArgument_ShouldThrowNullPointerException() {
+    void testContainsNullArg() {
         final CharRange range = CharRange.is('a');
         final NullPointerException e = assertNullPointerException(() -> range.contains(null));
         assertEquals("range", e.getMessage());
     }
 
-    // Tests for equals and hashCode
     @Test
-    void equals_WithSameRange_ShouldReturnTrue() {
-        final CharRange range1 = CharRange.is('a');
-        final CharRange range2 = CharRange.is('a');
-        assertEquals(range1, range2);
+    void testEquals_Object() {
+        final CharRange rangea = CharRange.is('a');
+        final CharRange rangeae = CharRange.isIn('a', 'e');
+        final CharRange rangenotbf = CharRange.isIn('b', 'f');
+
+        assertNotEquals(null, rangea);
+
+        assertEquals(rangea, rangea);
+        assertEquals(rangea, CharRange.is('a'));
+        assertEquals(rangeae, rangeae);
+        assertEquals(rangeae, CharRange.isIn('a', 'e'));
+        assertEquals(rangenotbf, rangenotbf);
+        assertEquals(rangenotbf, CharRange.isIn('b', 'f'));
+
+        assertNotEquals(rangea, rangeae);
+        assertNotEquals(rangea, rangenotbf);
+        assertNotEquals(rangeae, rangea);
+        assertNotEquals(rangeae, rangenotbf);
+        assertNotEquals(rangenotbf, rangea);
+        assertNotEquals(rangenotbf, rangeae);
     }
 
     @Test
-    void equals_WithDifferentRange_ShouldReturnFalse() {
-        final CharRange range1 = CharRange.is('a');
-        final CharRange range2 = CharRange.isIn('a', 'e');
-        assertNotEquals(range1, range2);
+    void testHashCode() {
+        final CharRange rangea = CharRange.is('a');
+        final CharRange rangeae = CharRange.isIn('a', 'e');
+        final CharRange rangenotbf = CharRange.isIn('b', 'f');
+
+        assertEquals(rangea.hashCode(), rangea.hashCode());
+        assertEquals(rangea.hashCode(), CharRange.is('a').hashCode());
+        assertEquals(rangeae.hashCode(), rangeae.hashCode());
+        assertEquals(rangeae.hashCode(), CharRange.isIn('a', 'e').hashCode());
+        assertEquals(rangenotbf.hashCode(), rangenotbf.hashCode());
+        assertEquals(rangenotbf.hashCode(), CharRange.isIn('b', 'f').hashCode());
+
+        assertNotEquals(rangea.hashCode(), rangeae.hashCode());
+        assertNotEquals(rangea.hashCode(), rangenotbf.hashCode());
+        assertNotEquals(rangeae.hashCode(), rangea.hashCode());
+        assertNotEquals(rangeae.hashCode(), rangenotbf.hashCode());
+        assertNotEquals(rangenotbf.hashCode(), rangea.hashCode());
+        assertNotEquals(rangenotbf.hashCode(), rangeae.hashCode());
     }
 
     @Test
-    void equals_WithNull_ShouldReturnFalse() {
-        final CharRange range = CharRange.is('a');
-        assertNotEquals(null, range);
-    }
+    void testIterator() {
+        final CharRange a = CharRange.is('a');
+        final CharRange ad = CharRange.isIn('a', 'd');
+        final CharRange nota = CharRange.isNot('a');
+        final CharRange emptySet = CharRange.isNotIn((char) 0, Character.MAX_VALUE);
+        final CharRange notFirst = CharRange.isNotIn((char) 1, Character.MAX_VALUE);
+        final CharRange notLast = CharRange.isNotIn((char) 0, (char) (Character.MAX_VALUE - 1));
 
-    @Test
-    void hashCode_ForEqualObjects_ShouldBeEqual() {
-        final CharRange range1 = CharRange.is('a');
-        final CharRange range2 = CharRange.is('a');
-        assertEquals(range1.hashCode(), range2.hashCode());
-    }
+        final Iterator<Character> aIt = a.iterator();
+        assertNotNull(aIt);
+        assertTrue(aIt.hasNext());
+        assertEquals(Character.valueOf('a'), aIt.next());
+        assertFalse(aIt.hasNext());
 
-    @Test
-    void hashCode_ForDifferentObjects_ShouldBeDifferent() {
-        final CharRange range1 = CharRange.is('a');
-        final CharRange range2 = CharRange.is('b');
-        assertNotEquals(range1.hashCode(), range2.hashCode());
-    }
+        final Iterator<Character> adIt = ad.iterator();
+        assertNotNull(adIt);
+        assertTrue(adIt.hasNext());
+        assertEquals(Character.valueOf('a'), adIt.next());
+        assertEquals(Character.valueOf('b'), adIt.next());
+        assertEquals(Character.valueOf('c'), adIt.next());
+        assertEquals(Character.valueOf('d'), adIt.next());
+        assertFalse(adIt.hasNext());
 
-    // Tests for iterator
-    @Test
-    void iterator_ForSingleCharRange_ShouldIterateSingleCharacter() {
-        final CharRange range = CharRange.is('a');
-        final Iterator<Character> it = range.iterator();
-        assertTrue(it.hasNext());
-        assertEquals(Character.valueOf('a'), it.next());
-        assertFalse(it.hasNext());
-    }
-
-    @Test
-    void iterator_ForCharRange_ShouldIterateAllCharactersInOrder() {
-        final CharRange range = CharRange.isIn('a', 'd');
-        final Iterator<Character> it = range.iterator();
-        assertTrue(it.hasNext());
-        assertEquals(Character.valueOf('a'), it.next());
-        assertEquals(Character.valueOf('b'), it.next());
-        assertEquals(Character.valueOf('c'), it.next());
-        assertEquals(Character.valueOf('d'), it.next());
-        assertFalse(it.hasNext());
-    }
-
-    @Test
-    void iterator_ForNegatedRange_ShouldIterateAllCharsExceptExcluded() {
-        final CharRange range = CharRange.isNot('a');
-        final Iterator<Character> it = range.iterator();
-        while (it.hasNext()) {
-            assertNotEquals('a', (char) it.next());
+        final Iterator<Character> notaIt = nota.iterator();
+        assertNotNull(notaIt);
+        assertTrue(notaIt.hasNext());
+        while (notaIt.hasNext()) {
+            final Character c = notaIt.next();
+            assertNotEquals('a', c.charValue());
         }
+
+        final Iterator<Character> emptySetIt = emptySet.iterator();
+        assertNotNull(emptySetIt);
+        assertFalse(emptySetIt.hasNext());
+        assertThrows(NoSuchElementException.class, emptySetIt::next);
+
+        final Iterator<Character> notFirstIt = notFirst.iterator();
+        assertNotNull(notFirstIt);
+        assertTrue(notFirstIt.hasNext());
+        assertEquals(Character.valueOf((char) 0), notFirstIt.next());
+        assertFalse(notFirstIt.hasNext());
+        assertThrows(NoSuchElementException.class, notFirstIt::next);
+
+        final Iterator<Character> notLastIt = notLast.iterator();
+        assertNotNull(notLastIt);
+        assertTrue(notLastIt.hasNext());
+        assertEquals(Character.valueOf(Character.MAX_VALUE), notLastIt.next());
+        assertFalse(notLastIt.hasNext());
+        assertThrows(NoSuchElementException.class, notLastIt::next);
     }
 
     @Test
-    void iterator_ForEmptyRange_ShouldHaveNoElements() {
-        final CharRange range = CharRange.isNotIn((char) 0, Character.MAX_VALUE);
-        final Iterator<Character> it = range.iterator();
-        assertFalse(it.hasNext());
-        assertThrows(NoSuchElementException.class, it::next);
+    void testIteratorRemove() {
+        final CharRange a = CharRange.is('a');
+        final Iterator<Character> aIt = a.iterator();
+        assertThrows(UnsupportedOperationException.class, aIt::remove);
     }
 
     @Test
-    void iterator_ForNegatedRangeExcludingFirstChar_ShouldIterateMinChar() {
-        final CharRange range = CharRange.isNotIn((char) 1, Character.MAX_VALUE);
-        final Iterator<Character> it = range.iterator();
-        assertTrue(it.hasNext());
-        assertEquals(Character.valueOf((char) 0), it.next());
-        assertFalse(it.hasNext());
-        assertThrows(NoSuchElementException.class, it::next);
-    }
-
-    @Test
-    void iterator_ForNegatedRangeExcludingLastChar_ShouldIterateMaxChar() {
-        final CharRange range = CharRange.isNotIn((char) 0, (char) (Character.MAX_VALUE - 1));
-        final Iterator<Character> it = range.iterator();
-        assertTrue(it.hasNext());
-        assertEquals(Character.valueOf(Character.MAX_VALUE), it.next());
-        assertFalse(it.hasNext());
-        assertThrows(NoSuchElementException.class, it::next);
-    }
-
-    @Test
-    void iteratorRemove_ShouldThrowUnsupportedOperationException() {
-        final CharRange range = CharRange.is('a');
-        final Iterator<Character> it = range.iterator();
-        assertThrows(UnsupportedOperationException.class, it::remove);
-    }
-
-    // Tests for serialization
-    @Test
-    void serialization_ShouldRoundtripCorrectly() {
+    void testSerialization() {
         CharRange range = CharRange.is('a');
         assertEquals(range, SerializationUtils.clone(range));
         range = CharRange.isIn('a', 'e');
