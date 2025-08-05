@@ -20,318 +20,167 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-/**
- * Tests for HashCodeAndEqualsSafeSet - a collection that can safely handle mocks
- * with failing hashCode() and equals() methods.
- */
 public class HashCodeAndEqualsSafeSetTest {
 
-    @Rule 
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
-    
-    @Mock 
-    private MockWithFailingHashCodeAndEquals mockWithFailingMethods;
-
-    // ========== Basic Operations Tests ==========
+    @Rule public MockitoRule r = MockitoJUnit.rule();
+    @Mock private UnmockableHashCodeAndEquals mock1;
 
     @Test
-    public void shouldAllowAddingMockWithFailingHashCode() {
-        // Given
-        HashCodeAndEqualsSafeSet safeSet = new HashCodeAndEqualsSafeSet();
-        
-        // When & Then - should not throw exception
-        safeSet.add(mockWithFailingMethods);
+    public void can_add_mock_that_have_failing_hashCode_method() throws Exception {
+        new HashCodeAndEqualsSafeSet().add(mock1);
     }
 
     @Test
-    public void shouldHandleContainsOperationWithFailingEquals() {
-        // Given
-        HashCodeAndEqualsSafeSet safeSet = new HashCodeAndEqualsSafeSet();
-        safeSet.add(mockWithFailingMethods);
-        MockWithFailingHashCodeAndEquals differentMock = mock(MockWithFailingHashCodeAndEquals.class);
-
-        // When & Then
-        assertThat(safeSet.contains(mockWithFailingMethods))
-            .as("Set should contain the added mock")
-            .isTrue();
-            
-        assertThat(safeSet.contains(differentMock))
-            .as("Set should not contain a different mock")
-            .isFalse();
+    public void mock_with_failing_hashCode_method_can_be_added() throws Exception {
+        new HashCodeAndEqualsSafeSet().add(mock1);
     }
 
     @Test
-    public void shouldAllowRemovingMockWithFailingMethods() {
-        // Given
-        HashCodeAndEqualsSafeSet safeSet = new HashCodeAndEqualsSafeSet();
-        safeSet.add(mockWithFailingMethods);
+    public void mock_with_failing_equals_method_can_be_used() throws Exception {
+        HashCodeAndEqualsSafeSet mocks = new HashCodeAndEqualsSafeSet();
+        mocks.add(mock1);
 
-        // When
-        safeSet.remove(mockWithFailingMethods);
+        assertThat(mocks.contains(mock1)).isTrue();
 
-        // Then
-        assertThat(safeSet.isEmpty())
-            .as("Set should be empty after removing the only element")
-            .isTrue();
+        UnmockableHashCodeAndEquals mock2 = mock(UnmockableHashCodeAndEquals.class);
+        assertThat(mocks.contains(mock2)).isFalse();
     }
 
     @Test
-    public void shouldClearAllElements() {
-        // Given
-        HashCodeAndEqualsSafeSet safeSet = HashCodeAndEqualsSafeSet.of(mockWithFailingMethods);
-        
-        // When
-        safeSet.clear();
+    public void can_remove() throws Exception {
+        HashCodeAndEqualsSafeSet mocks = new HashCodeAndEqualsSafeSet();
+        UnmockableHashCodeAndEquals mock = mock1;
+        mocks.add(mock);
+        mocks.remove(mock);
 
-        // Then
-        assertThat(safeSet)
-            .as("Set should be empty after clear")
-            .isEmpty();
-    }
-
-    // ========== Collection Operations Tests ==========
-
-    @Test
-    public void shouldAddAllElementsFromAnotherCollection() {
-        // Given
-        HashCodeAndEqualsSafeSet sourceSet = HashCodeAndEqualsSafeSet.of(
-            mockWithFailingMethods, 
-            mock(Observer.class)
-        );
-        HashCodeAndEqualsSafeSet targetSet = new HashCodeAndEqualsSafeSet();
-
-        // When
-        targetSet.addAll(sourceSet);
-
-        // Then
-        assertThat(targetSet.containsAll(sourceSet))
-            .as("Target set should contain all elements from source set")
-            .isTrue();
+        assertThat(mocks.isEmpty()).isTrue();
     }
 
     @Test
-    public void shouldRetainOnlySpecifiedElements() {
-        // Given
-        Object observerMock = mock(Observer.class);
-        Object listMock = mock(List.class);
-        
-        HashCodeAndEqualsSafeSet elementsToRetain = HashCodeAndEqualsSafeSet.of(
-            mockWithFailingMethods, 
-            observerMock
-        );
-        
+    public void can_add_a_collection() throws Exception {
+        HashCodeAndEqualsSafeSet mocks = HashCodeAndEqualsSafeSet.of(mock1, mock(Observer.class));
+
         HashCodeAndEqualsSafeSet workingSet = new HashCodeAndEqualsSafeSet();
-        workingSet.addAll(elementsToRetain);
-        workingSet.add(listMock); // This should be removed by retainAll
 
-        // When
-        boolean wasModified = workingSet.retainAll(elementsToRetain);
+        workingSet.addAll(mocks);
 
-        // Then
-        assertThat(wasModified)
-            .as("RetainAll should return true when set was modified")
-            .isTrue();
-            
-        assertThat(workingSet.containsAll(elementsToRetain))
-            .as("Working set should contain all retained elements")
-            .isTrue();
-            
-        assertThat(workingSet.contains(listMock))
-            .as("Working set should not contain the non-retained element")
-            .isFalse();
+        assertThat(workingSet.containsAll(mocks)).isTrue();
     }
 
     @Test
-    public void shouldRemoveAllSpecifiedElements() {
-        // Given
-        Object observerMock = mock(Observer.class);
-        Object listMock = mock(List.class);
-        
-        HashCodeAndEqualsSafeSet elementsToRemove = HashCodeAndEqualsSafeSet.of(
-            mockWithFailingMethods, 
-            observerMock
-        );
-        
+    public void can_retain_a_collection() throws Exception {
+        HashCodeAndEqualsSafeSet mocks = HashCodeAndEqualsSafeSet.of(mock1, mock(Observer.class));
+
         HashCodeAndEqualsSafeSet workingSet = new HashCodeAndEqualsSafeSet();
-        workingSet.addAll(elementsToRemove);
-        workingSet.add(listMock); // This should remain after removeAll
 
-        // When
-        boolean wasModified = workingSet.removeAll(elementsToRemove);
+        workingSet.addAll(mocks);
+        workingSet.add(mock(List.class));
 
-        // Then
-        assertThat(wasModified)
-            .as("RemoveAll should return true when set was modified")
-            .isTrue();
-            
-        assertThat(workingSet.containsAll(elementsToRemove))
-            .as("Working set should not contain any removed elements")
-            .isFalse();
-            
-        assertThat(workingSet.contains(listMock))
-            .as("Working set should still contain the non-removed element")
-            .isTrue();
+        assertThat(workingSet.retainAll(mocks)).isTrue();
+        assertThat(workingSet.containsAll(mocks)).isTrue();
     }
 
-    // ========== Iterator Tests ==========
+    @Test
+    public void can_remove_a_collection() throws Exception {
+        HashCodeAndEqualsSafeSet mocks = HashCodeAndEqualsSafeSet.of(mock1, mock(Observer.class));
+
+        HashCodeAndEqualsSafeSet workingSet = new HashCodeAndEqualsSafeSet();
+
+        workingSet.addAll(mocks);
+        workingSet.add(mock(List.class));
+
+        assertThat(workingSet.removeAll(mocks)).isTrue();
+        assertThat(workingSet.containsAll(mocks)).isFalse();
+    }
 
     @Test
-    public void shouldSupportIterationOverElements() {
-        // Given
-        HashCodeAndEqualsSafeSet safeSet = HashCodeAndEqualsSafeSet.of(
-            mockWithFailingMethods, 
-            mock(Observer.class)
-        );
+    public void can_iterate() throws Exception {
+        HashCodeAndEqualsSafeSet mocks = HashCodeAndEqualsSafeSet.of(mock1, mock(Observer.class));
 
-        // When
-        LinkedList<Object> iteratedElements = new LinkedList<>();
-        for (Object element : safeSet) {
-            iteratedElements.add(element);
+        LinkedList<Object> accumulator = new LinkedList<Object>();
+        for (Object mock : mocks) {
+            accumulator.add(mock);
         }
-
-        // Then
-        assertThat(iteratedElements)
-            .as("Should be able to iterate over all elements")
-            .isNotEmpty()
-            .hasSize(2);
+        assertThat(accumulator).isNotEmpty();
     }
 
     @Test
-    public void shouldSupportRemovalThroughIterator() {
-        // Given
-        HashCodeAndEqualsSafeSet safeSet = HashCodeAndEqualsSafeSet.of(mockWithFailingMethods);
-        Iterator<Object> iterator = safeSet.iterator();
+    public void toArray_just_work() throws Exception {
+        HashCodeAndEqualsSafeSet mocks = HashCodeAndEqualsSafeSet.of(mock1);
 
-        // When
+        assertThat(mocks.toArray()[0]).isSameAs(mock1);
+
+        assertThat(mocks.toArray(new UnmockableHashCodeAndEquals[0])[0]).isSameAs(mock1);
+    }
+
+    @Test
+    public void cloneIsNotSupported() {
+        assertThatThrownBy(
+                        () -> {
+                            HashCodeAndEqualsSafeSet.of().clone();
+                        })
+                .isInstanceOf(CloneNotSupportedException.class);
+    }
+
+    @Test
+    public void isEmptyAfterClear() {
+        HashCodeAndEqualsSafeSet set = HashCodeAndEqualsSafeSet.of(mock1);
+        set.clear();
+
+        assertThat(set).isEmpty();
+    }
+
+    @Test
+    @SuppressWarnings("SelfAssertion") // https://github.com/google/error-prone/issues/5131
+    public void isEqualToItself() {
+        HashCodeAndEqualsSafeSet set = HashCodeAndEqualsSafeSet.of(mock1);
+        assertThat(set).isEqualTo(set);
+    }
+
+    @Test
+    public void isNotEqualToAnOtherTypeOfSetWithSameContent() {
+        HashCodeAndEqualsSafeSet set = HashCodeAndEqualsSafeSet.of();
+        assertThat(set).isNotEqualTo(new HashSet<Object>());
+    }
+
+    @Test
+    public void isNotEqualWhenContentIsDifferent() {
+
+        HashCodeAndEqualsSafeSet set = HashCodeAndEqualsSafeSet.of(mock1);
+        assertThat(set).isNotEqualTo(HashCodeAndEqualsSafeSet.of());
+    }
+
+    @Test
+    public void hashCodeIsEqualIfContentIsEqual() {
+        HashCodeAndEqualsSafeSet set = HashCodeAndEqualsSafeSet.of(mock1);
+        assertThat(set.hashCode()).isEqualTo(HashCodeAndEqualsSafeSet.of(mock1).hashCode());
+    }
+
+    @Test
+    public void toStringIsNotNullOrEmpty() throws Exception {
+        HashCodeAndEqualsSafeSet set = HashCodeAndEqualsSafeSet.of(mock1);
+        assertThat(set.toString()).isNotEmpty();
+    }
+
+    @Test
+    public void removeByIterator() throws Exception {
+        HashCodeAndEqualsSafeSet set = HashCodeAndEqualsSafeSet.of(mock1);
+        Iterator<Object> iterator = set.iterator();
         iterator.next();
         iterator.remove();
 
-        // Then
-        assertThat(safeSet)
-            .as("Set should be empty after removing element via iterator")
-            .isEmpty();
+        assertThat(set).isEmpty();
     }
 
-    // ========== Array Conversion Tests ==========
-
-    @Test
-    public void shouldConvertToObjectArray() {
-        // Given
-        HashCodeAndEqualsSafeSet safeSet = HashCodeAndEqualsSafeSet.of(mockWithFailingMethods);
-
-        // When
-        Object[] array = safeSet.toArray();
-
-        // Then
-        assertThat(array[0])
-            .as("Array should contain the same mock instance")
-            .isSameAs(mockWithFailingMethods);
-    }
-
-    @Test
-    public void shouldConvertToTypedArray() {
-        // Given
-        HashCodeAndEqualsSafeSet safeSet = HashCodeAndEqualsSafeSet.of(mockWithFailingMethods);
-
-        // When
-        MockWithFailingHashCodeAndEquals[] typedArray = 
-            safeSet.toArray(new MockWithFailingHashCodeAndEquals[0]);
-
-        // Then
-        assertThat(typedArray[0])
-            .as("Typed array should contain the same mock instance")
-            .isSameAs(mockWithFailingMethods);
-    }
-
-    // ========== Object Contract Tests ==========
-
-    @Test
-    public void shouldBeEqualToItself() {
-        // Given
-        HashCodeAndEqualsSafeSet safeSet = HashCodeAndEqualsSafeSet.of(mockWithFailingMethods);
-        
-        // When & Then
-        assertThat(safeSet)
-            .as("Set should be equal to itself")
-            .isEqualTo(safeSet);
-    }
-
-    @Test
-    public void shouldNotBeEqualToDifferentTypeWithSameContent() {
-        // Given
-        HashCodeAndEqualsSafeSet safeSet = HashCodeAndEqualsSafeSet.of();
-        HashSet<Object> regularHashSet = new HashSet<>();
-
-        // When & Then
-        assertThat(safeSet)
-            .as("SafeSet should not be equal to regular HashSet even with same content")
-            .isNotEqualTo(regularHashSet);
-    }
-
-    @Test
-    public void shouldNotBeEqualWhenContentDiffers() {
-        // Given
-        HashCodeAndEqualsSafeSet setWithContent = HashCodeAndEqualsSafeSet.of(mockWithFailingMethods);
-        HashCodeAndEqualsSafeSet emptySet = HashCodeAndEqualsSafeSet.of();
-
-        // When & Then
-        assertThat(setWithContent)
-            .as("Sets with different content should not be equal")
-            .isNotEqualTo(emptySet);
-    }
-
-    @Test
-    public void shouldHaveSameHashCodeForEqualContent() {
-        // Given
-        HashCodeAndEqualsSafeSet firstSet = HashCodeAndEqualsSafeSet.of(mockWithFailingMethods);
-        HashCodeAndEqualsSafeSet secondSet = HashCodeAndEqualsSafeSet.of(mockWithFailingMethods);
-
-        // When & Then
-        assertThat(firstSet.hashCode())
-            .as("Sets with equal content should have same hash code")
-            .isEqualTo(secondSet.hashCode());
-    }
-
-    @Test
-    public void shouldHaveNonEmptyStringRepresentation() {
-        // Given
-        HashCodeAndEqualsSafeSet safeSet = HashCodeAndEqualsSafeSet.of(mockWithFailingMethods);
-
-        // When & Then
-        assertThat(safeSet.toString())
-            .as("String representation should not be empty")
-            .isNotEmpty();
-    }
-
-    // ========== Unsupported Operations Tests ==========
-
-    @Test
-    public void shouldThrowExceptionWhenCloningIsAttempted() {
-        // Given
-        HashCodeAndEqualsSafeSet safeSet = HashCodeAndEqualsSafeSet.of();
-
-        // When & Then
-        assertThatThrownBy(safeSet::clone)
-            .as("Clone operation should not be supported")
-            .isInstanceOf(CloneNotSupportedException.class);
-    }
-
-    // ========== Test Helper Classes ==========
-
-    /**
-     * A mock class that intentionally fails on hashCode() and equals() calls.
-     * This simulates real-world scenarios where mocks cannot be properly stubbed
-     * for these fundamental Object methods.
-     */
-    private static class MockWithFailingHashCodeAndEquals {
+    private static class UnmockableHashCodeAndEquals {
         @Override
         public final int hashCode() {
-            throw new NullPointerException("Intentional failure in hashCode() - simulates unstubbed mock");
+            throw new NullPointerException("I'm failing on hashCode and I don't care");
         }
 
         @Override
         public final boolean equals(Object obj) {
-            throw new NullPointerException("Intentional failure in equals() - simulates unstubbed mock");
+            throw new NullPointerException("I'm failing on equals and I don't care");
         }
     }
 }
