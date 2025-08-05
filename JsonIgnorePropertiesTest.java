@@ -3,172 +3,160 @@ package com.fasterxml.jackson.annotation;
 import java.util.*;
 
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests to verify the functionality of merging {@link JsonIgnoreProperties.Value}
- * instances for overrides and other related behaviors.
+ * Tests to verify that it is possibly to merge {@link JsonIgnoreProperties.Value}
+ * instances for overrides
  */
-public class JsonIgnorePropertiesTest {
+public class JsonIgnorePropertiesTest
+{
+    @JsonIgnoreProperties(value={ "foo", "bar" }, ignoreUnknown=true)
+    private final static class Bogus {
+    }
 
-    // A test class with JsonIgnoreProperties annotation for testing purposes
-    @JsonIgnoreProperties(value = { "foo", "bar" }, ignoreUnknown = true)
-    private static final class AnnotatedClass {}
-
-    // A constant representing an empty JsonIgnoreProperties.Value instance
-    private static final JsonIgnoreProperties.Value EMPTY = JsonIgnoreProperties.Value.empty();
+    private final JsonIgnoreProperties.Value EMPTY = JsonIgnoreProperties.Value.empty();
 
     @Test
-    public void testEmptyValueCreation() {
-        // Verify that creating a Value from null results in an empty Value
+    public void testEmpty() {
+        // ok to try to create from null; gives empty
         assertSame(EMPTY, JsonIgnoreProperties.Value.from(null));
 
-        // Verify properties of the empty Value
         assertEquals(0, EMPTY.getIgnored().size());
         assertFalse(EMPTY.getAllowGetters());
         assertFalse(EMPTY.getAllowSetters());
     }
 
     @Test
-    public void testValueEquality() {
-        // Verify that the same instance is equal to itself
+    public void testEquality() {
         assertEquals(EMPTY, EMPTY);
 
-        // Verify that the merge operation returns the same instance for empty Value
+        // empty has "merge" set to 'true' so:
         assertSame(EMPTY, EMPTY.withMerge());
 
-        // Create a non-merged Value and verify equality properties
-        JsonIgnoreProperties.Value nonMergedValue = EMPTY.withoutMerge();
-        assertEquals(nonMergedValue, nonMergedValue);
-        assertNotEquals(EMPTY, nonMergedValue);
-        assertNotEquals(nonMergedValue, EMPTY);
+        JsonIgnoreProperties.Value v = EMPTY.withoutMerge();
+        assertEquals(v, v);
+        assertFalse(EMPTY.equals(v));
+        assertFalse(v.equals(EMPTY));
     }
 
     @Test
-    public void testValueFromAnnotation() throws Exception {
-        // Create a Value from an annotation and verify its properties
-        JsonIgnoreProperties.Value valueFromAnnotation = JsonIgnoreProperties.Value.from(
-                AnnotatedClass.class.getAnnotation(JsonIgnoreProperties.class));
-        assertNotNull(valueFromAnnotation);
-        assertFalse(valueFromAnnotation.getMerge());
-        assertFalse(valueFromAnnotation.getAllowGetters());
-        assertFalse(valueFromAnnotation.getAllowSetters());
-        assertEquals(_set("foo", "bar"), valueFromAnnotation.getIgnored());
+    public void testFromAnnotation() throws Exception
+    {
+        JsonIgnoreProperties.Value v = JsonIgnoreProperties.Value.from(
+                Bogus.class.getAnnotation(JsonIgnoreProperties.class));
+        assertNotNull(v);
+        assertFalse(v.getMerge());
+        assertFalse(v.getAllowGetters());
+        assertFalse(v.getAllowSetters());
+        Set<String> ign = v.getIgnored();
+        assertEquals(2, v.getIgnored().size());
+        assertEquals(_set("foo", "bar"), ign);
     }
 
     @Test
-    public void testValueFactories() {
-        // Verify factory methods for creating empty Values
+    public void testFactories() {
         assertSame(EMPTY, JsonIgnoreProperties.Value.forIgnoreUnknown(false));
         assertSame(EMPTY, JsonIgnoreProperties.Value.forIgnoredProperties());
-        assertSame(EMPTY, JsonIgnoreProperties.Value.forIgnoredProperties(Collections.emptySet()));
+        assertSame(EMPTY, JsonIgnoreProperties.Value.forIgnoredProperties(Collections.<String>emptySet()));
 
-        // Verify creation of Value with specific ignored properties
-        JsonIgnoreProperties.Value valueWithIgnored = JsonIgnoreProperties.Value.forIgnoredProperties("a", "b");
-        assertEquals(_set("a", "b"), valueWithIgnored.getIgnored());
+        JsonIgnoreProperties.Value v = JsonIgnoreProperties.Value.forIgnoredProperties("a", "b");
+        assertEquals(_set("a", "b"), v.getIgnored());
 
-        // Verify properties of Value with allowed getters
-        JsonIgnoreProperties.Value valueWithGetters = valueWithIgnored.withAllowGetters();
-        assertTrue(valueWithGetters.getAllowGetters());
-        assertFalse(valueWithGetters.getAllowSetters());
-        assertEquals(_set("a", "b"), valueWithGetters.getIgnored());
-        assertEquals(_set("a", "b"), valueWithGetters.findIgnoredForDeserialization());
-        assertEquals(_set(), valueWithGetters.findIgnoredForSerialization());
+        JsonIgnoreProperties.Value vser = v.withAllowGetters();
+        assertTrue(vser.getAllowGetters());
+        assertFalse(vser.getAllowSetters());
+        assertEquals(_set("a", "b"), vser.getIgnored());
+        assertEquals(_set("a", "b"), vser.findIgnoredForDeserialization());
+        assertEquals(_set(), vser.findIgnoredForSerialization());
 
-        // Verify properties of Value with allowed setters
-        JsonIgnoreProperties.Value valueWithSetters = valueWithIgnored.withAllowSetters();
-        assertFalse(valueWithSetters.getAllowGetters());
-        assertTrue(valueWithSetters.getAllowSetters());
-        assertEquals(_set("a", "b"), valueWithSetters.getIgnored());
-        assertEquals(_set(), valueWithSetters.findIgnoredForDeserialization());
-        assertEquals(_set("a", "b"), valueWithSetters.findIgnoredForSerialization());
+        JsonIgnoreProperties.Value vdeser = v.withAllowSetters();
+        assertFalse(vdeser.getAllowGetters());
+        assertTrue(vdeser.getAllowSetters());
+        assertEquals(_set("a", "b"), vdeser.getIgnored());
+        assertEquals(_set(), vdeser.findIgnoredForDeserialization());
+        assertEquals(_set("a", "b"), vdeser.findIgnoredForSerialization());
     }
 
     @Test
-    public void testMutantFactories() {
-        // Verify creation of Values with different ignored properties
+    public void testMutantFactories()
+    {
         assertEquals(2, EMPTY.withIgnored("a", "b").getIgnored().size());
         assertEquals(1, EMPTY.withIgnored(Collections.singleton("x")).getIgnored().size());
         assertEquals(0, EMPTY.withIgnored((Set<String>) null).getIgnored().size());
 
-        // Verify toggling of ignoreUnknown property
         assertTrue(EMPTY.withIgnoreUnknown().getIgnoreUnknown());
         assertFalse(EMPTY.withoutIgnoreUnknown().getIgnoreUnknown());
 
-        // Verify toggling of allowGetters property
         assertTrue(EMPTY.withAllowGetters().getAllowGetters());
         assertFalse(EMPTY.withoutAllowGetters().getAllowGetters());
-
-        // Verify toggling of allowSetters property
         assertTrue(EMPTY.withAllowSetters().getAllowSetters());
         assertFalse(EMPTY.withoutAllowSetters().getAllowSetters());
 
-        // Verify toggling of merge property
         assertTrue(EMPTY.withMerge().getMerge());
         assertFalse(EMPTY.withoutMerge().getMerge());
     }
 
     @Test
-    public void testSimpleMergeBehavior() {
-        // Create Values with different properties
-        JsonIgnoreProperties.Value baseValue = EMPTY.withIgnoreUnknown().withAllowGetters();
-        JsonIgnoreProperties.Value overrideValueWithMerge = EMPTY.withMerge().withIgnored("a");
-        JsonIgnoreProperties.Value overrideValueWithoutMerge = EMPTY.withoutMerge();
+    public void testSimpleMerge()
+    {
+        JsonIgnoreProperties.Value v1 = EMPTY.withIgnoreUnknown().withAllowGetters();
+        JsonIgnoreProperties.Value v2a = EMPTY.withMerge()
+                .withIgnored("a");
+        JsonIgnoreProperties.Value v2b = EMPTY.withoutMerge();
 
-        // Verify merging behavior with merge enabled
-        JsonIgnoreProperties.Value mergedValueWithMerge = baseValue.withOverrides(overrideValueWithMerge);
-        assertEquals(Collections.singleton("a"), mergedValueWithMerge.getIgnored());
-        assertTrue(mergedValueWithMerge.getIgnoreUnknown());
-        assertTrue(mergedValueWithMerge.getAllowGetters());
-        assertFalse(mergedValueWithMerge.getAllowSetters());
+        // when merging, should just have union of things
+        JsonIgnoreProperties.Value v3a = v1.withOverrides(v2a);
+        assertEquals(Collections.singleton("a"), v3a.getIgnored());
+        assertTrue(v3a.getIgnoreUnknown());
+        assertTrue(v3a.getAllowGetters());
+        assertFalse(v3a.getAllowSetters());
 
-        // Verify merging behavior with merge disabled
-        JsonIgnoreProperties.Value mergedValueWithoutMerge = JsonIgnoreProperties.Value.merge(baseValue, overrideValueWithoutMerge);
-        assertEquals(Collections.emptySet(), mergedValueWithoutMerge.getIgnored());
-        assertFalse(mergedValueWithoutMerge.getIgnoreUnknown());
-        assertFalse(mergedValueWithoutMerge.getAllowGetters());
-        assertFalse(mergedValueWithoutMerge.getAllowSetters());
+        // when NOT merging, simply replacing values
+        JsonIgnoreProperties.Value v3b = JsonIgnoreProperties.Value.merge(v1, v2b);
+        assertEquals(Collections.emptySet(), v3b.getIgnored());
+        assertFalse(v3b.getIgnoreUnknown());
+        assertFalse(v3b.getAllowGetters());
+        assertFalse(v3b.getAllowSetters());
 
-        // Verify that non-merged value is effectively the override
-        assertEquals(overrideValueWithoutMerge, mergedValueWithoutMerge);
+        // and effectively really just uses overrides as is
+        assertEquals(v2b, v3b);
 
-        // Verify that merging with null or empty returns the original
-        assertSame(overrideValueWithoutMerge, overrideValueWithoutMerge.withOverrides(null));
-        assertSame(overrideValueWithoutMerge, overrideValueWithoutMerge.withOverrides(EMPTY));
+        assertSame(v2b, v2b.withOverrides(null));
+        assertSame(v2b, v2b.withOverrides(EMPTY));
     }
 
     @Test
-    public void testMergeMultipleIgnoreProperties() {
-        // Create multiple Values with different ignored properties
-        JsonIgnoreProperties.Value value1 = EMPTY.withIgnored("a");
-        JsonIgnoreProperties.Value value2 = EMPTY.withIgnored("b");
-        JsonIgnoreProperties.Value value3 = EMPTY.withIgnored("c");
+    public void testMergeIgnoreProperties()
+    {
+        JsonIgnoreProperties.Value v1 = EMPTY.withIgnored("a");
+        JsonIgnoreProperties.Value v2 = EMPTY.withIgnored("b");
+        JsonIgnoreProperties.Value v3 = EMPTY.withIgnored("c");
 
-        // Merge all Values and verify the combined ignored properties
-        JsonIgnoreProperties.Value mergedValue = JsonIgnoreProperties.Value.mergeAll(value1, value2, value3);
-        Set<String> allIgnored = mergedValue.getIgnored();
-        assertEquals(3, allIgnored.size());
-        assertTrue(allIgnored.contains("a"));
-        assertTrue(allIgnored.contains("b"));
-        assertTrue(allIgnored.contains("c"));
+        JsonIgnoreProperties.Value merged = JsonIgnoreProperties.Value.mergeAll(v1, v2, v3);
+        Set<String> all = merged.getIgnored();
+        assertEquals(3, all.size());
+        assertTrue(all.contains("a"));
+        assertTrue(all.contains("b"));
+        assertTrue(all.contains("c"));
     }
 
     @Test
-    public void testValueToString() {
-        // Verify the string representation of a Value with specific properties
+    public void testToString() {
         assertEquals(
                 "JsonIgnoreProperties.Value(ignored=[],ignoreUnknown=false,allowGetters=false,allowSetters=true,merge=true)",
-                EMPTY.withAllowSetters().withMerge().toString());
-
-        // Verify that the hash code is non-zero
+                EMPTY.withAllowSetters()
+                    .withMerge()
+                    .toString());
         int hash = EMPTY.hashCode();
+        // no real good way to test but...
         if (hash == 0) {
-            fail("Hash code should not be zero");
+            fail("Should not get 0 for hash");
         }
     }
 
-    // Helper method to create a set from given elements
-    private Set<String> _set(String... elements) {
-        return new LinkedHashSet<>(Arrays.asList(elements));
+    private Set<String> _set(String... args) {
+        return new LinkedHashSet<String>(Arrays.asList(args));
     }
 }
