@@ -20,447 +20,678 @@ import org.junit.runner.RunWith;
 import org.threeten.extra.scale.TaiInstant;
 import org.threeten.extra.scale.UtcInstant;
 
-@RunWith(EvoRunner.class)
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true, 
-    useVFS = true, 
-    useVNET = true, 
-    resetStaticState = true, 
-    separateClassLoader = true
-)
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class UtcInstant_ESTest extends UtcInstant_ESTest_scaffolding {
 
-    // ========== Constructor & Basic Properties Tests ==========
-    
-    @Test(timeout = 4000)
-    public void testHashCode_ConsistencyForLargeModifiedJulianDay() throws Throwable {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(73281320003518L, 73281320003518L);
-        instant.hashCode();  // Should not throw
-        assertEquals(73281320003518L, instant.getModifiedJulianDay());
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(73281320003518L, 73281320003518L);
+      utcInstant0.hashCode();
+      assertEquals(73281320003518L, utcInstant0.getModifiedJulianDay());
+  }
 
-    @Test(timeout = 4000)
-    public void testHashCode_ConsistencyForNegativeModifiedJulianDay() throws Throwable {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(-2985L, 0L);
-        instant.hashCode();  // Should not throw
-        assertEquals(-2985L, instant.getModifiedJulianDay());
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay((-2985L), 0L);
+      utcInstant0.hashCode();
+      assertEquals((-2985L), utcInstant0.getModifiedJulianDay());
+  }
 
-    // ========== Equality & Comparison Tests ==========
-    
-    @Test(timeout = 4000)
-    public void testEquals_DifferentNanoOfDay() throws Throwable {
-        UtcInstant instant1 = UtcInstant.ofModifiedJulianDay(301L, 301L);
-        UtcInstant instant2 = UtcInstant.ofModifiedJulianDay(301L, 70L);
-        assertNotEquals(instant1, instant2);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(301L, 301L);
+      UtcInstant utcInstant1 = UtcInstant.ofModifiedJulianDay(301L, 70L);
+      boolean boolean0 = utcInstant1.equals(utcInstant0);
+      assertFalse(boolean0);
+      assertEquals(301L, utcInstant1.getModifiedJulianDay());
+      assertFalse(utcInstant0.equals((Object)utcInstant1));
+  }
 
-    @Test(timeout = 4000)
-    public void testEquals_DifferentModifiedJulianDay() throws Throwable {
-        UtcInstant instant1 = UtcInstant.ofModifiedJulianDay(1285L, 2341L);
-        UtcInstant instant2 = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        assertNotEquals(instant1, instant2);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(1285L, 2341L);
+      UtcInstant utcInstant1 = UtcInstant.ofModifiedJulianDay(0L, 0L);
+      boolean boolean0 = utcInstant1.equals(utcInstant0);
+      assertFalse(boolean0);
+      assertEquals(1285L, utcInstant0.getModifiedJulianDay());
+  }
 
-    @Test(timeout = 4000)
-    public void testCompareTo_SameDayDifferentNano() throws Throwable {
-        UtcInstant instant1 = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        UtcInstant instant2 = UtcInstant.ofModifiedJulianDay(0L, 1891L);
-        assertTrue(instant2.compareTo(instant1) > 0);
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(9223372036854775807L, 73281320003515L);
+      assertFalse(utcInstant0.isLeapSecond());
+      
+      UtcInstant utcInstant1 = utcInstant0.withModifiedJulianDay(6400000041317L);
+      boolean boolean0 = utcInstant0.isBefore(utcInstant1);
+      assertFalse(boolean0);
+      assertEquals(6400000041317L, utcInstant1.getModifiedJulianDay());
+  }
 
-    @Test(timeout = 4000)
-    public void testIsBefore_WhenFirstInstantIsAfter() throws Throwable {
-        UtcInstant instant1 = UtcInstant.ofModifiedJulianDay(9223372036854775807L, 73281320003515L);
-        UtcInstant instant2 = instant1.withModifiedJulianDay(6400000041317L);
-        assertFalse(instant1.isBefore(instant2));
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      TaiInstant taiInstant0 = TaiInstant.ofTaiSeconds(3217L, 1000L);
+      UtcInstant utcInstant0 = taiInstant0.toUtcInstant();
+      TaiInstant taiInstant1 = taiInstant0.withTaiSeconds(0L);
+      UtcInstant utcInstant1 = UtcInstant.of(taiInstant1);
+      boolean boolean0 = utcInstant1.isAfter(utcInstant0);
+      assertFalse(boolean0);
+      assertEquals(86390000001000L, utcInstant1.getNanoOfDay());
+  }
 
-    @Test(timeout = 4000)
-    public void testIsAfter_WhenFirstInstantIsBefore() throws Throwable {
-        TaiInstant taiInstant = TaiInstant.ofTaiSeconds(3217L, 1000L);
-        UtcInstant instant1 = taiInstant.toUtcInstant();
-        UtcInstant instant2 = UtcInstant.of(taiInstant.withTaiSeconds(0L));
-        assertFalse(instant2.isAfter(instant1));
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
+      UtcInstant utcInstant1 = UtcInstant.ofModifiedJulianDay(0L, 1891L);
+      int int0 = utcInstant1.compareTo(utcInstant0);
+      assertEquals(1, int0);
+      assertEquals(0L, utcInstant1.getModifiedJulianDay());
+  }
 
-    @Test(timeout = 4000)
-    public void testIsAfter_WhenCurrentIsAfterOther() throws Throwable {
-        UtcInstant instant1 = UtcInstant.ofModifiedJulianDay(83843999999988L, 83843999999988L);
-        UtcInstant instant2 = instant1.withModifiedJulianDay(-1406L);
-        assertTrue(instant1.isAfter(instant2));
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.parse("1958-01-01T00:53:27.000001Z");
+      assertEquals(3207000001000L, utcInstant0.getNanoOfDay());
+      assertEquals(36204L, utcInstant0.getModifiedJulianDay());
+  }
 
-    @Test(timeout = 4000)
-    public void testCompareTo_SameInstance() throws Throwable {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        assertEquals(0, instant.compareTo(instant));
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      Instant instant0 = MockInstant.ofEpochSecond(0L);
+      UtcInstant utcInstant0 = UtcInstant.of(instant0);
+      UtcInstant utcInstant1 = utcInstant0.withNanoOfDay(0L);
+      assertEquals(0L, utcInstant1.getNanoOfDay());
+      assertEquals(40587L, utcInstant0.getModifiedJulianDay());
+      assertTrue(utcInstant1.equals((Object)utcInstant0));
+  }
 
-    @Test(timeout = 4000)
-    public void testIsBefore_SameInstance() throws Throwable {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(9223372036854775807L, 73281320003515L);
-        assertFalse(instant.isBefore(instant));
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
+      UtcInstant utcInstant1 = utcInstant0.withNanoOfDay(82636000000001L);
+      assertEquals(0L, utcInstant1.getModifiedJulianDay());
+      assertEquals(82636000000001L, utcInstant1.getNanoOfDay());
+  }
 
-    @Test(timeout = 4000)
-    public void testIsAfter_SameInstance() throws Throwable {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        assertFalse(instant.isAfter(instant));
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay((-2985L), 0L);
+      UtcInstant utcInstant1 = utcInstant0.withNanoOfDay(1000L);
+      assertEquals(1000L, utcInstant1.getNanoOfDay());
+      assertEquals((-2985L), utcInstant0.getModifiedJulianDay());
+      assertEquals((-2985L), utcInstant1.getModifiedJulianDay());
+  }
 
-    // ========== Parsing Tests ==========
-    
-    @Test(timeout = 4000)
-    public void testParse_ValidString() throws Throwable {
-        UtcInstant instant = UtcInstant.parse("1958-01-01T00:53:27.000001Z");
-        assertEquals(3207000001000L, instant.getNanoOfDay());
-        assertEquals(36204L, instant.getModifiedJulianDay());
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
+      UtcInstant utcInstant1 = utcInstant0.withModifiedJulianDay(0L);
+      assertEquals(0L, utcInstant1.getNanoOfDay());
+  }
 
-    @Test(timeout = 4000)
-    public void testParse_DateWithoutFractionalSeconds() throws Throwable {
-        UtcInstant instant = UtcInstant.parse("1859-09-09T00:00:00Z");
-        assertEquals(0L, instant.getNanoOfDay());
-        assertEquals(296L, instant.getModifiedJulianDay());
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      TaiInstant taiInstant0 = TaiInstant.ofTaiSeconds(3217L, 1000L);
+      TaiInstant taiInstant1 = taiInstant0.withTaiSeconds(0L);
+      UtcInstant utcInstant0 = UtcInstant.of(taiInstant1);
+      TaiInstant taiInstant2 = utcInstant0.toTaiInstant();
+      assertEquals(0L, taiInstant2.getTaiSeconds());
+  }
 
-    @Test(timeout = 4000)
-    public void testParse_DateWithFractionalSeconds() throws Throwable {
-        UtcInstant instant = UtcInstant.parse("1857-01-29T00:00:00.000001876Z");
-        assertEquals(1876L, instant.getNanoOfDay());
-        assertEquals(-657L, instant.getModifiedJulianDay());
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      TaiInstant taiInstant0 = TaiInstant.ofTaiSeconds(3217L, 1000L);
+      UtcInstant utcInstant0 = taiInstant0.toUtcInstant();
+      TaiInstant taiInstant1 = utcInstant0.toTaiInstant();
+      assertEquals(3217L, taiInstant1.getTaiSeconds());
+  }
 
-    @Test(timeout = 4000, expected = DateTimeParseException.class)
-    public void testParse_InvalidCharSequence() throws Throwable {
-        UtcInstant.parse(CharBuffer.allocate(2278));
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(296L, 0L);
+      TaiInstant taiInstant0 = utcInstant0.toTaiInstant();
+      assertEquals(0, taiInstant0.getNano());
+      assertEquals((-3102451190L), taiInstant0.getTaiSeconds());
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testParse_NullInput() throws Throwable {
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
+      Duration duration0 = utcInstant0.durationUntil(utcInstant0);
+      UtcInstant utcInstant1 = utcInstant0.plus(duration0);
+      assertNotSame(utcInstant1, utcInstant0);
+  }
+
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      Duration duration0 = Duration.ofNanos((-1606L));
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay((-571L), 0L);
+      UtcInstant utcInstant1 = utcInstant0.plus(duration0);
+      assertEquals((-572L), utcInstant1.getModifiedJulianDay());
+      assertEquals(86399999998394L, utcInstant1.getNanoOfDay());
+  }
+
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.parse("1859-09-09T00:00:00Z");
+      assertEquals(0L, utcInstant0.getNanoOfDay());
+      assertEquals(296L, utcInstant0.getModifiedJulianDay());
+  }
+
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.parse("1857-01-29T00:00:00.000001876Z");
+      assertEquals(1876L, utcInstant0.getNanoOfDay());
+      assertEquals((-657L), utcInstant0.getModifiedJulianDay());
+  }
+
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
+      TaiInstant taiInstant0 = TaiInstant.of(utcInstant0);
+      UtcInstant utcInstant1 = UtcInstant.of(taiInstant0);
+      assertEquals(0L, utcInstant1.getNanoOfDay());
+  }
+
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay((-127L), 41317L);
+      TaiInstant taiInstant0 = TaiInstant.of(utcInstant0);
+      UtcInstant.of(taiInstant0);
+      assertEquals((-3138998390L), taiInstant0.getTaiSeconds());
+      assertEquals((-127L), utcInstant0.getModifiedJulianDay());
+  }
+
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay((-127L), 41317L);
+      Instant instant0 = utcInstant0.toInstant();
+      UtcInstant utcInstant1 = UtcInstant.of(instant0);
+      assertTrue(utcInstant1.equals((Object)utcInstant0));
+      assertEquals((-127L), utcInstant1.getModifiedJulianDay());
+  }
+
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(140L, 140L);
+      Duration duration0 = Duration.ofMinutes(140L);
+      UtcInstant utcInstant1 = utcInstant0.minus(duration0);
+      assertEquals(139L, utcInstant1.getModifiedJulianDay());
+      assertEquals(78000000000140L, utcInstant1.getNanoOfDay());
+  }
+
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      Instant instant0 = MockInstant.ofEpochSecond(0L);
+      UtcInstant utcInstant0 = UtcInstant.of(instant0);
+      long long0 = utcInstant0.getNanoOfDay();
+      assertEquals(0L, long0);
+      assertEquals(40587L, utcInstant0.getModifiedJulianDay());
+  }
+
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(54L, 54L);
+      long long0 = utcInstant0.getNanoOfDay();
+      assertEquals(54L, long0);
+      assertEquals(54L, utcInstant0.getModifiedJulianDay());
+  }
+
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
+      long long0 = utcInstant0.getModifiedJulianDay();
+      assertEquals(0L, long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      Instant instant0 = MockInstant.ofEpochSecond(0L);
+      UtcInstant utcInstant0 = UtcInstant.of(instant0);
+      long long0 = utcInstant0.getModifiedJulianDay();
+      assertEquals(0L, utcInstant0.getNanoOfDay());
+      assertEquals(40587L, long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      TaiInstant taiInstant0 = TaiInstant.ofTaiSeconds(3217L, 1000L);
+      UtcInstant utcInstant0 = taiInstant0.toUtcInstant();
+      Instant instant0 = MockInstant.ofEpochMilli(3217L);
+      UtcInstant utcInstant1 = UtcInstant.of(instant0);
+      int int0 = utcInstant0.compareTo(utcInstant1);
+      assertEquals(3217000000L, utcInstant1.getNanoOfDay());
+      assertEquals((-1), int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(9223372036854775807L, 490L);
+      // Undeclared exception!
+      try { 
+        utcInstant0.toTaiInstant();
+        fail("Expecting exception: ArithmeticException");
+      
+      } catch(ArithmeticException e) {
+         //
+         // long overflow
+         //
+         verifyException("java.lang.Math", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(73281320003633L, 73281320003633L);
+      // Undeclared exception!
+      try { 
+        utcInstant0.toInstant();
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Instant exceeds minimum or maximum instant
+         //
+         verifyException("java.time.Instant", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(9223372036854775807L, 0L);
+      // Undeclared exception!
+      try { 
+        utcInstant0.toInstant();
+        fail("Expecting exception: ArithmeticException");
+      
+      } catch(ArithmeticException e) {
+         //
+         // long overflow
+         //
+         verifyException("java.lang.Math", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(86399999998838L, 86399999998838L);
+      // Undeclared exception!
+      try { 
+        utcInstant0.plus((Duration) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.threeten.extra.scale.TaiInstant", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test32()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(86399999999628L, 86399999999628L);
+      Duration duration0 = Duration.ofDays(86399999999628L);
+      // Undeclared exception!
+      try { 
+        utcInstant0.plus(duration0);
+        fail("Expecting exception: ArithmeticException");
+      
+      } catch(ArithmeticException e) {
+         //
+         // long overflow
+         //
+         verifyException("java.lang.Math", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test33()  throws Throwable  {
+      CharBuffer charBuffer0 = CharBuffer.allocate(2278);
+      // Undeclared exception!
+      try { 
+        UtcInstant.parse(charBuffer0);
+        fail("Expecting exception: DateTimeParseException");
+      
+      } catch(DateTimeParseException e) {
+         //
+         // Text '\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000...' could not be parsed at index 0
+         //
+         verifyException("java.time.format.DateTimeFormatter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test34()  throws Throwable  {
+      // Undeclared exception!
+      try { 
         UtcInstant.parse((CharSequence) null);
-    }
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // text
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 
-    // ========== Conversion Tests ==========
-    
-    @Test(timeout = 4000)
-    public void testToTaiInstant_FromZeroTaiSeconds() throws Throwable {
-        TaiInstant taiInstant = TaiInstant.ofTaiSeconds(0L, 1000L);
-        UtcInstant utcInstant = UtcInstant.of(taiInstant);
-        TaiInstant result = utcInstant.toTaiInstant();
-        assertEquals(0L, result.getTaiSeconds());
-    }
+  @Test(timeout = 4000)
+  public void test35()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        UtcInstant.ofModifiedJulianDay((-361L), (-361L));
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Nanosecond-of-day must be between 0 and 86400000000000 on date -361
+         //
+         verifyException("org.threeten.extra.scale.UtcRules", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testToTaiInstant_RoundTripConversion() throws Throwable {
-        TaiInstant original = TaiInstant.ofTaiSeconds(3217L, 1000L);
-        UtcInstant utcInstant = original.toUtcInstant();
-        TaiInstant converted = utcInstant.toTaiInstant();
-        assertEquals(3217L, converted.getTaiSeconds());
-    }
-
-    @Test(timeout = 4000)
-    public void testToTaiInstant_FromModifiedJulianDay() throws Throwable {
-        UtcInstant utcInstant = UtcInstant.ofModifiedJulianDay(296L, 0L);
-        TaiInstant taiInstant = utcInstant.toTaiInstant();
-        assertEquals(0, taiInstant.getNano());
-        assertEquals(-3102451190L, taiInstant.getTaiSeconds());
-    }
-
-    @Test(timeout = 4000)
-    public void testToInstant_FromEpochSecondZero() throws Throwable {
-        Instant epochInstant = MockInstant.ofEpochSecond(0L);
-        UtcInstant utcInstant = UtcInstant.of(epochInstant);
-        assertEquals(0L, utcInstant.getNanoOfDay());
-        assertEquals(40587L, utcInstant.getModifiedJulianDay());
-    }
-
-    @Test(timeout = 4000)
-    public void testToUtcInstant_FromTaiInstantRoundTrip() throws Throwable {
-        UtcInstant original = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        TaiInstant taiInstant = TaiInstant.of(original);
-        UtcInstant result = UtcInstant.of(taiInstant);
-        assertEquals(0L, result.getNanoOfDay());
-    }
-
-    @Test(timeout = 4000)
-    public void testToUtcInstant_FromTaiInstantWithNegativeModifiedJulianDay() throws Throwable {
-        UtcInstant original = UtcInstant.ofModifiedJulianDay(-127L, 41317L);
-        TaiInstant taiInstant = TaiInstant.of(original);
-        UtcInstant result = UtcInstant.of(taiInstant);
-        assertEquals(-127L, result.getModifiedJulianDay());
-        assertEquals(41317L, result.getNanoOfDay());
-    }
-
-    @Test(timeout = 4000)
-    public void testToUtcInstant_FromInstantRoundTrip() throws Throwable {
-        UtcInstant original = UtcInstant.ofModifiedJulianDay(-127L, 41317L);
-        Instant instant = original.toInstant();
-        UtcInstant result = UtcInstant.of(instant);
-        assertEquals(-127L, result.getModifiedJulianDay());
-    }
-
-    @Test(timeout = 4000)
-    public void testToInstant_FromMjdZero() throws Throwable {
-        UtcInstant utcInstant = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        Instant instant = MockInstant.parse("1858-11-17T00:00:00Z");
-        UtcInstant result = UtcInstant.of(instant);
-        assertEquals(0L, result.getNanoOfDay());
-    }
-
-    // ========== Modification Tests ==========
-    
-    @Test(timeout = 4000)
-    public void testWithNanoOfDay_Zero() throws Throwable {
-        Instant epochInstant = MockInstant.ofEpochSecond(0L);
-        UtcInstant original = UtcInstant.of(epochInstant);
-        UtcInstant modified = original.withNanoOfDay(0L);
-        assertEquals(0L, modified.getNanoOfDay());
-    }
-
-    @Test(timeout = 4000)
-    public void testWithNanoOfDay_LargeValue() throws Throwable {
-        UtcInstant original = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        UtcInstant modified = original.withNanoOfDay(82636000000001L);
-        assertEquals(82636000000001L, modified.getNanoOfDay());
-    }
-
-    @Test(timeout = 4000)
-    public void testWithNanoOfDay_SmallPositiveValue() throws Throwable {
-        UtcInstant original = UtcInstant.ofModifiedJulianDay(-2985L, 0L);
-        UtcInstant modified = original.withNanoOfDay(1000L);
-        assertEquals(1000L, modified.getNanoOfDay());
-        assertEquals(-2985L, modified.getModifiedJulianDay());
-    }
-
-    @Test(timeout = 4000)
-    public void testWithModifiedJulianDay_SameValue() throws Throwable {
-        UtcInstant original = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        UtcInstant modified = original.withModifiedJulianDay(0L);
-        assertEquals(0L, modified.getNanoOfDay());
-    }
-
-    @Test(timeout = 4000)
-    public void testWithModifiedJulianDay_NegativeValue() throws Throwable {
-        UtcInstant original = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        UtcInstant modified = original.withModifiedJulianDay(-2547L);
-        assertEquals(-2547L, modified.getModifiedJulianDay());
-    }
-
-    // ========== Arithmetic Operations ==========
-    
-    @Test(timeout = 4000)
-    public void testPlus_ZeroDuration() throws Throwable {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        Duration zero = Duration.ZERO;
-        UtcInstant result = instant.plus(zero);
-        assertEquals(instant, result);
-    }
-
-    @Test(timeout = 4000)
-    public void testPlus_NegativeDuration() throws Throwable {
-        UtcInstant original = UtcInstant.ofModifiedJulianDay(-571L, 0L);
-        Duration duration = Duration.ofNanos(-1606L);
-        UtcInstant result = original.plus(duration);
-        assertEquals(-572L, result.getModifiedJulianDay());
-        assertEquals(86399999998394L, result.getNanoOfDay());
-    }
-
-    @Test(timeout = 4000)
-    public void testMinus_Duration() throws Throwable {
-        UtcInstant original = UtcInstant.ofModifiedJulianDay(140L, 140L);
-        Duration duration = Duration.ofMinutes(140L);
-        UtcInstant result = original.minus(duration);
-        assertEquals(139L, result.getModifiedJulianDay());
-        assertEquals(78000000000140L, result.getNanoOfDay());
-    }
-
-    @Test(timeout = 4000)
-    public void testDurationUntil_SameInstant() throws Throwable {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        Duration duration = instant.durationUntil(instant);
-        assertEquals(Duration.ZERO, duration);
-    }
-
-    @Test(timeout = 4000)
-    public void testPlus_DurationThenCompare() throws Throwable {
-        UtcInstant original = UtcInstant.ofModifiedJulianDay(73281320003518L, 73281320003518L);
-        Duration duration = Duration.ofMillis(73281320003518L);
-        UtcInstant later = original.plus(duration);
-        assertTrue(original.isBefore(later));
-    }
-
-    // ========== Property Accessors ==========
-    
-    @Test(timeout = 4000)
-    public void testGetNanoOfDay_FromEpochSecondZero() throws Throwable {
-        Instant epochInstant = MockInstant.ofEpochSecond(0L);
-        UtcInstant utcInstant = UtcInstant.of(epochInstant);
-        assertEquals(0L, utcInstant.getNanoOfDay());
-    }
-
-    @Test(timeout = 4000)
-    public void testGetNanoOfDay_SmallValue() throws Throwable {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(54L, 54L);
-        assertEquals(54L, instant.getNanoOfDay());
-    }
-
-    @Test(timeout = 4000)
-    public void testGetModifiedJulianDay_Zero() throws Throwable {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        assertEquals(0L, instant.getModifiedJulianDay());
-    }
-
-    @Test(timeout = 4000)
-    public void testGetModifiedJulianDay_FromEpochSecondZero() throws Throwable {
-        Instant epochInstant = MockInstant.ofEpochSecond(0L);
-        UtcInstant utcInstant = UtcInstant.of(epochInstant);
-        assertEquals(40587L, utcInstant.getModifiedJulianDay());
-    }
-
-    // ========== Edge Cases & Exception Tests ==========
-    
-    @Test(timeout = 4000, expected = DateTimeException.class)
-    public void testOfModifiedJulianDay_InvalidNegativeNanoOfDay() {
-        UtcInstant.ofModifiedJulianDay(-361L, -361L);
-    }
-
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testOf_NullTaiInstant() {
+  @Test(timeout = 4000)
+  public void test36()  throws Throwable  {
+      // Undeclared exception!
+      try { 
         UtcInstant.of((TaiInstant) null);
-    }
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.threeten.extra.scale.SystemUtcRules", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testOf_NullInstant() {
+  @Test(timeout = 4000)
+  public void test37()  throws Throwable  {
+      // Undeclared exception!
+      try { 
         UtcInstant.of((Instant) null);
-    }
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.evosuite.runtime.mock.java.time.MockInstant", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testPlus_NullDuration() {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(86399999998838L, 86399999998838L);
-        instant.plus(null);
-    }
+  @Test(timeout = 4000)
+  public void test38()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(73281320003506L, 73281320003506L);
+      // Undeclared exception!
+      try { 
+        utcInstant0.minus((Duration) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.threeten.extra.scale.TaiInstant", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testMinus_NullDuration() {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(2775000000000L, 2775000000000L);
-        instant.minus(null);
-    }
+  @Test(timeout = 4000)
+  public void test39()  throws Throwable  {
+      Duration duration0 = Duration.ofNanos(490L);
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(9223372036854775807L, 490L);
+      // Undeclared exception!
+      try { 
+        utcInstant0.minus(duration0);
+        fail("Expecting exception: ArithmeticException");
+      
+      } catch(ArithmeticException e) {
+         //
+         // long overflow
+         //
+         verifyException("java.lang.Math", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testIsBefore_NullInput() {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(2775000000000L, 2775000000000L);
-        instant.isBefore(null);
-    }
+  @Test(timeout = 4000)
+  public void test40()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(2774999999977L, 2774999999977L);
+      // Undeclared exception!
+      try { 
+        utcInstant0.isBefore((UtcInstant) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.threeten.extra.scale.UtcInstant", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testIsAfter_NullInput() {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(2775000000000L, 2775000000000L);
-        instant.isAfter(null);
-    }
+  @Test(timeout = 4000)
+  public void test41()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(2775000000000L, 2775000000000L);
+      // Undeclared exception!
+      try { 
+        utcInstant0.isAfter((UtcInstant) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.threeten.extra.scale.UtcInstant", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testDurationUntil_NullInput() {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(1000000000L, 1000000000L);
-        instant.durationUntil(null);
-    }
+  @Test(timeout = 4000)
+  public void test42()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(1000000000L, 1000000000L);
+      // Undeclared exception!
+      try { 
+        utcInstant0.durationUntil((UtcInstant) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.threeten.extra.scale.UtcInstant", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testCompareTo_NullInput() {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(2775000000000L, 2775000000000L);
-        instant.compareTo(null);
-    }
+  @Test(timeout = 4000)
+  public void test43()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(9223372036854775807L, 73281320003515L);
+      // Undeclared exception!
+      try { 
+        utcInstant0.durationUntil(utcInstant0);
+        fail("Expecting exception: ArithmeticException");
+      
+      } catch(ArithmeticException e) {
+         //
+         // long overflow
+         //
+         verifyException("java.lang.Math", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = DateTimeException.class)
-    public void testToString_InvalidLargeModifiedJulianDay() {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(83844000000000L, 83844000000000L);
-        instant.toString();
-    }
+  @Test(timeout = 4000)
+  public void test44()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(2775000000000L, 2775000000000L);
+      // Undeclared exception!
+      try { 
+        utcInstant0.compareTo((UtcInstant) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.threeten.extra.scale.UtcInstant", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = ArithmeticException.class)
-    public void testToTaiInstant_Overflow() {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(9223372036854775807L, 490L);
-        instant.toTaiInstant();
-    }
+  @Test(timeout = 4000)
+  public void test45()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(83844000000000L, 83844000000000L);
+      // Undeclared exception!
+      try { 
+        utcInstant0.toString();
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value: ModifiedJulianDay 83844000000000
+         //
+         verifyException("java.time.temporal.JulianFields$Field", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = DateTimeException.class)
-    public void testToInstant_ExceedsRange() {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(73281320003633L, 73281320003633L);
-        instant.toInstant();
-    }
+  @Test(timeout = 4000)
+  public void test46()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
+      String string0 = utcInstant0.toString();
+      assertEquals("1858-11-17T00:00:00Z", string0);
+  }
 
-    @Test(timeout = 4000, expected = ArithmeticException.class)
-    public void testToInstant_ArithmeticOverflow() {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(9223372036854775807L, 0L);
-        instant.toInstant();
-    }
+  @Test(timeout = 4000)
+  public void test47()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
+      UtcInstant utcInstant1 = UtcInstant.ofModifiedJulianDay(0L, 1891L);
+      boolean boolean0 = utcInstant1.equals(utcInstant0);
+      assertFalse(boolean0);
+      assertFalse(utcInstant0.equals((Object)utcInstant1));
+      assertEquals(0L, utcInstant1.getModifiedJulianDay());
+  }
 
-    @Test(timeout = 4000, expected = ArithmeticException.class)
-    public void testPlus_DurationOverflow() {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(86399999999628L, 86399999999628L);
-        Duration duration = Duration.ofDays(86399999999628L);
-        instant.plus(duration);
-    }
+  @Test(timeout = 4000)
+  public void test48()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
+      Duration duration0 = Duration.ofSeconds(1526L);
+      UtcInstant utcInstant1 = utcInstant0.minus(duration0);
+      boolean boolean0 = utcInstant0.equals(utcInstant1);
+      assertEquals(84874000000000L, utcInstant1.getNanoOfDay());
+      assertEquals((-1L), utcInstant1.getModifiedJulianDay());
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000, expected = ArithmeticException.class)
-    public void testMinus_DurationOverflow() {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(9223372036854775807L, 490L);
-        Duration duration = Duration.ofNanos(490L);
-        instant.minus(duration);
-    }
+  @Test(timeout = 4000)
+  public void test49()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
+      Boolean boolean0 = new Boolean("GeO");
+      boolean boolean1 = utcInstant0.equals(boolean0);
+      assertFalse(boolean1);
+  }
 
-    @Test(timeout = 4000, expected = DateTimeException.class)
-    public void testWithNanoOfDay_InvalidNegativeValue() {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(86340000001821L, 86340000001821L);
-        instant.withNanoOfDay(-892L);
-    }
+  @Test(timeout = 4000)
+  public void test50()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
+      boolean boolean0 = utcInstant0.equals(utcInstant0);
+      assertTrue(boolean0);
+  }
 
-    // ========== Type & Value Semantics ==========
-    
-    @Test(timeout = 4000)
-    public void testEquals_SameNanoDifferentDay() throws Throwable {
-        UtcInstant instant1 = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        UtcInstant instant2 = UtcInstant.ofModifiedJulianDay(0L, 1891L);
-        assertNotEquals(instant1, instant2);
-    }
+  @Test(timeout = 4000)
+  public void test51()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
+      UtcInstant utcInstant1 = UtcInstant.parse("1858-11-17T00:00:00Z");
+      boolean boolean0 = utcInstant1.equals(utcInstant0);
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testEquals_DifferentInstants() throws Throwable {
-        UtcInstant instant1 = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        Duration duration = Duration.ofSeconds(1526L);
-        UtcInstant instant2 = instant1.minus(duration);
-        assertNotEquals(instant1, instant2);
-    }
+  @Test(timeout = 4000)
+  public void test52()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(9223372036854775807L, 73281320003515L);
+      boolean boolean0 = utcInstant0.isBefore(utcInstant0);
+      assertEquals(9223372036854775807L, utcInstant0.getModifiedJulianDay());
+      assertFalse(utcInstant0.isLeapSecond());
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testEquals_NonInstantObject() throws Throwable {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        assertFalse(instant.equals(new Boolean("GeO")));
-    }
+  @Test(timeout = 4000)
+  public void test53()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
+      boolean boolean0 = utcInstant0.isAfter(utcInstant0);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testEquals_SameObject() throws Throwable {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        assertTrue(instant.equals(instant));
-    }
+  @Test(timeout = 4000)
+  public void test54()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(83843999999988L, 83843999999988L);
+      assertEquals(83843999999988L, utcInstant0.getNanoOfDay());
+      
+      UtcInstant utcInstant1 = utcInstant0.withModifiedJulianDay((-1406L));
+      boolean boolean0 = utcInstant0.isAfter(utcInstant1);
+      assertEquals(83843999999988L, utcInstant1.getNanoOfDay());
+      assertEquals((-1406L), utcInstant1.getModifiedJulianDay());
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testEquals_EquivalentInstants() throws Throwable {
-        UtcInstant instant1 = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        UtcInstant instant2 = UtcInstant.parse("1858-11-17T00:00:00Z");
-        assertEquals(instant1, instant2);
-    }
+  @Test(timeout = 4000)
+  public void test55()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
+      int int0 = utcInstant0.compareTo(utcInstant0);
+      assertEquals(0, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void testIsLeapSecond_RegularInstant() throws Throwable {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(83843999999988L, 83843999999988L);
-        assertFalse(instant.isLeapSecond());
-    }
+  @Test(timeout = 4000)
+  public void test56()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(83843999999988L, 83843999999988L);
+      boolean boolean0 = utcInstant0.isLeapSecond();
+      assertEquals(83843999999988L, utcInstant0.getModifiedJulianDay());
+      assertFalse(boolean0);
+      assertEquals(83843999999988L, utcInstant0.getNanoOfDay());
+  }
 
-    @Test(timeout = 4000)
-    public void testToString_BasicInstant() throws Throwable {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        assertEquals("1858-11-17T00:00:00Z", instant.toString());
-    }
+  @Test(timeout = 4000)
+  public void test57()  throws Throwable  {
+      Instant instant0 = MockInstant.parse("1858-11-17T00:00:00Z");
+      UtcInstant utcInstant0 = UtcInstant.of(instant0);
+      assertEquals(0L, utcInstant0.getNanoOfDay());
+  }
+
+  @Test(timeout = 4000)
+  public void test58()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
+      Duration duration0 = utcInstant0.durationUntil(utcInstant0);
+      UtcInstant utcInstant1 = utcInstant0.minus(duration0);
+      assertEquals(0L, utcInstant1.getNanoOfDay());
+  }
+
+  @Test(timeout = 4000)
+  public void test59()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
+      UtcInstant utcInstant1 = utcInstant0.withModifiedJulianDay((-2547L));
+      long long0 = utcInstant1.getModifiedJulianDay();
+      assertEquals((-2547L), long0);
+      assertEquals(0L, utcInstant1.getNanoOfDay());
+  }
+
+  @Test(timeout = 4000)
+  public void test60()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(86340000001821L, 86340000001821L);
+      // Undeclared exception!
+      try { 
+        utcInstant0.withNanoOfDay((-892L));
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Nanosecond-of-day must be between 0 and 86400000000000 on date 86340000001821
+         //
+         verifyException("org.threeten.extra.scale.UtcRules", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test61()  throws Throwable  {
+      UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(73281320003518L, 73281320003518L);
+      Duration duration0 = Duration.ofMillis(73281320003518L);
+      UtcInstant utcInstant1 = utcInstant0.plus(duration0);
+      boolean boolean0 = utcInstant0.isBefore(utcInstant1);
+      assertEquals(73281320003518L, utcInstant0.getModifiedJulianDay());
+      assertTrue(boolean0);
+      assertEquals(23684838003518L, utcInstant1.getNanoOfDay());
+  }
 }
