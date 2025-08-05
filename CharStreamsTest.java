@@ -39,182 +39,190 @@ import org.jspecify.annotations.NullUnmarked;
 @NullUnmarked
 public class CharStreamsTest extends IoTestCase {
 
-  private static final String TEXT = "The quick brown fox jumped over the lazy dog.";
+  private static final String SAMPLE_TEXT = "The quick brown fox jumped over the lazy dog.";
+  private static final String MULTILINE_TEXT = "a\nb\nc";
+  private static final String TEST_STRING_FOR_SKIPPING = "abcdef";
 
-  public void testToString() throws IOException {
-    assertEquals(TEXT, CharStreams.toString(new StringReader(TEXT)));
+  // ========== toString() Tests ==========
+
+  public void testToString_convertsReaderContentToString() throws IOException {
+    String result = CharStreams.toString(new StringReader(SAMPLE_TEXT));
+    
+    assertEquals(SAMPLE_TEXT, result);
   }
 
-  public void testReadLines() throws IOException {
-    List<String> lines = CharStreams.readLines(new StringReader("a\nb\nc"));
+  // ========== readLines() Tests ==========
+
+  public void testReadLines_returnsAllLinesAsList() throws IOException {
+    List<String> lines = CharStreams.readLines(new StringReader(MULTILINE_TEXT));
+    
     assertEquals(ImmutableList.of("a", "b", "c"), lines);
   }
 
-  public void testReadLines_withLineProcessor() throws IOException {
-    String text = "a\nb\nc";
+  public void testReadLines_withLineProcessorThatStopsEarly() throws IOException {
+    Reader reader = new StringReader(MULTILINE_TEXT);
+    LineProcessor<Integer> stopAfterFirstLine = createLineCounterProcessor(false);
 
-    // Test a LineProcessor that always returns false.
-    Reader r = new StringReader(text);
-    LineProcessor<Integer> alwaysFalse =
-        new LineProcessor<Integer>() {
-          int seen;
+    int processedLines = CharStreams.readLines(reader, stopAfterFirstLine);
 
-          @Override
-          public boolean processLine(String line) {
-            seen++;
-            return false;
-          }
-
-          @Override
-          public Integer getResult() {
-            return seen;
-          }
-        };
-    assertEquals(
-        "processLine was called more than once",
-        1,
-        CharStreams.readLines(r, alwaysFalse).intValue());
-
-    // Test a LineProcessor that always returns true.
-    r = new StringReader(text);
-    LineProcessor<Integer> alwaysTrue =
-        new LineProcessor<Integer>() {
-          int seen;
-
-          @Override
-          public boolean processLine(String line) {
-            seen++;
-            return true;
-          }
-
-          @Override
-          public Integer getResult() {
-            return seen;
-          }
-        };
-    assertEquals(
-        "processLine was not called for all the lines",
-        3,
-        CharStreams.readLines(r, alwaysTrue).intValue());
-
-    // Test a LineProcessor that is conditional.
-    r = new StringReader(text);
-    StringBuilder sb = new StringBuilder();
-    LineProcessor<Integer> conditional =
-        new LineProcessor<Integer>() {
-          int seen;
-
-          @Override
-          public boolean processLine(String line) {
-            seen++;
-            sb.append(line);
-            return seen < 2;
-          }
-
-          @Override
-          public Integer getResult() {
-            return seen;
-          }
-        };
-    assertEquals(2, CharStreams.readLines(r, conditional).intValue());
-    assertEquals("ab", sb.toString());
+    assertEquals("processLine was called more than once", 1, processedLines);
   }
 
-  public void testSkipFully_eof() throws IOException {
+  public void testReadLines_withLineProcessorThatProcessesAllLines() throws IOException {
+    Reader reader = new StringReader(MULTILINE_TEXT);
+    LineProcessor<Integer> processAllLines = createLineCounterProcessor(true);
+
+    int processedLines = CharStreams.readLines(reader, processAllLines);
+
+    assertEquals("processLine was not called for all the lines", 3, processedLines);
+  }
+
+  public void testReadLines_withConditionalLineProcessor() throws IOException {
+    Reader reader = new StringReader(MULTILINE_TEXT);
+    StringBuilder capturedContent = new StringBuilder();
+    LineProcessor<Integer> conditionalProcessor = createConditionalLineProcessor(capturedContent);
+
+    int processedLines = CharStreams.readLines(reader, conditionalProcessor);
+
+    assertEquals("Should process exactly 2 lines", 2, processedLines);
+    assertEquals("Should capture first two lines", "ab", capturedContent.toString());
+  }
+
+  // ========== skipFully() Tests ==========
+
+  public void testSkipFully_throwsEOFExceptionWhenNotEnoughCharacters() throws IOException {
     Reader reader = new StringReader("abcde");
+    
     assertThrows(EOFException.class, () -> CharStreams.skipFully(reader, 6));
   }
 
-  public void testSkipFully() throws IOException {
-    String testString = "abcdef";
-    Reader reader = new StringReader(testString);
+  public void testSkipFully_skipsExactNumberOfCharacters() throws IOException {
+    Reader reader = new StringReader(TEST_STRING_FOR_SKIPPING);
 
-    assertEquals(testString.charAt(0), reader.read());
+    // Read first character: 'a'
+    assertEquals('a', reader.read());
+    
+    // Skip 1 character: 'b'
     CharStreams.skipFully(reader, 1);
-    assertEquals(testString.charAt(2), reader.read());
+    assertEquals('c', reader.read());
+    
+    // Skip 2 characters: 'd', 'e'
     CharStreams.skipFully(reader, 2);
-    assertEquals(testString.charAt(5), reader.read());
-
+    assertEquals('f', reader.read());
+    
+    // Should be at end of stream
     assertEquals(-1, reader.read());
   }
 
-  public void testAsWriter() {
-    // Should wrap Appendable in a new object
+  // ========== asWriter() Tests ==========
+
+  public void testAsWriter_wrapsPlainAppendableInNewWriter() {
     Appendable plainAppendable = new StringBuilder();
+    
     Writer result = CharStreams.asWriter(plainAppendable);
-    assertNotSame(plainAppendable, result);
+    
+    assertNotSame("Should wrap Appendable in a new object", plainAppendable, result);
     assertNotNull(result);
-
-    // A Writer should not be wrapped
-    Appendable secretlyAWriter = new StringWriter();
-    result = CharStreams.asWriter(secretlyAWriter);
-    assertSame(secretlyAWriter, result);
   }
 
-  // CharStreams.copy has type specific optimizations for Readers,StringBuilders and Writers
-
-  public void testCopy() throws IOException {
-    StringBuilder builder = new StringBuilder();
-    long copied =
-        CharStreams.copy(
-            wrapAsGenericReadable(new StringReader(ASCII)), wrapAsGenericAppendable(builder));
-    assertEquals(ASCII, builder.toString());
-    assertEquals(ASCII.length(), copied);
-
-    StringBuilder builder2 = new StringBuilder();
-    copied =
-        CharStreams.copy(
-            wrapAsGenericReadable(new StringReader(I18N)), wrapAsGenericAppendable(builder2));
-    assertEquals(I18N, builder2.toString());
-    assertEquals(I18N.length(), copied);
+  public void testAsWriter_returnsWriterUnwrapped() {
+    Writer existingWriter = new StringWriter();
+    
+    Writer result = CharStreams.asWriter(existingWriter);
+    
+    assertSame("A Writer should not be wrapped", existingWriter, result);
   }
 
-  public void testCopy_toStringBuilder_fromReader() throws IOException {
-    StringBuilder builder = new StringBuilder();
-    long copied = CharStreams.copy(new StringReader(ASCII), builder);
-    assertEquals(ASCII, builder.toString());
-    assertEquals(ASCII.length(), copied);
+  // ========== copy() Tests ==========
+  // Note: CharStreams.copy has type-specific optimizations for Readers, StringBuilders and Writers
 
-    StringBuilder builder2 = new StringBuilder();
-    copied = CharStreams.copy(new StringReader(I18N), builder2);
-    assertEquals(I18N, builder2.toString());
-    assertEquals(I18N.length(), copied);
+  public void testCopy_betweenGenericReadableAndAppendable() throws IOException {
+    StringBuilder destination = new StringBuilder();
+    Readable source = wrapAsGenericReadable(new StringReader(ASCII));
+    Appendable target = wrapAsGenericAppendable(destination);
+    
+    long copiedChars = CharStreams.copy(source, target);
+    
+    assertEquals("Should copy ASCII content", ASCII, destination.toString());
+    assertEquals("Should return number of copied characters", ASCII.length(), copiedChars);
+
+    // Test with internationalized text
+    StringBuilder i18nDestination = new StringBuilder();
+    Readable i18nSource = wrapAsGenericReadable(new StringReader(I18N));
+    Appendable i18nTarget = wrapAsGenericAppendable(i18nDestination);
+    
+    long i18nCopiedChars = CharStreams.copy(i18nSource, i18nTarget);
+    
+    assertEquals("Should copy I18N content", I18N, i18nDestination.toString());
+    assertEquals("Should return number of copied characters", I18N.length(), i18nCopiedChars);
   }
 
-  public void testCopy_toStringBuilder_fromReadable() throws IOException {
-    StringBuilder builder = new StringBuilder();
-    long copied = CharStreams.copy(wrapAsGenericReadable(new StringReader(ASCII)), builder);
-    assertEquals(ASCII, builder.toString());
-    assertEquals(ASCII.length(), copied);
+  public void testCopy_fromReaderToStringBuilder() throws IOException {
+    StringBuilder destination = new StringBuilder();
+    
+    long copiedChars = CharStreams.copy(new StringReader(ASCII), destination);
+    
+    assertEquals("Should copy ASCII content", ASCII, destination.toString());
+    assertEquals("Should return number of copied characters", ASCII.length(), copiedChars);
 
-    StringBuilder builder2 = new StringBuilder();
-    copied = CharStreams.copy(wrapAsGenericReadable(new StringReader(I18N)), builder2);
-    assertEquals(I18N, builder2.toString());
-    assertEquals(I18N.length(), copied);
+    // Test with internationalized text
+    StringBuilder i18nDestination = new StringBuilder();
+    long i18nCopiedChars = CharStreams.copy(new StringReader(I18N), i18nDestination);
+    
+    assertEquals("Should copy I18N content", I18N, i18nDestination.toString());
+    assertEquals("Should return number of copied characters", I18N.length(), i18nCopiedChars);
   }
 
-  public void testCopy_toWriter_fromReader() throws IOException {
-    StringWriter writer = new StringWriter();
-    long copied = CharStreams.copy(new StringReader(ASCII), writer);
-    assertEquals(ASCII, writer.toString());
-    assertEquals(ASCII.length(), copied);
+  public void testCopy_fromReadableToStringBuilder() throws IOException {
+    StringBuilder destination = new StringBuilder();
+    Readable source = wrapAsGenericReadable(new StringReader(ASCII));
+    
+    long copiedChars = CharStreams.copy(source, destination);
+    
+    assertEquals("Should copy ASCII content", ASCII, destination.toString());
+    assertEquals("Should return number of copied characters", ASCII.length(), copiedChars);
 
-    StringWriter writer2 = new StringWriter();
-    copied = CharStreams.copy(new StringReader(I18N), writer2);
-    assertEquals(I18N, writer2.toString());
-    assertEquals(I18N.length(), copied);
+    // Test with internationalized text
+    StringBuilder i18nDestination = new StringBuilder();
+    Readable i18nSource = wrapAsGenericReadable(new StringReader(I18N));
+    long i18nCopiedChars = CharStreams.copy(i18nSource, i18nDestination);
+    
+    assertEquals("Should copy I18N content", I18N, i18nDestination.toString());
+    assertEquals("Should return number of copied characters", I18N.length(), i18nCopiedChars);
   }
 
-  public void testCopy_toWriter_fromReadable() throws IOException {
-    StringWriter writer = new StringWriter();
-    long copied = CharStreams.copy(wrapAsGenericReadable(new StringReader(ASCII)), writer);
-    assertEquals(ASCII, writer.toString());
-    assertEquals(ASCII.length(), copied);
+  public void testCopy_fromReaderToWriter() throws IOException {
+    StringWriter destination = new StringWriter();
+    
+    long copiedChars = CharStreams.copy(new StringReader(ASCII), destination);
+    
+    assertEquals("Should copy ASCII content", ASCII, destination.toString());
+    assertEquals("Should return number of copied characters", ASCII.length(), copiedChars);
 
-    StringWriter writer2 = new StringWriter();
-    copied = CharStreams.copy(wrapAsGenericReadable(new StringReader(I18N)), writer2);
-    assertEquals(I18N, writer2.toString());
-    assertEquals(I18N.length(), copied);
+    // Test with internationalized text
+    StringWriter i18nDestination = new StringWriter();
+    long i18nCopiedChars = CharStreams.copy(new StringReader(I18N), i18nDestination);
+    
+    assertEquals("Should copy I18N content", I18N, i18nDestination.toString());
+    assertEquals("Should return number of copied characters", I18N.length(), i18nCopiedChars);
+  }
+
+  public void testCopy_fromReadableToWriter() throws IOException {
+    StringWriter destination = new StringWriter();
+    Readable source = wrapAsGenericReadable(new StringReader(ASCII));
+    
+    long copiedChars = CharStreams.copy(source, destination);
+    
+    assertEquals("Should copy ASCII content", ASCII, destination.toString());
+    assertEquals("Should return number of copied characters", ASCII.length(), copiedChars);
+
+    // Test with internationalized text
+    StringWriter i18nDestination = new StringWriter();
+    Readable i18nSource = wrapAsGenericReadable(new StringReader(I18N));
+    long i18nCopiedChars = CharStreams.copy(i18nSource, i18nDestination);
+    
+    assertEquals("Should copy I18N content", I18N, i18nDestination.toString());
+    assertEquals("Should return number of copied characters", I18N.length, i18nCopiedChars);
   }
 
   /**
@@ -222,113 +230,176 @@ public class CharStreamsTest extends IoTestCase {
    *
    * <p>CharStreams.copy was failing to clear its CharBuffer after each read call, which effectively
    * reduced the available size of the buffer each time a call to read didn't fill up the available
-   * space in the buffer completely. In general this is a performance problem since the buffer size
-   * is permanently reduced, but with certain Reader implementations it could also cause the buffer
-   * size to reach 0, causing an infinite loop.
+   * space in the buffer completely. This caused performance problems and could lead to infinite loops
+   * with certain Reader implementations.
    */
   @SuppressWarnings("InlineMeInliner") // String.repeat unavailable under Java 8
-  public void testCopyWithReaderThatDoesNotFillBuffer() throws IOException {
-    // need a long enough string for the buffer to hit 0 remaining before the copy completes
-    String string = Strings.repeat("0123456789", 100);
-    StringBuilder b = new StringBuilder();
-    // the main assertion of this test is here... the copy will fail if the buffer size goes down
-    // each time it is not filled completely
-    long copied = CharStreams.copy(newNonBufferFillingReader(new StringReader(string)), b);
-    assertEquals(string, b.toString());
-    assertEquals(string.length(), copied);
+  public void testCopy_withReaderThatDoesNotFillBuffer_avoidsInfiniteLoop() throws IOException {
+    // Create a long string to ensure the buffer hits 0 remaining before copy completes
+    String longString = Strings.repeat("0123456789", 100);
+    StringBuilder destination = new StringBuilder();
+    Reader nonBufferFillingReader = createNonBufferFillingReader(new StringReader(longString));
+    
+    // The main assertion: copy should complete without infinite loop
+    long copiedChars = CharStreams.copy(nonBufferFillingReader, destination);
+    
+    assertEquals("Should copy entire string", longString, destination.toString());
+    assertEquals("Should return correct character count", longString.length(), copiedChars);
   }
 
-  public void testExhaust_reader() throws IOException {
+  // ========== exhaust() Tests ==========
+
+  public void testExhaust_withReader() throws IOException {
     Reader reader = new StringReader(ASCII);
-    assertEquals(ASCII.length(), CharStreams.exhaust(reader));
-    assertEquals(-1, reader.read());
-    assertEquals(0, CharStreams.exhaust(reader));
+    
+    long exhaustedChars = CharStreams.exhaust(reader);
+    
+    assertEquals("Should exhaust all characters", ASCII.length(), exhaustedChars);
+    assertEquals("Reader should be at end", -1, reader.read());
+    assertEquals("Exhausting empty reader should return 0", 0, CharStreams.exhaust(reader));
 
-    Reader empty = new StringReader("");
-    assertEquals(0, CharStreams.exhaust(empty));
-    assertEquals(-1, empty.read());
+    // Test with empty reader
+    Reader emptyReader = new StringReader("");
+    assertEquals("Empty reader should exhaust 0 characters", 0, CharStreams.exhaust(emptyReader));
+    assertEquals("Empty reader should be at end", -1, emptyReader.read());
   }
 
-  public void testExhaust_readable() throws IOException {
-    CharBuffer buf = CharBuffer.wrap(ASCII);
-    assertEquals(ASCII.length(), CharStreams.exhaust(buf));
-    assertEquals(0, buf.remaining());
-    assertEquals(0, CharStreams.exhaust(buf));
+  public void testExhaust_withReadable() throws IOException {
+    CharBuffer buffer = CharBuffer.wrap(ASCII);
+    
+    long exhaustedChars = CharStreams.exhaust(buffer);
+    
+    assertEquals("Should exhaust all characters", ASCII.length(), exhaustedChars);
+    assertEquals("Buffer should have no remaining characters", 0, buffer.remaining());
+    assertEquals("Exhausting empty buffer should return 0", 0, CharStreams.exhaust(buffer));
 
-    CharBuffer empty = CharBuffer.wrap("");
-    assertEquals(0, CharStreams.exhaust(empty));
-    assertEquals(0, empty.remaining());
+    // Test with empty buffer
+    CharBuffer emptyBuffer = CharBuffer.wrap("");
+    assertEquals("Empty buffer should exhaust 0 characters", 0, CharStreams.exhaust(emptyBuffer));
+    assertEquals("Empty buffer should have no remaining characters", 0, emptyBuffer.remaining());
   }
 
-  public void testNullWriter() throws Exception {
-    // create a null writer
+  // ========== nullWriter() Tests ==========
+
+  public void testNullWriter_discardsAllWrittenData() throws Exception {
     Writer nullWriter = CharStreams.nullWriter();
-    // write to the writer
+    
+    // Write various types of data - all should be discarded silently
     nullWriter.write('n');
-    String test = "Test string for NullWriter";
-    nullWriter.write(test);
-    nullWriter.write(test, 2, 10);
+    String testString = "Test string for NullWriter";
+    nullWriter.write(testString);
+    nullWriter.write(testString, 2, 10);
     nullWriter.append(null);
     nullWriter.append(null, 0, 4);
 
-    assertThrows(IndexOutOfBoundsException.class, () -> nullWriter.append(null, -1, 4));
+    // Test boundary conditions that should throw exceptions
+    assertThrows("Negative start index should throw", 
+        IndexOutOfBoundsException.class, 
+        () -> nullWriter.append(null, -1, 4));
 
-    assertThrows(IndexOutOfBoundsException.class, () -> nullWriter.append(null, 0, 5));
+    assertThrows("End index beyond null length should throw", 
+        IndexOutOfBoundsException.class, 
+        () -> nullWriter.append(null, 0, 5));
 
-    // nothing really to assert?
-    assertSame(CharStreams.nullWriter(), CharStreams.nullWriter());
+    // Verify singleton behavior
+    assertSame("nullWriter should return same instance", 
+        CharStreams.nullWriter(), CharStreams.nullWriter());
   }
 
+  // ========== Helper Methods ==========
+
   /**
-   * Returns a reader wrapping the given reader that only reads half of the maximum number of
-   * characters that it could read in read(char[], int, int).
+   * Creates a LineProcessor that counts processed lines and optionally continues processing.
    */
-  private static Reader newNonBufferFillingReader(Reader reader) {
-    return new FilterReader(reader) {
+  private LineProcessor<Integer> createLineCounterProcessor(boolean continueProcessing) {
+    return new LineProcessor<Integer>() {
+      int processedLineCount = 0;
+
       @Override
-      public int read(char[] cbuf, int off, int len) throws IOException {
-        // if a buffer isn't being cleared correctly, this method will eventually start being called
-        // with a len of 0 forever
-        if (len <= 0) {
-          fail("read called with a len of " + len);
-        }
-        // read fewer than the max number of chars to read
-        // shouldn't be a problem unless the buffer is shrinking each call
-        return in.read(cbuf, off, Math.max(len - 1024, 0));
+      public boolean processLine(String line) {
+        processedLineCount++;
+        return continueProcessing;
+      }
+
+      @Override
+      public Integer getResult() {
+        return processedLineCount;
       }
     };
   }
 
-  /** Wrap an appendable in an appendable to defeat any type specific optimizations. */
-  private static Appendable wrapAsGenericAppendable(Appendable a) {
-    return new Appendable() {
+  /**
+   * Creates a LineProcessor that captures content and stops after processing 2 lines.
+   */
+  private LineProcessor<Integer> createConditionalLineProcessor(StringBuilder contentCapture) {
+    return new LineProcessor<Integer>() {
+      int processedLineCount = 0;
 
       @Override
+      public boolean processLine(String line) {
+        processedLineCount++;
+        contentCapture.append(line);
+        return processedLineCount < 2; // Stop after 2 lines
+      }
+
+      @Override
+      public Integer getResult() {
+        return processedLineCount;
+      }
+    };
+  }
+
+  /**
+   * Creates a Reader that intentionally doesn't fill the buffer completely on each read.
+   * This tests the buffer management logic in CharStreams.copy().
+   */
+  private static Reader createNonBufferFillingReader(Reader delegate) {
+    return new FilterReader(delegate) {
+      @Override
+      public int read(char[] buffer, int offset, int length) throws IOException {
+        if (length <= 0) {
+          fail("read called with invalid length: " + length);
+        }
+        // Intentionally read fewer characters than requested to test buffer clearing logic
+        int reducedLength = Math.max(length - 1024, 0);
+        return in.read(buffer, offset, reducedLength);
+      }
+    };
+  }
+
+  /**
+   * Wraps an Appendable to defeat type-specific optimizations in CharStreams methods.
+   */
+  private static Appendable wrapAsGenericAppendable(Appendable delegate) {
+    return new Appendable() {
+      @Override
       public Appendable append(CharSequence csq) throws IOException {
-        a.append(csq);
+        delegate.append(csq);
         return this;
       }
 
       @Override
       public Appendable append(CharSequence csq, int start, int end) throws IOException {
-        a.append(csq, start, end);
+        delegate.append(csq, start, end);
         return this;
       }
 
       @Override
       public Appendable append(char c) throws IOException {
-        a.append(c);
+        delegate.append(c);
         return this;
       }
     };
   }
 
-  /** Wrap a readable in a readable to defeat any type specific optimizations. */
-  private static Readable wrapAsGenericReadable(Readable a) {
+  /**
+   * Wraps a Readable to defeat type-specific optimizations in CharStreams methods.
+   */
+  private static Readable wrapAsGenericReadable(Readable delegate) {
     return new Readable() {
       @Override
       public int read(CharBuffer cb) throws IOException {
-        return a.read(cb);
+        return delegate.read(cb);
       }
     };
   }
