@@ -26,39 +26,99 @@ import org.junit.jupiter.api.Test;
 
 class CpioUtilTest {
 
+    // Test data constants for better readability and reusability
+    private static final byte[] MAGIC_BYTES_NORMAL_ORDER = {(byte) 0xc7, 0x71};
+    private static final byte[] MAGIC_BYTES_SWAPPED_ORDER = {0x71, (byte) 0xc7};
+    private static final int VALID_BYTE_ARRAY_LENGTH = 2;
+    private static final int INVALID_ODD_LENGTH = 1021;
+    private static final int INVALID_ZERO_LENGTH = 0;
+    private static final long TEST_VALUE = 0L;
+
+    // Tests for byteArray2long method
     @Test
-    void testByteArray2longThrowsUnsupportedOperationException() {
-        assertThrows(UnsupportedOperationException.class, () -> CpioUtil.byteArray2long(new byte[1], true));
+    void byteArray2long_withOddLengthArray_throwsUnsupportedOperationException() {
+        // Given: A byte array with odd length (not multiple of 2)
+        byte[] oddLengthArray = new byte[1];
+        boolean swapHalfWords = true;
+
+        // When & Then: Should throw UnsupportedOperationException
+        assertThrows(UnsupportedOperationException.class, 
+            () -> CpioUtil.byteArray2long(oddLengthArray, swapHalfWords),
+            "byteArray2long should reject arrays with odd length");
     }
 
     @Test
-    void testLong2byteArrayWithPositiveThrowsUnsupportedOperationException() {
-        assertThrows(UnsupportedOperationException.class, () -> CpioUtil.long2byteArray(0L, 1021, false));
+    void byteArray2long_withMagicBytesInNormalOrder_returnsCorrectValue() {
+        // Given: Magic bytes in normal order without swapping
+        boolean swapHalfWords = false;
+
+        // When: Converting byte array to long
+        long result = CpioUtil.byteArray2long(MAGIC_BYTES_NORMAL_ORDER, swapHalfWords);
+
+        // Then: Should return the old binary magic constant
+        assertEquals(CpioConstants.MAGIC_OLD_BINARY, result,
+            "Should correctly convert normal order magic bytes to MAGIC_OLD_BINARY");
     }
 
     @Test
-    void testLong2byteArrayWithZeroThrowsUnsupportedOperationException() {
-        assertThrows(UnsupportedOperationException.class, () -> CpioUtil.long2byteArray(0L, 0, false));
+    void byteArray2long_withMagicBytesInSwappedOrder_returnsCorrectValue() {
+        // Given: Magic bytes in swapped order with swapping enabled
+        boolean swapHalfWords = true;
+
+        // When: Converting byte array to long with half-word swapping
+        long result = CpioUtil.byteArray2long(MAGIC_BYTES_SWAPPED_ORDER, swapHalfWords);
+
+        // Then: Should return the old binary magic constant
+        assertEquals(CpioConstants.MAGIC_OLD_BINARY, result,
+            "Should correctly convert swapped order magic bytes to MAGIC_OLD_BINARY when swapping is enabled");
+    }
+
+    // Tests for long2byteArray method
+    @Test
+    void long2byteArray_withOddLength_throwsUnsupportedOperationException() {
+        // Given: An odd length (not multiple of 2)
+        boolean swapHalfWords = false;
+
+        // When & Then: Should throw UnsupportedOperationException
+        assertThrows(UnsupportedOperationException.class, 
+            () -> CpioUtil.long2byteArray(TEST_VALUE, INVALID_ODD_LENGTH, swapHalfWords),
+            "long2byteArray should reject odd lengths");
     }
 
     @Test
-    void testOldBinMagic2ByteArrayNotSwapped() {
-        assertArrayEquals(new byte[] { (byte) 0xc7, 0x71 }, CpioUtil.long2byteArray(CpioConstants.MAGIC_OLD_BINARY, 2, false));
+    void long2byteArray_withZeroLength_throwsUnsupportedOperationException() {
+        // Given: Zero length
+        boolean swapHalfWords = false;
+
+        // When & Then: Should throw UnsupportedOperationException
+        assertThrows(UnsupportedOperationException.class, 
+            () -> CpioUtil.long2byteArray(TEST_VALUE, INVALID_ZERO_LENGTH, swapHalfWords),
+            "long2byteArray should reject zero length");
     }
 
     @Test
-    void testOldBinMagic2ByteArraySwapped() {
-        assertArrayEquals(new byte[] { 0x71, (byte) 0xc7, }, CpioUtil.long2byteArray(CpioConstants.MAGIC_OLD_BINARY, 2, true));
+    void long2byteArray_withMagicValueAndNormalOrder_returnsCorrectByteArray() {
+        // Given: Old binary magic constant without swapping
+        boolean swapHalfWords = false;
+
+        // When: Converting long to byte array
+        byte[] result = CpioUtil.long2byteArray(CpioConstants.MAGIC_OLD_BINARY, VALID_BYTE_ARRAY_LENGTH, swapHalfWords);
+
+        // Then: Should return bytes in normal order
+        assertArrayEquals(MAGIC_BYTES_NORMAL_ORDER, result,
+            "Should convert MAGIC_OLD_BINARY to correct byte array in normal order");
     }
 
     @Test
-    void testOldBinMagicFromByteArrayNotSwapped() {
-        assertEquals(CpioConstants.MAGIC_OLD_BINARY, CpioUtil.byteArray2long(new byte[] { (byte) 0xc7, 0x71 }, false));
-    }
+    void long2byteArray_withMagicValueAndSwappedOrder_returnsCorrectByteArray() {
+        // Given: Old binary magic constant with swapping enabled
+        boolean swapHalfWords = true;
 
-    @Test
-    void testOldBinMagicFromByteArraySwapped() {
-        assertEquals(CpioConstants.MAGIC_OLD_BINARY, CpioUtil.byteArray2long(new byte[] { 0x71, (byte) 0xc7 }, true));
-    }
+        // When: Converting long to byte array with half-word swapping
+        byte[] result = CpioUtil.long2byteArray(CpioConstants.MAGIC_OLD_BINARY, VALID_BYTE_ARRAY_LENGTH, swapHalfWords);
 
+        // Then: Should return bytes in swapped order
+        assertArrayEquals(MAGIC_BYTES_SWAPPED_ORDER, result,
+            "Should convert MAGIC_OLD_BINARY to correct byte array in swapped order");
+    }
 }
