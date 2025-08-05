@@ -38,241 +38,637 @@ import org.jfree.data.time.TimePeriodAnchor;
 import org.jfree.data.time.TimeSeries;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) 
-@EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class ModuloAxis_ESTest extends ModuloAxis_ESTest_scaffolding {
 
-    // Constants for common values
-    private static final double TOLERANCE = 0.01;
-    private static final double DISPLAY_START_DEFAULT = 270.0;
-    private static final double DISPLAY_END_DEFAULT = 90.0;
-    private static final RectangleEdge DEFAULT_EDGE = RectangleEdge.BOTTOM;
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      moduloAxis0.resizeRange(1005.89236);
+      ModuloAxis moduloAxis1 = new ModuloAxis("", moduloAxis0.DEFAULT_RANGE);
+      moduloAxis0.equals(moduloAxis1);
+      assertEquals(0.8662200000107987, moduloAxis0.getDisplayStart(), 0.01);
+  }
 
-    // Tests for display range configuration
-    //--------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void testDefaultDisplayRangeConfiguration() {
-        DateRange dateRange = DateAxis.DEFAULT_DATE_RANGE;
-        ModuloAxis axis = new ModuloAxis("", dateRange);
-        
-        assertEquals("Default display start should be 270", 
-            DISPLAY_START_DEFAULT, axis.getDisplayStart(), TOLERANCE);
-        assertEquals("Default display end should be 90",
-            DISPLAY_END_DEFAULT, axis.getDisplayEnd(), TOLERANCE);
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      DropMode dropMode0 = DropMode.ON_OR_INSERT;
+      TimeSeries<DropMode> timeSeries0 = new TimeSeries<DropMode>(dropMode0);
+      TimePeriodAnchor timePeriodAnchor0 = TimePeriodAnchor.MIDDLE;
+      TimeZone timeZone0 = TimeZone.getDefault();
+      MockGregorianCalendar mockGregorianCalendar0 = new MockGregorianCalendar(timeZone0);
+      Range range0 = timeSeries0.findValueRange((Range) null, timePeriodAnchor0, (Calendar) mockGregorianCalendar0);
+      ModuloAxis moduloAxis0 = new ModuloAxis("", range0);
+      RectangleEdge rectangleEdge0 = RectangleEdge.BOTTOM;
+      // Undeclared exception!
+      try { 
+        moduloAxis0.lengthToJava2D(66.0, (Rectangle2D) null, rectangleEdge0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.jfree.chart.axis.ModuloAxis", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testSetDisplayRangeUpdatesConfiguration() {
-        DateRange dateRange = DateAxis.DEFAULT_DATE_RANGE;
-        ModuloAxis axis = new ModuloAxis("", dateRange);
-        
-        axis.setDisplayRange(500, 2.0);
-        assertEquals("Display start should update correctly",
-            0.0, axis.getDisplayStart(), TOLERANCE);
-        assertEquals("Display end should update correctly",
-            0.0, axis.getDisplayEnd(), TOLERANCE);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      moduloAxis0.resizeRange(1005.89236);
+      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
+      RectangleEdge rectangleEdge0 = RectangleEdge.LEFT;
+      moduloAxis0.resizeRange(2.0, (-5.439710113));
+      double double0 = moduloAxis0.lengthToJava2D(0.13377999998920131, rectangle2D_Double0, rectangleEdge0);
+      assertFalse(moduloAxis0.isAutoRange());
+      assertEquals(0.0, double0, 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testAutoAdjustRangeConfiguresDefaultDisplayRange() {
-        DateRange dateRange = DateAxis.DEFAULT_DATE_RANGE;
-        ModuloAxis axis = new ModuloAxis("", dateRange);
-        
-        axis.autoAdjustRange();
-        
-        assertTrue("Auto-range should be enabled", axis.isAutoRange());
-        assertEquals("Display start should be configured", 
-            DISPLAY_START_DEFAULT, axis.getDisplayStart(), TOLERANCE);
-        assertEquals("Display end should be configured",
-            DISPLAY_END_DEFAULT, axis.getDisplayEnd(), TOLERANCE);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      MeterPlot meterPlot0 = new MeterPlot();
+      Range range0 = meterPlot0.getRange();
+      ModuloAxis moduloAxis0 = new ModuloAxis("", range0);
+      moduloAxis0.resizeRange((double) 270);
+      XYShapeRenderer xYShapeRenderer0 = new XYShapeRenderer();
+      PaintScale paintScale0 = xYShapeRenderer0.getPaintScale();
+      PaintScaleLegend paintScaleLegend0 = new PaintScaleLegend(paintScale0, moduloAxis0);
+      // Undeclared exception!
+      try { 
+        moduloAxis0.lengthToJava2D(270.0, (Rectangle2D) null, paintScaleLegend0.DEFAULT_POSITION);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.jfree.chart.axis.ModuloAxis", e);
+      }
+  }
 
-    // Tests for coordinate conversion (valueToJava2D)
-    //--------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void testValueToJava2DHandlesNullArea() {
-        DropMode dropMode = DropMode.ON_OR_INSERT;
-        TimeSeries<DropMode> timeSeries = new TimeSeries<>(dropMode);
-        TimePeriodAnchor anchor = TimePeriodAnchor.MIDDLE;
-        TimeZone timeZone = TimeZone.getDefault();
-        MockGregorianCalendar calendar = new MockGregorianCalendar(timeZone);
-        Range range = timeSeries.findValueRange(null, anchor, calendar);
-        ModuloAxis axis = new ModuloAxis("", range);
-        
-        try {
-            axis.valueToJava2D(534.36, null, DEFAULT_EDGE);
-            fail("Expected NullPointerException for null area");
-        } catch (NullPointerException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      DefaultValueDataset defaultValueDataset0 = new DefaultValueDataset();
+      ThermometerPlot thermometerPlot0 = new ThermometerPlot(defaultValueDataset0);
+      Range range0 = thermometerPlot0.getDataRange((ValueAxis) null);
+      ModuloAxis moduloAxis0 = new ModuloAxis("", range0);
+      moduloAxis0.setDisplayRange(0.0, 10);
+      moduloAxis0.resizeRange(1462.0995585, (-2273.979600655645));
+      assertEquals(36.5181918443559, moduloAxis0.getDisplayEnd(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testValueToJava2DWithInvertedAxis() {
-        DateRange dateRange = DateAxis.DEFAULT_DATE_RANGE;
-        ModuloAxis axis = new ModuloAxis("", dateRange);
-        axis.setInverted(true);
-        axis.resizeRange(1.1565);
-        
-        Rectangle2D area = new Rectangle2D.Double(0.134, 500, 1e-8, 0.134);
-        double result = axis.valueToJava2D(0.05, area, RectangleEdge.RIGHT);
-        
-        assertEquals("Coordinate calculation should handle inverted axis",
-            500.128, result, TOLERANCE);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      moduloAxis0.resizeRange((double) 500);
+      XYShapeRenderer xYShapeRenderer0 = new XYShapeRenderer();
+      PaintScale paintScale0 = xYShapeRenderer0.getPaintScale();
+      PaintScaleLegend paintScaleLegend0 = new PaintScaleLegend(paintScale0, moduloAxis0);
+      Rectangle2D rectangle2D0 = paintScaleLegend0.getBounds();
+      double double0 = moduloAxis0.java2DToValue(0.5, rectangle2D0, paintScaleLegend0.DEFAULT_POSITION);
+      assertEquals(0.5, moduloAxis0.getDisplayEnd(), 0.01);
+      assertEquals(0.0, double0, 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testValueToJava2DWithCustomDisplayRange() {
-        DefaultValueDataset dataset = new DefaultValueDataset();
-        ThermometerPlot plot = new ThermometerPlot(dataset);
-        Range range = plot.getDataRange(null);
-        ModuloAxis axis = new ModuloAxis("", range);
-        axis.setDisplayRange(0.0, 10);
-        
-        Polygon polygon = new Polygon();
-        Rectangle area = polygon.getBounds();
-        area.setBounds(2, 97, 10, 2);
-        
-        double result = axis.valueToJava2D(2239.45, area, DEFAULT_EDGE);
-        
-        assertEquals("Coordinate should map to display range",
-            41.447, result, TOLERANCE);
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      DropMode dropMode0 = DropMode.ON_OR_INSERT;
+      TimeSeries<DropMode> timeSeries0 = new TimeSeries<DropMode>(dropMode0);
+      TimePeriodAnchor timePeriodAnchor0 = TimePeriodAnchor.MIDDLE;
+      TimeZone timeZone0 = TimeZone.getDefault();
+      MockGregorianCalendar mockGregorianCalendar0 = new MockGregorianCalendar(timeZone0);
+      Range range0 = timeSeries0.findValueRange((Range) null, timePeriodAnchor0, (Calendar) mockGregorianCalendar0);
+      ModuloAxis moduloAxis0 = new ModuloAxis("", range0);
+      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
+      RectangleEdge rectangleEdge0 = RectangleEdge.LEFT;
+      double double0 = moduloAxis0.valueToJava2D(19, rectangle2D_Double0, rectangleEdge0);
+      assertEquals(Double.NaN, double0, 0.01);
+      assertEquals(270.0, moduloAxis0.getDisplayStart(), 0.01);
+      assertEquals(90.0, moduloAxis0.getDisplayEnd(), 0.01);
+  }
 
-    // Tests for range resizing
-    //--------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void testResizeRangeUpdatesDisplayConfiguration() {
-        DateRange dateRange = DateAxis.DEFAULT_DATE_RANGE;
-        ModuloAxis axis = new ModuloAxis("", dateRange);
-        
-        axis.resizeRange(1005.89);
-        axis.resizeRange(0.866, 0.134);
-        
-        assertFalse("Resizing should disable auto-range", axis.isAutoRange());
-        assertEquals("Display start should update after resize",
-            0.866, axis.getDisplayStart(), TOLERANCE);
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("Plc=vQ!l", dateRange0);
+      moduloAxis0.setInverted(true);
+      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double(0.13377999998920131, 500, 1.0E-8, 0.13377999998920131);
+      RectangleEdge rectangleEdge0 = RectangleEdge.RIGHT;
+      double double0 = moduloAxis0.valueToJava2D(0.05, rectangle2D_Double0, rectangleEdge0);
+      assertEquals(499.9999626312849, double0, 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testResizeRangeWithAnchorValue() {
-        DateRange dateRange = DateAxis.DEFAULT_DATE_RANGE;
-        ModuloAxis axis = new ModuloAxis("", dateRange);
-        
-        axis.resizeRange(1462.1, -2273.98);
-        
-        assertEquals("Display end should update after anchored resize",
-            36.518, axis.getDisplayEnd(), TOLERANCE);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      Range range0 = new Range(0.043157868280104594, 946.7277932617);
+      ModuloAxis moduloAxis0 = new ModuloAxis("", range0);
+      moduloAxis0.setInverted(true);
+      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
+      RectangleEdge rectangleEdge0 = RectangleEdge.TOP;
+      double double0 = moduloAxis0.valueToJava2D(2.0, rectangle2D_Double0, rectangleEdge0);
+      assertEquals(0.0, double0, 0.01);
+      assertEquals(270.0, moduloAxis0.getDisplayStart(), 0.01);
+  }
 
-    // Tests for edge cases and exceptions
-    //--------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void testNullRangeThrowsExceptionInConstructor() {
-        try {
-            new ModuloAxis("", null);
-            fail("Expected IllegalArgumentException for null range");
-        } catch (IllegalArgumentException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      moduloAxis0.setInverted(true);
+      moduloAxis0.resizeRange(499.3112711);
+      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
+      RectangleEdge rectangleEdge0 = RectangleEdge.BOTTOM;
+      double double0 = moduloAxis0.valueToJava2D((-2588.490989243), rectangle2D_Double0, rectangleEdge0);
+      assertFalse(moduloAxis0.isAutoRange());
+      assertEquals(0.0, double0, 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testResizeRangeWithInvalidParametersThrowsException() {
-        DefaultMultiValueCategoryDataset<DropMode, DropMode> dataset = 
-            new DefaultMultiValueCategoryDataset<>();
-        Range range = dataset.getRangeBounds(false);
-        ModuloAxis axis = new ModuloAxis(null, range);
-        
-        try {
-            axis.resizeRange(-1471.7);
-            fail("Expected IllegalArgumentException for negative range");
-        } catch (IllegalArgumentException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      moduloAxis0.resizeRange((double) 2.0F);
+      moduloAxis0.setInverted(true);
+      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double(0.0F, 500, 2.0F, 0.05);
+      RectangleEdge rectangleEdge0 = RectangleEdge.LEFT;
+      double double0 = moduloAxis0.valueToJava2D((-4.0), rectangle2D_Double0, rectangleEdge0);
+      assertFalse(moduloAxis0.isAutoRange());
+      assertEquals(500.05, double0, 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testJava2DToValueHandlesNullArea() {
-        DateRange dateRange = DateAxis.DEFAULT_DATE_RANGE;
-        ModuloAxis axis = new ModuloAxis("", dateRange);
-        
-        try {
-            axis.java2DToValue(0.6155, null, DEFAULT_EDGE);
-            fail("Expected NullPointerException for null area");
-        } catch (NullPointerException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      moduloAxis0.resizeRange(1005.89236);
+      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
+      Rectangle2D rectangle2D0 = moduloAxis0.DEFAULT_TICK_LABEL_INSETS.createOutsetRectangle((Rectangle2D) rectangle2D_Double0, true, true);
+      RectangleEdge rectangleEdge0 = RectangleEdge.LEFT;
+      double double0 = moduloAxis0.valueToJava2D(3676.6, rectangle2D0, rectangleEdge0);
+      assertFalse(moduloAxis0.isAutoRange());
+      assertEquals(5.979967110664955, double0, 0.01);
+  }
 
-    // Tests for equals and clone
-    //--------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void testEqualsWithDifferentDisplayRanges() {
-        DateRange dateRange = DateAxis.DEFAULT_DATE_RANGE;
-        ModuloAxis axis1 = new ModuloAxis("", dateRange);
-        ModuloAxis axis2 = new ModuloAxis("", dateRange);
-        
-        axis2.resizeRange(2.0);
-        assertFalse("Axes with different ranges should not be equal", 
-            axis1.equals(axis2));
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      moduloAxis0.resizeRange(499.3112711);
+      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double((-2588.490989243), (-1638.3), 0.05, 1138.013594771);
+      RectangleEdge rectangleEdge0 = RectangleEdge.BOTTOM;
+      double double0 = moduloAxis0.valueToJava2D((-2588.490989243), rectangle2D_Double0, rectangleEdge0);
+      assertFalse(moduloAxis0.isAutoRange());
+      assertEquals((-2588.552898269559), double0, 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualsWithSameConfiguration() {
-        DateRange dateRange = DateAxis.DEFAULT_DATE_RANGE;
-        ModuloAxis axis1 = new ModuloAxis("", dateRange);
-        ModuloAxis axis2 = new ModuloAxis("", dateRange);
-        
-        assertTrue("Axes with identical configurations should be equal",
-            axis1.equals(axis2));
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      moduloAxis0.setInverted(true);
+      moduloAxis0.resizeRange((double) 2.0F);
+      moduloAxis0.resizeRange(2859.56, 2187.2);
+      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double(4454.370088683, 4.0, (-3835.51370066), 0.0F);
+      RectangleEdge rectangleEdge0 = RectangleEdge.TOP;
+      double double0 = moduloAxis0.valueToJava2D(2.0, rectangle2D_Double0, rectangleEdge0);
+      assertFalse(moduloAxis0.isAutoRange());
+      assertEquals((-2257.7788874723888), double0, 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testCloneProducesEqualInstance() {
-        DateRange dateRange = DateAxis.DEFAULT_DATE_RANGE;
-        ModuloAxis original = new ModuloAxis("", dateRange);
-        ModuloAxis clone = (ModuloAxis) original.clone();
-        
-        assertTrue("Clone should be equal to original", original.equals(clone));
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("Plc=vQ!l", dateRange0);
+      moduloAxis0.resizeRange(1.1565116986768456);
+      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double(0.13377999998920131, 500, 1.0E-8, 0.13377999998920131);
+      RectangleEdge rectangleEdge0 = RectangleEdge.RIGHT;
+      double double0 = moduloAxis0.valueToJava2D(0.05, rectangle2D_Double0, rectangleEdge0);
+      assertFalse(moduloAxis0.isAutoRange());
+      assertEquals(500.12804464945566, double0, 0.01);
+  }
 
-    // Tests for length conversions
-    //--------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void testLengthToJava2DHandlesNullArea() {
-        DropMode dropMode = DropMode.ON_OR_INSERT;
-        TimeSeries<DropMode> timeSeries = new TimeSeries<>(dropMode);
-        TimePeriodAnchor anchor = TimePeriodAnchor.MIDDLE;
-        TimeZone timeZone = TimeZone.getDefault();
-        MockGregorianCalendar calendar = new MockGregorianCalendar(timeZone);
-        Range range = timeSeries.findValueRange(null, anchor, calendar);
-        ModuloAxis axis = new ModuloAxis("", range);
-        
-        try {
-            axis.lengthToJava2D(66.0, null, DEFAULT_EDGE);
-            fail("Expected NullPointerException for null area");
-        } catch (NullPointerException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      DefaultValueDataset defaultValueDataset0 = new DefaultValueDataset();
+      ThermometerPlot thermometerPlot0 = new ThermometerPlot(defaultValueDataset0);
+      Range range0 = thermometerPlot0.getDataRange((ValueAxis) null);
+      ModuloAxis moduloAxis0 = new ModuloAxis("", range0);
+      Polygon polygon0 = new Polygon();
+      Rectangle rectangle0 = (Rectangle)polygon0.getBounds2D();
+      moduloAxis0.setDisplayRange(0.0, 10);
+      rectangle0.setBounds(2, 97, 10, 2);
+      RectangleEdge rectangleEdge0 = RectangleEdge.BOTTOM;
+      double double0 = moduloAxis0.valueToJava2D(2239.4471173664856, rectangle0, rectangleEdge0);
+      assertEquals(10.0, moduloAxis0.getDisplayEnd(), 0.01);
+      assertEquals(41.4471173664856, double0, 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testLengthToJava2DWithValidParameters() {
-        Range range = ValueAxis.DEFAULT_RANGE;
-        ModuloAxis axis = new ModuloAxis("", range);
-        JScrollPane scrollPane = new JScrollPane();
-        Rectangle area = scrollPane.getViewportBorderBounds();
-        
-        double result = axis.lengthToJava2D(1e-8, area, RectangleEdge.RIGHT);
-        
-        assertEquals("Length conversion should be accurate",
-            1.675e-10, result, TOLERANCE);
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      LookupPaintScale lookupPaintScale0 = new LookupPaintScale();
+      PaintScaleLegend paintScaleLegend0 = new PaintScaleLegend(lookupPaintScale0, moduloAxis0);
+      Rectangle2D rectangle2D0 = paintScaleLegend0.getBounds();
+      moduloAxis0.setDisplayRange(500, 2.0F);
+      double double0 = moduloAxis0.valueToJava2D(75.0, rectangle2D0, paintScaleLegend0.DEFAULT_POSITION);
+      assertEquals(0.0, moduloAxis0.getDisplayStart(), 0.01);
+      assertEquals(Double.NaN, double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      DropMode dropMode0 = DropMode.ON_OR_INSERT;
+      TimeSeries<DropMode> timeSeries0 = new TimeSeries<DropMode>(dropMode0);
+      TimePeriodAnchor timePeriodAnchor0 = TimePeriodAnchor.MIDDLE;
+      TimeZone timeZone0 = TimeZone.getDefault();
+      MockGregorianCalendar mockGregorianCalendar0 = new MockGregorianCalendar(timeZone0);
+      Range range0 = timeSeries0.findValueRange((Range) null, timePeriodAnchor0, (Calendar) mockGregorianCalendar0);
+      ModuloAxis moduloAxis0 = new ModuloAxis("", range0);
+      RectangleEdge rectangleEdge0 = RectangleEdge.BOTTOM;
+      // Undeclared exception!
+      try { 
+        moduloAxis0.valueToJava2D(534.359951174859, (Rectangle2D) null, rectangleEdge0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.jfree.chart.axis.ModuloAxis", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      moduloAxis0.autoAdjustRange();
+      assertEquals(270.0, moduloAxis0.getDisplayStart(), 0.01);
+      assertEquals(90.0, moduloAxis0.getDisplayEnd(), 0.01);
+      assertTrue(moduloAxis0.isAutoRange());
+  }
+
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
+      Rectangle2D rectangle2D0 = moduloAxis0.DEFAULT_TICK_LABEL_INSETS.createOutsetRectangle((Rectangle2D) rectangle2D_Double0, true, true);
+      moduloAxis0.setDisplayRange((-3112.0), (-2578.194629652568));
+      RectangleEdge rectangleEdge0 = RectangleEdge.TOP;
+      double double0 = moduloAxis0.valueToJava2D(0.0, rectangle2D0, rectangleEdge0);
+      assertEquals(1.0, moduloAxis0.getDisplayStart(), 0.01);
+      assertEquals((-4.0), double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      moduloAxis0.resizeRange(1005.89236);
+      Rectangle rectangle0 = new Rectangle(500, 1);
+      RectangleEdge rectangleEdge0 = RectangleEdge.BOTTOM;
+      double double0 = moduloAxis0.lengthToJava2D((-2.147483648E9), rectangle0, rectangleEdge0);
+      assertFalse(moduloAxis0.isAutoRange());
+      assertEquals((-4.013087995539962E12), double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("Plc=vQ!l", dateRange0);
+      moduloAxis0.setInverted(true);
+      moduloAxis0.resizeRange(1.1565116986768456);
+      Rectangle rectangle0 = new Rectangle(500, 500);
+      RectangleEdge rectangleEdge0 = RectangleEdge.RIGHT;
+      double double0 = moduloAxis0.java2DToValue((-75.7781029047), rectangle0, rectangleEdge0);
+      assertEquals(0.0077970315776809684, moduloAxis0.getDisplayStart(), 0.01);
+      assertEquals((-0.14139579718674034), double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      Range range0 = new Range((-3022.7454), (-2241.3964950581735));
+      ModuloAxis moduloAxis0 = new ModuloAxis("lFFFf+.F<AAFi", range0);
+      moduloAxis0.resizeRange(3737.437, 2.0);
+      double double0 = moduloAxis0.getDisplayStart();
+      assertFalse(moduloAxis0.isAutoRange());
+      assertEquals((-2514.145028011561), double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      moduloAxis0.setDisplayRange(533.2898185733466, 500);
+      double double0 = moduloAxis0.getDisplayEnd();
+      assertEquals(0.28981857334656524, moduloAxis0.getDisplayStart(), 0.01);
+      assertEquals(0.0, double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      Range range0 = new Range((-3022.7454), (-2241.3964950581735));
+      ModuloAxis moduloAxis0 = new ModuloAxis("lFFFf+.F<AAFi", range0);
+      moduloAxis0.resizeRange(3737.437, 2.0);
+      double double0 = moduloAxis0.getDisplayEnd();
+      assertEquals((-2169.9484016396004), moduloAxis0.getUpperBound(), 0.01);
+      assertEquals((-2951.2973065814267), double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      ModuloAxis moduloAxis0 = new ModuloAxis("", (Range) null);
+      // Undeclared exception!
+      try { 
+        moduloAxis0.setDisplayRange((-1402.04), (-1402.04));
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      ModuloAxis moduloAxis0 = new ModuloAxis((String) null, (Range) null);
+      // Undeclared exception!
+      try { 
+        moduloAxis0.resizeRange(142.0, 142.0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.jfree.chart.axis.ModuloAxis", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      ModuloAxis moduloAxis0 = new ModuloAxis("HL/Z&k~q6y%", (Range) null);
+      // Undeclared exception!
+      try { 
+        moduloAxis0.resizeRange((double) 0.0F, (double) 0.0F);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Null 'range' argument.
+         //
+         verifyException("org.jfree.chart.internal.Args", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      ModuloAxis moduloAxis0 = new ModuloAxis("jT(Ea9bn5b*o>jy", (Range) null);
+      // Undeclared exception!
+      try { 
+        moduloAxis0.resizeRange(1.0E-8);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.jfree.chart.axis.ModuloAxis", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      DefaultMultiValueCategoryDataset<DropMode, DropMode> defaultMultiValueCategoryDataset0 = new DefaultMultiValueCategoryDataset<DropMode, DropMode>();
+      Range range0 = defaultMultiValueCategoryDataset0.getRangeBounds(false);
+      ModuloAxis moduloAxis0 = new ModuloAxis((String) null, range0);
+      // Undeclared exception!
+      try { 
+        moduloAxis0.resizeRange((-1471.70084));
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // A positive range length is required: Range[0.0,0.0]
+         //
+         verifyException("org.jfree.chart.axis.ValueAxis", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("scXVbH@CIro/NE^!ZZ[", dateRange0);
+      moduloAxis0.resizeRange(0.6155460372287962, (double) 32L);
+      RectangleEdge rectangleEdge0 = RectangleEdge.BOTTOM;
+      // Undeclared exception!
+      try { 
+        moduloAxis0.java2DToValue(0.6155460372287962, (Rectangle2D) null, rectangleEdge0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.jfree.chart.axis.NumberAxis", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      ModuloAxis moduloAxis0 = new ModuloAxis("", (Range) null);
+      Object object0 = moduloAxis0.clone();
+      // Undeclared exception!
+      try { 
+        moduloAxis0.equals(object0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.jfree.chart.axis.ModuloAxis", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test32()  throws Throwable  {
+      DefaultValueDataset defaultValueDataset0 = new DefaultValueDataset();
+      ThermometerPlot thermometerPlot0 = new ThermometerPlot(defaultValueDataset0);
+      Range range0 = thermometerPlot0.getDataRange((ValueAxis) null);
+      ModuloAxis moduloAxis0 = new ModuloAxis("", range0);
+      moduloAxis0.setDisplayRange(0.0, 10);
+      double double0 = moduloAxis0.getDisplayStart();
+      assertEquals(0.0, double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test33()  throws Throwable  {
+      ModuloAxis moduloAxis0 = new ModuloAxis("", (Range) null);
+      ModuloAxis moduloAxis1 = new ModuloAxis("", moduloAxis0.DEFAULT_RANGE);
+      boolean boolean0 = moduloAxis1.equals(moduloAxis0);
+      assertFalse(boolean0);
+      assertEquals(90.0, moduloAxis1.getDisplayEnd(), 0.01);
+      assertEquals(270.0, moduloAxis1.getDisplayStart(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test34()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("TOKP_OR_LEFT", dateRange0);
+      ModuloAxis moduloAxis1 = new ModuloAxis("TOKP_OR_LEFT", moduloAxis0.DEFAULT_RANGE);
+      moduloAxis1.resizeRange((double) 2.0F);
+      boolean boolean0 = moduloAxis0.equals(moduloAxis1);
+      assertFalse(moduloAxis1.isAutoRange());
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test35()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      TickType tickType0 = TickType.MINOR;
+      boolean boolean0 = moduloAxis0.equals(tickType0);
+      assertEquals(270.0, moduloAxis0.getDisplayStart(), 0.01);
+      assertFalse(boolean0);
+      assertEquals(90.0, moduloAxis0.getDisplayEnd(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test36()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      boolean boolean0 = moduloAxis0.equals(moduloAxis0);
+      assertTrue(boolean0);
+      assertEquals(90.0, moduloAxis0.getDisplayEnd(), 0.01);
+      assertEquals(270.0, moduloAxis0.getDisplayStart(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test37()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      ModuloAxis moduloAxis1 = (ModuloAxis)moduloAxis0.clone();
+      boolean boolean0 = moduloAxis0.equals(moduloAxis1);
+      assertEquals(90.0, moduloAxis1.getDisplayEnd(), 0.01);
+      assertTrue(boolean0);
+      assertEquals(270.0, moduloAxis1.getDisplayStart(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test38()  throws Throwable  {
+      Range range0 = ValueAxis.DEFAULT_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", range0);
+      JScrollPane jScrollPane0 = new JScrollPane();
+      Rectangle rectangle0 = jScrollPane0.getViewportBorderBounds();
+      RectangleEdge rectangleEdge0 = RectangleEdge.RIGHT;
+      double double0 = moduloAxis0.lengthToJava2D(1.0E-8, rectangle0, rectangleEdge0);
+      assertEquals(1.675977653631285E-10, double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test39()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      moduloAxis0.resizeRange(1005.89236, 0.13377999998920131);
+      moduloAxis0.resizeRange(0.8662200000107987, 0.13377999998920131);
+      assertFalse(moduloAxis0.isAutoRange());
+  }
+
+  @Test(timeout = 4000)
+  public void test40()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      RectangleEdge rectangleEdge0 = RectangleEdge.TOP;
+      double double0 = moduloAxis0.java2DToValue(5.0, (Rectangle2D) null, rectangleEdge0);
+      assertEquals(270.0, moduloAxis0.getDisplayStart(), 0.01);
+      assertEquals(0.0, double0, 0.01);
+      assertEquals(90.0, moduloAxis0.getDisplayEnd(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test41()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
+      double double0 = moduloAxis0.valueToJava2D(53843.88561595805, rectangle2D_Double0, (RectangleEdge) null);
+      assertEquals(270.0, moduloAxis0.getDisplayStart(), 0.01);
+      assertEquals(0.0, double0, 0.01);
+      assertEquals(90.0, moduloAxis0.getDisplayEnd(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test42()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      moduloAxis0.resizeRange((double) 2.0F);
+      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
+      double double0 = moduloAxis0.valueToJava2D(0.7330000000001746, rectangle2D_Double0, (RectangleEdge) null);
+      assertFalse(moduloAxis0.isAutoRange());
+      assertEquals(0.0, double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test43()  throws Throwable  {
+      Range range0 = ValueAxis.DEFAULT_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("horizontalAlignment", range0);
+      moduloAxis0.resizeRange(82.21630182402, 0.05);
+      double double0 = moduloAxis0.valueToJava2D(90.57956035375857, (Rectangle2D) null, (RectangleEdge) null);
+      assertEquals(0.6909867502108682, moduloAxis0.getDisplayEnd(), 0.01);
+      assertEquals(0.0, double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test44()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      moduloAxis0.resizeRange(1005.89236, 0.13377999998920131);
+      Line2D.Float line2D_Float0 = new Line2D.Float();
+      Rectangle2D rectangle2D0 = line2D_Float0.getBounds2D();
+      RectangleEdge rectangleEdge0 = RectangleEdge.RIGHT;
+      double double0 = moduloAxis0.java2DToValue(0.8662200000107987, rectangle2D0, rectangleEdge0);
+      assertEquals(0.7675599999784026, moduloAxis0.getUpperBound(), 0.01);
+      assertEquals(Double.POSITIVE_INFINITY, double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test45()  throws Throwable  {
+      ModuloAxis moduloAxis0 = new ModuloAxis((String) null, (Range) null);
+      // Undeclared exception!
+      try { 
+        moduloAxis0.autoAdjustRange();
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Null 'range' argument.
+         //
+         verifyException("org.jfree.chart.internal.Args", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test46()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      double double0 = moduloAxis0.getDisplayEnd();
+      assertEquals(270.0, moduloAxis0.getDisplayStart(), 0.01);
+      assertEquals(90.0, double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test47()  throws Throwable  {
+      DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
+      ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
+      double double0 = moduloAxis0.getDisplayStart();
+      assertEquals(90.0, moduloAxis0.getDisplayEnd(), 0.01);
+      assertEquals(270.0, double0, 0.01);
+  }
 }
