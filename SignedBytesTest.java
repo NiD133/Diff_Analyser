@@ -43,41 +43,33 @@ import org.jspecify.annotations.NullMarked;
 @GwtCompatible(emulated = true)
 public class SignedBytesTest extends TestCase {
   private static final byte[] EMPTY = {};
-  private static final byte[] SINGLE_ELEMENT_ARRAY = {(byte) 1};
+  private static final byte[] ARRAY1 = {(byte) 1};
 
-  private static final byte MIN_VALUE = Byte.MIN_VALUE;
-  private static final byte MAX_VALUE = Byte.MAX_VALUE;
-  private static final byte[] ALL_VALUES = {MIN_VALUE, -1, 0, 1, MAX_VALUE};
+  private static final byte LEAST = Byte.MIN_VALUE;
+  private static final byte GREATEST = Byte.MAX_VALUE;
 
-  // Test cases for checkedCast
-  public void testCheckedCast_validValues() {
-    for (byte value : ALL_VALUES) {
+  private static final byte[] VALUES = {LEAST, -1, 0, 1, GREATEST};
+
+  public void testCheckedCast() {
+    for (byte value : VALUES) {
       assertThat(SignedBytes.checkedCast((long) value)).isEqualTo(value);
     }
-  }
-
-  public void testCheckedCast_outOfRangeValues() {
-    assertCastFails(MAX_VALUE + 1L);
-    assertCastFails(MIN_VALUE - 1L);
+    assertCastFails(GREATEST + 1L);
+    assertCastFails(LEAST - 1L);
     assertCastFails(Long.MAX_VALUE);
     assertCastFails(Long.MIN_VALUE);
   }
 
-  // Test cases for saturatedCast
-  public void testSaturatedCast_validValues() {
-    for (byte value : ALL_VALUES) {
+  public void testSaturatedCast() {
+    for (byte value : VALUES) {
       assertThat(SignedBytes.saturatedCast((long) value)).isEqualTo(value);
     }
+    assertThat(SignedBytes.saturatedCast(GREATEST + 1L)).isEqualTo(GREATEST);
+    assertThat(SignedBytes.saturatedCast(LEAST - 1L)).isEqualTo(LEAST);
+    assertThat(SignedBytes.saturatedCast(Long.MAX_VALUE)).isEqualTo(GREATEST);
+    assertThat(SignedBytes.saturatedCast(Long.MIN_VALUE)).isEqualTo(LEAST);
   }
 
-  public void testSaturatedCast_outOfRangeValues() {
-    assertThat(SignedBytes.saturatedCast(MAX_VALUE + 1L)).isEqualTo(MAX_VALUE);
-    assertThat(SignedBytes.saturatedCast(MIN_VALUE - 1L)).isEqualTo(MIN_VALUE);
-    assertThat(SignedBytes.saturatedCast(Long.MAX_VALUE)).isEqualTo(MAX_VALUE);
-    assertThat(SignedBytes.saturatedCast(Long.MIN_VALUE)).isEqualTo(MIN_VALUE);
-  }
-
-  // Helper for checkedCast failure cases
   private static void assertCastFails(long value) {
     try {
       SignedBytes.checkedCast(value);
@@ -89,83 +81,71 @@ public class SignedBytesTest extends TestCase {
     }
   }
 
-  // Test cases for compare
   public void testCompare() {
-    for (byte x : ALL_VALUES) {
-      for (byte y : ALL_VALUES) {
+    for (byte x : VALUES) {
+      for (byte y : VALUES) {
+        // Only compare the sign of the result of compare().
         int expected = Byte.compare(x, y);
         int actual = SignedBytes.compare(x, y);
         if (expected == 0) {
           assertWithMessage(x + ", " + y).that(actual).isEqualTo(expected);
         } else if (expected < 0) {
-          assertWithMessage(x + ", " + y).that(actual).isLessThan(0);
+          assertWithMessage(x + ", " + y + " (expected: " + expected + ", actual" + actual + ")")
+              .that(actual < 0)
+              .isTrue();
         } else {
-          assertWithMessage(x + ", " + y).that(actual).isGreaterThan(0);
+          assertWithMessage(x + ", " + y + " (expected: " + expected + ", actual" + actual + ")")
+              .that(actual > 0)
+              .isTrue();
         }
       }
     }
   }
 
-  // Test cases for max
   public void testMax_noArgs() {
     assertThrows(IllegalArgumentException.class, () -> max());
   }
 
-  public void testMax_singleElement() {
-    assertThat(max(MIN_VALUE)).isEqualTo(MIN_VALUE);
-    assertThat(max(MAX_VALUE)).isEqualTo(MAX_VALUE);
-  }
-
-  public void testMax_multipleElements() {
+  public void testMax() {
+    assertThat(max(LEAST)).isEqualTo(LEAST);
+    assertThat(max(GREATEST)).isEqualTo(GREATEST);
     assertThat(max((byte) 0, (byte) -128, (byte) -1, (byte) 127, (byte) 1)).isEqualTo((byte) 127);
   }
 
-  // Test cases for min
   public void testMin_noArgs() {
     assertThrows(IllegalArgumentException.class, () -> min());
   }
 
-  public void testMin_singleElement() {
-    assertThat(min(MIN_VALUE)).isEqualTo(MIN_VALUE);
-    assertThat(min(MAX_VALUE)).isEqualTo(MAX_VALUE);
-  }
-
-  public void testMin_multipleElements() {
+  public void testMin() {
+    assertThat(min(LEAST)).isEqualTo(LEAST);
+    assertThat(min(GREATEST)).isEqualTo(GREATEST);
     assertThat(min((byte) 0, (byte) -128, (byte) -1, (byte) 127, (byte) 1)).isEqualTo((byte) -128);
   }
 
-  // Test cases for join
-  public void testJoin_emptyArray() {
+  public void testJoin() {
     assertThat(SignedBytes.join(",", EMPTY)).isEmpty();
-  }
-
-  public void testJoin_singleElement() {
-    assertThat(SignedBytes.join(",", SINGLE_ELEMENT_ARRAY)).isEqualTo("1");
-  }
-
-  public void testJoin_multipleElements() {
+    assertThat(SignedBytes.join(",", ARRAY1)).isEqualTo("1");
     assertThat(SignedBytes.join(",", (byte) 1, (byte) 2)).isEqualTo("1,2");
     assertThat(SignedBytes.join("", (byte) 1, (byte) 2, (byte) 3)).isEqualTo("123");
     assertThat(SignedBytes.join(",", (byte) -128, (byte) -1)).isEqualTo("-128,-1");
   }
 
-  // Test cases for lexicographicalComparator
   @J2ktIncompatible // b/285319375
   public void testLexicographicalComparator() {
-    List<byte[]> orderedArrays = Arrays.asList(
-        new byte[] {},
-        new byte[] {MIN_VALUE},
-        new byte[] {MIN_VALUE, MIN_VALUE},
-        new byte[] {MIN_VALUE, (byte) 1},
-        new byte[] {(byte) 1},
-        new byte[] {(byte) 1, MIN_VALUE},
-        new byte[] {MAX_VALUE, (byte) (MAX_VALUE - 1)},
-        new byte[] {MAX_VALUE, MAX_VALUE},
-        new byte[] {MAX_VALUE, MAX_VALUE, MAX_VALUE}
-    );
+    List<byte[]> ordered =
+        Arrays.asList(
+            new byte[] {},
+            new byte[] {LEAST},
+            new byte[] {LEAST, LEAST},
+            new byte[] {LEAST, (byte) 1},
+            new byte[] {(byte) 1},
+            new byte[] {(byte) 1, LEAST},
+            new byte[] {GREATEST, GREATEST - (byte) 1},
+            new byte[] {GREATEST, GREATEST},
+            new byte[] {GREATEST, GREATEST, GREATEST});
 
     Comparator<byte[]> comparator = SignedBytes.lexicographicalComparator();
-    Helpers.testComparator(comparator, orderedArrays);
+    Helpers.testComparator(comparator, ordered);
   }
 
   @J2ktIncompatible
@@ -175,50 +155,34 @@ public class SignedBytesTest extends TestCase {
     assertThat(SerializableTester.reserialize(comparator)).isSameInstanceAs(comparator);
   }
 
-  // Test cases for sortDescending
-  public void testSortDescending_emptyArray() {
-    testSortDescendingHelper(new byte[] {}, new byte[] {});
+  public void testSortDescending() {
+    testSortDescending(new byte[] {}, new byte[] {});
+    testSortDescending(new byte[] {1}, new byte[] {1});
+    testSortDescending(new byte[] {1, 2}, new byte[] {2, 1});
+    testSortDescending(new byte[] {1, 3, 1}, new byte[] {3, 1, 1});
+    testSortDescending(new byte[] {-1, 1, -2, 2}, new byte[] {2, 1, -1, -2});
   }
 
-  public void testSortDescending_singleElement() {
-    testSortDescendingHelper(new byte[] {1}, new byte[] {1});
+  private static void testSortDescending(byte[] input, byte[] expectedOutput) {
+    input = Arrays.copyOf(input, input.length);
+    SignedBytes.sortDescending(input);
+    assertThat(input).isEqualTo(expectedOutput);
   }
 
-  public void testSortDescending_multipleElements() {
-    testSortDescendingHelper(new byte[] {1, 2}, new byte[] {2, 1});
-    testSortDescendingHelper(new byte[] {1, 3, 1}, new byte[] {3, 1, 1});
-    testSortDescendingHelper(new byte[] {-1, 1, -2, 2}, new byte[] {2, 1, -1, -2});
-  }
-
-  // Test cases for sortDescending with range parameters
-  public void testSortDescendingIndexed_emptyRange() {
-    testSortDescendingRangeHelper(new byte[] {}, 0, 0, new byte[] {});
-  }
-
-  public void testSortDescendingIndexed_fullArray() {
-    testSortDescendingRangeHelper(new byte[] {1}, 0, 1, new byte[] {1});
-    testSortDescendingRangeHelper(new byte[] {1, 2}, 0, 2, new byte[] {2, 1});
-    testSortDescendingRangeHelper(new byte[] {1, 3, 1}, 0, 3, new byte[] {3, 1, 1});
-  }
-
-  public void testSortDescendingIndexed_partialArray() {
-    testSortDescendingRangeHelper(new byte[] {1, 3, 1}, 0, 1, new byte[] {1, 3, 1});
-    testSortDescendingRangeHelper(new byte[] {-1, -2, 1, 2}, 1, 3, new byte[] {-1, 1, -2, 2});
-  }
-
-  // Helper method for sortDescending tests
-  private static void testSortDescendingHelper(byte[] input, byte[] expectedOutput) {
-    byte[] sortedInput = Arrays.copyOf(input, input.length);
-    SignedBytes.sortDescending(sortedInput);
-    assertThat(sortedInput).isEqualTo(expectedOutput);
-  }
-
-  // Helper method for sortDescending with range parameters
-  private static void testSortDescendingRangeHelper(
+  private static void testSortDescending(
       byte[] input, int fromIndex, int toIndex, byte[] expectedOutput) {
-    byte[] sortedInput = Arrays.copyOf(input, input.length);
-    SignedBytes.sortDescending(sortedInput, fromIndex, toIndex);
-    assertThat(sortedInput).isEqualTo(expectedOutput);
+    input = Arrays.copyOf(input, input.length);
+    SignedBytes.sortDescending(input, fromIndex, toIndex);
+    assertThat(input).isEqualTo(expectedOutput);
+  }
+
+  public void testSortDescendingIndexed() {
+    testSortDescending(new byte[] {}, 0, 0, new byte[] {});
+    testSortDescending(new byte[] {1}, 0, 1, new byte[] {1});
+    testSortDescending(new byte[] {1, 2}, 0, 2, new byte[] {2, 1});
+    testSortDescending(new byte[] {1, 3, 1}, 0, 2, new byte[] {3, 1, 1});
+    testSortDescending(new byte[] {1, 3, 1}, 0, 1, new byte[] {1, 3, 1});
+    testSortDescending(new byte[] {-1, -2, 1, 2}, 1, 3, new byte[] {-1, 1, -2, 2});
   }
 
   @J2ktIncompatible
