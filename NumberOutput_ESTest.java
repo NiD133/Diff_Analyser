@@ -16,294 +16,928 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class NumberOutput_ESTest extends NumberOutput_ESTest_scaffolding {
 
-    // ===========================================================
-    // Tests for toString() methods
-    // ===========================================================
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong((long) (byte)99, (byte[]) null, (int) (byte)91);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testToStringIntMinValue()  throws Throwable  {
-        // Test toString with Integer.MIN_VALUE
-        String result = NumberOutput.toString(Integer.MIN_VALUE);
-        assertEquals("-2147483648", result);
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      byte[] byteArray0 = new byte[3];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(9164449253911987585L, byteArray0, (int) (byte) (-48));
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // -48
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testToStringIntMaxValue()  throws Throwable  {
-        // Test toString with Integer.MAX_VALUE
-        String result = NumberOutput.toString(Integer.MAX_VALUE);
-        assertEquals("2147483647", result);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(99358116390671185L, (char[]) null, (-2869));
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testToStringNegativeInt()  throws Throwable  {
-        // Test toString with a negative integer
-        String result = NumberOutput.toString(-11);
-        assertEquals("-11", result);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      char[] charArray0 = new char[8];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(9007199254740992000L, charArray0, (-2118));
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // -2118
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testToStringPositiveInt()  throws Throwable  {
-        // Test toString with a positive integer
-        String result = NumberOutput.toString(1);
-        assertEquals("1", result);
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      char[] charArray0 = new char[7];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(10000000000000L, charArray0, 340);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 340
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testToStringLongMinValue()  throws Throwable  {
-        // Test toString with Long.MIN_VALUE
-        String result = NumberOutput.toString(Long.MIN_VALUE);
-        assertEquals("-9223372036854775808", result);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      byte[] byteArray0 = new byte[21];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(1000000000000L, byteArray0, 1668);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 1668
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testToStringLongMaxValue()  throws Throwable  {
-        // Test toString with Long.MAX_VALUE
-        String result = NumberOutput.toString(2574686535532678828L);
-        assertEquals("2574686535532678828", result);
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      String string0 = NumberOutput.toString((-2147483648L));
+      assertEquals("-2147483648", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testToStringDouble()  throws Throwable  {
-        // Test toString with a double value
-        String result = NumberOutput.toString(-1.0);
-        assertEquals("-1.0", result);
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      String string0 = NumberOutput.toString(2147483647L);
+      assertEquals("2147483647", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testToStringDoubleScientificNotation()  throws Throwable  {
-        // Test toString with a large double value requiring scientific notation
-        String result = NumberOutput.toString(9.007199254740992E18, true);
-        assertEquals("9.007199254740992E18", result);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      String string0 = NumberOutput.toString((long) (byte) (-11));
+      assertEquals("-11", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testToStringFloat()  throws Throwable  {
-        // Test toString with a float value
-        String result = NumberOutput.toString(-310.243F);
-        assertEquals("-310.243", result);
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      String string0 = NumberOutput.toString(1);
+      assertEquals("1", string0);
+  }
 
-    // ===========================================================
-    // Tests for outputInt() with char[] buffer
-    // ===========================================================
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      String string0 = NumberOutput.toString(11L);
+      assertEquals("11", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testOutputIntToCharArrayZero()  throws Throwable  {
-        // Test outputInt with zero value
-        char[] buffer = new char[7];
-        int offset = NumberOutput.outputInt(0, buffer, 1);
-        assertEquals(2, offset);
-        assertArrayEquals(new char[] {'\u0000', '0', '\u0000', '\u0000', '\u0000', '\u0000', '\u0000'}, buffer);
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      byte[] byteArray0 = new byte[1];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(2147483647L, byteArray0, 0);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 1
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testOutputIntToCharArrayNullBuffer()  throws Throwable  {
-        // Test outputInt with null buffer throws NullPointerException
-        try {
-            NumberOutput.outputInt(12, (char[]) null, 12);
-            fail("Expecting exception: NullPointerException");
-        } catch(NullPointerException e) {
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      char[] charArray0 = new char[0];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(2147483647L, charArray0, (-413));
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // -413
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testOutputIntToCharArrayInvalidOffset()  throws Throwable  {
-        // Test outputInt with negative offset throws ArrayIndexOutOfBoundsException
-        char[] buffer = new char[3];
-        try {
-            NumberOutput.outputInt(-4804, buffer, 4118);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch(ArrayIndexOutOfBoundsException e) {
-            // Expected due to invalid offset
-        }
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      char[] charArray0 = new char[7];
+      int int0 = NumberOutput.outputLong((long) 0, charArray0, 1);
+      assertEquals(2, int0);
+      assertArrayEquals(new char[] {'\u0000', '0', '\u0000', '\u0000', '\u0000', '\u0000', '\u0000'}, charArray0);
+  }
 
-    // ===========================================================
-    // Tests for outputInt() with byte[] buffer
-    // ===========================================================
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      byte[] byteArray0 = new byte[5];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(1000000000L, byteArray0, 0);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 5
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testOutputIntToByteArray()  throws Throwable  {
-        // Test outputInt with a positive integer
-        byte[] buffer = new byte[6];
-        int offset = NumberOutput.outputInt(1497, buffer, 2);
-        assertEquals(6, offset);
-        assertArrayEquals(new byte[] {0, 0, '1', '4', '9', '7'}, buffer);
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      byte[] byteArray0 = new byte[2];
+      int int0 = NumberOutput.outputLong(1L, byteArray0, (int) (byte)0);
+      assertArrayEquals(new byte[] {(byte)49, (byte)0}, byteArray0);
+      assertEquals(1, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void testOutputIntToByteArrayNullBuffer()  throws Throwable  {
-        // Test outputInt with null buffer throws NullPointerException
-        try {
-            NumberOutput.outputInt(10, (byte[]) null, 199);
-            fail("Expecting exception: NullPointerException");
-        } catch(NullPointerException e) {
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputInt((int) (byte)10, (byte[]) null, 199);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testOutputIntToByteArrayInsufficientSize()  throws Throwable  {
-        // Test outputInt with insufficient buffer size throws ArrayIndexOutOfBoundsException
-        byte[] buffer = new byte[5];
-        try {
-            NumberOutput.outputInt(1000000, buffer, 0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch(ArrayIndexOutOfBoundsException e) {
-            // Expected due to buffer overflow
-        }
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong((long) 1000, (byte[]) null, 1000);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    // ===========================================================
-    // Tests for outputLong() with char[] buffer
-    // ===========================================================
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(1L, (char[]) null, 0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testOutputLongToCharArray()  throws Throwable  {
-        // Test outputLong with a positive long value
-        char[] buffer = new char[14];
-        int offset = NumberOutput.outputLong(2084322237L, buffer, 4);
-        assertEquals(14, offset);
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputInt(12, (char[]) null, 12);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testOutputLongToCharArrayNegative()  throws Throwable  {
-        // Test outputLong with a negative long value
-        char[] buffer = new char[6];
-        int offset = NumberOutput.outputLong(-3640L, buffer, 0);
-        assertEquals(5, offset);
-        assertArrayEquals(new char[] {'-', '3', '6', '4', '0', '\u0000'}, buffer);
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      char[] charArray0 = new char[5];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputInt(1000000, charArray0, 5);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 5
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testOutputLongToCharArrayNullBuffer()  throws Throwable  {
-        // Test outputLong with null buffer throws NullPointerException
-        try {
-            NumberOutput.outputLong(10000000000000L, (char[]) null, -152);
-            fail("Expecting exception: NullPointerException");
-        } catch(NullPointerException e) {
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      char[] charArray0 = new char[3];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(5486124068793688683L, charArray0, 1);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 3
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testOutputLongToCharArrayInsufficientSize()  throws Throwable  {
-        // Test outputLong with insufficient buffer size throws ArrayIndexOutOfBoundsException
-        char[] buffer = new char[7];
-        try {
-            NumberOutput.outputLong(274877907L, buffer, 0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch(ArrayIndexOutOfBoundsException e) {
-            // Expected due to buffer overflow
-        }
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      char[] charArray0 = new char[9];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong((-2147483648L), charArray0, 0);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 9
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    // ===========================================================
-    // Tests for outputLong() with byte[] buffer
-    // ===========================================================
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      byte[] byteArray0 = new byte[5];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(7174648137343063403L, byteArray0, 0);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 5
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testOutputLongToByteArray()  throws Throwable  {
-        // Test outputLong with a positive long value
-        byte[] buffer = new byte[2];
-        int offset = NumberOutput.outputLong(1L, buffer, 0);
-        assertEquals(1, offset);
-        assertArrayEquals(new byte[] {'1', 0}, buffer);
-    }
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      byte[] byteArray0 = new byte[1];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong((-2147483648L), byteArray0, (int) (byte)45);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 45
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testOutputLongToByteArrayNullBuffer()  throws Throwable  {
-        // Test outputLong with null buffer throws NullPointerException
-        try {
-            NumberOutput.outputLong(99L, (byte[]) null, 91);
-            fail("Expecting exception: NullPointerException");
-        } catch(NullPointerException e) {
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      char[] charArray0 = new char[7];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(274877907L, charArray0, (int) (byte)0);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 7
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testOutputLongToByteArrayNegativeOffset()  throws Throwable  {
-        // Test outputLong with negative offset throws ArrayIndexOutOfBoundsException
-        byte[] buffer = new byte[3];
-        try {
-            NumberOutput.outputLong(9164449253911987585L, buffer, -48);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch(ArrayIndexOutOfBoundsException e) {
-            // Expected due to negative offset
-        }
-    }
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      byte[] byteArray0 = new byte[7];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(274877893L, byteArray0, (int) (byte)50);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 50
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    // ===========================================================
-    // Tests for helper methods (divBy1000, notFinite)
-    // ===========================================================
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      byte[] byteArray0 = new byte[3];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong((-424L), byteArray0, 0);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 3
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testDivBy1000Zero()  throws Throwable  {
-        // Test division by 1000 for zero
-        int result = NumberOutput.divBy1000(0);
-        assertEquals(0, result);
-    }
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      byte[] byteArray0 = new byte[8];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(10000000000008L, byteArray0, (int) (byte)1);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 8
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testDivBy1000Negative()  throws Throwable  {
-        // Test division by 1000 for a negative number
-        int result = NumberOutput.divBy1000(-1652);
-        assertEquals(67108862, result);
-    }
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      char[] charArray0 = new char[14];
+      int int0 = NumberOutput.outputLong((long) 2084322237, charArray0, 4);
+      assertEquals(14, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void testNotFiniteFloat()  throws Throwable  {
-        // Test notFinite with a finite float value
-        boolean result = NumberOutput.notFinite(2650.0F);
-        assertFalse(result);
-    }
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      char[] charArray0 = new char[6];
+      int int0 = NumberOutput.outputLong((-3640L), charArray0, 0);
+      assertArrayEquals(new char[] {'-', '3', '6', '4', '0', '\u0000'}, charArray0);
+      assertEquals(5, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void testNotFiniteDouble()  throws Throwable  {
-        // Test notFinite with a finite double value
-        boolean result = NumberOutput.notFinite(-128.0);
-        assertFalse(result);
-    }
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      char[] charArray0 = new char[9];
+      int int0 = NumberOutput.outputInt(0, charArray0, 0);
+      assertEquals(1, int0);
+      assertArrayEquals(new char[] {'0', '\u0000', '\u0000', '\u0000', '\u0000', '\u0000', '\u0000', '\u0000', '\u0000'}, charArray0);
+  }
 
-    // ===========================================================
-    // Additional edge case tests for outputLong and outputInt
-    // ===========================================================
+  @Test(timeout = 4000)
+  public void test32()  throws Throwable  {
+      int int0 = NumberOutput.divBy1000('\u0000');
+      assertEquals(0, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void testOutputLongMinValueToCharArray()  throws Throwable  {
-        // Test outputLong with Long.MIN_VALUE
-        char[] buffer = new char[9];
-        try {
-            NumberOutput.outputLong(Long.MIN_VALUE, buffer, 0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch(ArrayIndexOutOfBoundsException e) {
-            // Expected due to insufficient buffer size
-        }
-    }
+  @Test(timeout = 4000)
+  public void test33()  throws Throwable  {
+      int int0 = NumberOutput.divBy1000((-1652));
+      assertEquals(67108862, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void testOutputIntMinValueToByteArray()  throws Throwable  {
-        // Test outputInt with Integer.MIN_VALUE
-        byte[] buffer = new byte[23];
-        try {
-            NumberOutput.outputInt(Integer.MIN_VALUE, buffer, 45);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch(ArrayIndexOutOfBoundsException e) {
-            // Expected due to high offset
-        }
-    }
+  @Test(timeout = 4000)
+  public void test34()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong((long) (byte)0, (byte[]) null, (int) (byte)0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testOutputLongLargeValueToByteArray()  throws Throwable  {
-        // Test outputLong with a large value
-        byte[] buffer = new byte[8];
-        try {
-            NumberOutput.outputLong(10000000000008L, buffer, 1);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch(ArrayIndexOutOfBoundsException e) {
-            // Expected due to buffer overflow
-        }
-    }
+  @Test(timeout = 4000)
+  public void test35()  throws Throwable  {
+      String string0 = NumberOutput.toString((-2304.1F), false);
+      assertEquals("-2304.1", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test36()  throws Throwable  {
+      String string0 = NumberOutput.toString(1.0, false);
+      assertEquals("1.0", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test37()  throws Throwable  {
+      String string0 = NumberOutput.toString(2420);
+      assertEquals("2420", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test38()  throws Throwable  {
+      byte[] byteArray0 = new byte[5];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputInt(1146455159, byteArray0, 739);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 739
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test39()  throws Throwable  {
+      byte[] byteArray0 = new byte[8];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputInt(1000000, byteArray0, 11);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 11
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test40()  throws Throwable  {
+      byte[] byteArray0 = new byte[5];
+      int int0 = NumberOutput.outputInt(0, byteArray0, 0);
+      assertArrayEquals(new byte[] {(byte)48, (byte)0, (byte)0, (byte)0, (byte)0}, byteArray0);
+      assertEquals(1, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test41()  throws Throwable  {
+      byte[] byteArray0 = new byte[16];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputInt(2084322301, byteArray0, 2084322301);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 2084322301
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test42()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputInt((-2111), (byte[]) null, (-2111));
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test43()  throws Throwable  {
+      char[] charArray0 = new char[7];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputInt(1000000000, charArray0, 0);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 7
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test44()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputInt(2084322364, (char[]) null, 2084322364);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test45()  throws Throwable  {
+      char[] charArray0 = new char[3];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputInt((-4804), charArray0, 4118);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 4118
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test46()  throws Throwable  {
+      byte[] byteArray0 = new byte[6];
+      int int0 = NumberOutput.outputInt(1497, byteArray0, (int) (byte)2);
+      assertEquals(6, int0);
+      assertArrayEquals(new byte[] {(byte)0, (byte)0, (byte)49, (byte)52, (byte)57, (byte)55}, byteArray0);
+  }
+
+  @Test(timeout = 4000)
+  public void test47()  throws Throwable  {
+      byte[] byteArray0 = new byte[14];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(407030665140201709L, byteArray0, 0);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 14
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test48()  throws Throwable  {
+      byte[] byteArray0 = new byte[0];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(99999999999988L, byteArray0, 1436);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 1436
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test49()  throws Throwable  {
+      byte[] byteArray0 = new byte[12];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(9999999999988L, byteArray0, (int) (byte)57);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 57
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test50()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(100000000000000L, (char[]) null, (-152));
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test51()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(99999999999994L, (char[]) null, (-813));
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test52()  throws Throwable  {
+      byte[] byteArray0 = new byte[45];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(7039226437L, byteArray0, (int) (byte)50);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 50
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test53()  throws Throwable  {
+      byte[] byteArray0 = new byte[4];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(1000000000000000L, byteArray0, (int) (byte)121);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 121
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test54()  throws Throwable  {
+      char[] charArray0 = new char[9];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(833495342724150664L, charArray0, 1);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 9
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test55()  throws Throwable  {
+      boolean boolean0 = NumberOutput.notFinite(2650.0F);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test56()  throws Throwable  {
+      boolean boolean0 = NumberOutput.notFinite((double) (byte) (-128));
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test57()  throws Throwable  {
+      String string0 = NumberOutput.toString(1.0F, true);
+      assertEquals("1.0", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test58()  throws Throwable  {
+      String string0 = NumberOutput.toString((double) 9007199254740992000L, true);
+      assertEquals("9.007199254740992E18", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test59()  throws Throwable  {
+      String string0 = NumberOutput.toString((-9223372036854775805L));
+      assertEquals("-9223372036854775805", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test60()  throws Throwable  {
+      String string0 = NumberOutput.toString(2574686535532678828L);
+      assertEquals("2574686535532678828", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test61()  throws Throwable  {
+      String string0 = NumberOutput.toString((-1));
+      assertEquals("-1", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test62()  throws Throwable  {
+      String string0 = NumberOutput.toString((-1400));
+      assertEquals("-1400", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test63()  throws Throwable  {
+      String string0 = NumberOutput.toString(0);
+      assertEquals("0", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test64()  throws Throwable  {
+      byte[] byteArray0 = new byte[1];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(100000000000009L, byteArray0, (int) (byte)49);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 49
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test65()  throws Throwable  {
+      byte[] byteArray0 = new byte[22];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong((-9223372036854775717L), byteArray0, (int) (byte)51);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 51
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test66()  throws Throwable  {
+      byte[] byteArray0 = new byte[25];
+      int int0 = NumberOutput.outputLong(2084322364L, byteArray0, 0);
+      assertEquals(10, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test67()  throws Throwable  {
+      byte[] byteArray0 = new byte[23];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputInt(Integer.MIN_VALUE, byteArray0, (int) (byte)45);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 45
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test68()  throws Throwable  {
+      char[] charArray0 = new char[7];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputInt(1000, charArray0, 2084322301);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 2084322301
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test69()  throws Throwable  {
+      char[] charArray0 = new char[5];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputInt(10, charArray0, 806);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 806
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test70()  throws Throwable  {
+      char[] charArray0 = new char[4];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(9999999999969L, charArray0, 0);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 4
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test71()  throws Throwable  {
+      String string0 = NumberOutput.toString((-1.0));
+      assertEquals("-1.0", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test72()  throws Throwable  {
+      NumberOutput numberOutput0 = new NumberOutput();
+  }
+
+  @Test(timeout = 4000)
+  public void test73()  throws Throwable  {
+      char[] charArray0 = new char[4];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong(1000000000000L, charArray0, 2137541594);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 2137541594
+         //
+         verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test74()  throws Throwable  {
+      String string0 = NumberOutput.toString((-310.243F));
+      assertEquals("-310.243", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test75()  throws Throwable  {
+      char[] charArray0 = new char[14];
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputInt(Integer.MIN_VALUE, charArray0, Integer.MIN_VALUE);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test76()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        NumberOutput.outputLong((-9223372036854775768L), (char[]) null, (-1467));
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+      }
+  }
 }
