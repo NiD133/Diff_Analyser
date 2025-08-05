@@ -1,6 +1,7 @@
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
+
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -27,27 +28,43 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.collections4.set.CompositeSet.SetMutator;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
  * Extension of {@link AbstractSetTest} for exercising the
  * {@link CompositeSet} implementation.
  */
-public class CompositeSetTest<E> extends AbstractSetTest<E> {
+@DisplayName("CompositeSet Test")
+public class CompositeSetTest extends AbstractSetTest<String> {
 
-    @SuppressWarnings("unchecked")
-    public Set<E> buildOne() {
-        final HashSet<E> set = new HashSet<>();
-        set.add((E) "1");
-        set.add((E) "2");
+    private Set<String> setA;
+    private Set<String> setB;
+
+    @BeforeEach
+    public void setUp() {
+        setA = createSetWith("1", "2");
+        setB = createSetWith("3", "4");
+    }
+
+    private HashSet<String> createSetWith(final String... elements) {
+        final HashSet<String> set = new HashSet<>();
+        for (final String element : elements) {
+            set.add(element);
+        }
         return set;
     }
 
-    @SuppressWarnings("unchecked")
-    public Set<E> buildTwo() {
-        final HashSet<E> set = new HashSet<>();
-        set.add((E) "3");
-        set.add((E) "4");
+    //--- AbstractSetTest methods ---
+
+    @Override
+    public CompositeSet<String> makeObject() {
+        // Required for AbstractSetTest, which needs an empty set that can be modified.
+        final HashSet<String> contained = new HashSet<>();
+        final CompositeSet<String> set = new CompositeSet<>(contained);
+        // An empty mutator allows the abstract tests to add elements to the first set.
+        set.setMutator(new EmptySetMutator<>(contained));
         return set;
     }
 
@@ -61,143 +78,131 @@ public class CompositeSetTest<E> extends AbstractSetTest<E> {
         return UNORDERED;
     }
 
-    @Override
-    public CompositeSet<E> makeObject() {
-        final HashSet<E> contained = new HashSet<>();
-        final CompositeSet<E> set = new CompositeSet<>(contained);
-        set.setMutator(new EmptySetMutator<>(contained));
-        return set;
+    //--- CompositeSet specific tests ---
+
+    @Test
+    @DisplayName("addComposited should combine multiple sets into a single view")
+    public void addComposited_withMultipleSets_createsUnionView() {
+        // Arrange
+        final CompositeSet<String> compositeSet = new CompositeSet<>(setA);
+
+        // Act
+        compositeSet.addComposited(setB);
+
+        // Assert
+        assertEquals(4, compositeSet.size());
+        assertTrue(compositeSet.containsAll(List.of("1", "2", "3", "4")));
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    void testAddComposited() {
-        final Set<E> one = buildOne();
-        final Set<E> two = buildTwo();
-        final CompositeSet<E> set = new CompositeSet<>();
-        set.addComposited(one, two);
-        set.addComposited((Set<E>) null);
-        set.addComposited((Set<E>[]) null);
-        set.addComposited(null, null);
-        set.addComposited(null, null, null);
-        final CompositeSet<E> set2 = new CompositeSet<>(buildOne());
-        set2.addComposited(buildTwo());
-        assertEquals(set, set2);
-        final HashSet<E> set3 = new HashSet<>();
-        set3.add((E) "1");
-        set3.add((E) "2");
-        set3.add((E) "3");
-        final HashSet<E> set4 = new HashSet<>();
-        set4.add((E) "4");
-        final CompositeSet<E> set5 = new CompositeSet<>(set3);
-        set5.addComposited(set4);
-        assertEquals(set, set5);
-        assertThrows(UnsupportedOperationException.class, () -> set.addComposited(set3),
-                "Expecting UnsupportedOperationException.");
+    @DisplayName("addComposited should ignore null set arguments")
+    public void addComposited_withNullArguments_isIgnored() {
+        // Arrange
+        final CompositeSet<String> compositeSet = new CompositeSet<>(setA);
+        final int initialSize = compositeSet.size();
+
+        // Act
+        compositeSet.addComposited((Set<String>) null);
+        compositeSet.addComposited((Set<String>[]) null);
+        compositeSet.addComposited(null, null);
+
+        // Assert
+        assertEquals(initialSize, compositeSet.size());
+        assertEquals(setA, compositeSet.toSet());
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    void testAddCompositedCollision() {
-        final HashSet<E> set1 = new HashSet<>();
-        set1.add((E) "1");
-        set1.add((E) "2");
-        set1.add((E) "3");
-        final HashSet<E> set2 = new HashSet<>();
-        set2.add((E) "4");
-        final CompositeSet<E> set3 = new CompositeSet<>(set1);
-        assertThrows(UnsupportedOperationException.class, () -> set3.addComposited(set1, buildOne()),
-                "Expecting UnsupportedOperationException.");
-        assertThrows(UnsupportedOperationException.class, () -> set3.addComposited(set1, buildOne(), buildTwo()),
-                "Expecting UnsupportedOperationException.");
+    @DisplayName("addComposited should throw UnsupportedOperationException for overlapping sets when no mutator is present")
+    public void addComposited_withOverlappingSetsAndNoMutator_throwsException() {
+        // Arrange
+        final CompositeSet<String> compositeSet = new CompositeSet<>(setA); // Contains "1", "2"
+        final Set<String> overlappingSet = createSetWith("2", "3"); // "2" is the collision
+
+        // Act & Assert
+        assertThrows(UnsupportedOperationException.class, () -> compositeSet.addComposited(overlappingSet),
+                "Adding a set with common elements should fail without a collision resolver.");
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    void testContains() {
-        final CompositeSet<E> set = new CompositeSet<>(buildOne(), buildTwo());
-        assertTrue(set.contains("1"));
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    void testContainsAll() {
-        final CompositeSet<E> set = new CompositeSet<>(buildOne(), buildTwo());
-        assertFalse(set.containsAll(null));
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    void testFailedCollisionResolution() {
-        final Set<E> one = buildOne();
-        final Set<E> two = buildTwo();
-        final CompositeSet<E> set = new CompositeSet<>(one, two);
-        set.setMutator(new SetMutator<E>() {
+    @DisplayName("addComposited should throw IllegalArgumentException if the mutator fails to resolve a collision")
+    public void addComposited_whenCollisionResolutionFails_throwsIllegalArgumentException() {
+        // Arrange
+        final CompositeSet<String> compositeSet = new CompositeSet<>(setA, setB);
+        compositeSet.setMutator(new SetMutator<String>() {
             private static final long serialVersionUID = 1L;
 
             @Override
-            public boolean add(final CompositeSet<E> composite,
-                    final List<Set<E>> collections, final E obj) {
+            public boolean add(final CompositeSet<String> composite, final List<Set<String>> collections, final String obj) {
                 throw new UnsupportedOperationException();
             }
 
             @Override
-            public boolean addAll(final CompositeSet<E> composite,
-                    final List<Set<E>> collections, final Collection<? extends E> coll) {
+            public boolean addAll(final CompositeSet<String> composite, final List<Set<String>> collections, final Collection<? extends String> coll) {
                 throw new UnsupportedOperationException();
             }
 
             @Override
-            public void resolveCollision(final CompositeSet<E> comp, final Set<E> existing,
-                final Set<E> added, final Collection<E> intersects) {
-                //noop
+            public void resolveCollision(final CompositeSet<String> comp, final Set<String> existing,
+                final Set<String> added, final Collection<String> intersects) {
+                // This resolver does nothing, so the collision persists.
             }
         });
 
-        final HashSet<E> three = new HashSet<>();
-        three.add((E) "1");
-        assertThrows(IllegalArgumentException.class, () -> set.addComposited(three),
-                "IllegalArgumentException should have been thrown");
+        final Set<String> overlappingSet = createSetWith("1", "5"); // "1" is the collision
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> compositeSet.addComposited(overlappingSet),
+                "Should throw because the no-op resolver did not resolve the collision.");
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    void testRemoveAll() {
-        final CompositeSet<E> set = new CompositeSet<>(buildOne(), buildTwo());
-        assertFalse(set.removeAll(null));
+    @DisplayName("remove on composite set should remove the element from the correct underlying set")
+    public void remove_fromCompositeSet_removesFromUnderlyingSet() {
+        // Arrange
+        final CompositeSet<String> compositeSet = new CompositeSet<>(setA, setB);
+        assertTrue(setA.contains("1"), "Precondition: setA should contain '1'");
+        assertTrue(compositeSet.contains("1"), "Precondition: compositeSet should contain '1'");
+
+        // Act
+        final boolean removed = compositeSet.remove("1");
+
+        // Assert
+        assertTrue(removed);
+        assertFalse(setA.contains("1"), "Element '1' should be removed from the underlying setA.");
+        assertFalse(compositeSet.contains("1"), "Element '1' should be removed from the composite set.");
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    void testRemoveComposited() {
-        final Set<E> one = buildOne();
-        final Set<E> two = buildTwo();
-        final CompositeSet<E> set = new CompositeSet<>(one, two);
-        set.remove("1");
-        assertFalse(one.contains("1"));
+    @DisplayName("remove on an underlying set should be reflected in the composite set")
+    public void remove_fromUnderlyingSet_isReflectedInCompositeSet() {
+        // Arrange
+        final CompositeSet<String> compositeSet = new CompositeSet<>(setA, setB);
+        assertTrue(compositeSet.contains("1"), "Precondition: compositeSet should contain '1'");
 
-        set.remove("3");
-        assertFalse(one.contains("3"));
+        // Act
+        setA.remove("1");
+
+        // Assert
+        assertFalse(compositeSet.contains("1"), "Change in underlying setA should be reflected in composite set.");
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    void testRemoveUnderlying() {
-        final Set<E> one = buildOne();
-        final Set<E> two = buildTwo();
-        final CompositeSet<E> set = new CompositeSet<>(one, two);
-        one.remove("1");
-        assertFalse(set.contains("1"));
+    @DisplayName("containsAll with a null collection should throw NullPointerException")
+    public void containsAll_withNullCollection_throwsNullPointerException() {
+        // Arrange
+        final CompositeSet<String> compositeSet = new CompositeSet<>(setA, setB);
 
-        two.remove("3");
-        assertFalse(set.contains("3"));
+        // Act & Assert
+        assertThrows(NullPointerException.class, () -> compositeSet.containsAll(null));
     }
 
-//    void testCreate() throws Exception {
-//        resetEmpty();
-//        writeExternalFormToDisk((java.io.Serializable) getCollection(), "src/test/resources/data/test/CompositeSet.emptyCollection.version4.obj");
-//        resetFull();
-//        writeExternalFormToDisk((java.io.Serializable) getCollection(), "src/test/resources/data/test/CompositeSet.fullCollection.version4.obj");
-//    }
+    @Test
+    @DisplayName("removeAll with a null collection should throw NullPointerException")
+    public void removeAll_withNullCollection_throwsNullPointerException() {
+        // Arrange
+        final CompositeSet<String> compositeSet = new CompositeSet<>(setA, setB);
 
+        // Act & Assert
+        assertThrows(NullPointerException.class, () -> compositeSet.removeAll(null));
+    }
 }
