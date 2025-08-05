@@ -1,44 +1,38 @@
-/* ======================================================
+/* 
  * JFreeChart : a chart library for the Java(tm) platform
  * ======================================================
- *
  * (C) Copyright 2000-present, by David Gilbert and Contributors.
- *
- * Project Info:  https://www.jfree.org/jfreechart/index.html
- *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2.1 of the License, or
+ * Project Info: https://www.jfree.org/jfreechart/index.html
+ * 
+ * This library is free software; you can redistribute it and/or modify it 
+ * under the terms of the GNU Lesser General Public License as published by 
+ * the Free Software Foundation; either version 2.1 of the License, or 
  * (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ * 
+ * This library is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
  * License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * 
+ * You should have received a copy of the GNU Lesser General Public 
+ * License along with this library; if not, write to the Free Software 
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, 
  * USA.
- *
+ * 
  * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
  * Other names may be trademarks of their respective owners.]
- *
+ * 
  * --------------------------
  * DeviationRendererTest.java
  * --------------------------
  * (C) Copyright 2007-present, by David Gilbert and Contributors.
- *
- * Original Author:  David Gilbert;
- * Contributor(s):   -;
- *
+ * Original Author: David Gilbert;
  */
 
 package org.jfree.chart.renderer.xy;
 
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.api.PublicCloneable;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,65 +42,99 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class DeviationRendererTest {
 
+    // ========================================================================
+    // Equality Tests
+    // ========================================================================
+
     /**
-     * Test that the equals() method distinguishes all fields.
+     * Tests that two newly created instances of DeviationRenderer are equal.
      */
     @Test
-    public void testEquals() {
-        // default instances
+    public void equals_NewInstances_ShouldBeEqual() {
         DeviationRenderer r1 = new DeviationRenderer();
         DeviationRenderer r2 = new DeviationRenderer();
-        assertEquals(r1, r2);
-        assertEquals(r2, r1);
+        assertEquals(r1, r2, "Default instances should be equal");
+    }
 
+    /**
+     * Tests that instances with the same alpha value are equal.
+     */
+    @Test
+    public void equals_SameAlpha_ShouldBeEqual() {
+        DeviationRenderer r1 = new DeviationRenderer();
         r1.setAlpha(0.1f);
-        assertNotEquals(r1, r2);
+        DeviationRenderer r2 = new DeviationRenderer();
         r2.setAlpha(0.1f);
-        assertEquals(r1, r2);
+        assertEquals(r1, r2, "Instances with same alpha should be equal");
     }
 
     /**
-     * Two objects that are equal are required to return the same hashCode.
+     * Tests that instances with different alpha values are not equal.
      */
     @Test
-    public void testHashcode() {
+    public void equals_DifferentAlpha_ShouldNotBeEqual() {
+        DeviationRenderer r1 = new DeviationRenderer();
+        r1.setAlpha(0.1f);
+        DeviationRenderer r2 = new DeviationRenderer();
+        assertNotEquals(r1, r2, "Instances with different alpha should not be equal");
+    }
+
+    // ========================================================================
+    // HashCode Tests
+    // ========================================================================
+
+    /**
+     * Tests that equal instances produce the same hash code.
+     */
+    @Test
+    public void hashCode_EqualInstances_ShouldHaveSameHashCode() {
         DeviationRenderer r1 = new DeviationRenderer();
         DeviationRenderer r2 = new DeviationRenderer();
-        assertEquals(r1, r2);
-        int h1 = r1.hashCode();
-        int h2 = r2.hashCode();
-        assertEquals(h1, h2);
+        assertEquals(r1, r2, "Instances must be equal for hash code test");
+        assertEquals(r1.hashCode(), r2.hashCode(), "Equal instances must have same hash code");
     }
+
+    // ========================================================================
+    // Cloning Tests
+    // ========================================================================
 
     /**
-     * Confirm that cloning works.
+     * Tests that cloning creates a distinct copy with identical content.
      */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
-        DeviationRenderer r1 = new DeviationRenderer();
-        DeviationRenderer r2 = (DeviationRenderer) r1.clone();
-        assertNotSame(r1, r2);
-        assertSame(r1.getClass(), r2.getClass());
-        assertEquals(r1, r2);
+    public void cloning_ShouldCreateDistinctButEqualCopy() throws CloneNotSupportedException {
+        DeviationRenderer original = new DeviationRenderer();
+        DeviationRenderer clone = (DeviationRenderer) original.clone();
+        
+        assertNotSame(original, clone, "Cloned instance should be a different object");
+        assertSame(original.getClass(), clone.getClass(), "Cloned instance should be same class");
+        assertEquals(original, clone, "Cloned instance should be equal to original");
     }
+
+    // ========================================================================
+    // PublicCloneable Interface Tests
+    // ========================================================================
 
     /**
-     * Verify that this class implements {@link PublicCloneable}.
+     * Tests that DeviationRenderer implements the PublicCloneable interface.
      */
     @Test
-    public void testPublicCloneable() {
-        DeviationRenderer r1 = new DeviationRenderer();
-        assertTrue(r1 instanceof PublicCloneable);
+    public void publicCloneable_ShouldImplementInterface() {
+        DeviationRenderer renderer = new DeviationRenderer();
+        assertTrue(renderer instanceof PublicCloneable, "Must implement PublicCloneable");
     }
+
+    // ========================================================================
+    // Serialization Tests
+    // ========================================================================
 
     /**
-     * Serialize an instance, restore it, and check for equality.
+     * Tests that serialization preserves object equality.
      */
     @Test
-    public void testSerialization() {
-        DeviationRenderer r1 = new DeviationRenderer();
-        DeviationRenderer r2 = TestUtils.serialised(r1);
-        assertEquals(r1, r2);
+    public void serialization_ShouldPreserveEquality() {
+        DeviationRenderer original = new DeviationRenderer();
+        DeviationRenderer deserialized = TestUtils.serialised(original);
+        assertEquals(original, deserialized, "Deserialized instance should equal original");
     }
-
 }
