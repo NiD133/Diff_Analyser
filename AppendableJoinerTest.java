@@ -37,106 +37,178 @@ import org.junit.jupiter.params.provider.ValueSource;
  */
 class AppendableJoinerTest {
 
-    static class Fixture {
-
+    /**
+     * Test fixture that demonstrates custom rendering to an Appendable.
+     */
+    static class CustomRenderableObject {
         private final String name;
 
-        Fixture(final String name) {
+        CustomRenderableObject(final String name) {
             this.name = name;
         }
 
         /**
-         * Renders myself onto an Appendable to avoid creating intermediary strings.
+         * Renders this object to an Appendable with a custom format (name + exclamation).
          */
-        void render(final Appendable appendable) throws IOException {
+        void renderTo(final Appendable appendable) throws IOException {
             appendable.append(name);
             appendable.append('!');
         }
     }
 
     @Test
-    void testAllBuilderPropertiesStringBuilder() {
-        // @formatter:off
+    void testJoinerWithAllConfigurationOptions() {
+        // Given: A joiner configured with prefix, suffix, delimiter, and custom element appender
         final AppendableJoiner<Object> joiner = AppendableJoiner.builder()
                 .setPrefix("<")
                 .setDelimiter(".")
                 .setSuffix(">")
-                .setElementAppender((a, e) -> a.append(String.valueOf(e)))
+                .setElementAppender((appendable, element) -> appendable.append(String.valueOf(element)))
                 .get();
-        // @formatter:on
-        final StringBuilder sbuilder = new StringBuilder("A");
-        assertEquals("A<B.C>", joiner.join(sbuilder, "B", "C").toString());
-        sbuilder.append("1");
-        assertEquals("A<B.C>1<D.E>", joiner.join(sbuilder, Arrays.asList("D", "E")).toString());
+        
+        // When: Joining elements to an existing StringBuilder
+        final StringBuilder result = new StringBuilder("A");
+        joiner.join(result, "B", "C");
+        
+        // Then: Elements are joined with all configured options
+        assertEquals("A<B.C>", result.toString());
+        
+        // And: Multiple join operations can be chained
+        result.append("1");
+        joiner.join(result, Arrays.asList("D", "E"));
+        assertEquals("A<B.C>1<D.E>", result.toString());
     }
 
     @Test
-    void testBuildDefaultStringBuilder() {
-        final Builder<Object> builder = AppendableJoiner.builder();
-        assertNotSame(builder.get(), builder.get());
-        final AppendableJoiner<Object> joiner = builder.get();
-        final StringBuilder sbuilder = new StringBuilder("A");
-        assertEquals("ABC", joiner.join(sbuilder, "B", "C").toString());
-        sbuilder.append("1");
-        assertEquals("ABC1DE", joiner.join(sbuilder, "D", "E").toString());
+    void testDefaultJoinerConfiguration() {
+        // Given: A joiner with default configuration (no prefix, suffix, or delimiter)
+        final AppendableJoiner<Object> joiner = AppendableJoiner.builder().get();
+        
+        // When: Joining elements
+        final StringBuilder result = new StringBuilder("A");
+        joiner.join(result, "B", "C");
+        
+        // Then: Elements are concatenated without separators
+        assertEquals("ABC", result.toString());
+        
+        // And: Can continue appending
+        result.append("1");
+        joiner.join(result, "D", "E");
+        assertEquals("ABC1DE", result.toString());
     }
 
     @Test
-    void testBuilder() {
-        assertNotSame(AppendableJoiner.builder(), AppendableJoiner.builder());
+    void testBuilderCreatesNewInstances() {
+        // Given: Two builders
+        final Builder<Object> builder1 = AppendableJoiner.builder();
+        final Builder<Object> builder2 = AppendableJoiner.builder();
+        
+        // Then: Each builder is a new instance
+        assertNotSame(builder1, builder2);
+        
+        // And: Each call to get() creates a new joiner instance
+        final AppendableJoiner<Object> joiner1 = builder1.get();
+        final AppendableJoiner<Object> joiner2 = builder1.get();
+        assertNotSame(joiner1, joiner2);
     }
 
-    @SuppressWarnings("deprecation") // Test own StrBuilder
+    @SuppressWarnings("deprecation") // Testing deprecated StrBuilder
     @ParameterizedTest
-    @ValueSource(classes = { StringBuilder.class, StringBuffer.class, StringWriter.class, StrBuilder.class, TextStringBuilder.class })
-    void testDelimiterAppendable(final Class<? extends Appendable> clazz) throws Exception {
-        final AppendableJoiner<Object> joiner = AppendableJoiner.builder().setDelimiter(".").get();
-        final Appendable sbuilder = clazz.newInstance();
-        sbuilder.append("A");
-        // throws IOException
-        assertEquals("AB.C", joiner.joinA(sbuilder, "B", "C").toString());
-        sbuilder.append("1");
-        // throws IOException
-        assertEquals("AB.C1D.E", joiner.joinA(sbuilder, Arrays.asList("D", "E")).toString());
+    @ValueSource(classes = { 
+        StringBuilder.class, 
+        StringBuffer.class, 
+        StringWriter.class, 
+        StrBuilder.class, 
+        TextStringBuilder.class 
+    })
+    void testJoinerWorksWithDifferentAppendableTypes(final Class<? extends Appendable> appendableType) throws Exception {
+        // Given: A joiner with delimiter
+        final AppendableJoiner<Object> joiner = AppendableJoiner.builder()
+                .setDelimiter(".")
+                .get();
+        
+        // And: An instance of the specified Appendable type
+        final Appendable appendable = appendableType.newInstance();
+        appendable.append("A");
+        
+        // When: Joining elements using joinA (which may throw IOException)
+        joiner.joinA(appendable, "B", "C");
+        
+        // Then: Elements are joined with delimiter
+        assertEquals("AB.C", appendable.toString());
+        
+        // And: Can continue appending
+        appendable.append("1");
+        joiner.joinA(appendable, Arrays.asList("D", "E"));
+        assertEquals("AB.C1D.E", appendable.toString());
     }
 
     @Test
-    void testDelimiterStringBuilder() {
-        final AppendableJoiner<Object> joiner = AppendableJoiner.builder().setDelimiter(".").get();
-        final StringBuilder sbuilder = new StringBuilder("A");
-        // does not throw IOException
-        assertEquals("AB.C", joiner.join(sbuilder, "B", "C").toString());
-        sbuilder.append("1");
-        // does not throw IOException
-        assertEquals("AB.C1D.E", joiner.join(sbuilder, Arrays.asList("D", "E")).toString());
+    void testJoinerWithDelimiterOnStringBuilder() {
+        // Given: A joiner with only delimiter configured
+        final AppendableJoiner<Object> joiner = AppendableJoiner.builder()
+                .setDelimiter(".")
+                .get();
+        
+        // When: Using StringBuilder (which doesn't throw IOException)
+        final StringBuilder result = new StringBuilder("A");
+        joiner.join(result, "B", "C");
+        
+        // Then: Elements are joined with delimiter
+        assertEquals("AB.C", result.toString());
+        
+        // And: Can chain multiple join operations
+        result.append("1");
+        joiner.join(result, Arrays.asList("D", "E"));
+        assertEquals("AB.C1D.E", result.toString());
     }
 
     @Test
-    void testToCharSequenceStringBuilder1() {
-        // @formatter:off
+    void testCustomElementAppenderWithPrefixAndSuffix() {
+        // Given: A joiner with custom element appender that adds a pipe before each element
         final AppendableJoiner<Object> joiner = AppendableJoiner.builder()
                 .setPrefix("<")
                 .setDelimiter(".")
                 .setSuffix(">")
-                .setElementAppender((a, e) -> a.append("|").append(Objects.toString(e)))
+                .setElementAppender((appendable, element) -> 
+                    appendable.append("|").append(Objects.toString(element)))
                 .get();
-        // @formatter:on
-        final StringBuilder sbuilder = new StringBuilder("A");
-        assertEquals("A<|B.|C>", joiner.join(sbuilder, "B", "C").toString());
-        sbuilder.append("1");
-        assertEquals("A<|B.|C>1<|D.|E>", joiner.join(sbuilder, Arrays.asList("D", "E")).toString());
+        
+        // When: Joining elements
+        final StringBuilder result = new StringBuilder("A");
+        joiner.join(result, "B", "C");
+        
+        // Then: Each element is prefixed with pipe
+        assertEquals("A<|B.|C>", result.toString());
+        
+        // And: Works with multiple join operations
+        result.append("1");
+        joiner.join(result, Arrays.asList("D", "E"));
+        assertEquals("A<|B.|C>1<|D.|E>", result.toString());
     }
 
     @Test
-    void testToCharSequenceStringBuilder2() {
-        // @formatter:off
-        final AppendableJoiner<Fixture> joiner = AppendableJoiner.<Fixture>builder()
-                .setElementAppender((a, e) -> e.render(a))
-                .get();
-        // @formatter:on
-        final StringBuilder sbuilder = new StringBuilder("[");
-        assertEquals("[B!C!", joiner.join(sbuilder, new Fixture("B"), new Fixture("C")).toString());
-        sbuilder.append("]");
-        assertEquals("[B!C!]D!E!", joiner.join(sbuilder, Arrays.asList(new Fixture("D"), new Fixture("E"))).toString());
+    void testJoinerWithCustomRenderableObjects() {
+        // Given: A joiner for objects that render themselves
+        final AppendableJoiner<CustomRenderableObject> joiner = 
+                AppendableJoiner.<CustomRenderableObject>builder()
+                    .setElementAppender((appendable, element) -> element.renderTo(appendable))
+                    .get();
+        
+        // When: Joining custom objects
+        final StringBuilder result = new StringBuilder("[");
+        joiner.join(result, 
+            new CustomRenderableObject("B"), 
+            new CustomRenderableObject("C"));
+        
+        // Then: Each object renders itself with exclamation
+        assertEquals("[B!C!", result.toString());
+        
+        // And: Can continue building the string
+        result.append("]");
+        joiner.join(result, Arrays.asList(
+            new CustomRenderableObject("D"), 
+            new CustomRenderableObject("E")));
+        assertEquals("[B!C!]D!E!", result.toString());
     }
 }
