@@ -38,26 +38,82 @@ import org.apache.commons.lang3.ThreadUtils;
 import org.junit.jupiter.api.Test;
 
 class BackgroundInitializerTest extends AbstractLangTest {
-
     /**
-     * A simple counter that tracks initialization calls and can be closed.
-     * Used as the result object for background initialization tests.
+     * A concrete implementation of BackgroundInitializer. It also overloads
+     * some methods that simplify testing.
      */
-    protected static class InitializationCounter {
-        private final AtomicInteger initializeCalls = new AtomicInteger(0);
-        private final AtomicBoolean closed = new AtomicBoolean(false);
+    protected static class AbstractBackgroundInitializerTestImpl extends
+            BackgroundInitializer<CloseableCounter> {
+        /** An exception to be thrown by initialize(). */
+        Exception ex;
 
-        public InitializationCounter increment() {
-            initializeCalls.incrementAndGet();
-            return this;
+        /** A flag whether the background task should sleep a while. */
+        boolean shouldSleep;
+
+        /** A latch tests can use to control when initialize completes. */
+        final CountDownLatch latch = new CountDownLatch(1);
+        boolean waitForLatch;
+
+        /** An object containing the state we are testing */
+        CloseableCounter counter = new CloseableCounter();
+
+        AbstractBackgroundInitializerTestImpl() {
         }
 
-        public int getInitializationCount() {
-            return initializeCalls.get();
+        AbstractBackgroundInitializerTestImpl(final ExecutorService exec) {
+            super(exec);
         }
+
+        public void enableLatch() {
+            waitForLatch = true;
+        }
+
+        public CloseableCounter getCloseableCounter() {
+            return counter;
+        }
+
+        /**
+         * Records this invocation. Optionally throws an exception or sleeps a
+         * while.
+         *
+         * @throws Exception in case of an error
+         */
+        protected CloseableCounter initializeInternal() throws Exception {
+            if (ex != null) {
+                throw ex;
+            }
+            if (shouldSleep) {
+                ThreadUtils.sleep(Duration.ofMinutes(1));
+            }
+            if (waitForLatch) {
+                latch.await();
+            }
+            return counter.increment();
+        }
+
+        public void releaseLatch() {
+            latch.countDown();
+        }
+    }
+
+    protected static class CloseableCounter {
+        /** The number of invocations of initialize(). */
+        AtomicInteger initializeCalls = new AtomicInteger();
+
+        /** Has the close consumer successfully reached this object. */
+        AtomicBoolean closed = new AtomicBoolean();
 
         public void close() {
             closed.set(true);
+        }
+
+        public int getInitializeCalls() {
+            return initializeCalls.get();
+        }
+
+        public CloseableCounter increment() {
+            initializeCalls.incrementAndGet();
+            return this;
         }
 
         public boolean isClosed() {
@@ -65,313 +121,306 @@ class BackgroundInitializerTest extends AbstractLangTest {
         }
     }
 
-    /**
-     * Test implementation of BackgroundInitializer that provides control over:
-     * - Exception throwing during initialization
-     * - Sleep duration during initialization  
-     * - Synchronization with test thread via latch
-     * - Access to initialization result counter
-     */
-    protected static class TestableBackgroundInitializer extends BackgroundInitializer<InitializationCounter> {
-        
-        private final InitializationCounter counter = new InitializationCounter();
-        private final CountDownLatch initializationLatch = new CountDownLatch(1);
-        
-        // Configuration options for test scenarios
-        private Exception exceptionToThrow;
-        private boolean shouldSleepDuringInitialization;
-        private boolean shouldWaitForLatch;
+    protected static class MethodBackgroundInitializerTestImpl extends AbstractBackgroundInitializerTestImpl {
 
-        public TestableBackgroundInitializer() {
-            super();
+        MethodBackgroundInitializerTestImpl() {
         }
 
-        public TestableBackgroundInitializer(ExecutorService executorService) {
-            super(executorService);
+        MethodBackgroundInitializerTestImpl(final ExecutorService exec) {
+            super(exec);
         }
 
         @Override
-        protected InitializationCounter initialize() throws Exception {
-            if (exceptionToThrow != null) {
-                throw exceptionToThrow;
-            }
-            
-            if (shouldSleepDuringInitialization) {
-                ThreadUtils.sleep(Duration.ofMinutes(1));
-            }
-            
-            if (shouldWaitForLatch) {
-                initializationLatch.await();
-            }
-            
-            return counter.increment();
+        protected CloseableCounter initialize() throws Exception {
+            return initializeInternal();
         }
-
-        // Test configuration methods
-        public void throwExceptionDuringInitialization(Exception exception) {
-            this.exceptionToThrow = exception;
-        }
-
-        public void sleepDuringInitialization() {
-            this.shouldSleepDuringInitialization = true;
-        }
-
-        public void waitForLatchDuringInitialization() {
-            this.shouldWaitForLatch = true;
-        }
-
-        public void releaseInitializationLatch() {
-            initializationLatch.countDown();
-        }
-
-        public InitializationCounter getCounter() {
-            return counter;
-        }
-    }
-
-    // Factory methods for creating test instances
-    protected TestableBackgroundInitializer createInitializer() {
-        return new TestableBackgroundInitializer();
-    }
-
-    protected TestableBackgroundInitializer createInitializerWithExecutor(ExecutorService executorService) {
-        return new TestableBackgroundInitializer(executorService);
     }
 
     /**
-     * Verifies that initialization was called exactly once and completed successfully.
+     * Helper method for checking whether the initialize() method was correctly
+     * called. start() must already have been invoked.
+     *
+     * @param init the initializer to test
      */
-    private void verifySuccessfulInitialization(TestableBackgroundInitializer initializer) throws ConcurrentException {
-        InitializationCounter result = initializer.get();
-        assertEquals(1, result.getInitializationCount(), "Initialize should be called exactly once");
-        assertEquals(1, initializer.getCounter().getInitializationCount(), "Counter should show one initialization");
-        assertNotNull(initializer.getFuture(), "Future should be available after start");
+    private void checkInitialize(final AbstractBackgroundInitializerTestImpl init) throws ConcurrentException {
+        final Integer result = init.get().getInitializeCalls();
+        assertEquals(1, result.intValue(), "Wrong result");
+        assertEquals(1, init.getCloseableCounter().getInitializeCalls(), "Wrong number of invocations");
+        assertNotNull(init.getFuture(), "No future");
+    }
+
+    protected AbstractBackgroundInitializerTestImpl getBackgroundInitializerTestImpl() {
+        return new MethodBackgroundInitializerTestImpl();
+    }
+
+    protected AbstractBackgroundInitializerTestImpl getBackgroundInitializerTestImpl(final ExecutorService exec) {
+        return new MethodBackgroundInitializerTestImpl(exec);
     }
 
     @Test
-    void testBuilder_CreatesInitializerWithNullValues() throws ConcurrentException {
-        BackgroundInitializer<Object> initializer = BackgroundInitializer.builder()
+    void testBuilder() throws ConcurrentException {
+        // @formatter:off
+        final BackgroundInitializer<Object> backgroundInitializer = BackgroundInitializer.builder()
             .setCloser(null)
             .setExternalExecutor(null)
             .setInitializer(null)
             .get();
-
-        assertNull(initializer.getExternalExecutor());
-        assertFalse(initializer.isInitialized());
-        assertFalse(initializer.isStarted());
-        assertThrows(IllegalStateException.class, initializer::getFuture);
+        // @formatter:on
+        assertNull(backgroundInitializer.getExternalExecutor());
+        assertFalse(backgroundInitializer.isInitialized());
+        assertFalse(backgroundInitializer.isStarted());
+        assertThrows(IllegalStateException.class, backgroundInitializer::getFuture);
     }
 
     @Test
-    void testBuilder_InitializerThrowsException() throws ConcurrentException {
-        BackgroundInitializer<Object> initializer = BackgroundInitializer.builder()
+    void testBuilderThenGetFailures() throws ConcurrentException {
+        // @formatter:off
+        final BackgroundInitializer<Object> backgroundInitializer = BackgroundInitializer.builder()
             .setCloser(null)
             .setExternalExecutor(null)
             .setInitializer(() -> {
                 throw new IllegalStateException("test");
             })
             .get();
-
-        assertNull(initializer.getExternalExecutor());
-        assertFalse(initializer.isInitialized());
-        assertFalse(initializer.isStarted());
-        assertThrows(IllegalStateException.class, initializer::getFuture);
-        
-        // After starting, the exception should be propagated
-        initializer.start();
-        IllegalStateException thrownException = assertThrows(IllegalStateException.class, initializer::get);
-        assertEquals("test", thrownException.getMessage());
+        // @formatter:on
+        assertNull(backgroundInitializer.getExternalExecutor());
+        assertFalse(backgroundInitializer.isInitialized());
+        assertFalse(backgroundInitializer.isStarted());
+        assertThrows(IllegalStateException.class, backgroundInitializer::getFuture);
+        // start
+        backgroundInitializer.start();
+        assertEquals("test", assertThrows(IllegalStateException.class, backgroundInitializer::get).getMessage());
     }
 
+    /**
+     * Tries to obtain the executor before start(). It should not have been
+     * initialized yet.
+     */
     @Test
-    void testGetActiveExecutor_BeforeStart_ReturnsNull() {
-        TestableBackgroundInitializer initializer = createInitializer();
-        assertNull(initializer.getActiveExecutor(), "Should not have an active executor before start");
+    void testGetActiveExecutorBeforeStart() {
+        final AbstractBackgroundInitializerTestImpl init = getBackgroundInitializerTestImpl();
+        assertNull(init.getActiveExecutor(), "Got an executor");
     }
 
+    /**
+     * Tests whether an external executor is correctly detected.
+     */
     @Test
-    void testGetActiveExecutor_WithExternalExecutor_ReturnsSameExecutor() throws InterruptedException, ConcurrentException {
-        ExecutorService externalExecutor = Executors.newSingleThreadExecutor();
+    void testGetActiveExecutorExternal() throws InterruptedException, ConcurrentException {
+        final ExecutorService exec = Executors.newSingleThreadExecutor();
         try {
-            TestableBackgroundInitializer initializer = createInitializerWithExecutor(externalExecutor);
-            initializer.start();
-            
-            assertSame(externalExecutor, initializer.getActiveExecutor(), "Should return the external executor");
-            verifySuccessfulInitialization(initializer);
+            final AbstractBackgroundInitializerTestImpl init = getBackgroundInitializerTestImpl(exec);
+            init.start();
+            assertSame(exec, init.getActiveExecutor(), "Wrong executor");
+            checkInitialize(init);
         } finally {
-            externalExecutor.shutdown();
-            externalExecutor.awaitTermination(1, TimeUnit.SECONDS);
+            exec.shutdown();
+            exec.awaitTermination(1, TimeUnit.SECONDS);
         }
     }
 
+    /**
+     * Tests getActiveExecutor() for a temporary executor.
+     */
     @Test
-    void testGetActiveExecutor_WithTemporaryExecutor_ReturnsCreatedExecutor() throws ConcurrentException {
-        TestableBackgroundInitializer initializer = createInitializer();
-        initializer.start();
-        
-        assertNotNull(initializer.getActiveExecutor(), "Should have an active executor after start");
-        verifySuccessfulInitialization(initializer);
+    void testGetActiveExecutorTemp() throws ConcurrentException {
+        final AbstractBackgroundInitializerTestImpl init = getBackgroundInitializerTestImpl();
+        init.start();
+        assertNotNull(init.getActiveExecutor(), "No active executor");
+        checkInitialize(init);
     }
 
+    /**
+     * Tests calling get() before start(). This should cause an exception.
+     */
     @Test
-    void testGet_BeforeStart_ThrowsIllegalStateException() {
-        TestableBackgroundInitializer initializer = createInitializer();
-        assertThrows(IllegalStateException.class, initializer::get, 
-                    "Should throw IllegalStateException when get() called before start()");
+    void testGetBeforeStart() {
+        final AbstractBackgroundInitializerTestImpl init = getBackgroundInitializerTestImpl();
+        assertThrows(IllegalStateException.class, init::get);
     }
 
+    /**
+     * Tests the get() method if background processing causes a checked
+     * exception.
+     */
     @Test
-    void testGet_WhenInitializationThrowsCheckedException_WrapsInConcurrentException() {
-        TestableBackgroundInitializer initializer = createInitializer();
-        Exception checkedException = new Exception("Test checked exception");
-        initializer.throwExceptionDuringInitialization(checkedException);
-        initializer.start();
-        
-        ConcurrentException thrownException = assertThrows(ConcurrentException.class, initializer::get);
-        assertEquals(checkedException, thrownException.getCause(), "Should wrap the original exception");
+    void testGetCheckedException() {
+        final AbstractBackgroundInitializerTestImpl init = getBackgroundInitializerTestImpl();
+        final Exception ex = new Exception();
+        init.ex = ex;
+        init.start();
+        final ConcurrentException cex = assertThrows(ConcurrentException.class, init::get);
+        assertEquals(ex, cex.getCause(), "Exception not thrown");
     }
 
+    /**
+     * Tests the get() method if waiting for the initialization is interrupted.
+     *
+     * @throws InterruptedException because we're making use of Java's concurrent API
+     */
     @Test
-    void testGet_WhenInitializationThrowsRuntimeException_PropagatesException() {
-        TestableBackgroundInitializer initializer = createInitializer();
-        RuntimeException runtimeException = new RuntimeException("Test runtime exception");
-        initializer.throwExceptionDuringInitialization(runtimeException);
-        initializer.start();
-        
-        Exception thrownException = assertThrows(Exception.class, initializer::get);
-        assertEquals(runtimeException, thrownException, "Should propagate runtime exception directly");
-    }
-
-    @Test
-    void testGet_WhenThreadInterrupted_WrapsInterruptedException() throws InterruptedException {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        TestableBackgroundInitializer initializer = createInitializerWithExecutor(executor);
-        CountDownLatch testThreadLatch = new CountDownLatch(1);
-        
-        initializer.sleepDuringInitialization();
-        initializer.start();
-        
-        AtomicReference<InterruptedException> caughtInterruptedException = new AtomicReference<>();
-        Thread getterThread = new Thread(() -> {
-            try {
-                initializer.get();
-            } catch (ConcurrentException ex) {
-                if (ex.getCause() instanceof InterruptedException) {
-                    caughtInterruptedException.set((InterruptedException) ex.getCause());
+    void testGetInterruptedException() throws InterruptedException {
+        final ExecutorService exec = Executors.newSingleThreadExecutor();
+        final AbstractBackgroundInitializerTestImpl init = getBackgroundInitializerTestImpl(
+                exec);
+        final CountDownLatch latch1 = new CountDownLatch(1);
+        init.shouldSleep = true;
+        init.start();
+        final AtomicReference<InterruptedException> iex = new AtomicReference<>();
+        final Thread getThread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    init.get();
+                } catch (final ConcurrentException cex) {
+                    if (cex.getCause() instanceof InterruptedException) {
+                        iex.set((InterruptedException) cex.getCause());
+                    }
+                } finally {
+                    assertTrue(isInterrupted(), "Thread not interrupted");
+                    latch1.countDown();
                 }
-            } finally {
-                assertTrue(Thread.currentThread().isInterrupted(), "Thread should remain interrupted");
-                testThreadLatch.countDown();
             }
-        });
-        
-        getterThread.start();
-        getterThread.interrupt();
-        testThreadLatch.await();
-        
-        executor.shutdownNow();
-        executor.awaitTermination(1, TimeUnit.SECONDS);
-        assertNotNull(caughtInterruptedException.get(), "Should catch InterruptedException");
+        };
+        getThread.start();
+        getThread.interrupt();
+        latch1.await();
+        exec.shutdownNow();
+        exec.awaitTermination(1, TimeUnit.SECONDS);
+        assertNotNull(iex.get(), "No interrupted exception");
     }
 
+    /**
+     * Tests the get() method if background processing causes a runtime
+     * exception.
+     */
     @Test
-    void testInitialize_CallsInitializeMethodOnce() throws ConcurrentException {
-        TestableBackgroundInitializer initializer = createInitializer();
-        initializer.start();
-        verifySuccessfulInitialization(initializer);
+    void testGetRuntimeException() {
+        final AbstractBackgroundInitializerTestImpl init = getBackgroundInitializerTestImpl();
+        final RuntimeException rex = new RuntimeException();
+        init.ex = rex;
+        init.start();
+        final Exception ex = assertThrows(Exception.class, init::get);
+        assertEquals(rex, ex, "Runtime exception not thrown");
     }
 
+    /**
+     * Tests whether initialize() is invoked.
+     */
     @Test
-    void testInitializeWithTemporaryExecutor_ShutsDownExecutorAfterCompletion() throws ConcurrentException {
-        TestableBackgroundInitializer initializer = createInitializer();
-        assertTrue(initializer.start(), "Start should return true on first call");
-        verifySuccessfulInitialization(initializer);
-        assertTrue(initializer.getActiveExecutor().isShutdown(), "Temporary executor should be shut down");
+    void testInitialize() throws ConcurrentException {
+        final AbstractBackgroundInitializerTestImpl init = getBackgroundInitializerTestImpl();
+        init.start();
+        checkInitialize(init);
     }
 
+    /**
+     * Tests the execution of the background task if a temporary executor has to
+     * be created.
+     */
     @Test
-    void testIsInitialized_BeforeAndAfterCompletion() throws ConcurrentException {
-        TestableBackgroundInitializer initializer = createInitializer();
-        initializer.waitForLatchDuringInitialization();
-        initializer.start();
-        
-        assertTrue(initializer.isStarted(), "Should be started after start() call");
-        assertFalse(initializer.isInitialized(), "Should not be initialized while waiting for latch");
-        
-        initializer.releaseInitializationLatch();
-        initializer.get(); // Wait for completion
-        
-        assertTrue(initializer.isInitialized(), "Should be initialized after completion");
+    void testInitializeTempExecutor() throws ConcurrentException {
+        final AbstractBackgroundInitializerTestImpl init = getBackgroundInitializerTestImpl();
+        assertTrue(init.start(), "Wrong result of start()");
+        checkInitialize(init);
+        assertTrue(init.getActiveExecutor().isShutdown(), "Executor not shutdown");
     }
 
+    /**
+     * Tests isInitialized() before and after the background task has finished.
+     */
     @Test
-    void testIsStarted_AfterGet_RemainsTrue() throws ConcurrentException {
-        TestableBackgroundInitializer initializer = createInitializer();
-        initializer.start();
-        verifySuccessfulInitialization(initializer);
-        assertTrue(initializer.isStarted(), "Should remain started after get() completes");
+    void testIsInitialized() throws ConcurrentException {
+        final AbstractBackgroundInitializerTestImpl init = getBackgroundInitializerTestImpl();
+        init.enableLatch();
+        init.start();
+        assertTrue(init.isStarted(), "Not started"); //Started and Initialized should return opposite values
+        assertFalse(init.isInitialized(), "Initialized before releasing latch");
+        init.releaseLatch();
+        init.get(); //to ensure the initialize thread has completed.
+        assertTrue(init.isInitialized(), "Not initialized after releasing latch");
     }
 
+    /**
+     * Tests isStarted() after the background task has finished.
+     */
     @Test
-    void testIsStarted_BeforeStart_ReturnsFalse() {
-        TestableBackgroundInitializer initializer = createInitializer();
-        assertFalse(initializer.isStarted(), "Should not be started before start() is called");
+    void testIsStartedAfterGet() throws ConcurrentException {
+        final AbstractBackgroundInitializerTestImpl init = getBackgroundInitializerTestImpl();
+        init.start();
+        checkInitialize(init);
+        assertTrue(init.isStarted(), "Not started");
     }
 
+    /**
+     * Tests isStarted() before start() was called.
+     */
     @Test
-    void testIsStarted_AfterStart_ReturnsTrue() {
-        TestableBackgroundInitializer initializer = createInitializer();
-        initializer.start();
-        assertTrue(initializer.isStarted(), "Should be started after start() is called");
+    void testIsStartedFalse() {
+        final AbstractBackgroundInitializerTestImpl init = getBackgroundInitializerTestImpl();
+        assertFalse(init.isStarted(), "Already started");
     }
 
+    /**
+     * Tests isStarted() after start().
+     */
     @Test
-    void testSetExternalExecutor_SetsAndUsesProvidedExecutor() throws ConcurrentException {
-        ExecutorService externalExecutor = Executors.newCachedThreadPool();
+    void testIsStartedTrue() {
+        final AbstractBackgroundInitializerTestImpl init = getBackgroundInitializerTestImpl();
+        init.start();
+        assertTrue(init.isStarted(), "Not started");
+    }
+
+    /**
+     * Tests whether an external executor can be set using the
+     * setExternalExecutor() method.
+     */
+    @Test
+    void testSetExternalExecutor() throws ConcurrentException {
+        final ExecutorService exec = Executors.newCachedThreadPool();
         try {
-            TestableBackgroundInitializer initializer = createInitializer();
-            initializer.setExternalExecutor(externalExecutor);
-            
-            assertEquals(externalExecutor, initializer.getExternalExecutor(), 
-                        "Should return the set external executor");
-            assertTrue(initializer.start(), "Start should return true on first call");
-            assertSame(externalExecutor, initializer.getActiveExecutor(), 
-                      "Should use the external executor for background task");
-            verifySuccessfulInitialization(initializer);
-            assertFalse(externalExecutor.isShutdown(), 
-                       "External executor should not be shut down by initializer");
+            final AbstractBackgroundInitializerTestImpl init = getBackgroundInitializerTestImpl();
+            init.setExternalExecutor(exec);
+            assertEquals(exec, init.getExternalExecutor(), "Wrong executor service");
+            assertTrue(init.start(), "Wrong result of start()");
+            assertSame(exec, init.getActiveExecutor(), "Wrong active executor");
+            checkInitialize(init);
+            assertFalse(exec.isShutdown(), "Executor was shutdown");
         } finally {
-            externalExecutor.shutdown();
+            exec.shutdown();
         }
     }
 
+    /**
+     * Tests that setting an executor after start() causes an exception.
+     *
+     * @throws org.apache.commons.lang3.concurrent.ConcurrentException because the test implementation may throw it
+     */
     @Test
-    void testSetExternalExecutor_AfterStart_ThrowsIllegalStateException() throws ConcurrentException, InterruptedException {
-        TestableBackgroundInitializer initializer = createInitializer();
-        initializer.start();
-        
-        ExecutorService executor = Executors.newSingleThreadExecutor();
+    void testSetExternalExecutorAfterStart() throws ConcurrentException, InterruptedException {
+        final AbstractBackgroundInitializerTestImpl init = getBackgroundInitializerTestImpl();
+        init.start();
+        final ExecutorService exec = Executors.newSingleThreadExecutor();
         try {
-            assertThrows(IllegalStateException.class, 
-                        () -> initializer.setExternalExecutor(executor),
-                        "Should throw IllegalStateException when setting executor after start");
-            initializer.get(); // Ensure initialization completes
+            assertThrows(IllegalStateException.class, () -> init.setExternalExecutor(exec));
+            init.get();
         } finally {
-            executor.shutdown();
-            executor.awaitTermination(1, TimeUnit.SECONDS);
+            exec.shutdown();
+            exec.awaitTermination(1, TimeUnit.SECONDS);
         }
     }
 
+    /**
+     * Tests invoking start() multiple times. Only the first invocation should
+     * have an effect.
+     */
     @Test
-    void testStart_MultipleCalls_OnlyFirstCallReturnsTrue() throws ConcurrentException {
-        TestableBackgroundInitializer initializer = createInitializer();
-        
-        assertTrue(initializer.start(), "First start() call should return true");
-        
+    void testStartMultipleTimes() throws ConcurrentException {
+        final AbstractBackgroundInitializerTestImpl init = getBackgroundInitializerTestImpl();
+        assertTrue(init.start(), "Wrong result for start()");
         for (int i = 0; i < 10; i++) {
-            assertFalse(initializer.start(), "Subsequent start() calls should return false");
+            assertFalse(init.start(), "Could start again");
         }
-        
-        verifySuccessfulInitialization(initializer);
+        checkInitialize(init);
     }
 }
