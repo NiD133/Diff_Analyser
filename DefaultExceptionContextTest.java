@@ -31,40 +31,68 @@ class DefaultExceptionContextTest extends AbstractExceptionContextTest<DefaultEx
     @Override
     @BeforeEach
     public void setUp() throws Exception {
+        // This method is called before each test, ensuring a fresh context.
         exceptionContext = new DefaultExceptionContext();
         super.setUp();
     }
 
+    /**
+     * Tests that the formatted message is generated correctly even when a context
+     * value's toString() method throws an exception. The context label should
+     * still be included.
+     */
     @Test
-    void testFormattedExceptionMessageExceptionHandling() {
-        exceptionContext = new DefaultExceptionContext();
-        final String label1 = "throws 1";
-        final String label2 = "throws 2";
+    void getFormattedExceptionMessage_shouldSafelyFormatValue_whenValueToStringThrowsException() {
+        // Arrange
+        final String label1 = "Erroring Label 1";
+        final String label2 = "Erroring Label 2";
         exceptionContext.addContextValue(label1, new ObjectToStringRuntimeException(label1));
         exceptionContext.addContextValue(label2, new ObjectToStringRuntimeException(label2));
+
+        // Act
         final String message = exceptionContext.getFormattedExceptionMessage(TEST_MESSAGE);
-        assertTrue(message.startsWith(TEST_MESSAGE));
-        assertTrue(message.contains(label1));
-        assertTrue(message.contains(label2));
+
+        // Assert
+        assertTrue(message.startsWith(TEST_MESSAGE), "Message should start with the base message");
+        assertTrue(message.contains(label1), "Message should contain the first label");
+        assertTrue(message.contains(label2), "Message should contain the second label");
     }
 
+    /**
+     * Tests that an empty string is returned when the base message is null,
+     * regardless of the context content.
+     */
     @Test
-    void testFormattedExceptionMessageNull() {
-        exceptionContext = new DefaultExceptionContext();
-        assertEquals("", exceptionContext.getFormattedExceptionMessage(null));
+    void getFormattedExceptionMessage_shouldReturnEmptyString_whenBaseMessageIsNull() {
+        // Arrange
+        exceptionContext.addContextValue("Some Label", "Some Value");
+
+        // Act
+        final String message = exceptionContext.getFormattedExceptionMessage(null);
+
+        // Assert
+        assertEquals("", message);
     }
 
+    /**
+     * Tests that labels for null context values are still included in the
+     * formatted message.
+     */
     @Test
-    void testFormattedExceptionMessageNullValue() {
-        exceptionContext = new DefaultExceptionContext();
-        final String label1 = "throws 1";
-        final String label2 = "throws 2";
+    void getFormattedExceptionMessage_shouldIncludeLabels_whenContextValuesAreNull() {
+        // Arrange
+        final String label1 = "Label with null value 1";
+        final String label2 = "Label with null value 2";
         exceptionContext.addContextValue(label1, null);
         exceptionContext.addContextValue(label2, null);
+
+        // Act
         final String message = exceptionContext.getFormattedExceptionMessage(TEST_MESSAGE);
-        assertTrue(message.startsWith(TEST_MESSAGE));
-        assertTrue(message.contains(label1));
-        assertTrue(message.contains(label2));
+
+        // Assert
+        assertTrue(message.startsWith(TEST_MESSAGE), "Message should start with the base message");
+        assertTrue(message.contains(label1), "Message should contain the first label");
+        assertTrue(message.contains(label2), "Message should contain the second label");
     }
 
 }
