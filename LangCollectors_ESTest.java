@@ -16,49 +16,75 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class LangCollectors_ESTest extends LangCollectors_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test0()  throws Throwable  {
-      char[] charArray0 = new char[5];
-      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-      Collector<Object, ?, String> collector0 = LangCollectors.joining((CharSequence) null, (CharSequence) null, (CharSequence) charBuffer0);
-      assertNotNull(collector0);
-  }
+    @Test(timeout = 4000)
+    public void testJoiningWithNullDelimiterAndPrefixAndCharBufferSuffix() throws Throwable {
+        // Arrange: Create a CharBuffer with 5 null characters as suffix
+        char[] emptyChars = new char[5];
+        CharBuffer suffixBuffer = CharBuffer.wrap(emptyChars);
+        
+        // Act: Create collector with null delimiter, null prefix, and CharBuffer suffix
+        Collector<Object, ?, String> collector = LangCollectors.joining(
+            /* delimiter */ null, 
+            /* prefix */ null, 
+            /* suffix */ suffixBuffer
+        );
+        
+        // Assert: Collector should be created successfully
+        assertNotNull("Collector should not be null when created with null delimiter and prefix", collector);
+    }
 
-  @Test(timeout = 4000)
-  public void test1()  throws Throwable  {
-      char[] charArray0 = new char[1];
-      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-      Collector<Object, ?, String> collector0 = LangCollectors.joining((CharSequence) charBuffer0, (CharSequence) charBuffer0, (CharSequence) charBuffer0, (Function<Object, String>) null);
-      assertNotNull(collector0);
-  }
+    @Test(timeout = 4000)
+    public void testJoiningWithCharBufferParametersAndNullToStringFunction() throws Throwable {
+        // Arrange: Create a single-character CharBuffer to use for all parameters
+        char[] singleChar = new char[1];
+        CharBuffer charBuffer = CharBuffer.wrap(singleChar);
+        
+        // Act: Create collector with CharBuffer for delimiter, prefix, suffix and null toString function
+        Collector<Object, ?, String> collector = LangCollectors.joining(
+            /* delimiter */ charBuffer, 
+            /* prefix */ charBuffer, 
+            /* suffix */ charBuffer, 
+            /* toString */ null
+        );
+        
+        // Assert: Collector should be created successfully even with null toString function
+        assertNotNull("Collector should not be null when created with CharBuffer parameters and null toString", collector);
+    }
 
-  @Test(timeout = 4000)
-  public void test2()  throws Throwable  {
-      Collector<Object, ?, String> collector0 = LangCollectors.joining();
-      assertNotNull(collector0);
-  }
+    @Test(timeout = 4000)
+    public void testJoiningWithNoParameters() throws Throwable {
+        // Act: Create collector using the parameterless joining method
+        Collector<Object, ?, String> collector = LangCollectors.joining();
+        
+        // Assert: Collector should be created successfully
+        assertNotNull("Collector should not be null when created with no parameters", collector);
+    }
 
-  @Test(timeout = 4000)
-  public void test3()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        LangCollectors.collect((Collector<? super CharBuffer, CharBuffer, CharBuffer>) null, (CharBuffer[]) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.util.Objects", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testCollectWithNullCollectorThrowsNullPointerException() throws Throwable {
+        // Act & Assert: Calling collect with null collector should throw NullPointerException
+        try { 
+            LangCollectors.collect(
+                /* collector */ null, 
+                /* array */ (CharBuffer[]) null
+            );
+            fail("Expected NullPointerException when collector is null");
+        } catch(NullPointerException e) {
+            // Verify the exception comes from Objects utility (likely Objects.requireNonNull)
+            verifyException("java.util.Objects", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test4()  throws Throwable  {
-      Collector<Object, ?, String> collector0 = LangCollectors.joining((CharSequence) null);
-      assertNotNull(collector0);
-  }
+    @Test(timeout = 4000)
+    public void testJoiningWithNullDelimiter() throws Throwable {
+        // Act: Create collector with null delimiter
+        Collector<Object, ?, String> collector = LangCollectors.joining(/* delimiter */ null);
+        
+        // Assert: Collector should be created successfully with null delimiter
+        assertNotNull("Collector should not be null when created with null delimiter", collector);
+    }
 }
