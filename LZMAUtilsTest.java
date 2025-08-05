@@ -22,115 +22,165 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
- * Tests {@link LZMAUtils}.
+ * Tests for the {@link LZMAUtils} utility class.
  */
+@DisplayName("LZMAUtils")
 class LZMAUtilsTest {
 
-    @Test
-    void testCachingIsEnabledByDefaultAndLZMAIsPresent() {
-        assertEquals(LZMAUtils.CachedAvailability.CACHED_AVAILABLE, LZMAUtils.getCachedLZMAAvailability());
-        assertTrue(LZMAUtils.isLZMACompressionAvailable());
+    /**
+     * Resets the caching state after each test to ensure test isolation,
+     * as some tests modify this global static state.
+     */
+    @AfterEach
+    void resetLzmaCache() {
+        // The default is 'true' unless in an OSGi environment.
+        // Resetting to 'true' is safe for the context of this test suite.
+        LZMAUtils.setCacheLZMAAvailablity(true);
     }
 
-    @Test
-    void testCanTurnOffCaching() {
-        try {
-            LZMAUtils.setCacheLZMAAvailablity(false);
-            assertEquals(LZMAUtils.CachedAvailability.DONT_CACHE, LZMAUtils.getCachedLZMAAvailability());
-            assertTrue(LZMAUtils.isLZMACompressionAvailable());
-        } finally {
-            LZMAUtils.setCacheLZMAAvailablity(true);
-        }
-    }
+    @Nested
+    @DisplayName("Availability Caching")
+    class AvailabilityCachingTest {
 
-    @SuppressWarnings("deprecation")
-    @Test
-    void testGetCompressedFilename() {
-        assertEquals(".lzma", LZMAUtils.getCompressedFilename(""));
-        assertEquals(".lzma", LZMAUtils.getCompressedFileName(""));
-        assertEquals("x.lzma", LZMAUtils.getCompressedFilename("x"));
-        assertEquals("x.lzma", LZMAUtils.getCompressedFileName("x"));
-
-        assertEquals("x.wmf .lzma", LZMAUtils.getCompressedFilename("x.wmf "));
-        assertEquals("x.wmf .lzma", LZMAUtils.getCompressedFileName("x.wmf "));
-        assertEquals("x.wmf\n.lzma", LZMAUtils.getCompressedFilename("x.wmf\n"));
-        assertEquals("x.wmf\n.lzma", LZMAUtils.getCompressedFileName("x.wmf\n"));
-        assertEquals("x.wmf.y.lzma", LZMAUtils.getCompressedFilename("x.wmf.y"));
-        assertEquals("x.wmf.y.lzma", LZMAUtils.getCompressedFileName("x.wmf.y"));
-    }
-
-    @SuppressWarnings("deprecation")
-    @Test
-    void testGetUncompressedFilename() {
-        assertEquals("", LZMAUtils.getUncompressedFilename(""));
-        assertEquals("", LZMAUtils.getUncompressedFileName(""));
-        assertEquals(".lzma", LZMAUtils.getUncompressedFilename(".lzma"));
-        assertEquals(".lzma", LZMAUtils.getUncompressedFileName(".lzma"));
-
-        assertEquals("x", LZMAUtils.getUncompressedFilename("x.lzma"));
-        assertEquals("x", LZMAUtils.getUncompressedFileName("x.lzma"));
-        assertEquals("x", LZMAUtils.getUncompressedFilename("x-lzma"));
-        assertEquals("x", LZMAUtils.getUncompressedFileName("x-lzma"));
-
-        assertEquals("x.lzma ", LZMAUtils.getUncompressedFilename("x.lzma "));
-        assertEquals("x.lzma ", LZMAUtils.getUncompressedFileName("x.lzma "));
-        assertEquals("x.lzma\n", LZMAUtils.getUncompressedFilename("x.lzma\n"));
-        assertEquals("x.lzma\n", LZMAUtils.getUncompressedFileName("x.lzma\n"));
-        assertEquals("x.lzma.y", LZMAUtils.getUncompressedFilename("x.lzma.y"));
-        assertEquals("x.lzma.y", LZMAUtils.getUncompressedFileName("x.lzma.y"));
-    }
-
-    @SuppressWarnings("deprecation")
-    @Test
-    void testIsCompressedFilename() {
-        assertFalse(LZMAUtils.isCompressedFilename(""));
-        assertFalse(LZMAUtils.isCompressedFileName(""));
-        assertFalse(LZMAUtils.isCompressedFilename(".lzma"));
-        assertFalse(LZMAUtils.isCompressedFileName(".lzma"));
-
-        assertTrue(LZMAUtils.isCompressedFilename("x.lzma"));
-        assertTrue(LZMAUtils.isCompressedFileName("x.lzma"));
-        assertTrue(LZMAUtils.isCompressedFilename("x-lzma"));
-        assertTrue(LZMAUtils.isCompressedFileName("x-lzma"));
-
-        assertFalse(LZMAUtils.isCompressedFilename("xxgz"));
-        assertFalse(LZMAUtils.isCompressedFileName("xxgz"));
-        assertFalse(LZMAUtils.isCompressedFilename("lzmaz"));
-        assertFalse(LZMAUtils.isCompressedFileName("lzmaz"));
-        assertFalse(LZMAUtils.isCompressedFilename("xaz"));
-        assertFalse(LZMAUtils.isCompressedFileName("xaz"));
-
-        assertFalse(LZMAUtils.isCompressedFilename("x.lzma "));
-        assertFalse(LZMAUtils.isCompressedFileName("x.lzma "));
-        assertFalse(LZMAUtils.isCompressedFilename("x.lzma\n"));
-        assertFalse(LZMAUtils.isCompressedFileName("x.lzma\n"));
-        assertFalse(LZMAUtils.isCompressedFilename("x.lzma.y"));
-        assertFalse(LZMAUtils.isCompressedFileName("x.lzma.y"));
-    }
-
-    @Test
-    void testMatches() {
-        final byte[] data = { (byte) 0x5D, 0, 0, };
-        assertFalse(LZMAUtils.matches(data, 2));
-        assertTrue(LZMAUtils.matches(data, 3));
-        assertTrue(LZMAUtils.matches(data, 4));
-        data[2] = '0';
-        assertFalse(LZMAUtils.matches(data, 3));
-    }
-
-    @Test
-    void testTurningOnCachingReEvaluatesAvailability() {
-        try {
-            LZMAUtils.setCacheLZMAAvailablity(false);
-            assertEquals(LZMAUtils.CachedAvailability.DONT_CACHE, LZMAUtils.getCachedLZMAAvailability());
-            LZMAUtils.setCacheLZMAAvailablity(true);
+        @Test
+        @DisplayName("should have caching enabled and LZMA available by default")
+        void cachingIsEnabledByDefaultAndLzmaIsPresent() {
             assertEquals(LZMAUtils.CachedAvailability.CACHED_AVAILABLE, LZMAUtils.getCachedLZMAAvailability());
-        } finally {
+            assertTrue(LZMAUtils.isLZMACompressionAvailable());
+        }
+
+        @Test
+        @DisplayName("should allow disabling the availability cache")
+        void canTurnOffCaching() {
+            // When caching is turned off
+            LZMAUtils.setCacheLZMAAvailablity(false);
+
+            // Then the cache status should reflect it
+            assertEquals(LZMAUtils.CachedAvailability.DONT_CACHE, LZMAUtils.getCachedLZMAAvailability());
+
+            // And the availability check should still work correctly
+            assertTrue(LZMAUtils.isLZMACompressionAvailable());
+        }
+
+        @Test
+        @DisplayName("should re-evaluate availability when caching is re-enabled")
+        void turningOnCachingReEvaluatesAvailability() {
+            // Given caching is initially off
+            LZMAUtils.setCacheLZMAAvailablity(false);
+            assertEquals(LZMAUtils.CachedAvailability.DONT_CACHE, LZMAUtils.getCachedLZMAAvailability());
+
+            // When caching is turned back on
             LZMAUtils.setCacheLZMAAvailablity(true);
+
+            // Then availability is re-evaluated and cached
+            assertEquals(LZMAUtils.CachedAvailability.CACHED_AVAILABLE, LZMAUtils.getCachedLZMAAvailability());
         }
     }
 
+    @Nested
+    @DisplayName("Filename Handling")
+    class FilenameHandlingTest {
+
+        @SuppressWarnings("deprecation")
+        @DisplayName("getCompressedFileName should add .lzma suffix")
+        @ParameterizedTest(name = "for input \"{0}\", compressed should be \"{1}\"")
+        @CsvSource({
+            "'',        .lzma",
+            "x,         x.lzma",
+            "'x.wmf ',  'x.wmf .lzma'",
+            "'x.wmf\n', 'x.wmf\n.lzma'",
+            "x.wmf.y,   x.wmf.y.lzma"
+        })
+        void getCompressedFileName_should_addLzmaSuffix(final String input, final String expected) {
+            // Asserts that both the new and deprecated methods behave identically
+            assertEquals(expected, LZMAUtils.getCompressedFileName(input));
+            assertEquals(expected, LZMAUtils.getCompressedFilename(input));
+        }
+
+        @SuppressWarnings("deprecation")
+        @DisplayName("getUncompressedFileName should remove .lzma or -lzma suffix")
+        @ParameterizedTest(name = "for input \"{0}\", uncompressed should be \"{1}\"")
+        @CsvSource({
+            "'',          ''",
+            ".lzma,       .lzma", // Suffix without a base name is not removed
+            "x.lzma,      x",
+            "x-lzma,      x",
+            "'x.lzma ',   'x.lzma '",   // Suffix with trailing space is not removed
+            "'x.lzma\n',  'x.lzma\n'",  // Suffix with trailing newline is not removed
+            "x.lzma.y,    x.lzma.y"     // Suffix in the middle is not removed
+        })
+        void getUncompressedFileName_should_removeLzmaSuffix(final String input, final String expected) {
+            // Asserts that both the new and deprecated methods behave identically
+            assertEquals(expected, LZMAUtils.getUncompressedFileName(input));
+            assertEquals(expected, LZMAUtils.getUncompressedFilename(input));
+        }
+
+        @SuppressWarnings("deprecation")
+        @DisplayName("isCompressedFileName should correctly detect .lzma or -lzma suffix")
+        @ParameterizedTest(name = "isCompressedFileName(\"{0}\") should be {1}")
+        @CsvSource({
+            // Positive cases
+            "x.lzma,    true",
+            "x-lzma,    true",
+            // Negative cases
+            "'',        false",
+            ".lzma,     false",
+            "xxgz,      false",
+            "lzmaz,     false",
+            "xaz,       false",
+            "'x.lzma ', false",
+            "'x.lzma\n',false",
+            "x.lzma.y,  false"
+        })
+        void isCompressedFileName_should_detectLzmaSuffix(final String filename, final boolean expected) {
+            // Asserts that both the new and deprecated methods behave identically
+            assertEquals(expected, LZMAUtils.isCompressedFileName(filename));
+            assertEquals(expected, LZMAUtils.isCompressedFilename(filename));
+        }
+    }
+
+    @Nested
+    @DisplayName("Header Signature Matching")
+    class MatchesTest {
+
+        private final byte[] validHeader = {(byte) 0x5D, 0, 0};
+
+        @Test
+        @DisplayName("should return false if provided length is less than header size")
+        void matches_should_returnFalse_whenBufferIsTooShort() {
+            assertFalse(LZMAUtils.matches(validHeader, 2),
+                "Should fail because length 2 is less than the 3-byte header.");
+        }
+
+        @Test
+        @DisplayName("should return true if signature matches and length is sufficient")
+        void matches_should_returnTrue_whenSignatureMatches() {
+            assertTrue(LZMAUtils.matches(validHeader, 3),
+                "Should pass with exact length and correct signature.");
+        }
+
+        @Test
+        @DisplayName("should return true if buffer starts with a valid signature and length is greater than header size")
+        void matches_should_returnTrue_whenBufferIsLonger() {
+            final byte[] longBuffer = {(byte) 0x5D, 0, 0, 'a', 'b'};
+            assertTrue(LZMAUtils.matches(longBuffer, 5),
+                "Should pass as it only checks the first 3 bytes.");
+        }
+
+        @Test
+        @DisplayName("should return false if signature does not match")
+        void matches_should_returnFalse_whenSignatureIsInvalid() {
+            final byte[] invalidHeader = {(byte) 0x5D, 0, 'a'}; // Corrupted header
+            assertFalse(LZMAUtils.matches(invalidHeader, 3),
+                "Should fail due to a mismatch in the header bytes.");
+        }
+    }
 }
