@@ -53,257 +53,417 @@ import org.junit.jupiter.params.provider.CsvSource;
 import shaded.org.apache.commons.io.IOUtils;
 
 /**
- * Tests {@link GzipCompressorOutputStream}.
+ * Tests {@link GzipCompressorOutputStream} functionality including:
+ * - File name handling with different character encodings
+ * - Extra fields and subfields
+ * - Header CRC validation
  */
 class GzipCompressorOutputStreamTest {
 
-    private static final String EXPECTED_BASE_NAME = "\u6D4B\u8BD5\u4E2D\u6587\u540D\u79F0";
-    private static final String EXPECTED_FILE_NAME = EXPECTED_BASE_NAME + ".xml";
+    // Test data constants
+    private static final String CHINESE_BASE_NAME = "\u6D4B\u8BD5\u4E2D\u6587\u540D\u79F0"; // "测试中文名称"
+    private static final String CHINESE_FILE_NAME = CHINESE_BASE_NAME + ".xml";
+    private static final String TEST_CONTENT = "<text>Hello World!</text>";
+    private static final String SIMPLE_TEST_CONTENT = "Hello World!";
 
-    private void testChineseFileName(final String expected, final String sourceFile, final Charset fileNameCharset) throws IOException {
-        final Path tempSourceFile = Files.createTempFile(sourceFile, sourceFile);
-        final byte[] bytes = "<text>Hello World!</text>".getBytes(StandardCharsets.ISO_8859_1);
-        Files.write(tempSourceFile, bytes);
-        final Path targetFile = Files.createTempFile(EXPECTED_BASE_NAME, ".gz");
-        final GzipParameters parameters = new GzipParameters();
-        // If your system is Windows with Chinese, and your file name is Chinese, you need set the fileNameCharset to "GBK"
-        // otherwise your file name is different using GzipCompressorOutputStream without a GzipParameters.
-        // On Linux, set the fileNameCharset to UTF-8.
-        parameters.setFileNameCharset(fileNameCharset);
-        assertEquals(fileNameCharset, parameters.getFileNameCharset());
-        parameters.setFileName(EXPECTED_FILE_NAME);
-        parameters.setComment("Comment on " + EXPECTED_FILE_NAME);
-        try (OutputStream fos = Files.newOutputStream(targetFile);
-                GzipCompressorOutputStream gos = new GzipCompressorOutputStream(fos, parameters)) {
-            gos.write(tempSourceFile);
+    /**
+     * Tests Chinese file name handling with different character encodings.
+     * This is a common test pattern for both GBK and UTF-8 encodings.
+     */
+    private void testChineseFileNameWithEncoding(String expectedFileName, String sourceFileName, Charset fileNameCharset) throws IOException {
+        // Arrange: Create test files and content
+        Path sourceFile = Files.createTempFile(sourceFileName, sourceFileName);
+        byte[] testContent = TEST_CONTENT.getBytes(StandardCharsets.ISO_8859_1);
+        Files.write(sourceFile, testContent);
+        Path compressedFile = Files.createTempFile(CHINESE_BASE_NAME, ".gz");
+
+        // Configure gzip parameters with specific charset
+        GzipParameters gzipParams = new GzipParameters();
+        gzipParams.setFileNameCharset(fileNameCharset);
+        gzipParams.setFileName(CHINESE_FILE_NAME);
+        gzipParams.setComment("Comment on " + CHINESE_FILE_NAME);
+
+        // Act: Compress the file
+        compressFile(sourceFile, compressedFile, gzipParams);
+
+        // Assert: Verify file name encoding with legacy constructor
+        verifyFileNameWithLegacyConstructor(compressedFile, expectedFileName, fileNameCharset, testContent);
+
+        // Assert: Verify file name encoding with builder pattern
+        verifyFileNameWithBuilder(compressedFile, expectedFileName, fileNameCharset, testContent, gzipParams);
+    }
+
+    private void compressFile(Path sourceFile, Path targetFile, GzipParameters parameters) throws IOException {
+        try (OutputStream fileOutput = Files.newOutputStream(targetFile);
+             GzipCompressorOutputStream gzipOutput = new GzipCompressorOutputStream(fileOutput, parameters)) {
+            gzipOutput.write(sourceFile);
         }
-        // Old construction doesn't allow configuration of reading the file name and comment Charset.
-        try (GzipCompressorInputStream gis = new GzipCompressorInputStream(Files.newInputStream(targetFile))) {
-            final byte[] fileNameBytes = gis.getMetaData().getFileName().getBytes(StandardCharsets.ISO_8859_1);
-            final String unicodeFileName = new String(fileNameBytes, fileNameCharset);
-            assertEquals(expected, unicodeFileName);
-            assertArrayEquals(bytes, IOUtils.toByteArray(gis));
+    }
+
+    private void verifyFileNameWithLegacyConstructor(Path compressedFile, String expectedFileName, 
+                                                   Charset fileNameCharset, byte[] expectedContent) throws IOException {
+        // Old construction doesn't allow configuration of reading the file name and comment Charset
+        try (GzipCompressorInputStream gzipInput = new GzipCompressorInputStream(Files.newInputStream(compressedFile))) {
+            byte[] fileNameBytes = gzipInput.getMetaData().getFileName().getBytes(StandardCharsets.ISO_8859_1);
+            String decodedFileName = new String(fileNameBytes, fileNameCharset);
+            
+            assertEquals(expectedFileName, decodedFileName);
+            assertArrayEquals(expectedContent, IOUtils.toByteArray(gzipInput));
         }
-        // Construction allows configuration of reading the file name and comment Charset.
-        // @formatter:off
-        try (GzipCompressorInputStream gis = GzipCompressorInputStream.builder()
-                .setPath(targetFile)
+    }
+
+    private void verifyFileNameWithBuilder(Path compressedFile, String expectedFileName, 
+                                         Charset fileNameCharset, byte[] expectedContent, 
+                                         GzipParameters originalParams) throws IOException {
+        // Builder pattern allows configuration of reading the file name and comment Charset
+        try (GzipCompressorInputStream gzipInput = GzipCompressorInputStream.builder()
+                .setPath(compressedFile)
                 .setFileNameCharset(fileNameCharset)
                 .get()) {
-            // @formatter:on
-            final byte[] fileNameBytes = gis.getMetaData().getFileName().getBytes(fileNameCharset);
-            final String unicodeFileName = new String(fileNameBytes, fileNameCharset);
-            assertEquals(expected, unicodeFileName);
-            assertArrayEquals(bytes, IOUtils.toByteArray(gis));
-            // reset trailer values for a simple assertion.
-            gis.getMetaData().setTrailerCrc(0);
-            gis.getMetaData().setTrailerISize(0);
-            assertEquals(parameters, gis.getMetaData());
+            
+            byte[] fileNameBytes = gzipInput.getMetaData().getFileName().getBytes(fileNameCharset);
+            String decodedFileName = new String(fileNameBytes, fileNameCharset);
+            
+            assertEquals(expectedFileName, decodedFileName);
+            assertArrayEquals(expectedContent, IOUtils.toByteArray(gzipInput));
+            
+            // Reset trailer values for parameter comparison
+            gzipInput.getMetaData().setTrailerCrc(0);
+            gzipInput.getMetaData().setTrailerISize(0);
+            assertEquals(originalParams, gzipInput.getMetaData());
         }
     }
 
     /**
-     * Tests Chinese file name for Windows behavior.
-     *
-     * @throws IOException When the test fails.
+     * Tests Chinese file name handling for Windows systems using GBK encoding.
+     * GBK charset support is assumed to be available.
      */
     @Test
-    void testChineseFileNameGBK() throws IOException {
-        assumeTrue(Charset.isSupported("GBK"));
-        testChineseFileName(EXPECTED_FILE_NAME, EXPECTED_FILE_NAME, Charset.forName("GBK"));
+    void testChineseFileNameWithGBKEncoding() throws IOException {
+        assumeTrue(Charset.isSupported("GBK"), "GBK charset must be supported for this test");
+        testChineseFileNameWithEncoding(CHINESE_FILE_NAME, CHINESE_FILE_NAME, Charset.forName("GBK"));
     }
 
     /**
-     * Tests Chinese file name for Windows behavior.
-     *
-     * @throws IOException When the test fails.
+     * Tests Chinese file name handling using UTF-8 encoding.
+     * UTF-8 is always available in Java.
      */
     @Test
-    void testChineseFileNameUTF8() throws IOException {
-        testChineseFileName(EXPECTED_FILE_NAME, EXPECTED_FILE_NAME, StandardCharsets.UTF_8);
+    void testChineseFileNameWithUTF8Encoding() throws IOException {
+        testChineseFileNameWithEncoding(CHINESE_FILE_NAME, CHINESE_FILE_NAME, StandardCharsets.UTF_8);
     }
 
     /**
-     * Tests the gzip extra header containing subfields.
-     *
-     * @throws IOException When the test has issues with the underlying file system or unexpected gzip operations.
+     * Tests gzip extra header fields containing subfields with various configurations.
+     * 
+     * @param subFieldCount Number of subfields to create
+     * @param payloadSize Size of payload for each subfield (null means no payload)
+     * @param shouldFail Whether the operation is expected to fail
      */
     @ParameterizedTest
-    // @formatter:off
     @CsvSource({
-        "0,    42, false",
-        "1,      , true",
-        "1,     0, false",
-        "1, 65531, false",
-        "1, 65532, true",
-        "2,     0, false",
-        "2, 32764, true",
-        "2, 32763, false"
+        "0,    42, false",  // No subfields, should succeed
+        "1,      , true",   // One subfield with null payload, should fail
+        "1,     0, false",  // One subfield with empty payload, should succeed
+        "1, 65531, false",  // One subfield with large payload, should succeed
+        "1, 65532, true",   // One subfield with too large payload, should fail
+        "2,     0, false",  // Two subfields with empty payloads, should succeed
+        "2, 32764, true",   // Two subfields with large payloads, should fail (total too large)
+        "2, 32763, false"   // Two subfields with acceptable payloads, should succeed
     })
-    // @formatter:on
-    void testExtraSubfields(final int subFieldCount, final Integer payloadSize, final boolean shouldFail)
-            throws IOException {
-        final Path tempSourceFile = Files.createTempFile("test_gzip_extra_", ".txt");
-        final Path targetFile = Files.createTempFile("test_gzip_extra_", ".txt.gz");
-        Files.write(tempSourceFile, "Hello World!".getBytes(StandardCharsets.ISO_8859_1));
-        final GzipParameters parameters = new GzipParameters();
-        final ExtraField extra = new ExtraField();
-        boolean failed = false;
-        final byte[][] payloads = new byte[subFieldCount][];
+    void testGzipExtraSubfields(int subFieldCount, Integer payloadSize, boolean shouldFail) throws IOException {
+        // Arrange: Create test files
+        Path sourceFile = createTestFile("test_gzip_extra_", ".txt", SIMPLE_TEST_CONTENT);
+        Path compressedFile = Files.createTempFile("test_gzip_extra_", ".txt.gz");
+
+        // Arrange: Create gzip parameters with extra fields
+        GzipParameters gzipParams = new GzipParameters();
+        ExtraField extraField = new ExtraField();
+        
+        // Act: Try to add subfields and check if it fails as expected
+        boolean actuallyFailed = tryAddingSubfields(extraField, subFieldCount, payloadSize);
+        
+        // Assert: Verify failure expectation
+        assertEquals(shouldFail, actuallyFailed, 
+            String.format("Expected subfield addition to %s but it %s", 
+                shouldFail ? "fail" : "succeed", 
+                actuallyFailed ? "failed" : "succeeded"));
+
+        if (shouldFail) {
+            return; // Test complete for failure cases
+        }
+
+        // Continue testing for success cases
+        verifyExtraFieldIteratorImmutability(extraField, subFieldCount);
+        
+        // Act: Compress file with extra fields
+        gzipParams.setExtraField(extraField);
+        compressFileAndVerifyExtraFields(sourceFile, compressedFile, gzipParams, subFieldCount, payloadSize);
+    }
+
+    private Path createTestFile(String prefix, String suffix, String content) throws IOException {
+        Path file = Files.createTempFile(prefix, suffix);
+        Files.write(file, content.getBytes(StandardCharsets.ISO_8859_1));
+        return file;
+    }
+
+    private boolean tryAddingSubfields(ExtraField extraField, int subFieldCount, Integer payloadSize) {
+        byte[][] payloads = new byte[subFieldCount][];
+        
         for (int i = 0; i < subFieldCount; i++) {
             if (payloadSize != null) {
                 payloads[i] = ArrayFill.fill(new byte[payloadSize], (byte) ('a' + i));
             }
+            
             try {
-                extra.addSubField("z" + i, payloads[i]);
-            } catch (final NullPointerException | IOException e) {
-                failed = true;
-                break;
+                extraField.addSubField("z" + i, payloads[i]);
+            } catch (NullPointerException | IOException e) {
+                return true; // Failed as expected
             }
         }
-        assertEquals(shouldFail, failed, "add subfield " + (shouldFail ? "succes" : "failure") + " was not expected.");
-        if (shouldFail) {
-            return;
-        }
+        return false; // Succeeded
+    }
+
+    private void verifyExtraFieldIteratorImmutability(ExtraField extraField, int subFieldCount) {
         if (subFieldCount > 0) {
-            assertThrows(UnsupportedOperationException.class, () -> extra.iterator().remove());
+            assertThrows(UnsupportedOperationException.class, 
+                () -> extraField.iterator().remove(),
+                "ExtraField iterator should not allow removal");
         }
-        parameters.setExtraField(extra);
-        try (OutputStream fos = Files.newOutputStream(targetFile);
-                GzipCompressorOutputStream gos = new GzipCompressorOutputStream(fos, parameters)) {
-            gos.write(tempSourceFile);
-            gos.close();
-            assertTrue(gos.isClosed());
+    }
+
+    private void compressFileAndVerifyExtraFields(Path sourceFile, Path compressedFile, 
+                                                GzipParameters gzipParams, int subFieldCount, 
+                                                Integer payloadSize) throws IOException {
+        // Compress the file
+        try (OutputStream fileOutput = Files.newOutputStream(compressedFile);
+             GzipCompressorOutputStream gzipOutput = new GzipCompressorOutputStream(fileOutput, gzipParams)) {
+            gzipOutput.write(sourceFile);
+            gzipOutput.close();
+            assertTrue(gzipOutput.isClosed(), "GzipCompressorOutputStream should be closed");
         }
-        try (GzipCompressorInputStream gis = new GzipCompressorInputStream(Files.newInputStream(targetFile))) {
-            final ExtraField extra2 = gis.getMetaData().getExtraField();
-            assertEquals(parameters, gis.getMetaData());
-            assertEquals(subFieldCount == 0, extra2.isEmpty());
-            assertEquals(subFieldCount, extra2.size());
-            assertEquals(4 * subFieldCount + subFieldCount * payloadSize, extra2.getEncodedSize());
-            final ArrayList<SubField> listCopy = new ArrayList<>();
-            extra2.forEach(listCopy::add);
-            assertEquals(subFieldCount, listCopy.size());
-            for (int i = 0; i < subFieldCount; i++) {
-                final SubField sf = extra2.getSubField(i);
-                assertSame(sf, listCopy.get(i));
-                assertSame(sf, extra2.findFirstSubField("z" + i));
-                assertEquals("z" + i, sf.getId()); // id was saved/loaded correctly
-                assertArrayEquals(payloads[i], sf.getPayload(), "field " + i + " has wrong payload");
+
+        // Verify the compressed file and its extra fields
+        try (GzipCompressorInputStream gzipInput = new GzipCompressorInputStream(Files.newInputStream(compressedFile))) {
+            ExtraField readExtraField = gzipInput.getMetaData().getExtraField();
+            
+            assertEquals(gzipParams, gzipInput.getMetaData(), "Gzip parameters should match");
+            assertEquals(subFieldCount == 0, readExtraField.isEmpty(), "ExtraField empty state should match expectation");
+            assertEquals(subFieldCount, readExtraField.size(), "ExtraField size should match");
+            
+            int expectedEncodedSize = calculateExpectedEncodedSize(subFieldCount, payloadSize);
+            assertEquals(expectedEncodedSize, readExtraField.getEncodedSize(), "Encoded size should match");
+            
+            verifySubFields(readExtraField, subFieldCount, payloadSize);
+            
+            // Test clearing extra fields
+            readExtraField.clear();
+            assertTrue(readExtraField.isEmpty(), "ExtraField should be empty after clear");
+        }
+    }
+
+    private int calculateExpectedEncodedSize(int subFieldCount, Integer payloadSize) {
+        if (subFieldCount == 0 || payloadSize == null) {
+            return 0;
+        }
+        return 4 * subFieldCount + subFieldCount * payloadSize;
+    }
+
+    private void verifySubFields(ExtraField extraField, int subFieldCount, Integer payloadSize) {
+        ArrayList<SubField> subFieldList = new ArrayList<>();
+        extraField.forEach(subFieldList::add);
+        assertEquals(subFieldCount, subFieldList.size(), "SubField list size should match");
+
+        for (int i = 0; i < subFieldCount; i++) {
+            SubField subField = extraField.getSubField(i);
+            String expectedId = "z" + i;
+            
+            assertSame(subField, subFieldList.get(i), "SubField reference should be the same");
+            assertSame(subField, extraField.findFirstSubField(expectedId), "Found subfield should be the same reference");
+            assertEquals(expectedId, subField.getId(), "SubField ID should match");
+            
+            if (payloadSize != null) {
+                byte[] expectedPayload = ArrayFill.fill(new byte[payloadSize], (byte) ('a' + i));
+                assertArrayEquals(expectedPayload, subField.getPayload(), 
+                    String.format("SubField %d payload should match", i));
             }
-            extra2.clear();
-            assertTrue(extra2.isEmpty());
         }
-    }
-
-    @Test
-    void testExtraSubfieldsEmpty() {
-        final ExtraField extra = new ExtraField();
-        assertEquals(0, extra.toByteArray().length);
-        assertFalse(extra.iterator().hasNext());
-        extra.forEach(e -> fail("Not empty."));
-        assertThrows(IndexOutOfBoundsException.class, () -> extra.getSubField(0));
-    }
-
-    private void testFileName(final String expected, final String sourceFile) throws IOException {
-        final Path tempSourceFile = Files.createTempFile(sourceFile, sourceFile);
-        final byte[] bytes = "<text>Hello World!</text>".getBytes(StandardCharsets.ISO_8859_1);
-        Files.write(tempSourceFile, bytes);
-        final Path targetFile = Files.createTempFile("test", ".gz");
-        final GzipParameters parameters = new GzipParameters();
-        parameters.setFilename(sourceFile);
-        assertEquals(parameters.getFilename(), parameters.getFileName());
-        parameters.setFileName(sourceFile);
-        assertEquals(parameters.getFilename(), parameters.getFileName());
-        try (OutputStream fos = Files.newOutputStream(targetFile);
-                GzipCompressorOutputStream gos = new GzipCompressorOutputStream(fos, parameters)) {
-            gos.write(tempSourceFile);
-        }
-        try (GzipCompressorInputStream gis = new GzipCompressorInputStream(Files.newInputStream(targetFile))) {
-            assertEquals(expected, gis.getMetaData().getFileName());
-            assertEquals(expected, gis.getMetaData().getFilename());
-            assertArrayEquals(bytes, IOUtils.toByteArray(gis));
-        }
-    }
-
-    @Test
-    void testFileNameAscii() throws IOException {
-        testFileName("ASCII.xml", "ASCII.xml");
     }
 
     /**
-     * Tests COMPRESS-638. Use {@link GzipParameters#setFileNameCharset(Charset)} if you want non-ISO-8859-1 characters.
-     *
-     * GZip RFC requires ISO 8859-1 (LATIN-1).
-     *
-     * @throws IOException When the test fails.
+     * Tests empty extra fields behavior.
      */
     @Test
-    void testFileNameChinesePercentEncoded() throws IOException {
-        // "Test Chinese name"
-        testFileName("??????.xml", EXPECTED_FILE_NAME);
+    void testEmptyExtraFields() {
+        ExtraField emptyExtraField = new ExtraField();
+        
+        assertEquals(0, emptyExtraField.toByteArray().length, "Empty ExtraField should have zero byte array length");
+        assertFalse(emptyExtraField.iterator().hasNext(), "Empty ExtraField iterator should have no elements");
+        
+        // Verify forEach doesn't execute on empty field
+        emptyExtraField.forEach(subField -> fail("Empty ExtraField should not execute forEach"));
+        
+        // Verify accessing non-existent subfield throws exception
+        assertThrows(IndexOutOfBoundsException.class, 
+            () -> emptyExtraField.getSubField(0),
+            "Accessing subfield in empty ExtraField should throw IndexOutOfBoundsException");
     }
 
     /**
-     * Tests the gzip header CRC.
-     *
-     * @throws IOException When the test has issues with the underlying file system or unexpected gzip operations.
+     * Tests file name handling with different character sets.
+     * This is a common test pattern for ASCII and Chinese file names.
+     */
+    private void testFileNameHandling(String expectedFileName, String sourceFileName) throws IOException {
+        // Arrange: Create test file
+        Path sourceFile = Files.createTempFile(sourceFileName, sourceFileName);
+        byte[] testContent = TEST_CONTENT.getBytes(StandardCharsets.ISO_8859_1);
+        Files.write(sourceFile, testContent);
+        Path compressedFile = Files.createTempFile("test", ".gz");
+
+        // Arrange: Configure gzip parameters
+        GzipParameters gzipParams = new GzipParameters();
+        gzipParams.setFilename(sourceFileName);
+        
+        // Verify filename getter/setter consistency
+        assertEquals(gzipParams.getFilename(), gzipParams.getFileName(), "Filename getters should return same value");
+        
+        gzipParams.setFileName(sourceFileName);
+        assertEquals(gzipParams.getFilename(), gzipParams.getFileName(), "Filename should be consistent after setting");
+
+        // Act: Compress the file
+        compressFile(sourceFile, compressedFile, gzipParams);
+
+        // Assert: Verify file name in compressed file
+        try (GzipCompressorInputStream gzipInput = new GzipCompressorInputStream(Files.newInputStream(compressedFile))) {
+            assertEquals(expectedFileName, gzipInput.getMetaData().getFileName(), "File name should match expected");
+            assertEquals(expectedFileName, gzipInput.getMetaData().getFilename(), "Filename should match expected");
+            assertArrayEquals(testContent, IOUtils.toByteArray(gzipInput), "File content should match");
+        }
+    }
+
+    /**
+     * Tests ASCII file name handling.
      */
     @Test
-    void testHeaderCrc() throws IOException, DecoderException {
-        final GzipParameters parameters = new GzipParameters();
-        parameters.setHeaderCRC(true);
-        parameters.setModificationTime(0x66554433); // avoid changing time
-        parameters.setFileName("AAAA");
-        parameters.setComment("ZZZZ");
-        parameters.setOS(OS.UNIX);
-        final ExtraField extra = new ExtraField();
-        extra.addSubField("BB", "CCCC".getBytes(StandardCharsets.ISO_8859_1));
-        parameters.setExtraField(extra);
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (GzipCompressorOutputStream gos = new GzipCompressorOutputStream(baos, parameters)) {
-            // nothing to write for this test.
-        }
-        final byte[] result = baos.toByteArray();
-        final byte[] expected = Hex.decodeHex("1f8b" // id1 id2
-                + "08" // cm
-                + "1e" // flg(FEXTRA|FNAME|FCOMMENT|FHCRC)
-                + "33445566" // mtime little endian
-                + "00" + "03" // xfl os
-                + "0800" + "4242" + "0400" + "43434343" // xlen sfid sflen "CCCC"
-                + "4141414100" // "AAAA" with \0
-                + "5a5a5a5a00" // "ZZZZ" with \0
-                + "d842" // crc32 = 839242d8
-                + "0300" // empty deflate stream
-                + "00000000" // crs32
-                + "00000000" // isize
-        );
-        assertArrayEquals(expected, result);
+    void testAsciiFileName() throws IOException {
+        testFileNameHandling("ASCII.xml", "ASCII.xml");
+    }
+
+    /**
+     * Tests Chinese file name handling with percent encoding.
+     * 
+     * This test demonstrates COMPRESS-638 behavior.
+     * GZip RFC requires ISO 8859-1 (LATIN-1), so non-Latin characters get percent-encoded.
+     * Use {@link GzipParameters#setFileNameCharset(Charset)} for proper non-ISO-8859-1 character support.
+     */
+    @Test
+    void testChineseFileNameWithPercentEncoding() throws IOException {
+        // Chinese characters get percent-encoded when using default ISO-8859-1
+        testFileNameHandling("??????.xml", CHINESE_FILE_NAME);
+    }
+
+    /**
+     * Tests gzip header CRC functionality.
+     * Verifies that header CRC is correctly calculated and validated.
+     */
+    @Test
+    void testGzipHeaderCRC() throws IOException, DecoderException {
+        // Arrange: Create gzip parameters with header CRC enabled
+        GzipParameters gzipParams = createParametersForHeaderCrcTest();
+        
+        // Act: Create gzip stream with header CRC
+        byte[] compressedData = createGzipStreamWithHeaderCrc(gzipParams);
+        
+        // Assert: Verify the exact byte structure matches expected
+        byte[] expectedBytes = getExpectedHeaderCrcBytes();
+        assertArrayEquals(expectedBytes, compressedData, "Compressed data should match expected byte structure");
+        
+        // Assert: Verify standard GZIPInputStream can read it without errors
         assertDoesNotThrow(() -> {
-            try (GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(result))) {
-                // if it does not fail, the hcrc is good.
+            try (GZIPInputStream standardGzipInput = new GZIPInputStream(new ByteArrayInputStream(compressedData))) {
+                // If no exception is thrown, the header CRC is valid
             }
-        });
-        try (GzipCompressorInputStream gis = new GzipCompressorInputStream(new ByteArrayInputStream(result))) {
-            final GzipParameters metaData = gis.getMetaData();
-            assertTrue(metaData.getHeaderCRC());
-            assertEquals(0x66554433, metaData.getModificationTime());
-            assertEquals(1, metaData.getExtraField().size());
-            final SubField sf = metaData.getExtraField().iterator().next();
-            assertEquals("BB", sf.getId());
-            assertEquals("CCCC", new String(sf.getPayload(), StandardCharsets.ISO_8859_1));
-            assertEquals("AAAA", metaData.getFileName());
-            assertEquals("ZZZZ", metaData.getComment());
-            assertEquals(OS.UNIX, metaData.getOS());
-            assertEquals(parameters, metaData);
-        }
-        // verify that the constructor normally fails on bad HCRC
-        assertThrows(ZipException.class, () -> {
-            result[30] = 0x77; // corrupt the low byte of header CRC
-            try (GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(result))) {
-                // if it does not fail, the hcrc is good.
-            }
-        }, "Header CRC verification is no longer feasible with JDK classes. The earlier assertion would have passed despite a bad header CRC.");
+        }, "Standard GZIPInputStream should be able to read the stream without errors");
+
+        // Assert: Verify our implementation can read back the parameters correctly
+        verifyHeaderCrcParameters(compressedData, gzipParams);
+        
+        // Assert: Verify header CRC validation catches corruption
+        verifyHeaderCrcValidation(compressedData);
     }
 
+    private GzipParameters createParametersForHeaderCrcTest() throws IOException {
+        GzipParameters params = new GzipParameters();
+        params.setHeaderCRC(true);
+        params.setModificationTime(0x66554433); // Fixed time to avoid test variability
+        params.setFileName("AAAA");
+        params.setComment("ZZZZ");
+        params.setOS(OS.UNIX);
+        
+        // Add extra field
+        ExtraField extraField = new ExtraField();
+        extraField.addSubField("BB", "CCCC".getBytes(StandardCharsets.ISO_8859_1));
+        params.setExtraField(extraField);
+        
+        return params;
+    }
+
+    private byte[] createGzipStreamWithHeaderCrc(GzipParameters parameters) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try (GzipCompressorOutputStream gzipOutput = new GzipCompressorOutputStream(outputStream, parameters)) {
+            // Create empty gzip stream for this test
+        }
+        return outputStream.toByteArray();
+    }
+
+    private byte[] getExpectedHeaderCrcBytes() throws DecoderException {
+        return Hex.decodeHex(
+            "1f8b" +        // Magic number (id1 id2)
+            "08" +          // Compression method
+            "1e" +          // Flags (FEXTRA|FNAME|FCOMMENT|FHCRC)
+            "33445566" +    // Modification time (little endian)
+            "00" + "03" +   // Extra flags + OS
+            "0800" +        // Extra field length
+            "4242" +        // Subfield ID "BB"
+            "0400" +        // Subfield length
+            "43434343" +    // Subfield data "CCCC"
+            "4141414100" +  // File name "AAAA" with null terminator
+            "5a5a5a5a00" +  // Comment "ZZZZ" with null terminator
+            "d842" +        // Header CRC32 = 839242d8
+            "0300" +        // Empty deflate stream
+            "00000000" +    // Data CRC32
+            "00000000"      // Input size
+        );
+    }
+
+    private void verifyHeaderCrcParameters(byte[] compressedData, GzipParameters originalParams) throws IOException {
+        try (GzipCompressorInputStream gzipInput = new GzipCompressorInputStream(new ByteArrayInputStream(compressedData))) {
+            GzipParameters readParams = gzipInput.getMetaData();
+            
+            assertTrue(readParams.getHeaderCRC(), "Header CRC flag should be set");
+            assertEquals(0x66554433, readParams.getModificationTime(), "Modification time should match");
+            assertEquals(1, readParams.getExtraField().size(), "Should have one extra field");
+            
+            SubField subField = readParams.getExtraField().iterator().next();
+            assertEquals("BB", subField.getId(), "SubField ID should match");
+            assertEquals("CCCC", new String(subField.getPayload(), StandardCharsets.ISO_8859_1), "SubField payload should match");
+            
+            assertEquals("AAAA", readParams.getFileName(), "File name should match");
+            assertEquals("ZZZZ", readParams.getComment(), "Comment should match");
+            assertEquals(OS.UNIX, readParams.getOS(), "OS should match");
+            assertEquals(originalParams, readParams, "All parameters should match");
+        }
+    }
+
+    private void verifyHeaderCrcValidation(byte[] compressedData) {
+        // Test that corrupted header CRC is detected
+        assertThrows(ZipException.class, () -> {
+            byte[] corruptedData = compressedData.clone();
+            corruptedData[30] = 0x77; // Corrupt the low byte of header CRC
+            
+            try (GZIPInputStream standardGzipInput = new GZIPInputStream(new ByteArrayInputStream(corruptedData))) {
+                // Should throw ZipException due to bad header CRC
+            }
+        }, "Corrupted header CRC should be detected and cause ZipException");
+    }
 }
