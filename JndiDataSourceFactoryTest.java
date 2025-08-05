@@ -34,49 +34,103 @@ import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for JndiDataSourceFactory to verify JNDI-based DataSource retrieval.
+ * 
+ * This test uses mock JNDI context to simulate a real JNDI environment
+ * without requiring an actual application server.
+ */
 class JndiDataSourceFactoryTest extends BaseDataTest {
 
-  private static final String TEST_INITIAL_CONTEXT_FACTORY = MockContextFactory.class.getName();
-  private static final String TEST_INITIAL_CONTEXT = "/mypath/path/";
-  private static final String TEST_DATA_SOURCE = "myDataSource";
+  // JNDI configuration constants
+  private static final String MOCK_CONTEXT_FACTORY_CLASS = MockContextFactory.class.getName();
+  private static final String JNDI_CONTEXT_PATH = "/mypath/path/";
+  private static final String DATA_SOURCE_JNDI_NAME = "myDataSource";
+  
   private UnpooledDataSource expectedDataSource;
 
   @BeforeEach
-  void setup() throws Exception {
+  void setupTestDataSource() throws Exception {
+    // Create the DataSource that we expect to retrieve from JNDI
     expectedDataSource = createUnpooledDataSource(BLOG_PROPERTIES);
   }
 
   @Test
-  void shouldRetrieveDataSourceFromJNDI() {
-    createJndiDataSource();
-    JndiDataSourceFactory factory = new JndiDataSourceFactory();
-    factory.setProperties(new Properties() {
-      private static final long serialVersionUID = 1L;
-      {
-        setProperty(JndiDataSourceFactory.ENV_PREFIX + Context.INITIAL_CONTEXT_FACTORY, TEST_INITIAL_CONTEXT_FACTORY);
-        setProperty(JndiDataSourceFactory.INITIAL_CONTEXT, TEST_INITIAL_CONTEXT);
-        setProperty(JndiDataSourceFactory.DATA_SOURCE, TEST_DATA_SOURCE);
-      }
-    });
+  void shouldRetrieveDataSourceFromJndiContext() {
+    // Given: A DataSource is bound in the JNDI context
+    bindDataSourceInJndiContext();
+    
+    // When: JndiDataSourceFactory is configured and asked for a DataSource
+    JndiDataSourceFactory factory = createConfiguredJndiFactory();
     DataSource actualDataSource = factory.getDataSource();
-    assertEquals(expectedDataSource, actualDataSource);
+    
+    // Then: The factory should return the DataSource from JNDI
+    assertEquals(expectedDataSource, actualDataSource, 
+        "Factory should return the DataSource that was bound in JNDI");
   }
 
-  private void createJndiDataSource() {
+  /**
+   * Creates and configures a JndiDataSourceFactory with the necessary JNDI properties.
+   */
+  private JndiDataSourceFactory createConfiguredJndiFactory() {
+    JndiDataSourceFactory factory = new JndiDataSourceFactory();
+    Properties jndiProperties = createJndiProperties();
+    factory.setProperties(jndiProperties);
+    return factory;
+  }
+
+  /**
+   * Creates the properties needed to configure JNDI lookup.
+   */
+  private Properties createJndiProperties() {
+    Properties properties = new Properties();
+    
+    // Configure the mock JNDI context factory
+    properties.setProperty(
+        JndiDataSourceFactory.ENV_PREFIX + Context.INITIAL_CONTEXT_FACTORY, 
+        MOCK_CONTEXT_FACTORY_CLASS);
+    
+    // Set the JNDI context path where the DataSource is located
+    properties.setProperty(
+        JndiDataSourceFactory.INITIAL_CONTEXT, 
+        JNDI_CONTEXT_PATH);
+    
+    // Set the JNDI name of the DataSource
+    properties.setProperty(
+        JndiDataSourceFactory.DATA_SOURCE, 
+        DATA_SOURCE_JNDI_NAME);
+    
+    return properties;
+  }
+
+  /**
+   * Sets up the mock JNDI environment and binds the test DataSource.
+   * This simulates what an application server would do when deploying a DataSource.
+   */
+  private void bindDataSourceInJndiContext() {
     try {
-      Properties env = new Properties();
-      env.put(Context.INITIAL_CONTEXT_FACTORY, TEST_INITIAL_CONTEXT_FACTORY);
+      // Create JNDI environment properties
+      Properties jndiEnvironment = new Properties();
+      jndiEnvironment.put(Context.INITIAL_CONTEXT_FACTORY, MOCK_CONTEXT_FACTORY_CLASS);
 
-      MockContext ctx = new MockContext(false);
-      ctx.bind(TEST_DATA_SOURCE, expectedDataSource);
+      // Create mock context and bind our test DataSource
+      MockContext dataSourceContext = new MockContext(false);
+      dataSourceContext.bind(DATA_SOURCE_JNDI_NAME, expectedDataSource);
 
-      InitialContext initCtx = new InitialContext(env);
-      initCtx.bind(TEST_INITIAL_CONTEXT, ctx);
+      // Bind the context at the specified path
+      InitialContext rootContext = new InitialContext(jndiEnvironment);
+      rootContext.bind(JNDI_CONTEXT_PATH, dataSourceContext);
+      
     } catch (NamingException e) {
-      throw new DataSourceException("There was an error configuring JndiDataSourceTransactionPool. Cause: " + e, e);
+      throw new DataSourceException(
+          "Failed to set up mock JNDI environment for testing. Cause: " + e, e);
     }
   }
 
+  /**
+   * Mock implementation of InitialContextFactory for testing.
+   * This allows us to test JNDI functionality without a real JNDI provider.
+   */
   public static class MockContextFactory implements InitialContextFactory {
     @Override
     public Context getInitialContext(Hashtable<?, ?> environment) throws NamingException {
@@ -84,22 +138,26 @@ class JndiDataSourceFactoryTest extends BaseDataTest {
     }
   }
 
+  /**
+   * Mock JNDI Context implementation that stores bindings in memory.
+   * This simulates a real JNDI context for testing purposes.
+   */
   public static class MockContext extends InitialContext {
-    private static final Map<String, Object> bindings = new HashMap<>();
+    // Shared storage for all JNDI bindings in tests
+    private static final Map<String, Object> jndiBindings = new HashMap<>();
 
     MockContext(boolean lazy) throws NamingException {
       super(lazy);
     }
 
     @Override
-    public Object lookup(String name) {
-      return bindings.get(name);
+    public Object lookup(String jndiName) {
+      return jndiBindings.get(jndiName);
     }
 
     @Override
-    public void bind(String name, Object obj) {
-      bindings.put(name, obj);
+    public void bind(String jndiName, Object object) {
+      jndiBindings.put(jndiName, object);
     }
   }
-
 }
