@@ -26,556 +26,197 @@ import org.evosuite.runtime.EvoRunnerParameters;
 import org.evosuite.runtime.mock.java.io.MockFile;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true, 
+    useVFS = true, 
+    useVNET = true, 
+    resetStaticState = true, 
+    separateClassLoader = true
+) 
 public class MultiReadOnlySeekableByteChannel_ESTest extends MultiReadOnlySeekableByteChannel_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      File[] fileArray0 = new File[2];
-      MockFile mockFile0 = new MockFile("");
-      fileArray0[0] = (File) mockFile0;
-      fileArray0[1] = (File) mockFile0;
-      MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = (MultiReadOnlySeekableByteChannel)MultiReadOnlySeekableByteChannel.forFiles(fileArray0);
-      // Undeclared exception!
-      try { 
-        multiReadOnlySeekableByteChannel0.position(6L, (-1L));
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // Index: 2, Size: 2
-         //
-         verifyException("java.util.ArrayList", e);
-      }
-  }
+    // Constants for reused test values
+    private static final long MOCK_FILE_SIZE = 704L;
+    private static final long TOTAL_SIZE_TWO_FILES = 2 * MOCK_FILE_SIZE;
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      File[] fileArray0 = new File[2];
-      MockFile mockFile0 = new MockFile("");
-      fileArray0[0] = (File) mockFile0;
-      fileArray0[1] = (File) mockFile0;
-      SeekableByteChannel seekableByteChannel0 = MultiReadOnlySeekableByteChannel.forFiles(fileArray0);
-      long long0 = seekableByteChannel0.size();
-      assertEquals(1408L, long0);
-  }
+    // ========================================================================
+    // Tests for Factory Methods
+    // ========================================================================
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      File[] fileArray0 = new File[2];
-      MockFile mockFile0 = new MockFile("");
-      fileArray0[0] = (File) mockFile0;
-      fileArray0[1] = (File) mockFile0;
-      MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = (MultiReadOnlySeekableByteChannel)MultiReadOnlySeekableByteChannel.forFiles(fileArray0);
-      multiReadOnlySeekableByteChannel0.position(1L, 1L);
-      long long0 = multiReadOnlySeekableByteChannel0.position();
-      assertEquals(705L, long0);
-  }
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testConstructorWithNullListThrowsNPE() {
+        new MultiReadOnlySeekableByteChannel((List<SeekableByteChannel>) null);
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      File[] fileArray0 = new File[2];
-      MockFile mockFile0 = new MockFile("");
-      fileArray0[0] = (File) mockFile0;
-      fileArray0[1] = (File) mockFile0;
-      SeekableByteChannel seekableByteChannel0 = MultiReadOnlySeekableByteChannel.forFiles(fileArray0);
-      ((MultiReadOnlySeekableByteChannel) seekableByteChannel0).close();
-      boolean boolean0 = ((MultiReadOnlySeekableByteChannel) seekableByteChannel0).isOpen();
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testForFilesWithNullArrayThrowsNPE() {
+        MultiReadOnlySeekableByteChannel.forFiles((File[]) null);
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      MockFile mockFile0 = new MockFile("");
-      SeekableByteChannel[] seekableByteChannelArray0 = new SeekableByteChannel[1];
-      Path path0 = mockFile0.toPath();
-      OpenOption[] openOptionArray0 = new OpenOption[0];
-      FileChannel fileChannel0 = FileChannel.open(path0, openOptionArray0);
-      seekableByteChannelArray0[0] = (SeekableByteChannel) fileChannel0;
-      SeekableByteChannel seekableByteChannel0 = MultiReadOnlySeekableByteChannel.forSeekableByteChannels(seekableByteChannelArray0);
-      assertTrue(seekableByteChannel0.isOpen());
-  }
-
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      LinkedList<SeekableByteChannel> linkedList0 = new LinkedList<SeekableByteChannel>();
-      linkedList0.add((SeekableByteChannel) null);
-      MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = new MultiReadOnlySeekableByteChannel(linkedList0);
-      // Undeclared exception!
-      try { 
-        multiReadOnlySeekableByteChannel0.size();
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.util.stream.MatchOps$1MatchSink", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      LinkedList<SeekableByteChannel> linkedList0 = new LinkedList<SeekableByteChannel>();
-      MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = new MultiReadOnlySeekableByteChannel(linkedList0);
-      // Undeclared exception!
-      try { 
-        multiReadOnlySeekableByteChannel0.read((ByteBuffer) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.utils.MultiReadOnlySeekableByteChannel", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      File[] fileArray0 = new File[2];
-      MockFile mockFile0 = new MockFile("");
-      fileArray0[0] = (File) mockFile0;
-      fileArray0[1] = (File) mockFile0;
-      SeekableByteChannel seekableByteChannel0 = MultiReadOnlySeekableByteChannel.forFiles(fileArray0);
-      ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(5);
-      try { 
-        seekableByteChannel0.read(byteBuffer0);
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      LinkedList<SeekableByteChannel> linkedList0 = new LinkedList<SeekableByteChannel>();
-      linkedList0.add((SeekableByteChannel) null);
-      MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = new MultiReadOnlySeekableByteChannel(linkedList0);
-      // Undeclared exception!
-      try { 
-        multiReadOnlySeekableByteChannel0.position((-2052L), (-2052L));
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.util.stream.MatchOps$1MatchSink", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      LinkedList<SeekableByteChannel> linkedList0 = new LinkedList<SeekableByteChannel>();
-      MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = new MultiReadOnlySeekableByteChannel(linkedList0);
-      // Undeclared exception!
-      try { 
-        multiReadOnlySeekableByteChannel0.position((-1L), (-1L));
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Negative position: -1
-         //
-         verifyException("org.apache.commons.compress.utils.MultiReadOnlySeekableByteChannel", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      LinkedList<SeekableByteChannel> linkedList0 = new LinkedList<SeekableByteChannel>();
-      linkedList0.add((SeekableByteChannel) null);
-      MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = new MultiReadOnlySeekableByteChannel(linkedList0);
-      // Undeclared exception!
-      try { 
-        multiReadOnlySeekableByteChannel0.position(1L);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.util.stream.MatchOps$1MatchSink", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      LinkedList<SeekableByteChannel> linkedList0 = new LinkedList<SeekableByteChannel>();
-      linkedList0.add((SeekableByteChannel) null);
-      MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = new MultiReadOnlySeekableByteChannel(linkedList0);
-      // Undeclared exception!
-      try { 
-        multiReadOnlySeekableByteChannel0.isOpen();
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.util.stream.MatchOps$1MatchSink", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testForSeekableByteChannelsWithNullArrayThrowsNPE() {
         MultiReadOnlySeekableByteChannel.forSeekableByteChannels((SeekableByteChannel[]) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // channels
-         //
-         verifyException("java.util.Objects", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      Path[] pathArray0 = new Path[1];
-      MockFile mockFile0 = new MockFile("files");
-      Path path0 = mockFile0.toPath();
-      pathArray0[0] = path0;
-      try { 
-        MultiReadOnlySeekableByteChannel.forPaths(pathArray0);
-        fail("Expecting exception: NoSuchFileException");
-      
-      } catch(NoSuchFileException e) {
-      }
-  }
+    @Test(timeout = 4000, expected = NoSuchFileException.class)
+    public void testForFilesWithNonExistentFileThrowsException() throws Exception {
+        File[] files = { new MockFile("non-existent") };
+        MultiReadOnlySeekableByteChannel.forFiles(files);
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      File[] fileArray0 = new File[1];
-      MockFile mockFile0 = new MockFile("n");
-      fileArray0[0] = (File) mockFile0;
-      try { 
-        MultiReadOnlySeekableByteChannel.forFiles(fileArray0);
-        fail("Expecting exception: NoSuchFileException");
-      
-      } catch(NoSuchFileException e) {
-      }
-  }
+    @Test(timeout = 4000, expected = NoSuchFileException.class)
+    public void testForPathsWithNonExistentFileThrowsException() throws Exception {
+        Path[] paths = { new MockFile("non-existent").toPath() };
+        MultiReadOnlySeekableByteChannel.forPaths(paths);
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      File[] fileArray0 = new File[2];
-      // Undeclared exception!
-      try { 
-        MultiReadOnlySeekableByteChannel.forFiles(fileArray0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.utils.MultiReadOnlySeekableByteChannel", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testForSeekableByteChannelsWithEmptyArrayCreatesChannel() throws Exception {
+        SeekableByteChannel[] channels = new SeekableByteChannel[0];
+        SeekableByteChannel channel = MultiReadOnlySeekableByteChannel.forSeekableByteChannels(channels);
+        assertEquals(0L, channel.position());
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      LinkedList<SeekableByteChannel> linkedList0 = new LinkedList<SeekableByteChannel>();
-      linkedList0.add((SeekableByteChannel) null);
-      MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = new MultiReadOnlySeekableByteChannel(linkedList0);
-      // Undeclared exception!
-      try { 
-        multiReadOnlySeekableByteChannel0.close();
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.utils.MultiReadOnlySeekableByteChannel", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testForFilesCreatesOpenChannel() throws Exception {
+        File[] files = createTwoMockFiles();
+        SeekableByteChannel channel = MultiReadOnlySeekableByteChannel.forFiles(files);
+        assertTrue(channel.isOpen());
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = null;
-      try {
-        multiReadOnlySeekableByteChannel0 = new MultiReadOnlySeekableByteChannel((List<SeekableByteChannel>) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // channels
-         //
-         verifyException("java.util.Objects", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testForPathsCreatesOpenChannel() throws Exception {
+        Path[] paths = { new MockFile("").toPath() };
+        SeekableByteChannel channel = MultiReadOnlySeekableByteChannel.forPaths(paths);
+        assertTrue(channel.isOpen());
+    }
 
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      File[] fileArray0 = new File[2];
-      MockFile mockFile0 = new MockFile("");
-      fileArray0[0] = (File) mockFile0;
-      fileArray0[1] = (File) mockFile0;
-      SeekableByteChannel seekableByteChannel0 = MultiReadOnlySeekableByteChannel.forFiles(fileArray0);
-      seekableByteChannel0.position(2631L);
-      assertEquals(2631L, seekableByteChannel0.position());
-  }
+    // ========================================================================
+    // Tests for Channel Lifecycle (open/close)
+    // ========================================================================
 
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      File[] fileArray0 = new File[2];
-      MockFile mockFile0 = new MockFile("");
-      fileArray0[0] = (File) mockFile0;
-      fileArray0[1] = (File) mockFile0;
-      SeekableByteChannel seekableByteChannel0 = MultiReadOnlySeekableByteChannel.forFiles(fileArray0);
-      seekableByteChannel0.position(704L);
-      assertEquals(704L, seekableByteChannel0.position());
-  }
+    @Test(timeout = 4000)
+    public void testIsOpenAfterClose() throws Exception {
+        SeekableByteChannel channel = createChannelWithTwoFiles();
+        channel.close();
+        assertFalse(channel.isOpen());
+    }
 
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      LinkedList<SeekableByteChannel> linkedList0 = new LinkedList<SeekableByteChannel>();
-      MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = new MultiReadOnlySeekableByteChannel(linkedList0);
-      linkedList0.add((SeekableByteChannel) multiReadOnlySeekableByteChannel0);
-      MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel1 = new MultiReadOnlySeekableByteChannel(linkedList0);
-      SeekableByteChannel seekableByteChannel0 = multiReadOnlySeekableByteChannel1.position(0L);
-      assertSame(seekableByteChannel0, multiReadOnlySeekableByteChannel1);
-  }
+    @Test(timeout = 4000)
+    public void testIsOpenWithEmptyChannelList() throws Exception {
+        List<SeekableByteChannel> emptyList = new LinkedList<>();
+        MultiReadOnlySeekableByteChannel channel = new MultiReadOnlySeekableByteChannel(emptyList);
+        assertTrue(channel.isOpen());
+    }
 
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      MockFile mockFile0 = new MockFile("");
-      Path path0 = mockFile0.toPath();
-      Path[] pathArray0 = new Path[1];
-      pathArray0[0] = path0;
-      SeekableByteChannel seekableByteChannel0 = MultiReadOnlySeekableByteChannel.forPaths(pathArray0);
-      assertTrue(seekableByteChannel0.isOpen());
-  }
+    // ========================================================================
+    // Tests for Position and Size Operations
+    // ========================================================================
 
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      MockFile mockFile0 = new MockFile("");
-      Path[] pathArray0 = new Path[8];
-      Path path0 = mockFile0.toPath();
-      pathArray0[0] = path0;
-      pathArray0[1] = path0;
-      pathArray0[2] = path0;
-      pathArray0[3] = path0;
-      pathArray0[4] = pathArray0[0];
-      pathArray0[5] = path0;
-      pathArray0[6] = pathArray0[0];
-      pathArray0[7] = pathArray0[4];
-      SeekableByteChannel seekableByteChannel0 = MultiReadOnlySeekableByteChannel.forPaths(pathArray0);
-      assertEquals(0L, seekableByteChannel0.position());
-  }
+    @Test(timeout = 4000)
+    public void testSizeWithTwoFiles() throws Exception {
+        SeekableByteChannel channel = createChannelWithTwoFiles();
+        assertEquals(TOTAL_SIZE_TWO_FILES, channel.size());
+    }
 
-  @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
-      Path[] pathArray0 = new Path[8];
-      // Undeclared exception!
-      try { 
-        MultiReadOnlySeekableByteChannel.forPaths(pathArray0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.nio.file.Files", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testInitialPosition() throws Exception {
+        SeekableByteChannel channel = createChannelWithTwoFiles();
+        assertEquals(0L, channel.position());
+    }
 
-  @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
-      LinkedList<SeekableByteChannel> linkedList0 = new LinkedList<SeekableByteChannel>();
-      MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = new MultiReadOnlySeekableByteChannel(linkedList0);
-      boolean boolean0 = multiReadOnlySeekableByteChannel0.isOpen();
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testSetPositionWithinSize() throws Exception {
+        SeekableByteChannel channel = createChannelWithTwoFiles();
+        channel.position(MOCK_FILE_SIZE);
+        assertEquals(MOCK_FILE_SIZE, channel.position());
+    }
 
-  @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
-      LinkedList<SeekableByteChannel> linkedList0 = new LinkedList<SeekableByteChannel>();
-      MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = new MultiReadOnlySeekableByteChannel(linkedList0);
-      linkedList0.add((SeekableByteChannel) multiReadOnlySeekableByteChannel0);
-      MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel1 = new MultiReadOnlySeekableByteChannel(linkedList0);
-      long long0 = multiReadOnlySeekableByteChannel1.size();
-      assertEquals(0L, long0);
-  }
+    @Test(timeout = 4000)
+    public void testSetPositionBeyondSize() throws Exception {
+        SeekableByteChannel channel = createChannelWithTwoFiles();
+        channel.position(TOTAL_SIZE_TWO_FILES + 100);
+        assertEquals(TOTAL_SIZE_TWO_FILES + 100, channel.position());
+    }
 
-  @Test(timeout = 4000)
-  public void test26()  throws Throwable  {
-      File[] fileArray0 = new File[2];
-      MockFile mockFile0 = new MockFile("");
-      fileArray0[0] = (File) mockFile0;
-      fileArray0[1] = (File) mockFile0;
-      SeekableByteChannel seekableByteChannel0 = MultiReadOnlySeekableByteChannel.forFiles(fileArray0);
-      ((MultiReadOnlySeekableByteChannel) seekableByteChannel0).close();
-      try { 
-        seekableByteChannel0.size();
-        fail("Expecting exception: ClosedChannelException");
-      
-      } catch(ClosedChannelException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.utils.MultiReadOnlySeekableByteChannel", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testPositionAfterSettingChannelAndOffset() throws Exception {
+        MultiReadOnlySeekableByteChannel channel = 
+            (MultiReadOnlySeekableByteChannel) createChannelWithTwoFiles();
+        channel.position(1L, 1L);
+        assertEquals(MOCK_FILE_SIZE + 1, channel.position());
+    }
 
-  @Test(timeout = 4000)
-  public void test27()  throws Throwable  {
-      ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(359);
-      LinkedList<SeekableByteChannel> linkedList0 = new LinkedList<SeekableByteChannel>();
-      MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = new MultiReadOnlySeekableByteChannel(linkedList0);
-      linkedList0.add((SeekableByteChannel) multiReadOnlySeekableByteChannel0);
-      MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel1 = new MultiReadOnlySeekableByteChannel(linkedList0);
-      int int0 = multiReadOnlySeekableByteChannel1.read(byteBuffer0);
-      assertEquals((-1), int0);
-  }
+    // ========================================================================
+    // Tests for Read Operations
+    // ========================================================================
 
-  @Test(timeout = 4000)
-  public void test28()  throws Throwable  {
-      LinkedList<SeekableByteChannel> linkedList0 = new LinkedList<SeekableByteChannel>();
-      MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = new MultiReadOnlySeekableByteChannel(linkedList0);
-      ByteBuffer byteBuffer0 = ByteBuffer.allocate(0);
-      int int0 = multiReadOnlySeekableByteChannel0.read(byteBuffer0);
-      assertEquals(0, int0);
-  }
+    @Test(timeout = 4000, expected = ClosedChannelException.class)
+    public void testReadAfterCloseThrowsException() throws Exception {
+        SeekableByteChannel channel = createChannelWithTwoFiles();
+        channel.close();
+        channel.read(ByteBuffer.allocate(5));
+    }
 
-  @Test(timeout = 4000)
-  public void test29()  throws Throwable  {
-      File[] fileArray0 = new File[2];
-      MockFile mockFile0 = new MockFile("");
-      fileArray0[0] = (File) mockFile0;
-      fileArray0[1] = (File) mockFile0;
-      SeekableByteChannel seekableByteChannel0 = MultiReadOnlySeekableByteChannel.forFiles(fileArray0);
-      ((MultiReadOnlySeekableByteChannel) seekableByteChannel0).close();
-      ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(5);
-      try { 
-        seekableByteChannel0.read(byteBuffer0);
-        fail("Expecting exception: ClosedChannelException");
-      
-      } catch(ClosedChannelException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.utils.MultiReadOnlySeekableByteChannel", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testReadWithEmptyBufferReturnsZero() throws Exception {
+        List<SeekableByteChannel> emptyList = new LinkedList<>();
+        MultiReadOnlySeekableByteChannel channel = new MultiReadOnlySeekableByteChannel(emptyList);
+        ByteBuffer buffer = ByteBuffer.allocate(0);
+        assertEquals(0, channel.read(buffer));
+    }
 
-  @Test(timeout = 4000)
-  public void test30()  throws Throwable  {
-      File[] fileArray0 = new File[2];
-      MockFile mockFile0 = new MockFile("");
-      fileArray0[0] = (File) mockFile0;
-      fileArray0[1] = (File) mockFile0;
-      MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = (MultiReadOnlySeekableByteChannel)MultiReadOnlySeekableByteChannel.forFiles(fileArray0);
-      multiReadOnlySeekableByteChannel0.close();
-      try { 
-        multiReadOnlySeekableByteChannel0.position((-1456L), (-1456L));
-        fail("Expecting exception: ClosedChannelException");
-      
-      } catch(ClosedChannelException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.utils.MultiReadOnlySeekableByteChannel", e);
-      }
-  }
+    // ========================================================================
+    // Tests for Exception Scenarios
+    // ========================================================================
 
-  @Test(timeout = 4000)
-  public void test31()  throws Throwable  {
-      LinkedList<SeekableByteChannel> linkedList0 = new LinkedList<SeekableByteChannel>();
-      MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = new MultiReadOnlySeekableByteChannel(linkedList0);
-      // Undeclared exception!
-      try { 
-        multiReadOnlySeekableByteChannel0.position((-678L));
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Negative position: -678
-         //
-         verifyException("org.apache.commons.compress.utils.MultiReadOnlySeekableByteChannel", e);
-      }
-  }
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testSetNegativePositionThrowsException() throws Exception {
+        List<SeekableByteChannel> emptyList = new LinkedList<>();
+        MultiReadOnlySeekableByteChannel channel = new MultiReadOnlySeekableByteChannel(emptyList);
+        channel.position(-100L);
+    }
 
-  @Test(timeout = 4000)
-  public void test32()  throws Throwable  {
-      File[] fileArray0 = new File[2];
-      MockFile mockFile0 = new MockFile("");
-      fileArray0[0] = (File) mockFile0;
-      fileArray0[1] = (File) mockFile0;
-      SeekableByteChannel seekableByteChannel0 = MultiReadOnlySeekableByteChannel.forFiles(fileArray0);
-      ((MultiReadOnlySeekableByteChannel) seekableByteChannel0).close();
-      try { 
-        seekableByteChannel0.position(0L);
-        fail("Expecting exception: ClosedChannelException");
-      
-      } catch(ClosedChannelException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.utils.MultiReadOnlySeekableByteChannel", e);
-      }
-  }
+    @Test(timeout = 4000, expected = ClosedChannelException.class)
+    public void testSizeAfterCloseThrowsException() throws Exception {
+        SeekableByteChannel channel = createChannelWithTwoFiles();
+        channel.close();
+        channel.size();
+    }
 
-  @Test(timeout = 4000)
-  public void test33()  throws Throwable  {
-      SeekableByteChannel[] seekableByteChannelArray0 = new SeekableByteChannel[1];
-      SeekableByteChannel seekableByteChannel0 = MultiReadOnlySeekableByteChannel.forSeekableByteChannels(seekableByteChannelArray0);
-      assertNull(seekableByteChannel0);
-  }
+    @Test(timeout = 4000, expected = NonWritableChannelException.class)
+    public void testWriteThrowsNonWritableException() throws Exception {
+        List<SeekableByteChannel> emptyList = new LinkedList<>();
+        MultiReadOnlySeekableByteChannel channel = new MultiReadOnlySeekableByteChannel(emptyList);
+        channel.write(ByteBuffer.allocate(10));
+    }
 
-  @Test(timeout = 4000)
-  public void test34()  throws Throwable  {
-      SeekableByteChannel[] seekableByteChannelArray0 = new SeekableByteChannel[0];
-      SeekableByteChannel seekableByteChannel0 = MultiReadOnlySeekableByteChannel.forSeekableByteChannels(seekableByteChannelArray0);
-      assertEquals(0L, seekableByteChannel0.position());
-  }
+    @Test(timeout = 4000, expected = NonWritableChannelException.class)
+    public void testTruncateThrowsNonWritableException() throws Exception {
+        List<SeekableByteChannel> emptyList = new LinkedList<>();
+        MultiReadOnlySeekableByteChannel channel = new MultiReadOnlySeekableByteChannel(emptyList);
+        channel.truncate(0L);
+    }
 
-  @Test(timeout = 4000)
-  public void test35()  throws Throwable  {
-      LinkedList<SeekableByteChannel> linkedList0 = new LinkedList<SeekableByteChannel>();
-      MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = new MultiReadOnlySeekableByteChannel(linkedList0);
-      // Undeclared exception!
-      try { 
-        multiReadOnlySeekableByteChannel0.write((ByteBuffer) null);
-        fail("Expecting exception: NonWritableChannelException");
-      
-      } catch(NonWritableChannelException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.utils.MultiReadOnlySeekableByteChannel", e);
-      }
-  }
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testReadWithNullBufferThrowsNPE() throws Exception {
+        List<SeekableByteChannel> emptyList = new LinkedList<>();
+        MultiReadOnlySeekableByteChannel channel = new MultiReadOnlySeekableByteChannel(emptyList);
+        channel.read(null);
+    }
 
-  @Test(timeout = 4000)
-  public void test36()  throws Throwable  {
-      File[] fileArray0 = new File[2];
-      MockFile mockFile0 = new MockFile("");
-      fileArray0[0] = (File) mockFile0;
-      fileArray0[1] = (File) mockFile0;
-      SeekableByteChannel seekableByteChannel0 = MultiReadOnlySeekableByteChannel.forFiles(fileArray0);
-      long long0 = seekableByteChannel0.position();
-      assertEquals(0L, long0);
-  }
+    // ========================================================================
+    // Helper Methods
+    // ========================================================================
 
-  @Test(timeout = 4000)
-  public void test37()  throws Throwable  {
-      LinkedList<SeekableByteChannel> linkedList0 = new LinkedList<SeekableByteChannel>();
-      MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = new MultiReadOnlySeekableByteChannel(linkedList0);
-      // Undeclared exception!
-      try { 
-        multiReadOnlySeekableByteChannel0.truncate(0L);
-        fail("Expecting exception: NonWritableChannelException");
-      
-      } catch(NonWritableChannelException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.utils.MultiReadOnlySeekableByteChannel", e);
-      }
-  }
+    private SeekableByteChannel createChannelWithTwoFiles() throws IOException {
+        File[] files = createTwoMockFiles();
+        return MultiReadOnlySeekableByteChannel.forFiles(files);
+    }
+
+    private File[] createTwoMockFiles() {
+        File mockFile = new MockFile("");
+        return new File[] { mockFile, mockFile };
+    }
 }
