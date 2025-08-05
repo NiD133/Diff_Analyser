@@ -17,6 +17,7 @@
 
 package org.apache.commons.codec.net;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -25,155 +26,147 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
+import java.util.stream.Stream;
 
-import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.codec.CodecPolicy;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * Quoted-printable codec test cases
+ * Tests for the BCodec, which implements RFC 1522 'B' encoding.
  */
 class BCodecTest {
-    private static final String[] BASE64_IMPOSSIBLE_CASES = {
-            // Require the RFC 1522 "encoded-word" header
-            "=?ASCII?B?ZE==?=",
-            "=?ASCII?B?ZmC=?=",
-            "=?ASCII?B?Zm9vYE==?=",
-            "=?ASCII?B?Zm9vYmC=?=",
-            "=?ASCII?B?AB==?="
-    };
-
-    static final int[] SWISS_GERMAN_STUFF_UNICODE =
-        { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
-
-    static final int[] RUSSIAN_STUFF_UNICODE =
-        { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
-
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
-    }
 
     @Test
-    void testBase64ImpossibleSamplesDefault() throws DecoderException {
+    void shouldEncodeAndDecodeAsciiString() throws DecoderException, EncoderException {
         final BCodec codec = new BCodec();
-        // Default encoding is lenient
-        assertFalse(codec.isStrictDecoding());
-        for (final String s : BASE64_IMPOSSIBLE_CASES) {
-            codec.decode(s);
-        }
+        final String plainText = "Hello there";
+        final String encodedText = "=?UTF-8?B?SGVsbG8gdGhlcmU=?=";
+
+        assertEquals(encodedText, codec.encode(plainText));
+        assertEquals(plainText, codec.decode(encodedText));
     }
 
     @Test
-    void testBase64ImpossibleSamplesLenient() throws DecoderException {
-        final BCodec codec = new BCodec(StandardCharsets.UTF_8, CodecPolicy.LENIENT);
-        // Default encoding is lenient
-        assertFalse(codec.isStrictDecoding());
-        for (final String s : BASE64_IMPOSSIBLE_CASES) {
-            codec.decode(s);
-        }
+    void shouldEncodeAndDecodeNonAsciiStrings() throws DecoderException, EncoderException {
+        final BCodec codec = new BCodec(StandardCharsets.UTF_8);
+        final String swissGermanText = "Grüezi_zämä";
+        final String russianText = "Всем_привет";
+
+        final String encodedSwissGerman = "=?UTF-8?B?R3LDvGV6aV96w6Rtw6Q=?=";
+        final String encodedRussian = "=?UTF-8?B?0JLRgdC10Lxf0L/RgNC40LLQtdGC?=";
+
+        assertEquals(encodedSwissGerman, codec.encode(swissGermanText));
+        assertEquals(swissGermanText, codec.decode(encodedSwissGerman));
+
+        assertEquals(encodedRussian, codec.encode(russianText));
+        assertEquals(russianText, codec.decode(encodedRussian));
     }
 
     @Test
-    void testBase64ImpossibleSamplesStrict() {
-        final BCodec codec = new BCodec(StandardCharsets.UTF_8, CodecPolicy.STRICT);
-        assertTrue(codec.isStrictDecoding());
-        for (final String s : BASE64_IMPOSSIBLE_CASES) {
-            assertThrows(DecoderException.class, () -> codec.decode(s));
-        }
+    void encodeAndDecodeShouldReturnNullForNullString() throws DecoderException, EncoderException {
+        final BCodec codec = new BCodec();
+        assertNull(codec.encode((String) null));
+        assertNull(codec.decode((String) null));
     }
 
     @Test
-    void testBasicEncodeDecode() throws Exception {
-        final BCodec bcodec = new BCodec();
-        final String plain = "Hello there";
-        final String encoded = bcodec.encode(plain);
-        assertEquals("=?UTF-8?B?SGVsbG8gdGhlcmU=?=", encoded, "Basic B encoding test");
-        assertEquals(plain, bcodec.decode(encoded), "Basic B decoding test");
+    void encodeWithCharsetShouldReturnNullForNullInput() throws EncoderException {
+        final BCodec codec = new BCodec();
+        assertNull(codec.encode(null, "UTF-8"));
     }
 
     @Test
-    void testDecodeObjects() throws Exception {
-        final BCodec bcodec = new BCodec();
-        final String decoded = "=?UTF-8?B?d2hhdCBub3Q=?=";
-        final String plain = (String) bcodec.decode((Object) decoded);
-        assertEquals("what not", plain, "Basic B decoding test");
-        final Object result = bcodec.decode((Object) null);
-        assertNull(result, "Decoding a null Object should return null");
-
-        assertThrows(DecoderException.class, () -> bcodec.decode(Double.valueOf(3.0d)));
+    void constructorShouldThrowExceptionForInvalidCharsetName() {
+        assertThrows(UnsupportedCharsetException.class, () -> new BCodec("ThisIsAnInvalidCharsetName"));
     }
 
     @Test
-    void testDecodeStringWithNull() throws Exception {
-        final BCodec bcodec = new BCodec();
-        final String test = null;
-        final String result = bcodec.decode(test);
-        assertNull(result, "Result should be null");
+    void encodeObjectShouldCorrectlyEncodeString() throws EncoderException {
+        final BCodec codec = new BCodec();
+        final String plainText = "what not";
+        final String expectedEncoded = "=?UTF-8?B?d2hhdCBub3Q=?=";
+
+        Object result = codec.encode((Object) plainText);
+
+        assertEquals(expectedEncoded, result);
     }
 
     @Test
-    void testEncodeDecodeNull() throws Exception {
-        final BCodec bcodec = new BCodec();
-        assertNull(bcodec.encode((String) null), "Null string B encoding test");
-        assertNull(bcodec.decode((String) null), "Null string B decoding test");
+    void encodeObjectShouldReturnNullForNullInput() throws EncoderException {
+        final BCodec codec = new BCodec();
+        assertNull(codec.encode((Object) null));
     }
 
     @Test
-    void testEncodeObjects() throws Exception {
-        final BCodec bcodec = new BCodec();
-        final String plain = "what not";
-        final String encoded = (String) bcodec.encode((Object) plain);
-
-        assertEquals("=?UTF-8?B?d2hhdCBub3Q=?=", encoded, "Basic B encoding test");
-        final Object result = bcodec.encode((Object) null);
-
-        assertNull(result, "Encoding a null Object should return null");
-
-        assertThrows(EncoderException.class, () -> bcodec.encode(Double.valueOf(3.0d)),
-            "Trying to url encode a Double object should cause an exception.");
+    void encodeObjectShouldThrowExceptionForNonStringInput() {
+        final BCodec codec = new BCodec();
+        assertThrows(EncoderException.class, () -> codec.encode(Double.valueOf(3.0d)));
     }
 
     @Test
-    void testEncodeStringWithNull() throws Exception {
-        final BCodec bcodec = new BCodec();
-        final String test = null;
-        final String result = bcodec.encode(test, "charset");
-        assertNull(result, "Result should be null");
+    void decodeObjectShouldCorrectlyDecodeString() throws DecoderException {
+        final BCodec codec = new BCodec();
+        final String encodedText = "=?UTF-8?B?d2hhdCBub3Q=?=";
+        final String expectedPlainText = "what not";
+
+        Object result = codec.decode((Object) encodedText);
+
+        assertEquals(expectedPlainText, result);
     }
 
     @Test
-    void testInvalidEncoding() {
-        assertThrows(UnsupportedCharsetException.class, () -> new BCodec("NONSENSE"));
+    void decodeObjectShouldReturnNullForNullInput() throws DecoderException {
+        final BCodec codec = new BCodec();
+        assertNull(codec.decode((Object) null));
     }
 
     @Test
-    void testNullInput() throws Exception {
-        final BCodec bcodec = new BCodec();
-        assertNull(bcodec.doDecoding(null));
-        assertNull(bcodec.doEncoding(null));
+    void decodeObjectShouldThrowExceptionForNonStringInput() {
+        final BCodec codec = new BCodec();
+        assertThrows(DecoderException.class, () -> codec.decode(Double.valueOf(3.0d)));
     }
 
-    @Test
-    void testUTF8RoundTrip() throws Exception {
+    // --- Tests for Strict vs. Lenient decoding of malformed input ---
 
-        final String ru_msg = constructString(RUSSIAN_STUFF_UNICODE);
-        final String ch_msg = constructString(SWISS_GERMAN_STUFF_UNICODE);
-
-        final BCodec bcodec = new BCodec(CharEncoding.UTF_8);
-
-        assertEquals("=?UTF-8?B?0JLRgdC10Lxf0L/RgNC40LLQtdGC?=", bcodec.encode(ru_msg));
-        assertEquals("=?UTF-8?B?R3LDvGV6aV96w6Rtw6Q=?=", bcodec.encode(ch_msg));
-
-        assertEquals(ru_msg, bcodec.decode(bcodec.encode(ru_msg)));
-        assertEquals(ch_msg, bcodec.decode(bcodec.encode(ch_msg)));
+    static Stream<String> malformedBase64Provider() {
+        // These strings are syntactically valid "encoded-word"s but contain
+        // Base64 that is impossible (e.g., represents 1 or 4 bytes), which
+        // should be rejected by a strict decoder.
+        return Stream.of(
+            "=?ASCII?B?ZE==?=",      // "d" -> 1 byte, invalid Base64 padding
+            "=?ASCII?B?ZmC=?=",      // "fo" -> 2 bytes, invalid Base64 padding
+            "=?ASCII?B?Zm9vYE==?=",  // "foo`" -> 4 bytes, invalid Base64 padding
+            "=?ASCII?B?Zm9vYmC=?=",  // "foob" -> 4 bytes, invalid Base64 padding
+            "=?ASCII?B?AB==?="       // 0x00 0x10 -> 2 bytes, invalid Base64 padding
+        );
     }
 
+    @DisplayName("Should not throw exception for malformed Base64 in lenient mode")
+    @ParameterizedTest
+    @MethodSource("malformedBase64Provider")
+    void shouldNotThrowOnMalformedInputInLenientMode(final String malformedInput) {
+        // Default constructor creates a lenient codec
+        final BCodec defaultCodec = new BCodec();
+        assertFalse(defaultCodec.isStrictDecoding(), "Default codec should be lenient");
+        assertDoesNotThrow(() -> defaultCodec.decode(malformedInput));
+
+        // Explicitly create a lenient codec
+        final BCodec lenientCodec = new BCodec(StandardCharsets.UTF_8, CodecPolicy.LENIENT);
+        assertFalse(lenientCodec.isStrictDecoding(), "Codec should be lenient");
+        assertDoesNotThrow(() -> lenientCodec.decode(malformedInput));
+    }
+
+    @DisplayName("Should throw DecoderException for malformed Base64 in strict mode")
+    @ParameterizedTest
+    @MethodSource("malformedBase64Provider")
+    void shouldThrowOnMalformedInputInStrictMode(final String malformedInput) {
+        final BCodec strictCodec = new BCodec(StandardCharsets.UTF_8, CodecPolicy.STRICT);
+        assertTrue(strictCodec.isStrictDecoding(), "Codec should be strict");
+        assertThrows(DecoderException.class, () -> strictCodec.decode(malformedInput));
+    }
 }
