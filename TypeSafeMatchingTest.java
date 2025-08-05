@@ -23,139 +23,206 @@ import org.mockitousage.IMethods;
 
 public class TypeSafeMatchingTest {
 
-    private static final Object NOT_A_COMPARABLE = new Object();
+    private static final Object NON_COMPARABLE_OBJECT = new Object();
 
     @Rule public MockitoRule mockitoRule = MockitoJUnit.rule();
-
     @Mock public IMethods mock;
 
-    /**
-     * Should not throw an {@link NullPointerException}
-     *
-     * @see <a href="https://github.com/mockito/mockito/issues/457">Bug 457</a>
-     */
     @Test
-    public void compareNullArgument() {
-        boolean match = matchesTypeSafe().apply(new LessOrEqual<Integer>(5), null);
-        assertThat(match).isFalse();
-    }
-
-    /**
-     * Should not throw an {@link ClassCastException}
-     */
-    @Test
-    public void compareToNonCompareable() {
-        boolean match = matchesTypeSafe().apply(new LessOrEqual<Integer>(5), NOT_A_COMPARABLE);
-        assertThat(match).isFalse();
-    }
-
-    /**
-     * Should not throw an {@link ClassCastException}
-     */
-    @Test
-    public void compareToNull() {
-        boolean match = matchesTypeSafe().apply(new LessOrEqual<Integer>(null), null);
-        assertThat(match).isFalse();
-    }
-
-    /**
-     * Should not throw an {@link ClassCastException}
-     */
-    @Test
-    public void compareToNull2() {
-        boolean match = matchesTypeSafe().apply(Null.NULL, null);
-        assertThat(match).isTrue();
-    }
-
-    /**
-     * Should not throw an {@link ClassCastException}
-     */
-    @Test
-    public void compareToStringVsInt() {
-        boolean match = matchesTypeSafe().apply(new StartsWith("Hello"), 123);
+    public void lessOrEqualMatcher_withNullArgument_returnsFalse() {
+        // Given
+        ArgumentMatcher<Integer> matcher = new LessOrEqual<>(5);
+        
+        // When
+        boolean match = matchesTypeSafe().apply(matcher, null);
+        
+        // Then
         assertThat(match).isFalse();
     }
 
     @Test
-    public void compareToIntVsString() throws Exception {
-        boolean match = matchesTypeSafe().apply(new LessOrEqual<Integer>(5), "Hello");
+    public void lessOrEqualMatcher_withNonComparableArgument_returnsFalse() {
+        // Given
+        ArgumentMatcher<Integer> matcher = new LessOrEqual<>(5);
+        
+        // When
+        boolean match = matchesTypeSafe().apply(matcher, NON_COMPARABLE_OBJECT);
+        
+        // Then
         assertThat(match).isFalse();
     }
 
     @Test
-    public void matchesOverloadsMustBeIgnored() {
-        class TestMatcher implements ArgumentMatcher<Integer> {
-            @Override
-            public boolean matches(Integer arg) {
-                return false;
-            }
-
-            @SuppressWarnings("unused")
-            public boolean matches(Date arg) {
-                throw new UnsupportedOperationException();
-            }
-
-            @SuppressWarnings("unused")
-            public boolean matches(Integer arg, Void v) {
-                throw new UnsupportedOperationException();
-            }
-        }
-
-        boolean match = matchesTypeSafe().apply(new TestMatcher(), 123);
+    public void lessOrEqualMatcher_withNullWantedValueAndNullArgument_returnsFalse() {
+        // Given
+        ArgumentMatcher<Integer> matcher = new LessOrEqual<>(null);
+        
+        // When
+        boolean match = matchesTypeSafe().apply(matcher, null);
+        
+        // Then
         assertThat(match).isFalse();
     }
 
     @Test
-    public void matchesWithSubTypeExtendingGenericClass() {
-        abstract class GenericMatcher<T> implements ArgumentMatcher<T> {}
-        class TestMatcher extends GenericMatcher<Integer> {
-            @Override
-            public boolean matches(Integer argument) {
-                return true;
-            }
-        }
-        boolean match = matchesTypeSafe().apply(new TestMatcher(), 123);
+    public void nullMatcher_withNullArgument_returnsTrue() {
+        // Given
+        ArgumentMatcher<Object> matcher = Null.NULL;
+        
+        // When
+        boolean match = matchesTypeSafe().apply(matcher, null);
+        
+        // Then
         assertThat(match).isTrue();
     }
 
     @Test
-    public void dontMatchesWithSubTypeExtendingGenericClass() {
-        final AtomicBoolean wasCalled = new AtomicBoolean();
-
-        abstract class GenericMatcher<T> implements ArgumentMatcher<T> {}
-        class TestMatcher extends GenericMatcher<Integer> {
-            @Override
-            public boolean matches(Integer argument) {
-                wasCalled.set(true);
-                return true;
-            }
-        }
-        wasCalled.set(false);
-        matchesTypeSafe().apply(new TestMatcher(), 123);
-        assertThat(wasCalled.get()).isTrue();
-
-        wasCalled.set(false);
-        matchesTypeSafe().apply(new TestMatcher(), "");
-        assertThat(wasCalled.get()).isFalse();
+    public void startsWithMatcher_withNonStringArgument_returnsFalse() {
+        // Given
+        ArgumentMatcher<String> matcher = new StartsWith("Hello");
+        
+        // When
+        boolean match = matchesTypeSafe().apply(matcher, 123);
+        
+        // Then
+        assertThat(match).isFalse();
     }
 
     @Test
-    public void passEveryArgumentTypeIfNoBridgeMethodWasGenerated() {
-        final AtomicBoolean wasCalled = new AtomicBoolean();
-        class GenericMatcher<T> implements ArgumentMatcher<T> {
-            @Override
-            public boolean matches(T argument) {
-                wasCalled.set(true);
-                return true;
-            }
+    public void lessOrEqualMatcher_withNonIntegerArgument_returnsFalse() {
+        // Given
+        ArgumentMatcher<Integer> matcher = new LessOrEqual<>(5);
+        
+        // When
+        boolean match = matchesTypeSafe().apply(matcher, "Hello");
+        
+        // Then
+        assertThat(match).isFalse();
+    }
+
+    @Test
+    public void matcherWithOverloadedMethods_onlyUsesArgumentMatcherSignature() {
+        // Given
+        ArgumentMatcher<Integer> matcher = new OverloadedMatcher();
+        Integer argument = 123;
+        
+        // When
+        boolean match = matchesTypeSafe().apply(matcher, argument);
+        
+        // Then
+        assertThat(match).isFalse();
+    }
+
+    private static class OverloadedMatcher implements ArgumentMatcher<Integer> {
+        @Override
+        public boolean matches(Integer arg) {
+            return false;
         }
 
-        wasCalled.set(false);
-        matchesTypeSafe().apply(new GenericMatcher<Integer>(), 123);
-        assertThat(wasCalled.get()).isTrue();
+        // These should be ignored by TypeSafeMatching
+        public boolean matches(Date arg) {
+            throw new UnsupportedOperationException();
+        }
 
-        wasCalled.set(false);
-        matchesTypeSafe().apply(new GenericMatcher<Integer>(), "");
-        assertThat(wasCalled.get()).isTrue();
+        public boolean matches(Integer arg, Void v) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    @Test
+    public void matcherExtendingGenericClass_withMatchingArgument_returnsTrue() {
+        // Given
+        ArgumentMatcher<Integer> matcher = new IntegerMatcher();
+        Integer argument = 123;
+        
+        // When
+        boolean match = matchesTypeSafe().apply(matcher, argument);
+        
+        // Then
+        assertThat(match).isTrue();
+    }
+
+    private abstract static class GenericMatcher<T> implements ArgumentMatcher<T> {}
+    
+    private static class IntegerMatcher extends GenericMatcher<Integer> {
+        @Override
+        public boolean matches(Integer argument) {
+            return true;
+        }
+    }
+
+    @Test
+    public void matcherExtendingGenericClass_withMismatchedArgument_doesNotCallMatchesMethod() {
+        // Given
+        CallTrackerMatcher matcher = new CallTrackerMatcher();
+        String mismatchedArgument = "Hello";
+        
+        // When
+        matchesTypeSafe().apply(matcher, mismatchedArgument);
+        
+        // Then
+        assertThat(matcher.wasCalled()).isFalse();
+    }
+
+    @Test
+    public void matcherExtendingGenericClass_withMatchingArgument_callsMatchesMethod() {
+        // Given
+        CallTrackerMatcher matcher = new CallTrackerMatcher();
+        Integer matchingArgument = 123;
+        
+        // When
+        matchesTypeSafe().apply(matcher, matchingArgument);
+        
+        // Then
+        assertThat(matcher.wasCalled()).isTrue();
+    }
+
+    private static class CallTrackerMatcher extends GenericMatcher<Integer> {
+        private final AtomicBoolean called = new AtomicBoolean(false);
+        
+        @Override
+        public boolean matches(Integer argument) {
+            called.set(true);
+            return true;
+        }
+        
+        boolean wasCalled() {
+            return called.get();
+        }
+    }
+
+    @Test
+    public void genericMatcherWithoutBridgeMethod_callsMatchesMethodForAnyArgumentType() {
+        // Given
+        GenericMatcherWithoutBridge matcher = new GenericMatcherWithoutBridge();
+        
+        // When & Then: Integer argument
+        boolean calledForInteger = callAndCheck(matcher, 123);
+        assertThat(calledForInteger).isTrue();
+        
+        // When & Then: String argument
+        boolean calledForString = callAndCheck(matcher, "Hello");
+        assertThat(calledForString).isTrue();
+    }
+
+    private boolean callAndCheck(GenericMatcherWithoutBridge matcher, Object argument) {
+        AtomicBoolean called = new AtomicBoolean(false);
+        matcher.setCalledFlag(called);
+        matchesTypeSafe().apply(matcher, argument);
+        return called.get();
+    }
+
+    private static class GenericMatcherWithoutBridge<T> implements ArgumentMatcher<T> {
+        private AtomicBoolean calledFlag;
+
+        void setCalledFlag(AtomicBoolean calledFlag) {
+            this.calledFlag = calledFlag;
+        }
+
+        @Override
+        public boolean matches(T argument) {
+            calledFlag.set(true);
+            return true;
+        }
     }
 }
