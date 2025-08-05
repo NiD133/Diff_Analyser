@@ -43,70 +43,148 @@ import org.jspecify.annotations.NullUnmarked;
 @GwtIncompatible // java.util.Arrays#copyOf(Object[], int), java.lang.reflect.Array
 @NullUnmarked
 public class CompactLinkedHashSetTest extends TestCase {
+  
   @AndroidIncompatible // test-suite builders
   public static Test suite() {
-    List<Feature<?>> allFeatures =
-        Arrays.<Feature<?>>asList(
-            CollectionSize.ANY,
-            CollectionFeature.ALLOWS_NULL_VALUES,
-            CollectionFeature.FAILS_FAST_ON_CONCURRENT_MODIFICATION,
-            CollectionFeature.GENERAL_PURPOSE,
-            CollectionFeature.REMOVE_OPERATIONS,
-            CollectionFeature.SERIALIZABLE,
-            CollectionFeature.KNOWN_ORDER,
-            CollectionFeature.SUPPORTS_ADD,
-            CollectionFeature.SUPPORTS_REMOVE);
-
     TestSuite suite = new TestSuite();
+    
+    // Add unit tests from this class
     suite.addTestSuite(CompactLinkedHashSetTest.class);
-    suite.addTest(
-        SetTestSuiteBuilder.using(
-                new TestStringSetGenerator() {
-                  @Override
-                  protected Set<String> create(String[] elements) {
-                    return CompactLinkedHashSet.create(asList(elements));
-                  }
-                })
-            .named("CompactLinkedHashSet")
-            .withFeatures(allFeatures)
-            .createTestSuite());
-    suite.addTest(
-        SetTestSuiteBuilder.using(
-                new TestStringSetGenerator() {
-                  @Override
-                  protected Set<String> create(String[] elements) {
-                    CompactLinkedHashSet<String> set = CompactLinkedHashSet.create();
-                    set.convertToHashFloodingResistantImplementation();
-                    Collections.addAll(set, elements);
-                    return set;
-                  }
-                })
-            .named("CompactLinkedHashSet with flooding protection")
-            .withFeatures(allFeatures)
-            .createTestSuite());
+    
+    // Add comprehensive test suite for standard CompactLinkedHashSet
+    suite.addTest(createStandardCompactLinkedHashSetTestSuite());
+    
+    // Add comprehensive test suite for CompactLinkedHashSet with flooding protection
+    suite.addTest(createFloodingResistantCompactLinkedHashSetTestSuite());
+    
     return suite;
   }
 
-  public void testAllocArraysDefault() {
-    CompactHashSet<Integer> set = CompactHashSet.create();
-    assertThat(set.needsAllocArrays()).isTrue();
-    assertThat(set.elements).isNull();
-
-    set.add(1);
-    assertThat(set.needsAllocArrays()).isFalse();
-    assertThat(set.elements).hasLength(CompactHashing.DEFAULT_SIZE);
+  /**
+   * Creates a test suite for the standard CompactLinkedHashSet implementation.
+   */
+  private static Test createStandardCompactLinkedHashSetTestSuite() {
+    return SetTestSuiteBuilder.using(new StandardCompactLinkedHashSetGenerator())
+        .named("CompactLinkedHashSet")
+        .withFeatures(getAllSupportedFeatures())
+        .createTestSuite();
   }
 
-  public void testAllocArraysExpectedSize() {
-    for (int i = 0; i <= CompactHashing.DEFAULT_SIZE; i++) {
-      CompactHashSet<Integer> set = CompactHashSet.createWithExpectedSize(i);
-      assertThat(set.needsAllocArrays()).isTrue();
-      assertThat(set.elements).isNull();
+  /**
+   * Creates a test suite for CompactLinkedHashSet with flooding protection enabled.
+   */
+  private static Test createFloodingResistantCompactLinkedHashSetTestSuite() {
+    return SetTestSuiteBuilder.using(new FloodingResistantCompactLinkedHashSetGenerator())
+        .named("CompactLinkedHashSet with flooding protection")
+        .withFeatures(getAllSupportedFeatures())
+        .createTestSuite();
+  }
 
-      set.add(1);
-      assertThat(set.needsAllocArrays()).isFalse();
-      int expectedSize = max(1, i);
-      assertThat(set.elements).hasLength(expectedSize);
+  /**
+   * Returns all features supported by CompactLinkedHashSet implementations.
+   */
+  private static List<Feature<?>> getAllSupportedFeatures() {
+    return Arrays.<Feature<?>>asList(
+        CollectionSize.ANY,
+        CollectionFeature.ALLOWS_NULL_VALUES,
+        CollectionFeature.FAILS_FAST_ON_CONCURRENT_MODIFICATION,
+        CollectionFeature.GENERAL_PURPOSE,
+        CollectionFeature.REMOVE_OPERATIONS,
+        CollectionFeature.SERIALIZABLE,
+        CollectionFeature.KNOWN_ORDER,
+        CollectionFeature.SUPPORTS_ADD,
+        CollectionFeature.SUPPORTS_REMOVE);
+  }
+
+  /**
+   * Generator for standard CompactLinkedHashSet instances used in comprehensive testing.
+   */
+  private static class StandardCompactLinkedHashSetGenerator extends TestStringSetGenerator {
+    @Override
+    protected Set<String> create(String[] elements) {
+      return CompactLinkedHashSet.create(asList(elements));
     }
+  }
+
+  /**
+   * Generator for CompactLinkedHashSet instances with flooding protection enabled.
+   */
+  private static class FloodingResistantCompactLinkedHashSetGenerator extends TestStringSetGenerator {
+    @Override
+    protected Set<String> create(String[] elements) {
+      CompactLinkedHashSet<String> set = CompactLinkedHashSet.create();
+      set.convertToHashFloodingResistantImplementation();
+      Collections.addAll(set, elements);
+      return set;
+    }
+  }
+
+  // Unit Tests
+
+  /**
+   * Tests that CompactHashSet properly handles lazy array allocation with default sizing.
+   * 
+   * When created with default constructor:
+   * - Arrays should not be allocated until first element is added
+   * - After adding first element, arrays should be allocated with default size
+   */
+  public void testLazyArrayAllocation_DefaultSize() {
+    CompactHashSet<Integer> set = CompactHashSet.create();
+    
+    // Before adding any elements, arrays should not be allocated
+    assertArraysNotAllocated(set);
+
+    // After adding first element, arrays should be allocated with default size
+    set.add(SAMPLE_ELEMENT);
+    assertArraysAllocatedWithSize(set, CompactHashing.DEFAULT_SIZE);
+  }
+
+  /**
+   * Tests that CompactHashSet properly handles lazy array allocation with expected size.
+   * 
+   * When created with expected size:
+   * - Arrays should not be allocated until first element is added
+   * - After adding first element, arrays should be allocated with size >= expected size
+   */
+  public void testLazyArrayAllocation_ExpectedSize() {
+    for (int expectedSize = 0; expectedSize <= CompactHashing.DEFAULT_SIZE; expectedSize++) {
+      CompactHashSet<Integer> set = CompactHashSet.createWithExpectedSize(expectedSize);
+      
+      // Before adding any elements, arrays should not be allocated
+      assertArraysNotAllocated(set);
+
+      // After adding first element, arrays should be allocated with appropriate size
+      set.add(SAMPLE_ELEMENT);
+      int expectedArraySize = max(1, expectedSize);
+      assertArraysAllocatedWithSize(set, expectedArraySize);
+    }
+  }
+
+  // Test Helpers
+
+  private static final Integer SAMPLE_ELEMENT = 1;
+
+  /**
+   * Asserts that the given set has not yet allocated its internal arrays.
+   */
+  private void assertArraysNotAllocated(CompactHashSet<Integer> set) {
+    assertThat(set.needsAllocArrays())
+        .named("Set should need array allocation")
+        .isTrue();
+    assertThat(set.elements)
+        .named("Elements array should be null before allocation")
+        .isNull();
+  }
+
+  /**
+   * Asserts that the given set has allocated its internal arrays with the expected size.
+   */
+  private void assertArraysAllocatedWithSize(CompactHashSet<Integer> set, int expectedSize) {
+    assertThat(set.needsAllocArrays())
+        .named("Set should not need array allocation after first element added")
+        .isFalse();
+    assertThat(set.elements)
+        .named("Elements array should have expected length after allocation")
+        .hasLength(expectedSize);
   }
 }
