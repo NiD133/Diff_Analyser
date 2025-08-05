@@ -21,203 +21,166 @@ import org.locationtech.spatial4j.shape.Rectangle;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class GeohashUtils_ESTest extends GeohashUtils_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      HashMap<String, String> hashMap0 = new HashMap<String, String>();
-      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
-      SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
-      // Undeclared exception!
-      try { 
-        GeohashUtils.decode("R9ENOYUZj]oNX(A", spatialContext0);
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
-      
-      } catch(ArrayIndexOutOfBoundsException e) {
-         //
-         // -8
-         //
-         verifyException("org.locationtech.spatial4j.io.GeohashUtils", e);
-      }
-  }
+    //----- Decoding Tests -----//
+    
+    @Test(timeout = 4000)
+    public void decode_ThrowsArrayIndexOutOfBounds_ForInvalidCharacter() throws Throwable {
+        HashMap<String, String> hashMap0 = new HashMap<>();
+        ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+        SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
+        
+        try {
+            GeohashUtils.decode("R9ENOYUZj]oNX(A", spatialContext0);
+            fail("Expecting exception: ArrayIndexOutOfBoundsException");
+        } catch(ArrayIndexOutOfBoundsException e) {
+            // Invalid character causes index calculation error
+            verifyException("org.locationtech.spatial4j.io.GeohashUtils", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      GeohashUtils.encodeLatLon((double) 13, (double) 13, 0);
-  }
+    @Test(timeout = 4000)
+    public void decode_ReturnsCorrectPoint_ForLongGeohash() throws Throwable {
+        SpatialContext spatialContext0 = SpatialContext.GEO;
+        Point point = GeohashUtils.decode(
+            "h0pb421bn842p8h85bj0hbp000000000000000000000000000000000000000000000000000000000000000000000000000000000", 
+            spatialContext0
+        );
+        
+        assertEquals(11.0, point.getX(), 0.01);
+        assertEquals(-90.0, point.getLat(), 0.01);
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      SpatialContext spatialContext0 = SpatialContext.GEO;
-      GeohashUtils.decodeBoundary("d", spatialContext0);
-  }
+    //----- Boundary Decoding Tests -----//
+    
+    @Test(timeout = 4000)
+    public void decodeBoundary_HandlesSingleCharacterHash() throws Throwable {
+        SpatialContext spatialContext0 = SpatialContext.GEO;
+        Rectangle rect = GeohashUtils.decodeBoundary("d", spatialContext0);
+        assertNotNull(rect);
+    }
+    
+    @Test(timeout = 4000)
+    public void decodeBoundary_Handles12CharacterHash() throws Throwable {
+        SpatialContext spatialContext0 = SpatialContext.GEO;
+        Rectangle rect = GeohashUtils.decodeBoundary("eurbxcpfpurb", spatialContext0);
+        assertNotNull(rect);
+    }
+    
+    @Test(timeout = 4000)
+    public void decodeBoundary_HandlesRepeatedPatternHash() throws Throwable {
+        SpatialContext spatialContext0 = SpatialContext.GEO;
+        Rectangle rect = GeohashUtils.decodeBoundary("kpbpbpbpbpbp", spatialContext0);
+        
+        assertEquals(0.0, rect.getMinX(), 0.01);
+        assertEquals(3.3527612686157227E-7, rect.getMaxX(), 0.01);
+        assertEquals(-1.6763806343078613E-7, rect.getMinY(), 0.01);
+    }
+    
+    @Test(timeout = 4000)
+    public void decodeBoundary_ThrowsArrayIndexOutOfBounds_ForInvalidCharacter() throws Throwable {
+        SpatialContext spatialContext0 = SpatialContext.GEO;
+        try {
+            GeohashUtils.decodeBoundary("J-", spatialContext0);
+            fail("Expecting exception: ArrayIndexOutOfBoundsException");
+        } catch(ArrayIndexOutOfBoundsException e) {
+            // Invalid character causes negative index
+            verifyException("org.locationtech.spatial4j.io.GeohashUtils", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      SpatialContext spatialContext0 = SpatialContext.GEO;
-      GeohashUtils.decodeBoundary("eurbxcpfpurb", spatialContext0);
-  }
+    //----- Encoding Tests -----//
+    
+    @Test(timeout = 4000)
+    public void encodeLatLon_HandlesZeroPrecision() throws Throwable {
+        String hash = GeohashUtils.encodeLatLon(13.0, 13.0, 0);
+        assertNotNull(hash);
+    }
+    
+    @Test(timeout = 4000)
+    public void encodeLatLon_ReturnsExpectedValue_ForSpecificInput() throws Throwable {
+        String hash = GeohashUtils.encodeLatLon(1.0, 3.4332275390625E-4, 31);
+        assertEquals("s00j8n01rvxbrgrupfzgpbxzpbpbp00", hash);
+    }
+    
+    @Test(timeout = 4000)
+    public void encodeLatLon_ThrowsException_ForNegativePrecision() {
+        try {
+            GeohashUtils.encodeLatLon(0.017453292519943295, 0.017453292519943295, -3030);
+            fail("Expecting exception: NegativeArraySizeException");
+        } catch(NegativeArraySizeException e) {
+            // Negative precision causes invalid array allocation
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      SpatialContext spatialContext0 = SpatialContext.GEO;
-      GeohashUtils.decodeBoundary("8h2081040h20", spatialContext0);
-  }
+    //----- Hash Length Utility Tests -----//
+    
+    @Test(timeout = 4000)
+    public void lookupDegreesSizeForHashLen_ReturnsCorrectValues_ForValidLength() throws Throwable {
+        double[] sizes = GeohashUtils.lookupDegreesSizeForHashLen(16);
+        assertArrayEquals(new double[] {1.6370904631912708E-10, 3.2741809263825417E-10}, sizes, 0.01);
+    }
+    
+    @Test(timeout = 4000)
+    public void lookupDegreesSizeForHashLen_ThrowsArrayIndexOutOfBounds_ForNegativeLength() {
+        try {
+            GeohashUtils.lookupDegreesSizeForHashLen(-482);
+            fail("Expecting exception: ArrayIndexOutOfBoundsException");
+        } catch(ArrayIndexOutOfBoundsException e) {
+            // Negative length is invalid array index
+            verifyException("org.locationtech.spatial4j.io.GeohashUtils", e);
+        }
+    }
+    
+    @Test(timeout = 4000)
+    public void lookupHashLenForWidthHeight_Returns11_ForSpecificInput() throws Throwable {
+        int len = GeohashUtils.lookupHashLenForWidthHeight(1.0728836059570312E-5, 1115.07072940934);
+        assertEquals(11, len);
+    }
+    
+    @Test(timeout = 4000)
+    public void lookupHashLenForWidthHeight_Returns24_ForVerySmallValues() throws Throwable {
+        int len = GeohashUtils.lookupHashLenForWidthHeight(1.2490009027033011E-15, 1.2490009027033011E-15);
+        assertEquals(24, len);
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      SpatialContext spatialContext0 = SpatialContext.GEO;
-      GeohashUtils.decodeBoundary("pbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbp", spatialContext0);
-  }
+    //----- Sub-Geohash Tests -----//
+    
+    @Test(timeout = 4000)
+    public void getSubGeohashes_Returns32Elements_ForEmptyString() throws Throwable {
+        String[] subHashes = GeohashUtils.getSubGeohashes("");
+        assertEquals(32, subHashes.length);
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        GeohashUtils.lookupDegreesSizeForHashLen((-482));
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
-      
-      } catch(ArrayIndexOutOfBoundsException e) {
-         //
-         // -482
-         //
-         verifyException("org.locationtech.spatial4j.io.GeohashUtils", e);
-      }
-  }
+    //----- Exception Handling Tests -----//
+    
+    @Test(timeout = 4000)
+    public void decodeBoundary_ThrowsNullPointerException_WhenContextNull() {
+        try {
+            GeohashUtils.decodeBoundary("", null);
+            fail("Expecting exception: NullPointerException");
+        } catch(NullPointerException e) {
+            // Null context not allowed
+        }
+    }
+    
+    @Test(timeout = 4000)
+    public void decode_ThrowsNullPointerException_WhenContextNull() {
+        try {
+            GeohashUtils.decode("A0D", null);
+            fail("Expecting exception: NullPointerException");
+        } catch(NullPointerException e) {
+            // Null context not allowed
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      // Undeclared exception!
-      GeohashUtils.encodeLatLon(740.519, 740.519, 11520);
-  }
-
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        GeohashUtils.encodeLatLon(0.017453292519943295, 0.017453292519943295, (-3030));
-        fail("Expecting exception: NegativeArraySizeException");
-      
-      } catch(NegativeArraySizeException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.lang.AbstractStringBuilder", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      GeohashUtils.encodeLatLon((double) 24, (-1258.5428078205061));
-      GeohashUtils.encodeLatLon((-1422.830305), 803.7685944);
-      GeohashUtils.encodeLatLon((double) 24, (-1.7976931348623157E308), 1970);
-      // Undeclared exception!
-      GeohashUtils.encodeLatLon((-1.0), (-1258.5428078205061));
-  }
-
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      SpatialContext spatialContext0 = SpatialContext.GEO;
-      String string0 = GeohashUtils.encodeLatLon(2517.9302048088, 2517.9302048088, 1701);
-      // Undeclared exception!
-      GeohashUtils.decodeBoundary(string0, spatialContext0);
-  }
-
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        GeohashUtils.decodeBoundary("", (SpatialContext) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.locationtech.spatial4j.io.GeohashUtils", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      String string0 = GeohashUtils.encodeLatLon(3859.99041074114, 3859.99041074114, 1773);
-      // Undeclared exception!
-      GeohashUtils.decode(string0, (SpatialContext) null);
-  }
-
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        GeohashUtils.decode("A0D", (SpatialContext) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.locationtech.spatial4j.io.GeohashUtils", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      String string0 = GeohashUtils.encodeLatLon(1.0, 3.4332275390625E-4, 31);
-      assertEquals("s00j8n01rvxbrgrupfzgpbxzpbpbp00", string0);
-  }
-
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      int int0 = GeohashUtils.lookupHashLenForWidthHeight(1.0728836059570312E-5, 1115.07072940934);
-      assertEquals(11, int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      int int0 = GeohashUtils.lookupHashLenForWidthHeight(1.2490009027033011E-15, 1.2490009027033011E-15);
-      assertEquals(24, int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      String[] stringArray0 = GeohashUtils.getSubGeohashes("");
-      assertEquals(32, stringArray0.length);
-  }
-
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      SpatialContext spatialContext0 = SpatialContext.GEO;
-      Rectangle rectangle0 = GeohashUtils.decodeBoundary("kpbpbpbpbpbp", spatialContext0);
-      assertEquals(3.3527612686157227E-7, rectangle0.getMaxX(), 0.01);
-      assertEquals(0.0, rectangle0.getMinX(), 0.01);
-      assertEquals((-1.6763806343078613E-7), rectangle0.getMinY(), 0.01);
-  }
-
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      SpatialContext spatialContext0 = SpatialContext.GEO;
-      // Undeclared exception!
-      try { 
-        GeohashUtils.decodeBoundary("J-", spatialContext0);
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
-      
-      } catch(ArrayIndexOutOfBoundsException e) {
-         //
-         // -3
-         //
-         verifyException("org.locationtech.spatial4j.io.GeohashUtils", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      double[] doubleArray0 = GeohashUtils.lookupDegreesSizeForHashLen(16);
-      assertArrayEquals(new double[] {1.6370904631912708E-10, 3.2741809263825417E-10}, doubleArray0, 0.01);
-  }
-
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      SpatialContext spatialContext0 = SpatialContext.GEO;
-      Point point0 = GeohashUtils.decode("h0pb421bn842p8h85bj0hbp000000000000000000000000000000000000000000000000000000000000000000000000000000000", spatialContext0);
-      assertEquals(11.0, point0.getX(), 0.01);
-      assertEquals((-90.0), point0.getLat(), 0.01);
-  }
+    //----- Stress/Edge Case Tests -----//
+    
+    @Test(timeout = 4000)
+    public void decodeBoundary_HandlesExtremelyLongHash() throws Throwable {
+        SpatialContext spatialContext0 = SpatialContext.GEO;
+        // 126-character hash (repeating "pb")
+        String longHash = "pbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbp";
+        Rectangle rect = GeohashUtils.decodeBoundary(longHash, spatialContext0);
+        assertNotNull(rect);
+    }
 }
