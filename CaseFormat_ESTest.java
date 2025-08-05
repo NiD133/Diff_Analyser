@@ -17,204 +17,239 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class CaseFormat_ESTest extends CaseFormat_ESTest_scaffolding {
 
-    // Test CaseFormat enum values
-    @Test(timeout = 4000)
-    public void testEnumValues()  throws Throwable  {
-        CaseFormat[] caseFormats = CaseFormat.values();
-        assertEquals(5, caseFormats.length);
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.LOWER_CAMEL;
+      CaseFormat caseFormat1 = CaseFormat.UPPER_UNDERSCORE;
+      String string0 = caseFormat1.to(caseFormat0, "Y3:E]9bSR@H%B/_?");
+      assertEquals("y3:e]9bsr@h%b/?", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testValueOfLowerCamel()  throws Throwable  {
-        CaseFormat.valueOf("LOWER_CAMEL");
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.LOWER_CAMEL;
+      CaseFormat caseFormat1 = CaseFormat.LOWER_UNDERSCORE;
+      String string0 = caseFormat0.to(caseFormat1, "0P|{HG$S{ax$v|r_ ");
+      assertEquals("0_p|{_h_g$_s{ax$v|r_ ", string0);
+  }
 
-    // Test conversion between different formats
-    @Test(timeout = 4000)
-    public void testConvertUpperUnderscoreToLowerCamel()  throws Throwable  {
-        CaseFormat sourceFormat = CaseFormat.UPPER_UNDERSCORE;
-        CaseFormat targetFormat = CaseFormat.LOWER_CAMEL;
-        String converted = sourceFormat.to(targetFormat, "Y3:E]9bSR@H%B/_?");
-        assertEquals("y3:e]9bsr@h%b/?", converted);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.UPPER_UNDERSCORE;
+      String string0 = caseFormat0.convert(caseFormat0, " ALUEZ");
+      assertEquals(" ALUEZ", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testConvertLowerCamelToLowerUnderscore()  throws Throwable  {
-        CaseFormat sourceFormat = CaseFormat.LOWER_CAMEL;
-        CaseFormat targetFormat = CaseFormat.LOWER_UNDERSCORE;
-        String converted = sourceFormat.to(targetFormat, "0P|{HG$S{ax$v|r_ ");
-        assertEquals("0_p|{_h_g$_s{ax$v|r_ ", converted);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.UPPER_CAMEL;
+      CaseFormat caseFormat1 = CaseFormat.LOWER_UNDERSCORE;
+      String string0 = caseFormat1.to(caseFormat0, "bDU\"5");
+      assertEquals("Bdu\"5", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testConvertLowerUnderscoreToUpperCamel()  throws Throwable  {
-        CaseFormat sourceFormat = CaseFormat.LOWER_UNDERSCORE;
-        CaseFormat targetFormat = CaseFormat.UPPER_CAMEL;
-        String converted = sourceFormat.to(targetFormat, "bDU\"5");
-        assertEquals("Bdu\"5", converted);
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      CaseFormat[] caseFormatArray0 = CaseFormat.values();
+      assertEquals(5, caseFormatArray0.length);
+  }
 
-    @Test(timeout = 4000)
-    public void testConvertLowerHyphenToLowerUnderscore()  throws Throwable  {
-        CaseFormat sourceFormat = CaseFormat.LOWER_HYPHEN;
-        CaseFormat targetFormat = CaseFormat.LOWER_UNDERSCORE;
-        String converted = sourceFormat.to(targetFormat, "S:^5jO-|]r");
-        assertEquals("S:^5jO_|]r", converted);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      CaseFormat.valueOf("LOWER_CAMEL");
+  }
 
-    @Test(timeout = 4000)
-    public void testConvertLowerUnderscoreToUpperUnderscore()  throws Throwable  {
-        CaseFormat sourceFormat = CaseFormat.LOWER_UNDERSCORE;
-        CaseFormat targetFormat = CaseFormat.UPPER_UNDERSCORE;
-        String converted = sourceFormat.to(targetFormat, "Q#&'.zTN&p_");
-        assertEquals("Q#&'.ZTN&P_", converted);
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.UPPER_CAMEL;
+      String string0 = caseFormat0.normalizeFirstWord("");
+      assertEquals("", string0);
+  }
 
-    // Test identity conversions (same source and target format)
-    @Test(timeout = 4000)
-    public void testIdentityConversionUpperUnderscore()  throws Throwable  {
-        CaseFormat format = CaseFormat.UPPER_UNDERSCORE;
-        String result = format.convert(format, " ALUEZ");
-        assertEquals(" ALUEZ", result);
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.UPPER_CAMEL;
+      String string0 = caseFormat0.convert(caseFormat0, "");
+      assertEquals("", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testIdentityConversionLowerCamel()  throws Throwable  {
-        CaseFormat format = CaseFormat.LOWER_CAMEL;
-        String result = format.convert(format, "UPPER_UNDERSCORE");
-        assertEquals("uPPER_UNDERSCORE", result);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.LOWER_UNDERSCORE;
+      // Undeclared exception!
+      try { 
+        caseFormat0.to(caseFormat0, (String) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.base.Preconditions", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testIdentityConversionLowerCamelWithSpecialChars()  throws Throwable  {
-        CaseFormat format = CaseFormat.LOWER_CAMEL;
-        String result = format.convert(format, "0P|{HG$S{ax$v|r_ ");
-        assertEquals("0P|{HG$S{ax$v|r_ ", result);
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.LOWER_CAMEL;
+      // Undeclared exception!
+      try { 
+        caseFormat0.normalizeFirstWord((String) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testIdentityConversionLowerUnderscore()  throws Throwable  {
-        CaseFormat format = CaseFormat.LOWER_UNDERSCORE;
-        String result = format.convert(format, "83pvzR?h!");
-        assertEquals("83pvzr?h!", result);
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.LOWER_CAMEL;
+      // Undeclared exception!
+      try { 
+        caseFormat0.converterTo((CaseFormat) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.base.Preconditions", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testIdentityConversionLowerHyphen()  throws Throwable  {
-        CaseFormat format = CaseFormat.LOWER_HYPHEN;
-        String result = format.convert(format, "83pvzR?h!");
-        assertEquals("83pvzr?h!", result);
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.LOWER_HYPHEN;
+      CaseFormat caseFormat1 = CaseFormat.UPPER_CAMEL;
+      String string0 = caseFormat0.to(caseFormat1, "");
+      assertEquals("", string0);
+  }
 
-    // Test empty string conversions
-    @Test(timeout = 4000)
-    public void testConvertEmptyStringUpperCamelToSelf()  throws Throwable  {
-        CaseFormat format = CaseFormat.UPPER_CAMEL;
-        String result = format.convert(format, "");
-        assertEquals("", result);
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.LOWER_CAMEL;
+      String string0 = caseFormat0.convert(caseFormat0, "UPPER_UNDERSCORE");
+      assertEquals("uPPER_UNDERSCORE", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testConvertEmptyStringLowerHyphenToUpperCamel()  throws Throwable  {
-        CaseFormat sourceFormat = CaseFormat.LOWER_HYPHEN;
-        CaseFormat targetFormat = CaseFormat.UPPER_CAMEL;
-        String result = sourceFormat.to(targetFormat, "");
-        assertEquals("", result);
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.LOWER_CAMEL;
+      String string0 = caseFormat0.to(caseFormat0, "0P|{HG$S{ax$v|r_ ");
+      assertEquals("0P|{HG$S{ax$v|r_ ", string0);
+  }
 
-    // Test normalizeFirstWord method
-    @Test(timeout = 4000)
-    public void testNormalizeFirstWordEmptyString()  throws Throwable  {
-        CaseFormat format = CaseFormat.UPPER_CAMEL;
-        String result = format.normalizeFirstWord("");
-        assertEquals("", result);
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.LOWER_UNDERSCORE;
+      CaseFormat caseFormat1 = CaseFormat.UPPER_UNDERSCORE;
+      String string0 = caseFormat1.convert(caseFormat0, "2$ddmbvc\" rj0j %>[");
+      assertEquals("2$ddmbvc\" rj0j %>[", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testNormalizeFirstWordWithSpecialChars()  throws Throwable  {
-        CaseFormat format = CaseFormat.UPPER_CAMEL;
-        String result = format.normalizeFirstWord("&/>Ql\"@^2R");
-        assertEquals("&/>ql\"@^2r", result);
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.UPPER_UNDERSCORE;
+      CaseFormat caseFormat1 = CaseFormat.LOWER_HYPHEN;
+      String string0 = caseFormat0.convert(caseFormat1, "-");
+      assertEquals("-", string0);
+  }
 
-    // Test converterTo method
-    @Test(timeout = 4000)
-    public void testConverterToSameFormat()  throws Throwable  {
-        CaseFormat format = CaseFormat.LOWER_CAMEL;
-        Converter<String, String> converter = format.converterTo(format);
-        assertNotNull(converter);
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.LOWER_CAMEL;
+      CaseFormat caseFormat1 = CaseFormat.UPPER_UNDERSCORE;
+      // Undeclared exception!
+      try { 
+        caseFormat1.convert(caseFormat0, (String) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.base.CharMatcher", e);
+      }
+  }
 
-    // Test null input scenarios
-    @Test(timeout = 4000)
-    public void testToWithNullStringThrowsNullPointerException()  throws Throwable  {
-        CaseFormat format = CaseFormat.LOWER_UNDERSCORE;
-        try {
-            format.to(format, null);
-            fail("Expecting exception: NullPointerException");
-        } catch(NullPointerException e) {
-            verifyException("com.google.common.base.Preconditions", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.LOWER_UNDERSCORE;
+      CaseFormat caseFormat1 = CaseFormat.UPPER_UNDERSCORE;
+      String string0 = caseFormat0.to(caseFormat1, "Q#&'.zTN&p_");
+      assertEquals("Q#&'.ZTN&P_", string0);
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testNormalizeFirstWordWithNullThrows()  throws Throwable  {
-        CaseFormat.LOWER_CAMEL.normalizeFirstWord(null);
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.LOWER_UNDERSCORE;
+      CaseFormat caseFormat1 = CaseFormat.LOWER_HYPHEN;
+      // Undeclared exception!
+      try { 
+        caseFormat0.convert(caseFormat1, (String) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.base.CaseFormat$2", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testConverterToWithNullThrowsNullPointerException()  throws Throwable  {
-        CaseFormat format = CaseFormat.LOWER_CAMEL;
-        try {
-            format.converterTo(null);
-            fail("Expecting exception: NullPointerException");
-        } catch(NullPointerException e) {
-            verifyException("com.google.common.base.Preconditions", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.LOWER_UNDERSCORE;
+      String string0 = caseFormat0.convert(caseFormat0, "83pvzR?h!");
+      assertEquals("83pvzr?h!", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testConvertUpperUnderscoreToLowerCamelWithNullThrows()  throws Throwable  {
-        CaseFormat sourceFormat = CaseFormat.UPPER_UNDERSCORE;
-        CaseFormat targetFormat = CaseFormat.LOWER_CAMEL;
-        try {
-            sourceFormat.convert(targetFormat, null);
-            fail("Expecting exception: NullPointerException");
-        } catch(NullPointerException e) {
-            verifyException("com.google.common.base.CharMatcher", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.LOWER_HYPHEN;
+      CaseFormat caseFormat1 = CaseFormat.UPPER_UNDERSCORE;
+      // Undeclared exception!
+      try { 
+        caseFormat0.convert(caseFormat1, (String) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.base.CaseFormat$1", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testConvertLowerUnderscoreToLowerHyphenWithNullThrows()  throws Throwable  {
-        CaseFormat sourceFormat = CaseFormat.LOWER_UNDERSCORE;
-        CaseFormat targetFormat = CaseFormat.LOWER_HYPHEN;
-        try {
-            sourceFormat.convert(targetFormat, null);
-            fail("Expecting exception: NullPointerException");
-        } catch(NullPointerException e) {
-            verifyException("com.google.common.base.CaseFormat$2", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.LOWER_HYPHEN;
+      CaseFormat caseFormat1 = CaseFormat.LOWER_UNDERSCORE;
+      String string0 = caseFormat0.to(caseFormat1, "S:^5jO-|]r");
+      assertEquals("S:^5jO_|]r", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testConvertLowerHyphenToUpperUnderscoreWithNullThrows()  throws Throwable  {
-        CaseFormat sourceFormat = CaseFormat.LOWER_HYPHEN;
-        CaseFormat targetFormat = CaseFormat.UPPER_UNDERSCORE;
-        try {
-            sourceFormat.convert(targetFormat, null);
-            fail("Expecting exception: NullPointerException");
-        } catch(NullPointerException e) {
-            verifyException("com.google.common.base.CaseFormat$1", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.LOWER_HYPHEN;
+      String string0 = caseFormat0.convert(caseFormat0, "83pvzR?h!");
+      assertEquals("83pvzr?h!", string0);
+  }
 
-    // Test edge cases
-    @Test(timeout = 4000)
-    public void testConvertUpperUnderscoreToLowerHyphen()  throws Throwable  {
-        CaseFormat sourceFormat = CaseFormat.UPPER_UNDERSCORE;
-        CaseFormat targetFormat = CaseFormat.LOWER_HYPHEN;
-        String result = sourceFormat.convert(targetFormat, "-");
-        assertEquals("-", result);
-    }
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.UPPER_CAMEL;
+      String string0 = caseFormat0.normalizeFirstWord("&/>Ql\"@^2R");
+      assertEquals("&/>ql\"@^2r", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      CaseFormat caseFormat0 = CaseFormat.LOWER_CAMEL;
+      Converter<String, String> converter0 = caseFormat0.converterTo(caseFormat0);
+      assertNotNull(converter0);
+  }
 }
