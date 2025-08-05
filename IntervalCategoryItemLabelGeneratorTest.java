@@ -52,80 +52,134 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class IntervalCategoryItemLabelGeneratorTest {
 
+    // ========== Equality Tests ==========
+    
     /**
-     * Tests the equals() method.
+     * Verifies that two instances created with the default constructor are equal.
      */
     @Test
-    public void testEquals() {
-        IntervalCategoryItemLabelGenerator g1
-                = new IntervalCategoryItemLabelGenerator();
-        IntervalCategoryItemLabelGenerator g2
-                = new IntervalCategoryItemLabelGenerator();
-        assertEquals(g1, g2);
-        assertEquals(g2, g1);
-
-        g1 = new IntervalCategoryItemLabelGenerator("{3} - {4}",
-                new DecimalFormat("0.000"));
-        assertNotEquals(g1, g2);
-        g2 = new IntervalCategoryItemLabelGenerator("{3} - {4}",
-                new DecimalFormat("0.000"));
-        assertEquals(g1, g2);
-
-        g1 = new IntervalCategoryItemLabelGenerator("{3} - {4}",
-                new SimpleDateFormat("d-MMM"));
-        assertNotEquals(g1, g2);
-        g2 = new IntervalCategoryItemLabelGenerator("{3} - {4}",
-                new SimpleDateFormat("d-MMM"));
-        assertEquals(g1, g2);
+    public void testEquals_DefaultInstancesAreEqual() {
+        IntervalCategoryItemLabelGenerator g1 = new IntervalCategoryItemLabelGenerator();
+        IntervalCategoryItemLabelGenerator g2 = new IntervalCategoryItemLabelGenerator();
+        assertEquals(g1, g2, "Default instances should be equal");
     }
 
     /**
-     * Simple check that hashCode is implemented.
+     * Verifies that different label formats cause inequality.
      */
     @Test
-    public void testHashCode() {
-        IntervalCategoryItemLabelGenerator g1
-                = new IntervalCategoryItemLabelGenerator();
-        IntervalCategoryItemLabelGenerator g2
-                = new IntervalCategoryItemLabelGenerator();
-        assertEquals(g1, g2);
-        assertEquals(g1.hashCode(), g2.hashCode());
+    public void testEquals_NonDefaultLabelFormatCausesInequality() {
+        // Create generators with different label formats
+        IntervalCategoryItemLabelGenerator defaultGenerator = 
+            new IntervalCategoryItemLabelGenerator();
+        IntervalCategoryItemLabelGenerator customGenerator = 
+            new IntervalCategoryItemLabelGenerator("{3} - {4}", new DecimalFormat("0.000"));
+        
+        assertNotEquals(defaultGenerator, customGenerator, 
+            "Generators with different label formats should not be equal");
     }
 
     /**
-     * Confirm that cloning works.
+     * Verifies that identical label formats and number formatters produce equality.
      */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
-        IntervalCategoryItemLabelGenerator g1
-                = new IntervalCategoryItemLabelGenerator();
-        IntervalCategoryItemLabelGenerator g2 
-                = (IntervalCategoryItemLabelGenerator) g1.clone();
-        assertNotSame(g1, g2);
-        assertSame(g1.getClass(), g2.getClass());
-        assertEquals(g1, g2);
+    public void testEquals_SameLabelFormatAndNumberFormatProduceEquality() {
+        // Create two generators with identical custom configuration
+        IntervalCategoryItemLabelGenerator g1 = 
+            new IntervalCategoryItemLabelGenerator("{3} - {4}", new DecimalFormat("0.000"));
+        IntervalCategoryItemLabelGenerator g2 = 
+            new IntervalCategoryItemLabelGenerator("{3} - {4}", new DecimalFormat("0.000"));
+        
+        assertEquals(g1, g2, 
+            "Generators with identical label formats and number formatters should be equal");
     }
 
     /**
-     * Check to ensure that this class implements PublicCloneable.
+     * Verifies that different formatter types (Number vs Date) cause inequality.
      */
     @Test
-    public void testPublicCloneable() {
-        IntervalCategoryItemLabelGenerator g1
-                = new IntervalCategoryItemLabelGenerator();
-        assertTrue(g1 instanceof PublicCloneable);
+    public void testEquals_NumberFormatAndDateFormatCauseInequality() {
+        // Create generators with same label format but different formatter types
+        IntervalCategoryItemLabelGenerator numberGenerator = 
+            new IntervalCategoryItemLabelGenerator("{3} - {4}", new DecimalFormat("0.000"));
+        IntervalCategoryItemLabelGenerator dateGenerator = 
+            new IntervalCategoryItemLabelGenerator("{3} - {4}", new SimpleDateFormat("d-MMM"));
+        
+        assertNotEquals(numberGenerator, dateGenerator, 
+            "Generators with different formatter types should not be equal");
     }
 
     /**
-     * Serialize an instance, restore it, and check for equality.
+     * Verifies that identical label formats and date formatters produce equality.
      */
     @Test
-    public void testSerialization() {
-        IntervalCategoryItemLabelGenerator g1
-                = new IntervalCategoryItemLabelGenerator("{3} - {4}",
-                DateFormat.getInstance());
-        IntervalCategoryItemLabelGenerator g2 = TestUtils.serialised(g1);
-        assertEquals(g1, g2);
+    public void testEquals_SameLabelFormatAndDateFormatProduceEquality() {
+        // Create two generators with identical date formatters
+        IntervalCategoryItemLabelGenerator g1 = 
+            new IntervalCategoryItemLabelGenerator("{3} - {4}", new SimpleDateFormat("d-MMM"));
+        IntervalCategoryItemLabelGenerator g2 = 
+            new IntervalCategoryItemLabelGenerator("{3} - {4}", new SimpleDateFormat("d-MMM"));
+        
+        assertEquals(g1, g2, 
+            "Generators with identical label formats and date formatters should be equal");
+    }
+
+    // ========== HashCode Tests ==========
+    
+    /**
+     * Verifies that equal objects have the same hash code.
+     */
+    @Test
+    public void testHashCode_EqualObjectsHaveSameHashCode() {
+        IntervalCategoryItemLabelGenerator g1 = new IntervalCategoryItemLabelGenerator();
+        IntervalCategoryItemLabelGenerator g2 = new IntervalCategoryItemLabelGenerator();
+        
+        assertEquals(g1, g2, "Objects must be equal for hashCode test");
+        assertEquals(g1.hashCode(), g2.hashCode(), 
+            "Equal objects must have identical hash codes");
+    }
+
+    // ========== Cloning Tests ==========
+    
+    /**
+     * Verifies that cloning creates a distinct but equal copy.
+     */
+    @Test
+    public void testCloning_CreatesDistinctButEqualCopy() throws CloneNotSupportedException {
+        IntervalCategoryItemLabelGenerator original = new IntervalCategoryItemLabelGenerator();
+        IntervalCategoryItemLabelGenerator clone = (IntervalCategoryItemLabelGenerator) original.clone();
+        
+        assertNotSame(original, clone, "Cloned object should be a different instance");
+        assertSame(original.getClass(), clone.getClass(), "Cloned object should be same class");
+        assertEquals(original, clone, "Cloned object should be equal to original");
+    }
+
+    /**
+     * Confirms that the class implements the PublicCloneable interface.
+     */
+    @Test
+    public void testPublicCloneable_ImplementsInterface() {
+        IntervalCategoryItemLabelGenerator generator = new IntervalCategoryItemLabelGenerator();
+        assertTrue(generator instanceof PublicCloneable, 
+            "Class must implement PublicCloneable interface");
+    }
+
+    // ========== Serialization Tests ==========
+    
+    /**
+     * Verifies that serialization preserves object equality.
+     */
+    @Test
+    public void testSerialization_RoundTripPreservesEquality() {
+        // Create generator with non-default configuration
+        IntervalCategoryItemLabelGenerator original = 
+            new IntervalCategoryItemLabelGenerator("{3} - {4}", DateFormat.getInstance());
+        
+        // Serialize and deserialize
+        IntervalCategoryItemLabelGenerator deserialized = TestUtils.serialised(original);
+        
+        assertEquals(original, deserialized, 
+            "Deserialized object should equal original");
     }
 
 }
