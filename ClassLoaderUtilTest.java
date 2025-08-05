@@ -1,20 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.apache.commons.jxpath.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,134 +17,80 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests org.apache.commons.jxpath.util.ClassLoaderUtil.
+ * Unit tests for ClassLoaderUtil.
  */
 public class ClassLoaderUtilTest {
 
+    private static final String TEST_CASE_CLASS_NAME = "org.apache.commons.jxpath.util.ClassLoaderUtilTest";
+    private static final String EXAMPLE_CLASS_NAME = "org.apache.commons.jxpath.util.ClassLoadingExampleClass";
+
+    private ClassLoader originalContextClassLoader;
+
     /**
-     * A simple class loader which delegates all class loading to its parent with two exceptions. First, attempts to load the class
-     * {@code org.apache.commons.jxpath.util.ClassLoaderUtilTest} will always result in a ClassNotFoundException. Second, loading the class
-     * {@code org.apache.commons.jxpath.util.ClassLoadingExampleClass} will result in the class being loaded by this class loader, regardless of whether the
-     * parent can/has loaded it.
-     *
+     * Custom ClassLoader that simulates specific class loading behavior for testing.
      */
     private static final class TestClassLoader extends ClassLoader {
 
         private Class<?> testCaseClass = null;
 
-        public TestClassLoader(final ClassLoader classLoader) {
-            super(classLoader);
+        public TestClassLoader(final ClassLoader parentClassLoader) {
+            super(parentClassLoader);
         }
 
         @Override
-        public synchronized Class<?> loadClass(final String name, final boolean resolved) throws ClassNotFoundException {
+        public synchronized Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
             if (EXAMPLE_CLASS_NAME.equals(name)) {
-                throw new ClassNotFoundException();
+                throw new ClassNotFoundException("Simulated class not found for: " + name);
             }
             if (TEST_CASE_CLASS_NAME.equals(name)) {
                 if (testCaseClass == null) {
                     final URL classUrl = getParent().getResource("org/apache/commons/jxpath/util/ClassLoaderUtilTest.class");
-                    byte[] clazzBytes;
+                    byte[] classBytes;
                     try {
-                        clazzBytes = IOUtils.toByteArray(classUrl);
+                        classBytes = IOUtils.toByteArray(classUrl);
                     } catch (final IOException e) {
-                        throw new ClassNotFoundException(classUrl.toString(), e);
+                        throw new ClassNotFoundException("Failed to load class bytes from URL: " + classUrl, e);
                     }
-                    this.testCaseClass = this.defineClass(TEST_CASE_CLASS_NAME, clazzBytes, 0, clazzBytes.length);
+                    this.testCaseClass = this.defineClass(TEST_CASE_CLASS_NAME, classBytes, 0, classBytes.length);
                 }
                 return this.testCaseClass;
             }
-            return getParent().loadClass(name);
+            return super.loadClass(name, resolve);
         }
     }
 
-    // These must be string literals, and not populated by calling getName() on
-    // the respective classes, since the tests below will load this class in a
-    // special class loader which may be unable to load those classes.
-    private static final String TEST_CASE_CLASS_NAME = "org.apache.commons.jxpath.util.ClassLoaderUtilTest";
-    private static final String EXAMPLE_CLASS_NAME = "org.apache.commons.jxpath.util.ClassLoadingExampleClass";
-
-    /**
-     * Performs a basic query that requires a class be loaded dynamically by JXPath and asserts the dynamic class load fails.
-     */
-    public static void callExampleMessageMethodAndAssertClassNotFoundJXPathException() {
-        final JXPathContext context = JXPathContext.newContext(new Object());
-        assertThrows(JXPathException.class, () -> context.selectSingleNode(EXAMPLE_CLASS_NAME + ".getMessage()"),
-                "We should not be able to load " + EXAMPLE_CLASS_NAME + ".");
-    }
-
-    /**
-     * Performs a basic query that requires a class be loaded dynamically by JXPath and asserts the dynamic class load succeeds.
-     */
-    public static void callExampleMessageMethodAndAssertSuccess() {
-        final JXPathContext context = JXPathContext.newContext(new Object());
-        assertEquals("an example class", context.selectSingleNode(EXAMPLE_CLASS_NAME + ".getMessage()"));
-    }
-
-    private ClassLoader orginalContextClassLoader;
-
-    /**
-     * Loads this class through the given class loader and then invokes the indicated no argument static method of the class.
-     *
-     * @param cl         the class loader under which to invoke the method.
-     * @param methodName the name of the static no argument method on this class to invoke.
-     * @throws ReflectiveOperationException on test failures.
-     */
-    private void executeTestMethodUnderClassLoader(final ClassLoader cl, final String methodName) throws ReflectiveOperationException {
-        final Class<?> testClass = cl.loadClass(TEST_CASE_CLASS_NAME);
-        final Method testMethod = testClass.getMethod(methodName, ArrayUtils.EMPTY_CLASS_ARRAY);
-        try {
-            testMethod.invoke(null, (Object[]) null);
-        } catch (final InvocationTargetException e) {
-            if (e.getCause() instanceof RuntimeException) {
-                // Allow the runtime exception to propagate up.
-                throw (RuntimeException) e.getCause();
-            }
-        }
-    }
-
-    /**
-     * Setup for the tests.
-     */
     @BeforeEach
     public void setUp() {
-        this.orginalContextClassLoader = Thread.currentThread().getContextClassLoader();
+        this.originalContextClassLoader = Thread.currentThread().getContextClassLoader();
     }
 
-    /**
-     * Cleanup for the tests.
-     */
     @AfterEach
     public void tearDown() {
-        Thread.currentThread().setContextClassLoader(this.orginalContextClassLoader);
+        Thread.currentThread().setContextClassLoader(this.originalContextClassLoader);
     }
 
     /**
-     * Tests that JXPath cannot dynamically load a class, which is not visible to its class loader, when the context class loader is null.
-     *
-     * @throws ReflectiveOperationException on test failures.
+     * Test that JXPath fails to load a class when the context class loader is null.
      */
     @Test
     void testClassLoadFailWithoutContextClassLoader() throws ReflectiveOperationException {
         Thread.currentThread().setContextClassLoader(null);
-        final ClassLoader cl = new TestClassLoader(getClass().getClassLoader());
-        executeTestMethodUnderClassLoader(cl, "callExampleMessageMethodAndAssertClassNotFoundJXPathException");
+        final ClassLoader testClassLoader = new TestClassLoader(getClass().getClassLoader());
+        executeTestMethodUnderClassLoader(testClassLoader, "callExampleMessageMethodAndAssertClassNotFoundJXPathException");
     }
 
     /**
-     * Tests that JXPath can dynamically load a class, which is not visible to its class loader, when the context class loader is set and can load the class.
-     *
-     * @throws ReflectiveOperationException on test failures.
+     * Test that JXPath successfully loads a class when the context class loader is set.
      */
     @Test
     void testClassLoadSuccessWithContextClassLoader() throws ReflectiveOperationException {
         Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-        final ClassLoader cl = new TestClassLoader(getClass().getClassLoader());
-        executeTestMethodUnderClassLoader(cl, "callExampleMessageMethodAndAssertSuccess");
+        final ClassLoader testClassLoader = new TestClassLoader(getClass().getClassLoader());
+        executeTestMethodUnderClassLoader(testClassLoader, "callExampleMessageMethodAndAssertSuccess");
     }
 
     /**
-     * Tests that JXPath can dynamically load a class, which is visible to its class loader, when there is no context class loader set.
+     * Test that JXPath successfully loads a class without a context class loader.
      */
     @Test
     void testClassLoadSuccessWithoutContextClassLoader() {
@@ -170,12 +99,49 @@ public class ClassLoaderUtilTest {
     }
 
     /**
-     * Tests that JXPath will use its class loader to dynamically load a requested class when the context class loader is set but unable to load the class.
+     * Test that JXPath uses its class loader when the context class loader cannot load the class.
      */
     @Test
     void testCurrentClassLoaderFallback() {
-        final ClassLoader cl = new TestClassLoader(getClass().getClassLoader());
-        Thread.currentThread().setContextClassLoader(cl);
+        final ClassLoader testClassLoader = new TestClassLoader(getClass().getClassLoader());
+        Thread.currentThread().setContextClassLoader(testClassLoader);
         callExampleMessageMethodAndAssertSuccess();
+    }
+
+    /**
+     * Executes a static method on this class using a specific class loader.
+     *
+     * @param classLoader the class loader to use
+     * @param methodName  the name of the method to invoke
+     * @throws ReflectiveOperationException if an error occurs during reflection
+     */
+    private void executeTestMethodUnderClassLoader(final ClassLoader classLoader, final String methodName) throws ReflectiveOperationException {
+        final Class<?> testClass = classLoader.loadClass(TEST_CASE_CLASS_NAME);
+        final Method testMethod = testClass.getMethod(methodName, ArrayUtils.EMPTY_CLASS_ARRAY);
+        try {
+            testMethod.invoke(null, (Object[]) null);
+        } catch (final InvocationTargetException e) {
+            if (e.getCause() instanceof RuntimeException) {
+                throw (RuntimeException) e.getCause();
+            }
+        }
+    }
+
+    /**
+     * Asserts that a JXPathException is thrown when attempting to load a class that should not be found.
+     */
+    public static void callExampleMessageMethodAndAssertClassNotFoundJXPathException() {
+        final JXPathContext context = JXPathContext.newContext(new Object());
+        assertThrows(JXPathException.class, () -> context.selectSingleNode(EXAMPLE_CLASS_NAME + ".getMessage()"),
+                "Expected JXPathException due to class not found: " + EXAMPLE_CLASS_NAME);
+    }
+
+    /**
+     * Asserts that the example message method is successfully called.
+     */
+    public static void callExampleMessageMethodAndAssertSuccess() {
+        final JXPathContext context = JXPathContext.newContext(new Object());
+        assertEquals("an example class", context.selectSingleNode(EXAMPLE_CLASS_NAME + ".getMessage()"),
+                "Expected successful class load and method call.");
     }
 }
