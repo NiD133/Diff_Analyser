@@ -36,13 +36,10 @@
 
 package org.jfree.chart.renderer.category;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.api.PublicCloneable;
-
 import org.junit.jupiter.api.Test;
 
 /**
@@ -50,48 +47,55 @@ import org.junit.jupiter.api.Test;
  */
 public class StandardBarPainterTest {
 
-    /**
-     * Check that the equals() method distinguishes all fields.
-     */
     @Test
     public void testEquals() {
         StandardBarPainter p1 = new StandardBarPainter();
         StandardBarPainter p2 = new StandardBarPainter();
-        assertEquals(p1, p2);
+
+        // Reflexivity check
+        assertEquals(p1, p1, "Object should be equal to itself");
+
+        // Symmetry and equality check
+        assertEquals(p1, p2, "Two new instances should be equal");
+        assertEquals(p2, p1, "Equality should be symmetric");
+
+        // Null check
+        assertNotEquals(p1, null, "Object should not equal null");
+
+        // Type check
+        assertNotEquals(p1, new Object(), "Object should not equal different type");
     }
 
-    /**
-     * Two objects that are equal are required to return the same hashCode.
-     */
     @Test
-    public void testHashcode() {
+    public void testHashCode() {
         StandardBarPainter p1 = new StandardBarPainter();
         StandardBarPainter p2 = new StandardBarPainter();
-        assertEquals(p1, p2);
-        int h1 = p1.hashCode();
-        int h2 = p2.hashCode();
-        assertEquals(h1, h2);
+        
+        // Verify equal objects have same hash code
+        assertEquals(p1.hashCode(), p2.hashCode(), 
+            "Equal objects must have identical hash codes");
     }
 
-    /**
-     * Confirm that cloning isn't implemented (it isn't required, because
-     * instances of the class are immutable).
-     */
     @Test
     public void testCloning() {
-        StandardBarPainter p1 = new StandardBarPainter();
-        assertFalse(p1 instanceof Cloneable);
-        assertFalse(p1 instanceof PublicCloneable);
+        StandardBarPainter p = new StandardBarPainter();
+        
+        // Confirm class doesn't support cloning
+        assertFalse(p instanceof Cloneable, 
+            "Should not implement Cloneable due to immutability");
+        assertFalse(p instanceof PublicCloneable, 
+            "Should not implement PublicCloneable");
     }
 
-    /**
-     * Serialize an instance, restore it, and check for equality.
-     */
     @Test
     public void testSerialization() {
         StandardBarPainter p1 = new StandardBarPainter();
         StandardBarPainter p2 = TestUtils.serialised(p1);
-        assertEquals(p1, p2);
+        
+        // Verify post-serialization behavior
+        assertEquals(p1, p2, "Deserialized object should equal original");
+        assertNotSame(p1, p2, 
+            "Deserialized object should be a different instance");
     }
 
 }
