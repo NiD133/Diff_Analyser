@@ -21,108 +21,91 @@ import org.evosuite.runtime.EvoRunnerParameters;
 import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class)
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true,
-    useVFS = true,
-    useVNET = true,
-    resetStaticState = true,
-    separateClassLoader = true
-)
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class AbstractIterator_ESTest extends AbstractIterator_ESTest_scaffolding {
 
-    // Tests for basic iterator functionality
-    @Test(timeout = 4000)
-    public void next_returnsElementWhenAvailable() throws Throwable {
-        PriorityQueue<Locale.FilteringMode> queue = new PriorityQueue<>();
-        Locale.FilteringMode expectedElement = Locale.FilteringMode.REJECT_EXTENDED_RANGES;
-        queue.add(expectedElement);
-        
-        ConsumingQueueIterator<Locale.FilteringMode> iterator = 
-            new ConsumingQueueIterator<>(queue);
-        Locale.FilteringMode actualElement = iterator.next();
-        
-        assertSame("Iterator should return the added element", expectedElement, actualElement);
-    }
+  @Test(timeout = 4000)
+  public void test0()  throws Throwable  {
+      PriorityQueue<Locale.FilteringMode> priorityQueue0 = new PriorityQueue<Locale.FilteringMode>();
+      Locale.FilteringMode locale_FilteringMode0 = Locale.FilteringMode.REJECT_EXTENDED_RANGES;
+      priorityQueue0.add(locale_FilteringMode0);
+      ConsumingQueueIterator<Locale.FilteringMode> consumingQueueIterator0 = new ConsumingQueueIterator<Locale.FilteringMode>(priorityQueue0);
+      Locale.FilteringMode locale_FilteringMode1 = consumingQueueIterator0.next();
+      assertSame(locale_FilteringMode1, locale_FilteringMode0);
+  }
 
-    @Test(timeout = 4000)
-    public void hasNext_returnsTrueWhenElementsAvailable() {
-        PriorityQueue<Locale.FilteringMode> queue = new PriorityQueue<>();
-        queue.add(Locale.FilteringMode.REJECT_EXTENDED_RANGES);
-        
-        ConsumingQueueIterator<Locale.FilteringMode> iterator = 
-            new ConsumingQueueIterator<>(queue);
-        boolean hasNext = iterator.hasNext();
-        
-        assertTrue("Iterator should have next element", hasNext);
-    }
+  @Test(timeout = 4000)
+  public void test1()  throws Throwable  {
+      PriorityQueue<Locale.FilteringMode> priorityQueue0 = new PriorityQueue<Locale.FilteringMode>();
+      Locale.FilteringMode locale_FilteringMode0 = Locale.FilteringMode.REJECT_EXTENDED_RANGES;
+      priorityQueue0.add(locale_FilteringMode0);
+      ConsumingQueueIterator<Locale.FilteringMode> consumingQueueIterator0 = new ConsumingQueueIterator<Locale.FilteringMode>(priorityQueue0);
+      boolean boolean0 = consumingQueueIterator0.hasNext();
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void endOfData_returnsNull() throws Throwable {
-        ArrayDeque<Object> emptyQueue = new ArrayDeque<>();
-        ConsumingQueueIterator<Object> iterator = new ConsumingQueueIterator<>(emptyQueue);
-        
-        Object endMarker = iterator.endOfData();
-        
-        assertNull("endOfData() should return null", endMarker);
-    }
+  @Test(timeout = 4000)
+  public void test2()  throws Throwable  {
+      ArrayDeque<Object> arrayDeque0 = new ArrayDeque<Object>();
+      ConsumingQueueIterator<Object> consumingQueueIterator0 = new ConsumingQueueIterator<Object>(arrayDeque0);
+      Object object0 = consumingQueueIterator0.endOfData();
+      assertNull(object0);
+  }
 
-    @Test(timeout = 4000)
-    public void forEachRemaining_marksIteratorAsExhausted() {
-        ArrayDeque<Object> emptyQueue = new ArrayDeque<>();
-        ConsumingQueueIterator<Object> iterator = new ConsumingQueueIterator<>(emptyQueue);
-        Consumer<Object> mockConsumer = mock(Consumer.class, new ViolatedAssumptionAnswer());
-        
-        iterator.forEachRemaining(mockConsumer);
-        boolean hasNext = iterator.hasNext();
-        
-        assertFalse("Iterator should be exhausted after forEachRemaining", hasNext);
-    }
+  @Test(timeout = 4000)
+  public void test3()  throws Throwable  {
+      ArrayDeque<Object> arrayDeque0 = new ArrayDeque<Object>();
+      ConsumingQueueIterator<Object> consumingQueueIterator0 = new ConsumingQueueIterator<Object>(arrayDeque0);
+      Consumer<Object> consumer0 = (Consumer<Object>) mock(Consumer.class, new ViolatedAssumptionAnswer());
+      consumingQueueIterator0.forEachRemaining(consumer0);
+      boolean boolean0 = consumingQueueIterator0.hasNext();
+      assertFalse(boolean0);
+  }
 
-    // Tests for iterator behavior after peeking
-    @Test(timeout = 4000)
-    public void forEachRemaining_afterPeek_processesRemainingElements() {
-        LinkedList<Object> queue = new LinkedList<>();
-        Object element = new Object();
-        queue.add(element);
-        ConsumingQueueIterator<Object> iterator = new ConsumingQueueIterator<>(queue);
-        Consumer<Object> mockConsumer = mock(Consumer.class, new ViolatedAssumptionAnswer());
-        
-        iterator.peek();  // Look at element without consuming
-        iterator.forEachRemaining(mockConsumer);
-        
-        // Verify mockConsumer was called with the element
-        verify(mockConsumer).accept(element);
-    }
+  @Test(timeout = 4000)
+  public void test4()  throws Throwable  {
+      LinkedList<Object> linkedList0 = new LinkedList<Object>();
+      Object object0 = new Object();
+      linkedList0.add(object0);
+      ConsumingQueueIterator<Object> consumingQueueIterator0 = new ConsumingQueueIterator<Object>(linkedList0);
+      consumingQueueIterator0.peek();
+      Consumer<Object> consumer0 = (Consumer<Object>) mock(Consumer.class, new ViolatedAssumptionAnswer());
+      consumingQueueIterator0.forEachRemaining(consumer0);
+  }
 
-    // Tests for error cases
-    @Test(timeout = 4000)
-    public void next_throwsExceptionWhenNoElements() {
-        PriorityQueue<Locale.FilteringMode> emptyQueue = new PriorityQueue<>();
-        ConsumingQueueIterator<Locale.FilteringMode> iterator = 
-            new ConsumingQueueIterator<>(emptyQueue);
-        
-        try {
-            iterator.next();
-            fail("Expected NoSuchElementException when next() called on empty iterator");
-        } catch (NoSuchElementException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test5()  throws Throwable  {
+      PriorityQueue<Locale.FilteringMode> priorityQueue0 = new PriorityQueue<Locale.FilteringMode>();
+      ConsumingQueueIterator<Locale.FilteringMode> consumingQueueIterator0 = new ConsumingQueueIterator<Locale.FilteringMode>(priorityQueue0);
+      // Undeclared exception!
+      try { 
+        consumingQueueIterator0.next();
+        fail("Expecting exception: NoSuchElementException");
+      
+      } catch(NoSuchElementException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.collect.AbstractIterator", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void peek_throwsExceptionAfterExhaustingIterator() {
-        LinkedList<Object> emptyQueue = new LinkedList<>();
-        ConsumingQueueIterator<Object> iterator = new ConsumingQueueIterator<>(emptyQueue);
-        Consumer<Object> mockConsumer = mock(Consumer.class, new ViolatedAssumptionAnswer());
-        
-        iterator.forEachRemaining(mockConsumer);
-        
-        try {
-            iterator.peek();
-            fail("Expected NoSuchElementException when peek() called on exhausted iterator");
-        } catch (NoSuchElementException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test6()  throws Throwable  {
+      LinkedList<Object> linkedList0 = new LinkedList<Object>();
+      ConsumingQueueIterator<Object> consumingQueueIterator0 = new ConsumingQueueIterator<Object>(linkedList0);
+      Consumer<Object> consumer0 = (Consumer<Object>) mock(Consumer.class, new ViolatedAssumptionAnswer());
+      consumingQueueIterator0.forEachRemaining(consumer0);
+      // Undeclared exception!
+      try { 
+        consumingQueueIterator0.peek();
+        fail("Expecting exception: NoSuchElementException");
+      
+      } catch(NoSuchElementException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.collect.AbstractIterator", e);
+      }
+  }
 }
