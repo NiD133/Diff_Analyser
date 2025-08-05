@@ -19,418 +19,282 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class LocaleUtils_ESTest extends LocaleUtils_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      Locale locale0 = Locale.SIMPLIFIED_CHINESE;
-      Locale locale1 = new Locale("Italy", "und", "LV");
-      List<Locale> list0 = LocaleUtils.localeLookupList(locale1, locale0);
-      assertEquals(4, list0.size());
-  }
+    // ========================================================================
+    // Tests for toLocale(String)
+    // ========================================================================
+    
+    @Test(timeout = 4000)
+    public void testToLocale_WithNull_ReturnsNull() {
+        Locale locale = LocaleUtils.toLocale((String) null);
+        assertNull(locale);
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000)
+    public void testToLocale_WithEmptyString_ReturnsEmptyLocale() {
+        Locale locale = LocaleUtils.toLocale("");
+        assertEquals("", locale.getLanguage());
+    }
+
+    @Test(timeout = 4000)
+    public void testToLocale_WithValidLanguage_ReturnsLocale() {
+        Locale locale = LocaleUtils.toLocale("fr");
+        assertEquals("fr", locale.getLanguage());
+    }
+
+    @Test(timeout = 4000)
+    public void testToLocale_WithValidLanguageCountry_ReturnsLocale() {
+        Locale locale = LocaleUtils.toLocale("zh-CN");
+        assertEquals("zh_CN", locale.toString());
+    }
+
+    @Test(timeout = 4000)
+    public void testToLocale_WithDashCountry_ReturnsChinaLocale() {
+        Locale locale = LocaleUtils.toLocale("-CN");
+        assertEquals("CHN", locale.getISO3Country());
+    }
+
+    @Test(timeout = 4000)
+    public void testToLocale_WithDashDYn_ReturnsLocaleWithUnderscore() {
+        Locale locale = LocaleUtils.toLocale("-DY-n");
+        assertEquals("_DY_n", locale.toString());
+    }
+
+    @Test(timeout = 4000)
+    public void testToLocale_WithValidVariant_ReturnsLocale() {
+        Locale locale = LocaleUtils.toLocale("biTN-009");
+        assertEquals("bitn_009", locale.toString());
+    }
+
+    @Test(timeout = 4000)
+    public void testToLocale_WithMultiSegmentVariant_ReturnsLocale() {
+        Locale locale = LocaleUtils.toLocale("bfi-TN-D9");
+        assertEquals("bfi_TN_D9", locale.toString());
+    }
+
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testToLocale_InvalidFormat_uiTN_0029_ThrowsException() {
         LocaleUtils.toLocale("uiTN-0029");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid locale format: uiTN-0029
-         //
-         verifyException("org.apache.commons.lang3.LocaleUtils", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testToLocale_InvalidFormat_NonAscii_ThrowsException() {
         LocaleUtils.toLocale("\u00EDslenska");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid locale format: \u00EDslenska
-         //
-         verifyException("org.apache.commons.lang3.LocaleUtils", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testToLocale_InvalidFormat_zh_XCN_ThrowsException() {
         LocaleUtils.toLocale("zh-XCN");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid locale format: zh-XCN
-         //
-         verifyException("org.apache.commons.lang3.LocaleUtils", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      List<Locale> list0 = LocaleUtils.localeLookupList((Locale) null, (Locale) null);
-      assertTrue(list0.isEmpty());
-  }
-
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      Locale locale0 = LocaleUtils.toLocale("-DY-n");
-      assertEquals("_DY_n", locale0.toString());
-  }
-
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testToLocale_InvalidFormat_UnderscoreHUP_ThrowsException() {
         LocaleUtils.toLocale("_HUP");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid locale format: _HUP
-         //
-         verifyException("org.apache.commons.lang3.LocaleUtils", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      Locale locale0 = LocaleUtils.toLocale("-CN");
-      assertEquals("CHN", locale0.getISO3Country());
-  }
-
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testToLocale_InvalidFormat_DashCIIN_ThrowsException() {
         LocaleUtils.toLocale("-CIIN");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid locale format: -CIIN
-         //
-         verifyException("org.apache.commons.lang3.LocaleUtils", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testToLocale_InvalidFormat_DashJ_ThrowsException() {
         LocaleUtils.toLocale("-j");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid locale format: -j
-         //
-         verifyException("org.apache.commons.lang3.LocaleUtils", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testToLocale_InvalidFormat_DashCExclamationN_ThrowsException() {
         LocaleUtils.toLocale("-C!N");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid locale format: -C!N
-         //
-         verifyException("org.apache.commons.lang3.LocaleUtils", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testToLocale_InvalidFormat_LongUnderscoreString_ThrowsException() {
         LocaleUtils.toLocale("_9DSQCbSw^!e Mr4eg6");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid locale format: _9DSQCbSw^!e Mr4eg6
-         //
-         verifyException("org.apache.commons.lang3.LocaleUtils", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testToLocale_InvalidFormat_SinglePlus_ThrowsException() {
         LocaleUtils.toLocale("+");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid locale format: +
-         //
-         verifyException("org.apache.commons.lang3.LocaleUtils", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testToLocale_InvalidFormat_SingleHash_ThrowsException() {
         LocaleUtils.toLocale("#");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid locale format: #
-         //
-         verifyException("org.apache.commons.lang3.LocaleUtils", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      Locale locale0 = LocaleUtils.toLocale("");
-      assertEquals("", locale0.getLanguage());
-  }
-
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      Locale locale0 = LocaleUtils.toLocale((String) null);
-      assertNull(locale0);
-  }
-
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      Locale locale0 = Locale.ITALIAN;
-      Locale locale1 = LocaleUtils.toLocale(locale0);
-      assertEquals("ita", locale1.getISO3Language());
-  }
-
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      Locale locale0 = LocaleUtils.toLocale((Locale) null);
-      assertEquals("eng", locale0.getISO3Language());
-  }
-
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testToLocale_InvalidFormat_AtDoubleDash_ThrowsException() {
         LocaleUtils.toLocale("at--");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid locale format: at--
-         //
-         verifyException("org.apache.commons.lang3.LocaleUtils", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testToLocale_InvalidFormat_LongString_ThrowsException() {
         LocaleUtils.toLocale(")g%EOd_,G_0^e~VZj");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid locale format: )g%EOd_,G_0^e~VZj
-         //
-         verifyException("org.apache.commons.lang3.LocaleUtils", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testToLocale_InvalidFormat_zh_uCN_ThrowsException() {
         LocaleUtils.toLocale("zh-uCN");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid locale format: zh-uCN
-         //
-         verifyException("org.apache.commons.lang3.LocaleUtils", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      Locale locale0 = LocaleUtils.toLocale("zh-CN");
-      assertNotNull(locale0);
-      assertEquals("zh_CN", locale0.toString());
-  }
-
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      Locale locale0 = LocaleUtils.toLocale("fr");
-      assertNotNull(locale0);
-      assertEquals("fr", locale0.getLanguage());
-  }
-
-  @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
-      Locale locale0 = Locale.ENGLISH;
-      Locale locale1 = Locale.ROOT;
-      List<Locale> list0 = LocaleUtils.localeLookupList(locale0, locale1);
-      assertEquals(2, list0.size());
-      assertTrue(list0.contains(locale1));
-  }
-
-  @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
-      Locale locale0 = Locale.ENGLISH;
-      List<Locale> list0 = LocaleUtils.localeLookupList(locale0, locale0);
-      assertEquals(1, list0.size());
-  }
-
-  @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
-      List<Locale> list0 = LocaleUtils.languagesByCountry((String) null);
-      assertTrue(list0.isEmpty());
-  }
-
-  @Test(timeout = 4000)
-  public void test26()  throws Throwable  {
-      List<Locale> list0 = LocaleUtils.languagesByCountry("RO");
-      assertEquals(1, list0.size());
-  }
-
-  @Test(timeout = 4000)
-  public void test27()  throws Throwable  {
-      Locale locale0 = LocaleUtils.toLocale("biTN-009");
-      assertEquals("bitn_009", locale0.toString());
-      assertNotNull(locale0);
-  }
-
-  @Test(timeout = 4000)
-  public void test28()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testToLocale_InvalidFormat_DXQuoteNFC_ThrowsException() {
         LocaleUtils.toLocale("DX\"n{f!cA_1");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid locale format: DX\"n{f!cA_1
-         //
-         verifyException("org.apache.commons.lang3.LocaleUtils", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test29()  throws Throwable  {
-      Locale locale0 = Locale.ROOT;
-      boolean boolean0 = LocaleUtils.isLanguageUndetermined(locale0);
-      assertTrue(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test30()  throws Throwable  {
-      Locale locale0 = Locale.GERMANY;
-      boolean boolean0 = LocaleUtils.isLanguageUndetermined(locale0);
-      assertFalse(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test31()  throws Throwable  {
-      boolean boolean0 = LocaleUtils.isLanguageUndetermined((Locale) null);
-      assertTrue(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test32()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testToLocale_InvalidFormat_UnderscoreInVariant_ThrowsException() {
         LocaleUtils.toLocale("q_]:a$7mI");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid locale format: q_]:a$7mI
-         //
-         verifyException("org.apache.commons.lang3.LocaleUtils", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test33()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testToLocale_InvalidFormat_bi_KD9_ThrowsException() {
         LocaleUtils.toLocale("bi-K-D9");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid locale format: bi-K-D9
-         //
-         verifyException("org.apache.commons.lang3.LocaleUtils", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test34()  throws Throwable  {
-      Locale locale0 = LocaleUtils.toLocale("bfi-TN-D9");
-      assertNotNull(locale0);
-      assertEquals("bfi_TN_D9", locale0.toString());
-  }
+    // ========================================================================
+    // Tests for toLocale(Locale)
+    // ========================================================================
 
-  @Test(timeout = 4000)
-  public void test35()  throws Throwable  {
-      Locale locale0 = Locale.ITALY;
-      boolean boolean0 = LocaleUtils.isAvailableLocale(locale0);
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testToLocale_WithNullLocale_ReturnsDefaultLocale() {
+        Locale locale = LocaleUtils.toLocale((Locale) null);
+        assertEquals("eng", locale.getISO3Language());
+    }
 
-  @Test(timeout = 4000)
-  public void test36()  throws Throwable  {
-      boolean boolean0 = LocaleUtils.isAvailableLocale((Locale) null);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testToLocale_WithNonNullLocale_ReturnsSameLocale() {
+        Locale input = Locale.ITALIAN;
+        Locale result = LocaleUtils.toLocale(input);
+        assertEquals("ita", result.getISO3Language());
+    }
 
-  @Test(timeout = 4000)
-  public void test37()  throws Throwable  {
-      List<Locale> list0 = LocaleUtils.countriesByLanguage((String) null);
-      assertTrue(list0.isEmpty());
-  }
+    // ========================================================================
+    // Tests for localeLookupList()
+    // ========================================================================
 
-  @Test(timeout = 4000)
-  public void test38()  throws Throwable  {
-      List<Locale> list0 = LocaleUtils.countriesByLanguage("q@:a$7mI");
-      assertEquals(0, list0.size());
-  }
+    @Test(timeout = 4000)
+    public void testLocaleLookupList_WithNullLocaleAndNullDefault_ReturnsEmptyList() {
+        List<Locale> list = LocaleUtils.localeLookupList(null, null);
+        assertTrue(list.isEmpty());
+    }
 
-  @Test(timeout = 4000)
-  public void test39()  throws Throwable  {
-      List<Locale> list0 = LocaleUtils.availableLocaleList();
-      assertFalse(list0.isEmpty());
-  }
+    @Test(timeout = 4000)
+    public void testLocaleLookupList_WithNullLocale_ReturnsEmptyList() {
+        List<Locale> list = LocaleUtils.localeLookupList(null);
+        assertEquals(0, list.size());
+    }
 
-  @Test(timeout = 4000)
-  public void test40()  throws Throwable  {
-      Set<Locale> set0 = LocaleUtils.availableLocaleSet();
-      assertFalse(set0.isEmpty());
-  }
+    @Test(timeout = 4000)
+    public void testLocaleLookupList_WithSingleLocale_ReturnsOneElement() {
+        Locale locale = Locale.ENGLISH;
+        List<Locale> list = LocaleUtils.localeLookupList(locale, locale);
+        assertEquals(1, list.size());
+    }
 
-  @Test(timeout = 4000)
-  public void test41()  throws Throwable  {
-      List<Locale> list0 = LocaleUtils.localeLookupList((Locale) null);
-      assertEquals(0, list0.size());
-  }
+    @Test(timeout = 4000)
+    public void testLocaleLookupList_WithDifferentLocales_ReturnsFourElements() {
+        Locale locale0 = Locale.SIMPLIFIED_CHINESE;
+        Locale locale1 = new Locale("Italy", "und", "LV");
+        List<Locale> list = LocaleUtils.localeLookupList(locale1, locale0);
+        assertEquals(4, list.size());
+    }
 
-  @Test(timeout = 4000)
-  public void test42()  throws Throwable  {
-      LocaleUtils localeUtils0 = new LocaleUtils();
-  }
+    @Test(timeout = 4000)
+    public void testLocaleLookupList_WithEnglishAndRoot_ReturnsTwoLocales() {
+        Locale locale0 = Locale.ENGLISH;
+        Locale locale1 = Locale.ROOT;
+        List<Locale> list = LocaleUtils.localeLookupList(locale0, locale1);
+        assertEquals(2, list.size());
+        assertTrue(list.contains(locale1));
+    }
+
+    // ========================================================================
+    // Tests for languagesByCountry()
+    // ========================================================================
+
+    @Test(timeout = 4000)
+    public void testLanguagesByCountry_WithNull_ReturnsEmptyList() {
+        List<Locale> list = LocaleUtils.languagesByCountry(null);
+        assertTrue(list.isEmpty());
+    }
+
+    @Test(timeout = 4000)
+    public void testLanguagesByCountry_WithValidCountry_ReturnsNonEmptyList() {
+        List<Locale> list = LocaleUtils.languagesByCountry("RO");
+        assertEquals(1, list.size());
+    }
+
+    // ========================================================================
+    // Tests for countriesByLanguage()
+    // ========================================================================
+
+    @Test(timeout = 4000)
+    public void testCountriesByLanguage_WithNull_ReturnsEmptyList() {
+        List<Locale> list = LocaleUtils.countriesByLanguage(null);
+        assertTrue(list.isEmpty());
+    }
+
+    @Test(timeout = 4000)
+    public void testCountriesByLanguage_WithInvalidLanguage_ReturnsEmptyList() {
+        List<Locale> list = LocaleUtils.countriesByLanguage("q@:a$7mI");
+        assertEquals(0, list.size());
+    }
+
+    // ========================================================================
+    // Tests for isAvailableLocale()
+    // ========================================================================
+
+    @Test(timeout = 4000)
+    public void testIsAvailableLocale_WithNull_ReturnsFalse() {
+        assertFalse(LocaleUtils.isAvailableLocale(null));
+    }
+
+    @Test(timeout = 4000)
+    public void testIsAvailableLocale_WithItaly_ReturnsTrue() {
+        assertTrue(LocaleUtils.isAvailableLocale(Locale.ITALY));
+    }
+
+    // ========================================================================
+    // Tests for isLanguageUndetermined()
+    // ========================================================================
+
+    @Test(timeout = 4000)
+    public void testIsLanguageUndetermined_WithNull_ReturnsTrue() {
+        assertTrue(LocaleUtils.isLanguageUndetermined(null));
+    }
+
+    @Test(timeout = 4000)
+    public void testIsLanguageUndetermined_WithRootLocale_ReturnsTrue() {
+        assertTrue(LocaleUtils.isLanguageUndetermined(Locale.ROOT));
+    }
+
+    @Test(timeout = 4000)
+    public void testIsLanguageUndetermined_WithGermany_ReturnsFalse() {
+        assertFalse(LocaleUtils.isLanguageUndetermined(Locale.GERMANY));
+    }
+
+    // ========================================================================
+    // Tests for available locales
+    // ========================================================================
+
+    @Test(timeout = 4000)
+    public void testAvailableLocaleList_ReturnsNonEmptyList() {
+        List<Locale> list = LocaleUtils.availableLocaleList();
+        assertFalse(list.isEmpty());
+    }
+
+    @Test(timeout = 4000)
+    public void testAvailableLocaleSet_ReturnsNonEmptySet() {
+        Set<Locale> set = LocaleUtils.availableLocaleSet();
+        assertFalse(set.isEmpty());
+    }
+
+    // ========================================================================
+    // Tests for constructor
+    // ========================================================================
+
+    @Test(timeout = 4000)
+    public void testConstructor_InstantiationSucceeds() {
+        new LocaleUtils();
+    }
 }
