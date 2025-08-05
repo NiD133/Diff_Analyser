@@ -41,231 +41,589 @@ import org.evosuite.runtime.mock.java.time.chrono.MockThaiBuddhistDate;
 import org.junit.runner.RunWith;
 import org.threeten.extra.DayOfYear;
 
-@RunWith(EvoRunner.class) 
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true, 
-    useVFS = true, 
-    useVNET = true, 
-    resetStaticState = true, 
-    separateClassLoader = true
-) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class DayOfYear_ESTest extends DayOfYear_ESTest_scaffolding {
 
-    // Test Cases for now() method
-    @Test(timeout = 4000)
-    public void testNowWithDifferentTimeZones_shouldNotBeEqual() throws Throwable {
-        ZoneOffset maxOffset = ZoneOffset.MAX;
-        DayOfYear dayInMaxOffset = DayOfYear.now(maxOffset);
-        DayOfYear dayInDefaultZone = DayOfYear.now();
-        assertNotEquals("Days from different time zones should differ", 
-                        dayInDefaultZone, dayInMaxOffset);
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      ZoneOffset zoneOffset0 = ZoneOffset.MAX;
+      DayOfYear dayOfYear0 = DayOfYear.now((ZoneId) zoneOffset0);
+      DayOfYear dayOfYear1 = DayOfYear.now();
+      boolean boolean0 = dayOfYear1.equals(dayOfYear0);
+      assertFalse(boolean0);
+      assertFalse(dayOfYear0.equals((Object)dayOfYear1));
+  }
 
-    @Test(timeout = 4000)
-    public void testNowWithNullZone_shouldThrowNullPointerException() throws Throwable {
-        try {
-            DayOfYear.now((ZoneId) null);
-            fail("Expected NullPointerException for null zone");
-        } catch (NullPointerException e) {
-            assertEquals("zone", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.now();
+      ChronoField chronoField0 = ChronoField.DAY_OF_YEAR;
+      dayOfYear0.range(chronoField0);
+      assertEquals(45, dayOfYear0.getValue());
+  }
 
-    @Test(timeout = 4000)
-    public void testNowWithInvalidClock_shouldThrowDateTimeException() throws Throwable {
-        Clock systemClock = MockClock.systemDefaultZone();
-        Clock offsetClock = MockClock.offset(systemClock, ChronoUnit.ERAS.getDuration());
-        try {
-            DayOfYear.now(offsetClock);
-            fail("Expected DateTimeException for invalid clock");
-        } catch (DateTimeException e) {
-            assertEquals("Instant exceeds minimum or maximum instant", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      ZoneOffset zoneOffset0 = ZoneOffset.MAX;
+      DayOfYear dayOfYear0 = DayOfYear.now((ZoneId) zoneOffset0);
+      TemporalQuery<ChronoField> temporalQuery0 = (TemporalQuery<ChronoField>) mock(TemporalQuery.class, new ViolatedAssumptionAnswer());
+      doReturn((Object) null).when(temporalQuery0).queryFrom(any(java.time.temporal.TemporalAccessor.class));
+      dayOfYear0.query(temporalQuery0);
+      assertEquals(46, dayOfYear0.getValue());
+  }
 
-    // Test Cases for of() method
-    @Test(timeout = 4000)
-    public void testOfWithInvalidDay0_shouldThrowDateTimeException() throws Throwable {
-        try {
-            DayOfYear.of(0);
-            fail("Expected DateTimeException for day 0");
-        } catch (DateTimeException e) {
-            assertEquals("Invalid value for DayOfYear: 0", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      ZoneOffset zoneOffset0 = ZoneOffset.MAX;
+      DayOfYear dayOfYear0 = DayOfYear.now((ZoneId) zoneOffset0);
+      DayOfYear dayOfYear1 = DayOfYear.now();
+      int int0 = dayOfYear0.compareTo(dayOfYear1);
+      assertEquals(1, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void testOfValidDay_shouldReturnInstance() throws Throwable {
-        DayOfYear day = DayOfYear.of(1);
-        assertEquals(1, day.getValue());
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.of(1);
+      Clock clock0 = MockClock.systemDefaultZone();
+      DayOfYear dayOfYear1 = DayOfYear.now(clock0);
+      int int0 = dayOfYear0.compareTo(dayOfYear1);
+      assertEquals((-44), int0);
+  }
 
-    // Test Cases for from() method
-    @Test(timeout = 4000)
-    public void testFromWithNullTemporal_shouldThrowNullPointerException() throws Throwable {
-        try {
-            DayOfYear.from(null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            assertEquals("temporal", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.of(1);
+      Year year0 = MockYear.now();
+      LocalDate localDate0 = dayOfYear0.atYear(year0);
+      TemporalQuery<ChronoLocalDate> temporalQuery0 = (TemporalQuery<ChronoLocalDate>) mock(TemporalQuery.class, new ViolatedAssumptionAnswer());
+      doReturn(localDate0).when(temporalQuery0).queryFrom(any(java.time.temporal.TemporalAccessor.class));
+      ChronoLocalDate chronoLocalDate0 = dayOfYear0.query(temporalQuery0);
+      assertSame(localDate0, chronoLocalDate0);
+  }
 
-    @Test(timeout = 4000)
-    public void testFromWithInvalidTemporal_shouldThrowDateTimeException() throws Throwable {
-        try {
-            DayOfYear.from(Month.NOVEMBER);
-            fail("Expected DateTimeException for invalid temporal");
-        } catch (DateTimeException e) {
-            assertTrue(e.getMessage().contains("Unable to obtain DayOfYear"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.now();
+      LocalDate localDate0 = dayOfYear0.atYear((-2684));
+      Temporal temporal0 = dayOfYear0.adjustInto(localDate0);
+      assertEquals(45, dayOfYear0.getValue());
+      assertSame(temporal0, localDate0);
+  }
 
-    // Test Cases for get() and range() methods
-    @Test(timeout = 4000)
-    public void testGetSupportedField_shouldReturnValue() throws Throwable {
-        DayOfYear day = DayOfYear.now();
-        int value = day.get(ChronoField.DAY_OF_YEAR);
-        assertEquals(45, value);
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.now();
+      ChronoField chronoField0 = ChronoField.SECOND_OF_MINUTE;
+      // Undeclared exception!
+      try { 
+        dayOfYear0.range(chronoField0);
+        fail("Expecting exception: UnsupportedTemporalTypeException");
+      
+      } catch(UnsupportedTemporalTypeException e) {
+         //
+         // Unsupported field: SecondOfMinute
+         //
+         verifyException("java.time.temporal.TemporalAccessor", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetUnsupportedField_shouldThrowException() throws Throwable {
-        DayOfYear day = DayOfYear.now();
-        try {
-            day.get(ChronoField.ERA);
-            fail("Expected UnsupportedTemporalTypeException");
-        } catch (UnsupportedTemporalTypeException e) {
-            assertEquals("Unsupported field: Era", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        DayOfYear.of(0);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value for DayOfYear: 0
+         //
+         verifyException("org.threeten.extra.DayOfYear", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testRangeSupportedField_shouldReturnValidRange() throws Throwable {
-        DayOfYear day = DayOfYear.now();
-        ValueRange range = day.range(ChronoField.DAY_OF_YEAR);
-        assertNotNull(range);
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        DayOfYear.now((ZoneId) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // zone
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 
-    // Test Cases for adjustInto() method
-    @Test(timeout = 4000)
-    public void testAdjustIntoWithLocalDate_shouldAdjustSuccessfully() throws Throwable {
-        DayOfYear day = DayOfYear.now();
-        LocalDate date = LocalDate.of(2023, 1, 1);
-        Temporal adjusted = day.adjustInto(date);
-        assertEquals(day.getValue(), ((LocalDate) adjusted).getDayOfYear());
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      Clock clock0 = MockClock.systemDefaultZone();
+      ChronoUnit chronoUnit0 = ChronoUnit.ERAS;
+      Duration duration0 = chronoUnit0.getDuration();
+      Clock clock1 = MockClock.offset(clock0, duration0);
+      // Undeclared exception!
+      try { 
+        DayOfYear.now(clock1);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Instant exceeds minimum or maximum instant
+         //
+         verifyException("java.time.Instant", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testAdjustIntoWithNull_shouldThrowNullPointerException() throws Throwable {
-        DayOfYear day = DayOfYear.now();
-        try {
-            day.adjustInto(null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            assertEquals("temporal", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      ZoneOffset zoneOffset0 = ZoneOffset.UTC;
+      Clock clock0 = MockClock.system(zoneOffset0);
+      ChronoUnit chronoUnit0 = ChronoUnit.FOREVER;
+      Duration duration0 = chronoUnit0.getDuration();
+      Clock clock1 = MockClock.offset(clock0, duration0);
+      // Undeclared exception!
+      try { 
+        DayOfYear.now(clock1);
+        fail("Expecting exception: ArithmeticException");
+      
+      } catch(ArithmeticException e) {
+         //
+         // long overflow
+         //
+         verifyException("java.lang.Math", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testAdjustIntoWithNonISODate_shouldThrowDateTimeException() throws Throwable {
-        DayOfYear day = DayOfYear.now();
-        HijrahDate hijrahDate = MockHijrahDate.now();
-        try {
-            day.adjustInto(hijrahDate);
-            fail("Expected DateTimeException for non-ISO date");
-        } catch (DateTimeException e) {
-            assertEquals("Adjustment only supported on ISO date-time", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.now();
+      ChronoField chronoField0 = ChronoField.ERA;
+      // Undeclared exception!
+      try { 
+        dayOfYear0.get(chronoField0);
+        fail("Expecting exception: UnsupportedTemporalTypeException");
+      
+      } catch(UnsupportedTemporalTypeException e) {
+         //
+         // Unsupported field: Era
+         //
+         verifyException("java.time.temporal.TemporalAccessor", e);
+      }
+  }
 
-    // Test Cases for atYear() method
-    @Test(timeout = 4000)
-    public void testAtYearWithLeapDayNonLeapYear_shouldThrowException() throws Throwable {
-        DayOfYear leapDay = DayOfYear.of(366);
-        try {
-            leapDay.atYear(2023); // Non-leap year
-            fail("Expected DateTimeException");
-        } catch (DateTimeException e) {
-            assertTrue(e.getMessage().contains("Invalid date 'DayOfYear 366'"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.now();
+      // Undeclared exception!
+      try { 
+        dayOfYear0.get((TemporalField) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // field
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testAtYearWithNullYear_shouldThrowNullPointerException() throws Throwable {
-        DayOfYear day = DayOfYear.now();
-        try {
-            day.atYear((Year) null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            assertEquals("year", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        DayOfYear.from((TemporalAccessor) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // temporal
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 
-    // Test Cases for isValidYear() method
-    @Test(timeout = 4000)
-    public void testIsValidYearWithLeapDay_returnsTrueOnlyInLeapYears() throws Throwable {
-        DayOfYear leapDay = DayOfYear.of(366);
-        assertTrue(leapDay.isValidYear(2020)); // Leap year
-        assertFalse(leapDay.isValidYear(2023)); // Non-leap year
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      ZoneId zoneId0 = ZoneId.systemDefault();
+      DayOfYear dayOfYear0 = DayOfYear.now(zoneId0);
+      // Undeclared exception!
+      try { 
+        dayOfYear0.compareTo((DayOfYear) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.threeten.extra.DayOfYear", e);
+      }
+  }
 
-    // Test Cases for equals() and hashCode()
-    @Test(timeout = 4000)
-    public void testEqualsSameInstance_returnsTrue() throws Throwable {
-        DayOfYear day = DayOfYear.now();
-        assertTrue(day.equals(day));
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.now();
+      // Undeclared exception!
+      try { 
+        dayOfYear0.atYear((Year) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // year
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualsDifferentType_returnsFalse() throws Throwable {
-        DayOfYear day = DayOfYear.now();
-        assertFalse(day.equals(ZoneOffset.UTC));
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.of(366);
+      ZonedDateTime zonedDateTime0 = MockZonedDateTime.now();
+      // Undeclared exception!
+      try { 
+        dayOfYear0.adjustInto(zonedDateTime0);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid date 'DayOfYear 366' as '2014' is not a leap year
+         //
+         verifyException("java.time.LocalDate", e);
+      }
+  }
 
-    // Test Cases for compareTo()
-    @Test(timeout = 4000)
-    public void testCompareToSameDay_returnsZero() throws Throwable {
-        DayOfYear day = DayOfYear.now();
-        assertEquals(0, day.compareTo(day));
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.now();
+      // Undeclared exception!
+      try { 
+        dayOfYear0.adjustInto((Temporal) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // temporal
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testCompareToNull_shouldThrowNullPointerException() throws Throwable {
-        DayOfYear day = DayOfYear.now();
-        try {
-            day.compareTo(null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.now();
+      ChronoField chronoField0 = ChronoField.DAY_OF_YEAR;
+      long long0 = dayOfYear0.getLong(chronoField0);
+      assertEquals(45L, long0);
+  }
 
-    // Test Cases for query()
-    @Test(timeout = 4000)
-    public void testQueryReturnsLocalDate() throws Throwable {
-        DayOfYear day = DayOfYear.of(1);
-        Year year = MockYear.of(2023);
-        LocalDate expectedDate = LocalDate.ofYearDay(2023, 1);
-        
-        TemporalQuery<ChronoLocalDate> query = mock(TemporalQuery.class);
-        when(query.queryFrom(any(TemporalAccessor.class)).thenReturn(expectedDate);
-        
-        ChronoLocalDate result = day.query(query);
-        assertEquals(expectedDate, result);
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.now();
+      ChronoField chronoField0 = ChronoField.DAY_OF_YEAR;
+      dayOfYear0.isSupported(chronoField0);
+      assertEquals(45, dayOfYear0.getValue());
+  }
 
-    @Test(timeout = 4000)
-    public void testQueryWithNull_shouldThrowNullPointerException() throws Throwable {
-        DayOfYear day = DayOfYear.now();
-        try {
-            day.query(null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.now();
+      ChronoField chronoField0 = ChronoField.CLOCK_HOUR_OF_AMPM;
+      boolean boolean0 = dayOfYear0.isSupported(chronoField0);
+      assertEquals(45, dayOfYear0.getValue());
+      assertFalse(boolean0);
+  }
 
-    // Additional tests with clear names and comments...
-    // [Remaining tests follow the same pattern with descriptive names]
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        DayOfYear.now((Clock) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // clock
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.now();
+      // Undeclared exception!
+      try { 
+        dayOfYear0.range((TemporalField) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // field
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      ZoneOffset zoneOffset0 = ZoneOffset.MAX;
+      DayOfYear dayOfYear0 = DayOfYear.now((ZoneId) zoneOffset0);
+      String string0 = dayOfYear0.toString();
+      assertEquals("DayOfYear:46", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      ZoneOffset zoneOffset0 = ZoneOffset.MAX;
+      DayOfYear dayOfYear0 = DayOfYear.now((ZoneId) zoneOffset0);
+      boolean boolean0 = dayOfYear0.equals(zoneOffset0);
+      assertFalse(boolean0);
+      assertEquals(46, dayOfYear0.getValue());
+  }
+
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.now();
+      boolean boolean0 = dayOfYear0.equals(dayOfYear0);
+      assertTrue(boolean0);
+      assertEquals(45, dayOfYear0.getValue());
+  }
+
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      ZoneOffset zoneOffset0 = ZoneOffset.ofHoursMinutes(8, 8);
+      ThaiBuddhistDate thaiBuddhistDate0 = MockThaiBuddhistDate.now((ZoneId) zoneOffset0);
+      DayOfYear dayOfYear0 = DayOfYear.from(thaiBuddhistDate0);
+      DayOfYear dayOfYear1 = DayOfYear.now();
+      boolean boolean0 = dayOfYear0.equals(dayOfYear1);
+      assertFalse(boolean0);
+      assertFalse(dayOfYear1.equals((Object)dayOfYear0));
+  }
+
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.now();
+      HijrahDate hijrahDate0 = MockHijrahDate.now();
+      // Undeclared exception!
+      try { 
+        dayOfYear0.adjustInto(hijrahDate0);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Adjustment only supported on ISO date-time
+         //
+         verifyException("org.threeten.extra.DayOfYear", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.now();
+      YearMonth yearMonth0 = MockYearMonth.now();
+      // Undeclared exception!
+      try { 
+        dayOfYear0.adjustInto(yearMonth0);
+        fail("Expecting exception: UnsupportedTemporalTypeException");
+      
+      } catch(UnsupportedTemporalTypeException e) {
+         //
+         // Unsupported field: DayOfYear
+         //
+         verifyException("java.time.YearMonth", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      ZoneOffset zoneOffset0 = ZoneOffset.ofHoursMinutes(8, 8);
+      ThaiBuddhistDate thaiBuddhistDate0 = MockThaiBuddhistDate.now((ZoneId) zoneOffset0);
+      DayOfYear dayOfYear0 = DayOfYear.from(thaiBuddhistDate0);
+      // Undeclared exception!
+      try { 
+        dayOfYear0.query((TemporalQuery<ChronoField>) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.time.temporal.TemporalAccessor", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.of(366);
+      boolean boolean0 = dayOfYear0.isValidYear(366);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test32()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.of(366);
+      boolean boolean0 = dayOfYear0.isValidYear(364);
+      assertEquals(366, dayOfYear0.getValue());
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test33()  throws Throwable  {
+      ZoneOffset zoneOffset0 = ZoneOffset.ofHoursMinutes(8, 8);
+      ThaiBuddhistDate thaiBuddhistDate0 = MockThaiBuddhistDate.now((ZoneId) zoneOffset0);
+      DayOfYear dayOfYear0 = DayOfYear.from(thaiBuddhistDate0);
+      boolean boolean0 = dayOfYear0.isValidYear(8);
+      assertEquals(46, dayOfYear0.getValue());
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test34()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.now();
+      ChronoField chronoField0 = ChronoField.EPOCH_DAY;
+      // Undeclared exception!
+      try { 
+        dayOfYear0.getLong(chronoField0);
+        fail("Expecting exception: UnsupportedTemporalTypeException");
+      
+      } catch(UnsupportedTemporalTypeException e) {
+         //
+         // Unsupported field: EpochDay
+         //
+         verifyException("org.threeten.extra.DayOfYear", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test35()  throws Throwable  {
+      ZoneOffset zoneOffset0 = ZoneOffset.MAX;
+      DayOfYear dayOfYear0 = DayOfYear.now((ZoneId) zoneOffset0);
+      // Undeclared exception!
+      try { 
+        dayOfYear0.getLong((TemporalField) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.threeten.extra.DayOfYear", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test36()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.now();
+      ChronoField chronoField0 = ChronoField.DAY_OF_YEAR;
+      int int0 = dayOfYear0.get(chronoField0);
+      assertEquals(45, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test37()  throws Throwable  {
+      Month month0 = Month.NOVEMBER;
+      // Undeclared exception!
+      try { 
+        DayOfYear.from(month0);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Unable to obtain DayOfYear from TemporalAccessor: NOVEMBER of type java.time.Month
+         //
+         verifyException("org.threeten.extra.DayOfYear", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test38()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.now();
+      DayOfYear dayOfYear1 = DayOfYear.from(dayOfYear0);
+      assertEquals(45, dayOfYear1.getValue());
+  }
+
+  @Test(timeout = 4000)
+  public void test39()  throws Throwable  {
+      ZoneOffset zoneOffset0 = ZoneOffset.ofHoursMinutes(8, 8);
+      ThaiBuddhistDate thaiBuddhistDate0 = MockThaiBuddhistDate.now((ZoneId) zoneOffset0);
+      DayOfYear dayOfYear0 = DayOfYear.from(thaiBuddhistDate0);
+      boolean boolean0 = dayOfYear0.isSupported((TemporalField) null);
+      assertFalse(boolean0);
+      assertEquals(46, dayOfYear0.getValue());
+  }
+
+  @Test(timeout = 4000)
+  public void test40()  throws Throwable  {
+      ZoneOffset zoneOffset0 = ZoneOffset.MAX;
+      DayOfYear dayOfYear0 = DayOfYear.now((ZoneId) zoneOffset0);
+      int int0 = dayOfYear0.getValue();
+      assertEquals(46, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test41()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.of(1);
+      dayOfYear0.hashCode();
+      assertEquals(1, dayOfYear0.getValue());
+  }
+
+  @Test(timeout = 4000)
+  public void test42()  throws Throwable  {
+      ZoneOffset zoneOffset0 = ZoneOffset.MAX;
+      DayOfYear dayOfYear0 = DayOfYear.now((ZoneId) zoneOffset0);
+      int int0 = dayOfYear0.compareTo(dayOfYear0);
+      assertEquals(46, dayOfYear0.getValue());
+      assertEquals(0, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test43()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.of(366);
+      // Undeclared exception!
+      try { 
+        dayOfYear0.atYear(366);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid date 'DayOfYear 366' as '366' is not a leap year
+         //
+         verifyException("java.time.LocalDate", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test44()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.of(366);
+      Year year0 = MockYear.of(366);
+      // Undeclared exception!
+      try { 
+        dayOfYear0.atYear(year0);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid date 'DayOfYear 366' as '366' is not a leap year
+         //
+         verifyException("java.time.LocalDate", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test45()  throws Throwable  {
+      DayOfYear dayOfYear0 = DayOfYear.now();
+      // Undeclared exception!
+      try { 
+        MockYear.from(dayOfYear0);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Unable to obtain Year from TemporalAccessor: DayOfYear:45 of type org.threeten.extra.DayOfYear
+         //
+         verifyException("java.time.Year", e);
+      }
+  }
 }
