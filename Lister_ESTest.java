@@ -20,201 +20,215 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class Lister_ESTest extends Lister_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      String[] stringArray0 = new String[3];
-      // Undeclared exception!
-      try { 
-        Lister.main(stringArray0);
-        fail("Expecting exception: NoClassDefFoundError");
-      
-      } catch(NoClassDefFoundError e) {
-         //
-         // org/apache/commons/lang3/ArrayUtils
-         //
-         verifyException("org.apache.commons.compress.archivers.Lister", e);
-      }
-  }
+    // Tests for main() method -------------------------------------------------
+    
+    @Test(timeout = 4000)
+    public void testMain_WithThreeArguments_ThrowsNoClassDefFoundError() throws Throwable {
+        // Test that main method fails with NoClassDefFoundError when 
+        // required dependencies (ArrayUtils) are missing in classpath
+        String[] arguments = new String[3];
+        
+        try { 
+            Lister.main(arguments);
+            fail("Expecting exception: NoClassDefFoundError");
+        } catch(NoClassDefFoundError e) {
+            // Verify the missing class matches the expected dependency
+            assertEquals(
+                "org/apache/commons/lang3/ArrayUtils",
+                e.getMessage()
+            );
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      String[] stringArray0 = new String[1];
-      stringArray0[0] = "ustar\u0000";
-      Lister lister0 = new Lister(true, stringArray0);
-      // Undeclared exception!
-      try { 
-        lister0.go();
-        fail("Expecting exception: InvalidPathException");
-      
-      } catch(InvalidPathException e) {
-      }
-  }
+    // Tests for constructor ---------------------------------------------------
+    
+    @Test(timeout = 4000)
+    public void testConstructor_WithNullArgument_ThrowsNullPointerException() throws Throwable {
+        // Test that constructor validates first argument and throws NPE when null
+        String[] arguments = new String[3]; // First element is null
+        
+        try {
+            new Lister(false, arguments);
+            fail("Expecting exception: NullPointerException");
+        } catch(NullPointerException e) {
+            // Verify exception points to args[0] validation
+            assertTrue(e.getMessage().contains("args[0]"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      String[] stringArray0 = new String[5];
-      stringArray0[0] = "actual and claimed size don't match while reading a stored entry using data descriptor. Either the archive is broken or it cannot be read using ZipArchiveInputStream and you must use ZipFile. A common cause for this is a ZIP archive containing a ZIP archive. See https://commons.apache.org/proper/commons-compress/zip.html#ZipArchiveInputStream_vs_ZipFile";
-      stringArray0[1] = "actual and claimed size don't match while reading a stored entry using data descriptor. Either the archive is broken or it cannot be read using ZipArchiveInputStream and you must use ZipFile. A common cause for this is a ZIP archive containing a ZIP archive. See https://commons.apache.org/proper/commons-compress/zip.html#ZipArchiveInputStream_vs_ZipFile";
-      Lister lister0 = new Lister(true, stringArray0);
-      try { 
-        lister0.go();
-        fail("Expecting exception: FileSystemException");
-      
-      } catch(FileSystemException e) {
-      }
-  }
+    @Test(timeout = 4000)
+    public void testConstructor_WithEmptyArguments_ThrowsArrayIndexOutOfBounds() throws Throwable {
+        // Test that constructor requires at least one argument
+        String[] emptyArguments = new String[0];
+        
+        try {
+            new Lister(true, emptyArguments);
+            fail("Expecting exception: ArrayIndexOutOfBoundsException");
+        } catch(ArrayIndexOutOfBoundsException e) {
+            assertEquals("0", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      String[] stringArray0 = new String[8];
-      stringArray0[0] = "bf,eR=!9:b8u`J";
-      Lister lister0 = new Lister(true, stringArray0);
-      // Undeclared exception!
-      try { 
-        lister0.go();
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.archivers.Lister", e);
-      }
-  }
+    // Tests for go() method ---------------------------------------------------
+    
+    @Test(timeout = 4000)
+    public void testGo_WithInvalidPath_ThrowsInvalidPathException() throws Throwable {
+        // Test handling of invalid path containing null character
+        String[] arguments = new String[1];
+        arguments[0] = "ustar\u0000"; // Invalid path containing null char
+        Lister lister = new Lister(true, arguments);
+        
+        try { 
+            lister.go();
+            fail("Expecting exception: InvalidPathException");
+        } catch(InvalidPathException e) {
+            // Expected due to invalid character in path
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      String[] stringArray0 = new String[3];
-      Lister lister0 = null;
-      try {
-        lister0 = new Lister(false, stringArray0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // args[0]
-         //
-         verifyException("java.util.Objects", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testGo_WithLongPath_ThrowsFileSystemException() throws Throwable {
+        // Test handling of exceptionally long path names
+        String longString = "actual and claimed size don't match while reading a stored entry using data descriptor. Either the archive is broken or it cannot be read using ZipArchiveInputStream and you must use ZipFile. A common cause for this is a ZIP archive containing a ZIP archive. See https://commons.apache.org/proper/commons-compress/zip.html#ZipArchiveInputStream_vs_ZipFile";
+        
+        String[] arguments = new String[2];
+        arguments[0] = longString;
+        arguments[1] = longString;
+        Lister lister = new Lister(true, arguments);
+        
+        try { 
+            lister.go();
+            fail("Expecting exception: FileSystemException");
+        } catch(FileSystemException e) {
+            // Expected due to filesystem limitations
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      String[] stringArray0 = new String[0];
-      Lister lister0 = null;
-      try {
-        lister0 = new Lister(true, stringArray0);
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
-      
-      } catch(ArrayIndexOutOfBoundsException e) {
-         //
-         // 0
-         //
-         verifyException("org.apache.commons.compress.archivers.Lister", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testGo_WithMissingSecondArgument_ThrowsNullPointerException() throws Throwable {
+        // Test behavior when archive type argument is missing
+        String[] arguments = new String[8];
+        arguments[0] = "bf,eR=!9:b8u`J"; // Valid filename
+        // arguments[1] is null (archive type missing)
+        Lister lister = new Lister(true, arguments);
+        
+        try { 
+            lister.go();
+            fail("Expecting exception: NullPointerException");
+        } catch(NullPointerException e) {
+            // Expected due to missing archive type
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      String[] stringArray0 = new String[2];
-      stringArray0[0] = "sh;T]Ld";
-      stringArray0[1] = "zip";
-      Lister lister0 = new Lister(true, stringArray0);
-      // Undeclared exception!
-      try { 
-        lister0.go();
-        fail("Expecting exception: NoClassDefFoundError");
-      
-      } catch(NoClassDefFoundError e) {
-         //
-         // org/apache/commons/compress/archivers/zip/ZipFile$StoredStatisticsStream
-         //
-         verifyException("org.apache.commons.compress.archivers.Lister", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testGo_WithZipFormat_ThrowsNoClassDefFoundError() throws Throwable {
+        // Test Zip handling when required classes are missing
+        String[] arguments = new String[2];
+        arguments[0] = "sh;T]Ld"; // Archive filename
+        arguments[1] = "zip";      // Explicitly request Zip format
+        Lister lister = new Lister(true, arguments);
+        
+        try { 
+            lister.go();
+            fail("Expecting exception: NoClassDefFoundError");
+        } catch(NoClassDefFoundError e) {
+            // Verify missing internal Zip implementation class
+            assertEquals(
+                "org/apache/commons/compress/archivers/zip/ZipFile$StoredStatisticsStream",
+                e.getMessage()
+            );
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      String[] stringArray0 = new String[8];
-      stringArray0[0] = "bf,eR=!9:b8u`J";
-      stringArray0[1] = "7z";
-      Lister lister0 = new Lister(true, stringArray0);
-      // Undeclared exception!
-      try { 
-        lister0.go();
-        fail("Expecting exception: NoClassDefFoundError");
-      
-      } catch(NoClassDefFoundError e) {
-         //
-         // org/apache/commons/compress/archivers/sevenz/SevenZFile
-         //
-         verifyException("org.apache.commons.compress.archivers.Lister", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testGo_With7zFormat_ThrowsNoClassDefFoundError() throws Throwable {
+        // Test 7z handling when required classes are missing
+        String[] arguments = new String[2];
+        arguments[0] = "bf,eR=!9:b8u`J"; // Archive filename
+        arguments[1] = "7z";              // Explicitly request 7z format
+        Lister lister = new Lister(true, arguments);
+        
+        try { 
+            lister.go();
+            fail("Expecting exception: NoClassDefFoundError");
+        } catch(NoClassDefFoundError e) {
+            // Verify missing 7z implementation class
+            assertEquals(
+                "org/apache/commons/compress/archivers/sevenz/SevenZFile",
+                e.getMessage()
+            );
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      String[] stringArray0 = new String[9];
-      stringArray0[0] = "";
-      stringArray0[1] = "not encodeable";
-      Lister lister0 = new Lister(false, stringArray0);
-      try { 
-        lister0.go();
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // Archiver: not encodeable not found.
-         //
-         verifyException("org.apache.commons.compress.archivers.ArchiveStreamFactory", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testGo_WithEmptyArchiveName_ThrowsIOException() throws Throwable {
+        // Test behavior with empty filename and invalid format specifier
+        String[] arguments = new String[2];
+        arguments[0] = "";             // Empty filename
+        arguments[1] = "not encodeable"; // Invalid format
+        Lister lister = new Lister(false, arguments);
+        
+        try { 
+            lister.go();
+            fail("Expecting exception: IOException");
+        } catch(IOException e) {
+            // Verify correct error message from ArchiveStreamFactory
+            assertEquals(
+                "Archiver: not encodeable not found.",
+                e.getMessage()
+            );
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      Lister lister0 = new Lister();
-      // Undeclared exception!
-      try { 
-        lister0.go();
-        fail("Expecting exception: NoClassDefFoundError");
-      
-      } catch(NoClassDefFoundError e) {
-         //
-         // org/apache/commons/compress/utils/IOUtils
-         //
-         verifyException("org.apache.commons.compress.archivers.ArchiveStreamFactory", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testGo_WithDeprecatedConstructor_ThrowsNoClassDefFoundError() throws Throwable {
+        // Test behavior of deprecated no-arg constructor
+        Lister lister = new Lister(); // Deprecated constructor
+        
+        try { 
+            lister.go();
+            fail("Expecting exception: NoClassDefFoundError");
+        } catch(NoClassDefFoundError e) {
+            // Verify missing utility class
+            assertEquals(
+                "org/apache/commons/compress/utils/IOUtils",
+                e.getMessage()
+            );
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      String[] stringArray0 = new String[2];
-      stringArray0[0] = "";
-      stringArray0[1] = "tar";
-      Lister lister0 = new Lister(false, stringArray0);
-      // Undeclared exception!
-      try { 
-        lister0.go();
-        fail("Expecting exception: NoClassDefFoundError");
-      
-      } catch(NoClassDefFoundError e) {
-         //
-         // Could not initialize class org.apache.commons.compress.archivers.zip.ZipEncodingHelper
-         //
-         verifyException("org.apache.commons.compress.archivers.tar.TarFile", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testGo_WithTarFormat_ThrowsNoClassDefFoundError() throws Throwable {
+        // Test Tar handling when required dependencies are missing
+        String[] arguments = new String[2];
+        arguments[0] = "";     // Empty filename
+        arguments[1] = "tar";  // Request Tar format
+        Lister lister = new Lister(false, arguments);
+        
+        try { 
+            lister.go();
+            fail("Expecting exception: NoClassDefFoundError");
+        } catch(NoClassDefFoundError e) {
+            // Verify missing encoding helper class
+            assertEquals(
+                "Could not initialize class org.apache.commons.compress.archivers.zip.ZipEncodingHelper",
+                e.getMessage()
+            );
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      String[] stringArray0 = new String[1];
-      stringArray0[0] = "A(";
-      Lister lister0 = new Lister(true, stringArray0);
-      try { 
-        lister0.go();
-        fail("Expecting exception: NoSuchFileException");
-      
-      } catch(NoSuchFileException e) {
-      }
-  }
+    @Test(timeout = 4000)
+    public void testGo_WithNonExistentFile_ThrowsNoSuchFileException() throws Throwable {
+        // Test handling of non-existent archive file
+        String[] arguments = new String[1];
+        arguments[0] = "A("; // Non-existent filename
+        Lister lister = new Lister(true, arguments);
+        
+        try { 
+            lister.go();
+            fail("Expecting exception: NoSuchFileException");
+        } catch(NoSuchFileException e) {
+            // Expected because file doesn't exist
+        }
+    }
 }
