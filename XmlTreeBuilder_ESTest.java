@@ -33,714 +33,650 @@ import org.jsoup.parser.XmlTreeBuilder;
 import org.jsoup.select.Elements;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true, 
+    useVFS = true, 
+    useVNET = true, 
+    resetStaticState = true, 
+    separateClassLoader = true
+) 
 public class XmlTreeBuilder_ESTest extends XmlTreeBuilder_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Parser parser0 = new Parser(xmlTreeBuilder0);
-      StreamParser streamParser0 = new StreamParser(parser0);
-      Element element0 = new Element("http://www.w3.org/1998/Math/MathML", "http://www.w3.org/XML/1998/namespace");
-      streamParser0.parseFragment("http://www.w3.org/2000/svg", element0, "{FDP|4G0#6");
-      xmlTreeBuilder0.processStartTag("http://www.w3.org/1998/Math/MathML", (Attributes) null);
-      Token.EndTag token_EndTag0 = new Token.EndTag(xmlTreeBuilder0);
-      boolean boolean0 = xmlTreeBuilder0.processStartTag("~BQ~ug8>");
-      assertTrue(boolean0);
-      
-      xmlTreeBuilder0.popStackToClose(token_EndTag0);
-      assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
-  }
+    // Test handling of start tags and stack operations
+    @Test(timeout = 4000)
+    public void testProcessStartTagAndPopStackToClose() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Parser parser = new Parser(builder);
+        StreamParser streamParser = new StreamParser(parser);
+        
+        // Setup elements and parse fragment
+        Element element = new Element("http://www.w3.org/1998/Math/MathML", "http://www.w3.org/XML/1998/namespace");
+        streamParser.parseFragment("http://www.w3.org/XML/1998/namespace", element, "http://www.w3.org/1999/xhtml");
+        
+        // Process start tags
+        builder.processStartTag("http://www.w3.org/1998/Math/MathML", null);
+        Token.EndTag endTag = new Token.EndTag(builder);
+        boolean processResult = builder.processStartTag("~BQ~ug8>");
+        assertTrue(processResult);
+        
+        // Close stack and verify namespace
+        builder.popStackToClose(endTag);
+        assertEquals("http://www.w3.org/XML/1998/namespace", builder.defaultNamespace());
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      xmlTreeBuilder0.parse("jHQIs@:5#c&", "2#0f[w|.T$lBU[oa^f");
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.processStartTag(":contains(%s)");
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.jsoup.parser.TreeBuilder", e);
-      }
-  }
+    // Test NullPointerException when processing start tag with missing context
+    @Test(timeout = 4000)
+    public void testProcessStartTagThrowsNullPointerException() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        builder.parse("jHQIs@:5#c&", "2#0f[w|.T$lBU[oa^f");
+        
+        try {
+            builder.processStartTag(":contains(%s)");
+            fail("Expected NullPointerException due to missing context");
+        } catch (NullPointerException e) {
+            // Expected: TreeBuilder state not initialized properly
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Document document0 = new Document("d/uP=K>");
-      Element element0 = document0.head();
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.initialiseParseFragment(element0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.util.HashMap", e);
-      }
-  }
+    // Test exception during fragment initialization
+    @Test(timeout = 4000)
+    public void testInitialiseParseFragmentThrowsNullPointerException() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Document doc = new Document("d/uP=K>");
+        Element element = doc.head();
+        
+        try {
+            builder.initialiseParseFragment(element);
+            fail("Expected NullPointerException due to invalid context");
+        } catch (NullPointerException e) {
+            // Expected: HashMap requires non-null key in namespace handling
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Document document0 = xmlTreeBuilder0.parse(">: ", ">: ");
-      Parser parser0 = new Parser(xmlTreeBuilder0);
-      StreamParser streamParser0 = new StreamParser(parser0);
-      streamParser0.parseFragment("http://www.w3.org/2000/svg", (Element) document0, "http://www.w3.org/XML/1998/namespace");
-      assertEquals(">: ", document0.location());
-      
-      Token.EndTag token_EndTag0 = new Token.EndTag(xmlTreeBuilder0);
-      xmlTreeBuilder0.popStackToClose(token_EndTag0);
-      assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
-  }
+    // Test namespace consistency after stack operations
+    @Test(timeout = 4000)
+    public void testPopStackToCloseMaintainsNamespace() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Document doc = builder.parse(">: ", ">: ");
+        Parser parser = new Parser(builder);
+        StreamParser streamParser = new StreamParser(parser);
+        
+        // Parse fragment and close stack
+        streamParser.parseFragment("http://www.w3.org/2000/svg", doc, "http://www.w3.org/XML/1998/namespace");
+        Token.EndTag endTag = new Token.EndTag(builder);
+        builder.popStackToClose(endTag);
+        assertEquals("http://www.w3.org/XML/1998/namespace", builder.defaultNamespace());
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Document document0 = xmlTreeBuilder0.parse(">: ", ">: ");
-      Parser parser0 = new Parser(xmlTreeBuilder0);
-      StreamParser streamParser0 = new StreamParser(parser0);
-      streamParser0.parseFragment("http://www.w3.org/2000/svg", (Element) document0, "http://www.w3.org/XML/1998/namespace");
-      assertEquals(">: ", document0.location());
-      
-      Comment comment0 = new Comment("KRq7");
-      xmlTreeBuilder0.insertLeafNode(comment0);
-      assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
-  }
+    // Test insertion of comment node maintains namespace
+    @Test(timeout = 4000)
+    public void testInsertCommentNodeMaintainsNamespace() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Document doc = builder.parse(">: ", ">: ");
+        Parser parser = new Parser(builder);
+        StreamParser streamParser = new StreamParser(parser);
+        
+        streamParser.parseFragment("http://www.w3.org/2000/svg", doc, "http://www.w3.org/XML/1998/namespace");
+        Comment comment = new Comment("KRq7");
+        builder.insertLeafNode(comment);
+        assertEquals("http://www.w3.org/XML/1998/namespace", builder.defaultNamespace());
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Parser parser0 = new Parser(xmlTreeBuilder0);
-      StreamParser streamParser0 = new StreamParser(parser0);
-      Element element0 = new Element("http://www.w3.org/1999/xhtml", "http://www.w3.org/XML/1998/namespace");
-      streamParser0.parseFragment("z>!GVh", element0, "u");
-      Token.Doctype token_Doctype0 = new Token.Doctype();
-      xmlTreeBuilder0.insertDoctypeFor(token_Doctype0);
-      assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
-  }
+    // Test doctype insertion maintains namespace
+    @Test(timeout = 4000)
+    public void testInsertDoctypeMaintainsNamespace() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Parser parser = new Parser(builder);
+        StreamParser streamParser = new StreamParser(parser);
+        
+        Element element = new Element("http://www.w3.org/1999/xhtml", "http://www.w3.org/XML/1998/namespace");
+        streamParser.parseFragment("z>!GVh", element, "u");
+        Token.Doctype doctype = new Token.Doctype();
+        builder.insertDoctypeFor(doctype);
+        assertEquals("http://www.w3.org/XML/1998/namespace", builder.defaultNamespace());
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Document document0 = xmlTreeBuilder0.parse(">: ", ">: ");
-      Parser parser0 = new Parser(xmlTreeBuilder0);
-      StreamParser streamParser0 = new StreamParser(parser0);
-      streamParser0.parseFragment("}VF\"~1WF,kf?;\"Lf2", (Element) document0, "");
-      assertEquals(">: ", document0.location());
-      
-      Token.Comment token_Comment0 = new Token.Comment();
-      xmlTreeBuilder0.insertCommentFor(token_Comment0);
-      assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
-  }
+    // Test comment insertion maintains namespace
+    @Test(timeout = 4000)
+    public void testInsertCommentForTokenMaintainsNamespace() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Document doc = builder.parse(">: ", ">: ");
+        Parser parser = new Parser(builder);
+        StreamParser streamParser = new StreamParser(parser);
+        
+        streamParser.parseFragment("}VF\"~1WF,kf?;\"Lf2", doc, "");
+        Token.Comment commentToken = new Token.Comment();
+        builder.insertCommentFor(commentToken);
+        assertEquals("http://www.w3.org/XML/1998/namespace", builder.defaultNamespace());
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Document document0 = xmlTreeBuilder0.parse("", "");
-      Elements elements0 = document0.getAllElements();
-      xmlTreeBuilder0.stack = (ArrayList<Element>) elements0;
-      assertEquals("", document0.location());
-      
-      Token.Character token_Character0 = new Token.Character();
-      xmlTreeBuilder0.insertCharacterFor(token_Character0);
-      assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
-  }
+    // Test character insertion maintains namespace
+    @Test(timeout = 4000)
+    public void testInsertCharacterForTokenMaintainsNamespace() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Document doc = builder.parse("", "");
+        Elements elements = doc.getAllElements();
+        builder.stack = (ArrayList<Element>) elements;
+        Token.Character characterToken = new Token.Character();
+        builder.insertCharacterFor(characterToken);
+        assertEquals("http://www.w3.org/XML/1998/namespace", builder.defaultNamespace());
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      StringReader stringReader0 = new StringReader("xmlns:#text");
-      Parser parser0 = Parser.xmlParser();
-      xmlTreeBuilder0.initialiseParse(stringReader0, "xmlns:#text", parser0);
-      assertEquals("http://www.w3.org/XML/1998/namespace", parser0.defaultNamespace());
-      assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
-  }
+    // Test namespace after parser initialization
+    @Test(timeout = 4000)
+    public void testInitialiseParseSetsNamespace() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        StringReader reader = new StringReader("xmlns:#text");
+        Parser parser = Parser.xmlParser();
+        builder.initialiseParse(reader, "xmlns:#text", parser);
+        assertEquals("http://www.w3.org/XML/1998/namespace", builder.defaultNamespace());
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Document document0 = xmlTreeBuilder0.parse("ME;}", "ME;}");
-      assertEquals("ME;}", document0.location());
-      
-      xmlTreeBuilder0.completeParseFragment();
-      assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
-  }
+    // Test namespace after completing fragment parse
+    @Test(timeout = 4000)
+    public void testCompleteParseFragmentMaintainsNamespace() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        builder.parse("ME;}", "ME;}");
+        builder.completeParseFragment();
+        assertEquals("http://www.w3.org/XML/1998/namespace", builder.defaultNamespace());
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Document document0 = xmlTreeBuilder0.parse(">: ", ">: ");
-      Tokeniser tokeniser0 = new Tokeniser(xmlTreeBuilder0);
-      Parser parser0 = new Parser(xmlTreeBuilder0);
-      StreamParser streamParser0 = new StreamParser(parser0);
-      streamParser0.parseFragment("http://www.w3.org/2000/svg", (Element) document0, "http://www.w3.org/XML/1998/namespace");
-      assertEquals(">: ", document0.location());
-      
-      Token.XmlDecl token_XmlDecl0 = tokeniser0.createXmlDeclPending(true);
-      boolean boolean0 = xmlTreeBuilder0.process(token_XmlDecl0);
-      assertTrue(boolean0);
-      assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
-  }
+    // Test XML declaration processing
+    @Test(timeout = 4000)
+    public void testProcessXmlDeclaration() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Document doc = builder.parse(">: ", ">: ");
+        Tokeniser tokeniser = new Tokeniser(builder);
+        Parser parser = new Parser(builder);
+        StreamParser streamParser = new StreamParser(parser);
+        
+        streamParser.parseFragment("http://www.w3.org/2000/svg", doc, "http://www.w3.org/XML/1998/namespace");
+        Token.XmlDecl xmlDecl = tokeniser.createXmlDeclPending(true);
+        boolean result = builder.process(xmlDecl);
+        assertTrue(result);
+        assertEquals("http://www.w3.org/XML/1998/namespace", builder.defaultNamespace());
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Parser parser0 = new Parser(xmlTreeBuilder0);
-      StreamParser streamParser0 = new StreamParser(parser0);
-      Element element0 = new Element("Doctype", "nfHa(P+.f");
-      streamParser0.parseFragment("$M{RJ]hM9&ek.Vtk$I", element0, "http://www.w3.org/1999/xhtml");
-      Tokeniser tokeniser0 = new Tokeniser(xmlTreeBuilder0);
-      Token.XmlDecl token_XmlDecl0 = tokeniser0.createXmlDeclPending(true);
-      xmlTreeBuilder0.insertXmlDeclarationFor(token_XmlDecl0);
-      assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
-  }
+    // Test XML declaration insertion
+    @Test(timeout = 4000)
+    public void testInsertXmlDeclaration() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Parser parser = new Parser(builder);
+        StreamParser streamParser = new StreamParser(parser);
+        
+        Element element = new Element("Doctype", "nfHa(P+.f");
+        streamParser.parseFragment("$M{RJ]hM9&ek.Vtk$I", element, "http://www.w3.org/1999/xhtml");
+        Tokeniser tokeniser = new Tokeniser(builder);
+        Token.XmlDecl xmlDecl = tokeniser.createXmlDeclPending(true);
+        builder.insertXmlDeclarationFor(xmlDecl);
+        assertEquals("http://www.w3.org/XML/1998/namespace", builder.defaultNamespace());
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Parser parser0 = new Parser(xmlTreeBuilder0);
-      StreamParser streamParser0 = new StreamParser(parser0);
-      Element element0 = new Element("Doctype", "nfHa(P+.f");
-      streamParser0.parseFragment("$M{RJ]hM9&ek.Vtk$I", element0, "http://www.w3.org/1999/xhtml");
-      Token.Doctype token_Doctype0 = new Token.Doctype();
-      boolean boolean0 = xmlTreeBuilder0.process(token_Doctype0);
-      assertTrue(boolean0);
-      assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
-  }
+    // Test doctype processing
+    @Test(timeout = 4000)
+    public void testProcessDoctype() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Parser parser = new Parser(builder);
+        StreamParser streamParser = new StreamParser(parser);
+        
+        Element element = new Element("Doctype", "nfHa(P+.f");
+        streamParser.parseFragment("$M{RJ]hM9&ek.Vtk$I", element, "http://www.w3.org/1999/xhtml");
+        Token.Doctype doctype = new Token.Doctype();
+        boolean result = builder.process(doctype);
+        assertTrue(result);
+        assertEquals("http://www.w3.org/XML/1998/namespace", builder.defaultNamespace());
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Document document0 = xmlTreeBuilder0.parse(">: ", ">: ");
-      Tokeniser tokeniser0 = new Tokeniser(xmlTreeBuilder0);
-      Parser parser0 = new Parser(xmlTreeBuilder0);
-      StreamParser streamParser0 = new StreamParser(parser0);
-      streamParser0.parseFragment("http://www.w3.org/2000/svg", (Element) document0, "http://www.w3.org/XML/1998/namespace");
-      assertEquals(">: ", document0.location());
-      
-      Token.Comment token_Comment0 = tokeniser0.commentPending;
-      boolean boolean0 = xmlTreeBuilder0.process(token_Comment0);
-      assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
-      assertTrue(boolean0);
-  }
+    // Test comment processing
+    @Test(timeout = 4000)
+    public void testProcessComment() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Document doc = builder.parse(">: ", ">: ");
+        Tokeniser tokeniser = new Tokeniser(builder);
+        Parser parser = new Parser(builder);
+        StreamParser streamParser = new StreamParser(parser);
+        
+        streamParser.parseFragment("http://www.w3.org/2000/svg", doc, "http://www.w3.org/XML/1998/namespace");
+        Token.Comment comment = tokeniser.commentPending;
+        boolean result = builder.process(comment);
+        assertTrue(result);
+        assertEquals("http://www.w3.org/XML/1998/namespace", builder.defaultNamespace());
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Parser parser0 = new Parser(xmlTreeBuilder0);
-      StreamParser streamParser0 = new StreamParser(parser0);
-      Element element0 = new Element("http://www.w3.org/2000/svg", "http://www.w3.org/1999/xhtml");
-      streamParser0.parseFragment("7~n", element0, "7~n");
-      boolean boolean0 = xmlTreeBuilder0.processStartTag("http://www.w3.org/2000/svg");
-      assertTrue(boolean0);
-      
-      Element element1 = xmlTreeBuilder0.pop();
-      assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
-      assertEquals("http://www.w3.org/2000/svg", element1.tagName());
-  }
+    // Test element popping after start tag
+    @Test(timeout = 4000)
+    public void testPopAfterProcessStartTag() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Parser parser = new Parser(builder);
+        StreamParser streamParser = new StreamParser(parser);
+        
+        Element element = new Element("http://www.w3.org/2000/svg", "http://www.w3.org/1999/xhtml");
+        streamParser.parseFragment("7~n", element, "7~n");
+        boolean result = builder.processStartTag("http://www.w3.org/2000/svg");
+        assertTrue(result);
+        
+        Element popped = builder.pop();
+        assertEquals("http://www.w3.org/XML/1998/namespace", builder.defaultNamespace());
+        assertEquals("http://www.w3.org/2000/svg", popped.tagName());
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      TagSet tagSet0 = xmlTreeBuilder0.defaultTagSet();
-      assertNotNull(tagSet0);
-  }
+    // Test default tag set retrieval
+    @Test(timeout = 4000)
+    public void testDefaultTagSetNotNull() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        TagSet tagSet = builder.defaultTagSet();
+        assertNotNull(tagSet);
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      ParseSettings parseSettings0 = xmlTreeBuilder0.defaultSettings();
-      assertTrue(parseSettings0.preserveTagCase());
-  }
+    // Test default parse settings
+    @Test(timeout = 4000)
+    public void testDefaultSettingsPreserveTagCase() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        ParseSettings settings = builder.defaultSettings();
+        assertTrue(settings.preserveTagCase());
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Token.EndTag token_EndTag0 = new Token.EndTag(xmlTreeBuilder0);
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.popStackToClose(token_EndTag0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.jsoup.parser.XmlTreeBuilder", e);
-      }
-  }
+    // Test stack closing without initialization
+    @Test(timeout = 4000)
+    public void testPopStackToCloseThrowsNullPointerException() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Token.EndTag endTag = new Token.EndTag(builder);
+        
+        try {
+            builder.popStackToClose(endTag);
+            fail("Expected NullPointerException due to uninitialized stack");
+        } catch (NullPointerException e) {
+            // Expected: Stack not initialized
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      xmlTreeBuilder0.parse(",Ix<T(pi#>?mbGzH", ",Ix<T(pi#>?mbGzH");
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.pop();
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.jsoup.parser.TreeBuilder", e);
-      }
-  }
+    // Test element popping without initialization
+    @Test(timeout = 4000)
+    public void testPopThrowsNullPointerException() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        builder.parse(",Ix<T(pi#>?mbGzH", ",Ix<T(pi#>?mbGzH");
+        
+        try {
+            builder.pop();
+            fail("Expected NullPointerException due to stack handling issue");
+        } catch (NullPointerException e) {
+            // Expected: TreeBuilder state issue
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Parser parser0 = new Parser(xmlTreeBuilder0);
-      StreamParser streamParser0 = new StreamParser(parser0);
-      Element element0 = new Element("Doctype", "nfHa(P+.f");
-      streamParser0.parseFragment("$M{RJ]hM9&ek.Vtk$I", element0, "http://www.w3.org/1999/xhtml");
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.pop();
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
-      
-      } catch(ArrayIndexOutOfBoundsException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-      }
-  }
+    // Test parsing with null base URI
+    @Test(timeout = 4000)
+    public void testParseThrowsIllegalArgumentExceptionForNullBaseUri() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        
+        try {
+            builder.parse(",Ix<T(pi#>?mbGzH", null);
+            fail("Expected IllegalArgumentException for null baseUri");
+        } catch (IllegalArgumentException e) {
+            // Expected: Validate.notNull violation
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.parse(",Ix<T(pi#>?mbGzH", (String) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // The parameter 'baseUri' must not be null.
-         //
-         verifyException("org.jsoup.helper.Validate", e);
-      }
-  }
+    // Test parsing with null input
+    @Test(timeout = 4000)
+    public void testParseThrowsNullPointerExceptionForNullInput() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        
+        try {
+            builder.parse(null, null);
+            fail("Expected NullPointerException for null input");
+        } catch (NullPointerException e) {
+            // Expected: StringReader requires non-null input
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.parse((String) null, (String) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.io.StringReader", e);
-      }
-  }
+    // Test parsing with null base URI (Reader version)
+    @Test(timeout = 4000)
+    public void testParseReaderThrowsIllegalArgumentExceptionForNullBaseUri() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        PipedWriter writer = new PipedWriter();
+        PipedReader reader = new PipedReader(writer);
+        
+        try {
+            builder.parse(reader, null);
+            fail("Expected IllegalArgumentException for null baseUri");
+        } catch (IllegalArgumentException e) {
+            // Expected: Validate.notNull violation
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      PipedWriter pipedWriter0 = new PipedWriter();
-      PipedReader pipedReader0 = new PipedReader(pipedWriter0);
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.parse(pipedReader0, (String) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // The parameter 'baseUri' must not be null.
-         //
-         verifyException("org.jsoup.helper.Validate", e);
-      }
-  }
+    // Test parsing with disconnected pipe
+    @Test(timeout = 4000)
+    public void testParseReaderThrowsUncheckedIOException() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        PipedReader reader = new PipedReader();
+        
+        try {
+            builder.parse(reader, "kxrewut");
+            fail("Expected UncheckedIOException due to disconnected pipe");
+        } catch (UncheckedIOException e) {
+            // Expected: CharacterReader cannot read from disconnected pipe
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      PipedReader pipedReader0 = new PipedReader();
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.parse(pipedReader0, "kxrewut");
-        fail("Expecting exception: UncheckedIOException");
-      
-      } catch(UncheckedIOException e) {
-         //
-         // java.io.IOException: Pipe not connected
-         //
-         verifyException("org.jsoup.parser.CharacterReader", e);
-      }
-  }
+    // Test null XML declaration insertion
+    @Test(timeout = 4000)
+    public void testInsertXmlDeclarationForNullThrowsNullPointerException() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        
+        try {
+            builder.insertXmlDeclarationFor(null);
+            fail("Expected NullPointerException for null token");
+        } catch (NullPointerException e) {
+            // Expected: Null token handling
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.insertXmlDeclarationFor((Token.XmlDecl) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.jsoup.parser.XmlTreeBuilder", e);
-      }
-  }
+    // Test null leaf node insertion
+    @Test(timeout = 4000)
+    public void testInsertLeafNodeNullThrowsIllegalArgumentException() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Parser parser = new Parser(builder);
+        StreamParser streamParser = new StreamParser(parser);
+        Document doc = parser.parseInput("class", "class");
+        streamParser.parseFragment("{FDP|4G0#6", doc, "_',=~G~eEf3?aX_HU");
+        
+        try {
+            builder.insertLeafNode(null);
+            fail("Expected IllegalArgumentException for null node");
+        } catch (IllegalArgumentException e) {
+            // Expected: Validate.notNull violation
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Parser parser0 = new Parser(xmlTreeBuilder0);
-      StreamParser streamParser0 = new StreamParser(parser0);
-      Document document0 = parser0.parseInput("class", "class");
-      streamParser0.parseFragment("{FDP|4G0#6", (Element) document0, "_',=~G~eEf3?aX_HU");
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.insertLeafNode((LeafNode) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Object must not be null
-         //
-         verifyException("org.jsoup.helper.Validate", e);
-      }
-  }
+    // Test leaf node insertion without context
+    @Test(timeout = 4000)
+    public void testInsertLeafNodeThrowsNullPointerException() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        CDataNode node = new CDataNode("xl`t");
+        
+        try {
+            builder.insertLeafNode(node);
+            fail("Expected NullPointerException due to uninitialized stack");
+        } catch (NullPointerException e) {
+            // Expected: Stack not initialized
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test26()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      CDataNode cDataNode0 = new CDataNode("xl`t");
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.insertLeafNode(cDataNode0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.jsoup.parser.TreeBuilder", e);
-      }
-  }
+    // Test element insertion with empty tag name
+    @Test(timeout = 4000)
+    public void testInsertElementForEmptyTagNameThrowsIllegalArgumentException() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        builder.parse(",Ix<T(pi#>?mbGzH", "jsoup.xmlns-");
+        Token.StartTag startTag = new Token.StartTag(builder);
+        
+        try {
+            builder.insertElementFor(startTag);
+            fail("Expected IllegalArgumentException for empty tag name");
+        } catch (IllegalArgumentException e) {
+            // Expected: Validate.notEmpty violation
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test27()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      xmlTreeBuilder0.parse(",Ix<T(pi#>?mbGzH", "jsoup.xmlns-");
-      Token.StartTag token_StartTag0 = new Token.StartTag(xmlTreeBuilder0);
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.insertElementFor(token_StartTag0);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // String must not be empty
-         //
-         verifyException("org.jsoup.helper.Validate", e);
-      }
-  }
+    // Test null start tag insertion
+    @Test(timeout = 4000)
+    public void testInsertElementForNullThrowsNullPointerException() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        
+        try {
+            builder.insertElementFor(null);
+            fail("Expected NullPointerException for null token");
+        } catch (NullPointerException e) {
+            // Expected: Null token handling
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test28()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.insertElementFor((Token.StartTag) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.util.HashMap", e);
-      }
-  }
+    // Test doctype insertion without context
+    @Test(timeout = 4000)
+    public void testInsertDoctypeForThrowsNullPointerException() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Token.Doctype doctype = new Token.Doctype();
+        
+        try {
+            builder.insertDoctypeFor(doctype);
+            fail("Expected NullPointerException due to uninitialized document");
+        } catch (NullPointerException e) {
+            // Expected: Document not initialized
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test29()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Token.Doctype token_Doctype0 = new Token.Doctype();
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.insertDoctypeFor(token_Doctype0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.jsoup.parser.XmlTreeBuilder", e);
-      }
-  }
+    // Test initialization with null reader
+    @Test(timeout = 4000)
+    public void testInitialiseParseThrowsIllegalArgumentExceptionForNullReader() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Parser parser = Parser.xmlParser();
+        
+        try {
+            builder.initialiseParse(null, "ScriptData", parser);
+            fail("Expected IllegalArgumentException for null reader");
+        } catch (IllegalArgumentException e) {
+            // Expected: Validate.notNull violation
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test30()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Parser parser0 = Parser.xmlParser();
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.initialiseParse((Reader) null, "ScriptData", parser0);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // The parameter 'input' must not be null.
-         //
-         verifyException("org.jsoup.helper.Validate", e);
-      }
-  }
+    // Test initialization with disconnected pipe
+    @Test(timeout = 4000)
+    public void testInitialiseParseThrowsUncheckedIOException() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        PipedReader reader = new PipedReader();
+        Parser parser = new Parser(builder);
+        
+        try {
+            builder.initialiseParse(reader, "IuI=", parser);
+            fail("Expected UncheckedIOException due to disconnected pipe");
+        } catch (UncheckedIOException e) {
+            // Expected: CharacterReader cannot read from disconnected pipe
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test31()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      PipedReader pipedReader0 = new PipedReader();
-      Parser parser0 = new Parser(xmlTreeBuilder0);
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.initialiseParse(pipedReader0, "IuI=", parser0);
-        fail("Expecting exception: UncheckedIOException");
-      
-      } catch(UncheckedIOException e) {
-         //
-         // java.io.IOException: Pipe not connected
-         //
-         verifyException("org.jsoup.parser.CharacterReader", e);
-      }
-  }
+    // Test complete fragment without initialization
+    @Test(timeout = 4000)
+    public void testCompleteParseFragmentThrowsNullPointerException() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        
+        try {
+            builder.completeParseFragment();
+            fail("Expected NullPointerException due to uninitialized stack");
+        } catch (NullPointerException e) {
+            // Expected: Stack not initialized
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test32()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.completeParseFragment();
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.jsoup.parser.XmlTreeBuilder", e);
-      }
-  }
+    // Test token processing without initialization
+    @Test(timeout = 4000)
+    public void testProcessTokenThrowsNullPointerException() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Token.Comment comment = new Token.Comment();
+        
+        try {
+            builder.process(comment);
+            fail("Expected NullPointerException due to uninitialized stack");
+        } catch (NullPointerException e) {
+            // Expected: Stack not initialized
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test33()  throws Throwable  {
-      Token.Comment token_Comment0 = new Token.Comment();
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.process(token_Comment0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.jsoup.parser.TreeBuilder", e);
-      }
-  }
+    // Test default namespace value
+    @Test(timeout = 4000)
+    public void testDefaultNamespace() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        String namespace = builder.defaultNamespace();
+        assertEquals("http://www.w3.org/XML/1998/namespace", namespace);
+    }
 
-  @Test(timeout = 4000)
-  public void test34()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      String string0 = xmlTreeBuilder0.defaultNamespace();
-      assertEquals("http://www.w3.org/XML/1998/namespace", string0);
-  }
+    // Test end tag processing
+    @Test(timeout = 4000)
+    public void testProcessEndTag() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Parser parser = new Parser(builder);
+        StreamParser streamParser = new StreamParser(parser);
+        
+        Element element = new Element("http://www.w3.org/1998/Math/MathML", "http://www.w3.org/XML/1998/namespace");
+        streamParser.parseFragment("http://www.w3.org/XML/1998/namespace", element, "http://www.w3.org/1999/xhtml");
+        Token.EndTag endTag = new Token.EndTag(builder);
+        boolean result = builder.process(endTag);
+        assertTrue(result);
+        assertEquals("http://www.w3.org/XML/1998/namespace", builder.defaultNamespace());
+    }
 
-  @Test(timeout = 4000)
-  public void test35()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Parser parser0 = new Parser(xmlTreeBuilder0);
-      StreamParser streamParser0 = new StreamParser(parser0);
-      Element element0 = new Element("http://www.w3.org/1998/Math/MathML", "http://www.w3.org/XML/1998/namespace");
-      streamParser0.parseFragment("http://www.w3.org/XML/1998/namespace", element0, "http://www.w3.org/1999/xhtml");
-      Token.EndTag token_EndTag0 = new Token.EndTag(xmlTreeBuilder0);
-      boolean boolean0 = xmlTreeBuilder0.process(token_EndTag0);
-      assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
-      assertTrue(boolean0);
-  }
+    // Test XML declaration with attributes
+    @Test(timeout = 4000)
+    public void testProcessXmlDeclWithAttributesThrowsNullPointerException() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Token.XmlDecl xmlDecl = new Token.XmlDecl(builder);
+        xmlDecl.newAttribute();
+        
+        try {
+            builder.process(xmlDecl);
+            fail("Expected NullPointerException due to uninitialized stack");
+        } catch (NullPointerException e) {
+            // Expected: Stack not initialized
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test36()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Token.XmlDecl token_XmlDecl0 = new Token.XmlDecl(xmlTreeBuilder0);
-      token_XmlDecl0.newAttribute();
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.process(token_XmlDecl0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.jsoup.parser.TreeBuilder", e);
-      }
-  }
+    // Test character insertion without context
+    @Test(timeout = 4000)
+    public void testInsertCharacterForThrowsNullPointerException() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Token.CData cdata = new Token.CData("");
+        
+        try {
+            builder.insertCharacterFor(cdata);
+            fail("Expected NullPointerException due to uninitialized stack");
+        } catch (NullPointerException e) {
+            // Expected: Stack not initialized
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test37()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Token.CData token_CData0 = new Token.CData("");
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.insertCharacterFor(token_CData0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.jsoup.parser.TreeBuilder", e);
-      }
-  }
+    // Test start tag with empty name
+    @Test(timeout = 4000)
+    public void testProcessStartTagWithEmptyNameThrowsIllegalArgumentException() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        builder.parse("xmlns:{2u;3rllkw{s)I", "xmlns:{2u;3rllkw{s)I");
+        CDataNode node = new CDataNode("xmlns:{2u;3rllkw{s)I");
+        Attributes attributes = node.attributes();
+        attributes.add("xmlns:{2u;3rllkw{s)I", "6x J(VBX=|so_zGPsa");
+        Tokeniser tokeniser = new Tokeniser(builder);
+        Token.StartTag startTag = tokeniser.startPending;
+        startTag.nameAttr(null, attributes);
+        
+        try {
+            builder.process(startTag);
+            fail("Expected IllegalArgumentException for empty tag name");
+        } catch (IllegalArgumentException e) {
+            // Expected: Validate.notEmpty violation
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test38()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      xmlTreeBuilder0.parse("xmlns:{2u;3rllkw{s)I", "xmlns:{2u;3rllkw{s)I");
-      CDataNode cDataNode0 = new CDataNode("xmlns:{2u;3rllkw{s)I");
-      Attributes attributes0 = cDataNode0.attributes();
-      Attributes attributes1 = attributes0.add("xmlns:{2u;3rllkw{s)I", "6x J(VBX=|so_zGPsa");
-      Tokeniser tokeniser0 = new Tokeniser(xmlTreeBuilder0);
-      Token.StartTag token_StartTag0 = tokeniser0.startPending;
-      token_StartTag0.nameAttr((String) null, attributes1);
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.process(token_StartTag0);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // String must not be empty
-         //
-         verifyException("org.jsoup.helper.Validate", e);
-      }
-  }
+    // Test start tag processing with namespace attributes
+    @Test(timeout = 4000)
+    public void testProcessStartTagWithNamespaceAttributesThrowsNullPointerException() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        builder.parse(",Ix<T(pi#>?mbGzH", ",Ix<T(pi#>?mbGzH");
+        Token.StartTag startTag = new Token.StartTag(builder);
+        CDataNode node = new CDataNode("1'm<`CcR11r1m =@q");
+        Attributes attributes = node.attributes();
+        attributes.add("xmlns", "1'm<`CcR11r1m =@q");
+        Token.StartTag modifiedTag = startTag.nameAttr("X7,c,ddhqJ", attributes);
+        
+        try {
+            builder.process(modifiedTag);
+            fail("Expected NullPointerException due to uninitialized stack");
+        } catch (NullPointerException e) {
+            // Expected: Stack not initialized
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test39()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      xmlTreeBuilder0.parse(",Ix<T(pi#>?mbGzH", ",Ix<T(pi#>?mbGzH");
-      Token.StartTag token_StartTag0 = new Token.StartTag(xmlTreeBuilder0);
-      CDataNode cDataNode0 = new CDataNode("1'm<`CcR11r1m =@q");
-      Attributes attributes0 = cDataNode0.attributes();
-      attributes0.add("xmlns", "1'm<`CcR11r1m =@q");
-      Token.StartTag token_StartTag1 = token_StartTag0.nameAttr("X7,c,ddhqJ", attributes0);
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.process(token_StartTag1);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.jsoup.parser.TreeBuilder", e);
-      }
-  }
+    // Test start tag processing with namespace prefix
+    @Test(timeout = 4000)
+    public void testProcessStartTagWithNamespacePrefixThrowsNullPointerException() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        builder.parse("http://www.w3.org/XML/1998/namespace", "http://www.w3.org/XML/1998/namespace");
+        Tokeniser tokeniser = new Tokeniser(builder);
+        Token.StartTag startTag = tokeniser.startPending;
+        Attributes attributes = new Attributes();
+        attributes.add("http://www.w3.org/XML/1998/namespace", "}5ov4zKP6");
+        startTag.nameAttr("numeric referencD with no nu)erals", attributes);
+        
+        try {
+            builder.process(startTag);
+            fail("Expected NullPointerException due to uninitialized stack");
+        } catch (NullPointerException e) {
+            // Expected: Stack not initialized
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test40()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      xmlTreeBuilder0.parse("http://www.w3.org/XML/1998/namespace", "http://www.w3.org/XML/1998/namespace");
-      Tokeniser tokeniser0 = new Tokeniser(xmlTreeBuilder0);
-      Token.StartTag token_StartTag0 = tokeniser0.startPending;
-      Attributes attributes0 = new Attributes();
-      attributes0.add("http://www.w3.org/XML/1998/namespace", "}5ov4zKP6");
-      token_StartTag0.nameAttr("numeric referencD with no nu)erals", attributes0);
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.process(token_StartTag0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.jsoup.parser.TreeBuilder", e);
-      }
-  }
+    // Test element insertion
+    @Test(timeout = 4000)
+    public void testInsertElementFor() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Parser parser = new Parser(builder);
+        StreamParser streamParser = new StreamParser(parser);
+        
+        Element element = new Element("http://www.w3.org/XML/1998/namespace", "http://www.w3.org/2000/svg");
+        streamParser.parseFragment("http://www.w3.org/2000/svg", element, "http://www.w3.org/1998/Math/MathML");
+        Tokeniser tokeniser = new Tokeniser(builder);
+        Token.StartTag startTag = tokeniser.startPending;
+        Attributes attributes = new Attributes();
+        Token.StartTag modifiedTag = startTag.nameAttr("V#,{/v8G", attributes);
+        builder.insertElementFor(modifiedTag);
+        assertEquals("http://www.w3.org/XML/1998/namespace", builder.defaultNamespace());
+    }
 
-  @Test(timeout = 4000)
-  public void test41()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Parser parser0 = new Parser(xmlTreeBuilder0);
-      StreamParser streamParser0 = new StreamParser(parser0);
-      Element element0 = new Element("http://www.w3.org/XML/1998/namespace", "http://www.w3.org/2000/svg");
-      streamParser0.parseFragment("http://www.w3.org/2000/svg", element0, "http://www.w3.org/1998/Math/MathML");
-      Tokeniser tokeniser0 = new Tokeniser(xmlTreeBuilder0);
-      Token.StartTag token_StartTag0 = tokeniser0.startPending;
-      Attributes attributes0 = new Attributes();
-      Token.StartTag token_StartTag1 = token_StartTag0.nameAttr("V#,{/v8G", attributes0);
-      xmlTreeBuilder0.insertElementFor(token_StartTag1);
-      assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
-  }
+    // Test fragment initialization with null context
+    @Test(timeout = 4000)
+    public void testInitialiseParseFragmentWithNullContext() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        builder.initialiseParseFragment(null);
+        assertEquals("http://www.w3.org/XML/1998/namespace", builder.defaultNamespace());
+    }
 
-  @Test(timeout = 4000)
-  public void test42()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      xmlTreeBuilder0.initialiseParseFragment((Element) null);
-      assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
-  }
+    // Test parsing XML content
+    @Test(timeout = 4000)
+    public void testParseXmlContent() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        StringReader reader = new StringReader("xmlns");
+        builder.parse(reader, "xmlns");
+    }
 
-  @Test(timeout = 4000)
-  public void test43()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      StringReader stringReader0 = new StringReader("xmlns");
-      xmlTreeBuilder0.parse(stringReader0, "xmlns");
-  }
+    // Test comment insertion without context
+    @Test(timeout = 4000)
+    public void testInsertCommentForThrowsNullPointerException() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Token.Comment comment = new Token.Comment();
+        
+        try {
+            builder.insertCommentFor(comment);
+            fail("Expected NullPointerException due to uninitialized stack");
+        } catch (NullPointerException e) {
+            // Expected: Stack not initialized
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test44()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      Token.Comment token_Comment0 = new Token.Comment();
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.insertCommentFor(token_Comment0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.jsoup.parser.TreeBuilder", e);
-      }
-  }
+    // Test new instance namespace
+    @Test(timeout = 4000)
+    public void testNewInstanceHasDefaultNamespace() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        XmlTreeBuilder newInstance = builder.newInstance();
+        assertEquals("http://www.w3.org/XML/1998/namespace", newInstance.defaultNamespace());
+    }
 
-  @Test(timeout = 4000)
-  public void test45()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      XmlTreeBuilder xmlTreeBuilder1 = xmlTreeBuilder0.newInstance();
-      assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder1.defaultNamespace());
-  }
-
-  @Test(timeout = 4000)
-  public void test46()  throws Throwable  {
-      XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-      // Undeclared exception!
-      try { 
-        xmlTreeBuilder0.pop();
-        fail("Expecting exception: NoSuchElementException");
-      
-      } catch(NoSuchElementException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.util.ArrayDeque", e);
-      }
-  }
+    // Test element popping from empty stack
+    @Test(timeout = 4000)
+    public void testPopThrowsNoSuchElementException() throws Throwable {
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        
+        try {
+            builder.pop();
+            fail("Expected NoSuchElementException for empty stack");
+        } catch (NoSuchElementException e) {
+            // Expected: Stack is empty
+        }
+    }
 }
