@@ -10,182 +10,169 @@ package org.locationtech.spatial4j.shape;
 
 import com.carrotsearch.randomizedtesting.RandomizedTest;
 import com.carrotsearch.randomizedtesting.annotations.Repeat;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 import org.locationtech.spatial4j.TestLog;
 import org.locationtech.spatial4j.context.SpatialContext;
 import org.locationtech.spatial4j.context.SpatialContextFactory;
 import org.locationtech.spatial4j.shape.impl.BufferedLine;
 import org.locationtech.spatial4j.shape.impl.PointImpl;
 import org.locationtech.spatial4j.shape.impl.RectangleImpl;
+import org.junit.Rule;
+import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(Parameterized.class)
 public class BufferedLineTest extends RandomizedTest {
 
-    private final SpatialContext ctx = new SpatialContextFactory()
-        {{ geo = false; worldBounds = new RectangleImpl(-100, 100, -50, 50, null); }}.newSpatialContext();
+  private final SpatialContext ctx = new SpatialContextFactory()
+    {{geo = false; worldBounds = new RectangleImpl(-100, 100, -50, 50, null);}}.newSpatialContext();
 
-    @Rule
-    public TestLog testLog = TestLog.instance;
+  @Rule
+  public TestLog testLog = TestLog.instance;
+//SpatialContext.GEO ;//
 
-    // Test parameters for distance tests
-    private final Point start;
-    private final Point end;
-    private final Point testPoint;
-    private final double expectedDistance;
+  public static void logShapes(final BufferedLine line, final Rectangle rect) {
+    String lineWKT =
+        "LINESTRING(" + line.getA().getX() + " " + line.getA().getY() + "," +
+            line.getB().getX() + " " + line.getB().getY() + ")";
+    System.out.println(
+        "GEOMETRYCOLLECTION(" + lineWKT + "," + rectToWkt(line.getBoundingBox
+            ()) + ")");
 
-    public BufferedLineTest(Point start, Point end, Point testPoint, double expectedDistance) {
-        this.start = start;
-        this.end = end;
-        this.testPoint = testPoint;
-        this.expectedDistance = expectedDistance;
+    String rectWKT = rectToWkt(rect);
+    System.out.println(rectWKT);
+  }
+
+  static private String rectToWkt(Rectangle rect) {
+    return "POLYGON((" + rect.getMinX() + " " + rect.getMinY() + "," +
+        rect.getMaxX() + " " + rect.getMinY() + "," +
+        rect.getMaxX() + " " + rect.getMaxY() + "," +
+        rect.getMinX() + " " + rect.getMaxY() + "," +
+        rect.getMinX() + " " + rect.getMinY() + "))";
+  }
+
+  @Test
+  public void distance() {
+    //negative slope
+    testDistToPoint(ctx.makePoint(7, -4), ctx.makePoint(3, 2),
+        ctx.makePoint(5, 6), 3.88290);
+    //positive slope
+    testDistToPoint(ctx.makePoint(3, 2), ctx.makePoint(7, 5),
+        ctx.makePoint(5, 6), 2.0);
+    //vertical line
+    testDistToPoint(ctx.makePoint(3, 2), ctx.makePoint(3, 8),
+        ctx.makePoint(4, 3), 1.0);
+    //horiz line
+    testDistToPoint(ctx.makePoint(3, 2), ctx.makePoint(6, 2),
+        ctx.makePoint(4, 3), 1.0);
+  }
+
+  private void testDistToPoint(Point pA, Point pB, Point pC, double dist) {
+    if (dist > 0) {
+      assertFalse(new BufferedLine(pA, pB, dist * 0.999, ctx).contains(pC));
+    } else {
+      assert dist == 0;
+      assertTrue(new BufferedLine(pA, pB, 0, ctx).contains(pC));
     }
+    assertTrue(new BufferedLine(pA, pB, dist * 1.001, ctx).contains(pC));
+  }
 
-    @Parameters(name = "Line from ({0}) to ({1}) - Point {2} should have distance {3}")
-    public static Collection<Object[]> testData() {
-        return Arrays.asList(new Object[][] {
-            // Negative slope
-            { makePoint(7, -4), makePoint(3, 2), makePoint(5, 6), 3.88290 },
-            // Positive slope
-            { makePoint(3, 2), makePoint(7, 5), makePoint(5, 6), 2.0 },
-            // Vertical line
-            { makePoint(3, 2), makePoint(3, 8), makePoint(4, 3), 1.0 },
-            // Horizontal line
-            { makePoint(3, 2), makePoint(6, 2), makePoint(4, 3), 1.0 }
-        });
+  @Test
+  public void misc() {
+    //pa == pb
+    Point pt = ctx.makePoint(10, 1);
+    BufferedLine line = new BufferedLine(pt, pt, 3, ctx);
+    assertTrue(line.contains(ctx.makePoint(10, 1 + 3 - 0.1)));
+    assertFalse(line.contains(ctx.makePoint(10, 1 + 3 + 0.1)));
+  }
+
+  @Test
+  @Repeat(iterations = 15)
+  public void quadrants() {
+    //random line
+    BufferedLine line = newRandomLine();
+//    if (line.getA().equals(line.getB()))
+//      return;//this test doesn't work
+    Rectangle rect = newRandomLine().getBoundingBox();
+    //logShapes(line, rect);
+    //compute closest corner brute force
+    ArrayList<Point> corners = quadrantCorners(rect);
+    // a collection instead of 1 value due to ties
+    Collection<Integer> farthestDistanceQuads = new LinkedList<>();
+    double farthestDistance = -1;
+    int quad = 1;
+    for (Point corner : corners) {
+      double d = line.getLinePrimary().distanceUnbuffered(corner);
+      if (Math.abs(d - farthestDistance) < 0.000001) {//about equal
+        farthestDistanceQuads.add(quad);
+      } else if (d > farthestDistance) {
+        farthestDistanceQuads.clear();
+        farthestDistanceQuads.add(quad);
+        farthestDistance = d;
+      }
+      quad++;
     }
+    //compare results
+    int calcClosestQuad = line.getLinePrimary().quadrant(rect.getCenter());
+    assertTrue(farthestDistanceQuads.contains(calcClosestQuad));
+  }
 
-    private static Point makePoint(double x, double y) {
-        return SpatialContext.GEO.getShapeFactory().pointXY(x, y);
+  private BufferedLine newRandomLine() {
+    Point pA = new PointImpl(randomInt(9), randomInt(9), ctx);
+    Point pB = new PointImpl(randomInt(9), randomInt(9), ctx);
+    int buf = randomInt(5);
+    return new BufferedLine(pA, pB, buf, ctx);
+  }
+
+  private ArrayList<Point> quadrantCorners(Rectangle rect) {
+    ArrayList<Point> corners = new ArrayList<>(4);
+    corners.add(ctx.makePoint(rect.getMaxX(), rect.getMaxY()));
+    corners.add(ctx.makePoint(rect.getMinX(), rect.getMaxY()));
+    corners.add(ctx.makePoint(rect.getMinX(), rect.getMinY()));
+    corners.add(ctx.makePoint(rect.getMaxX(), rect.getMinY()));
+    return corners;
+  }
+
+  @Test
+  public void testRectIntersect() {
+    new RectIntersectionTestHelper<BufferedLine>(ctx) {
+
+      @Override
+      protected BufferedLine generateRandomShape(Point nearP) {
+        Rectangle nearR = randomRectangle(nearP);
+        ArrayList<Point> corners = quadrantCorners(nearR);
+        int r4 = randomInt(3);//0..3
+        Point pA = corners.get(r4);
+        Point pB = corners.get((r4 + 2) % 4);
+        double maxBuf = Math.max(nearR.getWidth(), nearR.getHeight());
+        double buf = Math.abs(randomGaussian()) * maxBuf / 4;
+        buf = randomInt((int) divisible(buf));
+        return new BufferedLine(pA, pB, buf, ctx);
+      }
+
+      protected Point randomPointInEmptyShape(BufferedLine shape) {
+        int r = randomInt(1);
+        if (r == 0) return shape.getA();
+        //if (r == 1)
+        return shape.getB();
+//        Point c = shape.getCenter();
+//        if (shape.contains(c));
+      }
+    }.testRelateWithRectangle();
+  }
+
+  private BufferedLine newBufLine(int x1, int y1, int x2, int y2, int buf) {
+    Point pA = ctx.makePoint(x1, y1);
+    Point pB = ctx.makePoint(x2, y2);
+    if (randomBoolean()) {
+      return new BufferedLine(pB, pA, buf, ctx);
+    } else {
+      return new BufferedLine(pA, pB, buf, ctx);
     }
+  }
 
-    @Test
-    public void testDistanceToPointWithVariousLineSlopes() {
-        // Test that a buffered line with a buffer slightly smaller doesn't contain the point
-        if (expectedDistance > 0) {
-            assertLineContainsPoint(start, end, expectedDistance * 0.999, testPoint, false);
-        } else {
-            assertLineContainsPoint(start, end, 0, testPoint, true);
-        }
-        // Test that a buffered line with a buffer slightly larger contains the point
-        assertLineContainsPoint(start, end, expectedDistance * 1.001, testPoint, true);
-    }
-
-    private void assertLineContainsPoint(Point start, Point end, double buffer, Point testPoint, boolean shouldContain) {
-        BufferedLine line = new BufferedLine(start, end, buffer, ctx);
-        if (shouldContain) {
-            assertTrue("Point should be within buffered line", line.contains(testPoint));
-        } else {
-            assertFalse("Point should not be within buffered line", line.contains(testPoint));
-        }
-    }
-
-    @Test
-    public void testLineWithIdenticalPoints() {
-        // Tests behavior when line start and end are the same point
-        Point point = ctx.makePoint(10, 1);
-        double buffer = 3;
-        BufferedLine line = new BufferedLine(point, point, buffer, ctx);
-
-        // Point within buffer distance
-        assertTrue(line.contains(ctx.makePoint(10, 1 + buffer - 0.1)));
-        // Point outside buffer distance
-        assertFalse(line.contains(ctx.makePoint(10, 1 + buffer + 0.1)));
-    }
-
-    @Test
-    @Repeat(iterations = 15)
-    public void testFarthestQuadrantFromLineCenter() {
-        // Generate random line and rectangle
-        BufferedLine line = generateRandomLine();
-        Rectangle rect = generateRandomLine().getBoundingBox();
-
-        // Calculate farthest corners from the line
-        List<Point> corners = getRectangleCorners(rect);
-        double maxDistance = -1;
-        Collection<Integer> farthestQuadrants = new LinkedList<>();
-
-        // Find corners with maximum distance to the line
-        for (int i = 0; i < corners.size(); i++) {
-            Point corner = corners.get(i);
-            double distance = line.getLinePrimary().distanceUnbuffered(corner);
-            if (distance > maxDistance) {
-                maxDistance = distance;
-                farthestQuadrants.clear();
-                farthestQuadrants.add(i + 1); // Quadrants are 1-indexed
-            } else if (Math.abs(distance - maxDistance) < 0.000001) {
-                farthestQuadrants.add(i + 1); // Handle ties
-            }
-        }
-
-        // Verify calculated quadrant matches expected farthest quadrant
-        int calculatedQuadrant = line.getLinePrimary().quadrant(rect.getCenter());
-        assertTrue(
-            "Calculated quadrant should be one of the farthest",
-            farthestQuadrants.contains(calculatedQuadrant)
-        );
-    }
-
-    private BufferedLine generateRandomLine() {
-        Point start = new PointImpl(randomInt(9), randomInt(9), ctx);
-        Point end = new PointImpl(randomInt(9), randomInt(9), ctx);
-        double buffer = randomInt(5);
-        return new BufferedLine(start, end, buffer, ctx);
-    }
-
-    private List<Point> getRectangleCorners(Rectangle rect) {
-        return Arrays.asList(
-            ctx.makePoint(rect.getMaxX(), rect.getMaxY()), // NE (quadrant 1)
-            ctx.makePoint(rect.getMinX(), rect.getMaxY()), // NW (quadrant 2)
-            ctx.makePoint(rect.getMinX(), rect.getMinY()), // SW (quadrant 3)
-            ctx.makePoint(rect.getMaxX(), rect.getMinY())  // SE (quadrant 4)
-        );
-    }
-
-    @Test
-    public void testRandomRectangleIntersection() {
-        new RectIntersectionTestHelper<BufferedLine>(ctx) {
-
-            @Override
-            protected BufferedLine generateRandomShape(Point nearPoint) {
-                Rectangle nearRect = randomRectangle(nearPoint);
-                List<Point> corners = getRectangleCorners(nearRect);
-                int cornerIndex = randomInt(3);
-                Point start = corners.get(cornerIndex);
-                Point end = corners.get((cornerIndex + 2) % 4); // Opposite corner
-                double maxBuffer = Math.max(nearRect.getWidth(), nearRect.getHeight());
-                double buffer = Math.abs(randomGaussian()) * maxBuffer / 4;
-                buffer = randomInt((int) divisible(buffer));
-                return new BufferedLine(start, end, buffer, ctx);
-            }
-
-            @Override
-            protected Point randomPointInEmptyShape(BufferedLine shape) {
-                // Return one of the endpoints (simple representation of "inside" the line)
-                return randomBoolean() ? shape.getA() : shape.getB();
-            }
-        }.testRelateWithRectangle();
-    }
-
-    private BufferedLine createBufferedLine(int x1, int y1, int x2, int y2, int buffer) {
-        Point start = ctx.makePoint(x1, y1);
-        Point end = ctx.makePoint(x2, y2);
-        // Randomize point order to test both directions
-        if (randomBoolean()) {
-            return new BufferedLine(end, start, buffer, ctx);
-        }
-        return new BufferedLine(start, end, buffer, ctx);
-    }
 }
