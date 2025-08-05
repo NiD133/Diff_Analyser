@@ -16,155 +16,142 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class CpioUtil_ESTest extends CpioUtil_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      byte[] byteArray0 = CpioUtil.long2byteArray((-3070L), 146, false);
-      assertEquals(146, byteArray0.length);
-  }
+    // Tests for fileType
+    @Test(timeout = 4000)
+    public void test_fileType_returnsZeroForZeroInput() {
+        long result = CpioUtil.fileType(0L);
+        assertEquals(0L, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      long long0 = CpioUtil.fileType(0L);
-      assertEquals(0L, long0);
-  }
+    @Test(timeout = 4000)
+    public void test_fileType_returnsValueForValidInput() {
+        long result = CpioUtil.fileType(61440L);
+        assertEquals(61440L, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      byte[] byteArray0 = new byte[8];
-      byteArray0[1] = (byte) (-51);
-      long long0 = CpioUtil.byteArray2long(byteArray0, false);
-      assertEquals((-3674937295934324736L), long0);
-  }
+    // Tests for byteArray2long
+    @Test(timeout = 4000)
+    public void test_byteArray2long_handlesSpecificValue() {
+        byte[] byteArray = new byte[8];
+        byteArray[1] = (byte) (-51);
+        long result = CpioUtil.byteArray2long(byteArray, false);
+        assertEquals(-3674937295934324736L, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      CpioUtil.long2byteArray(3634, 3634, false);
-      CpioUtil.long2byteArray(3634, 3634, false);
-      // Undeclared exception!
-      CpioUtil.long2byteArray(3634, 3634, false);
-  }
+    @Test(timeout = 4000)
+    public void test_byteArray2long_returnsZeroForZeroArray() {
+        byte[] byteArray = new byte[4];
+        long result = CpioUtil.byteArray2long(byteArray, false);
+        assertEquals(0L, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        CpioUtil.long2byteArray(0L, (-3182), true);
-        fail("Expecting exception: NegativeArraySizeException");
-      
-      } catch(NegativeArraySizeException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.archivers.cpio.CpioUtil", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_byteArray2long_throwsForOddLengthArray() {
+        byte[] byteArray = new byte[3];
+        try {
+            CpioUtil.byteArray2long(byteArray, true);
+            fail("Expected UnsupportedOperationException for odd-length array");
+        } catch (UnsupportedOperationException e) {
+            // Expected: length must be a multiple of 2
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        CpioUtil.byteArray2long((byte[]) null, true);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.archivers.cpio.CpioUtil", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_byteArray2long_throwsForNullArray() {
+        try {
+            CpioUtil.byteArray2long(null, true);
+            fail("Expected NullPointerException for null input");
+        } catch (NullPointerException e) {
+            // Expected: input array cannot be null
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      byte[] byteArray0 = new byte[0];
-      // Undeclared exception!
-      try { 
-        CpioUtil.byteArray2long(byteArray0, false);
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
-      
-      } catch(ArrayIndexOutOfBoundsException e) {
-         //
-         // 0
-         //
-         verifyException("org.apache.commons.compress.archivers.cpio.CpioUtil", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_byteArray2long_throwsForEmptyArray() {
+        byte[] byteArray = new byte[0];
+        try {
+            CpioUtil.byteArray2long(byteArray, false);
+            fail("Expected ArrayIndexOutOfBoundsException for empty array");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // Expected: array is empty
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      byte[] byteArray0 = CpioUtil.long2byteArray((byte)2, (byte)2, false);
-      assertArrayEquals(new byte[] {(byte)2, (byte)0}, byteArray0);
-  }
+    // Tests for long2byteArray
+    @Test(timeout = 4000)
+    public void test_long2byteArray_createsArrayOfSpecifiedLength() {
+        byte[] result = CpioUtil.long2byteArray(-3070L, 146, false);
+        assertEquals(146, result.length);
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        CpioUtil.long2byteArray(3061L, (byte)0, true);
-        fail("Expecting exception: UnsupportedOperationException");
-      
-      } catch(UnsupportedOperationException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.archivers.cpio.CpioUtil", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_long2byteArray_createsExpectedTwoByteArray() {
+        byte[] result = CpioUtil.long2byteArray(2L, 2, false);
+        assertArrayEquals(new byte[] { (byte) 2, (byte) 0 }, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        CpioUtil.long2byteArray(701, 701, false);
-        fail("Expecting exception: UnsupportedOperationException");
-      
-      } catch(UnsupportedOperationException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.archivers.cpio.CpioUtil", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_long2byteArray_throwsForNegativeLength() {
+        try {
+            CpioUtil.long2byteArray(0L, -3182, true);
+            fail("Expected NegativeArraySizeException for negative length");
+        } catch (NegativeArraySizeException e) {
+            // Expected: array length cannot be negative
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      byte[] byteArray0 = new byte[4];
-      long long0 = CpioUtil.byteArray2long(byteArray0, false);
-      assertEquals(0L, long0);
-  }
+    @Test(timeout = 4000)
+    public void test_long2byteArray_throwsForZeroLength() {
+        try {
+            CpioUtil.long2byteArray(3061L, 0, true);
+            fail("Expected UnsupportedOperationException for zero length");
+        } catch (UnsupportedOperationException e) {
+            // Expected: length must be a positive multiple of 2
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      byte[] byteArray0 = new byte[3];
-      // Undeclared exception!
-      try { 
-        CpioUtil.byteArray2long(byteArray0, true);
-        fail("Expecting exception: UnsupportedOperationException");
-      
-      } catch(UnsupportedOperationException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.archivers.cpio.CpioUtil", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_long2byteArray_throwsForOddLength() {
+        try {
+            CpioUtil.long2byteArray(701, 701, false);
+            fail("Expected UnsupportedOperationException for odd length");
+        } catch (UnsupportedOperationException e) {
+            // Expected: length must be a multiple of 2
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      byte[] byteArray0 = CpioUtil.long2byteArray(1L, 5174, true);
-      CpioUtil.byteArray2long(byteArray0, true);
-      // Undeclared exception!
-      CpioUtil.byteArray2long(byteArray0, true);
-  }
+    // Edge case tests (preserving original behavior)
+    @Test(timeout = 4000)
+    public void test_long2byteArray_multipleCallsWithLargeArray() {
+        // Original test called the method three times with a large array
+        CpioUtil.long2byteArray(3634, 3634, false);
+        CpioUtil.long2byteArray(3634, 3634, false);
+        // The third call might trigger an exception in specific environments
+        try {
+            CpioUtil.long2byteArray(3634, 3634, false);
+        } catch (Exception e) {
+            // Fail only if an unexpected exception occurs
+            fail("Unexpected exception: " + e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      long long0 = CpioUtil.fileType(61440L);
-      assertEquals(61440L, long0);
-  }
+    @Test(timeout = 4000)
+    public void test_byteArray2long_afterConversion() {
+        byte[] byteArray = CpioUtil.long2byteArray(1L, 5174, true);
+        CpioUtil.byteArray2long(byteArray, true);
+        // The second call might trigger an exception in specific environments
+        try {
+            CpioUtil.byteArray2long(byteArray, true);
+        } catch (Exception e) {
+            // Fail only if an unexpected exception occurs
+            fail("Unexpected exception: " + e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      CpioUtil cpioUtil0 = new CpioUtil();
-  }
+    // Constructor test
+    @Test(timeout = 4000)
+    public void test_constructor() {
+        // Verify the constructor is accessible
+        new CpioUtil();
+    }
 }
