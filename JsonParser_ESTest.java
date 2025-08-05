@@ -23,277 +23,365 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class JsonParser_ESTest extends JsonParser_ESTest_scaffolding {
 
-    // ===================================================
-    // Tests for parseString (static method)
-    // ===================================================
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      JsonElement jsonElement0 = JsonParser.parseString("");
+      assertTrue(jsonElement0.isJsonNull());
+  }
 
-    @Test(timeout = 4000)
-    public void test_parseString_emptyString_returnsJsonNull()  throws Throwable  {
-        JsonElement jsonElement = JsonParser.parseString("");
-        assertTrue(jsonElement.isJsonNull());
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      JsonElement jsonElement0 = JsonParser.parseString("[GoyG.G]");
+      assertTrue(jsonElement0.isJsonArray());
+  }
 
-    @Test(timeout = 4000)
-    public void test_parseString_validJsonArray_returnsJsonArray()  throws Throwable  {
-        JsonElement jsonElement = JsonParser.parseString("[GoyG.G]");
-        assertTrue(jsonElement.isJsonArray());
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("MUB_qz@d");
+      JsonPrimitive jsonPrimitive0 = (JsonPrimitive)JsonParser.parseReader((Reader) stringReader0);
+      assertFalse(jsonPrimitive0.isBoolean());
+  }
 
-    @Test(timeout = 4000)
-    public void test_parseString_singleCharacter_returnsJsonPrimitive()  throws Throwable  {
-        JsonPrimitive jsonPrimitive = (JsonPrimitive) JsonParser.parseString("A");
-        assertFalse(jsonPrimitive.isNumber());
-        assertTrue(jsonPrimitive.isString());
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("{}3+1M-tu;%QX!~Y");
+      JsonReader jsonReader0 = new JsonReader(stringReader0);
+      JsonElement jsonElement0 = JsonParser.parseReader(jsonReader0);
+      assertFalse(jsonElement0.isJsonNull());
+  }
 
-    @Test(timeout = 4000)
-    public void test_parseString_nullString_throwsNullPointerException()  throws Throwable  {
-        // Undeclared exception!
-        try { 
-            JsonParser.parseString(null);
-            fail("Expecting exception: NullPointerException");
-        } catch(NullPointerException e) {
-            verifyException("java.io.StringReader", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("[GoyG.G]");
+      JsonParser.parseReader((Reader) stringReader0);
+      JsonReader jsonReader0 = new JsonReader(stringReader0);
+      JsonElement jsonElement0 = JsonParser.parseReader(jsonReader0);
+      assertTrue(jsonElement0.isJsonNull());
+  }
 
-    @Test(timeout = 4000)
-    public void test_parseString_malformedJson_throwsRuntimeException()  throws Throwable  {
-        try { 
-            JsonParser.parseString("lP ?");
-            fail("Expecting exception: RuntimeException");
-        } catch(RuntimeException e) {
-            // Verify exception contains troubleshooting info
-            assertTrue(e.getMessage().contains("Troubleshooting.md#malformed-json"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      JsonParser jsonParser0 = new JsonParser();
+      JsonElement jsonElement0 = jsonParser0.parse("");
+      assertTrue(jsonElement0.isJsonNull());
+  }
 
-    // ===================================================
-    // Tests for parseReader(Reader) (static method)
-    // ===================================================
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      JsonParser jsonParser0 = new JsonParser();
+      JsonPrimitive jsonPrimitive0 = (JsonPrimitive)jsonParser0.parse("N");
+      assertFalse(jsonPrimitive0.isNumber());
+  }
 
-    @Test(timeout = 4000)
-    public void test_parseReaderReader_validString_returnsJsonPrimitive()  throws Throwable  {
-        StringReader reader = new StringReader("MUB_qz@d");
-        JsonPrimitive jsonPrimitive = (JsonPrimitive) JsonParser.parseReader(reader);
-        assertFalse(jsonPrimitive.isBoolean());
-        assertTrue(jsonPrimitive.isString());
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      JsonParser jsonParser0 = new JsonParser();
+      StringReader stringReader0 = new StringReader("M(");
+      JsonPrimitive jsonPrimitive0 = (JsonPrimitive)jsonParser0.parse((Reader) stringReader0);
+      assertFalse(jsonPrimitive0.isBoolean());
+  }
 
-    @Test(timeout = 4000)
-    public void test_parseReaderReader_validJsonObject_returnsJsonObject()  throws Throwable  {
-        StringReader reader = new StringReader("{}3+1M-tu;%QX!~Y");
-        JsonElement jsonElement = JsonParser.parseReader(reader);
-        assertTrue(jsonElement.isJsonObject());
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      JsonParser jsonParser0 = new JsonParser();
+      StringReader stringReader0 = new StringReader("{}/GH6t)T:8sOB3 #");
+      JsonReader jsonReader0 = new JsonReader(stringReader0);
+      JsonElement jsonElement0 = jsonParser0.parse(jsonReader0);
+      assertTrue(jsonElement0.isJsonObject());
+  }
 
-    @Test(timeout = 4000)
-    public void test_parseReaderReader_emptyReader_returnsJsonNull()  throws Throwable  {
-        StringReader reader = new StringReader("");
-        JsonElement jsonElement = JsonParser.parseReader(reader);
-        assertTrue(jsonElement.isJsonNull());
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      JsonParser jsonParser0 = new JsonParser();
+      StringReader stringReader0 = new StringReader("|h|[8&ZGQ1Fbg]Xp");
+      JsonReader jsonReader0 = new JsonReader(stringReader0);
+      jsonParser0.parse(jsonReader0);
+      JsonElement jsonElement0 = jsonParser0.parse(jsonReader0);
+      assertFalse(jsonElement0.isJsonObject());
+  }
 
-    @Test(timeout = 4000)
-    public void test_parseReaderReader_nullReader_throwsNullPointerException()  throws Throwable  {
-        // Undeclared exception!
-        try { 
-            JsonParser.parseReader((Reader) null);
-            fail("Expecting exception: NullPointerException");
-        } catch(NullPointerException e) {
-            assertEquals("in == null", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        JsonParser.parseString((String) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.io.StringReader", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void test_parseReaderReader_malformedJson_throwsRuntimeException()  throws Throwable  {
-        StringReader reader = new StringReader("=PC x;DM1DK}c/;");
-        try { 
-            JsonParser.parseReader(reader);
-            fail("Expecting exception: RuntimeException");
-        } catch(RuntimeException e) {
-            // Verify exception contains troubleshooting info
-            assertTrue(e.getMessage().contains("Troubleshooting.md#malformed-json"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      try { 
+        JsonParser.parseString("lP ?");
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // org.evosuite.runtime.mock.java.lang.MockThrowable: Use JsonReader.setStrictness(Strictness.LENIENT) to accept malformed JSON at line 1 column 5 path $
+         // See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
+         //
+         verifyException("com.google.gson.JsonParser", e);
+      }
+  }
 
-    // ===================================================
-    // Tests for parseReader(JsonReader) (static method)
-    // ===================================================
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        JsonParser.parseReader((Reader) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // in == null
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void test_parseReaderJsonReader_validJsonArray_returnsJsonArray()  throws Throwable  {
-        StringReader stringReader = new StringReader("[GoyG.G]");
-        JsonReader jsonReader = new JsonReader(stringReader);
-        JsonElement jsonElement = JsonParser.parseReader(jsonReader);
-        assertTrue(jsonElement.isJsonArray());
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("=PC x;DM1DK}c/;");
+      try { 
+        JsonParser.parseReader((Reader) stringReader0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // org.evosuite.runtime.mock.java.lang.MockThrowable: Expected value at line 1 column 1 path $
+         // See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
+         //
+         verifyException("com.google.gson.internal.Streams", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void test_parseReaderJsonReader_validJsonObject_returnsJsonObject()  throws Throwable  {
-        StringReader stringReader = new StringReader("{}3+1M-tu;%QX!~Y");
-        JsonReader jsonReader = new JsonReader(stringReader);
-        JsonElement jsonElement = JsonParser.parseReader(jsonReader);
-        assertTrue(jsonElement.isJsonObject());
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        JsonParser.parseReader((JsonReader) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.JsonParser", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void test_parseReaderJsonReader_exhaustedReader_returnsJsonNull()  throws Throwable  {
-        StringReader stringReader = new StringReader("[GoyG.G]");
-        // First parse consumes all data
-        JsonParser.parseReader(new JsonReader(stringReader));
-        
-        // Subsequent parse on exhausted reader
-        JsonReader jsonReader = new JsonReader(stringReader);
-        JsonElement jsonElement = JsonParser.parseReader(jsonReader);
-        assertTrue(jsonElement.isJsonNull());
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("R3P?4");
+      JsonReader jsonReader0 = new JsonReader(stringReader0);
+      JsonParser.parseReader(jsonReader0);
+      // Undeclared exception!
+      try { 
+        JsonParser.parseReader(jsonReader0);
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // Unexpected token: END_DOCUMENT
+         //
+         verifyException("com.google.gson.internal.bind.JsonElementTypeAdapter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void test_parseReaderJsonReader_nullReader_throwsNullPointerException()  throws Throwable  {
-        // Undeclared exception!
-        try { 
-            JsonParser.parseReader((JsonReader) null);
-            fail("Expecting exception: NullPointerException");
-        } catch(NullPointerException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      JsonParser jsonParser0 = new JsonParser();
+      // Undeclared exception!
+      try { 
+        jsonParser0.parse((String) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.io.StringReader", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void test_parseReaderJsonReader_malformedJson_throwsRuntimeException()  throws Throwable  {
-        StringReader stringReader = new StringReader("}pm");
-        JsonReader jsonReader = new JsonReader(stringReader);
-        try { 
-            JsonParser.parseReader(jsonReader);
-            fail("Expecting exception: RuntimeException");
-        } catch(RuntimeException e) {
-            // Verify exception contains troubleshooting info
-            assertTrue(e.getMessage().contains("Troubleshooting.md#malformed-json"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      JsonParser jsonParser0 = new JsonParser();
+      try { 
+        jsonParser0.parse("Did not consume the entire document.");
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // org.evosuite.runtime.mock.java.lang.MockThrowable: Use JsonReader.setStrictness(Strictness.LENIENT) to accept malformed JSON at line 1 column 6 path $
+         // See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
+         //
+         verifyException("com.google.gson.JsonParser", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void test_parseReaderJsonReader_strictMode_throwsRuntimeException()  throws Throwable  {
-        StringReader stringReader = new StringReader("MUB_qz@d");
-        JsonReader jsonReader = new JsonReader(stringReader);
-        jsonReader.setStrictness(Strictness.STRICT);
-        try { 
-            JsonParser.parseReader(jsonReader);
-            fail("Expecting exception: RuntimeException");
-        } catch(RuntimeException e) {
-            // Verify exception contains troubleshooting info
-            assertTrue(e.getMessage().contains("Troubleshooting.md#malformed-json"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      JsonParser jsonParser0 = new JsonParser();
+      // Undeclared exception!
+      try { 
+        jsonParser0.parse((Reader) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // in == null
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void test_parseReaderJsonReader_afterFullParse_throwsIllegalState()  throws Throwable  {
-        StringReader stringReader = new StringReader("R3P?4");
-        JsonReader jsonReader = new JsonReader(stringReader);
-        JsonParser.parseReader(jsonReader);  // First parse
-        
-        // Attempt second parse on same reader
-        try { 
-            JsonParser.parseReader(jsonReader);
-            fail("Expecting exception: IllegalStateException");
-        } catch(IllegalStateException e) {
-            assertEquals("Unexpected token: END_DOCUMENT", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      JsonParser jsonParser0 = new JsonParser();
+      StringReader stringReader0 = new StringReader("}Yz");
+      try { 
+        jsonParser0.parse((Reader) stringReader0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // org.evosuite.runtime.mock.java.lang.MockThrowable: Expected value at line 1 column 1 path $
+         // See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
+         //
+         verifyException("com.google.gson.internal.Streams", e);
+      }
+  }
 
-    // ===================================================
-    // Tests for deprecated JsonParser instance methods
-    // ===================================================
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      JsonParser jsonParser0 = new JsonParser();
+      // Undeclared exception!
+      try { 
+        jsonParser0.parse((JsonReader) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.JsonParser", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void test_deprecatedParseString_emptyString_returnsJsonNull()  throws Throwable  {
-        JsonParser parser = new JsonParser();
-        JsonElement jsonElement = parser.parse("");
-        assertTrue(jsonElement.isJsonNull());
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      JsonParser jsonParser0 = new JsonParser();
+      StringReader stringReader0 = new StringReader("?3p");
+      JsonReader jsonReader0 = new JsonReader(stringReader0);
+      jsonParser0.parse(jsonReader0);
+      // Undeclared exception!
+      try { 
+        jsonParser0.parse(jsonReader0);
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // Unexpected token: END_DOCUMENT
+         //
+         verifyException("com.google.gson.internal.bind.JsonElementTypeAdapter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void test_deprecatedParseString_validString_returnsJsonPrimitive()  throws Throwable  {
-        JsonParser parser = new JsonParser();
-        JsonPrimitive jsonPrimitive = (JsonPrimitive) parser.parse("N");
-        assertFalse(jsonPrimitive.isNumber());
-        assertTrue(jsonPrimitive.isString());
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      JsonParser jsonParser0 = new JsonParser();
+      StringReader stringReader0 = new StringReader("}pm");
+      JsonReader jsonReader0 = new JsonReader(stringReader0);
+      try { 
+        jsonParser0.parse(jsonReader0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // org.evosuite.runtime.mock.java.lang.MockThrowable: Expected value at line 1 column 1 path $
+         // See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
+         //
+         verifyException("com.google.gson.internal.Streams", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void test_deprecatedParseReader_validString_returnsJsonPrimitive()  throws Throwable  {
-        JsonParser parser = new JsonParser();
-        StringReader reader = new StringReader("M(");
-        JsonPrimitive jsonPrimitive = (JsonPrimitive) parser.parse(reader);
-        assertFalse(jsonPrimitive.isBoolean());
-        assertTrue(jsonPrimitive.isString());
-    }
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("[GoyG.G]");
+      JsonReader jsonReader0 = new JsonReader(stringReader0);
+      JsonElement jsonElement0 = JsonParser.parseReader(jsonReader0);
+      assertFalse(jsonElement0.isJsonPrimitive());
+  }
 
-    @Test(timeout = 4000)
-    public void test_deprecatedParseJsonReader_validJsonObject_returnsJsonObject()  throws Throwable  {
-        JsonParser parser = new JsonParser();
-        StringReader stringReader = new StringReader("{}/GH6t)T:8sOB3 #");
-        JsonReader jsonReader = new JsonReader(stringReader);
-        JsonElement jsonElement = parser.parse(jsonReader);
-        assertTrue(jsonElement.isJsonObject());
-    }
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("");
+      JsonElement jsonElement0 = JsonParser.parseReader((Reader) stringReader0);
+      assertFalse(jsonElement0.isJsonArray());
+  }
 
-    @Test(timeout = 4000)
-    public void test_deprecatedParseJsonReader_afterFullParse_returnsJsonNull()  throws Throwable  {
-        JsonParser parser = new JsonParser();
-        StringReader stringReader = new StringReader("|h|[8&ZGQ1Fbg]Xp");
-        JsonReader jsonReader = new JsonReader(stringReader);
-        parser.parse(jsonReader);  // First parse
-        
-        // Second parse on exhausted reader
-        JsonElement jsonElement = parser.parse(jsonReader);
-        assertTrue(jsonElement.isJsonNull());
-    }
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      JsonPrimitive jsonPrimitive0 = (JsonPrimitive)JsonParser.parseString("A");
+      assertFalse(jsonPrimitive0.isNumber());
+  }
 
-    // Error cases for deprecated methods
-    @Test(timeout = 4000)
-    public void test_deprecatedParseString_nullString_throwsNullPointerException()  throws Throwable  {
-        JsonParser parser = new JsonParser();
-        try { 
-            parser.parse((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch(NullPointerException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("MUB_qz@d");
+      JsonReader jsonReader0 = new JsonReader(stringReader0);
+      Strictness strictness0 = Strictness.STRICT;
+      jsonReader0.setStrictness(strictness0);
+      try { 
+        JsonParser.parseReader(jsonReader0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // org.evosuite.runtime.mock.java.lang.MockThrowable: Use JsonReader.setStrictness(Strictness.LENIENT) to accept malformed JSON at line 1 column 1 path $
+         // See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
+         //
+         verifyException("com.google.gson.internal.Streams", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void test_deprecatedParseString_malformedJson_throwsRuntimeException()  throws Throwable  {
-        JsonParser parser = new JsonParser();
-        try { 
-            parser.parse("Did not consume the entire document.");
-            fail("Expecting exception: RuntimeException");
-        } catch(RuntimeException e) {
-            // Verify exception contains troubleshooting info
-            assertTrue(e.getMessage().contains("Troubleshooting.md#malformed-json"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("[GoyG.G]");
+      JsonParser.parseReader((Reader) stringReader0);
+      JsonParser jsonParser0 = new JsonParser();
+      JsonElement jsonElement0 = jsonParser0.parse((Reader) stringReader0);
+      assertFalse(jsonElement0.isJsonArray());
+  }
 
-    @Test(timeout = 4000)
-    public void test_deprecatedParseReader_nullReader_throwsNullPointerException()  throws Throwable  {
-        JsonParser parser = new JsonParser();
-        try { 
-            parser.parse((Reader) null);
-            fail("Expecting exception: NullPointerException");
-        } catch(NullPointerException e) {
-            assertEquals("in == null", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("");
+      JsonParser jsonParser0 = new JsonParser();
+      JsonReader jsonReader0 = new JsonReader(stringReader0);
+      JsonElement jsonElement0 = jsonParser0.parse(jsonReader0);
+      assertFalse(jsonElement0.isJsonArray());
+  }
 
-    @Test(timeout = 4000)
-    public void test_deprecatedParseJsonReader_nullReader_throwsNullPointerException()  throws Throwable  {
-        JsonParser parser = new JsonParser();
-        try { 
-            parser.parse((JsonReader) null);
-            fail("Expecting exception: NullPointerException");
-        } catch(NullPointerException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("[GoyG.G]");
+      JsonParser jsonParser0 = new JsonParser();
+      JsonArray jsonArray0 = (JsonArray)jsonParser0.parse((Reader) stringReader0);
+      assertFalse(jsonArray0.isEmpty());
+  }
+
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      JsonParser jsonParser0 = new JsonParser();
+      JsonElement jsonElement0 = jsonParser0.parse("[GoyG.G]");
+      assertFalse(jsonElement0.isJsonObject());
+  }
 }
