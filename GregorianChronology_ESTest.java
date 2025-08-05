@@ -19,202 +19,201 @@ import org.joda.time.chrono.AssembledChronology;
 import org.joda.time.chrono.GregorianChronology;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true, 
+    useVFS = true, 
+    useVNET = true, 
+    resetStaticState = true, 
+    separateClassLoader = true
+) 
 public class GregorianChronology_ESTest extends GregorianChronology_ESTest_scaffolding {
 
   @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      GregorianChronology gregorianChronology0 = GregorianChronology.getInstanceUTC();
-      long long0 = gregorianChronology0.calculateFirstDayOfYearMillis(20);
-      assertEquals((-61536067200000L), long0);
+  public void testCalculateFirstDayOfYearMillis_Year20() throws Throwable {
+      GregorianChronology gregorianChronology = GregorianChronology.getInstanceUTC();
+      long actual = gregorianChronology.calculateFirstDayOfYearMillis(20);
+      assertEquals(-61536067200000L, actual);
   }
 
   @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      GregorianChronology gregorianChronology0 = GregorianChronology.getInstance();
-      AssembledChronology.Fields assembledChronology_Fields0 = new AssembledChronology.Fields();
-      gregorianChronology0.assemble(assembledChronology_Fields0);
+  public void testAssemble() throws Throwable {
+      // Test assembling chronology fields
+      GregorianChronology gregorianChronology = GregorianChronology.getInstance();
+      AssembledChronology.Fields fields = new AssembledChronology.Fields();
+      // Verify no exception is thrown during assembly
+      gregorianChronology.assemble(fields);
   }
 
   @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
-      GregorianChronology gregorianChronology0 = GregorianChronology.getInstance(dateTimeZone0);
-      boolean boolean0 = gregorianChronology0.isLeapYear(0);
-      assertTrue(boolean0);
+  public void testIsLeapYear_Year0_IsLeap() throws Throwable {
+      // Year 0 is a leap year in proleptic Gregorian calendar
+      DateTimeZone defaultZone = DateTimeZone.getDefault();
+      GregorianChronology gregorianChronology = GregorianChronology.getInstance(defaultZone);
+      boolean isLeap = gregorianChronology.isLeapYear(0);
+      assertTrue(isLeap);
   }
 
   @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      GregorianChronology gregorianChronology0 = GregorianChronology.getInstance();
-      boolean boolean0 = gregorianChronology0.isLeapYear((-900));
-      assertFalse(boolean0);
+  public void testIsLeapYear_YearNegative900_NotLeap() throws Throwable {
+      // Year -900 is not a leap year
+      GregorianChronology gregorianChronology = GregorianChronology.getInstance();
+      boolean isLeap = gregorianChronology.isLeapYear(-900);
+      assertFalse(isLeap);
   }
 
   @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      GregorianChronology gregorianChronology0 = GregorianChronology.getInstance();
-      long long0 = gregorianChronology0.getAverageMillisPerYearDividedByTwo();
-      assertEquals(15778476000L, long0);
+  public void testGetAverageMillisPerYearDividedByTwo() throws Throwable {
+      GregorianChronology gregorianChronology = GregorianChronology.getInstance();
+      long actual = gregorianChronology.getAverageMillisPerYearDividedByTwo();
+      assertEquals(15778476000L, actual);
   }
 
   @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      GregorianChronology gregorianChronology0 = GregorianChronology.getInstance();
-      long long0 = gregorianChronology0.getApproxMillisAtEpochDividedByTwo();
-      assertEquals(31083597720000L, long0);
+  public void testGetApproxMillisAtEpochDividedByTwo() throws Throwable {
+      GregorianChronology gregorianChronology = GregorianChronology.getInstance();
+      long actual = gregorianChronology.getApproxMillisAtEpochDividedByTwo();
+      assertEquals(31083597720000L, actual);
   }
 
   @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      GregorianChronology gregorianChronology0 = GregorianChronology.getInstance();
-      long long0 = gregorianChronology0.calculateFirstDayOfYearMillis(1970);
-      assertEquals(0L, long0);
+  public void testCalculateFirstDayOfYearMillis_Year1970() throws Throwable {
+      // Year 1970 should have 0L as the first day millis
+      GregorianChronology gregorianChronology = GregorianChronology.getInstance();
+      long actual = gregorianChronology.calculateFirstDayOfYearMillis(1970);
+      assertEquals(0L, actual);
   }
 
   @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      GregorianChronology gregorianChronology0 = GregorianChronology.getInstanceUTC();
-      // Undeclared exception!
-      try { 
-        gregorianChronology0.getDaysInYearMonth((-2764), (-2764));
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
-      
-      } catch(ArrayIndexOutOfBoundsException e) {
-         //
-         // -2765
-         //
-         verifyException("org.joda.time.chrono.BasicGJChronology", e);
+  public void testGetDaysInYearMonth_InvalidMonth_ThrowsArrayIndexOutOfBoundsException() throws Throwable {
+      // Using invalid month should throw ArrayIndexOutOfBoundsException
+      GregorianChronology gregorianChronology = GregorianChronology.getInstanceUTC();
+      try {
+          gregorianChronology.getDaysInYearMonth(-2764, -2764);
+          fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      } catch (ArrayIndexOutOfBoundsException e) {
+          // Expected exception
       }
   }
 
   @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      GregorianChronology gregorianChronology0 = GregorianChronology.getInstance();
-      // Undeclared exception!
-      try { 
-        gregorianChronology0.assemble((AssembledChronology.Fields) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.joda.time.chrono.BasicChronology", e);
+  public void testAssemble_NullFields_ThrowsNullPointerException() throws Throwable {
+      // Passing null to assemble should throw NullPointerException
+      GregorianChronology gregorianChronology = GregorianChronology.getInstance();
+      try {
+          gregorianChronology.assemble(null);
+          fail("Expecting exception: NullPointerException");
+      } catch (NullPointerException e) {
+          // Expected exception
       }
   }
 
   @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      GregorianChronology gregorianChronology0 = GregorianChronology.getInstanceUTC();
-      LocalDateTime localDateTime0 = new LocalDateTime(199L, (Chronology) gregorianChronology0);
-      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-3631));
-      DateTime dateTime0 = localDateTime0.toDateTime(dateTimeZone0);
-      assertEquals(3830L, dateTime0.getMillis());
+  public void testToDateTimeWithOffset() throws Throwable {
+      // Test converting LocalDateTime to DateTime with an offset
+      GregorianChronology gregorianChronology = GregorianChronology.getInstanceUTC();
+      LocalDateTime localDateTime = new LocalDateTime(199L, gregorianChronology);
+      DateTimeZone offsetZone = DateTimeZone.forOffsetMillis(-3631);
+      DateTime dateTime = localDateTime.toDateTime(offsetZone);
+      assertEquals(3830L, dateTime.getMillis());
   }
 
   @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis(531);
-      // Undeclared exception!
-      try { 
-        GregorianChronology.getInstance(dateTimeZone0, 531);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid min days in first week: 531
-         //
-         verifyException("org.joda.time.chrono.GregorianChronology", e);
+  public void testGetInstance_InvalidMinDaysInFirstWeek_ThrowsIllegalArgumentException() throws Throwable {
+      // Min days in first week must be between 1 and 7
+      DateTimeZone zone = DateTimeZone.forOffsetMillis(531);
+      try {
+          GregorianChronology.getInstance(zone, 531);
+          fail("Expecting exception: IllegalArgumentException");
+      } catch (IllegalArgumentException e) {
+          // Expected exception
       }
   }
 
   @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        GregorianChronology.getInstance((DateTimeZone) null, (-3203));
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid min days in first week: -3203
-         //
-         verifyException("org.joda.time.chrono.GregorianChronology", e);
+  public void testGetInstance_NegativeMinDaysInFirstWeek_ThrowsIllegalArgumentException() throws Throwable {
+      // Min days in first week cannot be negative
+      try {
+          GregorianChronology.getInstance(null, -3203);
+          fail("Expecting exception: IllegalArgumentException");
+      } catch (IllegalArgumentException e) {
+          // Expected exception
       }
   }
 
   @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      GregorianChronology gregorianChronology0 = GregorianChronology.getInstanceUTC();
-      long long0 = gregorianChronology0.getAverageMillisPerMonth();
-      assertEquals(2629746000L, long0);
+  public void testGetAverageMillisPerMonth() throws Throwable {
+      GregorianChronology gregorianChronology = GregorianChronology.getInstanceUTC();
+      long actual = gregorianChronology.getAverageMillisPerMonth();
+      assertEquals(2629746000L, actual);
   }
 
   @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      GregorianChronology gregorianChronology0 = GregorianChronology.getInstance();
-      int int0 = gregorianChronology0.getMaxYear();
-      assertEquals(292278993, int0);
+  public void testGetMaxYear() throws Throwable {
+      GregorianChronology gregorianChronology = GregorianChronology.getInstance();
+      int actual = gregorianChronology.getMaxYear();
+      assertEquals(292278993, actual);
   }
 
   @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
-      GregorianChronology gregorianChronology0 = GregorianChronology.getInstance(dateTimeZone0, 7);
-      Chronology chronology0 = gregorianChronology0.withUTC();
-      assertNotSame(chronology0, gregorianChronology0);
+  public void testWithUTC_ReturnsDifferentInstanceWhenNotUTC() throws Throwable {
+      // When chronology has non-UTC zone, withUTC should return a different instance
+      DateTimeZone defaultZone = DateTimeZone.getDefault();
+      GregorianChronology gregorianChronology = GregorianChronology.getInstance(defaultZone, 7);
+      Chronology utcChronology = gregorianChronology.withUTC();
+      assertNotSame(utcChronology, gregorianChronology);
   }
 
   @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      GregorianChronology gregorianChronology0 = GregorianChronology.getInstance();
-      long long0 = gregorianChronology0.getAverageMillisPerYear();
-      assertEquals(31556952000L, long0);
+  public void testGetAverageMillisPerYear() throws Throwable {
+      GregorianChronology gregorianChronology = GregorianChronology.getInstance();
+      long actual = gregorianChronology.getAverageMillisPerYear();
+      assertEquals(31556952000L, actual);
   }
 
   @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      GregorianChronology gregorianChronology0 = GregorianChronology.getInstanceUTC();
-      long long0 = gregorianChronology0.calculateFirstDayOfYearMillis((-292275054));
-      assertEquals((-9223372017043200000L), long0);
+  public void testCalculateFirstDayOfYearMillis_MinYear() throws Throwable {
+      // Test the minimum supported year
+      GregorianChronology gregorianChronology = GregorianChronology.getInstanceUTC();
+      long actual = gregorianChronology.calculateFirstDayOfYearMillis(-292275054);
+      assertEquals(-9223372017043200000L, actual);
   }
 
   @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      GregorianChronology gregorianChronology0 = GregorianChronology.getInstance();
-      long long0 = gregorianChronology0.calculateFirstDayOfYearMillis(3000);
-      assertEquals(32503680000000L, long0);
+  public void testCalculateFirstDayOfYearMillis_Year3000() throws Throwable {
+      GregorianChronology gregorianChronology = GregorianChronology.getInstance();
+      long actual = gregorianChronology.calculateFirstDayOfYearMillis(3000);
+      assertEquals(32503680000000L, actual);
   }
 
   @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      GregorianChronology gregorianChronology0 = GregorianChronology.getInstance();
-      long long0 = gregorianChronology0.calculateFirstDayOfYearMillis(0);
-      assertEquals((-62167219200000L), long0);
+  public void testCalculateFirstDayOfYearMillis_Year0() throws Throwable {
+      GregorianChronology gregorianChronology = GregorianChronology.getInstance();
+      long actual = gregorianChronology.calculateFirstDayOfYearMillis(0);
+      assertEquals(-62167219200000L, actual);
   }
 
   @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      GregorianChronology gregorianChronology0 = GregorianChronology.getInstance();
-      DateTimeZone dateTimeZone0 = DateTimeZone.UTC;
-      Chronology chronology0 = gregorianChronology0.withZone(dateTimeZone0);
-      assertSame(gregorianChronology0, chronology0);
+  public void testWithZone_UTC_ReturnsSameWhenDefaultTimeZoneIsUTC() throws Throwable {
+      // This test assumes the default time zone is UTC
+      GregorianChronology gregorianChronology = GregorianChronology.getInstance();
+      DateTimeZone utcZone = DateTimeZone.UTC;
+      Chronology resultChronology = gregorianChronology.withZone(utcZone);
+      assertSame(gregorianChronology, resultChronology);
   }
 
   @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      GregorianChronology gregorianChronology0 = GregorianChronology.getInstanceUTC();
-      Chronology chronology0 = gregorianChronology0.withZone((DateTimeZone) null);
-      assertSame(gregorianChronology0, chronology0);
+  public void testWithZone_Null_ReturnsSameWhenDefaultTimeZoneIsUTC() throws Throwable {
+      // This test assumes the default time zone is UTC
+      GregorianChronology gregorianChronology = GregorianChronology.getInstanceUTC();
+      Chronology resultChronology = gregorianChronology.withZone(null);
+      assertSame(gregorianChronology, resultChronology);
   }
 
   @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      TimeZone timeZone0 = TimeZone.getTimeZone("tySc3*yvDsM");
-      DateTimeZone dateTimeZone0 = DateTimeZone.forTimeZone(timeZone0);
-      GregorianChronology gregorianChronology0 = GregorianChronology.getInstance(dateTimeZone0, 1);
-      int int0 = gregorianChronology0.getMinYear();
-      assertEquals((-292275054), int0);
+  public void testGetMinYear() throws Throwable {
+      GregorianChronology gregorianChronology = GregorianChronology.getInstance(DateTimeZone.forTimeZone(TimeZone.getTimeZone("tySc3*yvDsM")), 1);
+      int actual = gregorianChronology.getMinYear();
+      assertEquals(-292275054, actual);
   }
 }
