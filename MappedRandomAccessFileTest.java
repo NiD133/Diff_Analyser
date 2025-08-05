@@ -40,7 +40,11 @@
     For more information, please contact iText Software Corp. at this
     address: sales@itextpdf.com
  */
-
+/*
+ * Created on Feb 10, 2012
+ * (c) 2012 Trumpet, Inc.
+ *
+ */
 package com.itextpdf.text.pdf;
 
 import java.io.File;
@@ -52,43 +56,24 @@ import org.junit.Test;
 
 import com.itextpdf.testutils.TestResourceUtils;
 
-/**
- * Unit tests for the MappedRandomAccessFile class.
- */
 public class MappedRandomAccessFileTest {
 
-    /**
-     * Sets up the test environment by purging temporary files.
-     */
     @Before
     public void setUp() throws Exception {
         TestResourceUtils.purgeTempFiles();
     }
 
-    /**
-     * Cleans up the test environment by purging temporary files.
-     */
     @After
     public void tearDown() throws Exception {
         TestResourceUtils.purgeTempFiles();
     }
 
-    /**
-     * Tests the behavior of MappedRandomAccessFile when handling a zero-sized file.
-     * Ensures that reading from a zero-sized file returns -1, indicating EOF.
-     */
     @Test
-    public void testReadFromZeroSizedFile() throws Exception {
-        // Retrieve a zero-sized PDF file as a temporary file
-        File zeroSizedPdfFile = TestResourceUtils.getResourceAsTempFile(getClass(), "zerosizedfile.pdf");
-        
-        // Create a MappedRandomAccessFile instance in read-write mode
-        MappedRandomAccessFile mappedFile = new MappedRandomAccessFile(zeroSizedPdfFile.getCanonicalPath(), "rw");
-        
-        // Assert that reading from the zero-sized file returns -1 (EOF)
-        Assert.assertEquals("Reading from a zero-sized file should return EOF (-1).", -1, mappedFile.read());
-        
-        // Close the MappedRandomAccessFile
-        mappedFile.close();
+    public void testZeroSize() throws Exception {
+        File pdf = TestResourceUtils.getResourceAsTempFile(getClass(), "zerosizedfile.pdf");
+        MappedRandomAccessFile f = new MappedRandomAccessFile(pdf.getCanonicalPath(), "rw");
+        Assert.assertEquals(-1, f.read());
+        f.close();
     }
+
 }
