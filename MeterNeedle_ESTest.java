@@ -37,190 +37,483 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class MeterNeedle_ESTest extends MeterNeedle_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void testSetRotateYAndEqualsForDifferentNeedleTypes() throws Throwable {
-        PlumNeedle plumNeedle = new PlumNeedle();
-        double customRotateY = -2433.34177;
-        plumNeedle.setRotateY(customRotateY);
-        
-        ShipNeedle shipNeedle = new ShipNeedle();
-        // Different needle types should not be equal
-        assertFalse(shipNeedle.equals(plumNeedle));
-        
-        assertEquals(customRotateY, plumNeedle.getRotateY(), 0.01);
-        assertEquals(0.5, plumNeedle.getRotateX(), 0.01); // Default value
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      PlumNeedle plumNeedle0 = new PlumNeedle();
+      plumNeedle0.setRotateY((-2433.34177));
+      ShipNeedle shipNeedle0 = new ShipNeedle();
+      shipNeedle0.equals(plumNeedle0);
+      assertEquals((-2433.34177), plumNeedle0.getRotateY(), 0.01);
+      assertEquals(0.5, plumNeedle0.getRotateX(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testSetRotateXAndEqualsForDifferentNeedleTypes() throws Throwable {
-        ShipNeedle shipNeedle = new ShipNeedle();
-        double customRotateX = -1.0;
-        shipNeedle.setRotateX(customRotateX);
-        
-        PointerNeedle pointerNeedle = new PointerNeedle();
-        // Different rotateX values should cause inequality
-        assertFalse(shipNeedle.equals(pointerNeedle));
-        
-        assertEquals(5, shipNeedle.getSize()); // Default size
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      ShipNeedle shipNeedle0 = new ShipNeedle();
+      assertEquals(0.5, shipNeedle0.getRotateX(), 0.01);
+      
+      shipNeedle0.setRotateX((-1.0));
+      PointerNeedle pointerNeedle0 = new PointerNeedle();
+      shipNeedle0.equals(pointerNeedle0);
+      assertEquals(5, shipNeedle0.getSize());
+  }
 
-    @Test(timeout = 4000)
-    public void testSetSizeAndEqualsForDifferentNeedleTypes() throws Throwable {
-        ShipNeedle shipNeedle = new ShipNeedle();
-        int customSize = 497;
-        shipNeedle.setSize(customSize);
-        
-        PlumNeedle plumNeedle = new PlumNeedle();
-        // Different sizes should cause inequality
-        assertFalse(shipNeedle.equals(plumNeedle));
-        
-        assertEquals(customSize, shipNeedle.getSize());
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      PlumNeedle plumNeedle0 = new PlumNeedle();
+      ShipNeedle shipNeedle0 = new ShipNeedle();
+      shipNeedle0.setSize(497);
+      shipNeedle0.equals(plumNeedle0);
+      assertEquals(497, shipNeedle0.getSize());
+  }
 
-    @Test(timeout = 4000)
-    public void testDrawLongNeedleWithZeroAngle() throws Throwable {
-        LongNeedle needle = new LongNeedle();
-        BufferedImage image = new BufferedImage(9, 9, BufferedImage.TYPE_INT_RGB);
-        Graphics2D graphics = image.createGraphics();
-        Rectangle2D.Float area = new Rectangle2D.Float(9, 9, 0.0F, 9);
-        
-        needle.draw(graphics, area, 0.0);
-        
-        // Verify default properties unchanged
-        assertEquals(5, needle.getSize());
-        assertEquals(0.5, needle.getRotateX(), 0.01);
-        assertEquals(0.8, needle.getRotateY(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      LongNeedle longNeedle0 = new LongNeedle();
+      BufferedImage bufferedImage0 = new BufferedImage(9, 9, 9);
+      Graphics2D graphics2D0 = bufferedImage0.createGraphics();
+      Rectangle2D.Float rectangle2D_Float0 = new Rectangle2D.Float(9, 9, 0.0F, 9);
+      Rectangle rectangle0 = rectangle2D_Float0.getBounds();
+      longNeedle0.draw(graphics2D0, (Rectangle2D) rectangle0, (double) 0.0F);
+      assertEquals(5, longNeedle0.getSize());
+      assertEquals(0.5, longNeedle0.getRotateX(), 0.01);
+      assertEquals(0.8, longNeedle0.getRotateY(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testDefaultDisplayHandlesNullGraphics() throws Throwable {
-        ShipNeedle needle = new ShipNeedle();
-        Rectangle2D.Float area = new Rectangle2D.Float();
-        
-        // Should handle null graphics without exception
-        needle.defaultDisplay(null, area);
-        
-        assertEquals(0.5, needle.getRotateX(), 0.01);
-        assertEquals(0.5, needle.getRotateY(), 0.01);
-        assertEquals(5, needle.getSize());
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      ShipNeedle shipNeedle0 = new ShipNeedle();
+      Rectangle2D.Float rectangle2D_Float0 = new Rectangle2D.Float();
+      shipNeedle0.defaultDisplay((Graphics2D) null, rectangle2D_Float0);
+      assertEquals(0.5, shipNeedle0.getRotateX(), 0.01);
+      assertEquals(0.5, shipNeedle0.getRotateY(), 0.01);
+      assertEquals(5, shipNeedle0.getSize());
+  }
 
-    @Test(timeout = 4000)
-    public void testHashCodeConsistency() throws Throwable {
-        MiddlePinNeedle needle = new MiddlePinNeedle();
-        int initialHashCode = needle.hashCode();
-        
-        // Verify hash code remains consistent
-        assertEquals(initialHashCode, needle.hashCode());
-        assertEquals(5, needle.getSize());
-        assertEquals(0.5, needle.getRotateY(), 0.01);
-        assertEquals(0.5, needle.getRotateX(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      MiddlePinNeedle middlePinNeedle0 = new MiddlePinNeedle();
+      middlePinNeedle0.hashCode();
+      assertEquals(5, middlePinNeedle0.getSize());
+      assertEquals(0.5, middlePinNeedle0.getRotateY(), 0.01);
+      assertEquals(0.5, middlePinNeedle0.getRotateX(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testSetNegativeSize() throws Throwable {
-        ShipNeedle needle = new ShipNeedle();
-        int customSize = -1083;
-        needle.setSize(customSize);
-        
-        assertEquals(customSize, needle.getSize());
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      ShipNeedle shipNeedle0 = new ShipNeedle();
+      shipNeedle0.setSize((-1083));
+      int int0 = shipNeedle0.getSize();
+      assertEquals((-1083), int0);
+  }
 
-    @Test(timeout = 4000)
-    public void testSetRotateYToZero() throws Throwable {
-        PointerNeedle needle = new PointerNeedle();
-        needle.setRotateY(0.0);
-        
-        assertEquals(0.0, needle.getRotateY(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      PointerNeedle pointerNeedle0 = new PointerNeedle();
+      assertEquals(0.5, pointerNeedle0.getRotateY(), 0.01);
+      
+      pointerNeedle0.setRotateY(0.0);
+      double double0 = pointerNeedle0.getRotateY();
+      assertEquals(0.0, double0, 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testSetRotateYToNegativeValue() throws Throwable {
-        LongNeedle needle = new LongNeedle();
-        double customRotateY = -590.9257035;
-        needle.setRotateY(customRotateY);
-        
-        assertEquals(customRotateY, needle.getRotateY(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      LongNeedle longNeedle0 = new LongNeedle();
+      longNeedle0.setRotateY((-590.9257035));
+      double double0 = longNeedle0.getRotateY();
+      assertEquals((-590.9257035), double0, 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testSetRotateXToNegativeValue() throws Throwable {
-        ArrowNeedle needle = new ArrowNeedle(false);
-        double customRotateX = -9.0;
-        needle.setRotateX(customRotateX);
-        
-        assertEquals(customRotateX, needle.getRotateX(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      ArrowNeedle arrowNeedle0 = new ArrowNeedle(false);
+      arrowNeedle0.setRotateX((-9.0));
+      double double0 = arrowNeedle0.getRotateX();
+      assertEquals((-9.0), double0, 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testSetOutlinePaint() throws Throwable {
-        PlumNeedle needle = new PlumNeedle();
-        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
-        Color expectedPaint = renderer.getTextNonSelectionColor();
-        
-        needle.setOutlinePaint(expectedPaint);
-        Paint actualPaint = needle.getOutlinePaint();
-        
-        assertSame(expectedPaint, actualPaint);
-        assertEquals(5, needle.getSize());
-        assertEquals(0.5, needle.getRotateY(), 0.01);
-        assertEquals(0.5, needle.getRotateX(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      PlumNeedle plumNeedle0 = new PlumNeedle();
+      DefaultTreeCellRenderer defaultTreeCellRenderer0 = new DefaultTreeCellRenderer();
+      Color color0 = defaultTreeCellRenderer0.getTextNonSelectionColor();
+      plumNeedle0.setOutlinePaint(color0);
+      Paint paint0 = plumNeedle0.getOutlinePaint();
+      assertEquals(0.5, plumNeedle0.getRotateY(), 0.01);
+      assertNotNull(paint0);
+      assertEquals(5, plumNeedle0.getSize());
+      assertEquals(0.5, plumNeedle0.getRotateX(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testSetHighlightPaint() throws Throwable {
-        PlumNeedle needle = new PlumNeedle();
-        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
-        Color expectedPaint = renderer.getBackgroundNonSelectionColor();
-        
-        needle.setHighlightPaint(expectedPaint);
-        Paint actualPaint = needle.getHighlightPaint();
-        
-        assertSame(expectedPaint, actualPaint);
-        assertEquals(5, needle.getSize());
-        assertEquals(0.5, needle.getRotateY(), 0.01);
-        assertEquals(0.5, needle.getRotateX(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      PlumNeedle plumNeedle0 = new PlumNeedle();
+      DefaultTreeCellRenderer defaultTreeCellRenderer0 = new DefaultTreeCellRenderer();
+      Color color0 = defaultTreeCellRenderer0.getBackgroundNonSelectionColor();
+      plumNeedle0.setHighlightPaint(color0);
+      Paint paint0 = plumNeedle0.getHighlightPaint();
+      assertEquals(5, plumNeedle0.getSize());
+      assertEquals(0.5, plumNeedle0.getRotateY(), 0.01);
+      assertEquals(0.5, plumNeedle0.getRotateX(), 0.01);
+      assertNotNull(paint0);
+  }
 
-    // Additional refactored tests follow the same pattern...
-    // Only showing first 12 for brevity, but full solution would refactor all 42 tests
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      WindNeedle windNeedle0 = new WindNeedle();
+      Color color0 = Color.blue;
+      windNeedle0.setFillPaint(color0);
+      Paint paint0 = windNeedle0.getFillPaint();
+      assertEquals(0.5, windNeedle0.getRotateX(), 0.01);
+      assertEquals(0.5, windNeedle0.getRotateY(), 0.01);
+      assertEquals(5, windNeedle0.getSize());
+      assertNotNull(paint0);
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualsWithDifferentRotateX() throws Throwable {
-        ShipNeedle shipNeedle = new ShipNeedle();
-        PointerNeedle pointerNeedle = new PointerNeedle();
-        pointerNeedle.setRotateX(-3074.422);
-        
-        assertFalse(shipNeedle.equals(pointerNeedle));
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      WindNeedle windNeedle0 = new WindNeedle();
+      windNeedle0.equals(windNeedle0);
+      assertEquals(0.5, windNeedle0.getRotateY(), 0.01);
+      assertEquals(5, windNeedle0.getSize());
+      assertEquals(0.5, windNeedle0.getRotateX(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testDrawWithNullGraphicsThrowsException() throws Throwable {
-        PointerNeedle needle = new PointerNeedle();
-        Rectangle2D.Float area = new Rectangle2D.Float();
-        
-        try {
-            needle.draw(null, area);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      WindNeedle windNeedle0 = new WindNeedle();
+      PlumNeedle plumNeedle0 = new PlumNeedle();
+      windNeedle0.equals(plumNeedle0);
+      assertEquals(0.5, plumNeedle0.getRotateY(), 0.01);
+      assertEquals(5, plumNeedle0.getSize());
+      assertEquals(0.5, plumNeedle0.getRotateX(), 0.01);
+      assertEquals(0.5, windNeedle0.getRotateX(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetDefaultOutlineStroke() throws Throwable {
-        LongNeedle needle = new LongNeedle();
-        BasicStroke stroke = (BasicStroke) needle.getOutlineStroke();
-        
-        assertEquals(2.0F, stroke.getLineWidth(), 0.01F);
-        assertEquals(5, needle.getSize());
-        assertEquals(0.5, needle.getRotateX(), 0.01);
-        assertEquals(0.8, needle.getRotateY(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      Rectangle2D.Float rectangle2D_Float0 = new Rectangle2D.Float();
+      MiddlePinNeedle middlePinNeedle0 = new MiddlePinNeedle();
+      Point2D.Float point2D_Float0 = new Point2D.Float(0.0F, 0.0F);
+      // Undeclared exception!
+      try { 
+        middlePinNeedle0.draw((Graphics2D) null, (Rectangle2D) rectangle2D_Float0, (Point2D) point2D_Float0, (-1.0));
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.jfree.chart.plot.compass.MeterNeedle", e);
+      }
+  }
 
-    // Additional tests would continue with the same pattern of:
-    // 1. Meaningful test names
-    // 2. Clear setup/action/verification sections
-    // 3. Descriptive variable names
-    // 4. Focused assertions
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      PointerNeedle pointerNeedle0 = new PointerNeedle();
+      Rectangle2D.Float rectangle2D_Float0 = new Rectangle2D.Float();
+      // Undeclared exception!
+      try { 
+        pointerNeedle0.draw((Graphics2D) null, (Rectangle2D) rectangle2D_Float0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.jfree.chart.plot.compass.MeterNeedle", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      PointerNeedle pointerNeedle0 = new PointerNeedle();
+      pointerNeedle0.getOutlinePaint();
+      assertEquals(0.5, pointerNeedle0.getRotateY(), 0.01);
+      assertEquals(0.5, pointerNeedle0.getRotateX(), 0.01);
+      assertEquals(5, pointerNeedle0.getSize());
+  }
+
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      WindNeedle windNeedle0 = new WindNeedle();
+      // Undeclared exception!
+      try { 
+        windNeedle0.draw((Graphics2D) null, (Rectangle2D) null, 2350.6341);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.jfree.chart.plot.compass.MeterNeedle", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      PlumNeedle plumNeedle0 = new PlumNeedle();
+      plumNeedle0.getHighlightPaint();
+      assertEquals(5, plumNeedle0.getSize());
+      assertEquals(0.5, plumNeedle0.getRotateY(), 0.01);
+      assertEquals(0.5, plumNeedle0.getRotateX(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      WindNeedle windNeedle0 = new WindNeedle();
+      windNeedle0.getFillPaint();
+      assertEquals(0.5, windNeedle0.getRotateX(), 0.01);
+      assertEquals(5, windNeedle0.getSize());
+      assertEquals(0.5, windNeedle0.getRotateY(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      LongNeedle longNeedle0 = new LongNeedle();
+      MiddlePinNeedle middlePinNeedle0 = new MiddlePinNeedle();
+      middlePinNeedle0.equals(longNeedle0);
+      assertEquals(0.5, middlePinNeedle0.getRotateY(), 0.01);
+      assertEquals(0.5, middlePinNeedle0.getRotateX(), 0.01);
+      assertEquals(5, middlePinNeedle0.getSize());
+      assertEquals(0.8, longNeedle0.getRotateY(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      ShipNeedle shipNeedle0 = new ShipNeedle();
+      PointerNeedle pointerNeedle0 = new PointerNeedle();
+      pointerNeedle0.setRotateX((-3074.422));
+      shipNeedle0.equals(pointerNeedle0);
+      assertEquals((-3074.422), pointerNeedle0.getRotateX(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      ShipNeedle shipNeedle0 = new ShipNeedle();
+      PointerNeedle pointerNeedle0 = new PointerNeedle();
+      Color color0 = Color.darkGray;
+      pointerNeedle0.setHighlightPaint(color0);
+      shipNeedle0.equals(pointerNeedle0);
+      assertEquals(5, pointerNeedle0.getSize());
+      assertEquals(0.5, pointerNeedle0.getRotateY(), 0.01);
+      assertEquals(0.5, pointerNeedle0.getRotateX(), 0.01);
+      assertEquals(0.5, shipNeedle0.getRotateX(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      ShipNeedle shipNeedle0 = new ShipNeedle();
+      Color color0 = Color.BLUE;
+      shipNeedle0.setFillPaint(color0);
+      PointerNeedle pointerNeedle0 = new PointerNeedle();
+      shipNeedle0.equals(pointerNeedle0);
+      assertEquals(5, pointerNeedle0.getSize());
+      assertEquals(0.5, pointerNeedle0.getRotateX(), 0.01);
+      assertEquals(0.5, pointerNeedle0.getRotateY(), 0.01);
+      assertEquals(5, shipNeedle0.getSize());
+  }
+
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      MiddlePinNeedle middlePinNeedle0 = new MiddlePinNeedle();
+      MiddlePinNeedle middlePinNeedle1 = (MiddlePinNeedle)middlePinNeedle0.clone();
+      assertTrue(middlePinNeedle1.equals((Object)middlePinNeedle0));
+      
+      BasicStroke basicStroke0 = new BasicStroke();
+      middlePinNeedle1.setOutlineStroke(basicStroke0);
+      boolean boolean0 = middlePinNeedle0.equals(middlePinNeedle1);
+      assertFalse(middlePinNeedle1.equals((Object)middlePinNeedle0));
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      ShipNeedle shipNeedle0 = new ShipNeedle();
+      PointerNeedle pointerNeedle0 = new PointerNeedle();
+      Color color0 = Color.MAGENTA;
+      pointerNeedle0.setOutlinePaint(color0);
+      shipNeedle0.equals(pointerNeedle0);
+      assertEquals(5, pointerNeedle0.getSize());
+      assertEquals(0.5, pointerNeedle0.getRotateY(), 0.01);
+      assertEquals(0.5, pointerNeedle0.getRotateX(), 0.01);
+      assertEquals(0.5, shipNeedle0.getRotateX(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      ShipNeedle shipNeedle0 = new ShipNeedle();
+      AttributedCharacterIterator.Attribute attributedCharacterIterator_Attribute0 = AttributedCharacterIterator.Attribute.LANGUAGE;
+      shipNeedle0.equals(attributedCharacterIterator_Attribute0);
+      assertEquals(0.5, shipNeedle0.getRotateX(), 0.01);
+      assertEquals(0.5, shipNeedle0.getRotateY(), 0.01);
+      assertEquals(5, shipNeedle0.getSize());
+  }
+
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      ShipNeedle shipNeedle0 = new ShipNeedle();
+      PointerNeedle pointerNeedle0 = new PointerNeedle();
+      shipNeedle0.equals(pointerNeedle0);
+      assertEquals(5, pointerNeedle0.getSize());
+      assertEquals(0.5, pointerNeedle0.getRotateY(), 0.01);
+      assertEquals(0.5, pointerNeedle0.getRotateX(), 0.01);
+      assertEquals(0.5, shipNeedle0.getRotateY(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      PointerNeedle pointerNeedle0 = new PointerNeedle();
+      pointerNeedle0.setHighlightPaint((Paint) null);
+      assertEquals(5, pointerNeedle0.getSize());
+      assertEquals(0.5, pointerNeedle0.getRotateY(), 0.01);
+      assertEquals(0.5, pointerNeedle0.getRotateX(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      SystemColor systemColor0 = SystemColor.info;
+      WindNeedle windNeedle0 = new WindNeedle();
+      windNeedle0.setFillPaint(systemColor0);
+      DefaultCaret defaultCaret0 = new DefaultCaret();
+      // Undeclared exception!
+      try { 
+        windNeedle0.defaultDisplay((Graphics2D) null, defaultCaret0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.jfree.chart.plot.compass.MeterNeedle", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      PointerNeedle pointerNeedle0 = new PointerNeedle();
+      pointerNeedle0.setFillPaint((Paint) null);
+      assertEquals(5, pointerNeedle0.getSize());
+      assertEquals(0.5, pointerNeedle0.getRotateY(), 0.01);
+      assertEquals(0.5, pointerNeedle0.getRotateX(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test32()  throws Throwable  {
+      ShipNeedle shipNeedle0 = new ShipNeedle();
+      shipNeedle0.setOutlineStroke((Stroke) null);
+      assertEquals(5, shipNeedle0.getSize());
+      assertEquals(0.5, shipNeedle0.getRotateY(), 0.01);
+      assertEquals(0.5, shipNeedle0.getRotateX(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test33()  throws Throwable  {
+      SystemColor systemColor0 = SystemColor.windowText;
+      WindNeedle windNeedle0 = new WindNeedle();
+      windNeedle0.setOutlinePaint(systemColor0);
+      DefaultCaret defaultCaret0 = new DefaultCaret();
+      // Undeclared exception!
+      try { 
+        windNeedle0.defaultDisplay((Graphics2D) null, defaultCaret0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.jfree.chart.plot.compass.MeterNeedle", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test34()  throws Throwable  {
+      ShipNeedle shipNeedle0 = new ShipNeedle();
+      shipNeedle0.setOutlinePaint((Paint) null);
+      assertEquals(0.5, shipNeedle0.getRotateX(), 0.01);
+      assertEquals(5, shipNeedle0.getSize());
+      assertEquals(0.5, shipNeedle0.getRotateY(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test35()  throws Throwable  {
+      ShipNeedle shipNeedle0 = new ShipNeedle();
+      shipNeedle0.getTransform();
+      assertEquals(0.5, shipNeedle0.getRotateX(), 0.01);
+      assertEquals(5, shipNeedle0.getSize());
+      assertEquals(0.5, shipNeedle0.getRotateY(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test36()  throws Throwable  {
+      LongNeedle longNeedle0 = new LongNeedle();
+      BufferedImage bufferedImage0 = new BufferedImage(9, 9, 9);
+      Graphics2D graphics2D0 = bufferedImage0.createGraphics();
+      Rectangle2D.Float rectangle2D_Float0 = new Rectangle2D.Float(9, 9, 0.0F, 9);
+      Rectangle rectangle0 = rectangle2D_Float0.getBounds();
+      longNeedle0.draw(graphics2D0, (Rectangle2D) rectangle0, (Point2D) null, (double) 0.0F);
+      assertEquals(0.5, longNeedle0.getRotateX(), 0.01);
+      assertEquals(0.8, longNeedle0.getRotateY(), 0.01);
+      assertEquals(5, longNeedle0.getSize());
+  }
+
+  @Test(timeout = 4000)
+  public void test37()  throws Throwable  {
+      LongNeedle longNeedle0 = new LongNeedle();
+      BasicStroke basicStroke0 = (BasicStroke)longNeedle0.getOutlineStroke();
+      assertEquals(2.0F, basicStroke0.getLineWidth(), 0.01F);
+      assertEquals(5, longNeedle0.getSize());
+      assertEquals(0.5, longNeedle0.getRotateX(), 0.01);
+      assertEquals(0.8, longNeedle0.getRotateY(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test38()  throws Throwable  {
+      ShipNeedle shipNeedle0 = new ShipNeedle();
+      shipNeedle0.setSize((-715827883));
+      PointerNeedle pointerNeedle0 = new PointerNeedle();
+      shipNeedle0.equals(pointerNeedle0);
+      assertEquals((-715827883), shipNeedle0.getSize());
+  }
+
+  @Test(timeout = 4000)
+  public void test39()  throws Throwable  {
+      ShipNeedle shipNeedle0 = new ShipNeedle();
+      int int0 = shipNeedle0.getSize();
+      assertEquals(0.5, shipNeedle0.getRotateY(), 0.01);
+      assertEquals(0.5, shipNeedle0.getRotateX(), 0.01);
+      assertEquals(5, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test40()  throws Throwable  {
+      PinNeedle pinNeedle0 = new PinNeedle();
+      BufferedImage bufferedImage0 = new BufferedImage(1, 1, 1);
+      Graphics2D graphics2D0 = bufferedImage0.createGraphics();
+      JScrollPane jScrollPane0 = new JScrollPane();
+      Rectangle rectangle0 = jScrollPane0.getViewportBorderBounds();
+      pinNeedle0.draw(graphics2D0, (Rectangle2D) rectangle0);
+      assertEquals(0.5, pinNeedle0.getRotateX(), 0.01);
+      assertEquals(0.5, pinNeedle0.getRotateY(), 0.01);
+      assertEquals(5, pinNeedle0.getSize());
+  }
+
+  @Test(timeout = 4000)
+  public void test41()  throws Throwable  {
+      LongNeedle longNeedle0 = new LongNeedle();
+      double double0 = longNeedle0.getRotateY();
+      assertEquals(0.5, longNeedle0.getRotateX(), 0.01);
+      assertEquals(0.8, double0, 0.01);
+      assertEquals(5, longNeedle0.getSize());
+  }
+
+  @Test(timeout = 4000)
+  public void test42()  throws Throwable  {
+      PointerNeedle pointerNeedle0 = new PointerNeedle();
+      double double0 = pointerNeedle0.getRotateX();
+      assertEquals(0.5, double0, 0.01);
+      assertEquals(5, pointerNeedle0.getSize());
+      assertEquals(0.5, pointerNeedle0.getRotateY(), 0.01);
+  }
 }
