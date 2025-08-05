@@ -16,12 +16,9 @@
 
 package com.google.common.reflect;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.testing.EqualsTester;
 import com.google.common.testing.NullPointerTester;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 import junit.framework.TestCase;
 import org.jspecify.annotations.NullUnmarked;
 
@@ -33,59 +30,33 @@ import org.jspecify.annotations.NullUnmarked;
 @NullUnmarked
 public class ParameterTest extends TestCase {
 
-  /**
-   * Tests that all public methods of {@link Parameter} pass {@link NullPointerTester} checks.
-   * Skipped on Android VMs due to missing {@code AnnotatedType} class.
-   */
-  public void testNullPointerTesterOnPublicMethods() {
-    if (isRunningInAndroidVm()) {
-      // Skip test in Android VM due to missing AnnotatedType class
+  public void testNulls() {
+    try {
+      Class.forName("java.lang.reflect.AnnotatedType");
+    } catch (ClassNotFoundException runningInAndroidVm) {
+      /*
+       * Parameter declares a method that returns AnnotatedType, which isn't available on Android.
+       * This would cause NullPointerTester, which calls Class.getDeclaredMethods, to throw
+       * NoClassDefFoundError.
+       */
       return;
     }
-    for (Parameter param : getAllParameters()) {
-      new NullPointerTester().testAllPublicInstanceMethods(param);
+    for (Method method : ParameterTest.class.getDeclaredMethods()) {
+      for (Parameter param : Invokable.from(method).getParameters()) {
+        new NullPointerTester().testAllPublicInstanceMethods(param);
+      }
     }
   }
 
-  /**
-   * Tests the {@link Parameter#equals} and {@link Parameter#hashCode} contract.
-   * Each parameter is added as its own equality group since they are all distinct.
-   */
-  public void testEqualsContract() {
+  public void testEquals() {
     EqualsTester tester = new EqualsTester();
-    for (Parameter param : getAllParameters()) {
-      tester.addEqualityGroup(param);
+    for (Method method : ParameterTest.class.getDeclaredMethods()) {
+      for (Parameter param : Invokable.from(method).getParameters()) {
+        tester.addEqualityGroup(param);
+      }
     }
     tester.testEquals();
   }
-
-  /**
-   * Checks if we're running in an Android VM by testing for the presence of
-   * {@code java.lang.reflect.AnnotatedType}.
-   */
-  private boolean isRunningInAndroidVm() {
-    try {
-      Class.forName("java.lang.reflect.AnnotatedType");
-      return false;
-    } catch (ClassNotFoundException e) {
-      return true;
-    }
-  }
-
-  /**
-   * Collects all parameters from all methods in this test class.
-   * Used to provide parameters for test cases.
-   */
-  private ImmutableList<Parameter> getAllParameters() {
-    List<Parameter> parameters = new ArrayList<>();
-    for (Method method : getClass().getDeclaredMethods()) {
-      parameters.addAll(Invokable.from(method).getParameters());
-    }
-    return ImmutableList.copyOf(parameters);
-  }
-
-  // Methods below are used to generate test parameters
-  // Each method has distinct parameters for testing
 
   @SuppressWarnings("unused")
   private void someMethod(int i, int j) {}
