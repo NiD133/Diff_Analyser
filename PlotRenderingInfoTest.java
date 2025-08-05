@@ -1,3 +1,39 @@
+/* ======================================================
+ * JFreeChart : a chart library for the Java(tm) platform
+ * ======================================================
+ *
+ * (C) Copyright 2000-present, by David Gilbert and Contributors.
+ *
+ * Project Info:  https://www.jfree.org/jfreechart/index.html
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ *
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
+ *
+ * --------------------------
+ * PlotRenderingInfoTest.java
+ * --------------------------
+ * (C) Copyright 2004-present, by David Gilbert and Contributors.
+ *
+ * Original Author:  David Gilbert;
+ * Contributor(s):   -;
+ *
+ */
+
 package org.jfree.chart.plot;
 
 import java.awt.Rectangle;
@@ -11,106 +47,73 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for the {@link PlotRenderingInfo} class.
+ * Tests for the {@link PlotRenderingInfo} class.
  */
 public class PlotRenderingInfoTest {
 
     /**
-     * Tests the equals() method of the PlotRenderingInfo class.
-     * Verifies that two instances are considered equal if they have the same state,
-     * and not equal if their state differs.
+     * Test the equals() method.
      */
     @Test
     public void testEquals() {
-        // Create two instances of PlotRenderingInfo with default state
-        PlotRenderingInfo info1 = new PlotRenderingInfo(new ChartRenderingInfo());
-        PlotRenderingInfo info2 = new PlotRenderingInfo(new ChartRenderingInfo());
+        PlotRenderingInfo p1 = new PlotRenderingInfo(new ChartRenderingInfo());
+        PlotRenderingInfo p2 = new PlotRenderingInfo(new ChartRenderingInfo());
+        assertEquals(p1, p2);
+        assertEquals(p2, p1);
 
-        // Verify that two new instances are equal
-        assertEquals(info1, info2);
-        assertEquals(info2, info1);
+        p1.setPlotArea(new Rectangle(2, 3, 4, 5));
+        assertNotEquals(p1, p2);
+        p2.setPlotArea(new Rectangle(2, 3, 4, 5));
+        assertEquals(p1, p2);
 
-        // Change plot area of info1 and verify inequality
-        info1.setPlotArea(new Rectangle(2, 3, 4, 5));
-        assertNotEquals(info1, info2);
+        p1.setDataArea(new Rectangle(2, 4, 6, 8));
+        assertNotEquals(p1, p2);
+        p2.setDataArea(new Rectangle(2, 4, 6, 8));
+        assertEquals(p1, p2);
 
-        // Set the same plot area for info2 and verify equality
-        info2.setPlotArea(new Rectangle(2, 3, 4, 5));
-        assertEquals(info1, info2);
+        p1.addSubplotInfo(new PlotRenderingInfo(null));
+        assertNotEquals(p1, p2);
+        p2.addSubplotInfo(new PlotRenderingInfo(null));
+        assertEquals(p1, p2);
 
-        // Change data area of info1 and verify inequality
-        info1.setDataArea(new Rectangle(2, 4, 6, 8));
-        assertNotEquals(info1, info2);
-
-        // Set the same data area for info2 and verify equality
-        info2.setDataArea(new Rectangle(2, 4, 6, 8));
-        assertEquals(info1, info2);
-
-        // Add subplot info to info1 and verify inequality
-        info1.addSubplotInfo(new PlotRenderingInfo(null));
-        assertNotEquals(info1, info2);
-
-        // Add the same subplot info to info2 and verify equality
-        info2.addSubplotInfo(new PlotRenderingInfo(null));
-        assertEquals(info1, info2);
-
-        // Change data area of subplot in info1 and verify inequality
-        info1.getSubplotInfo(0).setDataArea(new Rectangle(1, 2, 3, 4));
-        assertNotEquals(info1, info2);
-
-        // Set the same data area for subplot in info2 and verify equality
-        info2.getSubplotInfo(0).setDataArea(new Rectangle(1, 2, 3, 4));
-        assertEquals(info1, info2);
+        p1.getSubplotInfo(0).setDataArea(new Rectangle(1, 2, 3, 4));
+        assertNotEquals(p1, p2);
+        p2.getSubplotInfo(0).setDataArea(new Rectangle(1, 2, 3, 4));
+        assertEquals(p1, p2);
     }
 
     /**
-     * Tests the cloning functionality of the PlotRenderingInfo class.
-     * Ensures that a cloned instance is equal to the original but is a separate object.
+     * Confirm that cloning works.
      */
     @Test
     public void testCloning() throws CloneNotSupportedException {
-        // Create an instance of PlotRenderingInfo and set plot area
-        PlotRenderingInfo original = new PlotRenderingInfo(new ChartRenderingInfo());
-        original.setPlotArea(new Rectangle2D.Double());
+        PlotRenderingInfo p1 = new PlotRenderingInfo(new ChartRenderingInfo());
+        p1.setPlotArea(new Rectangle2D.Double());
+        PlotRenderingInfo p2 = CloneUtils.clone(p1);
+        assertNotSame(p1, p2);
+        assertSame(p1.getClass(), p2.getClass());
+        assertEquals(p1, p2);
 
-        // Clone the original instance
-        PlotRenderingInfo clone = CloneUtils.clone(original);
+        // check independence
+        p1.getPlotArea().setRect(1.0, 2.0, 3.0, 4.0);
+        assertNotEquals(p1, p2);
+        p2.getPlotArea().setRect(1.0, 2.0, 3.0, 4.0);
+        assertEquals(p1, p2);
 
-        // Verify that the clone is a separate instance but equal to the original
-        assertNotSame(original, clone);
-        assertSame(original.getClass(), clone.getClass());
-        assertEquals(original, clone);
-
-        // Modify the plot area of the original and verify inequality
-        original.getPlotArea().setRect(1.0, 2.0, 3.0, 4.0);
-        assertNotEquals(original, clone);
-
-        // Set the same plot area for the clone and verify equality
-        clone.getPlotArea().setRect(1.0, 2.0, 3.0, 4.0);
-        assertEquals(original, clone);
-
-        // Modify the data area of the original and verify inequality
-        original.getDataArea().setRect(4.0, 3.0, 2.0, 1.0);
-        assertNotEquals(original, clone);
-
-        // Set the same data area for the clone and verify equality
-        clone.getDataArea().setRect(4.0, 3.0, 2.0, 1.0);
-        assertEquals(original, clone);
+        p1.getDataArea().setRect(4.0, 3.0, 2.0, 1.0);
+        assertNotEquals(p1, p2);
+        p2.getDataArea().setRect(4.0, 3.0, 2.0, 1.0);
+        assertEquals(p1, p2);
     }
 
     /**
-     * Tests the serialization and deserialization functionality of the PlotRenderingInfo class.
-     * Ensures that a serialized and then deserialized instance is equal to the original.
+     * Serialize an instance, restore it, and check for equality.
      */
     @Test
     public void testSerialization() {
-        // Create an instance of PlotRenderingInfo
-        PlotRenderingInfo original = new PlotRenderingInfo(new ChartRenderingInfo());
-
-        // Serialize and then deserialize the instance
-        PlotRenderingInfo deserialized = TestUtils.serialised(original);
-
-        // Verify that the deserialized instance is equal to the original
-        assertEquals(original, deserialized);
+        PlotRenderingInfo p1 = new PlotRenderingInfo(new ChartRenderingInfo());
+        PlotRenderingInfo p2 = TestUtils.serialised(p1);
+        assertEquals(p1, p2);
     }
+
 }
