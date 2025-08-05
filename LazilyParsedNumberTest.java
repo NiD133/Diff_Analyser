@@ -26,29 +26,47 @@ import java.math.BigDecimal;
 import org.junit.Test;
 
 public class LazilyParsedNumberTest {
+
+  /**
+   * Tests that two LazilyParsedNumber objects with the same value have the same hash code.
+   */
   @Test
   public void testHashCode() {
-    LazilyParsedNumber n1 = new LazilyParsedNumber("1");
-    LazilyParsedNumber n1Another = new LazilyParsedNumber("1");
-    assertThat(n1Another.hashCode()).isEqualTo(n1.hashCode());
+    LazilyParsedNumber numberOne = new LazilyParsedNumber("1");
+    LazilyParsedNumber numberOneDuplicate = new LazilyParsedNumber("1");
+
+    assertThat(numberOneDuplicate.hashCode()).isEqualTo(numberOne.hashCode());
   }
 
+  /**
+   * Tests that two LazilyParsedNumber objects with the same value are equal.
+   */
   @Test
   public void testEquals() {
-    LazilyParsedNumber n1 = new LazilyParsedNumber("1");
-    LazilyParsedNumber n1Another = new LazilyParsedNumber("1");
-    assertThat(n1.equals(n1Another)).isTrue();
+    LazilyParsedNumber numberOne = new LazilyParsedNumber("1");
+    LazilyParsedNumber numberOneDuplicate = new LazilyParsedNumber("1");
+
+    assertThat(numberOne.equals(numberOneDuplicate)).isTrue();
   }
 
+  /**
+   * Tests that a LazilyParsedNumber object can be serialized and deserialized correctly.
+   * The deserialized object should be equal to a BigDecimal representation of the original number.
+   */
   @Test
   public void testJavaSerialization() throws IOException, ClassNotFoundException {
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    ObjectOutputStream objOut = new ObjectOutputStream(out);
-    objOut.writeObject(new LazilyParsedNumber("123"));
-    objOut.close();
+    // Serialize the LazilyParsedNumber object
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+    objectOutputStream.writeObject(new LazilyParsedNumber("123"));
+    objectOutputStream.close();
 
-    ObjectInputStream objIn = new ObjectInputStream(new ByteArrayInputStream(out.toByteArray()));
-    Number deserialized = (Number) objIn.readObject();
-    assertThat(deserialized).isEqualTo(new BigDecimal("123"));
+    // Deserialize the object
+    ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+    ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+    Number deserializedNumber = (Number) objectInputStream.readObject();
+
+    // Verify that the deserialized object matches the expected BigDecimal value
+    assertThat(deserializedNumber).isEqualTo(new BigDecimal("123"));
   }
 }
