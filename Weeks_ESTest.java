@@ -28,674 +28,486 @@ import org.joda.time.Seconds;
 import org.joda.time.Weeks;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true, 
+    useVFS = true, 
+    useVNET = true, 
+    resetStaticState = true, 
+    separateClassLoader = true
+) 
 public class Weeks_ESTest extends Weeks_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      Minutes minutes0 = Minutes.ZERO;
-      Weeks weeks0 = Weeks.TWO;
-      Weeks weeks1 = minutes0.toStandardWeeks();
-      boolean boolean0 = weeks0.isLessThan(weeks1);
-      assertFalse(boolean0);
-      assertEquals(0, weeks1.getWeeks());
-  }
+    //-------------------------- Comparison Tests --------------------------
+    
+    @Test(timeout = 4000)
+    public void testIsLessThanWhenTwoIsGreaterThanZeroWeeks() {
+        Minutes minutes = Minutes.ZERO;
+        Weeks twoWeeks = Weeks.TWO;
+        Weeks zeroWeeks = minutes.toStandardWeeks();
+        assertFalse(twoWeeks.isLessThan(zeroWeeks));
+        assertEquals(0, zeroWeeks.getWeeks());
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      Minutes minutes0 = Minutes.THREE;
-      Seconds seconds0 = minutes0.toStandardSeconds();
-      Weeks weeks0 = seconds0.toStandardWeeks();
-      boolean boolean0 = weeks0.isLessThan((Weeks) null);
-      assertFalse(boolean0);
-      assertEquals(0, weeks0.getWeeks());
-  }
+    @Test(timeout = 4000)
+    public void testIsLessThanWhenZeroWeeksComparedToNull() {
+        Minutes minutes = Minutes.THREE;
+        Seconds seconds = minutes.toStandardSeconds();
+        Weeks zeroWeeks = seconds.toStandardWeeks();
+        assertFalse(zeroWeeks.isLessThan(null));
+        assertEquals(0, zeroWeeks.getWeeks());
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      Weeks weeks0 = Weeks.standardWeeksIn((ReadablePeriod) null);
-      Weeks weeks1 = Weeks.TWO;
-      boolean boolean0 = weeks0.isGreaterThan(weeks1);
-      assertFalse(boolean0);
-      assertEquals(0, weeks0.getWeeks());
-  }
+    @Test(timeout = 4000)
+    public void testIsLessThanWhenMinValueComparedToNull() {
+        Weeks minWeeks = Weeks.MIN_VALUE;
+        assertTrue(minWeeks.isLessThan(null));
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      Weeks weeks0 = Weeks.MIN_VALUE;
-      boolean boolean0 = weeks0.isGreaterThan((Weeks) null);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testIsLessThanWhenThreeComparedToNull() {
+        Weeks threeWeeks = Weeks.THREE;
+        assertFalse(threeWeeks.isLessThan(null));
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      Weeks weeks0 = Weeks.weeks((-2820));
-      Seconds seconds0 = weeks0.toStandardSeconds();
-      assertEquals((-1705536000), seconds0.getSeconds());
-  }
+    @Test(timeout = 4000)
+    public void testIsLessThanWhenZeroComparedToItself() {
+        Weeks zeroWeeks = Weeks.standardWeeksIn((ReadablePeriod) null);
+        assertFalse(zeroWeeks.isLessThan(zeroWeeks));
+        assertEquals(0, zeroWeeks.getWeeks());
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      Weeks weeks0 = Weeks.parseWeeks((String) null);
-      Minutes minutes0 = weeks0.toStandardMinutes();
-      assertEquals(1, minutes0.size());
-  }
+    @Test(timeout = 4000)
+    public void testIsGreaterThanWhenZeroComparedToTwo() {
+        Weeks zeroWeeks = Weeks.standardWeeksIn((ReadablePeriod) null);
+        Weeks twoWeeks = Weeks.TWO;
+        assertFalse(zeroWeeks.isGreaterThan(twoWeeks));
+        assertEquals(0, zeroWeeks.getWeeks());
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      Weeks weeks0 = Weeks.ONE;
-      Minutes minutes0 = weeks0.toStandardMinutes();
-      assertEquals(10080, minutes0.getMinutes());
-  }
+    @Test(timeout = 4000)
+    public void testIsGreaterThanWhenMinValueComparedToNull() {
+        Weeks minWeeks = Weeks.MIN_VALUE;
+        assertFalse(minWeeks.isGreaterThan(null));
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      Weeks weeks0 = Weeks.weeksIn((ReadableInterval) null);
-      Weeks weeks1 = weeks0.minus(3765);
-      Minutes minutes0 = weeks1.toStandardMinutes();
-      assertEquals((-37951200), minutes0.getMinutes());
-  }
+    @Test(timeout = 4000)
+    public void testIsGreaterThanWhenThreeComparedToNull() {
+        Weeks threeWeeks = Weeks.THREE;
+        assertTrue(threeWeeks.isGreaterThan(null));
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      Weeks weeks0 = Weeks.ZERO;
-      Hours hours0 = weeks0.toStandardHours();
-      assertEquals(0, hours0.getHours());
-  }
+    @Test(timeout = 4000)
+    public void testIsGreaterThanWhenLargeValueComparedToItself() {
+        Weeks largeWeeks = Weeks.weeks(317351877);
+        assertFalse(largeWeeks.isGreaterThan(largeWeeks));
+        assertEquals(317351877, largeWeeks.getWeeks());
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      Seconds seconds0 = Seconds.MAX_VALUE;
-      Weeks weeks0 = seconds0.toStandardWeeks();
-      Hours hours0 = weeks0.toStandardHours();
-      assertEquals(596400, hours0.getHours());
-  }
+    @Test(timeout = 4000)
+    public void testIsGreaterThanWhenLargeValueComparedToMinValue() {
+        Weeks largeWeeks = Weeks.weeks(317351877);
+        Weeks minWeeks = Weeks.MIN_VALUE;
+        assertTrue(largeWeeks.isGreaterThan(minWeeks));
+        assertEquals(317351877, largeWeeks.getWeeks());
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      Weeks weeks0 = Weeks.ZERO;
-      Weeks weeks1 = Weeks.THREE;
-      Weeks weeks2 = weeks0.minus(weeks1);
-      Hours hours0 = weeks2.toStandardHours();
-      assertEquals((-504), hours0.getHours());
-  }
+    //-------------------------- Conversion Tests --------------------------
+    
+    @Test(timeout = 4000)
+    public void testToStandardSecondsWithNegativeWeeks() {
+        Weeks weeks = Weeks.weeks(-2820);
+        Seconds seconds = weeks.toStandardSeconds();
+        assertEquals(-1705536000, seconds.getSeconds());
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      Weeks weeks0 = Weeks.ZERO;
-      Duration duration0 = weeks0.TWO.toStandardDuration();
-      assertEquals(1209600000L, duration0.getMillis());
-  }
+    @Test(timeout = 4000)
+    public void testParseWeeksNullStringToMinutes() {
+        Weeks weeks = Weeks.parseWeeks((String) null);
+        Minutes minutes = weeks.toStandardMinutes();
+        assertEquals(1, minutes.size());
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      Weeks weeks0 = Weeks.weeksIn((ReadableInterval) null);
-      Days days0 = weeks0.toStandardDays();
-      assertEquals(1, days0.size());
-  }
+    @Test(timeout = 4000)
+    public void testOneWeekToStandardMinutes() {
+        Weeks oneWeek = Weeks.ONE;
+        Minutes minutes = oneWeek.toStandardMinutes();
+        assertEquals(10080, minutes.getMinutes());
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      Weeks weeks0 = Weeks.ZERO;
-      Days days0 = weeks0.THREE.toStandardDays();
-      assertEquals(21, days0.getDays());
-  }
+    @Test(timeout = 4000)
+    public void testWeeksInNullIntervalMinusPositiveToMinutes() {
+        Weeks weeks = Weeks.weeksIn((ReadableInterval) null);
+        Weeks result = weeks.minus(3765);
+        Minutes minutes = result.toStandardMinutes();
+        assertEquals(-37951200, minutes.getMinutes());
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      Weeks weeks0 = Weeks.MIN_VALUE;
-      Weeks weeks1 = weeks0.MAX_VALUE.plus(weeks0);
-      assertEquals((-1), weeks1.getWeeks());
-  }
+    @Test(timeout = 4000)
+    public void testZeroWeeksToStandardHours() {
+        Weeks zeroWeeks = Weeks.ZERO;
+        Hours hours = zeroWeeks.toStandardHours();
+        assertEquals(0, hours.getHours());
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      Weeks weeks0 = Weeks.MIN_VALUE;
-      Weeks weeks1 = weeks0.plus(4);
-      assertEquals((-2147483644), weeks1.getWeeks());
-  }
+    @Test(timeout = 4000)
+    public void testMaxSecondsToStandardWeeksAndHours() {
+        Seconds maxSeconds = Seconds.MAX_VALUE;
+        Weeks weeks = maxSeconds.toStandardWeeks();
+        Hours hours = weeks.toStandardHours();
+        assertEquals(596400, hours.getHours());
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      Weeks weeks0 = Weeks.ZERO;
-      Weeks weeks1 = weeks0.negated();
-      assertEquals(0, weeks1.getWeeks());
-  }
+    @Test(timeout = 4000)
+    public void testMinusThreeWeeksFromZeroToStandardHours() {
+        Weeks zeroWeeks = Weeks.ZERO;
+        Weeks threeWeeks = Weeks.THREE;
+        Weeks result = zeroWeeks.minus(threeWeeks);
+        Hours hours = result.toStandardHours();
+        assertEquals(-504, hours.getHours());
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      Weeks weeks0 = Weeks.weeks((-2490));
-      weeks0.negated();
-      assertEquals((-2490), weeks0.getWeeks());
-  }
+    @Test(timeout = 4000)
+    public void testTwoWeeksToStandardDuration() {
+        Weeks twoWeeks = Weeks.TWO;
+        Duration duration = twoWeeks.toStandardDuration();
+        assertEquals(1209600000L, duration.getMillis());
+    }
 
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      Weeks weeks0 = Weeks.parseWeeks((String) null);
-      Weeks weeks1 = weeks0.multipliedBy((-1060));
-      assertEquals(0, weeks1.getWeeks());
-  }
+    @Test(timeout = 4000)
+    public void testWeeksInNullIntervalToStandardDays() {
+        Weeks weeks = Weeks.weeksIn((ReadableInterval) null);
+        Days days = weeks.toStandardDays();
+        assertEquals(1, days.size());
+    }
 
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      Weeks weeks0 = Weeks.ONE;
-      Weeks weeks1 = weeks0.multipliedBy(604800);
-      assertEquals(604800, weeks1.getWeeks());
-  }
+    @Test(timeout = 4000)
+    public void testThreeWeeksToStandardDays() {
+        Weeks threeWeeks = Weeks.THREE;
+        Days days = threeWeeks.toStandardDays();
+        assertEquals(21, days.getDays());
+    }
 
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      Weeks weeks0 = Weeks.THREE;
-      Weeks weeks1 = weeks0.multipliedBy((-617));
-      assertEquals((-1851), weeks1.getWeeks());
-  }
+    @Test(timeout = 4000)
+    public void testOneWeekToStandardSeconds() {
+        Weeks zeroWeeks = Weeks.ZERO;
+        Seconds seconds = zeroWeeks.ONE.toStandardSeconds();
+        Weeks weeks = seconds.toStandardWeeks();
+        assertEquals(1, weeks.getWeeks());
+        assertEquals(604800, seconds.getSeconds());
+    }
 
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      Weeks weeks0 = Weeks.ZERO;
-      Weeks weeks1 = weeks0.ZERO.minus(weeks0);
-      assertEquals(0, weeks1.getWeeks());
-  }
+    @Test(timeout = 4000)
+    public void testZeroWeeksToStandardSeconds() {
+        Weeks zeroWeeks = Weeks.standardWeeksIn((ReadablePeriod) null);
+        Seconds seconds = zeroWeeks.toStandardSeconds();
+        assertEquals(0, seconds.getSeconds());
+    }
 
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      Weeks weeks0 = Weeks.weeks(317351877);
-      Weeks weeks1 = weeks0.minus(2285);
-      assertEquals(317349592, weeks1.getWeeks());
-  }
+    //-------------------------- Arithmetic Operation Tests --------------------------
+    
+    @Test(timeout = 4000)
+    public void testMaxValuePlusMinValue() {
+        Weeks minWeeks = Weeks.MIN_VALUE;
+        Weeks result = minWeeks.MAX_VALUE.plus(minWeeks);
+        assertEquals(-1, result.getWeeks());
+    }
 
-  @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
-      Minutes minutes0 = Minutes.ZERO;
-      Weeks weeks0 = minutes0.toStandardWeeks();
-      int int0 = weeks0.getWeeks();
-      assertEquals(0, int0);
-  }
+    @Test(timeout = 4000)
+    public void testMinValuePlusFour() {
+        Weeks minWeeks = Weeks.MIN_VALUE;
+        Weeks result = minWeeks.plus(4);
+        assertEquals(-2147483644, result.getWeeks());
+    }
 
-  @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
-      Weeks weeks0 = Weeks.MIN_VALUE;
-      int int0 = weeks0.getWeeks();
-      assertEquals(Integer.MIN_VALUE, int0);
-  }
+    @Test(timeout = 4000)
+    public void testZeroWeeksNegated() {
+        Weeks zeroWeeks = Weeks.ZERO;
+        Weeks result = zeroWeeks.negated();
+        assertEquals(0, result.getWeeks());
+    }
 
-  @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
-      Weeks weeks0 = Weeks.MAX_VALUE;
-      Weeks weeks1 = weeks0.dividedBy(888);
-      assertEquals(2418337, weeks1.getWeeks());
-  }
+    @Test(timeout = 4000)
+    public void testNegativeWeeksNegated() {
+        Weeks weeks = Weeks.weeks(-2490);
+        weeks.negated(); // Should not change original
+        assertEquals(-2490, weeks.getWeeks());
+    }
 
-  @Test(timeout = 4000)
-  public void test26()  throws Throwable  {
-      DateTimeFieldType[] dateTimeFieldTypeArray0 = new DateTimeFieldType[9];
-      DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.dayOfMonth();
-      dateTimeFieldTypeArray0[0] = dateTimeFieldType0;
-      int[] intArray0 = new int[0];
-      Partial partial0 = new Partial((Chronology) null, dateTimeFieldTypeArray0, intArray0);
-      // Undeclared exception!
-      try { 
-        Weeks.weeksBetween((ReadablePartial) partial0, (ReadablePartial) partial0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.joda.time.Partial", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testParseWeeksNullStringMultipliedByNegative() {
+        Weeks weeks = Weeks.parseWeeks((String) null);
+        Weeks result = weeks.multipliedBy(-1060);
+        assertEquals(0, result.getWeeks());
+    }
 
-  @Test(timeout = 4000)
-  public void test27()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000)
+    public void testOneWeekMultipliedByLargeNumber() {
+        Weeks oneWeek = Weeks.ONE;
+        Weeks result = oneWeek.multipliedBy(604800);
+        assertEquals(604800, result.getWeeks());
+    }
+
+    @Test(timeout = 4000)
+    public void testThreeWeeksMultipliedByNegative() {
+        Weeks threeWeeks = Weeks.THREE;
+        Weeks result = threeWeeks.multipliedBy(-617);
+        assertEquals(-1851, result.getWeeks());
+    }
+
+    @Test(timeout = 4000)
+    public void testZeroMinusZero() {
+        Weeks zeroWeeks = Weeks.ZERO;
+        Weeks result = zeroWeeks.ZERO.minus(zeroWeeks);
+        assertEquals(0, result.getWeeks());
+    }
+
+    @Test(timeout = 4000)
+    public void testLargeWeeksMinus() {
+        Weeks weeks = Weeks.weeks(317351877);
+        Weeks result = weeks.minus(2285);
+        assertEquals(317349592, result.getWeeks());
+    }
+
+    @Test(timeout = 4000)
+    public void testZeroWeeksDividedByOne() {
+        Weeks zeroWeeks = Weeks.standardWeeksIn((ReadablePeriod) null);
+        Weeks result = zeroWeeks.dividedBy(1);
+        assertEquals(0, result.getWeeks());
+    }
+
+    @Test(timeout = 4000)
+    public void testMaxValueDividedByNegativeOne() {
+        Weeks maxWeeks = Weeks.MAX_VALUE;
+        Weeks result = maxWeeks.dividedBy(-1);
+        assertEquals(-2147483647, result.getWeeks());
+    }
+
+    @Test(timeout = 4000)
+    public void testMinValueMinusNull() {
+        Weeks minWeeks = Weeks.MIN_VALUE;
+        Weeks result = minWeeks.minus((Weeks) null);
+        assertSame(minWeeks, result);
+    }
+
+    @Test(timeout = 4000)
+    public void testMaxValuePlusNull() {
+        Weeks maxWeeks = Weeks.MAX_VALUE;
+        Weeks result = maxWeeks.plus((Weeks) null);
+        assertEquals(1, result.size());
+    }
+
+    @Test(timeout = 4000)
+    public void testZeroPlusZero() {
+        Weeks zeroWeeks = Weeks.ZERO;
+        Weeks result = zeroWeeks.plus(zeroWeeks);
+        assertEquals(0, result.getWeeks());
+    }
+
+    @Test(timeout = 4000)
+    public void testParseWeeksNullStringPlusZero() {
+        Weeks weeks = Weeks.parseWeeks((String) null);
+        Weeks result = weeks.plus(0);
+        assertEquals(0, result.getWeeks());
+    }
+
+    @Test(timeout = 4000)
+    public void testWeeksInNullIntervalMinusNegative() {
+        Weeks weeks = Weeks.weeksIn((ReadableInterval) null);
+        Weeks result = weeks.minus(-2358);
+        Weeks negated = result.negated();
+        Days days = negated.toStandardDays();
+        assertEquals(2358, result.getWeeks());
+        assertEquals(-16506, days.getDays());
+    }
+
+    @Test(timeout = 4000)
+    public void testTwoWeeksPlusTwo() {
+        Weeks twoWeeks = Weeks.weeks(2);
+        Weeks result = twoWeeks.plus(2);
+        assertEquals(4, result.getWeeks());
+    }
+
+    @Test(timeout = 4000)
+    public void testThreeWeeksMinusTwo() {
+        Weeks threeWeeks = Weeks.THREE;
+        Weeks twoWeeks = Weeks.TWO;
+        Weeks result = threeWeeks.minus(twoWeeks);
+        assertEquals(1, result.getWeeks());
+    }
+
+    @Test(timeout = 4000)
+    public void testWeeksZeroMinusZero() {
+        Weeks weeks = Weeks.weeks(0);
+        Weeks result = weeks.minus(0);
+        assertEquals(0, result.getWeeks());
+    }
+
+    //-------------------------- Getter Tests --------------------------
+    
+    @Test(timeout = 4000)
+    public void testZeroWeeksGetWeeks() {
+        Minutes minutes = Minutes.ZERO;
+        Weeks weeks = minutes.toStandardWeeks();
+        assertEquals(0, weeks.getWeeks());
+    }
+
+    @Test(timeout = 4000)
+    public void testMinValueGetWeeks() {
+        Weeks minWeeks = Weeks.MIN_VALUE;
+        assertEquals(Integer.MIN_VALUE, minWeeks.getWeeks());
+    }
+
+    @Test(timeout = 4000)
+    public void testThreeWeeksGetWeeks() {
+        Weeks threeWeeks = Weeks.THREE;
+        assertEquals(3, threeWeeks.getWeeks());
+    }
+
+    @Test(timeout = 4000)
+    public void testTwoWeeksGetPeriodType() {
+        Weeks twoWeeks = Weeks.TWO;
+        PeriodType periodType = twoWeeks.getPeriodType();
+        assertEquals(1, periodType.size());
+    }
+
+    @Test(timeout = 4000)
+    public void testThreeWeeksGetFieldType() {
+        Weeks threeWeeks = Weeks.THREE;
+        DurationFieldType fieldType = threeWeeks.getFieldType();
+        assertEquals("weeks", fieldType.getName());
+    }
+
+    //-------------------------- Factory Method Tests --------------------------
+    
+    @Test(timeout = 4000)
+    public void testWeeksThree() {
+        Weeks weeks = Weeks.weeks(3);
+        assertEquals(3, weeks.getWeeks());
+    }
+
+    @Test(timeout = 4000)
+    public void testWeeksMaxValue() {
+        Weeks weeks = Weeks.weeks(Integer.MAX_VALUE);
+        assertEquals(Integer.MAX_VALUE, weeks.getWeeks());
+    }
+
+    @Test(timeout = 4000)
+    public void testOneWeekToString() {
+        Weeks oneWeek = Weeks.ONE;
+        assertEquals("P1W", oneWeek.toString());
+    }
+
+    @Test(timeout = 4000)
+    public void testWeeksBetweenSameInstant() {
+        Instant epoch = Instant.EPOCH;
+        Weeks weeks = Weeks.weeksBetween(epoch, epoch);
+        assertEquals(0, weeks.getWeeks());
+    }
+
+    //-------------------------- Exception Tests --------------------------
+    
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testWeeksBetweenPartialWithNullChronologyThrows() {
+        DateTimeFieldType[] fields = new DateTimeFieldType[9];
+        fields[0] = DateTimeFieldType.dayOfMonth();
+        int[] values = new int[0];
+        Partial partial = new Partial(null, fields, values);
+        Weeks.weeksBetween(partial, partial);
+    }
+
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testWeeksBetweenNullPartialsThrows() {
         Weeks.weeksBetween((ReadablePartial) null, (ReadablePartial) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // ReadablePartial objects must not be null
-         //
-         verifyException("org.joda.time.base.BaseSingleFieldPeriod", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test28()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testWeeksBetweenNullInstantsThrows() {
         Weeks.weeksBetween((ReadableInstant) null, (ReadableInstant) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // ReadableInstant objects must not be null
-         //
-         verifyException("org.joda.time.base.BaseSingleFieldPeriod", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test29()  throws Throwable  {
-      Weeks weeks0 = Weeks.MIN_VALUE;
-      // Undeclared exception!
-      try { 
-        weeks0.toStandardSeconds();
-        fail("Expecting exception: ArithmeticException");
-      
-      } catch(ArithmeticException e) {
-         //
-         // Multiplication overflows an int: -2147483648 * 604800
-         //
-         verifyException("org.joda.time.field.FieldUtils", e);
-      }
-  }
+    @Test(timeout = 4000, expected = ArithmeticException.class)
+    public void testMinValueToStandardSecondsThrows() {
+        Weeks minWeeks = Weeks.MIN_VALUE;
+        minWeeks.toStandardSeconds();
+    }
 
-  @Test(timeout = 4000)
-  public void test30()  throws Throwable  {
-      Hours hours0 = Hours.MIN_VALUE;
-      Weeks weeks0 = Weeks.standardWeeksIn(hours0);
-      assertEquals((-12782640), weeks0.getWeeks());
-  }
+    @Test(timeout = 4000, expected = ArithmeticException.class)
+    public void testMaxValuePlusMaxValueThrows() {
+        Weeks maxWeeks = Weeks.MAX_VALUE;
+        maxWeeks.plus(maxWeeks);
+    }
 
-  @Test(timeout = 4000)
-  public void test31()  throws Throwable  {
-      Weeks weeks0 = Weeks.MAX_VALUE;
-      // Undeclared exception!
-      try { 
-        weeks0.plus(weeks0);
-        fail("Expecting exception: ArithmeticException");
-      
-      } catch(ArithmeticException e) {
-         //
-         // The calculation caused an overflow: 2147483647 + 2147483647
-         //
-         verifyException("org.joda.time.field.FieldUtils", e);
-      }
-  }
+    @Test(timeout = 4000, expected = ArithmeticException.class)
+    public void testMinValueMinusMinValueThrows() {
+        Weeks minWeeks = Weeks.MIN_VALUE;
+        minWeeks.minus(minWeeks);
+    }
 
-  @Test(timeout = 4000)
-  public void test32()  throws Throwable  {
-      Weeks weeks0 = Weeks.MIN_VALUE;
-      // Undeclared exception!
-      try { 
-        weeks0.minus(weeks0);
-        fail("Expecting exception: ArithmeticException");
-      
-      } catch(ArithmeticException e) {
-         //
-         // Integer.MIN_VALUE cannot be negated
-         //
-         verifyException("org.joda.time.field.FieldUtils", e);
-      }
-  }
+    @Test(timeout = 4000, expected = ArithmeticException.class)
+    public void testDividedByZeroThrows() {
+        Weeks twoWeeks = Weeks.TWO;
+        twoWeeks.dividedBy(0);
+    }
 
-  @Test(timeout = 4000)
-  public void test33()  throws Throwable  {
-      Weeks weeks0 = Weeks.TWO;
-      // Undeclared exception!
-      try { 
-        weeks0.dividedBy(0);
-        fail("Expecting exception: ArithmeticException");
-      
-      } catch(ArithmeticException e) {
-         //
-         // / by zero
-         //
-         verifyException("org.joda.time.Weeks", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test34()  throws Throwable  {
-      Weeks weeks0 = Weeks.weeks(0);
-      Weeks weeks1 = weeks0.minus(0);
-      assertEquals(0, weeks1.getWeeks());
-  }
-
-  @Test(timeout = 4000)
-  public void test35()  throws Throwable  {
-      Weeks weeks0 = Weeks.weeks(Integer.MAX_VALUE);
-      assertEquals(Integer.MAX_VALUE, weeks0.getWeeks());
-  }
-
-  @Test(timeout = 4000)
-  public void test36()  throws Throwable  {
-      Weeks weeks0 = Weeks.ZERO;
-      Seconds seconds0 = weeks0.ONE.toStandardSeconds();
-      Weeks weeks1 = seconds0.toStandardWeeks();
-      assertEquals(1, weeks1.getWeeks());
-      assertEquals(604800, seconds0.getSeconds());
-  }
-
-  @Test(timeout = 4000)
-  public void test37()  throws Throwable  {
-      Weeks weeks0 = Weeks.standardWeeksIn((ReadablePeriod) null);
-      Weeks weeks1 = Weeks.MAX_VALUE;
-      boolean boolean0 = weeks0.isLessThan(weeks1);
-      assertEquals(0, weeks0.getWeeks());
-      assertTrue(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test38()  throws Throwable  {
-      Weeks weeks0 = Weeks.MIN_VALUE;
-      boolean boolean0 = weeks0.isLessThan((Weeks) null);
-      assertTrue(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test39()  throws Throwable  {
-      Weeks weeks0 = Weeks.THREE;
-      boolean boolean0 = weeks0.isLessThan((Weeks) null);
-      assertFalse(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test40()  throws Throwable  {
-      Weeks weeks0 = Weeks.standardWeeksIn((ReadablePeriod) null);
-      boolean boolean0 = weeks0.isLessThan(weeks0);
-      assertFalse(boolean0);
-      assertEquals(0, weeks0.getWeeks());
-  }
-
-  @Test(timeout = 4000)
-  public void test41()  throws Throwable  {
-      Weeks weeks0 = Weeks.weeks(317351877);
-      Weeks weeks1 = Weeks.MIN_VALUE;
-      boolean boolean0 = weeks0.isGreaterThan(weeks1);
-      assertEquals(317351877, weeks0.getWeeks());
-      assertTrue(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test42()  throws Throwable  {
-      Weeks weeks0 = Weeks.THREE;
-      boolean boolean0 = weeks0.isGreaterThan((Weeks) null);
-      assertTrue(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test43()  throws Throwable  {
-      Weeks weeks0 = Weeks.standardWeeksIn((ReadablePeriod) null);
-      boolean boolean0 = weeks0.isGreaterThan((Weeks) null);
-      assertEquals(0, weeks0.getWeeks());
-      assertFalse(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test44()  throws Throwable  {
-      Weeks weeks0 = Weeks.weeks(317351877);
-      boolean boolean0 = weeks0.isGreaterThan(weeks0);
-      assertFalse(boolean0);
-      assertEquals(317351877, weeks0.getWeeks());
-  }
-
-  @Test(timeout = 4000)
-  public void test45()  throws Throwable  {
-      Weeks weeks0 = Weeks.standardWeeksIn((ReadablePeriod) null);
-      Weeks weeks1 = weeks0.dividedBy(1);
-      assertEquals(0, weeks1.getWeeks());
-  }
-
-  @Test(timeout = 4000)
-  public void test46()  throws Throwable  {
-      Weeks weeks0 = Weeks.MAX_VALUE;
-      Weeks weeks1 = weeks0.dividedBy((-1));
-      assertEquals((-2147483647), weeks1.getWeeks());
-  }
-
-  @Test(timeout = 4000)
-  public void test47()  throws Throwable  {
-      Weeks weeks0 = Weeks.MIN_VALUE;
-      Weeks weeks1 = weeks0.minus((Weeks) null);
-      assertSame(weeks0, weeks1);
-  }
-
-  @Test(timeout = 4000)
-  public void test48()  throws Throwable  {
-      Weeks weeks0 = Weeks.MAX_VALUE;
-      Weeks weeks1 = weeks0.plus((Weeks) null);
-      assertEquals(1, weeks1.size());
-  }
-
-  @Test(timeout = 4000)
-  public void test49()  throws Throwable  {
-      Weeks weeks0 = Weeks.ZERO;
-      Weeks weeks1 = weeks0.plus(weeks0);
-      assertEquals(0, weeks1.getWeeks());
-  }
-
-  @Test(timeout = 4000)
-  public void test50()  throws Throwable  {
-      Weeks weeks0 = Weeks.parseWeeks((String) null);
-      Weeks weeks1 = weeks0.plus(0);
-      assertEquals(0, weeks1.getWeeks());
-  }
-
-  @Test(timeout = 4000)
-  public void test51()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testParseWeeksInvalidStringThrows() {
         Weeks.parseWeeks(")%X[WS");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid format: \")%X[WS\"
-         //
-         verifyException("org.joda.time.format.PeriodFormatter", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test52()  throws Throwable  {
-      Weeks weeks0 = Weeks.weeksIn((ReadableInterval) null);
-      Weeks weeks1 = weeks0.minus((-2358));
-      Weeks weeks2 = weeks1.negated();
-      Days days0 = weeks2.toStandardDays();
-      assertEquals(2358, weeks1.getWeeks());
-      assertEquals((-16506), days0.getDays());
-  }
+    @Test(timeout = 4000, expected = ArithmeticException.class)
+    public void testMinValuePlusMinValueThrows() {
+        Weeks weeks = Weeks.weeks(Integer.MIN_VALUE);
+        weeks.plus(Integer.MIN_VALUE);
+    }
 
-  @Test(timeout = 4000)
-  public void test53()  throws Throwable  {
-      DateTimeFieldType[] dateTimeFieldTypeArray0 = new DateTimeFieldType[9];
-      int[] intArray0 = new int[0];
-      Partial partial0 = new Partial((Chronology) null, dateTimeFieldTypeArray0, intArray0);
-      // Undeclared exception!
-      try { 
-        Weeks.weeksBetween((ReadablePartial) partial0, (ReadablePartial) partial0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.joda.time.Partial", e);
-      }
-  }
+    @Test(timeout = 4000, expected = ArithmeticException.class)
+    public void testMinValueToStandardHoursThrows() {
+        Weeks minWeeks = Weeks.MIN_VALUE;
+        minWeeks.toStandardHours();
+    }
 
-  @Test(timeout = 4000)
-  public void test54()  throws Throwable  {
-      Weeks weeks0 = Weeks.weeks(3);
-      assertEquals(3, weeks0.getWeeks());
-  }
+    @Test(timeout = 4000, expected = ArithmeticException.class)
+    public void testMaxValueToStandardDaysThrows() {
+        Weeks maxWeeks = Weeks.MAX_VALUE;
+        maxWeeks.toStandardDays();
+    }
 
-  @Test(timeout = 4000)
-  public void test55()  throws Throwable  {
-      Weeks weeks0 = Weeks.weeks(2);
-      Weeks weeks1 = weeks0.plus(2);
-      assertEquals(4, weeks1.getWeeks());
-  }
+    @Test(timeout = 4000, expected = ArithmeticException.class)
+    public void testMinValueNegatedThrows() {
+        Weeks minWeeks = Weeks.MIN_VALUE;
+        minWeeks.negated();
+    }
 
-  @Test(timeout = 4000)
-  public void test56()  throws Throwable  {
-      Weeks weeks0 = Weeks.THREE;
-      Weeks weeks1 = Weeks.TWO;
-      Weeks weeks2 = weeks0.minus(weeks1);
-      assertEquals(1, weeks2.getWeeks());
-  }
+    @Test(timeout = 4000, expected = ArithmeticException.class)
+    public void testMaxValueMinusNegativeThrows() {
+        Weeks maxWeeks = Weeks.MAX_VALUE;
+        maxWeeks.minus(-876);
+    }
 
-  @Test(timeout = 4000)
-  public void test57()  throws Throwable  {
-      Weeks weeks0 = Weeks.weeks(Integer.MIN_VALUE);
-      // Undeclared exception!
-      try { 
-        weeks0.plus(Integer.MIN_VALUE);
-        fail("Expecting exception: ArithmeticException");
-      
-      } catch(ArithmeticException e) {
-         //
-         // The calculation caused an overflow: -2147483648 + -2147483648
-         //
-         verifyException("org.joda.time.field.FieldUtils", e);
-      }
-  }
+    @Test(timeout = 4000, expected = ArithmeticException.class)
+    public void testMaxValueToStandardMinutesThrows() {
+        Weeks maxWeeks = Weeks.MAX_VALUE;
+        maxWeeks.toStandardMinutes();
+    }
 
-  @Test(timeout = 4000)
-  public void test58()  throws Throwable  {
-      Weeks weeks0 = Weeks.MIN_VALUE;
-      // Undeclared exception!
-      try { 
-        weeks0.toStandardHours();
-        fail("Expecting exception: ArithmeticException");
-      
-      } catch(ArithmeticException e) {
-         //
-         // Multiplication overflows an int: -2147483648 * 168
-         //
-         verifyException("org.joda.time.field.FieldUtils", e);
-      }
-  }
+    @Test(timeout = 4000, expected = ArithmeticException.class)
+    public void testMaxValueMultipliedBySevenThrows() {
+        Weeks maxWeeks = Weeks.MAX_VALUE;
+        maxWeeks.multipliedBy(7);
+    }
 
-  @Test(timeout = 4000)
-  public void test59()  throws Throwable  {
-      Weeks weeks0 = Weeks.ONE;
-      String string0 = weeks0.toString();
-      assertEquals("P1W", string0);
-  }
+    @Test(timeout = 4000)
+    public void testStandardWeeksInMinHours() {
+        Hours minHours = Hours.MIN_VALUE;
+        Weeks weeks = Weeks.standardWeeksIn(minHours);
+        assertEquals(-12782640, weeks.getWeeks());
+    }
 
-  @Test(timeout = 4000)
-  public void test60()  throws Throwable  {
-      Weeks weeks0 = Weeks.MAX_VALUE;
-      // Undeclared exception!
-      try { 
-        weeks0.toStandardDays();
-        fail("Expecting exception: ArithmeticException");
-      
-      } catch(ArithmeticException e) {
-         //
-         // Multiplication overflows an int: 2147483647 * 7
-         //
-         verifyException("org.joda.time.field.FieldUtils", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test61()  throws Throwable  {
-      Weeks weeks0 = Weeks.MIN_VALUE;
-      // Undeclared exception!
-      try { 
-        weeks0.negated();
-        fail("Expecting exception: ArithmeticException");
-      
-      } catch(ArithmeticException e) {
-         //
-         // Integer.MIN_VALUE cannot be negated
-         //
-         verifyException("org.joda.time.field.FieldUtils", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test62()  throws Throwable  {
-      Weeks weeks0 = Weeks.THREE;
-      DurationFieldType durationFieldType0 = weeks0.getFieldType();
-      assertEquals("weeks", durationFieldType0.getName());
-  }
-
-  @Test(timeout = 4000)
-  public void test63()  throws Throwable  {
-      Weeks weeks0 = Weeks.MAX_VALUE;
-      // Undeclared exception!
-      try { 
-        weeks0.minus((-876));
-        fail("Expecting exception: ArithmeticException");
-      
-      } catch(ArithmeticException e) {
-         //
-         // The calculation caused an overflow: 2147483647 + 876
-         //
-         verifyException("org.joda.time.field.FieldUtils", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test64()  throws Throwable  {
-      Weeks weeks0 = Weeks.THREE;
-      int int0 = weeks0.getWeeks();
-      assertEquals(3, int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test65()  throws Throwable  {
-      Weeks weeks0 = Weeks.standardWeeksIn((ReadablePeriod) null);
-      Seconds seconds0 = weeks0.toStandardSeconds();
-      assertEquals(0, seconds0.getSeconds());
-  }
-
-  @Test(timeout = 4000)
-  public void test66()  throws Throwable  {
-      Weeks weeks0 = Weeks.TWO;
-      PeriodType periodType0 = weeks0.getPeriodType();
-      assertEquals(1, periodType0.size());
-  }
-
-  @Test(timeout = 4000)
-  public void test67()  throws Throwable  {
-      Weeks weeks0 = Weeks.MAX_VALUE;
-      // Undeclared exception!
-      try { 
-        weeks0.toStandardMinutes();
-        fail("Expecting exception: ArithmeticException");
-      
-      } catch(ArithmeticException e) {
-         //
-         // Multiplication overflows an int: 2147483647 * 10080
-         //
-         verifyException("org.joda.time.field.FieldUtils", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test68()  throws Throwable  {
-      Weeks weeks0 = Weeks.MAX_VALUE;
-      // Undeclared exception!
-      try { 
-        weeks0.multipliedBy(7);
-        fail("Expecting exception: ArithmeticException");
-      
-      } catch(ArithmeticException e) {
-         //
-         // Multiplication overflows an int: 2147483647 * 7
-         //
-         verifyException("org.joda.time.field.FieldUtils", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test69()  throws Throwable  {
-      Instant instant0 = Instant.EPOCH;
-      Weeks weeks0 = Weeks.weeksBetween((ReadableInstant) instant0, (ReadableInstant) instant0);
-      assertEquals(0, weeks0.getWeeks());
-  }
-
-  @Test(timeout = 4000)
-  public void test70()  throws Throwable  {
-      Weeks weeks0 = Weeks.MIN_VALUE;
-      Duration duration0 = weeks0.toStandardDuration();
-      assertEquals((-15032385536L), duration0.getStandardDays());
-  }
+    @Test(timeout = 4000)
+    public void testMinValueToStandardDuration() {
+        Weeks minWeeks = Weeks.MIN_VALUE;
+        Duration duration = minWeeks.toStandardDuration();
+        assertEquals(-15032385536L, duration.getStandardDays());
+    }
 }
