@@ -20,175 +20,202 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class LineIterator_ESTest extends LineIterator_ESTest_scaffolding {
 
-    // Constructor Tests
-    @Test(timeout = 4000)
-    public void testConstructor_NullReader_ThrowsNullPointerException()  {
-        try {
-            new LineIterator((Reader) null);
-            fail("Expecting exception: NullPointerException");
-        } catch(NullPointerException e) {
-            assertEquals("reader", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("_MA");
+      LineIterator lineIterator0 = new LineIterator(stringReader0);
+      String string0 = lineIterator0.nextLine();
+      assertEquals("_MA", string0);
+  }
 
-    // hasNext() Tests
-    @Test(timeout = 4000)
-    public void testHasNext_EmptyReader_ReturnsFalse()  {
-        StringReader stringReader0 = new StringReader("");
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        assertFalse(lineIterator0.hasNext());
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("p)");
+      LineIterator lineIterator0 = new LineIterator(stringReader0);
+      String string0 = lineIterator0.next();
+      assertEquals("p)", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testHasNext_NonEmptyReader_ReturnsTrue()  {
-        StringReader stringReader0 = new StringReader("text");
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        assertTrue(lineIterator0.hasNext());
-        assertTrue(lineIterator0.hasNext()); // Multiple calls should still return true
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("w*N4EtL4abL*9i`");
+      LineIterator lineIterator0 = new LineIterator(stringReader0);
+      boolean boolean0 = lineIterator0.isValidLine("w*N4EtL4abL*9i`");
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testHasNext_AfterCloseQuietly_ReturnsFalse()  {
-        StringReader stringReader0 = new StringReader("text");
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        LineIterator.closeQuietly(lineIterator0);
-        assertFalse(lineIterator0.hasNext());
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("remove Kot supported");
+      stringReader0.close();
+      LineIterator lineIterator0 = new LineIterator(stringReader0);
+      // Undeclared exception!
+      try { 
+        lineIterator0.nextLine();
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // java.io.IOException: Stream closed
+         //
+         verifyException("org.apache.commons.io.LineIterator", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testHasNext_ClosedReader_ThrowsIllegalStateException()  {
-        StringReader stringReader0 = new StringReader("text");
-        stringReader0.close();
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        try {
-            lineIterator0.hasNext();
-            fail("Expecting exception: IllegalStateException");
-        } catch(IllegalStateException e) {
-            assertTrue(e.getMessage().contains("Stream closed"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("p)");
+      LineIterator lineIterator0 = new LineIterator(stringReader0);
+      lineIterator0.hasNext();
+      LineIterator lineIterator1 = new LineIterator(stringReader0);
+      // Undeclared exception!
+      try { 
+        lineIterator1.next();
+        fail("Expecting exception: NoSuchElementException");
+      
+      } catch(NoSuchElementException e) {
+         //
+         // No more lines
+         //
+         verifyException("org.apache.commons.io.LineIterator", e);
+      }
+  }
 
-    // next() and nextLine() Tests
-    @Test(timeout = 4000)
-    public void testNext_WithContent_ReturnsContent()  {
-        StringReader stringReader0 = new StringReader("content");
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        assertEquals("content", lineIterator0.next());
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("remove Kot spported");
+      stringReader0.close();
+      LineIterator lineIterator0 = new LineIterator(stringReader0);
+      // Undeclared exception!
+      try { 
+        lineIterator0.next();
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // java.io.IOException: Stream closed
+         //
+         verifyException("org.apache.commons.io.LineIterator", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testNextLine_WithContent_ReturnsContent()  {
-        StringReader stringReader0 = new StringReader("content");
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        assertEquals("content", lineIterator0.nextLine());
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("remove not supported");
+      stringReader0.close();
+      LineIterator lineIterator0 = new LineIterator(stringReader0);
+      // Undeclared exception!
+      try { 
+        lineIterator0.hasNext();
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // java.io.IOException: Stream closed
+         //
+         verifyException("org.apache.commons.io.LineIterator", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testNext_NewLineOnly_ReturnsEmptyString()  {
-        StringReader stringReader0 = new StringReader("\n");
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        assertEquals("", lineIterator0.next());
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      LineIterator lineIterator0 = null;
+      try {
+        lineIterator0 = new LineIterator((Reader) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // reader
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testNextLine_NewLineOnly_ReturnsEmptyString()  {
-        StringReader stringReader0 = new StringReader("\n");
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        lineIterator0.hasNext(); // Prime the iterator
-        assertEquals("", lineIterator0.nextLine());
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("");
+      BufferedReader bufferedReader0 = new BufferedReader(stringReader0, 2302);
+      LineIterator lineIterator0 = new LineIterator(bufferedReader0);
+      boolean boolean0 = lineIterator0.hasNext();
+      assertFalse(boolean0);
+  }
 
-    // Exception Tests
-    @Test(timeout = 4000)
-    public void testNext_EmptyReader_ThrowsNoSuchElementException()  {
-        StringReader stringReader0 = new StringReader("");
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        try {
-            lineIterator0.next();
-            fail("Expecting exception: NoSuchElementException");
-        } catch(NoSuchElementException e) {
-            assertEquals("No more lines", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("w*N4EtL4abL*9i`");
+      LineIterator lineIterator0 = new LineIterator(stringReader0);
+      lineIterator0.hasNext();
+      boolean boolean0 = lineIterator0.hasNext();
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testNextLine_EmptyReader_ThrowsNoSuchElementException()  {
-        StringReader stringReader0 = new StringReader("");
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        try {
-            lineIterator0.nextLine();
-            fail("Expecting exception: NoSuchElementException");
-        } catch(NoSuchElementException e) {
-            assertEquals("No more lines", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("remove not supported");
+      BufferedReader bufferedReader0 = new BufferedReader(stringReader0, 2745);
+      LineIterator lineIterator0 = new LineIterator(bufferedReader0);
+      lineIterator0.close();
+  }
 
-    @Test(timeout = 4000)
-    public void testNext_ExhaustedReader_ThrowsNoSuchElementException()  {
-        StringReader stringReader0 = new StringReader("first");
-        LineIterator firstIterator = new LineIterator(stringReader0);
-        firstIterator.next(); // Consume the only line
-        
-        LineIterator secondIterator = new LineIterator(stringReader0);
-        try {
-            secondIterator.next();
-            fail("Expecting exception: NoSuchElementException");
-        } catch(NoSuchElementException e) {
-            assertEquals("No more lines", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("");
+      LineIterator lineIterator0 = new LineIterator(stringReader0);
+      // Undeclared exception!
+      try { 
+        lineIterator0.nextLine();
+        fail("Expecting exception: NoSuchElementException");
+      
+      } catch(NoSuchElementException e) {
+         //
+         // No more lines
+         //
+         verifyException("org.apache.commons.io.LineIterator", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testNext_ClosedReader_ThrowsIllegalStateException()  {
-        StringReader stringReader0 = new StringReader("text");
-        stringReader0.close();
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        try {
-            lineIterator0.next();
-            fail("Expecting exception: IllegalStateException");
-        } catch(IllegalStateException e) {
-            assertTrue(e.getMessage().contains("Stream closed"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("\n");
+      BufferedReader bufferedReader0 = new BufferedReader(stringReader0, 1048);
+      LineIterator lineIterator0 = new LineIterator(bufferedReader0);
+      lineIterator0.hasNext();
+      String string0 = lineIterator0.nextLine();
+      assertEquals("", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testNextLine_ClosedReader_ThrowsIllegalStateException()  {
-        StringReader stringReader0 = new StringReader("text");
-        stringReader0.close();
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        try {
-            lineIterator0.nextLine();
-            fail("Expecting exception: IllegalStateException");
-        } catch(IllegalStateException e) {
-            assertTrue(e.getMessage().contains("Stream closed"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("\n");
+      LineIterator lineIterator0 = new LineIterator(stringReader0);
+      String string0 = lineIterator0.next();
+      assertEquals("", string0);
+  }
 
-    // Other Functionality Tests
-    @Test(timeout = 4000)
-    public void testIsValidLine_NonEmptyString_ReturnsTrue()  {
-        StringReader stringReader0 = new StringReader("");
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        assertTrue(lineIterator0.isValidLine("any string"));
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("w*N4EtL4abL*9i`");
+      LineIterator lineIterator0 = new LineIterator(stringReader0);
+      LineIterator.closeQuietly(lineIterator0);
+      boolean boolean0 = lineIterator0.hasNext();
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testRemove_Always_ThrowsUnsupportedOperationException()  {
-        StringReader stringReader0 = new StringReader("");
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        try {
-            lineIterator0.remove();
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch(UnsupportedOperationException e) {
-            assertEquals("remove not supported", e.getMessage());
-        }
-    }
-
-    @Test(timeout = 4000)
-    public void testClose_ValidReader_DoesNotThrow()  {
-        StringReader stringReader0 = new StringReader("text");
-        BufferedReader bufferedReader0 = new BufferedReader(stringReader0);
-        LineIterator lineIterator0 = new LineIterator(bufferedReader0);
-        lineIterator0.close(); // Should not throw
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("");
+      LineIterator lineIterator0 = new LineIterator(stringReader0);
+      // Undeclared exception!
+      try { 
+        lineIterator0.remove();
+        fail("Expecting exception: UnsupportedOperationException");
+      
+      } catch(UnsupportedOperationException e) {
+         //
+         // remove not supported
+         //
+         verifyException("org.apache.commons.io.LineIterator", e);
+      }
+  }
 }
