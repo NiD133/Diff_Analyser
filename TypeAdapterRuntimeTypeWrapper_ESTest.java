@@ -11,6 +11,7 @@ import static org.evosuite.shaded.org.mockito.Mockito.*;
 import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonSerializer;
 import com.google.gson.ToNumberPolicy;
 import com.google.gson.TypeAdapter;
@@ -36,305 +37,307 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) 
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true, 
-    useVFS = true, 
-    useVNET = true, 
-    resetStaticState = true, 
-    separateClassLoader = true
-) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class TypeAdapterRuntimeTypeWrapper_ESTest extends TypeAdapterRuntimeTypeWrapper_ESTest_scaffolding {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      Gson gson0 = new Gson();
+      Class<Object> class0 = Object.class;
+      Class<ChronoField> class1 = ChronoField.class;
+      TypeAdapter<ChronoField> typeAdapter0 = gson0.getAdapter(class1);
+      TypeAdapterRuntimeTypeWrapper<ChronoField> typeAdapterRuntimeTypeWrapper0 = new TypeAdapterRuntimeTypeWrapper<ChronoField>(gson0, typeAdapter0, class0);
+      PipedWriter pipedWriter0 = new PipedWriter();
+      BufferedWriter bufferedWriter0 = new BufferedWriter(pipedWriter0);
+      JsonWriter jsonWriter0 = gson0.newJsonWriter(bufferedWriter0);
+      ChronoField chronoField0 = ChronoField.HOUR_OF_AMPM;
+      typeAdapterRuntimeTypeWrapper0.write(jsonWriter0, chronoField0);
+      assertFalse(jsonWriter0.isLenient());
+  }
 
-    @Test(timeout = 4000)
-    public void writeEnumValueSucceeds() throws Throwable {
-        // Arrange
-        Gson gson = new Gson();
-        Class<Object> declaredType = Object.class;
-        Class<ChronoField> enumType = ChronoField.class;
-        TypeAdapter<ChronoField> enumAdapter = gson.getAdapter(enumType);
-        TypeAdapterRuntimeTypeWrapper<ChronoField> adapterWrapper = 
-            new TypeAdapterRuntimeTypeWrapper<>(gson, enumAdapter, declaredType);
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      JsonSerializer<Object> jsonSerializer0 = (JsonSerializer<Object>) mock(JsonSerializer.class, new ViolatedAssumptionAnswer());
+      Gson gson0 = new Gson();
+      Class<Short> class0 = Short.TYPE;
+      Class<Integer> class1 = Integer.class;
+      TypeToken<Integer> typeToken0 = TypeToken.get(class1);
+      TypeAdapterFactory typeAdapterFactory0 = TreeTypeAdapter.newFactory(typeToken0, jsonSerializer0);
+      Class<ChronoField> class2 = ChronoField.class;
+      TypeToken<ChronoField> typeToken1 = TypeToken.get(class2);
+      JsonSerializer<ChronoField> jsonSerializer1 = (JsonSerializer<ChronoField>) mock(JsonSerializer.class, new ViolatedAssumptionAnswer());
+      JsonDeserializer<ChronoField> jsonDeserializer0 = (JsonDeserializer<ChronoField>) mock(JsonDeserializer.class, new ViolatedAssumptionAnswer());
+      TreeTypeAdapter<ChronoField> treeTypeAdapter0 = new TreeTypeAdapter<ChronoField>(jsonSerializer1, jsonDeserializer0, gson0, typeToken1, typeAdapterFactory0);
+      TypeAdapterRuntimeTypeWrapper<ChronoField> typeAdapterRuntimeTypeWrapper0 = new TypeAdapterRuntimeTypeWrapper<ChronoField>(gson0, treeTypeAdapter0, class0);
+      StringReader stringReader0 = new StringReader("");
+      JsonReader jsonReader0 = new JsonReader(stringReader0);
+      typeAdapterRuntimeTypeWrapper0.read(jsonReader0);
+  }
 
-        PipedWriter pipedWriter = new PipedWriter();
-        BufferedWriter bufferedWriter = new BufferedWriter(pipedWriter);
-        JsonWriter jsonWriter = gson.newJsonWriter(bufferedWriter);
-        ChronoField value = ChronoField.HOUR_OF_AMPM;
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      Gson gson0 = new Gson();
+      Class<Object> class0 = Object.class;
+      TypeAdapter<Object> typeAdapter0 = gson0.getAdapter(class0);
+      TypeAdapterRuntimeTypeWrapper<Object> typeAdapterRuntimeTypeWrapper0 = new TypeAdapterRuntimeTypeWrapper<Object>(gson0, typeAdapter0, class0);
+      CharArrayWriter charArrayWriter0 = new CharArrayWriter();
+      MockPrintWriter mockPrintWriter0 = new MockPrintWriter(charArrayWriter0, false);
+      JsonWriter jsonWriter0 = new JsonWriter(charArrayWriter0);
+      // Undeclared exception!
+      typeAdapterRuntimeTypeWrapper0.write(jsonWriter0, mockPrintWriter0);
+  }
 
-        // Act
-        adapterWrapper.write(jsonWriter, value);
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      Gson gson0 = new Gson();
+      Class<Object> class0 = Object.class;
+      TypeAdapter<Object> typeAdapter0 = gson0.getAdapter(class0);
+      TypeAdapterRuntimeTypeWrapper<Object> typeAdapterRuntimeTypeWrapper0 = new TypeAdapterRuntimeTypeWrapper<Object>(gson0, typeAdapter0, class0);
+      StringWriter stringWriter0 = new StringWriter(2099);
+      MockPrintWriter mockPrintWriter0 = new MockPrintWriter(stringWriter0);
+      JsonWriter jsonWriter0 = new JsonWriter(mockPrintWriter0);
+      JsonWriter jsonWriter1 = jsonWriter0.nullValue();
+      // Undeclared exception!
+      try { 
+        typeAdapterRuntimeTypeWrapper0.write(jsonWriter1, stringWriter0);
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // JSON must have only one top-level value.
+         //
+         verifyException("com.google.gson.stream.JsonWriter", e);
+      }
+  }
 
-        // Assert
-        assertFalse(jsonWriter.isLenient());
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      Gson gson0 = new Gson();
+      Excluder excluder0 = new Excluder();
+      Class<Integer> class0 = Integer.TYPE;
+      TypeToken<Integer> typeToken0 = TypeToken.get(class0);
+      Class<Object> class1 = Object.class;
+      TypeToken<Object> typeToken1 = TypeToken.get(class1);
+      TypeAdapter<Object> typeAdapter0 = gson0.getDelegateAdapter((TypeAdapterFactory) excluder0, typeToken1);
+      TypeAdapterRuntimeTypeWrapper<Object> typeAdapterRuntimeTypeWrapper0 = new TypeAdapterRuntimeTypeWrapper<Object>(gson0, typeAdapter0, class0);
+      PipedWriter pipedWriter0 = new PipedWriter();
+      JsonWriter jsonWriter0 = new JsonWriter(pipedWriter0);
+      try { 
+        typeAdapterRuntimeTypeWrapper0.write(jsonWriter0, typeToken0);
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // Pipe not connected
+         //
+         verifyException("java.io.PipedWriter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void readFromEmptyStringReaderThrowsEOF() throws Throwable {
-        // Arrange
-        JsonSerializer<Object> mockSerializer = mock(JsonSerializer.class, new ViolatedAssumptionAnswer());
-        Gson gson = new Gson();
-        Class<Short> declaredType = Short.TYPE;
-        Class<Integer> targetType = Integer.class;
-        TypeToken<Integer> targetTypeToken = TypeToken.get(targetType);
-        TypeAdapterFactory adapterFactory = TreeTypeAdapter.newFactory(targetTypeToken, mockSerializer);
-        
-        Class<ChronoField> fieldType = ChronoField.class;
-        TypeToken<ChronoField> fieldTypeToken = TypeToken.get(fieldType);
-        JsonSerializer<ChronoField> fieldSerializer = mock(JsonSerializer.class, new ViolatedAssumptionAnswer());
-        JsonDeserializer<ChronoField> fieldDeserializer = mock(JsonDeserializer.class, new ViolatedAssumptionAnswer());
-        TreeTypeAdapter<ChronoField> treeAdapter = new TreeTypeAdapter<>(
-            fieldSerializer, fieldDeserializer, gson, fieldTypeToken, adapterFactory
-        );
-        TypeAdapterRuntimeTypeWrapper<ChronoField> adapterWrapper = 
-            new TypeAdapterRuntimeTypeWrapper<>(gson, treeAdapter, declaredType);
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      Gson gson0 = new Gson();
+      String string0 = gson0.toString();
+      Class<Object> class0 = Object.class;
+      TypeAdapter<Object> typeAdapter0 = gson0.getAdapter(class0);
+      TypeAdapterRuntimeTypeWrapper<Object> typeAdapterRuntimeTypeWrapper0 = new TypeAdapterRuntimeTypeWrapper<Object>(gson0, typeAdapter0, class0);
+      StringReader stringReader0 = new StringReader(string0);
+      JsonReader jsonReader0 = gson0.newJsonReader(stringReader0);
+      try { 
+        typeAdapterRuntimeTypeWrapper0.read(jsonReader0);
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // Use JsonReader.setStrictness(Strictness.LENIENT) to accept malformed JSON at line 1 column 3 path $.
+         // See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
+         //
+         verifyException("com.google.gson.stream.JsonReader", e);
+      }
+  }
 
-        StringReader reader = new StringReader("");
-        JsonReader jsonReader = new JsonReader(reader);
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      Gson gson0 = new Gson();
+      Class<Object> class0 = Object.class;
+      TypeAdapter<Object> typeAdapter0 = gson0.getAdapter(class0);
+      TypeAdapterRuntimeTypeWrapper<Object> typeAdapterRuntimeTypeWrapper0 = new TypeAdapterRuntimeTypeWrapper<Object>(gson0, typeAdapter0, class0);
+      // Undeclared exception!
+      try { 
+        typeAdapterRuntimeTypeWrapper0.read((JsonReader) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.internal.bind.ObjectTypeAdapter", e);
+      }
+  }
 
-        // Act & Assert: Expect EOFException due to empty input
-        thrown.expect(EOFException.class);
-        adapterWrapper.read(jsonReader);
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      JsonSerializer<Object> jsonSerializer0 = (JsonSerializer<Object>) mock(JsonSerializer.class, new ViolatedAssumptionAnswer());
+      Gson gson0 = new Gson();
+      Class<Object> class0 = Object.class;
+      TypeToken<Object> typeToken0 = TypeToken.get(class0);
+      TypeAdapterFactory typeAdapterFactory0 = TreeTypeAdapter.newFactoryWithMatchRawType(typeToken0, jsonSerializer0);
+      TypeAdapter<Object> typeAdapter0 = gson0.getDelegateAdapter(typeAdapterFactory0, typeToken0);
+      TypeAdapterRuntimeTypeWrapper<Object> typeAdapterRuntimeTypeWrapper0 = new TypeAdapterRuntimeTypeWrapper<Object>(gson0, typeAdapter0, class0);
+      StringReader stringReader0 = new StringReader("");
+      JsonReader jsonReader0 = gson0.newJsonReader(stringReader0);
+      try { 
+        typeAdapterRuntimeTypeWrapper0.read(jsonReader0);
+        fail("Expecting exception: EOFException");
+      
+      } catch(EOFException e) {
+         //
+         // End of input at line 1 column 1 path $
+         //
+         verifyException("com.google.gson.stream.JsonReader", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void writeUnsupportedTypeThrowsUnsupportedOperation() throws Throwable {
-        // Arrange
-        Gson gson = new Gson();
-        Class<Object> declaredType = Object.class;
-        TypeAdapter<Object> objectAdapter = gson.getAdapter(declaredType);
-        TypeAdapterRuntimeTypeWrapper<Object> adapterWrapper = 
-            new TypeAdapterRuntimeTypeWrapper<>(gson, objectAdapter, declaredType);
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      JsonSerializer<Integer> jsonSerializer0 = (JsonSerializer<Integer>) mock(JsonSerializer.class, new ViolatedAssumptionAnswer());
+      JsonDeserializer<Integer> jsonDeserializer0 = (JsonDeserializer<Integer>) mock(JsonDeserializer.class, new ViolatedAssumptionAnswer());
+      Class<Integer> class0 = Integer.class;
+      TypeToken<Integer> typeToken0 = TypeToken.get(class0);
+      TypeAdapterFactory typeAdapterFactory0 = DefaultDateTypeAdapter.DEFAULT_STYLE_FACTORY;
+      TreeTypeAdapter<Integer> treeTypeAdapter0 = new TreeTypeAdapter<Integer>(jsonSerializer0, jsonDeserializer0, (Gson) null, typeToken0, typeAdapterFactory0, true);
+      TypeAdapterRuntimeTypeWrapper<Integer> typeAdapterRuntimeTypeWrapper0 = new TypeAdapterRuntimeTypeWrapper<Integer>((Gson) null, treeTypeAdapter0, class0);
+      PipedReader pipedReader0 = new PipedReader();
+      JsonReader jsonReader0 = new JsonReader(pipedReader0);
+      // Undeclared exception!
+      try { 
+        typeAdapterRuntimeTypeWrapper0.read(jsonReader0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // java.io.IOException: Pipe not connected
+         //
+         verifyException("com.google.gson.internal.Streams", e);
+      }
+  }
 
-        CharArrayWriter charArrayWriter = new CharArrayWriter();
-        MockPrintWriter mockPrintWriter = new MockPrintWriter(charArrayWriter, false);
-        JsonWriter jsonWriter = new JsonWriter(charArrayWriter);
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      JsonSerializer<Object> jsonSerializer0 = (JsonSerializer<Object>) mock(JsonSerializer.class, new ViolatedAssumptionAnswer());
+      JsonDeserializer<Object> jsonDeserializer0 = (JsonDeserializer<Object>) mock(JsonDeserializer.class, new ViolatedAssumptionAnswer());
+      Gson gson0 = new Gson();
+      Class<Object> class0 = Object.class;
+      Class<Integer> class1 = Integer.class;
+      TypeToken<Integer> typeToken0 = TypeToken.get(class1);
+      TypeAdapterFactory typeAdapterFactory0 = TreeTypeAdapter.newFactory(typeToken0, jsonSerializer0);
+      TypeToken<Object> typeToken1 = TypeToken.get(class0);
+      TreeTypeAdapter<Object> treeTypeAdapter0 = new TreeTypeAdapter<Object>((JsonSerializer<Object>) null, jsonDeserializer0, gson0, typeToken1, typeAdapterFactory0);
+      Class<Byte> class2 = Byte.TYPE;
+      TypeAdapterRuntimeTypeWrapper<Object> typeAdapterRuntimeTypeWrapper0 = new TypeAdapterRuntimeTypeWrapper<Object>(gson0, treeTypeAdapter0, class2);
+      CharArrayWriter charArrayWriter0 = new CharArrayWriter();
+      JsonWriter jsonWriter0 = new JsonWriter(charArrayWriter0);
+      // Undeclared exception!
+      try { 
+        typeAdapterRuntimeTypeWrapper0.write(jsonWriter0, treeTypeAdapter0);
+        fail("Expecting exception: UnsupportedOperationException");
+      
+      } catch(UnsupportedOperationException e) {
+         //
+         // Attempted to serialize java.lang.Class: java.lang.Integer. Forgot to register a type adapter?
+         // See https://github.com/google/gson/blob/main/Troubleshooting.md#java-lang-class-unsupported
+         //
+         verifyException("com.google.gson.internal.bind.TypeAdapters$1", e);
+      }
+  }
 
-        // Act & Assert: Expect UnsupportedOperationException when writing unsupported type
-        thrown.expect(UnsupportedOperationException.class);
-        adapterWrapper.write(jsonWriter, mockPrintWriter);
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      JsonSerializer<Object> jsonSerializer0 = (JsonSerializer<Object>) mock(JsonSerializer.class, new ViolatedAssumptionAnswer());
+      doReturn((JsonElement) null).when(jsonSerializer0).serialize(any() , any(java.lang.reflect.Type.class) , any(com.google.gson.JsonSerializationContext.class));
+      JsonDeserializer<Object> jsonDeserializer0 = (JsonDeserializer<Object>) mock(JsonDeserializer.class, new ViolatedAssumptionAnswer());
+      Gson gson0 = new Gson();
+      Class<Object> class0 = Object.class;
+      TypeToken<Object> typeToken0 = TypeToken.get(class0);
+      TypeAdapterFactory typeAdapterFactory0 = TreeTypeAdapter.newFactory(typeToken0, jsonSerializer0);
+      TreeTypeAdapter<Object> treeTypeAdapter0 = new TreeTypeAdapter<Object>(jsonSerializer0, jsonDeserializer0, gson0, typeToken0, typeAdapterFactory0);
+      Class<Short> class1 = Short.TYPE;
+      TypeAdapterRuntimeTypeWrapper<Object> typeAdapterRuntimeTypeWrapper0 = new TypeAdapterRuntimeTypeWrapper<Object>(gson0, treeTypeAdapter0, class1);
+      // Undeclared exception!
+      try { 
+        typeAdapterRuntimeTypeWrapper0.write((JsonWriter) null, gson0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.internal.bind.JsonElementTypeAdapter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void writeAfterNullValueThrowsIllegalState() throws Throwable {
-        // Arrange
-        Gson gson = new Gson();
-        Class<Object> declaredType = Object.class;
-        TypeAdapter<Object> objectAdapter = gson.getAdapter(declaredType);
-        TypeAdapterRuntimeTypeWrapper<Object> adapterWrapper = 
-            new TypeAdapterRuntimeTypeWrapper<>(gson, objectAdapter, declaredType);
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      JsonDeserializer<Object> jsonDeserializer0 = (JsonDeserializer<Object>) mock(JsonDeserializer.class, new ViolatedAssumptionAnswer());
+      Gson gson0 = new Gson();
+      Class<Short> class0 = Short.TYPE;
+      Class<Object> class1 = Object.class;
+      TypeToken<Object> typeToken0 = TypeToken.get(class1);
+      ToNumberPolicy toNumberPolicy0 = ToNumberPolicy.DOUBLE;
+      TypeAdapterFactory typeAdapterFactory0 = ObjectTypeAdapter.getFactory(toNumberPolicy0);
+      TreeTypeAdapter<Object> treeTypeAdapter0 = new TreeTypeAdapter<Object>((JsonSerializer<Object>) null, jsonDeserializer0, gson0, typeToken0, typeAdapterFactory0);
+      TypeAdapterRuntimeTypeWrapper<Object> typeAdapterRuntimeTypeWrapper0 = new TypeAdapterRuntimeTypeWrapper<Object>(gson0, treeTypeAdapter0, class0);
+      // Undeclared exception!
+      try { 
+        typeAdapterRuntimeTypeWrapper0.write((JsonWriter) null, typeToken0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.internal.bind.ReflectiveTypeAdapterFactory$Adapter", e);
+      }
+  }
 
-        StringWriter stringWriter = new StringWriter(2099);
-        MockPrintWriter mockPrintWriter = new MockPrintWriter(stringWriter);
-        JsonWriter jsonWriter = new JsonWriter(mockPrintWriter);
-        jsonWriter.nullValue(); // Puts writer in invalid state for next value
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      Gson gson0 = new Gson();
+      Class<Object> class0 = Object.class;
+      TypeAdapter<Object> typeAdapter0 = gson0.getAdapter(class0);
+      TypeAdapterRuntimeTypeWrapper<Object> typeAdapterRuntimeTypeWrapper0 = new TypeAdapterRuntimeTypeWrapper<Object>(gson0, typeAdapter0, class0);
+      // Undeclared exception!
+      try { 
+        typeAdapterRuntimeTypeWrapper0.write((JsonWriter) null, (Object) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.internal.bind.ObjectTypeAdapter", e);
+      }
+  }
 
-        // Act & Assert: Expect IllegalStateException due to multiple top-level values
-        thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("JSON must have only one top-level value.");
-        adapterWrapper.write(jsonWriter, stringWriter);
-    }
-
-    @Test(timeout = 4000)
-    public void writeToUnconnectedPipeThrowsIOException() throws Throwable {
-        // Arrange
-        Gson gson = new Gson();
-        Excluder excluder = new Excluder();
-        Class<Integer> declaredType = Integer.TYPE;
-        TypeToken<Integer> intToken = TypeToken.get(declaredType);
-        Class<Object> objectClass = Object.class;
-        TypeToken<Object> objectToken = TypeToken.get(objectClass);
-        TypeAdapter<Object> objectAdapter = gson.getDelegateAdapter(excluder, objectToken);
-        TypeAdapterRuntimeTypeWrapper<Object> adapterWrapper = 
-            new TypeAdapterRuntimeTypeWrapper<>(gson, objectAdapter, declaredType);
-
-        PipedWriter pipedWriter = new PipedWriter(); // Never connected
-        JsonWriter jsonWriter = new JsonWriter(pipedWriter);
-
-        // Act & Assert: Expect IOException due to unconnected pipe
-        thrown.expect(IOException.class);
-        thrown.expectMessage("Pipe not connected");
-        adapterWrapper.write(jsonWriter, intToken);
-    }
-
-    @Test(timeout = 4000)
-    public void readMalformedJsonThrowsIOException() throws Throwable {
-        // Arrange
-        Gson gson = new Gson();
-        String malformedJson = gson.toString(); // Not valid JSON
-        Class<Object> declaredType = Object.class;
-        TypeAdapter<Object> objectAdapter = gson.getAdapter(declaredType);
-        TypeAdapterRuntimeTypeWrapper<Object> adapterWrapper = 
-            new TypeAdapterRuntimeTypeWrapper<>(gson, objectAdapter, declaredType);
-
-        StringReader reader = new StringReader(malformedJson);
-        JsonReader jsonReader = gson.newJsonReader(reader);
-
-        // Act & Assert: Expect IOException for malformed JSON
-        thrown.expect(IOException.class);
-        thrown.expectMessage("malformed JSON");
-        adapterWrapper.read(jsonReader);
-    }
-
-    @Test(timeout = 4000)
-    public void readWithNullReaderThrowsNullPointer() throws Throwable {
-        // Arrange
-        Gson gson = new Gson();
-        Class<Object> declaredType = Object.class;
-        TypeAdapter<Object> objectAdapter = gson.getAdapter(declaredType);
-        TypeAdapterRuntimeTypeWrapper<Object> adapterWrapper = 
-            new TypeAdapterRuntimeTypeWrapper<>(gson, objectAdapter, declaredType);
-
-        // Act & Assert: Expect NullPointerException
-        thrown.expect(NullPointerException.class);
-        adapterWrapper.read(null);
-    }
-
-    @Test(timeout = 4000)
-    public void readWithDelegateAdapterAndEmptyInputThrowsEOF() throws Throwable {
-        // Arrange
-        JsonSerializer<Object> mockSerializer = mock(JsonSerializer.class, new ViolatedAssumptionAnswer());
-        Gson gson = new Gson();
-        Class<Object> declaredType = Object.class;
-        TypeToken<Object> objectToken = TypeToken.get(declaredType);
-        TypeAdapterFactory adapterFactory = TreeTypeAdapter.newFactoryWithMatchRawType(objectToken, mockSerializer);
-        TypeAdapter<Object> delegateAdapter = gson.getDelegateAdapter(adapterFactory, objectToken);
-        TypeAdapterRuntimeTypeWrapper<Object> adapterWrapper = 
-            new TypeAdapterRuntimeTypeWrapper<>(gson, delegateAdapter, declaredType);
-
-        StringReader reader = new StringReader("");
-        JsonReader jsonReader = gson.newJsonReader(reader);
-
-        // Act & Assert: Expect EOFException
-        thrown.expect(EOFException.class);
-        thrown.expectMessage("End of input");
-        adapterWrapper.read(jsonReader);
-    }
-
-    @Test(timeout = 4000)
-    public void readFromUnconnectedPipedReaderThrowsRuntimeException() throws Throwable {
-        // Arrange
-        JsonSerializer<Integer> mockSerializer = mock(JsonSerializer.class, new ViolatedAssumptionAnswer());
-        JsonDeserializer<Integer> mockDeserializer = mock(JsonDeserializer.class, new ViolatedAssumptionAnswer());
-        Class<Integer> declaredType = Integer.class;
-        TypeToken<Integer> intToken = TypeToken.get(declaredType);
-        TypeAdapterFactory adapterFactory = DefaultDateTypeAdapter.DEFAULT_STYLE_FACTORY;
-        TreeTypeAdapter<Integer> treeAdapter = new TreeTypeAdapter<>(
-            mockSerializer, mockDeserializer, null, intToken, adapterFactory, true
-        );
-        TypeAdapterRuntimeTypeWrapper<Integer> adapterWrapper = 
-            new TypeAdapterRuntimeTypeWrapper<>(null, treeAdapter, declaredType);
-
-        PipedReader pipedReader = new PipedReader(); // Never connected
-        JsonReader jsonReader = new JsonReader(pipedReader);
-
-        // Act & Assert: Expect RuntimeException wrapping IOException
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage("Pipe not connected");
-        adapterWrapper.read(jsonReader);
-    }
-
-    @Test(timeout = 4000)
-    public void writeClassTypeThrowsUnsupportedOperation() throws Throwable {
-        // Arrange
-        JsonSerializer<Object> mockSerializer = mock(JsonSerializer.class, new ViolatedAssumptionAnswer());
-        JsonDeserializer<Object> mockDeserializer = mock(JsonDeserializer.class, new ViolatedAssumptionAnswer());
-        Gson gson = new Gson();
-        Class<Object> objectClass = Object.class;
-        Class<Integer> intClass = Integer.class;
-        TypeToken<Integer> intToken = TypeToken.get(intClass);
-        TypeAdapterFactory adapterFactory = TreeTypeAdapter.newFactory(intToken, mockSerializer);
-        TypeToken<Object> objectToken = TypeToken.get(objectClass);
-        TreeTypeAdapter<Object> treeAdapter = new TreeTypeAdapter<>(null, mockDeserializer, gson, objectToken, adapterFactory);
-        
-        Class<Byte> declaredType = Byte.TYPE;
-        TypeAdapterRuntimeTypeWrapper<Object> adapterWrapper = 
-            new TypeAdapterRuntimeTypeWrapper<>(gson, treeAdapter, declaredType);
-
-        CharArrayWriter charArrayWriter = new CharArrayWriter();
-        JsonWriter jsonWriter = new JsonWriter(charArrayWriter);
-
-        // Act & Assert: Expect UnsupportedOperationException when writing Class
-        thrown.expect(UnsupportedOperationException.class);
-        thrown.expectMessage("forgot to register a type adapter");
-        adapterWrapper.write(jsonWriter, treeAdapter);
-    }
-
-    @Test(timeout = 4000)
-    public void writeWithNullWriterThrowsNullPointer() throws Throwable {
-        // Arrange
-        JsonSerializer<Object> mockSerializer = mock(JsonSerializer.class, new ViolatedAssumptionAnswer());
-        doReturn(null).when(mockSerializer).serialize(any(), any(), any());
-        JsonDeserializer<Object> mockDeserializer = mock(JsonDeserializer.class, new ViolatedAssumptionAnswer());
-        Gson gson = new Gson();
-        Class<Object> objectClass = Object.class;
-        TypeToken<Object> objectToken = TypeToken.get(objectClass);
-        TypeAdapterFactory adapterFactory = TreeTypeAdapter.newFactory(objectToken, mockSerializer);
-        TreeTypeAdapter<Object> treeAdapter = new TreeTypeAdapter<>(mockSerializer, mockDeserializer, gson, objectToken, adapterFactory);
-        
-        Class<Short> declaredType = Short.TYPE;
-        TypeAdapterRuntimeTypeWrapper<Object> adapterWrapper = 
-            new TypeAdapterRuntimeTypeWrapper<>(gson, treeAdapter, declaredType);
-
-        // Act & Assert: Expect NullPointerException
-        thrown.expect(NullPointerException.class);
-        adapterWrapper.write(null, gson);
-    }
-
-    @Test(timeout = 4000)
-    public void writeNullValueThrowsNullPointer() throws Throwable {
-        // Arrange
-        JsonDeserializer<Object> mockDeserializer = mock(JsonDeserializer.class, new ViolatedAssumptionAnswer());
-        Gson gson = new Gson();
-        Class<Short> declaredType = Short.TYPE;
-        Class<Object> objectClass = Object.class;
-        TypeToken<Object> objectToken = TypeToken.get(objectClass);
-        ToNumberPolicy numberPolicy = ToNumberPolicy.DOUBLE;
-        TypeAdapterFactory adapterFactory = ObjectTypeAdapter.getFactory(numberPolicy);
-        TreeTypeAdapter<Object> treeAdapter = new TreeTypeAdapter<>(null, mockDeserializer, gson, objectToken, adapterFactory);
-        TypeAdapterRuntimeTypeWrapper<Object> adapterWrapper = 
-            new TypeAdapterRuntimeTypeWrapper<>(gson, treeAdapter, declaredType);
-
-        // Act & Assert: Expect NullPointerException
-        thrown.expect(NullPointerException.class);
-        adapterWrapper.write(null, objectToken);
-    }
-
-    @Test(timeout = 4000)
-    public void writeNullValueWithNullWriterThrowsNullPointer() throws Throwable {
-        // Arrange
-        Gson gson = new Gson();
-        Class<Object> declaredType = Object.class;
-        TypeAdapter<Object> objectAdapter = gson.getAdapter(declaredType);
-        TypeAdapterRuntimeTypeWrapper<Object> adapterWrapper = 
-            new TypeAdapterRuntimeTypeWrapper<>(gson, objectAdapter, declaredType);
-
-        // Act & Assert: Expect NullPointerException
-        thrown.expect(NullPointerException.class);
-        adapterWrapper.write(null, null);
-    }
-
-    @Test(timeout = 4000)
-    public void readFromPipedReaderThrowsIOException() throws Throwable {
-        // Arrange
-        Gson gson = new Gson();
-        Class<Object> declaredType = Object.class;
-        TypeAdapter<Object> objectAdapter = gson.getAdapter(declaredType);
-        TypeAdapterRuntimeTypeWrapper<Object> adapterWrapper = 
-            new TypeAdapterRuntimeTypeWrapper<>(gson, objectAdapter, declaredType);
-
-        PipedReader pipedReader = new PipedReader(); // Never connected
-        JsonReader jsonReader = gson.newJsonReader(pipedReader);
-
-        // Act & Assert: Expect IOException due to unconnected pipe
-        thrown.expect(IOException.class);
-        thrown.expectMessage("Pipe not connected");
-        adapterWrapper.read(jsonReader);
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      Gson gson0 = new Gson();
+      Class<Object> class0 = Object.class;
+      TypeAdapter<Object> typeAdapter0 = gson0.getAdapter(class0);
+      TypeAdapterRuntimeTypeWrapper<Object> typeAdapterRuntimeTypeWrapper0 = new TypeAdapterRuntimeTypeWrapper<Object>(gson0, typeAdapter0, class0);
+      PipedReader pipedReader0 = new PipedReader();
+      JsonReader jsonReader0 = gson0.newJsonReader(pipedReader0);
+      try { 
+        typeAdapterRuntimeTypeWrapper0.read(jsonReader0);
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // Pipe not connected
+         //
+         verifyException("java.io.PipedReader", e);
+      }
+  }
 }
