@@ -25,185 +25,222 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class MeterInterval_ESTest extends MeterInterval_ESTest_scaffolding {
 
-    // Constructor Tests
-    @Test(timeout = 4000)
-    public void constructorShouldRejectNullRange() {
-        try {
-            new MeterInterval("Valid label", null);
-            fail("Expected IllegalArgumentException for null range");
-        } catch(IllegalArgumentException e) {
-            assertEquals("Null 'range' argument.", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      DefaultBoxAndWhiskerCategoryDataset<HistogramType, HistogramType> defaultBoxAndWhiskerCategoryDataset0 = new DefaultBoxAndWhiskerCategoryDataset<HistogramType, HistogramType>();
+      Range range0 = defaultBoxAndWhiskerCategoryDataset0.getRangeBounds(false);
+      MeterInterval meterInterval0 = new MeterInterval("Px$=FZ)/l);", range0);
+      Range range1 = meterInterval0.getRange();
+      assertEquals(Double.NaN, range1.getUpperBound(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void constructorShouldRejectNullRangeInFullConstructor() {
-        try {
-            new MeterInterval("Valid label", null, Color.RED, new BasicStroke(), Color.BLUE);
-            fail("Expected IllegalArgumentException for null range");
-        } catch(IllegalArgumentException e) {
-            assertEquals("Null 'range' argument.", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      Range range0 = new Range((-3041.91489), (-3041.91489));
+      Range range1 = Range.shift(range0, 3388.0, true);
+      MeterInterval meterInterval0 = new MeterInterval("", range1);
+      Range range2 = meterInterval0.getRange();
+      assertNotSame(range2, range0);
+  }
 
-    // getRange() Tests
-    @Test(timeout = 4000)
-    public void getRangeShouldReturnOriginalRange() {
-        Range range = new Range(-10.0, 10.0);
-        MeterInterval interval = new MeterInterval("Test", range);
-        assertSame(range, interval.getRange());
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      Range range0 = new Range(0.0, 0.0);
+      MeterInterval meterInterval0 = new MeterInterval("|U<d(gc1", range0);
+      Range range1 = meterInterval0.getRange();
+      assertEquals(0.0, range1.getLowerBound(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void getRangeShouldHandleNaNBounds() {
-        DefaultBoxAndWhiskerCategoryDataset dataset = new DefaultBoxAndWhiskerCategoryDataset<>();
-        Range range = dataset.getRangeBounds(false);
-        MeterInterval interval = new MeterInterval("NaN Range", range);
-        assertTrue(Double.isNaN(interval.getRange().getUpperBound()));
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      Range range0 = new Range((-3041.91489), (-3041.91489));
+      Range range1 = Range.expandToInclude(range0, 3388.0);
+      MeterInterval meterInterval0 = new MeterInterval("", range1);
+      Range range2 = meterInterval0.getRange();
+      assertNotSame(range2, range0);
+  }
 
-    @Test(timeout = 4000)
-    public void getRangeShouldReturnModifiedRange() {
-        Range original = new Range(-100.0, -50.0);
-        Range modified = Range.shift(original, 200.0, true);
-        MeterInterval interval = new MeterInterval("Shifted", modified);
-        assertNotSame(original, interval.getRange());
-        assertEquals(100.0, interval.getRange().getLowerBound(), 0.001);
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      Range range0 = new Range((-229.41607020985958), (-229.41607020985958));
+      Color color0 = Color.gray;
+      MeterInterval meterInterval0 = new MeterInterval(",", range0, color0, (Stroke) null, color0);
+      Stroke stroke0 = meterInterval0.getOutlineStroke();
+      assertNull(stroke0);
+  }
 
-    @Test(timeout = 4000)
-    public void getRangeShouldHandleExpandedRange() {
-        Range original = new Range(-100.0, -50.0);
-        Range expanded = Range.expandToInclude(original, 100.0);
-        MeterInterval interval = new MeterInterval("Expanded", expanded);
-        assertNotSame(original, interval.getRange());
-        assertEquals(100.0, interval.getRange().getUpperBound(), 0.001);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      Range range0 = Range.expandToInclude((Range) null, (-229.311906958652));
+      BasicStroke basicStroke0 = new BasicStroke();
+      MeterInterval meterInterval0 = new MeterInterval("", range0, (Paint) null, basicStroke0, (Paint) null);
+      Paint paint0 = meterInterval0.getOutlinePaint();
+      assertNull(paint0);
+  }
 
-    @Test(timeout = 4000)
-    public void getRangeShouldPreserveZeroBounds() {
-        Range range = new Range(0.0, 0.0);
-        MeterInterval interval = new MeterInterval("Zero", range);
-        assertEquals(0.0, interval.getRange().getLowerBound(), 0.001);
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      Range range0 = Range.expandToInclude((Range) null, (-229.311906958652));
+      MeterInterval meterInterval0 = new MeterInterval("", range0);
+      String string0 = meterInterval0.getLabel();
+      assertEquals("", string0);
+  }
 
-    // getLabel() Tests
-    @Test(timeout = 4000)
-    public void getLabelShouldReturnConstructorValue() {
-        MeterInterval interval = new MeterInterval("Test Label", new Range(0, 100));
-        assertEquals("Test Label", interval.getLabel());
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      DefaultBoxAndWhiskerCategoryDataset<HistogramType, HistogramType> defaultBoxAndWhiskerCategoryDataset0 = new DefaultBoxAndWhiskerCategoryDataset<HistogramType, HistogramType>();
+      Range range0 = defaultBoxAndWhiskerCategoryDataset0.getRangeBounds(true);
+      Color color0 = Color.darkGray;
+      BasicStroke basicStroke0 = new BasicStroke(0.0F);
+      MeterInterval meterInterval0 = new MeterInterval("L5-", range0, color0, basicStroke0, color0);
+      Color color1 = (Color)meterInterval0.getBackgroundPaint();
+      assertEquals(64, color1.getBlue());
+  }
 
-    @Test(timeout = 4000)
-    public void getLabelShouldHandleEmptyString() {
-        MeterInterval interval = new MeterInterval("", new Range(0, 100));
-        assertEquals("", interval.getLabel());
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      SystemColor systemColor0 = SystemColor.controlHighlight;
+      BasicStroke basicStroke0 = new BasicStroke();
+      MeterInterval meterInterval0 = null;
+      try {
+        meterInterval0 = new MeterInterval("org.jfree.chart.plot.MeterInterval", (Range) null, systemColor0, basicStroke0, systemColor0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Null 'range' argument.
+         //
+         verifyException("org.jfree.chart.internal.Args", e);
+      }
+  }
 
-    // getBackgroundPaint() Tests
-    @Test(timeout = 4000)
-    public void getBackgroundPaintShouldReturnNullByDefault() {
-        MeterInterval interval = new MeterInterval("Test", new Range(0, 100));
-        assertNull(interval.getBackgroundPaint());
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      MeterInterval meterInterval0 = null;
+      try {
+        meterInterval0 = new MeterInterval("9+XJTk=~|", (Range) null);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Null 'range' argument.
+         //
+         verifyException("org.jfree.chart.internal.Args", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void getBackgroundPaintShouldReturnConstructorValue() {
-        Color bgColor = Color.GREEN;
-        MeterInterval interval = new MeterInterval("Test", new Range(0, 100), 
-                Color.RED, new BasicStroke(), bgColor);
-        assertEquals(bgColor, interval.getBackgroundPaint());
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      Range range0 = new Range((-808.678), (-808.678));
+      SystemColor systemColor0 = SystemColor.infoText;
+      GradientPaint gradientPaint0 = new GradientPaint(657.688F, 657.688F, systemColor0, (-89.9F), (-89.9F), systemColor0, false);
+      BasicStroke basicStroke0 = new BasicStroke();
+      MeterInterval meterInterval0 = new MeterInterval("k", range0, gradientPaint0, basicStroke0, systemColor0);
+      MeterInterval meterInterval1 = new MeterInterval("k", range0, gradientPaint0, basicStroke0, gradientPaint0);
+      boolean boolean0 = meterInterval0.equals(meterInterval1);
+      assertFalse(boolean0);
+  }
 
-    // getOutlinePaint() Tests
-    @Test(timeout = 4000)
-    public void getOutlinePaintShouldReturnNullWhenNotSet() {
-        MeterInterval interval = new MeterInterval("Test", new Range(0, 100), 
-                null, new BasicStroke(), Color.BLUE);
-        assertNull(interval.getOutlinePaint());
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      Range range0 = new Range((-229.41607020985958), (-229.41607020985958));
+      BasicStroke basicStroke0 = new BasicStroke();
+      MeterInterval meterInterval0 = new MeterInterval("d|V&g", range0);
+      MeterInterval meterInterval1 = new MeterInterval("U`/UA", range0);
+      Paint paint0 = meterInterval0.getOutlinePaint();
+      assertNotNull(paint0);
+      
+      MeterInterval meterInterval2 = new MeterInterval("U`/UA", range0, paint0, basicStroke0, paint0);
+      boolean boolean0 = meterInterval1.equals(meterInterval2);
+      assertFalse(meterInterval1.equals((Object)meterInterval0));
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void getOutlinePaintShouldReturnConstructorValue() {
-        Color outline = Color.BLUE;
-        MeterInterval interval = new MeterInterval("Test", new Range(0, 100), 
-                outline, new BasicStroke(), Color.GREEN);
-        assertEquals(outline, interval.getOutlinePaint());
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      Range range0 = new Range((-229.41607020985958), (-229.41607020985958));
+      MeterInterval meterInterval0 = new MeterInterval(",", range0);
+      Color color0 = Color.gray;
+      MeterInterval meterInterval1 = new MeterInterval(",", range0, color0, (Stroke) null, color0);
+      boolean boolean0 = meterInterval0.equals(meterInterval1);
+      assertFalse(boolean0);
+  }
 
-    // getOutlineStroke() Tests
-    @Test(timeout = 4000)
-    public void getOutlineStrokeShouldReturnNullWhenNotSet() {
-        MeterInterval interval = new MeterInterval("Test", new Range(0, 100), 
-                Color.RED, null, Color.BLUE);
-        assertNull(interval.getOutlineStroke());
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      Range range0 = new Range(Double.NaN, Double.NaN);
+      MeterInterval meterInterval0 = new MeterInterval("", range0);
+      MeterInterval meterInterval1 = new MeterInterval("", range0);
+      boolean boolean0 = meterInterval0.equals(meterInterval1);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void getOutlineStrokeShouldReturnDefaultStroke() {
-        MeterInterval interval = new MeterInterval("Test", new Range(0, 100));
-        BasicStroke stroke = (BasicStroke) interval.getOutlineStroke();
-        assertEquals(2.0f, stroke.getLineWidth(), 0.001f);
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      Range range0 = new Range((-229.41607020985958), (-229.41607020985958));
+      MeterInterval meterInterval0 = new MeterInterval("d|V&g", range0);
+      MeterInterval meterInterval1 = new MeterInterval("U`/UA", range0);
+      boolean boolean0 = meterInterval1.equals(meterInterval0);
+      assertFalse(boolean0);
+  }
 
-    // equals() Tests
-    @Test(timeout = 4000)
-    public void equalsShouldReturnTrueForSameInstance() {
-        MeterInterval interval = new MeterInterval("Test", new Range(0, 100));
-        assertTrue(interval.equals(interval));
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      Range range0 = new Range((-229.41607020985958), (-229.41607020985958));
+      MeterInterval meterInterval0 = new MeterInterval("d|V&g", range0);
+      MeterInterval meterInterval1 = new MeterInterval("d|V&g", range0);
+      boolean boolean0 = meterInterval0.equals(meterInterval1);
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void equalsShouldReturnFalseForDifferentClass() {
-        MeterInterval interval = new MeterInterval("Test", new Range(0, 100));
-        assertFalse(interval.equals("Not a MeterInterval"));
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      Range range0 = new Range((-229.41607020985958), (-229.41607020985958));
+      MeterInterval meterInterval0 = new MeterInterval(",", range0);
+      boolean boolean0 = meterInterval0.equals(meterInterval0);
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void equalsShouldReturnFalseForDifferentLabels() {
-        Range range = new Range(0, 100);
-        MeterInterval i1 = new MeterInterval("Label1", range);
-        MeterInterval i2 = new MeterInterval("Label2", range);
-        assertFalse(i1.equals(i2));
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      Range range0 = new Range((-229.41607020985958), (-229.41607020985958));
+      MeterInterval meterInterval0 = new MeterInterval("d|V&g", range0);
+      boolean boolean0 = meterInterval0.equals("d|V&g");
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void equalsShouldReturnFalseForDifferentRanges() {
-        MeterInterval i1 = new MeterInterval("Same", new Range(0, 100));
-        MeterInterval i2 = new MeterInterval("Same", new Range(0, 200));
-        assertFalse(i1.equals(i2));
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      Range range0 = new Range((-229.41607020985958), (-229.41607020985958));
+      MeterInterval meterInterval0 = new MeterInterval(",", range0);
+      BasicStroke basicStroke0 = (BasicStroke)meterInterval0.getOutlineStroke();
+      assertEquals(0, basicStroke0.getLineJoin());
+  }
 
-    @Test(timeout = 4000)
-    public void equalsShouldHandleNaNInRanges() {
-        // Two NaN ranges aren't equal due to how Range.equals() handles Double.NaN
-        Range nanRange = new Range(Double.NaN, Double.NaN);
-        MeterInterval i1 = new MeterInterval("Same", nanRange);
-        MeterInterval i2 = new MeterInterval("Same", nanRange);
-        assertFalse(i1.equals(i2));
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      Range range0 = Range.expandToInclude((Range) null, (-229.311906958652));
+      MeterInterval meterInterval0 = new MeterInterval("", range0);
+      Range range1 = meterInterval0.getRange();
+      assertSame(range1, range0);
+  }
 
-    @Test(timeout = 4000)
-    public void equalsShouldReturnFalseForDifferentOutlinePaints() {
-        Range range = new Range(0, 100);
-        MeterInterval i1 = new MeterInterval("Same", range, Color.RED, new BasicStroke(), null);
-        MeterInterval i2 = new MeterInterval("Same", range, Color.BLUE, new BasicStroke(), null);
-        assertFalse(i1.equals(i2));
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      Range range0 = new Range((-229.41607020985958), (-229.41607020985958));
+      MeterInterval meterInterval0 = new MeterInterval("d|V&g", range0);
+      Paint paint0 = meterInterval0.getBackgroundPaint();
+      assertNull(paint0);
+  }
 
-    @Test(timeout = 4000)
-    public void equalsShouldReturnFalseForDifferentBackgroundPaints() {
-        Range range = new Range(0, 100);
-        MeterInterval i1 = new MeterInterval("Same", range, Color.RED, new BasicStroke(), Color.GREEN);
-        MeterInterval i2 = new MeterInterval("Same", range, Color.RED, new BasicStroke(), Color.BLUE);
-        assertFalse(i1.equals(i2));
-    }
-
-    @Test(timeout = 4000)
-    public void equalsShouldReturnTrueForSameProperties() {
-        Range range = new Range(0, 100);
-        MeterInterval i1 = new MeterInterval("Same", range, Color.RED, new BasicStroke(), Color.GREEN);
-        MeterInterval i2 = new MeterInterval("Same", range, Color.RED, new BasicStroke(), Color.GREEN);
-        assertTrue(i1.equals(i2));
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      Range range0 = new Range((-808.678), (-808.678));
+      SystemColor systemColor0 = SystemColor.infoText;
+      GradientPaint gradientPaint0 = new GradientPaint(657.688F, 657.688F, systemColor0, (-89.9F), (-89.9F), systemColor0, false);
+      BasicStroke basicStroke0 = new BasicStroke();
+      MeterInterval meterInterval0 = new MeterInterval("k", range0, gradientPaint0, basicStroke0, systemColor0);
+      String string0 = meterInterval0.getLabel();
+      assertEquals("k", string0);
+  }
 }
