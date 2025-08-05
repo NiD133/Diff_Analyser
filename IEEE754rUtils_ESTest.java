@@ -35,7 +35,250 @@ public class IEEE754rUtils_ESTest extends IEEE754rUtils_ESTest_scaffolding {
       assertEquals(1.0F, float0, 0.01F);
   }
 
-  // ... and 42 more similar, hard-to-read tests ...
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      float[] floatArray0 = new float[1];
+      floatArray0[0] = (-1.0F);
+      float float0 = IEEE754rUtils.min(floatArray0);
+      assertEquals((-1.0F), float0, 0.01F);
+  }
+
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      double[] doubleArray0 = new double[1];
+      doubleArray0[0] = (double) 1.0F;
+      double double0 = IEEE754rUtils.min(doubleArray0);
+      assertEquals(1.0, double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      double[] doubleArray0 = new double[8];
+      doubleArray0[1] = (-567.84087);
+      double double0 = IEEE754rUtils.min(doubleArray0);
+      assertEquals((-567.84087), double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      float float0 = IEEE754rUtils.min(4616.2134F, 4616.2134F, 4616.2134F);
+      assertEquals(4616.2134F, float0, 0.01F);
+  }
+
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      float float0 = IEEE754rUtils.min(0.0F, 0.0F);
+      assertEquals(0.0F, float0, 0.01F);
+  }
+
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      float float0 = IEEE754rUtils.min((-513.9F), (-513.9F));
+      assertEquals((-513.9F), float0, 0.01F);
+  }
+
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      double double0 = IEEE754rUtils.min(1.0, 1.0, 1.0);
+      assertEquals(1.0, double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      double double0 = IEEE754rUtils.min(1660.66, (-567.84087), 4173.8887585);
+      assertEquals((-567.84087), double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      double double0 = IEEE754rUtils.min(2855.35762973, 2855.35762973);
+      assertEquals(2855.35762973, double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      double double0 = IEEE754rUtils.min((-855.02919), 0.0);
+      assertEquals((-855.02919), double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      float[] floatArray0 = new float[9];
+      floatArray0[2] = 981.74023F;
+      float float0 = IEEE754rUtils.max(floatArray0);
+      assertEquals(981.74023F, float0, 0.01F);
+  }
+
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      float[] floatArray0 = new float[3];
+      floatArray0[0] = (-835.94F);
+      floatArray0[1] = (-1742.84F);
+      floatArray0[2] = (-1.0F);
+      float float0 = IEEE754rUtils.max(floatArray0);
+      assertEquals((-1.0F), float0, 0.01F);
+  }
+
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      double[] doubleArray0 = new double[4];
+      doubleArray0[1] = 1769.7924036104557;
+      double double0 = IEEE754rUtils.max(doubleArray0);
+      assertEquals(1769.7924036104557, double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      double[] doubleArray0 = new double[7];
+      doubleArray0[0] = (double) (-1742.84F);
+      doubleArray0[1] = (-163.0);
+      doubleArray0[2] = (double) (-835.94F);
+      doubleArray0[3] = (double) (-1.0F);
+      doubleArray0[4] = (double) (-835.94F);
+      doubleArray0[5] = (double) (-1742.84F);
+      doubleArray0[6] = (double) (-1.0F);
+      double double0 = IEEE754rUtils.max(doubleArray0);
+      assertEquals((-1.0), double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      float float0 = IEEE754rUtils.max((-1.0F), 0.0F, (-2806.0F));
+      assertEquals(0.0F, float0, 0.01F);
+  }
+
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      float float0 = IEEE754rUtils.max((-659.8F), (-659.8F), (-659.8F));
+      assertEquals((-659.8F), float0, 0.01F);
+  }
+
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      float float0 = IEEE754rUtils.max(1.0F, 1190.8F);
+      assertEquals(1190.8F, float0, 0.01F);
+  }
+
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      float float0 = IEEE754rUtils.max((-2157.9656F), (-2157.9656F));
+      assertEquals((-2157.9656F), float0, 0.01F);
+  }
+
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      double double0 = IEEE754rUtils.max(0.0, (-1416.7961547236), 0.0);
+      assertEquals(0.0, double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      double double0 = IEEE754rUtils.max(1.0, 1.0, 1.0);
+      assertEquals(1.0, double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      double double0 = IEEE754rUtils.max((-4398.39854599338), 564.128287262);
+      assertEquals(564.128287262, double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      double double0 = IEEE754rUtils.max((-3055.536570341673), (double) (-1.0F));
+      assertEquals((-1.0), double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        IEEE754rUtils.min((float[]) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // array
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        IEEE754rUtils.min((double[]) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // array
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        IEEE754rUtils.max((float[]) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // array
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        IEEE754rUtils.max((double[]) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // array
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      float float0 = IEEE754rUtils.min(4616.2134F, 4616.2134F);
+      assertEquals(4616.2134F, float0, 0.01F);
+  }
+
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      double double0 = IEEE754rUtils.min(0.0, 1460.933541);
+      assertEquals(0.0, double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      float float0 = IEEE754rUtils.max(0.0F, 0.0F);
+      assertEquals(0.0F, float0, 0.01F);
+  }
+
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      double double0 = IEEE754rUtils.max((double) 0.0F, (double) 0.0F);
+      assertEquals(0.0, double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test32()  throws Throwable  {
+      float[] floatArray0 = new float[2];
+      float float0 = IEEE754rUtils.min(floatArray0);
+      assertEquals(0.0F, float0, 0.01F);
+  }
 
   @Test(timeout = 4000)
   public void test33()  throws Throwable  {
@@ -52,7 +295,100 @@ public class IEEE754rUtils_ESTest extends IEEE754rUtils_ESTest_scaffolding {
          verifyException("org.apache.commons.lang3.Validate", e);
       }
   }
-  
+
+  @Test(timeout = 4000)
+  public void test34()  throws Throwable  {
+      double[] doubleArray0 = new double[4];
+      double double0 = IEEE754rUtils.min(doubleArray0);
+      assertEquals(0.0, double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test35()  throws Throwable  {
+      double[] doubleArray0 = new double[0];
+      // Undeclared exception!
+      try { 
+        IEEE754rUtils.min(doubleArray0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Array cannot be empty.
+         //
+         verifyException("org.apache.commons.lang3.Validate", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test36()  throws Throwable  {
+      float[] floatArray0 = new float[3];
+      float float0 = IEEE754rUtils.max(floatArray0);
+      assertEquals(0.0F, float0, 0.01F);
+  }
+
+  @Test(timeout = 4000)
+  public void test37()  throws Throwable  {
+      float[] floatArray0 = new float[0];
+      // Undeclared exception!
+      try { 
+        IEEE754rUtils.max(floatArray0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Array cannot be empty.
+         //
+         verifyException("org.apache.commons.lang3.Validate", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test38()  throws Throwable  {
+      double[] doubleArray0 = new double[4];
+      double double0 = IEEE754rUtils.max(doubleArray0);
+      assertEquals(0.0, double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test39()  throws Throwable  {
+      double[] doubleArray0 = new double[0];
+      // Undeclared exception!
+      try { 
+        IEEE754rUtils.max(doubleArray0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Array cannot be empty.
+         //
+         verifyException("org.apache.commons.lang3.Validate", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test40()  throws Throwable  {
+      float float0 = IEEE754rUtils.min(0.0F, 0.0F, 0.0F);
+      assertEquals(0.0F, float0, 0.01F);
+  }
+
+  @Test(timeout = 4000)
+  public void test41()  throws Throwable  {
+      double double0 = IEEE754rUtils.min(976.5, 0.0, 0.0);
+      assertEquals(0.0, double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test42()  throws Throwable  {
+      double double0 = IEEE754rUtils.max((-1.0), (-1.0), (-4660.4));
+      assertEquals((-1.0), double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test43()  throws Throwable  {
+      float float0 = IEEE754rUtils.max(2162.2F, 0.0F, 2780.809F);
+      assertEquals(2780.809F, float0, 0.01F);
+  }
+
   @Test(timeout = 4000)
   public void test44()  throws Throwable  {
       IEEE754rUtils iEEE754rUtils0 = new IEEE754rUtils();
