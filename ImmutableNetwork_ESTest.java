@@ -19,160 +19,131 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class)
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true,
-    useVFS = true,
-    useVNET = true,
-    resetStaticState = true,
-    separateClassLoader = true
-)
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class ImmutableNetwork_ESTest extends ImmutableNetwork_ESTest_scaffolding {
 
-    // ========================= Builder Pattern Tests =========================
-    
-    @Test(timeout = 4000)
-    public void builderAddEdge_returnsNonNullBuilder() throws Throwable {
-        // Test that adding an edge returns a non-null builder instance
-        NetworkBuilder<Object, Object> baseBuilder = NetworkBuilder.directed();
-        StandardNetwork<Integer, Integer> baseNetwork = new StandardNetwork<>(baseBuilder);
-        NetworkBuilder<Integer, Integer> networkBuilder = NetworkBuilder.from(baseNetwork);
-        
-        ImmutableNetwork.Builder<Integer, Integer> builder = new ImmutableNetwork.Builder<>(networkBuilder);
-        Integer node1 = 1029;
-        Integer node2 = 1;
-        Integer edge = 1;
-        
-        ImmutableNetwork.Builder<Integer, Integer> resultBuilder = builder.addEdge(node1, node2, edge);
-        assertNotNull("Builder should be non-null after adding edge", resultBuilder);
-    }
+  @Test(timeout = 4000)
+  public void test0()  throws Throwable  {
+      NetworkBuilder<Object, Object> networkBuilder0 = NetworkBuilder.directed();
+      StandardNetwork<Integer, Integer> standardNetwork0 = new StandardNetwork<Integer, Integer>(networkBuilder0);
+      NetworkBuilder<Integer, Integer> networkBuilder1 = NetworkBuilder.from((Network<Integer, Integer>) standardNetwork0);
+      ImmutableNetwork.Builder<Integer, Integer> immutableNetwork_Builder0 = new ImmutableNetwork.Builder<Integer, Integer>(networkBuilder1);
+      Integer integer0 = new Integer(1029);
+      Integer integer1 = new Integer(1);
+      ImmutableNetwork.Builder<Integer, Integer> immutableNetwork_Builder1 = immutableNetwork_Builder0.addEdge(integer0, integer1, integer1);
+      assertNotNull(immutableNetwork_Builder1);
+  }
 
-    @Test(timeout = 4000)
-    public void builderAddNodeToUndirectedNetwork_createsNewNetworkInstance() throws Throwable {
-        // Test that adding a node creates a new network instance
-        NetworkBuilder<Object, Object> baseBuilder = NetworkBuilder.undirected();
-        StandardNetwork<Integer, Comparable<Integer>> baseNetwork = new StandardNetwork<>(baseBuilder);
-        NetworkBuilder<Integer, Comparable<Integer>> networkBuilder = NetworkBuilder.from(baseNetwork);
-        
-        networkBuilder.allowsParallelEdges(true);
-        StandardNetwork<Integer, Integer> network = new StandardNetwork<>(networkBuilder);
-        ImmutableNetwork<Integer, Integer> original = ImmutableNetwork.copyOf(network);
-        
-        NetworkBuilder<Integer, Integer> newBuilder = NetworkBuilder.from(original);
-        ImmutableNetwork.Builder<Integer, Integer> builder = newBuilder.immutable();
-        Integer node = 949;
-        
-        builder.addNode(node);
-        ImmutableNetwork<Integer, Integer> newNetwork = builder.build();
-        assertNotSame("New network should be different instance", original, newNetwork);
-    }
+  @Test(timeout = 4000)
+  public void test1()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        ImmutableNetwork.copyOf((Network<Integer, Integer>) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.graph.NetworkBuilder", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void builderAddNodeToDirectedNetwork_createsNewNetworkInstance() throws Throwable {
-        // Test that adding a node creates a new network instance
-        NetworkBuilder<Object, Object> baseBuilder = NetworkBuilder.directed();
-        baseBuilder.allowsParallelEdges(true);
-        StandardNetwork<Integer, Integer> baseNetwork = new StandardNetwork<>(baseBuilder);
-        ImmutableNetwork<Integer, Integer> original = ImmutableNetwork.copyOf(baseNetwork);
-        
-        NetworkBuilder<Integer, Integer> networkBuilder = NetworkBuilder.from(original);
-        ImmutableNetwork.Builder<Integer, Integer> builder = networkBuilder.immutable();
-        Integer node = -967;
-        
-        builder.addNode(node);
-        ImmutableNetwork<Integer, Integer> newNetwork = builder.build();
-        assertNotSame("New network should be different instance", original, newNetwork);
-    }
+  @Test(timeout = 4000)
+  public void test2()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        ImmutableNetwork.copyOf((ImmutableNetwork<Object, Integer>) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.base.Preconditions", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void builderAddEdgeWithEndpointPair_buildsSuccessfully() throws Throwable {
-        // Test that adding an edge via EndpointPair builds successfully
-        NetworkBuilder<Object, Object> baseBuilder = NetworkBuilder.undirected();
-        StandardMutableNetwork<Integer, Integer> network = new StandardMutableNetwork<>(baseBuilder);
-        NetworkBuilder<Integer, Integer> networkBuilder = NetworkBuilder.from(network);
-        
-        ImmutableNetwork.Builder<Integer, Integer> builder = networkBuilder.immutable();
-        Integer node1 = -1124;
-        Integer node2 = -405;
-        EndpointPair<Integer> endpoints = EndpointPair.unordered(node1, node2);
-        Integer edge = -1124;
-        
-        builder.addEdge(endpoints, edge);
-        ImmutableNetwork<Integer, Integer> result = builder.build();
-        assertNotNull("Network should be built successfully", result);
-    }
+  @Test(timeout = 4000)
+  public void test3()  throws Throwable  {
+      NetworkBuilder<Object, Object> networkBuilder0 = NetworkBuilder.undirected();
+      StandardNetwork<Integer, Comparable<Integer>> standardNetwork0 = new StandardNetwork<Integer, Comparable<Integer>>(networkBuilder0);
+      NetworkBuilder<Integer, Comparable<Integer>> networkBuilder1 = NetworkBuilder.from((Network<Integer, Comparable<Integer>>) standardNetwork0);
+      networkBuilder1.allowsParallelEdges(true);
+      StandardNetwork<Integer, Integer> standardNetwork1 = new StandardNetwork<Integer, Integer>(networkBuilder1);
+      ImmutableNetwork<Integer, Integer> immutableNetwork0 = ImmutableNetwork.copyOf((Network<Integer, Integer>) standardNetwork1);
+      NetworkBuilder<Integer, Integer> networkBuilder2 = NetworkBuilder.from((Network<Integer, Integer>) immutableNetwork0);
+      ImmutableNetwork.Builder<Integer, Integer> immutableNetwork_Builder0 = networkBuilder2.immutable();
+      Integer integer0 = new Integer(949);
+      immutableNetwork_Builder0.addNode(integer0);
+      ImmutableNetwork<Integer, Integer> immutableNetwork1 = immutableNetwork_Builder0.build();
+      assertNotSame(immutableNetwork0, immutableNetwork1);
+  }
 
-    @Test(timeout = 4000)
-    public void builderAddNode_buildsSuccessfully() throws Throwable {
-        // Test that building after adding a node succeeds
-        NetworkBuilder<Object, Object> baseBuilder = NetworkBuilder.directed();
-        StandardNetwork<Integer, Integer> baseNetwork = new StandardNetwork<>(baseBuilder);
-        NetworkBuilder<Integer, Integer> networkBuilder = NetworkBuilder.from(baseNetwork);
-        
-        ImmutableNetwork.Builder<Integer, Integer> builder = networkBuilder.immutable();
-        Integer node = -967;
-        
-        builder.addNode(node);
-        ImmutableNetwork<Integer, Integer> result = builder.build();
-        assertNotNull("Network should be built successfully", result);
-    }
+  @Test(timeout = 4000)
+  public void test4()  throws Throwable  {
+      NetworkBuilder<Object, Object> networkBuilder0 = NetworkBuilder.directed();
+      networkBuilder0.allowsParallelEdges(true);
+      StandardNetwork<Integer, Integer> standardNetwork0 = new StandardNetwork<Integer, Integer>(networkBuilder0);
+      ImmutableNetwork<Integer, Integer> immutableNetwork0 = ImmutableNetwork.copyOf((Network<Integer, Integer>) standardNetwork0);
+      NetworkBuilder<Integer, Integer> networkBuilder1 = NetworkBuilder.from((Network<Integer, Integer>) immutableNetwork0);
+      ImmutableNetwork.Builder<Integer, Integer> immutableNetwork_Builder0 = networkBuilder1.immutable();
+      Integer integer0 = new Integer((-967));
+      ImmutableNetwork.Builder<Integer, Integer> immutableNetwork_Builder1 = immutableNetwork_Builder0.addNode(integer0);
+      ImmutableNetwork<Integer, Integer> immutableNetwork1 = immutableNetwork_Builder1.build();
+      assertNotSame(immutableNetwork1, immutableNetwork0);
+  }
 
-    // ========================= copyOf() Method Tests =========================
-    
-    @Test(timeout = 4000)
-    public void copyOf_nullNetwork_throwsNullPointerException() throws Throwable {
-        // Test that copying null network throws NPE
-        try {
-            ImmutableNetwork.copyOf((Network<Integer, Integer>) null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test5()  throws Throwable  {
+      NetworkBuilder<Object, Object> networkBuilder0 = NetworkBuilder.undirected();
+      StandardMutableNetwork<Integer, Integer> standardMutableNetwork0 = new StandardMutableNetwork<Integer, Integer>(networkBuilder0);
+      Integer integer0 = new Integer((-405));
+      NetworkBuilder<Integer, Integer> networkBuilder1 = NetworkBuilder.from((Network<Integer, Integer>) standardMutableNetwork0);
+      ImmutableNetwork.Builder<Integer, Integer> immutableNetwork_Builder0 = networkBuilder1.immutable();
+      Integer integer1 = new Integer((-1124));
+      EndpointPair<Integer> endpointPair0 = EndpointPair.unordered(integer1, integer0);
+      ImmutableNetwork.Builder<Integer, Integer> immutableNetwork_Builder1 = immutableNetwork_Builder0.addEdge(endpointPair0, integer1);
+      ImmutableNetwork<Integer, Integer> immutableNetwork0 = immutableNetwork_Builder1.build();
+      assertNotNull(immutableNetwork0);
+  }
 
-    @Test(timeout = 4000)
-    public void copyOf_nullImmutableNetwork_throwsNullPointerException() throws Throwable {
-        // Test that copying null ImmutableNetwork throws NPE (deprecated method)
-        try {
-            ImmutableNetwork.copyOf((ImmutableNetwork<Object, Integer>) null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test6()  throws Throwable  {
+      NetworkBuilder<Object, Object> networkBuilder0 = NetworkBuilder.directed();
+      StandardNetwork<Integer, Integer> standardNetwork0 = new StandardNetwork<Integer, Integer>(networkBuilder0);
+      ImmutableNetwork<Integer, Integer> immutableNetwork0 = ImmutableNetwork.copyOf((Network<Integer, Integer>) standardNetwork0);
+      ImmutableNetwork<Integer, Integer> immutableNetwork1 = ImmutableNetwork.copyOf((Network<Integer, Integer>) immutableNetwork0);
+      assertSame(immutableNetwork0, immutableNetwork1);
+  }
 
-    @Test(timeout = 4000)
-    public void copyOf_standardNetwork_returnsSameInstanceOnSubsequentCopy() throws Throwable {
-        // Test that copying a standard network twice returns same instance
-        NetworkBuilder<Object, Object> baseBuilder = NetworkBuilder.directed();
-        StandardNetwork<Integer, Integer> network = new StandardNetwork<>(baseBuilder);
-        
-        ImmutableNetwork<Integer, Integer> firstCopy = ImmutableNetwork.copyOf(network);
-        ImmutableNetwork<Integer, Integer> secondCopy = ImmutableNetwork.copyOf(firstCopy);
-        assertSame("Subsequent copies should return same instance", firstCopy, secondCopy);
-    }
+  @Test(timeout = 4000)
+  public void test7()  throws Throwable  {
+      NetworkBuilder<Object, Object> networkBuilder0 = NetworkBuilder.directed();
+      StandardMutableNetwork<Object, Object> standardMutableNetwork0 = new StandardMutableNetwork<Object, Object>(networkBuilder0);
+      ImmutableNetwork<Object, Object> immutableNetwork0 = ImmutableNetwork.copyOf((Network<Object, Object>) standardMutableNetwork0);
+      ImmutableNetwork<Object, Object> immutableNetwork1 = ImmutableNetwork.copyOf(immutableNetwork0);
+      assertSame(immutableNetwork0, immutableNetwork1);
+  }
 
-    @Test(timeout = 4000)
-    public void copyOf_mutableNetwork_returnsSameInstanceOnSubsequentCopy() throws Throwable {
-        // Test that copying a mutable network twice returns same instance
-        NetworkBuilder<Object, Object> baseBuilder = NetworkBuilder.directed();
-        StandardMutableNetwork<Object, Object> mutableNetwork = new StandardMutableNetwork<>(baseBuilder);
-        
-        ImmutableNetwork<Object, Object> firstCopy = ImmutableNetwork.copyOf(mutableNetwork);
-        ImmutableNetwork<Object, Object> secondCopy = ImmutableNetwork.copyOf(firstCopy);
-        assertSame("Subsequent copies should return same instance", firstCopy, secondCopy);
-    }
+  @Test(timeout = 4000)
+  public void test8()  throws Throwable  {
+      NetworkBuilder<Object, Object> networkBuilder0 = NetworkBuilder.directed();
+      StandardNetwork<Integer, Integer> standardNetwork0 = new StandardNetwork<Integer, Integer>(networkBuilder0);
+      ImmutableNetwork<Integer, Integer> immutableNetwork0 = ImmutableNetwork.copyOf((Network<Integer, Integer>) standardNetwork0);
+      ImmutableGraph<Integer> immutableGraph0 = immutableNetwork0.asGraph();
+      assertNotNull(immutableGraph0);
+  }
 
-    // ========================= Other Method Tests =========================
-    
-    @Test(timeout = 4000)
-    public void asGraph_returnsNonNullGraph() throws Throwable {
-        // Test that asGraph() returns non-null
-        NetworkBuilder<Object, Object> baseBuilder = NetworkBuilder.directed();
-        StandardNetwork<Integer, Integer> network = new StandardNetwork<>(baseBuilder);
-        ImmutableNetwork<Integer, Integer> immutableNetwork = ImmutableNetwork.copyOf(network);
-        
-        ImmutableGraph<Integer> graph = immutableNetwork.asGraph();
-        assertNotNull("asGraph() should return non-null", graph);
-    }
+  @Test(timeout = 4000)
+  public void test9()  throws Throwable  {
+      NetworkBuilder<Object, Object> networkBuilder0 = NetworkBuilder.directed();
+      StandardNetwork<Integer, Integer> standardNetwork0 = new StandardNetwork<Integer, Integer>(networkBuilder0);
+      NetworkBuilder<Integer, Integer> networkBuilder1 = NetworkBuilder.from((Network<Integer, Integer>) standardNetwork0);
+      ImmutableNetwork.Builder<Integer, Integer> immutableNetwork_Builder0 = networkBuilder1.immutable();
+      Integer integer0 = new Integer((-967));
+      ImmutableNetwork.Builder<Integer, Integer> immutableNetwork_Builder1 = immutableNetwork_Builder0.addNode(integer0);
+      ImmutableNetwork<Integer, Integer> immutableNetwork0 = immutableNetwork_Builder1.build();
+      assertNotNull(immutableNetwork0);
+  }
 }
