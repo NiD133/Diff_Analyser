@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2014 The Guava Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.common.graph;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -7,87 +23,62 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-/** Unit tests for {@link ImmutableNetwork}. */
+/** Tests for {@link ImmutableNetwork}. */
 @RunWith(JUnit4.class)
 @NullUnmarked
 public class ImmutableNetworkTest {
 
-  /** Tests that an ImmutableNetwork is correctly created from a MutableNetwork. */
   @Test
-  public void testImmutableNetworkCreation() {
-    // Create a directed mutable network and add a node
+  public void immutableNetwork() {
     MutableNetwork<String, Integer> mutableNetwork = NetworkBuilder.directed().build();
     mutableNetwork.addNode("A");
-
-    // Create an immutable network from the mutable network
     ImmutableNetwork<String, Integer> immutableNetwork = ImmutableNetwork.copyOf(mutableNetwork);
 
-    // Verify the immutable network is an instance of ImmutableGraph and not MutableNetwork
     assertThat(immutableNetwork.asGraph()).isInstanceOf(ImmutableGraph.class);
     assertThat(immutableNetwork).isNotInstanceOf(MutableNetwork.class);
-
-    // Verify the immutable network is equal to the original mutable network
     assertThat(immutableNetwork).isEqualTo(mutableNetwork);
 
-    // Add another node to the mutable network and verify the immutable network remains unchanged
     mutableNetwork.addNode("B");
     assertThat(immutableNetwork).isNotEqualTo(mutableNetwork);
   }
 
-  /** Tests optimization when copying an already immutable network. */
   @Test
-  public void testCopyOfImmutableNetworkOptimization() {
-    // Create an immutable network
-    Network<String, String> originalNetwork =
+  public void copyOfImmutableNetwork_optimized() {
+    Network<String, String> network1 =
         ImmutableNetwork.copyOf(NetworkBuilder.directed().<String, String>build());
+    Network<String, String> network2 = ImmutableNetwork.copyOf(network1);
 
-    // Copy the immutable network
-    Network<String, String> copiedNetwork = ImmutableNetwork.copyOf(originalNetwork);
-
-    // Verify that the copied network is the same instance as the original
-    assertThat(copiedNetwork).isSameInstanceAs(originalNetwork);
+    assertThat(network2).isSameInstanceAs(network1);
   }
 
-  /** Tests edges connecting nodes in a directed network. */
   @Test
-  public void testEdgesConnectingInDirectedNetwork() {
-    // Create a directed mutable network allowing self-loops
+  public void edgesConnecting_directed() {
     MutableNetwork<String, String> mutableNetwork =
         NetworkBuilder.directed().allowsSelfLoops(true).build();
     mutableNetwork.addEdge("A", "A", "AA");
     mutableNetwork.addEdge("A", "B", "AB");
-
-    // Create an immutable network from the mutable network
     Network<String, String> network = ImmutableNetwork.copyOf(mutableNetwork);
 
-    // Verify edges connecting specific nodes
     assertThat(network.edgesConnecting("A", "A")).containsExactly("AA");
     assertThat(network.edgesConnecting("A", "B")).containsExactly("AB");
     assertThat(network.edgesConnecting("B", "A")).isEmpty();
   }
 
-  /** Tests edges connecting nodes in an undirected network. */
   @Test
-  public void testEdgesConnectingInUndirectedNetwork() {
-    // Create an undirected mutable network allowing self-loops
+  public void edgesConnecting_undirected() {
     MutableNetwork<String, String> mutableNetwork =
         NetworkBuilder.undirected().allowsSelfLoops(true).build();
     mutableNetwork.addEdge("A", "A", "AA");
     mutableNetwork.addEdge("A", "B", "AB");
-
-    // Create an immutable network from the mutable network
     Network<String, String> network = ImmutableNetwork.copyOf(mutableNetwork);
 
-    // Verify edges connecting specific nodes
     assertThat(network.edgesConnecting("A", "A")).containsExactly("AA");
     assertThat(network.edgesConnecting("A", "B")).containsExactly("AB");
     assertThat(network.edgesConnecting("B", "A")).containsExactly("AB");
   }
 
-  /** Tests that the ImmutableNetwork.Builder applies the NetworkBuilder configuration. */
   @Test
-  public void testImmutableNetworkBuilderAppliesConfiguration() {
-    // Create an immutable network with specific configuration
+  public void immutableNetworkBuilder_appliesNetworkBuilderConfig() {
     ImmutableNetwork<String, Integer> emptyNetwork =
         NetworkBuilder.directed()
             .allowsSelfLoops(true)
@@ -95,74 +86,62 @@ public class ImmutableNetworkTest {
             .<String, Integer>immutable()
             .build();
 
-    // Verify the configuration of the immutable network
     assertThat(emptyNetwork.isDirected()).isTrue();
     assertThat(emptyNetwork.allowsSelfLoops()).isTrue();
     assertThat(emptyNetwork.nodeOrder()).isEqualTo(ElementOrder.<String>natural());
   }
 
-  /** Tests that the ImmutableNetwork.Builder is unaffected by changes to the original NetworkBuilder. */
+  /**
+   * Tests that the ImmutableNetwork.Builder doesn't change when the creating NetworkBuilder
+   * changes.
+   */
   @Test
   @SuppressWarnings("CheckReturnValue")
-  public void testImmutableNetworkBuilderCopiesNetworkBuilder() {
-    // Create a network builder with specific configuration
+  public void immutableNetworkBuilder_copiesNetworkBuilder() {
     NetworkBuilder<String, Object> networkBuilder =
         NetworkBuilder.directed()
             .allowsSelfLoops(true)
             .<String>nodeOrder(ElementOrder.<String>natural());
-
-    // Create an immutable network builder from the network builder
     ImmutableNetwork.Builder<String, Integer> immutableNetworkBuilder =
         networkBuilder.<String, Integer>immutable();
 
-    // Modify the original network builder
+    // Update NetworkBuilder, but this shouldn't impact immutableNetworkBuilder
     networkBuilder.allowsSelfLoops(false).nodeOrder(ElementOrder.<String>unordered());
 
-    // Build an immutable network from the immutable network builder
     ImmutableNetwork<String, Integer> emptyNetwork = immutableNetworkBuilder.build();
 
-    // Verify that the immutable network retains the original configuration
     assertThat(emptyNetwork.isDirected()).isTrue();
     assertThat(emptyNetwork.allowsSelfLoops()).isTrue();
     assertThat(emptyNetwork.nodeOrder()).isEqualTo(ElementOrder.<String>natural());
   }
 
-  /** Tests adding a node using the ImmutableNetwork.Builder. */
   @Test
-  public void testImmutableNetworkBuilderAddNode() {
-    // Create an immutable network with a single node
+  public void immutableNetworkBuilder_addNode() {
     ImmutableNetwork<String, Integer> network =
         NetworkBuilder.directed().<String, Integer>immutable().addNode("A").build();
 
-    // Verify the network contains the node and no edges
     assertThat(network.nodes()).containsExactly("A");
     assertThat(network.edges()).isEmpty();
   }
 
-  /** Tests adding an edge between nodes using the ImmutableNetwork.Builder. */
   @Test
-  public void testImmutableNetworkBuilderAddEdgeFromNodes() {
-    // Create an immutable network with an edge between two nodes
+  public void immutableNetworkBuilder_putEdgeFromNodes() {
     ImmutableNetwork<String, Integer> network =
         NetworkBuilder.directed().<String, Integer>immutable().addEdge("A", "B", 10).build();
 
-    // Verify the network contains the nodes and the edge
     assertThat(network.nodes()).containsExactly("A", "B");
     assertThat(network.edges()).containsExactly(10);
     assertThat(network.incidentNodes(10)).isEqualTo(EndpointPair.ordered("A", "B"));
   }
 
-  /** Tests adding an edge using an EndpointPair with the ImmutableNetwork.Builder. */
   @Test
-  public void testImmutableNetworkBuilderAddEdgeFromEndpointPair() {
-    // Create an immutable network with an edge using an EndpointPair
+  public void immutableNetworkBuilder_putEdgeFromEndpointPair() {
     ImmutableNetwork<String, Integer> network =
         NetworkBuilder.directed()
             .<String, Integer>immutable()
             .addEdge(EndpointPair.ordered("A", "B"), 10)
             .build();
 
-    // Verify the network contains the nodes and the edge
     assertThat(network.nodes()).containsExactly("A", "B");
     assertThat(network.edges()).containsExactly(10);
     assertThat(network.incidentNodes(10)).isEqualTo(EndpointPair.ordered("A", "B"));
