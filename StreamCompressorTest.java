@@ -34,74 +34,41 @@ import org.junit.jupiter.api.Test;
 
 class StreamCompressorTest {
 
-    /**
-     * Tests the creation of a StreamCompressor with a DataOutput stream and a custom Deflater.
-     */
     @Test
     void testCreateDataOutputCompressor() throws IOException {
-        // Create a DataOutputStream to pass to the StreamCompressor
         final DataOutput dataOutputStream = new DataOutputStream(new ByteArrayOutputStream());
-        
-        // Create a StreamCompressor with maximum compression level
         try (StreamCompressor streamCompressor = StreamCompressor.create(dataOutputStream, new Deflater(9))) {
-            // Verify that the StreamCompressor is not null
             assertNotNull(streamCompressor);
         }
     }
 
-    /**
-     * Tests the deflation of entries using the DEFLATED method.
-     */
     @Test
     void testDeflatedEntries() throws Exception {
-        // Create a ByteArrayOutputStream to capture the compressed output
-        final ByteArrayOutputStream compressedOutput = new ByteArrayOutputStream();
-        
-        // Create a StreamCompressor with default compression level
-        try (StreamCompressor streamCompressor = StreamCompressor.create(compressedOutput)) {
-            // Deflate the input data using the DEFLATED method
-            streamCompressor.deflate(new ByteArrayInputStream("AAAAAABBBBBB".getBytes()), ZipEntry.DEFLATED);
-            
-            // Verify the number of bytes read and written
-            assertEquals(12, streamCompressor.getBytesRead());
-            assertEquals(8, streamCompressor.getBytesWrittenForLastEntry());
-            
-            // Verify the CRC32 checksum
-            assertEquals(3299542, streamCompressor.getCrc32());
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (StreamCompressor sc = StreamCompressor.create(baos)) {
+            sc.deflate(new ByteArrayInputStream("AAAAAABBBBBB".getBytes()), ZipEntry.DEFLATED);
+            assertEquals(12, sc.getBytesRead());
+            assertEquals(8, sc.getBytesWrittenForLastEntry());
+            assertEquals(3299542, sc.getCrc32());
 
-            // Verify the compressed output bytes
-            final byte[] actualCompressedBytes = compressedOutput.toByteArray();
-            final byte[] expectedCompressedBytes = { 115, 116, 4, 1, 39, 48, 0, 0 };
-            assertArrayEquals(expectedCompressedBytes, actualCompressedBytes);
+            final byte[] actuals = baos.toByteArray();
+            final byte[] expected = { 115, 116, 4, 1, 39, 48, 0, 0 };
+            // Note that this test really asserts stuff about the java Deflater, which might be a little bit brittle
+            assertArrayEquals(expected, actuals);
         }
     }
 
-    /**
-     * Tests the deflation of entries using the STORED method.
-     */
     @Test
     void testStoredEntries() throws Exception {
-        // Create a ByteArrayOutputStream to capture the compressed output
-        final ByteArrayOutputStream compressedOutput = new ByteArrayOutputStream();
-        
-        // Create a StreamCompressor with default compression level
-        try (StreamCompressor streamCompressor = StreamCompressor.create(compressedOutput)) {
-            // Deflate the input data using the STORED method
-            streamCompressor.deflate(new ByteArrayInputStream("A".getBytes()), ZipEntry.STORED);
-            streamCompressor.deflate(new ByteArrayInputStream("BAD".getBytes()), ZipEntry.STORED);
-            
-            // Verify the number of bytes read and written
-            assertEquals(3, streamCompressor.getBytesRead());
-            assertEquals(3, streamCompressor.getBytesWrittenForLastEntry());
-            
-            // Verify the CRC32 checksum
-            assertEquals(344750961, streamCompressor.getCrc32());
-            
-            // Deflate additional input data using the STORED method
-            streamCompressor.deflate(new ByteArrayInputStream("CAFE".getBytes()), ZipEntry.STORED);
-            
-            // Verify the final output string
-            assertEquals("ABADCAFE", compressedOutput.toString());
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (StreamCompressor sc = StreamCompressor.create(baos)) {
+            sc.deflate(new ByteArrayInputStream("A".getBytes()), ZipEntry.STORED);
+            sc.deflate(new ByteArrayInputStream("BAD".getBytes()), ZipEntry.STORED);
+            assertEquals(3, sc.getBytesRead());
+            assertEquals(3, sc.getBytesWrittenForLastEntry());
+            assertEquals(344750961, sc.getCrc32());
+            sc.deflate(new ByteArrayInputStream("CAFE".getBytes()), ZipEntry.STORED);
+            assertEquals("ABADCAFE", baos.toString());
         }
     }
 }
