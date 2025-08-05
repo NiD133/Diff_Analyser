@@ -1,3 +1,19 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.commons.codec.digest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,93 +36,70 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class XXHash32Test {
 
-    private Path filePath;
-    private String expectedChecksum;
-
-    /**
-     * Copies data from an InputStream to an OutputStream using a specified buffer size.
-     *
-     * @param input the input stream
-     * @param output the output stream
-     * @param bufferSize the buffer size
-     * @return the number of bytes copied
-     * @throws IOException if an I/O error occurs
-     */
-    private static long copyStream(final InputStream input, final OutputStream output, final int bufferSize) throws IOException {
+    private static long copy(final InputStream input, final OutputStream output, final int bufferSize) throws IOException {
         return IOUtils.copyLarge(input, output, new byte[bufferSize]);
     }
 
-    /**
-     * Provides test data for parameterized tests.
-     *
-     * @return a stream of arguments containing file paths and expected checksums
-     */
-    public static Stream<Arguments> provideTestData() {
+    public static Stream<Arguments> data() {
+        // @formatter:off
         return Stream.of(
+            // reference checksums created with xxh32sum
+            // https://cyan4973.github.io/xxHash/
             Arguments.of("org/apache/commons/codec/bla.tar", "fbb5c8d1"),
             Arguments.of("org/apache/commons/codec/bla.tar.xz", "4106a208"),
             Arguments.of("org/apache/commons/codec/small.bin", "f66c26f8")
         );
+        // @formatter:on
     }
 
-    /**
-     * Converts an InputStream to a byte array.
-     *
-     * @param input the input stream
-     * @return the byte array
-     * @throws IOException if an I/O error occurs
-     */
-    private static byte[] convertToByteArray(final InputStream input) throws IOException {
+    private static byte[] toByteArray(final InputStream input) throws IOException {
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
-        copyStream(input, output, 10240);
+        copy(input, output, 10240);
         return output.toByteArray();
     }
 
-    /**
-     * Initializes the test data by setting the file path and expected checksum.
-     *
-     * @param path the file path
-     * @param checksum the expected checksum
-     * @throws Exception if the file is not found or an error occurs
-     */
-    public void initializeTestData(final String path, final String checksum) throws Exception {
+    private Path file;
+
+    private String expectedChecksum;
+
+    public void initData(final String path, final String c) throws Exception {
         final URL url = XXHash32Test.class.getClassLoader().getResource(path);
         if (url == null) {
-            throw new FileNotFoundException("File not found: " + path);
+            throw new FileNotFoundException("couldn't find " + path);
         }
-        filePath = Paths.get(url.toURI());
-        expectedChecksum = checksum;
+        file = Paths.get(url.toURI());
+        expectedChecksum = c;
     }
 
     @ParameterizedTest
-    @MethodSource("provideTestData")
-    public void testChecksumVerification(final String path, final String checksum) throws Exception {
-        initializeTestData(path, checksum);
+    @MethodSource("data")
+    public void verifyChecksum(final String path, final String c) throws Exception {
+        initData(path, c);
         final XXHash32 hasher = new XXHash32();
-        try (InputStream inputStream = Files.newInputStream(filePath)) {
-            final byte[] fileBytes = convertToByteArray(inputStream);
-            hasher.update(fileBytes, 0, fileBytes.length);
+        try (InputStream in = Files.newInputStream(file)) {
+            final byte[] bytes = toByteArray(in);
+            hasher.update(bytes, 0, bytes.length);
         }
-        assertEquals(expectedChecksum, Long.toHexString(hasher.getValue()), "Checksum mismatch for file: " + filePath);
+        assertEquals(expectedChecksum, Long.toHexString(hasher.getValue()), "checksum for " + file);
     }
 
     @ParameterizedTest
-    @MethodSource("provideTestData")
-    public void testIncrementalChecksumVerification(final String path, final String checksum) throws Exception {
-        initializeTestData(path, checksum);
+    @MethodSource("data")
+    public void verifyIncrementalChecksum(final String path, final String c) throws Exception {
+        initData(path, c);
         final XXHash32 hasher = new XXHash32();
-        try (InputStream inputStream = Files.newInputStream(filePath)) {
-            final byte[] fileBytes = convertToByteArray(inputStream);
-            // Test resetting the hash
-            hasher.update(fileBytes[0]);
+        try (InputStream in = Files.newInputStream(file)) {
+            final byte[] bytes = toByteArray(in);
+            // Hit the case where the hash should be reset
+            hasher.update(bytes[0]);
             hasher.reset();
-            // Update hash in chunks
-            hasher.update(fileBytes[0]);
-            hasher.update(fileBytes, 1, fileBytes.length - 2);
-            hasher.update(fileBytes, fileBytes.length - 1, 1);
-            // Test hash with negative length (should be ignored)
-            hasher.update(fileBytes, 0, -1);
+            // Pass in chunks
+            hasher.update(bytes[0]);
+            hasher.update(bytes, 1, bytes.length - 2);
+            hasher.update(bytes, bytes.length - 1, 1);
+            // Check the hash ignores negative length
+            hasher.update(bytes, 0, -1);
         }
-        assertEquals(expectedChecksum, Long.toHexString(hasher.getValue()), "Checksum mismatch for file: " + filePath);
+        assertEquals(expectedChecksum, Long.toHexString(hasher.getValue()), "checksum for " + file);
     }
 }
