@@ -1,3 +1,18 @@
+/*
+ *    Copyright 2009-2024 the original author or authors.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package org.apache.ibatis.mapping;
 
 import static com.googlecode.catchexception.apis.BDDCatchException.caughtException;
@@ -16,56 +31,37 @@ import org.junit.jupiter.api.Test;
 class CacheBuilderTest {
 
   @Test
-  void shouldInitializeCacheSuccessfully() {
-    // Arrange
-    CacheBuilder cacheBuilder = new CacheBuilder("test").implementation(InitializingCache.class);
+  void initializing() {
+    InitializingCache cache = unwrap(new CacheBuilder("test").implementation(InitializingCache.class).build());
 
-    // Act
-    InitializingCache cache = unwrap(cacheBuilder.build());
-
-    // Assert
-    Assertions.assertThat(cache.isInitialized()).isTrue();
+    Assertions.assertThat(cache.initialized).isTrue();
   }
 
   @Test
-  void shouldThrowExceptionOnCacheInitializationFailure() {
-    // Arrange
-    CacheBuilder cacheBuilder = new CacheBuilder("test").implementation(InitializingFailureCache.class);
-
-    // Act
-    when(() -> cacheBuilder.build());
-
-    // Assert
-    then(caughtException())
-      .isInstanceOf(CacheException.class)
-      .hasMessage("Failed cache initialization for 'test' on 'org.apache.ibatis.mapping.CacheBuilderTest$InitializingFailureCache'");
+  void initializingFailure() {
+    when(() -> new CacheBuilder("test").implementation(InitializingFailureCache.class).build());
+    then(caughtException()).isInstanceOf(CacheException.class).hasMessage(
+        "Failed cache initialization for 'test' on 'org.apache.ibatis.mapping.CacheBuilderTest$InitializingFailureCache'");
   }
 
-  /**
-   * Unwraps the underlying cache implementation from a proxy or decorator.
-   *
-   * @param cache The cache instance to unwrap.
-   * @param <T> The type of the underlying cache implementation.
-   * @return The unwrapped cache implementation.
-   */
   @SuppressWarnings("unchecked")
   private <T> T unwrap(Cache cache) {
+    Field field;
     try {
-      Field delegateField = cache.getClass().getDeclaredField("delegate");
-      delegateField.setAccessible(true);
-      try {
-        return (T) delegateField.get(cache);
-      } finally {
-        delegateField.setAccessible(false);
-      }
-    } catch (NoSuchFieldException | IllegalAccessException e) {
-      throw new IllegalStateException("Failed to unwrap cache", e);
+      field = cache.getClass().getDeclaredField("delegate");
+    } catch (NoSuchFieldException e) {
+      throw new IllegalStateException(e);
+    }
+    try {
+      field.setAccessible(true);
+      return (T) field.get(cache);
+    } catch (IllegalAccessException e) {
+      throw new IllegalStateException(e);
+    } finally {
+      field.setAccessible(false);
     }
   }
 
-  /**
-   * A cache implementation that initializes successfully.
-   */
   private static class InitializingCache extends PerpetualCache implements InitializingObject {
 
     private boolean initialized;
@@ -79,14 +75,8 @@ class CacheBuilderTest {
       this.initialized = true;
     }
 
-    public boolean isInitialized() {
-      return initialized;
-    }
   }
 
-  /**
-   * A cache implementation that fails during initialization.
-   */
   private static class InitializingFailureCache extends PerpetualCache implements InitializingObject {
 
     public InitializingFailureCache(String id) {
@@ -97,5 +87,7 @@ class CacheBuilderTest {
     public void initialize() {
       throw new IllegalStateException("error");
     }
+
   }
+
 }
