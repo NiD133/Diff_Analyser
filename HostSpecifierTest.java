@@ -17,9 +17,6 @@
 package com.google.common.net;
 
 import static com.google.common.truth.Truth.assertThat;
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.fail;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.testing.EqualsTester;
@@ -39,112 +36,84 @@ import org.jspecify.annotations.NullUnmarked;
 @NullUnmarked
 public final class HostSpecifierTest extends TestCase {
 
-  private static final ImmutableList<String> VALID_IPS =
+  private static final ImmutableList<String> GOOD_IPS =
       ImmutableList.of("1.2.3.4", "2001:db8::1", "[2001:db8::1]");
 
-  private static final ImmutableList<String> INVALID_IPS =
+  private static final ImmutableList<String> BAD_IPS =
       ImmutableList.of("1.2.3", "2001:db8::1::::::0", "[2001:db8::1", "[::]:80");
 
-  private static final ImmutableList<String> VALID_DOMAINS =
+  private static final ImmutableList<String> GOOD_DOMAINS =
       ImmutableList.of("com", "google.com", "foo.co.uk");
 
-  private static final ImmutableList<String> INVALID_DOMAINS =
+  private static final ImmutableList<String> BAD_DOMAINS =
       ImmutableList.of("foo.blah", "", "[google.com]");
 
-  public void testValidIpAddresses() throws ParseException {
-    for (String spec : VALID_IPS) {
-      assertValidSpecifier(spec);
+  public void testGoodIpAddresses() throws ParseException {
+    for (String spec : GOOD_IPS) {
+      assertGood(spec);
     }
   }
 
-  public void testInvalidIpAddresses() {
-    for (String spec : INVALID_IPS) {
-      assertInvalidSpecifier(spec);
+  public void testBadIpAddresses() {
+    for (String spec : BAD_IPS) {
+      assertBad(spec);
     }
   }
 
-  public void testValidDomains() throws ParseException {
-    for (String spec : VALID_DOMAINS) {
-      assertValidSpecifier(spec);
+  public void testGoodDomains() throws ParseException {
+    for (String spec : GOOD_DOMAINS) {
+      assertGood(spec);
     }
   }
 
-  public void testInvalidDomains() {
-    for (String spec : INVALID_DOMAINS) {
-      assertInvalidSpecifier(spec);
+  public void testBadDomains() {
+    for (String spec : BAD_DOMAINS) {
+      assertBad(spec);
     }
   }
 
   public void testEquality() {
     new EqualsTester()
-        .addEqualityGroup(hostSpecifier("1.2.3.4"), hostSpecifier("1.2.3.4"))
-        .addEqualityGroup(
-            hostSpecifier("2001:db8::1"), 
-            hostSpecifier("2001:db8::1"), 
-            hostSpecifier("[2001:db8::1]")
-        )
-        .addEqualityGroup(hostSpecifier("2001:db8::2"))
-        .addEqualityGroup(hostSpecifier("google.com"), hostSpecifier("google.com"))
-        .addEqualityGroup(hostSpecifier("www.google.com"))
+        .addEqualityGroup(spec("1.2.3.4"), spec("1.2.3.4"))
+        .addEqualityGroup(spec("2001:db8::1"), spec("2001:db8::1"), spec("[2001:db8::1]"))
+        .addEqualityGroup(spec("2001:db8::2"))
+        .addEqualityGroup(spec("google.com"), spec("google.com"))
+        .addEqualityGroup(spec("www.google.com"))
         .testEquals();
   }
 
-  private static HostSpecifier hostSpecifier(String specifier) {
+  private static HostSpecifier spec(String specifier) {
     return HostSpecifier.fromValid(specifier);
   }
 
   public void testNulls() {
     NullPointerTester tester = new NullPointerTester();
+
     tester.testAllPublicStaticMethods(HostSpecifier.class);
     tester.testAllPublicInstanceMethods(HostSpecifier.fromValid("google.com"));
   }
 
-  private void assertValidSpecifier(String spec) throws ParseException {
-    // Verify fromValid() accepts valid specifier
-    try {
-      HostSpecifier.fromValid(spec);
-    } catch (IllegalArgumentException e) {
-      fail(String.format("HostSpecifier.fromValid(%s) threw unexpected exception: %s", spec, e));
-    }
-
-    // Verify from() accepts valid specifier
-    try {
-      HostSpecifier.from(spec);
-    } catch (ParseException e) {
-      fail(String.format("HostSpecifier.from(%s) threw unexpected exception: %s", spec, e));
-    }
-
-    // Verify isValid() returns true for valid specifier
-    assertTrue(
-        String.format("Expected HostSpecifier.isValid(%s) to return true", spec),
-        HostSpecifier.isValid(spec));
+  private void assertGood(String spec) throws ParseException {
+    // Throws exception if not working correctly
+    HostSpecifier unused = HostSpecifier.fromValid(spec);
+    unused = HostSpecifier.from(spec);
+    assertTrue(HostSpecifier.isValid(spec));
   }
 
-  private void assertInvalidSpecifier(String spec) {
-    // Verify fromValid() rejects invalid specifier
+  private void assertBad(String spec) {
     try {
       HostSpecifier.fromValid(spec);
-      fail(String.format("HostSpecifier.fromValid(%s) should have thrown IllegalArgumentException", spec));
+      fail("Should have thrown IllegalArgumentException: " + spec);
     } catch (IllegalArgumentException expected) {
-      // Expected behavior
     }
 
-    // Verify from() rejects invalid specifier with proper cause
     try {
       HostSpecifier.from(spec);
-      fail(String.format("HostSpecifier.from(%s) should have thrown ParseException", spec));
-    } catch (ParseException e) {
-      Throwable cause = e.getCause();
-      if (cause == null || !(cause instanceof IllegalArgumentException)) {
-        fail(String.format(
-            "Expected ParseException for '%s' to have IllegalArgumentException cause, but got: %s", 
-            spec, cause));
-      }
+      fail("Should have thrown ParseException: " + spec);
+    } catch (ParseException expected) {
+      assertThat(expected).hasCauseThat().isInstanceOf(IllegalArgumentException.class);
     }
 
-    // Verify isValid() returns false for invalid specifier
-    assertFalse(
-        String.format("Expected HostSpecifier.isValid(%s) to return false", spec),
-        HostSpecifier.isValid(spec));
+    assertFalse(HostSpecifier.isValid(spec));
   }
 }
