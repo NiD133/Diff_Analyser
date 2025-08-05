@@ -26,150 +26,142 @@ import org.evosuite.runtime.EvoRunnerParameters;
 import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, 
-useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class ListeningExecutorService_ESTest extends ListeningExecutorService_ESTest_scaffolding {
 
   @Test(timeout = 4000)
-  public void awaitTermination_AfterShutdown_ReturnsTrue() throws Throwable {
-      // Setup: Create executor and shut it down
-      DirectExecutorService executor = new DirectExecutorService();
-      executor.shutdown();
-      
-      // Execute: Wait for termination with zero duration
-      boolean terminated = executor.awaitTermination(Duration.ZERO);
-      
-      // Verify: Should report termination immediately
-      assertTrue(terminated);
+  public void test0()  throws Throwable  {
+      DirectExecutorService directExecutorService0 = new DirectExecutorService();
+      Duration duration0 = Duration.ZERO;
+      directExecutorService0.shutdown();
+      boolean boolean0 = directExecutorService0.awaitTermination(duration0);
+      assertTrue(boolean0);
   }
 
   @Test(timeout = 4000)
-  public void invokeAny_WithNullTimeout_ThrowsNullPointerException() throws Throwable {
-      // Setup: Create executor and task collection
-      DirectExecutorService executor = new DirectExecutorService();
-      LinkedBlockingQueue<Callable<Object>> tasks = new LinkedBlockingQueue<>();
-      
-      // Execute & Verify: Null timeout should cause NPE
+  public void test1()  throws Throwable  {
+      DirectExecutorService directExecutorService0 = new DirectExecutorService();
+      LinkedBlockingQueue<Callable<Object>> linkedBlockingQueue0 = new LinkedBlockingQueue<Callable<Object>>();
+      // Undeclared exception!
       try { 
-        executor.invokeAny(tasks, (Duration) null);
+        directExecutorService0.invokeAny((Collection<? extends Callable<Object>>) linkedBlockingQueue0, (Duration) null);
         fail("Expecting exception: NullPointerException");
       
       } catch(NullPointerException e) {
-          // Internal Guava utilities require non-null duration
-          verifyException("com.google.common.util.concurrent.Internal", e);
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.util.concurrent.Internal", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void invokeAny_WithValidTask_ThrowsNoClassDefErrorDueToMissingDependency() throws Throwable {
-      // Setup: Create executor and task with mock dependencies
-      DirectExecutorService executor = new DirectExecutorService();
-      ArrayList<Callable<Integer>> tasks = new ArrayList<>();
-      Callable<Integer> mockTask = mock(Callable.class, new ViolatedAssumptionAnswer());
-      tasks.add(mockTask);
-      
-      // Create a valid duration (5112 seconds)
-      TemporalUnit secondsUnit = ChronoField.SECOND_OF_MINUTE.getRangeUnit();
-      Duration timeout = Duration.of(5112L, secondsUnit);
-      
-      // Execute & Verify: Missing TrustedListenableFutureTask class should cause error
+  public void test2()  throws Throwable  {
+      DirectExecutorService directExecutorService0 = new DirectExecutorService();
+      ArrayList<Callable<Integer>> arrayList0 = new ArrayList<Callable<Integer>>();
+      Callable<Integer> callable0 = (Callable<Integer>) mock(Callable.class, new ViolatedAssumptionAnswer());
+      arrayList0.add(callable0);
+      ChronoField chronoField0 = ChronoField.SECOND_OF_MINUTE;
+      TemporalUnit temporalUnit0 = chronoField0.getRangeUnit();
+      Duration duration0 = Duration.of(5112L, temporalUnit0);
+      // Undeclared exception!
       try { 
-        executor.invokeAny(tasks, timeout);
+        directExecutorService0.invokeAny((Collection<? extends Callable<Integer>>) arrayList0, duration0);
         fail("Expecting exception: NoClassDefFoundError");
       
       } catch(NoClassDefFoundError e) {
-          verifyException("com.google.common.util.concurrent.AbstractListeningExecutorService", e);
+         //
+         // com/google/common/util/concurrent/TrustedListenableFutureTask
+         //
+         verifyException("com.google.common.util.concurrent.AbstractListeningExecutorService", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void invokeAll_WithNullTaskCollection_ThrowsNullPointerException() throws Throwable {
-      // Setup: Create executor
-      DirectExecutorService executor = new DirectExecutorService();
-      Duration timeout = Duration.ofMinutes(-356L); // Negative duration
-      
-      // Execute & Verify: Null task collection should cause NPE
+  public void test3()  throws Throwable  {
+      DirectExecutorService directExecutorService0 = new DirectExecutorService();
+      Duration duration0 = Duration.ofMinutes((-356L));
+      // Undeclared exception!
       try { 
-        executor.invokeAll(null, timeout);
+        directExecutorService0.invokeAll((Collection<? extends Callable<Object>>) null, duration0);
         fail("Expecting exception: NullPointerException");
       
       } catch(NullPointerException e) {
-          verifyException("java.util.concurrent.AbstractExecutorService", e);
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.util.concurrent.AbstractExecutorService", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void invokeAll_WithSingleTask_ThrowsNoClassDefErrorDueToMissingDependency() throws Throwable {
-      // Setup: Create executor and single mock task
-      DirectExecutorService executor = new DirectExecutorService();
-      LinkedHashSet<Callable<Object>> tasks = new LinkedHashSet<>();
-      Callable<Object> mockTask = mock(Callable.class, new ViolatedAssumptionAnswer());
-      tasks.add(mockTask);
-      
-      // Execute & Verify: Missing TrustedListenableFutureTask class should cause error
+  public void test4()  throws Throwable  {
+      DirectExecutorService directExecutorService0 = new DirectExecutorService();
+      Duration duration0 = Duration.ZERO;
+      LinkedHashSet<Callable<Object>> linkedHashSet0 = new LinkedHashSet<Callable<Object>>();
+      Callable<Object> callable0 = (Callable<Object>) mock(Callable.class, new ViolatedAssumptionAnswer());
+      linkedHashSet0.add(callable0);
+      // Undeclared exception!
       try { 
-        executor.invokeAll(tasks, Duration.ZERO);
+        directExecutorService0.invokeAll((Collection<? extends Callable<Object>>) linkedHashSet0, duration0);
         fail("Expecting exception: NoClassDefFoundError");
       
       } catch(NoClassDefFoundError e) {
-          verifyException("com.google.common.util.concurrent.AbstractListeningExecutorService", e);
+         //
+         // com/google/common/util/concurrent/TrustedListenableFutureTask
+         //
+         verifyException("com.google.common.util.concurrent.AbstractListeningExecutorService", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void awaitTermination_WithNullTimeout_ThrowsNullPointerException() throws Throwable {
-      // Setup: Create executor
-      DirectExecutorService executor = new DirectExecutorService();
-      
-      // Execute & Verify: Null timeout should cause NPE
+  public void test5()  throws Throwable  {
+      DirectExecutorService directExecutorService0 = new DirectExecutorService();
+      // Undeclared exception!
       try { 
-        executor.awaitTermination((Duration) null);
+        directExecutorService0.awaitTermination((Duration) null);
         fail("Expecting exception: NullPointerException");
       
       } catch(NullPointerException e) {
-          // Internal Guava utilities require non-null duration
-          verifyException("com.google.common.util.concurrent.Internal", e);
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.util.concurrent.Internal", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void invokeAny_WithEmptyTaskCollection_ThrowsIllegalArgumentException() throws Throwable {
-      // Setup: Create executor with empty task list
-      DirectExecutorService executor = new DirectExecutorService();
-      ArrayList<Callable<Object>> tasks = new ArrayList<>();
-      
-      // Execute & Verify: Empty task collection should cause IAE
+  public void test6()  throws Throwable  {
+      DirectExecutorService directExecutorService0 = new DirectExecutorService();
+      Duration duration0 = Duration.ZERO;
+      ArrayList<Callable<Object>> arrayList0 = new ArrayList<Callable<Object>>();
+      // Undeclared exception!
       try { 
-        executor.invokeAny(tasks, Duration.ZERO);
+        directExecutorService0.invokeAny((Collection<? extends Callable<Object>>) arrayList0, duration0);
         fail("Expecting exception: IllegalArgumentException");
       
       } catch(IllegalArgumentException e) {
-          verifyException("java.util.concurrent.AbstractExecutorService", e);
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.util.concurrent.AbstractExecutorService", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void invokeAll_WithEmptyTaskCollection_ReturnsEmptyFutureList() throws Throwable {
-      // Setup: Create executor with empty task collection
-      DirectExecutorService executor = new DirectExecutorService();
-      LinkedTransferQueue<Callable<Object>> tasks = new LinkedTransferQueue<>();
-      
-      // Execute: Process empty task list with zero timeout
-      List<Future<Object>> results = executor.invokeAll(tasks, Duration.ZERO);
-      
-      // Verify: Should return empty result list immediately
-      assertEquals(0, results.size());
+  public void test7()  throws Throwable  {
+      DirectExecutorService directExecutorService0 = new DirectExecutorService();
+      Duration duration0 = Duration.ZERO;
+      LinkedTransferQueue<Callable<Object>> linkedTransferQueue0 = new LinkedTransferQueue<Callable<Object>>();
+      List<Future<Object>> list0 = directExecutorService0.invokeAll((Collection<? extends Callable<Object>>) linkedTransferQueue0, duration0);
+      assertEquals(0, list0.size());
   }
 
   @Test(timeout = 4000)
-  public void awaitTermination_WithoutShutdown_ReturnsFalse() throws Throwable {
-      // Setup: Create active executor
-      DirectExecutorService executor = new DirectExecutorService();
-      
-      // Execute: Check termination with zero timeout
-      boolean terminated = executor.awaitTermination(Duration.ZERO);
-      
-      // Verify: Executor still active
-      assertFalse(terminated);
+  public void test8()  throws Throwable  {
+      DirectExecutorService directExecutorService0 = new DirectExecutorService();
+      Duration duration0 = Duration.ZERO;
+      boolean boolean0 = directExecutorService0.awaitTermination(duration0);
+      assertFalse(boolean0);
   }
 }
