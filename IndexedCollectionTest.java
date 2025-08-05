@@ -8,7 +8,7 @@
  *
  *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
+ * Unless required by applicable law in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
@@ -25,8 +25,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.collections4.Transformer;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -45,13 +47,7 @@ class IndexedCollectionTest extends AbstractCollectionTest<String> {
         }
     }
 
-    protected Collection<String> decorateCollection(final Collection<String> collection) {
-        return IndexedCollection.nonUniqueIndexedCollection(collection, new IntegerTransformer());
-    }
-
-    protected IndexedCollection<Integer, String> decorateUniqueCollection(final Collection<String> collection) {
-        return IndexedCollection.uniqueIndexedCollection(collection, new IntegerTransformer());
-    }
+    // --- Test Framework Overrides ---
 
     @Override
     public String[] getFullElements() {
@@ -61,6 +57,16 @@ class IndexedCollectionTest extends AbstractCollectionTest<String> {
     @Override
     public String[] getOtherElements() {
         return new String[] {"9", "88", "678", "87", "98", "78", "99"};
+    }
+
+    @Override
+    public Collection<String> makeObject() {
+        return decorateCollection(new ArrayList<>());
+    }
+
+    @Override
+    public Collection<String> makeFullCollection() {
+        return decorateCollection(new ArrayList<>(Arrays.asList(getFullElements())));
     }
 
     @Override
@@ -74,84 +80,115 @@ class IndexedCollectionTest extends AbstractCollectionTest<String> {
     }
 
     @Override
-    public Collection<String> makeFullCollection() {
-        return decorateCollection(new ArrayList<>(Arrays.asList(getFullElements())));
-    }
-
-    @Override
-    public Collection<String> makeObject() {
-        return decorateCollection(new ArrayList<>());
-    }
-
-    public Collection<String> makeTestCollection() {
-        return decorateCollection(new ArrayList<>());
-    }
-
-    public Collection<String> makeUniqueTestCollection() {
-        return decorateUniqueCollection(new ArrayList<>());
-    }
-
-    @Override
     protected boolean skipSerializedCanonicalTests() {
         // FIXME: support canonical tests
         return true;
     }
 
-    @Test
-    void testAddedObjectsCanBeRetrievedByKey() throws Exception {
-        final Collection<String> coll = makeTestCollection();
-        coll.add("12");
-        coll.add("16");
-        coll.add("1");
-        coll.addAll(asList("2", "3", "4"));
+    // --- Helper Methods ---
 
-        @SuppressWarnings("unchecked")
-        final IndexedCollection<Integer, String> indexed = (IndexedCollection<Integer, String>) coll;
-        assertEquals("12", indexed.get(12));
-        assertEquals("16", indexed.get(16));
-        assertEquals("1", indexed.get(1));
-        assertEquals("2", indexed.get(2));
-        assertEquals("3", indexed.get(3));
-        assertEquals("4", indexed.get(4));
+    /**
+     * Factory method for creating a non-unique indexed collection.
+     */
+    protected Collection<String> decorateCollection(final Collection<String> collection) {
+        return IndexedCollection.nonUniqueIndexedCollection(collection, new IntegerTransformer());
+    }
+
+    /**
+     * Factory method for creating a unique indexed collection.
+     */
+    protected IndexedCollection<Integer, String> decorateUniqueCollection(final Collection<String> collection) {
+        return IndexedCollection.uniqueIndexedCollection(collection, new IntegerTransformer());
+    }
+
+    /**
+     * Creates an empty non-unique indexed collection for testing.
+     */
+    private IndexedCollection<Integer, String> makeEmptyNonUniqueIndexedCollection() {
+        return (IndexedCollection<Integer, String>) makeObject();
+    }
+
+    /**
+     * Creates an empty unique indexed collection for testing.
+     */
+    private IndexedCollection<Integer, String> makeEmptyUniqueIndexedCollection() {
+        return decorateUniqueCollection(new ArrayList<>());
+    }
+
+    // --- Tests for IndexedCollection specific features ---
+
+    @Test
+    @DisplayName("get() should retrieve elements by key after they are added")
+    void getShouldRetrieveAddedElements() {
+        // Arrange
+        final IndexedCollection<Integer, String> indexedCollection = makeEmptyNonUniqueIndexedCollection();
+
+        // Act
+        indexedCollection.add("12");
+        indexedCollection.add("16");
+        indexedCollection.add("1");
+        indexedCollection.addAll(asList("2", "3", "4"));
+
+        // Assert
+        assertEquals("12", indexedCollection.get(12));
+        assertEquals("16", indexedCollection.get(16));
+        assertEquals("1", indexedCollection.get(1));
+        assertEquals("2", indexedCollection.get(2));
+        assertEquals("3", indexedCollection.get(3));
+        assertEquals("4", indexedCollection.get(4));
     }
 
     @Test
-    void testDecoratedCollectionIsIndexedOnCreation() throws Exception {
-        final Collection<String> original = makeFullCollection();
-        final IndexedCollection<Integer, String> indexed = decorateUniqueCollection(original);
+    @DisplayName("Constructor should correctly index elements of a pre-populated collection")
+    void constructorShouldIndexExistingElements() {
+        // Arrange
+        final List<String> initialElements = Arrays.asList("1", "2", "3");
+        final Collection<String> underlyingCollection = new ArrayList<>(initialElements);
 
-        assertEquals("1", indexed.get(1));
-        assertEquals("2", indexed.get(2));
-        assertEquals("3", indexed.get(3));
+        // Act
+        final IndexedCollection<Integer, String> indexedCollection = decorateUniqueCollection(underlyingCollection);
+
+        // Assert
+        assertEquals("1", indexedCollection.get(1));
+        assertEquals("2", indexedCollection.get(2));
+        assertEquals("3", indexedCollection.get(3));
     }
 
     @Test
-    void testEnsureDuplicateObjectsCauseException() throws Exception {
-        final Collection<String> coll = makeUniqueTestCollection();
+    @DisplayName("add() should throw IllegalArgumentException for a duplicate key in a unique index")
+    void addShouldThrowExceptionForDuplicateKeyInUniqueIndex() {
+        // Arrange
+        final Collection<String> uniqueIndexedCollection = makeEmptyUniqueIndexedCollection();
+        uniqueIndexedCollection.add("1"); // This adds the element with key 1
 
-        coll.add("1");
-
-        assertThrows(IllegalArgumentException.class, () -> coll.add("1"));
+        // Act & Assert
+        // Adding another element that maps to the same key should fail.
+        assertThrows(IllegalArgumentException.class, () -> uniqueIndexedCollection.add("1"));
     }
 
     @Test
-    void testReindexUpdatesIndexWhenDecoratedCollectionIsModifiedSeparately() throws Exception {
-        final Collection<String> original = new ArrayList<>();
-        final IndexedCollection<Integer, String> indexed = decorateUniqueCollection(original);
+    @DisplayName("reindex() should update the index after the decorated collection is modified externally")
+    void reindexShouldUpdateIndexAfterExternalModification() {
+        // Arrange
+        final Collection<String> underlyingCollection = new ArrayList<>();
+        final IndexedCollection<Integer, String> indexedCollection = decorateUniqueCollection(underlyingCollection);
 
-        original.add("1");
-        original.add("2");
-        original.add("3");
+        // Act: Modify the underlying collection directly, bypassing the decorator
+        underlyingCollection.add("1");
+        underlyingCollection.add("2");
+        underlyingCollection.add("3");
 
-        assertNull(indexed.get(1));
-        assertNull(indexed.get(2));
-        assertNull(indexed.get(3));
+        // Assert: The index is out of sync before reindexing
+        assertNull(indexedCollection.get(1));
+        assertNull(indexedCollection.get(2));
+        assertNull(indexedCollection.get(3));
 
-        indexed.reindex();
+        // Act: Manually trigger a reindex
+        indexedCollection.reindex();
 
-        assertEquals("1", indexed.get(1));
-        assertEquals("2", indexed.get(2));
-        assertEquals("3", indexed.get(3));
+        // Assert: The index is now synchronized with the underlying collection
+        assertEquals("1", indexedCollection.get(1));
+        assertEquals("2", indexedCollection.get(2));
+        assertEquals("3", indexedCollection.get(3));
     }
-
 }
