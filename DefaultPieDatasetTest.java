@@ -25,7 +25,7 @@
  * Other names may be trademarks of their respective owners.]
  *
  * -------------------
- * PieDatasetTest.java
+ * DefaultPieDatasetTest.java
  * -------------------
  * (C) Copyright 2003-present, by David Gilbert and Contributors.
  *
@@ -38,139 +38,210 @@ package org.jfree.data.general;
 
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.internal.CloneUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for the {@link org.jfree.data.general.PieDataset} class.
+ * Tests for the {@link DefaultPieDataset} class.
  */
 public class DefaultPieDatasetTest implements DatasetChangeListener {
 
-    private DatasetChangeEvent lastEvent;
+    private DatasetChangeEvent lastChangeEvent;
+    private DefaultPieDataset<String> dataset;
+
+    @BeforeEach
+    public void setUp() {
+        this.lastChangeEvent = null;
+        this.dataset = new DefaultPieDataset<>();
+    }
 
     /**
-     * Records the last event.
+     * Records the last dataset change event for testing purposes.
      *
-     * @param event  the last event.
+     * @param event the dataset change event
      */
     @Override
     public void datasetChanged(DatasetChangeEvent event) {
-        this.lastEvent = event;
+        this.lastChangeEvent = event;
     }
 
+    // ========== CLEAR METHOD TESTS ==========
+
     /**
-     * Some tests for the clear() method.
+     * Tests that clear() method works correctly and fires appropriate change events.
      */
     @Test
-    public void testClear() {
-        DefaultPieDataset<String> d = new DefaultPieDataset<>();
-        d.addChangeListener(this);
-        // no event is generated if the dataset is already empty
-        d.clear();
-        assertNull(this.lastEvent);
-        d.setValue("A", 1.0);
-        assertEquals(1, d.getItemCount());
-        this.lastEvent = null;
-        d.clear();
-        assertNotNull(this.lastEvent);
-        assertEquals(0, d.getItemCount());
+    public void testClear_EmptyDataset_NoEventFired() {
+        // Given: empty dataset with change listener
+        dataset.addChangeListener(this);
+        
+        // When: clearing empty dataset
+        dataset.clear();
+        
+        // Then: no change event should be fired
+        assertNull(lastChangeEvent, "No event should be fired when clearing empty dataset");
     }
 
-    /**
-     * Some checks for the getKey(int) method.
-     */
     @Test
-    public void testGetKey() {
-        DefaultPieDataset<String> d = new DefaultPieDataset<>();
-        d.setValue("A", 1.0);
-        d.setValue("B", 2.0);
-        assertEquals("A", d.getKey(0));
-        assertEquals("B", d.getKey(1));
-
-        boolean pass = false;
-        try {
-            d.getKey(-1);
-        }
-        catch (IndexOutOfBoundsException e) {
-            pass = true;
-        }
-        assertTrue(pass);
-
-        pass = false;
-        try {
-            d.getKey(2);
-        }
-        catch (IndexOutOfBoundsException e) {
-            pass = true;
-        }
-        assertTrue(pass);
+    public void testClear_NonEmptyDataset_EventFiredAndDatasetEmpty() {
+        // Given: dataset with data and change listener
+        dataset.addChangeListener(this);
+        dataset.setValue("Category A", 1.0);
+        assertEquals(1, dataset.getItemCount(), "Dataset should have 1 item initially");
+        lastChangeEvent = null; // Reset after setValue
+        
+        // When: clearing non-empty dataset
+        dataset.clear();
+        
+        // Then: change event should be fired and dataset should be empty
+        assertNotNull(lastChangeEvent, "Change event should be fired when clearing non-empty dataset");
+        assertEquals(0, dataset.getItemCount(), "Dataset should be empty after clear");
     }
 
+    // ========== GET KEY METHOD TESTS ==========
+
     /**
-     * Some checks for the getIndex() method.
+     * Tests that getKey() method returns correct keys for valid indices.
      */
     @Test
-    public void testGetIndex() {
-        DefaultPieDataset<String> d = new DefaultPieDataset<>();
-        d.setValue("A", 1.0);
-        d.setValue("B", 2.0);
-        assertEquals(0, d.getIndex("A"));
-        assertEquals(1, d.getIndex("B"));
-        assertEquals(-1, d.getIndex("XX"));
-
-        boolean pass = false;
-        try {
-            d.getIndex(null);
-        }
-        catch (IllegalArgumentException e) {
-            pass = true;
-        }
-        assertTrue(pass);
+    public void testGetKey_ValidIndices_ReturnsCorrectKeys() {
+        // Given: dataset with two items
+        dataset.setValue("Category A", 1.0);
+        dataset.setValue("Category B", 2.0);
+        
+        // When & Then: getting keys by valid indices
+        assertEquals("Category A", dataset.getKey(0), "First key should be 'Category A'");
+        assertEquals("Category B", dataset.getKey(1), "Second key should be 'Category B'");
     }
 
-    /**
-     * Confirm that cloning works.
-     * @throws java.lang.CloneNotSupportedException
-     */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
-        DefaultPieDataset<String> d1 = new DefaultPieDataset<>();
-        d1.setValue("V1", 1);
-        d1.setValue("V2", null);
-        d1.setValue("V3", 3);
-        DefaultPieDataset<String> d2 = CloneUtils.clone(d1);
-
-        assertNotSame(d1, d2);
-        assertSame(d1.getClass(), d2.getClass());
-        assertEquals(d1, d2);
+    public void testGetKey_NegativeIndex_ThrowsIndexOutOfBoundsException() {
+        // Given: dataset with data
+        dataset.setValue("Category A", 1.0);
+        dataset.setValue("Category B", 2.0);
+        
+        // When & Then: accessing negative index should throw exception
+        assertThrows(IndexOutOfBoundsException.class, () -> dataset.getKey(-1),
+                "Negative index should throw IndexOutOfBoundsException");
     }
 
-    /**
-     * Serialize an instance, restore it, and check for equality.
-     */
     @Test
-    public void testSerialization() {
-        DefaultPieDataset<String> d1 = new DefaultPieDataset<>();
-        d1.setValue("C1", 234.2);
-        d1.setValue("C2", null);
-        d1.setValue("C3", 345.9);
-        d1.setValue("C4", 452.7);
-
-        DefaultPieDataset<String> d2 = TestUtils.serialised(d1);
-        assertEquals(d1, d2);
+    public void testGetKey_IndexTooLarge_ThrowsIndexOutOfBoundsException() {
+        // Given: dataset with 2 items
+        dataset.setValue("Category A", 1.0);
+        dataset.setValue("Category B", 2.0);
+        
+        // When & Then: accessing index beyond dataset size should throw exception
+        assertThrows(IndexOutOfBoundsException.class, () -> dataset.getKey(2),
+                "Index beyond dataset size should throw IndexOutOfBoundsException");
     }
 
+    // ========== GET INDEX METHOD TESTS ==========
+
     /**
-     * A test for bug report https://github.com/jfree/jfreechart/issues/212
+     * Tests that getIndex() method returns correct indices for existing keys.
      */
     @Test
-    public void testBug212() {
-        DefaultPieDataset<String> d = new DefaultPieDataset<>();
-        assertThrows(IndexOutOfBoundsException.class, () ->  d.getValue(-1));
-        assertThrows(IndexOutOfBoundsException.class, () ->  d.getValue(0));
-        d.setValue("A", 1.0);
-        assertEquals(1.0, d.getValue(0));
-        assertThrows(IndexOutOfBoundsException.class, () ->  d.getValue(1));        
+    public void testGetIndex_ExistingKeys_ReturnsCorrectIndices() {
+        // Given: dataset with two items
+        dataset.setValue("Category A", 1.0);
+        dataset.setValue("Category B", 2.0);
+        
+        // When & Then: getting indices for existing keys
+        assertEquals(0, dataset.getIndex("Category A"), "Index of 'Category A' should be 0");
+        assertEquals(1, dataset.getIndex("Category B"), "Index of 'Category B' should be 1");
+    }
+
+    @Test
+    public void testGetIndex_NonExistentKey_ReturnsMinusOne() {
+        // Given: dataset with data
+        dataset.setValue("Category A", 1.0);
+        dataset.setValue("Category B", 2.0);
+        
+        // When & Then: getting index for non-existent key should return -1
+        assertEquals(-1, dataset.getIndex("NonExistent"), 
+                "Index of non-existent key should be -1");
+    }
+
+    @Test
+    public void testGetIndex_NullKey_ThrowsIllegalArgumentException() {
+        // Given: dataset with data
+        dataset.setValue("Category A", 1.0);
+        
+        // When & Then: null key should throw IllegalArgumentException
+        assertThrows(IllegalArgumentException.class, () -> dataset.getIndex(null),
+                "Null key should throw IllegalArgumentException");
+    }
+
+    // ========== CLONING TESTS ==========
+
+    /**
+     * Tests that cloning creates a proper deep copy of the dataset.
+     */
+    @Test
+    public void testCloning_CreatesProperDeepCopy() throws CloneNotSupportedException {
+        // Given: dataset with various data types including null
+        DefaultPieDataset<String> originalDataset = new DefaultPieDataset<>();
+        originalDataset.setValue("Value1", 1);
+        originalDataset.setValue("Value2", null);
+        originalDataset.setValue("Value3", 3);
+        
+        // When: cloning the dataset
+        DefaultPieDataset<String> clonedDataset = CloneUtils.clone(originalDataset);
+        
+        // Then: clone should be proper deep copy
+        assertNotSame(originalDataset, clonedDataset, "Clone should be different object instance");
+        assertSame(originalDataset.getClass(), clonedDataset.getClass(), "Clone should have same class");
+        assertEquals(originalDataset, clonedDataset, "Clone should be equal to original");
+    }
+
+    // ========== SERIALIZATION TESTS ==========
+
+    /**
+     * Tests that serialization and deserialization preserves dataset equality.
+     */
+    @Test
+    public void testSerialization_PreservesDatasetEquality() {
+        // Given: dataset with various data including null values
+        DefaultPieDataset<String> originalDataset = new DefaultPieDataset<>();
+        originalDataset.setValue("Category1", 234.2);
+        originalDataset.setValue("Category2", null);
+        originalDataset.setValue("Category3", 345.9);
+        originalDataset.setValue("Category4", 452.7);
+        
+        // When: serializing and deserializing
+        DefaultPieDataset<String> deserializedDataset = TestUtils.serialised(originalDataset);
+        
+        // Then: deserialized dataset should equal original
+        assertEquals(originalDataset, deserializedDataset, 
+                "Deserialized dataset should equal original dataset");
+    }
+
+    // ========== BUG REGRESSION TESTS ==========
+
+    /**
+     * Regression test for bug #212: getValue() with invalid indices should throw IndexOutOfBoundsException.
+     * See: https://github.com/jfree/jfreechart/issues/212
+     */
+    @Test
+    public void testGetValue_InvalidIndices_ThrowsIndexOutOfBoundsException() {
+        // Given: empty dataset
+        DefaultPieDataset<String> emptyDataset = new DefaultPieDataset<>();
+        
+        // When & Then: invalid indices on empty dataset should throw exceptions
+        assertThrows(IndexOutOfBoundsException.class, () -> emptyDataset.getValue(-1),
+                "Negative index should throw IndexOutOfBoundsException");
+        assertThrows(IndexOutOfBoundsException.class, () -> emptyDataset.getValue(0),
+                "Index 0 on empty dataset should throw IndexOutOfBoundsException");
+        
+        // Given: dataset with one item
+        emptyDataset.setValue("Category A", 1.0);
+        
+        // When & Then: valid index should work, invalid index should throw exception
+        assertEquals(1.0, emptyDataset.getValue(0), "Valid index should return correct value");
+        assertThrows(IndexOutOfBoundsException.class, () -> emptyDataset.getValue(1),
+                "Index beyond dataset size should throw IndexOutOfBoundsException");
     }
 }
