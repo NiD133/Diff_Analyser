@@ -4,186 +4,193 @@
  */
 package org.mockito.internal.exceptions.stacktrace;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockitoutil.Conditions.onlyThoseClasses;
 
-import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.mockito.exceptions.base.TraceBuilder;
 import org.mockitoutil.TestBase;
 
+/**
+ * Tests for {@link StackTraceFilter}.
+ * <p>
+ * The filter is responsible for cleaning up stack traces by removing irrelevant frames
+ * from Mockito, CGLIB, and other libraries to make them more readable for users.
+ */
 public class StackTraceFilterTest extends TestBase {
 
     private final StackTraceFilter filter = new StackTraceFilter();
 
+    // --- Constants for representative class names ---
+    private static final String USER_CODE = "org.my.app.MyTest";
+    private static final String USER_CODE_2 = "org.my.app.TestSupport";
+    private static final String JUNIT_RUNNER = "org.junit.runner.Runner";
+    private static final String MOCKITO_RUNNER = "org.mockito.runners.Runner";
+    private static final String MOCKITO_INTERNAL_RUNNER = "org.mockito.internal.runners.Runner";
+    private static final String MOCKITO_RULE = "org.mockito.internal.junit.JUnitRule$1.evaluate(JUnitRule.java:16)";
+
+    private static final String MOCKITO_INTERNAL = "org.mockito.internal.MockitoCore";
+    private static final String CGLIB_PROXY = "org.my.app.Book$$EnhancerByMockitoWithCGLIB$$12345";
+    private static final String BYTE_BUDDY_PROXY = "org.my.app.User$MockitoMock$1882975947.doSomething(Unknown Source)";
+
+    // region Basic Filtering (keepTop = false)
+
     @Test
-    public void shouldFilterOutCglibGarbage() {
-        StackTraceElement[] t =
-                new TraceBuilder()
-                        .classes("MockitoExampleTest", "List$$EnhancerByMockitoWithCGLIB$$2c406024")
-                        .toTraceArray();
+    public void filter_shouldRemoveCglibGeneratedClassNames() {
+        // given
+        StackTraceElement[] stackTrace = new TraceBuilder().classes(USER_CODE, CGLIB_PROXY).toTraceArray();
 
-        StackTraceElement[] filtered = filter.filter(t, false);
+        // when
+        StackTraceElement[] filtered = filter.filter(stackTrace, false);
 
-        Assertions.assertThat(filtered).has(onlyThoseClasses("MockitoExampleTest"));
+        // then
+        assertThat(filtered).has(onlyThoseClasses(USER_CODE));
     }
 
     @Test
-    public void shouldFilterOutByteBuddyGarbage() {
-        StackTraceElement[] t =
+    public void filter_shouldRemoveByteBuddyGeneratedClassNames() {
+        // given
+        StackTraceElement[] stackTrace = new TraceBuilder().classes(USER_CODE, BYTE_BUDDY_PROXY).toTraceArray();
+
+        // when
+        StackTraceElement[] filtered = filter.filter(stackTrace, false);
+
+        // then
+        assertThat(filtered).has(onlyThoseClasses(USER_CODE));
+    }
+
+    @Test
+    public void filter_shouldRemoveMockitoInternalClassNames() {
+        // given
+        StackTraceElement[] stackTrace = new TraceBuilder().classes(USER_CODE, MOCKITO_INTERNAL).toTraceArray();
+
+        // when
+        StackTraceElement[] filtered = filter.filter(stackTrace, false);
+
+        // then
+        assertThat(filtered).has(onlyThoseClasses(USER_CODE));
+    }
+
+    @Test
+    public void filter_shouldPreserveUserCodeBetweenFilteredClassNames() {
+        // given
+        StackTraceElement[] stackTrace =
+                new TraceBuilder()
+                        .classes(USER_CODE, USER_CODE_2, MOCKITO_INTERNAL, USER_CODE_2, MOCKITO_INTERNAL)
+                        .toTraceArray();
+
+        // when
+        StackTraceElement[] filtered = filter.filter(stackTrace, false);
+
+        // then
+        assertThat(filtered).has(onlyThoseClasses(USER_CODE, USER_CODE_2, USER_CODE_2));
+    }
+
+    @Test
+    public void filter_shouldPreserveRunnerClassNames() {
+        // given
+        StackTraceElement[] stackTrace =
+                new TraceBuilder().classes(MOCKITO_RUNNER, JUNIT_RUNNER, USER_CODE, MOCKITO_INTERNAL).toTraceArray();
+
+        // when
+        StackTraceElement[] filtered = filter.filter(stackTrace, false);
+
+        // then
+        assertThat(filtered).has(onlyThoseClasses(MOCKITO_RUNNER, JUNIT_RUNNER, USER_CODE));
+    }
+
+    @Test
+    public void filter_shouldPreserveInternalRunnerClassNames() {
+        // given
+        StackTraceElement[] stackTrace =
+                new TraceBuilder().classes(MOCKITO_INTERNAL_RUNNER, USER_CODE).toTraceArray();
+
+        // when
+        StackTraceElement[] filtered = filter.filter(stackTrace, false);
+
+        // then
+        assertThat(filtered).has(onlyThoseClasses(MOCKITO_INTERNAL_RUNNER, USER_CODE));
+    }
+
+    @Test
+    public void filter_shouldPreserveFramesAboveMockitoRule() {
+        // given
+        StackTraceElement[] stackTrace =
                 new TraceBuilder()
                         .classes(
-                                "MockitoExampleTest",
-                                "org.testcase.MockedClass$MockitoMock$1882975947.doSomething(Unknown Source)")
-                        .toTraceArray();
-
-        StackTraceElement[] filtered = filter.filter(t, false);
-
-        Assertions.assertThat(filtered).has(onlyThoseClasses("MockitoExampleTest"));
-    }
-
-    @Test
-    public void shouldFilterOutMockitoPackage() {
-        StackTraceElement[] t =
-                new TraceBuilder()
-                        .classes("org.test.MockitoSampleTest", "org.mockito.Mockito")
-                        .toTraceArray();
-
-        StackTraceElement[] filtered = filter.filter(t, false);
-
-        Assertions.assertThat(filtered).has(onlyThoseClasses("org.test.MockitoSampleTest"));
-    }
-
-    @Test
-    public void shouldNotFilterOutTracesMiddleGoodTraces() {
-        StackTraceElement[] t =
-                new TraceBuilder()
-                        .classes(
-                                "org.test.MockitoSampleTest",
-                                "org.test.TestSupport",
-                                "org.mockito.Mockito",
-                                "org.test.TestSupport",
-                                "org.mockito.Mockito")
-                        .toTraceArray();
-
-        StackTraceElement[] filtered = filter.filter(t, false);
-
-        Assertions.assertThat(filtered)
-                .has(
-                        onlyThoseClasses(
-                                "org.test.TestSupport",
-                                "org.test.TestSupport",
-                                "org.test.MockitoSampleTest"));
-    }
-
-    @Test
-    public void shouldKeepRunners() {
-        StackTraceElement[] t =
-                new TraceBuilder()
-                        .classes(
-                                "org.mockito.runners.Runner",
-                                "junit.stuff",
-                                "org.test.MockitoSampleTest",
-                                "org.mockito.Mockito")
-                        .toTraceArray();
-
-        StackTraceElement[] filtered = filter.filter(t, false);
-
-        Assertions.assertThat(filtered)
-                .has(
-                        onlyThoseClasses(
-                                "org.test.MockitoSampleTest",
-                                "junit.stuff",
-                                "org.mockito.runners.Runner"));
-    }
-
-    @Test
-    public void shouldNotFilterElementsAboveMockitoJUnitRule() {
-        StackTraceElement[] t =
-                new TraceBuilder()
-                        .classes(
-                                "org.mockito.internal.junit.JUnitRule$1.evaluate(JUnitRule.java:16)",
-                                "org.mockito.runners.Runner",
-                                "junit.stuff",
-                                "org.test.MockitoSampleTest",
-                                "org.mockito.internal.MockitoCore.verifyNoMoreInteractions",
+                                MOCKITO_RULE,
+                                MOCKITO_RUNNER,
+                                JUNIT_RUNNER,
+                                USER_CODE,
+                                MOCKITO_INTERNAL,
                                 "org.mockito.internal.debugging.LocationImpl")
                         .toTraceArray();
 
-        StackTraceElement[] filtered = filter.filter(t, false);
+        // when
+        StackTraceElement[] filtered = filter.filter(stackTrace, false);
 
-        Assertions.assertThat(filtered)
-                .has(
-                        onlyThoseClasses(
-                                "org.test.MockitoSampleTest",
-                                "junit.stuff",
-                                "org.mockito.runners.Runner",
-                                "org.mockito.internal.junit.JUnitRule$1.evaluate(JUnitRule.java:16)"));
+        // then
+        assertThat(filtered).has(onlyThoseClasses(MOCKITO_RULE, MOCKITO_RUNNER, JUNIT_RUNNER, USER_CODE));
     }
 
-    @Test
-    public void shouldKeepInternalRunners() {
-        StackTraceElement[] t =
-                new TraceBuilder()
-                        .classes(
-                                "org.mockito.internal.runners.Runner", "org.test.MockitoSampleTest")
-                        .toTraceArray();
+    // endregion
 
-        StackTraceElement[] filtered = filter.filter(t, false);
-
-        Assertions.assertThat(filtered)
-                .has(
-                        onlyThoseClasses(
-                                "org.test.MockitoSampleTest",
-                                "org.mockito.internal.runners.Runner"));
-    }
+    // region Advanced Filtering (keepTop = true)
 
     @Test
-    public void shouldStartFilteringAndKeepTop() {
+    public void filter_withKeepTop_preservesUserCodeAtTopOfStack() {
         // given
-        StackTraceElement[] t =
-                new TraceBuilder()
-                        .classes(
-                                "org.test.Good",
-                                "org.mockito.internal.Bad",
-                                "org.test.MockitoSampleTest")
-                        .toTraceArray();
+        // The 'keepTop' flag is for scenarios like exceptions in spies. It preserves all frames
+        // from the top until the first frame that needs to be filtered.
+        final String userCodeAtTop = "org.my.app.Good";
+        final String internalCodeInMiddle = "org.mockito.internal.Bad";
+        StackTraceElement[] stackTrace =
+                new TraceBuilder().classes(userCodeAtTop, internalCodeInMiddle, USER_CODE).toTraceArray();
 
         // when
-        StackTraceElement[] filtered = filter.filter(t, true);
+        StackTraceElement[] filtered = filter.filter(stackTrace, true);
 
         // then
-        Assertions.assertThat(filtered)
-                .has(onlyThoseClasses("org.test.MockitoSampleTest", "org.test.Good"));
+        // The internal code is removed, but the user code above it is preserved.
+        assertThat(filtered).has(onlyThoseClasses(userCodeAtTop, USER_CODE));
     }
 
     @Test
-    public void
-            shouldKeepGoodTraceFromTheTopBecauseRealImplementationsOfSpiesSometimesThrowExceptions() {
-        StackTraceElement[] t =
+    public void filter_withKeepTop_preservesUserCodeFromSpyInvocations() {
+        // given
+        // This simulates a spy calling real code, which then throws an exception.
+        // The top of the stack trace is user code that should be preserved.
+        final String userCodeSpyImpl = "org.my.app.SpyImpl";
+        final String anotherUserCode = "org.my.app.AnotherClass";
+        final String internalCode = "org.mockito.internal.to.be.Filtered";
+        StackTraceElement[] stackTrace =
                 new TraceBuilder()
-                        .classes(
-                                "org.good.Trace",
-                                "org.yet.another.good.Trace",
-                                "org.mockito.internal.to.be.Filtered",
-                                "org.test.MockitoSampleTest")
+                        .classes(userCodeSpyImpl, anotherUserCode, internalCode, USER_CODE)
                         .toTraceArray();
 
-        StackTraceElement[] filtered = filter.filter(t, true);
+        // when
+        StackTraceElement[] filtered = filter.filter(stackTrace, true);
 
-        Assertions.assertThat(filtered)
-                .has(
-                        onlyThoseClasses(
-                                "org.test.MockitoSampleTest",
-                                "org.yet.another.good.Trace",
-                                "org.good.Trace"));
+        // then
+        // The contiguous block of user code at the top is preserved.
+        assertThat(filtered).has(onlyThoseClasses(userCodeSpyImpl, anotherUserCode, USER_CODE));
     }
+
+    // endregion
+
+    // region Edge Cases
 
     @Test
-    public void shouldReturnEmptyArrayWhenInputIsEmpty() throws Exception {
+    public void filter_shouldReturnEmptyArrayForEmptyInput() {
+        // given
+        StackTraceElement[] emptyStackTrace = new StackTraceElement[0];
+
         // when
-        StackTraceElement[] filtered = filter.filter(new StackTraceElement[0], false);
+        StackTraceElement[] filtered = filter.filter(emptyStackTrace, false);
+
         // then
-        assertEquals(0, filtered.length);
+        assertThat(filtered).isEmpty();
     }
+
+    // endregion
 }
