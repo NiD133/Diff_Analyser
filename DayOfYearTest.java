@@ -31,11 +31,47 @@
  */
 package org.threeten.extra;
 
+import static java.time.temporal.ChronoField.ALIGNED_DAY_OF_WEEK_IN_MONTH;
+import static java.time.temporal.ChronoField.ALIGNED_DAY_OF_WEEK_IN_YEAR;
+import static java.time.temporal.ChronoField.ALIGNED_WEEK_OF_MONTH;
+import static java.time.temporal.ChronoField.ALIGNED_WEEK_OF_YEAR;
+import static java.time.temporal.ChronoField.AMPM_OF_DAY;
+import static java.time.temporal.ChronoField.CLOCK_HOUR_OF_AMPM;
+import static java.time.temporal.ChronoField.CLOCK_HOUR_OF_DAY;
+import static java.time.temporal.ChronoField.DAY_OF_MONTH;
+import static java.time.temporal.ChronoField.DAY_OF_WEEK;
+import static java.time.temporal.ChronoField.DAY_OF_YEAR;
+import static java.time.temporal.ChronoField.EPOCH_DAY;
+import static java.time.temporal.ChronoField.ERA;
+import static java.time.temporal.ChronoField.HOUR_OF_AMPM;
+import static java.time.temporal.ChronoField.HOUR_OF_DAY;
+import static java.time.temporal.ChronoField.INSTANT_SECONDS;
+import static java.time.temporal.ChronoField.MICRO_OF_DAY;
+import static java.time.temporal.ChronoField.MICRO_OF_SECOND;
+import static java.time.temporal.ChronoField.MILLI_OF_DAY;
+import static java.time.temporal.ChronoField.MILLI_OF_SECOND;
+import static java.time.temporal.ChronoField.MINUTE_OF_DAY;
+import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
+import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
+import static java.time.temporal.ChronoField.NANO_OF_DAY;
+import static java.time.temporal.ChronoField.NANO_OF_SECOND;
+import static java.time.temporal.ChronoField.OFFSET_SECONDS;
+import static java.time.temporal.ChronoField.PROLEPTIC_MONTH;
+import static java.time.temporal.ChronoField.SECOND_OF_DAY;
+import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
+import static java.time.temporal.ChronoField.YEAR;
+import static java.time.temporal.ChronoField.YEAR_OF_ERA;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.time.Clock;
 import java.time.DateTimeException;
 import java.time.Instant;
@@ -57,52 +93,77 @@ import java.time.temporal.TemporalUnit;
 import java.time.temporal.UnsupportedTemporalTypeException;
 import java.time.temporal.ValueRange;
 
-import com.google.common.testing.EqualsTester;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.RetryingTest;
 
-import static java.time.temporal.ChronoField.*;
-import static org.junit.jupiter.api.Assertions.*;
+import com.google.common.testing.EqualsTester;
 
 /**
  * Test DayOfYear.
  */
 public class TestDayOfYear {
 
-    private static final Year STANDARD_YEAR = Year.of(2007);
-    private static final Year LEAP_YEAR = Year.of(2008);
-    private static final int DAYS_IN_STANDARD_YEAR = 365;
-    private static final int DAYS_IN_LEAP_YEAR = 366;
-    private static final DayOfYear TEST_DAY = DayOfYear.of(12);
+    private static final Year YEAR_STANDARD = Year.of(2007);
+    private static final Year YEAR_LEAP = Year.of(2008);
+    private static final int STANDARD_YEAR_LENGTH = 365;
+    private static final int LEAP_YEAR_LENGTH = 366;
+    private static final DayOfYear TEST = DayOfYear.of(12);
     private static final ZoneId PARIS = ZoneId.of("Europe/Paris");
 
-    // Helper class for testing custom temporal fields
     private static class TestingField implements TemporalField {
+
         public static final TestingField INSTANCE = new TestingField();
 
-        @Override public TemporalUnit getBaseUnit() { return ChronoUnit.DAYS; }
-        @Override public TemporalUnit getRangeUnit() { return ChronoUnit.YEARS; }
-        @Override public ValueRange range() { return ValueRange.of(1, 365, 366); }
-        @Override public boolean isDateBased() { return true; }
-        @Override public boolean isTimeBased() { return false; }
-        @Override public boolean isSupportedBy(TemporalAccessor temporal) { 
-            return temporal.isSupported(DAY_OF_YEAR); 
+        @Override
+        public TemporalUnit getBaseUnit() {
+            return ChronoUnit.DAYS;
         }
-        @Override public ValueRange rangeRefinedBy(TemporalAccessor temporal) { return range(); }
-        @Override public long getFrom(TemporalAccessor temporal) { 
-            return temporal.getLong(DAY_OF_YEAR); 
+
+        @Override
+        public TemporalUnit getRangeUnit() {
+            return ChronoUnit.YEARS;
         }
-        @Override public <R extends Temporal> R adjustInto(R temporal, long newValue) {
+
+        @Override
+        public ValueRange range() {
+            return ValueRange.of(1, 365, 366);
+        }
+
+        @Override
+        public boolean isDateBased() {
+            return true;
+        }
+
+        @Override
+        public boolean isTimeBased() {
+            return false;
+        }
+
+        @Override
+        public boolean isSupportedBy(TemporalAccessor temporal) {
+            return temporal.isSupported(DAY_OF_YEAR);
+        }
+
+        @Override
+        public ValueRange rangeRefinedBy(TemporalAccessor temporal) {
+            return range();
+        }
+
+        @Override
+        public long getFrom(TemporalAccessor temporal) {
+            return temporal.getLong(DAY_OF_YEAR);
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <R extends Temporal> R adjustInto(R temporal, long newValue) {
             return (R) temporal.with(DAY_OF_YEAR, newValue);
         }
     }
 
     //-----------------------------------------------------------------------
-    // Class Structure Verification
-    //-----------------------------------------------------------------------
-    
     @Test
-    public void class_implements_expected_interfaces() {
+    public void test_interfaces() {
         assertTrue(Serializable.class.isAssignableFrom(DayOfYear.class));
         assertTrue(Comparable.class.isAssignableFrom(DayOfYear.class));
         assertTrue(TemporalAdjuster.class.isAssignableFrom(DayOfYear.class));
@@ -110,499 +171,462 @@ public class TestDayOfYear {
     }
 
     @Test
-    public void serialization_preserves_singleton_instances() throws Exception {
-        DayOfYear original = DayOfYear.of(1);
-        
+    public void test_serialization() throws IOException, ClassNotFoundException {
+        DayOfYear test = DayOfYear.of(1);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
-            oos.writeObject(original);
+            oos.writeObject(test);
         }
-        
-        try (ObjectInputStream ois = new ObjectInputStream(
-             new ByteArrayInputStream(baos.toByteArray()))) {
-            DayOfYear deserialized = (DayOfYear) ois.readObject();
-            assertSame(original, deserialized);
+        try (ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()))) {
+            assertSame(test, ois.readObject());
         }
     }
 
     //-----------------------------------------------------------------------
-    // now() Factory Methods
+    // now()
     //-----------------------------------------------------------------------
-    
     @RetryingTest(100)
-    public void now_uses_system_default_zone() {
-        assertEquals(LocalDate.now().getDayOfYear(), 
-                     DayOfYear.now().getValue());
+    public void test_now() {
+        assertEquals(LocalDate.now().getDayOfYear(), DayOfYear.now().getValue());
     }
 
+    //-----------------------------------------------------------------------
+    // now(ZoneId)
+    //-----------------------------------------------------------------------
     @RetryingTest(100)
-    public void now_with_zoneId_uses_specified_zone() {
-        ZoneId tokyo = ZoneId.of("Asia/Tokyo");
-        assertEquals(LocalDate.now(tokyo).getDayOfYear(), 
-                     DayOfYear.now(tokyo).getValue());
-    }
-
-    @Test
-    public void now_with_clock_in_standard_year() {
-        LocalDate date = LocalDate.of(2007, 1, 1);
-        for (int i = 1; i <= DAYS_IN_STANDARD_YEAR; i++) {
-            Instant instant = date.atStartOfDay(PARIS).toInstant();
-            Clock clock = Clock.fixed(instant, PARIS);
-            DayOfYear test = DayOfYear.now(clock);
-            assertEquals(i, test.getValue());
-            date = date.plusDays(1);
-        }
-    }
-
-    @Test
-    public void now_with_clock_in_leap_year() {
-        LocalDate date = LocalDate.of(2008, 1, 1);
-        for (int i = 1; i <= DAYS_IN_LEAP_YEAR; i++) {
-            Instant instant = date.atStartOfDay(PARIS).toInstant();
-            Clock clock = Clock.fixed(instant, PARIS);
-            DayOfYear test = DayOfYear.now(clock);
-            assertEquals(i, test.getValue());
-            date = date.plusDays(1);
-        }
+    public void test_now_ZoneId() {
+        ZoneId zone = ZoneId.of("Asia/Tokyo");
+        assertEquals(LocalDate.now(zone).getDayOfYear(), DayOfYear.now(zone).getValue());
     }
 
     //-----------------------------------------------------------------------
-    // of() Factory Method
+    // of(int)
     //-----------------------------------------------------------------------
-    
     @Test
-    public void of_valid_days_returns_cached_instances() {
-        for (int i = 1; i <= DAYS_IN_LEAP_YEAR; i++) {
-            DayOfYear instance = DayOfYear.of(i);
-            assertEquals(i, instance.getValue());
-            assertSame(instance, DayOfYear.of(i)); // Verify instance caching
+    public void test_of_int() {
+        for (int i = 1; i <= LEAP_YEAR_LENGTH; i++) {
+            DayOfYear test = DayOfYear.of(i);
+            assertEquals(i, test.getValue());
+            assertSame(test, DayOfYear.of(i));
         }
     }
 
     @Test
-    public void of_dayZero_throws_exception() {
+    public void test_of_int_tooLow() {
         assertThrows(DateTimeException.class, () -> DayOfYear.of(0));
     }
 
     @Test
-    public void of_day367_throws_exception() {
+    public void test_of_int_tooHigh() {
         assertThrows(DateTimeException.class, () -> DayOfYear.of(367));
     }
 
     //-----------------------------------------------------------------------
-    // from() Factory Method
+    // from(TemporalAccessor)
     //-----------------------------------------------------------------------
-    
     @Test
-    public void from_LocalDate_standard_year() {
+    public void test_from_TemporalAccessor_notLeapYear() {
         LocalDate date = LocalDate.of(2007, 1, 1);
-        for (int i = 1; i <= DAYS_IN_STANDARD_YEAR; i++) {
-            assertEquals(i, DayOfYear.from(date).getValue());
+        for (int i = 1; i <= STANDARD_YEAR_LENGTH; i++) {
+            DayOfYear test = DayOfYear.from(date);
+            assertEquals(i, test.getValue());
             date = date.plusDays(1);
         }
-        // Verify rollover to next year
-        assertEquals(1, DayOfYear.from(date).getValue());
+        DayOfYear test = DayOfYear.from(date);
+        assertEquals(1, test.getValue());
     }
 
     @Test
-    public void from_LocalDate_leap_year() {
+    public void test_from_TemporalAccessor_leapYear() {
         LocalDate date = LocalDate.of(2008, 1, 1);
-        for (int i = 1; i <= DAYS_IN_LEAP_YEAR; i++) {
-            assertEquals(i, DayOfYear.from(date).getValue());
+        for (int i = 1; i <= LEAP_YEAR_LENGTH; i++) {
+            DayOfYear test = DayOfYear.from(date);
+            assertEquals(i, test.getValue());
             date = date.plusDays(1);
         }
     }
 
     @Test
-    public void from_DayOfYear_returns_same_instance() {
-        DayOfYear instance = DayOfYear.of(6);
-        assertSame(instance, DayOfYear.from(instance));
+    public void test_from_TemporalAccessor_DayOfYear() {
+        DayOfYear dom = DayOfYear.of(6);
+        assertEquals(dom, DayOfYear.from(dom));
     }
 
     @Test
-    public void from_nonIsoTemporal_returns_correct_value() {
+    public void test_from_TemporalAccessor_nonIso() {
         LocalDate date = LocalDate.now();
-        JapaneseDate japaneseDate = JapaneseDate.from(date);
-        assertEquals(date.getDayOfYear(), 
-                     DayOfYear.from(japaneseDate).getValue());
+        assertEquals(date.getDayOfYear(), DayOfYear.from(JapaneseDate.from(date)).getValue());
     }
 
     @Test
-    public void from_unsupported_temporal_throws_exception() {
-        assertThrows(DateTimeException.class, 
-                     () -> DayOfYear.from(LocalTime.NOON));
+    public void test_from_TemporalAccessor_noDerive() {
+        assertThrows(DateTimeException.class, () -> DayOfYear.from(LocalTime.NOON));
     }
 
     @Test
-    public void from_null_throws_exception() {
-        assertThrows(NullPointerException.class, 
-                     () -> DayOfYear.from((TemporalAccessor) null));
+    public void test_from_TemporalAccessor_null() {
+        assertThrows(NullPointerException.class, () -> DayOfYear.from((TemporalAccessor) null));
     }
 
     @Test
-    public void from_parsed_string() {
+    public void test_from_parse_CharSequence() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("D");
-        assertEquals(DayOfYear.of(76), 
-                     formatter.parse("76", DayOfYear::from));
+        assertEquals(DayOfYear.of(76), formatter.parse("76", DayOfYear::from));
     }
 
     //-----------------------------------------------------------------------
-    // getValue()
+    // isSupported(TemporalField)
     //-----------------------------------------------------------------------
-    
     @Test
-    public void getValue_returns_day_of_year() {
-        DayOfYear instance = DayOfYear.of(12);
-        assertEquals(12, instance.getValue());
-    }
-
-    //-----------------------------------------------------------------------
-    // isSupported()
-    //-----------------------------------------------------------------------
-    
-    @Test
-    public void isSupported_for_various_temporal_fields() {
-        // Supported fields
-        assertTrue(TEST_DAY.isSupported(DAY_OF_YEAR));
-        assertTrue(TEST_DAY.isSupported(TestingField.INSTANCE));
-
-        // Unsupported fields
-        assertFalse(TEST_DAY.isSupported(null));
-        assertFalse(TEST_DAY.isSupported(NANO_OF_SECOND));
-        assertFalse(TEST_DAY.isSupported(NANO_OF_DAY));
-        assertFalse(TEST_DAY.isSupported(MICRO_OF_SECOND));
-        assertFalse(TEST_DAY.isSupported(MICRO_OF_DAY));
-        assertFalse(TEST_DAY.isSupported(MILLI_OF_SECOND));
-        assertFalse(TEST_DAY.isSupported(MILLI_OF_DAY));
-        assertFalse(TEST_DAY.isSupported(SECOND_OF_MINUTE));
-        assertFalse(TEST_DAY.isSupported(SECOND_OF_DAY));
-        assertFalse(TEST_DAY.isSupported(MINUTE_OF_HOUR));
-        assertFalse(TEST_DAY.isSupported(MINUTE_OF_DAY));
-        assertFalse(TEST_DAY.isSupported(HOUR_OF_AMPM));
-        assertFalse(TEST_DAY.isSupported(CLOCK_HOUR_OF_AMPM));
-        assertFalse(TEST_DAY.isSupported(HOUR_OF_DAY));
-        assertFalse(TEST_DAY.isSupported(CLOCK_HOUR_OF_DAY));
-        assertFalse(TEST_DAY.isSupported(AMPM_OF_DAY));
-        assertFalse(TEST_DAY.isSupported(DAY_OF_WEEK));
-        assertFalse(TEST_DAY.isSupported(ALIGNED_DAY_OF_WEEK_IN_MONTH));
-        assertFalse(TEST_DAY.isSupported(ALIGNED_DAY_OF_WEEK_IN_YEAR));
-        assertFalse(TEST_DAY.isSupported(DAY_OF_MONTH));
-        assertFalse(TEST_DAY.isSupported(EPOCH_DAY));
-        assertFalse(TEST_DAY.isSupported(ALIGNED_WEEK_OF_MONTH));
-        assertFalse(TEST_DAY.isSupported(ALIGNED_WEEK_OF_YEAR));
-        assertFalse(TEST_DAY.isSupported(MONTH_OF_YEAR));
-        assertFalse(TEST_DAY.isSupported(PROLEPTIC_MONTH));
-        assertFalse(TEST_DAY.isSupported(YEAR_OF_ERA));
-        assertFalse(TEST_DAY.isSupported(YEAR));
-        assertFalse(TEST_DAY.isSupported(ERA));
-        assertFalse(TEST_DAY.isSupported(INSTANT_SECONDS));
-        assertFalse(TEST_DAY.isSupported(OFFSET_SECONDS));
+    public void test_isSupported() {
+        assertEquals(false, TEST.isSupported((TemporalField) null));
+        assertEquals(false, TEST.isSupported(NANO_OF_SECOND));
+        assertEquals(false, TEST.isSupported(NANO_OF_DAY));
+        assertEquals(false, TEST.isSupported(MICRO_OF_SECOND));
+        assertEquals(false, TEST.isSupported(MICRO_OF_DAY));
+        assertEquals(false, TEST.isSupported(MILLI_OF_SECOND));
+        assertEquals(false, TEST.isSupported(MILLI_OF_DAY));
+        assertEquals(false, TEST.isSupported(SECOND_OF_MINUTE));
+        assertEquals(false, TEST.isSupported(SECOND_OF_DAY));
+        assertEquals(false, TEST.isSupported(MINUTE_OF_HOUR));
+        assertEquals(false, TEST.isSupported(MINUTE_OF_DAY));
+        assertEquals(false, TEST.isSupported(HOUR_OF_AMPM));
+        assertEquals(false, TEST.isSupported(CLOCK_HOUR_OF_AMPM));
+        assertEquals(false, TEST.isSupported(HOUR_OF_DAY));
+        assertEquals(false, TEST.isSupported(CLOCK_HOUR_OF_DAY));
+        assertEquals(false, TEST.isSupported(AMPM_OF_DAY));
+        assertEquals(false, TEST.isSupported(DAY_OF_WEEK));
+        assertEquals(false, TEST.isSupported(ALIGNED_DAY_OF_WEEK_IN_MONTH));
+        assertEquals(false, TEST.isSupported(ALIGNED_DAY_OF_WEEK_IN_YEAR));
+        assertEquals(false, TEST.isSupported(DAY_OF_MONTH));
+        assertEquals(true, TEST.isSupported(DAY_OF_YEAR));
+        assertEquals(false, TEST.isSupported(EPOCH_DAY));
+        assertEquals(false, TEST.isSupported(ALIGNED_WEEK_OF_MONTH));
+        assertEquals(false, TEST.isSupported(ALIGNED_WEEK_OF_YEAR));
+        assertEquals(false, TEST.isSupported(MONTH_OF_YEAR));
+        assertEquals(false, TEST.isSupported(PROLEPTIC_MONTH));
+        assertEquals(false, TEST.isSupported(YEAR_OF_ERA));
+        assertEquals(false, TEST.isSupported(YEAR));
+        assertEquals(false, TEST.isSupported(ERA));
+        assertEquals(false, TEST.isSupported(INSTANT_SECONDS));
+        assertEquals(false, TEST.isSupported(OFFSET_SECONDS));
+        assertEquals(true, TEST.isSupported(TestingField.INSTANCE));
     }
 
     //-----------------------------------------------------------------------
-    // range()
+    // range(TemporalField)
     //-----------------------------------------------------------------------
-    
     @Test
-    public void range_for_dayOfYear_returns_valid_range() {
-        assertEquals(DAY_OF_YEAR.range(), TEST_DAY.range(DAY_OF_YEAR));
+    public void test_range() {
+        assertEquals(DAY_OF_YEAR.range(), TEST.range(DAY_OF_YEAR));
     }
 
     @Test
-    public void range_unsupported_field_throws_exception() {
-        assertThrows(UnsupportedTemporalTypeException.class, 
-                     () -> TEST_DAY.range(MONTH_OF_YEAR));
+    public void test_range_invalidField() {
+        assertThrows(UnsupportedTemporalTypeException.class, () -> TEST.range(MONTH_OF_YEAR));
     }
 
     @Test
-    public void range_null_throws_exception() {
-        assertThrows(NullPointerException.class, 
-                     () -> TEST_DAY.range(null));
+    public void test_range_null() {
+        assertThrows(NullPointerException.class, () -> TEST.range((TemporalField) null));
     }
 
     //-----------------------------------------------------------------------
-    // get()
+    // get(TemporalField)
     //-----------------------------------------------------------------------
-    
     @Test
-    public void get_for_dayOfYear_returns_value() {
-        assertEquals(12, TEST_DAY.get(DAY_OF_YEAR));
+    public void test_get() {
+        assertEquals(12, TEST.get(DAY_OF_YEAR));
     }
 
     @Test
-    public void get_unsupported_field_throws_exception() {
-        assertThrows(UnsupportedTemporalTypeException.class, 
-                     () -> TEST_DAY.get(MONTH_OF_YEAR));
+    public void test_get_invalidField() {
+        assertThrows(UnsupportedTemporalTypeException.class, () -> TEST.get(MONTH_OF_YEAR));
     }
 
     @Test
-    public void get_null_throws_exception() {
-        assertThrows(NullPointerException.class, 
-                     () -> TEST_DAY.get(null));
+    public void test_get_null() {
+        assertThrows(NullPointerException.class, () -> TEST.get((TemporalField) null));
     }
 
     //-----------------------------------------------------------------------
-    // getLong()
+    // getLong(TemporalField)
     //-----------------------------------------------------------------------
-    
     @Test
-    public void getLong_for_dayOfYear_returns_value() {
-        assertEquals(12L, TEST_DAY.getLong(DAY_OF_YEAR));
+    public void test_getLong() {
+        assertEquals(12L, TEST.getLong(DAY_OF_YEAR));
     }
 
     @Test
-    public void getLong_for_custom_field_returns_value() {
-        assertEquals(12L, TEST_DAY.getLong(TestingField.INSTANCE));
+    public void test_getLong_derivedField() {
+        assertEquals(12L, TEST.getLong(TestingField.INSTANCE));
     }
 
     @Test
-    public void getLong_unsupported_field_throws_exception() {
-        assertThrows(UnsupportedTemporalTypeException.class, 
-                     () -> TEST_DAY.getLong(MONTH_OF_YEAR));
+    public void test_getLong_invalidField() {
+        assertThrows(UnsupportedTemporalTypeException.class, () -> TEST.getLong(MONTH_OF_YEAR));
     }
 
     @Test
-    public void getLong_unsupported_derived_field_throws_exception() {
-        assertThrows(UnsupportedTemporalTypeException.class, 
-                     () -> TEST_DAY.getLong(IsoFields.DAY_OF_QUARTER));
+    public void test_getLong_invalidField2() {
+        assertThrows(UnsupportedTemporalTypeException.class, () -> TEST.getLong(IsoFields.DAY_OF_QUARTER));
     }
 
     @Test
-    public void getLong_null_throws_exception() {
-        assertThrows(NullPointerException.class, 
-                     () -> TEST_DAY.getLong(null));
+    public void test_getLong_null() {
+        assertThrows(NullPointerException.class, () -> TEST.getLong((TemporalField) null));
     }
 
     //-----------------------------------------------------------------------
-    // isValidYear()
+    // isValidYear(int)
     //-----------------------------------------------------------------------
-    
     @Test
-    public void isValidYear_for_day366() {
-        DayOfYear day366 = DayOfYear.of(366);
-        assertFalse(day366.isValidYear(2011)); // Non-leap year
-        assertTrue(day366.isValidYear(2012));  // Leap year
-        assertFalse(day366.isValidYear(2013)); // Non-leap year
+    public void test_isValidYear_366() {
+        DayOfYear test = DayOfYear.of(366);
+        assertEquals(false, test.isValidYear(2011));
+        assertEquals(true, test.isValidYear(2012));
+        assertEquals(false, test.isValidYear(2013));
     }
 
     @Test
-    public void isValidYear_for_day365() {
-        DayOfYear day365 = DayOfYear.of(365);
-        assertTrue(day365.isValidYear(2011));
-        assertTrue(day365.isValidYear(2012));
-        assertTrue(day365.isValidYear(2013));
+    public void test_isValidYear_365() {
+        DayOfYear test = DayOfYear.of(365);
+        assertEquals(true, test.isValidYear(2011));
+        assertEquals(true, test.isValidYear(2012));
+        assertEquals(true, test.isValidYear(2013));
     }
 
     //-----------------------------------------------------------------------
-    // query()
+    // query(TemporalQuery)
     //-----------------------------------------------------------------------
-    
     @Test
-    public void query_returns_expected_values() {
-        assertEquals(IsoChronology.INSTANCE, 
-                     TEST_DAY.query(TemporalQueries.chronology()));
-        assertNull(TEST_DAY.query(TemporalQueries.localDate()));
-        assertNull(TEST_DAY.query(TemporalQueries.localTime()));
-        assertNull(TEST_DAY.query(TemporalQueries.offset()));
-        assertNull(TEST_DAY.query(TemporalQueries.precision()));
-        assertNull(TEST_DAY.query(TemporalQueries.zone()));
-        assertNull(TEST_DAY.query(TemporalQueries.zoneId()));
+    public void test_query() {
+        assertEquals(IsoChronology.INSTANCE, TEST.query(TemporalQueries.chronology()));
+        assertEquals(null, TEST.query(TemporalQueries.localDate()));
+        assertEquals(null, TEST.query(TemporalQueries.localTime()));
+        assertEquals(null, TEST.query(TemporalQueries.offset()));
+        assertEquals(null, TEST.query(TemporalQueries.precision()));
+        assertEquals(null, TEST.query(TemporalQueries.zone()));
+        assertEquals(null, TEST.query(TemporalQueries.zoneId()));
     }
 
     //-----------------------------------------------------------------------
-    // adjustInto()
+    // adjustInto(Temporal)
     //-----------------------------------------------------------------------
-    
     @Test
-    public void adjustInto_standard_year_start() {
-        LocalDate startDate = LocalDate.of(2007, 1, 1);
-        LocalDate currentDate = startDate;
-        
-        for (int day = 1; day <= DAYS_IN_STANDARD_YEAR; day++) {
-            DayOfYear dayOfYear = DayOfYear.of(day);
-            assertEquals(currentDate, dayOfYear.adjustInto(startDate));
-            currentDate = currentDate.plusDays(1);
+    public void test_adjustInto_fromStartOfYear_notLeapYear() {
+        LocalDate base = LocalDate.of(2007, 1, 1);
+        LocalDate expected = base;
+        for (int i = 1; i <= STANDARD_YEAR_LENGTH; i++) {
+            DayOfYear test = DayOfYear.of(i);
+            assertEquals(expected, test.adjustInto(base));
+            expected = expected.plusDays(1);
         }
     }
 
     @Test
-    public void adjustInto_standard_year_end() {
-        LocalDate endDate = LocalDate.of(2007, 12, 31);
-        LocalDate expectedDate = LocalDate.of(2007, 1, 1);
-        
-        for (int day = 1; day <= DAYS_IN_STANDARD_YEAR; day++) {
-            DayOfYear dayOfYear = DayOfYear.of(day);
-            assertEquals(expectedDate, dayOfYear.adjustInto(endDate));
-            expectedDate = expectedDate.plusDays(1);
+    public void test_adjustInto_fromEndOfYear_notLeapYear() {
+        LocalDate base = LocalDate.of(2007, 12, 31);
+        LocalDate expected = LocalDate.of(2007, 1, 1);
+        for (int i = 1; i <= STANDARD_YEAR_LENGTH; i++) {
+            DayOfYear test = DayOfYear.of(i);
+            assertEquals(expected, test.adjustInto(base));
+            expected = expected.plusDays(1);
         }
     }
 
     @Test
-    public void adjustInto_standard_year_invalid_day366_throws() {
-        LocalDate baseDate = LocalDate.of(2007, 1, 1);
-        DayOfYear day366 = DayOfYear.of(366);
-        assertThrows(DateTimeException.class, () -> day366.adjustInto(baseDate));
+    public void test_adjustInto_fromStartOfYear_notLeapYear_day366() {
+        LocalDate base = LocalDate.of(2007, 1, 1);
+        DayOfYear test = DayOfYear.of(LEAP_YEAR_LENGTH);
+        assertThrows(DateTimeException.class, () -> test.adjustInto(base));
     }
 
     @Test
-    public void adjustInto_leap_year_start() {
-        LocalDate startDate = LocalDate.of(2008, 1, 1);
-        LocalDate currentDate = startDate;
-        
-        for (int day = 1; day <= DAYS_IN_LEAP_YEAR; day++) {
-            DayOfYear dayOfYear = DayOfYear.of(day);
-            assertEquals(currentDate, dayOfYear.adjustInto(startDate));
-            currentDate = currentDate.plusDays(1);
+    public void test_adjustInto_fromEndOfYear_notLeapYear_day366() {
+        LocalDate base = LocalDate.of(2007, 12, 31);
+        DayOfYear test = DayOfYear.of(LEAP_YEAR_LENGTH);
+        assertThrows(DateTimeException.class, () -> test.adjustInto(base));
+    }
+
+    @Test
+    public void test_adjustInto_fromStartOfYear_leapYear() {
+        LocalDate base = LocalDate.of(2008, 1, 1);
+        LocalDate expected = base;
+        for (int i = 1; i <= LEAP_YEAR_LENGTH; i++) {
+            DayOfYear test = DayOfYear.of(i);
+            assertEquals(expected, test.adjustInto(base));
+            expected = expected.plusDays(1);
         }
     }
 
     @Test
-    public void adjustInto_leap_year_end() {
-        LocalDate endDate = LocalDate.of(2008, 12, 31);
-        LocalDate expectedDate = LocalDate.of(2008, 1, 1);
-        
-        for (int day = 1; day <= DAYS_IN_LEAP_YEAR; day++) {
-            DayOfYear dayOfYear = DayOfYear.of(day);
-            assertEquals(expectedDate, dayOfYear.adjustInto(endDate));
-            expectedDate = expectedDate.plusDays(1);
+    public void test_adjustInto_fromEndOfYear_leapYear() {
+        LocalDate base = LocalDate.of(2008, 12, 31);
+        LocalDate expected = LocalDate.of(2008, 1, 1);
+        for (int i = 1; i <= LEAP_YEAR_LENGTH; i++) {
+            DayOfYear test = DayOfYear.of(i);
+            assertEquals(expected, test.adjustInto(base));
+            expected = expected.plusDays(1);
         }
     }
 
     @Test
-    public void adjustInto_nonIso_throws_exception() {
-        assertThrows(DateTimeException.class, 
-                     () -> TEST_DAY.adjustInto(JapaneseDate.now()));
+    public void test_adjustInto_nonIso() {
+        assertThrows(DateTimeException.class, () -> TEST.adjustInto(JapaneseDate.now()));
     }
 
     @Test
-    public void adjustInto_null_throws_exception() {
-        assertThrows(NullPointerException.class, 
-                     () -> TEST_DAY.adjustInto(null));
+    public void test_adjustInto_null() {
+        assertThrows(NullPointerException.class, () -> TEST.adjustInto((Temporal) null));
     }
 
     //-----------------------------------------------------------------------
-    // atYear()
+    // atYear(Year)
     //-----------------------------------------------------------------------
-    
     @Test
-    public void atYear_withYearObject_standard_year() {
-        LocalDate expectedDate = LocalDate.of(2007, 1, 1);
-        
-        for (int day = 1; day <= DAYS_IN_STANDARD_YEAR; day++) {
-            DayOfYear dayOfYear = DayOfYear.of(day);
-            assertEquals(expectedDate, dayOfYear.atYear(STANDARD_YEAR));
-            expectedDate = expectedDate.plusDays(1);
+    public void test_atYear_Year_notLeapYear() {
+        LocalDate expected = LocalDate.of(2007, 1, 1);
+        for (int i = 1; i <= STANDARD_YEAR_LENGTH; i++) {
+            DayOfYear test = DayOfYear.of(i);
+            assertEquals(expected, test.atYear(YEAR_STANDARD));
+            expected = expected.plusDays(1);
         }
     }
 
     @Test
-    public void atYear_withYearObject_day366_standard_year_throws() {
-        DayOfYear day366 = DayOfYear.of(366);
-        assertThrows(DateTimeException.class, 
-                     () -> day366.atYear(STANDARD_YEAR));
+    public void test_atYear_fromStartOfYear_notLeapYear_day366() {
+        DayOfYear test = DayOfYear.of(LEAP_YEAR_LENGTH);
+        assertThrows(DateTimeException.class, () -> test.atYear(YEAR_STANDARD));
     }
 
     @Test
-    public void atYear_withYearObject_leap_year() {
-        LocalDate expectedDate = LocalDate.of(2008, 1, 1);
-        
-        for (int day = 1; day <= DAYS_IN_LEAP_YEAR; day++) {
-            DayOfYear dayOfYear = DayOfYear.of(day);
-            assertEquals(expectedDate, dayOfYear.atYear(LEAP_YEAR));
-            expectedDate = expectedDate.plusDays(1);
+    public void test_atYear_Year_leapYear() {
+        LocalDate expected = LocalDate.of(2008, 1, 1);
+        for (int i = 1; i <= LEAP_YEAR_LENGTH; i++) {
+            DayOfYear test = DayOfYear.of(i);
+            assertEquals(expected, test.atYear(YEAR_LEAP));
+            expected = expected.plusDays(1);
         }
     }
 
     @Test
-    public void atYear_withYearObject_null_throws_exception() {
-        assertThrows(NullPointerException.class, 
-                     () -> TEST_DAY.atYear((Year) null));
+    public void test_atYear_Year_nullYear() {
+        assertThrows(NullPointerException.class, () -> TEST.atYear((Year) null));
     }
 
+    //-----------------------------------------------------------------------
+    // atYear(int)
+    //-----------------------------------------------------------------------
     @Test
-    public void atYear_withInt_standard_year() {
-        LocalDate expectedDate = LocalDate.of(2007, 1, 1);
-        
-        for (int day = 1; day <= DAYS_IN_STANDARD_YEAR; day++) {
-            DayOfYear dayOfYear = DayOfYear.of(day);
-            assertEquals(expectedDate, dayOfYear.atYear(2007));
-            expectedDate = expectedDate.plusDays(1);
+    public void test_atYear_int_notLeapYear() {
+        LocalDate expected = LocalDate.of(2007, 1, 1);
+        for (int i = 1; i <= STANDARD_YEAR_LENGTH; i++) {
+            DayOfYear test = DayOfYear.of(i);
+            assertEquals(expected, test.atYear(2007));
+            expected = expected.plusDays(1);
         }
     }
 
     @Test
-    public void atYear_withInt_day366_standard_year_throws() {
-        DayOfYear day366 = DayOfYear.of(366);
-        assertThrows(DateTimeException.class, 
-                     () -> day366.atYear(2007));
+    public void test_atYear_int_fromStartOfYear_notLeapYear_day366() {
+        DayOfYear test = DayOfYear.of(LEAP_YEAR_LENGTH);
+        assertThrows(DateTimeException.class, () -> test.atYear(2007));
     }
 
     @Test
-    public void atYear_withInt_leap_year() {
-        LocalDate expectedDate = LocalDate.of(2008, 1, 1);
-        
-        for (int day = 1; day <= DAYS_IN_LEAP_YEAR; day++) {
-            DayOfYear dayOfYear = DayOfYear.of(day);
-            assertEquals(expectedDate, dayOfYear.atYear(2008));
-            expectedDate = expectedDate.plusDays(1);
+    public void test_atYear_int_leapYear() {
+        LocalDate expected = LocalDate.of(2008, 1, 1);
+        for (int i = 1; i <= LEAP_YEAR_LENGTH; i++) {
+            DayOfYear test = DayOfYear.of(i);
+            assertEquals(expected, test.atYear(2008));
+            expected = expected.plusDays(1);
         }
     }
 
     @Test
-    public void atYear_withInt_invalid_year_throws() {
-        assertThrows(DateTimeException.class, 
-                     () -> TEST_DAY.atYear(Year.MIN_VALUE - 1));
+    public void test_atYear_int_invalidDay() {
+        assertThrows(DateTimeException.class, () -> TEST.atYear(Year.MIN_VALUE - 1));
     }
 
     //-----------------------------------------------------------------------
     // compareTo()
     //-----------------------------------------------------------------------
-    
     @Test
-    public void compareTo_orders_by_day_of_year() {
-        for (int i = 1; i <= DAYS_IN_LEAP_YEAR; i++) {
+    public void test_compareTo() {
+        for (int i = 1; i <= LEAP_YEAR_LENGTH; i++) {
             DayOfYear a = DayOfYear.of(i);
-            
-            for (int j = 1; j <= DAYS_IN_LEAP_YEAR; j++) {
+            for (int j = 1; j <= LEAP_YEAR_LENGTH; j++) {
                 DayOfYear b = DayOfYear.of(j);
-                int expected = Integer.compare(i, j);
-                assertEquals(expected, a.compareTo(b));
+                if (i < j) {
+                    assertEquals(true, a.compareTo(b) < 0);
+                    assertEquals(true, b.compareTo(a) > 0);
+                } else if (i > j) {
+                    assertEquals(true, a.compareTo(b) > 0);
+                    assertEquals(true, b.compareTo(a) < 0);
+                } else {
+                    assertEquals(0, a.compareTo(b));
+                    assertEquals(0, b.compareTo(a));
+                }
             }
         }
     }
 
     @Test
-    public void compareTo_null_throws_exception() {
-        DayOfYear instance = DayOfYear.of(1);
-        assertThrows(NullPointerException.class, 
-                     () -> instance.compareTo(null));
+    public void test_compareTo_nullDayOfYear() {
+        DayOfYear doy = null;
+        DayOfYear test = DayOfYear.of(1);
+        assertThrows(NullPointerException.class, () -> test.compareTo(doy));
     }
 
     //-----------------------------------------------------------------------
     // equals() / hashCode()
     //-----------------------------------------------------------------------
-    
     @Test
-    public void equals_and_hashCode_consistent() {
-        EqualsTester tester = new EqualsTester();
-        
-        // Add equality groups (each group contains objects that should be equal)
-        for (int i = 1; i <= DAYS_IN_LEAP_YEAR; i++) {
-            tester.addEqualityGroup(DayOfYear.of(i), DayOfYear.of(i));
+    public void test_equals_and_hashCode() {
+        EqualsTester equalsTester = new EqualsTester();
+        for (int i = 1; i <= LEAP_YEAR_LENGTH; i++) {
+            equalsTester.addEqualityGroup(DayOfYear.of(i), DayOfYear.of(i));
         }
-        
-        tester.testEquals();
+        equalsTester.testEquals();
     }
 
     //-----------------------------------------------------------------------
     // toString()
     //-----------------------------------------------------------------------
-    
     @Test
-    public void toString_contains_day_value() {
-        for (int i = 1; i <= DAYS_IN_LEAP_YEAR; i++) {
-            DayOfYear instance = DayOfYear.of(i);
-            assertEquals("DayOfYear:" + i, instance.toString());
+    public void test_toString() {
+        for (int i = 1; i <= LEAP_YEAR_LENGTH; i++) {
+            DayOfYear a = DayOfYear.of(i);
+            assertEquals("DayOfYear:" + i, a.toString());
         }
     }
+
+    //-----------------------------------------------------------------------
+    // now(Clock)
+    //-----------------------------------------------------------------------
+    @Test
+    public void test_now_clock_notLeapYear() {
+        LocalDate date = LocalDate.of(2007, 1, 1);
+        for (int i = 1; i <= STANDARD_YEAR_LENGTH; i++) {
+            Instant instant = date.atStartOfDay(PARIS).toInstant();
+            Clock clock = Clock.fixed(instant, PARIS);
+            DayOfYear test = DayOfYear.now(clock);
+            assertEquals(i, test.getValue());
+            date = date.plusDays(1);
+        }
+    }
+
+    @Test
+    public void test_now_clock_leapYear() {
+        LocalDate date = LocalDate.of(2008, 1, 1);
+        for (int i = 1; i <= LEAP_YEAR_LENGTH; i++) {
+            Instant instant = date.atStartOfDay(PARIS).toInstant();
+            Clock clock = Clock.fixed(instant, PARIS);
+            DayOfYear test = DayOfYear.now(clock);
+            assertEquals(i, test.getValue());
+            date = date.plusDays(1);
+        }
+    }
+
 }
