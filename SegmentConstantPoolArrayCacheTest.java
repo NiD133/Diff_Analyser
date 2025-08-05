@@ -28,56 +28,58 @@ import org.junit.jupiter.api.Test;
 class SegmentConstantPoolArrayCacheTest {
 
     @Test
-    void testMultipleArrayMultipleHit() {
+    void testMultipleArraysWithMultipleHits() {
         final SegmentConstantPoolArrayCache arrayCache = new SegmentConstantPoolArrayCache();
+        // Test arrays with overlapping values
         final String[] arrayOne = { "Zero", "Shared", "Two", "Shared", "Shared" };
         final String[] arrayTwo = { "Shared", "One", "Shared", "Shared", "Shared" };
 
-        List<Integer> listOne = arrayCache.indexesForArrayKey(arrayOne, "Shared");
+        // Prime the cache with initial lookups
+        arrayCache.indexesForArrayKey(arrayOne, "Shared");
+        arrayCache.indexesForArrayKey(arrayTwo, "Shared");
+
+        // Verify cache returns correct values for subsequent lookups
+        List<Integer> listOne = arrayCache.indexesForArrayKey(arrayOne, "Two");
         List<Integer> listTwo = arrayCache.indexesForArrayKey(arrayTwo, "Shared");
-        // Make sure we're using the cached values. First trip
-        // through builds the cache.
-        listOne = arrayCache.indexesForArrayKey(arrayOne, "Two");
-        listTwo = arrayCache.indexesForArrayKey(arrayTwo, "Shared");
 
-        assertEquals(1, listOne.size());
-        assertEquals(2, listOne.get(0).intValue());
+        // Validate arrayOne results for "Two"
+        assertEquals(1, listOne.size(), "Should find one occurrence of 'Two'");
+        assertEquals(2, listOne.get(0), "'Two' should be at index 2");
 
-        // Now look for a different element in list one
+        // Validate arrayTwo results for "Shared"
+        final int expectedArrayTwoHits = 4;
+        assertEquals(expectedArrayTwoHits, listTwo.size(), "Should find four occurrences of 'Shared'");
+        assertEquals(List.of(0, 2, 3, 4), listTwo, "Incorrect indices for 'Shared' in arrayTwo");
+
+        // Verify cache returns updated results when switching keys in same array
         listOne = arrayCache.indexesForArrayKey(arrayOne, "Shared");
-        assertEquals(3, listOne.size());
-        assertEquals(1, listOne.get(0).intValue());
-        assertEquals(3, listOne.get(1).intValue());
-        assertEquals(4, listOne.get(2).intValue());
+        assertEquals(3, listOne.size(), "Should find three occurrences of 'Shared'");
+        assertEquals(List.of(1, 3, 4), listOne, "Incorrect indices for 'Shared' in arrayOne");
 
-        assertEquals(4, listTwo.size());
-        assertEquals(0, listTwo.get(0).intValue());
-        assertEquals(2, listTwo.get(1).intValue());
-        assertEquals(3, listTwo.get(2).intValue());
-        assertEquals(4, listTwo.get(3).intValue());
-
-        final List<Integer> listThree = arrayCache.indexesForArrayKey(arrayOne, "Not found");
-        assertEquals(0, listThree.size());
+        // Verify non-existent key returns empty list
+        final List<Integer> notFoundList = arrayCache.indexesForArrayKey(arrayOne, "Not found");
+        assertEquals(0, notFoundList.size(), "Should return empty list for missing key");
     }
 
     @Test
-    void testSingleMultipleHitArray() {
+    void testSingleArrayWithMultipleHits() {
         final SegmentConstantPoolArrayCache arrayCache = new SegmentConstantPoolArrayCache();
         final String[] array = { "Zero", "OneThreeFour", "Two", "OneThreeFour", "OneThreeFour" };
-        final List<Integer> list = arrayCache.indexesForArrayKey(array, "OneThreeFour");
-        assertEquals(3, list.size());
-        assertEquals(1, list.get(0).intValue());
-        assertEquals(3, list.get(1).intValue());
-        assertEquals(4, list.get(2).intValue());
+        
+        final List<Integer> indices = arrayCache.indexesForArrayKey(array, "OneThreeFour");
+        
+        assertEquals(3, indices.size(), "Should find three occurrences");
+        assertEquals(List.of(1, 3, 4), indices, "Incorrect indices for duplicate values");
     }
 
     @Test
-    void testSingleSimpleArray() {
+    void testSingleArrayWithUniqueValues() {
         final SegmentConstantPoolArrayCache arrayCache = new SegmentConstantPoolArrayCache();
         final String[] array = { "Zero", "One", "Two", "Three", "Four" };
-        final List<Integer> list = arrayCache.indexesForArrayKey(array, "Three");
-        assertEquals(1, list.size());
-        assertEquals(3, list.get(0).intValue());
+        
+        final List<Integer> indices = arrayCache.indexesForArrayKey(array, "Three");
+        
+        assertEquals(1, indices.size(), "Should find single occurrence");
+        assertEquals(3, indices.get(0), "Should find 'Three' at index 3");
     }
-
 }
