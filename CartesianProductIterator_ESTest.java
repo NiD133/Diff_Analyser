@@ -26,111 +26,137 @@ import org.junit.runner.RunWith;
 public class CartesianProductIterator_ESTest extends CartesianProductIterator_ESTest_scaffolding {
 
   @Test(timeout = 4000)
-  public void test0()  throws Throwable  {
-      Iterable<Locale.Category>[] iterableArray0 = (Iterable<Locale.Category>[]) Array.newInstance(Iterable.class, 2);
-      PriorityQueue<Locale.Category> priorityQueue0 = new PriorityQueue<Locale.Category>();
-      Locale.Category locale_Category0 = Locale.Category.FORMAT;
-      iterableArray0[0] = (Iterable<Locale.Category>) priorityQueue0;
-      iterableArray0[1] = (Iterable<Locale.Category>) priorityQueue0;
-      priorityQueue0.add(locale_Category0);
-      CartesianProductIterator<Object> cartesianProductIterator0 = new CartesianProductIterator<Object>(iterableArray0);
-      boolean boolean0 = cartesianProductIterator0.hasNext();
-      assertTrue(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test1()  throws Throwable  {
-      Stack<Locale.Category> stack0 = new Stack<Locale.Category>();
-      Locale.Category locale_Category0 = Locale.Category.DISPLAY;
-      stack0.add(locale_Category0);
-      Iterable<Locale.Category>[] iterableArray0 = (Iterable<Locale.Category>[]) Array.newInstance(Iterable.class, 1);
-      iterableArray0[0] = (Iterable<Locale.Category>) stack0;
-      CartesianProductIterator<Locale.Category> cartesianProductIterator0 = new CartesianProductIterator<Locale.Category>(iterableArray0);
-      stack0.add(locale_Category0);
-      // Undeclared exception!
-      try { 
-        cartesianProductIterator0.next();
-        fail("Expecting exception: ConcurrentModificationException");
+  public void testHasNext_WhenNonEmptyIterables_ReturnsTrue() throws Throwable {
+      // Test that hasNext() returns true when iterables contain elements
+      // Create an array of two iterables (both PriorityQueues)
+      Iterable<Locale.Category>[] iterableArray = (Iterable<Locale.Category>[]) Array.newInstance(Iterable.class, 2);
+      PriorityQueue<Locale.Category> queue = new PriorityQueue<>();
       
-      } catch(ConcurrentModificationException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.util.Vector$Itr", e);
-      }
+      // Add an element to both queues in the array
+      Locale.Category category = Locale.Category.FORMAT;
+      iterableArray[0] = queue;
+      iterableArray[1] = queue;
+      queue.add(category);
+
+      // Create iterator and verify it has elements
+      CartesianProductIterator<Object> iterator = new CartesianProductIterator<>(iterableArray);
+      assertTrue(iterator.hasNext());
   }
 
   @Test(timeout = 4000)
-  public void test2()  throws Throwable  {
-      Iterable<Locale.Category>[] iterableArray0 = (Iterable<Locale.Category>[]) Array.newInstance(Iterable.class, 1);
-      CartesianProductIterator<Object> cartesianProductIterator0 = null;
+  public void testNext_WhenConcurrentModification_ThrowsConcurrentModificationException() throws Throwable {
+      // Test that next() throws ConcurrentModificationException when underlying collection changes
+      // Create a stack and add an element
+      Stack<Locale.Category> stack = new Stack<>();
+      Locale.Category category = Locale.Category.DISPLAY;
+      stack.add(category);
+      
+      // Create iterator with the stack
+      Iterable<Locale.Category>[] iterableArray = (Iterable<Locale.Category>[]) Array.newInstance(Iterable.class, 1);
+      iterableArray[0] = stack;
+      CartesianProductIterator<Locale.Category> iterator = new CartesianProductIterator<>(iterableArray);
+      
+      // Modify the stack after iterator creation
+      stack.add(category);
+      
+      // Verify concurrent modification is detected
       try {
-        cartesianProductIterator0 = new CartesianProductIterator<Object>(iterableArray0);
-        fail("Expecting exception: NullPointerException");
+          iterator.next();
+          fail("Expected ConcurrentModificationException");
+      } catch(ConcurrentModificationException e) {
+          // Expected behavior
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void testConstructor_WhenNullIterable_ThrowsNullPointerException() throws Throwable {
+      // Test that constructor throws NPE when any iterable is null
+      // Create array with one null element
+      Iterable<Locale.Category>[] iterableArray = (Iterable<Locale.Category>[]) Array.newInstance(Iterable.class, 1);
       
+      try {
+          new CartesianProductIterator<>(iterableArray);
+          fail("Expected NullPointerException");
       } catch(NullPointerException e) {
-         //
-         // iterable
-         //
-         verifyException("java.util.Objects", e);
+          // Verify exception message
+          assertEquals("iterable", e.getMessage());
       }
   }
 
   @Test(timeout = 4000)
-  public void test3()  throws Throwable  {
-      Iterable<Locale.Category>[] iterableArray0 = (Iterable<Locale.Category>[]) Array.newInstance(Iterable.class, 2);
-      PriorityQueue<Locale.Category> priorityQueue0 = new PriorityQueue<Locale.Category>();
-      iterableArray0[0] = (Iterable<Locale.Category>) priorityQueue0;
-      CartesianProductIterator<Object> cartesianProductIterator0 = new CartesianProductIterator<Object>(iterableArray0);
-      boolean boolean0 = cartesianProductIterator0.hasNext();
-      assertFalse(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test4()  throws Throwable  {
-      Class<Locale.Category> class0 = Locale.Category.class;
-      EnumSet<Locale.Category> enumSet0 = EnumSet.allOf(class0);
-      Iterable<Locale.Category>[] iterableArray0 = (Iterable<Locale.Category>[]) Array.newInstance(Iterable.class, 2);
-      iterableArray0[0] = (Iterable<Locale.Category>) enumSet0;
-      iterableArray0[1] = (Iterable<Locale.Category>) enumSet0;
-      CartesianProductIterator<Locale.Category> cartesianProductIterator0 = new CartesianProductIterator<Locale.Category>(iterableArray0);
-      cartesianProductIterator0.next();
-      cartesianProductIterator0.next();
-      List<Locale.Category> list0 = cartesianProductIterator0.next();
-      assertFalse(list0.isEmpty());
-  }
-
-  @Test(timeout = 4000)
-  public void test5()  throws Throwable  {
-      Iterable<SQLNonTransientConnectionException>[] iterableArray0 = (Iterable<SQLNonTransientConnectionException>[]) Array.newInstance(Iterable.class, 0);
-      CartesianProductIterator<SQLNonTransientConnectionException> cartesianProductIterator0 = new CartesianProductIterator<SQLNonTransientConnectionException>(iterableArray0);
-      // Undeclared exception!
-      try { 
-        cartesianProductIterator0.next();
-        fail("Expecting exception: NoSuchElementException");
+  public void testHasNext_WhenFirstIterableEmpty_ReturnsFalse() throws Throwable {
+      // Test that hasNext() returns false when first iterable is empty
+      // Create array with two iterables:
+      //   [0]: Empty PriorityQueue
+      //   [1]: null (but not processed since first is empty)
+      Iterable<Locale.Category>[] iterableArray = (Iterable<Locale.Category>[]) Array.newInstance(Iterable.class, 2);
+      PriorityQueue<Locale.Category> emptyQueue = new PriorityQueue<>();
+      iterableArray[0] = emptyQueue;
       
+      // Create iterator (second element not set, but skipped due to empty first iterable)
+      CartesianProductIterator<Object> iterator = new CartesianProductIterator<>(iterableArray);
+      
+      // Verify no elements
+      assertFalse(iterator.hasNext());
+  }
+
+  @Test(timeout = 4000)
+  public void testNext_WhenTwoNonEmptyIterables_ReturnsCorrectTuples() throws Throwable {
+      // Test next() returns correct tuples for cartesian product
+      // Create EnumSet with all Locale.Category values (size=2)
+      EnumSet<Locale.Category> enumSet = EnumSet.allOf(Locale.Category.class);
+      
+      // Create array with two identical EnumSet iterables
+      Iterable<Locale.Category>[] iterableArray = (Iterable<Locale.Category>[]) Array.newInstance(Iterable.class, 2);
+      iterableArray[0] = enumSet;
+      iterableArray[1] = enumSet;
+      
+      // Create iterator and retrieve tuples
+      CartesianProductIterator<Locale.Category> iterator = new CartesianProductIterator<>(iterableArray);
+      
+      // Skip first two tuples
+      iterator.next();
+      iterator.next();
+      
+      // Verify third tuple exists and is non-empty
+      List<Locale.Category> tuple = iterator.next();
+      assertFalse(tuple.isEmpty());
+  }
+
+  @Test(timeout = 4000)
+  public void testNext_WhenEmptyIterablesArray_ThrowsNoSuchElementException() throws Throwable {
+      // Test next() throws NoSuchElementException when no iterables provided
+      // Create empty iterables array
+      Iterable<SQLNonTransientConnectionException>[] emptyArray = 
+          (Iterable<SQLNonTransientConnectionException>[]) Array.newInstance(Iterable.class, 0);
+      
+      CartesianProductIterator<SQLNonTransientConnectionException> iterator = 
+          new CartesianProductIterator<>(emptyArray);
+      
+      try {
+          iterator.next();
+          fail("Expected NoSuchElementException");
       } catch(NoSuchElementException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.collections4.iterators.CartesianProductIterator", e);
+          // Expected behavior
       }
   }
 
   @Test(timeout = 4000)
-  public void test6()  throws Throwable  {
-      Iterable<Locale.Category>[] iterableArray0 = (Iterable<Locale.Category>[]) Array.newInstance(Iterable.class, 0);
-      CartesianProductIterator<Locale.Category> cartesianProductIterator0 = new CartesianProductIterator<Locale.Category>(iterableArray0);
-      // Undeclared exception!
-      try { 
-        cartesianProductIterator0.remove();
-        fail("Expecting exception: UnsupportedOperationException");
+  public void testRemove_WhenCalled_ThrowsUnsupportedOperationException() throws Throwable {
+      // Test remove() always throws UnsupportedOperationException
+      // Create empty iterables array
+      Iterable<Locale.Category>[] emptyArray = 
+          (Iterable<Locale.Category>[]) Array.newInstance(Iterable.class, 0);
       
+      CartesianProductIterator<Locale.Category> iterator = 
+          new CartesianProductIterator<>(emptyArray);
+      
+      try {
+          iterator.remove();
+          fail("Expected UnsupportedOperationException");
       } catch(UnsupportedOperationException e) {
-         //
-         // remove
-         //
-         verifyException("org.apache.commons.collections4.iterators.CartesianProductIterator", e);
+          // Verify exception message
+          assertEquals("remove", e.getMessage());
       }
   }
 }
