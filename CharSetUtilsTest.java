@@ -21,11 +21,17 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
+import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests {@link CharSetUtils}.
@@ -33,215 +39,189 @@ import org.junit.jupiter.api.Test;
 class CharSetUtilsTest extends AbstractLangTest {
 
     @Test
-    void testConstructor() {
-        assertNotNull(new CharSetUtils());
+    void constructor_IsPublicAndNotFinal() throws NoSuchMethodException {
+        // Verify the constructor is public and class is non-final
         final Constructor<?>[] cons = CharSetUtils.class.getDeclaredConstructors();
         assertEquals(1, cons.length);
         assertTrue(Modifier.isPublic(cons[0].getModifiers()));
         assertTrue(Modifier.isPublic(CharSetUtils.class.getModifiers()));
         assertFalse(Modifier.isFinal(CharSetUtils.class.getModifiers()));
+        
+        // Ensure instantiation works
+        assertNotNull(new CharSetUtils());
     }
 
-    @Test
-    void testContainsAny_StringString() {
-        assertFalse(CharSetUtils.containsAny(null, (String) null));
-        assertFalse(CharSetUtils.containsAny(null, ""));
+    @Nested
+    class ContainsAnyTest {
+        @ParameterizedTest
+        @MethodSource("testCases")
+        void testContainsAny(String input, String[] set, boolean expected) {
+            assertEquals(expected, CharSetUtils.containsAny(input, set));
+        }
 
-        assertFalse(CharSetUtils.containsAny("", (String) null));
-        assertFalse(CharSetUtils.containsAny("", ""));
-        assertFalse(CharSetUtils.containsAny("", "a-e"));
-
-        assertFalse(CharSetUtils.containsAny("hello", (String) null));
-        assertFalse(CharSetUtils.containsAny("hello", ""));
-        assertTrue(CharSetUtils.containsAny("hello", "a-e"));
-        assertTrue(CharSetUtils.containsAny("hello", "l-p"));
+        private static Stream<Arguments> testCases() {
+            return Stream.of(
+                // Null and empty inputs
+                arguments(null, null, false),
+                arguments(null, new String[]{}, false),
+                arguments(null, new String[]{""}, false),
+                arguments(null, new String[]{"a-e"}, false),
+                arguments("", null, false),
+                arguments("", new String[]{}, false),
+                arguments("", new String[]{""}, false),
+                arguments("", new String[]{"a-e"}, false),
+                // Valid inputs
+                arguments("hello", null, false),
+                arguments("hello", new String[]{}, false),
+                arguments("hello", new String[]{""}, false),
+                arguments("hello", new String[]{"a-e"}, true),
+                arguments("hello", new String[]{"l-p"}, true),
+                arguments("hello", new String[]{"el"}, true),
+                arguments("hello", new String[]{"x"}, false),
+                arguments("hello", new String[]{"e-i"}, true),
+                arguments("hello", new String[]{"a-z"}, true),
+                arguments("hello", new String[]{""}, false)
+            );
+        }
     }
 
-    @Test
-    void testContainsAny_StringStringarray() {
-        assertFalse(CharSetUtils.containsAny(null, (String[]) null));
-        assertFalse(CharSetUtils.containsAny(null));
-        assertFalse(CharSetUtils.containsAny(null, (String) null));
-        assertFalse(CharSetUtils.containsAny(null, "a-e"));
+    @Nested
+    class CountTest {
+        @ParameterizedTest
+        @MethodSource("testCases")
+        void testCount(String input, String[] set, int expected) {
+            assertEquals(expected, CharSetUtils.count(input, set));
+        }
 
-        assertFalse(CharSetUtils.containsAny("", (String[]) null));
-        assertFalse(CharSetUtils.containsAny(""));
-        assertFalse(CharSetUtils.containsAny("", (String) null));
-        assertFalse(CharSetUtils.containsAny("", "a-e"));
-
-        assertFalse(CharSetUtils.containsAny("hello", (String[]) null));
-        assertFalse(CharSetUtils.containsAny("hello"));
-        assertFalse(CharSetUtils.containsAny("hello", (String) null));
-        assertTrue(CharSetUtils.containsAny("hello", "a-e"));
-
-        assertTrue(CharSetUtils.containsAny("hello", "el"));
-        assertFalse(CharSetUtils.containsAny("hello", "x"));
-        assertTrue(CharSetUtils.containsAny("hello", "e-i"));
-        assertTrue(CharSetUtils.containsAny("hello", "a-z"));
-        assertFalse(CharSetUtils.containsAny("hello", ""));
+        private static Stream<Arguments> testCases() {
+            return Stream.of(
+                // Null and empty inputs
+                arguments(null, null, 0),
+                arguments(null, new String[]{}, 0),
+                arguments(null, new String[]{null}, 0),
+                arguments(null, new String[]{"a-e"}, 0),
+                arguments("", null, 0),
+                arguments("", new String[]{}, 0),
+                arguments("", new String[]{null}, 0),
+                arguments("", new String[]{"a-e"}, 0),
+                // Valid inputs
+                arguments("hello", null, 0),
+                arguments("hello", new String[]{}, 0),
+                arguments("hello", new String[]{null}, 0),
+                arguments("hello", new String[]{"a-e"}, 1),
+                arguments("hello", new String[]{"l-p"}, 3),
+                arguments("hello", new String[]{"el"}, 3),
+                arguments("hello", new String[]{"x"}, 0),
+                arguments("hello", new String[]{"e-i"}, 2),
+                arguments("hello", new String[]{"a-z"}, 5),
+                arguments("hello", new String[]{""}, 0)
+            );
+        }
     }
 
-    @Test
-    void testCount_StringString() {
-        assertEquals(0, CharSetUtils.count(null, (String) null));
-        assertEquals(0, CharSetUtils.count(null, ""));
+    @Nested
+    class DeleteTest {
+        @ParameterizedTest
+        @MethodSource("testCases")
+        void testDelete(String input, String[] set, String expected) {
+            assertEquals(expected, CharSetUtils.delete(input, set));
+        }
 
-        assertEquals(0, CharSetUtils.count("", (String) null));
-        assertEquals(0, CharSetUtils.count("", ""));
-        assertEquals(0, CharSetUtils.count("", "a-e"));
-
-        assertEquals(0, CharSetUtils.count("hello", (String) null));
-        assertEquals(0, CharSetUtils.count("hello", ""));
-        assertEquals(1, CharSetUtils.count("hello", "a-e"));
-        assertEquals(3, CharSetUtils.count("hello", "l-p"));
+        private static Stream<Arguments> testCases() {
+            return Stream.of(
+                // Null and empty inputs
+                arguments(null, null, null),
+                arguments(null, new String[]{}, null),
+                arguments(null, new String[]{null}, null),
+                arguments(null, new String[]{"el"}, null),
+                arguments("", null, ""),
+                arguments("", new String[]{}, ""),
+                arguments("", new String[]{null}, ""),
+                arguments("", new String[]{"a-e"}, ""),
+                // Valid inputs
+                arguments("hello", null, "hello"),
+                arguments("hello", new String[]{}, "hello"),
+                arguments("hello", new String[]{null}, "hello"),
+                arguments("hello", new String[]{"xyz"}, "hello"),
+                arguments("hello", new String[]{"a-e"}, "hllo"),
+                arguments("hello", new String[]{"l-p"}, "he"),
+                arguments("hello", new String[]{"z"}, "hello"),
+                arguments("hello", new String[]{"el"}, "ho"),
+                arguments("hello", new String[]{"elho"}, ""),
+                arguments("hello", new String[]{""}, "hello"),
+                arguments("hello", new String[]{"a-z"}, ""),
+                arguments("----", new String[]{"-"}, ""),
+                arguments("hello", new String[]{"l"}, "heo")
+            );
+        }
     }
 
-    @Test
-    void testCount_StringStringarray() {
-        assertEquals(0, CharSetUtils.count(null, (String[]) null));
-        assertEquals(0, CharSetUtils.count(null));
-        assertEquals(0, CharSetUtils.count(null, (String) null));
-        assertEquals(0, CharSetUtils.count(null, "a-e"));
+    @Nested
+    class KeepTest {
+        @ParameterizedTest
+        @MethodSource("testCases")
+        void testKeep(String input, String[] set, String expected) {
+            assertEquals(expected, CharSetUtils.keep(input, set));
+        }
 
-        assertEquals(0, CharSetUtils.count("", (String[]) null));
-        assertEquals(0, CharSetUtils.count(""));
-        assertEquals(0, CharSetUtils.count("", (String) null));
-        assertEquals(0, CharSetUtils.count("", "a-e"));
-
-        assertEquals(0, CharSetUtils.count("hello", (String[]) null));
-        assertEquals(0, CharSetUtils.count("hello"));
-        assertEquals(0, CharSetUtils.count("hello", (String) null));
-        assertEquals(1, CharSetUtils.count("hello", "a-e"));
-
-        assertEquals(3, CharSetUtils.count("hello", "el"));
-        assertEquals(0, CharSetUtils.count("hello", "x"));
-        assertEquals(2, CharSetUtils.count("hello", "e-i"));
-        assertEquals(5, CharSetUtils.count("hello", "a-z"));
-        assertEquals(0, CharSetUtils.count("hello", ""));
+        private static Stream<Arguments> testCases() {
+            return Stream.of(
+                // Null and empty inputs
+                arguments(null, null, null),
+                arguments(null, new String[]{}, null),
+                arguments(null, new String[]{null}, null),
+                arguments(null, new String[]{"a-e"}, null),
+                arguments("", null, ""),
+                arguments("", new String[]{}, ""),
+                arguments("", new String[]{null}, ""),
+                arguments("", new String[]{"a-e"}, ""),
+                // Valid inputs
+                arguments("hello", null, ""),
+                arguments("hello", new String[]{}, ""),
+                arguments("hello", new String[]{null}, ""),
+                arguments("hello", new String[]{"xyz"}, ""),
+                arguments("hello", new String[]{"a-e"}, "e"),
+                arguments("hello", new String[]{"a-z"}, "hello"),
+                arguments("hello", new String[]{"elho"}, "hello"),
+                arguments("hello", new String[]{"el"}, "ell"),
+                arguments("----", new String[]{"-"}, "----"),
+                arguments("hello", new String[]{"l"}, "ll")
+            );
+        }
     }
 
-    @Test
-    void testDelete_StringString() {
-        assertNull(CharSetUtils.delete(null, (String) null));
-        assertNull(CharSetUtils.delete(null, ""));
+    @Nested
+    class SqueezeTest {
+        @ParameterizedTest
+        @MethodSource("testCases")
+        void testSqueeze(String input, String[] set, String expected) {
+            assertEquals(expected, CharSetUtils.squeeze(input, set));
+        }
 
-        assertEquals("", CharSetUtils.delete("", (String) null));
-        assertEquals("", CharSetUtils.delete("", ""));
-        assertEquals("", CharSetUtils.delete("", "a-e"));
-
-        assertEquals("hello", CharSetUtils.delete("hello", (String) null));
-        assertEquals("hello", CharSetUtils.delete("hello", ""));
-        assertEquals("hllo", CharSetUtils.delete("hello", "a-e"));
-        assertEquals("he", CharSetUtils.delete("hello", "l-p"));
-        assertEquals("hello", CharSetUtils.delete("hello", "z"));
+        private static Stream<Arguments> testCases() {
+            return Stream.of(
+                // Null and empty inputs
+                arguments(null, null, null),
+                arguments(null, new String[]{}, null),
+                arguments(null, new String[]{""}, null),
+                arguments(null, new String[]{"el"}, null),
+                arguments("", null, ""),
+                arguments("", new String[]{}, ""),
+                arguments("", new String[]{""}, ""),
+                arguments("", new String[]{"a-e"}, ""),
+                // Valid inputs
+                arguments("hello", null, "hello"),
+                arguments("hello", new String[]{}, "hello"),
+                arguments("hello", new String[]{""}, "hello"),
+                arguments("hello", new String[]{"a-e"}, "hello"),
+                arguments("hello", new String[]{"l-p"}, "helo"),
+                arguments("helloo", new String[]{"l"}, "heloo"),
+                arguments("helloo", new String[]{"^l"}, "hello"),
+                arguments("hello", new String[]{"el"}, "helo"),
+                arguments("hello", new String[]{"e"}, "hello"),
+                arguments("fooffooff", new String[]{"of"}, "fofof"),
+                arguments("fooooff", new String[]{"fo"}, "fof")
+            );
+        }
     }
-
-    @Test
-    void testDelete_StringStringarray() {
-        assertNull(CharSetUtils.delete(null, (String[]) null));
-        assertNull(CharSetUtils.delete(null));
-        assertNull(CharSetUtils.delete(null, (String) null));
-        assertNull(CharSetUtils.delete(null, "el"));
-
-        assertEquals("", CharSetUtils.delete("", (String[]) null));
-        assertEquals("", CharSetUtils.delete(""));
-        assertEquals("", CharSetUtils.delete("", (String) null));
-        assertEquals("", CharSetUtils.delete("", "a-e"));
-
-        assertEquals("hello", CharSetUtils.delete("hello", (String[]) null));
-        assertEquals("hello", CharSetUtils.delete("hello"));
-        assertEquals("hello", CharSetUtils.delete("hello", (String) null));
-        assertEquals("hello", CharSetUtils.delete("hello", "xyz"));
-
-        assertEquals("ho", CharSetUtils.delete("hello", "el"));
-        assertEquals("", CharSetUtils.delete("hello", "elho"));
-        assertEquals("hello", CharSetUtils.delete("hello", ""));
-        assertEquals("hello", CharSetUtils.delete("hello", ""));
-        assertEquals("", CharSetUtils.delete("hello", "a-z"));
-        assertEquals("", CharSetUtils.delete("----", "-"));
-        assertEquals("heo", CharSetUtils.delete("hello", "l"));
-    }
-
-    @Test
-    void testKeep_StringString() {
-        assertNull(CharSetUtils.keep(null, (String) null));
-        assertNull(CharSetUtils.keep(null, ""));
-
-        assertEquals("", CharSetUtils.keep("", (String) null));
-        assertEquals("", CharSetUtils.keep("", ""));
-        assertEquals("", CharSetUtils.keep("", "a-e"));
-
-        assertEquals("", CharSetUtils.keep("hello", (String) null));
-        assertEquals("", CharSetUtils.keep("hello", ""));
-        assertEquals("", CharSetUtils.keep("hello", "xyz"));
-        assertEquals("hello", CharSetUtils.keep("hello", "a-z"));
-        assertEquals("hello", CharSetUtils.keep("hello", "oleh"));
-        assertEquals("ell", CharSetUtils.keep("hello", "el"));
-    }
-
-    @Test
-    void testKeep_StringStringarray() {
-        assertNull(CharSetUtils.keep(null, (String[]) null));
-        assertNull(CharSetUtils.keep(null));
-        assertNull(CharSetUtils.keep(null, (String) null));
-        assertNull(CharSetUtils.keep(null, "a-e"));
-
-        assertEquals("", CharSetUtils.keep("", (String[]) null));
-        assertEquals("", CharSetUtils.keep(""));
-        assertEquals("", CharSetUtils.keep("", (String) null));
-        assertEquals("", CharSetUtils.keep("", "a-e"));
-
-        assertEquals("", CharSetUtils.keep("hello", (String[]) null));
-        assertEquals("", CharSetUtils.keep("hello"));
-        assertEquals("", CharSetUtils.keep("hello", (String) null));
-        assertEquals("e", CharSetUtils.keep("hello", "a-e"));
-
-        assertEquals("e", CharSetUtils.keep("hello", "a-e"));
-        assertEquals("ell", CharSetUtils.keep("hello", "el"));
-        assertEquals("hello", CharSetUtils.keep("hello", "elho"));
-        assertEquals("hello", CharSetUtils.keep("hello", "a-z"));
-        assertEquals("----", CharSetUtils.keep("----", "-"));
-        assertEquals("ll", CharSetUtils.keep("hello", "l"));
-    }
-
-    @Test
-    void testSqueeze_StringString() {
-        assertNull(CharSetUtils.squeeze(null, (String) null));
-        assertNull(CharSetUtils.squeeze(null, ""));
-
-        assertEquals("", CharSetUtils.squeeze("", (String) null));
-        assertEquals("", CharSetUtils.squeeze("", ""));
-        assertEquals("", CharSetUtils.squeeze("", "a-e"));
-
-        assertEquals("hello", CharSetUtils.squeeze("hello", (String) null));
-        assertEquals("hello", CharSetUtils.squeeze("hello", ""));
-        assertEquals("hello", CharSetUtils.squeeze("hello", "a-e"));
-        assertEquals("helo", CharSetUtils.squeeze("hello", "l-p"));
-        assertEquals("heloo", CharSetUtils.squeeze("helloo", "l"));
-        assertEquals("hello", CharSetUtils.squeeze("helloo", "^l"));
-    }
-
-    @Test
-    void testSqueeze_StringStringarray() {
-        assertNull(CharSetUtils.squeeze(null, (String[]) null));
-        assertNull(CharSetUtils.squeeze(null));
-        assertNull(CharSetUtils.squeeze(null, (String) null));
-        assertNull(CharSetUtils.squeeze(null, "el"));
-
-        assertEquals("", CharSetUtils.squeeze("", (String[]) null));
-        assertEquals("", CharSetUtils.squeeze(""));
-        assertEquals("", CharSetUtils.squeeze("", (String) null));
-        assertEquals("", CharSetUtils.squeeze("", "a-e"));
-
-        assertEquals("hello", CharSetUtils.squeeze("hello", (String[]) null));
-        assertEquals("hello", CharSetUtils.squeeze("hello"));
-        assertEquals("hello", CharSetUtils.squeeze("hello", (String) null));
-        assertEquals("hello", CharSetUtils.squeeze("hello", "a-e"));
-
-        assertEquals("helo", CharSetUtils.squeeze("hello", "el"));
-        assertEquals("hello", CharSetUtils.squeeze("hello", "e"));
-        assertEquals("fofof", CharSetUtils.squeeze("fooffooff", "of"));
-        assertEquals("fof", CharSetUtils.squeeze("fooooff", "fo"));
-    }
-
 }
