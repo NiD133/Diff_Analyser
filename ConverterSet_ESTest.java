@@ -32,254 +32,429 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class ConverterSet_ESTest extends ConverterSet_ESTest_scaffolding {
 
-    @Test(timeout = 4000, expected = IndexOutOfBoundsException.class)
-    public void remove_invalidIndex_throwsIndexOutOfBoundsException() {
-        Converter[] converters = new Converter[1];
-        ConverterSet set = new ConverterSet(converters);
-        set.remove(1, converters); // Index 1 is out of bounds for size 1
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[1];
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      // Undeclared exception!
+      try { 
+        converterSet0.remove(1, converterArray0);
+        fail("Expecting exception: IndexOutOfBoundsException");
+      
+      } catch(IndexOutOfBoundsException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.joda.time.convert.ConverterSet", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void add_newConverterInstance_returnsNewSet() {
-        Converter[] converters = new Converter[8];
-        converters[0] = new ReadableInstantConverter();
-        converters[1] = new ReadableIntervalConverter();
-        converters[2] = new ReadablePeriodConverter();
-        converters[3] = new CalendarConverter();
-        
-        ConverterSet originalSet = new ConverterSet(converters);
-        ConverterSet newSet = originalSet.add(new CalendarConverter(), converters);
-        assertNotSame(originalSet, newSet);
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[8];
+      ReadableInstantConverter readableInstantConverter0 = new ReadableInstantConverter();
+      converterArray0[0] = (Converter) readableInstantConverter0;
+      ReadableIntervalConverter readableIntervalConverter0 = new ReadableIntervalConverter();
+      converterArray0[1] = (Converter) readableIntervalConverter0;
+      ReadablePeriodConverter readablePeriodConverter0 = new ReadablePeriodConverter();
+      converterArray0[2] = (Converter) readablePeriodConverter0;
+      CalendarConverter calendarConverter0 = new CalendarConverter();
+      converterArray0[3] = (Converter) calendarConverter0;
+      CalendarConverter calendarConverter1 = new CalendarConverter();
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      ConverterSet converterSet1 = converterSet0.add(calendarConverter1, converterArray0);
+      assertNotSame(converterSet1, converterSet0);
+  }
 
-    @Test(timeout = 4000, expected = IllegalArgumentException.class)
-    public void creatingMutablePeriodWithNullObject_throwsIllegalArgumentException() {
-        Hours hours = Hours.ONE;
-        Seconds seconds = hours.toStandardSeconds();
-        PeriodType periodType = seconds.getPeriodType();
-        // Creating MutablePeriod with null object should fail due to missing converter
-        new MutablePeriod((Object) null, periodType);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      Hours hours0 = Hours.ONE;
+      Seconds seconds0 = hours0.toStandardSeconds();
+      PeriodType periodType0 = seconds0.getPeriodType();
+      MutablePeriod mutablePeriod0 = new MutablePeriod((Object) null, periodType0);
+  }
 
-    @Test(timeout = 4000)
-    public void remove_existingConverter_reducesSetSize() {
-        Converter[] converters = new Converter[1];
-        converters[0] = StringConverter.INSTANCE;
-        
-        ConverterSet originalSet = new ConverterSet(converters);
-        ConverterSet reducedSet = originalSet.remove(converters[0], converters);
-        assertEquals(0, reducedSet.size());
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[1];
+      StringConverter stringConverter0 = StringConverter.INSTANCE;
+      converterArray0[0] = (Converter) stringConverter0;
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      ConverterSet converterSet1 = converterSet0.remove(converterArray0[0], converterArray0);
+      int int0 = converterSet1.size();
+      assertEquals(0, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void size_afterInitialization_returnsCorrectCount() {
-        Converter[] converters = new Converter[1];
-        ConverterSet set = new ConverterSet(converters);
-        assertEquals(1, set.size());
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[1];
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      int int0 = converterSet0.size();
+      assertEquals(1, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void remove_validIndex_returnsDifferentSet() {
-        Converter[] converters = new Converter[7];
-        ConverterSet originalSet = new ConverterSet(converters);
-        ConverterSet newSet = originalSet.remove(1, converters);
-        assertNotSame(originalSet, newSet);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[7];
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      ConverterSet converterSet1 = converterSet0.remove(1, converterArray0);
+      assertFalse(converterSet1.equals((Object)converterSet0));
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void remove_nullConverterElement_throwsNullPointerException() {
-        Converter[] converters = new Converter[1]; // Contains null element
-        ConverterSet set = new ConverterSet(converters);
-        set.remove(converters[0], converters); // Attempt to remove null converter
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[1];
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      // Undeclared exception!
+      try { 
+        converterSet0.remove(converterArray0[0], converterArray0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.joda.time.convert.ConverterSet", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = ArrayIndexOutOfBoundsException.class)
-    public void remove_converterFromEmptySet_throwsArrayIndexOutOfBoundsException() {
-        Converter[] converters = new Converter[0];
-        ConverterSet set = new ConverterSet(converters);
-        set.remove(StringConverter.INSTANCE, converters); // Empty set access
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      StringConverter stringConverter0 = StringConverter.INSTANCE;
+      Converter[] converterArray0 = new Converter[0];
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      // Undeclared exception!
+      try { 
+        converterSet0.remove(stringConverter0, converterArray0);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 0
+         //
+         verifyException("org.joda.time.convert.ConverterSet", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void remove_indexFromNullConverterArray_throwsNullPointerException() {
-        ConverterSet set = new ConverterSet(null);
-        set.remove(291, null); // Null converter array
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      ConverterSet converterSet0 = new ConverterSet((Converter[]) null);
+      // Undeclared exception!
+      try { 
+        converterSet0.remove(291, (Converter[]) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.joda.time.convert.ConverterSet", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = NegativeArraySizeException.class)
-    public void remove_negativeIndex_throwsNegativeArraySizeException() {
-        Converter[] converters = new Converter[0];
-        ConverterSet set = new ConverterSet(converters);
-        set.remove(-3378, null); // Negative array size
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[0];
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      // Undeclared exception!
+      try { 
+        converterSet0.remove((-3378), (Converter[]) null);
+        fail("Expecting exception: NegativeArraySizeException");
+      
+      } catch(NegativeArraySizeException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.joda.time.convert.ConverterSet", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = ArrayIndexOutOfBoundsException.class)
-    public void remove_invalidNegativeIndex_throwsArrayIndexOutOfBoundsException() {
-        Converter[] converters = new Converter[0];
-        ConverterSet set = new ConverterSet(converters);
-        set.remove(-785, converters); // Invalid index
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[0];
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      // Undeclared exception!
+      try { 
+        converterSet0.remove((-785), converterArray0);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // -785
+         //
+         verifyException("org.joda.time.convert.ConverterSet", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void copyInto_nullArray_throwsNullPointerException() {
-        ConverterSet set = new ConverterSet(null);
-        set.copyInto(null); // Null destination array
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      ConverterSet converterSet0 = new ConverterSet((Converter[]) null);
+      // Undeclared exception!
+      try { 
+        converterSet0.copyInto((Converter[]) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.joda.time.convert.ConverterSet", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = ArrayIndexOutOfBoundsException.class)
-    public void copyInto_smallerDestinationArray_throwsArrayIndexOutOfBoundsException() {
-        Converter[] converters = new Converter[7];
-        ConverterSet set = new ConverterSet(converters);
-        Converter[] smallArray = new Converter[1];
-        set.copyInto(smallArray); // Destination array too small
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[7];
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      Converter[] converterArray1 = new Converter[1];
+      // Undeclared exception!
+      try { 
+        converterSet0.copyInto(converterArray1);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+      }
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void add_nullConverter_throwsNullPointerException() {
-        Converter[] converters = new Converter[14]; // Contains nulls
-        ConverterSet set = new ConverterSet(converters);
-        set.add(converters[0], converters); // Adding null converter
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[14];
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      // Undeclared exception!
+      try { 
+        converterSet0.add(converterArray0[0], converterArray0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.joda.time.convert.ConverterSet", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = ArrayIndexOutOfBoundsException.class)
-    public void add_converterToEmptySet_throwsArrayIndexOutOfBoundsException() {
-        Converter[] converters = new Converter[0];
-        ConverterSet set = new ConverterSet(converters);
-        set.add(StringConverter.INSTANCE, converters); // Empty set access
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      StringConverter stringConverter0 = StringConverter.INSTANCE;
+      Converter[] converterArray0 = new Converter[0];
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      // Undeclared exception!
+      try { 
+        converterSet0.add(stringConverter0, converterArray0);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 0
+         //
+         verifyException("org.joda.time.convert.ConverterSet", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void select_unsupportedClass_returnsNull() {
-        Converter[] converters = new Converter[1];
-        converters[0] = NullConverter.INSTANCE;
-        ConverterSet set = new ConverterSet(converters);
-        Converter result = set.select(ConverterSet.Entry.class);
-        assertNull(result);
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[1];
+      NullConverter nullConverter0 = NullConverter.INSTANCE;
+      converterArray0[0] = (Converter) nullConverter0;
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      Class<ConverterSet.Entry> class0 = ConverterSet.Entry.class;
+      Converter converter0 = converterSet0.select(class0);
+      assertNull(converter0);
+  }
 
-    @Test(timeout = 4000)
-    public void select_classNotHandledByConverters_returnsNull() {
-        Converter[] converters = new Converter[3];
-        converters[0] = new ReadableIntervalConverter();
-        converters[1] = new LongConverter();
-        converters[2] = new ReadableDurationConverter();
-        
-        ConverterSet set = new ConverterSet(converters);
-        Converter result = set.select(ConverterSet.Entry.class);
-        assertNull(result);
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      Hours hours0 = Hours.ONE;
+      Seconds seconds0 = hours0.toStandardSeconds();
+      PeriodType periodType0 = seconds0.getPeriodType();
+      MutablePeriod mutablePeriod0 = null;
+      try {
+        mutablePeriod0 = new MutablePeriod(periodType0, periodType0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // No period converter found for type: org.joda.time.PeriodType
+         //
+         verifyException("org.joda.time.convert.ConverterManager", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void select_nullClass_returnsNull() {
-        Converter[] converters = new Converter[1];
-        converters[0] = StringConverter.INSTANCE;
-        ConverterSet set = new ConverterSet(converters);
-        Converter result = set.select(null); // Null class input
-        assertNull(result);
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[3];
+      ReadableIntervalConverter readableIntervalConverter0 = new ReadableIntervalConverter();
+      converterArray0[0] = (Converter) readableIntervalConverter0;
+      LongConverter longConverter0 = new LongConverter();
+      converterArray0[1] = (Converter) longConverter0;
+      ReadableDurationConverter readableDurationConverter0 = new ReadableDurationConverter();
+      converterArray0[2] = (Converter) readableDurationConverter0;
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      Class<ConverterSet.Entry> class0 = ConverterSet.Entry.class;
+      Converter converter0 = converterSet0.select(class0);
+      assertNull(converter0);
+  }
 
-    @Test(timeout = 4000)
-    public void select_supportedClass_returnsCorrectConverter() {
-        Converter[] converters = new Converter[5];
-        LongConverter longConverter = LongConverter.INSTANCE;
-        converters[0] = longConverter;
-        converters[1] = new ReadablePartialConverter();
-        converters[2] = new CalendarConverter();
-        converters[3] = new ReadableIntervalConverter();
-        converters[4] = new ReadableIntervalConverter();
-        
-        ConverterSet set = new ConverterSet(converters);
-        Converter result = set.select(Long.class);
-        assertSame(longConverter, result);
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[1];
+      StringConverter stringConverter0 = StringConverter.INSTANCE;
+      converterArray0[0] = (Converter) stringConverter0;
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      Converter converter0 = converterSet0.select((Class<?>) null);
+      assertNull(converter0);
+  }
 
-    @Test(timeout = 4000, expected = IndexOutOfBoundsException.class)
-    public void remove_indexExceedingSize_throwsIndexOutOfBoundsException() {
-        Converter[] converters = new Converter[1];
-        ConverterSet set = new ConverterSet(converters);
-        set.remove(1968, converters); // Index 1968 is out of bounds
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[5];
+      LongConverter longConverter0 = LongConverter.INSTANCE;
+      converterArray0[0] = (Converter) longConverter0;
+      ReadablePartialConverter readablePartialConverter0 = new ReadablePartialConverter();
+      converterArray0[1] = (Converter) readablePartialConverter0;
+      CalendarConverter calendarConverter0 = new CalendarConverter();
+      converterArray0[2] = (Converter) calendarConverter0;
+      ReadableIntervalConverter readableIntervalConverter0 = new ReadableIntervalConverter();
+      converterArray0[3] = (Converter) readableIntervalConverter0;
+      converterArray0[4] = (Converter) readableIntervalConverter0;
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      Class<Long> class0 = Long.class;
+      Converter converter0 = converterSet0.select(class0);
+      assertSame(converter0, longConverter0);
+  }
 
-    @Test(timeout = 4000)
-    public void remove_nullConverterFromEmptySet_returnsSameSet() {
-        Converter[] converters = new Converter[0];
-        ConverterSet set = new ConverterSet(converters);
-        ConverterSet result = set.remove(null, null);
-        assertSame(set, result);
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[1];
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      // Undeclared exception!
+      try { 
+        converterSet0.remove(1968, converterArray0);
+        fail("Expecting exception: IndexOutOfBoundsException");
+      
+      } catch(IndexOutOfBoundsException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.joda.time.convert.ConverterSet", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void remove_existingConverter_returnsDifferentSet() {
-        Converter[] converters = new Converter[2];
-        converters[1] = ReadablePartialConverter.INSTANCE;
-        ConverterSet originalSet = new ConverterSet(converters);
-        ConverterSet newSet = originalSet.remove(converters[1], converters);
-        assertNotSame(originalSet, newSet);
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[0];
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      ConverterSet converterSet1 = converterSet0.remove((Converter) null, (Converter[]) null);
+      assertSame(converterSet1, converterSet0);
+  }
 
-    @Test(timeout = 4000)
-    public void add_converterToEmptySet_returnsNewSet() {
-        Converter[] converters = new Converter[0];
-        ConverterSet originalSet = new ConverterSet(converters);
-        ConverterSet newSet = originalSet.add(ReadableInstantConverter.INSTANCE, null);
-        assertNotSame(originalSet, newSet);
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[2];
+      ReadablePartialConverter readablePartialConverter0 = ReadablePartialConverter.INSTANCE;
+      converterArray0[1] = (Converter) readablePartialConverter0;
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      ConverterSet converterSet1 = converterSet0.remove(converterArray0[1], converterArray0);
+      assertNotSame(converterSet1, converterSet0);
+  }
 
-    @Test(timeout = 4000)
-    public void add_differentConverterInstance_returnsNewSet() {
-        Converter[] converters = new Converter[3];
-        converters[0] = ReadableInstantConverter.INSTANCE;
-        ConverterSet originalSet = new ConverterSet(converters);
-        ConverterSet newSet = originalSet.add(new ReadableInstantConverter(), null);
-        assertNotSame(originalSet, newSet);
-    }
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[0];
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      ReadableInstantConverter readableInstantConverter0 = ReadableInstantConverter.INSTANCE;
+      ConverterSet converterSet1 = converterSet0.add(readableInstantConverter0, (Converter[]) null);
+      assertNotSame(converterSet0, converterSet1);
+  }
 
-    @Test(timeout = 4000)
-    public void add_duplicateConverterInstance_returnsSameSet() {
-        Converter[] converters = new Converter[1];
-        StringConverter converter = StringConverter.INSTANCE;
-        converters[0] = converter;
-        ConverterSet set = new ConverterSet(converters);
-        ConverterSet result = set.add(converter, converters);
-        assertSame(set, result);
-    }
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[3];
+      ReadableInstantConverter readableInstantConverter0 = ReadableInstantConverter.INSTANCE;
+      converterArray0[0] = (Converter) readableInstantConverter0;
+      ReadableInstantConverter readableInstantConverter1 = new ReadableInstantConverter();
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      ConverterSet converterSet1 = converterSet0.add(readableInstantConverter1, (Converter[]) null);
+      assertNotSame(converterSet1, converterSet0);
+  }
 
-    @Test(timeout = 4000)
-    public void add_existingConverterInstance_returnsSameSet() {
-        Converter[] converters = new Converter[10];
-        ReadableInstantConverter converter = new ReadableInstantConverter();
-        converters[0] = converter;
-        ConverterSet set = new ConverterSet(converters);
-        ConverterSet result = set.add(converter, null);
-        assertSame(set, result);
-    }
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[1];
+      StringConverter stringConverter0 = StringConverter.INSTANCE;
+      converterArray0[0] = (Converter) stringConverter0;
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      ConverterSet converterSet1 = converterSet0.add(stringConverter0, converterArray0);
+      assertSame(converterSet1, converterSet0);
+  }
 
-    @Test(timeout = 4000, expected = IllegalArgumentException.class)
-    public void createInterval_withUnsupportedType_throwsIllegalArgumentException() {
-        ConverterSet.Entry entry = new ConverterSet.Entry(ConverterSet.Entry.class, new ReadablePartialConverter());
-        CopticChronology chronology = CopticChronology.getInstance();
-        // Interval creation fails due to unsupported type
-        new Interval(entry, chronology);
-    }
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[10];
+      ReadableInstantConverter readableInstantConverter0 = new ReadableInstantConverter();
+      converterArray0[0] = (Converter) readableInstantConverter0;
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      ConverterSet converterSet1 = converterSet0.add(converterArray0[0], (Converter[]) null);
+      assertSame(converterSet1, converterSet0);
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void select_nullClassWithNullConverter_throwsNullPointerException() {
-        Converter[] converters = new Converter[1]; // Contains null
-        ConverterSet set = new ConverterSet(converters);
-        set.select(null); // Null class input with null converter in set
-    }
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      Class<ConverterSet.Entry> class0 = ConverterSet.Entry.class;
+      ReadablePartialConverter readablePartialConverter0 = new ReadablePartialConverter();
+      ConverterSet.Entry converterSet_Entry0 = new ConverterSet.Entry(class0, readablePartialConverter0);
+      CopticChronology copticChronology0 = CopticChronology.getInstance();
+      Interval interval0 = null;
+      try {
+        interval0 = new Interval(converterSet_Entry0, copticChronology0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // No interval converter found for type: org.joda.time.convert.ConverterSet$Entry
+         //
+         verifyException("org.joda.time.convert.ConverterManager", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void size_withNullConverterArray_throwsNullPointerException() {
-        ConverterSet set = new ConverterSet(null);
-        set.size(); // Accessing null array
-    }
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[1];
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      // Undeclared exception!
+      try { 
+        converterSet0.select((Class<?>) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.joda.time.convert.ConverterSet", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void copyInto_arrayOfSameSize_succeeds() {
-        Converter[] converters = new Converter[7];
-        ConverterSet set = new ConverterSet(converters);
-        set.copyInto(converters); // Valid copy operation
-        assertEquals(7, converters.length);
-    }
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      ConverterSet converterSet0 = new ConverterSet((Converter[]) null);
+      // Undeclared exception!
+      try { 
+        converterSet0.size();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.joda.time.convert.ConverterSet", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      Converter[] converterArray0 = new Converter[7];
+      ConverterSet converterSet0 = new ConverterSet(converterArray0);
+      converterSet0.copyInto(converterArray0);
+      assertEquals(7, converterArray0.length);
+  }
 }
