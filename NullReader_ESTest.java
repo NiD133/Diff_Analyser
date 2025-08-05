@@ -18,341 +18,265 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class NullReader_ESTest extends NullReader_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      NullReader nullReader0 = NullReader.INSTANCE;
-      try { 
-        nullReader0.INSTANCE.reset();
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // No position has been marked
-         //
-         verifyException("org.apache.commons.io.input.NullReader", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_resetWithoutMark_ThrowsIOException_singleton() throws Throwable {
+        NullReader nullReader = NullReader.INSTANCE;
+        try {
+            nullReader.reset();
+            fail("Expecting exception: IOException");
+        } catch (IOException e) {
+            // Verify reset without mark throws IOException
+            verifyException("org.apache.commons.io.input.NullReader", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      NullReader nullReader0 = new NullReader(959L, true, true);
-      char[] charArray0 = new char[4];
-      nullReader0.read(charArray0);
-      nullReader0.mark(0);
-      nullReader0.reset();
-      assertEquals(4L, nullReader0.getPosition());
-  }
+    @Test(timeout = 4000)
+    public void test_markAndReset_AfterRead_Success() throws Throwable {
+        NullReader reader = new NullReader(959L, true, true);
+        char[] buffer = new char[4];
+        reader.read(buffer); // Read 4 chars
+        reader.mark(0);     // Mark position
+        reader.reset();     // Reset to mark
+        assertEquals(4L, reader.getPosition());
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      NullReader nullReader0 = new NullReader(959L, true, true);
-      int int0 = nullReader0.read();
-      assertEquals(1L, nullReader0.getPosition());
-      assertEquals(0, int0);
-  }
+    @Test(timeout = 4000)
+    public void test_read_ReturnsZeroAndIncrementsPosition() throws Throwable {
+        NullReader reader = new NullReader(959L, true, true);
+        int result = reader.read();
+        assertEquals(1L, reader.getPosition());
+        assertEquals(0, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      NullReader nullReader0 = new NullReader((-995L));
-      nullReader0.skip((-5663L));
-      int int0 = nullReader0.read((char[]) null, 0, 0);
-      assertEquals((-5663L), nullReader0.getPosition());
-      assertEquals(0, int0);
-  }
+    @Test(timeout = 4000)
+    public void test_skipNegativeAndRead_ZeroLengthArray_NoError() throws Throwable {
+        NullReader reader = new NullReader(-995L);
+        reader.skip(-5663L);
+        int readCount = reader.read((char[]) null, 0, 0);
+        assertEquals(-5663L, reader.getPosition());
+        assertEquals(0, readCount);
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      NullReader nullReader0 = new NullReader(959L, true, true);
-      char[] charArray0 = new char[4];
-      int int0 = nullReader0.read(charArray0, (-2654), 616);
-      assertEquals(616L, nullReader0.getPosition());
-      assertEquals(616, int0);
-  }
+    @Test(timeout = 4000)
+    public void test_read_WithNegativeOffset_ReadsFullLength() throws Throwable {
+        NullReader reader = new NullReader(959L, true, true);
+        char[] buffer = new char[4];
+        int readCount = reader.read(buffer, -2654, 616);
+        assertEquals(616L, reader.getPosition());
+        assertEquals(616, readCount);
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      NullReader nullReader0 = new NullReader(3453L);
-      char[] charArray0 = new char[0];
-      int int0 = nullReader0.read(charArray0);
-      assertTrue(nullReader0.markSupported());
-      assertEquals(0, int0);
-  }
+    @Test(timeout = 4000)
+    public void test_read_EmptyArray_ReturnsZero() throws Throwable {
+        NullReader reader = new NullReader(3453L);
+        char[] buffer = new char[0];
+        int readCount = reader.read(buffer);
+        assertEquals(0, readCount);
+        assertTrue(reader.markSupported());
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      NullReader nullReader0 = new NullReader((-476L));
-      int int0 = nullReader0.processChar();
-      assertEquals(0, int0);
-      assertEquals((-476L), nullReader0.getSize());
-      assertTrue(nullReader0.markSupported());
-  }
+    @Test(timeout = 4000)
+    public void test_processChar_ReturnsZero() throws Throwable {
+        NullReader reader = new NullReader(-476L);
+        int result = reader.processChar();
+        assertEquals(0, result);
+        assertEquals(-476L, reader.getSize());
+        assertTrue(reader.markSupported());
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      NullReader nullReader0 = new NullReader((-1L));
-      long long0 = nullReader0.getSize();
-      assertTrue(nullReader0.markSupported());
-      assertEquals((-1L), long0);
-  }
+    @Test(timeout = 4000)
+    public void test_getSize_ReturnsNegative() throws Throwable {
+        NullReader reader = new NullReader(-1L);
+        long size = reader.getSize();
+        assertEquals(-1L, size);
+        assertTrue(reader.markSupported());
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      NullReader nullReader0 = new NullReader(959L, true, true);
-      char[] charArray0 = new char[4];
-      nullReader0.read(charArray0, 616, (-1073741823));
-      long long0 = nullReader0.getPosition();
-      assertEquals((-1073741823L), long0);
-  }
+    @Test(timeout = 4000)
+    public void test_read_WithNegativeLength_AdjustsPosition() throws Throwable {
+        NullReader reader = new NullReader(959L, true, true);
+        char[] buffer = new char[4];
+        reader.read(buffer, 616, -1073741823);
+        assertEquals(-1073741823L, reader.getPosition());
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      NullReader nullReader0 = new NullReader(0, true, true);
-      try { 
-        nullReader0.skip(512L);
-        fail("Expecting exception: EOFException");
-      
-      } catch(EOFException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.input.NullReader", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_skip_BeyondEnd_ThrowsEOFException() throws Throwable {
+        NullReader reader = new NullReader(0, true, true);
+        try {
+            reader.skip(512L);
+            fail("Expecting exception: EOFException");
+        } catch (EOFException e) {
+            // Verify skipping beyond end throws EOFException
+            verifyException("org.apache.commons.io.input.NullReader", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      NullReader nullReader0 = new NullReader(1L, false, true);
-      char[] charArray0 = new char[1];
-      nullReader0.read(charArray0);
-      try { 
-        nullReader0.read(charArray0, 2146374983, 3917);
-        fail("Expecting exception: EOFException");
-      
-      } catch(EOFException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.input.NullReader", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_read_BeyondEnd_ThrowsEOFException() throws Throwable {
+        NullReader reader = new NullReader(1L, false, true);
+        char[] buffer = new char[1];
+        reader.read(buffer); // Read the only character
+        try {
+            reader.read(buffer, 2146374983, 3917);
+            fail("Expecting exception: EOFException");
+        } catch (EOFException e) {
+            // Verify reading beyond end throws EOFException
+            verifyException("org.apache.commons.io.input.NullReader", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      NullReader nullReader0 = new NullReader();
-      // Undeclared exception!
-      try { 
-        nullReader0.read((char[]) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.input.NullReader", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_read_NullArray_ThrowsNullPointerException() throws Throwable {
+        NullReader reader = new NullReader();
+        try {
+            reader.read((char[]) null);
+            fail("Expecting exception: NullPointerException");
+        } catch (NullPointerException e) {
+            // Verify null array throws NullPointerException
+            verifyException("org.apache.commons.io.input.NullReader", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      NullReader nullReader0 = new NullReader(7L, true, true);
-      nullReader0.skip(7L);
-      try { 
-        nullReader0.read();
-        fail("Expecting exception: EOFException");
-      
-      } catch(EOFException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.input.NullReader", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_read_AfterSkippingBeyondEnd_ThrowsEOFException() throws Throwable {
+        NullReader reader = new NullReader(7L, true, true);
+        reader.skip(7L); // Skip all characters
+        try {
+            reader.read();
+            fail("Expecting exception: EOFException");
+        } catch (EOFException e) {
+            // Verify read after skipping beyond end throws EOFException
+            verifyException("org.apache.commons.io.input.NullReader", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      NullReader nullReader0 = new NullReader(1L);
-      nullReader0.skip(1695L);
-      long long0 = nullReader0.getPosition();
-      assertEquals(1L, long0);
-  }
+    @Test(timeout = 4000)
+    public void test_skip_BeyondEnd_ClampedToSize() throws Throwable {
+        NullReader reader = new NullReader(1L);
+        reader.skip(1695L); // Attempt to skip beyond end
+        assertEquals(1L, reader.getPosition()); // Position clamped to size
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      NullReader nullReader0 = new NullReader();
-      nullReader0.ready();
-      int int0 = 2143;
-      nullReader0.mark(2143);
-      nullReader0.markSupported();
-      nullReader0.getSize();
-      nullReader0.getSize();
-      nullReader0.read();
-      char[] charArray0 = new char[0];
-      int int1 = 0;
-      int int2 = (-574);
-      try { 
-        nullReader0.INSTANCE.read(charArray0, 0, 2143);
-       //  fail("Expecting exception: IOException");
-       // Unstable assertion
-      } catch(IOException e) {
-         //
-         // Read after end of file
-         //
-         verifyException("org.apache.commons.io.input.NullReader", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_skipZero_ReturnsZero() throws Throwable {
+        NullReader reader = new NullReader(959L, true, true);
+        long skipped = reader.skip(0L);
+        assertEquals(0L, skipped);
+        assertTrue(reader.markSupported());
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      NullReader nullReader0 = new NullReader(959L, true, true);
-      long long0 = nullReader0.skip(0L);
-      assertTrue(nullReader0.markSupported());
-      assertEquals(0L, long0);
-  }
+    @Test(timeout = 4000)
+    public void test_skipNegative_AfterEnd_ThrowsIOException() throws Throwable {
+        NullReader reader = new NullReader();
+        reader.read(); // Read the only character (size=0)
+        try {
+            reader.skip(-1);
+            fail("Expecting exception: IOException");
+        } catch (IOException e) {
+            // Verify negative skip after end throws IOException
+            verifyException("org.apache.commons.io.input.NullReader", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      NullReader nullReader0 = new NullReader();
-      nullReader0.read();
-      try { 
-        nullReader0.skip((-1));
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // Skip after end of file
-         //
-         verifyException("org.apache.commons.io.input.NullReader", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_reset_WhenMarkNotSupported_ThrowsUnsupportedOperationException() throws Throwable {
+        NullReader reader = new NullReader(-1388L, false, false);
+        try {
+            reader.reset();
+            fail("Expecting exception: UnsupportedOperationException");
+        } catch (UnsupportedOperationException e) {
+            // Verify reset without mark support throws UnsupportedOperationException
+            verifyException("org.apache.commons.io.input.UnsupportedOperationExceptions", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      NullReader nullReader0 = new NullReader((-1388L), false, false);
-      // Undeclared exception!
-      try { 
-        nullReader0.reset();
-        fail("Expecting exception: UnsupportedOperationException");
-      
-      } catch(UnsupportedOperationException e) {
-         //
-         // mark/reset not supported
-         //
-         verifyException("org.apache.commons.io.input.UnsupportedOperationExceptions", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_resetWithoutMark_ThrowsIOException() throws Throwable {
+        NullReader reader = new NullReader(959L, true, true);
+        try {
+            reader.reset();
+            fail("Expecting exception: IOException");
+        } catch (IOException e) {
+            // Verify reset without mark throws IOException
+            verifyException("org.apache.commons.io.input.NullReader", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      NullReader nullReader0 = new NullReader(959L, true, true);
-      try { 
-        nullReader0.reset();
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // No position has been marked
-         //
-         verifyException("org.apache.commons.io.input.NullReader", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_mark_WhenMarkNotSupported_ThrowsUnsupportedOperationException() throws Throwable {
+        NullReader reader = new NullReader(-329L, false, true);
+        try {
+            reader.mark(0);
+            fail("Expecting exception: UnsupportedOperationException");
+        } catch (UnsupportedOperationException e) {
+            // Verify mark without support throws UnsupportedOperationException
+            verifyException("org.apache.commons.io.input.UnsupportedOperationExceptions", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      NullReader nullReader0 = NullReader.INSTANCE;
-      try { 
-        nullReader0.read();
-       //  fail("Expecting exception: IOException");
-       // Unstable assertion
-      } catch(IOException e) {
-         //
-         // Read after end of file
-         //
-         verifyException("org.apache.commons.io.input.NullReader", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_read_AfterInvalidReadOperation_ThrowsEOFException() throws Throwable {
+        NullReader reader = new NullReader(-1935L, true, true);
+        char[] buffer = new char[0];
+        reader.read(buffer, 1095, 1095); // Invalid read (buffer too small)
+        try {
+            reader.read(buffer);
+            fail("Expecting exception: EOFException");
+        } catch (EOFException e) {
+            // Verify read after invalid operation throws EOFException
+            verifyException("org.apache.commons.io.input.NullReader", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      NullReader nullReader0 = new NullReader((-329L), false, true);
-      // Undeclared exception!
-      try { 
-        nullReader0.mark(0);
-        fail("Expecting exception: UnsupportedOperationException");
-      
-      } catch(UnsupportedOperationException e) {
-         //
-         // mark/reset not supported
-         //
-         verifyException("org.apache.commons.io.input.UnsupportedOperationExceptions", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_read_ZeroCharsThenSkipNegative_ReturnsMinusOne() throws Throwable {
+        NullReader reader = new NullReader(-3294L, false, false);
+        char[] buffer = new char[7];
+        reader.read(buffer, 2144545913, 0); // Read zero characters
+        long skipped = reader.skip(-2904L);
+        assertEquals(-1L, skipped);
+        assertEquals(-3294L, reader.getPosition());
+    }
 
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      NullReader nullReader0 = new NullReader((-1935L), true, true);
-      char[] charArray0 = new char[0];
-      nullReader0.read(charArray0, 1095, 1095);
-      try { 
-        nullReader0.read(charArray0);
-        fail("Expecting exception: EOFException");
-      
-      } catch(EOFException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.input.NullReader", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_close_ResetsPosition() throws Throwable {
+        NullReader reader = new NullReader(-995L);
+        reader.close();
+        assertEquals(0L, reader.getPosition());
+        assertTrue(reader.markSupported());
+        assertEquals(-995L, reader.getSize());
+    }
 
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      NullReader nullReader0 = new NullReader((-3294L), false, false);
-      char[] charArray0 = new char[7];
-      nullReader0.read(charArray0, 2144545913, 0);
-      long long0 = nullReader0.skip((-2904L));
-      assertEquals((-3294L), nullReader0.getPosition());
-      assertEquals((-1L), long0);
-  }
+    @Test(timeout = 4000)
+    public void test_read_EmptyArrayWithNegativeSize_AdjustsPosition() throws Throwable {
+        NullReader reader = new NullReader(-1935L, true, true);
+        char[] buffer = new char[0];
+        int readCount = reader.read(buffer);
+        assertEquals(-1935L, reader.getPosition());
+        assertEquals(-1935, readCount);
+    }
 
-  @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
-      NullReader nullReader0 = new NullReader((-995L));
-      nullReader0.close();
-      assertEquals(0L, nullReader0.getPosition());
-      assertTrue(nullReader0.markSupported());
-      assertEquals((-995L), nullReader0.getSize());
-  }
+    @Test(timeout = 4000)
+    public void test_markSupported_WhenMarkNotSupported_ReturnsFalse() throws Throwable {
+        NullReader reader = new NullReader(-3294L, false, false);
+        assertFalse(reader.markSupported());
+        assertEquals(-3294L, reader.getSize());
+    }
 
-  @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
-      NullReader nullReader0 = new NullReader((-1935L), true, true);
-      char[] charArray0 = new char[0];
-      int int0 = nullReader0.read(charArray0);
-      assertEquals((-1935L), nullReader0.getPosition());
-      assertEquals((-1935), int0);
-  }
+    @Test(timeout = 4000)
+    public void test_initialPosition_MatchesConstructor() throws Throwable {
+        NullReader reader = new NullReader(959L, true, true);
+        assertEquals(0L, reader.getPosition());
+        assertTrue(reader.markSupported());
+        assertEquals(959L, reader.getSize());
+    }
 
-  @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
-      NullReader nullReader0 = new NullReader((-3294L), false, false);
-      boolean boolean0 = nullReader0.markSupported();
-      assertEquals((-3294L), nullReader0.getSize());
-      assertFalse(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test26()  throws Throwable  {
-      NullReader nullReader0 = new NullReader(959L, true, true);
-      nullReader0.getPosition();
-      assertTrue(nullReader0.markSupported());
-      assertEquals(959L, nullReader0.getSize());
-  }
-
-  @Test(timeout = 4000)
-  public void test27()  throws Throwable  {
-      NullReader nullReader0 = new NullReader((-3294L), false, false);
-      int int0 = nullReader0.read();
-      assertEquals(1L, nullReader0.getPosition());
-      assertEquals(0, int0);
-  }
+    @Test(timeout = 4000)
+    public void test_read_WithNegativeSize_ReturnsZeroAndIncrementsPosition() throws Throwable {
+        NullReader reader = new NullReader(-3294L, false, false);
+        int result = reader.read();
+        assertEquals(1L, reader.getPosition());
+        assertEquals(0, result);
+    }
 }
