@@ -31,327 +31,388 @@ import org.junit.Test;
  */
 public final class JsonArrayTest {
 
+  // ========== Equality Tests ==========
+
   @Test
   public void testEqualsOnEmptyArray() {
-    MoreAsserts.assertEqualsAndHashCode(new JsonArray(), new JsonArray());
+    JsonArray emptyArray1 = new JsonArray();
+    JsonArray emptyArray2 = new JsonArray();
+    
+    MoreAsserts.assertEqualsAndHashCode(emptyArray1, emptyArray2);
   }
 
   @Test
   public void testEqualsNonEmptyArray() {
-    JsonArray a = new JsonArray();
-    JsonArray b = new JsonArray();
+    JsonArray array1 = new JsonArray();
+    JsonArray array2 = new JsonArray();
 
-    new EqualsTester().addEqualityGroup(a).testEquals();
+    // Test empty arrays are equal
+    new EqualsTester().addEqualityGroup(array1).testEquals();
 
-    a.add(new JsonObject());
-    assertThat(a.equals(b)).isFalse();
-    assertThat(b.equals(a)).isFalse();
+    // Arrays with different sizes should not be equal
+    array1.add(new JsonObject());
+    assertThat(array1.equals(array2)).isFalse();
+    assertThat(array2.equals(array1)).isFalse();
 
-    b.add(new JsonObject());
-    MoreAsserts.assertEqualsAndHashCode(a, b);
+    // Arrays with same elements should be equal
+    array2.add(new JsonObject());
+    MoreAsserts.assertEqualsAndHashCode(array1, array2);
 
-    a.add(new JsonObject());
-    assertThat(a.equals(b)).isFalse();
-    assertThat(b.equals(a)).isFalse();
+    // Arrays with different number of elements should not be equal
+    array1.add(new JsonObject());
+    assertThat(array1.equals(array2)).isFalse();
+    assertThat(array2.equals(array1)).isFalse();
 
-    b.add(JsonNull.INSTANCE);
-    assertThat(a.equals(b)).isFalse();
-    assertThat(b.equals(a)).isFalse();
+    // Arrays with different element types should not be equal
+    array2.add(JsonNull.INSTANCE);
+    assertThat(array1.equals(array2)).isFalse();
+    assertThat(array2.equals(array1)).isFalse();
   }
+
+  // ========== Element Removal Tests ==========
 
   @Test
   public void testRemove() {
     JsonArray array = new JsonArray();
+    
+    // Should throw exception when removing from empty array
     assertThrows(IndexOutOfBoundsException.class, () -> array.remove(0));
 
-    JsonPrimitive a = new JsonPrimitive("a");
-    array.add(a);
-    assertThat(array.remove(a)).isTrue();
-    assertThat(array).doesNotContain(a);
-    array.add(a);
+    JsonPrimitive elementA = new JsonPrimitive("a");
+    array.add(elementA);
+    
+    // Test removing by element reference
+    assertThat(array.remove(elementA)).isTrue();
+    assertThat(array).doesNotContain(elementA);
+    
+    // Test removing by index
+    array.add(elementA);
     array.add(new JsonPrimitive("b"));
-    assertThat(array.remove(1).getAsString()).isEqualTo("b");
+    JsonElement removedElement = array.remove(1);
+    assertThat(removedElement.getAsString()).isEqualTo("b");
     assertThat(array).hasSize(1);
-    assertThat(array).contains(a);
+    assertThat(array).contains(elementA);
   }
+
+  // ========== Element Modification Tests ==========
 
   @Test
   public void testSet() {
     JsonArray array = new JsonArray();
+    
+    // Should throw exception when setting element in empty array
     assertThrows(IndexOutOfBoundsException.class, () -> array.set(0, new JsonPrimitive(1)));
 
-    JsonPrimitive a = new JsonPrimitive("a");
-    array.add(a);
+    JsonPrimitive elementA = new JsonPrimitive("a");
+    array.add(elementA);
 
-    JsonPrimitive b = new JsonPrimitive("b");
-    JsonElement oldValue = array.set(0, b);
-    assertThat(oldValue).isEqualTo(a);
+    // Test setting with non-null element
+    JsonPrimitive elementB = new JsonPrimitive("b");
+    JsonElement previousValue = array.set(0, elementB);
+    assertThat(previousValue).isEqualTo(elementA);
     assertThat(array.get(0).getAsString()).isEqualTo("b");
 
-    oldValue = array.set(0, null);
-    assertThat(oldValue).isEqualTo(b);
+    // Test setting with null (should become JsonNull)
+    previousValue = array.set(0, null);
+    assertThat(previousValue).isEqualTo(elementB);
     assertThat(array.get(0)).isEqualTo(JsonNull.INSTANCE);
 
-    oldValue = array.set(0, new JsonPrimitive("c"));
-    assertThat(oldValue).isEqualTo(JsonNull.INSTANCE);
+    // Test setting over JsonNull
+    JsonPrimitive elementC = new JsonPrimitive("c");
+    previousValue = array.set(0, elementC);
+    assertThat(previousValue).isEqualTo(JsonNull.INSTANCE);
     assertThat(array.get(0).getAsString()).isEqualTo("c");
     assertThat(array).hasSize(1);
   }
 
+  // ========== Deep Copy Tests ==========
+
   @Test
   public void testDeepCopy() {
-    JsonArray original = new JsonArray();
-    JsonArray firstEntry = new JsonArray();
-    original.add(firstEntry);
+    JsonArray originalArray = new JsonArray();
+    JsonArray nestedArray = new JsonArray();
+    originalArray.add(nestedArray);
 
-    JsonArray copy = original.deepCopy();
-    original.add(new JsonPrimitive("y"));
-
-    assertThat(copy).hasSize(1);
-    firstEntry.add(new JsonPrimitive("z"));
-
-    assertThat(original.get(0).getAsJsonArray()).hasSize(1);
-    assertThat(copy.get(0).getAsJsonArray()).hasSize(0);
+    JsonArray copiedArray = originalArray.deepCopy();
+    
+    // Modifications to original should not affect copy
+    originalArray.add(new JsonPrimitive("y"));
+    assertThat(copiedArray).hasSize(1);
+    
+    // Modifications to nested elements in original should not affect copy
+    nestedArray.add(new JsonPrimitive("z"));
+    assertThat(originalArray.get(0).getAsJsonArray()).hasSize(1);
+    assertThat(copiedArray.get(0).getAsJsonArray()).hasSize(0);
   }
+
+  // ========== Size and Empty Tests ==========
 
   @Test
   public void testIsEmpty() {
     JsonArray array = new JsonArray();
     assertThat(array).isEmpty();
 
-    JsonPrimitive a = new JsonPrimitive("a");
-    array.add(a);
+    JsonPrimitive element = new JsonPrimitive("a");
+    array.add(element);
     assertThat(array).isNotEmpty();
 
     array.remove(0);
     assertThat(array).isEmpty();
   }
 
+  // ========== Error Handling Tests ==========
+
   @Test
-  public void testFailedGetArrayValues() {
-    JsonArray jsonArray = new JsonArray();
-    jsonArray.add(
-        JsonParser.parseString(
-            "{"
-                + "\"key1\":\"value1\","
-                + "\"key2\":\"value2\","
-                + "\"key3\":\"value3\","
-                + "\"key4\":\"value4\""
-                + "}"));
+  public void testInvalidGetAsOperations_WithJsonObject() {
+    JsonArray arrayWithObject = new JsonArray();
+    String jsonObjectString = "{"
+        + "\"key1\":\"value1\","
+        + "\"key2\":\"value2\","
+        + "\"key3\":\"value3\","
+        + "\"key4\":\"value4\""
+        + "}";
+    arrayWithObject.add(JsonParser.parseString(jsonObjectString));
 
-    Exception e = assertThrows(UnsupportedOperationException.class, () -> jsonArray.getAsBoolean());
-    assertThat(e).hasMessageThat().isEqualTo("JsonObject");
+    // JsonArray containing JsonObject should not be convertible to primitives
+    Exception exception = assertThrows(UnsupportedOperationException.class, 
+        () -> arrayWithObject.getAsBoolean());
+    assertThat(exception).hasMessageThat().isEqualTo("JsonObject");
 
-    e = assertThrows(IndexOutOfBoundsException.class, () -> jsonArray.get(-1));
-    assertThat(e).hasMessageThat().isEqualTo("Index -1 out of bounds for length 1");
-
-    e = assertThrows(UnsupportedOperationException.class, () -> jsonArray.getAsString());
-    assertThat(e).hasMessageThat().isEqualTo("JsonObject");
-
-    jsonArray.remove(0);
-    jsonArray.add("hello");
-    e = assertThrows(NumberFormatException.class, () -> jsonArray.getAsDouble());
-    assertThat(e).hasMessageThat().isEqualTo("For input string: \"hello\"");
-
-    e = assertThrows(NumberFormatException.class, () -> jsonArray.getAsInt());
-    assertThat(e).hasMessageThat().isEqualTo("For input string: \"hello\"");
-
-    e = assertThrows(IllegalStateException.class, () -> jsonArray.get(0).getAsJsonArray());
-    assertThat(e).hasMessageThat().isEqualTo("Not a JSON Array: \"hello\"");
-
-    e = assertThrows(IllegalStateException.class, () -> jsonArray.getAsJsonObject());
-    assertThat(e).hasMessageThat().isEqualTo("Not a JSON Object: [\"hello\"]");
-
-    e = assertThrows(NumberFormatException.class, () -> jsonArray.getAsLong());
-    assertThat(e).hasMessageThat().isEqualTo("For input string: \"hello\"");
+    exception = assertThrows(UnsupportedOperationException.class, 
+        () -> arrayWithObject.getAsString());
+    assertThat(exception).hasMessageThat().isEqualTo("JsonObject");
   }
 
   @Test
-  public void testGetAs_WrongArraySize() {
-    JsonArray jsonArray = new JsonArray();
-    var e = assertThrows(IllegalStateException.class, () -> jsonArray.getAsByte());
-    assertThat(e).hasMessageThat().isEqualTo("Array must have size 1, but has size 0");
+  public void testInvalidGetAsOperations_WithInvalidString() {
+    JsonArray arrayWithString = new JsonArray();
+    arrayWithString.add("hello");
 
-    jsonArray.add(true);
-    jsonArray.add(false);
-    e = assertThrows(IllegalStateException.class, () -> jsonArray.getAsByte());
-    assertThat(e).hasMessageThat().isEqualTo("Array must have size 1, but has size 2");
+    // String "hello" cannot be converted to numbers
+    Exception exception = assertThrows(NumberFormatException.class, 
+        () -> arrayWithString.getAsDouble());
+    assertThat(exception).hasMessageThat().isEqualTo("For input string: \"hello\"");
+
+    exception = assertThrows(NumberFormatException.class, 
+        () -> arrayWithString.getAsInt());
+    assertThat(exception).hasMessageThat().isEqualTo("For input string: \"hello\"");
+
+    exception = assertThrows(NumberFormatException.class, 
+        () -> arrayWithString.getAsLong());
+    assertThat(exception).hasMessageThat().isEqualTo("For input string: \"hello\"");
   }
 
   @Test
-  public void testStringPrimitiveAddition() {
-    JsonArray jsonArray = new JsonArray();
+  public void testInvalidGetAsOperations_WithWrongTypes() {
+    JsonArray arrayWithString = new JsonArray();
+    arrayWithString.add("hello");
 
-    jsonArray.add("Hello");
-    jsonArray.add("Goodbye");
-    jsonArray.add("Thank you");
-    jsonArray.add((String) null);
-    jsonArray.add("Yes");
+    // String element cannot be accessed as JsonArray
+    Exception exception = assertThrows(IllegalStateException.class, 
+        () -> arrayWithString.get(0).getAsJsonArray());
+    assertThat(exception).hasMessageThat().isEqualTo("Not a JSON Array: \"hello\"");
 
-    assertThat(jsonArray.toString())
-        .isEqualTo("[\"Hello\",\"Goodbye\",\"Thank you\",null,\"Yes\"]");
+    // JsonArray cannot be accessed as JsonObject
+    exception = assertThrows(IllegalStateException.class, 
+        () -> arrayWithString.getAsJsonObject());
+    assertThat(exception).hasMessageThat().isEqualTo("Not a JSON Object: [\"hello\"]");
   }
 
   @Test
-  public void testIntegerPrimitiveAddition() {
-    JsonArray jsonArray = new JsonArray();
+  public void testInvalidArrayAccess() {
+    JsonArray array = new JsonArray();
+    array.add(JsonParser.parseString("{\"key\":\"value\"}"));
 
-    int x = 1;
-    jsonArray.add(x);
-
-    x = 2;
-    jsonArray.add(x);
-
-    x = -3;
-    jsonArray.add(x);
-
-    jsonArray.add((Integer) null);
-
-    x = 4;
-    jsonArray.add(x);
-
-    x = 0;
-    jsonArray.add(x);
-
-    assertThat(jsonArray.toString()).isEqualTo("[1,2,-3,null,4,0]");
+    // Negative index should throw exception
+    Exception exception = assertThrows(IndexOutOfBoundsException.class, () -> array.get(-1));
+    assertThat(exception).hasMessageThat().isEqualTo("Index -1 out of bounds for length 1");
   }
 
   @Test
-  public void testDoublePrimitiveAddition() {
-    JsonArray jsonArray = new JsonArray();
+  public void testGetAs_RequiresSingleElement() {
+    JsonArray emptyArray = new JsonArray();
+    Exception exception = assertThrows(IllegalStateException.class, () -> emptyArray.getAsByte());
+    assertThat(exception).hasMessageThat().isEqualTo("Array must have size 1, but has size 0");
 
-    double x = 1.0;
-    jsonArray.add(x);
+    JsonArray arrayWithTwoElements = new JsonArray();
+    arrayWithTwoElements.add(true);
+    arrayWithTwoElements.add(false);
+    exception = assertThrows(IllegalStateException.class, () -> arrayWithTwoElements.getAsByte());
+    assertThat(exception).hasMessageThat().isEqualTo("Array must have size 1, but has size 2");
+  }
 
-    x = 2.13232;
-    jsonArray.add(x);
+  // ========== Primitive Addition Tests ==========
 
-    x = 0.121;
-    jsonArray.add(x);
+  @Test
+  public void testAddStringPrimitives() {
+    JsonArray array = new JsonArray();
 
-    jsonArray.add((Double) null);
+    array.add("Hello");
+    array.add("Goodbye");
+    array.add("Thank you");
+    array.add((String) null);  // Should become JsonNull
+    array.add("Yes");
 
-    x = -0.00234;
-    jsonArray.add(x);
-
-    jsonArray.add((Double) null);
-
-    assertThat(jsonArray.toString()).isEqualTo("[1.0,2.13232,0.121,null,-0.00234,null]");
+    String expectedJson = "[\"Hello\",\"Goodbye\",\"Thank you\",null,\"Yes\"]";
+    assertThat(array.toString()).isEqualTo(expectedJson);
   }
 
   @Test
-  public void testBooleanPrimitiveAddition() {
-    JsonArray jsonArray = new JsonArray();
+  public void testAddIntegerPrimitives() {
+    JsonArray array = new JsonArray();
 
-    jsonArray.add(true);
-    jsonArray.add(true);
-    jsonArray.add(false);
-    jsonArray.add(false);
-    jsonArray.add((Boolean) null);
-    jsonArray.add(true);
+    array.add(1);
+    array.add(2);
+    array.add(-3);
+    array.add((Integer) null);  // Should become JsonNull
+    array.add(4);
+    array.add(0);
 
-    assertThat(jsonArray.toString()).isEqualTo("[true,true,false,false,null,true]");
+    String expectedJson = "[1,2,-3,null,4,0]";
+    assertThat(array.toString()).isEqualTo(expectedJson);
   }
 
   @Test
-  public void testCharPrimitiveAddition() {
-    JsonArray jsonArray = new JsonArray();
+  public void testAddDoublePrimitives() {
+    JsonArray array = new JsonArray();
 
-    jsonArray.add('a');
-    jsonArray.add('e');
-    jsonArray.add('i');
-    jsonArray.add((char) 111);
-    jsonArray.add((Character) null);
-    jsonArray.add('u');
-    jsonArray.add("and sometimes Y");
+    array.add(1.0);
+    array.add(2.13232);
+    array.add(0.121);
+    array.add((Double) null);  // Should become JsonNull
+    array.add(-0.00234);
+    array.add((Double) null);  // Should become JsonNull
 
-    assertThat(jsonArray.toString())
-        .isEqualTo("[\"a\",\"e\",\"i\",\"o\",null,\"u\",\"and sometimes Y\"]");
+    String expectedJson = "[1.0,2.13232,0.121,null,-0.00234,null]";
+    assertThat(array.toString()).isEqualTo(expectedJson);
   }
 
   @Test
-  public void testMixedPrimitiveAddition() {
-    JsonArray jsonArray = new JsonArray();
+  public void testAddBooleanPrimitives() {
+    JsonArray array = new JsonArray();
 
-    jsonArray.add('a');
-    jsonArray.add("apple");
-    jsonArray.add(12121);
-    jsonArray.add((char) 111);
+    array.add(true);
+    array.add(true);
+    array.add(false);
+    array.add(false);
+    array.add((Boolean) null);  // Should become JsonNull
+    array.add(true);
 
-    jsonArray.add((Boolean) null);
-    assertThat(jsonArray.get(jsonArray.size() - 1)).isEqualTo(JsonNull.INSTANCE);
-
-    jsonArray.add((Character) null);
-    assertThat(jsonArray.get(jsonArray.size() - 1)).isEqualTo(JsonNull.INSTANCE);
-
-    jsonArray.add(12.232);
-    jsonArray.add(BigInteger.valueOf(2323));
-
-    assertThat(jsonArray.toString())
-        .isEqualTo("[\"a\",\"apple\",12121,\"o\",null,null,12.232,2323]");
+    String expectedJson = "[true,true,false,false,null,true]";
+    assertThat(array.toString()).isEqualTo(expectedJson);
   }
 
   @Test
-  public void testNullPrimitiveAddition() {
-    JsonArray jsonArray = new JsonArray();
+  public void testAddCharacterPrimitives() {
+    JsonArray array = new JsonArray();
 
-    jsonArray.add((Character) null);
-    jsonArray.add((Boolean) null);
-    jsonArray.add((Integer) null);
-    jsonArray.add((Double) null);
-    jsonArray.add((Float) null);
-    jsonArray.add((BigInteger) null);
-    jsonArray.add((String) null);
-    jsonArray.add((Boolean) null);
-    jsonArray.add((Number) null);
+    array.add('a');
+    array.add('e');
+    array.add('i');
+    array.add((char) 111);  // ASCII 'o'
+    array.add((Character) null);  // Should become JsonNull
+    array.add('u');
+    array.add("and sometimes Y");
 
-    assertThat(jsonArray.toString()).isEqualTo("[null,null,null,null,null,null,null,null,null]");
-    for (int i = 0; i < jsonArray.size(); i++) {
-      // Verify that they are actually a JsonNull and not a Java null
-      assertThat(jsonArray.get(i)).isEqualTo(JsonNull.INSTANCE);
+    String expectedJson = "[\"a\",\"e\",\"i\",\"o\",null,\"u\",\"and sometimes Y\"]";
+    assertThat(array.toString()).isEqualTo(expectedJson);
+  }
+
+  @Test
+  public void testAddMixedPrimitives() {
+    JsonArray array = new JsonArray();
+
+    array.add('a');
+    array.add("apple");
+    array.add(12121);
+    array.add((char) 111);  // ASCII 'o'
+
+    // Verify null values become JsonNull instances
+    array.add((Boolean) null);
+    assertThat(array.get(array.size() - 1)).isEqualTo(JsonNull.INSTANCE);
+
+    array.add((Character) null);
+    assertThat(array.get(array.size() - 1)).isEqualTo(JsonNull.INSTANCE);
+
+    array.add(12.232);
+    array.add(BigInteger.valueOf(2323));
+
+    String expectedJson = "[\"a\",\"apple\",12121,\"o\",null,null,12.232,2323]";
+    assertThat(array.toString()).isEqualTo(expectedJson);
+  }
+
+  @Test
+  public void testAddNullPrimitives_BecomesJsonNull() {
+    JsonArray array = new JsonArray();
+
+    // All null primitive types should become JsonNull
+    array.add((Character) null);
+    array.add((Boolean) null);
+    array.add((Integer) null);
+    array.add((Double) null);
+    array.add((Float) null);
+    array.add((BigInteger) null);
+    array.add((String) null);
+    array.add((Boolean) null);
+    array.add((Number) null);
+
+    String expectedJson = "[null,null,null,null,null,null,null,null,null]";
+    assertThat(array.toString()).isEqualTo(expectedJson);
+    
+    // Verify all elements are JsonNull instances, not Java null
+    for (int i = 0; i < array.size(); i++) {
+      assertThat(array.get(i)).isEqualTo(JsonNull.INSTANCE);
     }
   }
 
   @Test
-  public void testNullJsonElementAddition() {
-    JsonArray jsonArray = new JsonArray();
-    jsonArray.add((JsonElement) null);
-    assertThat(jsonArray.get(0)).isEqualTo(JsonNull.INSTANCE);
+  public void testAddNullJsonElement_BecomesJsonNull() {
+    JsonArray array = new JsonArray();
+    array.add((JsonElement) null);
+    assertThat(array.get(0)).isEqualTo(JsonNull.INSTANCE);
   }
 
   @Test
-  public void testSameAddition() {
-    JsonArray jsonArray = new JsonArray();
+  public void testAddDuplicateValues() {
+    JsonArray array = new JsonArray();
 
-    jsonArray.add('a');
-    jsonArray.add('a');
-    jsonArray.add(true);
-    jsonArray.add(true);
-    jsonArray.add(1212);
-    jsonArray.add(1212);
-    jsonArray.add(34.34);
-    jsonArray.add(34.34);
-    jsonArray.add((Boolean) null);
-    jsonArray.add((Boolean) null);
+    // Arrays should allow duplicate values
+    array.add('a');
+    array.add('a');
+    array.add(true);
+    array.add(true);
+    array.add(1212);
+    array.add(1212);
+    array.add(34.34);
+    array.add(34.34);
+    array.add((Boolean) null);
+    array.add((Boolean) null);
 
-    assertThat(jsonArray.toString())
-        .isEqualTo("[\"a\",\"a\",true,true,1212,1212,34.34,34.34,null,null]");
+    String expectedJson = "[\"a\",\"a\",true,true,1212,1212,34.34,34.34,null,null]";
+    assertThat(array.toString()).isEqualTo(expectedJson);
   }
 
+  // ========== String Representation Tests ==========
+
   @Test
-  public void testToString() {
+  public void testToString_WithSpecialCharacters() {
     JsonArray array = new JsonArray();
     assertThat(array.toString()).isEqualTo("[]");
 
+    // Test various special values and characters
     array.add(JsonNull.INSTANCE);
     array.add(Float.NaN);
-    array.add("a\0");
+    array.add("a\0");  // String with null character
+    
     JsonArray nestedArray = new JsonArray();
-    nestedArray.add('"');
+    nestedArray.add('"');  // Quote character
     array.add(nestedArray);
+    
     JsonObject nestedObject = new JsonObject();
-    nestedObject.addProperty("n\0", 1);
+    nestedObject.addProperty("n\0", 1);  // Property name with null character
     array.add(nestedObject);
-    assertThat(array.toString()).isEqualTo("[null,NaN,\"a\\u0000\",[\"\\\"\"],{\"n\\u0000\":1}]");
+    
+    String expectedJson = "[null,NaN,\"a\\u0000\",[\"\\\"\"],{\"n\\u0000\":1}]";
+    assertThat(array.toString()).isEqualTo(expectedJson);
   }
 }
