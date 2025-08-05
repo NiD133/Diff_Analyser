@@ -20,140 +20,156 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class ForwardingQueue_ESTest extends ForwardingQueue_ESTest_scaffolding {
 
-    // Tests for standard methods with non-empty queue behavior
-    @Test(timeout = 4000)
-    public void testStandardOfferAndPoll_RetainsObjectReference() throws Throwable {
-        EvictingQueue<Object> queue = EvictingQueue.create(98);
-        Object testElement = new Object();
-        queue.standardOffer(testElement);
-        Object polledElement = queue.standardPoll();
-        assertSame("Polled element should be the same as offered element", polledElement, testElement);
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      EvictingQueue<Object> evictingQueue0 = EvictingQueue.create((int) 'b');
+      Object object0 = new Object();
+      evictingQueue0.standardOffer(object0);
+      Object object1 = evictingQueue0.standardPoll();
+      assertSame(object1, object0);
+  }
 
-    @Test(timeout = 4000)
-    public void testStandardPeek_AfterAdd_ReturnsSameElement() throws Throwable {
-        EvictingQueue<Locale.FilteringMode> queue = EvictingQueue.create(1);
-        Locale.FilteringMode testElement = Locale.FilteringMode.EXTENDED_FILTERING;
-        queue.add(testElement);
-        Locale.FilteringMode peekedElement = queue.standardPeek();
-        assertSame("Peeked element should be the same as added element", peekedElement, testElement);
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      EvictingQueue<Locale.FilteringMode> evictingQueue0 = EvictingQueue.create(1);
+      Locale.FilteringMode locale_FilteringMode0 = Locale.FilteringMode.EXTENDED_FILTERING;
+      evictingQueue0.add(locale_FilteringMode0);
+      Locale.FilteringMode locale_FilteringMode1 = evictingQueue0.standardPeek();
+      assertSame(locale_FilteringMode1, locale_FilteringMode0);
+  }
 
-    @Test(timeout = 4000)
-    public void testRemove_AfterOffer_RemovesElement() throws Throwable {
-        EvictingQueue<Object> queue = EvictingQueue.create(98);
-        Object testElement = new Object();
-        queue.standardOffer(testElement);
-        Object removedElement = queue.remove();
-        assertFalse("Queue should not contain removed element", queue.contains(removedElement));
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      EvictingQueue<Object> evictingQueue0 = EvictingQueue.create((int) 'b');
+      Object object0 = new Object();
+      evictingQueue0.standardOffer(object0);
+      Object object1 = evictingQueue0.remove();
+      assertFalse(evictingQueue0.contains(object1));
+  }
 
-    @Test(timeout = 4000)
-    public void testPoll_AfterAdd_RemovesElement() throws Throwable {
-        EvictingQueue<Locale.FilteringMode> queue = EvictingQueue.create(126);
-        Locale.FilteringMode testElement = Locale.FilteringMode.REJECT_EXTENDED_RANGES;
-        queue.add(testElement);
-        Locale.FilteringMode polledElement = queue.poll();
-        assertFalse("Queue should not contain polled element", queue.contains(polledElement));
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      EvictingQueue<Locale.FilteringMode> evictingQueue0 = EvictingQueue.create(126);
+      Locale.FilteringMode locale_FilteringMode0 = Locale.FilteringMode.REJECT_EXTENDED_RANGES;
+      evictingQueue0.add(locale_FilteringMode0);
+      Locale.FilteringMode locale_FilteringMode1 = evictingQueue0.poll();
+      assertFalse(evictingQueue0.contains(locale_FilteringMode1));
+  }
 
-    @Test(timeout = 4000)
-    public void testPeek_AfterAdd_ReturnsElementWithoutRemoving() throws Throwable {
-        EvictingQueue<Locale.Category> queue = EvictingQueue.create(5760);
-        Locale.Category testElement = Locale.Category.DISPLAY;
-        queue.add(testElement);
-        Locale.Category peekedElement = queue.peek();
-        assertTrue("Queue should still contain peeked element", queue.contains(peekedElement));
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      EvictingQueue<Locale.Category> evictingQueue0 = EvictingQueue.create(5760);
+      Locale.Category locale_Category0 = Locale.Category.DISPLAY;
+      evictingQueue0.add(locale_Category0);
+      Locale.Category locale_Category1 = evictingQueue0.peek();
+      assertTrue(evictingQueue0.contains(locale_Category1));
+  }
 
-    @Test(timeout = 4000)
-    public void testOffer_WithNonNullElement_ReturnsTrue() throws Throwable {
-        EvictingQueue<Object> queue = EvictingQueue.create(613);
-        LinkedListMultimap<Object, Object> testElement = LinkedListMultimap.create();
-        boolean result = queue.offer(testElement);
-        assertTrue("Offer should return true when adding element", result);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      EvictingQueue<Object> evictingQueue0 = EvictingQueue.create(613);
+      LinkedListMultimap<Object, Object> linkedListMultimap0 = LinkedListMultimap.create();
+      boolean boolean0 = evictingQueue0.offer(linkedListMultimap0);
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testElement_AfterOffer_ReturnsHeadElement() throws Throwable {
-        EvictingQueue<Object> queue = EvictingQueue.create(1937);
-        Object testElement = new Object();
-        queue.standardOffer(testElement);
-        Object headElement = queue.element();
-        assertTrue("Element should return the head of the queue", queue.contains(headElement));
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      EvictingQueue<Object> evictingQueue0 = EvictingQueue.create(1937);
+      Object object0 = new Object();
+      evictingQueue0.standardOffer(object0);
+      Object object1 = evictingQueue0.element();
+      assertTrue(evictingQueue0.contains(object1));
+  }
 
-    // Tests for null element handling
-    @Test(timeout = 4000)
-    public void testStandardOffer_NullElement_ThrowsNullPointerException() throws Throwable {
-        EvictingQueue<Object> queue = EvictingQueue.create(2014);
-        try {
-            queue.standardOffer(null);
-            fail("Expected NullPointerException for null element");
-        } catch (NullPointerException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      EvictingQueue<Object> evictingQueue0 = EvictingQueue.create(2014);
+      // Undeclared exception!
+      try { 
+        evictingQueue0.standardOffer((Object) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.base.Preconditions", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testOffer_NullElement_ThrowsNullPointerException() throws Throwable {
-        EvictingQueue<Object> queue = EvictingQueue.create(2);
-        try {
-            queue.offer(null);
-            fail("Expected NullPointerException for null element");
-        } catch (NullPointerException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      EvictingQueue<Object> evictingQueue0 = EvictingQueue.create(2);
+      // Undeclared exception!
+      try { 
+        evictingQueue0.offer((Object) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.base.Preconditions", e);
+      }
+  }
 
-    // Tests for empty queue behavior
-    @Test(timeout = 4000)
-    public void testStandardPoll_OnEmptyQueue_ReturnsNull() throws Throwable {
-        EvictingQueue<Object> queue = EvictingQueue.create(98);
-        Object result = queue.standardPoll();
-        assertNull("Poll on empty queue should return null", result);
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      EvictingQueue<Object> evictingQueue0 = EvictingQueue.create((int) 'b');
+      Object object0 = evictingQueue0.standardPoll();
+      assertNull(object0);
+  }
 
-    @Test(timeout = 4000)
-    public void testStandardPeek_OnEmptyQueue_ReturnsNull() throws Throwable {
-        EvictingQueue<Comparable<CharBuffer>> queue = EvictingQueue.create(0);
-        Comparable<CharBuffer> result = queue.standardPeek();
-        assertNull("Peek on empty queue should return null", result);
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      EvictingQueue<Comparable<CharBuffer>> evictingQueue0 = EvictingQueue.create(0);
+      Comparable<CharBuffer> comparable0 = evictingQueue0.standardPeek();
+      assertNull(comparable0);
+  }
 
-    @Test(timeout = 4000)
-    public void testRemove_OnEmptyQueue_ThrowsNoSuchElementException() throws Throwable {
-        EvictingQueue<Object> queue = EvictingQueue.create(98);
-        try {
-            queue.remove();
-            fail("Expected NoSuchElementException when removing from empty queue");
-        } catch (NoSuchElementException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      EvictingQueue<Object> evictingQueue0 = EvictingQueue.create((int) 'b');
+      // Undeclared exception!
+      try { 
+        evictingQueue0.remove();
+        fail("Expecting exception: NoSuchElementException");
+      
+      } catch(NoSuchElementException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.util.ArrayDeque", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testPeek_OnEmptyQueue_ReturnsNull() throws Throwable {
-        EvictingQueue<Object> queue = EvictingQueue.create(0);
-        Object result = queue.peek();
-        assertNull("Peek on empty queue should return null", result);
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      EvictingQueue<Object> evictingQueue0 = EvictingQueue.create(0);
+      Object object0 = evictingQueue0.peek();
+      assertNull(object0);
+  }
 
-    @Test(timeout = 4000)
-    public void testElement_OnEmptyQueue_ThrowsNoSuchElementException() throws Throwable {
-        EvictingQueue<Object> queue = EvictingQueue.create(1937);
-        try {
-            queue.element();
-            fail("Expected NoSuchElementException for element() on empty queue");
-        } catch (NoSuchElementException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      EvictingQueue<Object> evictingQueue0 = EvictingQueue.create(1937);
+      // Undeclared exception!
+      try { 
+        evictingQueue0.element();
+        fail("Expecting exception: NoSuchElementException");
+      
+      } catch(NoSuchElementException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.util.ArrayDeque", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testPoll_OnEmptyQueue_ReturnsNull() throws Throwable {
-        EvictingQueue<Locale.FilteringMode> queue = EvictingQueue.create(126);
-        Locale.FilteringMode result = queue.poll();
-        assertNull("Poll on empty queue should return null", result);
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      EvictingQueue<Locale.FilteringMode> evictingQueue0 = EvictingQueue.create(126);
+      evictingQueue0.poll();
+  }
 }
