@@ -22,200 +22,778 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class JsonTreeWriter_ESTest extends JsonTreeWriter_ESTest_scaffolding {
 
-    // Tests for basic writer operations
-    // ================================
-    
-    @Test(timeout = 4000)
-    public void beginObjectAfterBeginArray_returnsSameWriterInstance() throws Throwable {
-        JsonTreeWriter writer = new JsonTreeWriter();
-        writer.beginArray();
-        JsonWriter objectWriter = writer.beginObject();
-        assertSame(writer, objectWriter.endObject());
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      JsonWriter jsonWriter0 = jsonTreeWriter0.beginArray();
+      JsonWriter jsonWriter1 = jsonWriter0.beginObject();
+      JsonWriter jsonWriter2 = jsonWriter0.endObject();
+      assertSame(jsonWriter2, jsonWriter1);
+  }
 
-    @Test(timeout = 4000)
-    public void endObjectAfterBeginObject_returnsJsonObject() throws Throwable {
-        JsonTreeWriter writer = new JsonTreeWriter();
-        writer.beginObject();
-        writer.endObject();
-        JsonObject result = (JsonObject) writer.get();
-        assertFalse(result.isJsonNull());
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      Strictness strictness0 = Strictness.LENIENT;
+      jsonTreeWriter0.setStrictness(strictness0);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.value(true);
+      assertTrue(jsonWriter0.isLenient());
+  }
 
-    @Test(timeout = 4000)
-    public void endArrayAfterBeginArray_returnsJsonArray() throws Throwable {
-        JsonTreeWriter writer = new JsonTreeWriter();
-        writer.beginArray();
-        writer.endArray();
-        JsonElement result = writer.get();
-        assertTrue(result.isJsonArray());
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.setHtmlSafe(true);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.value(true);
+      assertFalse(jsonWriter0.isLenient());
+  }
 
-    @Test(timeout = 4000)
-    public void getInitialState_returnsJsonNull() throws Throwable {
-        JsonTreeWriter writer = new JsonTreeWriter();
-        JsonElement result = writer.get();
-        assertTrue(result.isJsonNull());
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.setSerializeNulls(false);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.value(false);
+      assertFalse(jsonWriter0.isHtmlSafe());
+  }
 
-    // Tests for value writing methods
-    // ===============================
-    
-    @Test(timeout = 4000)
-    public void writeBooleanValue_createsJsonPrimitive() throws Throwable {
-        JsonTreeWriter writer = new JsonTreeWriter();
-        writer.value(true);
-        JsonPrimitive result = (JsonPrimitive) writer.get();
-        assertTrue(result.getAsBoolean());
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      Strictness strictness0 = Strictness.LENIENT;
+      jsonTreeWriter0.setStrictness(strictness0);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.value("Kv)DQr");
+      assertFalse(jsonWriter0.isHtmlSafe());
+  }
 
-    @Test(timeout = 4000)
-    public void writeDoubleValue_createsJsonPrimitive() throws Throwable {
-        JsonTreeWriter writer = new JsonTreeWriter();
-        writer.value(495.5255);
-        JsonPrimitive result = (JsonPrimitive) writer.get();
-        assertEquals(495.5255, result.getAsDouble(), 0.0001);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.setHtmlSafe(true);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.value("");
+      assertFalse(jsonWriter0.isLenient());
+  }
 
-    @Test(timeout = 4000)
-    public void writeNullValue_createsJsonNull() throws Throwable {
-        JsonTreeWriter writer = new JsonTreeWriter();
-        writer.nullValue();
-        JsonElement result = writer.get();
-        assertTrue(result.isJsonNull());
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.setSerializeNulls(false);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.value("(71Tx?>D*D^oE0!");
+      assertFalse(jsonWriter0.isHtmlSafe());
+  }
 
-    @Test(timeout = 4000)
-    public void writeNamedNullValue_insideObject() throws Throwable {
-        JsonTreeWriter writer = new JsonTreeWriter();
-        writer.beginObject();
-        writer.name("property");
-        writer.nullValue();
-        writer.endObject();
-        JsonObject result = (JsonObject) writer.get();
-        assertTrue(result.has("property"));
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.setHtmlSafe(true);
+      Long long0 = Long.getLong("", 0L);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.value((Number) long0);
+      assertSame(jsonTreeWriter0, jsonWriter0);
+  }
 
-    // Tests for configuration flags
-    // =============================
-    
-    @Test(timeout = 4000)
-    public void setStrictnessLenient_affectsSubsequentOperations() throws Throwable {
-        JsonTreeWriter writer = new JsonTreeWriter();
-        writer.setStrictness(Strictness.LENIENT);
-        JsonWriter result = writer.value(true);
-        assertTrue(result.isLenient());
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.setSerializeNulls(false);
+      Short short0 = new Short((short)85);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.value((Number) short0);
+      assertFalse(jsonWriter0.getSerializeNulls());
+  }
 
-    @Test(timeout = 4000)
-    public void setHtmlSafe_affectsSubsequentOperations() throws Throwable {
-        JsonTreeWriter writer = new JsonTreeWriter();
-        writer.setHtmlSafe(true);
-        JsonWriter result = writer.value(true);
-        assertTrue(result.isHtmlSafe());
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      Boolean boolean0 = Boolean.TRUE;
+      Strictness strictness0 = Strictness.LENIENT;
+      jsonTreeWriter0.setStrictness(strictness0);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.value(boolean0);
+      assertTrue(jsonWriter0.isLenient());
+  }
 
-    @Test(timeout = 4000)
-    public void setSerializeNullsFalse_affectsSubsequentOperations() throws Throwable {
-        JsonTreeWriter writer = new JsonTreeWriter();
-        writer.setSerializeNulls(false);
-        JsonWriter result = writer.value(true);
-        assertFalse(result.getSerializeNulls());
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.setHtmlSafe(true);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.value((Boolean) null);
+      assertSame(jsonWriter0, jsonTreeWriter0);
+  }
 
-    // Tests for error handling scenarios
-    // ==================================
-    
-    @Test(timeout = 4000)
-    public void writeValueInsideObjectWithoutName_throwsException() {
-        JsonTreeWriter writer = new JsonTreeWriter();
-        writer.beginObject();
-        assertThrows(IllegalStateException.class, () -> writer.value(false));
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.setSerializeNulls(false);
+      Boolean boolean0 = Boolean.TRUE;
+      JsonWriter jsonWriter0 = jsonTreeWriter0.value(boolean0);
+      assertSame(jsonTreeWriter0, jsonWriter0);
+  }
 
-    @Test(timeout = 4000)
-    public void writeNameOutsideObject_throwsException() {
-        JsonTreeWriter writer = new JsonTreeWriter();
-        assertThrows(IllegalStateException.class, () -> writer.name("property"));
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      Strictness strictness0 = Strictness.LENIENT;
+      jsonTreeWriter0.setStrictness(strictness0);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.value((-336L));
+      assertTrue(jsonWriter0.isLenient());
+  }
 
-    @Test(timeout = 4000)
-    public void writeNameTwice_throwsException() throws Throwable {
-        JsonTreeWriter writer = new JsonTreeWriter();
-        writer.beginObject();
-        writer.name("first");
-        assertThrows(IllegalStateException.class, () -> writer.name("second"));
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.setHtmlSafe(true);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.value((-825L));
+      assertSame(jsonWriter0, jsonTreeWriter0);
+  }
 
-    @Test(timeout = 4000)
-    public void closeBeforeCompletingDocument_throwsException() {
-        JsonTreeWriter writer = new JsonTreeWriter();
-        writer.beginArray();
-        assertThrows(IOException.class, writer::close);
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.setSerializeNulls(false);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.value(27L);
+      assertFalse(jsonWriter0.isLenient());
+  }
 
-    @Test(timeout = 4000)
-    public void writeToClosedWriter_throwsException() throws IOException {
-        JsonTreeWriter writer = new JsonTreeWriter();
-        writer.close();
-        assertThrows(IllegalStateException.class, writer::beginObject);
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.setHtmlSafe(true);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.value((-1.0F));
+      assertSame(jsonWriter0, jsonTreeWriter0);
+  }
 
-    @Test(timeout = 4000)
-    public void callJsonValueMethod_throwsUnsupportedOperation() {
-        JsonTreeWriter writer = new JsonTreeWriter();
-        assertThrows(UnsupportedOperationException.class, () -> writer.jsonValue(""));
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.beginObject();
+      JsonWriter jsonWriter0 = jsonTreeWriter0.name("");
+      jsonWriter0.setSerializeNulls(false);
+      JsonWriter jsonWriter1 = jsonWriter0.value(331.5379F);
+      assertSame(jsonTreeWriter0, jsonWriter1);
+  }
 
-    // Tests for JSON structure building
-    // ================================
-    
-    @Test(timeout = 4000)
-    public void nestedArrayStructure_buildsCorrectly() throws Throwable {
-        JsonTreeWriter writer = new JsonTreeWriter();
-        writer.beginArray();
-        writer.beginArray();
-        writer.endArray();
-        writer.endArray();
-        JsonElement result = writer.get();
-        assertTrue(result.getAsJsonArray().get(0).isJsonArray());
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.setHtmlSafe(true);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.value(0.0);
+      assertSame(jsonTreeWriter0, jsonWriter0);
+  }
 
-    @Test(timeout = 4000)
-    public void namedValueInObject_buildsCorrectly() throws Throwable {
-        JsonTreeWriter writer = new JsonTreeWriter();
-        writer.beginObject();
-        writer.name("flag");
-        writer.value(true);
-        writer.endObject();
-        JsonObject result = (JsonObject) writer.get();
-        assertTrue(result.get("flag").getAsBoolean());
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.setSerializeNulls(false);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.value((-6037.94604733024));
+      assertEquals(Strictness.LEGACY_STRICT, jsonWriter0.getStrictness());
+  }
 
-    // Additional tests for edge cases
-    // ==============================
-    
-    @Test(timeout = 4000)
-    public void endObjectAfterBeginArray_throwsException() {
-        JsonTreeWriter writer = new JsonTreeWriter();
-        writer.beginArray();
-        assertThrows(IllegalStateException.class, writer::endObject);
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      Strictness strictness0 = Strictness.LENIENT;
+      jsonTreeWriter0.setStrictness(strictness0);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.nullValue();
+      assertTrue(jsonWriter0.isLenient());
+  }
 
-    @Test(timeout = 4000)
-    public void endArrayAfterBeginObject_throwsException() {
-        JsonTreeWriter writer = new JsonTreeWriter();
-        writer.beginObject();
-        assertThrows(IllegalStateException.class, writer::endArray);
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.setHtmlSafe(true);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.nullValue();
+      assertEquals(Strictness.LEGACY_STRICT, jsonWriter0.getStrictness());
+  }
 
-    @Test(timeout = 4000)
-    public void getIncompleteArray_throwsException() {
-        JsonTreeWriter writer = new JsonTreeWriter();
-        writer.beginArray();
-        assertThrows(IllegalStateException.class, writer::get);
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      JsonWriter jsonWriter0 = jsonTreeWriter0.beginObject();
+      Strictness strictness0 = Strictness.LENIENT;
+      jsonWriter0.setStrictness(strictness0);
+      JsonWriter jsonWriter1 = jsonWriter0.name("");
+      assertSame(jsonWriter0, jsonWriter1);
+  }
 
-    // Remaining tests follow same pattern with descriptive names...
-    // [Additional 45 tests would follow the same naming convention]
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.value(495.5255);
+      JsonPrimitive jsonPrimitive0 = (JsonPrimitive)jsonTreeWriter0.get();
+      assertFalse(jsonPrimitive0.isBoolean());
+  }
+
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      JsonTreeWriter jsonTreeWriter1 = (JsonTreeWriter)jsonTreeWriter0.beginObject();
+      jsonTreeWriter0.endObject();
+      JsonObject jsonObject0 = (JsonObject)jsonTreeWriter1.get();
+      assertFalse(jsonObject0.isJsonNull());
+  }
+
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      JsonElement jsonElement0 = jsonTreeWriter0.get();
+      assertFalse(jsonElement0.isJsonArray());
+  }
+
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      JsonWriter jsonWriter0 = jsonTreeWriter0.beginObject();
+      Strictness strictness0 = Strictness.LENIENT;
+      jsonWriter0.setStrictness(strictness0);
+      JsonWriter jsonWriter1 = jsonWriter0.endObject();
+      assertSame(jsonWriter0, jsonWriter1);
+  }
+
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.beginObject();
+      jsonTreeWriter0.setHtmlSafe(true);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.endObject();
+      assertTrue(jsonWriter0.getSerializeNulls());
+  }
+
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      JsonWriter jsonWriter0 = jsonTreeWriter0.beginArray();
+      Strictness strictness0 = Strictness.LENIENT;
+      jsonWriter0.setStrictness(strictness0);
+      JsonWriter jsonWriter1 = jsonTreeWriter0.endArray();
+      assertTrue(jsonWriter1.getSerializeNulls());
+  }
+
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.beginArray();
+      jsonTreeWriter0.setHtmlSafe(true);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.endArray();
+      assertSame(jsonTreeWriter0, jsonWriter0);
+  }
+
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      Strictness strictness0 = Strictness.LENIENT;
+      jsonTreeWriter0.setStrictness(strictness0);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.beginObject();
+      assertTrue(jsonWriter0.isLenient());
+  }
+
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.setHtmlSafe(true);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.beginObject();
+      assertFalse(jsonWriter0.isLenient());
+  }
+
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.setSerializeNulls(false);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.beginObject();
+      JsonWriter jsonWriter1 = jsonWriter0.endObject();
+      assertFalse(jsonWriter1.getSerializeNulls());
+  }
+
+  @Test(timeout = 4000)
+  public void test32()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      Strictness strictness0 = Strictness.LENIENT;
+      jsonTreeWriter0.setStrictness(strictness0);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.beginArray();
+      assertFalse(jsonWriter0.isHtmlSafe());
+  }
+
+  @Test(timeout = 4000)
+  public void test33()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      JsonWriter jsonWriter0 = jsonTreeWriter0.beginObject();
+      jsonWriter0.setHtmlSafe(true);
+      jsonWriter0.name("C,[}efl!G5<Uxw~gz");
+      JsonWriter jsonWriter1 = jsonTreeWriter0.beginArray();
+      assertSame(jsonTreeWriter0, jsonWriter1);
+  }
+
+  @Test(timeout = 4000)
+  public void test34()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.setSerializeNulls(false);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.beginArray();
+      JsonWriter jsonWriter1 = jsonWriter0.endArray();
+      assertFalse(jsonWriter1.isHtmlSafe());
+  }
+
+  @Test(timeout = 4000)
+  public void test35()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.beginObject();
+      // Undeclared exception!
+      try { 
+        jsonTreeWriter0.value(false);
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test36()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.beginObject();
+      // Undeclared exception!
+      try { 
+        jsonTreeWriter0.value("");
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test37()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.beginObject();
+      // Undeclared exception!
+      try { 
+        jsonTreeWriter0.value((Number) null);
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test38()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.beginObject();
+      // Undeclared exception!
+      try { 
+        jsonTreeWriter0.value(108L);
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test39()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      JsonWriter jsonWriter0 = jsonTreeWriter0.beginObject();
+      // Undeclared exception!
+      try { 
+        jsonWriter0.value((-1.0F));
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test40()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.beginObject();
+      // Undeclared exception!
+      try { 
+        jsonTreeWriter0.value((-1.0));
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test41()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.beginObject();
+      // Undeclared exception!
+      try { 
+        jsonTreeWriter0.nullValue();
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test42()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      // Undeclared exception!
+      try { 
+        jsonTreeWriter0.name((String) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // name == null
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test43()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.close();
+      // Undeclared exception!
+      try { 
+        jsonTreeWriter0.beginObject();
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test44()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.close();
+      // Undeclared exception!
+      try { 
+        jsonTreeWriter0.beginArray();
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test45()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.beginArray();
+      try { 
+        jsonTreeWriter0.close();
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // Incomplete document
+         //
+         verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test46()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      Strictness strictness0 = Strictness.LENIENT;
+      jsonTreeWriter0.setStrictness(strictness0);
+      Float float0 = new Float(1831.27507);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.value((Number) float0);
+      assertSame(jsonTreeWriter0, jsonWriter0);
+  }
+
+  @Test(timeout = 4000)
+  public void test47()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      Strictness strictness0 = Strictness.LENIENT;
+      jsonTreeWriter0.setStrictness(strictness0);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.value((double) (-1.0F));
+      assertFalse(jsonWriter0.isHtmlSafe());
+  }
+
+  @Test(timeout = 4000)
+  public void test48()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      Strictness strictness0 = Strictness.LENIENT;
+      jsonTreeWriter0.setStrictness(strictness0);
+      JsonWriter jsonWriter0 = jsonTreeWriter0.value((-42.784203F));
+      assertSame(jsonWriter0, jsonTreeWriter0);
+  }
+
+  @Test(timeout = 4000)
+  public void test49()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      JsonWriter jsonWriter0 = jsonTreeWriter0.value((String) null);
+      assertSame(jsonWriter0, jsonTreeWriter0);
+  }
+
+  @Test(timeout = 4000)
+  public void test50()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.beginArray();
+      // Undeclared exception!
+      try { 
+        jsonTreeWriter0.name("");
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // Please begin an object before writing a name.
+         //
+         verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test51()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.beginObject();
+      jsonTreeWriter0.name("");
+      // Undeclared exception!
+      try { 
+        jsonTreeWriter0.name("");
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // Did not expect a name
+         //
+         verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test52()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      // Undeclared exception!
+      try { 
+        jsonTreeWriter0.name("");
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // Did not expect a name
+         //
+         verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test53()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.beginArray();
+      // Undeclared exception!
+      try { 
+        jsonTreeWriter0.endObject();
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test54()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      JsonWriter jsonWriter0 = jsonTreeWriter0.beginObject();
+      jsonTreeWriter0.name("");
+      // Undeclared exception!
+      try { 
+        jsonWriter0.endObject();
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test55()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      // Undeclared exception!
+      try { 
+        jsonTreeWriter0.endObject();
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test56()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.beginObject();
+      // Undeclared exception!
+      try { 
+        jsonTreeWriter0.endArray();
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test57()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.beginObject();
+      jsonTreeWriter0.name("com.google.gson.internal.bind.TypeAdapters$9");
+      // Undeclared exception!
+      try { 
+        jsonTreeWriter0.endArray();
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test58()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      JsonWriter jsonWriter0 = jsonTreeWriter0.beginObject();
+      jsonWriter0.endObject();
+      // Undeclared exception!
+      try { 
+        jsonWriter0.endArray();
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test59()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.beginObject();
+      // Undeclared exception!
+      try { 
+        jsonTreeWriter0.value((Boolean) null);
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test60()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.beginArray();
+      jsonTreeWriter0.beginArray();
+      JsonWriter jsonWriter0 = jsonTreeWriter0.endArray();
+      assertSame(jsonTreeWriter0, jsonWriter0);
+  }
+
+  @Test(timeout = 4000)
+  public void test61()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      JsonWriter jsonWriter0 = jsonTreeWriter0.beginObject();
+      jsonWriter0.setSerializeNulls(false);
+      jsonTreeWriter0.name("");
+      JsonWriter jsonWriter1 = jsonTreeWriter0.nullValue();
+      assertSame(jsonTreeWriter0, jsonWriter1);
+  }
+
+  @Test(timeout = 4000)
+  public void test62()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.beginObject();
+      jsonTreeWriter0.name("");
+      JsonWriter jsonWriter0 = jsonTreeWriter0.nullValue();
+      assertFalse(jsonWriter0.isHtmlSafe());
+  }
+
+  @Test(timeout = 4000)
+  public void test63()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.beginArray();
+      // Undeclared exception!
+      try { 
+        jsonTreeWriter0.get();
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // Expected one JSON element but was [[]]
+         //
+         verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test64()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      // Undeclared exception!
+      try { 
+        jsonTreeWriter0.jsonValue("");
+        fail("Expecting exception: UnsupportedOperationException");
+      
+      } catch(UnsupportedOperationException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test65()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.beginArray();
+      jsonTreeWriter0.endArray();
+      JsonElement jsonElement0 = jsonTreeWriter0.get();
+      assertFalse(jsonElement0.isJsonNull());
+  }
+
+  @Test(timeout = 4000)
+  public void test66()  throws Throwable  {
+      JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
+      jsonTreeWriter0.flush();
+      assertEquals(Strictness.LEGACY_STRICT, jsonTreeWriter0.getStrictness());
+  }
 }
