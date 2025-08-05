@@ -50,229 +50,165 @@ class NullReaderTest {
         @Override
         protected void processChars(final char[] chars, final int offset, final int length) {
             final int startPos = (int) getPosition() - length;
-            for (int i = offset; i < offset + length; i++) {
-                chars[i] = (char) (startPos + i - offset);
+            for (int i = offset; i < length; i++) {
+                chars[i] = (char) (startPos + i);
             }
         }
+
     }
 
+    // Use the same message as in java.io.InputStream.reset() in OpenJDK 8.0.275-1.
     private static final String MARK_RESET_NOT_SUPPORTED = "mark/reset not supported";
-    private static final int TEST_READER_SIZE = 5;
 
     @Test
-    void readBeyondEndWithEofExceptionEnabled_ThrowsEofException() throws Exception {
+    void testEOFException() throws Exception {
         try (Reader reader = new TestNullReader(2, false, true)) {
-            assertEquals(0, reader.read(), "First read should return 0");
-            assertEquals(1, reader.read(), "Second read should return 1");
-            assertThrows(EOFException.class, reader::read, 
-                "Read beyond end should throw EOFException");
+            assertEquals(0, reader.read(), "Read 1");
+            assertEquals(1, reader.read(), "Read 2");
+            assertThrows(EOFException.class, () -> reader.read());
         }
     }
 
     @Test
-    void markSupported_WhenConstructedWithMarkSupported_ReturnsTrue() throws Exception {
+    void testMarkAndReset() throws Exception {
+        int position = 0;
+        final int readLimit = 10;
         try (Reader reader = new TestNullReader(100, true, false)) {
-            assertTrue(reader.markSupported(), "Reader should support mark");
-        }
-    }
 
-    @Test
-    void resetWithoutMark_ThrowsExceptionWithExpectedMessage() throws Exception {
-        try (Reader reader = new TestNullReader(100, true, false)) {
-            IOException exception = assertThrows(IOException.class, reader::reset);
-            assertEquals("No position has been marked", exception.getMessage(),
-                "Exception message should indicate no mark was set");
-        }
-    }
+            assertTrue(reader.markSupported(), "Mark Should be Supported");
 
-    @Test
-    void markAndReset_ResetsToMarkedPosition() throws Exception {
-        try (Reader reader = new TestNullReader(100, true, false)) {
-            // Read initial characters
-            assertEquals(0, reader.read(), "Character before mark");
-            assertEquals(1, reader.read(), "Character before mark");
-            assertEquals(2, reader.read(), "Character before mark");
-            
-            // Set mark at position 3
-            reader.mark(10);
-            
-            // Read past mark
-            assertEquals(3, reader.read(), "Character after mark");
-            assertEquals(4, reader.read(), "Character after mark");
-            assertEquals(5, reader.read(), "Character after mark");
-            
-            // Reset should return to marked position
-            reader.reset();
-            
-            // Verify reading starts from marked position (3)
-            assertEquals(3, reader.read(), "First character after reset");
-            assertEquals(4, reader.read(), "Second character after reset");
-        }
-    }
+            // No Mark
+            final IOException resetException = assertThrows(IOException.class, reader::reset);
+            assertEquals("No position has been marked", resetException.getMessage(), "No Mark IOException message");
 
-    @Test
-    void resetAfterExceedingReadLimit_ThrowsExceptionWithExpectedMessage() throws Exception {
-        try (Reader reader = new TestNullReader(100, true, false)) {
-            // Set mark at position 0 with read limit 3
-            reader.mark(3);
-            
-            // Read beyond read limit
-            for (int i = 0; i < 4; i++) {
-                reader.read();
+            for (; position < 3; position++) {
+                assertEquals(position, reader.read(), "Read Before Mark [" + position + "]");
             }
-            
-            // Reset after exceeding read limit
-            IOException exception = assertThrows(IOException.class, reader::reset);
-            assertEquals("Marked position [0] is no longer valid - passed the read limit [3]", 
-                exception.getMessage(), "Exception message should indicate read limit exceeded");
+
+            // Mark
+            reader.mark(readLimit);
+
+            // Read further
+            for (int i = 0; i < 3; i++) {
+                assertEquals(position + i, reader.read(), "Read After Mark [" + i + "]");
+            }
+
+            // Reset
+            reader.reset();
+
+            // Read From marked position
+            for (int i = 0; i < readLimit + 1; i++) {
+                assertEquals(position + i, reader.read(), "Read After Reset [" + i + "]");
+            }
+
+            // Reset after read limit passed
+            final IOException e = assertThrows(IOException.class, reader::reset);
+            assertEquals("Marked position [" + position + "] is no longer valid - passed the read limit [" + readLimit + "]", e.getMessage(),
+                    "Read limit IOException message");
         }
     }
 
     @Test
-    void markNotSupported_MarkOperation_ThrowsUnsupportedOperationException() {
-        TestNullReader reader = new TestNullReader(100, false, true);
-        assertFalse(reader.markSupported(), "Mark should not be supported");
-        
-        UnsupportedOperationException exception = assertThrows(
-            UnsupportedOperationException.class, 
-            () -> reader.mark(5)
-        );
-        assertEquals(MARK_RESET_NOT_SUPPORTED, exception.getMessage(),
-            "mark() should throw UnsupportedOperationException with proper message");
-        
-        reader.close();
-    }
+    void testMarkNotSupported() throws Exception {
+        final Reader reader = new TestNullReader(100, false, true);
+        assertFalse(reader.markSupported(), "Mark Should NOT be Supported");
 
-    @Test
-    void markNotSupported_ResetOperation_ThrowsUnsupportedOperationException() {
-        TestNullReader reader = new TestNullReader(100, false, true);
-        
-        UnsupportedOperationException exception = assertThrows(
-            UnsupportedOperationException.class, 
-            reader::reset
-        );
-        assertEquals(MARK_RESET_NOT_SUPPORTED, exception.getMessage(),
-            "reset() should throw UnsupportedOperationException with proper message");
-        
-        reader.close();
-    }
-
-    @Test
-    void read_WithSize_ReturnsExpectedCharacters() throws Exception {
-        TestNullReader reader = new TestNullReader(TEST_READER_SIZE);
-        
-        for (int i = 0; i < TEST_READER_SIZE; i++) {
-            assertEquals(i, reader.read(), "Character at position " + i);
+        try {
+            reader.mark(5);
+            fail("mark() should throw UnsupportedOperationException");
+        } catch (final UnsupportedOperationException e) {
+            assertEquals(MARK_RESET_NOT_SUPPORTED, e.getMessage(), "mark() error message");
         }
-        
-        reader.close();
-    }
 
-    @Test
-    void readAtEndOfFile_ReturnsEofIndicator() throws Exception {
-        TestNullReader reader = new TestNullReader(TEST_READER_SIZE);
-        
-        // Exhaust the reader
-        for (int i = 0; i < TEST_READER_SIZE; i++) {
-            reader.read();
-        }
-        
-        assertEquals(-1, reader.read(), "Read at EOF should return -1");
-        reader.close();
-    }
-
-    @Test
-    void readAfterEndOfFile_ThrowsExceptionWithExpectedMessage() throws Exception {
-        TestNullReader reader = new TestNullReader(1);
-        reader.read();  // Read the only character
-        
-        IOException exception = assertThrows(IOException.class, reader::read);
-        assertEquals("Read after end of file", exception.getMessage(),
-            "Exception message should indicate read after EOF");
-        
-        reader.close();
-    }
-
-    @Test
-    void close_ResetsPositionToZero() throws Exception {
-        TestNullReader reader = new TestNullReader(TEST_READER_SIZE);
-        reader.read();
-        reader.read();
-        
-        reader.close();
-        
-        assertEquals(0, reader.getPosition(), "Position should reset to 0 after close");
-    }
-
-    @Test
-    void readCharArray_ReadsExpectedData() throws Exception {
-        char[] buffer = new char[10];
-        TestNullReader reader = new TestNullReader(15);
-        
-        int firstRead = reader.read(buffer);
-        assertEquals(buffer.length, firstRead, "First read should fill buffer");
-        for (int i = 0; i < firstRead; i++) {
-            assertEquals(i, buffer[i], "Buffer content at index " + i);
-        }
-    }
-
-    @Test
-    void readCharArrayAfterEnd_ReturnsEofIndicator() throws Exception {
-        char[] buffer = new char[10];
-        TestNullReader reader = new TestNullReader(5);
-        
-        // Exhaust the reader
-        reader.read(buffer);
-        
-        int result = reader.read(buffer);
-        assertEquals(-1, result, "Read at EOF should return -1");
-        reader.close();
-    }
-
-    @Test
-    void readPartialCharArray_WithOffsetAndLength_ReadsExpectedData() throws Exception {
-        char[] buffer = new char[10];
-        TestNullReader reader = new TestNullReader(15);
-        
-        int offset = 2;
-        int length = 4;
-        int readCount = reader.read(buffer, offset, length);
-        
-        assertEquals(length, readCount, "Should read specified length");
-        for (int i = offset; i < offset + length; i++) {
-            assertEquals(i - offset, buffer[i], "Buffer content at index " + i);
+        try {
+            reader.reset();
+            fail("reset() should throw UnsupportedOperationException");
+        } catch (final UnsupportedOperationException e) {
+            assertEquals(MARK_RESET_NOT_SUPPORTED, e.getMessage(), "reset() error message");
         }
         reader.close();
     }
 
     @Test
-    void skip_WithinSize_SkipsExpectedCharacters() throws Exception {
-        try (TestNullReader reader = new TestNullReader(10, true, false)) {
-            reader.read(); // Position=1
-            
-            long skipped = reader.skip(5);
-            assertEquals(5, skipped, "Skipped characters count");
-            assertEquals(6, reader.read(), "Character after skip");
+    void testRead() throws Exception {
+        final int size = 5;
+        final TestNullReader reader = new TestNullReader(size);
+        for (int i = 0; i < size; i++) {
+            assertEquals(i, reader.read(), "Check Value [" + i + "]");
+        }
+
+        // Check End of File
+        assertEquals(-1, reader.read(), "End of File");
+
+        // Test reading after the end of file
+        try {
+            final int result = reader.read();
+            fail("Should have thrown an IOException, value=[" + result + "]");
+        } catch (final IOException e) {
+            assertEquals("Read after end of file", e.getMessage());
+        }
+
+        // Close - should reset
+        reader.close();
+        assertEquals(0, reader.getPosition(), "Available after close");
+    }
+
+    @Test
+    void testReadCharArray() throws Exception {
+        final char[] chars = new char[10];
+        final Reader reader = new TestNullReader(15);
+
+        // Read into array
+        final int count1 = reader.read(chars);
+        assertEquals(chars.length, count1, "Read 1");
+        for (int i = 0; i < count1; i++) {
+            assertEquals(i, chars[i], "Check Chars 1");
+        }
+
+        // Read into array
+        final int count2 = reader.read(chars);
+        assertEquals(5, count2, "Read 2");
+        for (int i = 0; i < count2; i++) {
+            assertEquals(count1 + i, chars[i], "Check Chars 2");
+        }
+
+        // End of File
+        final int count3 = reader.read(chars);
+        assertEquals(-1, count3, "Read 3 (EOF)");
+
+        // Test reading after the end of file
+        try {
+            final int count4 = reader.read(chars);
+            fail("Should have thrown an IOException, value=[" + count4 + "]");
+        } catch (final IOException e) {
+            assertEquals("Read after end of file", e.getMessage());
+        }
+
+        // reset by closing
+        reader.close();
+
+        // Read into array using offset & length
+        final int offset = 2;
+        final int lth    = 4;
+        final int count5 = reader.read(chars, offset, lth);
+        assertEquals(lth, count5, "Read 5");
+        for (int i = offset; i < lth; i++) {
+            assertEquals(i, chars[i], "Check Chars 3");
         }
     }
 
     @Test
-    void skipBeyondEnd_ReturnsRemainingCharacters() throws Exception {
-        try (TestNullReader reader = new TestNullReader(3, true, false)) {
-            reader.read(); // Position=1
-            long skipped = reader.skip(5);
-            assertEquals(2, skipped, "Should skip remaining characters");
-            assertEquals(-1, reader.read(), "Next read should be EOF");
-        }
-    }
+    void testSkip() throws Exception {
+        try (Reader reader = new TestNullReader(10, true, false)) {
+            assertEquals(0, reader.read(), "Read 1");
+            assertEquals(1, reader.read(), "Read 2");
+            assertEquals(5, reader.skip(5), "Skip 1");
+            assertEquals(7, reader.read(), "Read 3");
+            assertEquals(2, reader.skip(5), "Skip 2"); // only 2 left to skip
+            assertEquals(-1, reader.skip(5), "Skip 3 (EOF)"); // End of file
 
-    @Test
-    void skipAfterEnd_ThrowsExceptionWithExpectedMessage() throws Exception {
-        try (TestNullReader reader = new TestNullReader(2, true, false)) {
-            reader.skip(3); // Skip beyond end
-            IOException exception = assertThrows(IOException.class, () -> reader.skip(1));
-            assertEquals("Skip after end of file", exception.getMessage(),
-                "Exception should indicate skip after EOF");
+            final IOException e = assertThrows(IOException.class, () -> reader.skip(5));
+            assertEquals("Skip after end of file", e.getMessage(), "Skip after EOF IOException message");
         }
     }
 }
