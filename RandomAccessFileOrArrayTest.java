@@ -42,92 +42,72 @@
  */
 package com.itextpdf.text.pdf;
 
-import static org.junit.Assert.assertEquals;
+import java.io.ByteArrayOutputStream;
 
-import com.itextpdf.text.io.RandomAccessSourceFactory;
-import java.io.IOException;
+import junit.framework.Assert;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.itextpdf.text.io.RandomAccessSourceFactory;
+import com.itextpdf.text.pdf.RandomAccessFileOrArray;
+
 public class RandomAccessFileOrArrayTest {
-    // Test constants
-    private static final int TEST_DATA_SIZE = 10000;
-    private static final int SEEK_POSITION = 72;
-    private static final byte PUSHBACK_OFFSET = 42;
-    
-    private byte[] data;
-    private RandomAccessFileOrArray rafoa;
-    
-    @Before
-    public void setUp() throws IOException {
-        // Create test data: [0, 1, 2, ..., 9999] mod 256
-        data = new byte[TEST_DATA_SIZE];
-        for (int i = 0; i < data.length; i++) {
-            data[i] = (byte) i;
-        }
-        rafoa = new RandomAccessFileOrArray(
-            new RandomAccessSourceFactory().createSource(data)
-        );
-    }
+	byte[] data;
+	RandomAccessFileOrArray rafoa;
+	
+	@Before
+	public void setUp() throws Exception {
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		for (int i = 0; i < 10000; i++){
+			os.write(i);
+		}
+		data = os.toByteArray();
+		rafoa = new RandomAccessFileOrArray(new RandomAccessSourceFactory().createSource(data));
+	}
 
-    @Test
-    public void pushBack_WhenPushingBackByte_ThenNextReadReturnsPushedByte() 
-            throws Exception {
-        // Read first two bytes
-        assertEquals("First byte should match", data[0], (byte) rafoa.read());
-        assertEquals("Second byte should match", data[1], (byte) rafoa.read());
-        
-        // Push back modified second byte
-        byte pushBackVal = (byte) (data[1] + PUSHBACK_OFFSET);
-        rafoa.pushBack(pushBackVal);
-        
-        // Verify pushback and subsequent reads
-        assertEquals("Pushed back value should be read", pushBackVal, (byte) rafoa.read());
-        assertEquals("Third byte should follow", data[2], (byte) rafoa.read());
-        assertEquals("Fourth byte should follow", data[3], (byte) rafoa.read());
-    }
+	@After
+	public void tearDown() throws Exception {
+	}
 
-    @Test
-    public void read_WhenReadingEntireFile_ThenContentMatchesExpected() 
-            throws Exception {
-        // Read and verify entire data array
-        for (int i = 0; i < data.length; i++) {
-            assertEquals(
-                "Byte at position " + i + " should match", 
-                data[i], 
-                (byte) rafoa.read()
-            );
-        }
-    }
+	@Test
+	public void testPushback_byteByByte() throws Exception {
+		
+		Assert.assertEquals(data[0], (byte)rafoa.read());
+		Assert.assertEquals(data[1], (byte)rafoa.read());
+		byte pushBackVal = (byte)(data[1] + 42);
+		rafoa.pushBack(pushBackVal);
+		Assert.assertEquals(pushBackVal, (byte)rafoa.read());
+		Assert.assertEquals(data[2], (byte)rafoa.read());
+		Assert.assertEquals(data[3], (byte)rafoa.read());
+		
+	}
 
-    @Test
-    public void seek_WhenSeekingToPosition_ThenReadsFromThatPosition() 
-            throws Exception {
-        // Move to specific position
-        rafoa.seek(SEEK_POSITION);
-        
-        // Verify reads start from seek position
-        for (int i = SEEK_POSITION; i < data.length; i++) {
-            assertEquals(
-                "Byte at position " + i + " should match", 
-                data[i], 
-                (byte) rafoa.read()
-            );
-        }
-    }
-    
-    @Test
-    public void getFilePointer_AfterPushBack_ThenPositionDecreasesByOne() 
-            throws Exception {
-        // Move to specific position
-        rafoa.seek(SEEK_POSITION);
-        assertEquals("Initial position should be SEEK_POSITION", 
-            SEEK_POSITION, rafoa.getFilePointer());
-        
-        // Push back a byte and verify position
-        byte pushbackVal = 42;
-        rafoa.pushBack(pushbackVal);
-        assertEquals("Position should decrement after pushback", 
-            SEEK_POSITION - 1, rafoa.getFilePointer());
-    }
+	@Test
+	public void testSimple() throws Exception {
+		for(int i = 0; i < data.length; i++){
+			Assert.assertEquals(data[i], (byte)rafoa.read());
+		}
+	}
+
+	@Test
+	public void testSeek() throws Exception {
+		RandomAccessFileOrArray rafoa = new RandomAccessFileOrArray(new RandomAccessSourceFactory().createSource(data));
+		rafoa.seek(72);
+		for(int i = 72; i < data.length; i++){
+			Assert.assertEquals(data[i], (byte)rafoa.read());
+		}
+	}
+	
+	@Test
+	public void testFilePositionWithPushback() throws Exception {
+		RandomAccessFileOrArray rafoa = new RandomAccessFileOrArray(new RandomAccessSourceFactory().createSource(data));
+		long offset = 72;
+		rafoa.seek(offset);
+		Assert.assertEquals(offset, rafoa.getFilePointer());
+		byte pushbackVal = 42;
+		rafoa.pushBack(pushbackVal);
+		Assert.assertEquals(offset-1, rafoa.getFilePointer());
+	}
 }
