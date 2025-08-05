@@ -18,6 +18,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
+
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
@@ -37,71 +38,95 @@
 package org.jfree.chart.labels;
 
 import org.jfree.chart.TestUtils;
-import org.jfree.chart.internal.CloneUtils;
 import org.jfree.chart.api.PublicCloneable;
-
+import org.jfree.chart.internal.CloneUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for the {@link SymbolicXYItemLabelGenerator} class.
+ * Tests for the {@link SymbolicXYItemLabelGenerator} class, focusing on its
+ * object contract methods like equals, hashCode, cloning, and serialization.
+ *
+ * Note: This test suite does not cover the primary functionality of label
+ * generation, as the class under test has no state to configure. A complete
+ * test suite would require tests for the generateLabel() and generateToolTip()
+ * methods with various XYDataset inputs.
  */
 public class SymbolicXYItemLabelGeneratorTest {
 
     /**
-     * Tests the equals method.
+     * Verifies the equals() and hashCode() contract for two default instances.
+     * Since SymbolicXYItemLabelGenerator is stateless, any two instances created
+     * with the default constructor should be equal.
      */
     @Test
-    public void testEquals() {
-        SymbolicXYItemLabelGenerator g1 = new SymbolicXYItemLabelGenerator();
-        SymbolicXYItemLabelGenerator g2 = new SymbolicXYItemLabelGenerator();
-        assertEquals(g1, g2);
-        assertEquals(g2, g1);
+    public void equalsAndHashCode_shouldAdhereToContract() {
+        // Arrange
+        SymbolicXYItemLabelGenerator generator1 = new SymbolicXYItemLabelGenerator();
+        SymbolicXYItemLabelGenerator generator2 = new SymbolicXYItemLabelGenerator();
+
+        // Assert
+        // Reflexive: an object must equal itself
+        assertEquals(generator1, generator1);
+
+        // Symmetric: if x.equals(y) is true, then y.equals(x) must be true
+        assertEquals(generator1, generator2);
+        assertEquals(generator2, generator1);
+
+        // Not equal to null
+        assertNotEquals(null, generator1);
+
+        // Not equal to an object of a different type
+        assertNotEquals(generator1, new Object());
+
+        // Hash code: equal objects must have equal hash codes
+        assertEquals(generator1.hashCode(), generator2.hashCode());
     }
 
     /**
-     * Simple check that hashCode is implemented.
+     * Verifies that cloning creates a new, independent instance that is
+     * logically equal to the original.
      */
     @Test
-    public void testHashCode() {
-        SymbolicXYItemLabelGenerator g1
-                = new SymbolicXYItemLabelGenerator();
-        SymbolicXYItemLabelGenerator g2
-                = new SymbolicXYItemLabelGenerator();
-        assertEquals(g1, g2);
-        assertEquals(g1.hashCode(), g2.hashCode());
+    public void clone_shouldReturnIndependentAndEqualCopy() throws CloneNotSupportedException {
+        // Arrange
+        SymbolicXYItemLabelGenerator original = new SymbolicXYItemLabelGenerator();
+
+        // Act
+        SymbolicXYItemLabelGenerator clone = CloneUtils.clone(original);
+
+        // Assert
+        assertNotSame(original, clone, "A clone must be a different object in memory.");
+        assertEquals(original, clone, "A clone must be logically equal to the original.");
     }
 
     /**
-     * Confirm that cloning works.
+     * Confirms that the class implements the PublicCloneable interface,
+     * signaling that its clone() method is intended for public use.
      */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
-        SymbolicXYItemLabelGenerator g1 = new SymbolicXYItemLabelGenerator();
-        SymbolicXYItemLabelGenerator g2 = CloneUtils.clone(g1);
-        assertNotSame(g1, g2);
-        assertSame(g1.getClass(), g2.getClass());
-        assertEquals(g1, g2);
+    public void class_shouldImplementPublicCloneable() {
+        // Arrange
+        SymbolicXYItemLabelGenerator generator = new SymbolicXYItemLabelGenerator();
+
+        // Assert
+        assertTrue(generator instanceof PublicCloneable, "The class should be publicly cloneable.");
     }
 
     /**
-     * Check to ensure that this class implements PublicCloneable.
+     * Verifies that an instance can be serialized and deserialized, and that
+     * the resulting object is equal to the original.
      */
     @Test
-    public void testPublicCloneable() {
-        SymbolicXYItemLabelGenerator g1 = new SymbolicXYItemLabelGenerator();
-        assertTrue(g1 instanceof PublicCloneable);
-    }
+    public void serialization_shouldPreserveEquality() {
+        // Arrange
+        SymbolicXYItemLabelGenerator original = new SymbolicXYItemLabelGenerator();
 
-    /**
-     * Serialize an instance, restore it, and check for equality.
-     */
-    @Test
-    public void testSerialization() {
-        SymbolicXYItemLabelGenerator g1 = new SymbolicXYItemLabelGenerator();
-        SymbolicXYItemLabelGenerator g2 = TestUtils.serialised(g1);
-        assertEquals(g1, g2);
-    }
+        // Act
+        SymbolicXYItemLabelGenerator deserialized = TestUtils.serialised(original);
 
+        // Assert
+        assertEquals(original, deserialized, "Deserialized object should be equal to the original.");
+    }
 }
