@@ -8,178 +8,704 @@ package org.threeten.extra.chrono;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.*;
-import java.time.chrono.*;
-import java.time.temporal.*;
+import java.time.Clock;
+import java.time.DateTimeException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.OffsetDateTime;
+import java.time.Period;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.chrono.ChronoLocalDateTime;
+import java.time.chrono.ChronoZonedDateTime;
+import java.time.chrono.Era;
+import java.time.chrono.HijrahDate;
+import java.time.chrono.JapaneseDate;
+import java.time.chrono.JapaneseEra;
+import java.time.chrono.ThaiBuddhistEra;
+import java.time.format.ResolverStyle;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalField;
+import java.time.temporal.TemporalUnit;
+import java.time.temporal.UnsupportedTemporalTypeException;
+import java.time.temporal.ValueRange;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.*;
-import org.evosuite.runtime.mock.java.time.chrono.*;
+import org.evosuite.runtime.mock.java.time.MockClock;
+import org.evosuite.runtime.mock.java.time.MockInstant;
+import org.evosuite.runtime.mock.java.time.MockLocalDate;
+import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
+import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
+import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
+import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
 import org.junit.runner.RunWith;
-import org.threeten.extra.chrono.*;
+import org.threeten.extra.chrono.BritishCutoverDate;
+import org.threeten.extra.chrono.JulianChronology;
+import org.threeten.extra.chrono.JulianDate;
+import org.threeten.extra.chrono.JulianEra;
+import org.threeten.extra.chrono.PaxDate;
 
-@RunWith(EvoRunner.class)
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true, 
-    useVFS = true, 
-    useVNET = true, 
-    resetStaticState = true, 
-    separateClassLoader = true
-) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class JulianChronology_ESTest extends JulianChronology_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void testDateEpochDayBeforeCommonEra() throws Throwable {
-        JulianChronology chronology = JulianChronology.INSTANCE;
-        JulianDate date = chronology.dateEpochDay(-11999976L);
-        assertEquals(JulianEra.BC, date.getEra());
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      JulianDate julianDate0 = julianChronology0.dateEpochDay((-11999976L));
+      assertEquals(JulianEra.BC, julianDate0.getEra());
+  }
 
-    @Test(timeout = 4000)
-    public void testDateYearDayWithInvalidDayThrowsException() throws Throwable {
-        JulianChronology chronology = JulianChronology.INSTANCE;
-        JulianEra era = JulianEra.BC;
-        
-        try {
-            chronology.dateYearDay(era, 2493, 1461);
-            fail("Expected DateTimeException");
-        } catch (DateTimeException e) {
-            // Verify exception message for invalid day-of-year
-            assertTrue(e.getMessage().contains("Invalid value for DayOfYear"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      JulianChronology julianChronology0 = JulianChronology.INSTANCE;
+      JulianEra julianEra0 = JulianEra.BC;
+      // Undeclared exception!
+      try { 
+        julianChronology0.dateYearDay((Era) julianEra0, 2493, 1461);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value for DayOfYear (valid values 1 - 365/366): 1461
+         //
+         verifyException("java.time.temporal.ValueRange", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testZonedDateTimeFromInstant() throws Throwable {
-        JulianChronology chronology = JulianChronology.INSTANCE;
-        Instant instant = Instant.ofEpochMilli(3L);
-        ZoneOffset zone = ZoneOffset.MAX;
-        ChronoZonedDateTime<JulianDate> zdt = chronology.zonedDateTime(instant, zone);
-        assertNotNull(zdt);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      Instant instant0 = MockInstant.ofEpochMilli(3L);
+      ZoneOffset zoneOffset0 = ZoneOffset.MAX;
+      ChronoZonedDateTime<JulianDate> chronoZonedDateTime0 = julianChronology0.zonedDateTime(instant0, (ZoneId) zoneOffset0);
+      assertNotNull(chronoZonedDateTime0);
+  }
 
-    @Test(timeout = 4000)
-    public void testResolveDateWithEpochDay() throws Throwable {
-        JulianChronology chronology = JulianChronology.INSTANCE;
-        JulianDate currentDate = JulianDate.now();
-        
-        Map<TemporalField, Long> fieldValues = new HashMap<>();
-        fieldValues.put(ChronoField.EPOCH_DAY, 3L);
-        JulianDate resolvedDate = chronology.resolveDate(fieldValues, ResolverStyle.LENIENT);
-        
-        assertNotEquals(currentDate, resolvedDate);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      JulianDate julianDate0 = JulianDate.now();
+      JulianChronology julianChronology0 = julianDate0.getChronology();
+      HashMap<TemporalField, Long> hashMap0 = new HashMap<TemporalField, Long>();
+      ChronoField chronoField0 = ChronoField.EPOCH_DAY;
+      Long long0 = new Long(3L);
+      hashMap0.put(chronoField0, long0);
+      ResolverStyle resolverStyle0 = ResolverStyle.LENIENT;
+      JulianDate julianDate1 = julianChronology0.resolveDate(hashMap0, resolverStyle0);
+      assertFalse(julianDate1.equals((Object)julianDate0));
+  }
 
-    @Test(timeout = 4000)
-    public void testProlepticYearForCommonEra() throws Throwable {
-        JulianChronology chronology = JulianChronology.INSTANCE;
-        JulianDate date = JulianDate.now();
-        JulianEra era = date.getEra();
-        int prolepticYear = chronology.prolepticYear(era, 1850);
-        assertEquals(1850, prolepticYear);
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      JulianChronology julianChronology0 = JulianChronology.INSTANCE;
+      LocalDate localDate0 = MockLocalDate.now();
+      BritishCutoverDate britishCutoverDate0 = new BritishCutoverDate(localDate0);
+      JulianEra julianEra0 = britishCutoverDate0.getEra();
+      int int0 = julianChronology0.prolepticYear(julianEra0, 1850);
+      assertEquals(1850, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void testLocalDateTimeConversion() throws Throwable {
-        JulianChronology chronology = JulianChronology.INSTANCE;
-        LocalDateTime ldt = LocalDateTime.now();
-        ChronoLocalDateTime<JulianDate> chronoLdt = chronology.localDateTime(ldt);
-        assertNotNull(chronoLdt);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      LocalDateTime localDateTime0 = MockLocalDateTime.now();
+      ChronoLocalDateTime<JulianDate> chronoLocalDateTime0 = julianChronology0.localDateTime(localDateTime0);
+      assertNotNull(chronoLocalDateTime0);
+  }
 
-    @Test(timeout = 4000)
-    public void testNonLeapYear() throws Throwable {
-        JulianChronology chronology = JulianChronology.INSTANCE;
-        assertFalse(chronology.isLeapYear(2110));
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      JulianChronology julianChronology0 = JulianChronology.INSTANCE;
+      boolean boolean0 = julianChronology0.isLeapYear(2110L);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testEraOfBeforeChrist() throws Throwable {
-        JulianChronology chronology = JulianChronology.INSTANCE;
-        Era era = chronology.eraOf(0);
-        assertEquals(JulianEra.BC, era);
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      JulianEra julianEra0 = julianChronology0.eraOf(0);
+      assertEquals(JulianEra.BC, julianEra0);
+  }
 
-    @Test(timeout = 4000)
-    public void testDateYearDayCommonEra() throws Throwable {
-        JulianChronology chronology = JulianChronology.INSTANCE;
-        JulianDate date = chronology.dateYearDay(327, 327);
-        assertEquals(JulianEra.AD, date.getEra());
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      JulianDate julianDate0 = julianChronology0.dateYearDay(327, 327);
+      assertEquals(JulianEra.AD, julianDate0.getEra());
+  }
 
-    @Test(timeout = 4000)
-    public void testCurrentDateWithTimeZone() throws Throwable {
-        JulianChronology chronology = JulianChronology.INSTANCE;
-        ZoneId zone = ZoneOffset.MIN;
-        JulianDate date = chronology.dateNow(zone);
-        assertEquals(JulianEra.AD, date.getEra());
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      ZoneOffset zoneOffset0 = ZoneOffset.MIN;
+      JulianDate julianDate0 = julianChronology0.dateNow((ZoneId) zoneOffset0);
+      assertEquals(JulianEra.AD, julianDate0.getEra());
+  }
 
-    @Test(timeout = 4000)
-    public void testDateConversionFromJapaneseDate() throws Throwable {
-        JulianChronology chronology = JulianChronology.INSTANCE;
-        JapaneseDate japaneseDate = JapaneseDate.now();
-        JulianDate julianDate = chronology.date(japaneseDate);
-        assertEquals(JulianEra.AD, julianDate.getEra());
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      JulianChronology julianChronology0 = JulianChronology.INSTANCE;
+      JapaneseDate japaneseDate0 = MockJapaneseDate.now();
+      JulianDate julianDate0 = julianChronology0.date((TemporalAccessor) japaneseDate0);
+      assertEquals(JulianEra.AD, julianDate0.getEra());
+  }
 
-    @Test(timeout = 4000)
-    public void testDateInBeforeChristEra() throws Throwable {
-        JulianChronology chronology = JulianChronology.INSTANCE;
-        JulianDate date = chronology.date(JulianEra.AD, -2282, 9, 2);
-        assertEquals(JulianEra.BC, date.getEra());
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      JulianEra julianEra0 = JulianEra.AD;
+      JulianDate julianDate0 = julianChronology0.date((Era) julianEra0, (-2282), 9, 2);
+      assertEquals(JulianEra.BC, julianDate0.getEra());
+  }
 
-    @Test(timeout = 4000)
-    public void testZonedDateTimeConversionFailure() throws Throwable {
-        JulianChronology chronology = JulianChronology.INSTANCE;
-        ZoneOffset zone = ZoneOffset.MAX;
-        
-        try {
-            chronology.zonedDateTime(zone);
-            fail("Expected DateTimeException");
-        } catch (DateTimeException e) {
-            // Verify exception message for unsupported conversion
-            assertTrue(e.getMessage().contains("Unable to obtain ChronoZonedDateTime"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      ZoneOffset zoneOffset0 = ZoneOffset.MAX;
+      // Undeclared exception!
+      try { 
+        julianChronology0.zonedDateTime((TemporalAccessor) zoneOffset0);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Unable to obtain ChronoZonedDateTime from TemporalAccessor: class java.time.ZoneOffset
+         //
+         verifyException("java.time.chrono.Chronology", e);
+      }
+  }
 
-    // Additional tests follow the same pattern with descriptive names and comments...
-    // Only the first few tests are shown here for brevity
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      // Undeclared exception!
+      try { 
+        julianChronology0.zonedDateTime((TemporalAccessor) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.time.ZoneId", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testRangeForClockHourField() throws Throwable {
-        JulianChronology chronology = JulianChronology.INSTANCE;
-        ValueRange range = chronology.range(ChronoField.CLOCK_HOUR_OF_AMPM);
-        assertNotNull(range);
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      Instant instant0 = MockInstant.ofEpochSecond((-1L));
+      Period period0 = Period.ofDays((-1431655764));
+      Instant instant1 = MockInstant.plus(instant0, (TemporalAmount) period0);
+      ZoneOffset zoneOffset0 = ZoneOffset.UTC;
+      // Undeclared exception!
+      try { 
+        julianChronology0.zonedDateTime(instant1, (ZoneId) zoneOffset0);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Unable to obtain ChronoLocalDateTime from TemporalAccessor: class java.time.LocalDateTime
+         //
+         verifyException("java.time.chrono.Chronology", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testRangeForYearOfEraField() throws Throwable {
-        JulianChronology chronology = JulianChronology.INSTANCE;
-        ValueRange range = chronology.range(ChronoField.YEAR_OF_ERA);
-        assertNotNull(range);
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      HashMap<TemporalField, Long> hashMap0 = new HashMap<TemporalField, Long>();
+      ChronoField chronoField0 = ChronoField.ERA;
+      Long long0 = new Long(867L);
+      hashMap0.put(chronoField0, long0);
+      ResolverStyle resolverStyle0 = ResolverStyle.STRICT;
+      // Undeclared exception!
+      try { 
+        julianChronology0.resolveDate(hashMap0, resolverStyle0);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value for Era (valid values 0 - 1): 867
+         //
+         verifyException("java.time.temporal.ValueRange", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testErasList() throws Throwable {
-        JulianChronology chronology = JulianChronology.INSTANCE;
-        assertFalse(chronology.eras().isEmpty());
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      ResolverStyle resolverStyle0 = ResolverStyle.STRICT;
+      // Undeclared exception!
+      try { 
+        julianChronology0.resolveDate((Map<TemporalField, Long>) null, resolverStyle0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.time.chrono.AbstractChronology", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testCalendarType() throws Throwable {
-        JulianChronology chronology = JulianChronology.INSTANCE;
-        assertEquals("julian", chronology.getCalendarType());
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      ThaiBuddhistEra thaiBuddhistEra0 = ThaiBuddhistEra.BE;
+      // Undeclared exception!
+      try { 
+        julianChronology0.localDateTime(thaiBuddhistEra0);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Unable to obtain ChronoLocalDateTime from TemporalAccessor: class java.time.chrono.ThaiBuddhistEra
+         //
+         verifyException("java.time.chrono.Chronology", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testChronologyId() throws Throwable {
-        JulianChronology chronology = JulianChronology.INSTANCE;
-        assertEquals("Julian", chronology.getId());
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      JulianChronology julianChronology0 = JulianChronology.INSTANCE;
+      JapaneseEra japaneseEra0 = JapaneseEra.HEISEI;
+      // Undeclared exception!
+      try { 
+        julianChronology0.dateYearDay((Era) japaneseEra0, (-401), (-401));
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // Era must be JulianEra
+         //
+         verifyException("org.threeten.extra.chrono.JulianChronology", e);
+      }
+  }
 
-    // Remaining tests follow the same pattern of renaming and documentation...
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      // Undeclared exception!
+      try { 
+        julianChronology0.dateYearDay(366, 366);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid date 'DayOfYear 366' as '366' is not a leap year
+         //
+         verifyException("org.threeten.extra.chrono.JulianDate", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      Instant instant0 = MockInstant.ofEpochSecond(1702L);
+      Period period0 = Period.ofDays((-1073741823));
+      Instant instant1 = MockInstant.minus(instant0, (TemporalAmount) period0);
+      ZoneOffset zoneOffset0 = ZoneOffset.UTC;
+      Clock clock0 = MockClock.fixed(instant1, zoneOffset0);
+      // Undeclared exception!
+      try { 
+        julianChronology0.dateNow(clock0);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value for Year (valid values -999998 - 999999): 2941714
+         //
+         verifyException("java.time.temporal.ValueRange", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      // Undeclared exception!
+      try { 
+        julianChronology0.dateNow((Clock) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // clock
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      Clock clock0 = MockClock.systemDefaultZone();
+      ChronoUnit chronoUnit0 = ChronoUnit.FOREVER;
+      Duration duration0 = chronoUnit0.getDuration();
+      Clock clock1 = MockClock.offset(clock0, duration0);
+      // Undeclared exception!
+      try { 
+        julianChronology0.dateNow(clock1);
+        fail("Expecting exception: ArithmeticException");
+      
+      } catch(ArithmeticException e) {
+         //
+         // long overflow
+         //
+         verifyException("java.lang.Math", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      // Undeclared exception!
+      try { 
+        julianChronology0.dateEpochDay(365250000L);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value for Year (valid values -999998 - 999999): 1001969
+         //
+         verifyException("java.time.temporal.ValueRange", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      Month month0 = Month.APRIL;
+      // Undeclared exception!
+      try { 
+        julianChronology0.date((TemporalAccessor) month0);
+        fail("Expecting exception: UnsupportedTemporalTypeException");
+      
+      } catch(UnsupportedTemporalTypeException e) {
+         //
+         // Unsupported field: EpochDay
+         //
+         verifyException("java.time.Month", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      HijrahDate hijrahDate0 = MockHijrahDate.now();
+      PaxDate paxDate0 = PaxDate.from(hijrahDate0);
+      ChronoUnit chronoUnit0 = ChronoUnit.MILLENNIA;
+      PaxDate paxDate1 = paxDate0.minus((-2458L), (TemporalUnit) chronoUnit0);
+      PaxDate paxDate2 = paxDate1.plusYears(1308L);
+      // Undeclared exception!
+      try { 
+        julianChronology0.INSTANCE.date((TemporalAccessor) paxDate2);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value for Year (valid values -999998 - 999999): 2461271
+         //
+         verifyException("java.time.temporal.ValueRange", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      // Undeclared exception!
+      try { 
+        julianChronology0.date((-3115), (-3115), (-3115));
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value for MonthOfYear (valid values 1 - 12): -3115
+         //
+         verifyException("java.time.temporal.ValueRange", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      JulianChronology julianChronology0 = JulianChronology.INSTANCE;
+      LocalDate localDate0 = MockLocalDate.now();
+      BritishCutoverDate britishCutoverDate0 = new BritishCutoverDate(localDate0);
+      JulianEra julianEra0 = britishCutoverDate0.getEra();
+      int int0 = julianChronology0.prolepticYear(julianEra0, 0);
+      assertEquals(0, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      JulianEra julianEra0 = JulianEra.BC;
+      int int0 = julianChronology0.prolepticYear(julianEra0, 981);
+      assertEquals((-980), int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      JulianChronology julianChronology0 = JulianChronology.INSTANCE;
+      JapaneseEra japaneseEra0 = JapaneseEra.HEISEI;
+      // Undeclared exception!
+      try { 
+        julianChronology0.INSTANCE.prolepticYear(japaneseEra0, (-1768));
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // Era must be JulianEra
+         //
+         verifyException("org.threeten.extra.chrono.JulianChronology", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      boolean boolean0 = julianChronology0.isLeapYear((-236));
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      // Undeclared exception!
+      try { 
+        julianChronology0.date((TemporalAccessor) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.threeten.extra.chrono.JulianDate", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test32()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      // Undeclared exception!
+      try { 
+        julianChronology0.dateYearDay(2373, 2373);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value for DayOfYear (valid values 1 - 365/366): 2373
+         //
+         verifyException("java.time.temporal.ValueRange", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test33()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      // Undeclared exception!
+      try { 
+        julianChronology0.localDateTime((TemporalAccessor) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.threeten.extra.chrono.JulianDate", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test34()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      ZoneId zoneId0 = ZoneId.systemDefault();
+      // Undeclared exception!
+      try { 
+        julianChronology0.zonedDateTime((Instant) null, zoneId0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.time.chrono.ChronoZonedDateTimeImpl", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test35()  throws Throwable  {
+      JulianChronology julianChronology0 = JulianChronology.INSTANCE;
+      ChronoField chronoField0 = ChronoField.CLOCK_HOUR_OF_AMPM;
+      ValueRange valueRange0 = julianChronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
+
+  @Test(timeout = 4000)
+  public void test36()  throws Throwable  {
+      JulianChronology julianChronology0 = JulianChronology.INSTANCE;
+      ChronoField chronoField0 = ChronoField.YEAR_OF_ERA;
+      ValueRange valueRange0 = julianChronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
+
+  @Test(timeout = 4000)
+  public void test37()  throws Throwable  {
+      JulianChronology julianChronology0 = JulianChronology.INSTANCE;
+      ChronoField chronoField0 = ChronoField.YEAR;
+      ValueRange valueRange0 = julianChronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
+
+  @Test(timeout = 4000)
+  public void test38()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      ChronoField chronoField0 = ChronoField.PROLEPTIC_MONTH;
+      ValueRange valueRange0 = julianChronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
+
+  @Test(timeout = 4000)
+  public void test39()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      JulianEra julianEra0 = JulianEra.AD;
+      JulianDate julianDate0 = julianChronology0.dateYearDay((Era) julianEra0, 84, 84);
+      assertEquals(JulianEra.AD, julianDate0.getEra());
+  }
+
+  @Test(timeout = 4000)
+  public void test40()  throws Throwable  {
+      JulianChronology julianChronology0 = JulianChronology.INSTANCE;
+      JapaneseEra japaneseEra0 = JapaneseEra.HEISEI;
+      // Undeclared exception!
+      try { 
+        julianChronology0.date((Era) japaneseEra0, (-1610612735), (-1610612735), (-1610612735));
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // Era must be JulianEra
+         //
+         verifyException("org.threeten.extra.chrono.JulianChronology", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test41()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      JulianDate julianDate0 = julianChronology0.date(3, 3, 3);
+      ChronoUnit chronoUnit0 = ChronoUnit.DAYS;
+      JulianDate julianDate1 = julianDate0.minus((long) 3, (TemporalUnit) chronoUnit0);
+      assertEquals(JulianEra.AD, julianDate1.getEra());
+  }
+
+  @Test(timeout = 4000)
+  public void test42()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      Clock clock0 = MockClock.systemDefaultZone();
+      JulianDate julianDate0 = julianChronology0.dateNow(clock0);
+      assertEquals(JulianEra.AD, julianDate0.getEra());
+  }
+
+  @Test(timeout = 4000)
+  public void test43()  throws Throwable  {
+      JulianChronology julianChronology0 = JulianChronology.INSTANCE;
+      List<Era> list0 = julianChronology0.eras();
+      assertFalse(list0.isEmpty());
+  }
+
+  @Test(timeout = 4000)
+  public void test44()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      JulianEra julianEra0 = JulianEra.BC;
+      // Undeclared exception!
+      try { 
+        julianChronology0.date((Era) julianEra0, 983, 983, 983);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value for MonthOfYear (valid values 1 - 12): 983
+         //
+         verifyException("java.time.temporal.ValueRange", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test45()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      String string0 = julianChronology0.getCalendarType();
+      assertEquals("julian", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test46()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      String string0 = julianChronology0.getId();
+      assertEquals("Julian", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test47()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      // Undeclared exception!
+      try { 
+        julianChronology0.eraOf(3);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid era: 3
+         //
+         verifyException("org.threeten.extra.chrono.JulianEra", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test48()  throws Throwable  {
+      JulianChronology julianChronology0 = JulianChronology.INSTANCE;
+      OffsetDateTime offsetDateTime0 = MockOffsetDateTime.now();
+      ChronoZonedDateTime<JulianDate> chronoZonedDateTime0 = julianChronology0.zonedDateTime((TemporalAccessor) offsetDateTime0);
+      assertNotNull(chronoZonedDateTime0);
+  }
+
+  @Test(timeout = 4000)
+  public void test49()  throws Throwable  {
+      JulianChronology julianChronology0 = JulianChronology.INSTANCE;
+      JulianDate julianDate0 = julianChronology0.dateNow();
+      assertEquals(JulianEra.AD, julianDate0.getEra());
+  }
+
+  @Test(timeout = 4000)
+  public void test50()  throws Throwable  {
+      JulianChronology julianChronology0 = new JulianChronology();
+      HashMap<TemporalField, Long> hashMap0 = new HashMap<TemporalField, Long>();
+      ResolverStyle resolverStyle0 = ResolverStyle.STRICT;
+      JulianDate julianDate0 = julianChronology0.resolveDate(hashMap0, resolverStyle0);
+      assertNull(julianDate0);
+  }
+
+  @Test(timeout = 4000)
+  public void test51()  throws Throwable  {
+      JulianChronology julianChronology0 = JulianChronology.INSTANCE;
+      // Undeclared exception!
+      try { 
+        julianChronology0.dateNow((ZoneId) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // zone
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 }
