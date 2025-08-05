@@ -22,114 +22,151 @@ import org.jfree.data.xy.DefaultTableXYDataset;
 import org.jfree.data.xy.XIntervalSeriesCollection;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class)
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true, 
+    useVFS = true, 
+    useVNET = true, 
+    resetStaticState = true, 
+    separateClassLoader = true
+) 
 public class LegendItemEntity_ESTest extends LegendItemEntity_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
-      LegendItemEntity<HijrahEra> legendItemEntity0 = new LegendItemEntity<HijrahEra>(rectangle2D_Double0);
-      HijrahEra hijrahEra0 = HijrahEra.AH;
-      legendItemEntity0.setSeriesKey(hijrahEra0);
-      HijrahEra hijrahEra1 = legendItemEntity0.getSeriesKey();
-      assertSame(hijrahEra1, hijrahEra0);
-  }
+    @Test(timeout = 4000)
+    public void testConstructorThrowsExceptionForNullShape() {
+        try {
+            new LegendItemEntity<Integer>((Shape) null);
+            fail("Expected IllegalArgumentException: Null 'area' argument");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Null 'area' argument.", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      Rectangle2D.Float rectangle2D_Float0 = new Rectangle2D.Float();
-      Rectangle rectangle0 = rectangle2D_Float0.getBounds();
-      LegendItemEntity<Integer> legendItemEntity0 = new LegendItemEntity<Integer>(rectangle0);
-      DefaultTableXYDataset<Integer> defaultTableXYDataset0 = new DefaultTableXYDataset<Integer>(false);
-      legendItemEntity0.setDataset(defaultTableXYDataset0);
-      DefaultTableXYDataset defaultTableXYDataset1 = (DefaultTableXYDataset)legendItemEntity0.getDataset();
-      assertTrue(defaultTableXYDataset1.getNotify());
-  }
+    @Test(timeout = 4000)
+    public void testSetAndGetSeriesKey() {
+        // Setup
+        Rectangle2D.Double area = new Rectangle2D.Double();
+        LegendItemEntity<HijrahEra> entity = new LegendItemEntity<>(area);
+        HijrahEra eraKey = HijrahEra.AH;
+        
+        // Execute
+        entity.setSeriesKey(eraKey);
+        HijrahEra retrievedKey = entity.getSeriesKey();
+        
+        // Verify
+        assertSame("Series key should match what was set", eraKey, retrievedKey);
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      LegendItemEntity<Integer> legendItemEntity0 = null;
-      try {
-        legendItemEntity0 = new LegendItemEntity<Integer>((Shape) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Null 'area' argument.
-         //
-         verifyException("org.jfree.chart.internal.Args", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testSetAndGetDataset() {
+        // Setup
+        Rectangle area = new Rectangle();
+        LegendItemEntity<Integer> entity = new LegendItemEntity<>(area);
+        DefaultTableXYDataset dataset = new DefaultTableXYDataset(false);
+        
+        // Execute
+        entity.setDataset(dataset);
+        Dataset retrievedDataset = entity.getDataset();
+        
+        // Verify
+        assertTrue("Dataset should notify changes", ((DefaultTableXYDataset) retrievedDataset).getNotify());
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
-      LegendItemEntity<Integer> legendItemEntity0 = new LegendItemEntity<Integer>(rectangle2D_Double0);
-      Object object0 = legendItemEntity0.clone();
-      XIntervalSeriesCollection<Integer> xIntervalSeriesCollection0 = new XIntervalSeriesCollection<Integer>();
-      legendItemEntity0.setDataset(xIntervalSeriesCollection0);
-      boolean boolean0 = legendItemEntity0.equals(object0);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testGetSeriesKeyReturnsNullWhenNotSet() {
+        // Setup
+        Rectangle2D.Double area = new Rectangle2D.Double();
+        LegendItemEntity<Integer> entity = new LegendItemEntity<>(area);
+        
+        // Execute
+        Comparable<?> seriesKey = entity.getSeriesKey();
+        
+        // Verify
+        assertNull("Series key should be null when not set", seriesKey);
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      Line2D.Float line2D_Float0 = new Line2D.Float();
-      Rectangle2D rectangle2D0 = line2D_Float0.getBounds2D();
-      LegendItemEntity<Integer> legendItemEntity0 = new LegendItemEntity<Integer>(rectangle2D0);
-      Object object0 = new Object();
-      boolean boolean0 = legendItemEntity0.equals(object0);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testGetDatasetReturnsNullWhenNotSet() {
+        // Setup
+        Rectangle2D.Double area = new Rectangle2D.Double();
+        LegendItemEntity<Integer> entity = new LegendItemEntity<>(area);
+        
+        // Execute
+        Dataset dataset = entity.getDataset();
+        
+        // Verify
+        assertNull("Dataset should be null when not set", dataset);
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
-      LegendItemEntity<Integer> legendItemEntity0 = new LegendItemEntity<Integer>(rectangle2D_Double0);
-      boolean boolean0 = legendItemEntity0.equals(legendItemEntity0);
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testEqualsReturnsTrueForSameInstance() {
+        // Setup
+        Rectangle2D.Double area = new Rectangle2D.Double();
+        LegendItemEntity<Integer> entity = new LegendItemEntity<>(area);
+        
+        // Execute & Verify
+        assertTrue("Equals should return true for same instance", entity.equals(entity));
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      Rectangle rectangle0 = new Rectangle(0, 0, 0, 0);
-      LegendItemEntity<Integer> legendItemEntity0 = new LegendItemEntity<Integer>(rectangle0);
-      String string0 = legendItemEntity0.toString();
-      assertEquals("LegendItemEntity: seriesKey=null, dataset=null", string0);
-  }
+    @Test(timeout = 4000)
+    public void testEqualsReturnsTrueForClonedObject() throws Exception {
+        // Setup
+        Rectangle2D.Double area = new Rectangle2D.Double();
+        LegendItemEntity<Integer> entity = new LegendItemEntity<>(area);
+        
+        // Execute
+        Object clone = entity.clone();
+        
+        // Verify
+        assertTrue("Cloned object should be equal", entity.equals(clone));
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
-      LegendItemEntity<HijrahEra> legendItemEntity0 = new LegendItemEntity<HijrahEra>(rectangle2D_Double0);
-      legendItemEntity0.getSeriesKey();
-  }
+    @Test(timeout = 4000)
+    public void testEqualsReturnsFalseForDifferentClass() {
+        // Setup
+        Line2D.Float line = new Line2D.Float();
+        Rectangle2D area = line.getBounds2D();
+        LegendItemEntity<Integer> entity = new LegendItemEntity<>(area);
+        Object differentObject = new Object();
+        
+        // Execute & Verify
+        assertFalse("Equals should return false for different class", entity.equals(differentObject));
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
-      LegendItemEntity<Integer> legendItemEntity0 = new LegendItemEntity<Integer>(rectangle2D_Double0);
-      Integer integer0 = JLayeredPane.POPUP_LAYER;
-      legendItemEntity0.setSeriesKey(integer0);
-      LegendItemEntity<Integer> legendItemEntity1 = new LegendItemEntity<Integer>(rectangle2D_Double0);
-      boolean boolean0 = legendItemEntity0.equals(legendItemEntity1);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testEqualsReturnsFalseWhenSeriesKeyDiffers() {
+        // Setup
+        Rectangle2D.Double area = new Rectangle2D.Double();
+        LegendItemEntity<Integer> entity1 = new LegendItemEntity<>(area);
+        LegendItemEntity<Integer> entity2 = new LegendItemEntity<>(area);
+        entity1.setSeriesKey(JLayeredPane.POPUP_LAYER);
+        
+        // Execute & Verify
+        assertFalse("Entities with different series keys should not be equal", entity1.equals(entity2));
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
-      LegendItemEntity<Integer> legendItemEntity0 = new LegendItemEntity<Integer>(rectangle2D_Double0);
-      Object object0 = legendItemEntity0.clone();
-      boolean boolean0 = legendItemEntity0.equals(object0);
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testEqualsReturnsFalseWhenDatasetDiffers() throws Exception {
+        // Setup
+        Rectangle2D.Double area = new Rectangle2D.Double();
+        LegendItemEntity<Integer> entity = new LegendItemEntity<>(area);
+        Object clone = entity.clone();
+        entity.setDataset(new XIntervalSeriesCollection<>());
+        
+        // Execute & Verify
+        assertFalse("Entities with different datasets should not be equal", entity.equals(clone));
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
-      LegendItemEntity<Integer> legendItemEntity0 = new LegendItemEntity<Integer>(rectangle2D_Double0);
-      Dataset dataset0 = legendItemEntity0.getDataset();
-      assertNull(dataset0);
-  }
+    @Test(timeout = 4000)
+    public void testToString() {
+        // Setup
+        Rectangle area = new Rectangle(0, 0, 0, 0);
+        LegendItemEntity<Integer> entity = new LegendItemEntity<>(area);
+        
+        // Execute
+        String result = entity.toString();
+        
+        // Verify
+        assertEquals("LegendItemEntity: seriesKey=null, dataset=null", result);
+    }
 }
