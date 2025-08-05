@@ -1,26 +1,6 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.apache.commons.io;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -38,47 +18,54 @@ class IOCaseTest {
 
     private static final boolean WINDOWS = File.separatorChar == '\\';
 
-    private void assert0(final byte[] arr) {
+    private void assertArrayElementsAreZero(final byte[] arr) {
         for (final byte e : arr) {
             assertEquals(0, e);
         }
     }
 
-    private void assert0(final char[] arr) {
+    private void assertArrayElementsAreZero(final char[] arr) {
         for (final char e : arr) {
             assertEquals(0, e);
         }
     }
 
-    private IOCase serialize(final IOCase value) throws Exception {
-        final ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        try (ObjectOutputStream out = new ObjectOutputStream(buf)) {
+    private IOCase serializeIOCase(final IOCase value) throws Exception {
+        final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        try (ObjectOutputStream out = new ObjectOutputStream(buffer)) {
             out.writeObject(value);
             out.flush();
         }
 
-        final ByteArrayInputStream bufin = new ByteArrayInputStream(buf.toByteArray());
-        final ObjectInputStream in = new ObjectInputStream(bufin);
-        return (IOCase) in.readObject();
+        final ByteArrayInputStream inputBuffer = new ByteArrayInputStream(buffer.toByteArray());
+        try (ObjectInputStream in = new ObjectInputStream(inputBuffer)) {
+            return (IOCase) in.readObject();
+        }
     }
 
     @Test
-    void test_checkCompare_case() {
+    void testCaseSensitiveComparison() {
         assertEquals(0, IOCase.SENSITIVE.checkCompareTo("ABC", "ABC"));
         assertTrue(IOCase.SENSITIVE.checkCompareTo("ABC", "abc") < 0);
         assertTrue(IOCase.SENSITIVE.checkCompareTo("abc", "ABC") > 0);
+    }
 
+    @Test
+    void testCaseInsensitiveComparison() {
         assertEquals(0, IOCase.INSENSITIVE.checkCompareTo("ABC", "ABC"));
         assertEquals(0, IOCase.INSENSITIVE.checkCompareTo("ABC", "abc"));
         assertEquals(0, IOCase.INSENSITIVE.checkCompareTo("abc", "ABC"));
+    }
 
+    @Test
+    void testSystemCaseComparison() {
         assertEquals(0, IOCase.SYSTEM.checkCompareTo("ABC", "ABC"));
         assertEquals(WINDOWS, IOCase.SYSTEM.checkCompareTo("ABC", "abc") == 0);
         assertEquals(WINDOWS, IOCase.SYSTEM.checkCompareTo("abc", "ABC") == 0);
     }
 
     @Test
-    void test_checkCompare_functionality() {
+    void testCompareFunctionality() {
         assertTrue(IOCase.SENSITIVE.checkCompareTo("ABC", "") > 0);
         assertTrue(IOCase.SENSITIVE.checkCompareTo("", "ABC") < 0);
         assertTrue(IOCase.SENSITIVE.checkCompareTo("ABC", "DEF") < 0);
@@ -90,20 +77,27 @@ class IOCaseTest {
         assertThrows(NullPointerException.class, () -> IOCase.SENSITIVE.checkCompareTo(null, "ABC"));
         assertThrows(NullPointerException.class, () -> IOCase.SENSITIVE.checkCompareTo(null, null));
     }
+
     @Test
-    void test_checkEndsWith_case() {
+    void testEndsWithSensitiveCase() {
         assertTrue(IOCase.SENSITIVE.checkEndsWith("ABC", "BC"));
         assertFalse(IOCase.SENSITIVE.checkEndsWith("ABC", "Bc"));
+    }
 
+    @Test
+    void testEndsWithInsensitiveCase() {
         assertTrue(IOCase.INSENSITIVE.checkEndsWith("ABC", "BC"));
         assertTrue(IOCase.INSENSITIVE.checkEndsWith("ABC", "Bc"));
+    }
 
+    @Test
+    void testEndsWithSystemCase() {
         assertTrue(IOCase.SYSTEM.checkEndsWith("ABC", "BC"));
         assertEquals(WINDOWS, IOCase.SYSTEM.checkEndsWith("ABC", "Bc"));
     }
 
     @Test
-    void test_checkEndsWith_functionality() {
+    void testEndsWithFunctionality() {
         assertTrue(IOCase.SENSITIVE.checkEndsWith("ABC", ""));
         assertFalse(IOCase.SENSITIVE.checkEndsWith("ABC", "A"));
         assertFalse(IOCase.SENSITIVE.checkEndsWith("ABC", "AB"));
@@ -120,19 +114,25 @@ class IOCaseTest {
     }
 
     @Test
-    void test_checkEquals_case() {
+    void testEqualsSensitiveCase() {
         assertTrue(IOCase.SENSITIVE.checkEquals("ABC", "ABC"));
         assertFalse(IOCase.SENSITIVE.checkEquals("ABC", "Abc"));
+    }
 
+    @Test
+    void testEqualsInsensitiveCase() {
         assertTrue(IOCase.INSENSITIVE.checkEquals("ABC", "ABC"));
         assertTrue(IOCase.INSENSITIVE.checkEquals("ABC", "Abc"));
+    }
 
+    @Test
+    void testEqualsSystemCase() {
         assertTrue(IOCase.SYSTEM.checkEquals("ABC", "ABC"));
         assertEquals(WINDOWS, IOCase.SYSTEM.checkEquals("ABC", "Abc"));
     }
 
     @Test
-    void test_checkEquals_functionality() {
+    void testEqualsFunctionality() {
         assertFalse(IOCase.SENSITIVE.checkEquals("ABC", ""));
         assertFalse(IOCase.SENSITIVE.checkEquals("ABC", "A"));
         assertFalse(IOCase.SENSITIVE.checkEquals("ABC", "AB"));
@@ -149,58 +149,63 @@ class IOCaseTest {
     }
 
     @Test
-    void test_checkIndexOf_case() {
-        assertEquals(1,  IOCase.SENSITIVE.checkIndexOf("ABC", 0, "BC"));
+    void testIndexOfSensitiveCase() {
+        assertEquals(1, IOCase.SENSITIVE.checkIndexOf("ABC", 0, "BC"));
         assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABC", 0, "Bc"));
         assertEquals(-1, IOCase.SENSITIVE.checkIndexOf(null, 0, "Bc"));
         assertEquals(-1, IOCase.SENSITIVE.checkIndexOf(null, 0, null));
         assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABC", 0, null));
+    }
 
+    @Test
+    void testIndexOfInsensitiveCase() {
         assertEquals(1, IOCase.INSENSITIVE.checkIndexOf("ABC", 0, "BC"));
         assertEquals(1, IOCase.INSENSITIVE.checkIndexOf("ABC", 0, "Bc"));
+    }
 
+    @Test
+    void testIndexOfSystemCase() {
         assertEquals(1, IOCase.SYSTEM.checkIndexOf("ABC", 0, "BC"));
         assertEquals(WINDOWS ? 1 : -1, IOCase.SYSTEM.checkIndexOf("ABC", 0, "Bc"));
     }
 
     @Test
-    void test_checkIndexOf_functionality() {
-
+    void testIndexOfFunctionality() {
         // start
-        assertEquals(0,   IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "A"));
-        assertEquals(-1,  IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 1, "A"));
-        assertEquals(0,   IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "AB"));
-        assertEquals(-1,  IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 1, "AB"));
-        assertEquals(0,   IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "ABC"));
-        assertEquals(-1,  IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 1, "ABC"));
+        assertEquals(0, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "A"));
+        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 1, "A"));
+        assertEquals(0, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "AB"));
+        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 1, "AB"));
+        assertEquals(0, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "ABC"));
+        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 1, "ABC"));
 
         // middle
-        assertEquals(3,   IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "D"));
-        assertEquals(3,   IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 3, "D"));
-        assertEquals(-1,  IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 4, "D"));
-        assertEquals(3,   IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "DE"));
-        assertEquals(3,   IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 3, "DE"));
-        assertEquals(-1,  IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 4, "DE"));
-        assertEquals(3,   IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "DEF"));
-        assertEquals(3,   IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 3, "DEF"));
-        assertEquals(-1,  IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 4, "DEF"));
+        assertEquals(3, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "D"));
+        assertEquals(3, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 3, "D"));
+        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 4, "D"));
+        assertEquals(3, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "DE"));
+        assertEquals(3, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 3, "DE"));
+        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 4, "DE"));
+        assertEquals(3, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "DEF"));
+        assertEquals(3, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 3, "DEF"));
+        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 4, "DEF"));
 
         // end
-        assertEquals(9,   IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "J"));
-        assertEquals(9,   IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 8, "J"));
-        assertEquals(9,   IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 9, "J"));
-        assertEquals(8,   IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "IJ"));
-        assertEquals(8,   IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 8, "IJ"));
-        assertEquals(-1,  IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 9, "IJ"));
-        assertEquals(7,   IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 6, "HIJ"));
-        assertEquals(7,   IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 7, "HIJ"));
-        assertEquals(-1,  IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 8, "HIJ"));
+        assertEquals(9, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "J"));
+        assertEquals(9, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 8, "J"));
+        assertEquals(9, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 9, "J"));
+        assertEquals(8, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "IJ"));
+        assertEquals(8, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 8, "IJ"));
+        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 9, "IJ"));
+        assertEquals(7, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 6, "HIJ"));
+        assertEquals(7, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 7, "HIJ"));
+        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 8, "HIJ"));
 
         // not found
-        assertEquals(-1,   IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "DED"));
+        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "DED"));
 
         // too long
-        assertEquals(-1,   IOCase.SENSITIVE.checkIndexOf("DEF", 0, "ABCDEFGHIJ"));
+        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("DEF", 0, "ABCDEFGHIJ"));
 
         assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABC", 0, null));
         assertEquals(-1, IOCase.SENSITIVE.checkIndexOf(null, 0, "ABC"));
@@ -208,19 +213,25 @@ class IOCaseTest {
     }
 
     @Test
-    void test_checkRegionMatches_case() {
+    void testRegionMatchesSensitiveCase() {
         assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "AB"));
         assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "Ab"));
+    }
 
+    @Test
+    void testRegionMatchesInsensitiveCase() {
         assertTrue(IOCase.INSENSITIVE.checkRegionMatches("ABC", 0, "AB"));
         assertTrue(IOCase.INSENSITIVE.checkRegionMatches("ABC", 0, "Ab"));
+    }
 
+    @Test
+    void testRegionMatchesSystemCase() {
         assertTrue(IOCase.SYSTEM.checkRegionMatches("ABC", 0, "AB"));
         assertEquals(WINDOWS, IOCase.SYSTEM.checkRegionMatches("ABC", 0, "Ab"));
     }
 
     @Test
-    void test_checkRegionMatches_functionality() {
+    void testRegionMatchesFunctionality() {
         assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, ""));
         assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "A"));
         assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "AB"));
@@ -250,19 +261,25 @@ class IOCaseTest {
     }
 
     @Test
-    void test_checkStartsWith_case() {
+    void testStartsWithSensitiveCase() {
         assertTrue(IOCase.SENSITIVE.checkStartsWith("ABC", "AB"));
         assertFalse(IOCase.SENSITIVE.checkStartsWith("ABC", "Ab"));
+    }
 
+    @Test
+    void testStartsWithInsensitiveCase() {
         assertTrue(IOCase.INSENSITIVE.checkStartsWith("ABC", "AB"));
         assertTrue(IOCase.INSENSITIVE.checkStartsWith("ABC", "Ab"));
+    }
 
+    @Test
+    void testStartsWithSystemCase() {
         assertTrue(IOCase.SYSTEM.checkStartsWith("ABC", "AB"));
         assertEquals(WINDOWS, IOCase.SYSTEM.checkStartsWith("ABC", "Ab"));
     }
 
     @Test
-    void test_checkStartsWith_functionality() {
+    void testStartsWithFunctionality() {
         assertTrue(IOCase.SENSITIVE.checkStartsWith("ABC", ""));
         assertTrue(IOCase.SENSITIVE.checkStartsWith("ABC", "A"));
         assertTrue(IOCase.SENSITIVE.checkStartsWith("ABC", "AB"));
@@ -279,7 +296,7 @@ class IOCaseTest {
     }
 
     @Test
-    void test_forName() {
+    void testForName() {
         assertEquals(IOCase.SENSITIVE, IOCase.forName("Sensitive"));
         assertEquals(IOCase.INSENSITIVE, IOCase.forName("Insensitive"));
         assertEquals(IOCase.SYSTEM, IOCase.forName("System"));
@@ -288,70 +305,69 @@ class IOCaseTest {
     }
 
     @Test
-    void test_getName() {
+    void testGetName() {
         assertEquals("Sensitive", IOCase.SENSITIVE.getName());
         assertEquals("Insensitive", IOCase.INSENSITIVE.getName());
         assertEquals("System", IOCase.SYSTEM.getName());
     }
 
     @Test
-    void test_getScratchByteArray() {
+    void testGetScratchByteArray() {
         final byte[] array = IOUtils.getScratchByteArray();
-        assert0(array);
+        assertArrayElementsAreZero(array);
         Arrays.fill(array, (byte) 1);
-        assert0(IOUtils.getScratchCharArray());
+        assertArrayElementsAreZero(IOUtils.getScratchCharArray());
     }
 
     @Test
-    void test_getScratchByteArrayWriteOnly() {
+    void testGetScratchByteArrayWriteOnly() {
         final byte[] array = IOUtils.getScratchByteArrayWriteOnly();
-        assert0(array);
+        assertArrayElementsAreZero(array);
         Arrays.fill(array, (byte) 1);
-        assert0(IOUtils.getScratchCharArray());
+        assertArrayElementsAreZero(IOUtils.getScratchCharArray());
     }
 
     @Test
-    void test_getScratchCharArray() {
+    void testGetScratchCharArray() {
         final char[] array = IOUtils.getScratchCharArray();
-        assert0(array);
+        assertArrayElementsAreZero(array);
         Arrays.fill(array, (char) 1);
-        assert0(IOUtils.getScratchCharArray());
+        assertArrayElementsAreZero(IOUtils.getScratchCharArray());
     }
 
     @Test
-    void test_getScratchCharArrayWriteOnly() {
+    void testGetScratchCharArrayWriteOnly() {
         final char[] array = IOUtils.getScratchCharArrayWriteOnly();
-        assert0(array);
+        assertArrayElementsAreZero(array);
         Arrays.fill(array, (char) 1);
-        assert0(IOUtils.getScratchCharArray());
+        assertArrayElementsAreZero(IOUtils.getScratchCharArray());
     }
 
     @Test
-    void test_isCaseSensitive() {
+    void testIsCaseSensitive() {
         assertTrue(IOCase.SENSITIVE.isCaseSensitive());
         assertFalse(IOCase.INSENSITIVE.isCaseSensitive());
         assertEquals(!WINDOWS, IOCase.SYSTEM.isCaseSensitive());
     }
 
     @Test
-    void test_isCaseSensitive_static() {
+    void testIsCaseSensitiveStatic() {
         assertTrue(IOCase.isCaseSensitive(IOCase.SENSITIVE));
         assertFalse(IOCase.isCaseSensitive(IOCase.INSENSITIVE));
         assertEquals(!WINDOWS, IOCase.isCaseSensitive(IOCase.SYSTEM));
     }
 
     @Test
-    void test_serialization() throws Exception {
-        assertSame(IOCase.SENSITIVE, serialize(IOCase.SENSITIVE));
-        assertSame(IOCase.INSENSITIVE, serialize(IOCase.INSENSITIVE));
-        assertSame(IOCase.SYSTEM, serialize(IOCase.SYSTEM));
+    void testSerialization() throws Exception {
+        assertSame(IOCase.SENSITIVE, serializeIOCase(IOCase.SENSITIVE));
+        assertSame(IOCase.INSENSITIVE, serializeIOCase(IOCase.INSENSITIVE));
+        assertSame(IOCase.SYSTEM, serializeIOCase(IOCase.SYSTEM));
     }
 
     @Test
-    void test_toString() {
+    void testToString() {
         assertEquals("Sensitive", IOCase.SENSITIVE.toString());
         assertEquals("Insensitive", IOCase.INSENSITIVE.toString());
         assertEquals("System", IOCase.SYSTEM.toString());
     }
-
 }
