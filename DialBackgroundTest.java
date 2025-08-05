@@ -53,101 +53,207 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class DialBackgroundTest {
 
+    // Test data constants for better maintainability
+    private static final Color PRIMARY_COLOR = Color.RED;
+    private static final Color SECONDARY_COLOR = Color.YELLOW;
+    private static final Color ALTERNATE_COLOR = Color.GREEN;
+    
+    private static final GradientPaint TEST_GRADIENT = new GradientPaint(
+        1.0f, 2.0f, PRIMARY_COLOR, 
+        3.0f, 4.0f, SECONDARY_COLOR
+    );
+    
+    private static final GradientPaint ALTERNATE_GRADIENT = new GradientPaint(
+        1.0f, 2.0f, PRIMARY_COLOR, 
+        3.0f, 4.0f, ALTERNATE_COLOR
+    );
+    
+    private static final StandardGradientPaintTransformer TEST_TRANSFORMER = 
+        new StandardGradientPaintTransformer(GradientPaintTransformType.CENTER_VERTICAL);
+
     /**
-     * Confirm that the equals method can distinguish all the required fields.
+     * Tests that the equals method correctly distinguishes between different DialBackground configurations.
+     * This ensures that two backgrounds are equal only when all their properties match.
      */
     @Test
     public void testEquals() {
-        DialBackground b1 = new DialBackground();
-        DialBackground b2 = new DialBackground();
-        assertEquals(b1, b2);
+        // Given: Two identical default DialBackground instances
+        DialBackground defaultBackground1 = new DialBackground();
+        DialBackground defaultBackground2 = new DialBackground();
+        
+        // Then: They should be equal
+        assertEquals(defaultBackground1, defaultBackground2, 
+            "Two default DialBackground instances should be equal");
 
-        // paint
-        b1.setPaint(new GradientPaint(1.0f, 2.0f, Color.RED, 3.0f, 4.0f,
-                Color.YELLOW));
-        assertNotEquals(b1, b2);
-        b2.setPaint(new GradientPaint(1.0f, 2.0f, Color.RED, 3.0f, 4.0f,
-                Color.YELLOW));
-        assertEquals(b1, b2);
+        // When: First background gets a gradient paint
+        defaultBackground1.setPaint(TEST_GRADIENT);
+        
+        // Then: They should no longer be equal
+        assertNotEquals(defaultBackground1, defaultBackground2, 
+            "DialBackgrounds with different paints should not be equal");
+        
+        // When: Second background gets the same gradient paint
+        defaultBackground2.setPaint(TEST_GRADIENT);
+        
+        // Then: They should be equal again
+        assertEquals(defaultBackground1, defaultBackground2, 
+            "DialBackgrounds with identical gradient paints should be equal");
 
-        // gradient paint transformer
-        b1.setGradientPaintTransformer(new StandardGradientPaintTransformer(
-                GradientPaintTransformType.CENTER_VERTICAL));
-        assertNotEquals(b1, b2);
-        b2.setGradientPaintTransformer(new StandardGradientPaintTransformer(
-                GradientPaintTransformType.CENTER_VERTICAL));
-        assertEquals(b1, b2);
+        // When: First background gets a gradient paint transformer
+        defaultBackground1.setGradientPaintTransformer(TEST_TRANSFORMER);
+        
+        // Then: They should not be equal
+        assertNotEquals(defaultBackground1, defaultBackground2, 
+            "DialBackgrounds with different gradient transformers should not be equal");
+        
+        // When: Second background gets the same transformer
+        defaultBackground2.setGradientPaintTransformer(TEST_TRANSFORMER);
+        
+        // Then: They should be equal again
+        assertEquals(defaultBackground1, defaultBackground2, 
+            "DialBackgrounds with identical gradient transformers should be equal");
 
-        // check an inherited attribute
-        b1.setVisible(false);
-        assertNotEquals(b1, b2);
-        b2.setVisible(false);
-        assertEquals(b1, b2);
-
+        // When: Testing inherited attribute (visibility)
+        defaultBackground1.setVisible(false);
+        
+        // Then: They should not be equal
+        assertNotEquals(defaultBackground1, defaultBackground2, 
+            "DialBackgrounds with different visibility should not be equal");
+        
+        // When: Second background also becomes invisible
+        defaultBackground2.setVisible(false);
+        
+        // Then: They should be equal again
+        assertEquals(defaultBackground1, defaultBackground2, 
+            "DialBackgrounds with identical visibility should be equal");
     }
 
     /**
-     * Two objects that are equal are required to return the same hashCode.
+     * Tests that equal DialBackground objects produce the same hash code.
+     * This is required by the Java contract for hashCode and equals.
      */
     @Test
     public void testHashCode() {
-        DialBackground b1 = new DialBackground(Color.RED);
-        DialBackground b2 = new DialBackground(Color.RED);
-        assertEquals(b1, b2);
-        int h1 = b1.hashCode();
-        int h2 = b2.hashCode();
-        assertEquals(h1, h2);
+        // Given: Two DialBackground instances with the same color
+        DialBackground background1 = new DialBackground(PRIMARY_COLOR);
+        DialBackground background2 = new DialBackground(PRIMARY_COLOR);
+        
+        // When: They are equal
+        assertEquals(background1, background2, 
+            "Backgrounds with same color should be equal");
+        
+        // Then: Their hash codes should also be equal
+        int hashCode1 = background1.hashCode();
+        int hashCode2 = background2.hashCode();
+        assertEquals(hashCode1, hashCode2, 
+            "Equal DialBackground objects must have equal hash codes");
     }
 
     /**
-     * Confirm that cloning works.
-     * @throws java.lang.CloneNotSupportedException
+     * Tests that DialBackground objects can be properly cloned, ensuring:
+     * 1. The clone is a different object instance
+     * 2. The clone has the same class
+     * 3. The clone is equal to the original
+     * 4. The clone has independent event listeners
      */
     @Test
     public void testCloning() throws CloneNotSupportedException {
-        // test default instance
-        DialBackground b1 = new DialBackground();
-        DialBackground b2 = CloneUtils.clone(b1);
-        assertNotSame(b1, b2);
-        assertSame(b1.getClass(), b2.getClass());
-        assertEquals(b1, b2);
-
-        // test a customised instance
-        b1 = new DialBackground();
-        b1.setPaint(new GradientPaint(1.0f, 2.0f, Color.RED, 3.0f, 4.0f,
-                Color.GREEN));
-        b1.setGradientPaintTransformer(new StandardGradientPaintTransformer(
-                GradientPaintTransformType.CENTER_VERTICAL));
-        b2 = (DialBackground) b1.clone();
-        assertNotSame(b1, b2);
-        assertSame(b1.getClass(), b2.getClass());
-        assertEquals(b1, b2);
-
-        // check that the listener lists are independent
-        MyDialLayerChangeListener l1 = new MyDialLayerChangeListener();
-        b1.addChangeListener(l1);
-        assertTrue(b1.hasListener(l1));
-        assertFalse(b2.hasListener(l1));
+        testCloningOfDefaultInstance();
+        testCloningOfCustomizedInstance();
+        testCloneHasIndependentListeners();
+    }
+    
+    private void testCloningOfDefaultInstance() throws CloneNotSupportedException {
+        // Given: A default DialBackground instance
+        DialBackground originalBackground = new DialBackground();
+        
+        // When: Cloning the background
+        DialBackground clonedBackground = CloneUtils.clone(originalBackground);
+        
+        // Then: Verify clone properties
+        assertNotSame(originalBackground, clonedBackground, 
+            "Clone should be a different object instance");
+        assertSame(originalBackground.getClass(), clonedBackground.getClass(), 
+            "Clone should have the same class as original");
+        assertEquals(originalBackground, clonedBackground, 
+            "Clone should be equal to the original");
+    }
+    
+    private void testCloningOfCustomizedInstance() throws CloneNotSupportedException {
+        // Given: A customized DialBackground instance
+        DialBackground originalBackground = createCustomizedBackground();
+        
+        // When: Cloning the customized background
+        DialBackground clonedBackground = (DialBackground) originalBackground.clone();
+        
+        // Then: Verify clone properties
+        assertNotSame(originalBackground, clonedBackground, 
+            "Clone should be a different object instance");
+        assertSame(originalBackground.getClass(), clonedBackground.getClass(), 
+            "Clone should have the same class as original");
+        assertEquals(originalBackground, clonedBackground, 
+            "Clone should be equal to the original");
+    }
+    
+    private void testCloneHasIndependentListeners() throws CloneNotSupportedException {
+        // Given: An original background and its clone
+        DialBackground originalBackground = new DialBackground();
+        DialBackground clonedBackground = CloneUtils.clone(originalBackground);
+        
+        // When: Adding a listener to the original
+        MyDialLayerChangeListener testListener = new MyDialLayerChangeListener();
+        originalBackground.addChangeListener(testListener);
+        
+        // Then: Original should have the listener, clone should not
+        assertTrue(originalBackground.hasListener(testListener), 
+            "Original should have the added listener");
+        assertFalse(clonedBackground.hasListener(testListener), 
+            "Clone should have independent listener list");
     }
 
     /**
-     * Serialize an instance, restore it, and check for equality.
+     * Tests that DialBackground objects can be serialized and deserialized correctly,
+     * maintaining equality between the original and restored objects.
      */
     @Test
     public void testSerialization() {
-        // test a default instance
-        DialBackground b1 = new DialBackground();
-        DialBackground b2 = TestUtils.serialised(b1);
-        assertEquals(b1, b2);
-
-        // test a customised instance
-        b1 = new DialBackground();
-        b1.setPaint(new GradientPaint(1.0f, 2.0f, Color.RED, 3.0f, 4.0f, Color.GREEN));
-        b1.setGradientPaintTransformer(new StandardGradientPaintTransformer(
-                GradientPaintTransformType.CENTER_VERTICAL));
-
-        b2 = TestUtils.serialised(b1);
-        assertEquals(b1, b2);
+        testSerializationOfDefaultInstance();
+        testSerializationOfCustomizedInstance();
     }
-
+    
+    private void testSerializationOfDefaultInstance() {
+        // Given: A default DialBackground instance
+        DialBackground originalBackground = new DialBackground();
+        
+        // When: Serializing and deserializing
+        DialBackground deserializedBackground = TestUtils.serialised(originalBackground);
+        
+        // Then: Deserialized object should equal the original
+        assertEquals(originalBackground, deserializedBackground, 
+            "Deserialized default DialBackground should equal the original");
+    }
+    
+    private void testSerializationOfCustomizedInstance() {
+        // Given: A customized DialBackground instance
+        DialBackground originalBackground = createCustomizedBackground();
+        
+        // When: Serializing and deserializing
+        DialBackground deserializedBackground = TestUtils.serialised(originalBackground);
+        
+        // Then: Deserialized object should equal the original
+        assertEquals(originalBackground, deserializedBackground, 
+            "Deserialized customized DialBackground should equal the original");
+    }
+    
+    /**
+     * Creates a DialBackground with custom paint and gradient transformer for testing.
+     * 
+     * @return A customized DialBackground instance
+     */
+    private DialBackground createCustomizedBackground() {
+        DialBackground background = new DialBackground();
+        background.setPaint(ALTERNATE_GRADIENT);
+        background.setGradientPaintTransformer(TEST_TRANSFORMER);
+        return background;
+    }
 }
