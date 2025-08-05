@@ -43,19 +43,11 @@
  */
 package com.itextpdf.text.pdf.parser;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
-import com.itextpdf.text.DocumentException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.itextpdf.awt.geom.AffineTransform;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
@@ -66,11 +58,18 @@ import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfTextArray;
 import com.itextpdf.text.pdf.PdfWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
- * @author kevin
+ * Tests the {@link LocationTextExtractionStrategy} to ensure it correctly extracts and orders text
+ * based on its position, orientation, and styling on the PDF page.
  */
-public class LocationTextExtractionStrategyTest extends SimpleTextExtractionStrategyTest{
+public class LocationTextExtractionStrategyTest extends SimpleTextExtractionStrategyTest {
 
     @Override
     @Before
@@ -86,126 +85,212 @@ public class LocationTextExtractionStrategyTest extends SimpleTextExtractionStra
     public TextExtractionStrategy createRenderListenerForTest() {
         return new LocationTextExtractionStrategy();
     }
-    
-    @Test
-    public void testYPosition() throws Exception{
-        PdfReader r = createPdfWithOverlappingTextVertical(new String[]{"A", "B", "C", "D"}, new String[]{"AA", "BB", "CC", "DD"});
 
-        String text = PdfTextExtractor.getTextFromPage(r, 1, createRenderListenerForTest());
-        
-        Assert.assertEquals("A\nAA\nB\nBB\nC\nCC\nD\nDD", text);
-    }
-    
+    /**
+     * Tests that text positioned vertically is extracted in the correct top-to-bottom order,
+     * separated by newlines.
+     */
     @Test
-    public void testXPosition() throws Exception{
-        byte[] content = createPdfWithOverlappingTextHorizontal(new String[]{"A", "B", "C", "D"}, new String[]{"AA", "BB", "CC", "DD"});
-        PdfReader r = new PdfReader(content);
+    public void testExtractsTextInCorrectVerticalOrder() throws Exception {
+        // Arrange
+        String[] mainText = {"A", "B", "C", "D"};
+        String[] overlappingText = {"AA", "BB", "CC", "DD"};
+        PdfReader reader = createPdfWithOverlappingTextVertical(mainText, overlappingText);
+        String expectedText = "A\nAA\nB\nBB\nC\nCC\nD\nDD";
 
-        //TestResourceUtils.openBytesAsPdf(content);
-        
-        String text = PdfTextExtractor.getTextFromPage(r, 1, createRenderListenerForTest());
-        
-        Assert.assertEquals("A AA B BB C CC D DD", text);
-//        Assert.assertEquals("A\tAA\tB\tBB\tC\tCC\tD\tDD", text);
+        // Act
+        String actualText = PdfTextExtractor.getTextFromPage(reader, 1, createRenderListenerForTest());
+
+        // Assert
+        Assert.assertEquals("Text should be extracted in top-to-bottom order.", expectedText, actualText);
     }
 
+    /**
+     * Tests that text positioned horizontally is extracted in the correct left-to-right order,
+     * separated by spaces.
+     */
     @Test
-    public void testRotatedPage() throws Exception{
+    public void testExtractsTextInCorrectHorizontalOrderWithSpaces() throws Exception {
+        // Arrange
+        String[] text1 = {"A", "B", "C", "D"};
+        String[] text2 = {"AA", "BB", "CC", "DD"};
+        byte[] content = createPdfWithOverlappingTextHorizontal(text1, text2);
+        PdfReader reader = new PdfReader(content);
+        String expectedText = "A AA B BB C CC D DD";
+
+        // Act
+        String actualText = PdfTextExtractor.getTextFromPage(reader, 1, createRenderListenerForTest());
+
+        // Assert
+        Assert.assertEquals("Text should be extracted in left-to-right order with spaces.", expectedText, actualText);
+    }
+
+    /**
+     * Verifies that text is extracted correctly from a page that is rotated 90 degrees.
+     */
+    @Test
+    public void testExtractsTextFromPageRotated90Degrees() throws Exception {
+        // Arrange
         byte[] bytes = createSimplePdf(PageSize.LETTER.rotate(), "A\nB\nC\nD");
+        PdfReader reader = new PdfReader(bytes);
+        String expectedText = "A\nB\nC\nD";
 
-        PdfReader r = new PdfReader(bytes);
-        
-        String text = PdfTextExtractor.getTextFromPage(r, 1, createRenderListenerForTest());
-        
-        Assert.assertEquals("A\nB\nC\nD", text);
+        // Act
+        String actualText = PdfTextExtractor.getTextFromPage(reader, 1, createRenderListenerForTest());
+
+        // Assert
+        Assert.assertEquals("Text extraction should be correct on a 90-degree rotated page.", expectedText, actualText);
     }
-    
+
+    /**
+     * Verifies that text is extracted correctly from a page that is rotated 180 degrees.
+     */
     @Test
-    public void testRotatedPage2() throws Exception{
+    public void testExtractsTextFromPageRotated180Degrees() throws Exception {
+        // Arrange
         byte[] bytes = createSimplePdf(PageSize.LETTER.rotate().rotate(), "A\nB\nC\nD");
-        //TestResourceUtils.saveBytesToFile(bytes, new File("C:/temp/out.pdf"));
+        PdfReader reader = new PdfReader(bytes);
+        String expectedText = "A\nB\nC\nD";
 
-        PdfReader r = new PdfReader(bytes);
-        
-        String text = PdfTextExtractor.getTextFromPage(r, 1, createRenderListenerForTest());
-        
-        Assert.assertEquals("A\nB\nC\nD", text);
+        // Act
+        String actualText = PdfTextExtractor.getTextFromPage(reader, 1, createRenderListenerForTest());
+
+        // Assert
+        Assert.assertEquals("Text extraction should be correct on a 180-degree rotated page.", expectedText, actualText);
     }
 
+    /**
+     * Verifies that text is extracted correctly from a page that is rotated 270 degrees.
+     */
     @Test
-    public void testRotatedPage3() throws Exception{
+    public void testExtractsTextFromPageRotated270Degrees() throws Exception {
+        // Arrange
         byte[] bytes = createSimplePdf(PageSize.LETTER.rotate().rotate().rotate(), "A\nB\nC\nD");
-        //TestResourceUtils.saveBytesToFile(bytes, new File("C:/temp/out.pdf"));
+        PdfReader reader = new PdfReader(bytes);
+        String expectedText = "A\nB\nC\nD";
 
-        PdfReader r = new PdfReader(bytes);
-        
-        String text = PdfTextExtractor.getTextFromPage(r, 1, createRenderListenerForTest());
-        
-        Assert.assertEquals("A\nB\nC\nD", text);
+        // Act
+        String actualText = PdfTextExtractor.getTextFromPage(reader, 1, createRenderListenerForTest());
+
+        // Assert
+        Assert.assertEquals("Text extraction should be correct on a 270-degree rotated page.", expectedText, actualText);
     }
 
+    /**
+     * Tests that text within a rotated XObject is extracted and placed in the correct
+     * reading order relative to the surrounding text on the page.
+     */
     @Test
-    public void testExtractXObjectTextWithRotation() throws Exception {
-        //LocationAwareTextExtractingPdfContentRenderListener.DUMP_STATE = true;
-        String text1 = "X";
-        byte[] content = createPdfWithRotatedXObject(text1);
-        //TestResourceUtils.saveBytesToFile(content, new File("C:/temp/out.pdf"));
-        PdfReader r = new PdfReader(content);
-        
-        String text = PdfTextExtractor.getTextFromPage(r, 1, createRenderListenerForTest());
-        Assert.assertEquals("A\nB\nX\nC", text);
+    public void testExtractsTextFromRotatedXObjectInCorrectOrder() throws Exception {
+        // Arrange
+        byte[] content = createPdfWithRotatedXObject("X");
+        PdfReader reader = new PdfReader(content);
+        String expectedText = "A\nB\nX\nC";
+
+        // Act
+        String actualText = PdfTextExtractor.getTextFromPage(reader, 1, createRenderListenerForTest());
+
+        // Assert
+        Assert.assertEquals("Text from the rotated XObject should be inserted in the correct order.", expectedText, actualText);
     }
 
+    /**
+     * Tests that text with negative character spacing, which causes characters to overlap,
+     * is still extracted as a single, coherent word.
+     */
     @Test
-    public void testNegativeCharacterSpacing() throws Exception{
+    public void testExtractsTextWithNegativeCharacterSpacingAsSingleWord() throws Exception {
+        // Arrange
         byte[] content = createPdfWithNegativeCharSpacing("W", 200, "A");
-        //TestResourceUtils.openBytesAsPdf(content);
-        PdfReader r= new PdfReader(content);
-        String text = PdfTextExtractor.getTextFromPage(r, 1, createRenderListenerForTest());
-        Assert.assertEquals("WA", text);
+        PdfReader reader = new PdfReader(content);
+        String expectedText = "WA";
+
+        // Act
+        String actualText = PdfTextExtractor.getTextFromPage(reader, 1, createRenderListenerForTest());
+
+        // Assert
+        Assert.assertEquals("Text with negative character spacing should be merged into one word.", expectedText, actualText);
     }
-    
+
+    /**
+     * This is a sanity check to ensure the underlying vector math, used by the strategy
+     * to determine the spatial relationship between text chunks, is functioning as expected.
+     * It verifies the dot product calculation for parallel and anti-parallel vectors.
+     */
     @Test
-    public void testSanityCheckOnVectorMath(){
+    public void testVectorMathForChunkComparison_IsCorrect() {
+        // Arrange
         Vector start = new Vector(0, 0, 1);
         Vector end = new Vector(1, 0, 1);
+        Vector normalizedDirection = end.subtract(start).normalize();
+
         Vector antiparallelStart = new Vector(0.9f, 0, 1);
         Vector parallelStart = new Vector(1.1f, 0, 1);
-        
-        float rsltAntiParallel = antiparallelStart.subtract(end).dot(end.subtract(start).normalize());
-        Assert.assertEquals(-0.1f, rsltAntiParallel, 0.0001);
-        
-        float rsltParallel = parallelStart.subtract(end).dot(end.subtract(start).normalize());
-        Assert.assertEquals(0.1f, rsltParallel, 0.0001);
 
+        // Act
+        float rsltAntiParallel = antiparallelStart.subtract(end).dot(normalizedDirection);
+        float rsltParallel = parallelStart.subtract(end).dot(normalizedDirection);
+
+        // Assert
+        Assert.assertEquals("Anti-parallel vector projection should be negative.", -0.1f, rsltAntiParallel, 0.0001);
+        Assert.assertEquals("Parallel vector projection should be positive.", 0.1f, rsltParallel, 0.0001);
     }
-    
+
+    /**
+     * Tests that text formatted as a superscript is extracted as part of the same word,
+     * without any extra spaces or newlines.
+     */
     @Test
-    public void testSuperscript() throws Exception {
+    public void testExtractsSuperscriptTextAsPartOfSameWord() throws Exception {
+        // Arrange
         byte[] content = createPdfWithSupescript("Hel", "lo");
-        //TestResourceUtils.openBytesAsPdf(content);
-        PdfReader r= new PdfReader(content);
-        String text = PdfTextExtractor.getTextFromPage(r, 1, createRenderListenerForTest());
-        Assert.assertEquals("Hello", text);
-    	
+        PdfReader reader = new PdfReader(content);
+        String expectedText = "Hello";
 
-	}
+        // Act
+        String actualText = PdfTextExtractor.getTextFromPage(reader, 1, createRenderListenerForTest());
 
+        // Assert
+        Assert.assertEquals("Superscript text should be appended to the preceding text.", expectedText, actualText);
+    }
+
+    /**
+     * Tests text extraction in a complex scenario where character spacing adjustments
+     * are used, which can be challenging for extraction algorithms.
+     */
     @Test
-    public void testFontSpacingEqualsCharSpacing() throws Exception {
+    public void testExtractsTextWithComplexSpacingCorrectly() throws Exception {
+        // Arrange
         byte[] content = createPdfWithFontSpacingEqualsCharSpacing();
-        PdfReader r = new PdfReader(content);
-        String text = PdfTextExtractor.getTextFromPage(r, 1, createRenderListenerForTest());
-        Assert.assertEquals("Preface", text);
+        PdfReader reader = new PdfReader(content);
+        String expectedText = "Preface";
+
+        // Act
+        String actualText = PdfTextExtractor.getTextFromPage(reader, 1, createRenderListenerForTest());
+
+        // Assert
+        Assert.assertEquals("Text with complex character spacing should be extracted correctly.", expectedText, actualText);
     }
 
+    /**
+     * Tests that text written with a very small font size is still extracted correctly,
+     * along with other text of a normal font size.
+     */
     @Test
-    public void testLittleFontSize() throws Exception {
+    public void testExtractsTextWithVerySmallAndNormalFontSizes() throws Exception {
+        // Arrange
         byte[] content = createPdfWithLittleFontSize();
-        PdfReader r = new PdfReader(content);
-        String text = PdfTextExtractor.getTextFromPage(r, 1, createRenderListenerForTest());
-        Assert.assertEquals("Preface Preface ", text);
+        PdfReader reader = new PdfReader(content);
+        String expectedText = "Preface Preface ";
+
+        // Act
+        String actualText = PdfTextExtractor.getTextFromPage(reader, 1, createRenderListenerForTest());
+
+        // Assert
+        Assert.assertEquals("Text should be extracted correctly regardless of font size.", expectedText, actualText);
     }
+
+    // region PDF Creation Helper Methods
 
     private byte[] createPdfWithNegativeCharSpacing(String str1, float charSpacing, String str2) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -213,7 +298,7 @@ public class LocationTextExtractionStrategyTest extends SimpleTextExtractionStra
         PdfWriter writer = PdfWriter.getInstance(doc, baos);
         writer.setCompressionLevel(0);
         doc.open();
-        
+
         PdfContentByte canvas = writer.getDirectContent();
         canvas.beginText();
         canvas.setFontAndSize(BaseFont.createFont(), 12);
@@ -224,12 +309,12 @@ public class LocationTextExtractionStrategyTest extends SimpleTextExtractionStra
         ta.add(str2);
         canvas.showText(ta);
         canvas.endText();
-        
+
         doc.close();
-        
+
         return baos.toByteArray();
     }
-    
+
     private byte[] createPdfWithRotatedXObject(String xobjectText) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Document doc = new Document();
@@ -239,60 +324,58 @@ public class LocationTextExtractionStrategyTest extends SimpleTextExtractionStra
 
         doc.add(new Paragraph("A"));
         doc.add(new Paragraph("B"));
-        
+
         boolean rotate = true;
-        
+
         PdfTemplate template = writer.getDirectContent().createTemplate(20, 100);
         template.setColorStroke(BaseColor.GREEN);
         template.rectangle(0, 0, template.getWidth(), template.getHeight());
         template.stroke();
         AffineTransform tx = new AffineTransform();
-        if (rotate){
+        if (rotate) {
             tx.translate(0, template.getHeight());
-            tx.rotate(-90/180f*Math.PI);
+            tx.rotate(-90 / 180f * Math.PI);
         }
         template.transform(tx);
         template.beginText();
         template.setFontAndSize(BaseFont.createFont(), 12);
         if (rotate)
-            template.moveText(0, template.getWidth()-12);
+            template.moveText(0, template.getWidth() - 12);
         else
-            template.moveText(0, template.getHeight()-12);
+            template.moveText(0, template.getHeight() - 12);
         template.showText(xobjectText);
 
         template.endText();
-        
+
         Image xobjectImage = Image.getInstance(template);
         if (rotate)
             xobjectImage.setRotationDegrees(90);
         doc.add(xobjectImage);
-        
+
         doc.add(new Paragraph("C"));
-        
+
         doc.close();
-        
+
         return baos.toByteArray();
-    }    
-    
-    private byte[] createSimplePdf(Rectangle pageSize, final String... text) throws Exception{
-            final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-
-            final Document document = new Document(pageSize);
-            PdfWriter.getInstance(document, byteStream);
-            document.open();
-            for (String string : text) {
-                document.add(new Paragraph(string));
-                document.newPage();
-            }
-
-            document.close();
-
-            final byte[] pdfBytes = byteStream.toByteArray();
-
-            return pdfBytes;
     }
-    
-    protected byte[] createPdfWithOverlappingTextHorizontal(String[] text1, String[] text2) throws Exception{
+
+    private byte[] createSimplePdf(Rectangle pageSize, final String... text) throws Exception {
+        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+
+        final Document document = new Document(pageSize);
+        PdfWriter.getInstance(document, byteStream);
+        document.open();
+        for (String string : text) {
+            document.add(new Paragraph(string));
+            document.newPage();
+        }
+
+        document.close();
+
+        return byteStream.toByteArray();
+    }
+
+    protected byte[] createPdfWithOverlappingTextHorizontal(String[] text1, String[] text2) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Document doc = new Document();
         PdfWriter writer = PdfWriter.getInstance(doc, baos);
@@ -302,32 +385,30 @@ public class LocationTextExtractionStrategyTest extends SimpleTextExtractionStra
         PdfContentByte canvas = writer.getDirectContent();
         float ystart = 500;
         float xstart = 50;
-        
+
         canvas.beginText();
         canvas.setFontAndSize(BaseFont.createFont(), 12);
         float x = xstart;
         float y = ystart;
-        for(String text : text1){
+        for (String text : text1) {
             canvas.showTextAligned(PdfContentByte.ALIGN_LEFT, text, x, y, 0);
             x += 70.0;
         }
 
         x = xstart + 12;
         y = ystart;
-        for(String text : text2){
+        for (String text : text2) {
             canvas.showTextAligned(PdfContentByte.ALIGN_LEFT, text, x, y, 0);
             x += 70.0;
         }
         canvas.endText();
-        
+
         doc.close();
-        
-        
+
         return baos.toByteArray();
-        
-    }    
-    
-    private PdfReader createPdfWithOverlappingTextVertical(String[] text1, String[] text2) throws Exception{
+    }
+
+    private PdfReader createPdfWithOverlappingTextVertical(String[] text1, String[] text2) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Document doc = new Document();
         PdfWriter writer = PdfWriter.getInstance(doc, baos);
@@ -336,30 +417,29 @@ public class LocationTextExtractionStrategyTest extends SimpleTextExtractionStra
 
         PdfContentByte canvas = writer.getDirectContent();
         float ystart = 500;
-        
+
         canvas.beginText();
         canvas.setFontAndSize(BaseFont.createFont(), 12);
         float x = 50;
         float y = ystart;
-        for(String text : text1){
+        for (String text : text1) {
             canvas.showTextAligned(PdfContentByte.ALIGN_LEFT, text, x, y, 0);
             y -= 25.0;
         }
 
         y = ystart - 13;
-        for(String text : text2){
+        for (String text : text2) {
             canvas.showTextAligned(PdfContentByte.ALIGN_LEFT, text, x, y, 0);
             y -= 25.0;
         }
         canvas.endText();
-        
+
         doc.close();
-        
+
         return new PdfReader(baos.toByteArray());
-        
-    }    
-    
-    private byte[] createPdfWithSupescript(String regularText, String superscriptText) throws Exception{
+    }
+
+    private byte[] createPdfWithSupescript(String regularText, String superscriptText) throws Exception {
         final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 
         final Document document = new Document();
@@ -372,9 +452,7 @@ public class LocationTextExtractionStrategyTest extends SimpleTextExtractionStra
 
         document.close();
 
-        final byte[] pdfBytes = byteStream.toByteArray();
-
-        return pdfBytes;
+        return byteStream.toByteArray();
     }
 
     private byte[] createPdfWithFontSpacingEqualsCharSpacing() throws DocumentException, IOException {
@@ -451,4 +529,5 @@ public class LocationTextExtractionStrategyTest extends SimpleTextExtractionStra
 
         return baos.toByteArray();
     }
+    // endregion
 }
