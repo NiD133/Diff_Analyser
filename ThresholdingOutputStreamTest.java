@@ -42,77 +42,68 @@ class ThresholdingOutputStreamTest {
      *
      * @param out the stream to test.
      * @param expectedThreshold the expected threshold.
-     * @param expectedByteCount the expected byte count.
+     * @param expectedByeCount the expected byte count.
      */
-    static void assertInitialState(final ThresholdingOutputStream out, final int expectedThreshold, final long expectedByteCount) {
-        assertFalse(out.isThresholdExceeded(), "Threshold should not be exceeded initially");
-        assertEquals(expectedThreshold, out.getThreshold(), "Incorrect threshold value");
-        assertEquals(expectedByteCount, out.getByteCount(), "Incorrect initial byte count");
+    static void assertThresholdingInitialState(final ThresholdingOutputStream out, final int expectedThreshold, final int expectedByeCount) {
+        assertFalse(out.isThresholdExceeded());
+        assertEquals(expectedThreshold, out.getThreshold());
+        assertEquals(expectedByeCount, out.getByteCount());
     }
 
     @Test
-    void resetByteCount_ShouldResetCounterAndAllowReTriggeringThresholdEvent() throws IOException {
+    void testResetByteCount() throws IOException {
         final int threshold = 1;
-        final AtomicInteger eventCount = new AtomicInteger();
-        try (ByteArrayOutputStream os = new ByteArrayOutputStream();
-             ThresholdingOutputStream out = new ThresholdingOutputStream(threshold, tos -> {
-                 eventCount.incrementAndGet();
-                 tos.resetByteCount();
-             }, o -> os)) {
-
-            assertInitialState(out, threshold, 0);
-
-            // First write (count=1): reaches threshold but reset immediately
+        final AtomicInteger counter = new AtomicInteger();
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream(); ThresholdingOutputStream out = new ThresholdingOutputStream(threshold, tos -> {
+            counter.incrementAndGet();
+            tos.resetByteCount();
+        }, o -> os)) {
+            assertThresholdingInitialState(out, threshold, 0);
+            assertEquals(0, counter.get());
             out.write('a');
-            assertFalse(out.isThresholdExceeded(), "Threshold should not be exceeded after reset");
-            assertEquals(0, eventCount.get(), "Event should not be triggered until next write");
-
-            // Second write (count=1 again): should re-trigger threshold event
+            assertFalse(out.isThresholdExceeded());
             out.write('a');
-            assertEquals(1, eventCount.get(), "Threshold event should be triggered");
-            assertFalse(out.isThresholdExceeded(), "Threshold should not be exceeded after reset");
-
-            // Subsequent writes continue to trigger events
+            assertEquals(1, counter.get());
+            assertFalse(out.isThresholdExceeded());
             out.write('a');
             out.write('a');
-            assertEquals(3, eventCount.get(), "All threshold events should be counted");
+            assertEquals(3, counter.get());
         }
     }
 
     @Test
-    void resetByteCount_WithBrokenOutputStream_ShouldFailGracefully() {
+    void testResetByteCountBrokenOutputStream() {
         final int threshold = 1;
-        final AtomicInteger eventCount = new AtomicInteger();
-        final IOException expected = assertThrows(IOException.class, () -> {
-            try (ThresholdingOutputStream out = new ThresholdingOutputStream(threshold, tos -> {
-                eventCount.incrementAndGet();
+        final AtomicInteger counter = new AtomicInteger();
+        final IOException e = assertThrows(IOException.class, () -> {
+            try (ByteArrayOutputStream os = new ByteArrayOutputStream(); ThresholdingOutputStream out = new ThresholdingOutputStream(threshold, tos -> {
+                counter.incrementAndGet();
                 tos.resetByteCount();
             }, o -> BrokenOutputStream.INSTANCE)) {
-
-                assertInitialState(out, threshold, 0);
-
-                // First write fails (broken stream)
+                assertThresholdingInitialState(out, threshold, 0);
+                assertEquals(0, counter.get());
                 assertThrows(IOException.class, () -> out.write('a'));
-                assertFalse(out.isThresholdExceeded(), "Threshold should not be exceeded on broken stream");
-                
-                // Second write fails without triggering threshold event
+                assertFalse(out.isThresholdExceeded());
                 assertThrows(IOException.class, () -> out.write('a'));
-                assertEquals(0, eventCount.get(), "Threshold event should not be triggered");
+                assertEquals(0, counter.get());
+                assertFalse(out.isThresholdExceeded());
+                assertThrows(IOException.class, () -> out.write('a'));
+                assertThrows(IOException.class, () -> out.write('a'));
+                assertEquals(0, counter.get());
             }
         });
-
-        assertEquals("Broken output stream: close()", expected.getMessage());
+        // Should only happen on close
+        assertEquals("Broken output stream: close()", e.getMessage());
     }
 
     @Test
-    void setByteCount_WhenUsingGetOutputStream_ShouldStartCountingFromInitialValue() throws IOException {
-        final AtomicBoolean thresholdReached = new AtomicBoolean();
-        final int initialCount = 2;
+    void testSetByteCountOutputStream() throws IOException {
+        final AtomicBoolean reached = new AtomicBoolean();
+        final int initCount = 2;
         final int threshold = 3;
-        
         try (ThresholdingOutputStream out = new ThresholdingOutputStream(threshold) {
             {
-                setByteCount(initialCount);
+                setByteCount(initCount);
             }
 
             @Override
@@ -122,27 +113,27 @@ class ThresholdingOutputStreamTest {
 
             @Override
             protected void thresholdReached() throws IOException {
-                thresholdReached.set(true);
+                reached.set(true);
             }
         }) {
-            assertInitialState(out, threshold, initialCount);
-            
-            // Write 1 byte (total=3): reaches threshold
+            assertThresholdingInitialState(out, threshold, initCount);
             out.write('a');
-            assertTrue(thresholdReached.get(), "Threshold should be reached");
-            assertTrue(out.isThresholdExceeded(), "Threshold should be exceeded");
+            assertFalse(reached.get());
+            assertFalse(out.isThresholdExceeded());
+            out.write('a');
+            assertTrue(reached.get());
+            assertTrue(out.isThresholdExceeded());
         }
     }
 
     @Test
-    void setByteCount_WhenUsingGetStream_ShouldStartCountingFromInitialValue() throws IOException {
-        final AtomicBoolean thresholdReached = new AtomicBoolean();
-        final int initialCount = 2;
+    void testSetByteCountStream() throws IOException {
+        final AtomicBoolean reached = new AtomicBoolean();
+        final int initCount = 2;
         final int threshold = 3;
-        
         try (ThresholdingOutputStream out = new ThresholdingOutputStream(threshold) {
             {
-                setByteCount(initialCount);
+                setByteCount(initCount);
             }
 
             @Override
@@ -152,177 +143,151 @@ class ThresholdingOutputStreamTest {
 
             @Override
             protected void thresholdReached() throws IOException {
-                thresholdReached.set(true);
+                reached.set(true);
             }
         }) {
-            assertInitialState(out, threshold, initialCount);
-            
-            // Write 1 byte (total=3): reaches threshold
+            assertThresholdingInitialState(out, threshold, initCount);
             out.write('a');
-            assertTrue(thresholdReached.get(), "Threshold should be reached");
-            assertTrue(out.isThresholdExceeded(), "Threshold should be exceeded");
+            assertFalse(reached.get());
+            assertFalse(out.isThresholdExceeded());
+            out.write('a');
+            assertTrue(reached.get());
+            assertTrue(out.isThresholdExceeded());
         }
     }
 
     @Test
-    void thresholdConsumer_WhenNull_ShouldStillExceedThreshold() throws IOException {
+    void testThresholdIOConsumer() throws IOException {
         final int threshold = 1;
-        try (ThresholdingOutputStream out = new ThresholdingOutputStream(threshold, null, 
+        // Null threshold consumer
+        try (ThresholdingOutputStream out = new ThresholdingOutputStream(threshold, null,
             os -> new ByteArrayOutputStream(4))) {
-            
-            assertInitialState(out, threshold, 0);
-            
-            // First write doesn't exceed threshold
+            assertThresholdingInitialState(out, threshold, 0);
             out.write('a');
-            assertFalse(out.isThresholdExceeded(), "Threshold should not be exceeded");
-            
-            // Second write exceeds threshold
+            assertFalse(out.isThresholdExceeded());
             out.write('a');
-            assertTrue(out.isThresholdExceeded(), "Threshold should be exceeded");
+            assertTrue(out.isThresholdExceeded());
         }
-    }
-
-    @Test
-    void thresholdConsumer_WhenOutputStreamGetterIsNull_ShouldStillTriggerEvent() throws IOException {
-        final AtomicBoolean eventTriggered = new AtomicBoolean();
-        final int threshold = 1;
-        
-        try (ThresholdingOutputStream out = new ThresholdingOutputStream(threshold, 
-            os -> eventTriggered.set(true), 
-            null)) {
-            
-            assertInitialState(out, threshold, 0);
-            
-            // First write doesn't exceed threshold
+        // Null output stream function
+        final AtomicBoolean reached = new AtomicBoolean();
+        reached.set(false);
+        try (ThresholdingOutputStream out = new ThresholdingOutputStream(threshold, os -> reached.set(true), null)) {
+            assertThresholdingInitialState(out, threshold, 0);
             out.write('a');
-            assertFalse(eventTriggered.get(), "Event should not be triggered");
-            assertFalse(out.isThresholdExceeded(), "Threshold should not be exceeded");
-            
-            // Second write exceeds threshold and triggers event
+            assertFalse(reached.get());
+            assertFalse(out.isThresholdExceeded());
             out.write('a');
-            assertTrue(eventTriggered.get(), "Event should be triggered");
-            assertTrue(out.isThresholdExceeded(), "Threshold should be exceeded");
+            assertTrue(reached.get());
+            assertTrue(out.isThresholdExceeded());
         }
-    }
-
-    @Test
-    void thresholdConsumer_WithValidConsumers_ShouldTriggerEventWhenThresholdExceeded() throws IOException {
-        final AtomicBoolean eventTriggered = new AtomicBoolean();
-        final int threshold = 1;
-        
-        try (ThresholdingOutputStream out = new ThresholdingOutputStream(threshold, 
-            os -> eventTriggered.set(true),
+        // non-null inputs.
+        reached.set(false);
+        try (ThresholdingOutputStream out = new ThresholdingOutputStream(threshold, os -> reached.set(true),
             os -> new ByteArrayOutputStream(4))) {
-            
-            assertInitialState(out, threshold, 0);
-            
-            // First write doesn't exceed threshold
+            assertThresholdingInitialState(out, threshold, 0);
             out.write('a');
-            assertFalse(eventTriggered.get(), "Event should not be triggered");
-            assertFalse(out.isThresholdExceeded(), "Threshold should not be exceeded");
-            
-            // Second write exceeds threshold and triggers event
+            assertFalse(reached.get());
+            assertFalse(out.isThresholdExceeded());
             out.write('a');
-            assertTrue(eventTriggered.get(), "Event should be triggered");
-            assertTrue(out.isThresholdExceeded(), "Threshold should be exceeded");
+            assertTrue(reached.get());
+            assertTrue(out.isThresholdExceeded());
         }
     }
 
     @Test
-    void thresholdConsumer_ThrowingIOException_ShouldPropagateException() throws IOException {
+    void testThresholdIOConsumerIOException() throws IOException {
         final int threshold = 1;
-        try (ThresholdingOutputStream out = new ThresholdingOutputStream(threshold, 
-            os -> { throw new IOException("Threshold reached"); },
-            os -> new ByteArrayOutputStream(4))) {
-            
-            assertInitialState(out, threshold, 0);
-            
-            // First write doesn't exceed threshold
+        try (ThresholdingOutputStream out = new ThresholdingOutputStream(threshold, os -> {
+            throw new IOException("Threshold reached.");
+        }, os -> new ByteArrayOutputStream(4))) {
+            assertThresholdingInitialState(out, threshold, 0);
             out.write('a');
-            assertFalse(out.isThresholdExceeded(), "Threshold should not be exceeded");
-            
-            // Second write should throw during threshold event
-            assertThrows(IOException.class, () -> out.write('a'), "Should throw during threshold event");
-            assertFalse(out.isThresholdExceeded(), "Threshold should remain unexceeded after error");
+            assertFalse(out.isThresholdExceeded());
+            assertThrows(IOException.class, () -> out.write('a'));
+            assertFalse(out.isThresholdExceeded());
         }
     }
 
     @Test
-    void thresholdConsumer_ThrowingUncheckedException_ShouldPropagateException() throws IOException {
+    void testThresholdIOConsumerUncheckedException() throws IOException {
         final int threshold = 1;
-        try (ThresholdingOutputStream out = new ThresholdingOutputStream(threshold, 
-            os -> { throw new IllegalStateException("Threshold reached"); },
-            os -> new ByteArrayOutputStream(4))) {
-            
-            assertInitialState(out, threshold, 0);
-            
-            // First write doesn't exceed threshold
+        try (ThresholdingOutputStream out = new ThresholdingOutputStream(threshold, os -> {
+            throw new IllegalStateException("Threshold reached.");
+        }, os -> new ByteArrayOutputStream(4))) {
+            assertThresholdingInitialState(out, threshold, 0);
             out.write('a');
-            assertFalse(out.isThresholdExceeded(), "Threshold should not be exceeded");
-            
-            // Second write should throw during threshold event
-            assertThrows(IllegalStateException.class, () -> out.write('a'), "Should throw during threshold event");
-            assertFalse(out.isThresholdExceeded(), "Threshold should remain unexceeded after error");
+            assertFalse(out.isThresholdExceeded());
+            assertThrows(IllegalStateException.class, () -> out.write('a'));
+            assertFalse(out.isThresholdExceeded());
             assertInstanceOf(ByteArrayOutputStream.class, out.getOutputStream());
+            assertFalse(out.isThresholdExceeded());
         }
     }
 
+    /**
+     * Tests the case where the threshold is negative.
+     * The threshold is not reached until something is written to the stream.
+     */
     @Test
-    void negativeThreshold_ShouldTriggerEventImmediatelyOnFirstWrite() throws IOException {
-        final AtomicBoolean eventTriggered = new AtomicBoolean();
+    void testThresholdLessThanZero() throws IOException {
+        final AtomicBoolean reached = new AtomicBoolean();
         try (ThresholdingOutputStream out = new ThresholdingOutputStream(-1) {
             @Override
             protected void thresholdReached() throws IOException {
-                eventTriggered.set(true);
+                reached.set(true);
             }
         }) {
-            assertInitialState(out, 0, 0); // Negative threshold becomes 0
-            
-            // First write should immediately trigger threshold
+            assertThresholdingInitialState(out, 0, 0);
+            assertFalse(reached.get());
             out.write(89);
-            assertTrue(eventTriggered.get(), "Threshold event should be triggered");
-            assertTrue(out.isThresholdExceeded(), "Threshold should be exceeded");
+            assertTrue(reached.get());
+            assertTrue(out.isThresholdExceeded());
             assertInstanceOf(NullOutputStream.class, out.getOutputStream());
+            assertTrue(out.isThresholdExceeded());
         }
     }
 
     @Test
-    void zeroThreshold_ShouldTriggerEventImmediatelyOnFirstWrite() throws IOException {
-        final AtomicBoolean eventTriggered = new AtomicBoolean();
+    void testThresholdZero() throws IOException {
+        final AtomicBoolean reached = new AtomicBoolean();
         final int threshold = 0;
         try (ThresholdingOutputStream out = new ThresholdingOutputStream(threshold) {
             @Override
             protected void thresholdReached() throws IOException {
-                eventTriggered.set(true);
+                reached.set(true);
             }
         }) {
-            assertInitialState(out, threshold, 0);
-            
-            // First write should immediately trigger threshold
+            assertThresholdingInitialState(out, threshold, 0);
             out.write(89);
-            assertTrue(eventTriggered.get(), "Threshold event should be triggered");
-            assertTrue(out.isThresholdExceeded(), "Threshold should be exceeded");
+            assertTrue(reached.get());
+            assertTrue(out.isThresholdExceeded());
             assertInstanceOf(NullOutputStream.class, out.getOutputStream());
+            assertTrue(out.isThresholdExceeded());
         }
     }
 
+    /**
+     * Tests the case where no bytes are written.
+     * The threshold is not reached until something is written to the stream.
+     */
     @Test
-    void writingZeroBytes_ShouldNotTriggerThresholdEvent() throws IOException {
-        final AtomicBoolean eventTriggered = new AtomicBoolean();
+    void testThresholdZeroWrite() throws IOException {
+        final AtomicBoolean reached = new AtomicBoolean();
         final int threshold = 7;
         try (ThresholdingOutputStream out = new ThresholdingOutputStream(threshold) {
             @Override
             protected void thresholdReached() throws IOException {
-                eventTriggered.set(true);
+                super.thresholdReached();
+                reached.set(true);
             }
         }) {
-            assertInitialState(out, threshold, 0);
-            
-            // Writing empty array shouldn't trigger threshold
+            assertThresholdingInitialState(out, threshold, 0);
+            assertFalse(reached.get());
             out.write(new byte[0]);
-            assertFalse(eventTriggered.get(), "Threshold event should not be triggered");
-            assertFalse(out.isThresholdExceeded(), "Threshold should not be exceeded");
+            assertFalse(out.isThresholdExceeded());
+            assertFalse(reached.get());
             assertInstanceOf(NullOutputStream.class, out.getOutputStream());
+            assertFalse(out.isThresholdExceeded());
         }
     }
 }
