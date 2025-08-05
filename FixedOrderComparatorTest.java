@@ -16,74 +16,241 @@
  */
 package org.apache.commons.collections4.comparators;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test class for FixedOrderComparator.
+ * Tests for FixedOrderComparator.
  */
+@DisplayName("FixedOrderComparator")
 class FixedOrderComparatorTest extends AbstractComparatorTest<String> {
 
+    /**
+     * Top cities of the world, by population including metro areas.
+     * Used as the basis for the fixed order in tests.
+     */
+    private static final String[] TOP_CITIES = {
+        "Tokyo", "Mexico City", "Mumbai", "Sao Paulo", "New York",
+        "Shanghai", "Lagos", "Los Angeles", "Calcutta", "Buenos Aires"
+    };
+
     @Nested
-    class Equals {
+    @DisplayName("Constructor")
+    class ConstructorTests {
 
         @Test
-        void expectFalseWhenBothComparatorsWithDifferentItems() {
-            final FixedOrderComparator<Integer> comparator1 = new FixedOrderComparator<>(1, 2, 3);
-            final FixedOrderComparator<Integer> comparator2 = new FixedOrderComparator<>(2, 3, 4);
-            assertFalse(comparator1.equals(comparator2));
+        void shouldCreateComparatorFromArrayAndSortCorrectly() {
+            // Arrange
+            final Comparator<String> comparator = new FixedOrderComparator<>(TOP_CITIES);
+
+            // Act & Assert
+            assertSortsCorrectly(TOP_CITIES, comparator);
         }
 
         @Test
-        void expectFalseWhenBothComparatorsWithDifferentUnknownObjectBehavior() {
+        void shouldCreateComparatorFromListAndSortCorrectly() {
+            // Arrange
+            final List<String> cityList = Arrays.asList(TOP_CITIES);
+            final Comparator<String> comparator = new FixedOrderComparator<>(cityList);
+
+            // Act & Assert
+            assertSortsCorrectly(TOP_CITIES, comparator);
+        }
+
+        @Test
+        void shouldDefensivelyCopyInputArray() {
+            // Arrange
+            final String[] cityArray = TOP_CITIES.clone();
+            final Comparator<String> comparator = new FixedOrderComparator<>(cityArray);
+
+            // Act: Modify the original array after comparator creation
+            cityArray[0] = "Brighton";
+
+            // Assert: The comparator's order remains unchanged
+            assertSortsCorrectly(TOP_CITIES, comparator);
+        }
+
+        @Test
+        void shouldDefensivelyCopyInputList() {
+            // Arrange
+            final List<String> cityList = new LinkedList<>(Arrays.asList(TOP_CITIES));
+            final Comparator<String> comparator = new FixedOrderComparator<>(cityList);
+
+            // Act: Modify the original list after comparator creation
+            cityList.set(0, "Brighton");
+
+            // Assert: The comparator's order remains unchanged
+            assertSortsCorrectly(TOP_CITIES, comparator);
+        }
+    }
+
+    @Nested
+    @DisplayName("Modification")
+    class ModificationTests {
+
+        @Test
+        void shouldPreserveOrderWhenAddingItemsSequentially() {
+            // Arrange
+            final FixedOrderComparator<String> comparator = new FixedOrderComparator<>();
+
+            // Act
+            for (final String city : TOP_CITIES) {
+                comparator.add(city);
+            }
+
+            // Assert
+            assertSortsCorrectly(TOP_CITIES, comparator);
+        }
+
+        @Test
+        void shouldTreatItemsAddedAsEqualAsEquivalent() {
+            // Arrange
+            final FixedOrderComparator<String> comparator = new FixedOrderComparator<>(TOP_CITIES);
+            final String existingCity = "New York";
+            final String newCity = "Minneapolis";
+
+            // Act
+            comparator.addAsEqual(existingCity, newCity);
+
+            // Assert
+            assertEquals(0, comparator.compare(existingCity, newCity), "New York and Minneapolis should be equal");
+            assertTrue(comparator.compare("Tokyo", newCity) < 0, "An earlier item (Tokyo) should come before the new city");
+            assertTrue(comparator.compare("Shanghai", newCity) > 0, "A later item (Shanghai) should come after the new city");
+        }
+    }
+
+    @Nested
+    @DisplayName("Locking Behavior")
+    class LockingBehaviorTests {
+
+        @Test
+        void shouldBeUnlockedBeforeFirstCompare() {
+            // Arrange
+            final FixedOrderComparator<String> comparator = new FixedOrderComparator<>(TOP_CITIES);
+            // Act & Assert
+            assertFalse(comparator.isLocked(), "Comparator should not be locked before first use");
+        }
+
+        @Test
+        void shouldBeLockedAfterFirstCompare() {
+            // Arrange
+            final FixedOrderComparator<String> comparator = new FixedOrderComparator<>(TOP_CITIES);
+            // Act
+            comparator.compare("New York", "Tokyo");
+            // Assert
+            assertTrue(comparator.isLocked(), "Comparator should be locked after first use");
+        }
+
+        @Test
+        void shouldThrowExceptionWhenAddingToLockedComparator() {
+            // Arrange
+            final FixedOrderComparator<String> comparator = new FixedOrderComparator<>(TOP_CITIES);
+            comparator.compare("New York", "Tokyo"); // Lock the comparator
+
+            // Act & Assert
+            assertThrows(UnsupportedOperationException.class, () -> comparator.add("Minneapolis"));
+        }
+
+        @Test
+        void shouldThrowExceptionWhenAddingAsEqualToLockedComparator() {
+            // Arrange
+            final FixedOrderComparator<String> comparator = new FixedOrderComparator<>(TOP_CITIES);
+            comparator.compare("New York", "Tokyo"); // Lock the comparator
+
+            // Act & Assert
+            assertThrows(UnsupportedOperationException.class, () -> comparator.addAsEqual("New York", "Minneapolis"));
+        }
+    }
+
+    @Nested
+    @DisplayName("Unknown Object Behavior")
+    class UnknownObjectBehaviorTests {
+
+        private static final String UNKNOWN_CITY_1 = "Minneapolis";
+        private static final String UNKNOWN_CITY_2 = "St Paul";
+        private static final String KNOWN_CITY = "New York";
+
+        @Test
+        void shouldThrowExceptionForUnknownObjectByDefault() {
+            // Arrange
+            final FixedOrderComparator<String> comparator = new FixedOrderComparator<>(TOP_CITIES);
+
+            // Assert default behavior
+            assertEquals(FixedOrderComparator.UnknownObjectBehavior.EXCEPTION, comparator.getUnknownObjectBehavior());
+
+            // Act & Assert
+            assertThrows(IllegalArgumentException.class, () -> comparator.compare(KNOWN_CITY, UNKNOWN_CITY_1));
+            assertThrows(IllegalArgumentException.class, () -> comparator.compare(UNKNOWN_CITY_1, KNOWN_CITY));
+        }
+
+        @Test
+        void shouldPlaceUnknownObjectsBeforeKnownObjectsWhenSetToBefore() {
+            // Arrange
+            final FixedOrderComparator<String> comparator = new FixedOrderComparator<>(TOP_CITIES);
+            comparator.setUnknownObjectBehavior(FixedOrderComparator.UnknownObjectBehavior.BEFORE);
+
+            // Assert comparison results
+            assertTrue(comparator.compare(UNKNOWN_CITY_1, KNOWN_CITY) < 0, "Unknown should be less than known");
+            assertTrue(comparator.compare(KNOWN_CITY, UNKNOWN_CITY_1) > 0, "Known should be greater than unknown");
+            assertEquals(0, comparator.compare(UNKNOWN_CITY_1, UNKNOWN_CITY_2), "Two unknowns should be equal");
+
+            // Assert sorting order
+            final String[] expectedOrder = ArrayUtils.add(TOP_CITIES, 0, UNKNOWN_CITY_1);
+            assertSortsCorrectly(expectedOrder, comparator);
+        }
+
+        @Test
+        void shouldPlaceUnknownObjectsAfterKnownObjectsWhenSetToAfter() {
+            // Arrange
+            final FixedOrderComparator<String> comparator = new FixedOrderComparator<>(TOP_CITIES);
+            comparator.setUnknownObjectBehavior(FixedOrderComparator.UnknownObjectBehavior.AFTER);
+
+            // Assert comparison results
+            assertTrue(comparator.compare(UNKNOWN_CITY_1, KNOWN_CITY) > 0, "Unknown should be greater than known");
+            assertTrue(comparator.compare(KNOWN_CITY, UNKNOWN_CITY_1) < 0, "Known should be less than unknown");
+            assertEquals(0, comparator.compare(UNKNOWN_CITY_1, UNKNOWN_CITY_2), "Two unknowns should be equal");
+
+            // Assert sorting order
+            final String[] expectedOrder = ArrayUtils.add(TOP_CITIES, UNKNOWN_CITY_1);
+            assertSortsCorrectly(expectedOrder, comparator);
+        }
+    }
+
+    @Nested
+    @DisplayName("equals() Method")
+    class EqualsTests {
+
+        @Test
+        void shouldReturnTrueForSameObject() {
+            final FixedOrderComparator<Integer> comparator = new FixedOrderComparator<>();
+            assertTrue(comparator.equals(comparator));
+        }
+
+        @Test
+        void shouldReturnTrueForEqualEmptyComparators() {
             final FixedOrderComparator<Integer> comparator1 = new FixedOrderComparator<>();
-            comparator1.setUnknownObjectBehavior(FixedOrderComparator.UnknownObjectBehavior.BEFORE);
             final FixedOrderComparator<Integer> comparator2 = new FixedOrderComparator<>();
-            comparator2.setUnknownObjectBehavior(FixedOrderComparator.UnknownObjectBehavior.AFTER);
-            assertFalse(comparator1.equals(comparator2));
+            assertTrue(comparator1.equals(comparator2));
         }
 
         @Test
-        void expectFalseWhenFixedOrderComparatorIsComparedWithNull() {
-            final FixedOrderComparator<Integer> comparator = new FixedOrderComparator<>();
-            assertFalse(comparator.equals(null));
-        }
-
-        @Test
-        void expectFalseWhenFixedOrderComparatorIsComparedWithOtherObject() {
-            final FixedOrderComparator<Integer> comparator = new FixedOrderComparator<>();
-            assertFalse(comparator.equals(new Object()));
-        }
-
-        @Test
-        void expectFalseWhenOneComparatorIsLocked() {
-            final FixedOrderComparator<Integer> comparator1 = new FixedOrderComparator<>(1, 2, 3);
-            final FixedOrderComparator<Integer> comparator2 = new FixedOrderComparator<>(1, 2, 3);
-            comparator2.compare(1, 2);
-            assertFalse(comparator1.equals(comparator2));
-        }
-
-        @Test
-        void expectFalseWhenOneComparatorsWithDuplicateItems() {
-            final FixedOrderComparator<Integer> comparator1 = new FixedOrderComparator<>(1, 2, 3);
-            final FixedOrderComparator<Integer> comparator2 = new FixedOrderComparator<>(1, 2, 3, 3);
-            assertFalse(comparator1.equals(comparator2));
-        }
-
-        @Test
-        void expectTrueWhenBothComparatorsAreLocked() {
+        void shouldReturnTrueForTwoEqualAndLockedComparators() {
             final FixedOrderComparator<Integer> comparator1 = new FixedOrderComparator<>(1, 2, 3);
             final FixedOrderComparator<Integer> comparator2 = new FixedOrderComparator<>(1, 2, 3);
             comparator1.compare(1, 2);
@@ -92,206 +259,93 @@ class FixedOrderComparatorTest extends AbstractComparatorTest<String> {
         }
 
         @Test
-        void expectTrueWhenBothComparatorsWithoutAnyItems() {
-            final FixedOrderComparator<Integer> comparator1 = new FixedOrderComparator<>();
-            final FixedOrderComparator<Integer> comparator2 = new FixedOrderComparator<>();
-            assertTrue(comparator1.equals(comparator2));
+        void shouldReturnFalseWhenComparedWithNull() {
+            final FixedOrderComparator<Integer> comparator = new FixedOrderComparator<>();
+            assertFalse(comparator.equals(null));
         }
 
         @Test
-        void expectTrueWhenBothObjectsAreSame() {
+        void shouldReturnFalseWhenComparedWithDifferentObjectType() {
             final FixedOrderComparator<Integer> comparator = new FixedOrderComparator<>();
-            assertTrue(comparator.equals(comparator));
+            assertFalse(comparator.equals(new Object()));
+        }
+
+        @Test
+        void shouldReturnFalseForComparatorsWithDifferentItems() {
+            final FixedOrderComparator<Integer> comparator1 = new FixedOrderComparator<>(1, 2, 3);
+            final FixedOrderComparator<Integer> comparator2 = new FixedOrderComparator<>(2, 3, 4);
+            assertFalse(comparator1.equals(comparator2));
+        }
+
+        @Test
+        void shouldReturnFalseForComparatorsWithDifferentDuplicateItems() {
+            final FixedOrderComparator<Integer> comparator1 = new FixedOrderComparator<>(1, 2, 3);
+            final FixedOrderComparator<Integer> comparator2 = new FixedOrderComparator<>(1, 2, 3, 3);
+            assertFalse(comparator1.equals(comparator2));
+        }
+
+        @Test
+        void shouldReturnFalseForComparatorsWithDifferentUnknownObjectBehavior() {
+            final FixedOrderComparator<Integer> comparator1 = new FixedOrderComparator<>();
+            comparator1.setUnknownObjectBehavior(FixedOrderComparator.UnknownObjectBehavior.BEFORE);
+            final FixedOrderComparator<Integer> comparator2 = new FixedOrderComparator<>();
+            comparator2.setUnknownObjectBehavior(FixedOrderComparator.UnknownObjectBehavior.AFTER);
+            assertFalse(comparator1.equals(comparator2));
+        }
+
+        @Test
+        void shouldReturnFalseWhenOneComparatorIsLockedAndOtherIsNot() {
+            final FixedOrderComparator<Integer> comparator1 = new FixedOrderComparator<>(1, 2, 3);
+            final FixedOrderComparator<Integer> comparator2 = new FixedOrderComparator<>(1, 2, 3);
+            comparator2.compare(1, 2); // lock comparator2
+            assertFalse(comparator1.equals(comparator2));
         }
     }
 
-    //
-    // Initialization and busywork
-    //
+    // Helper Methods
+    //-----------------------------------------------------------------------
 
     /**
-     * Top cities of the world, by population including metro areas.
+     * Asserts that the given comparator correctly sorts a shuffled version of the
+     * expected order.
+     *
+     * @param expectedOrder The array of objects in the correct order.
+     * @param comparator    The comparator to test.
      */
-    private static final String[] topCities = {
-        "Tokyo",
-        "Mexico City",
-        "Mumbai",
-        "Sao Paulo",
-        "New York",
-        "Shanghai",
-        "Lagos",
-        "Los Angeles",
-        "Calcutta",
-        "Buenos Aires"
-    };
+    private void assertSortsCorrectly(final String[] expectedOrder, final Comparator<String> comparator) {
+        // Arrange: Create a shuffled version of the expected order
+        final List<String> listToSort = new ArrayList<>(Arrays.asList(expectedOrder));
+        Collections.shuffle(listToSort);
+        final String[] toSort = listToSort.toArray(new String[0]);
 
-    /** Shuffles the keys and asserts that the comparator sorts them back to
-     * their original order.
-     */
-    private void assertComparatorYieldsOrder(final String[] orderedObjects, final Comparator<String> comparator) {
-        final String[] keys = orderedObjects.clone();
-
-        // shuffle until the order changes. It's extremely rare that
-        // this requires more than one shuffle.
-
-        boolean isInNewOrder = false;
-        final Random rand = new Random();
-        while (keys.length > 1 && !isInNewOrder) {
-            // shuffle:
-            for (int i = keys.length - 1; i > 0; i--) {
-                final String swap = keys[i];
-                final int j = rand.nextInt(i + 1);
-                keys[i] = keys[j];
-                keys[j] = swap;
-            }
-
-            // testShuffle
-            for (int i = 0; i < keys.length; i++) {
-                if (!orderedObjects[i].equals(keys[i])) {
-                    isInNewOrder = true;
-                    break;
-                }
-            }
+        // To be robust, ensure the shuffle actually changed the order,
+        // which is highly likely for non-trivial arrays but not guaranteed.
+        if (expectedOrder.length > 1) {
+            assertNotEquals(Arrays.asList(expectedOrder), listToSort, "Test setup failed: array was not shuffled");
         }
 
-        // The real test: sort and make sure they come out right.
+        // Act: Sort the shuffled array using the comparator
+        Arrays.sort(toSort, comparator);
 
-        Arrays.sort(keys, comparator);
+        // Assert: The sorted array should match the expected order
+        assertArrayEquals(expectedOrder, toSort);
+    }
 
-        for (int i = 0; i < orderedObjects.length; i++) {
-            assertEquals(orderedObjects[i], keys[i]);
-        }
+    // AbstractComparatorTest Implementation
+    //-----------------------------------------------------------------------
+
+    @Override
+    public Comparator<String> makeObject() {
+        return new FixedOrderComparator<>(TOP_CITIES);
     }
 
     @Override
     public List<String> getComparableObjectsOrdered() {
-        return Arrays.asList(topCities);
+        return Arrays.asList(TOP_CITIES);
     }
-
-//    void testCreate() throws Exception {
-//        writeExternalFormToDisk((java.io.Serializable) makeObject(), "src/test/resources/data/test/FixedOrderComparator.version4.obj");
-//    }
-
-    //
-    // The tests
-    //
 
     @Override
     public String getCompatibilityVersion() {
         return "4";
-    }
-
-    @Override
-    public Comparator<String> makeObject() {
-        return new FixedOrderComparator<>(topCities);
-    }
-
-    /**
-     * Tests addAsEqual method.
-     */
-    @Test
-    void testAddAsEqual() {
-        final FixedOrderComparator<String> comparator = new FixedOrderComparator<>(topCities);
-        comparator.addAsEqual("New York", "Minneapolis");
-        assertEquals(0, comparator.compare("New York", "Minneapolis"));
-        assertEquals(-1, comparator.compare("Tokyo", "Minneapolis"));
-        assertEquals(1, comparator.compare("Shanghai", "Minneapolis"));
-    }
-
-    /**
-     * Tests that the array constructor compares items properly.
-     */
-    @Test
-    void testArrayConstructor() {
-        final String[] keys = topCities.clone();
-        final String[] topCitiesForTest = topCities.clone();
-        final FixedOrderComparator<String> comparator = new FixedOrderComparator<>(topCitiesForTest);
-        assertComparatorYieldsOrder(keys, comparator);
-        // test that changing input after constructor has no effect
-        topCitiesForTest[0] = "Brighton";
-        assertComparatorYieldsOrder(keys, comparator);
-    }
-
-    /**
-     * Tests that the constructor plus add method compares items properly.
-     */
-    @Test
-    void testConstructorPlusAdd() {
-        final FixedOrderComparator<String> comparator = new FixedOrderComparator<>();
-        for (final String topCity : topCities) {
-            comparator.add(topCity);
-        }
-        final String[] keys = topCities.clone();
-        assertComparatorYieldsOrder(keys, comparator);
-    }
-
-    /**
-     * Tests the list constructor.
-     */
-    @Test
-    void testListConstructor() {
-        final String[] keys = topCities.clone();
-        final List<String> topCitiesForTest = new LinkedList<>(Arrays.asList(topCities));
-        final FixedOrderComparator<String> comparator = new FixedOrderComparator<>(topCitiesForTest);
-        assertComparatorYieldsOrder(keys, comparator);
-        // test that changing input after constructor has no effect
-        topCitiesForTest.set(0, "Brighton");
-        assertComparatorYieldsOrder(keys, comparator);
-    }
-
-    //
-    // Helper methods
-    //
-
-    /**
-     * Tests whether or not updates are disabled after a comparison is made.
-     */
-    @Test
-    void testLock() {
-        final FixedOrderComparator<String> comparator = new FixedOrderComparator<>(topCities);
-        assertFalse(comparator.isLocked());
-        comparator.compare("New York", "Tokyo");
-        assertTrue(comparator.isLocked());
-
-        assertThrows(UnsupportedOperationException.class, () -> comparator.add("Minneapolis"),
-                "Should have thrown an UnsupportedOperationException");
-
-        assertThrows(UnsupportedOperationException.class, () -> comparator.addAsEqual("New York", "Minneapolis"),
-                "Should have thrown an UnsupportedOperationException");
-    }
-
-    @Test
-    void testUnknownObjectBehavior() {
-        FixedOrderComparator<String> comparator = new FixedOrderComparator<>(topCities);
-
-        final FixedOrderComparator<String> finalComparator = comparator;
-        assertThrows(IllegalArgumentException.class, () -> finalComparator.compare("New York", "Minneapolis"),
-                "Should have thrown a IllegalArgumentException");
-
-        assertThrows(IllegalArgumentException.class, () -> finalComparator.compare("Minneapolis", "New York"),
-                "Should have thrown a IllegalArgumentException");
-
-        assertEquals(FixedOrderComparator.UnknownObjectBehavior.EXCEPTION, comparator.getUnknownObjectBehavior());
-
-        comparator = new FixedOrderComparator<>(topCities);
-        comparator.setUnknownObjectBehavior(FixedOrderComparator.UnknownObjectBehavior.BEFORE);
-        assertEquals(FixedOrderComparator.UnknownObjectBehavior.BEFORE, comparator.getUnknownObjectBehavior());
-        LinkedList<String> keys = new LinkedList<>(Arrays.asList(topCities));
-        keys.addFirst("Minneapolis");
-        assertComparatorYieldsOrder(keys.toArray(ArrayUtils.EMPTY_STRING_ARRAY), comparator);
-
-        assertEquals(-1, comparator.compare("Minneapolis", "New York"));
-        assertEquals(1, comparator.compare("New York", "Minneapolis"));
-        assertEquals(0, comparator.compare("Minneapolis", "St Paul"));
-
-        comparator = new FixedOrderComparator<>(topCities);
-        comparator.setUnknownObjectBehavior(FixedOrderComparator.UnknownObjectBehavior.AFTER);
-        keys = new LinkedList<>(Arrays.asList(topCities));
-        keys.add("Minneapolis");
-        assertComparatorYieldsOrder(keys.toArray(ArrayUtils.EMPTY_STRING_ARRAY), comparator);
-
-        assertEquals(1, comparator.compare("Minneapolis", "New York"));
-        assertEquals(-1, comparator.compare("New York", "Minneapolis"));
-        assertEquals(0, comparator.compare("Minneapolis", "St Paul"));
     }
 }
