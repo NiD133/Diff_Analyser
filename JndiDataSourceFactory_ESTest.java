@@ -21,102 +21,104 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class JndiDataSourceFactory_ESTest extends JndiDataSourceFactory_ESTest_scaffolding {
 
-  @Test(timeout = 4000, expected = NullPointerException.class)
-  public void setProperties_WithNullProperties_ThrowsNullPointerException() throws Throwable {
-      // Test that setting null properties throws NullPointerException
-      JndiDataSourceFactory factory = new JndiDataSourceFactory();
-      factory.setProperties(null); // Should throw NullPointerException
+  @Test(timeout = 4000)
+  public void test0()  throws Throwable  {
+      JndiDataSourceFactory jndiDataSourceFactory0 = new JndiDataSourceFactory();
+      // Undeclared exception!
+      try { 
+        jndiDataSourceFactory0.setProperties((Properties) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.ibatis.datasource.jndi.JndiDataSourceFactory", e);
+      }
   }
 
   @Test(timeout = 4000)
-  public void setProperties_WithNonStringKeyInProperties_ThrowsClassCastException() throws Throwable {
-      // Test that properties with non-String keys cause ClassCastException
-      JndiDataSourceFactory factory = new JndiDataSourceFactory();
-      Properties invalidProperties = new Properties();
-      
-      // Create a key that is not a String
-      UnpooledDataSource invalidKey = new UnpooledDataSource("initial_context", "data_source", new Properties());
-      Object value = new Object();
-      
-      // Insert non-String key into properties
-      invalidProperties.put(invalidKey, value);
-      
+  public void test1()  throws Throwable  {
+      JndiDataSourceFactory jndiDataSourceFactory0 = new JndiDataSourceFactory();
+      Properties properties0 = new Properties();
+      UnpooledDataSource unpooledDataSource0 = new UnpooledDataSource("initial_context", "data_source", properties0);
+      Object object0 = new Object();
+      properties0.put(unpooledDataSource0, object0);
+      // Undeclared exception!
       try { 
-          factory.setProperties(invalidProperties);
-          fail("Expecting exception: ClassCastException");
+        jndiDataSourceFactory0.setProperties(properties0);
+        fail("Expecting exception: ClassCastException");
+      
       } catch(ClassCastException e) {
-          // Verify the expected exception
-          verifyException("org.apache.ibatis.datasource.jndi.JndiDataSourceFactory", e);
+         //
+         // class org.apache.ibatis.datasource.unpooled.UnpooledDataSource cannot be cast to class java.lang.String (org.apache.ibatis.datasource.unpooled.UnpooledDataSource is in unnamed module of loader org.evosuite.instrumentation.InstrumentingClassLoader @69dd31fb; java.lang.String is in module java.base of loader 'bootstrap')
+         //
+         verifyException("org.apache.ibatis.datasource.jndi.JndiDataSourceFactory", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void setProperties_WithEnvProperties_DoesNotThrow() throws Throwable {
-      // Test that properties with "env." prefix are handled without errors
-      JndiDataSourceFactory factory = new JndiDataSourceFactory();
-      Properties envProperties = new Properties();
-      
-      // Load properties with "env." prefix
-      envProperties.load(new StringReader("env."));
-      envProperties.load(new StringReader("env.env$ource"));
-      
-      // Should process without exceptions
-      factory.setProperties(envProperties);
+  public void test2()  throws Throwable  {
+      JndiDataSourceFactory jndiDataSourceFactory0 = new JndiDataSourceFactory();
+      Properties properties0 = new Properties();
+      StringReader stringReader0 = new StringReader("env.");
+      properties0.load((Reader) stringReader0);
+      StringReader stringReader1 = new StringReader("env.env$ource");
+      properties0.load((Reader) stringReader1);
+      jndiDataSourceFactory0.setProperties(properties0);
   }
 
   @Test(timeout = 4000)
-  public void setProperties_WithoutInitialContext_ThrowsRuntimeException() throws Throwable {
-      // Test that missing initial context configuration throws RuntimeException
-      JndiDataSourceFactory factory = new JndiDataSourceFactory();
-      Properties properties = new Properties();
-      
-      // Load a property without initial context
-      properties.load(new StringReader("data_source"));
-      
+  public void test3()  throws Throwable  {
+      JndiDataSourceFactory jndiDataSourceFactory0 = new JndiDataSourceFactory();
+      Properties properties0 = new Properties();
+      StringReader stringReader0 = new StringReader("data_source");
+      properties0.load((Reader) stringReader0);
+      // Undeclared exception!
       try { 
-          factory.setProperties(properties);
-          fail("Expecting exception: RuntimeException");
+        jndiDataSourceFactory0.setProperties(properties0);
+        fail("Expecting exception: RuntimeException");
+      
       } catch(RuntimeException e) {
-          // Verify expected error message about missing initial context
-          verifyException("org.apache.ibatis.datasource.jndi.JndiDataSourceFactory", e);
+         //
+         // There was an error configuring JndiDataSourceTransactionPool. Cause: javax.naming.NoInitialContextException: Need to specify class name in environment or system property, or in an application resource file: java.naming.factory.initial
+         //
+         verifyException("org.apache.ibatis.datasource.jndi.JndiDataSourceFactory", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void setProperties_WithInitialContextAndDataSource_ThrowsRuntimeExceptionBecauseNoFactory() throws Throwable {
-      // Test that valid properties still fail due to missing JNDI factory
-      JndiDataSourceFactory factory = new JndiDataSourceFactory();
-      Properties properties = new Properties();
-      
-      // Set required properties
-      properties.setProperty("initial_context", "initial_context");
-      properties.setProperty("data_source", "initial_context");
-      
+  public void test4()  throws Throwable  {
+      JndiDataSourceFactory jndiDataSourceFactory0 = new JndiDataSourceFactory();
+      Properties properties0 = new Properties();
+      properties0.setProperty("initial_context", "initial_context");
+      properties0.setProperty("data_source", "initial_context");
+      // Undeclared exception!
       try { 
-          factory.setProperties(properties);
-          fail("Expecting exception: RuntimeException");
+        jndiDataSourceFactory0.setProperties(properties0);
+        fail("Expecting exception: RuntimeException");
+      
       } catch(RuntimeException e) {
-          // Verify expected error about JNDI configuration
-          verifyException("org.apache.ibatis.datasource.jndi.JndiDataSourceFactory", e);
+         //
+         // There was an error configuring JndiDataSourceTransactionPool. Cause: javax.naming.NoInitialContextException: Need to specify class name in environment or system property, or in an application resource file: java.naming.factory.initial
+         //
+         verifyException("org.apache.ibatis.datasource.jndi.JndiDataSourceFactory", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void setProperties_WithInitialContextPropertyOnly_DoesNotThrow() throws Throwable {
-      // Test that setting only initial_context property doesn't throw
-      JndiDataSourceFactory factory = new JndiDataSourceFactory();
-      Properties properties = new Properties();
-      
-      // Only set initial_context property
-      properties.load(new StringReader("initial_context"));
-      factory.setProperties(properties); // Should not throw
+  public void test5()  throws Throwable  {
+      JndiDataSourceFactory jndiDataSourceFactory0 = new JndiDataSourceFactory();
+      StringReader stringReader0 = new StringReader("initial_context");
+      Properties properties0 = new Properties();
+      properties0.load((Reader) stringReader0);
+      jndiDataSourceFactory0.setProperties(properties0);
   }
 
   @Test(timeout = 4000)
-  public void getDataSource_BeforeSetProperties_ReturnsNull() throws Throwable {
-      // Verify DataSource is null before configuration
-      JndiDataSourceFactory factory = new JndiDataSourceFactory();
-      DataSource dataSource = factory.getDataSource();
-      assertNull("DataSource should be null before setProperties is called", dataSource);
+  public void test6()  throws Throwable  {
+      JndiDataSourceFactory jndiDataSourceFactory0 = new JndiDataSourceFactory();
+      DataSource dataSource0 = jndiDataSourceFactory0.getDataSource();
+      assertNull(dataSource0);
   }
 }
