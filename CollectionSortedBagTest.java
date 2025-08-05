@@ -30,10 +30,11 @@ import org.apache.commons.collections4.collection.AbstractCollectionTest;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test class for {@link CollectionSortedBag}.
+ * Tests serialization compatibility for {@link CollectionSortedBag}.
  * <p>
- * Note: This test is mainly for serialization support, the CollectionSortedBag decorator
- * is extensively used and tested in AbstractSortedBagTest.
+ * This test focuses on verifying that serialized forms of empty and full bags remain stable.
+ * Functional behavior is covered in {@link AbstractSortedBagTest}.
+ * </p>
  */
 public class CollectionSortedBagTest<T> extends AbstractCollectionTest<T> {
 
@@ -43,34 +44,37 @@ public class CollectionSortedBagTest<T> extends AbstractCollectionTest<T> {
     }
 
     /**
-     * Override to return comparable objects.
+     * Generates 30 non-null, unique, and comparable elements (odd integers).
+     * Required for sorted bag tests to ensure elements are comparable.
      */
     @Override
     @SuppressWarnings("unchecked")
     public T[] getFullNonNullElements() {
-        final Object[] elements = new Object[30];
-
-        for (int i = 0; i < 30; i++) {
-            elements[i] = Integer.valueOf(i + i + 1);
+        // Generate 30 consecutive odd integers starting from 1
+        final Integer[] elements = new Integer[30];
+        for (int i = 0; i < elements.length; i++) {
+            elements[i] = 2 * i + 1; // 1, 3, 5, ..., 59
         }
         return (T[]) elements;
     }
 
     /**
-     * Override to return comparable objects.
+     * Generates 30 alternative non-null elements (even integers).
+     * Used for modification tests.
      */
     @Override
     @SuppressWarnings("unchecked")
     public T[] getOtherNonNullElements() {
-        final Object[] elements = new Object[30];
-        for (int i = 0; i < 30; i++) {
-            elements[i] = Integer.valueOf(i + i + 2);
+        // Generate 30 consecutive even integers starting from 2
+        final Integer[] elements = new Integer[30];
+        for (int i = 0; i < elements.length; i++) {
+            elements[i] = 2 * i + 2; // 2, 4, 6, ..., 60
         }
         return (T[]) elements;
     }
 
     /**
-     * Overridden because SortedBags don't allow null elements (normally).
+     * Sorted bags do not support null elements.
      * @return false
      */
     @Override
@@ -78,26 +82,16 @@ public class CollectionSortedBagTest<T> extends AbstractCollectionTest<T> {
         return false;
     }
 
-    /**
-     * Returns an empty List for use in modification testing.
-     *
-     * @return a confirmed empty collection
-     */
     @Override
     public Collection<T> makeConfirmedCollection() {
         return new ArrayList<>();
     }
 
-    /**
-     * Returns a full Set for use in modification testing.
-     *
-     * @return a confirmed full collection
-     */
     @Override
     public Collection<T> makeConfirmedFullCollection() {
-        final Collection<T> set = makeConfirmedCollection();
-        set.addAll(Arrays.asList(getFullElements()));
-        return set;
+        final Collection<T> collection = makeConfirmedCollection();
+        collection.addAll(Arrays.asList(getFullElements()));
+        return collection;
     }
 
     @Override
@@ -105,41 +99,51 @@ public class CollectionSortedBagTest<T> extends AbstractCollectionTest<T> {
         return CollectionSortedBag.collectionSortedBag(new TreeBag<>());
     }
 
-//    void testCreate() throws Exception {
-//        resetEmpty();
-//        writeExternalFormToDisk((java.io.Serializable) getCollection(), "src/test/resources/data/test/CollectionSortedBag.emptyCollection.version4.obj");
-//        resetFull();
-//        writeExternalFormToDisk((java.io.Serializable) getCollection(), "src/test/resources/data/test/CollectionSortedBag.fullCollection.version4.obj");
-//    }
-
     /**
-     * Compare the current serialized form of the Bag
-     * against the canonical version in SCM.
+     * Verifies that the serialized form of an empty bag matches the canonical version.
+     * <p>
+     * This ensures backward compatibility for serialized empty bags.
      */
     @Test
     void testEmptyBagCompatibility() throws IOException, ClassNotFoundException {
-        // test to make sure the canonical form has been preserved
-        final Bag<T> bag = makeObject();
-        if (bag instanceof Serializable && !skipSerializedCanonicalTests() && isTestSerialization()) {
-            final Bag<?> bag2 = (Bag<?>) readExternalFormFromDisk(getCanonicalEmptyCollectionName(bag));
-            assertEquals(0, bag2.size(), "Bag is empty");
-            assertEquals(bag, bag2);
+        final Bag<T> emptyBag = makeObject();
+
+        if (shouldTestSerializationCompatibility(emptyBag)) {
+            final String serializedFileName = getCanonicalEmptyCollectionName(emptyBag);
+            final Bag<?> deserializedBag = (Bag<?>) readExternalFormFromDisk(serializedFileName);
+
+            assertEquals(0, deserializedBag.size(), "Deserialized empty bag should have size 0");
+            assertEquals(emptyBag, deserializedBag, "Deserialized empty bag should match original");
         }
     }
 
     /**
-     * Compare the current serialized form of the Bag
-     * against the canonical version in SCM.
+     * Verifies that the serialized form of a full bag matches the canonical version.
+     * <p>
+     * This ensures backward compatibility for serialized full bags.
      */
     @Test
     void testFullBagCompatibility() throws IOException, ClassNotFoundException {
-        // test to make sure the canonical form has been preserved
-        final SortedBag<T> bag = (SortedBag<T>) makeFullCollection();
-        if (bag instanceof Serializable && !skipSerializedCanonicalTests() && isTestSerialization()) {
-            final SortedBag<?> bag2 = (SortedBag<?>) readExternalFormFromDisk(getCanonicalFullCollectionName(bag));
-            assertEquals(bag.size(), bag2.size(), "Bag is the right size");
-            assertEquals(bag, bag2);
+        final SortedBag<T> fullBag = (SortedBag<T>) makeFullCollection();
+
+        if (shouldTestSerializationCompatibility(fullBag)) {
+            final String serializedFileName = getCanonicalFullCollectionName(fullBag);
+            final SortedBag<?> deserializedBag = (SortedBag<?>) readExternalFormFromDisk(serializedFileName);
+
+            assertEquals(fullBag.size(), deserializedBag.size(), "Deserialized full bag size mismatch");
+            assertEquals(fullBag, deserializedBag, "Deserialized full bag contents mismatch");
         }
     }
 
+    /**
+     * Checks if serialization compatibility tests should run for the given bag.
+     * 
+     * @param bag The bag to test
+     * @return true if tests should execute, false otherwise
+     */
+    private boolean shouldTestSerializationCompatibility(final Bag<?> bag) {
+        return bag instanceof Serializable && 
+               !skipSerializedCanonicalTests() && 
+               isTestSerialization();
+    }
 }
