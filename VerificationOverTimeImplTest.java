@@ -17,63 +17,54 @@ import org.mockito.exceptions.verification.opentest4j.ArgumentsAreDifferent;
 import org.mockito.verification.VerificationMode;
 
 public class VerificationOverTimeImplTest {
-
-    @Mock 
-    private VerificationMode mockVerificationMode;
-    
-    private VerificationOverTimeImpl verificationOverTime;
+    @Mock private VerificationMode delegate;
+    private VerificationOverTimeImpl impl;
 
     @Before
     public void setUp() {
         openMocks(this);
-        // Initialize VerificationOverTimeImpl with a polling period of 10ms, a timeout of 1000ms,
-        // and a mock delegate verification mode. It returns immediately on success.
-        verificationOverTime = new VerificationOverTimeImpl(10, 1000, mockVerificationMode, true);
+        impl = new VerificationOverTimeImpl(10, 1000, delegate, true);
     }
 
     @Test
-    public void shouldReturnOnSuccess() {
-        // When verification is successful, it should delegate the call to the mockVerificationMode.
-        verificationOverTime.verify(null);
-        verify(mockVerificationMode).verify(null);
+    public void should_return_on_success() {
+        impl.verify(null);
+        verify(delegate).verify(null);
     }
 
     @Test
-    public void shouldThrowMockitoAssertionError() {
-        // Prepare a MockitoAssertionError to be thrown by the mockVerificationMode.
-        MockitoAssertionError expectedError = new MockitoAssertionError("message");
+    public void should_throw_mockito_assertion_error() {
+        MockitoAssertionError toBeThrown = new MockitoAssertionError("message");
 
-        // Simulate the mockVerificationMode throwing the expected error during verification.
-        doThrow(expectedError).when(mockVerificationMode).verify(null);
-
-        // Verify that the same error is thrown by verificationOverTime.
-        assertThatThrownBy(() -> verificationOverTime.verify(null))
-                .isEqualTo(expectedError);
+        doThrow(toBeThrown).when(delegate).verify(null);
+        assertThatThrownBy(
+                        () -> {
+                            impl.verify(null);
+                        })
+                .isEqualTo(toBeThrown);
     }
 
     @Test
-    public void shouldHandleJUnitAssertionError() {
-        // Prepare an ArgumentsAreDifferent error to be thrown by the mockVerificationMode.
-        ArgumentsAreDifferent expectedError = new ArgumentsAreDifferent("message", "wanted", "actual");
+    public void should_deal_with_junit_assertion_error() {
+        ArgumentsAreDifferent toBeThrown = new ArgumentsAreDifferent("message", "wanted", "actual");
 
-        // Simulate the mockVerificationMode throwing the expected error during verification.
-        doThrow(expectedError).when(mockVerificationMode).verify(null);
-
-        // Verify that the same error is thrown by verificationOverTime.
-        assertThatThrownBy(() -> verificationOverTime.verify(null))
-                .isEqualTo(expectedError);
+        doThrow(toBeThrown).when(delegate).verify(null);
+        assertThatThrownBy(
+                        () -> {
+                            impl.verify(null);
+                        })
+                .isEqualTo(toBeThrown);
     }
 
     @Test
-    public void shouldNotWrapOtherExceptions() {
-        // Prepare a RuntimeException to be thrown by the mockVerificationMode.
-        RuntimeException expectedException = new RuntimeException();
+    public void should_not_wrap_other_exceptions() {
+        RuntimeException toBeThrown = new RuntimeException();
 
-        // Simulate the mockVerificationMode throwing the expected exception during verification.
-        doThrow(expectedException).when(mockVerificationMode).verify(null);
-
-        // Verify that the same exception is thrown by verificationOverTime.
-        assertThatThrownBy(() -> verificationOverTime.verify(null))
-                .isEqualTo(expectedException);
+        doThrow(toBeThrown).when(delegate).verify(null);
+        assertThatThrownBy(
+                        () -> {
+                            impl.verify(null);
+                        })
+                .isEqualTo(toBeThrown);
     }
 }
