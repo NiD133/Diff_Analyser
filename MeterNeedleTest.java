@@ -1,3 +1,39 @@
+/* ======================================================
+ * JFreeChart : a chart library for the Java(tm) platform
+ * ======================================================
+ *
+ * (C) Copyright 2000-present, by David Gilbert and Contributors.
+ *
+ * Project Info:  https://www.jfree.org/jfreechart/index.html
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ *
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
+ *
+ * --------------------
+ * MeterNeedleTest.java
+ * --------------------
+ * (C) Copyright 2005-present, by David Gilbert and Contributors.
+ *
+ * Original Author:  David Gilbert;
+ * Contributor(s):   -;
+ *
+ */
+
 package org.jfree.chart.plot.compass;
 
 import java.awt.BasicStroke;
@@ -8,71 +44,56 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
 /**
  * Tests for the {@link MeterNeedle} class.
  */
 public class MeterNeedleTest {
 
     /**
-     * Tests the equals() method of the MeterNeedle class to ensure
-     * it correctly distinguishes between different field values.
+     * Check that the equals() method can distinguish all fields.
      */
     @Test
     public void testEquals() {
-        // Create two identical LineNeedle instances
-        MeterNeedle needle1 = new LineNeedle();
-        MeterNeedle needle2 = new LineNeedle();
-        
-        // Initially, both needles should be equal
-        assertEquals(needle1, needle2);
+        MeterNeedle n1 = new LineNeedle();
+        MeterNeedle n2 = new LineNeedle();
+        assertEquals(n1, n2);
 
-        // Test fill paint
-        GradientPaint fillPaint = new GradientPaint(1.0f, 2.0f, Color.RED, 3.0f, 4.0f, Color.BLUE);
-        needle1.setFillPaint(fillPaint);
-        assertNotEquals(needle1, needle2);
-        needle2.setFillPaint(fillPaint);
-        assertEquals(needle1, needle2);
+        n1.setFillPaint(new GradientPaint(1.0f, 2.0f, Color.RED, 3.0f, 4.0f, Color.BLUE));
+        assertNotEquals(n1, n2);
+        n2.setFillPaint(new GradientPaint(1.0f, 2.0f, Color.RED, 3.0f, 4.0f, Color.BLUE));
+        assertEquals(n1, n2);
 
-        // Test outline paint
-        GradientPaint outlinePaint = new GradientPaint(5.0f, 6.0f, Color.RED, 7.0f, 8.0f, Color.BLUE);
-        needle1.setOutlinePaint(outlinePaint);
-        assertNotEquals(needle1, needle2);
-        needle2.setOutlinePaint(outlinePaint);
-        assertEquals(needle1, needle2);
+        n1.setOutlinePaint(new GradientPaint(5.0f, 6.0f, Color.RED, 7.0f, 8.0f, Color.BLUE));
+        assertNotEquals(n1, n2);
+        n2.setOutlinePaint(new GradientPaint(5.0f, 6.0f, Color.RED, 7.0f, 8.0f, Color.BLUE));
+        assertEquals(n1, n2);
 
-        // Test highlight paint
-        GradientPaint highlightPaint = new GradientPaint(9.0f, 0.0f, Color.RED, 1.0f, 2.0f, Color.BLUE);
-        needle1.setHighlightPaint(highlightPaint);
-        assertNotEquals(needle1, needle2);
-        needle2.setHighlightPaint(highlightPaint);
-        assertEquals(needle1, needle2);
+        n1.setHighlightPaint(new GradientPaint(9.0f, 0.0f, Color.RED, 1.0f, 2.0f, Color.BLUE));
+        assertNotEquals(n1, n2);
+        n2.setHighlightPaint(new GradientPaint(9.0f, 0.0f, Color.RED, 1.0f, 2.0f, Color.BLUE));
+        assertEquals(n1, n2);
 
-        // Test outline stroke
-        Stroke outlineStroke = new BasicStroke(1.23f);
-        needle1.setOutlineStroke(outlineStroke);
-        assertNotEquals(needle1, needle2);
-        needle2.setOutlineStroke(outlineStroke);
-        assertEquals(needle1, needle2);
+        Stroke s = new BasicStroke(1.23f);
+        n1.setOutlineStroke(s);
+        assertNotEquals(n1, n2);
+        n2.setOutlineStroke(s);
+        assertEquals(n1, n2);
 
-        // Test rotation x-coordinate
-        double rotateX = 1.23;
-        needle1.setRotateX(rotateX);
-        assertNotEquals(needle1, needle2);
-        needle2.setRotateX(rotateX);
-        assertEquals(needle1, needle2);
+        n1.setRotateX(1.23);
+        assertNotEquals(n1, n2);
+        n2.setRotateX(1.23);
+        assertEquals(n1, n2);
 
-        // Test rotation y-coordinate
-        double rotateY = 4.56;
-        needle1.setRotateY(rotateY);
-        assertNotEquals(needle1, needle2);
-        needle2.setRotateY(rotateY);
-        assertEquals(needle1, needle2);
+        n1.setRotateY(4.56);
+        assertNotEquals(n1, n2);
+        n2.setRotateY(4.56);
+        assertEquals(n1, n2);
 
-        // Test size
-        int size = 11;
-        needle1.setSize(size);
-        assertNotEquals(needle1, needle2);
-        needle2.setSize(size);
-        assertEquals(needle1, needle2);
+        n1.setSize(11);
+        assertNotEquals(n1, n2);
+        n2.setSize(11);
+        assertEquals(n1, n2);
     }
+
 }
