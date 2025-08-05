@@ -36,99 +36,147 @@
 
 package org.jfree.data.flow;
 
-
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.api.PublicCloneable;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for the {@link DefaultFlowDataset} class.
+ * Tests for the {@link DefaultFlowDataset} class, focusing on its core
+ * functionality, state management, and contract compliance (equals, cloneable,
+ * serializable).
  */
-public class DefaultFlowDatasetTest {
+@DisplayName("DefaultFlowDataset")
+class DefaultFlowDatasetTest {
 
-    /**
-     * Some checks for the getValue() method.
-     */
-    @Test
-    public void testGetFlow() {
-        DefaultFlowDataset<String> d = new DefaultFlowDataset<>();
-        d.setFlow(0, "A", "Z", 1.5);
-        assertEquals(1.5, d.getFlow(0, "A", "Z"));
+    private DefaultFlowDataset<String> dataset;
+
+    @BeforeEach
+    void setUp() {
+        dataset = new DefaultFlowDataset<>();
     }
 
-    /**
-     * Some tests for the getStageCount() method.
-     */
     @Test
-    public void testGetStageCount() {
-        DefaultFlowDataset<String> d = new DefaultFlowDataset<>();
-        assertEquals(1, d.getStageCount());
+    @DisplayName("should retrieve a flow value after it has been set")
+    void getFlow_shouldReturnCorrectValue_whenFlowIsSet() {
+        // Arrange
+        final int stage = 0;
+        final String source = "A";
+        final String destination = "Z";
+        final double flowValue = 1.5;
+        dataset.setFlow(stage, source, destination, flowValue);
 
-        d.setFlow(0, "A", "Z", 11.1);
-        assertEquals(1, d.getStageCount());
+        // Act
+        double result = dataset.getFlow(stage, source, destination).doubleValue();
 
-        // a row of all null values is still counted...
-        d.setFlow(1, "Z", "P", 5.0);
-        assertEquals(2, d.getStageCount());
+        // Assert
+        assertEquals(flowValue, result);
     }
 
-    /**
-     * Confirm that the equals method can distinguish all the required fields.
-     */
-    @Test
-    public void testEquals() {
-        DefaultFlowDataset<String> d1 = new DefaultFlowDataset<>();
-        DefaultFlowDataset<String> d2 = new DefaultFlowDataset<>();
-        assertEquals(d1, d2);
-        
-        d1.setFlow(0, "A", "Z", 1.0);
-        assertNotEquals(d1, d2);
-        d2.setFlow(0, "A", "Z", 1.0);
-        assertEquals(d1, d2);
+    @Nested
+    @DisplayName("getStageCount")
+    class GetStageCountTests {
+        @Test
+        @DisplayName("should return 1 for a new, empty dataset")
+        void shouldReturnOneForNewDataset() {
+            // Arrange (dataset is new from setUp)
+
+            // Act
+            int stageCount = dataset.getStageCount();
+
+            // Assert
+            assertEquals(1, stageCount, "An empty dataset should have one default stage.");
+        }
+
+        @Test
+        @DisplayName("should not increase when adding a flow to an existing stage")
+        void shouldNotIncreaseWhenAddingFlowToExistingStage() {
+            // Arrange
+            dataset.setFlow(0, "A", "Z", 11.1);
+
+            // Act
+            int stageCount = dataset.getStageCount();
+
+            // Assert
+            assertEquals(1, stageCount);
+        }
+
+        @Test
+        @DisplayName("should increase when adding a flow to a new stage")
+        void shouldIncreaseWhenAddingFlowToNewStage() {
+            // Arrange
+            dataset.setFlow(1, "Z", "P", 5.0);
+
+            // Act
+            int stageCount = dataset.getStageCount();
+
+            // Assert
+            assertEquals(2, stageCount);
+        }
     }
 
-    /**
-     * Serialize an instance, restore it, and check for equality.
-     */
     @Test
-    public void testSerialization() {
-        DefaultFlowDataset<String> d1 = new DefaultFlowDataset<>();
-        d1.setFlow(0, "A", "Z", 1.0);
-        DefaultFlowDataset<String> d2 = TestUtils.serialised(d1);
-        assertEquals(d1, d2);
+    @DisplayName("equals() should correctly compare dataset content")
+    void equals_shouldCorrectlyCompareDatasetContent() {
+        // Arrange
+        DefaultFlowDataset<String> dataset1 = new DefaultFlowDataset<>();
+        DefaultFlowDataset<String> dataset2 = new DefaultFlowDataset<>();
+
+        // Assert: Two newly created datasets should be equal
+        assertEquals(dataset1, dataset2);
+
+        // Act: Modify the first dataset
+        dataset1.setFlow(0, "A", "Z", 1.0);
+
+        // Assert: Datasets should no longer be equal
+        assertNotEquals(dataset1, dataset2);
+
+        // Act: Apply the same modification to the second dataset
+        dataset2.setFlow(0, "A", "Z", 1.0);
+
+        // Assert: Datasets should be equal again
+        assertEquals(dataset1, dataset2);
     }
 
-    /**
-     * Confirm that cloning works.
-     * @throws java.lang.CloneNotSupportedException
-     */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
-        DefaultFlowDataset<String> d1 = new DefaultFlowDataset<>();
-        d1.setFlow(0, "A", "Z", 1.0);
-        DefaultFlowDataset<String> d2 = (DefaultFlowDataset<String>) d1.clone();
+    @DisplayName("should remain equal after serialization and deserialization")
+    void serialization_shouldPreserveDatasetEquality() {
+        // Arrange
+        dataset.setFlow(0, "A", "Z", 1.0);
 
-        assertNotSame(d1, d2);
-        assertSame(d1.getClass(), d2.getClass());
-        assertEquals(d1, d2);
+        // Act
+        DefaultFlowDataset<String> deserializedDataset = TestUtils.serialised(dataset);
 
-        // check that the clone doesn't share the same underlying arrays.
-        d1.setFlow(0, "A", "Y", 8.0);
-        assertNotEquals(d1, d2);
-        d2.setFlow(0, "A", "Y", 8.0);
-        assertEquals(d1, d2);
+        // Assert
+        assertEquals(dataset, deserializedDataset);
     }
 
-    /**
-     * Check that this class implements PublicCloneable.
-     */
     @Test
-    public void testPublicCloneable() {
-        DefaultFlowDataset<String> d = new DefaultFlowDataset<>();
-        assertTrue(d instanceof PublicCloneable);
+    @DisplayName("clone() should produce an independent and equal copy")
+    void clone_shouldProduceIndependentAndEqualCopy() throws CloneNotSupportedException {
+        // Arrange
+        dataset.setFlow(0, "A", "Z", 1.0);
+
+        // Act
+        DefaultFlowDataset<String> clonedDataset = (DefaultFlowDataset<String>) dataset.clone();
+
+        // Assert: Basic clone contract
+        assertNotSame(dataset, clonedDataset, "Clone should be a different object instance.");
+        assertEquals(dataset, clonedDataset, "Clone should be equal to the original.");
+
+        // Assert: Deep copy - modifying the original should not affect the clone
+        dataset.setFlow(0, "A", "Y", 8.0);
+        assertNotEquals(dataset, clonedDataset, "Modifying original should make it unequal to the clone.");
     }
 
+    @Test
+    @DisplayName("should implement PublicCloneable")
+    void class_shouldImplementPublicCloneable() {
+        // Assert
+        assertTrue(dataset instanceof PublicCloneable);
+    }
 }
-
