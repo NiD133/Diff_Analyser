@@ -40,26 +40,15 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-final class ClassNotFoundSerialization implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    private void readObject(final ObjectInputStream in) throws ClassNotFoundException    {
-        throw new ClassNotFoundException(SerializationUtilsTest.CLASS_NOT_FOUND_MESSAGE);
-    }
-}
-
-interface SerializableSupplier<T> extends Supplier<T>, Serializable {
-    // empty
-}
-
-/**
- * Tests {@link SerializationUtils}.
- */
 class SerializationUtilsTest extends AbstractLangTest {
 
     static final String CLASS_NOT_FOUND_MESSAGE = "ClassNotFoundSerialization.readObject fake exception";
@@ -78,309 +67,332 @@ class SerializationUtilsTest extends AbstractLangTest {
         iMap.put("BAR", iInteger);
     }
 
-    @Test
-    void testClone() {
-        final Object test = SerializationUtils.clone(iMap);
-        assertNotNull(test);
-        assertInstanceOf(HashMap.class, test);
-        assertNotSame(test, iMap);
-        final HashMap<?, ?> testMap = (HashMap<?, ?>) test;
-        assertEquals(iString, testMap.get("FOO"));
-        assertNotSame(iString, testMap.get("FOO"));
-        assertEquals(iInteger, testMap.get("BAR"));
-        assertNotSame(iInteger, testMap.get("BAR"));
-        assertEquals(iMap, testMap);
-    }
+    @Nested
+    class CloneTests {
 
-    @Test
-    void testCloneNull() {
-        final Object test = SerializationUtils.clone(null);
-        assertNull(test);
-    }
-
-    @Test
-    void testCloneSerializableSupplier() {
-        final SerializableSupplier<String> supplier = () -> "test";
-        assertEquals("test", supplier.get());
-        final SerializableSupplier<String> clone = SerializationUtils.clone(supplier);
-        assertEquals("test", clone.get());
-    }
-
-    @Test
-    void testCloneUnserializable() {
-        iMap.put(new Object(), new Object());
-        assertThrows(SerializationException.class, () -> SerializationUtils.clone(iMap));
-    }
-
-    @Test
-    void testConstructor() {
-        assertNotNull(new SerializationUtils());
-        final Constructor<?>[] cons = SerializationUtils.class.getDeclaredConstructors();
-        assertEquals(1, cons.length);
-        assertTrue(Modifier.isPublic(cons[0].getModifiers()));
-        assertTrue(Modifier.isPublic(SerializationUtils.class.getModifiers()));
-        assertFalse(Modifier.isFinal(SerializationUtils.class.getModifiers()));
-    }
-
-    @Test
-    void testDeserializeBytes() throws Exception {
-        final ByteArrayOutputStream streamReal = new ByteArrayOutputStream();
-        try (ObjectOutputStream oos = new ObjectOutputStream(streamReal)) {
-            oos.writeObject(iMap);
-            oos.flush();
+        @Test
+        void clone_serializableObject_createsEqualCopy() {
+            final Object test = SerializationUtils.clone(iMap);
+            assertNotNull(test);
+            assertInstanceOf(HashMap.class, test);
+            assertNotSame(test, iMap);
+            final HashMap<?, ?> testMap = (HashMap<?, ?>) test;
+            assertEquals(iString, testMap.get("FOO"));
+            assertNotSame(iString, testMap.get("FOO"));
+            assertEquals(iInteger, testMap.get("BAR"));
+            assertNotSame(iInteger, testMap.get("BAR"));
+            assertEquals(iMap, testMap);
         }
 
-        final Object test = SerializationUtils.deserialize(streamReal.toByteArray());
-        assertNotNull(test);
-        assertInstanceOf(HashMap.class, test);
-        assertNotSame(test, iMap);
-        final HashMap<?, ?> testMap = (HashMap<?, ?>) test;
-        assertEquals(iString, testMap.get("FOO"));
-        assertNotSame(iString, testMap.get("FOO"));
-        assertEquals(iInteger, testMap.get("BAR"));
-        assertNotSame(iInteger, testMap.get("BAR"));
-        assertEquals(iMap, testMap);
-    }
-
-    @Test
-    void testDeserializeBytesBadStream() {
-        assertThrows(SerializationException.class, () -> SerializationUtils.deserialize(new byte[0]));
-    }
-
-    @Test
-    void testDeserializeBytesNull() {
-        assertNullPointerException(() -> SerializationUtils.deserialize((byte[]) null));
-    }
-
-    @Test
-    void testDeserializeBytesOfNull() throws Exception {
-        final ByteArrayOutputStream streamReal = new ByteArrayOutputStream();
-        try (ObjectOutputStream oos = new ObjectOutputStream(streamReal)) {
-            oos.writeObject(null);
-            oos.flush();
+        @Test
+        void clone_nullInput_returnsNull() {
+            final Object test = SerializationUtils.clone(null);
+            assertNull(test);
         }
 
-        final Object test = SerializationUtils.deserialize(streamReal.toByteArray());
-        assertNull(test);
-    }
-
-    @Test
-    void testDeserializeClassCastException() {
-        final String value = "Hello";
-        final byte[] serialized = SerializationUtils.serialize(value);
-        assertEquals(value, SerializationUtils.deserialize(serialized));
-        assertThrows(ClassCastException.class, () -> {
-            // Causes ClassCastException in call site, not in SerializationUtils.deserialize
-            @SuppressWarnings("unused") // needed to cause Exception
-            final Integer i = SerializationUtils.deserialize(serialized);
-        });
-    }
-
-    @Test
-    void testDeserializeStream() throws Exception {
-        final ByteArrayOutputStream streamReal = new ByteArrayOutputStream();
-        try (ObjectOutputStream oos = new ObjectOutputStream(streamReal)) {
-            oos.writeObject(iMap);
-            oos.flush();
+        @Test
+        void clone_serializableSupplier_maintainsFunctionality() {
+            final SerializableSupplier<String> supplier = () -> "test";
+            final SerializableSupplier<String> clone = SerializationUtils.clone(supplier);
+            assertEquals("test", clone.get());
         }
 
-        final ByteArrayInputStream inTest = new ByteArrayInputStream(streamReal.toByteArray());
-        final Object test = SerializationUtils.deserialize(inTest);
-        assertNotNull(test);
-        assertInstanceOf(HashMap.class, test);
-        assertNotSame(test, iMap);
-        final HashMap<?, ?> testMap = (HashMap<?, ?>) test;
-        assertEquals(iString, testMap.get("FOO"));
-        assertNotSame(iString, testMap.get("FOO"));
-        assertEquals(iInteger, testMap.get("BAR"));
-        assertNotSame(iInteger, testMap.get("BAR"));
-        assertEquals(iMap, testMap);
+        @Test
+        void clone_unserializableObject_throwsSerializationException() {
+            iMap.put(new Object(), new Object());
+            assertThrows(SerializationException.class, () -> SerializationUtils.clone(iMap));
+        }
     }
 
-    @Test
-    void testDeserializeStreamBadStream() {
-        assertThrows(SerializationException.class, () -> SerializationUtils.deserialize(new ByteArrayInputStream(new byte[0])));
+    @Nested
+    class ConstructorTests {
+
+        @Test
+        void constructor_instantiationAndVisibility() {
+            assertNotNull(new SerializationUtils());
+            final Constructor<?>[] cons = SerializationUtils.class.getDeclaredConstructors();
+            assertEquals(1, cons.length);
+            assertTrue(Modifier.isPublic(cons[0].getModifiers()));
+            assertTrue(Modifier.isPublic(SerializationUtils.class.getModifiers()));
+            assertFalse(Modifier.isFinal(SerializationUtils.class.getModifiers()));
+        }
     }
 
-    @Test
-    void testDeserializeStreamClassNotFound() throws Exception {
-        final ByteArrayOutputStream streamReal = new ByteArrayOutputStream();
-        try (ObjectOutputStream oos = new ObjectOutputStream(streamReal)) {
-            oos.writeObject(new ClassNotFoundSerialization());
-            oos.flush();
+    @Nested
+    class DeserializeBytesTests {
+
+        @Test
+        void deserialize_validByteArray_returnsDeserializedObject() throws Exception {
+            final byte[] serializedData = serializeObject(iMap);
+            final Object test = SerializationUtils.deserialize(serializedData);
+            assertDeserializedObjectValid(test);
         }
 
-        final ByteArrayInputStream inTest = new ByteArrayInputStream(streamReal.toByteArray());
-        final SerializationException se = assertThrows(SerializationException.class, () -> SerializationUtils.deserialize(inTest));
-        assertEquals("java.lang.ClassNotFoundException: " + CLASS_NOT_FOUND_MESSAGE, se.getMessage());
-    }
-
-    @Test
-    void testDeserializeStreamNull() {
-        assertNullPointerException(() -> SerializationUtils.deserialize((InputStream) null));
-    }
-
-    @Test
-    void testDeserializeStreamOfNull() throws Exception {
-        final ByteArrayOutputStream streamReal = new ByteArrayOutputStream();
-        try (ObjectOutputStream oos = new ObjectOutputStream(streamReal)) {
-            oos.writeObject(null);
-            oos.flush();
+        @Test
+        void deserialize_emptyByteArray_throwsSerializationException() {
+            assertThrows(SerializationException.class, () -> SerializationUtils.deserialize(new byte[0]));
         }
 
-        final ByteArrayInputStream inTest = new ByteArrayInputStream(streamReal.toByteArray());
-        final Object test = SerializationUtils.deserialize(inTest);
-        assertNull(test);
+        @Test
+        void deserialize_nullByteArray_throwsNullPointerException() {
+            assertNullPointerException(() -> SerializationUtils.deserialize((byte[]) null));
+        }
+
+        @Test
+        void deserialize_byteArrayContainingNull_returnsNull() throws Exception {
+            final byte[] serializedData = serializeObject(null);
+            final Object test = SerializationUtils.deserialize(serializedData);
+            assertNull(test);
+        }
+
+        @Test
+        void deserialize_incorrectTypeCast_throwsClassCastException() {
+            final String value = "Hello";
+            final byte[] serialized = SerializationUtils.serialize(value);
+            // Valid deserialization
+            assertEquals(value, SerializationUtils.deserialize(serialized));
+            // Invalid cast attempt
+            assertThrows(ClassCastException.class, () -> {
+                @SuppressWarnings("unused")
+                final Integer i = SerializationUtils.deserialize(serialized);
+            });
+        }
     }
 
-    @Test
-    void testException() {
-        SerializationException serEx;
-        final Exception ex = new Exception();
+    @Nested
+    class DeserializeStreamTests {
 
-        serEx = new SerializationException();
-        assertSame(null, serEx.getMessage());
-        assertSame(null, serEx.getCause());
+        @Test
+        void deserialize_validInputStream_returnsDeserializedObject() throws Exception {
+            final byte[] serializedData = serializeObject(iMap);
+            final Object test = SerializationUtils.deserialize(new ByteArrayInputStream(serializedData));
+            assertDeserializedObjectValid(test);
+        }
 
-        serEx = new SerializationException("Message");
-        assertSame("Message", serEx.getMessage());
-        assertSame(null, serEx.getCause());
+        @Test
+        void deserialize_emptyInputStream_throwsSerializationException() {
+            assertThrows(SerializationException.class, 
+                () -> SerializationUtils.deserialize(new ByteArrayInputStream(new byte[0])));
+        }
 
-        serEx = new SerializationException(ex);
-        assertEquals("java.lang.Exception", serEx.getMessage());
-        assertSame(ex, serEx.getCause());
+        @Test
+        void deserialize_classNotFoundInSerializedData_throwsSerializationExceptionWithCause() throws Exception {
+            final byte[] serializedData = serializeObject(new ClassNotFoundSerialization());
+            final InputStream inTest = new ByteArrayInputStream(serializedData);
+            final SerializationException se = assertThrows(SerializationException.class, 
+                () -> SerializationUtils.deserialize(inTest));
+            assertEquals("java.lang.ClassNotFoundException: " + CLASS_NOT_FOUND_MESSAGE, se.getMessage());
+        }
 
-        serEx = new SerializationException("Message", ex);
-        assertSame("Message", serEx.getMessage());
-        assertSame(ex, serEx.getCause());
+        @Test
+        void deserialize_nullInputStream_throwsNullPointerException() {
+            assertNullPointerException(() -> SerializationUtils.deserialize((InputStream) null));
+        }
+
+        @Test
+        void deserialize_inputStreamContainingNull_returnsNull() throws Exception {
+            final byte[] serializedData = serializeObject(null);
+            final InputStream inTest = new ByteArrayInputStream(serializedData);
+            final Object test = SerializationUtils.deserialize(inTest);
+            assertNull(test);
+        }
     }
 
-    @Test
-    void testNegativeByteArray() {
-        final byte[] byteArray = {
-            (byte) -84, (byte) -19, (byte) 0, (byte) 5, (byte) 125, (byte) -19, (byte) 0,
-            (byte) 5, (byte) 115, (byte) 114, (byte) -1, (byte) 97, (byte) 122, (byte) -48, (byte) -65
-        };
+    @Nested
+    class SerializeBytesTests {
 
-        assertThrows(SerializationException.class, () -> SerializationUtils.deserialize(new ByteArrayInputStream(byteArray)));
+        @Test
+        void serialize_validObject_producesExpectedByteArray() throws Exception {
+            final byte[] testBytes = SerializationUtils.serialize(iMap);
+            final byte[] expectedBytes = serializeUsingObjectOutputStream(iMap);
+            assertArrayEquals(expectedBytes, testBytes);
+        }
+
+        @Test
+        void serialize_nullObject_producesExpectedByteArray() throws Exception {
+            final byte[] testBytes = SerializationUtils.serialize(null);
+            final byte[] expectedBytes = serializeUsingObjectOutputStream(null);
+            assertArrayEquals(expectedBytes, testBytes);
+        }
+
+        @Test
+        void serialize_unserializableObject_throwsSerializationException() {
+            iMap.put(new Object(), new Object());
+            assertThrows(SerializationException.class, () -> SerializationUtils.serialize(iMap));
+        }
     }
 
-    @Test
-    void testPrimitiveTypeClassSerialization() {
-        final Class<?>[] primitiveTypes = { byte.class, short.class, int.class, long.class, float.class, double.class,
-                boolean.class, char.class, void.class };
+    @Nested
+    class SerializeStreamTests {
 
-        for (final Class<?> primitiveType : primitiveTypes) {
+        @Test
+        void serialize_validObjectToStream_producesExpectedOutput() throws Exception {
+            final ByteArrayOutputStream testStream = new ByteArrayOutputStream();
+            SerializationUtils.serialize(iMap, testStream);
+            final byte[] testBytes = testStream.toByteArray();
+            final byte[] expectedBytes = serializeUsingObjectOutputStream(iMap);
+            assertArrayEquals(expectedBytes, testBytes);
+        }
+
+        @Test
+        void serialize_nullObjectToStream_producesExpectedOutput() throws Exception {
+            final ByteArrayOutputStream testStream = new ByteArrayOutputStream();
+            SerializationUtils.serialize(null, testStream);
+            final byte[] testBytes = testStream.toByteArray();
+            final byte[] expectedBytes = serializeUsingObjectOutputStream(null);
+            assertArrayEquals(expectedBytes, testBytes);
+        }
+
+        @Test
+        void serialize_outputStreamThrowsIOException_wrapsInSerializationException() {
+            final OutputStream failingStream = new OutputStream() {
+                @Override
+                public void write(int arg0) throws IOException {
+                    throw new IOException(SERIALIZE_IO_EXCEPTION_MESSAGE);
+                }
+            };
+            final SerializationException e = assertThrows(SerializationException.class,
+                () -> SerializationUtils.serialize(iMap, failingStream));
+            assertEquals("java.io.IOException: " + SERIALIZE_IO_EXCEPTION_MESSAGE, e.getMessage());
+        }
+
+        @Test
+        void serialize_nullObjectAndNullStream_throwsNullPointerException() {
+            assertNullPointerException(() -> SerializationUtils.serialize(null, null));
+        }
+
+        @Test
+        void serialize_validObjectWithNullStream_throwsNullPointerException() {
+            assertNullPointerException(() -> SerializationUtils.serialize(iMap, null));
+        }
+
+        @Test
+        void serialize_unserializableObjectToStream_throwsSerializationException() {
+            iMap.put(new Object(), new Object());
+            assertThrows(SerializationException.class,
+                () -> SerializationUtils.serialize(iMap, new ByteArrayOutputStream()));
+        }
+    }
+
+    @Nested
+    class RoundtripTests {
+
+        @Test
+        void roundtrip_serializableObject_returnsEqualInstance() {
+            final HashMap<Object, Object> newMap = SerializationUtils.roundtrip(iMap);
+            assertEquals(iMap, newMap);
+        }
+    }
+
+    @Nested
+    class PrimitiveTypeTests {
+
+        static Stream<Arguments> primitiveTypes() {
+            return Stream.of(
+                Arguments.of(byte.class),
+                Arguments.of(short.class),
+                Arguments.of(int.class),
+                Arguments.of(long.class),
+                Arguments.of(float.class),
+                Arguments.of(double.class),
+                Arguments.of(boolean.class),
+                Arguments.of(char.class),
+                Arguments.of(void.class)
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource("primitiveTypes")
+        void clone_primitiveTypeClass_returnsSameClass(Class<?> primitiveType) {
             final Class<?> clone = SerializationUtils.clone(primitiveType);
             assertEquals(primitiveType, clone);
         }
     }
 
-    @Test
-    void testRoundtrip() {
-        final HashMap<Object, Object> newMap = SerializationUtils.roundtrip(iMap);
-        assertEquals(iMap, newMap);
-    }
+    @Nested
+    class ExceptionTests {
 
-    @Test
-    void testSerializeBytes() throws Exception {
-        final byte[] testBytes = SerializationUtils.serialize(iMap);
-
-        final ByteArrayOutputStream streamReal = new ByteArrayOutputStream();
-        try (ObjectOutputStream oos = new ObjectOutputStream(streamReal)) {
-            oos.writeObject(iMap);
-            oos.flush();
+        @Test
+        void serializationException_noArgConstructor_hasNullMessageAndCause() {
+            final SerializationException ex = new SerializationException();
+            assertNull(ex.getMessage());
+            assertNull(ex.getCause());
         }
 
-        final byte[] realBytes = streamReal.toByteArray();
-        assertEquals(testBytes.length, realBytes.length);
-        assertArrayEquals(realBytes, testBytes);
-    }
-
-    @Test
-    void testSerializeBytesNull() throws Exception {
-        final byte[] testBytes = SerializationUtils.serialize(null);
-
-        final ByteArrayOutputStream streamReal = new ByteArrayOutputStream();
-        try (ObjectOutputStream oos = new ObjectOutputStream(streamReal)) {
-            oos.writeObject(null);
-            oos.flush();
+        @Test
+        void serializationException_messageConstructor_hasSpecifiedMessage() {
+            final String message = "Test message";
+            final SerializationException ex = new SerializationException(message);
+            assertEquals(message, ex.getMessage());
+            assertNull(ex.getCause());
         }
 
-        final byte[] realBytes = streamReal.toByteArray();
-        assertEquals(testBytes.length, realBytes.length);
-        assertArrayEquals(realBytes, testBytes);
+        @Test
+        void serializationException_causeConstructor_hasSpecifiedCause() {
+            final Exception cause = new Exception("Test cause");
+            final SerializationException ex = new SerializationException(cause);
+            assertEquals(cause.toString(), ex.getMessage());
+            assertSame(cause, ex.getCause());
+        }
+
+        @Test
+        void serializationException_messageAndCauseConstructor_hasBothProperties() {
+            final String message = "Test message";
+            final Exception cause = new Exception("Test cause");
+            final SerializationException ex = new SerializationException(message, cause);
+            assertEquals(message, ex.getMessage());
+            assertSame(cause, ex.getCause());
+        }
     }
 
     @Test
-    void testSerializeBytesUnserializable() {
-        iMap.put(new Object(), new Object());
-        assertThrows(SerializationException.class, () -> SerializationUtils.serialize(iMap));
-    }
-
-    @Test
-    void testSerializeIOException() {
-        // forces an IOException when the ObjectOutputStream is created, to test not closing the stream
-        // in the finally block
-        final OutputStream streamTest = new OutputStream() {
-            @Override
-            public void write(final int arg0) throws IOException {
-                throw new IOException(SERIALIZE_IO_EXCEPTION_MESSAGE);
-            }
+    void deserialize_invalidByteArray_throwsSerializationException() {
+        final byte[] invalidData = {
+            (byte) -84, (byte) -19, (byte) 0, (byte) 5, (byte) 125, (byte) -19, (byte) 0,
+            (byte) 5, (byte) 115, (byte) 112, (byte) -1, (byte) 97, (byte) 122, (byte) -48, (byte) -65
         };
-        final SerializationException e =
-                assertThrows(SerializationException.class, () -> SerializationUtils.serialize(iMap, streamTest));
-        assertEquals("java.io.IOException: " + SERIALIZE_IO_EXCEPTION_MESSAGE, e.getMessage());
+        assertThrows(SerializationException.class,
+            () -> SerializationUtils.deserialize(new ByteArrayInputStream(invalidData)));
     }
 
-    @Test
-    void testSerializeStream() throws Exception {
-        final ByteArrayOutputStream streamTest = new ByteArrayOutputStream();
-        SerializationUtils.serialize(iMap, streamTest);
-
-        final ByteArrayOutputStream streamReal = new ByteArrayOutputStream();
-        try (ObjectOutputStream oos = new ObjectOutputStream(streamReal)) {
-            oos.writeObject(iMap);
-            oos.flush();
+    // Helper methods
+    private byte[] serializeObject(Object obj) throws IOException {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+             ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+            oos.writeObject(obj);
+            return baos.toByteArray();
         }
-
-        final byte[] testBytes = streamTest.toByteArray();
-        final byte[] realBytes = streamReal.toByteArray();
-        assertEquals(testBytes.length, realBytes.length);
-        assertArrayEquals(realBytes, testBytes);
     }
 
-    @Test
-    void testSerializeStreamNullNull() {
-        assertNullPointerException(() -> SerializationUtils.serialize(null, null));
-    }
-
-    @Test
-    void testSerializeStreamNullObj() throws Exception {
-        final ByteArrayOutputStream streamTest = new ByteArrayOutputStream();
-        SerializationUtils.serialize(null, streamTest);
-
-        final ByteArrayOutputStream streamReal = new ByteArrayOutputStream();
-        try (ObjectOutputStream oos = new ObjectOutputStream(streamReal)) {
-            oos.writeObject(null);
-            oos.flush();
+    private byte[] serializeUsingObjectOutputStream(Serializable obj) throws IOException {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+             ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+            oos.writeObject(obj);
+            return baos.toByteArray();
         }
-
-        final byte[] testBytes = streamTest.toByteArray();
-        final byte[] realBytes = streamReal.toByteArray();
-        assertEquals(testBytes.length, realBytes.length);
-        assertArrayEquals(realBytes, testBytes);
     }
 
-    @Test
-    void testSerializeStreamObjNull() {
-        assertNullPointerException(() -> SerializationUtils.serialize(iMap, null));
+    private void assertDeserializedObjectValid(Object test) {
+        assertNotNull(test);
+        assertInstanceOf(HashMap.class, test);
+        assertNotSame(test, iMap);
+        final HashMap<?, ?> testMap = (HashMap<?, ?>) test;
+        assertEquals(iString, testMap.get("FOO"));
+        assertNotSame(iString, testMap.get("FOO"));
+        assertEquals(iInteger, testMap.get("BAR"));
+        assertNotSame(iInteger, testMap.get("BAR"));
+        assertEquals(iMap, testMap);
     }
 
-    @Test
-    void testSerializeStreamUnserializable() {
-        final ByteArrayOutputStream streamTest = new ByteArrayOutputStream();
-        iMap.put(new Object(), new Object());
-        assertThrows(SerializationException.class, () -> SerializationUtils.serialize(iMap, streamTest));
+    // Test classes
+    static final class ClassNotFoundSerialization implements Serializable {
+        private static final long serialVersionUID = 1L;
+        private void readObject(ObjectInputStream in) throws ClassNotFoundException {
+            throw new ClassNotFoundException(SerializationUtilsTest.CLASS_NOT_FOUND_MESSAGE);
+        }
+    }
+
+    interface SerializableSupplier<T> extends Supplier<T>, Serializable {
+        // Marker interface
     }
 }
