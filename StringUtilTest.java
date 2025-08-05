@@ -6,129 +6,112 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static org.jsoup.internal.StringUtil.*;
+import static org.jsoup.internal.StringUtil.normaliseWhitespace;
+import static org.jsoup.internal.StringUtil.resolve;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class StringUtilTest {
 
     @Test
-    public void testJoin() {
-        // Test joining a single empty string
-        assertEquals("", join(Collections.singletonList(""), " "));
-
-        // Test joining a single non-empty string
-        assertEquals("one", join(Collections.singletonList("one"), " "));
-
-        // Test joining multiple strings with a space separator
-        assertEquals("one two three", join(Arrays.asList("one", "two", "three"), " "));
+    public void join() {
+        assertEquals("", StringUtil.join(Collections.singletonList(""), " "));
+        assertEquals("one", StringUtil.join(Collections.singletonList("one"), " "));
+        assertEquals("one two three", StringUtil.join(Arrays.asList("one", "two", "three"), " "));
     }
 
-    @Test
-    public void testPadding() {
-        // Test padding with default max width
-        assertEquals("", padding(0));
-        assertEquals(" ", padding(1));
-        assertEquals("  ", padding(2));
-        assertEquals("               ", padding(15));
-        assertEquals("                              ", padding(45)); // Max default padding is 30
+    @Test public void padding() {
+        assertEquals("", StringUtil.padding(0));
+        assertEquals(" ", StringUtil.padding(1));
+        assertEquals("  ", StringUtil.padding(2));
+        assertEquals("               ", StringUtil.padding(15));
+        assertEquals("                              ", StringUtil.padding(45)); // we default to tap out at 30
 
-        // Test padding with unlimited length (-1)
-        assertEquals("", padding(0, -1));
-        assertEquals("                    ", padding(20, -1));
-        assertEquals("                     ", padding(21, -1));
-        assertEquals("                              ", padding(30, -1));
-        assertEquals("                                             ", padding(45, -1));
+        // memoization is up to 21 blocks (0 to 20 spaces) and exits early before min checks making maxPaddingWidth unused
+        assertEquals("", StringUtil.padding(0, -1));
+        assertEquals("                    ", StringUtil.padding(20, -1));
 
-        // Test padding with zero max width
-        assertEquals("", padding(0, 0));
-        assertEquals("", padding(21, 0));
+        // this test escapes memoization and continues through
+        assertEquals("                     ", StringUtil.padding(21, -1));
 
-        // Test padding with max width of 30
-        assertEquals("", padding(0, 30));
-        assertEquals(" ", padding(1, 30));
-        assertEquals("  ", padding(2, 30));
-        assertEquals("               ", padding(15, 30));
-        assertEquals("                              ", padding(45, 30));
+        // this test escapes memoization and using unlimited length (-1) will allow requested spaces
+        assertEquals("                              ", StringUtil.padding(30, -1));
+        assertEquals("                                             ", StringUtil.padding(45, -1));
 
-        // Test padding with max width less than requested width
-        assertEquals(5, padding(20, 5).length());
+        // we tap out at 0 for this test
+        assertEquals("", StringUtil.padding(0, 0));
+
+        // as memoization is escaped, setting zero for max padding will not allow any requested width
+        assertEquals("", StringUtil.padding(21, 0));
+
+        // we tap out at 30 for these tests making > 30 use 30
+        assertEquals("", StringUtil.padding(0, 30));
+        assertEquals(" ", StringUtil.padding(1, 30));
+        assertEquals("  ", StringUtil.padding(2, 30));
+        assertEquals("               ", StringUtil.padding(15, 30));
+        assertEquals("                              ", StringUtil.padding(45, 30));
+
+        // max applies regardless of memoized
+        assertEquals(5, StringUtil.padding(20, 5).length());
     }
 
-    @Test
-    public void testPaddingInACan() {
-        // Verify memoized padding array
-        String[] paddingArray = padding;
-        assertEquals(21, paddingArray.length);
-        for (int i = 0; i < paddingArray.length; i++) {
-            assertEquals(i, paddingArray[i].length());
+    @Test public void paddingInACan() {
+        String[] padding = StringUtil.padding;
+        assertEquals(21, padding.length);
+        for (int i = 0; i < padding.length; i++) {
+            assertEquals(i, padding[i].length());
         }
     }
 
-    @Test
-    public void testIsBlank() {
-        // Test blank strings
-        assertTrue(isBlank(null));
-        assertTrue(isBlank(""));
-        assertTrue(isBlank("      "));
-        assertTrue(isBlank("   \r\n  "));
+    @Test public void isBlank() {
+        assertTrue(StringUtil.isBlank(null));
+        assertTrue(StringUtil.isBlank(""));
+        assertTrue(StringUtil.isBlank("      "));
+        assertTrue(StringUtil.isBlank("   \r\n  "));
 
-        // Test non-blank strings
-        assertFalse(isBlank("hello"));
-        assertFalse(isBlank("   hello   "));
+        assertFalse(StringUtil.isBlank("hello"));
+        assertFalse(StringUtil.isBlank("   hello   "));
     }
 
-    @Test
-    public void testIsNumeric() {
-        // Test non-numeric strings
-        assertFalse(isNumeric(null));
-        assertFalse(isNumeric(" "));
-        assertFalse(isNumeric("123 546"));
-        assertFalse(isNumeric("hello"));
-        assertFalse(isNumeric("123.334"));
+    @Test public void isNumeric() {
+        assertFalse(StringUtil.isNumeric(null));
+        assertFalse(StringUtil.isNumeric(" "));
+        assertFalse(StringUtil.isNumeric("123 546"));
+        assertFalse(StringUtil.isNumeric("hello"));
+        assertFalse(StringUtil.isNumeric("123.334"));
 
-        // Test numeric strings
-        assertTrue(isNumeric("1"));
-        assertTrue(isNumeric("1234"));
+        assertTrue(StringUtil.isNumeric("1"));
+        assertTrue(StringUtil.isNumeric("1234"));
     }
 
-    @Test
-    public void testIsWhitespace() {
-        // Test whitespace characters
-        assertTrue(isWhitespace('\t'));
-        assertTrue(isWhitespace('\n'));
-        assertTrue(isWhitespace('\r'));
-        assertTrue(isWhitespace('\f'));
-        assertTrue(isWhitespace(' '));
+    @Test public void isWhitespace() {
+        assertTrue(StringUtil.isWhitespace('\t'));
+        assertTrue(StringUtil.isWhitespace('\n'));
+        assertTrue(StringUtil.isWhitespace('\r'));
+        assertTrue(StringUtil.isWhitespace('\f'));
+        assertTrue(StringUtil.isWhitespace(' '));
 
-        // Test non-whitespace characters
-        assertFalse(isWhitespace('\u00a0'));
-        assertFalse(isWhitespace('\u2000'));
-        assertFalse(isWhitespace('\u3000'));
+        assertFalse(StringUtil.isWhitespace('\u00a0'));
+        assertFalse(StringUtil.isWhitespace('\u2000'));
+        assertFalse(StringUtil.isWhitespace('\u3000'));
     }
 
-    @Test
-    public void testNormaliseWhiteSpace() {
-        // Test normalizing whitespace in strings
+    @Test public void normaliseWhiteSpace() {
         assertEquals(" ", normaliseWhitespace("    \r \n \r\n"));
         assertEquals(" hello there ", normaliseWhitespace("   hello   \r \n  there    \n"));
         assertEquals("hello", normaliseWhitespace("hello"));
         assertEquals("hello there", normaliseWhitespace("hello\nthere"));
     }
 
-    @Test
-    public void testNormaliseWhiteSpaceHandlesHighSurrogates() {
-        // Test normalizing whitespace with high surrogate characters
-        String input = "\ud869\udeb2\u304b\u309a  1";
-        String expected = "\ud869\udeb2\u304b\u309a 1";
+    @Test public void normaliseWhiteSpaceHandlesHighSurrogates() {
+        String test71540chars = "\ud869\udeb2\u304b\u309a  1";
+        String test71540charsExpectedSingleWhitespace = "\ud869\udeb2\u304b\u309a 1";
 
-        assertEquals(expected, normaliseWhitespace(input));
-        String extractedText = Jsoup.parse(input).text();
-        assertEquals(expected, extractedText);
+        assertEquals(test71540charsExpectedSingleWhitespace, normaliseWhitespace(test71540chars));
+        String extractedText = Jsoup.parse(test71540chars).text();
+        assertEquals(test71540charsExpectedSingleWhitespace, extractedText);
     }
 
-    @Test
-    public void testResolvesRelativeUrls() {
-        // Test resolving relative URLs
+    @Test public void resolvesRelativeUrls() {
         assertEquals("http://example.com/one/two?three", resolve("http://example.com", "./one/two?three"));
         assertEquals("http://example.com/one/two?three", resolve("http://example.com?one", "./one/two?three"));
         assertEquals("http://example.com/one/two?three#four", resolve("http://example.com", "./one/two?three#four"));
@@ -143,8 +126,7 @@ public class StringUtilTest {
         assertEquals("ftp://example.com/one", resolve("ftp://example.com/two/", "../one"));
         assertEquals("ftp://example.com/one/two.c", resolve("ftp://example.com/one/", "./two.c"));
         assertEquals("ftp://example.com/one/two.c", resolve("ftp://example.com/one/", "two.c"));
-
-        // Examples from RFC 3986 section 5.4.2
+        // examples taken from rfc3986 section 5.4.2
         assertEquals("http://example.com/g", resolve("http://example.com/b/c/d;p?q", "../../../g"));
         assertEquals("http://example.com/g", resolve("http://example.com/b/c/d;p?q", "../../../../g"));
         assertEquals("http://example.com/g", resolve("http://example.com/b/c/d;p?q", "/./g"));
@@ -165,104 +147,89 @@ public class StringUtilTest {
         assertEquals("http://example.com/b/c/g#s/../x", resolve("http://example.com/b/c/d;p?q", "g#s/../x"));
     }
 
-    @Test
-    public void testStripsControlCharsFromUrls() {
-        // Test resolving URLs with control characters
+    @Test void stripsControlCharsFromUrls() {
+        // should resovle to an absolute url:
         assertEquals("foo:bar", resolve("\nhttps://\texample.com/", "\r\nfo\to:ba\br"));
     }
 
-    @Test
-    public void testAllowsSpaceInUrl() {
-        // Test resolving URLs with spaces
+    @Test void allowsSpaceInUrl() {
         assertEquals("https://example.com/foo bar/", resolve("HTTPS://example.com/example/", "../foo bar/"));
     }
 
     @Test
-    public void testIsAscii() {
-        // Test ASCII strings
-        assertTrue(isAscii(""));
-        assertTrue(isAscii("example.com"));
-        assertTrue(isAscii("One Two"));
-
-        // Test non-ASCII strings
-        assertFalse(isAscii("🧔"));
-        assertFalse(isAscii("测试"));
-        assertFalse(isAscii("测试.com"));
+    void isAscii() {
+        assertTrue(StringUtil.isAscii(""));
+        assertTrue(StringUtil.isAscii("example.com"));
+        assertTrue(StringUtil.isAscii("One Two"));
+        assertFalse(StringUtil.isAscii("🧔"));
+        assertFalse(StringUtil.isAscii("测试"));
+        assertFalse(StringUtil.isAscii("测试.com"));
     }
 
-    @Test
-    public void testIsAsciiLetter() {
-        // Test ASCII letters
-        assertTrue(isAsciiLetter('a'));
-        assertTrue(isAsciiLetter('n'));
-        assertTrue(isAsciiLetter('z'));
-        assertTrue(isAsciiLetter('A'));
-        assertTrue(isAsciiLetter('N'));
-        assertTrue(isAsciiLetter('Z'));
+    @Test void isAsciiLetter() {
+        assertTrue(StringUtil.isAsciiLetter('a'));
+        assertTrue(StringUtil.isAsciiLetter('n'));
+        assertTrue(StringUtil.isAsciiLetter('z'));
+        assertTrue(StringUtil.isAsciiLetter('A'));
+        assertTrue(StringUtil.isAsciiLetter('N'));
+        assertTrue(StringUtil.isAsciiLetter('Z'));
 
-        // Test non-ASCII letters
-        assertFalse(isAsciiLetter(' '));
-        assertFalse(isAsciiLetter('-'));
-        assertFalse(isAsciiLetter('0'));
-        assertFalse(isAsciiLetter('ß'));
-        assertFalse(isAsciiLetter('Ě'));
+        assertFalse(StringUtil.isAsciiLetter(' '));
+        assertFalse(StringUtil.isAsciiLetter('-'));
+        assertFalse(StringUtil.isAsciiLetter('0'));
+        assertFalse(StringUtil.isAsciiLetter('ß'));
+        assertFalse(StringUtil.isAsciiLetter('Ě'));
     }
 
-    @Test
-    public void testIsDigit() {
-        // Test digit characters
-        assertTrue(isDigit('0'));
-        assertTrue(isDigit('1'));
-        assertTrue(isDigit('2'));
-        assertTrue(isDigit('3'));
-        assertTrue(isDigit('4'));
-        assertTrue(isDigit('5'));
-        assertTrue(isDigit('6'));
-        assertTrue(isDigit('7'));
-        assertTrue(isDigit('8'));
-        assertTrue(isDigit('9'));
+    @Test void isDigit() {
+        assertTrue(StringUtil.isDigit('0'));
+        assertTrue(StringUtil.isDigit('1'));
+        assertTrue(StringUtil.isDigit('2'));
+        assertTrue(StringUtil.isDigit('3'));
+        assertTrue(StringUtil.isDigit('4'));
+        assertTrue(StringUtil.isDigit('5'));
+        assertTrue(StringUtil.isDigit('6'));
+        assertTrue(StringUtil.isDigit('7'));
+        assertTrue(StringUtil.isDigit('8'));
+        assertTrue(StringUtil.isDigit('9'));
 
-        // Test non-digit characters
-        assertFalse(isDigit('a'));
-        assertFalse(isDigit('A'));
-        assertFalse(isDigit('ä'));
-        assertFalse(isDigit('Ä'));
-        assertFalse(isDigit('١'));
-        assertFalse(isDigit('୳'));
+        assertFalse(StringUtil.isDigit('a'));
+        assertFalse(StringUtil.isDigit('A'));
+        assertFalse(StringUtil.isDigit('ä'));
+        assertFalse(StringUtil.isDigit('Ä'));
+        assertFalse(StringUtil.isDigit('١'));
+        assertFalse(StringUtil.isDigit('୳'));
     }
 
-    @Test
-    public void testIsHexDigit() {
-        // Test hex digit characters
-        assertTrue(isHexDigit('0'));
-        assertTrue(isHexDigit('1'));
-        assertTrue(isHexDigit('2'));
-        assertTrue(isHexDigit('3'));
-        assertTrue(isHexDigit('4'));
-        assertTrue(isHexDigit('5'));
-        assertTrue(isHexDigit('6'));
-        assertTrue(isHexDigit('7'));
-        assertTrue(isHexDigit('8'));
-        assertTrue(isHexDigit('9'));
-        assertTrue(isHexDigit('a'));
-        assertTrue(isHexDigit('b'));
-        assertTrue(isHexDigit('c'));
-        assertTrue(isHexDigit('d'));
-        assertTrue(isHexDigit('e'));
-        assertTrue(isHexDigit('f'));
-        assertTrue(isHexDigit('A'));
-        assertTrue(isHexDigit('B'));
-        assertTrue(isHexDigit('C'));
-        assertTrue(isHexDigit('D'));
-        assertTrue(isHexDigit('E'));
-        assertTrue(isHexDigit('F'));
+    @Test void isHexDigit() {
+        assertTrue(StringUtil.isHexDigit('0'));
+        assertTrue(StringUtil.isHexDigit('1'));
+        assertTrue(StringUtil.isHexDigit('2'));
+        assertTrue(StringUtil.isHexDigit('3'));
+        assertTrue(StringUtil.isHexDigit('4'));
+        assertTrue(StringUtil.isHexDigit('5'));
+        assertTrue(StringUtil.isHexDigit('6'));
+        assertTrue(StringUtil.isHexDigit('7'));
+        assertTrue(StringUtil.isHexDigit('8'));
+        assertTrue(StringUtil.isHexDigit('9'));
+        assertTrue(StringUtil.isHexDigit('a'));
+        assertTrue(StringUtil.isHexDigit('b'));
+        assertTrue(StringUtil.isHexDigit('c'));
+        assertTrue(StringUtil.isHexDigit('d'));
+        assertTrue(StringUtil.isHexDigit('e'));
+        assertTrue(StringUtil.isHexDigit('f'));
+        assertTrue(StringUtil.isHexDigit('A'));
+        assertTrue(StringUtil.isHexDigit('B'));
+        assertTrue(StringUtil.isHexDigit('C'));
+        assertTrue(StringUtil.isHexDigit('D'));
+        assertTrue(StringUtil.isHexDigit('E'));
+        assertTrue(StringUtil.isHexDigit('F'));
 
-        // Test non-hex digit characters
-        assertFalse(isHexDigit('g'));
-        assertFalse(isHexDigit('G'));
-        assertFalse(isHexDigit('ä'));
-        assertFalse(isHexDigit('Ä'));
-        assertFalse(isHexDigit('١'));
-        assertFalse(isHexDigit('୳'));
+        assertFalse(StringUtil.isHexDigit('g'));
+        assertFalse(StringUtil.isHexDigit('G'));
+        assertFalse(StringUtil.isHexDigit('ä'));
+        assertFalse(StringUtil.isHexDigit('Ä'));
+        assertFalse(StringUtil.isHexDigit('١'));
+        assertFalse(StringUtil.isHexDigit('୳'));
     }
 }
