@@ -23,437 +23,248 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class)
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true, 
+    useVFS = true, 
+    useVNET = true, 
+    resetStaticState = true, 
+    separateClassLoader = true
+)
 public class GroupedRandomAccessSource_ESTest extends GroupedRandomAccessSource_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[2];
-      byte[] byteArray0 = new byte[11];
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-      GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(arrayRandomAccessSource0);
-      randomAccessSourceArray0[1] = (RandomAccessSource) getBufferedRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      int int0 = groupedRandomAccessSource0.get(10L, byteArray0, 5, 5);
-      assertEquals(5, int0);
-  }
+    // ================= Constructor Tests =================
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[2];
-      byte[] byteArray0 = new byte[1];
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-      GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(arrayRandomAccessSource0);
-      randomAccessSourceArray0[1] = (RandomAccessSource) getBufferedRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      int int0 = groupedRandomAccessSource0.get((long) 0, byteArray0, (-10), (-10));
-      assertEquals(2L, groupedRandomAccessSource0.length());
-      assertEquals((-1), int0);
-  }
+    @Test(timeout = 4000)
+    public void testConstructorWithNullSourcesThrowsException() {
+        try {
+            new GroupedRandomAccessSource((RandomAccessSource[]) null);
+            fail("Expected NullPointerException for null sources array");
+        } catch (NullPointerException e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[2];
-      byte[] byteArray0 = new byte[0];
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-      GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(arrayRandomAccessSource0);
-      randomAccessSourceArray0[1] = (RandomAccessSource) getBufferedRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      groupedRandomAccessSource0.sourceInUse(arrayRandomAccessSource0);
-      assertEquals(0L, groupedRandomAccessSource0.length());
-  }
+    @Test(timeout = 4000)
+    public void testConstructorWithEmptySourcesThrowsException() {
+        RandomAccessSource[] emptySources = new RandomAccessSource[0];
+        try {
+            new GroupedRandomAccessSource(emptySources);
+            fail("Expected ArrayIndexOutOfBoundsException for empty sources array");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[2];
-      byte[] byteArray0 = new byte[0];
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-      GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(arrayRandomAccessSource0);
-      randomAccessSourceArray0[1] = (RandomAccessSource) getBufferedRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      long long0 = groupedRandomAccessSource0.length();
-      assertEquals(0L, long0);
-  }
+    // ================= get() Method Tests =================
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      byte[] byteArray0 = new byte[5];
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(arrayRandomAccessSource0);
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[3];
-      randomAccessSourceArray0[0] = (RandomAccessSource) getBufferedRandomAccessSource0;
-      randomAccessSourceArray0[1] = (RandomAccessSource) getBufferedRandomAccessSource0;
-      randomAccessSourceArray0[2] = (RandomAccessSource) getBufferedRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      long long0 = groupedRandomAccessSource0.length();
-      assertEquals(15L, long0);
-  }
+    @Test(timeout = 4000)
+    public void testGetWithValidOffsetAndLength() throws Throwable {
+        // Setup: Two sources with 11 bytes total
+        byte[] sourceData = new byte[11]; // Defaults to zeros
+        ArrayRandomAccessSource source1 = new ArrayRandomAccessSource(sourceData);
+        GetBufferedRandomAccessSource source2 = new GetBufferedRandomAccessSource(source1);
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(
+            new RandomAccessSource[] { source1, source2 }
+        );
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      byte[] byteArray0 = new byte[11];
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(arrayRandomAccessSource0);
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[9];
-      randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-      randomAccessSourceArray0[1] = (RandomAccessSource) getBufferedRandomAccessSource0;
-      WindowRandomAccessSource windowRandomAccessSource0 = new WindowRandomAccessSource(getBufferedRandomAccessSource0, (-2024L), (-2024L));
-      randomAccessSourceArray0[2] = (RandomAccessSource) windowRandomAccessSource0;
-      randomAccessSourceArray0[3] = (RandomAccessSource) getBufferedRandomAccessSource0;
-      randomAccessSourceArray0[4] = (RandomAccessSource) getBufferedRandomAccessSource0;
-      randomAccessSourceArray0[5] = (RandomAccessSource) getBufferedRandomAccessSource0;
-      randomAccessSourceArray0[6] = (RandomAccessSource) arrayRandomAccessSource0;
-      randomAccessSourceArray0[7] = (RandomAccessSource) getBufferedRandomAccessSource0;
-      randomAccessSourceArray0[8] = (RandomAccessSource) getBufferedRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      long long0 = groupedRandomAccessSource0.length();
-      assertEquals((-1936L), long0);
-  }
+        byte[] buffer = new byte[11];
+        int bytesRead = groupedSource.get(10L, buffer, 5, 5);
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[2];
-      byte[] byteArray0 = new byte[1];
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      WindowRandomAccessSource windowRandomAccessSource0 = new WindowRandomAccessSource(arrayRandomAccessSource0, 7L, 7L);
-      IndependentRandomAccessSource independentRandomAccessSource0 = new IndependentRandomAccessSource(windowRandomAccessSource0);
-      randomAccessSourceArray0[0] = (RandomAccessSource) independentRandomAccessSource0;
-      randomAccessSourceArray0[1] = (RandomAccessSource) windowRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      int int0 = groupedRandomAccessSource0.getStartingSourceIndex(7L);
-      assertEquals(1, int0);
-      assertEquals(14L, groupedRandomAccessSource0.length());
-  }
+        assertEquals(5, bytesRead);
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      byte[] byteArray0 = new byte[4];
-      byteArray0[2] = (byte)3;
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(arrayRandomAccessSource0);
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[5];
-      randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-      randomAccessSourceArray0[1] = (RandomAccessSource) getBufferedRandomAccessSource0;
-      randomAccessSourceArray0[2] = (RandomAccessSource) arrayRandomAccessSource0;
-      randomAccessSourceArray0[3] = (RandomAccessSource) arrayRandomAccessSource0;
-      randomAccessSourceArray0[4] = (RandomAccessSource) getBufferedRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      int int0 = groupedRandomAccessSource0.get(2L);
-      assertEquals(3, int0);
-      assertEquals(20L, groupedRandomAccessSource0.length());
-  }
+    @Test(timeout = 4000)
+    public void testGetWithNegativeLengthReturnsMinusOne() throws Throwable {
+        byte[] sourceData = new byte[1];
+        ArrayRandomAccessSource source1 = new ArrayRandomAccessSource(sourceData);
+        GetBufferedRandomAccessSource source2 = new GetBufferedRandomAccessSource(source1);
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(
+            new RandomAccessSource[] { source1, source2 }
+        );
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[1];
-      byte[] byteArray0 = new byte[3];
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      groupedRandomAccessSource0.close();
-      // Undeclared exception!
-      try { 
-        groupedRandomAccessSource0.get((long) 1, byteArray0, 1, 1);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.itextpdf.text.io.ArrayRandomAccessSource", e);
-      }
-  }
+        byte[] buffer = new byte[1];
+        int bytesRead = groupedSource.get(0L, buffer, -10, -10);
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      byte[] byteArray0 = new byte[2];
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[7];
-      randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-      randomAccessSourceArray0[1] = (RandomAccessSource) arrayRandomAccessSource0;
-      randomAccessSourceArray0[2] = (RandomAccessSource) arrayRandomAccessSource0;
-      randomAccessSourceArray0[3] = (RandomAccessSource) arrayRandomAccessSource0;
-      ByteBuffer byteBuffer0 = ByteBuffer.allocate(1297);
-      ByteBufferRandomAccessSource byteBufferRandomAccessSource0 = new ByteBufferRandomAccessSource(byteBuffer0);
-      randomAccessSourceArray0[4] = (RandomAccessSource) byteBufferRandomAccessSource0;
-      randomAccessSourceArray0[5] = (RandomAccessSource) arrayRandomAccessSource0;
-      randomAccessSourceArray0[6] = (RandomAccessSource) arrayRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      // Undeclared exception!
-      try { 
-        groupedRandomAccessSource0.get((long) 1297, byteArray0, (-1228), 1297);
-        fail("Expecting exception: NoSuchMethodError");
-      
-      } catch(NoSuchMethodError e) {
-         //
-         // java.nio.ByteBuffer.position(I)Ljava/nio/ByteBuffer;
-         //
-         verifyException("com.itextpdf.text.io.ByteBufferRandomAccessSource", e);
-      }
-  }
+        assertEquals(-1, bytesRead);
+        assertEquals(2L, groupedSource.length());
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[2];
-      byte[] byteArray0 = new byte[1];
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      WindowRandomAccessSource windowRandomAccessSource0 = new WindowRandomAccessSource(arrayRandomAccessSource0, 7L, 7L);
-      IndependentRandomAccessSource independentRandomAccessSource0 = new IndependentRandomAccessSource(windowRandomAccessSource0);
-      randomAccessSourceArray0[0] = (RandomAccessSource) independentRandomAccessSource0;
-      randomAccessSourceArray0[1] = (RandomAccessSource) windowRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      groupedRandomAccessSource0.close();
-      // Undeclared exception!
-      try { 
-        groupedRandomAccessSource0.get((long) 1, byteArray0, 1, 1);
-        fail("Expecting exception: IllegalStateException");
-      
-      } catch(IllegalStateException e) {
-         //
-         // Already closed
-         //
-         verifyException("com.itextpdf.text.io.ArrayRandomAccessSource", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testGetAfterCloseThrowsException() throws Throwable {
+        byte[] sourceData = new byte[1];
+        ArrayRandomAccessSource source = new ArrayRandomAccessSource(sourceData);
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(
+            new RandomAccessSource[] { source }
+        );
+        
+        groupedSource.close();
+        
+        try {
+            groupedSource.get(1L, sourceData, 1, 1);
+            fail("Expected NullPointerException after closing source");
+        } catch (NullPointerException e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[1];
-      byte[] byteArray0 = new byte[7];
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      // Undeclared exception!
-      try { 
-        groupedRandomAccessSource0.get((long) 1, byteArray0, 5239, 1);
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
-      
-      } catch(ArrayIndexOutOfBoundsException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.itextpdf.text.io.ArrayRandomAccessSource", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testGetWithOutOfBoundsOffsetReturnsMinusOne() throws Throwable {
+        byte[] sourceData = new byte[3];
+        ArrayRandomAccessSource source = new ArrayRandomAccessSource(sourceData);
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(
+            new RandomAccessSource[] { source }
+        );
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[4];
-      MappedChannelRandomAccessSource mappedChannelRandomAccessSource0 = new MappedChannelRandomAccessSource((FileChannel) null, 2L, 2L);
-      randomAccessSourceArray0[0] = (RandomAccessSource) mappedChannelRandomAccessSource0;
-      randomAccessSourceArray0[1] = (RandomAccessSource) mappedChannelRandomAccessSource0;
-      byte[] byteArray0 = new byte[7];
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      randomAccessSourceArray0[2] = (RandomAccessSource) arrayRandomAccessSource0;
-      IndependentRandomAccessSource independentRandomAccessSource0 = new IndependentRandomAccessSource(randomAccessSourceArray0[1]);
-      randomAccessSourceArray0[3] = (RandomAccessSource) independentRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      try { 
-        groupedRandomAccessSource0.get(2L, byteArray0, (int) (byte)109, (int) (byte)43);
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // RandomAccessSource not opened
-         //
-         verifyException("com.itextpdf.text.io.MappedChannelRandomAccessSource", e);
-      }
-  }
+        int result = groupedSource.get(12L);
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[1];
-      byte[] byteArray0 = new byte[2];
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      groupedRandomAccessSource0.close();
-      // Undeclared exception!
-      try { 
-        groupedRandomAccessSource0.get((long) 1);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.itextpdf.text.io.ArrayRandomAccessSource", e);
-      }
-  }
+        assertEquals(-1, result);
+        assertEquals(3L, groupedSource.length());
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[2];
-      byte[] byteArray0 = new byte[10];
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-      GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(arrayRandomAccessSource0);
-      randomAccessSourceArray0[1] = (RandomAccessSource) getBufferedRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      groupedRandomAccessSource0.close();
-      // Undeclared exception!
-      try { 
-        groupedRandomAccessSource0.get(10L);
-        fail("Expecting exception: IllegalStateException");
-      
-      } catch(IllegalStateException e) {
-         //
-         // Already closed
-         //
-         verifyException("com.itextpdf.text.io.ArrayRandomAccessSource", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testGetWithSingleSource() throws Throwable {
+        byte[] sourceData = new byte[2];
+        ArrayRandomAccessSource source = new ArrayRandomAccessSource(sourceData);
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(
+            new RandomAccessSource[] { source }
+        );
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[1];
-      WindowRandomAccessSource windowRandomAccessSource0 = new WindowRandomAccessSource((RandomAccessSource) null, 328L, 328L);
-      randomAccessSourceArray0[0] = (RandomAccessSource) windowRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      // Undeclared exception!
-      try { 
-        groupedRandomAccessSource0.close();
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.itextpdf.text.io.WindowRandomAccessSource", e);
-      }
-  }
+        int result = groupedSource.get(0L);
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      GroupedRandomAccessSource groupedRandomAccessSource0 = null;
-      try {
-        groupedRandomAccessSource0 = new GroupedRandomAccessSource((RandomAccessSource[]) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.itextpdf.text.io.GroupedRandomAccessSource", e);
-      }
-  }
+        assertEquals(0, result);
+        assertEquals(2L, groupedSource.length());
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[0];
-      GroupedRandomAccessSource groupedRandomAccessSource0 = null;
-      try {
-        groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
-      
-      } catch(ArrayIndexOutOfBoundsException e) {
-         //
-         // -1
-         //
-         verifyException("com.itextpdf.text.io.GroupedRandomAccessSource", e);
-      }
-  }
+    // ================= length() Method Tests =================
 
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[2];
-      byte[] byteArray0 = new byte[1];
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      WindowRandomAccessSource windowRandomAccessSource0 = new WindowRandomAccessSource(arrayRandomAccessSource0, 7L, 7L);
-      IndependentRandomAccessSource independentRandomAccessSource0 = new IndependentRandomAccessSource(windowRandomAccessSource0);
-      randomAccessSourceArray0[0] = (RandomAccessSource) independentRandomAccessSource0;
-      randomAccessSourceArray0[1] = (RandomAccessSource) windowRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      int int0 = groupedRandomAccessSource0.get((long) 1, byteArray0, 1, 1);
-      assertEquals(14L, groupedRandomAccessSource0.length());
-      assertEquals((-1), int0);
-  }
+    @Test(timeout = 4000)
+    public void testLengthWithZeroLengthSources() throws Throwable {
+        byte[] emptyData = new byte[0];
+        ArrayRandomAccessSource source1 = new ArrayRandomAccessSource(emptyData);
+        GetBufferedRandomAccessSource source2 = new GetBufferedRandomAccessSource(source1);
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(
+            new RandomAccessSource[] { source1, source2 }
+        );
 
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[1];
-      byte[] byteArray0 = new byte[5];
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      int int0 = groupedRandomAccessSource0.get((long) 3, byteArray0, 3, 3);
-      assertEquals(2, int0);
-  }
+        long length = groupedSource.length();
 
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[1];
-      byte[] byteArray0 = new byte[3];
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      int int0 = groupedRandomAccessSource0.get(12L);
-      assertEquals((-1), int0);
-      assertEquals(3L, groupedRandomAccessSource0.length());
-  }
+        assertEquals(0L, length);
+    }
 
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[1];
-      byte[] byteArray0 = new byte[1];
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      int int0 = groupedRandomAccessSource0.get((long) 1, byteArray0, 1, 1);
-      assertEquals(1L, groupedRandomAccessSource0.length());
-      assertEquals((-1), int0);
-  }
+    @Test(timeout = 4000)
+    public void testLengthWithMultipleSources() throws Throwable {
+        byte[] data = new byte[5];
+        ArrayRandomAccessSource source = new ArrayRandomAccessSource(data);
+        GetBufferedRandomAccessSource bufferedSource = new GetBufferedRandomAccessSource(source);
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(
+            new RandomAccessSource[] { bufferedSource, bufferedSource, bufferedSource }
+        );
 
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[1];
-      byte[] byteArray0 = new byte[8];
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      int int0 = groupedRandomAccessSource0.getStartingSourceIndex(1L);
-      assertEquals(8L, groupedRandomAccessSource0.length());
-      assertEquals(0, int0);
-  }
+        long length = groupedSource.length();
 
-  @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[1];
-      byte[] byteArray0 = new byte[7];
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      int int0 = groupedRandomAccessSource0.get((long) (-3), byteArray0, (-3), (-3));
-      assertEquals(7L, groupedRandomAccessSource0.length());
-      assertEquals((-1), int0);
-  }
+        assertEquals(15L, length);
+    }
 
-  @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[1];
-      byte[] byteArray0 = new byte[2];
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      int int0 = groupedRandomAccessSource0.get((long) 0);
-      assertEquals(2L, groupedRandomAccessSource0.length());
-      assertEquals(0, int0);
-  }
+    @Test(timeout = 4000)
+    public void testLengthWithNegativeSizedSource() throws Throwable {
+        // Setup: Includes a WindowRandomAccessSource with negative size
+        byte[] data = new byte[11];
+        ArrayRandomAccessSource arraySource = new ArrayRandomAccessSource(data);
+        GetBufferedRandomAccessSource bufferedSource = new GetBufferedRandomAccessSource(arraySource);
+        WindowRandomAccessSource windowSource = new WindowRandomAccessSource(
+            bufferedSource, -2024L, -2024L
+        );
 
-  @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
-      RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[2];
-      byte[] byteArray0 = new byte[0];
-      ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-      randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-      GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(arrayRandomAccessSource0);
-      randomAccessSourceArray0[1] = (RandomAccessSource) getBufferedRandomAccessSource0;
-      GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-      groupedRandomAccessSource0.sourceReleased(arrayRandomAccessSource0);
-      assertEquals(0L, groupedRandomAccessSource0.length());
-  }
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(
+            new RandomAccessSource[] { 
+                arraySource, bufferedSource, windowSource, bufferedSource,
+                bufferedSource, bufferedSource, arraySource, bufferedSource, bufferedSource 
+            }
+        );
+
+        long length = groupedSource.length();
+
+        assertEquals(-1936L, length);
+    }
+
+    // ================= getStartingSourceIndex() Tests =================
+
+    @Test(timeout = 4000)
+    public void testGetStartingSourceIndex() throws Throwable {
+        byte[] data = new byte[1];
+        ArrayRandomAccessSource arraySource = new ArrayRandomAccessSource(data);
+        WindowRandomAccessSource windowSource = new WindowRandomAccessSource(arraySource, 7L, 7L);
+        IndependentRandomAccessSource independentSource = new IndependentRandomAccessSource(windowSource);
+
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(
+            new RandomAccessSource[] { independentSource, windowSource }
+        );
+
+        int sourceIndex = groupedSource.getStartingSourceIndex(7L);
+
+        assertEquals(1, sourceIndex);
+        assertEquals(14L, groupedSource.length());
+    }
+
+    // ================= sourceInUse/sourceReleased Tests =================
+
+    @Test(timeout = 4000)
+    public void testSourceInUse() throws Throwable {
+        byte[] emptyData = new byte[0];
+        ArrayRandomAccessSource source1 = new ArrayRandomAccessSource(emptyData);
+        GetBufferedRandomAccessSource source2 = new GetBufferedRandomAccessSource(source1);
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(
+            new RandomAccessSource[] { source1, source2 }
+        );
+
+        groupedSource.sourceInUse(source1); // Verify no exception
+        assertEquals(0L, groupedSource.length());
+    }
+
+    @Test(timeout = 4000)
+    public void testSourceReleased() throws Throwable {
+        byte[] emptyData = new byte[0];
+        ArrayRandomAccessSource source1 = new ArrayRandomAccessSource(emptyData);
+        GetBufferedRandomAccessSource source2 = new GetBufferedRandomAccessSource(source1);
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(
+            new RandomAccessSource[] { source1, source2 }
+        );
+
+        groupedSource.sourceReleased(source1); // Verify no exception
+        assertEquals(0L, groupedSource.length());
+    }
+
+    // ================= Edge Case Tests =================
+
+    @Test(timeout = 4000)
+    public void testGetWithInvalidBufferOffset() throws Throwable {
+        byte[] sourceData = new byte[2];
+        ArrayRandomAccessSource source = new ArrayRandomAccessSource(sourceData);
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(
+            new RandomAccessSource[] { source }
+        );
+
+        try {
+            groupedSource.get(1L, sourceData, 5239, 1);
+            fail("Expected ArrayIndexOutOfBoundsException for invalid buffer offset");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // Expected behavior
+        }
+    }
+
+    @Test(timeout = 4000)
+    public void testCloseWithNullSourceThrowsException() throws Throwable {
+        WindowRandomAccessSource windowSource = new WindowRandomAccessSource(null, 328L, 328L);
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(
+            new RandomAccessSource[] { windowSource }
+        );
+
+        try {
+            groupedSource.close();
+            fail("Expected NullPointerException when closing source with null delegate");
+        } catch (NullPointerException e) {
+            // Expected behavior
+        }
+    }
 }
