@@ -22,56 +22,83 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.apache.commons.lang3.AbstractLangTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * Tests for {@link org.apache.commons.lang3.text.translate.NumericEntityUnescaper}.
  */
 @Deprecated
+@SuppressWarnings("deprecation") // The class under test is deprecated
 class NumericEntityUnescaperTest extends AbstractLangTest {
 
     @Test
-    void testOutOfBounds() {
-        final NumericEntityUnescaper neu = new NumericEntityUnescaper();
-
-        assertEquals("Test &", neu.translate("Test &"), "Failed to ignore when last character is &");
-        assertEquals("Test &#", neu.translate("Test &#"), "Failed to ignore when last character is &");
-        assertEquals("Test &#x", neu.translate("Test &#x"), "Failed to ignore when last character is &");
-        assertEquals("Test &#X", neu.translate("Test &#X"), "Failed to ignore when last character is &");
-    }
-
-    @Test
-    void testSupplementaryUnescaping() {
-        final NumericEntityUnescaper neu = new NumericEntityUnescaper();
+    void shouldUnescapeDecimalEntityForSupplementaryCharacter() {
+        // Arrange
+        final NumericEntityUnescaper unescaper = new NumericEntityUnescaper();
         final String input = "&#68642;";
-        final String expected = "\uD803\uDC22";
+        final String expected = "\uD803\uDC22"; // U+10C42
 
-        final String result = neu.translate(input);
-        assertEquals(expected, result, "Failed to unescape numeric entities supplementary characters");
+        // Act
+        final String result = unescaper.translate(input);
+
+        // Assert
+        assertEquals(expected, result, "Failed to unescape a supplementary character.");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Test &", "Test &#", "Test &#x", "Test &#X"})
+    void shouldNotTranslateIncompleteEntityAtEndOfInput(final String incompleteEntity) {
+        // Arrange
+        final NumericEntityUnescaper unescaper = new NumericEntityUnescaper();
+
+        // Act
+        final String result = unescaper.translate(incompleteEntity);
+
+        // Assert
+        // The unescaper should leave the malformed input unchanged.
+        assertEquals(incompleteEntity, result);
     }
 
     @Test
-    void testUnfinishedEntity() {
-        // parse it
-        NumericEntityUnescaper neu = new NumericEntityUnescaper(NumericEntityUnescaper.OPTION.semiColonOptional);
-        String input = "Test &#x30 not test";
-        String expected = "Test \u0030 not test";
+    void shouldUnescapeEntityWhenSemicolonIsOptional() {
+        // Arrange
+        final NumericEntityUnescaper unescaper = new NumericEntityUnescaper(NumericEntityUnescaper.OPTION.semiColonOptional);
+        final String inputWithMissingSemicolon = "Test &#x30 not test"; // &#x30 is '0'
+        final String expected = "Test 0 not test";
 
-        String result = neu.translate(input);
-        assertEquals(expected, result, "Failed to support unfinished entities (i.e. missing semicolon)");
+        // Act
+        final String result = unescaper.translate(inputWithMissingSemicolon);
 
-        // ignore it
-        neu = new NumericEntityUnescaper();
-        input = "Test &#x30 not test";
-        expected = input;
-
-        result = neu.translate(input);
-        assertEquals(expected, result, "Failed to ignore unfinished entities (i.e. missing semicolon)");
-
-        // fail it
-        final NumericEntityUnescaper failingNeu =
-                new NumericEntityUnescaper(NumericEntityUnescaper.OPTION.errorIfNoSemiColon);
-        final String failingInput = "Test &#x30 not test";
-        assertIllegalArgumentException(() -> failingNeu.translate(failingInput));
+        // Assert
+        assertEquals(expected, result, "Failed to unescape entity when semicolon is optional.");
     }
 
+    @Test
+    void shouldNotUnescapeEntityWhenSemicolonIsRequiredByDefault() {
+        // Arrange
+        // The default constructor requires a semicolon for a valid entity.
+        final NumericEntityUnescaper unescaper = new NumericEntityUnescaper();
+        final String inputWithMissingSemicolon = "Test &#x30 not test";
+
+        // Act
+        final String result = unescaper.translate(inputWithMissingSolon);
+
+        // Assert
+        // The input should be returned unchanged because the entity is considered malformed.
+        assertEquals(inputWithMissingSemicolon, result, "Should not unescape entity when semicolon is required and missing.");
+    }
+
+    @Test
+    void shouldThrowExceptionForMissingSemicolonWhenConfiguredToError() {
+        // Arrange
+        final NumericEntityUnescaper unescaper = new NumericEntityUnescaper(NumericEntityUnescaper.OPTION.errorIfNoSemiColon);
+        final String inputWithMissingSemicolon = "Test &#x30 not test";
+
+        // Act & Assert
+        assertIllegalArgumentException(
+            () -> unescaper.translate(inputWithMissingSemicolon),
+            "Should throw an exception for a missing semicolon when configured to do so."
+        );
+    }
 }
