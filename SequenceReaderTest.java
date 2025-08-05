@@ -1,19 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.apache.commons.io.input;
 
 import static org.apache.commons.io.IOUtils.EOF;
@@ -33,17 +17,21 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test case for {@link SequenceReader}.
+ * Test suite for the {@link SequenceReader} class.
  */
 class SequenceReaderTest {
 
+    /**
+     * CustomReader is a simple Reader implementation used for testing.
+     * It simulates a reader that can be closed and throws an exception if read after being closed.
+     */
     private static class CustomReader extends Reader {
 
-        boolean closed;
+        private boolean closed;
 
-        protected void checkOpen() throws IOException {
+        private void ensureOpen() throws IOException {
             if (closed) {
-                throw new IOException("emptyReader already closed");
+                throw new IOException("Reader is already closed");
             }
         }
 
@@ -57,104 +45,102 @@ class SequenceReaderTest {
         }
 
         @Override
-        public int read(final char[] cbuf, final int off, final int len) throws IOException {
-            checkOpen();
-            close();
+        public int read(final char[] buffer, final int offset, final int length) throws IOException {
+            ensureOpen();
+            close(); // Simulate reading and then closing
             return EOF;
         }
     }
 
-    private static final char NUL = 0;
+    private static final char NULL_CHAR = 0;
 
-    private void checkArray(final char[] expected, final char[] actual) {
+    /**
+     * Asserts that two character arrays are equal.
+     */
+    private void assertCharArrayEquals(final char[] expected, final char[] actual) {
         for (int i = 0; i < expected.length; i++) {
-            assertEquals(expected[i], actual[i], "Compare[" + i + "]");
+            assertEquals(expected[i], actual[i], "Character mismatch at index " + i);
         }
     }
 
-    private void checkRead(final Reader reader, final String expected) throws IOException {
-        for (int i = 0; i < expected.length(); i++) {
-            assertEquals(expected.charAt(i), (char) reader.read(), "Read[" + i + "] of '" + expected + "'");
+    /**
+     * Reads characters from the reader and compares them to the expected string.
+     */
+    private void assertReaderContentEquals(final Reader reader, final String expectedContent) throws IOException {
+        for (int i = 0; i < expectedContent.length(); i++) {
+            assertEquals(expectedContent.charAt(i), (char) reader.read(), "Mismatch at position " + i);
         }
     }
 
-    private void checkReadEof(final Reader reader) throws IOException {
+    /**
+     * Asserts that the reader returns EOF for a number of reads.
+     */
+    private void assertReaderIsAtEof(final Reader reader) throws IOException {
         for (int i = 0; i < 10; i++) {
-            assertEquals(-1, reader.read());
+            assertEquals(EOF, reader.read(), "Reader should be at EOF");
         }
     }
 
     @Test
-    void testAutoClose() throws IOException {
+    void testAutoCloseReader() throws IOException {
         try (Reader reader = new SequenceReader(new CharSequenceReader("FooBar"))) {
-            checkRead(reader, "Foo");
+            assertReaderContentEquals(reader, "Foo");
             reader.close();
-            checkReadEof(reader);
+            assertReaderIsAtEof(reader);
         }
     }
 
     @Test
-    void testClose() throws IOException {
+    void testManualCloseReader() throws IOException {
         final Reader reader = new SequenceReader(new CharSequenceReader("FooBar"));
-        checkRead(reader, "Foo");
+        assertReaderContentEquals(reader, "Foo");
         reader.close();
-        checkReadEof(reader);
+        assertReaderIsAtEof(reader);
     }
 
     @Test
-    void testCloseReaders() throws IOException {
-        final CustomReader reader0 = new CustomReader();
-        final CustomReader reader1 = new CustomReader() {
-
+    void testCloseAllReaders() throws IOException {
+        final CustomReader reader1 = new CustomReader();
+        final CustomReader reader2 = new CustomReader() {
             private final char[] content = {'A'};
             private int position;
 
             @Override
-            public int read(final char[] cbuf, final int off, final int len) throws IOException {
-                checkOpen();
+            public int read(final char[] buffer, final int offset, final int length) throws IOException {
+                ensureOpen();
 
-                if (off < 0) {
-                    throw new IndexOutOfBoundsException("off is negative");
-                }
-                if (len < 0) {
-                    throw new IndexOutOfBoundsException("len is negative");
-                }
-                if (len > cbuf.length - off) {
-                    throw new IndexOutOfBoundsException("len is greater than cbuf.length - off");
+                if (offset < 0 || length < 0 || length > buffer.length - offset) {
+                    throw new IndexOutOfBoundsException("Invalid offset or length");
                 }
 
                 if (position > 0) {
                     return EOF;
                 }
 
-                cbuf[off] = content[0];
+                buffer[offset] = content[0];
                 position++;
                 return 1;
             }
-
         };
 
-        try (SequenceReader sequenceReader = new SequenceReader(reader1, reader0)) {
+        try (SequenceReader sequenceReader = new SequenceReader(reader2, reader1)) {
             assertEquals('A', sequenceReader.read());
             assertEquals(EOF, sequenceReader.read());
         } finally {
+            assertTrue(reader2.isClosed());
             assertTrue(reader1.isClosed());
-            assertTrue(reader0.isClosed());
         }
-        assertTrue(reader1.isClosed());
-        assertTrue(reader0.isClosed());
-
     }
 
     @Test
-    void testMarkSupported() throws Exception {
+    void testMarkNotSupported() throws Exception {
         try (Reader reader = new SequenceReader()) {
-            assertFalse(reader.markSupported());
+            assertFalse(reader.markSupported(), "Mark should not be supported");
         }
     }
 
     @Test
-    void testRead() throws IOException {
+    void testSequentialRead() throws IOException {
         try (Reader reader = new SequenceReader(new StringReader("Foo"), new StringReader("Bar"))) {
             assertEquals('F', reader.read());
             assertEquals('o', reader.read());
@@ -162,62 +148,66 @@ class SequenceReaderTest {
             assertEquals('B', reader.read());
             assertEquals('a', reader.read());
             assertEquals('r', reader.read());
-            checkReadEof(reader);
+            assertReaderIsAtEof(reader);
         }
     }
 
     @Test
-    void testReadCharArray() throws IOException {
+    void testReadIntoCharArray() throws IOException {
         try (Reader reader = new SequenceReader(new StringReader("Foo"), new StringReader("Bar"))) {
-            char[] chars = new char[2];
-            assertEquals(2, reader.read(chars));
-            checkArray(new char[] { 'F', 'o' }, chars);
-            chars = new char[3];
-            assertEquals(3, reader.read(chars));
-            checkArray(new char[] { 'o', 'B', 'a' }, chars);
-            chars = new char[3];
-            assertEquals(1, reader.read(chars));
-            checkArray(new char[] { 'r', NUL, NUL }, chars);
-            assertEquals(-1, reader.read(chars));
+            char[] buffer = new char[2];
+            assertEquals(2, reader.read(buffer));
+            assertCharArrayEquals(new char[] {'F', 'o'}, buffer);
+
+            buffer = new char[3];
+            assertEquals(3, reader.read(buffer));
+            assertCharArrayEquals(new char[] {'o', 'B', 'a'}, buffer);
+
+            buffer = new char[3];
+            assertEquals(1, reader.read(buffer));
+            assertCharArrayEquals(new char[] {'r', NULL_CHAR, NULL_CHAR}, buffer);
+
+            assertEquals(EOF, reader.read(buffer));
         }
     }
 
     @Test
-    void testReadCharArrayPortion() throws IOException {
-        final char[] chars = new char[10];
+    void testReadIntoCharArrayPortion() throws IOException {
+        final char[] buffer = new char[10];
         try (Reader reader = new SequenceReader(new StringReader("Foo"), new StringReader("Bar"))) {
-            assertEquals(3, reader.read(chars, 3, 3));
-            checkArray(new char[] { NUL, NUL, NUL, 'F', 'o', 'o' }, chars);
-            assertEquals(3, reader.read(chars, 0, 3));
-            checkArray(new char[] { 'B', 'a', 'r', 'F', 'o', 'o', NUL }, chars);
-            assertEquals(-1, reader.read(chars));
-            assertThrows(IndexOutOfBoundsException.class, () -> reader.read(chars, 10, 10));
+            assertEquals(3, reader.read(buffer, 3, 3));
+            assertCharArrayEquals(new char[] {NULL_CHAR, NULL_CHAR, NULL_CHAR, 'F', 'o', 'o'}, buffer);
+
+            assertEquals(3, reader.read(buffer, 0, 3));
+            assertCharArrayEquals(new char[] {'B', 'a', 'r', 'F', 'o', 'o', NULL_CHAR}, buffer);
+
+            assertEquals(EOF, reader.read(buffer));
+            assertThrows(IndexOutOfBoundsException.class, () -> reader.read(buffer, 10, 10));
             assertThrows(NullPointerException.class, () -> reader.read(null, 0, 10));
         }
     }
 
     @Test
-    void testReadClosedReader() throws IOException {
-        @SuppressWarnings("resource")
+    void testReadAfterClose() throws IOException {
         final Reader reader = new SequenceReader(new CharSequenceReader("FooBar"));
         reader.close();
-        checkReadEof(reader);
+        assertReaderIsAtEof(reader);
     }
 
     @Test
-    void testReadCollection() throws IOException {
+    void testReadFromCollection() throws IOException {
         final Collection<Reader> readers = new ArrayList<>();
         readers.add(new StringReader("F"));
         readers.add(new StringReader("B"));
         try (Reader reader = new SequenceReader(readers)) {
             assertEquals('F', reader.read());
             assertEquals('B', reader.read());
-            checkReadEof(reader);
+            assertReaderIsAtEof(reader);
         }
     }
 
     @Test
-    void testReadIterable() throws IOException {
+    void testReadFromIterable() throws IOException {
         final Collection<Reader> readers = new ArrayList<>();
         readers.add(new StringReader("F"));
         readers.add(new StringReader("B"));
@@ -225,27 +215,27 @@ class SequenceReaderTest {
         try (Reader reader = new SequenceReader(iterable)) {
             assertEquals('F', reader.read());
             assertEquals('B', reader.read());
-            checkReadEof(reader);
+            assertReaderIsAtEof(reader);
         }
     }
 
     @Test
-    void testReadLength0Readers() throws IOException {
-        try (Reader reader = new SequenceReader(new StringReader(StringUtils.EMPTY),
-            new StringReader(StringUtils.EMPTY), new StringReader(StringUtils.EMPTY))) {
-            checkReadEof(reader);
-        }
-    }
-
-    @Test
-    void testReadLength1Readers() throws IOException {
+    void testReadEmptyReaders() throws IOException {
         try (Reader reader = new SequenceReader(
-        // @formatter:off
+            new StringReader(StringUtils.EMPTY),
+            new StringReader(StringUtils.EMPTY),
+            new StringReader(StringUtils.EMPTY))) {
+            assertReaderIsAtEof(reader);
+        }
+    }
+
+    @Test
+    void testReadSingleCharacterReaders() throws IOException {
+        try (Reader reader = new SequenceReader(
             new StringReader("0"),
             new StringReader("1"),
             new StringReader("2"),
             new StringReader("3"))) {
-            // @formatter:on
             assertEquals('0', reader.read());
             assertEquals('1', reader.read());
             assertEquals('2', reader.read());
@@ -254,22 +244,22 @@ class SequenceReaderTest {
     }
 
     @Test
-    void testReadList() throws IOException {
+    void testReadFromList() throws IOException {
         final List<Reader> readers = new ArrayList<>();
         readers.add(new StringReader("F"));
         readers.add(new StringReader("B"));
         try (Reader reader = new SequenceReader(readers)) {
             assertEquals('F', reader.read());
             assertEquals('B', reader.read());
-            checkReadEof(reader);
+            assertReaderIsAtEof(reader);
         }
     }
 
     @Test
-    void testSkip() throws IOException {
+    void testSkipCharacters() throws IOException {
         try (Reader reader = new SequenceReader(new StringReader("Foo"), new StringReader("Bar"))) {
             assertEquals(3, reader.skip(3));
-            checkRead(reader, "Bar");
+            assertReaderContentEquals(reader, "Bar");
             assertEquals(0, reader.skip(3));
         }
     }
