@@ -24,71 +24,107 @@ import org.junit.jupiter.api.Test;
 
 class EnumOrdinalTypeHandlerTest extends BaseTypeHandlerTest {
 
-  enum MyEnum {
-    ONE, TWO
-  }
+    enum MyEnum {
+        FIRST, SECOND
+    }
 
-  private static final TypeHandler<MyEnum> TYPE_HANDLER = new EnumOrdinalTypeHandler<>(MyEnum.class);
+    private static final TypeHandler<MyEnum> TYPE_HANDLER = new EnumOrdinalTypeHandler<>(MyEnum.class);
+    private static final String COLUMN_NAME = "column";
+    private static final int COLUMN_INDEX = 1;
+    private static final int PARAMETER_INDEX = 1;
+    private static final int FIRST_ORDINAL = MyEnum.FIRST.ordinal();
 
-  @Override
-  @Test
-  public void shouldSetParameter() throws Exception {
-    TYPE_HANDLER.setParameter(ps, 1, MyEnum.ONE, null);
-    verify(ps).setInt(1, 0);
-  }
+    /**
+     * Verifies that a non-null enum parameter is correctly set
+     * as its ordinal value in the prepared statement.
+     */
+    @Override
+    @Test
+    public void shouldSetParameter() throws Exception {
+        TYPE_HANDLER.setParameter(ps, PARAMETER_INDEX, MyEnum.FIRST, null);
+        verify(ps).setInt(PARAMETER_INDEX, FIRST_ORDINAL);
+    }
 
-  @Test
-  void shouldSetNullParameter() throws Exception {
-    TYPE_HANDLER.setParameter(ps, 1, null, JdbcType.VARCHAR);
-    verify(ps).setNull(1, JdbcType.VARCHAR.TYPE_CODE);
-  }
+    /**
+     * Verifies that a null enum parameter is correctly set
+     * as a JDBC NULL value using the specified JDBC type.
+     */
+    @Test
+    void shouldSetNullParameterWithJdbcType() throws Exception {
+        TYPE_HANDLER.setParameter(ps, PARAMETER_INDEX, null, JdbcType.VARCHAR);
+        verify(ps).setNull(PARAMETER_INDEX, JdbcType.VARCHAR.TYPE_CODE);
+    }
 
-  @Override
-  @Test
-  public void shouldGetResultFromResultSetByName() throws Exception {
-    when(rs.getInt("column")).thenReturn(0);
-    when(rs.wasNull()).thenReturn(false);
-    assertEquals(MyEnum.ONE, TYPE_HANDLER.getResult(rs, "column"));
-  }
+    /**
+     * Verifies that an enum result is correctly retrieved
+     * from a ResultSet by column name when the value is non-null.
+     */
+    @Override
+    @Test
+    public void shouldGetResultFromResultSetByName() throws Exception {
+        when(rs.getInt(COLUMN_NAME)).thenReturn(FIRST_ORDINAL);
+        when(rs.wasNull()).thenReturn(false);
+        assertEquals(MyEnum.FIRST, TYPE_HANDLER.getResult(rs, COLUMN_NAME));
+    }
 
-  @Override
-  @Test
-  public void shouldGetResultNullFromResultSetByName() throws Exception {
-    when(rs.getInt("column")).thenReturn(0);
-    when(rs.wasNull()).thenReturn(true);
-    assertNull(TYPE_HANDLER.getResult(rs, "column"));
-  }
+    /**
+     * Verifies that a null enum result is correctly returned
+     * from a ResultSet by column name when the JDBC value is NULL.
+     */
+    @Override
+    @Test
+    public void shouldGetResultNullFromResultSetByName() throws Exception {
+        when(rs.getInt(COLUMN_NAME)).thenReturn(0);
+        when(rs.wasNull()).thenReturn(true);
+        assertNull(TYPE_HANDLER.getResult(rs, COLUMN_NAME));
+    }
 
-  @Override
-  @Test
-  public void shouldGetResultFromResultSetByPosition() throws Exception {
-    when(rs.getInt(1)).thenReturn(0);
-    when(rs.wasNull()).thenReturn(false);
-    assertEquals(MyEnum.ONE, TYPE_HANDLER.getResult(rs, 1));
-  }
+    /**
+     * Verifies that an enum result is correctly retrieved
+     * from a ResultSet by column index when the value is non-null.
+     */
+    @Override
+    @Test
+    public void shouldGetResultFromResultSetByPosition() throws Exception {
+        when(rs.getInt(COLUMN_INDEX)).thenReturn(FIRST_ORDINAL);
+        when(rs.wasNull()).thenReturn(false);
+        assertEquals(MyEnum.FIRST, TYPE_HANDLER.getResult(rs, COLUMN_INDEX));
+    }
 
-  @Override
-  @Test
-  public void shouldGetResultNullFromResultSetByPosition() throws Exception {
-    when(rs.getInt(1)).thenReturn(0);
-    when(rs.wasNull()).thenReturn(true);
-    assertNull(TYPE_HANDLER.getResult(rs, 1));
-  }
+    /**
+     * Verifies that a null enum result is correctly returned
+     * from a ResultSet by column index when the JDBC value is NULL.
+     */
+    @Override
+    @Test
+    public void shouldGetResultNullFromResultSetByPosition() throws Exception {
+        when(rs.getInt(COLUMN_INDEX)).thenReturn(0);
+        when(rs.wasNull()).thenReturn(true);
+        assertNull(TYPE_HANDLER.getResult(rs, COLUMN_INDEX));
+    }
 
-  @Override
-  @Test
-  public void shouldGetResultFromCallableStatement() throws Exception {
-    when(cs.getInt(1)).thenReturn(0);
-    when(cs.wasNull()).thenReturn(false);
-    assertEquals(MyEnum.ONE, TYPE_HANDLER.getResult(cs, 1));
-  }
+    /**
+     * Verifies that an enum result is correctly retrieved
+     * from a CallableStatement when the value is non-null.
+     */
+    @Override
+    @Test
+    public void shouldGetResultFromCallableStatement() throws Exception {
+        when(cs.getInt(COLUMN_INDEX)).thenReturn(FIRST_ORDINAL);
+        when(cs.wasNull()).thenReturn(false);
+        assertEquals(MyEnum.FIRST, TYPE_HANDLER.getResult(cs, COLUMN_INDEX));
+    }
 
-  @Override
-  @Test
-  public void shouldGetResultNullFromCallableStatement() throws Exception {
-    when(cs.getInt(1)).thenReturn(0);
-    when(cs.wasNull()).thenReturn(true);
-    assertNull(TYPE_HANDLER.getResult(cs, 1));
-  }
+    /**
+     * Verifies that a null enum result is correctly returned
+     * from a CallableStatement when the JDBC value is NULL.
+     */
+    @Override
+    @Test
+    public void shouldGetResultNullFromCallableStatement() throws Exception {
+        when(cs.getInt(COLUMN_INDEX)).thenReturn(0);
+        when(cs.wasNull()).thenReturn(true);
+        assertNull(TYPE_HANDLER.getResult(cs, COLUMN_INDEX));
+    }
 
 }
