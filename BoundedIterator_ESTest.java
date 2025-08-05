@@ -22,170 +22,204 @@ import org.evosuite.runtime.EvoRunnerParameters;
 import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) 
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true, 
-    useVFS = true, 
-    useVNET = true, 
-    resetStaticState = true, 
-    separateClassLoader = true
-) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class BoundedIterator_ESTest extends BoundedIterator_ESTest_scaffolding {
 
-    // ================= Constructor Tests =================
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      Iterator<Predicate<Object>> iterator0 = (Iterator<Predicate<Object>>) mock(Iterator.class, new ViolatedAssumptionAnswer());
+      doReturn(true, true, false, false).when(iterator0).hasNext();
+      doReturn((Object) null, (Object) null, (Object) null).when(iterator0).next();
+      BoundedIterator<Predicate<Object>> boundedIterator0 = new BoundedIterator<Predicate<Object>>(iterator0, 1031L, 1031L);
+      boundedIterator0.next();
+      BoundedIterator<Predicate<Object>> boundedIterator1 = new BoundedIterator<Predicate<Object>>(boundedIterator0, 1031L, 0L);
+      // Undeclared exception!
+      try { 
+        boundedIterator1.remove();
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // remove() cannot be called before calling next()
+         //
+         verifyException("org.apache.commons.collections4.iterators.BoundedIterator", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testConstructor_ThrowsNPE_WhenIteratorIsNull() {
-        try {
-            new BoundedIterator<Boolean>(null, 0L, 0L);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            verifyException("java.util.Objects", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
+      Integer integer0 = new Integer(1);
+      linkedList0.add(integer0);
+      Iterator<Integer> iterator0 = linkedList0.descendingIterator();
+      BoundedIterator<Integer> boundedIterator0 = new BoundedIterator<Integer>(iterator0, 0L, 508L);
+      boolean boolean0 = boundedIterator0.hasNext();
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testConstructor_ThrowsIAE_WhenOffsetIsNegative() {
-        Iterator<Boolean> mockIterator = mock(Iterator.class);
-        try {
-            new BoundedIterator<Boolean>(mockIterator, -1007L, -1007L);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            assertEquals("Offset parameter must not be negative.", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      LinkedList<Boolean> linkedList0 = new LinkedList<Boolean>();
+      Iterator<Boolean> iterator0 = linkedList0.iterator();
+      BoundedIterator<Object> boundedIterator0 = new BoundedIterator<Object>(iterator0, 1909L, 1909L);
+      // Undeclared exception!
+      try { 
+        boundedIterator0.next();
+        fail("Expecting exception: NoSuchElementException");
+      
+      } catch(NoSuchElementException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.util.LinkedList$ListItr", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testConstructor_ThrowsIAE_WhenMaxIsNegative() {
-        Iterator<Boolean> mockIterator = mock(Iterator.class);
-        try {
-            new BoundedIterator<Boolean>(mockIterator, 0L, -1022L);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            assertEquals("Max parameter must not be negative.", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      LinkedList<Object> linkedList0 = new LinkedList<Object>();
+      Iterator<Object> iterator0 = linkedList0.descendingIterator();
+      BoundedIterator<Object> boundedIterator0 = new BoundedIterator<Object>(iterator0, 5L, 5L);
+      linkedList0.add((Object) iterator0);
+      // Undeclared exception!
+      try { 
+        boundedIterator0.next();
+        fail("Expecting exception: ConcurrentModificationException");
+      
+      } catch(ConcurrentModificationException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.util.LinkedList$ListItr", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testConstructor_ThrowsCME_WhenUnderlyingIteratorModifiedDuringInitialization() {
-        LinkedList<Object> list = new LinkedList<>();
-        Iterator<Object> iterator = list.iterator();
-        list.add(new Object()); // Modifies the list after iterator creation
-        
-        try {
-            new BoundedIterator<>(iterator, 1973L, 287L);
-            fail("Expecting exception: ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            // Expected: List modified after iterator creation
-        }
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      LinkedList<Object> linkedList0 = new LinkedList<Object>();
+      Iterator<Object> iterator0 = linkedList0.iterator();
+      linkedList0.add((Object) iterator0);
+      BoundedIterator<Object> boundedIterator0 = null;
+      try {
+        boundedIterator0 = new BoundedIterator<Object>(iterator0, 1973L, 287L);
+        fail("Expecting exception: ConcurrentModificationException");
+      
+      } catch(ConcurrentModificationException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.util.LinkedList$ListItr", e);
+      }
+  }
 
-    // ================= hasNext() Tests =================
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      BoundedIterator<Boolean> boundedIterator0 = null;
+      try {
+        boundedIterator0 = new BoundedIterator<Boolean>((Iterator<? extends Boolean>) null, 0L, 0L);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // iterator
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testHasNext_ReturnsTrue_WhenElementsAvailableAfterOffset() {
-        LinkedList<Integer> list = new LinkedList<>();
-        list.add(1);
-        Iterator<Integer> baseIterator = list.descendingIterator();
-        BoundedIterator<Integer> boundedIterator = new BoundedIterator<>(baseIterator, 0L, 508L);
-        assertTrue(boundedIterator.hasNext());
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      Iterator<Predicate<Object>> iterator0 = (Iterator<Predicate<Object>>) mock(Iterator.class, new ViolatedAssumptionAnswer());
+      doReturn(true, true, false).when(iterator0).hasNext();
+      doReturn((Object) null, (Object) null).when(iterator0).next();
+      BoundedIterator<Predicate<Object>> boundedIterator0 = new BoundedIterator<Predicate<Object>>(iterator0, 1031L, 1031L);
+      // Undeclared exception!
+      try { 
+        boundedIterator0.remove();
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // remove() cannot be called before calling next()
+         //
+         verifyException("org.apache.commons.collections4.iterators.BoundedIterator", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testHasNext_ReturnsFalse_WhenNoElementsWithinBounds() {
-        LinkedList<Object> list = new LinkedList<>();
-        Iterator<Object> baseIterator = list.iterator();
-        BoundedIterator<Object> boundedIterator = new BoundedIterator<>(baseIterator, 0L, 0L);
-        assertFalse(boundedIterator.hasNext());
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      Closure<Integer> closure0 = NOPClosure.nopClosure();
+      Iterator<Closure<Integer>> iterator0 = (Iterator<Closure<Integer>>) mock(Iterator.class, new ViolatedAssumptionAnswer());
+      doReturn(closure0).when(iterator0).next();
+      BoundedIterator<Closure<Integer>> boundedIterator0 = new BoundedIterator<Closure<Integer>>(iterator0, 0L, 909L);
+      boundedIterator0.next();
+      boundedIterator0.remove();
+  }
 
-    // ================= next() Tests =================
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      Iterator<Closure<Integer>> iterator0 = (Iterator<Closure<Integer>>) mock(Iterator.class, new ViolatedAssumptionAnswer());
+      doReturn(true, false).when(iterator0).hasNext();
+      doReturn((Object) null).when(iterator0).next();
+      BoundedIterator<Closure<Integer>> boundedIterator0 = new BoundedIterator<Closure<Integer>>(iterator0, 1L, 5275L);
+      BoundedIterator<Closure<Integer>> boundedIterator1 = new BoundedIterator<Closure<Integer>>(boundedIterator0, 5275L, 0L);
+      assertFalse(boundedIterator1.equals((Object)boundedIterator0));
+  }
 
-    @Test(timeout = 4000)
-    public void testNext_ThrowsNoSuchElement_WhenNoElementsAvailable() {
-        LinkedList<Object> list = new LinkedList<>();
-        Iterator<Object> baseIterator = list.iterator();
-        BoundedIterator<Object> boundedIterator = new BoundedIterator<>(baseIterator, 0L, 0L);
-        
-        try {
-            boundedIterator.next();
-            fail("Expecting exception: NoSuchElementException");
-        } catch (NoSuchElementException e) {
-            // Expected: No elements to return
-        }
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      LinkedList<Object> linkedList0 = new LinkedList<Object>();
+      Iterator<Object> iterator0 = linkedList0.iterator();
+      BoundedIterator<Object> boundedIterator0 = new BoundedIterator<Object>(iterator0, 0L, 0L);
+      boolean boolean0 = boundedIterator0.hasNext();
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testNext_ThrowsCME_WhenUnderlyingCollectionModified() {
-        LinkedList<Object> list = new LinkedList<>();
-        Iterator<Object> baseIterator = list.descendingIterator();
-        BoundedIterator<Object> boundedIterator = new BoundedIterator<>(baseIterator, 5L, 5L);
-        list.add(new Object()); // Modifies list after iterator creation
-        
-        try {
-            boundedIterator.next();
-            fail("Expecting exception: ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            // Expected: Concurrent modification during iteration
-        }
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
+      Iterator<Integer> iterator0 = linkedList0.descendingIterator();
+      BoundedIterator<Integer> boundedIterator0 = new BoundedIterator<Integer>(iterator0, 0L, 0L);
+      // Undeclared exception!
+      try { 
+        boundedIterator0.next();
+        fail("Expecting exception: NoSuchElementException");
+      
+      } catch(NoSuchElementException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.collections4.iterators.BoundedIterator", e);
+      }
+  }
 
-    // ================= remove() Tests =================
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      BoundedIterator<Boolean> boundedIterator0 = null;
+      try {
+        boundedIterator0 = new BoundedIterator<Boolean>((Iterator<? extends Boolean>) null, 0L, (-1022L));
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Max parameter must not be negative.
+         //
+         verifyException("org.apache.commons.collections4.iterators.BoundedIterator", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testRemove_ThrowsIllegalStateException_WhenCalledBeforeNext() {
-        Iterator<Predicate<Object>> mockIterator = mock(Iterator.class, new ViolatedAssumptionAnswer());
-        when(mockIterator.hasNext()).thenReturn(true, true, false, false);
-        when(mockIterator.next()).thenReturn(null, null, null);
-        
-        BoundedIterator<Predicate<Object>> boundedIterator = new BoundedIterator<>(mockIterator, 1031L, 1031L);
-        boundedIterator.next(); // Advance past first element
-        BoundedIterator<Predicate<Object>> chainedIterator = new BoundedIterator<>(boundedIterator, 1031L, 0L);
-        
-        try {
-            chainedIterator.remove();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            assertEquals("remove() cannot be called before calling next()", e.getMessage());
-        }
-    }
-
-    @Test(timeout = 4000)
-    public void testRemove_ThrowsIllegalStateException_WhenCalledBeforeNextAfterInitialization() {
-        Iterator<Predicate<Object>> mockIterator = mock(Iterator.class, new ViolatedAssumptionAnswer());
-        when(mockIterator.hasNext()).thenReturn(true, true, false);
-        when(mockIterator.next()).thenReturn(null, null);
-        
-        BoundedIterator<Predicate<Object>> boundedIterator = new BoundedIterator<>(mockIterator, 1031L, 1031L);
-        try {
-            boundedIterator.remove();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            assertEquals("remove() cannot be called before calling next()", e.getMessage());
-        }
-    }
-
-    @Test(timeout = 4000)
-    public void testRemove_Succeeds_WhenCalledAfterNext() {
-        Iterator<Closure<Integer>> mockIterator = mock(Iterator.class, new ViolatedAssumptionAnswer());
-        Closure<Integer> mockClosure = NOPClosure.nopClosure();
-        when(mockIterator.next()).thenReturn(mockClosure);
-        
-        BoundedIterator<Closure<Integer>> boundedIterator = new BoundedIterator<>(mockIterator, 0L, 909L);
-        boundedIterator.next(); // Required before remove
-        boundedIterator.remove(); // Should succeed without exception
-    }
-
-    // ================= Edge Case Tests =================
-
-    @Test(timeout = 4000)
-    public void testChainedBoundedIterators_ConstructSuccessfully() {
-        Iterator<Closure<Integer>> mockIterator = mock(Iterator.class, new ViolatedAssumptionAnswer());
-        when(mockIterator.hasNext()).thenReturn(true, false);
-        when(mockIterator.next()).thenReturn(null);
-        
-        BoundedIterator<Closure<Integer>> firstIterator = new BoundedIterator<>(mockIterator, 1L, 5275L);
-        BoundedIterator<Closure<Integer>> secondIterator = new BoundedIterator<>(firstIterator, 5275L, 0L);
-        assertNotEquals(firstIterator, secondIterator);
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      BoundedIterator<Boolean> boundedIterator0 = null;
+      try {
+        boundedIterator0 = new BoundedIterator<Boolean>((Iterator<? extends Boolean>) null, (-1007L), (-1007L));
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Offset parameter must not be negative.
+         //
+         verifyException("org.apache.commons.collections4.iterators.BoundedIterator", e);
+      }
+  }
 }
