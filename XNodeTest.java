@@ -22,89 +22,23 @@ import java.util.Properties;
 import org.junit.jupiter.api.Test;
 
 class XNodeTest {
-
-  @Test
-  void formatXNodeToString() {
-    XPathParser parser = new XPathParser(
-        "<users><user><id>100</id><name>Tom</name><age>30</age><cars><car index=\"1\">BMW</car><car index=\"2\">Audi</car><car index=\"3\">Benz</car></cars></user></users>");
-    String usersNodeToString = parser.evalNode("/users").toString();
-    String userNodeToString = parser.evalNode("/users/user").toString();
-    String carsNodeToString = parser.evalNode("/users/user/cars").toString();
-
-    String usersNodeToStringExpect = """
+    // Test data constants
+    private static final String USERS_XML = """
         <users>
           <user>
-            <id>
-              100
-            </id>
-            <name>
-              Tom
-            </name>
-            <age>
-              30
-            </age>
+            <id>100</id>
+            <name>Tom</name>
+            <age>30</age>
             <cars>
-              <car index="1">
-                BMW
-              </car>
-              <car index="2">
-                Audi
-              </car>
-              <car index="3">
-                Benz
-              </car>
+              <car index="1">BMW</car>
+              <car index="2">Audi</car>
+              <car index="3">Benz</car>
             </cars>
           </user>
         </users>
         """;
-
-    String userNodeToStringExpect = """
-        <user>
-          <id>
-            100
-          </id>
-          <name>
-            Tom
-          </name>
-          <age>
-            30
-          </age>
-          <cars>
-            <car index="1">
-              BMW
-            </car>
-            <car index="2">
-              Audi
-            </car>
-            <car index="3">
-              Benz
-            </car>
-          </cars>
-        </user>
-        """;
-
-    String carsNodeToStringExpect = """
-        <cars>
-          <car index="1">
-            BMW
-          </car>
-          <car index="2">
-            Audi
-          </car>
-          <car index="3">
-            Benz
-          </car>
-        </cars>
-        """;
-
-    assertEquals(usersNodeToStringExpect, usersNodeToString);
-    assertEquals(userNodeToStringExpect, userNodeToString);
-    assertEquals(carsNodeToStringExpect, carsNodeToString);
-  }
-
-  @Test
-  void xNodeToString() {
-    String xml = """
+    
+    private static final String MAPPER_XML = """
         <mapper>
           <select id='select' resultType='map'>
             select
@@ -129,47 +63,156 @@ class XNodeTest {
         </mapper>
         """;
 
-    // a little bit ugly with id/name break, but not a blocker
-    String expected = """
-        <select id="select" resultType="map">
-          select
-          <var set="foo" value="bar" />
-          ID,
-              NAME
-            from STUDENT
-          <where>
-            <if test="name != null">
-              NAME = #{name}
-            </if>
-            and DISABLED = false
-          </where>
-          order by ID
-          <choose>
-            <when test="limit10">
-              limit 10
-            </when>
-            <otherwise>
-              limit 20
-            </otherwise>
-          </choose>
-        </select>
-        """;
+    @Test
+    void toString_ShouldFormatUsersNodeWithProperIndentation() {
+        XPathParser parser = new XPathParser(USERS_XML);
+        XNode usersNode = parser.evalNode("/users");
+        String actual = usersNode.toString();
 
-    XPathParser parser = new XPathParser(xml);
-    XNode selectNode = parser.evalNode("/mapper/select");
-    assertEquals(expected, selectNode.toString());
-  }
+        String expected = """
+            <users>
+              <user>
+                <id>
+                  100
+                </id>
+                <name>
+                  Tom
+                </name>
+                <age>
+                  30
+                </age>
+                <cars>
+                  <car index="1">
+                    BMW
+                  </car>
+                  <car index="2">
+                    Audi
+                  </car>
+                  <car index="3">
+                    Benz
+                  </car>
+                </cars>
+              </user>
+            </users>
+            """;
+        
+        assertEquals(expected, actual);
+    }
 
-  @Test
-  void xnodeToStringVariables() throws Exception {
-    String src = "<root attr='${x}'>y = ${y}<sub attr='${y}'>x = ${x}</sub></root>";
-    String expected = "<root attr=\"foo\">\n  y = bar\n  <sub attr=\"bar\">\n    x = foo\n  </sub>\n</root>\n";
-    Properties vars = new Properties();
-    vars.put("x", "foo");
-    vars.put("y", "bar");
-    XPathParser parser = new XPathParser(src, false, vars);
-    XNode selectNode = parser.evalNode("/root");
-    assertEquals(expected, selectNode.toString());
-  }
+    @Test
+    void toString_ShouldFormatUserNodeWithProperIndentation() {
+        XPathParser parser = new XPathParser(USERS_XML);
+        XNode userNode = parser.evalNode("/users/user");
+        String actual = userNode.toString();
 
+        String expected = """
+            <user>
+              <id>
+                100
+              </id>
+              <name>
+                Tom
+              </name>
+              <age>
+                30
+              </age>
+              <cars>
+                <car index="1">
+                  BMW
+                </car>
+                <car index="2">
+                  Audi
+                </car>
+                <car index="3">
+                  Benz
+                </car>
+              </cars>
+            </user>
+            """;
+        
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void toString_ShouldFormatCarsNodeWithProperIndentation() {
+        XPathParser parser = new XPathParser(USERS_XML);
+        XNode carsNode = parser.evalNode("/users/user/cars");
+        String actual = carsNode.toString();
+
+        String expected = """
+            <cars>
+              <car index="1">
+                BMW
+              </car>
+              <car index="2">
+                Audi
+              </car>
+              <car index="3">
+                Benz
+              </car>
+            </cars>
+            """;
+        
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void toString_ShouldFormatComplexSelectNodeWithProperIndentation() {
+        XPathParser parser = new XPathParser(MAPPER_XML);
+        XNode selectNode = parser.evalNode("/mapper/select");
+        String actual = selectNode.toString();
+
+        String expected = """
+            <select id="select" resultType="map">
+              select
+              <var set="foo" value="bar" />
+              ID,
+                  NAME
+                from STUDENT
+              <where>
+                <if test="name != null">
+                  NAME = #{name}
+                </if>
+                and DISABLED = false
+              </where>
+              order by ID
+              <choose>
+                <when test="limit10">
+                  limit 10
+                </when>
+                <otherwise>
+                  limit 20
+                </otherwise>
+              </choose>
+            </select>
+            """;
+        
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void toString_ShouldResolveVariablesAndFormatNode() {
+        // Setup
+        String xml = "<root attr='${x}'>y = ${y}<sub attr='${y}'>x = ${x}</sub></root>";
+        Properties variables = new Properties();
+        variables.put("x", "foo");
+        variables.put("y", "bar");
+
+        // Execute
+        XPathParser parser = new XPathParser(xml, false, variables);
+        XNode rootNode = parser.evalNode("/root");
+        String actual = rootNode.toString();
+
+        // Verify
+        String expected = """
+            <root attr="foo">
+              y = bar
+              <sub attr="bar">
+                x = foo
+              </sub>
+            </root>
+            """;
+        
+        assertEquals(expected, actual);
+    }
 }
