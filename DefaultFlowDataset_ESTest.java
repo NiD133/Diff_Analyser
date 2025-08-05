@@ -21,251 +21,459 @@ import org.jfree.data.flow.FlowKey;
 import org.jfree.data.flow.NodeKey;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) 
-@EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, 
-                     useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class DefaultFlowDataset_ESTest extends DefaultFlowDataset_ESTest_scaffolding {
 
-    // Constants for JLayeredPane values
-    private static final Integer DEFAULT_LAYER = JLayeredPane.DEFAULT_LAYER;
-    private static final Integer MODAL_LAYER = JLayeredPane.MODAL_LAYER;
-    private static final Integer POPUP_LAYER = JLayeredPane.POPUP_LAYER;
-    private static final Integer PALETTE_LAYER = JLayeredPane.PALETTE_LAYER;
-    private static final Integer FRAME_CONTENT_LAYER = JLayeredPane.FRAME_CONTENT_LAYER;
-    private static final Integer DRAG_LAYER = JLayeredPane.DRAG_LAYER;
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.DEFAULT_LAYER;
+      defaultFlowDataset0.setFlow(1, integer0, integer0, 0);
+      defaultFlowDataset0.hashCode();
+  }
 
-    // Constants for test values
-    private static final int STAGE_0 = 0;
-    private static final int STAGE_1 = 1;
-    private static final int INVALID_STAGE = -882;
-    private static final int NON_EXISTENT_STAGE = 71;
-    private static final double FLOW_VALUE_0 = 0.0;
-    private static final double FLOW_VALUE_1 = 1.0;
-    private static final double FLOW_VALUE_NEGATIVE = -478.3883577094;
-    private static final String PROPERTY_SELECTED = "selected";
-    private static final String PROPERTY_EMPTY = "";
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.MODAL_LAYER;
+      Integer integer1 = JLayeredPane.POPUP_LAYER;
+      defaultFlowDataset0.setFlow(0, integer0, integer1, 0);
+      DefaultFlowDataset defaultFlowDataset1 = (DefaultFlowDataset)defaultFlowDataset0.clone();
+      boolean boolean0 = defaultFlowDataset0.equals(defaultFlowDataset1);
+      assertTrue(boolean0);
+      assertEquals(1, defaultFlowDataset1.getStageCount());
+  }
 
-    // NodeKey constants for reuse
-    private static final NodeKey<Integer> NODE_KEY_STAGE0_DEFAULT = new NodeKey<>(STAGE_0, DEFAULT_LAYER);
-    private static final NodeKey<Integer> NODE_KEY_STAGE1_POPUP = new NodeKey<>(STAGE_1, POPUP_LAYER);
-    private static final NodeKey<Integer> NODE_KEY_NONEXISTENT = new NodeKey<>(213, DEFAULT_LAYER);
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.DEFAULT_LAYER;
+      DefaultFlowDataset<Integer> defaultFlowDataset1 = new DefaultFlowDataset<Integer>();
+      assertTrue(defaultFlowDataset1.equals((Object)defaultFlowDataset0));
+      
+      defaultFlowDataset1.setFlow(1, integer0, integer0, 1);
+      Object object0 = defaultFlowDataset1.clone();
+      boolean boolean0 = defaultFlowDataset0.equals(object0);
+      assertFalse(defaultFlowDataset1.equals((Object)defaultFlowDataset0));
+      assertFalse(boolean0);
+  }
 
-    // ========================================================================
-    // Constructor Tests
-    // ========================================================================
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.PALETTE_LAYER;
+      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>((-352), integer0);
+      defaultFlowDataset0.setFlow(1, integer0, integer0, (-478.3883577094));
+      List<FlowKey> list0 = (List<FlowKey>)defaultFlowDataset0.getOutFlows(nodeKey0);
+      assertEquals(0, list0.size());
+  }
 
-    @Test(timeout = 4000)
-    public void testConstructorInitialState() {
-        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
-        assertEquals("Initial stage count should be 1", 1, dataset.getStageCount());
-        assertTrue("Sources for stage 0 should be empty", dataset.getSources(STAGE_0).isEmpty());
-        assertTrue("Destinations for stage 0 should be empty", dataset.getDestinations(STAGE_0).isEmpty());
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.DEFAULT_LAYER;
+      defaultFlowDataset0.setFlow(0, integer0, integer0, 0);
+      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(213, integer0);
+      List<FlowKey<Integer>> list0 = defaultFlowDataset0.getInFlows(nodeKey0);
+      assertEquals(0, list0.size());
+      assertEquals(1, defaultFlowDataset0.getStageCount());
+  }
 
-    // ========================================================================
-    // Flow Operations Tests
-    // ========================================================================
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.PALETTE_LAYER;
+      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>((-352), integer0);
+      defaultFlowDataset0.setFlow(1, integer0, integer0, (-478.3883577094));
+      List<FlowKey<Integer>> list0 = defaultFlowDataset0.getInFlows(nodeKey0);
+      assertEquals(0, list0.size());
+  }
 
-    @Test(timeout = 4000)
-    public void testSetAndGetFlow() {
-        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
-        dataset.setFlow(STAGE_0, DEFAULT_LAYER, DEFAULT_LAYER, FLOW_VALUE_0);
-        
-        assertEquals("Flow value should match set value", 
-                     FLOW_VALUE_0, 
-                     dataset.getFlow(STAGE_0, DEFAULT_LAYER, DEFAULT_LAYER).doubleValue(),
-                     0.0001);
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.PALETTE_LAYER;
+      defaultFlowDataset0.setFlow(1, integer0, integer0, (-1670.283700956413));
+      defaultFlowDataset0.setFlow(0, integer0, integer0, (-2177.79472));
+      assertEquals(2, defaultFlowDataset0.getStageCount());
+  }
 
-    @Test(timeout = 4000)
-    public void testGetFlowWhenNotSet() {
-        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
-        assertNull("Flow should be null when not set", 
-                   dataset.getFlow(87, MODAL_LAYER, POPUP_LAYER));
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.POPUP_LAYER;
+      Integer integer1 = JLayeredPane.MODAL_LAYER;
+      Number number0 = defaultFlowDataset0.getFlow(87, integer1, integer0);
+      assertNull(number0);
+  }
 
-    @Test(timeout = 4000)
-    public void testSetFlowInvalidStageThrowsException() {
-        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
-        try {
-            dataset.setFlow(INVALID_STAGE, DEFAULT_LAYER, DEFAULT_LAYER, FLOW_VALUE_0);
-            fail("Expected IllegalArgumentException for invalid stage");
-        } catch (IllegalArgumentException e) {
-            assertEquals("Require 'stage' (-882) to be in the range 0 to 1", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.DEFAULT_LAYER;
+      defaultFlowDataset0.setFlow(0, integer0, integer0, 0);
+      List<Integer> list0 = defaultFlowDataset0.getSources(1);
+      assertTrue(list0.contains(integer0));
+      assertEquals(1, defaultFlowDataset0.getStageCount());
+  }
 
-    // ========================================================================
-    // Node and Flow Property Tests
-    // ========================================================================
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.POPUP_LAYER;
+      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(0, integer0);
+      JRadioButtonMenuItem jRadioButtonMenuItem0 = new JRadioButtonMenuItem((Icon) null);
+      defaultFlowDataset0.setNodeProperty(nodeKey0, "selected", jRadioButtonMenuItem0);
+      JRadioButtonMenuItem jRadioButtonMenuItem1 = (JRadioButtonMenuItem)defaultFlowDataset0.getNodeProperty(nodeKey0, "selected");
+      assertFalse(jRadioButtonMenuItem1.isFocusTraversalPolicySet());
+  }
 
-    @Test(timeout = 4000)
-    public void testSetAndGetNodeProperty() {
-        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
-        JRadioButtonMenuItem propertyValue = new JRadioButtonMenuItem();
-        
-        dataset.setNodeProperty(NODE_KEY_STAGE0_DEFAULT, PROPERTY_SELECTED, propertyValue);
-        JRadioButtonMenuItem retrieved = (JRadioButtonMenuItem) 
-            dataset.getNodeProperty(NODE_KEY_STAGE0_DEFAULT, PROPERTY_SELECTED);
-        
-        assertSame("Should retrieve same property object", propertyValue, retrieved);
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.MODAL_LAYER;
+      FlowKey<Integer> flowKey0 = new FlowKey<Integer>(0, integer0, integer0);
+      defaultFlowDataset0.setFlowProperty(flowKey0, "selected", flowKey0);
+      FlowKey flowKey1 = (FlowKey)defaultFlowDataset0.getFlowProperty(flowKey0, "selected");
+      assertEquals(0, flowKey1.getStage());
+  }
 
-    @Test(timeout = 4000)
-    public void testGetNodePropertyWhenNotSet() {
-        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
-        assertNull("Node property should be null when not set",
-                   dataset.getNodeProperty(NODE_KEY_STAGE0_DEFAULT, PROPERTY_SELECTED));
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.FRAME_CONTENT_LAYER;
+      defaultFlowDataset0.setFlow(0, integer0, integer0, 0);
+      List<Integer> list0 = defaultFlowDataset0.getDestinations(0);
+      assertTrue(list0.contains(integer0));
+      assertEquals(1, defaultFlowDataset0.getStageCount());
+  }
 
-    @Test(timeout = 4000)
-    public void testSetAndGetFlowProperty() {
-        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
-        FlowKey<Integer> flowKey = new FlowKey<>(STAGE_0, DEFAULT_LAYER, DEFAULT_LAYER);
-        
-        dataset.setFlowProperty(flowKey, PROPERTY_SELECTED, flowKey);
-        FlowKey<?> retrieved = (FlowKey<?>) 
-            dataset.getFlowProperty(flowKey, PROPERTY_SELECTED);
-        
-        assertEquals("FlowKey stage should match", STAGE_0, retrieved.getStage());
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.FRAME_CONTENT_LAYER;
+      defaultFlowDataset0.setFlow(0, integer0, integer0, 0);
+      defaultFlowDataset0.getAllFlows();
+      assertEquals(1, defaultFlowDataset0.getStageCount());
+  }
 
-    // ========================================================================
-    // Sources and Destinations Tests
-    // ========================================================================
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.MODAL_LAYER;
+      // Undeclared exception!
+      try { 
+        defaultFlowDataset0.setFlow((-882), integer0, integer0, (-882));
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Require 'stage' (-882) to be in the range 0 to 1
+         //
+         verifyException("org.jfree.chart.internal.Args", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetSourcesAfterAddingFlow() {
-        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
-        dataset.setFlow(STAGE_0, DEFAULT_LAYER, DEFAULT_LAYER, FLOW_VALUE_0);
-        
-        List<Integer> sources = dataset.getSources(STAGE_1);
-        assertTrue("Sources should contain added node", sources.contains(DEFAULT_LAYER));
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      // Undeclared exception!
+      try { 
+        defaultFlowDataset0.getSources(71);
+        fail("Expecting exception: IndexOutOfBoundsException");
+      
+      } catch(IndexOutOfBoundsException e) {
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetDestinationsAfterAddingFlow() {
-        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
-        dataset.setFlow(STAGE_0, FRAME_CONTENT_LAYER, FRAME_CONTENT_LAYER, FLOW_VALUE_0);
-        
-        List<Integer> destinations = dataset.getDestinations(STAGE_0);
-        assertTrue("Destinations should contain added node", destinations.contains(FRAME_CONTENT_LAYER));
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      // Undeclared exception!
+      try { 
+        defaultFlowDataset0.getOutFlows((NodeKey) null);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Null 'nodeKey' argument.
+         //
+         verifyException("org.jfree.chart.internal.Args", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetSourcesInvalidStageThrowsException() {
-        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
-        try {
-            dataset.getSources(NON_EXISTENT_STAGE);
-            fail("Expected IndexOutOfBoundsException for non-existent stage");
-        } catch (IndexOutOfBoundsException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      // Undeclared exception!
+      try { 
+        defaultFlowDataset0.getInFlows((NodeKey) null);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Null 'nodeKey' argument.
+         //
+         verifyException("org.jfree.chart.internal.Args", e);
+      }
+  }
 
-    // ========================================================================
-    // InFlows and OutFlows Tests
-    // ========================================================================
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      // Undeclared exception!
+      try { 
+        defaultFlowDataset0.getFlow((-1067), (Integer) null, (Integer) null);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Null 'source' argument.
+         //
+         verifyException("org.jfree.chart.internal.Args", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetOutFlowsForExistingNode() {
-        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
-        dataset.setFlow(STAGE_0, DEFAULT_LAYER, DEFAULT_LAYER, FLOW_VALUE_0);
-        
-        List<FlowKey> outFlows = (List<FlowKey>) dataset.getOutFlows(NODE_KEY_STAGE0_DEFAULT);
-        assertFalse("Outflows should exist for node with flow", outFlows.isEmpty());
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      // Undeclared exception!
+      try { 
+        defaultFlowDataset0.getDestinations(1);
+        fail("Expecting exception: IndexOutOfBoundsException");
+      
+      } catch(IndexOutOfBoundsException e) {
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetInFlowsForExistingNode() {
-        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
-        dataset.setFlow(STAGE_0, FRAME_CONTENT_LAYER, FRAME_CONTENT_LAYER, FLOW_VALUE_0);
-        
-        NodeKey<Integer> nodeKey = new NodeKey<>(STAGE_1, FRAME_CONTENT_LAYER);
-        List<FlowKey<Integer>> inFlows = dataset.getInFlows(nodeKey);
-        assertFalse("Inflows should exist for destination node", inFlows.isEmpty());
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      List<Integer> list0 = defaultFlowDataset0.getSources(0);
+      assertFalse(list0.contains(0));
+  }
 
-    @Test(timeout = 4000)
-    public void testGetInFlowsNullNodeThrowsException() {
-        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
-        try {
-            dataset.getInFlows(null);
-            fail("Expected IllegalArgumentException for null node");
-        } catch (IllegalArgumentException e) {
-            assertEquals("Null 'nodeKey' argument.", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      int int0 = defaultFlowDataset0.getStageCount();
+      assertEquals(1, int0);
+  }
 
-    // ========================================================================
-    // Clone Tests
-    // ========================================================================
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      List<Integer> list0 = defaultFlowDataset0.getDestinations(0);
+      assertTrue(list0.isEmpty());
+  }
 
-    @Test(timeout = 4000)
-    public void testCloneEqualsAfterFlowChange() throws Exception {
-        DefaultFlowDataset<Integer> original = new DefaultFlowDataset<>();
-        original.setFlow(STAGE_0, DEFAULT_LAYER, DEFAULT_LAYER, FLOW_VALUE_0);
-        
-        DefaultFlowDataset<?> clone = (DefaultFlowDataset<?>) original.clone();
-        assertTrue("Clone should equal original", original.equals(clone));
-        
-        original.setFlow(STAGE_0, DEFAULT_LAYER, DEFAULT_LAYER, FLOW_VALUE_NEGATIVE);
-        assertFalse("Clone should not equal modified original", original.equals(clone));
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.FRAME_CONTENT_LAYER;
+      defaultFlowDataset0.setFlow(0, integer0, integer0, 0);
+      DefaultFlowDataset defaultFlowDataset1 = (DefaultFlowDataset)defaultFlowDataset0.clone();
+      defaultFlowDataset0.setFlow(0, integer0, integer0, (-3612.716603546956));
+      boolean boolean0 = defaultFlowDataset0.equals(defaultFlowDataset1);
+      assertFalse(boolean0);
+      assertEquals(1, defaultFlowDataset1.getStageCount());
+  }
 
-    // ========================================================================
-    // Equals and HashCode Tests
-    // ========================================================================
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.MODAL_LAYER;
+      defaultFlowDataset0.setFlow(0, integer0, integer0, 0);
+      DefaultFlowDataset defaultFlowDataset1 = (DefaultFlowDataset)defaultFlowDataset0.clone();
+      Integer integer1 = JLayeredPane.PALETTE_LAYER;
+      defaultFlowDataset0.setFlow(0, integer0, integer1, (-744.1398505791022));
+      boolean boolean0 = defaultFlowDataset0.equals(defaultFlowDataset1);
+      assertFalse(boolean0);
+      assertEquals(1, defaultFlowDataset0.getStageCount());
+      assertEquals(1, defaultFlowDataset1.getStageCount());
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualsSameInstance() {
-        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
-        assertTrue("Dataset should equal itself", dataset.equals(dataset));
-    }
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.POPUP_LAYER;
+      defaultFlowDataset0.setFlow(0, integer0, integer0, 0);
+      DefaultFlowDataset<Integer> defaultFlowDataset1 = new DefaultFlowDataset<Integer>();
+      boolean boolean0 = defaultFlowDataset0.equals(defaultFlowDataset1);
+      assertFalse(boolean0);
+      assertEquals(1, defaultFlowDataset0.getStageCount());
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualsDifferentStageCount() {
-        DefaultFlowDataset<Integer> dataset1 = new DefaultFlowDataset<>();
-        DefaultFlowDataset<Integer> dataset2 = new DefaultFlowDataset<>();
-        dataset2.setFlow(STAGE_1, POPUP_LAYER, POPUP_LAYER, 4286.22);
-        
-        assertFalse("Datasets with different stage counts should not be equal", 
-                    dataset1.equals(dataset2));
-    }
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.POPUP_LAYER;
+      defaultFlowDataset0.setFlow(1, integer0, integer0, 4286.22);
+      DefaultFlowDataset<Integer> defaultFlowDataset1 = new DefaultFlowDataset<Integer>();
+      boolean boolean0 = defaultFlowDataset0.equals(defaultFlowDataset1);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testHashCodeConsistency() {
-        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
-        dataset.setFlow(STAGE_1, DEFAULT_LAYER, DEFAULT_LAYER, FLOW_VALUE_0);
-        assertEquals("Hashcode should be consistent", dataset.hashCode(), dataset.hashCode());
-    }
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      boolean boolean0 = defaultFlowDataset0.equals(defaultFlowDataset0);
+      assertTrue(boolean0);
+  }
 
-    // ========================================================================
-    // Edge Case Tests
-    // ========================================================================
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.DEFAULT_LAYER;
+      Integer integer1 = JLayeredPane.PALETTE_LAYER;
+      defaultFlowDataset0.setFlow(0, integer1, integer1, 0);
+      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(0, integer0);
+      List<FlowKey> list0 = (List<FlowKey>)defaultFlowDataset0.getOutFlows(nodeKey0);
+      assertEquals(1, defaultFlowDataset0.getStageCount());
+      assertTrue(list0.isEmpty());
+  }
 
-    @Test(timeout = 4000)
-    public void testGetAllNodesWithMultipleStages() {
-        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
-        dataset.setFlow(STAGE_1, POPUP_LAYER, POPUP_LAYER, 4286.22);
-        Set<NodeKey<K>> allNodes = dataset.getAllNodes();
-        assertEquals("Stage count should be 2", 2, dataset.getStageCount());
-        assertFalse("All nodes should not be empty", allNodes.isEmpty());
-    }
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.DEFAULT_LAYER;
+      defaultFlowDataset0.setFlow(0, integer0, integer0, 0);
+      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(0, integer0);
+      List<FlowKey> list0 = (List<FlowKey>)defaultFlowDataset0.getOutFlows(nodeKey0);
+      assertEquals(1, defaultFlowDataset0.getStageCount());
+      assertFalse(list0.isEmpty());
+  }
 
-    @Test(timeout = 4000)
-    public void testSetNodePropertyOverwrite() {
-        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
-        NodeKey<Integer> nodeKey = new NodeKey<>(-1567, DRAG_LAYER);
-        
-        dataset.setNodeProperty(nodeKey, PROPERTY_EMPTY, dataset);
-        dataset.setNodeProperty(nodeKey, PROPERTY_EMPTY, nodeKey);
-        
-        assertEquals("Property should be overwritten", 
-                     nodeKey, 
-                     dataset.getNodeProperty(nodeKey, PROPERTY_EMPTY));
-    }
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.DEFAULT_LAYER;
+      defaultFlowDataset0.setFlow(0, integer0, integer0, 0);
+      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(213, integer0);
+      List<FlowKey> list0 = (List<FlowKey>)defaultFlowDataset0.getOutFlows(nodeKey0);
+      assertTrue(list0.isEmpty());
+      assertEquals(1, defaultFlowDataset0.getStageCount());
+  }
 
-    // Additional tests would follow the same pattern with descriptive names and comments...
-    // [Remaining tests refactored similarly for brevity]
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.POPUP_LAYER;
+      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(1, integer0);
+      List<FlowKey> list0 = (List<FlowKey>)defaultFlowDataset0.getOutFlows(nodeKey0);
+      assertTrue(list0.isEmpty());
+  }
+
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.MODAL_LAYER;
+      defaultFlowDataset0.setFlow(0, integer0, integer0, 0);
+      Integer integer1 = JLayeredPane.PALETTE_LAYER;
+      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(1, integer1);
+      List<FlowKey<Integer>> list0 = defaultFlowDataset0.getInFlows(nodeKey0);
+      assertEquals(1, defaultFlowDataset0.getStageCount());
+      assertTrue(list0.isEmpty());
+  }
+
+  @Test(timeout = 4000)
+  public void test32()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.FRAME_CONTENT_LAYER;
+      defaultFlowDataset0.setFlow(0, integer0, integer0, 0);
+      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(1, integer0);
+      List<FlowKey<Integer>> list0 = defaultFlowDataset0.getInFlows(nodeKey0);
+      assertFalse(list0.isEmpty());
+      assertEquals(1, defaultFlowDataset0.getStageCount());
+  }
+
+  @Test(timeout = 4000)
+  public void test33()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.DEFAULT_LAYER;
+      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(0, integer0);
+      List<FlowKey<Integer>> list0 = defaultFlowDataset0.getInFlows(nodeKey0);
+      assertTrue(list0.isEmpty());
+  }
+
+  @Test(timeout = 4000)
+  public void test34()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.DEFAULT_LAYER;
+      FlowKey<Integer> flowKey0 = new FlowKey<Integer>(0, integer0, integer0);
+      defaultFlowDataset0.setFlowProperty(flowKey0, "[FlowKey: 0, 0 -> 0]", integer0);
+      HijrahEra hijrahEra0 = HijrahEra.AH;
+      defaultFlowDataset0.setFlowProperty(flowKey0, "", hijrahEra0);
+      assertEquals(0, flowKey0.getStage());
+  }
+
+  @Test(timeout = 4000)
+  public void test35()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.DEFAULT_LAYER;
+      FlowKey<Integer> flowKey0 = new FlowKey<Integer>(0, integer0, integer0);
+      defaultFlowDataset0.setFlowProperty(flowKey0, "[FlowKey: 0, 0 -> 0]", integer0);
+      Object object0 = defaultFlowDataset0.getFlowProperty(flowKey0, "");
+      assertNull(object0);
+  }
+
+  @Test(timeout = 4000)
+  public void test36()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.DEFAULT_LAYER;
+      FlowKey<Integer> flowKey0 = new FlowKey<Integer>(0, integer0, integer0);
+      Object object0 = defaultFlowDataset0.getFlowProperty(flowKey0, "selected");
+      assertNull(object0);
+  }
+
+  @Test(timeout = 4000)
+  public void test37()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.DRAG_LAYER;
+      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>((-1567), integer0);
+      defaultFlowDataset0.setNodeProperty(nodeKey0, "", defaultFlowDataset0);
+      defaultFlowDataset0.setNodeProperty(nodeKey0, "", nodeKey0);
+      assertEquals((-1567), nodeKey0.getStage());
+  }
+
+  @Test(timeout = 4000)
+  public void test38()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      defaultFlowDataset0.setNodeProperty((NodeKey<Integer>) null, "", (Object) null);
+      Object object0 = defaultFlowDataset0.getNodeProperty((NodeKey) null, "");
+      assertNull(object0);
+  }
+
+  @Test(timeout = 4000)
+  public void test39()  throws Throwable  {
+      Integer integer0 = JLayeredPane.MODAL_LAYER;
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(0, integer0);
+      Object object0 = defaultFlowDataset0.getNodeProperty(nodeKey0, "selected");
+      assertNull(object0);
+  }
+
+  @Test(timeout = 4000)
+  public void test40()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Integer integer0 = JLayeredPane.POPUP_LAYER;
+      defaultFlowDataset0.setFlow(1, integer0, integer0, 4286.22);
+      defaultFlowDataset0.getAllNodes();
+      assertEquals(2, defaultFlowDataset0.getStageCount());
+  }
+
+  @Test(timeout = 4000)
+  public void test41()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      defaultFlowDataset0.getAllNodes();
+      assertEquals(1, defaultFlowDataset0.getStageCount());
+  }
+
+  @Test(timeout = 4000)
+  public void test42()  throws Throwable  {
+      DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
+      Set<FlowKey<Integer>> set0 = defaultFlowDataset0.getAllFlows();
+      boolean boolean0 = defaultFlowDataset0.equals(set0);
+      assertFalse(boolean0);
+  }
 }
