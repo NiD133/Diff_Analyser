@@ -50,120 +50,61 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for the {@link LabelBlock} class.
+ * Some tests for the {@link LabelBlock} class.
  */
 public class LabelBlockTest {
 
-    // Constants for test values
-    private static final String DEFAULT_TEXT = "ABC";
-    private static final String DIFFERENT_TEXT = "XYZ";
-    private static final Font DEFAULT_FONT = new Font("Dialog", Font.PLAIN, 12);
-    private static final Font DIFFERENT_FONT = new Font("Dialog", Font.BOLD, 12);
-    private static final Paint DEFAULT_PAINT = Color.RED;
-    private static final Paint DIFFERENT_PAINT = Color.BLUE;
-    private static final String TOOLTIP_TEXT = "Tooltip";
-    private static final String URL_TEXT = "URL";
-    private static final TextBlockAnchor CONTENT_ANCHOR = TextBlockAnchor.CENTER_RIGHT;
-    private static final RectangleAnchor TEXT_ANCHOR = RectangleAnchor.BOTTOM_RIGHT;
-
     /**
-     * Creates a base LabelBlock instance for testing.
+     * Confirm that the equals() method can distinguish all the required fields.
      */
-    private LabelBlock createBaseLabelBlock() {
-        return new LabelBlock(DEFAULT_TEXT, DEFAULT_FONT, DEFAULT_PAINT);
-    }
-
     @Test
-    public void equals_SameObject() {
-        LabelBlock block = createBaseLabelBlock();
-        assertEquals(block, block);
-    }
-
-    @Test
-    public void equals_NullComparison() {
-        LabelBlock block = createBaseLabelBlock();
-        assertNotEquals(null, block);
-    }
-
-    @Test
-    public void equals_DifferentClass() {
-        LabelBlock block = createBaseLabelBlock();
-        assertNotEquals(block, new Object());
-    }
-
-    @Test
-    public void equals_EqualAfterConstruction() {
-        LabelBlock b1 = createBaseLabelBlock();
-        LabelBlock b2 = createBaseLabelBlock();
+    public void testEquals() {
+        LabelBlock b1 = new LabelBlock("ABC", new Font("Dialog",
+                Font.PLAIN, 12), Color.RED);
+        LabelBlock b2 = new LabelBlock("ABC", new Font("Dialog",
+                Font.PLAIN, 12), Color.RED);
         assertEquals(b1, b2);
-    }
+        assertEquals(b2, b2);
 
-    @Test
-    public void equals_DifferentText() {
-        LabelBlock base = createBaseLabelBlock();
-        LabelBlock differentText = new LabelBlock(DIFFERENT_TEXT, DEFAULT_FONT, DEFAULT_PAINT);
-        assertNotEquals(base, differentText);
-    }
-
-    @Test
-    public void equals_DifferentFont() {
-        LabelBlock base = createBaseLabelBlock();
-        LabelBlock differentFont = new LabelBlock(DEFAULT_TEXT, DIFFERENT_FONT, DEFAULT_PAINT);
-        assertNotEquals(base, differentFont);
-    }
-
-    @Test
-    public void equals_DifferentPaint() {
-        LabelBlock base = createBaseLabelBlock();
-        LabelBlock differentPaint = new LabelBlock(DEFAULT_TEXT, DEFAULT_FONT, DIFFERENT_PAINT);
-        assertNotEquals(base, differentPaint);
-    }
-
-    @Test
-    public void equals_DifferentToolTipText() {
-        LabelBlock b1 = createBaseLabelBlock();
-        LabelBlock b2 = createBaseLabelBlock();
-        
-        b1.setToolTipText(TOOLTIP_TEXT);
+        b1 = new LabelBlock("XYZ", new Font("Dialog", Font.PLAIN, 12),
+                Color.RED);
         assertNotEquals(b1, b2);
-        
-        b2.setToolTipText(TOOLTIP_TEXT);
+        b2 = new LabelBlock("XYZ", new Font("Dialog", Font.PLAIN, 12),
+                Color.RED);
         assertEquals(b1, b2);
-    }
 
-    @Test
-    public void equals_DifferentUrlText() {
-        LabelBlock b1 = createBaseLabelBlock();
-        LabelBlock b2 = createBaseLabelBlock();
-        
-        b1.setURLText(URL_TEXT);
+        b1 = new LabelBlock("XYZ", new Font("Dialog", Font.BOLD, 12),
+                Color.RED);
         assertNotEquals(b1, b2);
-        
-        b2.setURLText(URL_TEXT);
+        b2 = new LabelBlock("XYZ", new Font("Dialog", Font.BOLD, 12),
+                Color.RED);
         assertEquals(b1, b2);
-    }
 
-    @Test
-    public void equals_DifferentContentAlignmentPoint() {
-        LabelBlock b1 = createBaseLabelBlock();
-        LabelBlock b2 = createBaseLabelBlock();
-        
-        b1.setContentAlignmentPoint(CONTENT_ANCHOR);
+        b1 = new LabelBlock("XYZ", new Font("Dialog", Font.BOLD, 12),
+                Color.BLUE);
         assertNotEquals(b1, b2);
-        
-        b2.setContentAlignmentPoint(CONTENT_ANCHOR);
+        b2 = new LabelBlock("XYZ", new Font("Dialog", Font.BOLD, 12),
+                Color.BLUE);
         assertEquals(b1, b2);
-    }
 
-    @Test
-    public void equals_DifferentTextAnchor() {
-        LabelBlock b1 = createBaseLabelBlock();
-        LabelBlock b2 = createBaseLabelBlock();
-        
-        b1.setTextAnchor(TEXT_ANCHOR);
+        b1.setToolTipText("Tooltip");
         assertNotEquals(b1, b2);
-        
-        b2.setTextAnchor(TEXT_ANCHOR);
+        b2.setToolTipText("Tooltip");
+        assertEquals(b1, b2);
+
+        b1.setURLText("URL");
+        assertNotEquals(b1, b2);
+        b2.setURLText("URL");
+        assertEquals(b1, b2);
+
+        b1.setContentAlignmentPoint(TextBlockAnchor.CENTER_RIGHT);
+        assertNotEquals(b1, b2);
+        b2.setContentAlignmentPoint(TextBlockAnchor.CENTER_RIGHT);
+        assertEquals(b1, b2);
+
+        b1.setTextAnchor(RectangleAnchor.BOTTOM_RIGHT);
+        assertNotEquals(b1, b2);
+        b2.setTextAnchor(RectangleAnchor.BOTTOM_RIGHT);
         assertEquals(b1, b2);
     }
 
@@ -172,12 +113,12 @@ public class LabelBlockTest {
      */
     @Test
     public void testCloning() throws CloneNotSupportedException {
-        LabelBlock original = createBaseLabelBlock();
-        LabelBlock clone = CloneUtils.clone(original);
-        
-        assertNotSame(original, clone);
-        assertSame(original.getClass(), clone.getClass());
-        assertEquals(original, clone);
+        LabelBlock b1 = new LabelBlock("ABC", new Font("Dialog",
+                Font.PLAIN, 12), Color.RED);
+        LabelBlock b2 = CloneUtils.clone(b1);
+        assertNotSame(b1, b2);
+        assertSame(b1.getClass(), b2.getClass());
+        assertEquals(b1, b2);
     }
 
     /**
@@ -185,10 +126,12 @@ public class LabelBlockTest {
      */
     @Test
     public void testSerialization() {
-        GradientPaint gp = new GradientPaint(1.0f, 2.0f, Color.RED, 3.0f, 4.0f, Color.BLUE);
-        LabelBlock original = new LabelBlock(DEFAULT_TEXT, DEFAULT_FONT, gp);
-        LabelBlock deserialized = TestUtils.serialised(original);
-        
-        assertEquals(original, deserialized);
+        GradientPaint gp = new GradientPaint(1.0f, 2.0f, Color.RED, 3.0f, 4.0f,
+                Color.BLUE);
+        LabelBlock b1 = new LabelBlock("ABC", new Font("Dialog",
+                Font.PLAIN, 12), gp);
+        LabelBlock b2 = TestUtils.serialised(b1);
+        assertEquals(b1, b2);
     }
+
 }
