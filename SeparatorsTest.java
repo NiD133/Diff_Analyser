@@ -4,68 +4,66 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for class {@link Separators}.
+ *
+ * @date 2017-07-31
+ * @see Separators
+ **/
 class SeparatorsTest {
 
-    // Tests for withArrayValueSeparator()
-    
     @Test
-    void withArrayValueSeparator_whenSameValue_returnsSameInstance() {
-        Separators original = new Separators('5', '5', '5');
-        Separators updated = original.withArrayValueSeparator('5');
+    void withArrayValueSeparatorWithDigit() {
+    Separators separators = new Separators('5', '5', '5');
+    Separators separatorsTwo = separators.withArrayValueSeparator('5');
 
-        assertSame(original, updated, "Should return same instance when value unchanged");
-    }
+    assertEquals('5', separatorsTwo.getObjectEntrySeparator());
+    assertEquals('5', separatorsTwo.getObjectFieldValueSeparator());
+    assertEquals('5', separatorsTwo.getArrayValueSeparator());
+    assertSame(separatorsTwo, separators);
 
-    @Test
-    void withArrayValueSeparator_whenNewValue_returnsNewInstanceWithUpdatedSeparator() {
-        Separators original = new Separators('5', '5', '5');
-        Separators updated = original.withArrayValueSeparator('6');
+    separatorsTwo = separators.withArrayValueSeparator('6');
 
-        assertNotSame(original, updated, "Should return new instance when value changes");
-        assertEquals('6', updated.getArrayValueSeparator(), "Array separator should be updated");
-        assertEquals('5', updated.getObjectEntrySeparator(), "Object entry separator should remain unchanged");
-        assertEquals('5', updated.getObjectFieldValueSeparator(), "Object field separator should remain unchanged");
-    }
+    assertEquals('5', separatorsTwo.getObjectEntrySeparator());
+    assertEquals('5', separatorsTwo.getObjectFieldValueSeparator());
+    assertEquals('6', separatorsTwo.getArrayValueSeparator());
+    assertNotSame(separatorsTwo, separators);
 
-    // Tests for withObjectEntrySeparator()
-    
-    @Test
-    void withObjectEntrySeparator_whenSameValue_returnsSameInstance() {
-        Separators original = new Separators('5', '5', '5');
-        Separators updated = original.withObjectEntrySeparator('5');
-        
-        assertSame(original, updated, "Should return same instance when value unchanged");
-    }
+  }
 
     @Test
-    void withObjectEntrySeparator_whenNewValue_returnsNewInstanceWithUpdatedSeparator() {
-        Separators original = new Separators('5', '5', '5');
-        Separators updated = original.withObjectEntrySeparator('!');
+    void withObjectEntrySeparator() {
+    Separators separators = new Separators('5', '5', '5');
+    Separators separatorsTwo = separators.withObjectEntrySeparator('!');
+    Separators separatorsThree = separatorsTwo.withObjectEntrySeparator('!');
 
-        assertNotSame(original, updated, "Should return new instance when value changes");
-        assertEquals('!', updated.getObjectEntrySeparator(), "Object entry separator should be updated");
-        assertEquals('5', updated.getObjectFieldValueSeparator(), "Object field separator should remain unchanged");
-        assertEquals('5', updated.getArrayValueSeparator(), "Array separator should remain unchanged");
-    }
+    assertEquals('!', separatorsThree.getObjectEntrySeparator());
+    assertEquals('5', separatorsThree.getObjectFieldValueSeparator());
 
-    // Tests for withObjectFieldValueSeparator()
-    
-    @Test
-    void withObjectFieldValueSeparator_whenSameValue_returnsSameInstance() {
-        Separators original = new Separators('5', '5', '5');
-        Separators updated = original.withObjectFieldValueSeparator('5');
+    assertSame(separatorsThree, separatorsTwo);
+    assertEquals('5', separators.getArrayValueSeparator());
 
-        assertSame(original, updated, "Should return same instance when value unchanged");
-    }
+    assertEquals('5', separatorsThree.getArrayValueSeparator());
+    assertEquals('5', separators.getObjectFieldValueSeparator());
+  }
 
     @Test
-    void withObjectFieldValueSeparator_whenNewValue_returnsNewInstanceWithUpdatedSeparator() {
-        Separators original = new Separators('5', '5', '5');
-        Separators updated = original.withObjectFieldValueSeparator('6');
+    void withObjectFieldValueSeparatorWithDigit() {
+    Separators separators = new Separators('5', '5', '5');
+    Separators separatorsTwo = separators.withObjectFieldValueSeparator('5');
 
-        assertNotSame(original, updated, "Should return new instance when value changes");
-        assertEquals('6', updated.getObjectFieldValueSeparator(), "Object field separator should be updated");
-        assertEquals('5', updated.getObjectEntrySeparator(), "Object entry separator should remain unchanged");
-        assertEquals('5', updated.getArrayValueSeparator(), "Array separator should remain unchanged");
-    }
+    assertEquals('5', separatorsTwo.getArrayValueSeparator());
+    assertSame(separatorsTwo, separators);
+    assertEquals('5', separatorsTwo.getObjectEntrySeparator());
+    assertEquals('5', separatorsTwo.getObjectFieldValueSeparator());
+
+    separatorsTwo = separators.withObjectFieldValueSeparator('6');
+
+    assertEquals('5', separatorsTwo.getArrayValueSeparator());
+    assertNotSame(separatorsTwo, separators);
+    assertEquals('5', separatorsTwo.getObjectEntrySeparator());
+    assertEquals('6', separatorsTwo.getObjectFieldValueSeparator());
+
+  }
+
 }
