@@ -23,215 +23,198 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.api.Test;
 
 class SequencesComparatorTest {
 
-    private static final class ExecutionVisitor<T> implements CommandVisitor<T> {
+    /**
+     * Applies edit commands to transform a sequence and track the result.
+     */
+    private static final class ScriptApplierVisitor<T> implements CommandVisitor<T> {
 
-        private List<T> v;
-        private int index;
+        private List<T> sequence;
+        private int currentIndex;
 
-        public String getString() {
+        /**
+         * @return Final transformed sequence as a concatenated string
+         */
+        public String getResultAsString() {
             final StringBuilder buffer = new StringBuilder();
-            for (final T c : v) {
-                buffer.append(c);
+            for (final T element : sequence) {
+                buffer.append(element);
             }
             return buffer.toString();
         }
 
-        public void setList(final List<T> array) {
-            v = new ArrayList<>(array);
-            index = 0;
+        /**
+         * Initializes visitor with starting sequence.
+         * @param sequence Initial sequence to transform
+         */
+        public void initialize(List<T> sequence) {
+            this.sequence = new ArrayList<>(sequence);
+            currentIndex = 0;
         }
 
         @Override
         public void visitDeleteCommand(final T object) {
-            v.remove(index);
+            sequence.remove(currentIndex);
         }
 
         @Override
         public void visitInsertCommand(final T object) {
-            v.add(index++, object);
+            sequence.add(currentIndex++, object);
         }
 
         @Override
         public void visitKeepCommand(final T object) {
-            ++index;
+            currentIndex++;
         }
-
     }
-    private List<String> before;
-    private List<String> after;
 
-    private int[]        length;
-
-    private List<Character> sequence(final String string) {
+    /**
+     * Converts a string to a list of characters.
+     * @param string Input string
+     * @return List of characters
+     */
+    private static List<Character> stringToCharacterList(final String string) {
         final List<Character> list = new ArrayList<>();
-        for (int i = 0; i < string.length(); ++i) {
-            list.add(Character.valueOf(string.charAt(i)));
+        for (final char c : string.toCharArray()) {
+            list.add(c);
         }
         return list;
     }
 
-    @BeforeEach
-    public void setUp() {
-
-        before = Arrays.asList(
-            "bottle",
-            "nematode knowledge",
-            StringUtils.EMPTY,
-            "aa",
-            "prefixed string",
-            "ABCABBA",
-            "glop glop",
-            "coq",
-            "spider-man");
-
-        after = Arrays.asList(
-            "noodle",
-            "empty bottle",
-            StringUtils.EMPTY,
-            "C",
-            "prefix",
-            "CBABAC",
-            "pas glop pas glop",
-            "ane",
-            "klingon");
-
-        length = new int[] {
-            6,
-            16,
-            0,
-            3,
-            9,
-            5,
-            8,
-            6,
-            13
-        };
-
+    /**
+     * Provides test cases for parameterized tests.
+     * Each entry: [initial string, target string, expected edit count]
+     */
+    private static Stream<Arguments> provideStringPairsAndEditCount() {
+        return Stream.of(
+            Arguments.of("bottle", "noodle", 6),
+            Arguments.of("nematode knowledge", "empty bottle", 16),
+            Arguments.of(StringUtils.EMPTY, StringUtils.EMPTY, 0),
+            Arguments.of("aa", "C", 3),
+            Arguments.of("prefixed string", "prefix", 9),
+            Arguments.of("ABCABBA", "CBABAC", 5),
+            Arguments.of("glop glop", "pas glop pas glop", 8),
+            Arguments.of("coq", "ane", 6),
+            Arguments.of("spider-man", "klingon", 13)
+        );
     }
 
-    @AfterEach
-    public void tearDown() {
-        before = null;
-        after  = null;
-        length = null;
+    @ParameterizedTest
+    @MethodSource("provideStringPairsAndEditCount")
+    @DisplayName("Applies edit script and verifies final string matches target")
+    void applyEditScript_TransformsInitialToTargetString(
+            final String initial, final String target, final int expectedEditCount) {
+        final ScriptApplierVisitor<Character> applier = new ScriptApplierVisitor<>();
+        applier.initialize(stringToCharacterList(initial));
+        new SequencesComparator<>(
+            stringToCharacterList(initial),
+            stringToCharacterList(target)
+        ).getScript().visit(applier);
+
+        assertEquals(target, applier.getResultAsString());
     }
 
-    @Test
-    void testExecution() {
-        final ExecutionVisitor<Character> ev = new ExecutionVisitor<>();
-        for (int i = 0; i < before.size(); ++i) {
-            ev.setList(sequence(before.get(i)));
-            new SequencesComparator<>(sequence(before.get(i)),
-                    sequence(after.get(i))).getScript().visit(ev);
-            assertEquals(after.get(i), ev.getString());
-        }
+    @ParameterizedTest
+    @MethodSource("provideStringPairsAndEditCount")
+    @DisplayName("Verifies correct number of edit operations")
+    void getScriptModifications_ReturnsCorrectEditCount(
+            final String initial, final String target, final int expectedEditCount) {
+        final SequencesComparator<Character> comparator = new SequencesComparator<>(
+            stringToCharacterList(initial),
+            stringToCharacterList(target)
+        );
+        assertEquals(expectedEditCount, comparator.getScript().getModifications());
     }
 
     @Test
-    void testLength() {
-        for (int i = 0; i < before.size(); ++i) {
-            final SequencesComparator<Character> comparator =
-                    new SequencesComparator<>(sequence(before.get(i)),
-                            sequence(after.get(i)));
-            assertEquals(length[i], comparator.getScript().getModifications());
-        }
-    }
-
-    @Test
-    void testMinimal() {
-        final String[] shadokAlph = {
-            "GA",
-            "BU",
-            "ZO",
-            "MEU"
-        };
-        final List<String> sentenceBefore = new ArrayList<>();
-        final List<String> sentenceAfter  = new ArrayList<>();
-        sentenceBefore.add(shadokAlph[0]);
-        sentenceBefore.add(shadokAlph[2]);
-        sentenceBefore.add(shadokAlph[3]);
-        sentenceBefore.add(shadokAlph[1]);
-        sentenceBefore.add(shadokAlph[0]);
-        sentenceBefore.add(shadokAlph[0]);
-        sentenceBefore.add(shadokAlph[2]);
-        sentenceBefore.add(shadokAlph[1]);
-        sentenceBefore.add(shadokAlph[3]);
-        sentenceBefore.add(shadokAlph[0]);
-        sentenceBefore.add(shadokAlph[2]);
-        sentenceBefore.add(shadokAlph[1]);
-        sentenceBefore.add(shadokAlph[3]);
-        sentenceBefore.add(shadokAlph[2]);
-        sentenceBefore.add(shadokAlph[2]);
-        sentenceBefore.add(shadokAlph[0]);
-        sentenceBefore.add(shadokAlph[1]);
-        sentenceBefore.add(shadokAlph[3]);
-        sentenceBefore.add(shadokAlph[0]);
-        sentenceBefore.add(shadokAlph[3]);
+    @DisplayName("Verifies edit count doesn't exceed random modifications")
+    void randomModifications_EditCountWithinBounds() {
+        final String[] shadokAlphabet = {"GA", "BU", "ZO", "MEU"};
+        final List<String> originalSentence = Arrays.asList(
+            "GA", "ZO", "MEU", "BU", "GA", "GA", "ZO", "BU", "MEU", "GA",
+            "ZO", "BU", "MEU", "ZO", "ZO", "GA", "BU", "MEU", "GA", "MEU"
+        );
 
         final Random random = new Random(4564634237452342L);
 
-        for (int nbCom = 0; nbCom <= 40; nbCom += 5) {
-            sentenceAfter.clear();
-            sentenceAfter.addAll(sentenceBefore);
-            for (int i = 0; i < nbCom; i++) {
-                if (random.nextInt(2) == 0) {
-                    sentenceAfter.add(random.nextInt(sentenceAfter.size() + 1), shadokAlph[random.nextInt(4)]);
+        for (int numberOfModifications = 0; numberOfModifications <= 40; numberOfModifications += 5) {
+            // Create a modified copy of the original sentence
+            List<String> modifiedSentence = new ArrayList<>(originalSentence);
+            
+            // Apply random insertions/deletions
+            for (int i = 0; i < numberOfModifications; i++) {
+                if (random.nextBoolean()) {
+                    // Insert random word at random position
+                    modifiedSentence.add(
+                        random.nextInt(modifiedSentence.size() + 1),
+                        shadokAlphabet[random.nextInt(shadokAlphabet.length)]
+                    );
                 } else {
-                    sentenceAfter.remove(random.nextInt(sentenceAfter.size()));
+                    // Delete random word
+                    modifiedSentence.remove(random.nextInt(modifiedSentence.size()));
                 }
             }
 
-            final SequencesComparator<String> comparator = new SequencesComparator<>(sentenceBefore, sentenceAfter);
-            assertTrue(comparator.getScript().getModifications() <= nbCom);
+            // Verify edit count doesn't exceed applied modifications
+            final SequencesComparator<String> comparator = new SequencesComparator<>(
+                originalSentence,
+                modifiedSentence
+            );
+            assertTrue(comparator.getScript().getModifications() <= numberOfModifications,
+                "Edit count should be <= " + numberOfModifications);
         }
     }
 
     @Test
-    void testShadok() {
-        final int lgMax = 5;
-        final String[] shadokAlph = {
-            "GA",
-            "BU",
-            "ZO",
-            "MEU"
-        };
+    @DisplayName("Verifies all Shadok sentence transformations")
+    void allShadokSentencePairs_TransformCorrectly() {
+        final int maxLength = 5;
+        final String[] shadokAlphabet = {"GA", "BU", "ZO", "MEU"};
+        
+        // Generate all possible Shadok sentences up to maxLength
         List<List<String>> shadokSentences = new ArrayList<>();
-        for (int lg = 0; lg < lgMax; ++lg) {
-            final List<List<String>> newTab = new ArrayList<>();
-            newTab.add(new ArrayList<>());
-            for (final String element : shadokAlph) {
+        shadokSentences.add(new ArrayList<>()); // Start with empty sentence
+        
+        for (int length = 1; length <= maxLength; length++) {
+            final List<List<String>> nextLengthSentences = new ArrayList<>();
+            for (final String word : shadokAlphabet) {
                 for (final List<String> sentence : shadokSentences) {
                     final List<String> newSentence = new ArrayList<>(sentence);
-                    newSentence.add(element);
-                    newTab.add(newSentence);
+                    newSentence.add(word);
+                    nextLengthSentences.add(newSentence);
                 }
             }
-            shadokSentences = newTab;
+            shadokSentences.addAll(nextLengthSentences);
         }
 
-        final ExecutionVisitor<String> ev = new ExecutionVisitor<>();
+        final ScriptApplierVisitor<String> applier = new ScriptApplierVisitor<>();
 
-        for (final List<String> element : shadokSentences) {
-            for (final List<String> shadokSentence : shadokSentences) {
-                ev.setList(element);
-                new SequencesComparator<>(element,
-                        shadokSentence).getScript().visit(ev);
+        // Verify every sentence can be transformed to every other sentence
+        for (final List<String> sourceSentence : shadokSentences) {
+            for (final List<String> targetSentence : shadokSentences) {
+                applier.initialize(sourceSentence);
+                new SequencesComparator<>(sourceSentence, targetSentence)
+                    .getScript().visit(applier);
 
-                final StringBuilder concat = new StringBuilder();
-                for (final String s : shadokSentence) {
-                    concat.append(s);
+                // Build expected result by concatenating target words
+                final StringBuilder expected = new StringBuilder();
+                for (final String word : targetSentence) {
+                    expected.append(word);
                 }
-                assertEquals(concat.toString(), ev.getString());
+
+                assertEquals(expected.toString(), applier.getResultAsString(),
+                    "Transformation failed for source->target");
             }
         }
     }
-
 }
