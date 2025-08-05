@@ -16,13 +16,14 @@
  */
 package org.apache.commons.collections4.bloomfilter;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.LongPredicate;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -49,39 +50,58 @@ class IndexExtractorTest {
 
     @ParameterizedTest
     @ValueSource(ints = {32, 33})
-    void testAsIndexArray(final int n) {
-        final IndexExtractor ip = i -> {
-            for (int j = 0; j < n; j++) {
-                // Always test index zero
-                i.test(0);
+    void asIndexArray_WhenAllIndicesAreZero_ReturnsArrayOfZeros(final int n) {
+        // Create an IndexExtractor that returns index 0 exactly n times
+        final IndexExtractor indexExtractor = consumer -> {
+            for (int i = 0; i < n; i++) {
+                consumer.test(0);
             }
             return true;
         };
-        Assertions.assertArrayEquals(new int[n], ip.asIndexArray());
+
+        final int[] expected = new int[n]; // Array of n zeros
+        assertArrayEquals(expected, indexExtractor.asIndexArray());
     }
 
     @Test
-    void testFromBitMapExtractor() {
-        TestingBitMapExtractor testingBitMapExtractor = new TestingBitMapExtractor(new long[] {1L, 2L, 3L});
-        IndexExtractor underTest = IndexExtractor.fromBitMapExtractor(testingBitMapExtractor);
-        List<Integer> lst = new ArrayList<>();
+    void fromBitMapExtractor_WithMultipleLongs_ProducesCorrectIndices() {
+        // BitMaps: [1L, 2L, 3L]
+        // Expected indices:
+        //  1L (binary: ...001) -> index 0
+        //  2L (binary: ...010) -> index 1 + 64 = 65
+        //  3L (binary: ...011) -> indices 0+128 and 1+128 (128, 129)
+        final int[] expectedIndices = {0, 65, 128, 129};
+        
+        // Create extractor from bitmaps
+        final BitMapExtractor bitMapExtractor = new TestingBitMapExtractor(new long[] {1L, 2L, 3L});
+        final IndexExtractor indexExtractor = IndexExtractor.fromBitMapExtractor(bitMapExtractor);
+        
+        // Collect indices
+        final List<Integer> collectedIndices = new ArrayList<>();
+        indexExtractor.processIndices(collectedIndices::add);
+        
+        // Verify collected indices
+        assertEquals(expectedIndices.length, collectedIndices.size());
+        for (int i = 0; i < expectedIndices.length; i++) {
+            assertEquals(expectedIndices[i], collectedIndices.get(i));
+        }
+    }
 
-        underTest.processIndices(lst::add);
-        assertEquals(4, lst.size());
-        assertEquals(Integer.valueOf(0), lst.get(0));
-        assertEquals(Integer.valueOf(1 + 64), lst.get(1));
-        assertEquals(Integer.valueOf(0 + 128), lst.get(2));
-        assertEquals(Integer.valueOf(1 + 128), lst.get(3));
-
-        testingBitMapExtractor = new TestingBitMapExtractor(new long[] {0xFFFFFFFFFFFFFFFFL});
-        underTest = IndexExtractor.fromBitMapExtractor(testingBitMapExtractor);
-        lst = new ArrayList<>();
-
-        underTest.processIndices(lst::add);
-
-        assertEquals(64, lst.size());
-        for (int i = 0; i < 64; i++) {
-            assertEquals(Integer.valueOf(i), lst.get(i));
+    @Test
+    void fromBitMapExtractor_WithFullLong_ProducesAllIndicesFrom0To63() {
+        // A long with all 64 bits set should produce indices 0-63
+        final BitMapExtractor bitMapExtractor = new TestingBitMapExtractor(new long[] {0xFFFFFFFFFFFFFFFFL});
+        final IndexExtractor indexExtractor = IndexExtractor.fromBitMapExtractor(bitMapExtractor);
+        
+        final List<Integer> collectedIndices = new ArrayList<>();
+        indexExtractor.processIndices(collectedIndices::add);
+        
+        // Verify we have all 64 indices
+        assertEquals(64, collectedIndices.size());
+        
+        // Verify each index from 0 to 63 exists
+        for (int expectedIndex = 0; expectedIndex < 64; expectedIndex++) {
+            assertEquals(expectedIndex, collectedIndices.get(expectedIndex));
         }
     }
 }
