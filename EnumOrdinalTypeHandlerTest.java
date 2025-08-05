@@ -1,3 +1,18 @@
+/*
+ *    Copyright 2009-2024 the original author or authors.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package org.apache.ibatis.type;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -5,131 +20,75 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class EnumOrdinalTypeHandlerTest extends BaseTypeHandlerTest {
 
-  // Define an enum for testing purposes
   enum MyEnum {
     ONE, TWO
   }
 
-  // TypeHandler instance for MyEnum
   private static final TypeHandler<MyEnum> TYPE_HANDLER = new EnumOrdinalTypeHandler<>(MyEnum.class);
 
-  @BeforeEach
-  void setUp() {
-    // Reset mock objects before each test if necessary
+  @Override
+  @Test
+  public void shouldSetParameter() throws Exception {
+    TYPE_HANDLER.setParameter(ps, 1, MyEnum.ONE, null);
+    verify(ps).setInt(1, 0);
   }
 
   @Test
-  void testSetParameterWithEnumValue() throws Exception {
-    // Arrange
-    int parameterIndex = 1;
-    MyEnum enumValue = MyEnum.ONE;
-
-    // Act
-    TYPE_HANDLER.setParameter(ps, parameterIndex, enumValue, null);
-
-    // Assert
-    verify(ps).setInt(parameterIndex, enumValue.ordinal());
+  void shouldSetNullParameter() throws Exception {
+    TYPE_HANDLER.setParameter(ps, 1, null, JdbcType.VARCHAR);
+    verify(ps).setNull(1, JdbcType.VARCHAR.TYPE_CODE);
   }
 
+  @Override
   @Test
-  void testSetParameterWithNullValue() throws Exception {
-    // Arrange
-    int parameterIndex = 1;
-    JdbcType jdbcType = JdbcType.VARCHAR;
-
-    // Act
-    TYPE_HANDLER.setParameter(ps, parameterIndex, null, jdbcType);
-
-    // Assert
-    verify(ps).setNull(parameterIndex, jdbcType.TYPE_CODE);
-  }
-
-  @Test
-  void testGetResultFromResultSetByName() throws Exception {
-    // Arrange
-    String columnName = "column";
-    when(rs.getInt(columnName)).thenReturn(0);
+  public void shouldGetResultFromResultSetByName() throws Exception {
+    when(rs.getInt("column")).thenReturn(0);
     when(rs.wasNull()).thenReturn(false);
-
-    // Act
-    MyEnum result = TYPE_HANDLER.getResult(rs, columnName);
-
-    // Assert
-    assertEquals(MyEnum.ONE, result);
+    assertEquals(MyEnum.ONE, TYPE_HANDLER.getResult(rs, "column"));
   }
 
+  @Override
   @Test
-  void testGetResultNullFromResultSetByName() throws Exception {
-    // Arrange
-    String columnName = "column";
-    when(rs.getInt(columnName)).thenReturn(0);
+  public void shouldGetResultNullFromResultSetByName() throws Exception {
+    when(rs.getInt("column")).thenReturn(0);
     when(rs.wasNull()).thenReturn(true);
-
-    // Act
-    MyEnum result = TYPE_HANDLER.getResult(rs, columnName);
-
-    // Assert
-    assertNull(result);
+    assertNull(TYPE_HANDLER.getResult(rs, "column"));
   }
 
+  @Override
   @Test
-  void testGetResultFromResultSetByPosition() throws Exception {
-    // Arrange
-    int columnIndex = 1;
-    when(rs.getInt(columnIndex)).thenReturn(0);
+  public void shouldGetResultFromResultSetByPosition() throws Exception {
+    when(rs.getInt(1)).thenReturn(0);
     when(rs.wasNull()).thenReturn(false);
-
-    // Act
-    MyEnum result = TYPE_HANDLER.getResult(rs, columnIndex);
-
-    // Assert
-    assertEquals(MyEnum.ONE, result);
+    assertEquals(MyEnum.ONE, TYPE_HANDLER.getResult(rs, 1));
   }
 
+  @Override
   @Test
-  void testGetResultNullFromResultSetByPosition() throws Exception {
-    // Arrange
-    int columnIndex = 1;
-    when(rs.getInt(columnIndex)).thenReturn(0);
+  public void shouldGetResultNullFromResultSetByPosition() throws Exception {
+    when(rs.getInt(1)).thenReturn(0);
     when(rs.wasNull()).thenReturn(true);
-
-    // Act
-    MyEnum result = TYPE_HANDLER.getResult(rs, columnIndex);
-
-    // Assert
-    assertNull(result);
+    assertNull(TYPE_HANDLER.getResult(rs, 1));
   }
 
+  @Override
   @Test
-  void testGetResultFromCallableStatement() throws Exception {
-    // Arrange
-    int columnIndex = 1;
-    when(cs.getInt(columnIndex)).thenReturn(0);
+  public void shouldGetResultFromCallableStatement() throws Exception {
+    when(cs.getInt(1)).thenReturn(0);
     when(cs.wasNull()).thenReturn(false);
-
-    // Act
-    MyEnum result = TYPE_HANDLER.getResult(cs, columnIndex);
-
-    // Assert
-    assertEquals(MyEnum.ONE, result);
+    assertEquals(MyEnum.ONE, TYPE_HANDLER.getResult(cs, 1));
   }
 
+  @Override
   @Test
-  void testGetResultNullFromCallableStatement() throws Exception {
-    // Arrange
-    int columnIndex = 1;
-    when(cs.getInt(columnIndex)).thenReturn(0);
+  public void shouldGetResultNullFromCallableStatement() throws Exception {
+    when(cs.getInt(1)).thenReturn(0);
     when(cs.wasNull()).thenReturn(true);
-
-    // Act
-    MyEnum result = TYPE_HANDLER.getResult(cs, columnIndex);
-
-    // Assert
-    assertNull(result);
+    assertNull(TYPE_HANDLER.getResult(cs, 1));
   }
+
 }
