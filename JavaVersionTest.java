@@ -29,57 +29,68 @@ public class JavaVersionTest {
   // https://github.com/prestodb/presto/blob/master/presto-main/src/test/java/com/facebook/presto/server/TestJavaVersion.java
 
   @Test
-  public void testGetMajorJavaVersion() {
-    // Gson currently requires at least Java 8
+  public void getMajorJavaVersion_currentVersionIsAtLeast8() {
+    // Gson requires at least Java 8
     assertThat(JavaVersion.getMajorJavaVersion()).isAtLeast(8);
   }
 
   @Test
-  public void testJava6() {
-    // http://www.oracle.com/technetwork/java/javase/version-6-141920.html
+  public void parseMajorJavaVersion_java6() {
+    // Java 6 version format: http://www.oracle.com/technetwork/java/javase/version-6-141920.html
     assertThat(JavaVersion.parseMajorJavaVersion("1.6.0")).isEqualTo(6);
   }
 
   @Test
-  public void testJava7() {
-    // http://www.oracle.com/technetwork/java/javase/jdk7-naming-418744.html
+  public void parseMajorJavaVersion_java7() {
+    // Java 7 version format: http://www.oracle.com/technetwork/java/javase/jdk7-naming-418744.html
     assertThat(JavaVersion.parseMajorJavaVersion("1.7.0")).isEqualTo(7);
   }
 
   @Test
-  public void testJava8() {
-    assertThat(JavaVersion.parseMajorJavaVersion("1.8")).isEqualTo(8);
-    assertThat(JavaVersion.parseMajorJavaVersion("1.8.0")).isEqualTo(8);
-    assertThat(JavaVersion.parseMajorJavaVersion("1.8.0_131")).isEqualTo(8);
-    assertThat(JavaVersion.parseMajorJavaVersion("1.8.0_60-ea")).isEqualTo(8);
-    assertThat(JavaVersion.parseMajorJavaVersion("1.8.0_111-internal")).isEqualTo(8);
+  public void parseMajorJavaVersion_java8() {
+    String[] versions = {
+        "1.8",           // Basic version
+        "1.8.0",         // With minor version
+        "1.8.0_131",     // With update number
+        "1.8.0_60-ea",   // Early access release
+        "1.8.0_111-internal", // Internal build
+        "1.8.0-internal",      // OpenJDK format (https://github.com/AdoptOpenJDK/openjdk-build/issues/93)
+        "1.8.0_131-adoptopenjdk" // AdoptOpenJDK build
+    };
 
-    // openjdk8 per https://github.com/AdoptOpenJDK/openjdk-build/issues/93
-    assertThat(JavaVersion.parseMajorJavaVersion("1.8.0-internal")).isEqualTo(8);
-    assertThat(JavaVersion.parseMajorJavaVersion("1.8.0_131-adoptopenjdk")).isEqualTo(8);
+    for (String version : versions) {
+      assertThat(JavaVersion.parseMajorJavaVersion(version)).isEqualTo(8);
+    }
   }
 
   @Test
-  public void testJava9() {
-    // Legacy style
-    assertThat(JavaVersion.parseMajorJavaVersion("9.0.4")).isEqualTo(9); // Oracle JDK 9
-    // Debian as reported in https://github.com/google/gson/issues/1310
-    assertThat(JavaVersion.parseMajorJavaVersion("9-Debian")).isEqualTo(9);
+  public void parseMajorJavaVersion_java9() {
+    String[] versions = {
+        // Oracle JDK 9 legacy format
+        "9.0.4",
+        // Debian-specific format (https://github.com/google/gson/issues/1310)
+        "9-Debian",
+        // New versioning formats
+        "9-ea+19",      // Early access
+        "9+100",         // Build number
+        "9.0.1+20",      // Point release with build
+        "9.1.1+20"       // Minor release with build
+    };
 
-    // New style
-    assertThat(JavaVersion.parseMajorJavaVersion("9-ea+19")).isEqualTo(9);
-    assertThat(JavaVersion.parseMajorJavaVersion("9+100")).isEqualTo(9);
-    assertThat(JavaVersion.parseMajorJavaVersion("9.0.1+20")).isEqualTo(9);
-    assertThat(JavaVersion.parseMajorJavaVersion("9.1.1+20")).isEqualTo(9);
+    for (String version : versions) {
+      assertThat(JavaVersion.parseMajorJavaVersion(version)).isEqualTo(9);
+    }
   }
 
   @Test
-  public void testJava10() {
-    assertThat(JavaVersion.parseMajorJavaVersion("10.0.1")).isEqualTo(10); // Oracle JDK 10.0.1
+  public void parseMajorJavaVersion_java10() {
+    // Oracle JDK 10 format
+    assertThat(JavaVersion.parseMajorJavaVersion("10.0.1")).isEqualTo(10);
   }
 
   @Test
-  public void testUnknownVersionFormat() {
-    assertThat(JavaVersion.parseMajorJavaVersion("Java9")).isEqualTo(6); // unknown format
+  public void parseMajorJavaVersion_unknownFormatDefaultsTo6() {
+    // Unrecognized format should default to Java 6
+    assertThat(JavaVersion.parseMajorJavaVersion("Java9")).isEqualTo(6);
   }
 }
