@@ -12,62 +12,109 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class JsonReadContextTest extends JUnit5TestBase
 {
-    static class MyContext extends JsonReadContext {
-        public MyContext(JsonReadContext parent, int nestingDepth, DupDetector dups,
-                         int type, int lineNr, int colNr) {
+    // Test helper class to verify JsonReadContext can be extended
+    static class TestableJsonReadContext extends JsonReadContext {
+        public TestableJsonReadContext(JsonReadContext parent, int nestingDepth, DupDetector dups,
+                                     int type, int lineNr, int colNr) {
             super(parent, nestingDepth, dups, type, lineNr, colNr);
         }
     }
 
     @Test
-    void setCurrentNameTwiceWithSameNameRaisesJsonParseException() throws Exception
-    {
-      DupDetector dupDetector = DupDetector.rootDetector((JsonGenerator) null);
-      JsonReadContext jsonReadContext = new JsonReadContext((JsonReadContext) null, 0,
-              dupDetector, 2441, 2441, 2441);
-      jsonReadContext.setCurrentName("dupField");
-      try {
-          jsonReadContext.setCurrentName("dupField");
-          fail("Should not pass");
-      } catch (JsonParseException e) {
-          verifyException(e, "Duplicate field 'dupField'");
-      }
+    void shouldThrowExceptionWhenSettingSameDuplicateFieldName() throws Exception {
+        // Given: A JsonReadContext with duplicate detection enabled
+        DupDetector duplicateDetector = DupDetector.rootDetector((JsonGenerator) null);
+        JsonReadContext context = createContextWithDuplicateDetection(duplicateDetector);
+        
+        // When: Setting the same field name twice
+        String duplicateFieldName = "dupField";
+        context.setCurrentName(duplicateFieldName);
+        
+        // Then: Should throw JsonParseException for duplicate field
+        JsonParseException exception = assertThrows(JsonParseException.class, () -> {
+            context.setCurrentName(duplicateFieldName);
+        });
+        
+        verifyException(exception, "Duplicate field 'dupField'");
     }
 
     @Test
-    void setCurrentName() throws Exception
-    {
-      JsonReadContext jsonReadContext = JsonReadContext.createRootContext(0, 0, (DupDetector) null);
-      jsonReadContext.setCurrentName("abc");
-      assertEquals("abc", jsonReadContext.getCurrentName());
-      jsonReadContext.setCurrentName(null);
-      assertNull(jsonReadContext.getCurrentName());
+    void shouldSetAndGetCurrentNameCorrectly() throws Exception {
+        // Given: A root JsonReadContext without duplicate detection
+        JsonReadContext context = JsonReadContext.createRootContext(0, 0, null);
+        
+        // When: Setting a field name
+        String fieldName = "abc";
+        context.setCurrentName(fieldName);
+        
+        // Then: Should return the same field name
+        assertEquals(fieldName, context.getCurrentName());
+        
+        // When: Setting name to null
+        context.setCurrentName(null);
+        
+        // Then: Should return null
+        assertNull(context.getCurrentName());
     }
 
     @Test
-    void reset()
-    {
-      DupDetector dupDetector = DupDetector.rootDetector((JsonGenerator) null);
-      JsonReadContext jsonReadContext = JsonReadContext.createRootContext(dupDetector);
-      final ContentReference bogusSrc = ContentReference.unknown();
+    void shouldResetContextStateCorrectly() {
+        // Given: A root context with duplicate detection
+        DupDetector duplicateDetector = DupDetector.rootDetector((JsonGenerator) null);
+        JsonReadContext context = JsonReadContext.createRootContext(duplicateDetector);
+        ContentReference contentReference = ContentReference.unknown();
 
-      assertTrue(jsonReadContext.inRoot());
-      assertEquals("root", jsonReadContext.typeDesc());
-      assertEquals(1, jsonReadContext.startLocation(bogusSrc).getLineNr());
-      assertEquals(0, jsonReadContext.startLocation(bogusSrc).getColumnNr());
+        // Verify initial root context state
+        assertTrue(context.inRoot());
+        assertEquals("root", context.typeDesc());
+        assertEquals(1, context.startLocation(contentReference).getLineNr());
+        assertEquals(0, context.startLocation(contentReference).getColumnNr());
 
-      jsonReadContext.reset(200, 500, 200);
+        // When: Resetting context with new position values
+        int newType = 200;
+        int newLineNumber = 500;
+        int newColumnNumber = 200;
+        context.reset(newType, newLineNumber, newColumnNumber);
 
-      assertFalse(jsonReadContext.inRoot());
-      assertEquals("?", jsonReadContext.typeDesc());
-      assertEquals(500, jsonReadContext.startLocation(bogusSrc).getLineNr());
-      assertEquals(200, jsonReadContext.startLocation(bogusSrc).getColumnNr());
+        // Then: Context should reflect the new state
+        assertFalse(context.inRoot());
+        assertEquals("?", context.typeDesc()); // Unknown type description
+        assertEquals(newLineNumber, context.startLocation(contentReference).getLineNr());
+        assertEquals(newColumnNumber, context.startLocation(contentReference).getColumnNr());
     }
 
-    // [core#1421]
+    /**
+     * Test for issue #1421 - Verifies that JsonReadContext can be extended
+     */
     @Test
-    void testExtension() {
-        MyContext context = new MyContext(null, 0, null, 0, 0, 0);
-        assertNotNull(context);
+    void shouldAllowContextExtension() {
+        // Given: Parameters for creating an extended context
+        JsonReadContext parentContext = null;
+        int nestingDepth = 0;
+        DupDetector duplicateDetector = null;
+        int contextType = 0;
+        int lineNumber = 0;
+        int columnNumber = 0;
+        
+        // When: Creating an extended JsonReadContext
+        TestableJsonReadContext extendedContext = new TestableJsonReadContext(
+            parentContext, nestingDepth, duplicateDetector, 
+            contextType, lineNumber, columnNumber
+        );
+        
+        // Then: Should successfully create the extended context
+        assertNotNull(extendedContext);
+    }
+
+    // Helper method to create a context with duplicate detection for cleaner test setup
+    private JsonReadContext createContextWithDuplicateDetection(DupDetector duplicateDetector) {
+        return new JsonReadContext(
+            null,           // parent context
+            0,              // nesting depth
+            duplicateDetector,
+            2441,           // context type
+            2441,           // line number
+            2441            // column number
+        );
     }
 }
