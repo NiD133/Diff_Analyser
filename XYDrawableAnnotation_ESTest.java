@@ -40,287 +40,552 @@ import org.jfree.chart.title.TextTitle;
 import org.jfree.data.general.DefaultValueDataset;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) 
-@EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class XYDrawableAnnotation_ESTest extends XYDrawableAnnotation_ESTest_scaffolding {
 
-    // Test cases focus on core functionality: construction, properties, drawing, and equality
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      TextTitle textTitle0 = new TextTitle("(Sq");
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation((-2648.3), (-2648.3), (-1549.15850542798), 2.0, textTitle0);
+      xYDrawableAnnotation0.hashCode();
+      assertEquals((-2648.3), xYDrawableAnnotation0.getX(), 0.01);
+      assertEquals((-2648.3), xYDrawableAnnotation0.getY(), 0.01);
+      assertEquals((-1549.15850542798), xYDrawableAnnotation0.getDisplayWidth(), 0.01);
+      assertEquals(2.0, xYDrawableAnnotation0.getDisplayHeight(), 0.01);
+      assertEquals(1.0, xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
+  }
 
-    // Tests for getter methods
-    @Test(timeout = 4000)
-    public void testGettersAfterConstruction() {
-        TextTitle textTitle = new TextTitle("(Sq");
-        XYDrawableAnnotation annotation = new XYDrawableAnnotation(-2648.3, -2648.3, -1549.15850542798, 2.0, textTitle);
-        
-        assertEquals(-2648.3, annotation.getX(), 0.01);
-        assertEquals(-2648.3, annotation.getY(), 0.01);
-        assertEquals(-1549.15850542798, annotation.getDisplayWidth(), 0.01);
-        assertEquals(2.0, annotation.getDisplayHeight(), 0.01);
-        assertEquals(1.0, annotation.getDrawScaleFactor(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      BlockContainer blockContainer0 = new BlockContainer();
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation((-2674.765041096609), (-2674.765041096609), 2.0, (-2674.765041096609), blockContainer0);
+      XYDrawableAnnotation xYDrawableAnnotation1 = new XYDrawableAnnotation((-2674.765041096609), (-2674.765041096609), 2.0, (-2674.765041096609), (-888.093), blockContainer0);
+      boolean boolean0 = xYDrawableAnnotation0.equals(xYDrawableAnnotation1);
+      assertEquals((-2674.765041096609), xYDrawableAnnotation1.getY(), 0.01);
+      assertEquals(2.0, xYDrawableAnnotation1.getDisplayWidth(), 0.01);
+      assertEquals((-2674.765041096609), xYDrawableAnnotation1.getX(), 0.01);
+      assertFalse(boolean0);
+      assertEquals((-888.093), xYDrawableAnnotation1.getDrawScaleFactor(), 0.01);
+      assertFalse(xYDrawableAnnotation1.equals((Object)xYDrawableAnnotation0));
+      assertEquals((-2674.765041096609), xYDrawableAnnotation1.getDisplayHeight(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testHashCodeConsistency() {
-        TextTitle textTitle = new TextTitle("(Sq");
-        XYDrawableAnnotation annotation = new XYDrawableAnnotation(-2648.3, -2648.3, -1549.15850542798, 2.0, textTitle);
-        annotation.hashCode(); // Verify no exception
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      TextTitle textTitle0 = new TextTitle("");
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(0.0, 0.0, 0.0, (-1062.3), textTitle0);
+      ScatterRenderer scatterRenderer0 = new ScatterRenderer();
+      LegendTitle legendTitle0 = new LegendTitle(scatterRenderer0);
+      XYDrawableAnnotation xYDrawableAnnotation1 = new XYDrawableAnnotation(0.0, 0.0, 0.0, 26.840400407963966, 26.840400407963966, legendTitle0);
+      boolean boolean0 = xYDrawableAnnotation0.equals(xYDrawableAnnotation1);
+      assertFalse(boolean0);
+      assertEquals(0.0, xYDrawableAnnotation1.getX(), 0.01);
+      assertEquals(0.0, xYDrawableAnnotation1.getY(), 0.01);
+      assertEquals(0.0, xYDrawableAnnotation1.getDisplayWidth(), 0.01);
+      assertEquals((-1062.3), xYDrawableAnnotation0.getDisplayHeight(), 0.01);
+      assertEquals(1.0, xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
+  }
 
-    // Tests for equality and comparison
-    @Test(timeout = 4000)
-    public void testEqualityWithDifferentScaleFactor() {
-        BlockContainer drawable = new BlockContainer();
-        XYDrawableAnnotation annotation1 = new XYDrawableAnnotation(-2674.765041096609, -2674.765041096609, 2.0, -2674.765041096609, drawable);
-        XYDrawableAnnotation annotation2 = new XYDrawableAnnotation(-2674.765041096609, -2674.765041096609, 2.0, -2674.765041096609, -888.093, drawable);
-        
-        assertNotEquals(annotation1, annotation2);
-        assertEquals(-2674.765041096609, annotation2.getY(), 0.01);
-        assertEquals(2.0, annotation2.getDisplayWidth(), 0.01);
-        assertEquals(-2674.765041096609, annotation2.getX(), 0.01);
-        assertEquals(-888.093, annotation2.getDrawScaleFactor(), 0.01);
-        assertEquals(-2674.765041096609, annotation2.getDisplayHeight(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      TextTitle textTitle0 = new TextTitle("(Sq");
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation((-2648.3), (-2648.3), (-1549.15850542798), 2.0, textTitle0);
+      XYDrawableAnnotation xYDrawableAnnotation1 = new XYDrawableAnnotation((-2648.3), (-2648.3), (-726.455728), 189.629747483, 276.2905402437176, textTitle0);
+      boolean boolean0 = xYDrawableAnnotation0.equals(xYDrawableAnnotation1);
+      assertEquals((-2648.3), xYDrawableAnnotation1.getX(), 0.01);
+      assertEquals(189.629747483, xYDrawableAnnotation1.getDisplayHeight(), 0.01);
+      assertEquals((-2648.3), xYDrawableAnnotation1.getY(), 0.01);
+      assertEquals((-726.455728), xYDrawableAnnotation1.getDisplayWidth(), 0.01);
+      assertFalse(boolean0);
+      assertEquals(276.2905402437176, xYDrawableAnnotation1.getDrawScaleFactor(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualityWithDifferentHeight() {
-        TextTitle textTitle = new TextTitle("");
-        XYDrawableAnnotation annotation1 = new XYDrawableAnnotation(0.0, 0.0, 0.0, -1062.3, textTitle);
-        ScatterRenderer renderer = new ScatterRenderer();
-        LegendTitle legend = new LegendTitle(renderer);
-        XYDrawableAnnotation annotation2 = new XYDrawableAnnotation(0.0, 0.0, 0.0, 26.840400407963966, 26.840400407963966, legend);
-        
-        assertNotEquals(annotation1, annotation2);
-        assertEquals(0.0, annotation2.getX(), 0.01);
-        assertEquals(0.0, annotation2.getY(), 0.01);
-        assertEquals(0.0, annotation2.getDisplayWidth(), 0.01);
-        assertEquals(-1062.3, annotation1.getDisplayHeight(), 0.01);
-        assertEquals(1.0, annotation1.getDrawScaleFactor(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      DateTitle dateTitle0 = new DateTitle();
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(1.0, (-2346.68), 3131.33, 1.0, (-2061.18113), dateTitle0);
+      XYDrawableAnnotation xYDrawableAnnotation1 = new XYDrawableAnnotation(1.0, (-1.0), (-2061.18113), (-3471.8789344), dateTitle0);
+      boolean boolean0 = xYDrawableAnnotation0.equals(xYDrawableAnnotation1);
+      assertFalse(boolean0);
+      assertEquals((-2061.18113), xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
+      assertEquals(1.0, xYDrawableAnnotation1.getX(), 0.01);
+      assertEquals(1.0, xYDrawableAnnotation0.getX(), 0.01);
+      assertEquals((-3471.8789344), xYDrawableAnnotation1.getDisplayHeight(), 0.01);
+      assertEquals((-1.0), xYDrawableAnnotation1.getY(), 0.01);
+      assertEquals((-2061.18113), xYDrawableAnnotation1.getDisplayWidth(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualityWithDifferentWidth() {
-        TextTitle textTitle = new TextTitle("(Sq");
-        XYDrawableAnnotation annotation1 = new XYDrawableAnnotation(-2648.3, -2648.3, -1549.15850542798, 2.0, textTitle);
-        XYDrawableAnnotation annotation2 = new XYDrawableAnnotation(-2648.3, -2648.3, -726.455728, 189.629747483, 276.2905402437176, textTitle);
-        
-        assertNotEquals(annotation1, annotation2);
-        assertEquals(-2648.3, annotation2.getX(), 0.01);
-        assertEquals(189.629747483, annotation2.getDisplayHeight(), 0.01);
-        assertEquals(-2648.3, annotation2.getY(), 0.01);
-        assertEquals(-726.455728, annotation2.getDisplayWidth(), 0.01);
-        assertEquals(276.2905402437176, annotation2.getDrawScaleFactor(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      BlockContainer blockContainer0 = new BlockContainer();
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation((-2655.096265552367), (-2655.096265552367), (-2655.096265552367), (-2655.096265552367), (-2655.096265552367), blockContainer0);
+      XYDrawableAnnotation xYDrawableAnnotation1 = new XYDrawableAnnotation(0.0F, 0.0F, 0.0F, 0.0F, blockContainer0);
+      boolean boolean0 = xYDrawableAnnotation0.equals(xYDrawableAnnotation1);
+      assertEquals(1.0, xYDrawableAnnotation1.getDrawScaleFactor(), 0.01);
+      assertEquals(0.0, xYDrawableAnnotation1.getDisplayHeight(), 0.01);
+      assertFalse(boolean0);
+      assertEquals(0.0, xYDrawableAnnotation1.getDisplayWidth(), 0.01);
+      assertEquals(0.0, xYDrawableAnnotation1.getY(), 0.01);
+      assertEquals(0.0, xYDrawableAnnotation1.getX(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualityWithDifferentCoordinates() {
-        DateTitle dateTitle = new DateTitle();
-        XYDrawableAnnotation annotation1 = new XYDrawableAnnotation(1.0, -2346.68, 3131.33, 1.0, -2061.18113, dateTitle);
-        XYDrawableAnnotation annotation2 = new XYDrawableAnnotation(1.0, -1.0, -2061.18113, -3471.8789344, dateTitle);
-        
-        assertNotEquals(annotation1, annotation2);
-        assertEquals(-2061.18113, annotation1.getDrawScaleFactor(), 0.01);
-        assertEquals(1.0, annotation1.getX(), 0.01);
-        assertEquals(-3471.8789344, annotation2.getDisplayHeight(), 0.01);
-        assertEquals(-1.0, annotation2.getY(), 0.01);
-        assertEquals(-2061.18113, annotation2.getDisplayWidth(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      BlockContainer blockContainer0 = new BlockContainer();
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation((-2655.096265552367), (-2655.096265552367), (-2655.096265552367), (-2655.096265552367), (-2655.096265552367), blockContainer0);
+      XYPlot<PolarAxisLocation> xYPlot0 = new XYPlot<PolarAxisLocation>();
+      RoundRectangle2D.Float roundRectangle2D_Float0 = new RoundRectangle2D.Float(0.0F, 0.0F, 2561.058F, 0.0F, 1.0F, 0.0F);
+      Rectangle2D rectangle2D0 = roundRectangle2D_Float0.getBounds2D();
+      NumberAxis numberAxis0 = new NumberAxis("KpTx6U: [");
+      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
+      PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
+      JFreeChart jFreeChart0 = new JFreeChart(xYPlot0);
+      BufferedImage bufferedImage0 = jFreeChart0.createBufferedImage(10, 500, (-2562.43728), 3.0, chartRenderingInfo0);
+      Graphics2D graphics2D0 = bufferedImage0.createGraphics();
+      xYDrawableAnnotation0.draw(graphics2D0, xYPlot0, rectangle2D0, numberAxis0, numberAxis0, 10, plotRenderingInfo0);
+      assertEquals((-2655.096265552367), xYDrawableAnnotation0.getY(), 0.01);
+      assertEquals((-2655.096265552367), xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
+      assertEquals((-2655.096265552367), xYDrawableAnnotation0.getDisplayHeight(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualityWithDifferentDrawable() {
-        BlockContainer drawable1 = new BlockContainer();
-        XYDrawableAnnotation annotation1 = new XYDrawableAnnotation(-2655.096265552367, -2655.096265552367, -2655.096265552367, -2655.096265552367, -2655.096265552367, drawable1);
-        BlockContainer drawable2 = new BlockContainer();
-        XYDrawableAnnotation annotation2 = new XYDrawableAnnotation(0.0, 0.0, 0.0, 0.0, drawable2);
-        
-        assertNotEquals(annotation1, annotation2);
-        assertEquals(1.0, annotation2.getDrawScaleFactor(), 0.01);
-        assertEquals(0.0, annotation2.getDisplayHeight(), 0.01);
-        assertEquals(0.0, annotation2.getDisplayWidth(), 0.01);
-        assertEquals(0.0, annotation2.getY(), 0.01);
-        assertEquals(0.0, annotation2.getX(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      BlockContainer blockContainer0 = new BlockContainer();
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation((-3258.2894942095554), (-3258.2894942095554), (-3258.2894942095554), (-3258.2894942095554), (-3258.2894942095554), blockContainer0);
+      XYPlot<PolarAxisLocation> xYPlot0 = new XYPlot<PolarAxisLocation>();
+      Rectangle2D.Float rectangle2D_Float0 = new Rectangle2D.Float(0.0F, 0.0F, 10, 1.0F);
+      CyclicNumberAxis cyclicNumberAxis0 = new CyclicNumberAxis(0.0F);
+      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
+      PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo(chartRenderingInfo0);
+      BufferedImage bufferedImage0 = new BufferedImage(10, 10, 10);
+      Graphics2D graphics2D0 = bufferedImage0.createGraphics();
+      // Undeclared exception!
+      try { 
+        xYDrawableAnnotation0.draw(graphics2D0, xYPlot0, rectangle2D_Float0, cyclicNumberAxis0, (ValueAxis) null, 10, plotRenderingInfo0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.jfree.chart.annotations.XYDrawableAnnotation", e);
+      }
+  }
 
-    // Tests for drawing operations
-    @Test(timeout = 4000)
-    public void testDrawingOperation() throws Throwable {
-        BlockContainer drawable = new BlockContainer();
-        XYDrawableAnnotation annotation = new XYDrawableAnnotation(-2655.096265552367, -2655.096265552367, -2655.096265552367, -2655.096265552367, -2655.096265552367, drawable);
-        XYPlot<PolarAxisLocation> plot = new XYPlot<>();
-        RoundRectangle2D.Float roundRect = new RoundRectangle2D.Float(0.0F, 0.0F, 2561.058F, 0.0F, 1.0F, 0.0F);
-        Rectangle2D dataArea = roundRect.getBounds2D();
-        NumberAxis domainAxis = new NumberAxis("KpTx6U: [");
-        NumberAxis rangeAxis = new NumberAxis("KpTx6U: [");
-        ChartRenderingInfo chartInfo = new ChartRenderingInfo();
-        PlotRenderingInfo plotInfo = chartInfo.getPlotInfo();
-        JFreeChart chart = new JFreeChart(plot);
-        BufferedImage image = chart.createBufferedImage(10, 500, -2562.43728, 3.0, chartInfo);
-        Graphics2D g2 = image.createGraphics();
-        
-        annotation.draw(g2, plot, dataArea, domainAxis, rangeAxis, 10, plotInfo);
-        
-        assertEquals(-2655.096265552367, annotation.getY(), 0.01);
-        assertEquals(-2655.096265552367, annotation.getDrawScaleFactor(), 0.01);
-        assertEquals(-2655.096265552367, annotation.getDisplayHeight(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      DateTitle dateTitle0 = new DateTitle();
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(1.0, 1.0, 1.0, 1.0, (-3471.8789344), dateTitle0);
+      double double0 = xYDrawableAnnotation0.getY();
+      assertEquals(1.0, xYDrawableAnnotation0.getDisplayHeight(), 0.01);
+      assertEquals(1.0, double0, 0.01);
+      assertEquals(1.0, xYDrawableAnnotation0.getX(), 0.01);
+      assertEquals((-3471.8789344), xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
+      assertEquals(1.0, xYDrawableAnnotation0.getDisplayWidth(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testDrawingWithNullRangeAxisThrowsException() {
-        BlockContainer drawable = new BlockContainer();
-        XYDrawableAnnotation annotation = new XYDrawableAnnotation(-3258.2894942095554, -3258.2894942095554, -3258.2894942095554, -3258.2894942095554, -3258.2894942095554, drawable);
-        XYPlot<PolarAxisLocation> plot = new XYPlot<>();
-        Rectangle2D.Float dataArea = new Rectangle2D.Float(0.0F, 0.0F, 10, 1.0F);
-        CyclicNumberAxis domainAxis = new CyclicNumberAxis(0.0F);
-        ChartRenderingInfo chartInfo = new ChartRenderingInfo();
-        PlotRenderingInfo plotInfo = new PlotRenderingInfo(chartInfo);
-        BufferedImage image = new BufferedImage(10, 10, 10);
-        Graphics2D g2 = image.createGraphics();
-        
-        assertThrows(NullPointerException.class, () -> 
-            annotation.draw(g2, plot, dataArea, domainAxis, null, 10, plotInfo)
-        );
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      TextTitle textTitle0 = new TextTitle("(Sq");
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation((-2648.3), (-2648.3), (-1549.15850542798), 2.0, textTitle0);
+      double double0 = xYDrawableAnnotation0.getY();
+      assertEquals((-1549.15850542798), xYDrawableAnnotation0.getDisplayWidth(), 0.01);
+      assertEquals(1.0, xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
+      assertEquals((-2648.3), xYDrawableAnnotation0.getX(), 0.01);
+      assertEquals(2.0, xYDrawableAnnotation0.getDisplayHeight(), 0.01);
+      assertEquals((-2648.3), double0, 0.01);
+  }
 
-    // Tests for constructor validation
-    @Test(timeout = 4000)
-    public void testConstructorRejectsNullDrawable() {
-        assertThrows(IllegalArgumentException.class, () -> 
-            new XYDrawableAnnotation(738.4170062070756, 0.0F, 0.0F, 489.8514, null)
-        );
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      CompositeTitle compositeTitle0 = new CompositeTitle();
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(979.566284070757, 2102.65, 1.0, 2389.56649, 1.0, compositeTitle0);
+      double double0 = xYDrawableAnnotation0.getX();
+      assertEquals(1.0, xYDrawableAnnotation0.getDisplayWidth(), 0.01);
+      assertEquals(2102.65, xYDrawableAnnotation0.getY(), 0.01);
+      assertEquals(2389.56649, xYDrawableAnnotation0.getDisplayHeight(), 0.01);
+      assertEquals(979.566284070757, double0, 0.01);
+      assertEquals(1.0, xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testParameterizedConstructorRejectsNullDrawable() {
-        assertThrows(IllegalArgumentException.class, () -> 
-            new XYDrawableAnnotation(-98.734775112, -98.734775112, -98.734775112, -98.734775112, -98.734775112, null)
-        );
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      TextTitle textTitle0 = new TextTitle("(Sq");
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation((-2648.3), (-2648.3), (-1549.15850542798), 2.0, textTitle0);
+      double double0 = xYDrawableAnnotation0.getX();
+      assertEquals(1.0, xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
+      assertEquals((-1549.15850542798), xYDrawableAnnotation0.getDisplayWidth(), 0.01);
+      assertEquals((-2648.3), xYDrawableAnnotation0.getY(), 0.01);
+      assertEquals((-2648.3), double0, 0.01);
+      assertEquals(2.0, xYDrawableAnnotation0.getDisplayHeight(), 0.01);
+  }
 
-    // Tests for edge cases in equality checks
-    @Test(timeout = 4000)
-    public void testEqualityWithDifferentDrawableType() {
-        BlockContainer blockDrawable = new BlockContainer();
-        XYDrawableAnnotation annotation1 = new XYDrawableAnnotation(-111.02033357721, -111.02033357721, -111.02033357721, -111.02033357721, -111.02033357721, blockDrawable);
-        XYBarRenderer renderer = new XYBarRenderer(-111.02033357721);
-        LegendTitle legendDrawable = new LegendTitle(renderer);
-        XYDrawableAnnotation annotation2 = new XYDrawableAnnotation(-111.02033357721, -111.02033357721, -111.02033357721, -111.02033357721, -111.02033357721, legendDrawable);
-        
-        assertNotEquals(annotation1, annotation2);
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      Font font0 = AbstractRenderer.DEFAULT_VALUE_LABEL_FONT;
+      TextTitle textTitle0 = new TextTitle("", font0);
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation((-317.3886), 3036.177828359721, (-317.3886), (-1.0), 0.0, textTitle0);
+      double double0 = xYDrawableAnnotation0.getDrawScaleFactor();
+      assertEquals(0.0, double0, 0.01);
+      assertEquals((-317.3886), xYDrawableAnnotation0.getDisplayWidth(), 0.01);
+      assertEquals((-1.0), xYDrawableAnnotation0.getDisplayHeight(), 0.01);
+      assertEquals((-317.3886), xYDrawableAnnotation0.getX(), 0.01);
+      assertEquals(3036.177828359721, xYDrawableAnnotation0.getY(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualityWithDifferentScaleFactorInDefaultConstructor() {
-        BlockContainer drawable = new BlockContainer();
-        XYDrawableAnnotation annotation1 = new XYDrawableAnnotation(-2655.096265552367, -2655.096265552367, -2655.096265552367, -2655.096265552367, -2655.096265552367, drawable);
-        XYDrawableAnnotation annotation2 = new XYDrawableAnnotation(-2655.096265552367, -2655.096265552367, -2655.096265552367, -2655.096265552367, drawable);
-        
-        assertNotEquals(annotation1, annotation2);
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      Font font0 = AbstractRenderer.DEFAULT_VALUE_LABEL_FONT;
+      BigInteger bigInteger0 = BigInteger.TEN;
+      DefaultValueDataset defaultValueDataset0 = new DefaultValueDataset(bigInteger0);
+      MeterPlot meterPlot0 = new MeterPlot(defaultValueDataset0);
+      JFreeChart jFreeChart0 = new JFreeChart("Pie_Plot", font0, meterPlot0, true);
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation((-317.3886), (-317.3886), (-1.0), 0.0, (-1.0), jFreeChart0);
+      double double0 = xYDrawableAnnotation0.getDrawScaleFactor();
+      assertEquals((-1.0), double0, 0.01);
+      assertEquals((-1.0), xYDrawableAnnotation0.getDisplayWidth(), 0.01);
+      assertEquals(0.0, xYDrawableAnnotation0.getDisplayHeight(), 0.01);
+      assertEquals((-317.3886), xYDrawableAnnotation0.getX(), 0.01);
+      assertEquals((-317.3886), xYDrawableAnnotation0.getY(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualityWithDifferentHeightInDefaultConstructor() {
-        BlockContainer drawable = new BlockContainer();
-        XYDrawableAnnotation annotation1 = new XYDrawableAnnotation(2927.5241410323115, 2927.5241410323115, 2927.5241410323115, 2927.5241410323115, 2927.5241410323115, drawable);
-        XYDrawableAnnotation annotation2 = new XYDrawableAnnotation(2927.5241410323115, 2927.5241410323115, 2927.5241410323115, 1530.0121533066, drawable);
-        
-        assertNotEquals(annotation1, annotation2);
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      ShortTextTitle shortTextTitle0 = new ShortTextTitle("");
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(0.04, 0.0, 2307.6453724016596, 0.04, 2307.6453724016596, shortTextTitle0);
+      double double0 = xYDrawableAnnotation0.getDisplayWidth();
+      assertEquals(2307.6453724016596, double0, 0.01);
+      assertEquals(0.04, xYDrawableAnnotation0.getDisplayHeight(), 0.01);
+      assertEquals(2307.6453724016596, xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
+      assertEquals(0.0, xYDrawableAnnotation0.getY(), 0.01);
+      assertEquals(0.04, xYDrawableAnnotation0.getX(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualityWithDifferentWidth() {
-        BlockContainer drawable = new BlockContainer();
-        XYDrawableAnnotation annotation1 = new XYDrawableAnnotation(2929.6115057820657, 2929.6115057820657, 2929.6115057820657, 2929.6115057820657, 2929.6115057820657, drawable);
-        XYDrawableAnnotation annotation2 = new XYDrawableAnnotation(2929.6115057820657, 2929.6115057820657, -1095.6, 2929.6115057820657, -1095.6, drawable);
-        
-        assertNotEquals(annotation1, annotation2);
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      DateTitle dateTitle0 = new DateTitle(0);
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(0.0, 0.0, (-1.0), 0.0, (-3958.9), dateTitle0);
+      double double0 = xYDrawableAnnotation0.getDisplayWidth();
+      assertEquals((-3958.9), xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
+      assertEquals(0.0, xYDrawableAnnotation0.getX(), 0.01);
+      assertEquals(0.0, xYDrawableAnnotation0.getY(), 0.01);
+      assertEquals(0.0, xYDrawableAnnotation0.getDisplayHeight(), 0.01);
+      assertEquals((-1.0), double0, 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualityWithDifferentYCoordinate() {
-        BlockContainer drawable = new BlockContainer();
-        XYDrawableAnnotation annotation1 = new XYDrawableAnnotation(2934.8649531520473, 2934.8649531520473, 2934.8649531520473, 2934.8649531520473, 2934.8649531520473, drawable);
-        XYDrawableAnnotation annotation2 = new XYDrawableAnnotation(2934.8649531520473, -1942.5102826, 2934.8649531520473, -1942.5102826, drawable);
-        
-        assertNotEquals(annotation1, annotation2);
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      TextTitle textTitle0 = new TextTitle("");
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(0.0, 0.0, 0.0, 0.0, textTitle0);
+      double double0 = xYDrawableAnnotation0.getDisplayHeight();
+      assertEquals(0.0, double0, 0.01);
+      assertEquals(1.0, xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
+      assertEquals(0.0, xYDrawableAnnotation0.getX(), 0.01);
+      assertEquals(0.0, xYDrawableAnnotation0.getDisplayWidth(), 0.01);
+      assertEquals(0.0, xYDrawableAnnotation0.getY(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualityWithDifferentXCoordinate() {
-        BlockContainer drawable = new BlockContainer();
-        XYDrawableAnnotation annotation1 = new XYDrawableAnnotation(2.0, 1.0, 1.0, 1.0, 1.0, drawable);
-        XYDrawableAnnotation annotation2 = new XYDrawableAnnotation(1.0, 2.0, 1.0, 2.0, 2.0, drawable);
-        
-        assertNotEquals(annotation1, annotation2);
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      DateTitle dateTitle0 = new DateTitle();
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(1.0, (-1.0), (-2061.18113), (-3471.8789344), dateTitle0);
+      double double0 = xYDrawableAnnotation0.getDisplayHeight();
+      assertEquals((-3471.8789344), double0, 0.01);
+      assertEquals((-2061.18113), xYDrawableAnnotation0.getDisplayWidth(), 0.01);
+      assertEquals(1.0, xYDrawableAnnotation0.getX(), 0.01);
+      assertEquals((-1.0), xYDrawableAnnotation0.getY(), 0.01);
+      assertEquals(1.0, xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualityWithNonAnnotationObject() {
-        BlockContainer drawable = new BlockContainer();
-        XYDrawableAnnotation annotation = new XYDrawableAnnotation(2926.465410521232, 2926.465410521232, 2926.465410521232, 2926.465410521232, 2926.465410521232, drawable);
-        XYBoxAnnotation otherAnnotation = new XYBoxAnnotation(10.0, 30.0, 2926.465410521232, 3.0);
-        
-        assertNotEquals(annotation, otherAnnotation);
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      BlockContainer blockContainer0 = new BlockContainer();
+      CompositeTitle compositeTitle0 = new CompositeTitle(blockContainer0);
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(225.0, (-2655.096265552367), (-2655.096265552367), (-1100.3), compositeTitle0);
+      xYDrawableAnnotation0.setToolTipText("+k|)3t,}i+0(sO6");
+      XYPlot<PolarAxisLocation> xYPlot0 = new XYPlot<PolarAxisLocation>();
+      RoundRectangle2D.Float roundRectangle2D_Float0 = new RoundRectangle2D.Float();
+      Rectangle2D rectangle2D0 = roundRectangle2D_Float0.getBounds2D();
+      NumberAxis numberAxis0 = new NumberAxis("epq>fd");
+      JFreeChart jFreeChart0 = new JFreeChart(xYPlot0);
+      BufferedImage bufferedImage0 = jFreeChart0.createBufferedImage(10, 10);
+      Graphics2D graphics2D0 = bufferedImage0.createGraphics();
+      PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo((ChartRenderingInfo) null);
+      // Undeclared exception!
+      try { 
+        xYDrawableAnnotation0.draw(graphics2D0, xYPlot0, rectangle2D0, numberAxis0, numberAxis0, 2146892502, plotRenderingInfo0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.jfree.chart.annotations.AbstractXYAnnotation", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualityWithStringObject() {
-        TextTitle drawable = new TextTitle("x");
-        XYDrawableAnnotation annotation = new XYDrawableAnnotation(738.4170062070756, 738.4170062070756, 738.4170062070756, 738.4170062070756, drawable);
-        assertFalse(annotation.equals("x"));
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      XYDrawableAnnotation xYDrawableAnnotation0 = null;
+      try {
+        xYDrawableAnnotation0 = new XYDrawableAnnotation(738.4170062070756, 0.0F, 0.0F, 489.8514, (Drawable) null);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Null 'drawable' argument.
+         //
+         verifyException("org.jfree.chart.internal.Args", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testReflexiveEquality() {
-        TextTitle drawable = new TextTitle("");
-        XYDrawableAnnotation annotation = new XYDrawableAnnotation(0.0, 0.0, 0.0, 0.0, drawable);
-        assertEquals(annotation, annotation);
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      XYDrawableAnnotation xYDrawableAnnotation0 = null;
+      try {
+        xYDrawableAnnotation0 = new XYDrawableAnnotation((-98.734775112), (-98.734775112), (-98.734775112), (-98.734775112), (-98.734775112), (Drawable) null);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Null 'drawable' argument.
+         //
+         verifyException("org.jfree.chart.internal.Args", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testClonedObjectEquality() throws CloneNotSupportedException {
-        TextTitle drawable = new TextTitle("x");
-        XYDrawableAnnotation annotation = new XYDrawableAnnotation(738.4170062070756, 738.4170062070756, 738.4170062070756, 738.4170062070756, drawable);
-        XYDrawableAnnotation clone = (XYDrawableAnnotation) annotation.clone();
-        assertEquals(annotation, clone);
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      BlockContainer blockContainer0 = new BlockContainer();
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation((-111.02033357721), (-111.02033357721), (-111.02033357721), (-111.02033357721), (-111.02033357721), blockContainer0);
+      XYBarRenderer xYBarRenderer0 = new XYBarRenderer((-111.02033357721));
+      LegendTitle legendTitle0 = new LegendTitle(xYBarRenderer0);
+      XYDrawableAnnotation xYDrawableAnnotation1 = new XYDrawableAnnotation((-111.02033357721), (-111.02033357721), (-111.02033357721), (-111.02033357721), (-111.02033357721), legendTitle0);
+      boolean boolean0 = xYDrawableAnnotation1.equals(xYDrawableAnnotation0);
+      assertEquals((-111.02033357721), xYDrawableAnnotation1.getX(), 0.01);
+      assertEquals((-111.02033357721), xYDrawableAnnotation1.getDisplayHeight(), 0.01);
+      assertEquals((-111.02033357721), xYDrawableAnnotation1.getDrawScaleFactor(), 0.01);
+      assertFalse(boolean0);
+      assertEquals((-111.02033357721), xYDrawableAnnotation1.getDisplayWidth(), 0.01);
+      assertEquals((-111.02033357721), xYDrawableAnnotation1.getY(), 0.01);
+  }
 
-    // Tests for edge case property values
-    @Test(timeout = 4000)
-    public void testZeroScaleFactor() {
-        Font font = AbstractRenderer.DEFAULT_VALUE_LABEL_FONT;
-        TextTitle drawable = new TextTitle("", font);
-        XYDrawableAnnotation annotation = new XYDrawableAnnotation(-317.3886, 3036.177828359721, -317.3886, -1.0, 0.0, drawable);
-        assertEquals(0.0, annotation.getDrawScaleFactor(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      BlockContainer blockContainer0 = new BlockContainer();
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation((-2655.096265552367), (-2655.096265552367), (-2655.096265552367), (-2655.096265552367), (-2655.096265552367), blockContainer0);
+      XYDrawableAnnotation xYDrawableAnnotation1 = new XYDrawableAnnotation((-2655.096265552367), (-2655.096265552367), (-2655.096265552367), (-2655.096265552367), blockContainer0);
+      boolean boolean0 = xYDrawableAnnotation0.equals(xYDrawableAnnotation1);
+      assertFalse(xYDrawableAnnotation1.equals((Object)xYDrawableAnnotation0));
+      assertEquals((-2655.096265552367), xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
+      assertEquals((-2655.096265552367), xYDrawableAnnotation1.getX(), 0.01);
+      assertEquals((-2655.096265552367), xYDrawableAnnotation1.getDisplayHeight(), 0.01);
+      assertFalse(boolean0);
+      assertEquals((-2655.096265552367), xYDrawableAnnotation1.getY(), 0.01);
+      assertEquals((-2655.096265552367), xYDrawableAnnotation1.getDisplayWidth(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testNegativeScaleFactor() {
-        Font font = AbstractRenderer.DEFAULT_VALUE_LABEL_FONT;
-        BigInteger bigInt = BigInteger.TEN;
-        DefaultValueDataset dataset = new DefaultValueDataset(bigInt);
-        MeterPlot meterPlot = new MeterPlot(dataset);
-        JFreeChart drawable = new JFreeChart("Pie_Plot", font, meterPlot, true);
-        XYDrawableAnnotation annotation = new XYDrawableAnnotation(-317.3886, -317.3886, -1.0, 0.0, -1.0, drawable);
-        assertEquals(-1.0, annotation.getDrawScaleFactor(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      BlockContainer blockContainer0 = new BlockContainer();
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(2927.5241410323115, 2927.5241410323115, 2927.5241410323115, 2927.5241410323115, 2927.5241410323115, blockContainer0);
+      XYDrawableAnnotation xYDrawableAnnotation1 = new XYDrawableAnnotation(2927.5241410323115, 2927.5241410323115, 2927.5241410323115, 1530.0121533066, blockContainer0);
+      boolean boolean0 = xYDrawableAnnotation0.equals(xYDrawableAnnotation1);
+      assertEquals(1.0, xYDrawableAnnotation1.getDrawScaleFactor(), 0.01);
+      assertEquals(1530.0121533066, xYDrawableAnnotation1.getDisplayHeight(), 0.01);
+      assertEquals(2927.5241410323115, xYDrawableAnnotation1.getDisplayWidth(), 0.01);
+      assertEquals(2927.5241410323115, xYDrawableAnnotation1.getY(), 0.01);
+      assertFalse(boolean0);
+      assertEquals(2927.5241410323115, xYDrawableAnnotation1.getX(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testLargeDisplayWidth() {
-        ShortTextTitle drawable = new ShortTextTitle("");
-        XYDrawableAnnotation annotation = new XYDrawableAnnotation(0.04, 0.0, 2307.6453724016596, 0.04, 2307.6453724016596, drawable);
-        assertEquals(2307.6453724016596, annotation.getDisplayWidth(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      BlockContainer blockContainer0 = new BlockContainer();
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(2929.6115057820657, 2929.6115057820657, 2929.6115057820657, 2929.6115057820657, 2929.6115057820657, blockContainer0);
+      XYDrawableAnnotation xYDrawableAnnotation1 = new XYDrawableAnnotation(2929.6115057820657, 2929.6115057820657, (-1095.6), 2929.6115057820657, (-1095.6), blockContainer0);
+      boolean boolean0 = xYDrawableAnnotation0.equals(xYDrawableAnnotation1);
+      assertEquals(2929.6115057820657, xYDrawableAnnotation1.getY(), 0.01);
+      assertEquals(2929.6115057820657, xYDrawableAnnotation1.getDisplayHeight(), 0.01);
+      assertFalse(boolean0);
+      assertEquals((-1095.6), xYDrawableAnnotation1.getDrawScaleFactor(), 0.01);
+      assertEquals((-1095.6), xYDrawableAnnotation1.getDisplayWidth(), 0.01);
+      assertEquals(2929.6115057820657, xYDrawableAnnotation1.getX(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testNegativeDisplayWidth() {
-        DateTitle drawable = new DateTitle(0);
-        XYDrawableAnnotation annotation = new XYDrawableAnnotation(0.0, 0.0, -1.0, 0.0, -3958.9, drawable);
-        assertEquals(-1.0, annotation.getDisplayWidth(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      BlockContainer blockContainer0 = new BlockContainer();
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(2934.8649531520473, 2934.8649531520473, 2934.8649531520473, 2934.8649531520473, 2934.8649531520473, blockContainer0);
+      XYDrawableAnnotation xYDrawableAnnotation1 = new XYDrawableAnnotation(2934.8649531520473, (-1942.5102826), 2934.8649531520473, (-1942.5102826), blockContainer0);
+      boolean boolean0 = xYDrawableAnnotation0.equals(xYDrawableAnnotation1);
+      assertEquals(1.0, xYDrawableAnnotation1.getDrawScaleFactor(), 0.01);
+      assertEquals((-1942.5102826), xYDrawableAnnotation1.getY(), 0.01);
+      assertEquals(2934.8649531520473, xYDrawableAnnotation1.getX(), 0.01);
+      assertEquals((-1942.5102826), xYDrawableAnnotation1.getDisplayHeight(), 0.01);
+      assertEquals(2934.8649531520473, xYDrawableAnnotation1.getDisplayWidth(), 0.01);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testNegativeDisplayHeight() {
-        ShortTextTitle drawable = new ShortTextTitle("");
-        XYDrawableAnnotation annotation = new XYDrawableAnnotation(0.0, 0.0, 0.0, -1062.3, drawable);
-        assertEquals(-1062.3, annotation.getDisplayHeight(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      BlockContainer blockContainer0 = new BlockContainer();
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(2.0, 1.0, 1.0, 1.0, 1.0, blockContainer0);
+      XYDrawableAnnotation xYDrawableAnnotation1 = new XYDrawableAnnotation(1.0, 2.0, 1.0, 2.0, 2.0, blockContainer0);
+      boolean boolean0 = xYDrawableAnnotation0.equals(xYDrawableAnnotation1);
+      assertEquals(2.0, xYDrawableAnnotation1.getDisplayHeight(), 0.01);
+      assertEquals(2.0, xYDrawableAnnotation1.getDrawScaleFactor(), 0.01);
+      assertEquals(2.0, xYDrawableAnnotation0.getX(), 0.01);
+      assertEquals(1.0, xYDrawableAnnotation1.getDisplayWidth(), 0.01);
+      assertEquals(2.0, xYDrawableAnnotation1.getY(), 0.01);
+      assertFalse(boolean0);
+      assertEquals(1.0, xYDrawableAnnotation0.getDisplayWidth(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      BlockContainer blockContainer0 = new BlockContainer();
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(2926.465410521232, 2926.465410521232, 2926.465410521232, 2926.465410521232, 2926.465410521232, blockContainer0);
+      XYBoxAnnotation xYBoxAnnotation0 = new XYBoxAnnotation(10.0, 30.0, 2926.465410521232, 3.0);
+      boolean boolean0 = xYDrawableAnnotation0.equals(xYBoxAnnotation0);
+      assertEquals(2926.465410521232, xYDrawableAnnotation0.getX(), 0.01);
+      assertEquals(2926.465410521232, xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
+      assertEquals(2926.465410521232, xYDrawableAnnotation0.getY(), 0.01);
+      assertEquals(2926.465410521232, xYDrawableAnnotation0.getDisplayWidth(), 0.01);
+      assertFalse(boolean0);
+      assertEquals(2926.465410521232, xYDrawableAnnotation0.getDisplayHeight(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      TextTitle textTitle0 = new TextTitle("x");
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(738.4170062070756, 738.4170062070756, 738.4170062070756, 738.4170062070756, textTitle0);
+      boolean boolean0 = xYDrawableAnnotation0.equals("x");
+      assertEquals(1.0, xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
+      assertEquals(738.4170062070756, xYDrawableAnnotation0.getX(), 0.01);
+      assertEquals(738.4170062070756, xYDrawableAnnotation0.getDisplayHeight(), 0.01);
+      assertFalse(boolean0);
+      assertEquals(738.4170062070756, xYDrawableAnnotation0.getDisplayWidth(), 0.01);
+      assertEquals(738.4170062070756, xYDrawableAnnotation0.getY(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      TextTitle textTitle0 = new TextTitle();
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(0.0, 0.0, 0.0, 0.0, textTitle0);
+      boolean boolean0 = xYDrawableAnnotation0.equals(xYDrawableAnnotation0);
+      assertTrue(boolean0);
+      assertEquals(0.0, xYDrawableAnnotation0.getDisplayHeight(), 0.01);
+      assertEquals(1.0, xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
+      assertEquals(0.0, xYDrawableAnnotation0.getDisplayWidth(), 0.01);
+      assertEquals(0.0, xYDrawableAnnotation0.getX(), 0.01);
+      assertEquals(0.0, xYDrawableAnnotation0.getY(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      TextTitle textTitle0 = new TextTitle("x");
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(738.4170062070756, 738.4170062070756, 738.4170062070756, 738.4170062070756, textTitle0);
+      XYDrawableAnnotation xYDrawableAnnotation1 = (XYDrawableAnnotation)xYDrawableAnnotation0.clone();
+      boolean boolean0 = xYDrawableAnnotation0.equals(xYDrawableAnnotation1);
+      assertEquals(738.4170062070756, xYDrawableAnnotation1.getDisplayHeight(), 0.01);
+      assertEquals(1.0, xYDrawableAnnotation1.getDrawScaleFactor(), 0.01);
+      assertEquals(738.4170062070756, xYDrawableAnnotation1.getDisplayWidth(), 0.01);
+      assertTrue(boolean0);
+      assertEquals(738.4170062070756, xYDrawableAnnotation1.getY(), 0.01);
+      assertEquals(738.4170062070756, xYDrawableAnnotation1.getX(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      TextTitle textTitle0 = new TextTitle("x");
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(738.4170062070756, 738.4170062070756, 738.4170062070756, 738.4170062070756, textTitle0);
+      xYDrawableAnnotation0.setURL("x");
+      XYPlot<PolarAxisLocation> xYPlot0 = new XYPlot<PolarAxisLocation>();
+      RoundRectangle2D.Float roundRectangle2D_Float0 = new RoundRectangle2D.Float();
+      Rectangle2D rectangle2D0 = roundRectangle2D_Float0.getBounds2D();
+      NumberAxis numberAxis0 = new NumberAxis("x");
+      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
+      PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
+      JFreeChart jFreeChart0 = new JFreeChart(xYPlot0);
+      BufferedImage bufferedImage0 = jFreeChart0.createBufferedImage(1564, 1564, (double) 0.0F, 50.70624, chartRenderingInfo0);
+      Graphics2D graphics2D0 = bufferedImage0.createGraphics();
+      xYDrawableAnnotation0.draw(graphics2D0, xYPlot0, rectangle2D0, numberAxis0, numberAxis0, 3697, plotRenderingInfo0);
+      assertEquals(1.0, xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
+      assertEquals(738.4170062070756, xYDrawableAnnotation0.getDisplayWidth(), 0.01);
+      assertEquals(738.4170062070756, xYDrawableAnnotation0.getX(), 0.01);
+      assertEquals(738.4170062070756, xYDrawableAnnotation0.getDisplayHeight(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test32()  throws Throwable  {
+      DateTitle dateTitle0 = new DateTitle();
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(1.0, (-2346.68), 3131.33, 1.0, (-2061.18113), dateTitle0);
+      double double0 = xYDrawableAnnotation0.getDisplayHeight();
+      assertEquals((-2061.18113), xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
+      assertEquals(1.0, double0, 0.01);
+      assertEquals(3131.33, xYDrawableAnnotation0.getDisplayWidth(), 0.01);
+      assertEquals((-2346.68), xYDrawableAnnotation0.getY(), 0.01);
+      assertEquals(1.0, xYDrawableAnnotation0.getX(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test33()  throws Throwable  {
+      ShortTextTitle shortTextTitle0 = new ShortTextTitle("");
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(0.0, 0.0, 0.0, (-1062.3), shortTextTitle0);
+      xYDrawableAnnotation0.hashCode();
+      assertEquals(0.0, xYDrawableAnnotation0.getDisplayWidth(), 0.01);
+      assertEquals(0.0, xYDrawableAnnotation0.getY(), 0.01);
+      assertEquals(0.0, xYDrawableAnnotation0.getX(), 0.01);
+      assertEquals(1.0, xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
+      assertEquals((-1062.3), xYDrawableAnnotation0.getDisplayHeight(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test34()  throws Throwable  {
+      ShortTextTitle shortTextTitle0 = new ShortTextTitle("");
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(0.0, 0.0, 0.0, (-1062.3), shortTextTitle0);
+      double double0 = xYDrawableAnnotation0.getY();
+      assertEquals((-1062.3), xYDrawableAnnotation0.getDisplayHeight(), 0.01);
+      assertEquals(0.0, double0, 0.01);
+      assertEquals(1.0, xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
+      assertEquals(0.0, xYDrawableAnnotation0.getX(), 0.01);
+      assertEquals(0.0, xYDrawableAnnotation0.getDisplayWidth(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test35()  throws Throwable  {
+      ShortTextTitle shortTextTitle0 = new ShortTextTitle("");
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(0.0, 0.0, 0.0, (-1062.3), shortTextTitle0);
+      double double0 = xYDrawableAnnotation0.getX();
+      assertEquals(0.0, xYDrawableAnnotation0.getDisplayWidth(), 0.01);
+      assertEquals(0.0, double0, 0.01);
+      assertEquals(1.0, xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
+      assertEquals(0.0, xYDrawableAnnotation0.getY(), 0.01);
+      assertEquals((-1062.3), xYDrawableAnnotation0.getDisplayHeight(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test36()  throws Throwable  {
+      DateTitle dateTitle0 = new DateTitle();
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(1.0, 1.0, 1.0, 1.0, 1.0, dateTitle0);
+      double double0 = xYDrawableAnnotation0.getDrawScaleFactor();
+      assertEquals(1.0, double0, 0.01);
+      assertEquals(1.0, xYDrawableAnnotation0.getX(), 0.01);
+      assertEquals(1.0, xYDrawableAnnotation0.getY(), 0.01);
+      assertEquals(1.0, xYDrawableAnnotation0.getDisplayWidth(), 0.01);
+      assertEquals(1.0, xYDrawableAnnotation0.getDisplayHeight(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test37()  throws Throwable  {
+      ShortTextTitle shortTextTitle0 = new ShortTextTitle("");
+      XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(0.0, 0.0, 0.0, (-1062.3), shortTextTitle0);
+      double double0 = xYDrawableAnnotation0.getDisplayWidth();
+      assertEquals((-1062.3), xYDrawableAnnotation0.getDisplayHeight(), 0.01);
+      assertEquals(1.0, xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
+      assertEquals(0.0, xYDrawableAnnotation0.getY(), 0.01);
+      assertEquals(0.0, double0, 0.01);
+      assertEquals(0.0, xYDrawableAnnotation0.getX(), 0.01);
+  }
 }
