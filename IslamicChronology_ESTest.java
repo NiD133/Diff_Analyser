@@ -24,538 +24,604 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class IslamicChronology_ESTest extends IslamicChronology_ESTest_scaffolding {
 
-    // Leap Year Pattern Tests
-    //-----------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void testDifferentLeapYearPatternsAreNotEqual() throws Throwable {
-        IslamicChronology.LeapYearPatternType pattern1 = IslamicChronology.LEAP_YEAR_15_BASED;
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        boolean areEqual = chronology.LEAP_YEAR_HABASH_AL_HASIB.equals(pattern1);
-        assertFalse(areEqual);
-    }
-
-    @Test(timeout = 4000)
-    public void testCustomLeapYearPatternRecognizesNonLeapYear() throws Throwable {
-        IslamicChronology.LeapYearPatternType customPattern = 
-            new IslamicChronology.LeapYearPatternType(-1861, -276);
-        boolean isLeap = customPattern.isLeapYear(-1861);
-        assertFalse(isLeap);
-    }
-
-    @Test(timeout = 4000)
-    public void testLeapYearIndianPatternNotEqualToHabashAlHasib() throws Throwable {
-        IslamicChronology.LeapYearPatternType pattern1 = IslamicChronology.LEAP_YEAR_HABASH_AL_HASIB;
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        boolean areEqual = chronology.LEAP_YEAR_INDIAN.equals(pattern1);
-        assertFalse(areEqual);
-    }
-
-    @Test(timeout = 4000)
-    public void testLeapYearPatternEqualsItself() throws Throwable {
-        IslamicChronology.LeapYearPatternType pattern = IslamicChronology.LEAP_YEAR_15_BASED;
-        boolean areEqual = pattern.equals(pattern);
-        assertTrue(areEqual);
-    }
-
-    @Test(timeout = 4000)
-    public void testLeapYearPatternNotEqualToChronology() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
-        boolean areEqual = chronology.LEAP_YEAR_16_BASED.equals(chronology);
-        assertFalse(areEqual);
-    }
-
-    // Date Calculation Tests
-    //-----------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void testCalculateFirstDayOfYearForVeryNegativeYear() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        long firstDayMillis = chronology.calculateFirstDayOfYearMillis(-292269337);
-        assertEquals(-8948534433609600000L, firstDayMillis);
-    }
-
-    @Test(timeout = 4000)
-    public void testCalculateFirstDayOfYearForYear1576() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
-        long firstDayMillis = chronology.calculateFirstDayOfYearMillis(1576);
-        assertEquals(5700585600000L, firstDayMillis);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetYearMonthDayMillisWithLargeYearAndNegativeMonth() throws Throwable {
-        IslamicChronology.LeapYearPatternType pattern = IslamicChronology.LEAP_YEAR_15_BASED;
-        IslamicChronology chronology = new IslamicChronology(null, null, pattern);
-        long resultMillis = chronology.getYearMonthDayMillis(292271022, -1, 273);
-        assertEquals(8948501182656000000L, resultMillis);
-    }
-
-    @Test(timeout = 4000)
-    public void testSetYearOperation() throws Throwable {
-        DateTimeZone zone = DateTimeZone.getDefault();
-        IslamicChronology chronology = IslamicChronology.getInstance(zone);
-        long newDateMillis = chronology.setYear(-42246144000000L, 1900);
-        assertEquals(15651100800000L, newDateMillis);
-    }
-
-    @Test(timeout = 4000)
-    public void testSetYearForYear46() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        long newDateMillis = chronology.setYear(2602045900800000L, 46);
-        assertEquals(-41113267200000L, newDateMillis);
-    }
-
-    @Test(timeout = 4000)
-    public void testSetYearForLargeYear() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
-        long newDateMillis = chronology.setYear(2602780732800000L, 86400);
-        assertEquals(2602811318400000L, newDateMillis);
-    }
-
-    @Test(timeout = 4000)
-    public void testSetYearForYear1() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        long newDateMillis = chronology.setYear(1, 1);
-        assertEquals(-42496790399999L, newDateMillis);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetYearDifference() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
-        long difference = chronology.getYearDifference(-2254L, 55382400010L);
-        assertEquals(-2L, difference);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetYearDifferenceForSameInstant() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        long difference = chronology.getYearDifference(-2966L, -2966L);
-        assertEquals(0L, difference);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetYearDifferenceWithPositiveInstants() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
-        long difference = chronology.getYearDifference(918518400000L, 604800L);
-        assertEquals(29L, difference);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetTotalMillisByYearMonth() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
-        long totalMillis = chronology.getTotalMillisByYearMonth(1, 1);
-        assertEquals(0L, totalMillis);
-    }
-
-    // Day/Month/Year Component Tests
-    //-----------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void testGetDaysInMonthMaxForNegativeMonth() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
-        int days = chronology.getDaysInMonthMax(-238);
-        assertEquals(29, days);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetDaysInMonthMaxForMonth1() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
-        int days = chronology.getDaysInMonthMax(1);
-        assertEquals(30, days);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetDaysInMonthMaxForMonth12() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
-        int days = chronology.getDaysInMonthMax(12);
-        assertEquals(30, days);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetDaysInMonthMaxForInvalidMonth() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        int days = chronology.getDaysInMonthMax(100);
-        assertEquals(29, days);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetDaysInMonthMaxForSpecificInstant() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
-        int days = chronology.getDaysInMonthMax(-42215385600000L);
-        assertEquals(30, days);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetDaysInYearMonthForNegativeMonth() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        int days = chronology.getDaysInYearMonth(220, -4026);
-        assertEquals(29, days);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetDaysInYearMonthForLargeMonth() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        int days = chronology.getDaysInYearMonth(354, 354);
-        assertEquals(29, days);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetDaysInYearMonthForMonth12Year12() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
-        int days = chronology.getDaysInYearMonth(12, 12);
-        assertEquals(29, days);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetDaysInYearForNegativeYear() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        int days = chronology.getDaysInYear(-188);
-        assertEquals(355, days);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetDaysInYearForYear1() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        int days = chronology.getDaysInYear(1);
-        assertEquals(354, days);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetDayOfMonthForNegativeInstant() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        int day = chronology.getDayOfMonth(-108654998400000L);
-        assertEquals(0, day);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetDayOfMonthForAnotherNegativeInstant() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        int day = chronology.getDayOfMonth(-83855174400000L);
-        assertEquals(-2, day);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetDayOfMonthForSpecificInstant() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        int day = chronology.getDayOfMonth(2602780732800000L);
-        assertEquals(30, day);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetDayOfMonthWithCustomPattern() throws Throwable {
-        IslamicChronology.LeapYearPatternType customPattern = 
-            new IslamicChronology.LeapYearPatternType(8171, 8171);
-        IslamicChronology chronology = new IslamicChronology(null, null, customPattern);
-        int day = chronology.getDayOfMonth(8171);
-        assertEquals(19, day);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetMonthOfYearWithNegativeYear() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        int month = chronology.getMonthOfYear(0L, -2992);
-        assertEquals(52360, month);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetMonthOfYearWithLargeYear() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
-        int month = chronology.getMonthOfYear(1518L, 292271022);
-        assertEquals(-16657633, month);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetYearForLargeNegativeInstant() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        int year = chronology.getYear(-69139612803234L);
-        assertEquals(-839, year);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetYearForNegativeInstant() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance(null);
-        int year = chronology.getYear(-2099L);
-        assertEquals(1389, year);
-    }
-
-    // Leap Year Tests
-    //-----------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void testIsLeapYearWithHabashAlHasibPatternForYear30() throws Throwable {
-        TimeZone timeZone = TimeZone.getTimeZone("");
-        DateTimeZone dateTimeZone = DateTimeZone.forTimeZone(timeZone);
-        IslamicChronology baseChronology = IslamicChronology.getInstance(dateTimeZone);
-        IslamicChronology chronology = IslamicChronology.getInstance(
-            dateTimeZone, baseChronology.LEAP_YEAR_HABASH_AL_HASIB
-        );
-        boolean isLeap = chronology.isLeapYear(30);
-        assertTrue(isLeap);
-    }
-
-    @Test(timeout = 4000)
-    public void testIsLeapYearWithDefaultPatternForYear1() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        boolean isLeap = chronology.isLeapYear(1);
-        assertFalse(isLeap);
-    }
-
-    // Chronology Assembly Tests
-    //-----------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void testAssembleChronology() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        AssembledChronology.Fields fields = new AssembledChronology.Fields();
-        chronology.assemble(fields);
-        assertEquals(1, IslamicChronology.AH);
-    }
-
-    // Equality & Hash Code Tests
-    //-----------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void testEqualsWithDifferentObjects() throws Throwable {
-        DateTimeZone zone = DateTimeZone.getDefault();
-        IslamicChronology chronology1 = IslamicChronology.getInstance(zone);
-        Object object = new Object();
-        IslamicChronology chronology2 = new IslamicChronology(
-            chronology1, object, chronology1.LEAP_YEAR_15_BASED
-        );
-        boolean areEqual = chronology1.equals(chronology2);
-        assertFalse(areEqual);
-    }
-
-    @Test(timeout = 4000)
-    public void testEqualsWithDifferentTimeZones() throws Throwable {
-        IslamicChronology utcChronology = IslamicChronology.getInstanceUTC();
-        DateTimeZone customZone = DateTimeZone.forOffsetMillis(1);
-        IslamicChronology customZoneChronology = IslamicChronology.getInstance(customZone);
-        boolean areEqual = utcChronology.equals(customZoneChronology);
-        assertFalse(areEqual);
-    }
-
-    @Test(timeout = 4000)
-    public void testEqualsWithDifferentLeapYearPatterns() throws Throwable {
-        IslamicChronology utcChronology = IslamicChronology.getInstanceUTC();
-        DateTimeZone customZone = DateTimeZone.forOffsetMillis(1);
-        IslamicChronology customPatternChronology = IslamicChronology.getInstance(
-            customZone, utcChronology.LEAP_YEAR_INDIAN
-        );
-        boolean areEqual = utcChronology.equals(customPatternChronology);
-        assertFalse(areEqual);
-    }
-
-    @Test(timeout = 4000)
-    public void testEqualsWithDifferentClass() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
-        Object otherObject = new Object();
-        boolean areEqual = chronology.equals(otherObject);
-        assertFalse(areEqual);
-    }
-
-    @Test(timeout = 4000)
-    public void testEqualsWithSameObject() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
-        boolean areEqual = chronology.equals(chronology);
-        assertTrue(areEqual);
-    }
-
-    @Test(timeout = 4000)
-    public void testEqualsWithEqualChronologies() throws Throwable {
-        IslamicChronology baseChronology = IslamicChronology.getInstance();
-        IslamicChronology sameChronology = new IslamicChronology(
-            baseChronology, baseChronology, baseChronology.LEAP_YEAR_16_BASED
-        );
-        boolean areEqual = baseChronology.equals(sameChronology);
-        assertTrue(areEqual);
-    }
-
-    // Time Zone Handling Tests
-    //-----------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void testWithUTC() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        Chronology utcChronology = chronology.withUTC();
-        assertSame(chronology, utcChronology);
-    }
-
-    @Test(timeout = 4000)
-    public void testWithNonNullZone() throws Throwable {
-        IslamicChronology utcChronology = IslamicChronology.getInstanceUTC();
-        DateTimeZone customZone = DateTimeZone.forOffsetHoursMinutes(1, 1);
-        Chronology chronologyWithZone = utcChronology.withZone(customZone);
-        assertNotSame(chronologyWithZone, utcChronology);
-    }
-
-    @Test(timeout = 4000)
-    public void testWithNullZone() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
-        Chronology chronologyWithNullZone = chronology.withZone(null);
-        assertEquals(1, IslamicChronology.AH);
-    }
-
-    // Null Pattern Handling Tests (Expected Exceptions)
-    //-----------------------------------------------------------------------
-    
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testSetYearWithNullLeapYearPattern() throws Throwable {
-        CopticChronology copticChronology = CopticChronology.getInstanceUTC();
-        IslamicChronology chronology = new IslamicChronology(
-            copticChronology, copticChronology, null
-        );
-        chronology.setYear(380L, 1);
-    }
-
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testHashCodeWithNullLeapYearPattern() throws Throwable {
-        ISOChronology isoChronology = ISOChronology.getInstanceUTC();
-        IslamicChronology chronology = new IslamicChronology(
-            isoChronology, isoChronology, null
-        );
-        chronology.hashCode();
-    }
-
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testGetYearWithNullLeapYearPattern() throws Throwable {
-        IslamicChronology chronology = new IslamicChronology(null, null, null);
-        chronology.getYear(1);
-    }
-
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testGetMonthOfYearWithNullLeapYearPattern() throws Throwable {
-        ISOChronology isoChronology = ISOChronology.getInstanceUTC();
-        IslamicChronology chronology = new IslamicChronology(
-            isoChronology, isoChronology, null
-        );
-        chronology.getMonthOfYear(918518400000L, 1138);
-    }
-
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testGetDayOfMonthWithNullLeapYearPattern() throws Throwable {
-        CopticChronology copticChronology = CopticChronology.getInstance();
-        IslamicChronology chronology = new IslamicChronology(
-            copticChronology, copticChronology, null
-        );
-        chronology.getDayOfMonth(1);
-    }
-
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testCalculateFirstDayOfYearWithNullLeapYearPattern() throws Throwable {
-        GJChronology gjChronology = GJChronology.getInstanceUTC();
-        Object param = new Object();
-        IslamicChronology chronology = new IslamicChronology(gjChronology, param, null);
-        chronology.calculateFirstDayOfYearMillis(1593);
-    }
-
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testGetInstanceWithNullLeapYearPattern() throws Throwable {
-        DateTimeZone zone = DateTimeZone.forOffsetHours(12);
-        IslamicChronology.getInstance(zone, null);
-    }
-
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testGetDaysInYearWithNullLeapYearPattern() throws Throwable {
-        IslamicChronology chronology = new IslamicChronology(null, null, null);
-        chronology.getDaysInYear(1);
-    }
-
-    // Edge Case Tests
-    //-----------------------------------------------------------------------
-    
-    @Test(timeout = 4000, expected = ArithmeticException.class)
-    public void testCalculateFirstDayOfYearForTooLargeYear() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
-        chronology.calculateFirstDayOfYearMillis(292272984);
-    }
-
-    @Test(timeout = 4000, expected = ArrayIndexOutOfBoundsException.class)
-    public void testGetInstanceWithCustomLeapYearPattern() throws Throwable {
-        IslamicChronology.LeapYearPatternType customPattern = 
-            new IslamicChronology.LeapYearPatternType(4497, 4497);
-        IslamicChronology.getInstance(null, customPattern);
-    }
-
-    // Chronology Property Tests
-    //-----------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void testGetLeapYearPatternTypeReturnsNonNull() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        IslamicChronology.LeapYearPatternType pattern = chronology.getLeapYearPatternType();
-        assertNotNull(pattern);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetLeapYearPatternTypeReturnsNull() throws Throwable {
-        UTCProvider utcProvider = new UTCProvider();
-        GJChronology gjChronology = GJChronology.getInstance(null);
-        IslamicChronology chronology = new IslamicChronology(gjChronology, utcProvider, null);
-        IslamicChronology.LeapYearPatternType pattern = chronology.getLeapYearPatternType();
-        assertNull(pattern);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetAverageMillisPerMonth() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        long averageMillis = chronology.getAverageMillisPerMonth();
-        assertEquals(2551440384L, averageMillis);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetAverageMillisPerYear() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        long averageMillis = chronology.getAverageMillisPerYear();
-        assertEquals(30617280288L, averageMillis);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetAverageMillisPerYearDividedByTwo() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
-        long result = chronology.getAverageMillisPerYearDividedByTwo();
-        assertEquals(15308640144L, result);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetApproxMillisAtEpochDividedByTwo() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
-        long result = chronology.getApproxMillisAtEpochDividedByTwo();
-        assertEquals(21260793600000L, result);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetDaysInYearMax() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
-        int maxDays = chronology.getDaysInYearMax();
-        assertEquals(355, maxDays);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetMinYear() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
-        int minYear = chronology.getMinYear();
-        assertEquals(1, minYear);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetMaxYear() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
-        int maxYear = chronology.getMaxYear();
-        assertEquals(292271022, maxYear);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetDaysInMonthMaxDefault() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        int maxDays = chronology.getDaysInMonthMax();
-        assertEquals(30, maxDays);
-    }
-
-    @Test(timeout = 4000)
-    public void testHashCodeCalculation() throws Throwable {
-        IslamicChronology chronology = IslamicChronology.getInstance();
-        chronology.hashCode();
-        // No explicit assertion, verifies no exception
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      IslamicChronology.LeapYearPatternType islamicChronology_LeapYearPatternType0 = IslamicChronology.LEAP_YEAR_15_BASED;
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      boolean boolean0 = islamicChronology0.LEAP_YEAR_HABASH_AL_HASIB.equals(islamicChronology_LeapYearPatternType0);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      IslamicChronology.LeapYearPatternType islamicChronology_LeapYearPatternType0 = new IslamicChronology.LeapYearPatternType((-1861), (-276));
+      boolean boolean0 = islamicChronology_LeapYearPatternType0.isLeapYear((-1861));
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      long long0 = islamicChronology0.calculateFirstDayOfYearMillis((-292269337));
+      assertEquals((-8948534433609600000L), long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      IslamicChronology.LeapYearPatternType islamicChronology_LeapYearPatternType0 = IslamicChronology.LEAP_YEAR_15_BASED;
+      IslamicChronology islamicChronology0 = new IslamicChronology((Chronology) null, (Object) null, islamicChronology_LeapYearPatternType0);
+      long long0 = islamicChronology0.getYearMonthDayMillis(292271022, (-1), 273);
+      assertEquals(8948501182656000000L, long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      int int0 = islamicChronology0.getDaysInMonthMax((-238));
+      assertEquals(29, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      int int0 = islamicChronology0.getDaysInYearMonth(220, (-4026));
+      assertEquals(29, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      int int0 = islamicChronology0.getDaysInYearMonth(354, 354);
+      assertEquals(29, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      long long0 = islamicChronology0.getYearDifference((-2254L), 55382400010L);
+      assertEquals((-2L), long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance(dateTimeZone0);
+      long long0 = islamicChronology0.setYear((-42246144000000L), 1900);
+      assertEquals(15651100800000L, long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      int int0 = islamicChronology0.getDaysInMonthMax((-42215385600000L));
+      assertEquals(30, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance(dateTimeZone0);
+      Object object0 = new Object();
+      IslamicChronology islamicChronology1 = new IslamicChronology(islamicChronology0, object0, islamicChronology0.LEAP_YEAR_15_BASED);
+      boolean boolean0 = islamicChronology0.equals(islamicChronology1);
+      assertFalse(islamicChronology1.equals((Object)islamicChronology0));
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      AssembledChronology.Fields assembledChronology_Fields0 = new AssembledChronology.Fields();
+      islamicChronology0.assemble(assembledChronology_Fields0);
+      assertEquals(1, IslamicChronology.AH);
+  }
+
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      TimeZone timeZone0 = TimeZone.getTimeZone("");
+      DateTimeZone dateTimeZone0 = DateTimeZone.forTimeZone(timeZone0);
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance(dateTimeZone0);
+      IslamicChronology islamicChronology1 = IslamicChronology.getInstance(dateTimeZone0, islamicChronology0.LEAP_YEAR_HABASH_AL_HASIB);
+      boolean boolean0 = islamicChronology1.isLeapYear(30);
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      boolean boolean0 = islamicChronology0.isLeapYear(1);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      long long0 = islamicChronology0.getYearDifference(918518400000L, 604800L);
+      assertEquals(29L, long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      int int0 = islamicChronology0.getYear((-69139612803234L));
+      assertEquals((-839), int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      long long0 = islamicChronology0.getTotalMillisByYearMonth(1, 1);
+      assertEquals(0L, long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      long long0 = islamicChronology0.getTotalMillisByYearMonth((-182), 690562340);
+      assertEquals(1760105289686400000L, long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      long long0 = islamicChronology0.getTotalMillisByYearMonth(1, (-1291));
+      assertEquals((-3293049600000L), long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      int int0 = islamicChronology0.getMonthOfYear(0L, (-2992));
+      assertEquals(52360, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      int int0 = islamicChronology0.getMonthOfYear(1518L, 292271022);
+      assertEquals((-16657633), int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      UTCProvider uTCProvider0 = new UTCProvider();
+      GJChronology gJChronology0 = GJChronology.getInstance((DateTimeZone) null);
+      IslamicChronology islamicChronology0 = new IslamicChronology(gJChronology0, uTCProvider0, (IslamicChronology.LeapYearPatternType) null);
+      IslamicChronology.LeapYearPatternType islamicChronology_LeapYearPatternType0 = islamicChronology0.getLeapYearPatternType();
+      assertNull(islamicChronology_LeapYearPatternType0);
+  }
+
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      int int0 = islamicChronology0.getDayOfMonth((-108654998400000L));
+      assertEquals(0, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      int int0 = islamicChronology0.getDayOfMonth((-83855174400000L));
+      assertEquals((-2), int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      long long0 = islamicChronology0.getAverageMillisPerMonth();
+      assertEquals(2551440384L, long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      long long0 = islamicChronology0.calculateFirstDayOfYearMillis(1576);
+      assertEquals(5700585600000L, long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      CopticChronology copticChronology0 = CopticChronology.getInstanceUTC();
+      IslamicChronology islamicChronology0 = new IslamicChronology(copticChronology0, copticChronology0, (IslamicChronology.LeapYearPatternType) null);
+      // Undeclared exception!
+      try { 
+        islamicChronology0.setYear(380L, 1);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      ISOChronology iSOChronology0 = ISOChronology.getInstanceUTC();
+      IslamicChronology islamicChronology0 = new IslamicChronology(iSOChronology0, iSOChronology0, (IslamicChronology.LeapYearPatternType) null);
+      // Undeclared exception!
+      try { 
+        islamicChronology0.hashCode();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.joda.time.chrono.IslamicChronology", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      IslamicChronology islamicChronology0 = new IslamicChronology((Chronology) null, (Object) null, (IslamicChronology.LeapYearPatternType) null);
+      // Undeclared exception!
+      try { 
+        islamicChronology0.getYear(1);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      ISOChronology iSOChronology0 = ISOChronology.getInstanceUTC();
+      IslamicChronology islamicChronology0 = new IslamicChronology(iSOChronology0, iSOChronology0, (IslamicChronology.LeapYearPatternType) null);
+      // Undeclared exception!
+      try { 
+        islamicChronology0.getMonthOfYear(918518400000L, 1138);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      CopticChronology copticChronology0 = CopticChronology.getInstance();
+      IslamicChronology islamicChronology0 = new IslamicChronology(copticChronology0, copticChronology0, (IslamicChronology.LeapYearPatternType) null);
+      // Undeclared exception!
+      try { 
+        islamicChronology0.getDayOfMonth(1);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      GJChronology gJChronology0 = GJChronology.getInstanceUTC();
+      Object object0 = new Object();
+      IslamicChronology islamicChronology0 = new IslamicChronology(gJChronology0, object0, (IslamicChronology.LeapYearPatternType) null);
+      // Undeclared exception!
+      try { 
+        islamicChronology0.calculateFirstDayOfYearMillis(1593);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test32()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      // Undeclared exception!
+      try { 
+        islamicChronology0.calculateFirstDayOfYearMillis(292272984);
+        fail("Expecting exception: ArithmeticException");
+      
+      } catch(ArithmeticException e) {
+         //
+         // Year is too large: 292272984 > 292271022
+         //
+         verifyException("org.joda.time.chrono.IslamicChronology", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test33()  throws Throwable  {
+      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetHours(12);
+      // Undeclared exception!
+      try { 
+        IslamicChronology.getInstance(dateTimeZone0, (IslamicChronology.LeapYearPatternType) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.joda.time.chrono.IslamicChronology", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test34()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      Chronology chronology0 = islamicChronology0.withUTC();
+      assertSame(islamicChronology0, chronology0);
+  }
+
+  @Test(timeout = 4000)
+  public void test35()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      IslamicChronology.LeapYearPatternType islamicChronology_LeapYearPatternType0 = islamicChronology0.getLeapYearPatternType();
+      assertNotNull(islamicChronology_LeapYearPatternType0);
+  }
+
+  @Test(timeout = 4000)
+  public void test36()  throws Throwable  {
+      IslamicChronology.LeapYearPatternType islamicChronology_LeapYearPatternType0 = IslamicChronology.LEAP_YEAR_HABASH_AL_HASIB;
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      boolean boolean0 = islamicChronology0.LEAP_YEAR_INDIAN.equals(islamicChronology_LeapYearPatternType0);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test37()  throws Throwable  {
+      IslamicChronology.LeapYearPatternType islamicChronology_LeapYearPatternType0 = IslamicChronology.LEAP_YEAR_15_BASED;
+      boolean boolean0 = islamicChronology_LeapYearPatternType0.equals(islamicChronology_LeapYearPatternType0);
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test38()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      boolean boolean0 = islamicChronology0.LEAP_YEAR_16_BASED.equals(islamicChronology0);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test39()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      int int0 = islamicChronology0.getDaysInMonthMax(1);
+      assertEquals(30, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test40()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      int int0 = islamicChronology0.getDaysInMonthMax(12);
+      assertEquals(30, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test41()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      int int0 = islamicChronology0.getDaysInMonthMax(100);
+      assertEquals(29, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test42()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      int int0 = islamicChronology0.getDaysInMonthMax(2602780732800000L);
+      assertEquals(30, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test43()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      int int0 = islamicChronology0.getDaysInYearMonth(12, 12);
+      assertEquals(29, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test44()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      int int0 = islamicChronology0.getDaysInYear((-188));
+      assertEquals(355, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test45()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      int int0 = islamicChronology0.getDaysInYear(1);
+      assertEquals(354, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test46()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      int int0 = islamicChronology0.getDayOfMonth(2602780732800000L);
+      assertEquals(30, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test47()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      long long0 = islamicChronology0.getYearDifference((-2966L), (-2966L));
+      assertEquals(0L, long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test48()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      long long0 = islamicChronology0.setYear(2602045900800000L, 46);
+      assertEquals((-41113267200000L), long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test49()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      long long0 = islamicChronology0.setYear(2602780732800000L, 86400);
+      assertEquals(2602811318400000L, long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test50()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      long long0 = islamicChronology0.setYear(1, 1);
+      assertEquals((-42496790399999L), long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test51()  throws Throwable  {
+      IslamicChronology.LeapYearPatternType islamicChronology_LeapYearPatternType0 = new IslamicChronology.LeapYearPatternType(8171, 8171);
+      IslamicChronology islamicChronology0 = new IslamicChronology((Chronology) null, (Object) null, islamicChronology_LeapYearPatternType0);
+      int int0 = islamicChronology0.getDayOfMonth(8171);
+      assertEquals(19, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test52()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis(1);
+      IslamicChronology islamicChronology1 = IslamicChronology.getInstance(dateTimeZone0);
+      boolean boolean0 = islamicChronology0.equals(islamicChronology1);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test53()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis(1);
+      IslamicChronology islamicChronology1 = IslamicChronology.getInstance(dateTimeZone0, islamicChronology0.LEAP_YEAR_INDIAN);
+      boolean boolean0 = islamicChronology0.equals(islamicChronology1);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test54()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      Object object0 = new Object();
+      boolean boolean0 = islamicChronology0.equals(object0);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test55()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      boolean boolean0 = islamicChronology0.equals(islamicChronology0);
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test56()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      IslamicChronology islamicChronology1 = new IslamicChronology(islamicChronology0, islamicChronology0, islamicChronology0.LEAP_YEAR_16_BASED);
+      boolean boolean0 = islamicChronology0.equals(islamicChronology1);
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test57()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetHoursMinutes(1, 1);
+      Chronology chronology0 = islamicChronology0.withZone(dateTimeZone0);
+      assertNotSame(chronology0, islamicChronology0);
+  }
+
+  @Test(timeout = 4000)
+  public void test58()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      IslamicChronology islamicChronology1 = (IslamicChronology)islamicChronology0.withZone((DateTimeZone) null);
+      assertEquals(1, IslamicChronology.AH);
+  }
+
+  @Test(timeout = 4000)
+  public void test59()  throws Throwable  {
+      IslamicChronology.LeapYearPatternType islamicChronology_LeapYearPatternType0 = new IslamicChronology.LeapYearPatternType(4497, 4497);
+      // Undeclared exception!
+      try { 
+        IslamicChronology.getInstance((DateTimeZone) null, islamicChronology_LeapYearPatternType0);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // -111
+         //
+         verifyException("org.joda.time.chrono.IslamicChronology", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test60()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      int int0 = islamicChronology0.getDaysInYearMax();
+      assertEquals(355, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test61()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      int int0 = islamicChronology0.getMinYear();
+      assertEquals(1, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test62()  throws Throwable  {
+      IslamicChronology islamicChronology0 = new IslamicChronology((Chronology) null, (Object) null, (IslamicChronology.LeapYearPatternType) null);
+      // Undeclared exception!
+      try { 
+        islamicChronology0.getDaysInYear(1);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test63()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      long long0 = islamicChronology0.getApproxMillisAtEpochDividedByTwo();
+      assertEquals(21260793600000L, long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test64()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      int int0 = islamicChronology0.getMaxYear();
+      assertEquals(292271022, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test65()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      long long0 = islamicChronology0.getAverageMillisPerYearDividedByTwo();
+      assertEquals(15308640144L, long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test66()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      long long0 = islamicChronology0.getAverageMillisPerYear();
+      assertEquals(30617280288L, long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test67()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance((DateTimeZone) null);
+      int int0 = islamicChronology0.getYear((-2099L));
+      assertEquals(1389, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test68()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      islamicChronology0.hashCode();
+  }
+
+  @Test(timeout = 4000)
+  public void test69()  throws Throwable  {
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      int int0 = islamicChronology0.getDaysInMonthMax();
+      assertEquals(30, int0);
+  }
 }
