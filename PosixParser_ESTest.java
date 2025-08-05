@@ -18,166 +18,195 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class PosixParser_ESTest extends PosixParser_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void burstToken_WithEmptyString_ShouldNotThrow() throws Throwable {
-        // Test that bursting an empty token doesn't cause exceptions
-        PosixParser parser = new PosixParser();
-        parser.burstToken("", true);
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      PosixParser posixParser0 = new PosixParser();
+      posixParser0.burstToken("", true);
+  }
 
-    @Test(timeout = 4000)
-    public void flatten_WithNullArguments_ThrowsNullPointerException() {
-        // Test null safety
-        PosixParser parser = new PosixParser();
-        try {
-            parser.flatten(null, null, true);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      PosixParser posixParser0 = new PosixParser();
+      // Undeclared exception!
+      try { 
+        posixParser0.flatten((Options) null, (String[]) null, true);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void flatten_WithRequiredShortOption_ReturnsCorrectTokens() {
-        // Test handling of required short option
-        Options options = new Options();
-        options.addRequiredOption("j", "j", true, "j");
-        PosixParser parser = new PosixParser();
-        
-        String[] input = new String[5];
-        input[1] = "-j";  // Valid short option
-        
-        String[] result = parser.flatten(options, input, true);
-        assertEquals(1, result.length);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      Options options0 = new Options();
+      options0.addRequiredOption("j", "j", true, "j");
+      PosixParser posixParser0 = new PosixParser();
+      String[] stringArray0 = new String[5];
+      stringArray0[1] = "-j";
+      String[] stringArray1 = posixParser0.flatten(options0, stringArray0, true);
+      assertEquals(1, stringArray1.length);
+  }
 
-    @Test(timeout = 4000)
-    public void flatten_WithLongOptionStartingWithSingleDash_ProcessesCorrectly() {
-        // Test handling of long option formatted with single dash
-        Options options = new Options();
-        options.addRequiredOption("j", "org.apache.commons.cli.PosixParser", true, "j");
-        PosixParser parser = new PosixParser();
-        
-        String[] input = new String[9];
-        input[2] = "-org.apache.commons.cli.PosixParser";  // Invalid long option format
-        
-        parser.flatten(options, input, false);
-        // Additional token burst test
-        parser.burstToken(";-", true);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      Options options0 = new Options();
+      Options options1 = options0.addRequiredOption("j", "org.apache.commons.cli.PosixParser", true, "j");
+      PosixParser posixParser0 = new PosixParser();
+      String[] stringArray0 = new String[9];
+      stringArray0[2] = "-org.apache.commons.cli.PosixParser";
+      posixParser0.flatten(options1, stringArray0, false);
+      posixParser0.burstToken(";-", true);
+  }
 
-    @Test(timeout = 4000)
-    public void flatten_WithShortOption_ReturnsAllTokens() {
-        // Test that short option doesn't stop token processing
-        Options options = new Options();
-        PosixParser parser = new PosixParser();
-        
-        String[] input = new String[5];
-        input[1] = "-j";  // Short option without required config
-        
-        String[] result = parser.flatten(options, input, true);
-        assertEquals(4, result.length);
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      Options options0 = new Options();
+      PosixParser posixParser0 = new PosixParser();
+      String[] stringArray0 = new String[5];
+      stringArray0[1] = "-j";
+      String[] stringArray1 = posixParser0.flatten(options0, stringArray0, true);
+      assertEquals(4, stringArray1.length);
+  }
 
-    @Test(timeout = 4000)
-    public void flatten_WithDoubleDashArgument_ProcessesCorrectly() {
-        // Test handling of '--=' argument format
-        Options options = new Options();
-        options.addRequiredOption("j", "j", false, "j");
-        PosixParser parser = new PosixParser();
-        
-        String[] input = new String[11];
-        input[5] = "--=<iy";  // Special argument format
-        
-        String[] result = parser.flatten(options, input, false);
-        String[] finalResult = parser.flatten(options, result, true);
-        assertEquals(3, finalResult.length);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      Options options0 = new Options();
+      Options options1 = options0.addRequiredOption("j", "j", false, "j");
+      PosixParser posixParser0 = new PosixParser();
+      String[] stringArray0 = new String[11];
+      stringArray0[5] = "--=<iy";
+      String[] stringArray1 = posixParser0.flatten(options1, stringArray0, false);
+      String[] stringArray2 = posixParser0.flatten(options1, stringArray1, true);
+      assertEquals(3, stringArray2.length);
+  }
 
-    @Test(timeout = 4000)
-    public void flatten_WithAmbiguousDoubleDashOption_ThrowsException() {
-        // Test ambiguous option detection
-        Options options = new Options();
-        options.addRequiredOption("j", "j", false, "j")
-               .addOption("j", "--WS", false, "--WS");
-        PosixParser parser = new PosixParser();
-        
-        String[] input = new String[12];
-        input[10] = "--=<ibn";  // Ambiguous option prefix
-        
-        try {
-            parser.flatten(options, input, false);
-            fail("Expected Exception for ambiguous option");
-        } catch (Exception e) {
-            // Verify exception message
-            assertTrue(e.getMessage().contains("Ambiguous option: '--'"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      Options options0 = new Options();
+      Options options1 = options0.addRequiredOption("j", "j", false, "j");
+      Options options2 = options1.addOption("j", "--WS", false, "--WS");
+      String[] stringArray0 = new String[12];
+      stringArray0[10] = "--=<ibn";
+      PosixParser posixParser0 = new PosixParser();
+      try { 
+        posixParser0.flatten(options2, stringArray0, false);
+        fail("Expecting exception: Exception");
+      
+      } catch(Exception e) {
+         //
+         // Ambiguous option: '--'  (could be: 'j', '--WS')
+         //
+         verifyException("org.apache.commons.cli.PosixParser", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void flatten_WithLongOption_ProcessesAsSingleToken() {
-        // Test long option handling
-        Options options = new Options();
-        PosixParser parser = new PosixParser();
-        
-        String[] input = new String[37];
-        input[19] = "--K";  // Valid long option
-        
-        String[] result = parser.flatten(options, input, false);
-        assertEquals(1, result.length);
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      String[] stringArray0 = new String[37];
+      stringArray0[19] = "--K";
+      PosixParser posixParser0 = new PosixParser();
+      Options options0 = new Options();
+      String[] stringArray1 = posixParser0.flatten(options0, stringArray0, false);
+      assertEquals(1, stringArray1.length);
+  }
 
-    @Test(timeout = 4000)
-    public void flatten_WithInvalidDoubleDashArgument_ProcessesAsSingleToken() {
-        // Test invalid double-dash argument
-        Options options = new Options();
-        PosixParser parser = new PosixParser();
-        
-        String[] input = new String[9];
-        input[5] = "--=<q;n";  // Non-standard argument
-        
-        String[] result = parser.flatten(options, input, false);
-        assertEquals(1, result.length);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      Options options0 = new Options();
+      PosixParser posixParser0 = new PosixParser();
+      String[] stringArray0 = new String[9];
+      stringArray0[5] = "--=<q;n";
+      String[] stringArray1 = posixParser0.flatten(options0, stringArray0, false);
+      assertEquals(1, stringArray1.length);
+  }
 
-    @Test(timeout = 4000)
-    public void flatten_WithAllCountryCodes_ProcessesCorrectly() {
-        // Test processing large input array
-        Options options = new Options();
-        PosixParser parser = new PosixParser();
-        
-        // Using real ISO country codes as input
-        String[] countries = Locale.getISOCountries();
-        
-        String[] firstPass = parser.flatten(options, countries, true);
-        String[] secondPass = parser.flatten(options, firstPass, true);
-        
-        assertEquals(252, secondPass.length);
-        assertEquals(251, firstPass.length);
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      Options options0 = new Options();
+      String[] stringArray0 = Locale.getISOCountries();
+      PosixParser posixParser0 = new PosixParser();
+      String[] stringArray1 = posixParser0.flatten(options0, stringArray0, true);
+      String[] stringArray2 = posixParser0.flatten(options0, stringArray1, true);
+      assertEquals(252, stringArray2.length);
+      assertEquals(251, stringArray1.length);
+  }
 
-    @Test(timeout = 4000)
-    public void flatten_WithSingleDashArgument_ProcessesAsSingleToken() {
-        // Test single dash argument
-        Options options = new Options();
-        PosixParser parser = new PosixParser();
-        
-        String[] input = new String[5];
-        input[4] = "-";  // Single dash token
-        
-        String[] result = parser.flatten(options, input, true);
-        assertEquals(1, result.length);
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      PosixParser posixParser0 = new PosixParser();
+      Options options0 = new Options();
+      String[] stringArray0 = new String[5];
+      stringArray0[4] = "-";
+      String[] stringArray1 = posixParser0.flatten(options0, stringArray0, true);
+      assertEquals(1, stringArray1.length);
+  }
 
-    @Test(timeout = 4000)
-    public void burstToken_WithSpecialPrefix_ThrowsNullPointerException() {
-        // Test bursting of malformed token
-        PosixParser parser = new PosixParser();
-        try {
-            parser.burstToken("$--", true);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      Options options0 = new Options();
+      Options options1 = options0.addRequiredOption("j", "", true, "");
+      PosixParser posixParser0 = new PosixParser();
+      String[] stringArray0 = Locale.getISOCountries();
+      posixParser0.flatten(options1, stringArray0, true);
+      posixParser0.burstToken("--", true);
+  }
+
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      Options options0 = new Options();
+      Options options1 = options0.addRequiredOption("q", "", false, "q");
+      PosixParser posixParser0 = new PosixParser();
+      String[] stringArray0 = Locale.getISOCountries();
+      posixParser0.flatten(options1, stringArray0, false);
+      posixParser0.burstToken("--", false);
+  }
+
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      Options options0 = new Options();
+      String[] stringArray0 = new String[6];
+      stringArray0[3] = "-/C";
+      PosixParser posixParser0 = new PosixParser();
+      String[] stringArray1 = posixParser0.flatten(options0, stringArray0, false);
+      assertEquals(1, stringArray1.length);
+  }
+
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      Options options0 = new Options();
+      Options options1 = options0.addRequiredOption("j", "", true, "j");
+      PosixParser posixParser0 = new PosixParser();
+      String[] stringArray0 = Locale.getISOCountries();
+      posixParser0.flatten(options1, stringArray0, true);
+      posixParser0.burstToken("$--", true);
+  }
+
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      PosixParser posixParser0 = new PosixParser();
+      // Undeclared exception!
+      try { 
+        posixParser0.burstToken(";-", true);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.cli.PosixParser", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      Options options0 = new Options();
+      PosixParser posixParser0 = new PosixParser();
+      String[] stringArray0 = new String[9];
+      posixParser0.flatten(options0, stringArray0, false);
+      posixParser0.burstToken(";-", true);
+  }
 }
