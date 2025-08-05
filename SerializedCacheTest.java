@@ -28,69 +28,82 @@ import org.junit.jupiter.api.Test;
 
 class SerializedCacheTest {
 
-    @Test
-    void serializedObjects_ShouldRemainEqual_AfterCaching() {
-        // Arrange: Initialize cache with serialization support
-        SerializedCache cache = new SerializedCache(new PerpetualCache("default"));
-        SerializableObject originalObject = new SerializableObject(42);
+  @Test
+  void shouldDemonstrateSerializedObjectAreEqual() {
+    SerializedCache cache = new SerializedCache(new PerpetualCache("default"));
+    for (int i = 0; i < 5; i++) {
+      cache.putObject(i, new CachingObject(i));
+    }
+    for (int i = 0; i < 5; i++) {
+      assertEquals(new CachingObject(i), cache.getObject(i));
+    }
+  }
 
-        // Act: Store and retrieve the object
-        cache.putObject(1, originalObject);
-        Object retrievedObject = cache.getObject(1);
+  @Test
+  void shouldDemonstrateNullsAreSerializable() {
+    SerializedCache cache = new SerializedCache(new PerpetualCache("default"));
+    for (int i = 0; i < 5; i++) {
+      cache.putObject(i, null);
+    }
+    for (int i = 0; i < 5; i++) {
+      assertNull(cache.getObject(i));
+    }
+  }
 
-        // Assert: Deserialized object equals the original
-        assertEquals(originalObject, retrievedObject);
+  @Test
+  void throwExceptionWhenTryingToCacheNonSerializableObject() {
+    SerializedCache cache = new SerializedCache(new PerpetualCache("default"));
+    assertThrows(CacheException.class, () -> cache.putObject(0, new CachingObjectWithoutSerializable(0)));
+  }
+
+  static class CachingObject implements Serializable {
+    private static final long serialVersionUID = 1L;
+    int x;
+
+    public CachingObject(int x) {
+      this.x = x;
     }
 
-    @Test
-    void nullValues_ShouldBeStoredAndRetrieved_Successfully() {
-        // Arrange: Initialize cache
-        SerializedCache cache = new SerializedCache(new PerpetualCache("default"));
-
-        // Act & Assert: Store null and verify retrieval
-        cache.putObject(1, null);
-        assertNull(cache.getObject(1));
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+      CachingObject obj = (CachingObject) o;
+      return x == obj.x;
     }
 
-    @Test
-    void nonSerializableObject_ShouldThrowException_WhenCached() {
-        // Arrange: Initialize cache
-        SerializedCache cache = new SerializedCache(new PerpetualCache("default"));
-        NonSerializableObject invalidObject = new NonSerializableObject(99);
+    @Override
+    public int hashCode() {
+      return Objects.hash(x);
+    }
+  }
 
-        // Act & Assert: Verify exception on cache attempt
-        assertThrows(CacheException.class, () -> cache.putObject(1, invalidObject));
+  static class CachingObjectWithoutSerializable {
+    int x;
+
+    public CachingObjectWithoutSerializable(int x) {
+      this.x = x;
     }
 
-    // Helper class: Serializable object for testing
-    static class SerializableObject implements Serializable {
-        private static final long serialVersionUID = 1L;
-        private final int value;
-
-        SerializableObject(int value) {
-            this.value = value;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            SerializableObject that = (SerializableObject) o;
-            return value == that.value;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(value);
-        }
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+      CachingObjectWithoutSerializable obj = (CachingObjectWithoutSerializable) o;
+      return x == obj.x;
     }
 
-    // Helper class: Non-serializable object for exception testing
-    static class NonSerializableObject {
-        private final int value;
-
-        NonSerializableObject(int value) {
-            this.value = value;
-        }
+    @Override
+    public int hashCode() {
+      return Objects.hash(x);
     }
+  }
 }
