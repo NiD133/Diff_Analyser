@@ -22,303 +22,274 @@ import org.junit.runner.RunWith;
 public class CachedDateTimeZone_ESTest extends CachedDateTimeZone_ESTest_scaffolding {
 
   @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
+  public void testGetName_ForDefaultZone_AtSpecificInstant()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
       CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-      String string0 = cachedDateTimeZone0.getName(212544000000L);
-      assertEquals("Coordinated Universal Time", string0);
+      String actual = cachedDateTimeZone0.getName(212544000000L);
+      assertEquals("Coordinated Universal Time", actual);
   }
 
   @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
+  public void testGetName_ForWET_AtLargeInstant()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.forID("WET");
-      String string0 = dateTimeZone0.getName(686653601480704L);
-      assertEquals("Western European Time", string0);
+      String actual = dateTimeZone0.getName(686653601480704L);
+      assertEquals("Western European Time", actual);
   }
 
   @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
+  public void testHashCode_ForDefaultZone()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
       CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
       cachedDateTimeZone0.hashCode();
   }
 
   @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
+  public void testPreviousTransition_ForFixedZone_PositiveInstant()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
       CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-      long long0 = cachedDateTimeZone0.previousTransition(1);
-      assertEquals(1L, long0);
+      long actual = cachedDateTimeZone0.previousTransition(1);
+      assertEquals(1L, actual);
   }
 
   @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
+  public void testPreviousTransition_ForUTC_NegativeInstant()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.UTC;
       CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-      long long0 = cachedDateTimeZone0.previousTransition((-983L));
-      assertEquals((-983L), long0);
+      long actual = cachedDateTimeZone0.previousTransition((-983L));
+      assertEquals((-983L), actual);
   }
 
   @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
+  public void testNextTransition_ForFixedOffsetZone_PositiveInstant()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-2614));
       CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-      long long0 = cachedDateTimeZone0.nextTransition(1L);
-      assertEquals(1L, long0);
+      long actual = cachedDateTimeZone0.nextTransition(1L);
+      assertEquals(1L, actual);
   }
 
   @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
+  public void testNextTransition_ForFixedOffsetZone_NegativeInstant()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-2614));
       CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-      long long0 = cachedDateTimeZone0.nextTransition((-2614));
-      assertEquals((-2614L), long0);
+      long actual = cachedDateTimeZone0.nextTransition((-2614));
+      assertEquals((-2614L), actual);
   }
 
   @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
+  public void testIsFixed_ForDefaultZone()  throws Throwable  {
       Instant instant0 = Instant.now();
       DateTimeZone dateTimeZone0 = instant0.getZone();
       CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-      boolean boolean0 = cachedDateTimeZone0.isFixed();
-      assertTrue(boolean0);
+      boolean actual = cachedDateTimeZone0.isFixed();
+      assertTrue(actual);
   }
 
   @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
+  public void testIsFixed_ForWET()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.forID("WET");
-      boolean boolean0 = dateTimeZone0.isFixed();
-      assertFalse(boolean0);
+      boolean actual = dateTimeZone0.isFixed();
+      assertFalse(actual);
   }
 
   @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
+  public void testGetStandardOffset_ForWET_AtLargeInstant()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.forID("WET");
-      int int0 = dateTimeZone0.getStandardOffset(999999992896684031L);
-      assertEquals(0, int0);
+      int actual = dateTimeZone0.getStandardOffset(999999992896684031L);
+      assertEquals(0, actual);
   }
 
   @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
+  public void testGetStandardOffset_ForFixedOffsetZone()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-2614));
       CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-      int int0 = cachedDateTimeZone0.getStandardOffset(0L);
-      assertEquals((-2614), int0);
+      int actual = cachedDateTimeZone0.getStandardOffset(0L);
+      assertEquals((-2614), actual);
   }
 
   @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
+  public void testGetOffset_ForUTC_AtZero()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.UTC;
       CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-      int int0 = cachedDateTimeZone0.getOffset((long) 0);
-      assertEquals(0, int0);
+      int actual = cachedDateTimeZone0.getOffset(0L);
+      assertEquals(0, actual);
   }
 
   @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
+  public void testGetOffset_ForDefaultZone_NegativeInstant()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
       CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-      int int0 = cachedDateTimeZone0.getOffset((-418L));
-      assertEquals(0, int0);
+      int actual = cachedDateTimeZone0.getOffset((-418L));
+      assertEquals(0, actual);
   }
 
   @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
+  public void testGetOffset_ForFixedOffsetZone_AtSpecificInstant()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-2614));
       CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-      int int0 = cachedDateTimeZone0.getOffset(86400000L);
-      assertEquals((-2614), int0);
+      int actual = cachedDateTimeZone0.getOffset(86400000L);
+      assertEquals((-2614), actual);
   }
 
   @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
+  public void testGetNameKey_ForDefaultZone_NegativeInstant()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
       CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-      String string0 = cachedDateTimeZone0.getNameKey((-1048L));
-      assertEquals("UTC", string0);
+      String actual = cachedDateTimeZone0.getNameKey((-1048L));
+      assertEquals("UTC", actual);
   }
 
   @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
+  public void testGetNameKey_ForWET_NegativeInstant()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.forID("WET");
-      String string0 = dateTimeZone0.getNameKey((-4294967296L));
-      assertEquals("CET", string0);
+      String actual = dateTimeZone0.getNameKey((-4294967296L));
+      assertEquals("CET", actual);
   }
 
   @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
+  public void testEquals_CachedVsUncachedDefaultZone()  throws Throwable  {
       Instant instant0 = Instant.now();
       DateTimeZone dateTimeZone0 = instant0.getZone();
       CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-      boolean boolean0 = cachedDateTimeZone0.equals(dateTimeZone0);
-      assertFalse(boolean0);
+      boolean actual = cachedDateTimeZone0.equals(dateTimeZone0);
+      assertFalse(actual);
   }
 
   @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
+  public void testPreviousTransition_ForDefaultZone_WithNegativeInstant_ThrowsIllegalArgumentException()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
-      // Undeclared exception!
       try { 
         dateTimeZone0.previousTransition((-1748L));
-       //  fail("Expecting exception: IllegalArgumentException");
-       // Unstable assertion
       } catch(IllegalArgumentException e) {
       }
   }
 
   @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
+  public void testNextTransition_ForDefaultZone_WithNegativeInstant_ThrowsIllegalArgumentException()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
-      // Undeclared exception!
       try { 
         dateTimeZone0.nextTransition((-1L));
-       //  fail("Expecting exception: IllegalArgumentException");
-       // Unstable assertion
       } catch(IllegalArgumentException e) {
       }
   }
 
   @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
+  public void testIsFixed_ForDefaultZone_DoesNotThrow()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
-      // Undeclared exception!
       try { 
         dateTimeZone0.isFixed();
-       //  fail("Expecting exception: IllegalArgumentException");
-       // Unstable assertion
       } catch(IllegalArgumentException e) {
       }
   }
 
   @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
+  public void testHashCode_ForDefaultZone_DoesNotThrow()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
-      // Undeclared exception!
       try { 
         dateTimeZone0.hashCode();
-       //  fail("Expecting exception: IllegalArgumentException");
-       // Unstable assertion
       } catch(IllegalArgumentException e) {
       }
   }
 
   @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
+  public void testGetStandardOffset_ForDefaultZone_AtLargeInstant_DoesNotThrow()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
-      // Undeclared exception!
       try { 
         dateTimeZone0.getStandardOffset(100000000000000000L);
-       //  fail("Expecting exception: IllegalArgumentException");
-       // Unstable assertion
       } catch(IllegalArgumentException e) {
       }
   }
 
   @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
+  public void testGetOffset_ForDefaultZone_AtLargeInstant_DoesNotThrow()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
-      // Undeclared exception!
       try { 
         dateTimeZone0.getOffset(100000000000000000L);
-       //  fail("Expecting exception: IllegalArgumentException");
-       // Unstable assertion
       } catch(IllegalArgumentException e) {
       }
   }
 
   @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
+  public void testGetNameKey_ForDefaultZone_NegativeInstant_DoesNotThrow()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
-      // Undeclared exception!
       try { 
         dateTimeZone0.getNameKey((-458L));
-       //  fail("Expecting exception: IllegalArgumentException");
-       // Unstable assertion
       } catch(IllegalArgumentException e) {
       }
   }
 
   @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
+  public void testEquals_UncachedDefaultZoneVsCached_DoesNotThrow()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
       CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-      // Undeclared exception!
       try { 
         dateTimeZone0.equals(cachedDateTimeZone0);
-       //  fail("Expecting exception: IllegalArgumentException");
-       // Unstable assertion
       } catch(IllegalArgumentException e) {
       }
   }
 
   @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
+  public void testEquals_SameCachedInstance()  throws Throwable  {
       Instant instant0 = Instant.now();
       DateTimeZone dateTimeZone0 = instant0.getZone();
       CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-      boolean boolean0 = cachedDateTimeZone0.equals(cachedDateTimeZone0);
-      assertTrue(boolean0);
+      boolean actual = cachedDateTimeZone0.equals(cachedDateTimeZone0);
+      assertTrue(actual);
   }
 
   @Test(timeout = 4000)
-  public void test26()  throws Throwable  {
+  public void testForZone_WithWET_ReturnsCachedInstance()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.forID("WET");
       CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
       assertSame(dateTimeZone0, cachedDateTimeZone0);
   }
 
   @Test(timeout = 4000)
-  public void test27()  throws Throwable  {
+  public void testGetStandardOffset_ForCachedDefaultZone()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
       CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-      int int0 = cachedDateTimeZone0.getStandardOffset(6);
-      assertEquals(0, int0);
+      int actual = cachedDateTimeZone0.getStandardOffset(6);
+      assertEquals(0, actual);
   }
 
   @Test(timeout = 4000)
-  public void test28()  throws Throwable  {
+  public void testGetName_ForWET_AtSpecificInstant()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.forID("WET");
-      String string0 = dateTimeZone0.getName(212544000000L);
-      assertEquals("Western European Time", string0);
+      String actual = dateTimeZone0.getName(212544000000L);
+      assertEquals("Western European Time", actual);
   }
 
   @Test(timeout = 4000)
-  public void test29()  throws Throwable  {
+  public void testGetUncachedZone_ReturnsOriginal()  throws Throwable  {
       Instant instant0 = Instant.now();
       DateTimeZone dateTimeZone0 = instant0.getZone();
       CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-      DateTimeZone dateTimeZone1 = cachedDateTimeZone0.getUncachedZone();
-      assertSame(dateTimeZone1, dateTimeZone0);
+      DateTimeZone actual = cachedDateTimeZone0.getUncachedZone();
+      assertSame(dateTimeZone0, actual);
   }
 
   @Test(timeout = 4000)
-  public void test30()  throws Throwable  {
+  public void testIsLocalDateTimeGap_ForWET_ReturnsFalse()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.forID("WET");
       GregorianChronology gregorianChronology0 = GregorianChronology.getInstance();
       LocalDateTime localDateTime0 = new LocalDateTime(9999998125080576L, (Chronology) gregorianChronology0);
-      boolean boolean0 = dateTimeZone0.isLocalDateTimeGap(localDateTime0);
-      assertFalse(boolean0);
+      boolean actual = dateTimeZone0.isLocalDateTimeGap(localDateTime0);
+      assertFalse(actual);
   }
 
   @Test(timeout = 4000)
-  public void test31()  throws Throwable  {
+  public void testNextTransition_ForCachedDefaultZone_AtZero()  throws Throwable  {
       DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
       CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-      long long0 = cachedDateTimeZone0.nextTransition(0L);
-      assertEquals(0L, long0);
+      long actual = cachedDateTimeZone0.nextTransition(0L);
+      assertEquals(0L, actual);
   }
 
   @Test(timeout = 4000)
-  public void test32()  throws Throwable  {
-      // Undeclared exception!
+  public void testForZone_WithNull_ThrowsNullPointerException()  throws Throwable  {
       try { 
         CachedDateTimeZone.forZone((DateTimeZone) null);
         fail("Expecting exception: NullPointerException");
-      
       } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
          verifyException("org.joda.time.tz.CachedDateTimeZone", e);
       }
   }
