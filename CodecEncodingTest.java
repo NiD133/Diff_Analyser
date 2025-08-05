@@ -18,7 +18,9 @@
  */
 package org.apache.commons.compress.harmony.pack200;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
@@ -27,183 +29,207 @@ import java.io.InputStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
+ * Tests for {@link CodecEncoding}, which handles the serialization and deserialization of Codec instances.
  */
 class CodecEncodingTest {
 
-    static Stream<Arguments> arbitraryCodec() {
-        return Stream.of(Arguments.of("(1,256)", new byte[] { 0x00, (byte) 0xFF }), Arguments.of("(5,128,2,1)", new byte[] { 0x25, (byte) 0x7F }),
-                Arguments.of("(2,128,1,1)", new byte[] { 0x0B, (byte) 0x7F }));
-    }
-
-    // These are the canonical encodings specified by the Pack200 spec
-    static Stream<Arguments> canonicalEncodings() {
-        return Stream.of(Arguments.of(1, "(1,256)"), Arguments.of(2, "(1,256,1)"), Arguments.of(3, "(1,256,0,1)"), Arguments.of(4, "(1,256,1,1)"),
-                Arguments.of(5, "(2,256)"), Arguments.of(6, "(2,256,1)"), Arguments.of(7, "(2,256,0,1)"), Arguments.of(8, "(2,256,1,1)"),
-                Arguments.of(9, "(3,256)"), Arguments.of(10, "(3,256,1)"), Arguments.of(11, "(3,256,0,1)"), Arguments.of(12, "(3,256,1,1)"),
-                Arguments.of(13, "(4,256)"), Arguments.of(14, "(4,256,1)"), Arguments.of(15, "(4,256,0,1)"), Arguments.of(16, "(4,256,1,1)"),
-                Arguments.of(17, "(5,4)"), Arguments.of(18, "(5,4,1)"), Arguments.of(19, "(5,4,2)"), Arguments.of(20, "(5,16)"), Arguments.of(21, "(5,16,1)"),
-                Arguments.of(22, "(5,16,2)"), Arguments.of(23, "(5,32)"), Arguments.of(24, "(5,32,1)"), Arguments.of(25, "(5,32,2)"),
-                Arguments.of(26, "(5,64)"), Arguments.of(27, "(5,64,1)"), Arguments.of(28, "(5,64,2)"), Arguments.of(29, "(5,128)"),
-                Arguments.of(30, "(5,128,1)"), Arguments.of(31, "(5,128,2)"), Arguments.of(32, "(5,4,0,1)"), Arguments.of(33, "(5,4,1,1)"),
-                Arguments.of(34, "(5,4,2,1)"), Arguments.of(35, "(5,16,0,1)"), Arguments.of(36, "(5,16,1,1)"), Arguments.of(37, "(5,16,2,1)"),
-                Arguments.of(38, "(5,32,0,1)"), Arguments.of(39, "(5,32,1,1)"), Arguments.of(40, "(5,32,2,1)"), Arguments.of(41, "(5,64,0,1)"),
-                Arguments.of(42, "(5,64,1,1)"), Arguments.of(43, "(5,64,2,1)"), Arguments.of(44, "(5,128,0,1)"), Arguments.of(45, "(5,128,1,1)"),
-                Arguments.of(46, "(5,128,2,1)"), Arguments.of(47, "(2,192)"), Arguments.of(48, "(2,224)"), Arguments.of(49, "(2,240)"),
-                Arguments.of(50, "(2,248)"), Arguments.of(51, "(2,252)"), Arguments.of(52, "(2,8,0,1)"), Arguments.of(53, "(2,8,1,1)"),
-                Arguments.of(54, "(2,16,0,1)"), Arguments.of(55, "(2,16,1,1)"), Arguments.of(56, "(2,32,0,1)"), Arguments.of(57, "(2,32,1,1)"),
-                Arguments.of(58, "(2,64,0,1)"), Arguments.of(59, "(2,64,1,1)"), Arguments.of(60, "(2,128,0,1)"), Arguments.of(61, "(2,128,1,1)"),
-                Arguments.of(62, "(2,192,0,1)"), Arguments.of(63, "(2,192,1,1)"), Arguments.of(64, "(2,224,0,1)"), Arguments.of(65, "(2,224,1,1)"),
-                Arguments.of(66, "(2,240,0,1)"), Arguments.of(67, "(2,240,1,1)"), Arguments.of(68, "(2,248,0,1)"), Arguments.of(69, "(2,248,1,1)"),
-                Arguments.of(70, "(3,192)"), Arguments.of(71, "(3,224)"), Arguments.of(72, "(3,240)"), Arguments.of(73, "(3,248)"), Arguments.of(74, "(3,252)"),
-                Arguments.of(75, "(3,8,0,1)"), Arguments.of(76, "(3,8,1,1)"), Arguments.of(77, "(3,16,0,1)"), Arguments.of(78, "(3,16,1,1)"),
-                Arguments.of(79, "(3,32,0,1)"), Arguments.of(80, "(3,32,1,1)"), Arguments.of(81, "(3,64,0,1)"), Arguments.of(82, "(3,64,1,1)"),
-                Arguments.of(83, "(3,128,0,1)"), Arguments.of(84, "(3,128,1,1)"), Arguments.of(85, "(3,192,0,1)"), Arguments.of(86, "(3,192,1,1)"),
-                Arguments.of(87, "(3,224,0,1)"), Arguments.of(88, "(3,224,1,1)"), Arguments.of(89, "(3,240,0,1)"), Arguments.of(90, "(3,240,1,1)"),
-                Arguments.of(91, "(3,248,0,1)"), Arguments.of(92, "(3,248,1,1)"), Arguments.of(93, "(4,192)"), Arguments.of(94, "(4,224)"),
-                Arguments.of(95, "(4,240)"), Arguments.of(96, "(4,248)"), Arguments.of(97, "(4,252)"), Arguments.of(98, "(4,8,0,1)"),
-                Arguments.of(99, "(4,8,1,1)"), Arguments.of(100, "(4,16,0,1)"), Arguments.of(101, "(4,16,1,1)"), Arguments.of(102, "(4,32,0,1)"),
-                Arguments.of(103, "(4,32,1,1)"), Arguments.of(104, "(4,64,0,1)"), Arguments.of(105, "(4,64,1,1)"), Arguments.of(106, "(4,128,0,1)"),
-                Arguments.of(107, "(4,128,1,1)"), Arguments.of(108, "(4,192,0,1)"), Arguments.of(109, "(4,192,1,1)"), Arguments.of(110, "(4,224,0,1)"),
-                Arguments.of(111, "(4,224,1,1)"), Arguments.of(112, "(4,240,0,1)"), Arguments.of(113, "(4,240,1,1)"), Arguments.of(114, "(4,248,0,1)"),
-                Arguments.of(115, "(4,248,1,1)"));
-    }
-
-    // Test canonical codecs
-    static Stream<Arguments> canonicalGetSpecifier() {
-        return IntStream.range(1, 115).mapToObj(Arguments::of);
-    }
-
-    static Stream<Arguments> specifier() {
-        return Stream.of(Arguments.of(new BHSDCodec(2, 125, 0, 1)), Arguments.of(new BHSDCodec(3, 125, 2, 1)), Arguments.of(new BHSDCodec(4, 125)),
-                Arguments.of(new BHSDCodec(5, 125, 2, 0)), Arguments.of(new BHSDCodec(3, 5, 2, 1)));
-    }
-
-    @ParameterizedTest
-    @MethodSource("arbitraryCodec")
-    void testArbitraryCodec(final String expected, final byte[] bytes) throws IOException, Pack200Exception {
-        assertEquals(expected, CodecEncoding.getCodec(116, new ByteArrayInputStream(bytes), null).toString());
-    }
-
-    @ParameterizedTest
-    @MethodSource("canonicalEncodings")
-    void testCanonicalEncodings(final int i, final String expectedCodec) throws IOException, Pack200Exception {
-        assertEquals(expectedCodec, CodecEncoding.getCodec(i, null, null).toString());
-    }
-
-    @ParameterizedTest
-    @MethodSource("canonicalGetSpecifier")
-    void testCanonicalGetSpecifier(final int i) throws Pack200Exception, IOException {
-        assertEquals(i, CodecEncoding.getSpecifier(CodecEncoding.getCodec(i, null, null), null)[0]);
-    }
+    private static final int BHSD_CODEC_SPECIFIER = 116;
+    private static final int MIN_RUN_CODEC_SPECIFIER = 117;
+    private static final int MAX_RUN_CODEC_SPECIFIER = 140;
+    private static final int MIN_POPULATION_CODEC_SPECIFIER = 141;
+    private static final int MAX_POPULATION_CODEC_SPECIFIER = 188;
 
     @Test
-    void testDefaultCodec() throws Pack200Exception, IOException {
-        final Codec defaultCodec = new BHSDCodec(2, 16, 0, 0);
-        assertEquals(defaultCodec, CodecEncoding.getCodec(0, null, defaultCodec));
+    @DisplayName("getCodec with specifier 0 should return the default codec")
+    void getCodecWithZeroSpecifierShouldReturnDefaultCodec() throws IOException, Pack200Exception {
+        final Codec defaultCodec = new BHSDCodec(2, 16);
+        final Codec result = CodecEncoding.getCodec(0, null, defaultCodec);
+        assertEquals(defaultCodec, result);
     }
 
-    @Test
-    void testGetSpeciferForPopulationCodec() throws IOException, Pack200Exception {
-        final PopulationCodec populationCodec = new PopulationCodec(Codec.BYTE1, Codec.CHAR3, Codec.UNSIGNED5);
-        final int[] specifiers = CodecEncoding.getSpecifier(populationCodec, null);
-        assertTrue(specifiers[0] > 140);
-        assertTrue(specifiers[0] < 189);
-        final byte[] bytes = new byte[specifiers.length - 1];
-        for (int i = 0; i < bytes.length; i++) {
-            bytes[i] = (byte) specifiers[i + 1];
+    @Nested
+    @DisplayName("Canonical BHSD Codec Tests")
+    class CanonicalCodecTest {
+
+        static IntStream canonicalCodecSpecifiers() {
+            // The Pack200 spec defines canonical codecs for specifiers 1 through 115.
+            return IntStream.rangeClosed(1, 115);
         }
-        final InputStream in = new ByteArrayInputStream(bytes);
-        final PopulationCodec populationCodec2 = (PopulationCodec) CodecEncoding.getCodec(specifiers[0], in, null);
-        assertEquals(populationCodec.getFavouredCodec(), populationCodec2.getFavouredCodec());
-        assertEquals(populationCodec.getTokenCodec(), populationCodec2.getTokenCodec());
-        assertEquals(populationCodec.getUnfavouredCodec(), populationCodec2.getUnfavouredCodec());
+
+        @ParameterizedTest(name = "Specifier: {0}")
+        @MethodSource("canonicalCodecSpecifiers")
+        @DisplayName("getCodec should return the correct canonical codec for a given specifier")
+        void getCodecShouldReturnCorrectCanonicalCodec(final int specifier) throws IOException, Pack200Exception {
+            final Codec expected = CodecEncoding.getCanonicalCodec(specifier);
+            final Codec actual = CodecEncoding.getCodec(specifier, null, null);
+            assertEquals(expected, actual);
+        }
+
+        @ParameterizedTest(name = "Specifier: {0}")
+        @MethodSource("canonicalCodecSpecifiers")
+        @DisplayName("getSpecifier should return the correct specifier for a canonical codec")
+        void getSpecifierShouldReturnCorrectSpecifierForCanonicalCodec(final int specifier) throws IOException, Pack200Exception {
+            final Codec codec = CodecEncoding.getCanonicalCodec(specifier);
+            final int[] specifierData = CodecEncoding.getSpecifier(codec, null);
+
+            // Canonical codecs are encoded with a single integer specifier and no extra bytes.
+            assertArrayEquals(new int[] { specifier }, specifierData);
+        }
     }
 
-    @Test
-    void testGetSpeciferForRunCodec() throws Pack200Exception, IOException {
-        RunCodec runCodec = new RunCodec(25, Codec.DELTA5, Codec.BYTE1);
-        int[] specifiers = CodecEncoding.getSpecifier(runCodec, null);
-        assertTrue(specifiers[0] > 116);
-        assertTrue(specifiers[0] < 141);
-        byte[] bytes = new byte[specifiers.length - 1];
-        for (int i = 0; i < bytes.length; i++) {
-            bytes[i] = (byte) specifiers[i + 1];
-        }
-        InputStream in = new ByteArrayInputStream(bytes);
-        RunCodec runCodec2 = (RunCodec) CodecEncoding.getCodec(specifiers[0], in, null);
-        assertEquals(runCodec.getK(), runCodec2.getK());
-        assertEquals(runCodec.getACodec(), runCodec2.getACodec());
-        assertEquals(runCodec.getBCodec(), runCodec2.getBCodec());
+    @Nested
+    @DisplayName("Arbitrary (Non-Canonical) BHSD Codec Tests")
+    class ArbitraryBHSDCodecTest {
 
-        // One codec is the same as the default
-        runCodec = new RunCodec(4096, Codec.DELTA5, Codec.BYTE1);
-        specifiers = CodecEncoding.getSpecifier(runCodec, Codec.DELTA5);
-        assertTrue(specifiers[0] > 116);
-        assertTrue(specifiers[0] < 141);
-        bytes = new byte[specifiers.length - 1];
-        for (int i = 0; i < bytes.length; i++) {
-            bytes[i] = (byte) specifiers[i + 1];
+        static Stream<Arguments> arbitraryBHSDCodecsAndBytes() {
+            return Stream.of(
+                Arguments.of(new BHSDCodec(1, 256), new byte[] { 0x00, (byte) 0xFF }),
+                Arguments.of(new BHSDCodec(5, 128, 2, 1), new byte[] { 0x25, (byte) 0x7F }),
+                Arguments.of(new BHSDCodec(2, 128, 1, 1), new byte[] { 0x0B, (byte) 0x7F })
+            );
         }
-        in = new ByteArrayInputStream(bytes);
-        runCodec2 = (RunCodec) CodecEncoding.getCodec(specifiers[0], in, Codec.DELTA5);
-        assertEquals(runCodec.getK(), runCodec2.getK());
-        assertEquals(runCodec.getACodec(), runCodec2.getACodec());
-        assertEquals(runCodec.getBCodec(), runCodec2.getBCodec());
 
-        // Nested run codecs
-        runCodec = new RunCodec(64, Codec.SIGNED5, new RunCodec(25, Codec.UDELTA5, Codec.DELTA5));
-        specifiers = CodecEncoding.getSpecifier(runCodec, null);
-        assertTrue(specifiers[0] > 116);
-        assertTrue(specifiers[0] < 141);
-        bytes = new byte[specifiers.length - 1];
-        for (int i = 0; i < bytes.length; i++) {
-            bytes[i] = (byte) specifiers[i + 1];
+        static Stream<BHSDCodec> arbitraryBHSDCodecs() {
+            return Stream.of(
+                new BHSDCodec(2, 125, 0, 1),
+                new BHSDCodec(3, 125, 2, 1),
+                new BHSDCodec(4, 125),
+                new BHSDCodec(5, 125, 2, 0),
+                new BHSDCodec(3, 5, 2, 1)
+            );
         }
-        in = new ByteArrayInputStream(bytes);
-        runCodec2 = (RunCodec) CodecEncoding.getCodec(specifiers[0], in, null);
-        assertEquals(runCodec.getK(), runCodec2.getK());
-        assertEquals(runCodec.getACodec(), runCodec2.getACodec());
-        RunCodec bCodec = (RunCodec) runCodec.getBCodec();
-        RunCodec bCodec2 = (RunCodec) runCodec2.getBCodec();
-        assertEquals(bCodec.getK(), bCodec2.getK());
-        assertEquals(bCodec.getACodec(), bCodec2.getACodec());
-        assertEquals(bCodec.getBCodec(), bCodec2.getBCodec());
 
-        // Nested with one the same as the default
-        runCodec = new RunCodec(64, Codec.SIGNED5, new RunCodec(25, Codec.UDELTA5, Codec.DELTA5));
-        specifiers = CodecEncoding.getSpecifier(runCodec, Codec.UDELTA5);
-        assertTrue(specifiers[0] > 116);
-        assertTrue(specifiers[0] < 141);
-        bytes = new byte[specifiers.length - 1];
-        for (int i = 0; i < bytes.length; i++) {
-            bytes[i] = (byte) specifiers[i + 1];
+        @ParameterizedTest
+        @MethodSource("arbitraryBHSDCodecsAndBytes")
+        @DisplayName("getCodec should correctly decode arbitrary BHSD codecs from a byte stream")
+        void getCodecShouldDecodeArbitraryBHSDCodec(final BHSDCodec expectedCodec, final byte[] encodedBytes) throws IOException, Pack200Exception {
+            final InputStream inputStream = new ByteArrayInputStream(encodedBytes);
+            final Codec decodedCodec = CodecEncoding.getCodec(BHSD_CODEC_SPECIFIER, inputStream, null);
+            assertEquals(expectedCodec, decodedCodec);
         }
-        in = new ByteArrayInputStream(bytes);
-        runCodec2 = (RunCodec) CodecEncoding.getCodec(specifiers[0], in, Codec.UDELTA5);
-        assertEquals(runCodec.getK(), runCodec2.getK());
-        assertEquals(runCodec.getACodec(), runCodec2.getACodec());
-        bCodec = (RunCodec) runCodec.getBCodec();
-        bCodec2 = (RunCodec) runCodec2.getBCodec();
-        assertEquals(bCodec.getK(), bCodec2.getK());
-        assertEquals(bCodec.getACodec(), bCodec2.getACodec());
-        assertEquals(bCodec.getBCodec(), bCodec2.getBCodec());
+
+        @ParameterizedTest
+        @MethodSource("arbitraryBHSDCodecs")
+        @DisplayName("Arbitrary BHSD codecs should round-trip successfully")
+        void arbitraryBHSDCodecShouldRoundTrip(final BHSDCodec codec) throws IOException, Pack200Exception {
+            assertCodecRoundTripSucceeds(codec, null);
+        }
     }
 
-    @ParameterizedTest
-    @MethodSource("specifier")
-    void testGetSpecifier(final Codec c1) throws IOException, Pack200Exception {
-        final int[] specifiers = CodecEncoding.getSpecifier(c1, null);
-        assertEquals(3, specifiers.length);
-        assertEquals(116, specifiers[0]);
-        final byte[] bytes = { (byte) specifiers[1], (byte) specifiers[2] };
-        final InputStream in = new ByteArrayInputStream(bytes);
-        assertEquals(c1, CodecEncoding.getCodec(116, in, null));
+    @Nested
+    @DisplayName("RunCodec Tests")
+    class RunCodecTest {
+
+        @Test
+        @DisplayName("A simple RunCodec should round-trip successfully")
+        void simpleRunCodecShouldRoundTrip() throws IOException, Pack200Exception {
+            final RunCodec runCodec = new RunCodec(25, Codec.DELTA5, Codec.BYTE1);
+            final RunCodec roundTripped = assertCodecRoundTripSucceeds(runCodec, null);
+
+            assertEquals(runCodec.getK(), roundTripped.getK());
+            assertEquals(runCodec.getACodec(), roundTripped.getACodec());
+            assertEquals(runCodec.getBCodec(), roundTripped.getBCodec());
+        }
+
+        @Test
+        @DisplayName("A RunCodec with a component matching the default codec should round-trip")
+        void runCodecWithDefaultComponentShouldRoundTrip() throws IOException, Pack200Exception {
+            final RunCodec runCodec = new RunCodec(4096, Codec.DELTA5, Codec.BYTE1);
+            final Codec defaultCodec = Codec.DELTA5; // A-Codec matches the default
+            final RunCodec roundTripped = assertCodecRoundTripSucceeds(runCodec, defaultCodec);
+
+            assertEquals(runCodec.getK(), roundTripped.getK());
+            assertEquals(runCodec.getACodec(), roundTripped.getACodec());
+            assertEquals(runCodec.getBCodec(), roundTripped.getBCodec());
+        }
+
+        @Test
+        @DisplayName("A nested RunCodec should round-trip successfully")
+        void nestedRunCodecShouldRoundTrip() throws IOException, Pack200Exception {
+            final RunCodec nestedCodec = new RunCodec(25, Codec.UDELTA5, Codec.DELTA5);
+            final RunCodec runCodec = new RunCodec(64, Codec.SIGNED5, nestedCodec);
+            final RunCodec roundTripped = assertCodecRoundTripSucceeds(runCodec, null);
+
+            assertEquals(runCodec.getK(), roundTripped.getK());
+            assertEquals(runCodec.getACodec(), roundTripped.getACodec());
+
+            final RunCodec originalBCoDec = assertInstanceOf(RunCodec.class, runCodec.getBCodec());
+            final RunCodec roundTrippedBCodec = assertInstanceOf(RunCodec.class, roundTripped.getBCodec());
+
+            assertEquals(originalBCoDec.getK(), roundTrippedBCodec.getK());
+            assertEquals(originalBCoDec.getACodec(), roundTrippedBCodec.getACodec());
+            assertEquals(originalBCoDec.getBCodec(), roundTrippedBCodec.getBCodec());
+        }
     }
 
+    @Nested
+    @DisplayName("PopulationCodec Tests")
+    class PopulationCodecTest {
+
+        @Test
+        @DisplayName("A PopulationCodec should round-trip successfully")
+        void populationCodecShouldRoundTrip() throws IOException, Pack200Exception {
+            final PopulationCodec populationCodec = new PopulationCodec(Codec.BYTE1, Codec.CHAR3, Codec.UNSIGNED5);
+            final PopulationCodec roundTripped = assertCodecRoundTripSucceeds(populationCodec, null);
+
+            assertEquals(populationCodec.getFavouredCodec(), roundTripped.getFavouredCodec());
+            assertEquals(populationCodec.getTokenCodec(), roundTripped.getTokenCodec());
+            assertEquals(populationCodec.getUnfavouredCodec(), roundTripped.getUnfavouredCodec());
+        }
+    }
+
+    /**
+     * Asserts that a given Codec can be successfully encoded to a specifier and then decoded back to an equivalent
+     * Codec.
+     *
+     * @param original The original codec to test.
+     * @param defaultForBand The default codec for the band, which can affect encoding.
+     * @return The codec after the round-trip, for further assertions.
+     */
+    private <T extends Codec> T assertCodecRoundTripSucceeds(final T original, final Codec defaultForBand)
+        throws IOException, Pack200Exception {
+        // 1. Encode the Codec into its specifier and byte data representation.
+        final int[] specifierData = CodecEncoding.getSpecifier(original, defaultForBand);
+        final int specifier = specifierData[0];
+
+        // Assert that the specifier is in the expected range for the codec type.
+        if (original instanceof RunCodec) {
+            assertTrue(specifier >= MIN_RUN_CODEC_SPECIFIER && specifier <= MAX_RUN_CODEC_SPECIFIER,
+                "RunCodec specifier out of range");
+        } else if (original instanceof PopulationCodec) {
+            assertTrue(specifier >= MIN_POPULATION_CODEC_SPECIFIER && specifier <= MAX_POPULATION_CODEC_SPECIFIER,
+                "PopulationCodec specifier out of range");
+        }
+
+        // 2. Decode the specifier and byte data back into a new Codec instance.
+        final InputStream inputStream = specifierToInputStream(specifierData);
+        final Codec roundTripped = CodecEncoding.getCodec(specifier, inputStream, defaultForBand);
+
+        // 3. Assert that the original and round-tripped codecs are equivalent.
+        assertEquals(original, roundTripped);
+
+        @SuppressWarnings("unchecked")
+        final T result = (T) roundTripped;
+        return result;
+    }
+
+    /**
+     * Converts a specifier array (int[]) into an InputStream containing the byte data part of the specifier.
+     * The first element of the array is the specifier itself and is ignored.
+     */
+    private InputStream specifierToInputStream(final int[] specifierData) {
+        final byte[] bytes = new byte[specifierData.length - 1];
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = (byte) specifierData[i + 1];
+        }
+        return new ByteArrayInputStream(bytes);
+    }
 }
