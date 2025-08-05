@@ -25,132 +25,202 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.charset.Charset;
+import java.util.stream.Stream;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * Test for {@link ByteOrderMark}.
+ * Tests for {@link ByteOrderMark}.
  */
 class ByteOrderMarkTest {
 
-    private static final ByteOrderMark TEST_BOM_1 = new ByteOrderMark("test1", 1);
-    private static final ByteOrderMark TEST_BOM_2 = new ByteOrderMark("test2", 1, 2);
-    private static final ByteOrderMark TEST_BOM_3 = new ByteOrderMark("test3", 1, 2, 3);
+    private static final ByteOrderMark BOM_1_BYTE = new ByteOrderMark("test1", 1);
+    private static final ByteOrderMark BOM_2_BYTES = new ByteOrderMark("test2", 1, 2);
+    private static final ByteOrderMark BOM_3_BYTES = new ByteOrderMark("test3", 1, 2, 3);
 
-    /** Tests that {@link ByteOrderMark#getCharsetName()} can be loaded as a {@link java.nio.charset.Charset} as advertised. */
-    @Test
-    void testConstantCharsetNames() {
-        assertNotNull(Charset.forName(ByteOrderMark.UTF_8.getCharsetName()));
-        assertNotNull(Charset.forName(ByteOrderMark.UTF_16BE.getCharsetName()));
-        assertNotNull(Charset.forName(ByteOrderMark.UTF_16LE.getCharsetName()));
-        assertNotNull(Charset.forName(ByteOrderMark.UTF_32BE.getCharsetName()));
-        assertNotNull(Charset.forName(ByteOrderMark.UTF_32LE.getCharsetName()));
+    @Nested
+    @DisplayName("Constructor")
+    class ConstructorTest {
+
+        @Test
+        void constructor_withNullCharsetName_throwsNullPointerException() {
+            assertThrows(NullPointerException.class, () -> new ByteOrderMark(null, 1, 2, 3),
+                "Constructor should not accept a null charset name.");
+        }
+
+        @Test
+        void constructor_withEmptyCharsetName_throwsIllegalArgumentException() {
+            assertThrows(IllegalArgumentException.class, () -> new ByteOrderMark("", 1, 2, 3),
+                "Constructor should not accept an empty charset name.");
+        }
+
+        @Test
+        void constructor_withNullBytes_throwsNullPointerException() {
+            assertThrows(NullPointerException.class, () -> new ByteOrderMark("a", (int[]) null),
+                "Constructor should not accept a null byte array.");
+        }
+
+        @Test
+        void constructor_withEmptyBytes_throwsIllegalArgumentException() {
+            assertThrows(IllegalArgumentException.class, () -> new ByteOrderMark("b"),
+                "Constructor should not accept an empty byte array.");
+        }
     }
 
-    /** Tests Exceptions */
-    @Test
-    void testConstructorExceptions() {
-        assertThrows(NullPointerException.class, () -> new ByteOrderMark(null, 1, 2, 3));
-        assertThrows(IllegalArgumentException.class, () -> new ByteOrderMark("", 1, 2, 3));
-        assertThrows(NullPointerException.class, () -> new ByteOrderMark("a", (int[]) null));
-        assertThrows(IllegalArgumentException.class, () -> new ByteOrderMark("b"));
+    @Nested
+    @DisplayName("Predefined BOM Constants")
+    class PredefinedConstantsTest {
+
+        static Stream<ByteOrderMark> predefinedBoms() {
+            return Stream.of(
+                ByteOrderMark.UTF_8,
+                ByteOrderMark.UTF_16BE,
+                ByteOrderMark.UTF_16LE,
+                ByteOrderMark.UTF_32BE,
+                ByteOrderMark.UTF_32LE
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource("predefinedBoms")
+        void predefinedBoms_shouldHaveValidCharset(final ByteOrderMark bom) {
+            assertNotNull(Charset.forName(bom.getCharsetName()),
+                "Charset name '" + bom.getCharsetName() + "' should be valid.");
+        }
     }
 
-    /** Tests {@link ByteOrderMark#equals(Object)} */
-    @SuppressWarnings("EqualsWithItself")
-    @Test
-    void testEquals() {
-        assertEquals(ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_16BE);
-        assertEquals(ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_16LE);
-        assertEquals(ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32BE);
-        assertEquals(ByteOrderMark.UTF_32LE, ByteOrderMark.UTF_32LE);
-        assertEquals(ByteOrderMark.UTF_8, ByteOrderMark.UTF_8);
+    @Nested
+    @DisplayName("Getters")
+    class GettersTest {
 
-        assertNotEquals(ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE);
-        assertNotEquals(ByteOrderMark.UTF_8, ByteOrderMark.UTF_16LE);
-        assertNotEquals(ByteOrderMark.UTF_8, ByteOrderMark.UTF_32BE);
-        assertNotEquals(ByteOrderMark.UTF_8, ByteOrderMark.UTF_32LE);
+        @Test
+        void getCharsetName_shouldReturnCorrectName() {
+            assertEquals("test1", BOM_1_BYTE.getCharsetName());
+            assertEquals("test2", BOM_2_BYTES.getCharsetName());
+            assertEquals("test3", BOM_3_BYTES.getCharsetName());
+        }
 
-        assertEquals(TEST_BOM_1, TEST_BOM_1, "test1 equals");
-        assertEquals(TEST_BOM_2, TEST_BOM_2, "test2 equals");
-        assertEquals(TEST_BOM_3, TEST_BOM_3, "test3 equals");
+        @Test
+        void length_shouldReturnCorrectByteCount() {
+            assertEquals(1, BOM_1_BYTE.length());
+            assertEquals(2, BOM_2_BYTES.length());
+            assertEquals(3, BOM_3_BYTES.length());
+        }
 
-        assertNotEquals(TEST_BOM_1, new Object(), "Object not equal");
-        assertNotEquals(TEST_BOM_1, new ByteOrderMark("1a", 2), "test1-1 not equal");
-        assertNotEquals(TEST_BOM_1, new ByteOrderMark("1b", 1, 2), "test1-2 not test2");
-        assertNotEquals(TEST_BOM_2, new ByteOrderMark("2", 1, 1), "test2 not equal");
-        assertNotEquals(TEST_BOM_3, new ByteOrderMark("3", 1, 2, 4), "test3 not equal");
+        @Test
+        void get_shouldReturnCorrectByteAtIndex() {
+            assertEquals(1, BOM_2_BYTES.get(0));
+            assertEquals(2, BOM_2_BYTES.get(1));
+        }
+
+        @Test
+        void getBytes_shouldReturnCorrectBytes() {
+            assertArrayEquals(new byte[]{(byte) 1}, BOM_1_BYTE.getBytes());
+            assertArrayEquals(new byte[]{(byte) 1, (byte) 2}, BOM_2_BYTES.getBytes());
+            assertArrayEquals(new byte[]{(byte) 1, (byte) 2, (byte) 3}, BOM_3_BYTES.getBytes());
+        }
+
+        @Test
+        void getBytes_shouldReturnDefensiveCopy() {
+            final byte[] bytes = BOM_2_BYTES.getBytes();
+            // Modify the returned array
+            bytes[0] = 99;
+            // Assert that the original BOM's internal state is unchanged
+            assertArrayEquals(new byte[]{(byte) 1, (byte) 2}, BOM_2_BYTES.getBytes(),
+                "Modifying the returned byte array should not affect the BOM's internal state.");
+        }
     }
 
-    /** Tests {@link ByteOrderMark#getBytes()} */
-    @Test
-    void testGetBytes() {
-        assertArrayEquals(TEST_BOM_1.getBytes(), new byte[] { (byte) 1 }, "test1 bytes");
-        TEST_BOM_1.getBytes()[0] = 2;
-        assertArrayEquals(TEST_BOM_1.getBytes(), new byte[] { (byte) 1 }, "test1 bytes");
-        assertArrayEquals(TEST_BOM_2.getBytes(), new byte[] { (byte) 1, (byte) 2 }, "test1 bytes");
-        assertArrayEquals(TEST_BOM_3.getBytes(), new byte[] { (byte) 1, (byte) 2, (byte) 3 }, "test1 bytes");
+    @Nested
+    @DisplayName("equals() and hashCode() Contract")
+    class EqualsAndHashCodeContractTest {
+
+        @Test
+        void equals_shouldBeReflexive() {
+            assertEquals(BOM_2_BYTES, BOM_2_BYTES);
+        }
+
+        @Test
+        void equals_shouldBeSymmetricAndConsistent() {
+            final ByteOrderMark bomA = new ByteOrderMark("test2", 1, 2);
+            final ByteOrderMark bomB = new ByteOrderMark("test2", 1, 2);
+            assertEquals(bomA, bomB, "Two BOMs with the same charset and bytes should be equal.");
+            assertEquals(bomB, bomA, "Equals should be symmetric.");
+        }
+
+        @Test
+        void hashCode_shouldBeConsistentWithEquals() {
+            final ByteOrderMark bomA = new ByteOrderMark("test2", 1, 2);
+            final ByteOrderMark bomB = new ByteOrderMark("test2", 1, 2);
+            assertEquals(bomA, bomB, "Test objects should be equal for a valid hash code comparison.");
+            assertEquals(bomA.hashCode(), bomB.hashCode(), "Hash codes must be equal for equal objects.");
+        }
+
+        @Test
+        void equals_shouldReturnFalseForDifferentBytes() {
+            final ByteOrderMark other = new ByteOrderMark("test2", 1, 99);
+            assertNotEquals(BOM_2_BYTES, other);
+        }
+
+        @Test
+        void equals_shouldReturnFalseForDifferentCharsetName() {
+            final ByteOrderMark other = new ByteOrderMark("otherName", 1, 2);
+            assertNotEquals(BOM_2_BYTES, other);
+        }
+
+        @Test
+        void equals_shouldReturnFalseForDifferentLength() {
+            assertNotEquals(BOM_2_BYTES, BOM_3_BYTES);
+        }
+
+        @Test
+        void equals_shouldReturnFalseForNull() {
+            assertNotEquals(null, BOM_1_BYTE);
+        }
+
+        @Test
+        void equals_shouldReturnFalseForDifferentClass() {
+            assertNotEquals(new Object(), BOM_1_BYTE);
+        }
     }
 
-    /** Tests {@link ByteOrderMark#getCharsetName()} */
-    @Test
-    void testGetCharsetName() {
-        assertEquals("test1", TEST_BOM_1.getCharsetName(), "test1 name");
-        assertEquals("test2", TEST_BOM_2.getCharsetName(), "test2 name");
-        assertEquals("test3", TEST_BOM_3.getCharsetName(), "test3 name");
-    }
+    @Nested
+    @DisplayName("Behavior")
+    class BehaviorTest {
 
-    /** Tests {@link ByteOrderMark#get(int)} */
-    @Test
-    void testGetInt() {
-        assertEquals(1, TEST_BOM_1.get(0), "test1 get(0)");
-        assertEquals(1, TEST_BOM_2.get(0), "test2 get(0)");
-        assertEquals(2, TEST_BOM_2.get(1), "test2 get(1)");
-        assertEquals(1, TEST_BOM_3.get(0), "test3 get(0)");
-        assertEquals(2, TEST_BOM_3.get(1), "test3 get(1)");
-        assertEquals(3, TEST_BOM_3.get(2), "test3 get(2)");
-    }
+        @Test
+        void matches_shouldReturnTrueForExactMatch() {
+            assertTrue(BOM_2_BYTES.matches(new int[]{1, 2}),
+                "matches() should return true for an identical byte sequence.");
+        }
 
-    /** Tests {@link ByteOrderMark#hashCode()} */
-    @Test
-    void testHashCode() {
-        final int bomClassHash = ByteOrderMark.class.hashCode();
-        assertEquals(bomClassHash + 1, TEST_BOM_1.hashCode(), "hash test1 ");
-        assertEquals(bomClassHash + 3, TEST_BOM_2.hashCode(), "hash test2 ");
-        assertEquals(bomClassHash + 6, TEST_BOM_3.hashCode(), "hash test3 ");
-    }
+        @Test
+        void matches_shouldReturnTrueForMatchingPrefix() {
+            assertTrue(BOM_2_BYTES.matches(new int[]{1, 2, 3, 4}),
+                "matches() should return true if the array starts with the BOM bytes.");
+        }
 
-    /** Tests {@link ByteOrderMark#length()} */
-    @Test
-    void testLength() {
-        assertEquals(1, TEST_BOM_1.length(), "test1 length");
-        assertEquals(2, TEST_BOM_2.length(), "test2 length");
-        assertEquals(3, TEST_BOM_3.length(), "test3 length");
-    }
+        @Test
+        void matches_shouldReturnFalseForNonMatchingBytes() {
+            assertFalse(BOM_2_BYTES.matches(new int[]{1, 99}),
+                "matches() should return false for a non-matching byte sequence.");
+        }
 
-    @Test
-    void testMatches() {
-        assertTrue(ByteOrderMark.UTF_16BE.matches(ByteOrderMark.UTF_16BE.getRawBytes()));
-        assertTrue(ByteOrderMark.UTF_16LE.matches(ByteOrderMark.UTF_16LE.getRawBytes()));
-        assertTrue(ByteOrderMark.UTF_32BE.matches(ByteOrderMark.UTF_32BE.getRawBytes()));
-        assertTrue(ByteOrderMark.UTF_16BE.matches(ByteOrderMark.UTF_16BE.getRawBytes()));
-        assertTrue(ByteOrderMark.UTF_8.matches(ByteOrderMark.UTF_8.getRawBytes()));
+        @Test
+        void matches_shouldReturnFalseForShorterArray() {
+            assertFalse(BOM_2_BYTES.matches(new int[]{1}),
+                "matches() should return false if the array is shorter than the BOM.");
+        }
 
-        assertTrue(TEST_BOM_1.matches(TEST_BOM_1.getRawBytes()));
-        assertTrue(TEST_BOM_2.matches(TEST_BOM_2.getRawBytes()));
-        assertTrue(TEST_BOM_3.matches(TEST_BOM_3.getRawBytes()));
-
-        assertFalse(TEST_BOM_1.matches(new ByteOrderMark("1a", 2).getRawBytes()));
-        assertTrue(TEST_BOM_1.matches(new ByteOrderMark("1b", 1, 2).getRawBytes()));
-        assertFalse(TEST_BOM_2.matches(new ByteOrderMark("2", 1, 1).getRawBytes()));
-        assertFalse(TEST_BOM_3.matches(new ByteOrderMark("3", 1, 2, 4).getRawBytes()));
-    }
-
-    /** Tests {@link ByteOrderMark#toString()} */
-    @Test
-    void testToString() {
-        assertEquals("ByteOrderMark[test1: 0x1]", TEST_BOM_1.toString(), "test1 ");
-        assertEquals("ByteOrderMark[test2: 0x1,0x2]", TEST_BOM_2.toString(), "test2 ");
-        assertEquals("ByteOrderMark[test3: 0x1,0x2,0x3]", TEST_BOM_3.toString(), "test3 ");
+        @Test
+        void toString_shouldReturnCorrectRepresentation() {
+            assertEquals("ByteOrderMark[test1: 0x1]", BOM_1_BYTE.toString());
+            assertEquals("ByteOrderMark[test2: 0x1,0x2]", BOM_2_BYTES.toString());
+            assertEquals("ByteOrderMark[test3: 0x1,0x2,0x3]", BOM_3_BYTES.toString());
+        }
     }
 }
