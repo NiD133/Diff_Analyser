@@ -46,52 +46,79 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class PdfDictionaryTest {
+    
     @Test
-    public void pdfDictionaryGetReturnsNullIfKeyIsNull() {
+    public void get_WhenKeyIsNull_ReturnsNull() {
+        // Arrange
         PdfDictionary dictionary = new PdfDictionary();
-
-        PdfObject value = dictionary.get(null);
-
-        Assert.assertNull(value);
+        
+        // Act
+        PdfObject result = dictionary.get(null);
+        
+        // Assert
+        Assert.assertNull("Getting a value with null key should return null", result);
     }
 
     @Test
-    public void pdfDictionaryContainsReturnsFalseIfKeyIsNull() {
+    public void contains_WhenKeyIsNull_ReturnsFalse() {
+        // Arrange
         PdfDictionary dictionary = new PdfDictionary();
-
-        boolean contained = dictionary.contains(null);
-
-        Assert.assertFalse(contained);
+        
+        // Act
+        boolean result = dictionary.contains(null);
+        
+        // Assert
+        Assert.assertFalse("Dictionary should not contain null key", result);
     }
 
     @Test
-    public void pdfDictionaryRemoveDoesNothingIfKeyIsNull() {
+    public void remove_WhenKeyIsNull_DoesNotModifyDictionary() {
+        // Arrange
         PdfDictionary dictionary = new PdfDictionary();
-
+        dictionary.put(new PdfName("ValidKey"), new PdfString("TestValue"));
+        int initialSize = dictionary.size();
+        
+        // Act
         dictionary.remove(null);
+        
+        // Assert
+        Assert.assertEquals("Dictionary size should remain unchanged", 
+                            initialSize, dictionary.size());
+        Assert.assertTrue("Valid key should still be present", 
+                         dictionary.contains(new PdfName("ValidKey")));
     }
 
     @Test
-    public void pdfDictionaryPutThrowsExceptionIfKeyIsNull() {
+    public void put_WhenKeyIsNull_ThrowsIllegalArgumentException() {
+        // Arrange
         PdfDictionary dictionary = new PdfDictionary();
-
+        PdfObject value = new PdfName("TestValue");
+        
+        // Act & Assert
         try {
-            dictionary.put(null, new PdfName("null"));
-            Assert.fail("IllegalArgumentException expected");
+            dictionary.put(null, value);
+            Assert.fail("put should throw IllegalArgumentException when key is null");
         } catch (IllegalArgumentException e) {
-            Assert.assertEquals(e.getMessage(), "key is null.");
+            // Verify exception details
+            Assert.assertEquals("Exception message should indicate null key", 
+                                "key is null.", e.getMessage());
         }
     }
 
     @Test
-    public void pdfDictionaryPutExThrowsExceptionIfKeyIsNull() {
+    public void putEx_WhenKeyIsNull_ThrowsIllegalArgumentException() {
+        // Arrange
         PdfDictionary dictionary = new PdfDictionary();
-
+        PdfObject value = new PdfName("TestValue");
+        
+        // Act & Assert
         try {
-            dictionary.putEx(null, new PdfName("null"));
-            Assert.fail("IllegalArgumentException expected");
+            dictionary.putEx(null, value);
+            Assert.fail("putEx should throw IllegalArgumentException when key is null");
         } catch (IllegalArgumentException e) {
-            Assert.assertEquals(e.getMessage(), "key is null.");
+            // Verify exception details
+            Assert.assertEquals("Exception message should indicate null key", 
+                                "key is null.", e.getMessage());
         }
     }
 }
