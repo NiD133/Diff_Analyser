@@ -51,6 +51,14 @@ import java.util.Collections;
 import junit.framework.TestCase;
 import org.jspecify.annotations.NullUnmarked;
 
+/**
+ * Tests for {@link PairedStatsAccumulator}. This tests the stats methods for instances built with
+ * {@link PairedStatsAccumulator#add}, and various error cases of that method. For tests of the
+ * {@link PairedStatsAccumulator#snapshot} method which returns {@link PairedStats} instances, see
+ * {@link PairedStatsTest}.
+ *
+ * @author Pete Gillin
+ */
 @NullUnmarked
 public class PairedStatsAccumulatorTest extends TestCase {
 
@@ -118,44 +126,6 @@ public class PairedStatsAccumulatorTest extends TestCase {
             2);
   }
 
-  // Helper methods for common assertions
-  private void assertPopulationCovarianceFails(PairedStatsAccumulator accumulator) {
-    assertThrows(IllegalStateException.class, accumulator::populationCovariance);
-  }
-
-  private void assertPopulationCovarianceEquals(
-      PairedStatsAccumulator accumulator, double expected, double tolerance) {
-    assertThat(accumulator.populationCovariance()).isWithin(tolerance).of(expected);
-  }
-
-  private void assertSampleCovarianceFails(PairedStatsAccumulator accumulator) {
-    assertThrows(IllegalStateException.class, accumulator::sampleCovariance);
-  }
-
-  private void assertSampleCovarianceEquals(
-      PairedStatsAccumulator accumulator, double expected, double tolerance) {
-    assertThat(accumulator.sampleCovariance()).isWithin(tolerance).of(expected);
-  }
-
-  private void assertPearsonsCorrelationFails(PairedStatsAccumulator accumulator) {
-    assertThrows(IllegalStateException.class, accumulator::pearsonsCorrelationCoefficient);
-  }
-
-  private void assertPearsonsCorrelationEquals(
-      PairedStatsAccumulator accumulator, double expected, double tolerance) {
-    double actual = accumulator.pearsonsCorrelationCoefficient();
-    if (Double.isNaN(expected)) {
-      assertThat(actual).isNaN();
-    } else {
-      assertThat(actual).isWithin(tolerance).of(expected);
-    }
-  }
-
-  private void assertLeastSquaresFitFails(PairedStatsAccumulator accumulator) {
-    assertThrows(IllegalStateException.class, accumulator::leastSquaresFit);
-  }
-
-  // Test methods
   public void testCount() {
     assertThat(emptyAccumulator.count()).isEqualTo(0);
     assertThat(emptyAccumulatorByAddAllEmptyPairedStats.count()).isEqualTo(0);
@@ -174,6 +144,7 @@ public class PairedStatsAccumulatorTest extends TestCase {
     for (int power = 1; power < Long.SIZE - 1; power++) {
       accumulator.addAll(accumulator.snapshot());
     }
+    // Should overflow without throwing.
     accumulator.addAll(accumulator.snapshot());
     assertThat(accumulator.count()).isLessThan(0L);
   }
@@ -205,210 +176,206 @@ public class PairedStatsAccumulatorTest extends TestCase {
         OTHER_MANY_VALUES_STATS, manyValuesAccumulatorByAddAllPartitionedPairedStats.yStats());
   }
 
-  // Population covariance tests
-  public void testPopulationCovariance_empty() {
-    assertPopulationCovarianceFails(emptyAccumulator);
-    assertPopulationCovarianceFails(emptyAccumulatorByAddAllEmptyPairedStats);
-  }
-
-  public void testPopulationCovariance_oneValue() {
+  public void testPopulationCovariance() {
+    assertThrows(IllegalStateException.class, () -> emptyAccumulator.populationCovariance());
+    assertThrows(
+        IllegalStateException.class,
+        () -> emptyAccumulatorByAddAllEmptyPairedStats.populationCovariance());
     assertThat(oneValueAccumulator.populationCovariance()).isEqualTo(0.0);
     assertThat(oneValueAccumulatorByAddAllEmptyPairedStats.populationCovariance()).isEqualTo(0.0);
-  }
-
-  public void testPopulationCovariance_twoValues() {
-    double expected = TWO_VALUES_SUM_OF_PRODUCTS_OF_DELTAS / 2;
-    assertPopulationCovarianceEquals(twoValuesAccumulator, expected, ALLOWED_ERROR);
-    assertPopulationCovarianceEquals(
-        twoValuesAccumulatorByAddAllPartitionedPairedStats, expected, ALLOWED_ERROR);
-  }
-
-  public void testPopulationCovariance_manyValues() {
-    double expected = MANY_VALUES_SUM_OF_PRODUCTS_OF_DELTAS / MANY_VALUES_COUNT;
-    assertPopulationCovarianceEquals(manyValuesAccumulator, expected, ALLOWED_ERROR);
-    assertPopulationCovarianceEquals(
-        manyValuesAccumulatorByAddAllPartitionedPairedStats, expected, ALLOWED_ERROR);
-  }
-
-  public void testPopulationCovariance_horizontal() {
-    assertPopulationCovarianceEquals(horizontalValuesAccumulator, 0.0, ALLOWED_ERROR);
-    assertPopulationCovarianceEquals(
-        horizontalValuesAccumulatorByAddAllPartitionedPairedStats, 0.0, ALLOWED_ERROR);
-  }
-
-  public void testPopulationCovariance_vertical() {
-    assertPopulationCovarianceEquals(verticalValuesAccumulator, 0.0, ALLOWED_ERROR);
-    assertPopulationCovarianceEquals(
-        verticalValuesAccumulatorByAddAllPartitionedPairedStats, 0.0, ALLOWED_ERROR);
-  }
-
-  public void testPopulationCovariance_constant() {
-    assertPopulationCovarianceEquals(constantValuesAccumulator, 0.0, ALLOWED_ERROR);
-    assertPopulationCovarianceEquals(
-        constantValuesAccumulatorByAddAllPartitionedPairedStats, 0.0, ALLOWED_ERROR);
-  }
-
-  public void testPopulationCovariance_manyValuesWithNonFiniteX() {
+    assertThat(twoValuesAccumulator.populationCovariance())
+        .isWithin(ALLOWED_ERROR)
+        .of(TWO_VALUES_SUM_OF_PRODUCTS_OF_DELTAS / 2);
+    assertThat(twoValuesAccumulatorByAddAllPartitionedPairedStats.populationCovariance())
+        .isWithin(ALLOWED_ERROR)
+        .of(TWO_VALUES_SUM_OF_PRODUCTS_OF_DELTAS / 2);
+    assertThat(manyValuesAccumulator.populationCovariance())
+        .isWithin(ALLOWED_ERROR)
+        .of(MANY_VALUES_SUM_OF_PRODUCTS_OF_DELTAS / MANY_VALUES_COUNT);
+    assertThat(manyValuesAccumulatorByAddAllPartitionedPairedStats.populationCovariance())
+        .isWithin(ALLOWED_ERROR)
+        .of(MANY_VALUES_SUM_OF_PRODUCTS_OF_DELTAS / MANY_VALUES_COUNT);
+    // For datasets of many double values, we test many combinations of finite and non-finite
+    // x-values:
     for (ManyValues values : ALL_MANY_VALUES) {
       PairedStatsAccumulator accumulator =
           createFilledPairedStatsAccumulator(values.asIterable(), OTHER_MANY_VALUES);
-      PairedStatsAccumulator accumulatorByAddAll =
+      PairedStatsAccumulator accumulatorByAddAllPartitionedPairedStats =
           createPartitionedFilledPairedStatsAccumulator(values.asIterable(), OTHER_MANY_VALUES, 2);
-
+      double populationCovariance = accumulator.populationCovariance();
+      double populationCovarianceByAddAllPartitionedPairedStats =
+          accumulatorByAddAllPartitionedPairedStats.populationCovariance();
       if (values.hasAnyNonFinite()) {
-        assertWithMessage("population covariance of " + values)
-            .that(accumulator.populationCovariance())
-            .isNaN();
+        assertWithMessage("population covariance of " + values).that(populationCovariance).isNaN();
         assertWithMessage("population covariance by addAll(PairedStats) of " + values)
-            .that(accumulatorByAddAll.populationCovariance())
+            .that(populationCovarianceByAddAllPartitionedPairedStats)
             .isNaN();
       } else {
-        double expected = MANY_VALUES_SUM_OF_PRODUCTS_OF_DELTAS / MANY_VALUES_COUNT;
         assertWithMessage("population covariance of " + values)
-            .that(accumulator.populationCovariance())
+            .that(populationCovariance)
             .isWithin(ALLOWED_ERROR)
-            .of(expected);
+            .of(MANY_VALUES_SUM_OF_PRODUCTS_OF_DELTAS / MANY_VALUES_COUNT);
         assertWithMessage("population covariance by addAll(PairedStats) of " + values)
-            .that(accumulatorByAddAll.populationCovariance())
+            .that(populationCovarianceByAddAllPartitionedPairedStats)
             .isWithin(ALLOWED_ERROR)
-            .of(expected);
+            .of(MANY_VALUES_SUM_OF_PRODUCTS_OF_DELTAS / MANY_VALUES_COUNT);
       }
     }
+    assertThat(horizontalValuesAccumulator.populationCovariance()).isWithin(ALLOWED_ERROR).of(0.0);
+    assertThat(horizontalValuesAccumulatorByAddAllPartitionedPairedStats.populationCovariance())
+        .isWithin(ALLOWED_ERROR)
+        .of(0.0);
+    assertThat(verticalValuesAccumulator.populationCovariance()).isWithin(ALLOWED_ERROR).of(0.0);
+    assertThat(verticalValuesAccumulatorByAddAllPartitionedPairedStats.populationCovariance())
+        .isWithin(ALLOWED_ERROR)
+        .of(0.0);
+    assertThat(constantValuesAccumulator.populationCovariance()).isWithin(ALLOWED_ERROR).of(0.0);
+    assertThat(constantValuesAccumulatorByAddAllPartitionedPairedStats.populationCovariance())
+        .isWithin(ALLOWED_ERROR)
+        .of(0.0);
   }
 
-  // Sample covariance tests
-  public void testSampleCovariance_empty() {
-    assertSampleCovarianceFails(emptyAccumulator);
-    assertSampleCovarianceFails(emptyAccumulatorByAddAllEmptyPairedStats);
+  public void testSampleCovariance() {
+    assertThrows(IllegalStateException.class, () -> emptyAccumulator.sampleCovariance());
+    assertThrows(
+        IllegalStateException.class,
+        () -> emptyAccumulatorByAddAllEmptyPairedStats.sampleCovariance());
+    assertThrows(IllegalStateException.class, () -> oneValueAccumulator.sampleCovariance());
+    assertThrows(
+        IllegalStateException.class,
+        () -> oneValueAccumulatorByAddAllEmptyPairedStats.sampleCovariance());
+    assertThat(twoValuesAccumulator.sampleCovariance())
+        .isWithin(ALLOWED_ERROR)
+        .of(TWO_VALUES_SUM_OF_PRODUCTS_OF_DELTAS);
+    assertThat(twoValuesAccumulatorByAddAllPartitionedPairedStats.sampleCovariance())
+        .isWithin(ALLOWED_ERROR)
+        .of(TWO_VALUES_SUM_OF_PRODUCTS_OF_DELTAS);
+    assertThat(manyValuesAccumulator.sampleCovariance())
+        .isWithin(ALLOWED_ERROR)
+        .of(MANY_VALUES_SUM_OF_PRODUCTS_OF_DELTAS / (MANY_VALUES_COUNT - 1));
+    assertThat(manyValuesAccumulatorByAddAllPartitionedPairedStats.sampleCovariance())
+        .isWithin(ALLOWED_ERROR)
+        .of(MANY_VALUES_SUM_OF_PRODUCTS_OF_DELTAS / (MANY_VALUES_COUNT - 1));
+    assertThat(horizontalValuesAccumulator.sampleCovariance()).isWithin(ALLOWED_ERROR).of(0.0);
+    assertThat(horizontalValuesAccumulatorByAddAllPartitionedPairedStats.sampleCovariance())
+        .isWithin(ALLOWED_ERROR)
+        .of(0.0);
+    assertThat(verticalValuesAccumulator.sampleCovariance()).isWithin(ALLOWED_ERROR).of(0.0);
+    assertThat(verticalValuesAccumulatorByAddAllPartitionedPairedStats.sampleCovariance())
+        .isWithin(ALLOWED_ERROR)
+        .of(0.0);
+    assertThat(constantValuesAccumulator.sampleCovariance()).isWithin(ALLOWED_ERROR).of(0.0);
+    assertThat(constantValuesAccumulatorByAddAllPartitionedPairedStats.sampleCovariance())
+        .isWithin(ALLOWED_ERROR)
+        .of(0.0);
   }
 
-  public void testSampleCovariance_oneValue() {
-    assertSampleCovarianceFails(oneValueAccumulator);
-    assertSampleCovarianceFails(oneValueAccumulatorByAddAllEmptyPairedStats);
-  }
-
-  public void testSampleCovariance_twoValues() {
-    double expected = TWO_VALUES_SUM_OF_PRODUCTS_OF_DELTAS;
-    assertSampleCovarianceEquals(twoValuesAccumulator, expected, ALLOWED_ERROR);
-    assertSampleCovarianceEquals(
-        twoValuesAccumulatorByAddAllPartitionedPairedStats, expected, ALLOWED_ERROR);
-  }
-
-  public void testSampleCovariance_manyValues() {
-    double expected = MANY_VALUES_SUM_OF_PRODUCTS_OF_DELTAS / (MANY_VALUES_COUNT - 1);
-    assertSampleCovarianceEquals(manyValuesAccumulator, expected, ALLOWED_ERROR);
-    assertSampleCovarianceEquals(
-        manyValuesAccumulatorByAddAllPartitionedPairedStats, expected, ALLOWED_ERROR);
-  }
-
-  public void testSampleCovariance_horizontal() {
-    assertSampleCovarianceEquals(horizontalValuesAccumulator, 0.0, ALLOWED_ERROR);
-    assertSampleCovarianceEquals(
-        horizontalValuesAccumulatorByAddAllPartitionedPairedStats, 0.0, ALLOWED_ERROR);
-  }
-
-  public void testSampleCovariance_vertical() {
-    assertSampleCovarianceEquals(verticalValuesAccumulator, 0.0, ALLOWED_ERROR);
-    assertSampleCovarianceEquals(
-        verticalValuesAccumulatorByAddAllPartitionedPairedStats, 0.0, ALLOWED_ERROR);
-  }
-
-  public void testSampleCovariance_constant() {
-    assertSampleCovarianceEquals(constantValuesAccumulator, 0.0, ALLOWED_ERROR);
-    assertSampleCovarianceEquals(
-        constantValuesAccumulatorByAddAllPartitionedPairedStats, 0.0, ALLOWED_ERROR);
-  }
-
-  // Pearson's correlation tests
-  public void testPearsonsCorrelationCoefficient_empty() {
-    assertPearsonsCorrelationFails(emptyAccumulator);
-    assertPearsonsCorrelationFails(emptyAccumulatorByAddAllEmptyPairedStats);
-  }
-
-  public void testPearsonsCorrelationCoefficient_oneValue() {
-    assertPearsonsCorrelationFails(oneValueAccumulator);
-    assertPearsonsCorrelationFails(oneValueAccumulatorByAddAllEmptyPairedStats);
-  }
-
-  public void testPearsonsCorrelationCoefficient_twoValues() {
-    double expected =
-        twoValuesAccumulator.populationCovariance()
-            / (twoValuesAccumulator.xStats().populationStandardDeviation()
-                * twoValuesAccumulator.yStats().populationStandardDeviation());
-    assertPearsonsCorrelationEquals(twoValuesAccumulator, expected, ALLOWED_ERROR);
-  }
-
-  public void testPearsonsCorrelationCoefficient_manyValues() {
-    double expected =
-        manyValuesAccumulator.populationCovariance()
-            / (manyValuesAccumulator.xStats().populationStandardDeviation()
-                * manyValuesAccumulator.yStats().populationStandardDeviation());
-    assertPearsonsCorrelationEquals(manyValuesAccumulator, expected, ALLOWED_ERROR);
-    assertPearsonsCorrelationEquals(
-        manyValuesAccumulatorByAddAllPartitionedPairedStats, expected, ALLOWED_ERROR);
-  }
-
-  public void testPearsonsCorrelationCoefficient_manyValuesWithNonFiniteY() {
+  public void testPearsonsCorrelationCoefficient() {
+    assertThrows(
+        IllegalStateException.class, () -> emptyAccumulator.pearsonsCorrelationCoefficient());
+    assertThrows(
+        IllegalStateException.class,
+        () -> emptyAccumulatorByAddAllEmptyPairedStats.pearsonsCorrelationCoefficient());
+    assertThrows(
+        IllegalStateException.class, () -> oneValueAccumulator.pearsonsCorrelationCoefficient());
+    assertThrows(
+        IllegalStateException.class,
+        () -> oneValueAccumulatorByAddAllEmptyPairedStats.pearsonsCorrelationCoefficient());
+    assertThat(twoValuesAccumulator.pearsonsCorrelationCoefficient())
+        .isWithin(ALLOWED_ERROR)
+        .of(
+            twoValuesAccumulator.populationCovariance()
+                / (twoValuesAccumulator.xStats().populationStandardDeviation()
+                    * twoValuesAccumulator.yStats().populationStandardDeviation()));
+    assertThat(manyValuesAccumulator.pearsonsCorrelationCoefficient())
+        .isWithin(ALLOWED_ERROR)
+        .of(
+            manyValuesAccumulator.populationCovariance()
+                / (manyValuesAccumulator.xStats().populationStandardDeviation()
+                    * manyValuesAccumulator.yStats().populationStandardDeviation()));
+    assertThat(manyValuesAccumulatorByAddAllPartitionedPairedStats.pearsonsCorrelationCoefficient())
+        .isWithin(ALLOWED_ERROR)
+        .of(
+            manyValuesAccumulatorByAddAllPartitionedPairedStats.populationCovariance()
+                / (manyValuesAccumulatorByAddAllPartitionedPairedStats
+                        .xStats()
+                        .populationStandardDeviation()
+                    * manyValuesAccumulatorByAddAllPartitionedPairedStats
+                        .yStats()
+                        .populationStandardDeviation()));
+    // For datasets of many double values, we test many combinations of finite and non-finite
+    // y-values:
     for (ManyValues values : ALL_MANY_VALUES) {
       PairedStatsAccumulator accumulator =
           createFilledPairedStatsAccumulator(MANY_VALUES, values.asIterable());
-      PairedStatsAccumulator accumulatorByAddAll =
+      PairedStatsAccumulator accumulatorByAddAllPartitionedPairedStats =
           createPartitionedFilledPairedStatsAccumulator(MANY_VALUES, values.asIterable(), 2);
-
+      double pearsonsCorrelationCoefficient = accumulator.pearsonsCorrelationCoefficient();
+      double pearsonsCorrelationCoefficientByAddAllPartitionedPairedStats =
+          accumulatorByAddAllPartitionedPairedStats.pearsonsCorrelationCoefficient();
       if (values.hasAnyNonFinite()) {
         assertWithMessage("Pearson's correlation coefficient of " + values)
-            .that(accumulator.pearsonsCorrelationCoefficient())
+            .that(pearsonsCorrelationCoefficient)
             .isNaN();
         assertWithMessage("Pearson's correlation coefficient by addAll(PairedStats) of " + values)
-            .that(accumulatorByAddAll.pearsonsCorrelationCoefficient())
+            .that(pearsonsCorrelationCoefficient)
             .isNaN();
       } else {
-        double expected =
-            accumulator.populationCovariance()
-                / (accumulator.xStats().populationStandardDeviation()
-                    * accumulator.yStats().populationStandardDeviation());
         assertWithMessage("Pearson's correlation coefficient of " + values)
-            .that(accumulator.pearsonsCorrelationCoefficient())
+            .that(pearsonsCorrelationCoefficient)
             .isWithin(ALLOWED_ERROR)
-            .of(expected);
+            .of(
+                accumulator.populationCovariance()
+                    / (accumulator.xStats().populationStandardDeviation()
+                        * accumulator.yStats().populationStandardDeviation()));
         assertWithMessage("Pearson's correlation coefficient by addAll(PairedStats) of " + values)
-            .that(accumulatorByAddAll.pearsonsCorrelationCoefficient())
+            .that(pearsonsCorrelationCoefficientByAddAllPartitionedPairedStats)
             .isWithin(ALLOWED_ERROR)
-            .of(expected);
+            .of(
+                accumulatorByAddAllPartitionedPairedStats.populationCovariance()
+                    / (accumulatorByAddAllPartitionedPairedStats
+                            .xStats()
+                            .populationStandardDeviation()
+                        * accumulatorByAddAllPartitionedPairedStats
+                            .yStats()
+                            .populationStandardDeviation()));
       }
     }
+    assertThrows(
+        IllegalStateException.class,
+        () -> horizontalValuesAccumulator.pearsonsCorrelationCoefficient());
+    assertThrows(
+        IllegalStateException.class,
+        () ->
+            horizontalValuesAccumulatorByAddAllPartitionedPairedStats
+                .pearsonsCorrelationCoefficient());
+    assertThrows(
+        IllegalStateException.class,
+        () -> verticalValuesAccumulator.pearsonsCorrelationCoefficient());
+    assertThrows(
+        IllegalStateException.class,
+        () ->
+            verticalValuesAccumulatorByAddAllPartitionedPairedStats
+                .pearsonsCorrelationCoefficient());
+    assertThrows(
+        IllegalStateException.class,
+        () -> constantValuesAccumulator.pearsonsCorrelationCoefficient());
+    assertThrows(
+        IllegalStateException.class,
+        () ->
+            constantValuesAccumulatorByAddAllPartitionedPairedStats
+                .pearsonsCorrelationCoefficient());
   }
 
-  public void testPearsonsCorrelationCoefficient_horizontal() {
-    assertPearsonsCorrelationFails(horizontalValuesAccumulator);
-    assertPearsonsCorrelationFails(
-        horizontalValuesAccumulatorByAddAllPartitionedPairedStats);
-  }
-
-  public void testPearsonsCorrelationCoefficient_vertical() {
-    assertPearsonsCorrelationFails(verticalValuesAccumulator);
-    assertPearsonsCorrelationFails(
-        verticalValuesAccumulatorByAddAllPartitionedPairedStats);
-  }
-
-  public void testPearsonsCorrelationCoefficient_constant() {
-    assertPearsonsCorrelationFails(constantValuesAccumulator);
-    assertPearsonsCorrelationFails(
-        constantValuesAccumulatorByAddAllPartitionedPairedStats);
-  }
-
-  // Least squares fit tests
-  public void testLeastSquaresFit_empty() {
-    assertLeastSquaresFitFails(emptyAccumulator);
-    assertLeastSquaresFitFails(emptyAccumulatorByAddAllEmptyPairedStats);
-  }
-
-  public void testLeastSquaresFit_oneValue() {
-    assertLeastSquaresFitFails(oneValueAccumulator);
-    assertLeastSquaresFitFails(oneValueAccumulatorByAddAllEmptyPairedStats);
-  }
-
-  public void testLeastSquaresFit_twoValues() {
+  public void testLeastSquaresFit() {
+    assertThrows(IllegalStateException.class, () -> emptyAccumulator.leastSquaresFit());
+    assertThrows(
+        IllegalStateException.class,
+        () -> emptyAccumulatorByAddAllEmptyPairedStats.leastSquaresFit());
+    assertThrows(IllegalStateException.class, () -> oneValueAccumulator.leastSquaresFit());
+    assertThrows(
+        IllegalStateException.class,
+        () -> oneValueAccumulatorByAddAllEmptyPairedStats.leastSquaresFit());
     assertDiagonalLinearTransformation(
         twoValuesAccumulator.leastSquaresFit(),
         twoValuesAccumulator.xStats().mean(),
@@ -421,9 +388,6 @@ public class PairedStatsAccumulatorTest extends TestCase {
         twoValuesAccumulatorByAddAllPartitionedPairedStats.yStats().mean(),
         twoValuesAccumulatorByAddAllPartitionedPairedStats.xStats().populationVariance(),
         twoValuesAccumulatorByAddAllPartitionedPairedStats.populationCovariance());
-  }
-
-  public void testLeastSquaresFit_manyValues() {
     assertDiagonalLinearTransformation(
         manyValuesAccumulator.leastSquaresFit(),
         manyValuesAccumulator.xStats().mean(),
@@ -436,21 +400,19 @@ public class PairedStatsAccumulatorTest extends TestCase {
         manyValuesAccumulatorByAddAllPartitionedPairedStats.yStats().mean(),
         manyValuesAccumulatorByAddAllPartitionedPairedStats.xStats().populationVariance(),
         manyValuesAccumulatorByAddAllPartitionedPairedStats.populationCovariance());
-  }
-
-  public void testLeastSquaresFit_manyValuesWithNonFiniteX() {
+    // For datasets of many double values, we test many combinations of finite and non-finite
+    // x-values:
     for (ManyValues values : ALL_MANY_VALUES) {
       PairedStatsAccumulator accumulator =
           createFilledPairedStatsAccumulator(values.asIterable(), OTHER_MANY_VALUES);
-      PairedStatsAccumulator accumulatorByAddAll =
+      PairedStatsAccumulator accumulatorByAddAllPartitionedPairedStats =
           createPartitionedFilledPairedStatsAccumulator(values.asIterable(), OTHER_MANY_VALUES, 2);
-
       LinearTransformation fit = accumulator.leastSquaresFit();
-      LinearTransformation fitByAddAll = accumulatorByAddAll.leastSquaresFit();
-
+      LinearTransformation fitByAddAllPartitionedPairedStats =
+          accumulatorByAddAllPartitionedPairedStats.leastSquaresFit();
       if (values.hasAnyNonFinite()) {
         assertLinearTransformationNaN(fit);
-        assertLinearTransformationNaN(fitByAddAll);
+        assertLinearTransformationNaN(fitByAddAllPartitionedPairedStats);
       } else {
         assertDiagonalLinearTransformation(
             fit,
@@ -459,33 +421,26 @@ public class PairedStatsAccumulatorTest extends TestCase {
             accumulator.xStats().populationVariance(),
             accumulator.populationCovariance());
         assertDiagonalLinearTransformation(
-            fitByAddAll,
-            accumulatorByAddAll.xStats().mean(),
-            accumulatorByAddAll.yStats().mean(),
-            accumulatorByAddAll.xStats().populationVariance(),
-            accumulatorByAddAll.populationCovariance());
+            fitByAddAllPartitionedPairedStats,
+            accumulatorByAddAllPartitionedPairedStats.xStats().mean(),
+            accumulatorByAddAllPartitionedPairedStats.yStats().mean(),
+            accumulatorByAddAllPartitionedPairedStats.xStats().populationVariance(),
+            accumulatorByAddAllPartitionedPairedStats.populationCovariance());
       }
     }
-  }
-
-  public void testLeastSquaresFit_horizontal() {
     assertHorizontalLinearTransformation(
         horizontalValuesAccumulator.leastSquaresFit(), horizontalValuesAccumulator.yStats().mean());
     assertHorizontalLinearTransformation(
         horizontalValuesAccumulatorByAddAllPartitionedPairedStats.leastSquaresFit(),
         horizontalValuesAccumulatorByAddAllPartitionedPairedStats.yStats().mean());
-  }
-
-  public void testLeastSquaresFit_vertical() {
     assertVerticalLinearTransformation(
         verticalValuesAccumulator.leastSquaresFit(), verticalValuesAccumulator.xStats().mean());
     assertVerticalLinearTransformation(
         verticalValuesAccumulatorByAddAllPartitionedPairedStats.leastSquaresFit(),
         verticalValuesAccumulatorByAddAllPartitionedPairedStats.xStats().mean());
-  }
-
-  public void testLeastSquaresFit_constant() {
-    assertLeastSquaresFitFails(constantValuesAccumulator);
-    assertLeastSquaresFitFails(constantValuesAccumulatorByAddAllPartitionedPairedStats);
+    assertThrows(IllegalStateException.class, () -> constantValuesAccumulator.leastSquaresFit());
+    assertThrows(
+        IllegalStateException.class,
+        () -> constantValuesAccumulatorByAddAllPartitionedPairedStats.leastSquaresFit());
   }
 }
