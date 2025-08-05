@@ -43,182 +43,164 @@
 package com.itextpdf.text.pdf.parser;
 
 import com.itextpdf.testutils.TestResourceUtils;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfName;
-import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.PdfWriter;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.itextpdf.text.pdf.PdfDictionary;
+import com.itextpdf.text.pdf.PdfName;
+import org.junit.Assert;
+import org.junit.Test;
+
+import com.itextpdf.text.Document;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfWriter;
+
 public class TextRenderInfoTest {
 
-    private static final int FIRST_PAGE = 1;
-    private static final int FIRST_ELEMENT_INDEX = 0;
+    public static final int FIRST_PAGE = 1;
+    public static final int FIRST_ELEMENT_INDEX = 0;
 
-    @Test
-    public void testCharacterRenderInfos() throws Exception {
-        // Create a simple PDF with rotated page size and text "ABCD"
-        byte[] pdfBytes = createSimplePdf(PageSize.LETTER.rotate().rotate(), "ABCD");
+	@Test
+	public void testCharacterRenderInfos() throws Exception {
+        byte[] bytes = createSimplePdf(PageSize.LETTER.rotate().rotate(), "ABCD");
+        //TestResourceUtils.saveBytesToFile(bytes, new File("C:/temp/out.pdf"));
 
-        // Read the PDF content
-        PdfReader pdfReader = new PdfReader(pdfBytes);
-        PdfReaderContentParser parser = new PdfReaderContentParser(pdfReader);
+        PdfReader r = new PdfReader(bytes);
 
-        // Process the content with a custom listener
+        PdfReaderContentParser parser = new PdfReaderContentParser(r);
         parser.processContent(FIRST_PAGE, new CharacterPositionRenderListener());
-    }
 
-    /**
-     * Test for handling Unicode quirk for Japanese characters.
-     * Ensures TextRenderInfo does not throw an AIOOBE for certain characters.
-     */
-    @Test
-    public void testUnicodeEmptyString() throws Exception {
-        StringBuilder extractedText = new StringBuilder();
-        String inputFileName = "japanese_text.pdf";
+	}
 
-        // Read the PDF file
-        PdfReader pdfReader = TestResourceUtils.getResourceAsPdfReader(this, inputFileName);
-        TextExtractionStrategy textExtractionStrategy = new SimpleTextExtractionStrategy();
+        /**
+         * Test introduced to exclude a bug related to a Unicode quirk for
+         * Japanese. TextRenderInfo threw an AIOOBE for some characters.
+         * @throws java.lang.Exception
+         * @since 5.5.5-SNAPSHOT
+         */
+        @Test
+        public void testUnicodeEmptyString() throws Exception {
+            StringBuilder sb = new StringBuilder();
+            String inFile = "japanese_text.pdf";
 
-        // Extract text from the first page
-        extractedText.append(PdfTextExtractor.getTextFromPage(pdfReader, FIRST_PAGE, textExtractionStrategy));
 
-        // Extract the first line of the text
-        String extractedLine = extractedText.substring(0, extractedText.indexOf("\n"));
-        String expectedText =
-                "\u76f4\u8fd1\u306e\u0053\uff06\u0050\u0035\u0030\u0030"
-                        + "\u914d\u5f53\u8cb4\u65cf\u6307\u6570\u306e\u30d1\u30d5"
-                        + "\u30a9\u30fc\u30de\u30f3\u30b9\u306f\u0053\uff06\u0050"
-                        + "\u0035\u0030\u0030\u6307\u6570\u3092\u4e0a\u56de\u308b";
+            PdfReader p = TestResourceUtils.getResourceAsPdfReader(this, inFile);
+            TextExtractionStrategy strat = new SimpleTextExtractionStrategy();
 
-        // Assert that the extracted text matches the expected text
-        Assert.assertEquals(expectedText, extractedLine);
-    }
+            sb.append(PdfTextExtractor.getTextFromPage(p, FIRST_PAGE, strat));
+
+            String result = sb.substring(0, sb.indexOf("\n"));
+            String origText =
+                    "\u76f4\u8fd1\u306e\u0053\uff06\u0050\u0035\u0030\u0030"
+                    + "\u914d\u5f53\u8cb4\u65cf\u6307\u6570\u306e\u30d1\u30d5"
+                    + "\u30a9\u30fc\u30de\u30f3\u30b9\u306f\u0053\uff06\u0050"
+                    + "\u0035\u0030\u0030\u6307\u6570\u3092\u4e0a\u56de\u308b";
+            Assert.assertEquals(result, origText);
+        }
 
     @Test
     public void testType3FontWidth() throws Exception {
-        String inputFileName = "type3font_text.pdf";
-        LineSegment expectedLineSegment = new LineSegment(
-                new Vector(20.3246f, 769.4974f, 1.0f),
-                new Vector(151.22923f, 769.4974f, 1.0f)
-        );
+        String inFile = "type3font_text.pdf";
+        LineSegment origLineSegment = new LineSegment(new Vector(20.3246f, 769.4974f, 1.0f), new Vector(151.22923f, 769.4974f, 1.0f));
 
-        // Read the PDF file
-        PdfReader pdfReader = TestResourceUtils.getResourceAsPdfReader(this, inputFileName);
+        PdfReader reader = TestResourceUtils.getResourceAsPdfReader(this, inFile);
         TextPositionRenderListener renderListener = new TextPositionRenderListener();
         PdfContentStreamProcessor processor = new PdfContentStreamProcessor(renderListener);
 
-        // Process the content of the first page
-        PdfDictionary pageDictionary = pdfReader.getPageN(FIRST_PAGE);
-        PdfDictionary resourcesDictionary = pageDictionary.getAsDict(PdfName.RESOURCES);
-        processor.processContent(ContentByteUtils.getContentBytesForPage(pdfReader, FIRST_PAGE), resourcesDictionary);
+        PdfDictionary pageDic = reader.getPageN(FIRST_PAGE);
+        PdfDictionary resourcesDic = pageDic.getAsDict(PdfName.RESOURCES);
+        processor.processContent(ContentByteUtils.getContentBytesForPage(reader, FIRST_PAGE), resourcesDic);
 
-        // Assert that the line segments match the expected values
-        Assert.assertEquals(
-                expectedLineSegment.getStartPoint().get(FIRST_ELEMENT_INDEX),
-                renderListener.getLineSegments().get(FIRST_ELEMENT_INDEX).getStartPoint().get(FIRST_ELEMENT_INDEX),
-                1 / 2f
-        );
 
-        Assert.assertEquals(
-                expectedLineSegment.getEndPoint().get(FIRST_ELEMENT_INDEX),
-                renderListener.getLineSegments().get(FIRST_ELEMENT_INDEX).getEndPoint().get(FIRST_ELEMENT_INDEX),
-                1 / 2f
-        );
+        Assert.assertEquals(renderListener.getLineSegments().get(FIRST_ELEMENT_INDEX).getStartPoint().get(FIRST_ELEMENT_INDEX),
+                origLineSegment.getStartPoint().get(FIRST_ELEMENT_INDEX), 1 / 2f);
+
+        Assert.assertEquals(renderListener.getLineSegments().get(FIRST_ELEMENT_INDEX).getEndPoint().get(FIRST_ELEMENT_INDEX),
+                origLineSegment.getEndPoint().get(FIRST_ELEMENT_INDEX), 1 / 2f);
+
     }
+
 
     private static class TextPositionRenderListener implements RenderListener {
 
-        private final List<LineSegment> lineSegments = new ArrayList<>();
+        List<LineSegment> lineSegments = new ArrayList<LineSegment>();
 
         public List<LineSegment> getLineSegments() {
             return lineSegments;
         }
 
-        @Override
         public void renderText(TextRenderInfo renderInfo) {
             lineSegments.add(renderInfo.getBaseline());
         }
 
-        @Override
         public void beginTextBlock() {
-            // No implementation needed
         }
 
-        @Override
         public void endTextBlock() {
-            // No implementation needed
+
         }
 
-        @Override
         public void renderImage(ImageRenderInfo renderInfo) {
-            // No implementation needed
+
         }
+
+
     }
 
-    private static class CharacterPositionRenderListener implements TextExtractionStrategy {
+	private static class CharacterPositionRenderListener implements TextExtractionStrategy{
 
-        @Override
-        public void beginTextBlock() {
-            // No implementation needed
-        }
+		public void beginTextBlock() {
+		}
 
-        @Override
-        public void renderText(TextRenderInfo renderInfo) {
-            List<TextRenderInfo> characterInfos = renderInfo.getCharacterRenderInfos();
-            TextRenderInfo previousCharInfo = characterInfos.get(0);
+		public void renderText(TextRenderInfo renderInfo) {
+			List<TextRenderInfo> subs = renderInfo.getCharacterRenderInfos();
+			TextRenderInfo previousCharInfo = subs.get(0);
 
-            for (int i = 1; i < characterInfos.size(); i++) {
-                TextRenderInfo currentCharInfo = characterInfos.get(i);
-                Vector previousEndPoint = previousCharInfo.getBaseline().getEndPoint();
-                Vector currentStartPoint = currentCharInfo.getBaseline().getStartPoint();
-                assertVectorsEqual(currentCharInfo.getText(), previousEndPoint, currentStartPoint);
-                previousCharInfo = currentCharInfo;
-            }
-        }
+			for(int i = 1; i < subs.size(); i++){
+				TextRenderInfo charInfo = subs.get(i);
+				Vector previousEndPoint = previousCharInfo.getBaseline().getEndPoint();
+				Vector currentStartPoint = charInfo.getBaseline().getStartPoint();
+				assertVectorsEqual(charInfo.getText(), previousEndPoint, currentStartPoint);
+				previousCharInfo = charInfo;
+			}
 
-        private void assertVectorsEqual(String message, Vector v1, Vector v2) {
-            Assert.assertEquals(message, v1.get(0), v2.get(0), 1 / 72f);
-            Assert.assertEquals(message, v1.get(1), v2.get(1), 1 / 72f);
-        }
+		}
 
-        @Override
-        public void endTextBlock() {
-            // No implementation needed
-        }
+		private void assertVectorsEqual(String message, Vector v1, Vector v2){
+			Assert.assertEquals(message, v1.get(0), v2.get(0), 1/72f);
+			Assert.assertEquals(message, v1.get(1), v2.get(1), 1/72f);
+		}
+		public void endTextBlock() {
+		}
 
-        @Override
-        public void renderImage(ImageRenderInfo renderInfo) {
-            // No implementation needed
-        }
+		public void renderImage(ImageRenderInfo renderInfo) {
+		}
 
-        @Override
-        public String getResultantText() {
-            return null;
-        }
-    }
+		public String getResultantText() {
+			return null;
+		}
 
-    private byte[] createSimplePdf(Rectangle pageSize, String... text) throws Exception {
-        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        Document document = new Document(pageSize);
+	}
+
+	private byte[] createSimplePdf(Rectangle pageSize, final String... text) throws Exception{
+        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+
+        final Document document = new Document(pageSize);
         PdfWriter.getInstance(document, byteStream);
         document.open();
-
-        for (String content : text) {
-            document.add(new Paragraph(content));
+        for (String string : text) {
+            document.add(new Paragraph(string));
             document.newPage();
         }
 
         document.close();
-        return byteStream.toByteArray();
-    }
+
+        final byte[] pdfBytes = byteStream.toByteArray();
+
+        return pdfBytes;
+}
 }
