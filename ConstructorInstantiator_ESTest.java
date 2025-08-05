@@ -17,102 +17,110 @@ import org.mockito.internal.creation.instance.ConstructorInstantiator;
 public class ConstructorInstantiator_ESTest extends ConstructorInstantiator_ESTest_scaffolding {
 
   @Test(timeout = 4000)
-  public void test0()  throws Throwable  {
-      Object[] objectArray0 = new Object[3];
-      Object object0 = new Object();
-      objectArray0[0] = object0;
-      objectArray0[1] = objectArray0[0];
-      ConstructorInstantiator constructorInstantiator0 = new ConstructorInstantiator(false, objectArray0);
-      Class<Object> class0 = Object.class;
-      // Undeclared exception!
-      try { 
-        constructorInstantiator0.newInstance(class0);
+  public void whenConstructorArgsDoNotMatchAnyConstructor_thenThrowRuntimeException() throws Throwable {
+      // Arrange: Create mismatched constructor arguments
+      Object[] constructorArgs = new Object[3];
+      Object arg0 = new Object();
+      constructorArgs[0] = arg0;
+      constructorArgs[1] = arg0;  // Duplicate reference
+      // Third element remains null
+      ConstructorInstantiator instantiator = new ConstructorInstantiator(false, constructorArgs);
+
+      // Act & Assert: Expect RuntimeException due to no matching constructor
+      try {
+        instantiator.newInstance(Object.class);
         fail("Expecting exception: RuntimeException");
-      
       } catch(RuntimeException e) {
+        // Expected exception
       }
   }
 
   @Test(timeout = 4000)
-  public void test1()  throws Throwable  {
-      ConstructorInstantiator constructorInstantiator0 = new ConstructorInstantiator(false, (Object[]) null);
-      Class<Object> class0 = Object.class;
-      // Undeclared exception!
-      try { 
-        constructorInstantiator0.newInstance(class0);
+  public void whenConstructorArgsIsNull_thenThrowNullPointerException() throws Throwable {
+      // Arrange: Pass null constructor arguments
+      ConstructorInstantiator instantiator = new ConstructorInstantiator(false, (Object[]) null);
+
+      // Act & Assert: Expect NullPointerException when accessing null array
+      try {
+        instantiator.newInstance(Object.class);
         fail("Expecting exception: NullPointerException");
-      
       } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.mockito.internal.creation.instance.ConstructorInstantiator", e);
+        // Verify exception originates from ConstructorInstantiator
+        verifyException("org.mockito.internal.creation.instance.ConstructorInstantiator", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void test2()  throws Throwable  {
-      Class<Integer> class0 = Integer.class;
-      Object[] objectArray0 = new Object[1];
-      objectArray0[0] = (Object) class0;
-      ConstructorInstantiator constructorInstantiator0 = new ConstructorInstantiator(false, objectArray0);
-      // Undeclared exception!
-      try { 
-        constructorInstantiator0.newInstance(class0);
+  public void whenConstructorArgTypeMismatch_thenThrowRuntimeException() throws Throwable {
+      // Arrange: Pass Integer class as argument to Integer constructor
+      Object[] constructorArgs = new Object[1];
+      constructorArgs[0] = Integer.class;  // Incorrect argument type
+      ConstructorInstantiator instantiator = new ConstructorInstantiator(false, constructorArgs);
+
+      // Act & Assert: Expect RuntimeException due to type mismatch
+      try {
+        instantiator.newInstance(Integer.class);
         fail("Expecting exception: RuntimeException");
-      
       } catch(RuntimeException e) {
+        // Expected exception
       }
   }
 
   @Test(timeout = 4000)
-  public void test3()  throws Throwable  {
-      Object[] objectArray0 = new Object[1];
-      Class<Integer> class0 = Integer.class;
-      ConstructorInstantiator constructorInstantiator0 = new ConstructorInstantiator(true, objectArray0);
-      // Undeclared exception!
-      try { 
-        constructorInstantiator0.newInstance(class0);
+  public void whenSingleNullArgForIntegerClass_thenThrowRuntimeException() throws Throwable {
+      // Arrange: Single null argument for Integer class
+      Object[] constructorArgs = new Object[1];  // Defaults to [null]
+      ConstructorInstantiator instantiator = new ConstructorInstantiator(true, constructorArgs);
+
+      // Act & Assert: Expect RuntimeException (no int constructor with null)
+      try {
+        instantiator.newInstance(Integer.class);
         fail("Expecting exception: RuntimeException");
-      
       } catch(RuntimeException e) {
+        // Expected exception
       }
   }
 
   @Test(timeout = 4000)
-  public void test4()  throws Throwable  {
-      Object[] objectArray0 = new Object[7];
-      ConstructorInstantiator constructorInstantiator0 = new ConstructorInstantiator(true, objectArray0);
-      Class<Object> class0 = Object.class;
-      // Undeclared exception!
-      try { 
-        constructorInstantiator0.newInstance(class0);
+  public void whenTooManyArgsForObjectClass_thenThrowRuntimeException() throws Throwable {
+      // Arrange: 7 arguments for Object class (which has no parameters)
+      Object[] constructorArgs = new Object[7];  // All elements null
+      ConstructorInstantiator instantiator = new ConstructorInstantiator(true, constructorArgs);
+
+      // Act & Assert: Expect RuntimeException (too many arguments)
+      try {
+        instantiator.newInstance(Object.class);
         fail("Expecting exception: RuntimeException");
-      
       } catch(RuntimeException e) {
+        // Expected exception
       }
   }
 
   @Test(timeout = 4000)
-  public void test5()  throws Throwable  {
-      Object[] objectArray0 = new Object[0];
-      ConstructorInstantiator constructorInstantiator0 = new ConstructorInstantiator(true, objectArray0);
-      Class<Integer> class0 = Integer.class;
-      // Undeclared exception!
-      try { 
-        constructorInstantiator0.newInstance(class0);
+  public void whenNoArgConstructorNotAvailable_thenThrowRuntimeException() throws Throwable {
+      // Arrange: Empty arguments for Integer class (no no-arg constructor)
+      Object[] constructorArgs = new Object[0];
+      ConstructorInstantiator instantiator = new ConstructorInstantiator(true, constructorArgs);
+
+      // Act & Assert: Expect RuntimeException (Integer has no no-arg constructor)
+      try {
+        instantiator.newInstance(Integer.class);
         fail("Expecting exception: RuntimeException");
-      
       } catch(RuntimeException e) {
+        // Expected exception
       }
   }
 
   @Test(timeout = 4000)
-  public void test6()  throws Throwable  {
-      Object[] objectArray0 = new Object[0];
-      ConstructorInstantiator constructorInstantiator0 = new ConstructorInstantiator(true, objectArray0);
-      Class<Object> class0 = Object.class;
-      Object object0 = constructorInstantiator0.newInstance(class0);
-      assertNotNull(object0);
+  public void whenNoArgConstructorAvailable_thenSuccessfullyCreateInstance() throws Throwable {
+      // Arrange: Empty arguments for Object class (has no-arg constructor)
+      Object[] constructorArgs = new Object[0];
+      ConstructorInstantiator instantiator = new ConstructorInstantiator(true, constructorArgs);
+
+      // Act: Create instance
+      Object instance = instantiator.newInstance(Object.class);
+
+      // Assert: Verify successful instantiation
+      assertNotNull(instance);
   }
 }
