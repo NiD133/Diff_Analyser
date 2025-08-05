@@ -18,6 +18,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
+
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
@@ -38,75 +39,91 @@ package org.jfree.chart.renderer.xy;
 
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.api.PublicCloneable;
-
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for the {@link DeviationRenderer} class.
+ * Tests for the {@link DeviationRenderer} class, focusing on object contracts
+ * like equals, hashCode, cloning, and serialization.
  */
 public class DeviationRendererTest {
 
-    /**
-     * Test that the equals() method distinguishes all fields.
-     */
     @Test
-    public void testEquals() {
-        // default instances
-        DeviationRenderer r1 = new DeviationRenderer();
-        DeviationRenderer r2 = new DeviationRenderer();
-        assertEquals(r1, r2);
-        assertEquals(r2, r1);
+    @DisplayName("The equals method should correctly compare renderer instances")
+    void equals_shouldCorrectlyCompareInstances() {
+        // Arrange: Create two default renderers
+        DeviationRenderer renderer1 = new DeviationRenderer();
+        DeviationRenderer renderer2 = new DeviationRenderer();
 
-        r1.setAlpha(0.1f);
-        assertNotEquals(r1, r2);
-        r2.setAlpha(0.1f);
-        assertEquals(r1, r2);
+        // Assert: Default instances should be equal
+        assertEquals(renderer1, renderer2);
+
+        // Act: Change a property on one renderer
+        renderer1.setAlpha(0.1f);
+
+        // Assert: Instances should now be unequal
+        assertNotEquals(renderer1, renderer2);
+
+        // Act: Make the properties equal again
+        renderer2.setAlpha(0.1f);
+
+        // Assert: Instances should be equal again
+        assertEquals(renderer1, renderer2);
     }
 
-    /**
-     * Two objects that are equal are required to return the same hashCode.
-     */
     @Test
-    public void testHashcode() {
-        DeviationRenderer r1 = new DeviationRenderer();
-        DeviationRenderer r2 = new DeviationRenderer();
-        assertEquals(r1, r2);
-        int h1 = r1.hashCode();
-        int h2 = r2.hashCode();
-        assertEquals(h1, h2);
+    @DisplayName("The hash code should be consistent with the equals method")
+    void hashCode_shouldBeConsistentWithEquals() {
+        // Arrange
+        DeviationRenderer renderer1 = new DeviationRenderer();
+        DeviationRenderer renderer2 = new DeviationRenderer();
+        assertEquals(renderer1, renderer2, "Pre-condition: renderers must be equal for this test.");
+
+        // Act & Assert
+        assertEquals(renderer1.hashCode(), renderer2.hashCode());
     }
 
-    /**
-     * Confirm that cloning works.
-     */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
-        DeviationRenderer r1 = new DeviationRenderer();
-        DeviationRenderer r2 = (DeviationRenderer) r1.clone();
-        assertNotSame(r1, r2);
-        assertSame(r1.getClass(), r2.getClass());
-        assertEquals(r1, r2);
+    @DisplayName("Cloning should produce an independent copy")
+    void clone_shouldProduceIndependentCopy() throws CloneNotSupportedException {
+        // Arrange
+        DeviationRenderer original = new DeviationRenderer();
+
+        // Act
+        DeviationRenderer clone = (DeviationRenderer) original.clone();
+
+        // Assert: The clone is a different object but is equal in value
+        assertNotSame(original, clone);
+        assertEquals(original, clone);
+
+        // Assert: Modifying the clone does not affect the original
+        clone.setAlpha(0.9f);
+        assertNotEquals(original.getAlpha(), clone.getAlpha());
     }
 
-    /**
-     * Verify that this class implements {@link PublicCloneable}.
-     */
     @Test
-    public void testPublicCloneable() {
-        DeviationRenderer r1 = new DeviationRenderer();
-        assertTrue(r1 instanceof PublicCloneable);
+    @DisplayName("The renderer should be publicly cloneable")
+    void isPublicCloneable() {
+        // Arrange
+        DeviationRenderer renderer = new DeviationRenderer();
+
+        // Act & Assert
+        assertInstanceOf(PublicCloneable.class, renderer, "DeviationRenderer must implement PublicCloneable.");
     }
 
-    /**
-     * Serialize an instance, restore it, and check for equality.
-     */
     @Test
-    public void testSerialization() {
-        DeviationRenderer r1 = new DeviationRenderer();
-        DeviationRenderer r2 = TestUtils.serialised(r1);
-        assertEquals(r1, r2);
-    }
+    @DisplayName("Serialization and deserialization should preserve object state")
+    void serialization_shouldPreserveState() {
+        // Arrange
+        DeviationRenderer original = new DeviationRenderer();
+        original.setAlpha(0.75f); // Use a non-default value for a more robust test
 
+        // Act
+        DeviationRenderer deserialized = TestUtils.serialised(original);
+
+        // Assert
+        assertEquals(original, deserialized, "Deserialized object should be equal to the original.");
+    }
 }
