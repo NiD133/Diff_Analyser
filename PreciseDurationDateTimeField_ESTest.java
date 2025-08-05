@@ -17,9 +17,6 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Days;
 import org.joda.time.DurationField;
 import org.joda.time.DurationFieldType;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.Weeks;
 import org.joda.time.chrono.EthiopicChronology;
 import org.joda.time.chrono.GJChronology;
 import org.joda.time.chrono.GregorianChronology;
@@ -38,7 +35,8 @@ import org.junit.runner.RunWith;
 public class PreciseDurationDateTimeField_ESTest extends PreciseDurationDateTimeField_ESTest_scaffolding {
 
   @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
+  public void testRemainderCalculation()  throws Throwable  {
+      // Test remainder calculation for a precise duration field
       DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.clockhourOfHalfday();
       DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
       EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstance();
@@ -46,12 +44,13 @@ public class PreciseDurationDateTimeField_ESTest extends PreciseDurationDateTime
       DurationField durationField0 = zonedChronology0.days();
       DurationField durationField1 = zonedChronology0.seconds();
       PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, durationField1, durationField0);
-      long long0 = preciseDateTimeField0.remainder(2946L);
-      assertEquals(946L, long0);
+      long remainder = preciseDateTimeField0.remainder(2946L);
+      assertEquals(946L, remainder);
   }
 
   @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
+  public void testRoundCeilingWithPositiveValue()  throws Throwable  {
+      // Test rounding ceiling with positive value
       DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfCentury();
       JulianChronology julianChronology0 = JulianChronology.getInstance();
       DateTimeZone dateTimeZone0 = DateTimeZone.UTC;
@@ -61,12 +60,13 @@ public class PreciseDurationDateTimeField_ESTest extends PreciseDurationDateTime
       DurationFieldType durationFieldType0 = days0.getFieldType();
       PreciseDurationField preciseDurationField0 = new PreciseDurationField(durationFieldType0, 21859200000L);
       PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, durationField0, preciseDurationField0);
-      long long0 = preciseDateTimeField0.roundCeiling(1902L);
-      assertEquals(86400000L, long0);
+      long rounded = preciseDateTimeField0.roundCeiling(1902L);
+      assertEquals(86400000L, rounded);
   }
 
   @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
+  public void testRoundCeilingWithZero()  throws Throwable  {
+      // Test rounding ceiling with zero value
       DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfCentury();
       MillisDurationField millisDurationField0 = (MillisDurationField)MillisDurationField.INSTANCE;
       JulianChronology julianChronology0 = JulianChronology.getInstance();
@@ -74,12 +74,13 @@ public class PreciseDurationDateTimeField_ESTest extends PreciseDurationDateTime
       ZonedChronology zonedChronology0 = ZonedChronology.getInstance(julianChronology0, dateTimeZone0);
       DurationField durationField0 = zonedChronology0.days();
       PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, millisDurationField0, durationField0);
-      long long0 = preciseDateTimeField0.roundCeiling(0L);
-      assertEquals(0L, long0);
+      long rounded = preciseDateTimeField0.roundCeiling(0L);
+      assertEquals(0L, rounded);
   }
 
   @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
+  public void testRoundFloorWithZero()  throws Throwable  {
+      // Test rounding floor with zero value
       DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfCentury();
       MillisDurationField millisDurationField0 = (MillisDurationField)MillisDurationField.INSTANCE;
       JulianChronology julianChronology0 = JulianChronology.getInstance();
@@ -87,19 +88,13 @@ public class PreciseDurationDateTimeField_ESTest extends PreciseDurationDateTime
       ZonedChronology zonedChronology0 = ZonedChronology.getInstance(julianChronology0, dateTimeZone0);
       DurationField durationField0 = zonedChronology0.days();
       PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, millisDurationField0, durationField0);
-      long long0 = preciseDateTimeField0.roundFloor(0L);
-      assertEquals(0L, long0);
+      long rounded = preciseDateTimeField0.roundFloor(0L);
+      assertEquals(0L, rounded);
   }
 
   @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      LocalDate localDate0 = LocalDate.now();
-      LocalDate localDate1 = localDate0.withDayOfYear(365);
-      assertNotSame(localDate1, localDate0);
-  }
-
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
+  public void testSetToZero()  throws Throwable  {
+      // Test setting field value to zero
       DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfCentury();
       MillisDurationField millisDurationField0 = (MillisDurationField)MillisDurationField.INSTANCE;
       JulianChronology julianChronology0 = JulianChronology.getInstance();
@@ -107,12 +102,13 @@ public class PreciseDurationDateTimeField_ESTest extends PreciseDurationDateTime
       ZonedChronology zonedChronology0 = ZonedChronology.getInstance(julianChronology0, dateTimeZone0);
       DurationField durationField0 = zonedChronology0.days();
       PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, millisDurationField0, durationField0);
-      long long0 = preciseDateTimeField0.set(2979L, 0);
-      assertEquals(0L, long0);
+      long result = preciseDateTimeField0.set(2979L, 0);
+      assertEquals(0L, result);
   }
 
   @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
+  public void testSetToLargeValue()  throws Throwable  {
+      // Test setting field to a large valid value
       DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfCentury();
       MillisDurationField millisDurationField0 = (MillisDurationField)MillisDurationField.INSTANCE;
       JulianChronology julianChronology0 = JulianChronology.getInstance();
@@ -120,12 +116,13 @@ public class PreciseDurationDateTimeField_ESTest extends PreciseDurationDateTime
       ZonedChronology zonedChronology0 = ZonedChronology.getInstance(julianChronology0, dateTimeZone0);
       DurationField durationField0 = zonedChronology0.days();
       PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, millisDurationField0, durationField0);
-      long long0 = preciseDateTimeField0.set(31536000000L, 86399850);
-      assertEquals(31622399850L, long0);
+      long result = preciseDateTimeField0.set(31536000000L, 86399850);
+      assertEquals(31622399850L, result);
   }
 
   @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
+  public void testSetToNegativeValue()  throws Throwable  {
+      // Test setting field to a negative value
       DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfCentury();
       MillisDurationField millisDurationField0 = (MillisDurationField)MillisDurationField.INSTANCE;
       JulianChronology julianChronology0 = JulianChronology.getInstance();
@@ -133,12 +130,13 @@ public class PreciseDurationDateTimeField_ESTest extends PreciseDurationDateTime
       ZonedChronology zonedChronology0 = ZonedChronology.getInstance(julianChronology0, dateTimeZone0);
       DurationField durationField0 = zonedChronology0.days();
       PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, millisDurationField0, durationField0);
-      long long0 = preciseDateTimeField0.set((-3012L), 82);
-      assertEquals((-86399918L), long0);
+      long result = preciseDateTimeField0.set((-3012L), 82);
+      assertEquals((-86399918L), result);
   }
 
   @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
+  public void testRoundFloorAndCheckLeniency()  throws Throwable  {
+      // Test round floor operation and field leniency
       DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.dayOfWeek();
       GregorianChronology gregorianChronology0 = GregorianChronology.getInstanceUTC();
       LenientChronology lenientChronology0 = LenientChronology.getInstance(gregorianChronology0);
@@ -147,13 +145,14 @@ public class PreciseDurationDateTimeField_ESTest extends PreciseDurationDateTime
       DurationField durationField0 = zonedChronology0.minutes();
       DurationField durationField1 = zonedChronology0.halfdays();
       PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, durationField0, durationField1);
-      long long0 = preciseDateTimeField0.roundFloor(992280585600000L);
-      assertEquals(992280585600000L, long0);
+      long rounded = preciseDateTimeField0.roundFloor(992280585600000L);
+      assertEquals(992280585600000L, rounded);
       assertFalse(preciseDateTimeField0.isLenient());
   }
 
   @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
+  public void testRoundFloorWithNegativeValue()  throws Throwable  {
+      // Test round floor with negative value
       DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfCentury();
       MillisDurationField millisDurationField0 = (MillisDurationField)MillisDurationField.INSTANCE;
       JulianChronology julianChronology0 = JulianChronology.getInstance();
@@ -161,12 +160,13 @@ public class PreciseDurationDateTimeField_ESTest extends PreciseDurationDateTime
       ZonedChronology zonedChronology0 = ZonedChronology.getInstance(julianChronology0, dateTimeZone0);
       DurationField durationField0 = zonedChronology0.days();
       PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, millisDurationField0, durationField0);
-      long long0 = preciseDateTimeField0.roundFloor((-5225));
-      assertEquals((-5225L), long0);
+      long rounded = preciseDateTimeField0.roundFloor((-5225));
+      assertEquals((-5225L), rounded);
   }
 
   @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
+  public void testRoundCeilingWithNegativeValue()  throws Throwable  {
+      // Test round ceiling with negative value
       DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfCentury();
       JulianChronology julianChronology0 = JulianChronology.getInstance();
       DateTimeZone dateTimeZone0 = DateTimeZone.UTC;
@@ -176,12 +176,13 @@ public class PreciseDurationDateTimeField_ESTest extends PreciseDurationDateTime
       DurationFieldType durationFieldType0 = days0.getFieldType();
       PreciseDurationField preciseDurationField0 = new PreciseDurationField(durationFieldType0, 21859200000L);
       PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, durationField0, preciseDurationField0);
-      long long0 = preciseDateTimeField0.roundCeiling((-1481L));
-      assertEquals(0L, long0);
+      long rounded = preciseDateTimeField0.roundCeiling((-1481L));
+      assertEquals(0L, rounded);
   }
 
   @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
+  public void testRemainderWithNegativeValue()  throws Throwable  {
+      // Test remainder calculation with negative value
       DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfCentury();
       JulianChronology julianChronology0 = JulianChronology.getInstance();
       DateTimeZone dateTimeZone0 = DateTimeZone.UTC;
@@ -191,12 +192,13 @@ public class PreciseDurationDateTimeField_ESTest extends PreciseDurationDateTime
       DurationFieldType durationFieldType0 = days0.getFieldType();
       PreciseDurationField preciseDurationField0 = new PreciseDurationField(durationFieldType0, 21859200000L);
       PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, durationField0, preciseDurationField0);
-      long long0 = preciseDateTimeField0.remainder((-5225));
-      assertEquals(86394775L, long0);
+      long remainder = preciseDateTimeField0.remainder((-5225));
+      assertEquals(86394775L, remainder);
   }
 
   @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
+  public void testIsLenient()  throws Throwable  {
+      // Test field leniency property
       DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.dayOfWeek();
       GregorianChronology gregorianChronology0 = GregorianChronology.getInstanceUTC();
       LenientChronology lenientChronology0 = LenientChronology.getInstance(gregorianChronology0);
@@ -205,12 +207,13 @@ public class PreciseDurationDateTimeField_ESTest extends PreciseDurationDateTime
       DurationField durationField0 = zonedChronology0.minutes();
       DurationField durationField1 = zonedChronology0.halfdays();
       PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, durationField0, durationField1);
-      boolean boolean0 = preciseDateTimeField0.isLenient();
-      assertFalse(boolean0);
+      boolean isLenient = preciseDateTimeField0.isLenient();
+      assertFalse(isLenient);
   }
 
   @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
+  public void testGetUnitMillis()  throws Throwable  {
+      // Test retrieval of unit milliseconds
       DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfCentury();
       MillisDurationField millisDurationField0 = (MillisDurationField)MillisDurationField.INSTANCE;
       JulianChronology julianChronology0 = JulianChronology.getInstance();
@@ -218,12 +221,13 @@ public class PreciseDurationDateTimeField_ESTest extends PreciseDurationDateTime
       ZonedChronology zonedChronology0 = ZonedChronology.getInstance(julianChronology0, dateTimeZone0);
       DurationField durationField0 = zonedChronology0.days();
       PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, millisDurationField0, durationField0);
-      long long0 = preciseDateTimeField0.getUnitMillis();
-      assertEquals(1L, long0);
+      long unitMillis = preciseDateTimeField0.getUnitMillis();
+      assertEquals(1L, unitMillis);
   }
 
   @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
+  public void testGetMinimumValue()  throws Throwable  {
+      // Test retrieval of minimum field value
       DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.dayOfWeek();
       IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
       DateTimeZone dateTimeZone0 = DateTimeZone.forTimeZone((TimeZone) null);
@@ -231,12 +235,13 @@ public class PreciseDurationDateTimeField_ESTest extends PreciseDurationDateTime
       DurationField durationField0 = zonedChronology0.halfdays();
       DurationField durationField1 = zonedChronology0.days();
       PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, durationField0, durationField1);
-      int int0 = preciseDateTimeField0.getMinimumValue();
-      assertEquals(0, int0);
+      int minValue = preciseDateTimeField0.getMinimumValue();
+      assertEquals(0, minValue);
   }
 
   @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
+  public void testGetMaximumValueForSet()  throws Throwable  {
+      // Test retrieval of maximum allowed value for set operation
       DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfCentury();
       MillisDurationField millisDurationField0 = (MillisDurationField)MillisDurationField.INSTANCE;
       JulianChronology julianChronology0 = JulianChronology.getInstance();
@@ -244,12 +249,13 @@ public class PreciseDurationDateTimeField_ESTest extends PreciseDurationDateTime
       ZonedChronology zonedChronology0 = ZonedChronology.getInstance(julianChronology0, dateTimeZone0);
       DurationField durationField0 = zonedChronology0.days();
       PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, millisDurationField0, durationField0);
-      int int0 = preciseDateTimeField0.getMaximumValueForSet((-3870L), (-2146901673));
-      assertEquals(86399999, int0);
+      int maxValue = preciseDateTimeField0.getMaximumValueForSet((-3870L), (-2146901673));
+      assertEquals(86399999, maxValue);
   }
 
   @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
+  public void testGetDurationField()  throws Throwable  {
+      // Test retrieval of duration field
       DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfCentury();
       MillisDurationField millisDurationField0 = (MillisDurationField)MillisDurationField.INSTANCE;
       JulianChronology julianChronology0 = JulianChronology.getInstance();
@@ -262,14 +268,8 @@ public class PreciseDurationDateTimeField_ESTest extends PreciseDurationDateTime
   }
 
   @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      LocalTime localTime0 = LocalTime.MIDNIGHT;
-      String string0 = localTime0.toString();
-      assertEquals("00:00:00.000", string0);
-  }
-
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
+  public void testRemainderWithNegativeValueResultZero()  throws Throwable  {
+      // Test remainder calculation with negative value resulting in zero
       DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfCentury();
       MillisDurationField millisDurationField0 = (MillisDurationField)MillisDurationField.INSTANCE;
       JulianChronology julianChronology0 = JulianChronology.getInstance();
@@ -277,12 +277,13 @@ public class PreciseDurationDateTimeField_ESTest extends PreciseDurationDateTime
       ZonedChronology zonedChronology0 = ZonedChronology.getInstance(julianChronology0, dateTimeZone0);
       DurationField durationField0 = zonedChronology0.days();
       PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, millisDurationField0, durationField0);
-      long long0 = preciseDateTimeField0.remainder((-1142L));
-      assertEquals(0L, long0);
+      long remainder = preciseDateTimeField0.remainder((-1142L));
+      assertEquals(0L, remainder);
   }
 
   @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
+  public void testRoundCeilingWithLargeValue()  throws Throwable  {
+      // Test round ceiling with large positive value
       DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfCentury();
       MillisDurationField millisDurationField0 = (MillisDurationField)MillisDurationField.INSTANCE;
       JulianChronology julianChronology0 = JulianChronology.getInstance();
@@ -290,12 +291,13 @@ public class PreciseDurationDateTimeField_ESTest extends PreciseDurationDateTime
       ZonedChronology zonedChronology0 = ZonedChronology.getInstance(julianChronology0, dateTimeZone0);
       DurationField durationField0 = zonedChronology0.days();
       PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, millisDurationField0, durationField0);
-      long long0 = preciseDateTimeField0.roundCeiling(100000000000000L);
-      assertEquals(100000000000000L, long0);
+      long rounded = preciseDateTimeField0.roundCeiling(100000000000000L);
+      assertEquals(100000000000000L, rounded);
   }
 
   @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
+  public void testRoundCeilingWithAlignedNegativeValue()  throws Throwable  {
+      // Test round ceiling with aligned negative value
       DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfCentury();
       MillisDurationField millisDurationField0 = (MillisDurationField)MillisDurationField.INSTANCE;
       JulianChronology julianChronology0 = JulianChronology.getInstance();
@@ -303,48 +305,41 @@ public class PreciseDurationDateTimeField_ESTest extends PreciseDurationDateTime
       ZonedChronology zonedChronology0 = ZonedChronology.getInstance(julianChronology0, dateTimeZone0);
       DurationField durationField0 = zonedChronology0.days();
       PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, millisDurationField0, durationField0);
-      long long0 = preciseDateTimeField0.roundCeiling((-1142L));
-      assertEquals((-1142L), long0);
+      long rounded = preciseDateTimeField0.roundCeiling((-1142L));
+      assertEquals((-1142L), rounded);
   }
 
   @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
+  public void testConstructorWithUnsupportedDurationFieldThrowsException()  throws Throwable  {
+      // Test constructor exception with unsupported duration field
       DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.clockhourOfDay();
       DurationFieldType durationFieldType0 = DurationFieldType.centuries();
       UnsupportedDurationField unsupportedDurationField0 = UnsupportedDurationField.getInstance(durationFieldType0);
-      PreciseDateTimeField preciseDateTimeField0 = null;
       try {
-        preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, unsupportedDurationField0, unsupportedDurationField0);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // The unit milliseconds must be at least 1
-         //
-         verifyException("org.joda.time.field.PreciseDurationDateTimeField", e);
+        new PreciseDateTimeField(dateTimeFieldType0, unsupportedDurationField0, unsupportedDurationField0);
+        fail("Expected IllegalArgumentException");
+      } catch (IllegalArgumentException e) {
+        assertEquals("The unit milliseconds must be at least 1", e.getMessage());
       }
   }
 
   @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
+  public void testConstructorWithNonPreciseDurationFieldThrowsException()  throws Throwable  {
+      // Test constructor exception with non-precise duration field
       DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.halfdayOfDay();
       DurationFieldType durationFieldType0 = DurationFieldType.years();
       DurationField durationField0 = durationFieldType0.getField((Chronology) null);
-      PreciseDateTimeField preciseDateTimeField0 = null;
       try {
-        preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, durationField0, durationField0);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Unit duration field must be precise
-         //
-         verifyException("org.joda.time.field.PreciseDurationDateTimeField", e);
+        new PreciseDateTimeField(dateTimeFieldType0, durationField0, durationField0);
+        fail("Expected IllegalArgumentException");
+      } catch (IllegalArgumentException e) {
+        assertEquals("Unit duration field must be precise", e.getMessage());
       }
   }
 
   @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
+  public void testSetWithOutOfRangeValueThrowsException()  throws Throwable  {
+      // Test exception when setting out-of-range value
       DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.minuteOfDay();
       Weeks weeks0 = Weeks.ONE;
       DurationFieldType durationFieldType0 = weeks0.getFieldType();
@@ -352,16 +347,11 @@ public class PreciseDurationDateTimeField_ESTest extends PreciseDurationDateTime
       DurationField durationField0 = durationFieldType0.getField(gJChronology0);
       ScaledDurationField scaledDurationField0 = new ScaledDurationField(durationField0, durationFieldType0, 1058);
       PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, durationField0, scaledDurationField0);
-      // Undeclared exception!
-      try { 
-        preciseDateTimeField0.set((long) 1058, 1058);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Value 1058 for minuteOfDay must be in the range [0,1057]
-         //
-         verifyException("org.joda.time.field.FieldUtils", e);
+      try {
+        preciseDateTimeField0.set(1058L, 1058);
+        fail("Expected IllegalArgumentException");
+      } catch (IllegalArgumentException e) {
+        assertEquals("Value 1058 for minuteOfDay must be in the range [0,1057]", e.getMessage());
       }
   }
 }
