@@ -18,233 +18,342 @@ import org.evosuite.runtime.EvoRunnerParameters;
 import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class)
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true,
-    useVFS = true,
-    useVNET = true,
-    resetStaticState = true,
-    separateClassLoader = true
-)
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class Parameter_ESTest extends Parameter_ESTest_scaffolding {
 
-    // Constants for position values to improve readability
-    private static final int POSITION_0 = 0;
-    private static final int POSITION_1 = 1;
-    private static final int POSITION_8 = 8;
-    private static final int POSITION_11 = 11;
-    private static final int NEGATIVE_POSITION = -3591;
-    private static final int POSITION_1021 = 1021;
-    private static final int POSITION_1296 = 1296;
-    private static final int POSITION_1563 = 1563;
-    private static final int POSITION_2473 = 2473;
-    private static final int POSITION_2844 = 2844;
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      Invokable<Object, Annotation> invokable0 = (Invokable<Object, Annotation>) mock(Invokable.class, new ViolatedAssumptionAnswer());
+      Class<Annotation> class0 = Annotation.class;
+      TypeToken<Annotation> typeToken0 = TypeToken.of(class0);
+      Annotation[] annotationArray0 = new Annotation[0];
+      Object object0 = new Object();
+      Parameter parameter0 = new Parameter(invokable0, 2473, typeToken0, annotationArray0, object0);
+      Parameter parameter1 = new Parameter((Invokable<?, ?>) null, 1021, typeToken0, annotationArray0, parameter0);
+      boolean boolean0 = parameter0.equals(parameter1);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testEquals_whenDifferentDeclaringInvokable_returnsFalse() throws Throwable {
-        Invokable<Object, Annotation> invokable1 = mock(Invokable.class, new ViolatedAssumptionAnswer());
-        Invokable<Object, Annotation> invokable2 = mock(Invokable.class, new ViolatedAssumptionAnswer());
-        TypeToken<Annotation> typeToken = TypeToken.of(Annotation.class);
-        Annotation[] noAnnotations = new Annotation[0];
-        Object annotatedType = new Object();
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      Class<Object> class0 = Object.class;
+      TypeToken<Object> typeToken0 = TypeToken.of(class0);
+      Annotation[] annotationArray0 = new Annotation[0];
+      Parameter parameter0 = new Parameter((Invokable<?, ?>) null, 2844, typeToken0, annotationArray0, (Object) null);
+      Class<Annotation> class1 = Annotation.class;
+      Annotation[] annotationArray1 = parameter0.getDeclaredAnnotationsByType(class1);
+      assertNotSame(annotationArray0, annotationArray1);
+  }
 
-        Parameter param1 = new Parameter(invokable1, POSITION_1563, typeToken, noAnnotations, annotatedType);
-        Parameter param2 = new Parameter(invokable2, POSITION_1563, typeToken, noAnnotations, annotatedType);
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      Annotation[] annotationArray0 = new Annotation[0];
+      Parameter parameter0 = new Parameter((Invokable<?, ?>) null, 1296, (TypeToken<?>) null, annotationArray0, (Object) null);
+      // Undeclared exception!
+      try { 
+        parameter0.isAnnotationPresent((Class<? extends Annotation>) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.base.Preconditions", e);
+      }
+  }
 
-        assertFalse(param1.equals(param2));
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      Class<Object> class0 = Object.class;
+      TypeToken<Object> typeToken0 = TypeToken.of(class0);
+      Annotation[] annotationArray0 = new Annotation[0];
+      Parameter parameter0 = new Parameter((Invokable<?, ?>) null, 2844, typeToken0, annotationArray0, (Object) null);
+      // Undeclared exception!
+      try { 
+        parameter0.getDeclaredAnnotation((Class<Annotation>) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.base.Preconditions", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testEquals_whenDifferentPositions_returnsFalse() throws Throwable {
-        Invokable<Object, Annotation> invokable = mock(Invokable.class, new ViolatedAssumptionAnswer());
-        TypeToken<Annotation> typeToken = TypeToken.of(Annotation.class);
-        Annotation[] noAnnotations = new Annotation[0];
-        Object annotatedType = new Object();
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      Annotation[] annotationArray0 = new Annotation[0];
+      Parameter parameter0 = new Parameter((Invokable<?, ?>) null, (-2148), (TypeToken<?>) null, annotationArray0, (Object) null);
+      // Undeclared exception!
+      try { 
+        parameter0.getAnnotationsByType((Class<Annotation>) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.base.Preconditions", e);
+      }
+  }
 
-        Parameter param1 = new Parameter(invokable, POSITION_2473, typeToken, noAnnotations, annotatedType);
-        Parameter param2 = new Parameter(invokable, POSITION_1021, typeToken, noAnnotations, annotatedType);
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      Invokable<Object, Annotation> invokable0 = (Invokable<Object, Annotation>) mock(Invokable.class, new ViolatedAssumptionAnswer());
+      Class<Annotation> class0 = Annotation.class;
+      TypeToken<Annotation> typeToken0 = TypeToken.of(class0);
+      Annotation[] annotationArray0 = new Annotation[0];
+      Parameter parameter0 = new Parameter(invokable0, 0, typeToken0, annotationArray0, invokable0);
+      // Undeclared exception!
+      try { 
+        parameter0.getAnnotation((Class<Annotation>) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.base.Preconditions", e);
+      }
+  }
 
-        assertFalse(param1.equals(param2));
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      Annotation[] annotationArray0 = new Annotation[0];
+      Object object0 = new Object();
+      Parameter parameter0 = new Parameter((Invokable<?, ?>) null, (-948), (TypeToken<?>) null, annotationArray0, object0);
+      // Undeclared exception!
+      try { 
+        parameter0.getAnnotatedType();
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // java.lang.Object cannot be cast to java.lang.reflect.AnnotatedType
+         //
+         verifyException("com.google.common.reflect.Parameter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testEquals_whenSameInstance_returnsTrue() throws Throwable {
-        Invokable<Object, Annotation> invokable = mock(Invokable.class, new ViolatedAssumptionAnswer());
-        TypeToken<Annotation> typeToken = TypeToken.of(Annotation.class);
-        Annotation[] noAnnotations = new Annotation[0];
-        Object annotatedType = new Object();
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      Parameter parameter0 = null;
+      try {
+        parameter0 = new Parameter((Invokable<?, ?>) null, 14, (TypeToken<?>) null, (Annotation[]) null, (Object) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.collect.ImmutableList", e);
+      }
+  }
 
-        Parameter param = new Parameter(invokable, POSITION_1563, typeToken, noAnnotations, annotatedType);
-        assertTrue(param.equals(param));
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      Annotation[] annotationArray0 = new Annotation[1];
+      Parameter parameter0 = null;
+      try {
+        parameter0 = new Parameter((Invokable<?, ?>) null, (-3591), (TypeToken<?>) null, annotationArray0, (Object) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.base.Preconditions", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testEquals_whenNull_returnsFalse() throws Throwable {
-        Annotation[] noAnnotations = new Annotation[0];
-        Parameter param = new Parameter(null, NEGATIVE_POSITION, null, noAnnotations, null);
-        assertFalse(param.equals(null));
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      Class<Object> class0 = Object.class;
+      TypeToken<Object> typeToken0 = TypeToken.of(class0);
+      Annotation[] annotationArray0 = new Annotation[0];
+      Parameter parameter0 = new Parameter((Invokable<?, ?>) null, 2844, typeToken0, annotationArray0, (Object) null);
+      Class<Annotation> class1 = Annotation.class;
+      Annotation annotation0 = parameter0.getAnnotation(class1);
+      assertNull(annotation0);
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testEquals_whenNullDeclaringInvokable_throwsException() throws Throwable {
-        Annotation[] noAnnotations = new Annotation[0];
-        Parameter param = new Parameter(null, NEGATIVE_POSITION, null, noAnnotations, null);
-        param.equals(param); // Should throw NPE
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      Invokable<Object, Annotation> invokable0 = (Invokable<Object, Annotation>) mock(Invokable.class, new ViolatedAssumptionAnswer());
+      Annotation[] annotationArray0 = new Annotation[0];
+      Parameter parameter0 = new Parameter(invokable0, (-751), (TypeToken<?>) null, annotationArray0, (Object) null);
+      // Undeclared exception!
+      try { 
+        parameter0.getDeclaredAnnotationsByType((Class<Annotation>) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.base.Preconditions", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetDeclaredAnnotations_returnsEmptyArray() throws Throwable {
-        TypeToken<Object> typeToken = TypeToken.of(Object.class);
-        Annotation[] noAnnotations = new Annotation[0];
-        Parameter param = new Parameter(null, POSITION_2844, typeToken, noAnnotations, null);
-        
-        Annotation[] result = param.getDeclaredAnnotations();
-        assertEquals(0, result.length);
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      Class<Object> class0 = Object.class;
+      TypeToken<Object> typeToken0 = TypeToken.of(class0);
+      Annotation[] annotationArray0 = new Annotation[0];
+      Parameter parameter0 = new Parameter((Invokable<?, ?>) null, 2844, typeToken0, annotationArray0, (Object) null);
+      Annotation[] annotationArray1 = parameter0.getDeclaredAnnotations();
+      assertEquals(0, annotationArray1.length);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetAnnotations_returnsEmptyArray() throws Throwable {
-        Invokable<Object, Annotation> invokable = mock(Invokable.class, new ViolatedAssumptionAnswer());
-        Annotation[] noAnnotations = new Annotation[0];
-        Parameter param = new Parameter(invokable, POSITION_0, null, noAnnotations, null);
-        
-        Annotation[] result = param.getAnnotations();
-        assertEquals(0, result.length);
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      Invokable<Object, Annotation> invokable0 = (Invokable<Object, Annotation>) mock(Invokable.class, new ViolatedAssumptionAnswer());
+      Class<Annotation> class0 = Annotation.class;
+      TypeToken<Annotation> typeToken0 = TypeToken.of(class0);
+      Annotation[] annotationArray0 = new Annotation[0];
+      Parameter parameter0 = new Parameter(invokable0, 1563, typeToken0, annotationArray0, class0);
+      boolean boolean0 = parameter0.equals(parameter0);
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetAnnotation_whenNotPresent_returnsNull() throws Throwable {
-        TypeToken<Object> typeToken = TypeToken.of(Object.class);
-        Annotation[] noAnnotations = new Annotation[0];
-        Parameter param = new Parameter(null, POSITION_2844, typeToken, noAnnotations, null);
-        
-        assertNull(param.getAnnotation(Annotation.class));
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      Invokable<Object, Annotation> invokable0 = (Invokable<Object, Annotation>) mock(Invokable.class, new ViolatedAssumptionAnswer());
+      Class<Annotation> class0 = Annotation.class;
+      TypeToken<Annotation> typeToken0 = TypeToken.of(class0);
+      Annotation[] annotationArray0 = new Annotation[0];
+      Parameter parameter0 = new Parameter(invokable0, 1563, typeToken0, annotationArray0, class0);
+      Invokable<Parameter, Annotation> invokable1 = (Invokable<Parameter, Annotation>) mock(Invokable.class, new ViolatedAssumptionAnswer());
+      Parameter parameter1 = new Parameter(invokable1, 1563, typeToken0, annotationArray0, class0);
+      boolean boolean0 = parameter0.equals(parameter1);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetDeclaredAnnotation_whenNotPresent_returnsNull() throws Throwable {
-        Annotation[] noAnnotations = new Annotation[0];
-        Parameter param = new Parameter(null, NEGATIVE_POSITION, null, noAnnotations, null);
-        
-        assertNull(param.getDeclaredAnnotation(Annotation.class));
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      Annotation[] annotationArray0 = new Annotation[0];
+      Parameter parameter0 = new Parameter((Invokable<?, ?>) null, (-3558), (TypeToken<?>) null, annotationArray0, (Object) null);
+      Parameter parameter1 = new Parameter((Invokable<?, ?>) null, 1, (TypeToken<?>) null, annotationArray0, parameter0);
+      boolean boolean0 = parameter0.equals(parameter1);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testIsAnnotationPresent_whenNotPresent_returnsFalse() throws Throwable {
-        Invokable<Object, Annotation> invokable = mock(Invokable.class, new ViolatedAssumptionAnswer());
-        TypeToken<Annotation> typeToken = TypeToken.of(Annotation.class);
-        Annotation[] noAnnotations = new Annotation[0];
-        Parameter param = new Parameter(invokable, POSITION_0, typeToken, noAnnotations, invokable);
-        
-        assertFalse(param.isAnnotationPresent(Annotation.class));
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      Annotation[] annotationArray0 = new Annotation[0];
+      Parameter parameter0 = new Parameter((Invokable<?, ?>) null, (-3558), (TypeToken<?>) null, annotationArray0, (Object) null);
+      // Undeclared exception!
+      try { 
+        parameter0.equals(parameter0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.reflect.Parameter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetAnnotationsByType_returnsEmptyArray() throws Throwable {
-        Invokable<Object, Annotation> invokable = mock(Invokable.class, new ViolatedAssumptionAnswer());
-        Annotation[] noAnnotations = new Annotation[0];
-        Parameter param = new Parameter(invokable, POSITION_0, null, noAnnotations, null);
-        
-        Annotation[] result = param.getAnnotationsByType(Annotation.class);
-        assertEquals(0, result.length);
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      Annotation[] annotationArray0 = new Annotation[0];
+      Parameter parameter0 = new Parameter((Invokable<?, ?>) null, (-3591), (TypeToken<?>) null, annotationArray0, (Object) null);
+      boolean boolean0 = parameter0.equals((Object) null);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetDeclaredAnnotationsByType_returnsEmptyArray() throws Throwable {
-        TypeToken<Object> typeToken = TypeToken.of(Object.class);
-        Annotation[] noAnnotations = new Annotation[0];
-        Parameter param = new Parameter(null, POSITION_2844, typeToken, noAnnotations, null);
-        
-        Annotation[] result = param.getDeclaredAnnotationsByType(Annotation.class);
-        assertNotSame(noAnnotations, result);
-        assertEquals(0, result.length);
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      Invokable<Object, Annotation> invokable0 = (Invokable<Object, Annotation>) mock(Invokable.class, new ViolatedAssumptionAnswer());
+      Class<Annotation> class0 = Annotation.class;
+      TypeToken<Annotation> typeToken0 = TypeToken.of(class0);
+      Annotation[] annotationArray0 = new Annotation[0];
+      Parameter parameter0 = new Parameter(invokable0, 0, typeToken0, annotationArray0, invokable0);
+      boolean boolean0 = parameter0.isAnnotationPresent(class0);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetDeclaringInvokable_whenNull_returnsNull() throws Throwable {
-        Annotation[] noAnnotations = new Annotation[0];
-        Parameter param = new Parameter(null, NEGATIVE_POSITION, null, noAnnotations, null);
-        assertNull(param.getDeclaringInvokable());
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      Annotation[] annotationArray0 = new Annotation[0];
+      Parameter parameter0 = new Parameter((Invokable<?, ?>) null, (-3591), (TypeToken<?>) null, annotationArray0, (Object) null);
+      Invokable<?, ?> invokable0 = parameter0.getDeclaringInvokable();
+      assertNull(invokable0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetType_whenNull_returnsNull() throws Throwable {
-        Annotation[] noAnnotations = new Annotation[0];
-        Parameter param = new Parameter(null, NEGATIVE_POSITION, null, noAnnotations, null);
-        assertNull(param.getType());
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      Invokable<Object, Annotation> invokable0 = (Invokable<Object, Annotation>) mock(Invokable.class, new ViolatedAssumptionAnswer());
+      Class<Annotation> class0 = Annotation.class;
+      TypeToken<Annotation> typeToken0 = TypeToken.of(class0);
+      Annotation[] annotationArray0 = new Annotation[0];
+      Parameter parameter0 = new Parameter(invokable0, 0, typeToken0, annotationArray0, invokable0);
+      Annotation[] annotationArray1 = parameter0.getAnnotations();
+      assertEquals(0, annotationArray1.length);
+  }
 
-    @Test(timeout = 4000)
-    public void testToString_formatsCorrectly() throws Throwable {
-        Annotation[] noAnnotations = new Annotation[0];
-        Parameter param = new Parameter(null, POSITION_11, null, noAnnotations, null);
-        assertEquals("null arg11", param.toString());
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      Annotation[] annotationArray0 = new Annotation[0];
+      Parameter parameter0 = new Parameter((Invokable<?, ?>) null, (-3591), (TypeToken<?>) null, annotationArray0, (Object) null);
+      // Undeclared exception!
+      try { 
+        parameter0.getAnnotatedType();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testHashCode_doesNotThrowException() throws Throwable {
-        Invokable<Object, Annotation> invokable = mock(Invokable.class, new ViolatedAssumptionAnswer());
-        TypeToken<Object> typeToken = TypeToken.of(Object.class);
-        Annotation[] noAnnotations = new Annotation[0];
-        Parameter param = new Parameter(invokable, POSITION_8, typeToken, noAnnotations, Object.class);
-        param.hashCode(); // Should not throw
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      Annotation[] annotationArray0 = new Annotation[0];
+      Parameter parameter0 = new Parameter((Invokable<?, ?>) null, (-3591), (TypeToken<?>) null, annotationArray0, (Object) null);
+      TypeToken<?> typeToken0 = parameter0.getType();
+      assertNull(typeToken0);
+  }
 
-    // Tests for expected exceptions
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testIsAnnotationPresent_withNullArgument_throwsException() throws Throwable {
-        Annotation[] noAnnotations = new Annotation[0];
-        Parameter param = new Parameter(null, POSITION_1296, null, noAnnotations, null);
-        param.isAnnotationPresent(null); // Should throw NPE
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      Annotation[] annotationArray0 = new Annotation[0];
+      Parameter parameter0 = new Parameter((Invokable<?, ?>) null, 11, (TypeToken<?>) null, annotationArray0, (Object) null);
+      String string0 = parameter0.toString();
+      assertEquals("null arg11", string0);
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testGetDeclaredAnnotation_withNullArgument_throwsException() throws Throwable {
-        TypeToken<Object> typeToken = TypeToken.of(Object.class);
-        Annotation[] noAnnotations = new Annotation[0];
-        Parameter param = new Parameter(null, POSITION_2844, typeToken, noAnnotations, null);
-        param.getDeclaredAnnotation(null); // Should throw NPE
-    }
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      Annotation[] annotationArray0 = new Annotation[0];
+      Parameter parameter0 = new Parameter((Invokable<?, ?>) null, (-3591), (TypeToken<?>) null, annotationArray0, (Object) null);
+      Class<Annotation> class0 = Annotation.class;
+      Annotation annotation0 = parameter0.getDeclaredAnnotation(class0);
+      assertNull(annotation0);
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testGetAnnotationsByType_withNullArgument_throwsException() throws Throwable {
-        Annotation[] noAnnotations = new Annotation[0];
-        Parameter param = new Parameter(null, NEGATIVE_POSITION, null, noAnnotations, null);
-        param.getAnnotationsByType(null); // Should throw NPE
-    }
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      Invokable<Object, Annotation> invokable0 = (Invokable<Object, Annotation>) mock(Invokable.class, new ViolatedAssumptionAnswer());
+      Class<Object> class0 = Object.class;
+      TypeToken<Object> typeToken0 = TypeToken.of(class0);
+      Annotation[] annotationArray0 = new Annotation[0];
+      Parameter parameter0 = new Parameter(invokable0, 8, typeToken0, annotationArray0, class0);
+      parameter0.hashCode();
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testGetAnnotation_withNullArgument_throwsException() throws Throwable {
-        Invokable<Object, Annotation> invokable = mock(Invokable.class, new ViolatedAssumptionAnswer());
-        TypeToken<Annotation> typeToken = TypeToken.of(Annotation.class);
-        Annotation[] noAnnotations = new Annotation[0];
-        Parameter param = new Parameter(invokable, POSITION_0, typeToken, noAnnotations, invokable);
-        param.getAnnotation(null); // Should throw NPE
-    }
-
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testConstructor_withNullAnnotations_throwsException() throws Throwable {
-        new Parameter(null, 14, null, null, null); // Should throw NPE
-    }
-
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testConstructor_withNullElementInAnnotations_throwsException() throws Throwable {
-        Annotation[] annotationsWithNull = new Annotation[1]; // Contains null element
-        new Parameter(null, NEGATIVE_POSITION, null, annotationsWithNull, null); // Should throw NPE
-    }
-
-    @Test(timeout = 4000, expected = ClassCastException.class)
-    public void testGetAnnotatedType_whenInvalidType_throwsException() throws Throwable {
-        Annotation[] noAnnotations = new Annotation[0];
-        Object invalidAnnotatedType = new Object(); // Not AnnotatedType
-        Parameter param = new Parameter(null, -948, null, noAnnotations, invalidAnnotatedType);
-        param.getAnnotatedType(); // Should throw ClassCastException
-    }
-
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void testGetAnnotatedType_whenNull_throwsException() throws Throwable {
-        Annotation[] noAnnotations = new Annotation[0];
-        Parameter param = new Parameter(null, NEGATIVE_POSITION, null, noAnnotations, null);
-        param.getAnnotatedType(); // Should throw NPE
-    }
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      Invokable<Object, Annotation> invokable0 = (Invokable<Object, Annotation>) mock(Invokable.class, new ViolatedAssumptionAnswer());
+      Class<Annotation> class0 = Annotation.class;
+      TypeToken<Annotation> typeToken0 = TypeToken.of(class0);
+      Annotation[] annotationArray0 = new Annotation[0];
+      Parameter parameter0 = new Parameter(invokable0, 0, typeToken0, annotationArray0, invokable0);
+      Annotation[] annotationArray1 = parameter0.getAnnotationsByType(class0);
+      assertNotSame(annotationArray0, annotationArray1);
+  }
 }
