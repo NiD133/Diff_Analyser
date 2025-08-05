@@ -15,124 +15,142 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true, 
+    useVFS = true, 
+    useVNET = true, 
+    resetStaticState = true, 
+    separateClassLoader = true
+) 
 public class SimpleObjectIdResolver_ESTest extends SimpleObjectIdResolver_ESTest_scaffolding {
 
   @Test(timeout = 4000)
-  public void test0()  throws Throwable  {
-      SimpleObjectIdResolver simpleObjectIdResolver0 = new SimpleObjectIdResolver();
-      Class<Object> class0 = Object.class;
-      ObjectIdGenerator.IdKey objectIdGenerator_IdKey0 = new ObjectIdGenerator.IdKey(class0, class0, simpleObjectIdResolver0);
-      simpleObjectIdResolver0.bindItem(objectIdGenerator_IdKey0, class0);
-      Class class1 = (Class)simpleObjectIdResolver0.resolveId(objectIdGenerator_IdKey0);
-      assertFalse(class1.isEnum());
+  public void testResolveId_returnsBoundValue() throws Throwable {
+      SimpleObjectIdResolver resolver = new SimpleObjectIdResolver();
+      Class<Object> objectClass = Object.class;
+      ObjectIdGenerator.IdKey idKey = new ObjectIdGenerator.IdKey(objectClass, objectClass, resolver);
+      
+      // Bind class object to resolver and verify resolution
+      resolver.bindItem(idKey, objectClass);
+      Class<?> resolvedClass = (Class<?>) resolver.resolveId(idKey);
+      
+      assertFalse("Resolved class should not be an enum", resolvedClass.isEnum());
   }
 
   @Test(timeout = 4000)
-  public void test1()  throws Throwable  {
-      SimpleObjectIdResolver simpleObjectIdResolver0 = new SimpleObjectIdResolver();
-      // Undeclared exception!
-      try { 
-        simpleObjectIdResolver0.canUseFor((ObjectIdResolver) null);
-        fail("Expecting exception: NullPointerException");
+  public void testCanUseFor_withNullResolver_throwsNullPointerException() throws Throwable {
+      SimpleObjectIdResolver resolver = new SimpleObjectIdResolver();
       
+      // Verify null parameter causes NullPointerException
+      try { 
+          resolver.canUseFor(null);
+          fail("Expected NullPointerException when passing null resolver");
       } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.fasterxml.jackson.annotation.SimpleObjectIdResolver", e);
+          // NPE expected when resolver is null
+          verifyException("com.fasterxml.jackson.annotation.SimpleObjectIdResolver", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void test2()  throws Throwable  {
-      SimpleObjectIdResolver simpleObjectIdResolver0 = new SimpleObjectIdResolver();
-      Object object0 = new Object();
-      simpleObjectIdResolver0.bindItem((ObjectIdGenerator.IdKey) null, object0);
-      // Undeclared exception!
-      try { 
-        simpleObjectIdResolver0.bindItem((ObjectIdGenerator.IdKey) null, (Object) null);
-        fail("Expecting exception: NullPointerException");
+  public void testBindItem_withNullIdKey_throwsNullPointerException() throws Throwable {
+      SimpleObjectIdResolver resolver = new SimpleObjectIdResolver();
+      Object object = new Object();
       
+      // First binding with null key should succeed
+      resolver.bindItem(null, object);
+      
+      // Second binding with null key should fail during conflict resolution
+      try { 
+          resolver.bindItem(null, null);
+          fail("Expected NullPointerException when binding to null key");
       } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.fasterxml.jackson.annotation.SimpleObjectIdResolver", e);
+          // NPE expected during exception message construction
+          verifyException("com.fasterxml.jackson.annotation.SimpleObjectIdResolver", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void test3()  throws Throwable  {
-      SimpleObjectIdResolver simpleObjectIdResolver0 = new SimpleObjectIdResolver();
-      boolean boolean0 = simpleObjectIdResolver0.canUseFor(simpleObjectIdResolver0);
-      assertTrue(boolean0);
+  public void testCanUseFor_withSameResolverType_returnsTrue() throws Throwable {
+      SimpleObjectIdResolver resolver = new SimpleObjectIdResolver();
+      boolean result = resolver.canUseFor(resolver);
+      assertTrue("Should be able to use same resolver type", result);
   }
 
   @Test(timeout = 4000)
-  public void test4()  throws Throwable  {
-      SimpleObjectIdResolver simpleObjectIdResolver0 = new SimpleObjectIdResolver();
-      Class<Object> class0 = Object.class;
-      Class<String> class1 = String.class;
-      ObjectIdGenerator.IdKey objectIdGenerator_IdKey0 = new ObjectIdGenerator.IdKey(class0, class1, simpleObjectIdResolver0);
-      simpleObjectIdResolver0.bindItem(objectIdGenerator_IdKey0, (Object) null);
-      Object object0 = simpleObjectIdResolver0.resolveId(objectIdGenerator_IdKey0);
-      assertNull(object0);
-  }
-
-  @Test(timeout = 4000)
-  public void test5()  throws Throwable  {
-      SimpleObjectIdResolver simpleObjectIdResolver0 = new SimpleObjectIdResolver();
-      Class<Object> class0 = Object.class;
-      ObjectIdGenerator.IdKey objectIdGenerator_IdKey0 = new ObjectIdGenerator.IdKey(class0, class0, simpleObjectIdResolver0);
-      simpleObjectIdResolver0.bindItem(objectIdGenerator_IdKey0, class0);
-      // Undeclared exception!
-      try { 
-        simpleObjectIdResolver0.bindItem(objectIdGenerator_IdKey0, (Object) null);
-        fail("Expecting exception: IllegalStateException");
+  public void testResolveId_afterBindingNull_returnsNull() throws Throwable {
+      SimpleObjectIdResolver resolver = new SimpleObjectIdResolver();
+      Class<Object> objectClass = Object.class;
+      Class<String> stringClass = String.class;
+      ObjectIdGenerator.IdKey idKey = new ObjectIdGenerator.IdKey(objectClass, stringClass, resolver);
       
-      } catch(IllegalStateException e) {
-         //
-         // Object Id conflict: Id [ObjectId: key=com.fasterxml.jackson.annotation.SimpleObjectIdResolver@1, type=java.lang.Object, scope=java.lang.Object] already bound to an Object (type: `java.lang.Class`, value: java.lang.Class@0000000003): attempt to re-bind to a different Object (null)
-         //
-         verifyException("com.fasterxml.jackson.annotation.SimpleObjectIdResolver", e);
-      }
+      // Bind null value and verify resolution returns null
+      resolver.bindItem(idKey, null);
+      Object result = resolver.resolveId(idKey);
+      
+      assertNull("Should return null for bound null value", result);
   }
 
   @Test(timeout = 4000)
-  public void test6()  throws Throwable  {
-      SimpleObjectIdResolver simpleObjectIdResolver0 = new SimpleObjectIdResolver();
-      Class<String> class0 = String.class;
-      ObjectIdGenerator.IdKey objectIdGenerator_IdKey0 = new ObjectIdGenerator.IdKey(class0, class0, "");
-      simpleObjectIdResolver0.bindItem(objectIdGenerator_IdKey0, "");
-      // Undeclared exception!
+  public void testBindItem_duplicateBindingWithNull_throwsIllegalStateException() throws Throwable {
+      SimpleObjectIdResolver resolver = new SimpleObjectIdResolver();
+      Class<Object> objectClass = Object.class;
+      ObjectIdGenerator.IdKey idKey = new ObjectIdGenerator.IdKey(objectClass, objectClass, resolver);
+      
+      // Initial binding
+      resolver.bindItem(idKey, objectClass);
+      
+      // Verify duplicate binding with null fails
       try { 
-        simpleObjectIdResolver0.bindItem(objectIdGenerator_IdKey0, "");
-       //  fail("Expecting exception: IllegalStateException");
-       // Unstable assertion
+          resolver.bindItem(idKey, null);
+          fail("Expected IllegalStateException for duplicate binding");
       } catch(IllegalStateException e) {
-         //
-         // Object Id conflict: Id [ObjectId: key=, type=java.lang.String, scope=java.lang.String] already bound to an Object (type: `java.lang.String`, value: \"\"): attempt to re-bind to a different Object (type: `java.lang.String`, value: \"\")
-         //
-         verifyException("com.fasterxml.jackson.annotation.SimpleObjectIdResolver", e);
+          // Exception expected when rebinding to different value
+          verifyException("com.fasterxml.jackson.annotation.SimpleObjectIdResolver", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void test7()  throws Throwable  {
-      SimpleObjectIdResolver simpleObjectIdResolver0 = new SimpleObjectIdResolver();
-      Class<Object> class0 = Object.class;
-      Class<String> class1 = String.class;
-      ObjectIdGenerator.IdKey objectIdGenerator_IdKey0 = new ObjectIdGenerator.IdKey(class0, class1, simpleObjectIdResolver0);
-      Object object0 = simpleObjectIdResolver0.resolveId(objectIdGenerator_IdKey0);
-      simpleObjectIdResolver0.bindItem(objectIdGenerator_IdKey0, (Object) null);
-      simpleObjectIdResolver0.bindItem(objectIdGenerator_IdKey0, object0);
+  public void testBindItem_duplicateBindingWithSameString_throwsIllegalStateException() throws Throwable {
+      SimpleObjectIdResolver resolver = new SimpleObjectIdResolver();
+      Class<String> stringClass = String.class;
+      ObjectIdGenerator.IdKey idKey = new ObjectIdGenerator.IdKey(stringClass, stringClass, "");
+      
+      // Initial binding with empty string
+      resolver.bindItem(idKey, "");
+      
+      // Verify duplicate binding fails (even with same value)
+      try { 
+          resolver.bindItem(idKey, "");
+          fail("Expected IllegalStateException for duplicate binding");
+      } catch(IllegalStateException e) {
+          // Exception expected when rebinding same key
+          verifyException("com.fasterxml.jackson.annotation.SimpleObjectIdResolver", e);
+      }
   }
 
   @Test(timeout = 4000)
-  public void test8()  throws Throwable  {
-      SimpleObjectIdResolver simpleObjectIdResolver0 = new SimpleObjectIdResolver();
-      ObjectIdResolver objectIdResolver0 = simpleObjectIdResolver0.newForDeserialization((Object) null);
-      assertNotSame(objectIdResolver0, simpleObjectIdResolver0);
+  public void testBindItem_afterResolvingNullCanRebindNull() throws Throwable {
+      SimpleObjectIdResolver resolver = new SimpleObjectIdResolver();
+      Class<Object> objectClass = Object.class;
+      Class<String> stringClass = String.class;
+      ObjectIdGenerator.IdKey idKey = new ObjectIdGenerator.IdKey(objectClass, stringClass, resolver);
+      
+      // Initial resolution (returns null)
+      Object initialResolution = resolver.resolveId(idKey);
+      
+      // Bind null and then rebind with same value
+      resolver.bindItem(idKey, null);
+      resolver.bindItem(idKey, initialResolution); // rebinding with null
+      
+      // Test passes if no exception thrown
+  }
+
+  @Test(timeout = 4000)
+  public void testNewForDeserialization_returnsNewInstance() throws Throwable {
+      SimpleObjectIdResolver originalResolver = new SimpleObjectIdResolver();
+      ObjectIdResolver newResolver = originalResolver.newForDeserialization(null);
+      
+      assertNotSame("Should return new resolver instance", originalResolver, newResolver);
   }
 }
