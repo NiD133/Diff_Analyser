@@ -43,17 +43,8 @@
  */
 package com.itextpdf.text.pdf.parser;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-import com.itextpdf.testutils.TestResourceUtils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.itextpdf.awt.geom.AffineTransform;
+import com.itextpdf.testutils.TestResourceUtils;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
@@ -63,294 +54,368 @@ import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
+ * Tests for {@link SimpleTextExtractionStrategy}.
+ *
  * @author kevin
  */
 public class SimpleTextExtractionStrategyTest {
 
-    String TEXT1 = "TEXT1 TEXT1";
-    String TEXT2 = "TEXT2 TEXT2";
-    
-    @Before
-    public void setUp() throws Exception {
-    }
+    private static final String TEXT_CHUNK_1 = "TEXT1 TEXT1";
+    private static final String TEXT_CHUNK_2 = "TEXT2 TEXT2";
 
-    @After
-    public void tearDown() throws Exception {
-    }
-    
-    public TextExtractionStrategy createRenderListenerForTest(){
+    private TextExtractionStrategy createStrategy() {
         return new SimpleTextExtractionStrategy();
     }
 
+    // --- Tests for Collinear Text ---
+
     @Test
-    public void testCoLinnearText() throws Exception{
-        byte[] bytes = createPdfWithRotatedText(TEXT1, TEXT2, 0, false, 0);
-        
-        Assert.assertEquals(TEXT1 + TEXT2, PdfTextExtractor.getTextFromPage(new PdfReader(bytes), 1, createRenderListenerForTest()));
-    }
-    
-    @Test
-    public void testCoLinnearTextWithSpace() throws Exception{
-        byte[] bytes = createPdfWithRotatedText(TEXT1, TEXT2, 0, false, 2);
-        //saveBytesToFile(bytes, new File("c:/temp/test.pdf"));
-        
-        Assert.assertEquals(TEXT1 + " " + TEXT2, PdfTextExtractor.getTextFromPage(new PdfReader(bytes), 1, createRenderListenerForTest()));
-    }
-    
-    @Test
-    public void testCoLinnearTextEndingWithSpaceCharacter() throws Exception{
-        // in this case, we shouldn't be inserting an extra space
-        TEXT1 = TEXT1 + " ";
-        byte[] bytes = createPdfWithRotatedText(TEXT1, TEXT2, 0, false, 2);
+    public void should_concatenateCollinearText_when_renderedOnSameLineWithoutGap() throws Exception {
+        // Arrange: Create a PDF with two text chunks on the same line with no space between them.
+        byte[] pdfBytes = createPdfWithTwoTextChunks(TEXT_CHUNK_1, TEXT_CHUNK_2, 0, false, 0);
+        String expectedText = TEXT_CHUNK_1 + TEXT_CHUNK_2;
 
-        //TestResourceUtils.openBytesAsPdf(bytes);
-        
-        Assert.assertEquals(TEXT1 + TEXT2, PdfTextExtractor.getTextFromPage(new PdfReader(bytes), 1, createRenderListenerForTest()));
-        
-    }    
-    @Test
-    public void testUnRotatedText() throws Exception{
-        
-        byte[] bytes = createPdfWithRotatedText(TEXT1, TEXT2, 0, true, -20);
+        // Act
+        String extractedText = PdfTextExtractor.getTextFromPage(new PdfReader(pdfBytes), 1, createStrategy());
 
-        Assert.assertEquals(TEXT1 + "\n" + TEXT2, PdfTextExtractor.getTextFromPage(new PdfReader(bytes), 1, createRenderListenerForTest()));
-        
-    }
-
-    
-    @Test
-    public void testRotatedText() throws Exception{
-        
-        byte[] bytes = createPdfWithRotatedText(TEXT1, TEXT2, -90, true, -20);
-
-        Assert.assertEquals(TEXT1 + "\n" + TEXT2, PdfTextExtractor.getTextFromPage(new PdfReader(bytes), 1, createRenderListenerForTest()));
-
-    }
-    
-    @Test
-    public void testRotatedText2() throws Exception{
-        
-        byte[] bytes = createPdfWithRotatedText(TEXT1, TEXT2, 90, true, -20);
-        //TestResourceUtils.saveBytesToFile(bytes, new File("C:/temp/out.pdf"));
-
-        Assert.assertEquals(TEXT1 + "\n" + TEXT2, PdfTextExtractor.getTextFromPage(new PdfReader(bytes), 1, createRenderListenerForTest()));
-
+        // Assert
+        Assert.assertEquals(expectedText, extractedText);
     }
 
     @Test
-    public void testPartiallyRotatedText() throws Exception{
-        
-        byte[] bytes = createPdfWithRotatedText(TEXT1, TEXT2, 33, true, -20);
+    public void should_insertSpace_when_collinearTextHasSufficientGap() throws Exception {
+        // Arrange: Create a PDF with two text chunks on the same line with a 2-point gap.
+        byte[] pdfBytes = createPdfWithTwoTextChunks(TEXT_CHUNK_1, TEXT_CHUNK_2, 0, false, 2);
+        String expectedText = TEXT_CHUNK_1 + " " + TEXT_CHUNK_2;
 
-        Assert.assertEquals(TEXT1 + "\n" + TEXT2, PdfTextExtractor.getTextFromPage(new PdfReader(bytes), 1, createRenderListenerForTest()));
-        
-    }
-    
-    @Test
-    public void testWordSpacingCausedByExplicitGlyphPositioning() throws Exception{
-        byte[] bytes = createPdfWithArrayText(TEXT1, TEXT2, 250);
+        // Act
+        String extractedText = PdfTextExtractor.getTextFromPage(new PdfReader(pdfBytes), 1, createStrategy());
 
-        Assert.assertEquals(TEXT1 + " " + TEXT2, PdfTextExtractor.getTextFromPage(new PdfReader(bytes), 1, createRenderListenerForTest()));
-    }
-    
-    
-    @Test
-    public void testWordSpacingCausedByExplicitGlyphPositioning2() throws Exception{
-        
-        byte[] bytes = createPdfWithArrayText("[(S)3.2(an)-255.0(D)13.0(i)8.3(e)-10.1(g)1.6(o)-247.5(C)2.4(h)5.8(ap)3.0(t)10.7(er)]TJ");
-
-        Assert.assertEquals("San Diego Chapter", PdfTextExtractor.getTextFromPage(new PdfReader(bytes), 1, createRenderListenerForTest()));
-    }
-    
-    
-    @Test
-    public void testTrailingSpace() throws Exception{
-        byte[] bytes = createPdfWithRotatedText(TEXT1 + " ", TEXT2, 0, false, 6);
-
-        Assert.assertEquals(TEXT1 + " " + TEXT2, PdfTextExtractor.getTextFromPage(new PdfReader(bytes), 1, createRenderListenerForTest()));
+        // Assert
+        Assert.assertEquals(expectedText, extractedText);
     }
 
     @Test
-    public void testLeadingSpace() throws Exception{
-        byte[] bytes = createPdfWithRotatedText(TEXT1, " " + TEXT2, 0, false, 6);
-        
-        Assert.assertEquals(TEXT1 + " " + TEXT2, PdfTextExtractor.getTextFromPage(new PdfReader(bytes), 1, createRenderListenerForTest()));
-    }
-    
-    @Test
-    public void testExtractXObjectText() throws Exception {
-        String text1 = "X";
-        byte[] bytes = createPdfWithXObject(text1);
-        String text = PdfTextExtractor.getTextFromPage(new PdfReader(bytes), 1, createRenderListenerForTest());
-        Assert.assertTrue("extracted text (" + text + ") must contain '" + text1 + "'", text.indexOf(text1) >= 0);
-    }
+    public void should_notInsertExtraSpace_when_firstTextChunkEndsWithSpace() throws Exception {
+        // Arrange: Create a PDF where the first text chunk already ends with a space.
+        // The strategy should not add a second, redundant space.
+        String text1WithSpace = TEXT_CHUNK_1 + " ";
+        byte[] pdfBytes = createPdfWithTwoTextChunks(text1WithSpace, TEXT_CHUNK_2, 0, false, 2);
+        String expectedText = text1WithSpace + TEXT_CHUNK_2;
 
-    @Test
-    public void extractFromPage229() throws IOException {
-        if (this.getClass() != SimpleTextExtractionStrategyTest.class)
-            return;
-        InputStream is = TestResourceUtils.getResourceAsStream(this, "page229.pdf");
-        PdfReader reader = new PdfReader(is);
-        String text1 = PdfTextExtractor.getTextFromPage(reader, 1, new SimpleTextExtractionStrategy());
-        String text2 = PdfTextExtractor.getTextFromPage(reader, 1, new SingleCharacterSimpleTextExtractionStrategy());
-        Assert.assertEquals(text1, text2);
-        reader.close();
+        // Act
+        String extractedText = PdfTextExtractor.getTextFromPage(new PdfReader(pdfBytes), 1, createStrategy());
+
+        // Assert
+        Assert.assertEquals(expectedText, extractedText);
     }
 
     @Test
-    public void extractFromIsoTc171() throws IOException {
-        if (this.getClass() != SimpleTextExtractionStrategyTest.class)
-            return;
-        InputStream is = TestResourceUtils.getResourceAsStream(this, "ISO-TC171-SC2_N0896_SC2WG5_Edinburgh_Agenda.pdf");
-        PdfReader reader = new PdfReader(is);
-        String text1 = PdfTextExtractor.getTextFromPage(reader, 1, new SimpleTextExtractionStrategy()) +
-                "\n" +
-                PdfTextExtractor.getTextFromPage(reader, 2, new SimpleTextExtractionStrategy());
-        String text2 = PdfTextExtractor.getTextFromPage(reader, 1, new SingleCharacterSimpleTextExtractionStrategy()) +
-                "\n" +
-                PdfTextExtractor.getTextFromPage(reader, 2, new SingleCharacterSimpleTextExtractionStrategy());
-        Assert.assertEquals(text1, text2);
-        reader.close();
+    public void should_handleTrailingSpacesCorrectly() throws Exception {
+        // Arrange
+        byte[] pdfBytes = createPdfWithTwoTextChunks(TEXT_CHUNK_1 + " ", TEXT_CHUNK_2, 0, false, 6);
+        String expectedText = TEXT_CHUNK_1 + " " + TEXT_CHUNK_2;
+
+        // Act
+        String extractedText = PdfTextExtractor.getTextFromPage(new PdfReader(pdfBytes), 1, createStrategy());
+
+        // Assert
+        Assert.assertEquals(expectedText, extractedText);
     }
 
-    byte[] createPdfWithXObject(String xobjectText) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Document doc = new Document();
-        PdfWriter writer = PdfWriter.getInstance(doc, baos);
-        writer.setCompressionLevel(0);
-        doc.open();
+    @Test
+    public void should_handleLeadingSpacesCorrectly() throws Exception {
+        // Arrange
+        byte[] pdfBytes = createPdfWithTwoTextChunks(TEXT_CHUNK_1, " " + TEXT_CHUNK_2, 0, false, 6);
+        String expectedText = TEXT_CHUNK_1 + " " + TEXT_CHUNK_2;
 
-        doc.add(new Paragraph("A"));
-        doc.add(new Paragraph("B"));
-        
-        PdfTemplate template = writer.getDirectContent().createTemplate(100, 100);
-        
-        template.beginText();
-        template.setFontAndSize(BaseFont.createFont(), 12);
-        template.moveText(5, template.getHeight()-5);
-        template.showText(xobjectText);
-        template.endText();
-        
-        Image xobjectImage = Image.getInstance(template);
-        
-        doc.add(xobjectImage);
-        
-        doc.add(new Paragraph("C"));
-        
-        doc.close();
-        
-        return baos.toByteArray();
-    }    
-    
-    private static byte[] createPdfWithArrayText(String directContentTj) throws Exception{
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        // Act
+        String extractedText = PdfTextExtractor.getTextFromPage(new PdfReader(pdfBytes), 1, createStrategy());
 
-        final Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, byteStream);
-        document.setPageSize(PageSize.LETTER);
-
-        document.open();
-
-        PdfContentByte cb = writer.getDirectContent();
-
-        BaseFont font = BaseFont.createFont();
-        
-        cb.transform(AffineTransform.getTranslateInstance(100, 500));
-        cb.beginText();
-        cb.setFontAndSize(font, 12);
-
-        cb.getInternalBuffer().append(directContentTj + "\n");
-        
-        cb.endText();
-        
-        document.close();
-
-        final byte[] pdfBytes = byteStream.toByteArray();
-
-        return pdfBytes;
-
-    }    
-    
-    private static byte[] createPdfWithArrayText(String text1, String text2, int spaceInPoints) throws Exception{
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-
-        final Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, byteStream);
-        document.setPageSize(PageSize.LETTER);
-
-        document.open();
-
-        PdfContentByte cb = writer.getDirectContent();
-
-        BaseFont font = BaseFont.createFont();
-        
-        
-        cb.beginText();
-        cb.setFontAndSize(font, 12);
-
-        cb.getInternalBuffer().append("[(" + text1 + ")" + (-spaceInPoints) + "(" + text2 + ")]TJ\n");
-        
-        cb.endText();
-        
-        document.close();
-
-        final byte[] pdfBytes = byteStream.toByteArray();
-
-        return pdfBytes;
-
-    }
-    
-    private static byte[] createPdfWithRotatedText(String text1, String text2, float rotation, boolean moveTextToNextLine, float moveTextDelta) throws Exception {
-
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-
-        final Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, byteStream);
-        document.setPageSize(PageSize.LETTER);
-
-        document.open();
-
-        PdfContentByte cb = writer.getDirectContent();
-
-        BaseFont font = BaseFont.createFont();
-
-        float x = document.getPageSize().getWidth()/2;
-        float y = document.getPageSize().getHeight()/2;
-        
-        cb.transform(AffineTransform.getTranslateInstance(x, y));
-
-        cb.moveTo(-10, 0);
-        cb.lineTo(10, 0);
-        cb.moveTo(0, -10);
-        cb.lineTo(0, 10);
-        cb.stroke();
-        
-        cb.beginText();
-        cb.setFontAndSize(font, 12);
-        cb.transform(AffineTransform.getRotateInstance(rotation/180f*Math.PI));
-        cb.showText(text1);
-        if (moveTextToNextLine)
-            cb.moveText(0, moveTextDelta);
-        else
-            cb.transform(AffineTransform.getTranslateInstance(moveTextDelta, 0));
-        cb.showText(text2);
-        cb.endText();
-
-        document.close();
-
-        final byte[] pdfBytes = byteStream.toByteArray();
-
-        return pdfBytes;
+        // Assert
+        Assert.assertEquals(expectedText, extractedText);
     }
 
+    // --- Tests for Multi-line and Rotated Text ---
+
+    @Test
+    public void should_insertNewline_when_textIsOnDifferentLines() throws Exception {
+        // Arrange: Create a PDF where the second text chunk is on a new line below the first.
+        byte[] pdfBytes = createPdfWithTwoTextChunks(TEXT_CHUNK_1, TEXT_CHUNK_2, 0, true, -20);
+        String expectedText = TEXT_CHUNK_1 + "\n" + TEXT_CHUNK_2;
+
+        // Act
+        String extractedText = PdfTextExtractor.getTextFromPage(new PdfReader(pdfBytes), 1, createStrategy());
+
+        // Assert
+        Assert.assertEquals(expectedText, extractedText);
+    }
+
+    @Test
+    public void should_insertNewline_when_textIsOnDifferentLines_withNegative90DegreeRotation() throws Exception {
+        // Arrange
+        byte[] pdfBytes = createPdfWithTwoTextChunks(TEXT_CHUNK_1, TEXT_CHUNK_2, -90, true, -20);
+        String expectedText = TEXT_CHUNK_1 + "\n" + TEXT_CHUNK_2;
+
+        // Act
+        String extractedText = PdfTextExtractor.getTextFromPage(new PdfReader(pdfBytes), 1, createStrategy());
+
+        // Assert
+        Assert.assertEquals(expectedText, extractedText);
+    }
+
+    @Test
+    public void should_insertNewline_when_textIsOnDifferentLines_withPositive90DegreeRotation() throws Exception {
+        // Arrange
+        byte[] pdfBytes = createPdfWithTwoTextChunks(TEXT_CHUNK_1, TEXT_CHUNK_2, 90, true, -20);
+        String expectedText = TEXT_CHUNK_1 + "\n" + TEXT_CHUNK_2;
+
+        // Act
+        String extractedText = PdfTextExtractor.getTextFromPage(new PdfReader(pdfBytes), 1, createStrategy());
+
+        // Assert
+        Assert.assertEquals(expectedText, extractedText);
+    }
+
+    @Test
+    public void should_insertNewline_when_textIsOnDifferentLines_withPartialRotation() throws Exception {
+        // Arrange
+        byte[] pdfBytes = createPdfWithTwoTextChunks(TEXT_CHUNK_1, TEXT_CHUNK_2, 33, true, -20);
+        String expectedText = TEXT_CHUNK_1 + "\n" + TEXT_CHUNK_2;
+
+        // Act
+        String extractedText = PdfTextExtractor.getTextFromPage(new PdfReader(pdfBytes), 1, createStrategy());
+
+        // Assert
+        Assert.assertEquals(expectedText, extractedText);
+    }
+
+    // --- Tests for TJ Operator (Glyph Positioning) ---
+
+    @Test
+    public void should_insertSpace_when_wordSpacingIsCreatedByTjOperator() throws Exception {
+        // Arrange: Create a PDF using the TJ operator to position two text chunks with a space.
+        byte[] pdfBytes = createPdfWithTjOperator(TEXT_CHUNK_1, TEXT_CHUNK_2, 250);
+        String expectedText = TEXT_CHUNK_1 + " " + TEXT_CHUNK_2;
+
+        // Act
+        String extractedText = PdfTextExtractor.getTextFromPage(new PdfReader(pdfBytes), 1, createStrategy());
+
+        // Assert
+        Assert.assertEquals(expectedText, extractedText);
+    }
+
+    @Test
+    public void should_correctlyExtractText_when_usingComplexGlyphPositioning() throws Exception {
+        // Arrange: Create a PDF with complex character spacing via the TJ operator.
+        String tjCommand = "[(S)3.2(an)-255.0(D)13.0(i)8.3(e)-10.1(g)1.6(o)-247.5(C)2.4(h)5.8(ap)3.0(t)10.7(er)]TJ";
+        byte[] pdfBytes = createPdfWithTjOperator(tjCommand);
+        String expectedText = "San Diego Chapter";
+
+        // Act
+        String extractedText = PdfTextExtractor.getTextFromPage(new PdfReader(pdfBytes), 1, createStrategy());
+
+        // Assert
+        Assert.assertEquals(expectedText, extractedText);
+    }
+
+    // --- Tests for Special PDF Structures ---
+
+    @Test
+    public void should_extractTextFromXObject() throws Exception {
+        // Arrange
+        String xObjectText = "This is text inside an XObject";
+        byte[] pdfBytes = createPdfWithXObject(xObjectText);
+
+        // Act
+        String extractedText = PdfTextExtractor.getTextFromPage(new PdfReader(pdfBytes), 1, createStrategy());
+
+        // Assert
+        Assert.assertTrue("Extracted text should contain the XObject text.", extractedText.contains(xObjectText));
+    }
+
+    // --- Regression Tests from PDF Files ---
+
+    @Test
+    public void should_produceSameOutputAsCharByCharStrategy_forPage229RegressionPdf() throws IOException {
+        // This regression test uses a PDF where text is rendered character by character.
+        // It ensures that the standard strategy (processing whole text chunks) produces the
+        // same result as a strategy that processes each character individually. This validates
+        // the logic for handling character-based render information.
+        try (
+                InputStream is = TestResourceUtils.getResourceAsStream(this, "page229.pdf");
+                PdfReader reader = new PdfReader(is)
+        ) {
+            // Act
+            String textFromStandardStrategy = PdfTextExtractor.getTextFromPage(reader, 1, new SimpleTextExtractionStrategy());
+            String textFromCharByCharStrategy = PdfTextExtractor.getTextFromPage(reader, 1, new SingleCharacterSimpleTextExtractionStrategy());
+
+            // Assert
+            Assert.assertEquals("Results from standard and char-by-char strategies should match.",
+                    textFromStandardStrategy, textFromCharByCharStrategy);
+        }
+    }
+
+    @Test
+    public void should_produceSameOutputAsCharByCharStrategy_forIsoRegressionPdf() throws IOException {
+        // This is another regression test to ensure consistency between chunk-based and
+        // character-based text processing for a more complex, real-world document.
+        try (
+                InputStream is = TestResourceUtils.getResourceAsStream(this, "ISO-TC171-SC2_N0896_SC2WG5_Edinburgh_Agenda.pdf");
+                PdfReader reader = new PdfReader(is)
+        ) {
+            // Act
+            String textFromPage1 = PdfTextExtractor.getTextFromPage(reader, 1, new SimpleTextExtractionStrategy());
+            String textFromPage2 = PdfTextExtractor.getTextFromPage(reader, 2, new SimpleTextExtractionStrategy());
+            String textFromStandardStrategy = textFromPage1 + "\n" + textFromPage2;
+
+            String textFromPage1Char = PdfTextExtractor.getTextFromPage(reader, 1, new SingleCharacterSimpleTextExtractionStrategy());
+            String textFromPage2Char = PdfTextExtractor.getTextFromPage(reader, 2, new SingleCharacterSimpleTextExtractionStrategy());
+            String textFromCharByCharStrategy = textFromPage1Char + "\n" + textFromPage2Char;
+
+            // Assert
+            Assert.assertEquals("Results from standard and char-by-char strategies should match.",
+                    textFromStandardStrategy, textFromCharByCharStrategy);
+        }
+    }
+
+    // ===================================================================================
+    //                                 HELPER METHODS
+    // ===================================================================================
+
+    /**
+     * Creates a PDF document with two text chunks, allowing for control over their relative position and rotation.
+     * This is the primary helper method for testing how the strategy handles different text layouts.
+     *
+     * @param text1              The first string of text.
+     * @param text2              The second string of text.
+     * @param rotation           The rotation in degrees to apply to the text.
+     * @param moveTextToNextLine If true, uses the 'moveText' operator (Td) to create a new line. If false,
+     *                           uses a translation transform (Tm) to move horizontally.
+     * @param moveTextDelta      The distance to move before drawing the second text chunk. The unit and direction
+     *                           depend on the 'moveTextToNextLine' parameter.
+     * @return A byte array containing the generated PDF.
+     */
+    private static byte[] createPdfWithTwoTextChunks(String text1, String text2, float rotation, boolean moveTextToNextLine, float moveTextDelta) throws Exception {
+        try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream()) {
+            Document document = new Document(PageSize.LETTER);
+            PdfWriter writer = PdfWriter.getInstance(document, byteStream);
+            document.open();
+
+            PdfContentByte cb = writer.getDirectContent();
+            BaseFont font = BaseFont.createFont();
+
+            float x = document.getPageSize().getWidth() / 2;
+            float y = document.getPageSize().getHeight() / 2;
+
+            cb.saveState();
+            cb.transform(AffineTransform.getTranslateInstance(x, y));
+            cb.beginText();
+            cb.setFontAndSize(font, 12);
+            cb.transform(AffineTransform.getRotateInstance(Math.toRadians(rotation)));
+            cb.showText(text1);
+            if (moveTextToNextLine) {
+                cb.moveText(0, moveTextDelta);
+            } else {
+                cb.transform(AffineTransform.getTranslateInstance(moveTextDelta, 0));
+            }
+            cb.showText(text2);
+            cb.endText();
+            cb.restoreState();
+
+            document.close();
+            return byteStream.toByteArray();
+        }
+    }
+
+    /**
+     * Creates a PDF with text positioned using the TJ operator with an explicit spacing value.
+     *
+     * @param text1         The first text chunk.
+     * @param text2         The second text chunk.
+     * @param spaceInPoints The spacing value (kerning) to insert between chunks.
+     * @return A byte array containing the generated PDF.
+     */
+    private static byte[] createPdfWithTjOperator(String text1, String text2, int spaceInPoints) throws Exception {
+        String tjCommand = String.format("[ (%s) %d (%s) ]TJ", text1, -spaceInPoints, text2);
+        return createPdfWithTjOperator(tjCommand);
+    }
+
+    /**
+     * Creates a PDF with text positioned using a raw TJ operator command.
+     *
+     * @param directContentTj The full TJ command string.
+     * @return A byte array containing the generated PDF.
+     */
+    private static byte[] createPdfWithTjOperator(String directContentTj) throws Exception {
+        try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream()) {
+            Document document = new Document(PageSize.LETTER);
+            PdfWriter writer = PdfWriter.getInstance(document, byteStream);
+            document.open();
+
+            PdfContentByte cb = writer.getDirectContent();
+            BaseFont font = BaseFont.createFont();
+
+            cb.beginText();
+            cb.setFontAndSize(font, 12);
+            cb.moveText(100, 500);
+            cb.getInternalBuffer().append(directContentTj).append("\n");
+            cb.endText();
+
+            document.close();
+            return byteStream.toByteArray();
+        }
+    }
+
+    /**
+     * Creates a PDF containing an XObject (a reusable graphic object), which in turn contains text.
+     *
+     * @param xobjectText The text to place inside the XObject.
+     * @return A byte array containing the generated PDF.
+     */
+    private static byte[] createPdfWithXObject(String xobjectText) throws Exception {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            Document doc = new Document();
+            PdfWriter writer = PdfWriter.getInstance(doc, baos);
+            doc.open();
+
+            doc.add(new Paragraph("Before XObject"));
+
+            PdfTemplate template = writer.getDirectContent().createTemplate(200, 100);
+            template.beginText();
+            template.setFontAndSize(BaseFont.createFont(), 12);
+            template.moveText(5, 50);
+            template.showText(xobjectText);
+            template.endText();
+
+            Image xobjectImage = Image.getInstance(template);
+            doc.add(xobjectImage);
+
+            doc.add(new Paragraph("After XObject"));
+
+            doc.close();
+            return baos.toByteArray();
+        }
+    }
+
+    /**
+     * A test-specific strategy that renders text character by character.
+     * Used to verify that chunk-based processing is equivalent to char-based processing.
+     */
     private static class SingleCharacterSimpleTextExtractionStrategy extends SimpleTextExtractionStrategy {
         @Override
         public void renderText(TextRenderInfo renderInfo) {
-            for (TextRenderInfo tri : renderInfo.getCharacterRenderInfos())
-                super.renderText(tri);
+            for (TextRenderInfo characterRenderInfo : renderInfo.getCharacterRenderInfos()) {
+                super.renderText(characterRenderInfo);
+            }
         }
     }
-  
 }
