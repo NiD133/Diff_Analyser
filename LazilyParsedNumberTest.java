@@ -26,69 +26,29 @@ import java.math.BigDecimal;
 import org.junit.Test;
 
 public class LazilyParsedNumberTest {
-
   @Test
-  public void testHashCode_sameStringValue_producesEqualHashCodes() {
-    // Given: Two LazilyParsedNumber instances with the same string value
-    String numberValue = "1";
-    LazilyParsedNumber firstNumber = new LazilyParsedNumber(numberValue);
-    LazilyParsedNumber secondNumber = new LazilyParsedNumber(numberValue);
-
-    // When: Computing hash codes for both instances
-    int firstHashCode = firstNumber.hashCode();
-    int secondHashCode = secondNumber.hashCode();
-
-    // Then: Hash codes should be equal (required by equals/hashCode contract)
-    assertThat(secondHashCode).isEqualTo(firstHashCode);
+  public void testHashCode() {
+    LazilyParsedNumber n1 = new LazilyParsedNumber("1");
+    LazilyParsedNumber n1Another = new LazilyParsedNumber("1");
+    assertThat(n1Another.hashCode()).isEqualTo(n1.hashCode());
   }
 
   @Test
-  public void testEquals_sameStringValue_returnsTrue() {
-    // Given: Two LazilyParsedNumber instances with the same string value
-    String numberValue = "1";
-    LazilyParsedNumber firstNumber = new LazilyParsedNumber(numberValue);
-    LazilyParsedNumber secondNumber = new LazilyParsedNumber(numberValue);
-
-    // When: Comparing the instances for equality
-    boolean areEqual = firstNumber.equals(secondNumber);
-
-    // Then: They should be considered equal
-    assertThat(areEqual).isTrue();
+  public void testEquals() {
+    LazilyParsedNumber n1 = new LazilyParsedNumber("1");
+    LazilyParsedNumber n1Another = new LazilyParsedNumber("1");
+    assertThat(n1.equals(n1Another)).isTrue();
   }
 
   @Test
-  public void testJavaSerialization_deserializesAsBigDecimal() throws IOException, ClassNotFoundException {
-    // Given: A LazilyParsedNumber with a numeric string value
-    String originalValue = "123";
-    LazilyParsedNumber originalNumber = new LazilyParsedNumber(originalValue);
+  public void testJavaSerialization() throws IOException, ClassNotFoundException {
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    ObjectOutputStream objOut = new ObjectOutputStream(out);
+    objOut.writeObject(new LazilyParsedNumber("123"));
+    objOut.close();
 
-    // When: Serializing and then deserializing the number
-    Number deserializedNumber = serializeAndDeserialize(originalNumber);
-
-    // Then: The deserialized object should be a BigDecimal with the same value
-    // (LazilyParsedNumber converts to BigDecimal during serialization to avoid 
-    // requiring Gson on the deserializing side)
-    BigDecimal expectedBigDecimal = new BigDecimal(originalValue);
-    assertThat(deserializedNumber).isEqualTo(expectedBigDecimal);
-  }
-
-  /**
-   * Helper method to perform Java serialization round-trip for testing.
-   * 
-   * @param object the object to serialize and deserialize
-   * @return the deserialized object
-   */
-  private Number serializeAndDeserialize(LazilyParsedNumber object) throws IOException, ClassNotFoundException {
-    // Serialize the object to a byte array
-    ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
-    try (ObjectOutputStream objectOutput = new ObjectOutputStream(byteOutput)) {
-      objectOutput.writeObject(object);
-    }
-
-    // Deserialize the object from the byte array
-    ByteArrayInputStream byteInput = new ByteArrayInputStream(byteOutput.toByteArray());
-    try (ObjectInputStream objectInput = new ObjectInputStream(byteInput)) {
-      return (Number) objectInput.readObject();
-    }
+    ObjectInputStream objIn = new ObjectInputStream(new ByteArrayInputStream(out.toByteArray()));
+    Number deserialized = (Number) objIn.readObject();
+    assertThat(deserialized).isEqualTo(new BigDecimal("123"));
   }
 }
