@@ -37,7 +37,7 @@
 package org.jfree.chart.urls;
 
 import java.util.ArrayList;
-
+import java.util.Arrays;
 import java.util.List;
 
 import org.jfree.chart.TestUtils;
@@ -53,110 +53,151 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class CustomCategoryURLGeneratorTest {
 
+    // Test data constants for URLs
+    private static final List<String> URLS_SERIES_A = Arrays.asList("URL A1", "URL A2", "URL A3");
+    private static final List<String> URLS_SERIES_B = Arrays.asList("URL B1", "URL B2", "URL B3");
+    private static final List<String> URLS_SINGLE = Arrays.asList("URL1");
+    private static final List<String> URLS_MODIFIED = Arrays.asList("URL XXX");
+
     /**
-     * Some checks for the equals() method.
+     * Tests that two empty generators are equal.
      */
     @Test
-    public void testEquals() {
+    public void testEqualsForEmptyGenerators() {
         CustomCategoryURLGenerator g1 = new CustomCategoryURLGenerator();
         CustomCategoryURLGenerator g2 = new CustomCategoryURLGenerator();
-        assertEquals(g1, g2);
-        List<String> u1 = new ArrayList<>();
-        u1.add("URL A1");
-        u1.add("URL A2");
-        u1.add("URL A3");
-        g1.addURLSeries(u1);
-        assertNotEquals(g1, g2);
-        List<String> u2 = new ArrayList<>();
-        u2.add("URL A1");
-        u2.add("URL A2");
-        u2.add("URL A3");
-        g2.addURLSeries(u2);
-        assertEquals(g1, g2);
+        assertEquals(g1, g2, "Empty generators should be equal");
     }
 
     /**
-     * Confirm that cloning works.
-     * @throws java.lang.CloneNotSupportedException
+     * Tests that generators with different URL series are not equal.
      */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
+    public void testEqualsWhenGeneratorHasURLSeriesAndOtherDoesNot() {
         CustomCategoryURLGenerator g1 = new CustomCategoryURLGenerator();
-        List<String> u1 = new ArrayList<>();
-        u1.add("URL A1");
-        u1.add("URL A2");
-        u1.add("URL A3");
-        g1.addURLSeries(u1);
-        CustomCategoryURLGenerator g2 = CloneUtils.clone(g1);
-        assertNotSame(g1, g2);
-        assertSame(g1.getClass(), g2.getClass());
-        assertEquals(g1, g2);
-
-        // check independence
-        List<String> u2 = new ArrayList<>();
-        u2.add("URL XXX");
-        g1.addURLSeries(u2);
-        assertNotEquals(g1, g2);
-        g2.addURLSeries(new ArrayList<>(u2));
-        assertEquals(g1, g2);
+        g1.addURLSeries(URLS_SERIES_A);
+        
+        CustomCategoryURLGenerator g2 = new CustomCategoryURLGenerator();
+        
+        assertNotEquals(g1, g2, "Generators with different URL series should not be equal");
     }
 
     /**
-     * Checks that the class implements PublicCloneable.
+     * Tests that generators with identical URL series are equal.
      */
     @Test
-    public void testPublicCloneable() {
+    public void testEqualsWhenGeneratorsHaveSameURLSeries() {
         CustomCategoryURLGenerator g1 = new CustomCategoryURLGenerator();
-        assertTrue(g1 instanceof PublicCloneable);
+        g1.addURLSeries(URLS_SERIES_A);
+        
+        CustomCategoryURLGenerator g2 = new CustomCategoryURLGenerator();
+        g2.addURLSeries(new ArrayList<>(URLS_SERIES_A)); // Defensive copy
+        
+        assertEquals(g1, g2, "Generators with same URL series should be equal");
     }
 
     /**
-     * Serialize an instance, restore it, and check for equality.
+     * Tests that cloned generator is equal but not the same instance.
      */
     @Test
-    public void testSerialization() {
-
-        List<String> u1 = new ArrayList<>();
-        u1.add("URL A1");
-        u1.add("URL A2");
-        u1.add("URL A3");
-
-        List<String> u2 = new ArrayList<>();
-        u2.add("URL B1");
-        u2.add("URL B2");
-        u2.add("URL B3");
-
-        CustomCategoryURLGenerator g1 = new CustomCategoryURLGenerator();
-        g1.addURLSeries(u1);
-        g1.addURLSeries(u2);
-        CustomCategoryURLGenerator g2 = TestUtils.serialised(g1);
-        assertEquals(g1, g2);
+    public void testCloningCreatesIndependentEqualInstance() throws CloneNotSupportedException {
+        CustomCategoryURLGenerator original = new CustomCategoryURLGenerator();
+        original.addURLSeries(URLS_SERIES_A);
+        
+        CustomCategoryURLGenerator clone = CloneUtils.clone(original);
+        
+        assertNotSame(original, clone, "Cloned instance should be a different object");
+        assertEquals(original, clone, "Cloned instance should be equal to the original");
     }
 
     /**
-     * Some checks for the addURLSeries() method.
+     * Tests that modifications to original generator do not affect the clone.
      */
     @Test
-    public void testAddURLSeries() {
-        CustomCategoryURLGenerator g1 = new CustomCategoryURLGenerator();
-        // you can add a null list - it would have been better if this
-        // required EMPTY_LIST
-        g1.addURLSeries(null);
-        assertEquals(1, g1.getListCount());
-        assertEquals(0, g1.getURLCount(0));
-
-        List<String> list1 = new ArrayList<>();
-        list1.add("URL1");
-        g1.addURLSeries(list1);
-        assertEquals(2, g1.getListCount());
-        assertEquals(0, g1.getURLCount(0));
-        assertEquals(1, g1.getURLCount(1));
-        assertEquals("URL1", g1.getURL(1, 0));
-
-        // if we modify the original list, it's best if the URL generator is
-        // not affected
-        list1.clear();
-        assertEquals("URL1", g1.getURL(1, 0));
+    public void testCloningMaintainsIndependence() throws CloneNotSupportedException {
+        CustomCategoryURLGenerator original = new CustomCategoryURLGenerator();
+        original.addURLSeries(URLS_SERIES_A);
+        CustomCategoryURLGenerator clone = CloneUtils.clone(original);
+        
+        // Modify original after cloning
+        original.addURLSeries(URLS_MODIFIED);
+        
+        assertNotEquals(original, clone, "Modifying original should break equality with clone");
+        
+        // Synchronize clone with modification
+        clone.addURLSeries(new ArrayList<>(URLS_MODIFIED));
+        assertEquals(original, clone, "Synchronized generators should be equal again");
     }
 
+    /**
+     * Tests that the generator implements the PublicCloneable interface.
+     */
+    @Test
+    public void testPublicCloneableInterface() {
+        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
+        assertTrue(generator instanceof PublicCloneable, 
+                "Generator should implement PublicCloneable");
+    }
+
+    /**
+     * Tests serialization and deserialization maintains equality.
+     */
+    @Test
+    public void testSerializationMaintainsEquality() {
+        CustomCategoryURLGenerator original = new CustomCategoryURLGenerator();
+        original.addURLSeries(URLS_SERIES_A);
+        original.addURLSeries(URLS_SERIES_B);
+        
+        CustomCategoryURLGenerator deserialized = TestUtils.serialised(original);
+        assertEquals(original, deserialized, "Deserialized generator should equal original");
+    }
+
+    /**
+     * Tests adding a null URL series is handled correctly.
+     */
+    @Test
+    public void testAddURLSeriesWithNull() {
+        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
+        generator.addURLSeries(null);
+        
+        assertEquals(1, generator.getListCount(), 
+                "Adding null should create one URL list");
+        assertEquals(0, generator.getURLCount(0), 
+                "Null URL series should have zero URLs");
+    }
+
+    /**
+     * Tests adding a valid URL series updates the generator state.
+     */
+    @Test
+    public void testAddURLSeriesWithValidList() {
+        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
+        generator.addURLSeries(URLS_SINGLE);
+        
+        assertEquals(1, generator.getListCount(), 
+                "Generator should have one URL list");
+        assertEquals(1, generator.getURLCount(0), 
+                "URL list should contain one URL");
+        assertEquals("URL1", generator.getURL(0, 0), 
+                "Stored URL should match added URL");
+    }
+
+    /**
+     * Tests that modifying the original list after adding does not affect the generator.
+     */
+    @Test
+    public void testAddURLSeriesIsIndependentOfSourceList() {
+        // Create mutable list
+        List<String> urls = new ArrayList<>();
+        urls.add("URL1");
+        
+        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
+        generator.addURLSeries(urls);
+        
+        // Modify original list
+        urls.clear();
+        
+        assertEquals("URL1", generator.getURL(0, 0), 
+                "Modifying source list should not affect stored URLs");
+    }
 }
