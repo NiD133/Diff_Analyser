@@ -40,277 +40,395 @@ import org.evosuite.runtime.mock.java.io.MockFile;
 import org.evosuite.runtime.mock.java.io.MockIOException;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) 
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true,
-    useVFS = true,
-    useVNET = true,
-    resetStaticState = true,
-    separateClassLoader = true
-) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class CountingPathVisitor_ESTest extends CountingPathVisitor_ESTest_scaffolding {
 
-    // ===========================================================
-    // = Constructor and Builder Tests                           =
-    // ===========================================================
-    
-    @Test(timeout = 4000)
-    public void testBuilderSetPathCounters() {
-        CountingPathVisitor.Builder builder = new CountingPathVisitor.Builder();
-        Counters.PathCounters pathCounters = builder.getPathCounters();
-        CountingPathVisitor.Builder result = builder.setPathCounters(pathCounters);
-        assertSame(result, builder);
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      AccumulatorPathVisitor.Builder accumulatorPathVisitor_Builder0 = new AccumulatorPathVisitor.Builder();
+      AccumulatorPathVisitor accumulatorPathVisitor0 = accumulatorPathVisitor_Builder0.get();
+      MockFile mockFile0 = new MockFile("");
+      Path path0 = mockFile0.toPath();
+      BasicFileAttributes basicFileAttributes0 = mock(BasicFileAttributes.class, new ViolatedAssumptionAnswer());
+      doReturn(0L).when(basicFileAttributes0).size();
+      accumulatorPathVisitor0.updateFileCounters(path0, basicFileAttributes0);
+  }
 
-    @Test(timeout = 4000)
-    public void testBuilderSetDirectoryFilter() {
-        CountingPathVisitor.Builder builder = new CountingPathVisitor.Builder();
-        NotFileFilter filter = (NotFileFilter) CanWriteFileFilter.CANNOT_WRITE;
-        CountingPathVisitor.Builder result = builder.setDirectoryFilter(filter);
-        assertSame(result, builder);
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      CountingPathVisitor.Builder countingPathVisitor_Builder0 = new CountingPathVisitor.Builder();
+      Counters.PathCounters counters_PathCounters0 = countingPathVisitor_Builder0.getPathCounters();
+      CountingPathVisitor.Builder countingPathVisitor_Builder1 = countingPathVisitor_Builder0.setPathCounters(counters_PathCounters0);
+      assertSame(countingPathVisitor_Builder1, countingPathVisitor_Builder0);
+  }
 
-    @Test(timeout = 4000)
-    public void testBuilderSetFileFilter() {
-        CountingPathVisitor.Builder builder = new CountingPathVisitor.Builder();
-        PathFilter filter = builder.getFileFilter();
-        CountingPathVisitor.Builder result = builder.setFileFilter(filter);
-        assertSame(builder, result);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      CountingPathVisitor.Builder countingPathVisitor_Builder0 = new CountingPathVisitor.Builder();
+      NotFileFilter notFileFilter0 = (NotFileFilter)CanWriteFileFilter.CANNOT_WRITE;
+      CountingPathVisitor.Builder countingPathVisitor_Builder1 = countingPathVisitor_Builder0.setDirectoryFilter(notFileFilter0);
+      assertSame(countingPathVisitor_Builder1, countingPathVisitor_Builder0);
+  }
 
-    @Test(timeout = 4000)
-    public void testConstructorWithPathCountersAndFilters() {
-        Counters.PathCounters pathCounters = CountingPathVisitor.defaultPathCounters();
-        EmptyFileFilter filter = (EmptyFileFilter) EmptyFileFilter.EMPTY;
-        new CountingPathVisitor(pathCounters, filter, filter);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      CountingPathVisitor.Builder countingPathVisitor_Builder0 = new CountingPathVisitor.Builder();
+      PathFilter pathFilter0 = countingPathVisitor_Builder0.getFileFilter();
+      CountingPathVisitor.Builder countingPathVisitor_Builder1 = countingPathVisitor_Builder0.setFileFilter(pathFilter0);
+      assertSame(countingPathVisitor_Builder0, countingPathVisitor_Builder1);
+  }
 
-    @Test(timeout = 4000)
-    public void testConstructorWithPathCountersAndFilters2() {
-        CountingPathVisitor.Builder builder = new CountingPathVisitor.Builder();
-        NotFileFilter notFilter = (NotFileFilter) CanWriteFileFilter.CANNOT_WRITE;
-        Counters.PathCounters pathCounters = builder.getPathCounters();
-        IOFileFilter fileFilter = CountingPathVisitor.defaultFileFilter();
-        new CountingPathVisitor(pathCounters, notFilter, fileFilter);
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      CountingPathVisitor countingPathVisitor0 = CountingPathVisitor.withLongCounters();
+      MockFile mockFile0 = new MockFile("");
+      Path path0 = mockFile0.toPath();
+      BasicFileAttributes basicFileAttributes0 = mock(BasicFileAttributes.class, new ViolatedAssumptionAnswer());
+      doReturn(0L).when(basicFileAttributes0).size();
+      FileVisitResult fileVisitResult0 = countingPathVisitor0.visitFile(path0, basicFileAttributes0);
+      assertEquals(FileVisitResult.CONTINUE, fileVisitResult0);
+  }
 
-    @Test(timeout = 4000)
-    public void testConstructorWithNullBuilderThrowsNPE() {
-        try {
-            new CountingPathVisitor((CountingPathVisitor.AbstractBuilder<?, ?>) null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      Counters.PathCounters counters_PathCounters0 = CountingPathVisitor.defaultPathCounters();
+      EmptyFileFilter emptyFileFilter0 = (EmptyFileFilter)EmptyFileFilter.EMPTY;
+      CountingPathVisitor countingPathVisitor0 = new CountingPathVisitor(counters_PathCounters0, emptyFileFilter0, emptyFileFilter0);
+  }
 
-    @Test(timeout = 4000)
-    public void testConstructorWithNullFileFilterThrowsNPE() {
-        Counters.PathCounters pathCounters = CountingPathVisitor.defaultPathCounters();
-        try {
-            new CountingPathVisitor(pathCounters, null, null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            assertEquals("fileFilter", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      IOFileFilter iOFileFilter0 = CountingPathVisitor.defaultFileFilter();
+      NotFileFilter notFileFilter0 = (NotFileFilter)CanWriteFileFilter.CANNOT_WRITE;
+      CountingPathVisitor.Builder countingPathVisitor_Builder0 = new CountingPathVisitor.Builder();
+      Counters.PathCounters counters_PathCounters0 = countingPathVisitor_Builder0.getPathCounters();
+      CountingPathVisitor countingPathVisitor0 = new CountingPathVisitor(counters_PathCounters0, notFileFilter0, iOFileFilter0);
+  }
 
-    @Test(timeout = 4000)
-    public void testConstructorWithNullVisitFileFailedFunctionThrowsNPE() {
-        Counters.PathCounters pathCounters = CountingPathVisitor.defaultPathCounters();
-        FileFileFilter filter = (FileFileFilter) FileFileFilter.INSTANCE;
-        try {
-            new CountingPathVisitor(pathCounters, filter, filter, null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            assertEquals("visitFileFailedFunction", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      UnaryOperator<Path> unaryOperator0 = CountingPathVisitor.defaultDirectoryTransformer();
+      assertNotNull(unaryOperator0);
+  }
 
-    // ===========================================================
-    // = Static Method Tests                                     =
-    // ===========================================================
-    
-    @Test(timeout = 4000)
-    public void testDefaultDirectoryTransformer() {
-        UnaryOperator<Path> transformer = CountingPathVisitor.defaultDirectoryTransformer();
-        assertNotNull(transformer);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      AccumulatorPathVisitor accumulatorPathVisitor0 = AccumulatorPathVisitor.withBigIntegerCounters();
+      MockFile mockFile0 = new MockFile("96UM\"T>:Dps");
+      Path path0 = mockFile0.toPath();
+      boolean boolean0 = accumulatorPathVisitor0.accept(path0, (BasicFileAttributes) null);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testDefaultDirectoryFilter() {
-        IOFileFilter filter = CountingPathVisitor.defaultDirectoryFilter();
-        AccumulatorPathVisitor visitor = AccumulatorPathVisitor.withBigIntegerCounters(filter, filter);
-        assertNotNull(visitor);
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      Counters.PathCounters counters_PathCounters0 = CountingPathVisitor.defaultPathCounters();
+      DeleteOption[] deleteOptionArray0 = new DeleteOption[3];
+      StandardDeleteOption standardDeleteOption0 = StandardDeleteOption.OVERRIDE_READ_ONLY;
+      deleteOptionArray0[2] = (DeleteOption) standardDeleteOption0;
+      String[] stringArray0 = new String[0];
+      DeletingPathVisitor deletingPathVisitor0 = new DeletingPathVisitor(counters_PathCounters0, deleteOptionArray0, stringArray0);
+      MockFile mockFile0 = new MockFile("");
+      Path path0 = mockFile0.toPath();
+      try { 
+        deletingPathVisitor0.visitFile(path0, (BasicFileAttributes) null);
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // DOS or POSIX file operations not available for '', linkOptions [NOFOLLOW_LINKS]
+         //
+         verifyException("org.apache.commons.io.file.PathUtils", e);
+      }
+  }
 
-    // ===========================================================
-    // = Core Functionality Tests                                =
-    // ===========================================================
-    
-    @Test(timeout = 4000)
-    public void testVisitFileSuccess() throws Throwable {
-        CountingPathVisitor visitor = CountingPathVisitor.withLongCounters();
-        MockFile mockFile = new MockFile("");
-        Path path = mockFile.toPath();
-        BasicFileAttributes attrs = mock(BasicFileAttributes.class);
-        doReturn(0L).when(attrs).size();
-        
-        FileVisitResult result = visitor.visitFile(path, attrs);
-        assertEquals(FileVisitResult.CONTINUE, result);
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      CountingPathVisitor.Builder countingPathVisitor_Builder0 = new CountingPathVisitor.Builder();
+      Counters.PathCounters counters_PathCounters0 = countingPathVisitor_Builder0.getPathCounters();
+      String[] stringArray0 = new String[3];
+      stringArray0[0] = "org.apache.commons.io.file.CountingPathVisitor$AbstractBuilder";
+      stringArray0[1] = "Z'flPCE";
+      stringArray0[2] = "";
+      CleaningPathVisitor cleaningPathVisitor0 = new CleaningPathVisitor(counters_PathCounters0, (DeleteOption[]) null, stringArray0);
+      // Undeclared exception!
+      try { 
+        cleaningPathVisitor0.preVisitDirectory((Path) null, (BasicFileAttributes) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testAcceptFileWithoutAttributes() {
-        CountingPathVisitor visitor = CountingPathVisitor.withBigIntegerCounters();
-        MockFile mockFile = new MockFile("");
-        Path path = mockFile.toPath();
-        assertTrue(visitor.accept(path, null));
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      MockFile mockFile0 = new MockFile("");
+      Path path0 = mockFile0.toPath();
+      PathEqualsFileFilter pathEqualsFileFilter0 = new PathEqualsFileFilter(path0);
+      NotFileFilter notFileFilter0 = (NotFileFilter)HiddenFileFilter.VISIBLE;
+      IOFileFilter iOFileFilter0 = pathEqualsFileFilter0.or(notFileFilter0);
+      AccumulatorPathVisitor accumulatorPathVisitor0 = AccumulatorPathVisitor.withLongCounters((PathFilter) iOFileFilter0, (PathFilter) notFileFilter0);
+      BasicFileAttributes basicFileAttributes0 = mock(BasicFileAttributes.class, new ViolatedAssumptionAnswer());
+      // Undeclared exception!
+      try { 
+        accumulatorPathVisitor0.preVisitDirectory(path0, basicFileAttributes0);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testUpdateDirCounter() {
-        CountingPathVisitor.Builder builder = new CountingPathVisitor.Builder();
-        CountingPathVisitor visitor = builder.getUnchecked();
-        MockFile mockFile = new MockFile("pathCounters", "pathCounters");
-        Path path = mockFile.toPath();
-        visitor.updateDirCounter(path, null);
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      CountingPathVisitor.Builder countingPathVisitor_Builder0 = new CountingPathVisitor.Builder();
+      Counters.PathCounters counters_PathCounters0 = countingPathVisitor_Builder0.getPathCounters();
+      String[] stringArray0 = new String[3];
+      stringArray0[0] = "hCUJ&KIcnhn";
+      stringArray0[1] = "*Qus;#HzV)I)";
+      stringArray0[2] = "&V8coOO1NH$";
+      DeletingPathVisitor deletingPathVisitor0 = new DeletingPathVisitor(counters_PathCounters0, stringArray0);
+      File file0 = MockFile.createTempFile("-i8e'2;3AOg#yY!", "fileFilter");
+      Path path0 = file0.toPath();
+      MockIOException mockIOException0 = new MockIOException();
+      try { 
+        deletingPathVisitor0.postVisitDirectory(path0, (IOException) mockIOException0);
+        fail("Expecting exception: NoSuchFileException");
+      
+      } catch(NoSuchFileException e) {
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testPostVisitDirectoryAfterException() {
-        CountingPathVisitor visitor = CleaningPathVisitor.withBigIntegerCounters();
-        MockIOException exception = new MockIOException();
-        FileVisitResult result = visitor.postVisitDirectory(null, exception);
-        assertEquals(FileVisitResult.CONTINUE, result);
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      DeletingPathVisitor deletingPathVisitor0 = DeletingPathVisitor.withLongCounters();
+      MockIOException mockIOException0 = new MockIOException();
+      // Undeclared exception!
+      try { 
+        deletingPathVisitor0.postVisitDirectory((Path) null, (IOException) mockIOException0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.nio.file.Files", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testUpdateFileCountersWithNullThrowsNPE() {
-        CountingPathVisitor visitor = CountingPathVisitor.withBigIntegerCounters();
-        try {
-            visitor.updateFileCounters(null, null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      CountingPathVisitor.Builder countingPathVisitor_Builder0 = new CountingPathVisitor.Builder();
+      CountingPathVisitor countingPathVisitor0 = countingPathVisitor_Builder0.get();
+      BasicFileAttributes basicFileAttributes0 = mock(BasicFileAttributes.class, new ViolatedAssumptionAnswer());
+      // Undeclared exception!
+      try { 
+        countingPathVisitor0.accept((Path) null, basicFileAttributes0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+      }
+  }
 
-    // ===========================================================
-    // = AccumulatorPathVisitor Tests                            =
-    // ===========================================================
-    
-    @Test(timeout = 4000)
-    public void testAccumulatorUpdateFileCounters() throws Throwable {
-        AccumulatorPathVisitor.Builder builder = new AccumulatorPathVisitor.Builder();
-        AccumulatorPathVisitor visitor = builder.get();
-        MockFile mockFile = new MockFile("");
-        Path path = mockFile.toPath();
-        BasicFileAttributes attrs = mock(BasicFileAttributes.class);
-        doReturn(0L).when(attrs).size();
-        visitor.updateFileCounters(path, attrs);
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      CountingPathVisitor countingPathVisitor0 = null;
+      try {
+        countingPathVisitor0 = new CountingPathVisitor((CountingPathVisitor.AbstractBuilder<?, ?>) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.io.file.SimplePathVisitor$AbstractBuilder", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testAccumulatorAcceptWithNullAttributes() {
-        AccumulatorPathVisitor visitor = AccumulatorPathVisitor.withBigIntegerCounters();
-        MockFile mockFile = new MockFile("96UM\"T>:Dps");
-        Path path = mockFile.toPath();
-        assertFalse(visitor.accept(path, null));
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      CountingPathVisitor.Builder countingPathVisitor_Builder0 = new CountingPathVisitor.Builder();
+      CountingPathVisitor countingPathVisitor0 = countingPathVisitor_Builder0.getUnchecked();
+      MockFile mockFile0 = new MockFile("pathCounters", "pathCounters");
+      Path path0 = mockFile0.toPath();
+      countingPathVisitor0.updateDirCounter(path0, (IOException) null);
+  }
 
-    @Test(timeout = 4000)
-    public void testAccumulatorPreVisitDirectorySkip() {
-        SuffixFileFilter filter = new SuffixFileFilter("org.apache.commons.io.file.CountingPathVisitor");
-        AccumulatorPathVisitor visitor = AccumulatorPathVisitor.withLongCounters(filter, filter);
-        FileVisitResult result = visitor.preVisitDirectory(null, null);
-        assertEquals(FileVisitResult.SKIP_SUBTREE, result);
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      CountingPathVisitor countingPathVisitor0 = CountingPathVisitor.withLongCounters();
+      MockFile mockFile0 = new MockFile("");
+      Path path0 = mockFile0.toPath();
+      // Undeclared exception!
+      try { 
+        countingPathVisitor0.visitFile(path0, (BasicFileAttributes) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.io.file.CountingPathVisitor", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testAccumulatorToString() {
-        AccumulatorPathVisitor visitor = AccumulatorPathVisitor.withBigIntegerCounters();
-        assertEquals("0 files, 0 directories, 0 bytes", visitor.toString());
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      SuffixFileFilter suffixFileFilter0 = new SuffixFileFilter("org.apache.commons.io.file.CountingPathVisitor");
+      AccumulatorPathVisitor accumulatorPathVisitor0 = AccumulatorPathVisitor.withLongCounters((PathFilter) suffixFileFilter0, (PathFilter) suffixFileFilter0);
+      FileVisitResult fileVisitResult0 = accumulatorPathVisitor0.preVisitDirectory((Path) null, (BasicFileAttributes) null);
+      assertEquals(FileVisitResult.SKIP_SUBTREE, fileVisitResult0);
+  }
 
-    @Test(timeout = 4000)
-    public void testAccumulatorGetPathCounters() {
-        AccumulatorPathVisitor visitor = AccumulatorPathVisitor.withBigIntegerCounters(null, null);
-        assertNotNull(visitor.getPathCounters());
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      AccumulatorPathVisitor accumulatorPathVisitor0 = AccumulatorPathVisitor.withLongCounters();
+      MockIOException mockIOException0 = new MockIOException();
+      boolean boolean0 = accumulatorPathVisitor0.equals(mockIOException0);
+      assertFalse(boolean0);
+  }
 
-    // ===========================================================
-    // = Exception Handling Tests                                =
-    // ===========================================================
-    
-    @Test(timeout = 4000)
-    public void testVisitFileThrowsNPE() throws Throwable {
-        CountingPathVisitor visitor = CountingPathVisitor.withLongCounters();
-        MockFile mockFile = new MockFile("");
-        Path path = mockFile.toPath();
-        try {
-            visitor.visitFile(path, null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      CountingPathVisitor countingPathVisitor0 = CountingPathVisitor.withLongCounters();
+      boolean boolean0 = countingPathVisitor0.equals(countingPathVisitor0);
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testDeletingVisitorThrowsIOException() {
-        Counters.PathCounters pathCounters = CountingPathVisitor.defaultPathCounters();
-        DeleteOption[] options = new DeleteOption[3];
-        options[2] = StandardDeleteOption.OVERRIDE_READ_ONLY;
-        DeletingPathVisitor visitor = new DeletingPathVisitor(pathCounters, options, new String[0]);
-        MockFile mockFile = new MockFile("");
-        Path path = mockFile.toPath();
-        
-        try {
-            visitor.visitFile(path, null);
-            fail("Expected IOException");
-        } catch (IOException e) {
-            assertTrue(e.getMessage().contains("DOS or POSIX file operations not available"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      AccumulatorPathVisitor accumulatorPathVisitor0 = AccumulatorPathVisitor.withBigIntegerCounters();
+      CountingPathVisitor countingPathVisitor0 = CleaningPathVisitor.withBigIntegerCounters();
+      boolean boolean0 = countingPathVisitor0.equals(accumulatorPathVisitor0);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testPostVisitDirectoryThrowsNoSuchFileException() {
-        CountingPathVisitor.Builder builder = new CountingPathVisitor.Builder();
-        Counters.PathCounters pathCounters = builder.getPathCounters();
-        String[] patterns = {"hCUJ&KIcnhn", "*Qus;#HzV)I)", "&V8coOO1NH$"};
-        DeletingPathVisitor visitor = new DeletingPathVisitor(pathCounters, patterns);
-        File tempFile = MockFile.createTempFile("-i8e'2;3AOg#yY!", "fileFilter");
-        Path path = tempFile.toPath();
-        MockIOException mockException = new MockIOException();
-        
-        try {
-            visitor.postVisitDirectory(path, mockException);
-            fail("Expected NoSuchFileException");
-        } catch (NoSuchFileException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      SuffixFileFilter suffixFileFilter0 = new SuffixFileFilter("");
+      AccumulatorPathVisitor accumulatorPathVisitor0 = AccumulatorPathVisitor.withLongCounters((PathFilter) suffixFileFilter0, (PathFilter) suffixFileFilter0);
+      MockFile mockFile0 = new MockFile("", "");
+      Path path0 = mockFile0.toPath();
+      BasicFileAttributes basicFileAttributes0 = mock(BasicFileAttributes.class, new ViolatedAssumptionAnswer());
+      FileVisitResult fileVisitResult0 = accumulatorPathVisitor0.visitFile(path0, basicFileAttributes0);
+      assertEquals(FileVisitResult.CONTINUE, fileVisitResult0);
+  }
 
-    // ===========================================================
-    // = Edge Case Tests                                         =
-    // ===========================================================
-    
-    @Test(timeout = 4000)
-    public void testEqualsSameInstance() {
-        CountingPathVisitor visitor = CountingPathVisitor.withLongCounters();
-        assertTrue(visitor.equals(visitor));
-    }
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      CountingPathVisitor countingPathVisitor0 = CountingPathVisitor.withBigIntegerCounters();
+      MockFile mockFile0 = new MockFile("");
+      Path path0 = mockFile0.toPath();
+      boolean boolean0 = countingPathVisitor0.accept(path0, (BasicFileAttributes) null);
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualsDifferentTypes() {
-        AccumulatorPathVisitor visitor1 = AccumulatorPathVisitor.withBigIntegerCounters();
-        CountingPathVisitor visitor2 = CleaningPathVisitor.withBigIntegerCounters();
-        assertFalse(visitor2.equals(visitor1));
-    }
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      CountingPathVisitor countingPathVisitor0 = new CountingPathVisitor((Counters.PathCounters) null);
+  }
 
-    @Test(timeout = 4000)
-    public void testHashCode() {
-        CountingPathVisitor visitor = CountingPathVisitor.withLongCounters();
-        visitor.hashCode();
-    }
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      UnaryOperator<Path> unaryOperator0 = UnaryOperator.identity();
+      CountingPathVisitor.Builder countingPathVisitor_Builder0 = new CountingPathVisitor.Builder();
+      CountingPathVisitor.Builder countingPathVisitor_Builder1 = countingPathVisitor_Builder0.setDirectoryPostTransformer(unaryOperator0);
+      assertSame(countingPathVisitor_Builder1, countingPathVisitor_Builder0);
+  }
+
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      CountingPathVisitor.Builder countingPathVisitor_Builder0 = new CountingPathVisitor.Builder();
+      CountingPathVisitor.Builder countingPathVisitor_Builder1 = countingPathVisitor_Builder0.setDirectoryPostTransformer((UnaryOperator<Path>) null);
+      assertSame(countingPathVisitor_Builder1, countingPathVisitor_Builder0);
+  }
+
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      IOFileFilter iOFileFilter0 = CountingPathVisitor.defaultDirectoryFilter();
+      AccumulatorPathVisitor accumulatorPathVisitor0 = AccumulatorPathVisitor.withBigIntegerCounters((PathFilter) iOFileFilter0, (PathFilter) iOFileFilter0);
+      assertNotNull(accumulatorPathVisitor0);
+  }
+
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      AccumulatorPathVisitor accumulatorPathVisitor0 = AccumulatorPathVisitor.withBigIntegerCounters();
+      String string0 = accumulatorPathVisitor0.toString();
+      assertEquals("0 files, 0 directories, 0 bytes", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      Counters.PathCounters counters_PathCounters0 = CountingPathVisitor.defaultPathCounters();
+      CountingPathVisitor countingPathVisitor0 = null;
+      try {
+        countingPathVisitor0 = new CountingPathVisitor(counters_PathCounters0, (PathFilter) null, (PathFilter) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // fileFilter
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      CountingPathVisitor countingPathVisitor0 = CountingPathVisitor.withLongCounters();
+      countingPathVisitor0.hashCode();
+  }
+
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      CountingPathVisitor countingPathVisitor0 = CleaningPathVisitor.withBigIntegerCounters();
+      MockIOException mockIOException0 = new MockIOException();
+      FileVisitResult fileVisitResult0 = countingPathVisitor0.postVisitDirectory((Path) null, (IOException) mockIOException0);
+      assertEquals(FileVisitResult.CONTINUE, fileVisitResult0);
+  }
+
+  @Test(timeout = 4000)
+  public void test32()  throws Throwable  {
+      CountingPathVisitor countingPathVisitor0 = CountingPathVisitor.withBigIntegerCounters();
+      // Undeclared exception!
+      try { 
+        countingPathVisitor0.updateFileCounters((Path) null, (BasicFileAttributes) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.io.file.CountingPathVisitor", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test33()  throws Throwable  {
+      Counters.PathCounters counters_PathCounters0 = CountingPathVisitor.defaultPathCounters();
+      FileFileFilter fileFileFilter0 = (FileFileFilter)FileFileFilter.INSTANCE;
+      CountingPathVisitor countingPathVisitor0 = null;
+      try {
+        countingPathVisitor0 = new CountingPathVisitor(counters_PathCounters0, fileFileFilter0, fileFileFilter0, (IOBiFunction<Path, IOException, FileVisitResult>) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // visitFileFailedFunction
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test34()  throws Throwable  {
+      AccumulatorPathVisitor accumulatorPathVisitor0 = AccumulatorPathVisitor.withBigIntegerCounters((PathFilter) null, (PathFilter) null);
+      Counters.PathCounters counters_PathCounters0 = accumulatorPathVisitor0.getPathCounters();
+      assertNotNull(counters_PathCounters0);
+  }
 }
