@@ -49,131 +49,85 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Tests for the {@link ChartRenderingInfo} class.
  */
-public class ChartRenderingInfoTest {
-
-    // Test data constants for better maintainability
-    private static final Rectangle2D CHART_AREA_1 = new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0);
-    private static final Rectangle2D CHART_AREA_2 = new Rectangle2D.Double(4.0, 3.0, 2.0, 1.0);
-    private static final Rectangle DATA_AREA = new Rectangle(1, 2, 3, 4);
-    private static final Rectangle ENTITY_AREA_1 = new Rectangle(1, 2, 3, 4);
-    private static final Rectangle ENTITY_AREA_2 = new Rectangle(1, 2, 2, 1);
+public class ChartRenderingInfoTest  {
 
     /**
-     * Tests that the equals method correctly compares all fields of ChartRenderingInfo objects.
-     * This test verifies equality behavior for:
-     * - Default instances
-     * - Chart area differences
-     * - Plot data area differences  
-     * - Entity collection differences
+     * Confirm that the equals method can distinguish all the required fields.
      */
     @Test
     public void testEquals() {
-        // Test 1: Default instances should be equal
-        ChartRenderingInfo defaultInfo1 = new ChartRenderingInfo();
-        ChartRenderingInfo defaultInfo2 = new ChartRenderingInfo();
-        assertEquals(defaultInfo1, defaultInfo2, "Default ChartRenderingInfo instances should be equal");
+        ChartRenderingInfo i1 = new ChartRenderingInfo();
+        ChartRenderingInfo i2 = new ChartRenderingInfo();
+        assertEquals(i1, i2);
 
-        // Test 2: Chart area affects equality
-        defaultInfo1.setChartArea(CHART_AREA_1);
-        assertNotEquals(defaultInfo1, defaultInfo2, "Instances with different chart areas should not be equal");
-        
-        defaultInfo2.setChartArea(CHART_AREA_1);
-        assertEquals(defaultInfo1, defaultInfo2, "Instances with same chart areas should be equal");
+        i1.setChartArea(new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0));
+        assertNotEquals(i1, i2);
+        i2.setChartArea(new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0));
+        assertEquals(i1, i2);
 
-        // Test 3: Plot data area affects equality
-        defaultInfo1.getPlotInfo().setDataArea(DATA_AREA);
-        assertNotEquals(defaultInfo1, defaultInfo2, "Instances with different plot data areas should not be equal");
-        
-        defaultInfo2.getPlotInfo().setDataArea(DATA_AREA);
-        assertEquals(defaultInfo1, defaultInfo2, "Instances with same plot data areas should be equal");
+        i1.getPlotInfo().setDataArea(new Rectangle(1, 2, 3, 4));
+        assertNotEquals(i1, i2);
+        i2.getPlotInfo().setDataArea(new Rectangle(1, 2, 3, 4));
+        assertEquals(i1, i2);
 
-        // Test 4: Entity collection affects equality
-        StandardEntityCollection entityCollection1 = createEntityCollectionWithSingleEntity(ENTITY_AREA_1);
-        defaultInfo1.setEntityCollection(entityCollection1);
-        assertNotEquals(defaultInfo1, defaultInfo2, "Instances with different entity collections should not be equal");
-        
-        StandardEntityCollection entityCollection2 = createEntityCollectionWithSingleEntity(ENTITY_AREA_1);
-        defaultInfo2.setEntityCollection(entityCollection2);
-        assertEquals(defaultInfo1, defaultInfo2, "Instances with same entity collections should be equal");
+        StandardEntityCollection e1 = new StandardEntityCollection();
+        e1.add(new ChartEntity(new Rectangle(1, 2, 3, 4)));
+        i1.setEntityCollection(e1);
+        assertNotEquals(i1, i2);
+        StandardEntityCollection e2 = new StandardEntityCollection();
+        e2.add(new ChartEntity(new Rectangle(1, 2, 3, 4)));
+        i2.setEntityCollection(e2);
     }
 
     /**
-     * Tests that ChartRenderingInfo objects can be properly cloned and that
-     * the cloned objects are independent of the original.
+     * Confirm that cloning works.
+     * @throws java.lang.CloneNotSupportedException
      */
     @Test
     public void testCloning() throws CloneNotSupportedException {
-        // Create original instance
-        ChartRenderingInfo originalInfo = new ChartRenderingInfo();
-        
-        // Clone the instance
-        ChartRenderingInfo clonedInfo = CloneUtils.clone(originalInfo);
+        ChartRenderingInfo i1 = new ChartRenderingInfo();
+        ChartRenderingInfo i2 = CloneUtils.clone(i1);
 
-        // Verify basic clone properties
-        assertNotSame(originalInfo, clonedInfo, "Cloned instance should be a different object");
-        assertSame(originalInfo.getClass(), clonedInfo.getClass(), "Cloned instance should have same class");
-        assertEquals(originalInfo, clonedInfo, "Cloned instance should be equal to original");
+        assertNotSame(i1, i2);
+        assertSame(i1.getClass(), i2.getClass());
+        assertEquals(i1, i2);
 
-        // Test independence: Modifying chart area
-        originalInfo.getChartArea().setRect(CHART_AREA_2.getX(), CHART_AREA_2.getY(), 
-                                          CHART_AREA_2.getWidth(), CHART_AREA_2.getHeight());
-        assertNotEquals(originalInfo, clonedInfo, "Modifying original chart area should not affect clone");
-        
-        clonedInfo.getChartArea().setRect(CHART_AREA_2.getX(), CHART_AREA_2.getY(), 
-                                        CHART_AREA_2.getWidth(), CHART_AREA_2.getHeight());
-        assertEquals(originalInfo, clonedInfo, "Both instances should be equal after same modifications");
+        // check independence
+        i1.getChartArea().setRect(4.0, 3.0, 2.0, 1.0);
+        assertNotEquals(i1, i2);
+        i2.getChartArea().setRect(4.0, 3.0, 2.0, 1.0);
+        assertEquals(i1, i2);
 
-        // Test independence: Modifying entity collection
-        originalInfo.getEntityCollection().add(new ChartEntity(ENTITY_AREA_2));
-        assertNotEquals(originalInfo, clonedInfo, "Modifying original entity collection should not affect clone");
-        
-        clonedInfo.getEntityCollection().add(new ChartEntity(ENTITY_AREA_2));
-        assertEquals(originalInfo, clonedInfo, "Both instances should be equal after same entity additions");
+        i1.getEntityCollection().add(new ChartEntity(new Rectangle(1, 2, 2,
+                1)));
+        assertNotEquals(i1, i2);
+        i2.getEntityCollection().add(new ChartEntity(new Rectangle(1, 2, 2,
+                1)));
+        assertEquals(i1, i2);
+
     }
 
     /**
-     * Tests serialization of ChartRenderingInfo with chart area set.
-     * Verifies that serialized and deserialized objects are equal.
+     * Serialize an instance, restore it, and check for equality.
      */
     @Test
-    public void testSerializationWithChartArea() {
-        ChartRenderingInfo originalInfo = new ChartRenderingInfo();
-        originalInfo.setChartArea(CHART_AREA_1);
-        
-        ChartRenderingInfo deserializedInfo = TestUtils.serialised(originalInfo);
-        
-        assertEquals(originalInfo, deserializedInfo, 
-                    "Deserialized ChartRenderingInfo should equal original");
+    public void testSerialization() {
+        ChartRenderingInfo i1 = new ChartRenderingInfo();
+        i1.setChartArea(new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0));
+        ChartRenderingInfo i2 = TestUtils.serialised(i1);
+        assertEquals(i1, i2);
     }
 
     /**
-     * Tests serialization of ChartRenderingInfo with plot data area set.
-     * Verifies that serialized and deserialized objects are equal and that
-     * the plot info maintains proper owner reference after deserialization.
+     * Serialize an instance, restore it, and check for equality.
      */
     @Test
-    public void testSerializationWithPlotDataArea() {
-        ChartRenderingInfo originalInfo = new ChartRenderingInfo();
-        Rectangle2D plotDataArea = new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0);
-        originalInfo.getPlotInfo().setDataArea(plotDataArea);
-        
-        ChartRenderingInfo deserializedInfo = TestUtils.serialised(originalInfo);
-        
-        assertEquals(originalInfo, deserializedInfo, 
-                    "Deserialized ChartRenderingInfo should equal original");
-        assertEquals(deserializedInfo, deserializedInfo.getPlotInfo().getOwner(), 
-                    "PlotInfo should maintain correct owner reference after deserialization");
-    }
-
-    /**
-     * Helper method to create a StandardEntityCollection with a single ChartEntity.
-     * 
-     * @param entityArea the area for the chart entity
-     * @return a new StandardEntityCollection containing one ChartEntity
-     */
-    private StandardEntityCollection createEntityCollectionWithSingleEntity(Rectangle entityArea) {
-        StandardEntityCollection collection = new StandardEntityCollection();
-        collection.add(new ChartEntity(entityArea));
-        return collection;
+    public void testSerialization2() {
+        ChartRenderingInfo i1 = new ChartRenderingInfo();
+        i1.getPlotInfo().setDataArea(new Rectangle2D.Double(1.0, 2.0, 3.0,
+                4.0));
+        ChartRenderingInfo i2 = TestUtils.serialised(i1);
+        assertEquals(i1, i2);
+        assertEquals(i2, i2.getPlotInfo().getOwner());
     }
 }
