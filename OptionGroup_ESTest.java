@@ -18,147 +18,152 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class OptionGroup_ESTest extends OptionGroup_ESTest_scaffolding {
 
-    // Tests for initial state after construction
-    @Test(timeout = 4000)
-    public void initialState_GetOptionsReturnsEmptyCollection()  {
-        OptionGroup group = new OptionGroup();
-        Collection<Option> options = group.getOptions();
-        assertNotNull(options);
-        assertTrue(options.isEmpty());
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      OptionGroup optionGroup0 = new OptionGroup();
+      optionGroup0.setRequired(true);
+      boolean boolean0 = optionGroup0.isRequired();
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void initialState_GetNamesReturnsEmptyCollection()  {
-        OptionGroup group = new OptionGroup();
-        Collection<String> names = group.getNames();
-        assertNotNull(names);
-        assertTrue(names.isEmpty());
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      OptionGroup optionGroup0 = new OptionGroup();
+      Option option0 = new Option("oQxw", (String) null, true, "[]");
+      optionGroup0.setSelected(option0);
+      String string0 = optionGroup0.getSelected();
+      assertEquals("oQxw", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void initialState_IsSelectedReturnsFalse()  {
-        OptionGroup group = new OptionGroup();
-        assertFalse(group.isSelected());
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      OptionGroup optionGroup0 = new OptionGroup();
+      Option option0 = new Option((String) null, "", false, "cHfx;>NW^}R|1DYvgS");
+      optionGroup0.setSelected(option0);
+      String string0 = optionGroup0.getSelected();
+      assertEquals("", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void initialState_GetSelectedReturnsNull()  {
-        OptionGroup group = new OptionGroup();
-        assertNull(group.getSelected());
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      OptionGroup optionGroup0 = new OptionGroup();
+      Option option0 = new Option("oQxw", (String) null, true, "[]");
+      optionGroup0.setSelected(option0);
+      OptionGroup optionGroup1 = optionGroup0.addOption(option0);
+      assertTrue(optionGroup1.isSelected());
+  }
 
-    @Test(timeout = 4000)
-    public void initialState_IsRequiredReturnsFalse()  {
-        OptionGroup group = new OptionGroup();
-        assertFalse(group.isRequired());
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      OptionGroup optionGroup0 = new OptionGroup();
+      Option option0 = new Option((String) null, (String) null);
+      optionGroup0.setRequired(true);
+      optionGroup0.addOption(option0);
+      assertTrue(optionGroup0.isRequired());
+  }
 
-    // Tests for required status
-    @Test(timeout = 4000)
-    public void setRequiredTrue_ThenIsRequiredReturnsTrue()  {
-        OptionGroup group = new OptionGroup();
-        group.setRequired(true);
-        assertTrue(group.isRequired());
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      OptionGroup optionGroup0 = new OptionGroup();
+      // Undeclared exception!
+      try { 
+        optionGroup0.addOption((Option) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.cli.OptionGroup", e);
+      }
+  }
 
-    // Tests for selection behavior
-    @Test(timeout = 4000)
-    public void setSelectedOptionWithLongOpt_ThenGetSelectedReturnsLongOpt()  {
-        OptionGroup group = new OptionGroup();
-        Option option = new Option("oQxw", null, true, "[]");
-        group.setSelected(option);
-        assertEquals("oQxw", group.getSelected());
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      OptionGroup optionGroup0 = new OptionGroup();
+      Collection<Option> collection0 = optionGroup0.getOptions();
+      assertNotNull(collection0);
+  }
 
-    @Test(timeout = 4000)
-    public void setSelectedOptionWithoutLongOpt_ThenGetSelectedReturnsEmpty()  {
-        OptionGroup group = new OptionGroup();
-        Option option = new Option(null, "", false, "description");
-        group.setSelected(option);
-        assertEquals("", group.getSelected());
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      OptionGroup optionGroup0 = new OptionGroup();
+      Option option0 = new Option((String) null, (String) null);
+      OptionGroup optionGroup1 = optionGroup0.addOption(option0);
+      Option option1 = new Option("vN", "", false, "");
+      optionGroup1.addOption(option1);
+      String string0 = optionGroup0.toString();
+      assertEquals("[--null, -vN ]", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void setSelectedOption_ThenIsSelectedReturnsTrue()  {
-        OptionGroup group = new OptionGroup();
-        Option option = new Option("opt", null, true, "description");
-        group.setSelected(option);
-        assertTrue(group.isSelected());
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      OptionGroup optionGroup0 = new OptionGroup();
+      Option option0 = new Option("oQxw", (String) null, true, "[]");
+      optionGroup0.setSelected(option0);
+      Option option1 = new Option("Xr0g", false, "[");
+      try { 
+        optionGroup0.setSelected(option1);
+        fail("Expecting exception: Exception");
+      
+      } catch(Exception e) {
+         //
+         // The option 'Xr0g' was specified but an option from this group has already been selected: 'oQxw'
+         //
+         verifyException("org.apache.commons.cli.OptionGroup", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void setSelectedToNull_DoesNotSetSelectedOption()  {
-        OptionGroup group = new OptionGroup();
-        group.setSelected(null);
-        assertFalse(group.isSelected());
-        assertNull(group.getSelected());
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      OptionGroup optionGroup0 = new OptionGroup();
+      Option option0 = new Option("oQxw", (String) null, true, "[]");
+      optionGroup0.setSelected(option0);
+      optionGroup0.setSelected(option0);
+      assertFalse(option0.isRequired());
+  }
 
-    @Test(timeout = 4000)
-    public void setSameOptionTwice_DoesNotThrowException()  {
-        OptionGroup group = new OptionGroup();
-        Option option = new Option("opt", null, true, "description");
-        group.setSelected(option);
-        group.setSelected(option); // Should not throw
-        assertTrue(group.isSelected());
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      OptionGroup optionGroup0 = new OptionGroup();
+      optionGroup0.setSelected((Option) null);
+      assertFalse(optionGroup0.isRequired());
+  }
 
-    @Test(timeout = 4000)
-    public void setDifferentOptionAfterSelection_ThrowsException()  {
-        OptionGroup group = new OptionGroup();
-        Option firstOption = new Option("first", null, true, "first option");
-        Option secondOption = new Option("second", null, false, "second option");
-        
-        group.setSelected(firstOption);
-        
-        try {
-            group.setSelected(secondOption);
-            fail("Expected exception when selecting different option after initial selection");
-        } catch (Exception e) {
-            assertTrue(e.getMessage().contains("The option 'second' was specified but an option from this group has already been selected: 'first'"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      OptionGroup optionGroup0 = new OptionGroup();
+      Option option0 = new Option("oQxw", (String) null, true, "[]");
+      optionGroup0.setSelected(option0);
+      boolean boolean0 = optionGroup0.isSelected();
+      assertTrue(boolean0);
+  }
 
-    // Tests for addOption behavior
-    @Test(timeout = 4000)
-    public void addOption_WhenGroupIsRequired_DoesNotAffectRequiredStatus()  {
-        OptionGroup group = new OptionGroup();
-        group.setRequired(true);
-        Option option = new Option(null, null);
-        group.addOption(option);
-        assertTrue(group.isRequired());
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      OptionGroup optionGroup0 = new OptionGroup();
+      boolean boolean0 = optionGroup0.isSelected();
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void addOption_WhenOptionIsSelected_GroupRemainsSelected()  {
-        OptionGroup group = new OptionGroup();
-        Option option = new Option("opt", null, true, "description");
-        group.setSelected(option);
-        OptionGroup updatedGroup = group.addOption(option);
-        assertTrue(updatedGroup.isSelected());
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      OptionGroup optionGroup0 = new OptionGroup();
+      String string0 = optionGroup0.getSelected();
+      assertNull(string0);
+  }
 
-    @Test(timeout = 4000)
-    public void addNullOption_ThrowsNullPointerException()  {
-        OptionGroup group = new OptionGroup();
-        try {
-            group.addOption(null);
-            fail("Expected NullPointerException when adding null option");
-        } catch (NullPointerException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      OptionGroup optionGroup0 = new OptionGroup();
+      Collection<String> collection0 = optionGroup0.getNames();
+      assertNotNull(collection0);
+  }
 
-    // Tests for toString behavior
-    @Test(timeout = 4000)
-    public void toString_WithOptions_ReturnsFormattedString()  {
-        OptionGroup group = new OptionGroup();
-        Option option1 = new Option(null, null);
-        Option option2 = new Option("vN", "", false, "");
-        
-        group.addOption(option1)
-             .addOption(option2);
-        
-        assertEquals("[--null, -vN ]", group.toString());
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      OptionGroup optionGroup0 = new OptionGroup();
+      boolean boolean0 = optionGroup0.isRequired();
+      assertFalse(boolean0);
+  }
 }
