@@ -24,198 +24,210 @@ import org.evosuite.runtime.mock.java.util.MockDate;
 import org.jfree.chart.axis.QuarterDateFormat;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true, 
+    useVFS = true, 
+    useVNET = true, 
+    resetStaticState = true, 
+    separateClassLoader = true
+) 
 public class QuarterDateFormat_ESTest extends QuarterDateFormat_ESTest_scaffolding {
 
   @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      TimeZone timeZone0 = TimeZone.getDefault();
-      QuarterDateFormat quarterDateFormat0 = new QuarterDateFormat(timeZone0);
-      QuarterDateFormat quarterDateFormat1 = new QuarterDateFormat(timeZone0, quarterDateFormat0.ROMAN_QUARTERS, true);
-      boolean boolean0 = quarterDateFormat1.equals(quarterDateFormat0);
-      assertFalse(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      SimpleTimeZone simpleTimeZone0 = new SimpleTimeZone(712, "");
-      String[] stringArray0 = new String[1];
-      QuarterDateFormat quarterDateFormat0 = new QuarterDateFormat(simpleTimeZone0, stringArray0);
-      MockDate mockDate0 = new MockDate((-1), 3, (-1), (-1), 1943, (-2263));
-      Format.Field format_Field0 = mock(Format.Field.class, new ViolatedAssumptionAnswer());
-      FieldPosition fieldPosition0 = new FieldPosition(format_Field0, 712);
-      StringBuffer stringBuffer0 = new StringBuffer("{F@~<xQ@d0");
-      quarterDateFormat0.format((Date) mockDate0, stringBuffer0, fieldPosition0);
-      assertEquals(19, stringBuffer0.length());
-  }
-
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      TimeZone timeZone0 = TimeZone.getDefault();
-      QuarterDateFormat quarterDateFormat0 = new QuarterDateFormat(timeZone0);
-      QuarterDateFormat quarterDateFormat1 = new QuarterDateFormat(timeZone0, quarterDateFormat0.ROMAN_QUARTERS, true);
-      MockDate mockDate0 = new MockDate((-2355), 0, 2123, 584, 0, (-797));
-      StringWriter stringWriter0 = new StringWriter();
-      StringBuffer stringBuffer0 = stringWriter0.getBuffer();
-      quarterDateFormat1.format((Date) mockDate0, stringBuffer0, (FieldPosition) null);
-      assertEquals("IV 451", stringBuffer0.toString());
-      assertEquals("IV 451", stringWriter0.toString());
-  }
-
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      SimpleTimeZone simpleTimeZone0 = new SimpleTimeZone(4, "");
-      QuarterDateFormat quarterDateFormat0 = new QuarterDateFormat(simpleTimeZone0);
-      MockDate mockDate0 = new MockDate(1L);
-      FieldPosition fieldPosition0 = new FieldPosition(80);
-      // Undeclared exception!
-      try { 
-        quarterDateFormat0.format((Date) mockDate0, (StringBuffer) null, fieldPosition0);
-        fail("Expecting exception: NullPointerException");
+  public void testEquals_differentQuarterSymbolsAndQuarterFirst_instance1NotEqualToInstance2() throws Throwable {
+      TimeZone defaultTimeZone = TimeZone.getDefault();
+      QuarterDateFormat regularFormat = new QuarterDateFormat(defaultTimeZone);
+      QuarterDateFormat romanFormat = new QuarterDateFormat(
+          defaultTimeZone, 
+          regularFormat.ROMAN_QUARTERS, 
+          true
+      );
       
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.jfree.chart.axis.QuarterDateFormat", e);
-      }
+      boolean areEqual = romanFormat.equals(regularFormat);
+      assertFalse(areEqual);
   }
 
   @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      QuarterDateFormat quarterDateFormat0 = new QuarterDateFormat();
-      quarterDateFormat0.setNumberFormat((NumberFormat) null);
-      QuarterDateFormat quarterDateFormat1 = new QuarterDateFormat();
-      // Undeclared exception!
-      try { 
-        quarterDateFormat0.equals(quarterDateFormat1);
-        fail("Expecting exception: NullPointerException");
+  public void testFormat_customTimeZoneAndQuarterSymbols_stringBufferLengthAsExpected() throws Throwable {
+      // Create custom time zone and quarter symbols
+      SimpleTimeZone customTimeZone = new SimpleTimeZone(712, "");
+      String[] customQuarterSymbols = new String[1];
+      QuarterDateFormat formatter = new QuarterDateFormat(customTimeZone, customQuarterSymbols);
       
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.text.DateFormat", e);
-      }
+      // Create a mock date (year=-1, month=3, day=-1, hour=-1, minute=1943, second=-2263)
+      MockDate mockDate = new MockDate((-1), 3, (-1), (-1), 1943, (-2263));
+      
+      // Mock field position
+      Format.Field mockField = mock(Format.Field.class, new ViolatedAssumptionAnswer());
+      FieldPosition fieldPosition = new FieldPosition(mockField, 712);
+      
+      StringBuffer buffer = new StringBuffer("{F@~<xQ@d0");
+      formatter.format(mockDate, buffer, fieldPosition);
+      
+      assertEquals(19, buffer.length());
   }
 
   @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      String[] stringArray0 = new String[6];
-      QuarterDateFormat quarterDateFormat0 = null;
+  public void testFormat_romanQuartersAndQuarterFirst_returnsExpectedString() throws Throwable {
+      TimeZone defaultTimeZone = TimeZone.getDefault();
+      QuarterDateFormat regularFormat = new QuarterDateFormat(defaultTimeZone);
+      QuarterDateFormat romanFormat = new QuarterDateFormat(
+          defaultTimeZone, 
+          regularFormat.ROMAN_QUARTERS, 
+          true
+      );
+      
+      // Create a mock date (year=-2355, month=0, day=2123, hour=584, minute=0, second=-797)
+      MockDate mockDate = new MockDate((-2355), 0, 2123, 584, 0, (-797));
+      
+      StringWriter writer = new StringWriter();
+      StringBuffer buffer = writer.getBuffer();
+      romanFormat.format(mockDate, buffer, (FieldPosition) null);
+      
+      assertEquals("IV 451", buffer.toString());
+      assertEquals("IV 451", writer.toString());
+  }
+
+  @Test(timeout = 4000)
+  public void testFormat_nullStringBuffer_throwsNullPointerException() throws Throwable {
+      SimpleTimeZone customTimeZone = new SimpleTimeZone(4, "");
+      QuarterDateFormat formatter = new QuarterDateFormat(customTimeZone);
+      MockDate mockDate = new MockDate(1L);
+      FieldPosition fieldPosition = new FieldPosition(80);
+      
       try {
-        quarterDateFormat0 = new QuarterDateFormat((TimeZone) null, stringArray0, true);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Null 'zone' argument.
-         //
-         verifyException("org.jfree.chart.internal.Args", e);
+          formatter.format(mockDate, (StringBuffer) null, fieldPosition);
+          fail("Expected NullPointerException");
+      } catch (NullPointerException e) {
+          // Expected due to null StringBuffer
       }
   }
 
   @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      String[] stringArray0 = new String[1];
-      QuarterDateFormat quarterDateFormat0 = null;
+  public void testEquals_afterSettingNumberFormatToNull_throwsNullPointerException() throws Throwable {
+      QuarterDateFormat formatter1 = new QuarterDateFormat();
+      formatter1.setNumberFormat(null); // Makes superclass methods vulnerable to NPE
+      
+      QuarterDateFormat formatter2 = new QuarterDateFormat();
+      
       try {
-        quarterDateFormat0 = new QuarterDateFormat((TimeZone) null, stringArray0);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Null 'zone' argument.
-         //
-         verifyException("org.jfree.chart.internal.Args", e);
+          formatter1.equals(formatter2);
+          fail("Expected NullPointerException");
+      } catch (NullPointerException e) {
+          // Expected from DateFormat.equals
       }
   }
 
   @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      TimeZone timeZone0 = TimeZone.getDefault();
-      QuarterDateFormat quarterDateFormat0 = new QuarterDateFormat(timeZone0);
-      QuarterDateFormat quarterDateFormat1 = new QuarterDateFormat(timeZone0);
-      boolean boolean0 = quarterDateFormat1.equals(quarterDateFormat0);
-      assertTrue(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      TimeZone timeZone0 = TimeZone.getDefault();
-      QuarterDateFormat quarterDateFormat0 = new QuarterDateFormat(timeZone0);
-      Object object0 = new Object();
-      boolean boolean0 = quarterDateFormat0.equals(object0);
-      assertFalse(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      QuarterDateFormat quarterDateFormat0 = new QuarterDateFormat();
-      boolean boolean0 = quarterDateFormat0.equals(quarterDateFormat0);
-      assertTrue(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      TimeZone timeZone0 = TimeZone.getDefault();
-      QuarterDateFormat quarterDateFormat0 = new QuarterDateFormat(timeZone0);
-      QuarterDateFormat quarterDateFormat1 = new QuarterDateFormat(timeZone0, quarterDateFormat0.ROMAN_QUARTERS, true);
-      boolean boolean0 = quarterDateFormat0.equals(quarterDateFormat1);
-      assertFalse(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      TimeZone timeZone0 = TimeZone.getDefault();
-      String[] stringArray0 = new String[0];
-      QuarterDateFormat quarterDateFormat0 = new QuarterDateFormat(timeZone0, stringArray0, true);
-      MockDate mockDate0 = new MockDate();
-      FieldPosition fieldPosition0 = new FieldPosition((-1375));
-      // Undeclared exception!
-      try { 
-        quarterDateFormat0.format((Date) mockDate0, (StringBuffer) null, fieldPosition0);
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+  public void testConstructor_nullTimeZoneWithQuarterSymbolsAndQuarterFirst_throwsIllegalArgumentException() {
+      String[] quarterSymbols = new String[1];
       
-      } catch(ArrayIndexOutOfBoundsException e) {
-         //
-         // Index 0 out of bounds for length 0
-         //
-         verifyException("org.jfree.chart.axis.QuarterDateFormat", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      TimeZone timeZone0 = TimeZone.getDefault();
-      QuarterDateFormat quarterDateFormat0 = new QuarterDateFormat(timeZone0);
-      MockDate mockDate0 = new MockDate((-2355), 0, 2123, 584, 0, (-797));
-      StringWriter stringWriter0 = new StringWriter();
-      StringBuffer stringBuffer0 = stringWriter0.getBuffer();
-      quarterDateFormat0.format((Date) mockDate0, stringBuffer0, (FieldPosition) null);
-      assertEquals(5, stringBuffer0.length());
-      assertEquals("451 4", stringWriter0.toString());
-  }
-
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      QuarterDateFormat quarterDateFormat0 = new QuarterDateFormat();
-      Date date0 = quarterDateFormat0.parse(" ", (ParsePosition) null);
-      assertNull(date0);
-  }
-
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      QuarterDateFormat quarterDateFormat0 = null;
       try {
-        quarterDateFormat0 = new QuarterDateFormat((TimeZone) null);
-        fail("Expecting exception: IllegalArgumentException");
+          new QuarterDateFormat(null, quarterSymbols, true);
+          fail("Expected IllegalArgumentException for null time zone");
+      } catch (IllegalArgumentException e) {
+          assertEquals("Null 'zone' argument.", e.getMessage());
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void testConstructor_nullTimeZoneWithQuarterSymbols_throwsIllegalArgumentException() {
+      String[] quarterSymbols = new String[1];
       
-      } catch(IllegalArgumentException e) {
-         //
-         // Null 'zone' argument.
-         //
-         verifyException("org.jfree.chart.internal.Args", e);
+      try {
+          new QuarterDateFormat(null, quarterSymbols);
+          fail("Expected IllegalArgumentException for null time zone");
+      } catch (IllegalArgumentException e) {
+          assertEquals("Null 'zone' argument.", e.getMessage());
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void testEquals_sameConfiguration_returnsTrue() throws Throwable {
+      TimeZone defaultTimeZone = TimeZone.getDefault();
+      QuarterDateFormat formatter1 = new QuarterDateFormat(defaultTimeZone);
+      QuarterDateFormat formatter2 = new QuarterDateFormat(defaultTimeZone);
+      
+      assertTrue(formatter1.equals(formatter2));
+  }
+
+  @Test(timeout = 4000)
+  public void testEquals_arbitraryObject_returnsFalse() throws Throwable {
+      TimeZone defaultTimeZone = TimeZone.getDefault();
+      QuarterDateFormat formatter = new QuarterDateFormat(defaultTimeZone);
+      Object otherObject = new Object();
+      
+      assertFalse(formatter.equals(otherObject));
+  }
+
+  @Test(timeout = 4000)
+  public void testEquals_sameInstance_returnsTrue() throws Throwable {
+      QuarterDateFormat formatter = new QuarterDateFormat();
+      assertTrue(formatter.equals(formatter));
+  }
+
+  @Test(timeout = 4000)
+  public void testEquals_differentQuarterSymbolsAndQuarterFirst_instance2NotEqualToInstance1() throws Throwable {
+      TimeZone defaultTimeZone = TimeZone.getDefault();
+      QuarterDateFormat regularFormat = new QuarterDateFormat(defaultTimeZone);
+      QuarterDateFormat romanFormat = new QuarterDateFormat(
+          defaultTimeZone, 
+          regularFormat.ROMAN_QUARTERS, 
+          true
+      );
+      
+      boolean areEqual = regularFormat.equals(romanFormat);
+      assertFalse(areEqual);
+  }
+
+  @Test(timeout = 4000)
+  public void testFormat_emptyQuarterSymbols_throwsArrayIndexOutOfBoundsException() throws Throwable {
+      TimeZone defaultTimeZone = TimeZone.getDefault();
+      String[] emptyQuarterSymbols = new String[0];
+      QuarterDateFormat formatter = new QuarterDateFormat(defaultTimeZone, emptyQuarterSymbols, true);
+      
+      MockDate currentDate = new MockDate();
+      FieldPosition fieldPosition = new FieldPosition(-1375);
+      
+      try {
+          formatter.format(currentDate, (StringBuffer) null, fieldPosition);
+          fail("Expected ArrayIndexOutOfBoundsException");
+      } catch (ArrayIndexOutOfBoundsException e) {
+          assertEquals("Index 0 out of bounds for length 0", e.getMessage());
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void testFormat_specificDate_returnsExpectedString() throws Throwable {
+      TimeZone defaultTimeZone = TimeZone.getDefault();
+      QuarterDateFormat formatter = new QuarterDateFormat(defaultTimeZone);
+      
+      // Create a mock date (year=-2355, month=0, day=2123, hour=584, minute=0, second=-797)
+      MockDate mockDate = new MockDate((-2355), 0, 2123, 584, 0, (-797));
+      
+      StringWriter writer = new StringWriter();
+      StringBuffer buffer = writer.getBuffer();
+      formatter.format(mockDate, buffer, (FieldPosition) null);
+      
+      assertEquals("451 4", buffer.toString());
+      assertEquals(5, buffer.length());
+  }
+
+  @Test(timeout = 4000)
+  public void testParse_invalidString_returnsNull() {
+      QuarterDateFormat formatter = new QuarterDateFormat();
+      Date parsedDate = formatter.parse(" ", (ParsePosition) null);
+      assertNull(parsedDate);
+  }
+
+  @Test(timeout = 4000)
+  public void testConstructor_nullTimeZone_throwsIllegalArgumentException() {
+      try {
+          new QuarterDateFormat(null);
+          fail("Expected IllegalArgumentException for null time zone");
+      } catch (IllegalArgumentException e) {
+          assertEquals("Null 'zone' argument.", e.getMessage());
       }
   }
 }
