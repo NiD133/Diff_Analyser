@@ -46,32 +46,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for JXPath extension functions including:
- * - Object allocation via constructors
- * - Static and instance method calls
- * - Collection handling and return types
- * - NodeSet operations
- * - Type conversion and compatibility
+ * Test extension functions.
  */
 class ExtensionFunctionTest extends AbstractJXPathTest {
 
-    // Test constants
-    private static final String EXPECTED_DEFAULT_CONSTRUCTOR_RESULT = "foo=0; bar=null";
-    private static final String EXPECTED_CUSTOM_CONSTRUCTOR_RESULT = "foo=3; bar=baz";
-    private static final String EXPECTED_TYPE_CONVERTED_CONSTRUCTOR_RESULT = "foo=3; bar=4.0";
-    private static final String EXPECTED_VARIABLE_CONSTRUCTOR_RESULT = "foo=2; bar=baz";
-    private static final String EXPECTED_STATIC_METHOD_RESULT = "foo=8; bar=goober";
-    private static final String EXPECTED_INCREMENT_RESULT = "9";
+    private static final class Context implements ExpressionContext {
 
-    /**
-     * Mock ExpressionContext implementation for testing function invocation.
-     * Provides a simple context with a single object.
-     */
-    private static final class TestExpressionContext implements ExpressionContext {
-        private final Object contextObject;
+        private final Object object;
 
-        public TestExpressionContext(final Object contextObject) {
-            this.contextObject = contextObject;
+        public Context(final Object object) {
+            this.object = object;
         }
 
         @Override
@@ -81,7 +65,7 @@ class ExtensionFunctionTest extends AbstractJXPathTest {
 
         @Override
         public Pointer getContextNodePointer() {
-            return NodePointer.newNodePointer(null, contextObject, Locale.getDefault());
+            return NodePointer.newNodePointer(null, object, Locale.getDefault());
         }
 
         @Override
@@ -95,401 +79,208 @@ class ExtensionFunctionTest extends AbstractJXPathTest {
         }
     }
 
-    // Test fixtures
-    private Functions testFunctions;
-    private JXPathContext jxpathContext;
+    private Functions functions;
+    private JXPathContext context;
     private TestBean testBean;
-    private TypeConverter originalTypeConverter;
+    private TypeConverter typeConverter;
 
     @Override
     @BeforeEach
     public void setUp() {
-        setupJXPathContext();
-        setupTestFunctions();
-        preserveOriginalTypeConverter();
+        if (context == null) {
+            testBean = new TestBean();
+            context = JXPathContext.newContext(testBean);
+            final Variables vars = context.getVariables();
+            vars.declareVariable("test", new TestFunctions(4, "test"));
+            final FunctionLibrary lib = new FunctionLibrary();
+            lib.addFunctions(new ClassFunctions(TestFunctions.class, "test"));
+            lib.addFunctions(new ClassFunctions(TestFunctions2.class, "test"));
+            lib.addFunctions(new PackageFunctions("", "call"));
+            lib.addFunctions(new PackageFunctions("org.apache.commons.jxpath.ri.compiler.", "jxpathtest"));
+            lib.addFunctions(new PackageFunctions("", null));
+            context.setFunctions(lib);
+            context.getVariables().declareVariable("List.class", List.class);
+            context.getVariables().declareVariable("NodeSet.class", NodeSet.class);
+        }
+        functions = new ClassFunctions(TestFunctions.class, "test");
+        typeConverter = TypeUtils.getTypeConverter();
     }
 
     @AfterEach
     public void tearDown() {
-        restoreOriginalTypeConverter();
-    }
-
-    // === Object Allocation Tests ===
-
-    @Test
-    void shouldAllocateObjectUsingDefaultConstructor() {
-        String actualResult = evaluateXPathAsString("test:new()");
-        
-        assertEquals(EXPECTED_DEFAULT_CONSTRUCTOR_RESULT, actualResult,
-            "Default constructor should create object with initial values");
+        TypeUtils.setTypeConverter(typeConverter);
     }
 
     @Test
-    void shouldAllocateObjectUsingPackageFunctionsWithClassName() {
-        String actualResult = evaluateXPathAsString("jxpathtest:TestFunctions.new()");
-        
-        assertEquals(EXPECTED_DEFAULT_CONSTRUCTOR_RESULT, actualResult,
-            "PackageFunctions with class name should create object with default constructor");
+    void testAllocation() {
+        // Allocate new object using the default constructor
+        assertXPathValue(context, "string(test:new())", "foo=0; bar=null");
+        // Allocate new object using PackageFunctions and class name
+        assertXPathValue(context, "string(jxpathtest:TestFunctions.new())", "foo=0; bar=null");
+        // Allocate new object using a fully qualified class name
+        assertXPathValue(context, "string(" + TestFunctions.class.getName() + ".new())", "foo=0; bar=null");
+        // Allocate new object using a custom constructor
+        assertXPathValue(context, "string(test:new(3, 'baz'))", "foo=3; bar=baz");
+        // Allocate new object using a custom constructor - type conversion
+        assertXPathValue(context, "string(test:new('3', 4))", "foo=3; bar=4.0");
+        context.getVariables().declareVariable("A", "baz");
+        assertXPathValue(context, "string(test:new(2, $A, false))", "foo=2; bar=baz");
     }
 
     @Test
-    void shouldAllocateObjectUsingFullyQualifiedClassName() {
-        String fullyQualifiedExpression = "string(" + TestFunctions.class.getName() + ".new())";
-        String actualResult = (String) jxpathContext.getValue(fullyQualifiedExpression);
-        
-        assertEquals(EXPECTED_DEFAULT_CONSTRUCTOR_RESULT, actualResult,
-            "Fully qualified class name should create object with default constructor");
-    }
-
-    @Test
-    void shouldAllocateObjectUsingCustomConstructor() {
-        String actualResult = evaluateXPathAsString("test:new(3, 'baz')");
-        
-        assertEquals(EXPECTED_CUSTOM_CONSTRUCTOR_RESULT, actualResult,
-            "Custom constructor should create object with provided values");
-    }
-
-    @Test
-    void shouldAllocateObjectWithTypeConversion() {
-        String actualResult = evaluateXPathAsString("test:new('3', 4)");
-        
-        assertEquals(EXPECTED_TYPE_CONVERTED_CONSTRUCTOR_RESULT, actualResult,
-            "Constructor should handle type conversion from string to int and int to double");
-    }
-
-    @Test
-    void shouldAllocateObjectUsingVariables() {
-        jxpathContext.getVariables().declareVariable("A", "baz");
-        
-        String actualResult = evaluateXPathAsString("test:new(2, $A, false)");
-        
-        assertEquals(EXPECTED_VARIABLE_CONSTRUCTOR_RESULT, actualResult,
-            "Constructor should work with XPath variables");
-    }
-
-    // === Static Method Call Tests ===
-
-    @Test
-    void shouldCallStaticMethodWithClassFunctions() {
-        String actualResult = evaluateXPathAsString("test:build(8, 'goober')");
-        
-        assertEquals(EXPECTED_STATIC_METHOD_RESULT, actualResult,
-            "Static method should be callable via ClassFunctions");
-    }
-
-    @Test
-    void shouldCallStaticMethodWithPackageFunctions() {
-        String actualResult = evaluateXPathAsString("jxpathtest:TestFunctions.build(8, 'goober')");
-        
-        assertEquals(EXPECTED_STATIC_METHOD_RESULT, actualResult,
-            "Static method should be callable via PackageFunctions");
-    }
-
-    @Test
-    void shouldCallStaticMethodWithFullyQualifiedName() {
-        String fullyQualifiedExpression = "string(" + TestFunctions.class.getName() + ".build(8, 'goober'))";
-        String actualResult = (String) jxpathContext.getValue(fullyQualifiedExpression);
-        
-        assertEquals(EXPECTED_STATIC_METHOD_RESULT, actualResult,
-            "Static method should be callable with fully qualified class name");
-    }
-
-    @Test
-    void shouldCallStaticMethodFromDifferentClassWithSamePrefix() {
-        String actualResult = evaluateXPathAsString("test:increment(8)");
-        
-        assertEquals(EXPECTED_INCREMENT_RESULT, actualResult,
-            "Should be able to call methods from different classes sharing the same prefix");
-    }
-
-    @Test
-    void shouldConvertNodeSetToStringInStaticMethod() {
-        String actualResult = (String) jxpathContext.getValue("test:string(/beans/name)");
-        
-        assertEquals("Name 1", actualResult,
-            "NodeSet should be properly converted to string in static method calls");
-    }
-
-    // === Instance Method Call Tests ===
-
-    @Test
-    void shouldCallBuiltInStringMethod() {
-        Integer actualLength = (Integer) jxpathContext.getValue("length('foo')");
-        
-        assertEquals(Integer.valueOf(3), actualLength,
-            "Built-in string length method should work");
-    }
-
-    @Test
-    void shouldCallMethodIgnoringPrefix() {
-        String actualResult = (String) jxpathContext.getValue("call:substring('foo', 1, 2)");
-        
-        assertEquals("o", actualResult,
-            "Method calls should work regardless of prefix");
-    }
-
-    @Test
-    void shouldCallInstanceMethodWithVariable() {
-        String actualResult = evaluateXPathAsString("test:getFoo($test)");
-        
-        assertEquals("4", actualResult,
-            "Instance method should work with variable arguments");
-    }
-
-    @Test
-    void shouldCallInstanceMethodWithMultipleArguments() {
-        String actualResult = evaluateXPathAsString("test:setFooAndBar($test, 7, 'biz')");
-        
-        assertEquals("foo=7; bar=biz", actualResult,
-            "Instance method should handle multiple arguments");
-    }
-
-    // === Collection Handling Tests ===
-
-    @Test
-    void shouldHandleCollectionMethodCalls() {
-        List<String> testList = new ArrayList<>();
-        testList.add("foo");
-        jxpathContext.getVariables().declareVariable("myList", testList);
-        
-        // Test size method on variable
-        assertEquals(Integer.valueOf(1), jxpathContext.getValue("size($myList)"),
-            "Size method should work on collection variables");
-        
-        // Test size method on context property
-        assertEquals(Integer.valueOf(2), jxpathContext.getValue("size(beans)"),
-            "Size method should work on context properties");
-        
-        // Test mutating method call
-        jxpathContext.getValue("add($myList, 'hello')");
-        assertEquals(2, testList.size(),
-            "Collection should be modified after method call");
-    }
-
-    @Test
-    void shouldHandleCollectionMethodOnRootContext() {
-        JXPathContext rootCollectionContext = JXPathContext.newContext(new ArrayList<>());
-        
-        String actualSize = String.valueOf(rootCollectionContext.getValue("size(/)"));
-        
-        assertEquals("0", actualSize,
-            "Extension function should work on root collection context");
-    }
-
-    @Test
-    void shouldReturnCollectionFromExtensionFunction() {
-        // Test iteration over returned collection
-        assertXPathValueIterator(jxpathContext, "test:collection()/name", list("foo", "bar"));
-        assertXPathPointerIterator(jxpathContext, "test:collection()/name", list("/.[1]/name", "/.[2]/name"));
-        
-        // Test single value access
-        assertXPathValue(jxpathContext, "test:collection()/name", "foo");
-        assertXPathValue(jxpathContext, "test:collection()/@name", "foo");
-        
-        // Test collection conversion
-        List<String> inputList = list("foo", "bar");
-        jxpathContext.getVariables().declareVariable("list", inputList);
-        
-        Object result = jxpathContext.getValue("test:items($list)");
-        assertInstanceOf(Collection.class, result, "Return type should be Collection");
-        assertEquals(inputList, new ArrayList<>((Collection<?>) result), "Return values should match input");
-    }
-
-    // === NodeSet Handling Tests ===
-
-    @Test
-    void shouldReturnNodeSetFromExtensionFunction() {
-        assertXPathValueIterator(jxpathContext, "test:nodeSet()/name", list("Name 1", "Name 2"));
-        assertXPathValueIterator(jxpathContext, "test:nodeSet()", list(testBean.getBeans()[0], testBean.getBeans()[1]));
-        assertXPathPointerIterator(jxpathContext, "test:nodeSet()/name", list("/beans[1]/name", "/beans[2]/name"));
-        assertXPathValueAndPointer(jxpathContext, "test:nodeSet()/name", "Name 1", "/beans[1]/name");
-        assertXPathValueAndPointer(jxpathContext, "test:nodeSet()/@name", "Name 1", "/beans[1]/@name");
-        
-        assertEquals(2, ((Number) jxpathContext.getValue("count(test:nodeSet())")).intValue(),
-            "NodeSet should contain correct number of elements");
-        
-        assertEquals(testBean.getBeans()[0], jxpathContext.getValue("test:nodeSet()"),
-            "NodeSet should return first element when accessed as single value");
-    }
-
-    // === Type Conversion Tests ===
-
-    @Test
-    void shouldHandleNodeSetTypeChecking() {
-        jxpathContext.getVariables().declareVariable("List.class", List.class);
-        jxpathContext.getVariables().declareVariable("NodeSet.class", NodeSet.class);
-        
-        assertEquals(Boolean.TRUE, jxpathContext.getValue("test:isInstance(//strings, $List.class)"),
-            "NodeSet should be recognized as List by default");
-        assertEquals(Boolean.FALSE, jxpathContext.getValue("test:isInstance(//strings, $NodeSet.class)"),
-            "NodeSet should not be recognized as NodeSet by default");
-    }
-
-    @Test
-    void shouldHandleBackwardCompatibilityTypeConversion() {
+    void testBCNodeSetHack() {
         TypeUtils.setTypeConverter(new JXPath11CompatibleTypeConverter());
-        jxpathContext.getVariables().declareVariable("List.class", List.class);
-        jxpathContext.getVariables().declareVariable("NodeSet.class", NodeSet.class);
-        
-        assertEquals(Boolean.FALSE, jxpathContext.getValue("test:isInstance(//strings, $List.class)"),
-            "With JXPath 1.1 compatibility, NodeSet should not be recognized as List");
-        assertEquals(Boolean.TRUE, jxpathContext.getValue("test:isInstance(//strings, $NodeSet.class)"),
-            "With JXPath 1.1 compatibility, NodeSet should be recognized as NodeSet");
-    }
-
-    // === Expression Context Tests ===
-
-    @Test
-    void shouldUseExpressionContextInExtensionFunctions() {
-        // Function uses ExpressionContext to access current node
-        assertXPathValue(jxpathContext, "//.[test:isMap()]/Key1", "Value 1");
-        
-        // Function gets all nodes matching pattern
-        assertXPathValue(jxpathContext, "count(//.[test:count(strings) = 3])", Double.valueOf(7));
-        
-        // Function receives collection and processes it
-        assertXPathValue(jxpathContext, "test:count(//strings)", Integer.valueOf(21));
-        
-        // Function receives pointers and processes them
-        assertXPathValue(jxpathContext, "test:countPointers(//strings)", Integer.valueOf(21));
-        
-        // Function uses ExpressionContext to get current pointer path
-        assertXPathValue(jxpathContext, "/beans[contains(test:path(), '[2]')]/name", "Name 2");
-    }
-
-    // === Function Lookup Tests ===
-
-    @Test
-    void shouldLookupConstructorFunction() {
-        Object[] arguments = { Integer.valueOf(1), "x" };
-        
-        Function constructorFunction = testFunctions.getFunction("test", "new", arguments);
-        Object result = constructorFunction.invoke(new TestExpressionContext(null), arguments);
-        
-        assertEquals("foo=1; bar=x", result.toString(),
-            "Constructor function lookup should find appropriate constructor");
+        assertXPathValue(context, "test:isInstance(//strings, $List.class)", Boolean.FALSE);
+        assertXPathValue(context, "test:isInstance(//strings, $NodeSet.class)", Boolean.TRUE);
     }
 
     @Test
-    void shouldLookupConstructorFunctionWithExpressionContext() {
-        Object[] arguments = { "baz" };
-        
-        Function constructorFunction = testFunctions.getFunction("test", "new", arguments);
-        Object result = constructorFunction.invoke(new TestExpressionContext(Integer.valueOf(1)), arguments);
-        
-        assertEquals("foo=1; bar=baz", result.toString(),
-            "Constructor function should use ExpressionContext when available");
+    void testCollectionMethodCall() {
+        final List list = new ArrayList();
+        list.add("foo");
+        context.getVariables().declareVariable("myList", list);
+        assertXPathValue(context, "size($myList)", Integer.valueOf(1));
+        assertXPathValue(context, "size(beans)", Integer.valueOf(2));
+        context.getValue("add($myList, 'hello')");
+        assertEquals(2, list.size(), "After adding an element");
+        final JXPathContext context = JXPathContext.newContext(new ArrayList());
+        assertEquals("0", String.valueOf(context.getValue("size(/)")), "Extension function on root collection");
     }
 
     @Test
-    void shouldLookupStaticMethodFunction() {
-        Object[] arguments = { Integer.valueOf(1), "x" };
-        
-        Function staticMethod = testFunctions.getFunction("test", "build", arguments);
-        Object result = staticMethod.invoke(new TestExpressionContext(null), arguments);
-        
-        assertEquals("foo=1; bar=x", result.toString(),
-            "Static method function lookup should work correctly");
+    void testCollectionReturn() {
+        assertXPathValueIterator(context, "test:collection()/name", list("foo", "bar"));
+        assertXPathPointerIterator(context, "test:collection()/name", list("/.[1]/name", "/.[2]/name"));
+        assertXPathValue(context, "test:collection()/name", "foo");
+        assertXPathValue(context, "test:collection()/@name", "foo");
+        final List list = new ArrayList();
+        list.add("foo");
+        list.add("bar");
+        context.getVariables().declareVariable("list", list);
+        final Object values = context.getValue("test:items($list)");
+        assertInstanceOf(Collection.class, values, "Return type: ");
+        assertEquals(list, new ArrayList((Collection) values), "Return values: ");
     }
 
     @Test
-    void shouldLookupStaticMethodWithTypeConversion() {
-        Object[] arguments = { "7", Integer.valueOf(1) };
-        
-        Function staticMethod = testFunctions.getFunction("test", "build", arguments);
-        Object result = staticMethod.invoke(new TestExpressionContext(null), arguments);
-        
-        assertEquals("foo=7; bar=1", result.toString(),
-            "Static method should handle type conversion during lookup");
+    void testConstructorLookup() {
+        final Object[] args = { Integer.valueOf(1), "x" };
+        final Function func = functions.getFunction("test", "new", args);
+        assertEquals("foo=1; bar=x", func.invoke(new Context(null), args).toString(), "test:new(1, x)");
     }
 
     @Test
-    void shouldLookupStaticMethodWithExpressionContext() {
-        Object[] arguments = {};
-        
-        Function staticMethod = testFunctions.getFunction("test", "path", arguments);
-        Object result = staticMethod.invoke(new TestExpressionContext(Integer.valueOf(1)), arguments);
-        
-        assertEquals("1", result,
-            "Static method should use ExpressionContext when needed");
+    void testConstructorLookupWithExpressionContext() {
+        final Object[] args = { "baz" };
+        final Function func = functions.getFunction("test", "new", args);
+        assertEquals("foo=1; bar=baz", func.invoke(new Context(Integer.valueOf(1)), args).toString(), "test:new('baz')");
     }
 
     @Test
-    void shouldLookupInstanceMethodFunction() {
-        Object[] arguments = { new TestFunctions() };
-        
-        Function instanceMethod = testFunctions.getFunction("test", "getFoo", arguments);
-        Object result = instanceMethod.invoke(new TestExpressionContext(null), arguments);
-        
-        assertEquals("0", result.toString(),
-            "Instance method function lookup should work correctly");
+    void testEstablishNodeSetBaseline() {
+        assertXPathValue(context, "test:isInstance(//strings, $List.class)", Boolean.TRUE);
+        assertXPathValue(context, "test:isInstance(//strings, $NodeSet.class)", Boolean.FALSE);
     }
 
     @Test
-    void shouldLookupInstanceMethodWithExpressionContext() {
-        Object[] arguments = { new TestFunctions() };
-        
-        Function instanceMethod = testFunctions.getFunction("test", "instancePath", arguments);
-        Object result = instanceMethod.invoke(new TestExpressionContext(Integer.valueOf(1)), arguments);
-        
-        assertEquals("1", result,
-            "Instance method should use ExpressionContext when available");
+    void testExpressionContext() {
+        // Execute an extension function for each node while searching
+        // The function uses ExpressionContext to get to the current
+        // node.
+        assertXPathValue(context, "//.[test:isMap()]/Key1", "Value 1");
+        // The function gets all
+        // nodes in the context that match the pattern.
+        assertXPathValue(context, "count(//.[test:count(strings) = 3])", Double.valueOf(7));
+        // The function receives a collection of strings
+        // and checks their type for testing purposes
+        assertXPathValue(context, "test:count(//strings)", Integer.valueOf(21));
+        // The function receives a collection of pointers
+        // and checks their type for testing purposes
+        assertXPathValue(context, "test:countPointers(//strings)", Integer.valueOf(21));
+        // The function uses ExpressionContext to get to the current
+        // pointer and returns its path.
+        assertXPathValue(context, "/beans[contains(test:path(), '[2]')]/name", "Name 2");
     }
 
     @Test
-    void shouldLookupInstanceMethodWithExpressionContextAndArguments() {
-        Object[] arguments = { new TestFunctions(), "*" };
-        
-        Function instanceMethod = testFunctions.getFunction("test", "pathWithSuffix", arguments);
-        Object result = instanceMethod.invoke(new TestExpressionContext(Integer.valueOf(1)), arguments);
-        
-        assertEquals("1*", result,
-            "Instance method should handle both ExpressionContext and regular arguments");
+    void testMethodCall() {
+        assertXPathValue(context, "length('foo')", Integer.valueOf(3));
+        // We are just calling a method - prefix is ignored
+        assertXPathValue(context, "call:substring('foo', 1, 2)", "o");
+        // Invoke a function implemented as a regular method
+        assertXPathValue(context, "string(test:getFoo($test))", "4");
+        // Note that the prefix is ignored anyway, we are just calling a method
+        assertXPathValue(context, "string(call:getFoo($test))", "4");
+        // We don't really need to supply a prefix in this case
+        assertXPathValue(context, "string(getFoo($test))", "4");
+        // Method with two arguments
+        assertXPathValue(context, "string(test:setFooAndBar($test, 7, 'biz'))", "foo=7; bar=biz");
     }
 
-    // === Helper Methods ===
-
-    private void setupJXPathContext() {
-        if (jxpathContext == null) {
-            testBean = new TestBean();
-            jxpathContext = JXPathContext.newContext(testBean);
-            
-            setupVariables();
-            setupFunctionLibrary();
-        }
+    @Test
+    void testMethodLookup() {
+        final Object[] args = { new TestFunctions() };
+        final Function func = functions.getFunction("test", "getFoo", args);
+        assertEquals("0", func.invoke(new Context(null), args).toString(), "test:getFoo($test, 1, x)");
     }
 
-    private void setupVariables() {
-        Variables variables = jxpathContext.getVariables();
-        variables.declareVariable("test", new TestFunctions(4, "test"));
-        variables.declareVariable("List.class", List.class);
-        variables.declareVariable("NodeSet.class", NodeSet.class);
+    @Test
+    void testMethodLookupWithExpressionContext() {
+        final Object[] args = { new TestFunctions() };
+        final Function func = functions.getFunction("test", "instancePath", args);
+        assertEquals("1", func.invoke(new Context(Integer.valueOf(1)), args), "test:instancePath()");
     }
 
-    private void setupFunctionLibrary() {
-        FunctionLibrary functionLibrary = new FunctionLibrary();
-        functionLibrary.addFunctions(new ClassFunctions(TestFunctions.class, "test"));
-        functionLibrary.addFunctions(new ClassFunctions(TestFunctions2.class, "test"));
-        functionLibrary.addFunctions(new PackageFunctions("", "call"));
-        functionLibrary.addFunctions(new PackageFunctions("org.apache.commons.jxpath.ri.compiler.", "jxpathtest"));
-        functionLibrary.addFunctions(new PackageFunctions("", null));
-        
-        jxpathContext.setFunctions(functionLibrary);
+    @Test
+    void testMethodLookupWithExpressionContextAndArgument() {
+        final Object[] args = { new TestFunctions(), "*" };
+        final Function func = functions.getFunction("test", "pathWithSuffix", args);
+        assertEquals("1*", func.invoke(new Context(Integer.valueOf(1)), args), "test:pathWithSuffix('*')");
     }
 
-    private void setupTestFunctions() {
-        testFunctions = new ClassFunctions(TestFunctions.class, "test");
+    @Test
+    void testNodeSetReturn() {
+        assertXPathValueIterator(context, "test:nodeSet()/name", list("Name 1", "Name 2"));
+        assertXPathValueIterator(context, "test:nodeSet()", list(testBean.getBeans()[0], testBean.getBeans()[1]));
+        assertXPathPointerIterator(context, "test:nodeSet()/name", list("/beans[1]/name", "/beans[2]/name"));
+        assertXPathValueAndPointer(context, "test:nodeSet()/name", "Name 1", "/beans[1]/name");
+        assertXPathValueAndPointer(context, "test:nodeSet()/@name", "Name 1", "/beans[1]/@name");
+        assertEquals(2, ((Number) context.getValue("count(test:nodeSet())")).intValue());
+        assertXPathValue(context, "test:nodeSet()", testBean.getBeans()[0]);
     }
 
-    private void preserveOriginalTypeConverter() {
-        originalTypeConverter = TypeUtils.getTypeConverter();
+    @Test
+    void testStaticMethodCall() {
+        assertXPathValue(context, "string(test:build(8, 'goober'))", "foo=8; bar=goober");
+        // Call a static method using PackageFunctions and class name
+        assertXPathValue(context, "string(jxpathtest:TestFunctions.build(8, 'goober'))", "foo=8; bar=goober");
+        // Call a static method with a fully qualified class name
+        assertXPathValue(context, "string(" + TestFunctions.class.getName() + ".build(8, 'goober'))", "foo=8; bar=goober");
+        // Two ClassFunctions are sharing the same prefix.
+        // This is TestFunctions2
+        assertXPathValue(context, "string(test:increment(8))", "9");
+        // See that a NodeSet gets properly converted to a string
+        assertXPathValue(context, "test:string(/beans/name)", "Name 1");
     }
 
-    private void restoreOriginalTypeConverter() {
-        TypeUtils.setTypeConverter(originalTypeConverter);
+    @Test
+    void testStaticMethodLookup() {
+        final Object[] args = { Integer.valueOf(1), "x" };
+        final Function func = functions.getFunction("test", "build", args);
+        assertEquals("foo=1; bar=x", func.invoke(new Context(null), args).toString(), "test:build(1, x)");
     }
 
-    private String evaluateXPathAsString(String expression) {
-        return (String) jxpathContext.getValue("string(" + expression + ")");
+    @Test
+    void testStaticMethodLookupWithConversion() {
+        final Object[] args = { "7", Integer.valueOf(1) };
+        final Function func = functions.getFunction("test", "build", args);
+        assertEquals("foo=7; bar=1", func.invoke(new Context(null), args).toString(), "test:build('7', 1)");
+    }
+
+    @Test
+    void testStaticMethodLookupWithExpressionContext() {
+        final Object[] args = {};
+        final Function func = functions.getFunction("test", "path", args);
+        assertEquals("1", func.invoke(new Context(Integer.valueOf(1)), args), "test:path()");
     }
 }
