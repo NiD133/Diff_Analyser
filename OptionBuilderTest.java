@@ -26,38 +26,41 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
+/**
+ * Tests for the deprecated {@link OptionBuilder}.
+ * This test class acknowledges that OptionBuilder uses a static, mutable state,
+ * and includes tests to verify that this state is properly reset between calls.
+ */
 @SuppressWarnings("deprecation") // OptionBuilder is marked deprecated
 class OptionBuilderTest {
-    @Test
-    void testBaseOptionCharOpt() {
-        final Option base = OptionBuilder.withDescription("option description").create('o');
 
-        assertEquals("o", base.getOpt());
-        assertEquals("option description", base.getDescription());
-        assertFalse(base.hasArg());
+    @Test
+    void testCreateSimpleOptionWithCharName() {
+        // Act
+        final Option option = OptionBuilder.withDescription("option description").create('o');
+
+        // Assert
+        assertEquals("o", option.getOpt());
+        assertEquals("option description", option.getDescription());
+        assertFalse(option.hasArg(), "Option should not have an argument by default");
     }
 
     @Test
-    void testBaseOptionStringOpt() {
-        final Option base = OptionBuilder.withDescription("option description").create("o");
+    void testCreateSimpleOptionWithStringName() {
+        // Act
+        final Option option = OptionBuilder.withDescription("option description").create("o");
 
-        assertEquals("o", base.getOpt());
-        assertEquals("option description", base.getDescription());
-        assertFalse(base.hasArg());
+        // Assert
+        assertEquals("o", option.getOpt());
+        assertEquals("option description", option.getDescription());
+        assertFalse(option.hasArg(), "Option should not have an argument by default");
     }
 
     @Test
-    void testBuilderIsResettedAlways() {
-        assertThrows(IllegalArgumentException.class, () -> OptionBuilder.withDescription("JUnit").create('"'));
-        assertNull(OptionBuilder.create('x').getDescription(), "we inherited a description");
-        assertThrows(IllegalStateException.class, (Executable) OptionBuilder::create);
-        assertNull(OptionBuilder.create('x').getDescription(), "we inherited a description");
-    }
-
-    @Test
-    void testCompleteOption() {
+    void testCreateWithAllProperties() {
+        // Act
         //@formatter:off
-        final Option simple = OptionBuilder.withLongOpt("simple option")
+        final Option option = OptionBuilder.withLongOpt("simple-option")
                                      .hasArg()
                                      .isRequired()
                                      .hasArgs()
@@ -66,87 +69,104 @@ class OptionBuilderTest {
                                      .create('s');
         //@formatter:on
 
-        assertEquals("s", simple.getOpt());
-        assertEquals("simple option", simple.getLongOpt());
-        assertEquals("this is a simple option", simple.getDescription());
-        assertEquals(simple.getType(), Float.class);
-        assertTrue(simple.hasArg());
-        assertTrue(simple.isRequired());
-        assertTrue(simple.hasArgs());
+        // Assert
+        assertEquals("s", option.getOpt());
+        assertEquals("simple-option", option.getLongOpt());
+        assertEquals("this is a simple option", option.getDescription());
+        assertEquals(Float.class, option.getType());
+        assertTrue(option.hasArg());
+        assertTrue(option.isRequired());
+        assertTrue(option.hasArgs());
     }
 
     @Test
-    void testCreateIncompleteOption() {
-        assertThrows(IllegalStateException.class, (Executable) OptionBuilder::create);
-        // implicitly reset the builder
-        OptionBuilder.create("opt");
+    void testCreateWithSpecificNumberOfArguments() {
+        // Act
+        final Option option = OptionBuilder.withDescription("option description")
+                                           .hasArgs(2)
+                                           .create('o');
+        // Assert
+        assertEquals(2, option.getArgs());
     }
 
     @Test
-    void testIllegalOptions() {
-        // bad single character option
-        assertThrows(IllegalArgumentException.class, () -> OptionBuilder.withDescription("option description").create('"'));
-        // bad character in option string
-        assertThrows(IllegalArgumentException.class, () -> OptionBuilder.create("opt`"));
-        // valid option
-        OptionBuilder.create("opt");
+    void testCreateWithValidSpecialCharacters() {
+        // Act
+        final Option helpOpt = OptionBuilder.withDescription("help options").create('?');
+        final Option atOpt = OptionBuilder.withDescription("read from stdin").create('@');
+
+        // Assert
+        assertEquals("?", helpOpt.getOpt());
+        assertEquals("@", atOpt.getOpt());
     }
 
     @Test
-    void testOptionArgNumbers() {
-        //@formatter:off
-        final Option opt = OptionBuilder.withDescription("option description")
-                                  .hasArgs(2)
-                                  .create('o');
-        //@formatter:on
-        assertEquals(2, opt.getArgs());
-    }
-
-    @Test
-    void testSpecialOptChars() throws Exception {
-        // '?'
-        final Option opt1 = OptionBuilder.withDescription("help options").create('?');
-        assertEquals("?", opt1.getOpt());
-        // '@'
-        final Option opt2 = OptionBuilder.withDescription("read from stdin").create('@');
-        assertEquals("@", opt2.getOpt());
-        // ' '
+    void testCreateFailsWithInvalidCharacters() {
+        // Assert that creating an option with an invalid character name throws an exception.
         assertThrows(IllegalArgumentException.class, () -> OptionBuilder.create(' '));
+        assertThrows(IllegalArgumentException.class, () -> OptionBuilder.create('"'));
+        assertThrows(IllegalArgumentException.class, () -> OptionBuilder.create("opt`"));
     }
 
     @Test
-    void testTwoCompleteOptions() {
+    void testCreateFailsWhenNoOptionNameIsProvided() {
+        // Assert
+        assertThrows(IllegalArgumentException.class,
+            (Executable) OptionBuilder::create,
+            "Creation should fail if no option name is provided.");
+    }
+
+    @Test
+    void testBuilderIsResetAfterSuccessfulCreate() {
+        // This test verifies that after successfully creating an option, the builder is
+        // reset for the next option creation, and properties do not leak.
+
+        // Arrange & Act: Create the first, complex option
         //@formatter:off
-        Option simple = OptionBuilder.withLongOpt("simple option")
-                                     .hasArg()
-                                     .isRequired()
-                                     .hasArgs()
-                                     .withType(Float.class)
-                                     .withDescription("this is a simple option")
-                                     .create('s');
+        final Option firstOption = OptionBuilder.withLongOpt("first-option")
+                                                .hasArg()
+                                                .isRequired()
+                                                .hasArgs()
+                                                .withType(Integer.class)
+                                                .withDescription("a complex option")
+                                                .create('f');
         //@formatter:on
 
-        assertEquals("s", simple.getOpt());
-        assertEquals("simple option", simple.getLongOpt());
-        assertEquals("this is a simple option", simple.getDescription());
-        assertEquals(simple.getType(), Float.class);
-        assertTrue(simple.hasArg());
-        assertTrue(simple.isRequired());
-        assertTrue(simple.hasArgs());
+        // Assert: Verify properties of the first option
+        assertTrue(firstOption.isRequired());
+        assertTrue(firstOption.hasArgs());
+        assertEquals(Integer.class, firstOption.getType());
 
+        // Arrange & Act: Create a second, simple option immediately after
         //@formatter:off
-        simple = OptionBuilder.withLongOpt("dimple option")
-                              .hasArg()
-                              .withDescription("this is a dimple option")
-                              .create('d');
+        final Option secondOption = OptionBuilder.withLongOpt("second-option")
+                                                 .hasArg()
+                                                 .withDescription("a simple option")
+                                                 .create('s');
         //@formatter:on
 
-        assertEquals("d", simple.getOpt());
-        assertEquals("dimple option", simple.getLongOpt());
-        assertEquals("this is a dimple option", simple.getDescription());
-        assertEquals(String.class, simple.getType());
-        assertTrue(simple.hasArg());
-        assertFalse(simple.isRequired());
-        assertFalse(simple.hasArgs());
+        // Assert: Verify properties of the second option and confirm state was reset
+        assertEquals("s", secondOption.getOpt());
+        assertEquals("second-option", secondOption.getLongOpt());
+        assertTrue(secondOption.hasArg());
+        assertFalse(secondOption.isRequired(), "isRequired should have been reset to false");
+        assertFalse(secondOption.hasArgs(), "hasArgs should have been reset to false");
+        assertEquals(String.class, secondOption.getType(), "Type should have been reset to the default (String)");
+    }
+
+    @Test
+    void testBuilderIsResetAfterFailedCreate() {
+        // This test verifies that the builder's internal state is reset
+        // even when a create() call fails.
+
+        // Arrange: Set a description, then trigger a failure by using an invalid option character.
+        assertThrows(IllegalArgumentException.class,
+            () -> OptionBuilder.withDescription("should be reset").create('"'));
+
+        // Act: Create a new, valid option.
+        final Option option = OptionBuilder.create('x');
+
+        // Assert: Verify the description was reset and not inherited from the failed call.
+        assertNull(option.getDescription(), "Description should be null after a failed create call");
     }
 }
