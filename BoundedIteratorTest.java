@@ -18,6 +18,7 @@ package org.apache.commons.collections4.iterators;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -29,244 +30,308 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * A unit test for the basic functions of {@link BoundedIterator}.
+ * A unit test to test the basic functions of {@link BoundedIterator}.
+ *
+ * @param <E> the type of elements tested by this iterator.
  */
-@DisplayName("BoundedIterator")
-public class BoundedIteratorTest extends AbstractIteratorTest<String> {
+public class BoundedIteratorTest<E> extends AbstractIteratorTest<E> {
 
     /** Test array of size 7 */
     private final String[] testArray = {
         "a", "b", "c", "d", "e", "f", "g"
     };
 
-    private List<String> testList;
+    private List<E> testList;
 
     @Override
-    public Iterator<String> makeEmptyIterator() {
-        return new BoundedIterator<>(Collections.<String>emptyList().iterator(), 0, 10);
+    public Iterator<E> makeEmptyIterator() {
+        return new BoundedIterator<>(Collections.<E>emptyList().iterator(), 0, 10);
     }
 
     @Override
-    public Iterator<String> makeObject() {
-        // Creates an iterator that is bounded from the second element to the end.
+    public Iterator<E> makeObject() {
         return new BoundedIterator<>(new ArrayList<>(testList).iterator(), 1, testList.size() - 1);
     }
 
+    @SuppressWarnings("unchecked")
     @BeforeEach
-    public void setUp() {
-        testList = Arrays.asList(testArray);
+    public void setUp()
+        throws Exception {
+        testList = Arrays.asList((E[]) testArray);
     }
 
+    /**
+     * Test a decorated iterator bounded such that the first element returned is
+     * at an index greater its first element, and the last element returned is
+     * at an index less than its last element.
+     */
     @Test
-    @DisplayName("Should iterate over a sub-list when offset and max define a specific range")
-    void shouldIterateOverSubListWhenOffsetAndMaxAreWithinBounds() {
-        // Arrange: BoundedIterator should start at index 2 ("c") and return at most 4 elements.
-        final int offset = 2;
-        final int maxElements = 4;
-        final Iterator<String> boundedIterator = new BoundedIterator<>(testList.iterator(), offset, maxElements);
+    void testBounded() {
+        final Iterator<E> iter = new BoundedIterator<>(testList.iterator(), 2, 4);
 
-        // Act
-        final List<String> result = new ArrayList<>();
-        boundedIterator.forEachRemaining(result::add);
+        assertTrue(iter.hasNext());
+        assertEquals("c", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("d", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("e", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("f", iter.next());
 
-        // Assert
-        final List<String> expected = testList.subList(2, 6); // "c", "d", "e", "f"
-        assertEquals(expected, result);
-        assertFalse(boundedIterator.hasNext());
-        assertThrows(NoSuchElementException.class, boundedIterator::next);
+        assertFalse(iter.hasNext());
+
+        assertThrows(NoSuchElementException.class, () -> iter.next(),
+                "Expected NoSuchElementException.");
     }
 
+    /**
+     * Test a decorated iterator bounded to a {@code max} of 0. The
+     * BoundedIterator should behave as if there are no more elements to return,
+     * since it is technically an empty iterator.
+     */
     @Test
-    @DisplayName("Should be empty when max is zero")
-    void shouldBeEmptyWhenMaxIsZero() {
-        // Arrange
-        final Iterator<String> boundedIterator = new BoundedIterator<>(testList.iterator(), 3, 0);
+    void testEmptyBounded() {
+        final Iterator<E> iter = new BoundedIterator<>(testList.iterator(), 3, 0);
+        assertFalse(iter.hasNext());
 
-        // Act & Assert
-        assertFalse(boundedIterator.hasNext());
-        assertThrows(NoSuchElementException.class, boundedIterator::next);
+        assertThrows(NoSuchElementException.class, () -> iter.next());
     }
 
+    /**
+     * Test the case if the {@code max} passed to the constructor is
+     * greater than the size of the decorated iterator. The last element
+     * returned should be the same as the last element of the decorated
+     * iterator.
+     */
     @Test
-    @DisplayName("Should iterate to the end of underlying iterator when max is larger than remaining elements")
-    void shouldIterateToEndWhenMaxIsLargerThanRemaining() {
-        // Arrange: Start at index 1 ("b") and request up to 10 elements.
-        final int offset = 1;
-        final int maxElements = 10;
-        final Iterator<String> boundedIterator = new BoundedIterator<>(testList.iterator(), offset, maxElements);
+    void testMaxGreaterThanSize() {
+        final Iterator<E> iter = new BoundedIterator<>(testList.iterator(), 1, 10);
 
-        // Act
-        final List<String> result = new ArrayList<>();
-        boundedIterator.forEachRemaining(result::add);
+        assertTrue(iter.hasNext());
+        assertEquals("b", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("c", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("d", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("e", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("f", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("g", iter.next());
 
-        // Assert
-        final List<String> expected = testList.subList(1, testList.size()); // "b" through "g"
-        assertEquals(expected, result);
-        assertFalse(boundedIterator.hasNext());
+        assertFalse(iter.hasNext());
+
+        assertThrows(NoSuchElementException.class, () -> iter.next());
     }
 
+    /**
+     * Test the case if a negative {@code max} is passed to the
+     * constructor. {@link IllegalArgumentException} is expected.
+     */
     @Test
-    @DisplayName("Constructor should throw IllegalArgumentException for a negative max")
-    void constructorShouldThrowExceptionForNegativeMax() {
-        // Arrange
-        final int invalidMax = -1;
-
-        // Act & Assert
-        final Exception e = assertThrows(IllegalArgumentException.class,
-            () -> new BoundedIterator<>(testList.iterator(), 3, invalidMax));
-        assertEquals("Max parameter must not be negative.", e.getMessage());
+    void testNegativeMax() {
+        final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> new BoundedIterator<>(testList.iterator(), 3, -1));
+        assertEquals("Max parameter must not be negative.", thrown.getMessage());
     }
 
+    /**
+     * Test the case if a negative {@code offset} is passed to the
+     * constructor. {@link IllegalArgumentException} is expected.
+     */
     @Test
-    @DisplayName("Constructor should throw IllegalArgumentException for a negative offset")
-    void constructorShouldThrowExceptionForNegativeOffset() {
-        // Arrange
-        final int invalidOffset = -1;
-
-        // Act & Assert
-        final Exception e = assertThrows(IllegalArgumentException.class,
-            () -> new BoundedIterator<>(testList.iterator(), invalidOffset, 4));
-        assertEquals("Offset parameter must not be negative.", e.getMessage());
+    void testNegativeOffset() {
+        final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> new BoundedIterator<>(testList.iterator(), -1, 4));
+        assertEquals("Offset parameter must not be negative.", thrown.getMessage());
     }
 
+    /**
+     * Test the case if the {@code offset} passed to the constructor is
+     * greater than the decorated iterator's size. The BoundedIterator should
+     * behave as if there are no more elements to return.
+     */
     @Test
-    @DisplayName("Should be empty when offset is greater than the underlying iterator's size")
-    void shouldBeEmptyWhenOffsetIsGreaterThanSize() {
-        // Arrange
-        final Iterator<String> boundedIterator = new BoundedIterator<>(testList.iterator(), 10, 4);
+    void testOffsetGreaterThanSize() {
+        final Iterator<E> iter = new BoundedIterator<>(testList.iterator(), 10, 4);
+        assertFalse(iter.hasNext());
 
-        // Act & Assert
-        assertFalse(boundedIterator.hasNext());
-        assertThrows(NoSuchElementException.class, boundedIterator::next);
+        assertThrows(NoSuchElementException.class, () -> iter.next());
     }
 
+    /**
+     * Test the {@code remove()} method being called twice without calling
+     * {@code next()} in between.
+     */
     @Test
-    @DisplayName("remove() should throw IllegalStateException when called twice in a row")
-    void removeShouldThrowExceptionWhenCalledTwice() {
-        // Arrange
-        final List<String> modifiableList = new ArrayList<>(testList);
-        final Iterator<String> boundedIterator = new BoundedIterator<>(modifiableList.iterator(), 1, 5);
-        boundedIterator.next(); // Consume "b"
-        boundedIterator.remove(); // First remove() is valid
+    void testRemoveCalledTwice() {
+        final List<E> testListCopy = new ArrayList<>(testList);
+        final Iterator<E> iter = new BoundedIterator<>(testListCopy.iterator(), 1, 5);
 
-        // Act & Assert
-        assertThrows(IllegalStateException.class, boundedIterator::remove);
+        assertTrue(iter.hasNext());
+        assertEquals("b", iter.next());
+        iter.remove();
+
+        assertThrows(IllegalStateException.class, () -> iter.remove());
     }
 
+    /**
+     * Test removing the first element. Verify that the element is removed from
+     * the underlying collection.
+     */
     @Test
-    @DisplayName("Should remove the first element of the bounded range from the underlying collection")
-    void shouldRemoveFirstElementOfBoundedRange() {
-        // Arrange: Bounded range starts at "b"
-        final List<String> modifiableList = new ArrayList<>(testList);
-        final Iterator<String> boundedIterator = new BoundedIterator<>(modifiableList.iterator(), 1, 5);
-        final String firstElement = testList.get(1); // "b"
+    void testRemoveFirst() {
+        final List<E> testListCopy = new ArrayList<>(testList);
+        final Iterator<E> iter = new BoundedIterator<>(testListCopy.iterator(), 1, 5);
 
-        // Act
-        boundedIterator.next(); // Consume "b"
-        boundedIterator.remove();
+        assertTrue(iter.hasNext());
+        assertEquals("b", iter.next());
 
-        // Assert
-        assertFalse(modifiableList.contains(firstElement));
-        assertEquals(testList.size() - 1, modifiableList.size());
+        iter.remove();
+        assertFalse(testListCopy.contains("b"));
 
-        // Verify remaining elements in iterator
-        final List<String> result = new ArrayList<>();
-        boundedIterator.forEachRemaining(result::add);
-        final List<String> expected = testList.subList(2, 6); // "c", "d", "e", "f"
-        assertEquals(expected, result);
+        assertTrue(iter.hasNext());
+        assertEquals("c", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("d", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("e", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("f", iter.next());
+
+        assertFalse(iter.hasNext());
+
+        assertThrows(NoSuchElementException.class, () -> iter.next());
     }
 
+    /**
+     * Test removing the last element. Verify that the element is removed from
+     * the underlying collection.
+     */
     @Test
-    @DisplayName("Should remove the last element returned by next() from the underlying collection")
-    void shouldRemoveLastElementOfBoundedRange() {
-        // Arrange: Bounded range is "b", "c", "d", "e", "f"
-        final List<String> modifiableList = new ArrayList<>(testList);
-        final Iterator<String> boundedIterator = new BoundedIterator<>(modifiableList.iterator(), 1, 5);
-        final String lastElementInBounds = testList.get(5); // "f"
+    void testRemoveLast() {
+        final List<E> testListCopy = new ArrayList<>(testList);
+        final Iterator<E> iter = new BoundedIterator<>(testListCopy.iterator(), 1, 5);
 
-        // Act: Consume all elements, so the last element returned by next() is "f"
-        while (boundedIterator.hasNext()) {
-            boundedIterator.next();
-        }
-        boundedIterator.remove(); // Remove "f"
+        assertTrue(iter.hasNext());
+        assertEquals("b", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("c", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("d", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("e", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("f", iter.next());
 
-        // Assert
-        assertFalse(modifiableList.contains(lastElementInBounds), "Element 'f' should have been removed.");
-        assertEquals(testList.size() - 1, modifiableList.size());
-        final List<String> expectedList = Arrays.asList("a", "b", "c", "d", "e", "g");
-        assertEquals(expectedList, modifiableList);
+        assertFalse(iter.hasNext());
+
+        final NoSuchElementException thrown = assertThrows(NoSuchElementException.class, () -> iter.next());
+        assertNull(thrown.getMessage());
+
+        iter.remove();
+        assertFalse(testListCopy.contains("f"));
+
+        assertFalse(iter.hasNext());
+
+        final NoSuchElementException thrown1 = assertThrows(NoSuchElementException.class, () -> iter.next());
+        assertNull(thrown1.getMessage());
     }
 
+    /**
+     * Test removing an element in the middle of the iterator. Verify that the
+     * element is removed from the underlying collection.
+     */
     @Test
-    @DisplayName("Should remove a middle element of the bounded range from the underlying collection")
-    void shouldRemoveMiddleElementOfBoundedRange() {
-        // Arrange: Bounded range is "b", "c", "d", "e", "f"
-        final List<String> modifiableList = new ArrayList<>(testList);
-        final Iterator<String> boundedIterator = new BoundedIterator<>(modifiableList.iterator(), 1, 5);
-        final String middleElement = testList.get(3); // "d"
+    void testRemoveMiddle() {
+        final List<E> testListCopy = new ArrayList<>(testList);
+        final Iterator<E> iter = new BoundedIterator<>(testListCopy.iterator(), 1, 5);
 
-        // Act
-        boundedIterator.next(); // "b"
-        boundedIterator.next(); // "c"
-        boundedIterator.next(); // "d"
-        boundedIterator.remove(); // remove "d"
+        assertTrue(iter.hasNext());
+        assertEquals("b", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("c", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("d", iter.next());
 
-        // Assert
-        assertFalse(modifiableList.contains(middleElement));
-        assertEquals(testList.size() - 1, modifiableList.size());
+        iter.remove();
+        assertFalse(testListCopy.contains("d"));
 
-        // Verify remaining elements in iterator
-        final List<String> result = new ArrayList<>();
-        boundedIterator.forEachRemaining(result::add);
-        final List<String> expected = testList.subList(4, 6); // "e", "f"
-        assertEquals(expected, result);
+        assertTrue(iter.hasNext());
+        assertEquals("e", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("f", iter.next());
+
+        assertFalse(iter.hasNext());
+
+        assertThrows(NoSuchElementException.class, () -> iter.next());
     }
 
+    /**
+     * Test the case if the decorated iterator does not support the
+     * {@code remove()} method and throws an {@link UnsupportedOperationException}.
+     */
     @Test
-    @DisplayName("remove() should throw UnsupportedOperationException when underlying iterator does not support it")
-    void removeShouldThrowExceptionWhenNotSupportedByUnderlying() {
-        // Arrange
-        final Iterator<String> mockIterator = new AbstractIteratorDecorator<String>(testList.iterator()) {
+    void testRemoveUnsupported() {
+        final Iterator<E> mockIterator = new AbstractIteratorDecorator<E>(testList.iterator()) {
             @Override
             public void remove() {
                 throw new UnsupportedOperationException();
             }
         };
-        final Iterator<String> boundedIterator = new BoundedIterator<>(mockIterator, 1, 5);
-        boundedIterator.next(); // Consume "b"
 
-        // Act & Assert
-        assertThrows(UnsupportedOperationException.class, boundedIterator::remove);
+        final Iterator<E> iter = new BoundedIterator<>(mockIterator, 1, 5);
+        assertTrue(iter.hasNext());
+        assertEquals("b", iter.next());
+
+        final UnsupportedOperationException thrown = assertThrows(UnsupportedOperationException.class, () -> iter.remove());
+        assertNull(thrown.getMessage());
+
     }
 
+    /**
+     * Test the {@code remove()} method being called without
+     * {@code next()} being called first.
+     */
     @Test
-    @DisplayName("remove() should throw IllegalStateException when called before next()")
-    void removeShouldThrowExceptionWhenCalledBeforeNext() {
-        // Arrange
-        final List<String> modifiableList = new ArrayList<>(testList);
-        final Iterator<String> boundedIterator = new BoundedIterator<>(modifiableList.iterator(), 1, 5);
+    void testRemoveWithoutCallingNext() {
+        final List<E> testListCopy = new ArrayList<>(testList);
+        final Iterator<E> iter = new BoundedIterator<>(testListCopy.iterator(), 1, 5);
 
-        // Act & Assert
-        final Exception e = assertThrows(IllegalStateException.class, boundedIterator::remove);
-        assertEquals("remove() cannot be called before calling next()", e.getMessage());
+        final IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> iter.remove());
+        assertEquals("remove() cannot be called before calling next()", thrown.getMessage());
     }
 
+    /**
+     * Test a decorated iterator bounded such that the {@code offset} is
+     * zero and the {@code max} is its size, in that the BoundedIterator
+     * should return all the same elements as its decorated iterator.
+     */
     @Test
-    @DisplayName("Should iterate over all elements when offset is 0 and max is size")
-    void shouldIterateOverAllElementsWhenNotEffectivelyBounded() {
-        // Arrange
-        final Iterator<String> boundedIterator = new BoundedIterator<>(testList.iterator(), 0, testList.size());
+    void testSameAsDecorated() {
+        final Iterator<E> iter = new BoundedIterator<>(testList.iterator(), 0,
+                                                  testList.size());
 
-        // Act
-        final List<String> result = new ArrayList<>();
-        boundedIterator.forEachRemaining(result::add);
+        assertTrue(iter.hasNext());
+        assertEquals("a", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("b", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("c", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("d", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("e", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("f", iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals("g", iter.next());
 
-        // Assert
-        assertEquals(testList, result);
-        assertFalse(boundedIterator.hasNext());
+        assertFalse(iter.hasNext());
+
+        assertThrows(NoSuchElementException.class, () -> iter.next());
     }
+
 }
