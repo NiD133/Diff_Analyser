@@ -27,258 +27,251 @@ import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.evosuite.runtime.mock.java.io.MockFileInputStream;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class)
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true,
+    useVFS = true,
+    useVNET = true,
+    resetStaticState = true,
+    separateClassLoader = true
+) 
 public class DataFormatMatcher_ESTest extends DataFormatMatcher_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      PipedInputStream pipedInputStream0 = new PipedInputStream();
-      byte[] byteArray0 = new byte[6];
-      InputAccessor.Std inputAccessor_Std0 = new InputAccessor.Std(pipedInputStream0, byteArray0);
-      JsonFactory jsonFactory0 = new JsonFactory();
-      MatchStrength matchStrength0 = MatchStrength.SOLID_MATCH;
-      DataFormatMatcher dataFormatMatcher0 = inputAccessor_Std0.createMatcher(jsonFactory0, matchStrength0);
-      JsonFactory jsonFactory1 = dataFormatMatcher0.getMatch();
-      assertNotNull(jsonFactory1);
-      assertEquals(MatchStrength.SOLID_MATCH, dataFormatMatcher0.getMatchStrength());
-  }
+    @Test(timeout = 4000)
+    public void testCreateMatcherWithPipedInputStreamReturnsSolidMatch() throws Throwable {
+        PipedInputStream pipedInputStream = new PipedInputStream();
+        byte[] buffer = new byte[6];
+        InputAccessor.Std inputAccessor = new InputAccessor.Std(pipedInputStream, buffer);
+        JsonFactory factory = new JsonFactory();
+        DataFormatMatcher matcher = inputAccessor.createMatcher(factory, MatchStrength.SOLID_MATCH);
+        
+        JsonFactory matchedFactory = matcher.getMatch();
+        assertNotNull(matchedFactory);
+        assertEquals(MatchStrength.SOLID_MATCH, matcher.getMatchStrength());
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      byte[] byteArray0 = new byte[6];
-      ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
-      JsonFactory jsonFactory0 = new JsonFactory();
-      MatchStrength matchStrength0 = MatchStrength.SOLID_MATCH;
-      DataFormatMatcher dataFormatMatcher0 = new DataFormatMatcher(byteArrayInputStream0, byteArray0, 2, 1, jsonFactory0, matchStrength0);
-      // Undeclared exception!
-      try { 
-        dataFormatMatcher0.createParserWithMatch();
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
-      
-      } catch(ArrayIndexOutOfBoundsException e) {
-      }
-  }
+    @Test(timeout = 4000)
+    public void testCreateParserWithInvalidBufferThrowsArrayIndexOutOfBounds() throws Throwable {
+        byte[] buffer = new byte[6];
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(buffer);
+        JsonFactory factory = new JsonFactory();
+        // Create matcher with a buffer length (1) shorter than the data (2 bytes needed)
+        DataFormatMatcher matcher = new DataFormatMatcher(
+            inputStream, buffer, 2, 1, factory, MatchStrength.SOLID_MATCH
+        );
+        
+        try {
+            matcher.createParserWithMatch();
+            fail("Expected ArrayIndexOutOfBoundsException");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // Expected exception
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      byte[] byteArray0 = new byte[3];
-      JsonFactory jsonFactory0 = new JsonFactory();
-      FileDescriptor fileDescriptor0 = new FileDescriptor();
-      MockFileInputStream mockFileInputStream0 = new MockFileInputStream(fileDescriptor0);
-      InputAccessor.Std inputAccessor_Std0 = new InputAccessor.Std(mockFileInputStream0, byteArray0);
-      MatchStrength matchStrength0 = MatchStrength.FULL_MATCH;
-      DataFormatMatcher dataFormatMatcher0 = inputAccessor_Std0.createMatcher(jsonFactory0, matchStrength0);
-      try { 
-        dataFormatMatcher0.createParserWithMatch();
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.evosuite.runtime.mock.java.io.NativeMockedIO", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testCreateParserWithMockFileInputStreamThrowsIOException() throws Throwable {
+        byte[] buffer = new byte[3];
+        FileDescriptor fileDescriptor = new FileDescriptor();
+        MockFileInputStream fileInputStream = new MockFileInputStream(fileDescriptor);
+        InputAccessor.Std inputAccessor = new InputAccessor.Std(fileInputStream, buffer);
+        JsonFactory factory = new JsonFactory();
+        DataFormatMatcher matcher = inputAccessor.createMatcher(factory, MatchStrength.FULL_MATCH);
+        
+        try {
+            matcher.createParserWithMatch();
+            fail("Expected IOException");
+        } catch (IOException e) {
+            // Expected due to mocked file stream
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      byte[] byteArray0 = new byte[9];
-      byteArray0[2] = (byte) (-83);
-      InputAccessor.Std inputAccessor_Std0 = new InputAccessor.Std(byteArray0);
-      ObjectCodec objectCodec0 = mock(ObjectCodec.class, new ViolatedAssumptionAnswer());
-      JsonFactory jsonFactory0 = new JsonFactory(objectCodec0);
-      MatchStrength matchStrength0 = MatchStrength.WEAK_MATCH;
-      DataFormatMatcher dataFormatMatcher0 = inputAccessor_Std0.createMatcher(jsonFactory0, matchStrength0);
-      try { 
-        dataFormatMatcher0.createParserWithMatch();
-        fail("Expecting exception: CharConversionException");
-      
-      } catch(CharConversionException e) {
-         //
-         // Unsupported UCS-4 endianness (2143) detected
-         //
-         verifyException("com.fasterxml.jackson.core.json.ByteSourceJsonBootstrapper", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testCreateParserWithInvalidByteSequenceThrowsCharConversionException() throws Throwable {
+        byte[] buffer = new byte[9];
+        buffer[2] = (byte) 0xA3; // Invalid UCS-4 sequence
+        InputAccessor.Std inputAccessor = new InputAccessor.Std(buffer);
+        ObjectCodec codec = mock(ObjectCodec.class, new ViolatedAssumptionAnswer());
+        JsonFactory factory = new JsonFactory(codec);
+        DataFormatMatcher matcher = inputAccessor.createMatcher(factory, MatchStrength.WEAK_MATCH);
+        
+        try {
+            matcher.createParserWithMatch();
+            fail("Expected CharConversionException");
+        } catch (CharConversionException e) {
+            // Expected due to invalid byte sequence
+            assertTrue(e.getMessage().contains("UCS-4"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      byte[] byteArray0 = new byte[1];
-      ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
-      JsonFactory jsonFactory0 = new JsonFactory();
-      MatchStrength matchStrength0 = MatchStrength.INCONCLUSIVE;
-      DataFormatMatcher dataFormatMatcher0 = null;
-      try {
-        dataFormatMatcher0 = new DataFormatMatcher(byteArrayInputStream0, (byte[]) null, '\"', '\"', jsonFactory0, matchStrength0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.fasterxml.jackson.core.format.DataFormatMatcher", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testConstructorWithNullBufferThrowsNullPointerException() throws Throwable {
+        byte[] buffer = new byte[1];
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(buffer);
+        JsonFactory factory = new JsonFactory();
+        
+        try {
+            new DataFormatMatcher(
+                inputStream, null, '"', '"', factory, MatchStrength.INCONCLUSIVE
+            );
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected due to null buffer
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      byte[] byteArray0 = new byte[9];
-      JsonFactory jsonFactory0 = new JsonFactory();
-      FileDescriptor fileDescriptor0 = new FileDescriptor();
-      MockFileInputStream mockFileInputStream0 = new MockFileInputStream(fileDescriptor0);
-      InputAccessor.Std inputAccessor_Std0 = new InputAccessor.Std(mockFileInputStream0, byteArray0);
-      MatchStrength matchStrength0 = MatchStrength.WEAK_MATCH;
-      DataFormatMatcher dataFormatMatcher0 = inputAccessor_Std0.createMatcher(jsonFactory0, matchStrength0);
-      dataFormatMatcher0.getDataStream();
-      assertTrue(dataFormatMatcher0.hasMatch());
-      assertEquals(MatchStrength.WEAK_MATCH, dataFormatMatcher0.getMatchStrength());
-  }
+    @Test(timeout = 4000)
+    public void testGetDataStreamWithWeakMatchReturnsValidStream() throws Throwable {
+        byte[] buffer = new byte[9];
+        FileDescriptor fileDescriptor = new FileDescriptor();
+        MockFileInputStream fileInputStream = new MockFileInputStream(fileDescriptor);
+        InputAccessor.Std inputAccessor = new InputAccessor.Std(fileInputStream, buffer);
+        JsonFactory factory = new JsonFactory();
+        DataFormatMatcher matcher = inputAccessor.createMatcher(factory, MatchStrength.WEAK_MATCH);
+        
+        InputStream dataStream = matcher.getDataStream();
+        assertNotNull(dataStream);
+        assertTrue(matcher.hasMatch());
+        assertEquals(MatchStrength.WEAK_MATCH, matcher.getMatchStrength());
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      byte[] byteArray0 = new byte[0];
-      JsonFactory jsonFactory0 = new JsonFactory();
-      InputAccessor.Std inputAccessor_Std0 = new InputAccessor.Std(byteArray0);
-      MatchStrength matchStrength0 = MatchStrength.WEAK_MATCH;
-      DataFormatMatcher dataFormatMatcher0 = inputAccessor_Std0.createMatcher(jsonFactory0, matchStrength0);
-      boolean boolean0 = dataFormatMatcher0.hasMatch();
-      assertEquals(MatchStrength.WEAK_MATCH, dataFormatMatcher0.getMatchStrength());
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testHasMatchWithWeakMatchAndEmptyBufferReturnsTrue() throws Throwable {
+        byte[] buffer = new byte[0];
+        InputAccessor.Std inputAccessor = new InputAccessor.Std(buffer);
+        JsonFactory factory = new JsonFactory();
+        DataFormatMatcher matcher = inputAccessor.createMatcher(factory, MatchStrength.WEAK_MATCH);
+        
+        assertTrue(matcher.hasMatch());
+        assertEquals(MatchStrength.WEAK_MATCH, matcher.getMatchStrength());
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      byte[] byteArray0 = new byte[0];
-      InputAccessor.Std inputAccessor_Std0 = new InputAccessor.Std(byteArray0);
-      MatchStrength matchStrength0 = MatchStrength.NO_MATCH;
-      DataFormatMatcher dataFormatMatcher0 = inputAccessor_Std0.createMatcher((JsonFactory) null, matchStrength0);
-      dataFormatMatcher0.hasMatch();
-      assertEquals(MatchStrength.NO_MATCH, dataFormatMatcher0.getMatchStrength());
-  }
+    @Test(timeout = 4000)
+    public void testHasMatchWhenNoMatchReturnsFalse() throws Throwable {
+        byte[] buffer = new byte[0];
+        InputAccessor.Std inputAccessor = new InputAccessor.Std(buffer);
+        DataFormatMatcher matcher = inputAccessor.createMatcher(null, MatchStrength.NO_MATCH);
+        
+        assertFalse(matcher.hasMatch());
+        assertEquals(MatchStrength.NO_MATCH, matcher.getMatchStrength());
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      byte[] byteArray0 = new byte[6];
-      InputAccessor.Std inputAccessor_Std0 = new InputAccessor.Std(byteArray0);
-      MatchStrength matchStrength0 = MatchStrength.INCONCLUSIVE;
-      DataFormatMatcher dataFormatMatcher0 = inputAccessor_Std0.createMatcher((JsonFactory) null, matchStrength0);
-      JsonFactory jsonFactory0 = dataFormatMatcher0.getMatch();
-      assertNull(jsonFactory0);
-  }
+    @Test(timeout = 4000)
+    public void testGetMatchWhenNoMatchReturnsNull() throws Throwable {
+        byte[] buffer = new byte[6];
+        InputAccessor.Std inputAccessor = new InputAccessor.Std(buffer);
+        DataFormatMatcher matcher = inputAccessor.createMatcher(null, MatchStrength.INCONCLUSIVE);
+        
+        assertNull(matcher.getMatch());
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      byte[] byteArray0 = new byte[12];
-      JsonFactory jsonFactory0 = new JsonFactory();
-      InputAccessor.Std inputAccessor_Std0 = new InputAccessor.Std(byteArray0);
-      MatchStrength matchStrength0 = MatchStrength.WEAK_MATCH;
-      DataFormatMatcher dataFormatMatcher0 = inputAccessor_Std0.createMatcher(jsonFactory0, matchStrength0);
-      InputStream inputStream0 = dataFormatMatcher0.getDataStream();
-      assertEquals(12, inputStream0.available());
-      assertEquals(MatchStrength.WEAK_MATCH, dataFormatMatcher0.getMatchStrength());
-      assertTrue(dataFormatMatcher0.hasMatch());
-  }
+    @Test(timeout = 4000)
+    public void testGetDataStreamWithWeakMatchReturnsStreamWithFullBuffer() throws Throwable {
+        byte[] buffer = new byte[12];
+        InputAccessor.Std inputAccessor = new InputAccessor.Std(buffer);
+        JsonFactory factory = new JsonFactory();
+        DataFormatMatcher matcher = inputAccessor.createMatcher(factory, MatchStrength.WEAK_MATCH);
+        
+        InputStream dataStream = matcher.getDataStream();
+        assertEquals(buffer.length, dataStream.available());
+        assertTrue(matcher.hasMatch());
+        assertEquals(MatchStrength.WEAK_MATCH, matcher.getMatchStrength());
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      byte[] byteArray0 = new byte[9];
-      JsonFactory jsonFactory0 = new JsonFactory();
-      InputAccessor.Std inputAccessor_Std0 = new InputAccessor.Std(byteArray0);
-      MatchStrength matchStrength0 = MatchStrength.WEAK_MATCH;
-      DataFormatMatcher dataFormatMatcher0 = inputAccessor_Std0.createMatcher(jsonFactory0, matchStrength0);
-      JsonParser jsonParser0 = dataFormatMatcher0.createParserWithMatch();
-      assertNotNull(jsonParser0);
-      assertEquals(MatchStrength.WEAK_MATCH, dataFormatMatcher0.getMatchStrength());
-  }
+    @Test(timeout = 4000)
+    public void testCreateParserWithWeakMatchReturnsParser() throws Throwable {
+        byte[] buffer = new byte[9];
+        InputAccessor.Std inputAccessor = new InputAccessor.Std(buffer);
+        JsonFactory factory = new JsonFactory();
+        DataFormatMatcher matcher = inputAccessor.createMatcher(factory, MatchStrength.WEAK_MATCH);
+        
+        JsonParser parser = matcher.createParserWithMatch();
+        assertNotNull(parser);
+        assertEquals(MatchStrength.WEAK_MATCH, matcher.getMatchStrength());
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      byte[] byteArray0 = new byte[0];
-      InputAccessor.Std inputAccessor_Std0 = new InputAccessor.Std(byteArray0);
-      MatchStrength matchStrength0 = MatchStrength.NO_MATCH;
-      DataFormatMatcher dataFormatMatcher0 = inputAccessor_Std0.createMatcher((JsonFactory) null, matchStrength0);
-      dataFormatMatcher0.createParserWithMatch();
-      assertEquals(MatchStrength.NO_MATCH, dataFormatMatcher0.getMatchStrength());
-  }
+    @Test(timeout = 4000)
+    public void testCreateParserWhenNoMatchReturnsNull() throws Throwable {
+        byte[] buffer = new byte[0];
+        InputAccessor.Std inputAccessor = new InputAccessor.Std(buffer);
+        DataFormatMatcher matcher = inputAccessor.createMatcher(null, MatchStrength.NO_MATCH);
+        
+        assertNull(matcher.createParserWithMatch());
+        assertEquals(MatchStrength.NO_MATCH, matcher.getMatchStrength());
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      byte[] byteArray0 = new byte[9];
-      JsonFactory jsonFactory0 = new JsonFactory();
-      InputAccessor.Std inputAccessor_Std0 = new InputAccessor.Std(byteArray0);
-      DataFormatMatcher dataFormatMatcher0 = inputAccessor_Std0.createMatcher(jsonFactory0, (MatchStrength) null);
-      dataFormatMatcher0.getMatchStrength();
-      assertTrue(dataFormatMatcher0.hasMatch());
-  }
+    @Test(timeout = 4000)
+    public void testGetMatchStrengthWithNullStrengthReturnsInconclusive() throws Throwable {
+        byte[] buffer = new byte[9];
+        InputAccessor.Std inputAccessor = new InputAccessor.Std(buffer);
+        JsonFactory factory = new JsonFactory();
+        // Create matcher with null strength (should default to INCONCLUSIVE)
+        DataFormatMatcher matcher = inputAccessor.createMatcher(factory, null);
+        
+        assertEquals(MatchStrength.INCONCLUSIVE, matcher.getMatchStrength());
+        assertTrue(matcher.hasMatch());
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      byte[] byteArray0 = new byte[14];
-      JsonFactory jsonFactory0 = new JsonFactory();
-      InputAccessor.Std inputAccessor_Std0 = new InputAccessor.Std(byteArray0);
-      MatchStrength matchStrength0 = MatchStrength.NO_MATCH;
-      DataFormatMatcher dataFormatMatcher0 = inputAccessor_Std0.createMatcher(jsonFactory0, matchStrength0);
-      MatchStrength matchStrength1 = dataFormatMatcher0.getMatchStrength();
-      assertEquals(MatchStrength.NO_MATCH, matchStrength1);
-      assertTrue(dataFormatMatcher0.hasMatch());
-  }
+    @Test(timeout = 4000)
+    public void testGetMatchStrengthWhenNoMatchReturnsNoMatch() throws Throwable {
+        byte[] buffer = new byte[14];
+        InputAccessor.Std inputAccessor = new InputAccessor.Std(buffer);
+        JsonFactory factory = new JsonFactory();
+        DataFormatMatcher matcher = inputAccessor.createMatcher(factory, MatchStrength.NO_MATCH);
+        
+        assertEquals(MatchStrength.NO_MATCH, matcher.getMatchStrength());
+        assertTrue(matcher.hasMatch()); // Note: hasMatch is true because factory is non-null
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      byte[] byteArray0 = new byte[41];
-      ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
-      MatchStrength matchStrength0 = MatchStrength.INCONCLUSIVE;
-      DataFormatMatcher dataFormatMatcher0 = new DataFormatMatcher(byteArrayInputStream0, byteArray0, 0, 0, (JsonFactory) null, matchStrength0);
-      String string0 = dataFormatMatcher0.getMatchedFormatName();
-      assertNull(string0);
-  }
+    @Test(timeout = 4000)
+    public void testGetMatchedFormatNameWhenNoMatchReturnsNull() throws Throwable {
+        byte[] buffer = new byte[41];
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(buffer);
+        DataFormatMatcher matcher = new DataFormatMatcher(
+            inputStream, buffer, 0, 0, null, MatchStrength.INCONCLUSIVE
+        );
+        
+        assertNull(matcher.getMatchedFormatName());
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      byte[] byteArray0 = new byte[0];
-      ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
-      JsonFactory jsonFactory0 = new JsonFactory();
-      MatchStrength matchStrength0 = MatchStrength.INCONCLUSIVE;
-      DataFormatMatcher dataFormatMatcher0 = null;
-      try {
-        dataFormatMatcher0 = new DataFormatMatcher(byteArrayInputStream0, byteArray0, '\"', '\"', jsonFactory0, matchStrength0);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Illegal start/length (34/34) wrt input array of 0 bytes
-         //
-         verifyException("com.fasterxml.jackson.core.format.DataFormatMatcher", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testConstructorWithInvalidStartAndLengthThrowsIllegalArgumentException() throws Throwable {
+        byte[] buffer = new byte[0];
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(buffer);
+        JsonFactory factory = new JsonFactory();
+        
+        try {
+            new DataFormatMatcher(
+                inputStream, buffer, '"', '"', factory, MatchStrength.INCONCLUSIVE
+            );
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            assertTrue(e.getMessage().contains("Illegal start/length"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      byte[] byteArray0 = new byte[9];
-      JsonFactory jsonFactory0 = new JsonFactory();
-      MatchStrength matchStrength0 = MatchStrength.WEAK_MATCH;
-      DataFormatMatcher dataFormatMatcher0 = null;
-      try {
-        dataFormatMatcher0 = new DataFormatMatcher((InputStream) null, byteArray0, '\"', (-1442), jsonFactory0, matchStrength0);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Illegal start/length (34/-1442) wrt input array of 9 bytes
-         //
-         verifyException("com.fasterxml.jackson.core.format.DataFormatMatcher", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testConstructorWithNegativeLengthThrowsIllegalArgumentException() throws Throwable {
+        byte[] buffer = new byte[9];
+        JsonFactory factory = new JsonFactory();
+        
+        try {
+            new DataFormatMatcher(
+                null, buffer, '"', -1442, factory, MatchStrength.WEAK_MATCH
+            );
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            assertTrue(e.getMessage().contains("Illegal start/length"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      byte[] byteArray0 = new byte[4];
-      JsonFactory jsonFactory0 = new JsonFactory();
-      InputAccessor.Std inputAccessor_Std0 = new InputAccessor.Std(byteArray0);
-      MatchStrength matchStrength0 = MatchStrength.SOLID_MATCH;
-      DataFormatMatcher dataFormatMatcher0 = inputAccessor_Std0.createMatcher(jsonFactory0, matchStrength0);
-      String string0 = dataFormatMatcher0.getMatchedFormatName();
-      assertNotNull(string0);
-      assertEquals(MatchStrength.SOLID_MATCH, dataFormatMatcher0.getMatchStrength());
-  }
+    @Test(timeout = 4000)
+    public void testGetMatchedFormatNameWithSolidMatchReturnsFormatName() throws Throwable {
+        byte[] buffer = new byte[4];
+        InputAccessor.Std inputAccessor = new InputAccessor.Std(buffer);
+        JsonFactory factory = new JsonFactory();
+        DataFormatMatcher matcher = inputAccessor.createMatcher(factory, MatchStrength.SOLID_MATCH);
+        
+        assertEquals(JsonFactory.FORMAT_NAME_JSON, matcher.getMatchedFormatName());
+        assertEquals(MatchStrength.SOLID_MATCH, matcher.getMatchStrength());
+    }
 }
