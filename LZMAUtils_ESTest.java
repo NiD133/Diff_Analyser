@@ -13,254 +13,246 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-/**
- * Test suite for LZMAUtils utility class.
- * Tests file name operations, signature matching, and LZMA availability checking.
- */
-@RunWith(EvoRunner.class) 
-@EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, 
-                     resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class LZMAUtils_ESTest extends LZMAUtils_ESTest_scaffolding {
 
-    // ========== Signature Matching Tests ==========
-    
-    @Test(timeout = 4000)
-    public void testMatches_WithIncorrectFirstByte_ReturnsFalse() throws Throwable {
-        // LZMA signature starts with 0x5D (93), but we use 117
-        byte[] signature = new byte[5];
-        signature[0] = (byte) 117; // Wrong first byte
-        
-        boolean result = LZMAUtils.matches(signature, (byte) 93);
-        
-        assertFalse("Should return false when first byte doesn't match LZMA signature", result);
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      byte[] byteArray0 = new byte[5];
+      byteArray0[0] = (byte)117;
+      boolean boolean0 = LZMAUtils.matches(byteArray0, (byte)93);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testMatches_WithCorrectFirstByte_ReturnsTrue() throws Throwable {
-        byte[] signature = new byte[16];
-        signature[0] = (byte) 93; // Correct LZMA first byte (0x5D)
-        
-        boolean result = LZMAUtils.matches(signature, (byte) 93);
-        
-        assertTrue("Should return true when first byte matches LZMA signature", result);
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      byte[] byteArray0 = new byte[0];
+      // Undeclared exception!
+      try { 
+        LZMAUtils.matches(byteArray0, 3);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 0
+         //
+         verifyException("org.apache.commons.compress.compressors.lzma.LZMAUtils", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testMatches_WithInsufficientLength_ReturnsFalse() throws Throwable {
-        byte[] signature = new byte[4];
-        
-        boolean result = LZMAUtils.matches(signature, 117);
-        
-        assertFalse("Should return false when signature is too short", result);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      boolean boolean0 = LZMAUtils.isCompressedFilename("$VALUES.lzma");
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testMatches_WithEmptyArray_ThrowsException() throws Throwable {
-        byte[] emptySignature = new byte[0];
-        
-        try { 
-            LZMAUtils.matches(emptySignature, 3);
-            fail("Should throw ArrayIndexOutOfBoundsException for empty array");
-        } catch(ArrayIndexOutOfBoundsException e) {
-            verifyException("org.apache.commons.compress.compressors.lzma.LZMAUtils", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      boolean boolean0 = LZMAUtils.isCompressedFileName("CACHED_UNAVAILABLE");
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testMatches_WithZeroLength_ReturnsFalse() throws Throwable {
-        byte[] signature = new byte[0];
-        
-        boolean result = LZMAUtils.matches(signature, 0);
-        
-        assertFalse("Should return false when length is zero", result);
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      String string0 = LZMAUtils.getUncompressedFilename("CACHED_UNAVAILABLE");
+      assertEquals("CACHED_UNAVAILABLE", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testMatches_WithNullArray_ThrowsException() throws Throwable {
-        try { 
-            LZMAUtils.matches(null, (byte) 93);
-            fail("Should throw NullPointerException for null array");
-        } catch(NullPointerException e) {
-            verifyException("org.apache.commons.compress.compressors.lzma.LZMAUtils", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      String string0 = LZMAUtils.getUncompressedFilename("");
+      assertEquals("", string0);
+  }
 
-    // ========== Compressed File Name Detection Tests ==========
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      String string0 = LZMAUtils.getUncompressedFileName("");
+      assertEquals("", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testIsCompressedFilename_WithLzmaExtension_ReturnsTrue() throws Throwable {
-        boolean result = LZMAUtils.isCompressedFilename("$VALUES.lzma");
-        
-        assertTrue("Should detect .lzma extension as compressed", result);
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        LZMAUtils.isCompressedFilename((String) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.compressors.FileNameUtil", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testIsCompressedFileName_WithLzmaExtension_ReturnsTrue() throws Throwable {
-        boolean result = LZMAUtils.isCompressedFileName("Kj-M[Oi{g@l@.lzma");
-        
-        assertTrue("Should detect .lzma extension as compressed", result);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        LZMAUtils.isCompressedFileName((String) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.compressors.FileNameUtil", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testIsCompressedFileName_WithoutLzmaExtension_ReturnsFalse() throws Throwable {
-        boolean result = LZMAUtils.isCompressedFileName("CACHED_UNAVAILABLE");
-        
-        assertFalse("Should not detect non-LZMA filename as compressed", result);
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        LZMAUtils.getUncompressedFileName((String) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.compressors.FileNameUtil", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testIsCompressedFilename_WithoutLzmaExtension_ReturnsFalse() throws Throwable {
-        boolean result = LZMAUtils.isCompressedFilename("Jz[y2){c^no");
-        
-        assertFalse("Should not detect non-LZMA filename as compressed", result);
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        LZMAUtils.getCompressedFilename((String) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.compressors.FileNameUtil", e);
+      }
+  }
 
-    // ========== File Name Conversion Tests ==========
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        LZMAUtils.getCompressedFileName((String) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.compressors.FileNameUtil", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetCompressedFilename_AddsLzmaExtension() throws Throwable {
-        String result = LZMAUtils.getCompressedFilename("h6n");
-        
-        assertEquals("Should add .lzma extension", "h6n.lzma", result);
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      LZMAUtils.setCacheLZMAAvailablity(false);
+      LZMAUtils.setCacheLZMAAvailablity(true);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetCompressedFileName_AddsLzmaExtension() throws Throwable {
-        String result = LZMAUtils.getCompressedFileName("Kj-M[Oi{g@l@");
-        
-        assertEquals("Should add .lzma extension", "Kj-M[Oi{g@l@.lzma", result);
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      LZMAUtils.setCacheLZMAAvailablity(true);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetUncompressedFilename_WithoutLzmaExtension_ReturnsUnchanged() throws Throwable {
-        String filename = "CACHED_UNAVAILABLE";
-        
-        String result = LZMAUtils.getUncompressedFilename(filename);
-        
-        assertEquals("Should return unchanged filename without LZMA extension", filename, result);
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      byte[] byteArray0 = new byte[4];
+      boolean boolean0 = LZMAUtils.matches(byteArray0, 117);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetUncompressedFileName_WithoutLzmaExtension_ReturnsUnchanged() throws Throwable {
-        String filename = "Kj-M[Oi{g@l@";
-        
-        String result = LZMAUtils.getUncompressedFileName(filename);
-        
-        assertEquals("Should return unchanged filename without LZMA extension", filename, result);
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      byte[] byteArray0 = new byte[16];
+      byteArray0[0] = (byte)93;
+      boolean boolean0 = LZMAUtils.matches(byteArray0, (byte)93);
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetUncompressedFilename_WithEmptyString_ReturnsEmpty() throws Throwable {
-        String result = LZMAUtils.getUncompressedFilename("");
-        
-        assertEquals("Should handle empty string", "", result);
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      byte[] byteArray0 = new byte[0];
+      boolean boolean0 = LZMAUtils.matches(byteArray0, 0);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetUncompressedFileName_WithEmptyString_ReturnsEmpty() throws Throwable {
-        String result = LZMAUtils.getUncompressedFileName("");
-        
-        assertEquals("Should handle empty string", "", result);
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        LZMAUtils.matches((byte[]) null, (byte)93);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.compressors.lzma.LZMAUtils", e);
+      }
+  }
 
-    // ========== Null Parameter Tests ==========
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      boolean boolean0 = LZMAUtils.isLZMACompressionAvailable();
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testIsCompressedFilename_WithNull_ThrowsException() throws Throwable {
-        try { 
-            LZMAUtils.isCompressedFilename(null);
-            fail("Should throw NullPointerException for null filename");
-        } catch(NullPointerException e) {
-            verifyException("org.apache.commons.compress.compressors.FileNameUtil", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      boolean boolean0 = LZMAUtils.isCompressedFilename("Jz[y2){c^no");
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testIsCompressedFileName_WithNull_ThrowsException() throws Throwable {
-        try { 
-            LZMAUtils.isCompressedFileName(null);
-            fail("Should throw NullPointerException for null filename");
-        } catch(NullPointerException e) {
-            verifyException("org.apache.commons.compress.compressors.FileNameUtil", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      LZMAUtils.setCacheLZMAAvailablity(false);
+      boolean boolean0 = LZMAUtils.isLZMACompressionAvailable();
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetUncompressedFileName_WithNull_ThrowsException() throws Throwable {
-        try { 
-            LZMAUtils.getUncompressedFileName(null);
-            fail("Should throw NullPointerException for null filename");
-        } catch(NullPointerException e) {
-            verifyException("org.apache.commons.compress.compressors.FileNameUtil", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        LZMAUtils.getUncompressedFilename((String) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.compressors.FileNameUtil", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetUncompressedFilename_WithNull_ThrowsException() throws Throwable {
-        try { 
-            LZMAUtils.getUncompressedFilename(null);
-            fail("Should throw NullPointerException for null filename");
-        } catch(NullPointerException e) {
-            verifyException("org.apache.commons.compress.compressors.FileNameUtil", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      String string0 = LZMAUtils.getCompressedFilename("h6n");
+      assertEquals("h6n.lzma", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetCompressedFilename_WithNull_ThrowsException() throws Throwable {
-        try { 
-            LZMAUtils.getCompressedFilename(null);
-            fail("Should throw NullPointerException for null filename");
-        } catch(NullPointerException e) {
-            verifyException("org.apache.commons.compress.compressors.FileNameUtil", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      boolean boolean0 = LZMAUtils.isCompressedFileName("Kj-M[Oi{g@l@.lzma");
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetCompressedFileName_WithNull_ThrowsException() throws Throwable {
-        try { 
-            LZMAUtils.getCompressedFileName(null);
-            fail("Should throw NullPointerException for null filename");
-        } catch(NullPointerException e) {
-            verifyException("org.apache.commons.compress.compressors.FileNameUtil", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      String string0 = LZMAUtils.getCompressedFileName("Kj-M[Oi{g@l@");
+      assertEquals("Kj-M[Oi{g@l@.lzma", string0);
+  }
 
-    // ========== LZMA Availability and Caching Tests ==========
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      LZMAUtils.getCachedLZMAAvailability();
+  }
 
-    @Test(timeout = 4000)
-    public void testIsLZMACompressionAvailable_ReturnsFalse() throws Throwable {
-        boolean result = LZMAUtils.isLZMACompressionAvailable();
-        
-        assertFalse("LZMA compression should not be available in test environment", result);
-    }
-
-    @Test(timeout = 4000)
-    public void testIsLZMACompressionAvailable_WithCachingDisabled_ReturnsFalse() throws Throwable {
-        LZMAUtils.setCacheLZMAAvailablity(false);
-        
-        boolean result = LZMAUtils.isLZMACompressionAvailable();
-        
-        assertFalse("LZMA compression should not be available when caching is disabled", result);
-    }
-
-    @Test(timeout = 4000)
-    public void testSetCacheLZMAAvailablity_CanToggleCaching() throws Throwable {
-        // Test that caching can be enabled and disabled without errors
-        LZMAUtils.setCacheLZMAAvailablity(false);
-        LZMAUtils.setCacheLZMAAvailablity(true);
-        // No assertion needed - just verify no exceptions are thrown
-    }
-
-    @Test(timeout = 4000)
-    public void testSetCacheLZMAAvailablity_CanEnableCaching() throws Throwable {
-        LZMAUtils.setCacheLZMAAvailablity(true);
-        // No assertion needed - just verify no exceptions are thrown
-    }
-
-    @Test(timeout = 4000)
-    public void testGetCachedLZMAAvailability_DoesNotThrow() throws Throwable {
-        // This method exists only for unit testing support
-        LZMAUtils.getCachedLZMAAvailability();
-        // No assertion needed - just verify no exceptions are thrown
-    }
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      String string0 = LZMAUtils.getUncompressedFileName("Kj-M[Oi{g@l@");
+      assertEquals("Kj-M[Oi{g@l@", string0);
+  }
 }
