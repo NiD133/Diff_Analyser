@@ -15,136 +15,101 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Unit tests for {@link GeohashUtils}
+ * Tests for {@link GeohashUtils}
  */
 public class TestGeohashUtils {
-
-  // Spatial context for geographical calculations
-  private final SpatialContext geoContext = SpatialContext.GEO;
+  SpatialContext ctx = SpatialContext.GEO;
 
   /**
-   * Test encoding of latitude and longitude into geohash strings.
-   * Expected geohash values are based on known correct values.
+   * Pass condition: lat=42.6, lng=-5.6 should be encoded as "ezs42e44yx96",
+   * lat=57.64911 lng=10.40744 should be encoded as "u4pruydqqvj8"
    */
   @Test
-  public void testEncodeLatLonToGeohash() {
-    // Test case 1: Coordinates (42.6, -5.6)
-    String geohash1 = GeohashUtils.encodeLatLon(42.6, -5.6);
-    assertEquals("ezs42e44yx96", geohash1);
+  public void testEncode() {
+    String hash = GeohashUtils.encodeLatLon(42.6, -5.6);
+    assertEquals("ezs42e44yx96", hash);
 
-    // Test case 2: Coordinates (57.64911, 10.40744)
-    String geohash2 = GeohashUtils.encodeLatLon(57.64911, 10.40744);
-    assertEquals("u4pruydqqvj8", geohash2);
+    hash = GeohashUtils.encodeLatLon(57.64911, 10.40744);
+    assertEquals("u4pruydqqvj8", hash);
   }
 
   /**
-   * Test decoding of geohash to latitude and longitude with high precision.
-   * The decoded values should be within a small delta of the original values.
+   * Pass condition: lat=52.3738007, lng=4.8909347 should be encoded and then
+   * decoded within 0.00001 of the original value
    */
   @Test
-  public void testDecodeGeohashToPreciseLatLon() {
-    // Known coordinates
-    double originalLat = 52.3738007;
-    double originalLon = 4.8909347;
+  public void testDecodePreciseLongitudeLatitude() {
+    String hash = GeohashUtils.encodeLatLon(52.3738007, 4.8909347);
 
-    // Encode and decode
-    String geohash = GeohashUtils.encodeLatLon(originalLat, originalLon);
-    Point decodedPoint = GeohashUtils.decode(geohash, geoContext);
+    Point point = GeohashUtils.decode(hash,ctx);
 
-    // Assert decoded values are close to original
-    assertEquals(originalLat, decodedPoint.getY(), 0.00001);
-    assertEquals(originalLon, decodedPoint.getX(), 0.00001);
+    assertEquals(52.3738007, point.getY(), 0.00001D);
+    assertEquals(4.8909347, point.getX(), 0.00001D);
   }
 
   /**
-   * Test decoding of geohash to latitude and longitude with less precision.
-   * The decoded values should be within a small delta of the original values.
+   * Pass condition: lat=84.6, lng=10.5 should be encoded and then decoded
+   * within 0.00001 of the original value
    */
   @Test
-  public void testDecodeGeohashToImpreciseLatLon() {
-    // Known coordinates
-    double originalLat = 84.6;
-    double originalLon = 10.5;
+  public void testDecodeImpreciseLongitudeLatitude() {
+    String hash = GeohashUtils.encodeLatLon(84.6, 10.5);
 
-    // Encode and decode
-    String geohash = GeohashUtils.encodeLatLon(originalLat, originalLon);
-    Point decodedPoint = GeohashUtils.decode(geohash, geoContext);
+    Point point = GeohashUtils.decode(hash, ctx);
 
-    // Assert decoded values are close to original
-    assertEquals(originalLat, decodedPoint.getY(), 0.00001);
-    assertEquals(originalLon, decodedPoint.getX(), 0.00001);
+    assertEquals(84.6, point.getY(), 0.00001D);
+    assertEquals(10.5, point.getX(), 0.00001D);
   }
 
-  /**
-   * Test encoding and decoding consistency.
-   * The geohash should encode and decode back to the original values.
+  /*
+   * see https://issues.apache.org/jira/browse/LUCENE-1815 for details
    */
   @Test
-  public void testEncodeDecodeConsistency() {
-    // Known geohash and coordinates
-    String initialGeohash = "u173zq37x014";
-    double originalLat = 52.3738007;
-    double originalLon = 4.8909347;
+  public void testDecodeEncode() {
+    String geoHash = "u173zq37x014";
+    assertEquals(geoHash, GeohashUtils.encodeLatLon(52.3738007, 4.8909347));
+    Point point = GeohashUtils.decode(geoHash,ctx);
+    assertEquals(52.37380061d, point.getY(), 0.000001d);
+    assertEquals(4.8909343d, point.getX(), 0.000001d);
 
-    // Encode and decode
-    assertEquals(initialGeohash, GeohashUtils.encodeLatLon(originalLat, originalLon));
-    Point decodedPoint = GeohashUtils.decode(initialGeohash, geoContext);
+    assertEquals(geoHash, GeohashUtils.encodeLatLon(point.getY(), point.getX()));
 
-    // Assert decoded values are close to original
-    assertEquals(52.37380061, decodedPoint.getY(), 0.000001);
-    assertEquals(4.8909343, decodedPoint.getX(), 0.000001);
-
-    // Re-encode and check consistency
-    assertEquals(initialGeohash, GeohashUtils.encodeLatLon(decodedPoint.getY(), decodedPoint.getX()));
-
-    // Test with a shorter geohash
-    String shortGeohash = "u173";
-    Point shortDecodedPoint = GeohashUtils.decode(shortGeohash, geoContext);
-    String reEncodedGeohash = GeohashUtils.encodeLatLon(shortDecodedPoint.getY(), shortDecodedPoint.getX());
-    Point reDecodedPoint = GeohashUtils.decode(reEncodedGeohash, geoContext);
-
-    // Assert re-decoded values are consistent
-    assertEquals(shortDecodedPoint.getY(), reDecodedPoint.getY(), 0.000001);
-    assertEquals(shortDecodedPoint.getX(), reDecodedPoint.getX(), 0.000001);
+    geoHash = "u173";
+    point = GeohashUtils.decode("u173",ctx);
+    geoHash = GeohashUtils.encodeLatLon(point.getY(), point.getX());
+    final Point point2 = GeohashUtils.decode(geoHash, ctx);
+    assertEquals(point.getY(), point2.getY(), 0.000001d);
+    assertEquals(point.getX(), point2.getX(), 0.000001d);
   }
 
-  /**
-   * Test conversion from geohash length to latitude and longitude width.
-   * Expected values are based on known correct values from reference tables.
-   */
+  /** see the table at http://en.wikipedia.org/wiki/Geohash */
   @Test
-  public void testGeohashLengthToWidthHeight() {
-    // Test for odd length geohash
-    double[] oddLengthBox = GeohashUtils.lookupDegreesSizeForHashLen(3);
-    assertEquals(1.40625, oddLengthBox[0], 0.0001);
-    assertEquals(1.40625, oddLengthBox[1], 0.0001);
-
-    // Test for even length geohash
-    double[] evenLengthBox = GeohashUtils.lookupDegreesSizeForHashLen(4);
-    assertEquals(0.1757, evenLengthBox[0], 0.0001);
-    assertEquals(0.3515, evenLengthBox[1], 0.0001);
+  public void testHashLenToWidth() {
+    //test odd & even len
+    double[] boxOdd = GeohashUtils.lookupDegreesSizeForHashLen(3);
+    assertEquals(1.40625,boxOdd[0],0.0001);
+    assertEquals(1.40625,boxOdd[1],0.0001);
+    double[] boxEven = GeohashUtils.lookupDegreesSizeForHashLen(4);
+    assertEquals(0.1757,boxEven[0],0.0001);
+    assertEquals(0.3515,boxEven[1],0.0001);
   }
 
-  /**
-   * Test lookup of geohash length for given width and height.
-   * Expected values are based on known correct values from reference tables.
-   */
+  /** see the table at http://en.wikipedia.org/wiki/Geohash */
   @Test
-  public void testLookupGeohashLengthForWidthHeight() {
-    // Test various width and height combinations
-    assertEquals(1, GeohashUtils.lookupHashLenForWidthHeight(999, 999));
-    assertEquals(1, GeohashUtils.lookupHashLenForWidthHeight(999, 46));
-    assertEquals(1, GeohashUtils.lookupHashLenForWidthHeight(46, 999));
+  public void testLookupHashLenForWidthHeight() {
+    assertEquals(1, GeohashUtils.lookupHashLenForWidthHeight(999,999));
 
-    assertEquals(2, GeohashUtils.lookupHashLenForWidthHeight(44, 999));
-    assertEquals(2, GeohashUtils.lookupHashLenForWidthHeight(999, 44));
-    assertEquals(2, GeohashUtils.lookupHashLenForWidthHeight(999, 5.7));
-    assertEquals(2, GeohashUtils.lookupHashLenForWidthHeight(11.3, 999));
+    assertEquals(1, GeohashUtils.lookupHashLenForWidthHeight(999,46));
+    assertEquals(1, GeohashUtils.lookupHashLenForWidthHeight(46,999));
 
-    assertEquals(3, GeohashUtils.lookupHashLenForWidthHeight(999, 5.5));
-    assertEquals(3, GeohashUtils.lookupHashLenForWidthHeight(11.1, 999));
+    assertEquals(2, GeohashUtils.lookupHashLenForWidthHeight(44,999));
+    assertEquals(2, GeohashUtils.lookupHashLenForWidthHeight(999,44));
+    assertEquals(2, GeohashUtils.lookupHashLenForWidthHeight(999,5.7));
+    assertEquals(2, GeohashUtils.lookupHashLenForWidthHeight(11.3,999));
 
-    // Test for very small width and height
-    assertEquals(GeohashUtils.MAX_PRECISION, GeohashUtils.lookupHashLenForWidthHeight(10e-20, 10e-20));
+    assertEquals(3, GeohashUtils.lookupHashLenForWidthHeight(999,5.5));
+    assertEquals(3, GeohashUtils.lookupHashLenForWidthHeight(11.1,999));
+
+    assertEquals(GeohashUtils.MAX_PRECISION, GeohashUtils.lookupHashLenForWidthHeight(10e-20,10e-20));
   }
 }
