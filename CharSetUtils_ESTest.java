@@ -15,184 +15,187 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class CharSetUtils_ESTest extends CharSetUtils_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void testSqueeze_WithDigitSet_NoConsecutiveDigits_NoChange()  {
-        String[] digitSet = {"0-9"};
-        String result = CharSetUtils.squeeze("offset cannot be negative", digitSet);
-        assertEquals("offset cannot be negative", result);
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      String[] stringArray0 = new String[4];
+      stringArray0[0] = "0-9";
+      String string0 = CharSetUtils.squeeze("offset cannot be negative", stringArray0);
+      assertEquals("offset cannot be negative", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testSqueeze_WithSpecialSet_RemovesConsecutiveDuplicates()  {
-        String[] specialSet = {"uk{Z^6e/S>lTbb#wl"};
-        String input = "Aborting to protect against StackOverflowError - output of one loop is the input of another";
-        String expected = "Aborting to protect against StackOverflowEror - output of one lop is the input of another";
-        String result = CharSetUtils.squeeze(input, specialSet);
-        assertEquals(expected, result);
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      String[] stringArray0 = new String[13];
+      stringArray0[0] = "uk{Z^6e/S>lTbb#wl";
+      String string0 = CharSetUtils.squeeze("Aborting to protect against StackOverflowError - output of one loop is the input of another", stringArray0);
+      assertEquals("Aborting to protect against StackOverflowEror - output of one lop is the input of another", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testSqueeze_EmptyString_ReturnsEmpty()  {
-        String[] anySet = new String[4];
-        String result = CharSetUtils.squeeze("", anySet);
-        assertEquals("", result);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      String[] stringArray0 = new String[4];
+      String string0 = CharSetUtils.squeeze("", stringArray0);
+      assertEquals("", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testDelete_NullString_ReturnsNull()  {
-        String[] anySet = new String[6];
-        String result = CharSetUtils.delete(null, anySet);
-        assertNull(result);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      String[] stringArray0 = new String[6];
+      String string0 = CharSetUtils.delete((String) null, stringArray0);
+      assertNull(string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testSqueeze_WithSetWithoutDots_NoChange()  {
-        String[] specialSet = {",']t[O'q)5c-["};
-        String result = CharSetUtils.squeeze("...", specialSet);
-        assertEquals("...", result);
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      String[] stringArray0 = new String[2];
+      stringArray0[0] = ",']t[O'q)5c-[";
+      String string0 = CharSetUtils.squeeze("...", stringArray0);
+      assertEquals("...", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testSqueeze_DotsWithSpecificSet_ReducesToSingleDot()  {
-        String[] specialSet = {"uk{Z^6e/S>lTbb#wl"};
-        String result = CharSetUtils.squeeze("...", specialSet);
-        assertEquals(".", result);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      String[] stringArray0 = new String[13];
+      stringArray0[0] = "uk{Z^6e/S>lTbb#wl";
+      String string0 = CharSetUtils.squeeze("...", stringArray0);
+      assertEquals(".", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testSqueeze_WithComplexSet_RemovesDuplicates()  {
-        String[] complexSet = {"Jk{Z^]6e/!S>zlTbb#wl"};
-        String input = "offset cannot be negative";
-        String expected = "ofset canot be negative";
-        String result = CharSetUtils.squeeze(input, complexSet);
-        assertEquals(expected, result);
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      String[] stringArray0 = new String[2];
+      stringArray0[0] = "Jk{Z^]6e/!S>zlTbb#wl";
+      String string0 = CharSetUtils.squeeze("offset cannot be negative", stringArray0);
+      assertEquals("ofset canot be negative", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testSqueeze_WithSetNotMatching_NoChange()  {
-        String[] nonMatchingSet = {"h|Bv_9mUP7'&Y"};
-        String input = "Aborting to protect against StackOverflowError - output of one loop is the input of another";
-        String result = CharSetUtils.squeeze(input, nonMatchingSet);
-        assertEquals(input, result);
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      String[] stringArray0 = new String[2];
+      stringArray0[0] = "h|Bv_9mUP7'&Y";
+      String string0 = CharSetUtils.squeeze("Aborting to protect against StackOverflowError - output of one loop is the input of another", stringArray0);
+      assertEquals("Aborting to protect against StackOverflowError - output of one loop is the input of another", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testSqueeze_EmptySet_NoChange()  {
-        String[] emptySet = new String[2];
-        String input = "Aborting to protect against StackOverflowError - output of one loop is the input of another";
-        String result = CharSetUtils.squeeze(input, emptySet);
-        assertEquals(input, result);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      String[] stringArray0 = new String[2];
+      String string0 = CharSetUtils.squeeze("Aborting to protect against StackOverflowError - output of one loop is the input of another", stringArray0);
+      assertEquals("Aborting to protect against StackOverflowError - output of one loop is the input of another", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testSqueeze_NullString_ReturnsNull()  {
-        String[] anySet = new String[8];
-        String result = CharSetUtils.squeeze(null, anySet);
-        assertNull(result);
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      String[] stringArray0 = new String[8];
+      String string0 = CharSetUtils.squeeze((String) null, stringArray0);
+      assertNull(string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testKeep_SetAtoZ_KeepsLetters()  {
-        String[] letterSet = {"A-Z"};
-        String result = CharSetUtils.keep("A-Z", letterSet);
-        assertEquals("AZ", result);
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      String[] stringArray0 = new String[8];
+      stringArray0[0] = "A-Z";
+      String string0 = CharSetUtils.keep("A-Z", stringArray0);
+      assertEquals("AZ", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testKeep_EmptyString_ReturnsEmpty()  {
-        String[] anySet = new String[4];
-        String result = CharSetUtils.keep("", anySet);
-        assertEquals("", result);
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      String[] stringArray0 = new String[4];
+      String string0 = CharSetUtils.keep("", stringArray0);
+      assertEquals("", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testKeep_NullString_ReturnsNull()  {
-        String[] anySet = new String[5];
-        String result = CharSetUtils.keep(null, anySet);
-        assertNull(result);
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      String[] stringArray0 = new String[5];
+      String string0 = CharSetUtils.keep((String) null, stringArray0);
+      assertNull(string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testKeep_EmptySet_ReturnsEmptyString()  {
-        String[] emptySet = new String[8];
-        String result = CharSetUtils.keep("A-Z", emptySet);
-        assertEquals("", result);
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      String[] stringArray0 = new String[8];
+      String string0 = CharSetUtils.keep("A-Z", stringArray0);
+      assertEquals("", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testDelete_SetAtoZ_DeletesLettersLeavingDash()  {
-        String[] letterSet = {"A-Z"};
-        String result = CharSetUtils.delete("A-Z", letterSet);
-        assertEquals("-", result);
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      String[] stringArray0 = new String[8];
+      stringArray0[0] = "A-Z";
+      String string0 = CharSetUtils.delete("A-Z", stringArray0);
+      assertEquals("-", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testDelete_EmptySet_ReturnsOriginal()  {
-        String[] emptySet = new String[8];
-        String result = CharSetUtils.delete("A-Z", emptySet);
-        assertEquals("A-Z", result);
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      String[] stringArray0 = new String[8];
+      String string0 = CharSetUtils.delete("A-Z", stringArray0);
+      assertEquals("A-Z", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testDelete_EmptyString_ReturnsEmpty()  {
-        String[] emptySet = new String[0];
-        String result = CharSetUtils.delete("", emptySet);
-        assertEquals("", result);
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      String[] stringArray0 = new String[0];
+      String string0 = CharSetUtils.delete("", stringArray0);
+      assertEquals("", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testCount_WithSetMatchingUppercaseP_ReturnsOne()  {
-        String[] specialSet = {"h|Bv_9mUP7'&Y"};
-        int count = CharSetUtils.count("^MPkb@$Zu", specialSet);
-        assertEquals(1, count);
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      String[] stringArray0 = new String[2];
+      stringArray0[0] = "h|Bv_9mUP7'&Y";
+      int int0 = CharSetUtils.count("^MPkb@$Zu", stringArray0);
+      assertEquals(1, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void testCount_EmptyString_ReturnsZero()  {
-        String[] anySet = new String[13];
-        int count = CharSetUtils.count("", anySet);
-        assertEquals(0, count);
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      String[] stringArray0 = new String[13];
+      int int0 = CharSetUtils.count("", stringArray0);
+      assertEquals(0, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void testContainsAny_WithSetNotMatching_ReturnsFalse()  {
-        String[] nonMatchingSet = {"Xii8KJ"};
-        boolean result = CharSetUtils.containsAny("A-Za-z", nonMatchingSet);
-        assertFalse(result);
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      String[] stringArray0 = new String[7];
+      stringArray0[0] = "Xii8KJ";
+      boolean boolean0 = CharSetUtils.containsAny("A-Za-z", stringArray0);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testContainsAny_WithSetMatchingFirstChar_ReturnsTrue()  {
-        String[] matchingSet = {"h|Bv_9mUP7'&Y"};
-        boolean result = CharSetUtils.containsAny("h|Bv_9mUP7'&Y", matchingSet);
-        assertTrue(result);
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      String[] stringArray0 = new String[2];
+      stringArray0[0] = "h|Bv_9mUP7'&Y";
+      boolean boolean0 = CharSetUtils.containsAny("h|Bv_9mUP7'&Y", stringArray0);
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testContainsAny_EmptySet_ReturnsFalse()  {
-        String[] emptySet = new String[2];
-        boolean result = CharSetUtils.containsAny("h|Bv_9mUP7'&Y", emptySet);
-        assertFalse(result);
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      String[] stringArray0 = new String[2];
+      boolean boolean0 = CharSetUtils.containsAny("h|Bv_9mUP7'&Y", stringArray0);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testContainsAny_EmptyString_ReturnsFalse()  {
-        String[] anySet = new String[7];
-        boolean result = CharSetUtils.containsAny("", anySet);
-        assertFalse(result);
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      String[] stringArray0 = new String[7];
+      boolean boolean0 = CharSetUtils.containsAny("", stringArray0);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testCount_EmptySet_ReturnsZero()  {
-        String[] emptySet = new String[2];
-        int count = CharSetUtils.count("&", emptySet);
-        assertEquals(0, count);
-    }
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      String[] stringArray0 = new String[2];
+      int int0 = CharSetUtils.count("&", stringArray0);
+      assertEquals(0, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void testConstructor_Instantiation()  {
-        // Test the deprecated constructor for coverage
-        CharSetUtils charSetUtils = new CharSetUtils();
-        assertNotNull(charSetUtils);
-    }
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      CharSetUtils charSetUtils0 = new CharSetUtils();
+  }
 }
