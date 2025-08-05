@@ -5,92 +5,82 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.core.SerializableString;
 import com.fasterxml.jackson.core.io.SerializedString;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Unit tests for verifying the functionality of the {@link SerializedString} class,
- * which implements the {@link SerializableString} interface.
+ * Simple unit tests to try to verify that the default
+ * {@link SerializableString} implementation works as expected.
  */
-class SerializedStringTest extends com.fasterxml.jackson.core.JUnit5TestBase {
-
-    private static final String QUOTED_STRING = "\\\"quo\\\\ted\\\"";
+class SerializedStringTest
+    extends com.fasterxml.jackson.core.JUnit5TestBase
+{
+    private static final String QUOTED = "\\\"quo\\\\ted\\\"";
 
     @Test
-    void testAppendingQuotedAndUnquotedUTF8() throws IOException {
-        final String inputString = "\"quo\\ted\"";
-        SerializableString serializedString = new SerializedString(inputString);
+    void appending() throws IOException
+    {
+        final String INPUT = "\"quo\\ted\"";
 
-        // Verify initial value and quoted characters
-        assertEquals(inputString, serializedString.getValue());
-        assertEquals(QUOTED_STRING, new String(serializedString.asQuotedChars()));
+        SerializableString sstr = new SerializedString(INPUT);
+        // sanity checks first:
+        assertEquals(sstr.getValue(), INPUT);
+        assertEquals(QUOTED, new String(sstr.asQuotedChars()));
 
-        // Test writing quoted UTF-8
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        assertEquals(QUOTED_STRING.length(), serializedString.writeQuotedUTF8(outputStream));
-        assertEquals(QUOTED_STRING, outputStream.toString("UTF-8"));
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        assertEquals(QUOTED.length(), sstr.writeQuotedUTF8(bytes));
+        assertEquals(QUOTED, bytes.toString("UTF-8"));
+        bytes.reset();
+        assertEquals(INPUT.length(), sstr.writeUnquotedUTF8(bytes));
+        assertEquals(INPUT, bytes.toString("UTF-8"));
 
-        // Test writing unquoted UTF-8
-        outputStream.reset();
-        assertEquals(inputString.length(), serializedString.writeUnquotedUTF8(outputStream));
-        assertEquals(inputString, outputStream.toString("UTF-8"));
-
-        // Test appending quoted UTF-8 to a buffer
         byte[] buffer = new byte[100];
-        assertEquals(QUOTED_STRING.length(), serializedString.appendQuotedUTF8(buffer, 3));
-        assertEquals(QUOTED_STRING, new String(buffer, 3, QUOTED_STRING.length()));
-
-        // Test appending unquoted UTF-8 to a buffer
+        assertEquals(QUOTED.length(), sstr.appendQuotedUTF8(buffer, 3));
+        assertEquals(QUOTED, new String(buffer, 3, QUOTED.length()));
         Arrays.fill(buffer, (byte) 0);
-        assertEquals(inputString.length(), serializedString.appendUnquotedUTF8(buffer, 5));
-        assertEquals(inputString, new String(buffer, 5, inputString.length()));
+        assertEquals(INPUT.length(), sstr.appendUnquotedUTF8(buffer, 5));
+        assertEquals(INPUT, new String(buffer, 5, INPUT.length()));
     }
 
     @Test
-    void testFailedAccessDueToInsufficientBufferSize() throws IOException {
-        final String inputString = "Bit longer text";
-        SerializableString serializedString = new SerializedString(inputString);
+    void failedAccess() throws IOException
+    {
+        final String INPUT = "Bit longer text";
+        SerializableString sstr = new SerializedString(INPUT);
 
-        // Buffers smaller than the input string length
-        final byte[] byteBuffer = new byte[inputString.length() - 2];
-        final char[] charBuffer = new char[inputString.length() - 2];
-        final ByteBuffer byteBufferObj = ByteBuffer.allocate(inputString.length() - 2);
+        final byte[] buffer = new byte[INPUT.length() - 2];
+        final char[] ch = new char[INPUT.length() - 2];
+        final ByteBuffer bbuf = ByteBuffer.allocate(INPUT.length() - 2);
 
-        // Verify that appending to insufficient buffers returns -1
-        assertEquals(-1, serializedString.appendQuotedUTF8(byteBuffer, 0));
-        assertEquals(-1, serializedString.appendQuoted(charBuffer, 0));
-        assertEquals(-1, serializedString.putQuotedUTF8(byteBufferObj));
+        assertEquals(-1, sstr.appendQuotedUTF8(buffer, 0));
+        assertEquals(-1, sstr.appendQuoted(ch, 0));
+        assertEquals(-1, sstr.putQuotedUTF8(bbuf));
 
-        byteBufferObj.rewind();
-        assertEquals(-1, serializedString.appendUnquotedUTF8(byteBuffer, 0));
-        assertEquals(-1, serializedString.appendUnquoted(charBuffer, 0));
-        assertEquals(-1, serializedString.putUnquotedUTF8(byteBufferObj));
+        bbuf.rewind();
+        assertEquals(-1, sstr.appendUnquotedUTF8(buffer, 0));
+        assertEquals(-1, sstr.appendUnquoted(ch, 0));
+        assertEquals(-1, sstr.putUnquotedUTF8(bbuf));
     }
 
     @Test
-    void testAppendQuotedUTF8ToBuffer() throws IOException {
-        SerializedString serializedString = new SerializedString(QUOTED_STRING);
-        assertEquals(QUOTED_STRING, serializedString.getValue());
-
+    void testAppendQuotedUTF8() throws IOException {
+        SerializedString sstr = new SerializedString(QUOTED);
+        assertEquals(QUOTED, sstr.getValue());
         final byte[] buffer = new byte[100];
-        final int length = serializedString.appendQuotedUTF8(buffer, 3);
-        assertEquals("\\\\\\\"quo\\\\\\\\ted\\\\\\\"", new String(buffer, 3, length));
+        final int len = sstr.appendQuotedUTF8(buffer, 3);
+        assertEquals("\\\\\\\"quo\\\\\\\\ted\\\\\\\"", new String(buffer, 3, len));
     }
 
     @Test
-    void testJdkSerialization() throws IOException {
-        // Serialize and deserialize the SerializedString object
-        final byte[] serializedBytes = jdkSerialize(new SerializedString(QUOTED_STRING));
-        SerializedString deserializedString = jdkDeserialize(serializedBytes);
-
-        // Verify the deserialized value
-        assertEquals(QUOTED_STRING, deserializedString.getValue());
-
-        // Test appending quoted UTF-8 to a buffer
+    void testJdkSerialize() throws IOException {
+        final byte[] bytes = jdkSerialize(new SerializedString(QUOTED));
+        SerializedString sstr = jdkDeserialize(bytes);
+        assertEquals(QUOTED, sstr.getValue());
         final byte[] buffer = new byte[100];
-        final int length = deserializedString.appendQuotedUTF8(buffer, 3);
-        assertEquals("\\\\\\\"quo\\\\\\\\ted\\\\\\\"", new String(buffer, 3, length));
+        final int len = sstr.appendQuotedUTF8(buffer, 3);
+        assertEquals("\\\\\\\"quo\\\\\\\\ted\\\\\\\"", new String(buffer, 3, len));
     }
 }
