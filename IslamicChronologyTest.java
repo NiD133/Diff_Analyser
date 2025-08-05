@@ -1,3 +1,18 @@
+/*
+ *  Copyright 2001-2013 Stephen Colebourne
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package org.joda.time.chrono;
 
 import java.util.Locale;
@@ -16,40 +31,39 @@ import org.joda.time.DurationFieldType;
 import org.joda.time.DateTime.Property;
 
 /**
- * Unit tests for IslamicChronology.
- * This class tests the functionality of the IslamicChronology class.
- * It includes tests for factory methods, equality, time zone handling, 
- * string representation, duration fields, date fields, time fields, 
- * and specific date calculations.
- * 
- * Author: Stephen Colebourne
+ * This class is a Junit unit test for IslamicChronology.
+ *
+ * @author Stephen Colebourne
  */
 public class TestIslamicChronology extends TestCase {
 
-    // Constants for time zones
+    private static long SKIP = 1 * DateTimeConstants.MILLIS_PER_DAY;
+
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
     private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
-
-    // Chronologies
     private static final Chronology ISLAMIC_UTC = IslamicChronology.getInstanceUTC();
     private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
     private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
 
-    // Test time constants
-    private static final long MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
-    private static final long TEST_TIME_NOW = calculateTestTimeNow();
+    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 
+                     366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 
+                     365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 +
+                     366 + 365;
+    // 2002-06-09
+    private long TEST_TIME_NOW =
+            (y2002days + 31L + 28L + 31L + 30L + 31L + 9L -1L) * DateTimeConstants.MILLIS_PER_DAY;
 
-    // Original settings for restoration after tests
-    private DateTimeZone originalDateTimeZone;
-    private TimeZone originalTimeZone;
-    private Locale originalLocale;
+    private DateTimeZone originalDateTimeZone = null;
+    private TimeZone originalTimeZone = null;
+    private Locale originalLocale = null;
 
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
 
     public static TestSuite suite() {
+        SKIP = 1 * DateTimeConstants.MILLIS_PER_DAY;
         return new TestSuite(TestIslamicChronology.class);
     }
 
@@ -59,13 +73,10 @@ public class TestIslamicChronology extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        // Set fixed current time for testing
         DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        // Save original settings
         originalDateTimeZone = DateTimeZone.getDefault();
         originalTimeZone = TimeZone.getDefault();
         originalLocale = Locale.getDefault();
-        // Set test-specific settings
         DateTimeZone.setDefault(LONDON);
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
         Locale.setDefault(Locale.UK);
@@ -73,20 +84,16 @@ public class TestIslamicChronology extends TestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        // Restore original settings
         DateTimeUtils.setCurrentMillisSystem();
         DateTimeZone.setDefault(originalDateTimeZone);
         TimeZone.setDefault(originalTimeZone);
         Locale.setDefault(originalLocale);
+        originalDateTimeZone = null;
+        originalTimeZone = null;
+        originalLocale = null;
     }
 
-    // Helper method to calculate test time now
-    private static long calculateTestTimeNow() {
-        long y2002days = 365 * 8 + 366 * 3; // Days from 1970 to 2002
-        return (y2002days + 31 + 28 + 31 + 30 + 31 + 9 - 1) * MILLIS_PER_DAY;
-    }
-
-    // Test factory methods
+    //-----------------------------------------------------------------------
     public void testFactoryUTC() {
         assertEquals(DateTimeZone.UTC, IslamicChronology.getInstanceUTC().getZone());
         assertSame(IslamicChronology.class, IslamicChronology.getInstanceUTC().getClass());
@@ -104,7 +111,7 @@ public class TestIslamicChronology extends TestCase {
         assertSame(IslamicChronology.class, IslamicChronology.getInstance(TOKYO).getClass());
     }
 
-    // Test equality of chronologies
+    //-----------------------------------------------------------------------
     public void testEquality() {
         assertSame(IslamicChronology.getInstance(TOKYO), IslamicChronology.getInstance(TOKYO));
         assertSame(IslamicChronology.getInstance(LONDON), IslamicChronology.getInstance(LONDON));
@@ -113,7 +120,6 @@ public class TestIslamicChronology extends TestCase {
         assertSame(IslamicChronology.getInstance(), IslamicChronology.getInstance(LONDON));
     }
 
-    // Test UTC conversion
     public void testWithUTC() {
         assertSame(IslamicChronology.getInstanceUTC(), IslamicChronology.getInstance(LONDON).withUTC());
         assertSame(IslamicChronology.getInstanceUTC(), IslamicChronology.getInstance(TOKYO).withUTC());
@@ -121,7 +127,6 @@ public class TestIslamicChronology extends TestCase {
         assertSame(IslamicChronology.getInstanceUTC(), IslamicChronology.getInstance().withUTC());
     }
 
-    // Test zone conversion
     public void testWithZone() {
         assertSame(IslamicChronology.getInstance(TOKYO), IslamicChronology.getInstance(TOKYO).withZone(TOKYO));
         assertSame(IslamicChronology.getInstance(LONDON), IslamicChronology.getInstance(TOKYO).withZone(LONDON));
@@ -131,7 +136,6 @@ public class TestIslamicChronology extends TestCase {
         assertSame(IslamicChronology.getInstance(PARIS), IslamicChronology.getInstanceUTC().withZone(PARIS));
     }
 
-    // Test string representation
     public void testToString() {
         assertEquals("IslamicChronology[Europe/London]", IslamicChronology.getInstance(LONDON).toString());
         assertEquals("IslamicChronology[Asia/Tokyo]", IslamicChronology.getInstance(TOKYO).toString());
@@ -139,7 +143,7 @@ public class TestIslamicChronology extends TestCase {
         assertEquals("IslamicChronology[UTC]", IslamicChronology.getInstanceUTC().toString());
     }
 
-    // Test duration fields
+    //-----------------------------------------------------------------------
     public void testDurationFields() {
         final IslamicChronology islamic = IslamicChronology.getInstance();
         assertEquals("eras", islamic.eras().getName());
@@ -154,7 +158,7 @@ public class TestIslamicChronology extends TestCase {
         assertEquals("minutes", islamic.minutes().getName());
         assertEquals("seconds", islamic.seconds().getName());
         assertEquals("millis", islamic.millis().getName());
-
+        
         assertEquals(false, islamic.eras().isSupported());
         assertEquals(true, islamic.centuries().isSupported());
         assertEquals(true, islamic.years().isSupported());
@@ -167,7 +171,7 @@ public class TestIslamicChronology extends TestCase {
         assertEquals(true, islamic.minutes().isSupported());
         assertEquals(true, islamic.seconds().isSupported());
         assertEquals(true, islamic.millis().isSupported());
-
+        
         assertEquals(false, islamic.centuries().isPrecise());
         assertEquals(false, islamic.years().isPrecise());
         assertEquals(false, islamic.weekyears().isPrecise());
@@ -179,7 +183,7 @@ public class TestIslamicChronology extends TestCase {
         assertEquals(true, islamic.minutes().isPrecise());
         assertEquals(true, islamic.seconds().isPrecise());
         assertEquals(true, islamic.millis().isPrecise());
-
+        
         final IslamicChronology islamicUTC = IslamicChronology.getInstanceUTC();
         assertEquals(false, islamicUTC.centuries().isPrecise());
         assertEquals(false, islamicUTC.years().isPrecise());
@@ -192,7 +196,7 @@ public class TestIslamicChronology extends TestCase {
         assertEquals(true, islamicUTC.minutes().isPrecise());
         assertEquals(true, islamicUTC.seconds().isPrecise());
         assertEquals(true, islamicUTC.millis().isPrecise());
-
+        
         final DateTimeZone gmt = DateTimeZone.forID("Etc/GMT");
         final IslamicChronology islamicGMT = IslamicChronology.getInstance(gmt);
         assertEquals(false, islamicGMT.centuries().isPrecise());
@@ -208,7 +212,6 @@ public class TestIslamicChronology extends TestCase {
         assertEquals(true, islamicGMT.millis().isPrecise());
     }
 
-    // Test date fields
     public void testDateFields() {
         final IslamicChronology islamic = IslamicChronology.getInstance();
         assertEquals("era", islamic.era().getName());
@@ -223,7 +226,7 @@ public class TestIslamicChronology extends TestCase {
         assertEquals("dayOfYear", islamic.dayOfYear().getName());
         assertEquals("dayOfMonth", islamic.dayOfMonth().getName());
         assertEquals("dayOfWeek", islamic.dayOfWeek().getName());
-
+        
         assertEquals(true, islamic.era().isSupported());
         assertEquals(true, islamic.centuryOfEra().isSupported());
         assertEquals(true, islamic.yearOfCentury().isSupported());
@@ -236,7 +239,7 @@ public class TestIslamicChronology extends TestCase {
         assertEquals(true, islamic.dayOfYear().isSupported());
         assertEquals(true, islamic.dayOfMonth().isSupported());
         assertEquals(true, islamic.dayOfWeek().isSupported());
-
+        
         assertEquals(islamic.eras(), islamic.era().getDurationField());
         assertEquals(islamic.centuries(), islamic.centuryOfEra().getDurationField());
         assertEquals(islamic.years(), islamic.yearOfCentury().getDurationField());
@@ -249,7 +252,7 @@ public class TestIslamicChronology extends TestCase {
         assertEquals(islamic.days(), islamic.dayOfYear().getDurationField());
         assertEquals(islamic.days(), islamic.dayOfMonth().getDurationField());
         assertEquals(islamic.days(), islamic.dayOfWeek().getDurationField());
-
+        
         assertEquals(null, islamic.era().getRangeDurationField());
         assertEquals(islamic.eras(), islamic.centuryOfEra().getRangeDurationField());
         assertEquals(islamic.centuries(), islamic.yearOfCentury().getRangeDurationField());
@@ -264,7 +267,6 @@ public class TestIslamicChronology extends TestCase {
         assertEquals(islamic.weeks(), islamic.dayOfWeek().getRangeDurationField());
     }
 
-    // Test time fields
     public void testTimeFields() {
         final IslamicChronology islamic = IslamicChronology.getInstance();
         assertEquals("halfdayOfDay", islamic.halfdayOfDay().getName());
@@ -278,7 +280,7 @@ public class TestIslamicChronology extends TestCase {
         assertEquals("secondOfMinute", islamic.secondOfMinute().getName());
         assertEquals("millisOfDay", islamic.millisOfDay().getName());
         assertEquals("millisOfSecond", islamic.millisOfSecond().getName());
-
+        
         assertEquals(true, islamic.halfdayOfDay().isSupported());
         assertEquals(true, islamic.clockhourOfHalfday().isSupported());
         assertEquals(true, islamic.hourOfHalfday().isSupported());
@@ -292,32 +294,32 @@ public class TestIslamicChronology extends TestCase {
         assertEquals(true, islamic.millisOfSecond().isSupported());
     }
 
-    // Test epoch calculation
+    //-----------------------------------------------------------------------
     public void testEpoch() {
         DateTime epoch = new DateTime(1, 1, 1, 0, 0, 0, 0, ISLAMIC_UTC);
         DateTime expectedEpoch = new DateTime(622, 7, 16, 0, 0, 0, 0, JULIAN_UTC);
         assertEquals(expectedEpoch.getMillis(), epoch.getMillis());
     }
 
-    // Test era handling
     public void testEra() {
         assertEquals(1, IslamicChronology.AH);
         try {
             new DateTime(-1, 13, 5, 0, 0, 0, 0, ISLAMIC_UTC);
             fail();
-        } catch (IllegalArgumentException ex) {
-            // Expected exception
-        }
+        } catch (IllegalArgumentException ex) {}
     }
 
-    // Test field constructor
+    //-----------------------------------------------------------------------
     public void testFieldConstructor() {
         DateTime date = new DateTime(1364, 12, 6, 0, 0, 0, 0, ISLAMIC_UTC);
         DateTime expectedDate = new DateTime(1945, 11, 12, 0, 0, 0, 0, ISO_UTC);
         assertEquals(expectedDate.getMillis(), date.getMillis());
     }
 
-    // Test calendar calculations
+    //-----------------------------------------------------------------------
+    /**
+     * Tests era, year, monthOfYear, dayOfMonth and dayOfWeek.
+     */
     public void testCalendar() {
         if (TestAll.FAST) {
             return;
@@ -350,25 +352,25 @@ public class TestIslamicChronology extends TestCase {
             if (monthValue < 1 || monthValue > 12) {
                 fail("Bad month: " + millis);
             }
-
-            // Test era
+            
+            // test era
             assertEquals(1, era.get(millis));
             assertEquals("AH", era.getAsText(millis));
             assertEquals("AH", era.getAsShortText(millis));
-
-            // Test date
+            
+            // test date
             assertEquals(expectedDOY, doyValue);
             assertEquals(expectedMonth, monthValue);
             assertEquals(expectedDay, dayValue);
             assertEquals(expectedDOW, dowValue);
             assertEquals(expectedYear, yearValue);
             assertEquals(expectedYear, yearOfEraValue);
-
-            // Test leap year
+            
+            // test leap year
             boolean leap = ((11 * yearValue + 14) % 30) < 11;
             assertEquals(leap, year.isLeap(millis));
-
-            // Test month length
+            
+            // test month length
             switch (monthValue) {
                 case 1:
                 case 3:
@@ -389,11 +391,11 @@ public class TestIslamicChronology extends TestCase {
                     assertEquals((leap ? 30 : 29), monthLen);
                     break;
             }
-
-            // Test year length
+            
+            // test year length
             assertEquals((leap ? 355 : 354), dayOfYearLen);
-
-            // Recalculate date
+            
+            // recalculate date
             expectedDOW = (((expectedDOW + 1) - 1) % 7) + 1;
             expectedDay++;
             expectedDOY++;
@@ -406,26 +408,25 @@ public class TestIslamicChronology extends TestCase {
                     expectedYear++;
                 }
             }
-            millis += MILLIS_PER_DAY;
+            millis += SKIP;
         }
     }
 
-    // Test specific sample dates
     public void testSampleDate1() {
         DateTime dt = new DateTime(1945, 11, 12, 0, 0, 0, 0, ISO_UTC);
         dt = dt.withChronology(ISLAMIC_UTC);
         assertEquals(IslamicChronology.AH, dt.getEra());
-        assertEquals(14, dt.getCenturyOfEra());
+        assertEquals(14, dt.getCenturyOfEra());  // TODO confirm
         assertEquals(64, dt.getYearOfCentury());
         assertEquals(1364, dt.getYearOfEra());
-
+        
         assertEquals(1364, dt.getYear());
         Property fld = dt.year();
         assertEquals(false, fld.isLeap());
         assertEquals(0, fld.getLeapAmount());
         assertEquals(DurationFieldType.days(), fld.getLeapDurationField().getType());
         assertEquals(new DateTime(1365, 12, 6, 0, 0, 0, 0, ISLAMIC_UTC), fld.addToCopy(1));
-
+        
         assertEquals(12, dt.getMonthOfYear());
         fld = dt.monthOfYear();
         assertEquals(false, fld.isLeap());
@@ -437,7 +438,7 @@ public class TestIslamicChronology extends TestCase {
         assertEquals(12, fld.getMaximumValueOverall());
         assertEquals(new DateTime(1365, 1, 6, 0, 0, 0, 0, ISLAMIC_UTC), fld.addToCopy(1));
         assertEquals(new DateTime(1364, 1, 6, 0, 0, 0, 0, ISLAMIC_UTC), fld.addWrapFieldToCopy(1));
-
+        
         assertEquals(6, dt.getDayOfMonth());
         fld = dt.dayOfMonth();
         assertEquals(false, fld.isLeap());
@@ -448,7 +449,7 @@ public class TestIslamicChronology extends TestCase {
         assertEquals(29, fld.getMaximumValue());
         assertEquals(30, fld.getMaximumValueOverall());
         assertEquals(new DateTime(1364, 12, 7, 0, 0, 0, 0, ISLAMIC_UTC), fld.addToCopy(1));
-
+        
         assertEquals(DateTimeConstants.MONDAY, dt.getDayOfWeek());
         fld = dt.dayOfWeek();
         assertEquals(false, fld.isLeap());
@@ -459,7 +460,7 @@ public class TestIslamicChronology extends TestCase {
         assertEquals(7, fld.getMaximumValue());
         assertEquals(7, fld.getMaximumValueOverall());
         assertEquals(new DateTime(1364, 12, 7, 0, 0, 0, 0, ISLAMIC_UTC), fld.addToCopy(1));
-
+        
         assertEquals(6 * 30 + 5 * 29 + 6, dt.getDayOfYear());
         fld = dt.dayOfYear();
         assertEquals(false, fld.isLeap());
@@ -470,7 +471,7 @@ public class TestIslamicChronology extends TestCase {
         assertEquals(354, fld.getMaximumValue());
         assertEquals(355, fld.getMaximumValueOverall());
         assertEquals(new DateTime(1364, 12, 7, 0, 0, 0, 0, ISLAMIC_UTC), fld.addToCopy(1));
-
+        
         assertEquals(0, dt.getHourOfDay());
         assertEquals(0, dt.getMinuteOfHour());
         assertEquals(0, dt.getSecondOfMinute());
@@ -481,16 +482,16 @@ public class TestIslamicChronology extends TestCase {
         DateTime dt = new DateTime(2005, 11, 26, 0, 0, 0, 0, ISO_UTC);
         dt = dt.withChronology(ISLAMIC_UTC);
         assertEquals(IslamicChronology.AH, dt.getEra());
-        assertEquals(15, dt.getCenturyOfEra());
+        assertEquals(15, dt.getCenturyOfEra());  // TODO confirm
         assertEquals(26, dt.getYearOfCentury());
         assertEquals(1426, dt.getYearOfEra());
-
+        
         assertEquals(1426, dt.getYear());
         Property fld = dt.year();
         assertEquals(true, fld.isLeap());
         assertEquals(1, fld.getLeapAmount());
         assertEquals(DurationFieldType.days(), fld.getLeapDurationField().getType());
-
+        
         assertEquals(10, dt.getMonthOfYear());
         fld = dt.monthOfYear();
         assertEquals(false, fld.isLeap());
@@ -500,7 +501,7 @@ public class TestIslamicChronology extends TestCase {
         assertEquals(1, fld.getMinimumValueOverall());
         assertEquals(12, fld.getMaximumValue());
         assertEquals(12, fld.getMaximumValueOverall());
-
+        
         assertEquals(24, dt.getDayOfMonth());
         fld = dt.dayOfMonth();
         assertEquals(false, fld.isLeap());
@@ -510,7 +511,7 @@ public class TestIslamicChronology extends TestCase {
         assertEquals(1, fld.getMinimumValueOverall());
         assertEquals(29, fld.getMaximumValue());
         assertEquals(30, fld.getMaximumValueOverall());
-
+        
         assertEquals(DateTimeConstants.SATURDAY, dt.getDayOfWeek());
         fld = dt.dayOfWeek();
         assertEquals(false, fld.isLeap());
@@ -520,7 +521,7 @@ public class TestIslamicChronology extends TestCase {
         assertEquals(1, fld.getMinimumValueOverall());
         assertEquals(7, fld.getMaximumValue());
         assertEquals(7, fld.getMaximumValueOverall());
-
+        
         assertEquals(5 * 30 + 4 * 29 + 24, dt.getDayOfYear());
         fld = dt.dayOfYear();
         assertEquals(false, fld.isLeap());
@@ -530,7 +531,7 @@ public class TestIslamicChronology extends TestCase {
         assertEquals(1, fld.getMinimumValueOverall());
         assertEquals(355, fld.getMaximumValue());
         assertEquals(355, fld.getMaximumValueOverall());
-
+        
         assertEquals(0, dt.getHourOfDay());
         assertEquals(0, dt.getMinuteOfHour());
         assertEquals(0, dt.getSecondOfMinute());
@@ -540,13 +541,13 @@ public class TestIslamicChronology extends TestCase {
     public void testSampleDate3() {
         DateTime dt = new DateTime(1426, 12, 24, 0, 0, 0, 0, ISLAMIC_UTC);
         assertEquals(IslamicChronology.AH, dt.getEra());
-
+        
         assertEquals(1426, dt.getYear());
         Property fld = dt.year();
         assertEquals(true, fld.isLeap());
         assertEquals(1, fld.getLeapAmount());
         assertEquals(DurationFieldType.days(), fld.getLeapDurationField().getType());
-
+        
         assertEquals(12, dt.getMonthOfYear());
         fld = dt.monthOfYear();
         assertEquals(true, fld.isLeap());
@@ -556,7 +557,7 @@ public class TestIslamicChronology extends TestCase {
         assertEquals(1, fld.getMinimumValueOverall());
         assertEquals(12, fld.getMaximumValue());
         assertEquals(12, fld.getMaximumValueOverall());
-
+        
         assertEquals(24, dt.getDayOfMonth());
         fld = dt.dayOfMonth();
         assertEquals(false, fld.isLeap());
@@ -566,7 +567,7 @@ public class TestIslamicChronology extends TestCase {
         assertEquals(1, fld.getMinimumValueOverall());
         assertEquals(30, fld.getMaximumValue());
         assertEquals(30, fld.getMaximumValueOverall());
-
+        
         assertEquals(DateTimeConstants.TUESDAY, dt.getDayOfWeek());
         fld = dt.dayOfWeek();
         assertEquals(false, fld.isLeap());
@@ -576,7 +577,7 @@ public class TestIslamicChronology extends TestCase {
         assertEquals(1, fld.getMinimumValueOverall());
         assertEquals(7, fld.getMaximumValue());
         assertEquals(7, fld.getMaximumValueOverall());
-
+        
         assertEquals(6 * 30 + 5 * 29 + 24, dt.getDayOfYear());
         fld = dt.dayOfYear();
         assertEquals(false, fld.isLeap());
@@ -586,7 +587,7 @@ public class TestIslamicChronology extends TestCase {
         assertEquals(1, fld.getMinimumValueOverall());
         assertEquals(355, fld.getMaximumValue());
         assertEquals(355, fld.getMaximumValueOverall());
-
+        
         assertEquals(0, dt.getHourOfDay());
         assertEquals(0, dt.getMinuteOfHour());
         assertEquals(0, dt.getSecondOfMinute());
@@ -605,7 +606,6 @@ public class TestIslamicChronology extends TestCase {
         assertEquals(0, dt.getMillisOfSecond());
     }
 
-    // Test leap year patterns
     public void test15BasedLeapYear() {
         assertEquals(false, IslamicChronology.LEAP_YEAR_15_BASED.isLeapYear(1));
         assertEquals(true, IslamicChronology.LEAP_YEAR_15_BASED.isLeapYear(2));
@@ -737,4 +737,5 @@ public class TestIslamicChronology extends TestCase {
         assertEquals(false, IslamicChronology.LEAP_YEAR_HABASH_AL_HASIB.isLeapYear(29));
         assertEquals(true, IslamicChronology.LEAP_YEAR_HABASH_AL_HASIB.isLeapYear(30));
     }
+
 }
