@@ -6,141 +6,145 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
-class NumberOutputTest {
-    // Predefined edge cases for integer printing tests
-    private static final int[] INT_EDGE_CASES = {
-        0, -3, 1234, -1234, 56789, -56789,
-        999999, -999999, 1000000, -1000000,
-        10000001, -10000001, -100000012, 100000012,
-        1999888777, -1999888777, Integer.MAX_VALUE, Integer.MIN_VALUE
-    };
-
-    // Predefined edge cases for long printing tests
-    private static final long[] LONG_EDGE_CASES = {
-        0L, 1L, -1L, Long.MAX_VALUE, Long.MIN_VALUE,
-        Long.MAX_VALUE - 1L, Long.MIN_VALUE + 1L
-    };
-
+class NumberOutputTest
+{
     @Test
-    void intPrinting() throws Exception {
-        // Test predefined edge cases
-        for (int value : INT_EDGE_CASES) {
-            assertIntPrint(value);
-        }
+    void intPrinting() throws Exception
+    {
+        assertIntPrint(0);
+        assertIntPrint(-3);
+        assertIntPrint(1234);
+        assertIntPrint(-1234);
+        assertIntPrint(56789);
+        assertIntPrint(-56789);
+        assertIntPrint(999999);
+        assertIntPrint(-999999);
+        assertIntPrint(1000000);
+        assertIntPrint(-1000000);
+        assertIntPrint(10000001);
+        assertIntPrint(-10000001);
+        assertIntPrint(-100000012);
+        assertIntPrint(100000012);
+        assertIntPrint(1999888777);
+        assertIntPrint(-1999888777);
+        assertIntPrint(Integer.MAX_VALUE);
+        assertIntPrint(Integer.MIN_VALUE);
 
-        // Test random integers to ensure broad coverage
         Random rnd = new Random(12345L);
-        for (int i = 0; i < 251000; i++) {
+        for (int i = 0; i < 251000; ++i) {
             assertIntPrint(rnd.nextInt());
         }
     }
 
     @Test
-    void longPrinting() throws Exception {
-        // Test predefined edge cases
-        for (long value : LONG_EDGE_CASES) {
-            assertLongPrint(value, -1); // -1 indicates edge case
-        }
+    void longPrinting() throws Exception
+    {
+        // First, let's just cover couple of edge cases
+        assertLongPrint(0L, 0);
+        assertLongPrint(1L, 0);
+        assertLongPrint(-1L, 0);
+        assertLongPrint(Long.MAX_VALUE, 0);
+        assertLongPrint(Long.MIN_VALUE, 0);
+        assertLongPrint(Long.MAX_VALUE-1L, 0);
+        assertLongPrint(Long.MIN_VALUE+1L, 0);
 
-        // Test random longs for comprehensive coverage
         Random rnd = new Random(12345L);
-        for (int i = 0; i < 678000; i++) {
-            long value = ((long) rnd.nextInt() << 32) | rnd.nextInt();
-            assertLongPrint(value, i);
+        // Bigger value space, need more iterations for long
+        for (int i = 0; i < 678000; ++i) {
+            long l = ((long) rnd.nextInt() << 32) | rnd.nextInt();
+            assertLongPrint(l, i);
         }
     }
 
+    // // // Tests for divBy1000
+    
     @Test
-    void divBy1000WithSmallNumbers() {
-        // Verify division for all numbers in [0, 999_999]
-        for (int number = 0; number <= 999_999; number++) {
+    void divBy1000Small()
+    {
+        for (int number = 0; number <= 999_999; ++number) {
             int expected = number / 1000;
             int actual = NumberOutput.divBy1000(number);
-            assertEquals(expected, actual, () -> 
-                "Failed for " + number + ": expected " + expected + ", got " + actual
-            );
+            if (expected != actual) { // only construct String if fail
+                fail("With "+number+" should get "+expected+", got: "+actual);
+            }
         }
     }
 
     @Test
-    void divBy1000WithSampledLargeNumbers() {
-        // Verify division for sampled large numbers
+    void divBy1000Sampled()
+    {
         for (int number = 1_000_000; number > 0; number += 7) {
             int expected = number / 1000;
             int actual = NumberOutput.divBy1000(number);
-            assertEquals(expected, actual, () -> 
-                "Failed for " + number + ": expected " + expected + ", got " + actual
-            );
+            if (expected != actual) { // only construct String if fail
+                fail("With "+number+" should get "+expected+", got: "+actual);
+            }
         }
     }
 
+    // And then full range, not included in CI since code shouldn't change;
+    // but has been run to verify full range manually
     @Test
-    @Disabled("For manual testing only - verifies full integer range")
+    // Comment out for manual testing:
+    @Disabled
     void divBy1000FullRange() {
-        // Full range verification (disabled in CI)
-        for (int number = 0; number >= 0; number++) {
+        // To get to Integer.MAX_VALUE, need to check for overflow
+        for (int number = 0; number >= 0; ++number) {
             int expected = number / 1000;
             int actual = NumberOutput.divBy1000(number);
-            assertEquals(expected, actual, () -> 
-                "Failed for " + number + ": expected " + expected + ", got " + actual
-            );
+            if (expected != actual) { // only construct String if fail
+                fail("With "+number+" should get "+expected+", got: "+actual);
+            }
         }
     }
 
     /*
     /**********************************************************
-    /* Helper assertion methods
+    /* Internal methods
     /**********************************************************
      */
 
-    private void assertIntPrint(int value) {
-        String expectedString = String.valueOf(value);
-        
-        // Verify outputInt() method
-        String actualOutputInt = printIntToString(value);
-        assertEquals(expectedString, actualOutputInt,
-            "outputInt() conversion mismatch for: " + value
-        );
-        
-        // Verify toString() method
-        String actualToString = NumberOutput.toString(value);
-        assertEquals(expectedString, actualToString,
-            "toString() conversion mismatch for: " + value
-        );
+    private void assertIntPrint(int value)
+    {
+        String exp = ""+value;
+        String act = printToString(value);
+
+        if (!exp.equals(act)) {
+            assertEquals(exp, act, "Expected conversion (exp '"+exp+"', len "+exp.length()+"; act len "+act.length()+")");
+        }
+        String alt = NumberOutput.toString(value);
+        if (!exp.equals(alt)) {
+            assertEquals(exp, act, "Expected conversion (exp '"+exp+"', len "+exp.length()+"; act len "+act.length()+")");
+        }
     }
 
-    private void assertLongPrint(long value, int index) {
-        String expectedString = String.valueOf(value);
-        
-        // Verify outputLong() method
-        String actualOutputLong = printLongToString(value);
-        assertEquals(expectedString, actualOutputLong, () ->
-            "outputLong() conversion mismatch at index " + index + " for: " + value
-        );
-        
-        // Verify toString() method
-        String actualToString = NumberOutput.toString(value);
-        assertEquals(expectedString, actualToString, () ->
-            "toString() conversion mismatch at index " + index + " for: " + value
-        );
+    private void assertLongPrint(long value, int index)
+    {
+        String exp = ""+value;
+        String act = printToString(value);
+
+        if (!exp.equals(act)) {
+            assertEquals(exp, act, "Expected conversion (exp '"+exp+"', len "+exp.length()+"; act len "+act.length()+"; number index "+index+")");
+        }
+        String alt = NumberOutput.toString(value);
+        if (!exp.equals(alt)) {
+            assertEquals(exp, act, "Expected conversion (exp '"+exp+"', len "+exp.length()+"; act len "+act.length()+"; number index "+index+")");
+        }
     }
 
-    /*
-    /**********************************************************
-    /* Internal conversion helpers
-    /**********************************************************
-     */
-
-    private String printIntToString(int value) {
+    private String printToString(int value)
+    {
         char[] buffer = new char[12];
-        int len = NumberOutput.outputInt(value, buffer, 0);
-        return new String(buffer, 0, len);
+        int offset = NumberOutput.outputInt(value, buffer, 0);
+        return new String(buffer, 0, offset);
     }
 
-    private String printLongToString(long value) {
+    private String printToString(long value)
+    {
         char[] buffer = new char[22];
-        int len = NumberOutput.outputLong(value, buffer, 0);
-        return new String(buffer, 0, len);
+        int offset = NumberOutput.outputLong(value, buffer, 0);
+        return new String(buffer, 0, offset);
     }
 }
