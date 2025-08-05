@@ -4,78 +4,67 @@
  */
 package org.mockito.internal.verification;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.exceptions.base.MockitoAssertionError;
-import org.mockito.exceptions.verification.opentest4j.ArgumentsAreDifferent;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.verification.VerificationMode;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.MockitoAnnotations.openMocks;
 
-@RunWith(MockitoJUnitRunner.class)
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.exceptions.base.MockitoAssertionError;
+import org.mockito.exceptions.verification.opentest4j.ArgumentsAreDifferent;
+import org.mockito.verification.VerificationMode;
+
 public class VerificationOverTimeImplTest {
-
-    private static final long POLLING_PERIOD_MS = 10;
-    private static final long DURATION_MS = 1000;
-
-    @Mock
-    private VerificationMode delegate;
-
+    @Mock private VerificationMode delegate;
     private VerificationOverTimeImpl impl;
 
     @Before
     public void setUp() {
-        impl = new VerificationOverTimeImpl(POLLING_PERIOD_MS, DURATION_MS, delegate, true);
+        openMocks(this);
+        impl = new VerificationOverTimeImpl(10, 1000, delegate, true);
     }
 
     @Test
-    public void shouldSucceedWhenDelegateSucceeds() {
-        // Given: No setup needed for successful verification
-        
-        // When: Performing verification
+    public void should_return_on_success() {
         impl.verify(null);
-        
-        // Then: Delegate is invoked successfully
         verify(delegate).verify(null);
     }
 
     @Test
-    public void shouldPropagateMockitoAssertionError() {
-        // Given: Delegate configured to throw MockitoAssertionError
-        MockitoAssertionError expectedError = new MockitoAssertionError("message");
-        doThrow(expectedError).when(delegate).verify(null);
+    public void should_throw_mockito_assertion_error() {
+        MockitoAssertionError toBeThrown = new MockitoAssertionError("message");
 
-        // When/Then: Verify exception propagation
-        assertThatThrownBy(() -> impl.verify(null))
-                .isSameAs(expectedError);
+        doThrow(toBeThrown).when(delegate).verify(null);
+        assertThatThrownBy(
+                        () -> {
+                            impl.verify(null);
+                        })
+                .isEqualTo(toBeThrown);
     }
 
     @Test
-    public void shouldPropagateArgumentsAreDifferentError() {
-        // Given: Delegate configured to throw ArgumentsAreDifferent
-        ArgumentsAreDifferent expectedError = 
-            new ArgumentsAreDifferent("message", "wanted", "actual");
-        doThrow(expectedError).when(delegate).verify(null);
+    public void should_deal_with_junit_assertion_error() {
+        ArgumentsAreDifferent toBeThrown = new ArgumentsAreDifferent("message", "wanted", "actual");
 
-        // When/Then: Verify exception propagation
-        assertThatThrownBy(() -> impl.verify(null))
-                .isSameAs(expectedError);
+        doThrow(toBeThrown).when(delegate).verify(null);
+        assertThatThrownBy(
+                        () -> {
+                            impl.verify(null);
+                        })
+                .isEqualTo(toBeThrown);
     }
 
     @Test
-    public void shouldPropagateRuntimeExceptionUnwrapped() {
-        // Given: Delegate configured to throw RuntimeException
-        RuntimeException expectedException = new RuntimeException("error");
-        doThrow(expectedException).when(delegate).verify(null);
+    public void should_not_wrap_other_exceptions() {
+        RuntimeException toBeThrown = new RuntimeException();
 
-        // When/Then: Verify exception propagation
-        assertThatThrownBy(() -> impl.verify(null))
-                .isSameAs(expectedException);
+        doThrow(toBeThrown).when(delegate).verify(null);
+        assertThatThrownBy(
+                        () -> {
+                            impl.verify(null);
+                        })
+                .isEqualTo(toBeThrown);
     }
 }
