@@ -16,13 +16,11 @@
  */
 package org.apache.commons.collections4.bag;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.apache.commons.collections4.Bag;
 import org.apache.commons.collections4.SortedBag;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -41,13 +39,8 @@ public class TreeBagTest<T> extends AbstractSortedBagTest<T> {
         return new TreeBag<>();
     }
 
-    /**
-     * Creates a bag with a known set of elements.
-     *
-     * @return a new bag containing "A", "B", "C", "D"
-     */
     @SuppressWarnings("unchecked")
-    private SortedBag<T> setupBagWithKnownElements() {
+    public SortedBag<T> setupBag() {
         final SortedBag<T> bag = makeObject();
         bag.add((T) "C");
         bag.add((T) "A");
@@ -57,46 +50,41 @@ public class TreeBagTest<T> extends AbstractSortedBagTest<T> {
     }
 
     @Test
-    @DisplayName("add(Object) should throw IllegalArgumentException for non-comparable types")
-    void testAddNonComparableTypeThrowsException() {
+    void testCollections265() {
         final Bag<Object> bag = new TreeBag<>();
-        // A TreeBag with no comparator requires elements to be Comparable.
-        assertThrows(IllegalArgumentException.class, () -> bag.add(new Object()),
-            "Adding an object that doesn't implement Comparable should fail.");
+
+        assertThrows(IllegalArgumentException.class, () -> bag.add(new Object()));
     }
 
     @Test
-    @DisplayName("add(null) should throw NullPointerException for a bag with natural ordering")
-    void testAddNullToNaturalOrderBagThrowsException() {
+    void testCollections555() {
         final Bag<Object> bag = new TreeBag<>();
-        assertThrows(NullPointerException.class, () -> bag.add(null),
-            "Adding null to a TreeBag using natural ordering should fail.");
+
+        assertThrows(NullPointerException.class, () -> bag.add(null));
+
+        final Bag<String> bag2 = new TreeBag<>(String::compareTo);
+        // jdk bug: adding null to an empty TreeMap works
+        // thus ensure that the bag is not empty before adding null
+        bag2.add("a");
+
+        assertThrows(NullPointerException.class, () -> bag2.add(null));
     }
 
     @Test
-    @DisplayName("add(null) should throw NullPointerException for a bag with a comparator")
-    void testAddNullToBagWithComparatorThrowsException() {
-        final Bag<String> bag = new TreeBag<>(String::compareTo);
-        // Per TreeMap Javadoc, behavior with nulls depends on the comparator.
-        // String::compareTo throws a NullPointerException.
-        // We add an element first to avoid edge cases with empty TreeMaps.
-        bag.add("a");
-
-        assertThrows(NullPointerException.class, () -> bag.add(null),
-            "Adding null to a TreeBag with a non-null-safe comparator should fail.");
-    }
-
-    @Test
-    @DisplayName("TreeBag should maintain elements in sorted order")
     void testOrdering() {
-        final SortedBag<T> bag = setupBagWithKnownElements();
-
-        // Elements added were "C", "A", "B", "D". Expected sorted order is "A", "B", "C", "D".
-        final Object[] expectedOrder = {"A", "B", "C", "D"};
-        assertArrayEquals(expectedOrder, bag.toArray(), "Elements should be sorted in toArray()");
-
-        assertEquals("A", bag.first(), "first() should return the lowest element");
-        assertEquals("D", bag.last(), "last() should return the highest element");
+        final Bag<T> bag = setupBag();
+        assertEquals("A", bag.toArray()[0], "Should get elements in correct order");
+        assertEquals("B", bag.toArray()[1], "Should get elements in correct order");
+        assertEquals("C", bag.toArray()[2], "Should get elements in correct order");
+        assertEquals("A", ((SortedBag<T>) bag).first(), "Should get first key");
+        assertEquals("D", ((SortedBag<T>) bag).last(), "Should get last key");
     }
+
+//    void testCreate() throws Exception {
+//        Bag<T> bag = makeObject();
+//        writeExternalFormToDisk((java.io.Serializable) bag, "src/test/resources/data/test/TreeBag.emptyCollection.version4.obj");
+//        bag = makeFullCollection();
+//        writeExternalFormToDisk((java.io.Serializable) bag, "src/test/resources/data/test/TreeBag.fullCollection.version4.obj");
+//    }
 
 }
