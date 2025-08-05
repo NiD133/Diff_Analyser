@@ -20,205 +20,204 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class EthiopicChronology_ESTest extends EthiopicChronology_ESTest_scaffolding {
 
-    private static final int MIN_DAYS_IN_FIRST_WEEK = 4;
-    private static final int MAX_YEAR = 292272984;
-    private static final int MIN_YEAR = -292269337;
-    private static final long APPROX_MILLIS_AT_EPOCH = 30962844000000L;
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstance((DateTimeZone) null);
+      boolean boolean0 = ethiopicChronology0.isLeapDay((-56623968000000L));
+      assertFalse(boolean0);
+  }
 
-    // Test cases for getInstance() and constructor
-    //--------------------------------------------------------------------
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstanceUTC();
+      AssembledChronology.Fields assembledChronology_Fields0 = new AssembledChronology.Fields();
+      ethiopicChronology0.assemble(assembledChronology_Fields0);
+      assertEquals(1, EthiopicChronology.EE);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetInstance_WithCustomZoneAndMinDays_EEConstantIsOne() {
-        DateTimeZone zone = DateTimeZone.forOffsetMillis(-1962);
-        EthiopicChronology chrono = EthiopicChronology.getInstance(zone, 1);
-        assertEquals(1, EthiopicChronology.EE);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstanceUTC();
+      int int0 = ethiopicChronology0.getMaxYear();
+      assertEquals(292272984, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetInstance_WithInvalidMinDays_ThrowsIllegalArgumentException() {
-        DateTimeZone zone = DateTimeZone.forOffsetMillis(1900);
-        int invalidMinDays = -4898;
-        try {
-            EthiopicChronology.getInstance(zone, invalidMinDays);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            assertEquals("Invalid min days in first week: -4898", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstance();
+      long long0 = ethiopicChronology0.getApproxMillisAtEpochDividedByTwo();
+      assertEquals(30962844000000L, long0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetInstance_WithAnotherInvalidMinDays_ThrowsIllegalArgumentException() {
-        int invalidMinDays = 1767;
-        try {
-            EthiopicChronology.getInstance(null, invalidMinDays);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            assertEquals("Invalid min days in first week: 1767", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstanceUTC();
+      // Undeclared exception!
+      try { 
+        ethiopicChronology0.isLeapDay((-9223372036854775808L));
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // The instant is below the supported minimum of 0001-01-01T00:00:00.000Z (EthiopicChronology[UTC])
+         //
+         verifyException("org.joda.time.chrono.LimitChronology", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testConstructor_WithInvalidMinDays_ThrowsIllegalArgumentException() {
-        int invalidMinDays = -159;
-        try {
-            new EthiopicChronology(null, null, invalidMinDays);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            assertEquals("Invalid min days in first week: -159", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-4246));
+      EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstance(dateTimeZone0);
+      // Undeclared exception!
+      try { 
+        ethiopicChronology0.isLeapDay((-9223372036854775808L));
+        fail("Expecting exception: ArithmeticException");
+      
+      } catch(ArithmeticException e) {
+         //
+         // Adding time zone offset caused overflow
+         //
+         verifyException("org.joda.time.DateTimeZone", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testConstructor_WithLenientChronologyAndMinDays_CreatesNewInstance() {
-        DateTimeZone zone = DateTimeZone.forOffsetMillis(-1962);
-        EthiopicChronology base = EthiopicChronology.getInstance(zone);
-        LenientChronology lenient = LenientChronology.getInstance(base);
-        EthiopicChronology chrono = new EthiopicChronology(lenient, new Object(), 1);
-        assertNotEquals(base, chrono);
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstanceUTC();
+      long long0 = ethiopicChronology0.calculateFirstDayOfYearMillis(15271875);
+      assertEquals(481881796790400000L, long0);
+  }
 
-    // Test cases for isLeapDay()
-    //--------------------------------------------------------------------
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstance();
+      long long0 = ethiopicChronology0.calculateFirstDayOfYearMillis(1);
+      assertEquals((-61894108800000L), long0);
+  }
 
-    @Test(timeout = 4000)
-    public void testIsLeapDay_WithNegativeInstant_ReturnsFalse() {
-        EthiopicChronology chrono = EthiopicChronology.getInstance((DateTimeZone) null);
-        boolean isLeap = chrono.isLeapDay(-56623968000000L);
-        assertFalse(isLeap);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-1962));
+      EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstance(dateTimeZone0, 1);
+      assertEquals(1, EthiopicChronology.EE);
+  }
 
-    @Test(timeout = 4000)
-    public void testIsLeapDay_WithMinLong_ThrowsIllegalArgumentException() {
-        EthiopicChronology chrono = EthiopicChronology.getInstanceUTC();
-        try {
-            chrono.isLeapDay(Long.MIN_VALUE);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            assertTrue(e.getMessage().contains("The instant is below the supported minimum"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis(1900);
+      // Undeclared exception!
+      try { 
+        EthiopicChronology.getInstance(dateTimeZone0, (-4898));
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid min days in first week: -4898
+         //
+         verifyException("org.joda.time.chrono.EthiopicChronology", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testIsLeapDay_WithMinLongAndNegativeOffset_ThrowsArithmeticException() {
-        DateTimeZone zone = DateTimeZone.forOffsetMillis(-4246);
-        EthiopicChronology chrono = EthiopicChronology.getInstance(zone);
-        try {
-            chrono.isLeapDay(Long.MIN_VALUE);
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            assertEquals("Adding time zone offset caused overflow", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        EthiopicChronology.getInstance((DateTimeZone) null, 1767);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid min days in first week: 1767
+         //
+         verifyException("org.joda.time.chrono.EthiopicChronology", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testIsLeapDay_WithSpecificInstant_ReturnsTrue() {
-        DateTimeZone zone = DateTimeZone.forOffsetMillis(-833);
-        EthiopicChronology chrono = EthiopicChronology.getInstance(zone);
-        long leapInstant = 3461702400000L;  // Known leap day
-        boolean isLeap = chrono.isLeapDay(leapInstant);
-        assertTrue(isLeap);
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      EthiopicChronology ethiopicChronology0 = null;
+      try {
+        ethiopicChronology0 = new EthiopicChronology((Chronology) null, (Object) null, (-159));
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid min days in first week: -159
+         //
+         verifyException("org.joda.time.chrono.BasicChronology", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testIsLeapDay_WithAnotherInstant_ReturnsFalse() {
-        DateTimeZone zone = DateTimeZone.forOffsetMillis(-2263);
-        EthiopicChronology chrono = EthiopicChronology.getInstance(zone);
-        long nonLeapInstant = 1209600011L;  // Known non-leap day
-        boolean isLeap = chrono.isLeapDay(nonLeapInstant);
-        assertFalse(isLeap);
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-1962));
+      EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstance(dateTimeZone0);
+      LenientChronology lenientChronology0 = LenientChronology.getInstance(ethiopicChronology0);
+      Object object0 = new Object();
+      EthiopicChronology ethiopicChronology1 = new EthiopicChronology(lenientChronology0, object0, 1);
+      assertFalse(ethiopicChronology1.equals((Object)ethiopicChronology0));
+  }
 
-    @Test(timeout = 4000)
-    public void testIsLeapDay_WithSmallInstant_ReturnsFalse() {
-        DateTimeZone zone = DateTimeZone.forOffsetMillis(-1962);
-        EthiopicChronology chrono = EthiopicChronology.getInstance(zone);
-        boolean isLeap = chrono.isLeapDay(-2899);
-        assertFalse(isLeap);
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-833));
+      EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstance(dateTimeZone0);
+      boolean boolean0 = ethiopicChronology0.isLeapDay(3461702400000L);
+      assertTrue(boolean0);
+  }
 
-    // Test cases for calculateFirstDayOfYearMillis()
-    //--------------------------------------------------------------------
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-2263));
+      EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstance(dateTimeZone0);
+      boolean boolean0 = ethiopicChronology0.isLeapDay(1209600011L);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testCalculateFirstDayOfYearMillis_WithLargeYear_ReturnsExpectedValue() {
-        EthiopicChronology chrono = EthiopicChronology.getInstanceUTC();
-        int year = 15271875;
-        long expected = 481881796790400000L;
-        long actual = chrono.calculateFirstDayOfYearMillis(year);
-        assertEquals(expected, actual);
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstance((DateTimeZone) null);
+      Chronology chronology0 = ethiopicChronology0.withZone((DateTimeZone) null);
+      assertSame(ethiopicChronology0, chronology0);
+  }
 
-    @Test(timeout = 4000)
-    public void testCalculateFirstDayOfYearMillis_WithYear1_ReturnsNegativeValue() {
-        EthiopicChronology chrono = EthiopicChronology.getInstance();
-        long actual = chrono.calculateFirstDayOfYearMillis(1);
-        assertEquals(-61894108800000L, actual);
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-1962));
+      EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstance(dateTimeZone0);
+      int int0 = ethiopicChronology0.getMinYear();
+      assertEquals((-292269337), int0);
+  }
 
-    @Test(timeout = 4000)
-    public void testCalculateFirstDayOfYearMillis_WithMaxYear_ReturnsExpectedValue() {
-        EthiopicChronology chrono = EthiopicChronology.getInstanceUTC();
-        long expected = 9223371994233600000L;
-        long actual = chrono.calculateFirstDayOfYearMillis(MAX_YEAR);
-        assertEquals(expected, actual);
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-1962));
+      EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstance(dateTimeZone0);
+      boolean boolean0 = ethiopicChronology0.isLeapDay((-2899));
+      assertFalse(boolean0);
+  }
 
-    // Test cases for getMaxYear(), getMinYear(), and getApproxMillisAtEpochDividedByTwo()
-    //--------------------------------------------------------------------
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstance();
+      DateTimeZone dateTimeZone0 = DateTimeZone.UTC;
+      EthiopicChronology ethiopicChronology1 = (EthiopicChronology)ethiopicChronology0.withZone(dateTimeZone0);
+      assertEquals(1, EthiopicChronology.EE);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetMaxYear_ReturnsConstantValue() {
-        EthiopicChronology chrono = EthiopicChronology.getInstanceUTC();
-        assertEquals(MAX_YEAR, chrono.getMaxYear());
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstanceUTC();
+      long long0 = ethiopicChronology0.calculateFirstDayOfYearMillis(292272984);
+      assertEquals(9223371994233600000L, long0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetMinYear_ReturnsConstantValue() {
-        DateTimeZone zone = DateTimeZone.forOffsetMillis(-1962);
-        EthiopicChronology chrono = EthiopicChronology.getInstance(zone);
-        assertEquals(MIN_YEAR, chrono.getMinYear());
-    }
-
-    @Test(timeout = 4000)
-    public void testGetApproxMillisAtEpochDividedByTwo_ReturnsConstantValue() {
-        EthiopicChronology chrono = EthiopicChronology.getInstance();
-        assertEquals(APPROX_MILLIS_AT_EPOCH, chrono.getApproxMillisAtEpochDividedByTwo());
-    }
-
-    // Test cases for assemble()
-    //--------------------------------------------------------------------
-
-    @Test(timeout = 4000)
-    public void testAssemble_AfterAssembly_EEConstantIsOne() {
-        EthiopicChronology chrono = EthiopicChronology.getInstanceUTC();
-        AssembledChronology.Fields fields = new AssembledChronology.Fields();
-        chrono.assemble(fields);  // Verify no exception
-        assertEquals(1, EthiopicChronology.EE);
-    }
-
-    // Test cases for withZone() and withUTC()
-    //--------------------------------------------------------------------
-
-    @Test(timeout = 4000)
-    public void testWithZone_NullZone_ReturnsSameChronology() {
-        EthiopicChronology chrono = EthiopicChronology.getInstance((DateTimeZone) null);
-        Chronology result = chrono.withZone((DateTimeZone) null);
-        assertSame(chrono, result);
-    }
-
-    @Test(timeout = 4000)
-    public void testWithZone_UTC_ReturnsChronologyWithSameEE() {
-        EthiopicChronology chrono = EthiopicChronology.getInstance();
-        Chronology utcChrono = chrono.withZone(DateTimeZone.UTC);
-        assertEquals(1, EthiopicChronology.EE);
-    }
-
-    @Test(timeout = 4000)
-    public void testWithUTC_FromCustomZone_ReturnsDifferentChronology() {
-        DateTimeZone zone = DateTimeZone.forOffsetMillis(-1962);
-        EthiopicChronology chrono = EthiopicChronology.getInstance(zone);
-        Chronology utcChrono = chrono.withUTC();
-        assertNotSame(chrono, utcChrono);
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-1962));
+      EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstance(dateTimeZone0);
+      Chronology chronology0 = ethiopicChronology0.withUTC();
+      assertNotSame(chronology0, ethiopicChronology0);
+  }
 }
