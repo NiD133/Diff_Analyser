@@ -44,146 +44,239 @@ package com.itextpdf.text.io;
 
 import java.io.ByteArrayOutputStream;
 
-import junit.framework.Assert;
-import junit.framework.AssertionFailedError;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
+/**
+ * Tests for GroupedRandomAccessSource which combines multiple RandomAccessSource instances
+ * into a single contiguous data source.
+ */
 public class GroupedRandomAccessSourceTest {
-	byte[] data;
-	
-	@Before
-	public void setUp() throws Exception {
-		
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		for (int i = 0; i < 100; i++){
-			baos.write((byte)i);
-		}
-		
-		data = baos.toByteArray();
-	}
+    
+    // Test data constants
+    private static final int TEST_DATA_SIZE = 100;
+    private static final int EXPECTED_TOTAL_SIZE = 300; // 3 sources * 100 bytes each
+    
+    private byte[] testData;
+    
+    @Before
+    public void setUp() throws Exception {
+        testData = createTestData();
+    }
 
-	@After
-	public void tearDown() throws Exception {
-	}
+    @After
+    public void tearDown() throws Exception {
+        // No cleanup needed
+    }
 
+    /**
+     * Creates test data: byte array containing values 0-99
+     */
+    private byte[] createTestData() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        for (int i = 0; i < TEST_DATA_SIZE; i++) {
+            baos.write((byte) i);
+        }
+        return baos.toByteArray();
+    }
 
-	@Test
-	public void testGet() throws Exception {
-		ArrayRandomAccessSource source1 = new ArrayRandomAccessSource(data);
-		ArrayRandomAccessSource source2 = new ArrayRandomAccessSource(data);
-		ArrayRandomAccessSource source3 = new ArrayRandomAccessSource(data);
-		
-		RandomAccessSource[] inputs = new RandomAccessSource[]{
-				source1, source2, source3
-		};
-		
-		GroupedRandomAccessSource grouped = new GroupedRandomAccessSource(inputs);
-		
-		Assert.assertEquals(source1.length() + source2.length() + source3.length(), grouped.length());
+    /**
+     * Tests single byte access across multiple grouped sources.
+     * 
+     * Setup: 3 sources, each containing bytes 0-99
+     * Expected layout:
+     * - Source 1: positions 0-99
+     * - Source 2: positions 100-199  
+     * - Source 3: positions 200-299
+     */
+    @Test
+    public void testSingleByteAccess() throws Exception {
+        // Arrange
+        GroupedRandomAccessSource groupedSource = createThreeSourceGroup();
+        
+        // Act & Assert - Test total length
+        assertEquals("Total length should be sum of all sources", 
+                     EXPECTED_TOTAL_SIZE, groupedSource.length());
 
-		Assert.assertEquals(source1.get(99),  grouped.get(99));
-		Assert.assertEquals(source2.get(0),  grouped.get(100));
-		Assert.assertEquals(source2.get(1),  grouped.get(101));
-		Assert.assertEquals(source1.get(99),  grouped.get(99));
-		Assert.assertEquals(source3.get(99),  grouped.get(299));
+        // Test reading from first source (positions 0-99)
+        assertEquals("Should read last byte from first source", 
+                     (byte) 99, groupedSource.get(99));
+        
+        // Test reading from second source (positions 100-199)
+        assertEquals("Should read first byte from second source", 
+                     (byte) 0, groupedSource.get(100));
+        assertEquals("Should read second byte from second source", 
+                     (byte) 1, groupedSource.get(101));
+        
+        // Test reading from third source (positions 200-299)
+        assertEquals("Should read last byte from third source", 
+                     (byte) 99, groupedSource.get(299));
 
-		Assert.assertEquals(-1, grouped.get(300));
-	}
+        // Test reading beyond bounds
+        assertEquals("Should return -1 for position beyond end", 
+                     -1, groupedSource.get(300));
+    }
 
-	private byte[] rangeArray(int start, int count){
-		byte[] rslt = new byte[count];
-		for(int i = 0; i < count; i++){
-			rslt[i] = (byte)(i + start);
-		}
-		return rslt;
-	}
-	
-	private void assertArrayEqual(byte[] a, int offa, byte[] b, int offb, int len){
-		for(int i = 0; i < len; i++){
-			if (a[i+offa] != b[i + offb]){
-				throw new AssertionFailedError("Differ at index " + (i+offa) + " and " + (i + offb) + " -> " + a[i+offa] + " != " + b[i + offb]);
-			}
-			
-		}
-	}
-	
-	@Test
-	public void testGetArray() throws Exception {
-		ArrayRandomAccessSource source1 = new ArrayRandomAccessSource(data); // 0 - 99
-		ArrayRandomAccessSource source2 = new ArrayRandomAccessSource(data); // 100 - 199
-		ArrayRandomAccessSource source3 = new ArrayRandomAccessSource(data); // 200 - 299
-		
-		RandomAccessSource[] inputs = new RandomAccessSource[]{
-				source1, source2, source3
-		};
-		
-		GroupedRandomAccessSource grouped = new GroupedRandomAccessSource(inputs);
+    /**
+     * Tests bulk byte array reading across source boundaries.
+     */
+    @Test
+    public void testBulkByteArrayAccess() throws Exception {
+        // Arrange
+        GroupedRandomAccessSource groupedSource = createThreeSourceGroup();
+        byte[] outputBuffer = new byte[500];
 
-		byte[] out = new byte[500];
+        // Act & Assert - Read entire content
+        int bytesRead = groupedSource.get(0, outputBuffer, 0, 300);
+        assertEquals("Should read all 300 bytes", 300, bytesRead);
+        
+        // Verify each source's data is correctly positioned
+        assertArrayEquals("First 100 bytes should match test data", 
+                         testData, copyRange(outputBuffer, 0, TEST_DATA_SIZE));
+        assertArrayEquals("Second 100 bytes should match test data", 
+                         testData, copyRange(outputBuffer, 100, TEST_DATA_SIZE));
+        assertArrayEquals("Third 100 bytes should match test data", 
+                         testData, copyRange(outputBuffer, 200, TEST_DATA_SIZE));
+        
+        // Test reading beyond bounds
+        bytesRead = groupedSource.get(0, outputBuffer, 0, 301);
+        assertEquals("Should still only read 300 bytes when requesting 301", 
+                     300, bytesRead);
+        
+        // Test reading across source boundary (middle of second source to middle of third)
+        bytesRead = groupedSource.get(150, outputBuffer, 0, 100);
+        assertEquals("Should read 100 bytes starting from position 150", 
+                     100, bytesRead);
+        
+        // Verify the cross-boundary read
+        byte[] expectedFirstHalf = createRangeArray(50, 50); // bytes 50-99 from second source
+        byte[] expectedSecondHalf = createRangeArray(0, 50);  // bytes 0-49 from third source
+        
+        assertArrayEquals("First half should be bytes 50-99", 
+                         expectedFirstHalf, copyRange(outputBuffer, 0, 50));
+        assertArrayEquals("Second half should be bytes 0-49", 
+                         expectedSecondHalf, copyRange(outputBuffer, 50, 50));
+    }
 
-		Assert.assertEquals(300, grouped.get(0, out, 0, 300));
-		assertArrayEqual(rangeArray(0, 100), 0, out, 0, 100);
-		assertArrayEqual(rangeArray(0, 100), 0, out, 100, 100);
-		assertArrayEqual(rangeArray(0, 100), 0, out, 200, 100);
-		
-		Assert.assertEquals(300, grouped.get(0, out, 0, 301));
-		assertArrayEqual(rangeArray(0, 100), 0, out, 0, 100);
-		assertArrayEqual(rangeArray(0, 100), 0, out, 100, 100);
-		assertArrayEqual(rangeArray(0, 100), 0, out, 200, 100);
-		
-		Assert.assertEquals(100, grouped.get(150, out, 0, 100));
-		assertArrayEqual(rangeArray(50, 50), 0, out, 0, 50);
-		assertArrayEqual(rangeArray(0, 50), 0, out, 50, 50);
-	}
-	
-	@Test
-	public void testRelease() throws Exception{
-		
-		ArrayRandomAccessSource source1 = new ArrayRandomAccessSource(data); // 0 - 99
-		ArrayRandomAccessSource source2 = new ArrayRandomAccessSource(data); // 100 - 199
-		ArrayRandomAccessSource source3 = new ArrayRandomAccessSource(data); // 200 - 299
-		
-		RandomAccessSource[] sources = new RandomAccessSource[]{
-				source1, source2, source3
-		};
-		
-		final RandomAccessSource[] current = new RandomAccessSource[]{null};
-		final int[] openCount = new int[]{0};
-		GroupedRandomAccessSource grouped = new GroupedRandomAccessSource(sources){
-			protected void sourceReleased(RandomAccessSource source) throws java.io.IOException {
-				openCount[0]--;
-				if (current[0] != source)
-					throw new AssertionFailedError("Released source isn't the current source");
-				current[0] = null;
-			}
-			
-			protected void sourceInUse(RandomAccessSource source) throws java.io.IOException {
-				if (current[0] != null)
-					throw new AssertionFailedError("Current source wasn't released properly");
-				openCount[0]++;
-				current[0] = source;
-			}
-		};
+    /**
+     * Tests the source management lifecycle - ensuring sources are properly
+     * opened and closed as the grouped source switches between them.
+     */
+    @Test
+    public void testSourceLifecycleManagement() throws Exception {
+        // Arrange - Create a grouped source with lifecycle tracking
+        RandomAccessSource[] sources = {
+            new ArrayRandomAccessSource(testData),
+            new ArrayRandomAccessSource(testData), 
+            new ArrayRandomAccessSource(testData)
+        };
+        
+        SourceLifecycleTracker lifecycleTracker = new SourceLifecycleTracker();
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(sources) {
+            @Override
+            protected void sourceReleased(RandomAccessSource source) throws java.io.IOException {
+                lifecycleTracker.onSourceReleased(source);
+            }
+            
+            @Override
+            protected void sourceInUse(RandomAccessSource source) throws java.io.IOException {
+                lifecycleTracker.onSourceInUse(source);
+            }
+        };
 
-		grouped.get(250);
-		grouped.get(251);
-		Assert.assertEquals(1, openCount[0]);
-		grouped.get(150);
-		grouped.get(151);
-		Assert.assertEquals(1, openCount[0]);
-		grouped.get(50);
-		grouped.get(51);
-		Assert.assertEquals(1, openCount[0]);
-		grouped.get(150);
-		grouped.get(151);
-		Assert.assertEquals(1, openCount[0]);
-		grouped.get(250);
-		grouped.get(251);
-		Assert.assertEquals(1, openCount[0]);
+        // Act & Assert - Test source switching behavior
+        
+        // Access third source (positions 200-299)
+        groupedSource.get(250);
+        groupedSource.get(251);
+        assertEquals("Should have exactly one source open", 1, lifecycleTracker.getOpenCount());
+        
+        // Switch to second source (positions 100-199)
+        groupedSource.get(150);
+        groupedSource.get(151);
+        assertEquals("Should still have exactly one source open after switch", 1, lifecycleTracker.getOpenCount());
+        
+        // Switch to first source (positions 0-99)
+        groupedSource.get(50);
+        groupedSource.get(51);
+        assertEquals("Should still have exactly one source open", 1, lifecycleTracker.getOpenCount());
+        
+        // Switch back to second source
+        groupedSource.get(150);
+        groupedSource.get(151);
+        assertEquals("Should maintain one open source", 1, lifecycleTracker.getOpenCount());
+        
+        // Switch back to third source
+        groupedSource.get(250);
+        groupedSource.get(251);
+        assertEquals("Should maintain one open source", 1, lifecycleTracker.getOpenCount());
 
-		grouped.close();
-	}
+        // Cleanup
+        groupedSource.close();
+    }
+
+    // Helper methods
+    
+    /**
+     * Creates a GroupedRandomAccessSource with three identical sources.
+     */
+    private GroupedRandomAccessSource createThreeSourceGroup() {
+        RandomAccessSource[] sources = {
+            new ArrayRandomAccessSource(testData), // positions 0-99
+            new ArrayRandomAccessSource(testData), // positions 100-199
+            new ArrayRandomAccessSource(testData)  // positions 200-299
+        };
+        return new GroupedRandomAccessSource(sources);
+    }
+
+    /**
+     * Creates a byte array with sequential values starting from a given offset.
+     */
+    private byte[] createRangeArray(int startValue, int count) {
+        byte[] result = new byte[count];
+        for (int i = 0; i < count; i++) {
+            result[i] = (byte) (i + startValue);
+        }
+        return result;
+    }
+    
+    /**
+     * Copies a range of bytes from a source array to a new array.
+     */
+    private byte[] copyRange(byte[] source, int offset, int length) {
+        byte[] result = new byte[length];
+        System.arraycopy(source, offset, result, 0, length);
+        return result;
+    }
+
+    /**
+     * Helper class to track source lifecycle events during testing.
+     */
+    private static class SourceLifecycleTracker {
+        private RandomAccessSource currentSource;
+        private int openCount = 0;
+        
+        public void onSourceReleased(RandomAccessSource source) {
+            openCount--;
+            if (currentSource != source) {
+                fail("Released source should be the current source");
+            }
+            currentSource = null;
+        }
+        
+        public void onSourceInUse(RandomAccessSource source) {
+            if (currentSource != null) {
+                fail("Current source should be released before opening new one");
+            }
+            openCount++;
+            currentSource = source;
+        }
+        
+        public int getOpenCount() {
+            return openCount;
+        }
+    }
 }
