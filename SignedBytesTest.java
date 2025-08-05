@@ -50,54 +50,58 @@ public class SignedBytesTest extends TestCase {
 
   private static final byte[] VALUES = {LEAST, -1, 0, 1, GREATEST};
 
-  public void testCheckedCast() {
+  public void testCheckedCast_inRangeValue_isUnchanged() {
     for (byte value : VALUES) {
       assertThat(SignedBytes.checkedCast((long) value)).isEqualTo(value);
     }
-    assertCastFails(GREATEST + 1L);
-    assertCastFails(LEAST - 1L);
-    assertCastFails(Long.MAX_VALUE);
-    assertCastFails(Long.MIN_VALUE);
   }
 
-  public void testSaturatedCast() {
+  public void testCheckedCast_valueTooLarge_throwsIllegalArgumentException() {
+    long tooLarge = (long) GREATEST + 1;
+    IllegalArgumentException thrown =
+        assertThrows(IllegalArgumentException.class, () -> SignedBytes.checkedCast(tooLarge));
+    assertThat(thrown).hasMessageThat().contains(String.valueOf(tooLarge));
+
+    thrown =
+        assertThrows(IllegalArgumentException.class, () -> SignedBytes.checkedCast(Long.MAX_VALUE));
+    assertThat(thrown).hasMessageThat().contains(String.valueOf(Long.MAX_VALUE));
+  }
+
+  public void testCheckedCast_valueTooSmall_throwsIllegalArgumentException() {
+    long tooSmall = (long) LEAST - 1;
+    IllegalArgumentException thrown =
+        assertThrows(IllegalArgumentException.class, () -> SignedBytes.checkedCast(tooSmall));
+    assertThat(thrown).hasMessageThat().contains(String.valueOf(tooSmall));
+
+    thrown =
+        assertThrows(IllegalArgumentException.class, () -> SignedBytes.checkedCast(Long.MIN_VALUE));
+    assertThat(thrown).hasMessageThat().contains(String.valueOf(Long.MIN_VALUE));
+  }
+
+  public void testSaturatedCast_inRangeValue_isUnchanged() {
     for (byte value : VALUES) {
       assertThat(SignedBytes.saturatedCast((long) value)).isEqualTo(value);
     }
-    assertThat(SignedBytes.saturatedCast(GREATEST + 1L)).isEqualTo(GREATEST);
-    assertThat(SignedBytes.saturatedCast(LEAST - 1L)).isEqualTo(LEAST);
+  }
+
+  public void testSaturatedCast_valueTooLarge_saturatesToMaxByte() {
+    assertThat(SignedBytes.saturatedCast((long) GREATEST + 1)).isEqualTo(GREATEST);
     assertThat(SignedBytes.saturatedCast(Long.MAX_VALUE)).isEqualTo(GREATEST);
+  }
+
+  public void testSaturatedCast_valueTooSmall_saturatesToMinByte() {
+    assertThat(SignedBytes.saturatedCast((long) LEAST - 1)).isEqualTo(LEAST);
     assertThat(SignedBytes.saturatedCast(Long.MIN_VALUE)).isEqualTo(LEAST);
   }
 
-  private static void assertCastFails(long value) {
-    try {
-      SignedBytes.checkedCast(value);
-      fail("Cast to byte should have failed: " + value);
-    } catch (IllegalArgumentException ex) {
-      assertWithMessage(value + " not found in exception text: " + ex.getMessage())
-          .that(ex.getMessage().contains(String.valueOf(value)))
-          .isTrue();
-    }
-  }
-
-  public void testCompare() {
+  public void testCompare_hasSameSignAsByteCompare() {
     for (byte x : VALUES) {
       for (byte y : VALUES) {
-        // Only compare the sign of the result of compare().
-        int expected = Byte.compare(x, y);
-        int actual = SignedBytes.compare(x, y);
-        if (expected == 0) {
-          assertWithMessage(x + ", " + y).that(actual).isEqualTo(expected);
-        } else if (expected < 0) {
-          assertWithMessage(x + ", " + y + " (expected: " + expected + ", actual" + actual + ")")
-              .that(actual < 0)
-              .isTrue();
-        } else {
-          assertWithMessage(x + ", " + y + " (expected: " + expected + ", actual" + actual + ")")
-              .that(actual > 0)
-              .isTrue();
-        }
+        int expectedSign = Integer.signum(Byte.compare(x, y));
+        int actualSign = Integer.signum(SignedBytes.compare(x, y));
+        assertWithMessage("compare(" + x + ", " + y + ")")
+            .that(actualSign)
+            .isEqualTo(expectedSign);
       }
     }
   }
@@ -106,7 +110,7 @@ public class SignedBytesTest extends TestCase {
     assertThrows(IllegalArgumentException.class, () -> max());
   }
 
-  public void testMax() {
+  public void testMax_returnsLargestValue() {
     assertThat(max(LEAST)).isEqualTo(LEAST);
     assertThat(max(GREATEST)).isEqualTo(GREATEST);
     assertThat(max((byte) 0, (byte) -128, (byte) -1, (byte) 127, (byte) 1)).isEqualTo((byte) 127);
@@ -116,7 +120,7 @@ public class SignedBytesTest extends TestCase {
     assertThrows(IllegalArgumentException.class, () -> min());
   }
 
-  public void testMin() {
+  public void testMin_returnsSmallestValue() {
     assertThat(min(LEAST)).isEqualTo(LEAST);
     assertThat(min(GREATEST)).isEqualTo(GREATEST);
     assertThat(min((byte) 0, (byte) -128, (byte) -1, (byte) 127, (byte) 1)).isEqualTo((byte) -128);
@@ -156,11 +160,18 @@ public class SignedBytesTest extends TestCase {
   }
 
   public void testSortDescending() {
+    // empty array
     testSortDescending(new byte[] {}, new byte[] {});
+    // single element
     testSortDescending(new byte[] {1}, new byte[] {1});
+    // two elements
     testSortDescending(new byte[] {1, 2}, new byte[] {2, 1});
+    // with duplicates
     testSortDescending(new byte[] {1, 3, 1}, new byte[] {3, 1, 1});
+    // with negative numbers
     testSortDescending(new byte[] {-1, 1, -2, 2}, new byte[] {2, 1, -1, -2});
+    // with boundary values
+    testSortDescending(VALUES.clone(), new byte[] {GREATEST, 1, 0, -1, LEAST});
   }
 
   private static void testSortDescending(byte[] input, byte[] expectedOutput) {
@@ -177,11 +188,17 @@ public class SignedBytesTest extends TestCase {
   }
 
   public void testSortDescendingIndexed() {
+    // empty array, empty range
     testSortDescending(new byte[] {}, 0, 0, new byte[] {});
+    // single element, full range
     testSortDescending(new byte[] {1}, 0, 1, new byte[] {1});
+    // full range
     testSortDescending(new byte[] {1, 2}, 0, 2, new byte[] {2, 1});
+    // partial range at start
     testSortDescending(new byte[] {1, 3, 1}, 0, 2, new byte[] {3, 1, 1});
+    // partial range of one element (no-op)
     testSortDescending(new byte[] {1, 3, 1}, 0, 1, new byte[] {1, 3, 1});
+    // partial range in middle
     testSortDescending(new byte[] {-1, -2, 1, 2}, 1, 3, new byte[] {-1, 1, -2, 2});
   }
 
