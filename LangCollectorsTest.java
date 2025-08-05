@@ -36,7 +36,7 @@ class LangCollectorsTest {
     private static final class Fixture {
         int value;
 
-        Fixture(final int value) {
+        private Fixture(final int value) {
             this.value = value;
         }
 
@@ -46,213 +46,225 @@ class LangCollectorsTest {
         }
     }
 
-    private static final Long ONE = 1L;
-    private static final Long TWO = 2L;
-    private static final Long THREE = 3L;
+    private static final Long _1L = Long.valueOf(1);
+    private static final Long _2L = Long.valueOf(2);
+    private static final Long _3L = Long.valueOf(3);
 
     private static final Function<Object, String> TO_STRING = Objects::toString;
-    private static final Function<Object, String> NULL_TO_STRING = o -> Objects.toString(o, "NUL");
 
-    private static final Collector<Object, ?, String> NO_DELIMITER = LangCollectors.joining();
-    private static final Collector<Object, ?, String> DELIMITER_ONLY = LangCollectors.joining("-");
-    private static final Collector<Object, ?, String> DELIMITER_PREFIX_SUFFIX = LangCollectors.joining("-", "<", ">");
-    private static final Collector<Object, ?, String> DELIMITER_PREFIX_SUFFIX_MAPPER = LangCollectors.joining("-", "<", ">", TO_STRING);
-    private static final Collector<Object, ?, String> DELIMITER_PREFIX_SUFFIX_NULL_MAPPER = LangCollectors.joining("-", "<", ">", NULL_TO_STRING);
+    private static final Collector<Object, ?, String> JOINING_0 = LangCollectors.joining();
+    private static final Collector<Object, ?, String> JOINING_1 = LangCollectors.joining("-");
+    private static final Collector<Object, ?, String> JOINING_3 = LangCollectors.joining("-", "<", ">");
+    private static final Collector<Object, ?, String> JOINING_4 = LangCollectors.joining("-", "<", ">", TO_STRING);
+    private static final Collector<Object, ?, String> JOINING_4_NUL = LangCollectors.joining("-", "<", ">", o -> Objects.toString(o, "NUL"));
 
-    private static final String[] STRINGS = {"1", "2", "3"};
-    private static final Long[] LONGS = {ONE, TWO, THREE};
-    private static final Fixture[] FIXTURES = {new Fixture(1), new Fixture(2)};
-    private static final AtomicLong[] ATOMIC_LONGS = {new AtomicLong(1), new AtomicLong(2)};
-
-    private String collectWithNoDelimiter(final Object... objects) {
-        return LangCollectors.collect(NO_DELIMITER, objects);
+    private String join0(final Object... objects) {
+        return LangCollectors.collect(JOINING_0, objects);
     }
 
-    private String collectWithDelimiterOnly(final Object... objects) {
-        return LangCollectors.collect(DELIMITER_ONLY, objects);
+    private String join1(final Object... objects) {
+        return LangCollectors.collect(JOINING_1, objects);
     }
 
-    private String collectWithDelimiterPrefixSuffix(final Object... objects) {
-        return LangCollectors.collect(DELIMITER_PREFIX_SUFFIX, objects);
+    private String join3(final Object... objects) {
+        return LangCollectors.collect(JOINING_3, objects);
     }
 
-    private String collectWithDelimiterPrefixSuffixMapper(final Object... objects) {
-        return LangCollectors.collect(DELIMITER_PREFIX_SUFFIX_MAPPER, objects);
+    private String join4(final Object... objects) {
+        return LangCollectors.collect(JOINING_4, objects);
     }
 
-    private String collectWithDelimiterPrefixSuffixNullMapper(final Object... objects) {
-        return LangCollectors.collect(DELIMITER_PREFIX_SUFFIX_NULL_MAPPER, objects);
+    private String join4NullToString(final Object... objects) {
+        return LangCollectors.collect(JOINING_4_NUL, objects);
     }
 
     @Test
-    void testCollectorWithNoDelimiter_Strings() {
-        assertEquals("", collectWithNoDelimiter());
-        assertEquals("1", collectWithNoDelimiter(STRINGS[0]));
-        assertEquals("12", collectWithNoDelimiter(STRINGS[0], STRINGS[1]));
-        assertEquals("123", collectWithNoDelimiter(STRINGS));
-        assertEquals("1null3", collectWithNoDelimiter("1", null, "3"));
+    void testCollectStrings1Arg() {
+        assertEquals("", join1());
+        assertEquals("1", join1("1"));
+        assertEquals("1-2", join1("1", "2"));
+        assertEquals("1-2-3", join1("1", "2", "3"));
+        assertEquals("1-null-3", join1("1", null, "3"));
     }
 
     @Test
-    void testCollectorWithNoDelimiter_NonStrings() {
-        assertEquals("", collectWithNoDelimiter());
-        assertEquals("1", collectWithNoDelimiter(LONGS[0]));
-        assertEquals("12", collectWithNoDelimiter(LONGS[0], LONGS[1]));
-        assertEquals("123", collectWithNoDelimiter(LONGS));
-        assertEquals("1null3", collectWithNoDelimiter(ONE, null, THREE));
-        assertEquals("12", collectWithNoDelimiter(ATOMIC_LONGS));
-        assertEquals("12", collectWithNoDelimiter(FIXTURES));
+    void testJoinCollectNonStrings0Arg() {
+        assertEquals("", join0());
+        assertEquals("1", join0(_1L));
+        assertEquals("12", join0(_1L, _2L));
+        assertEquals("123", join0(_1L, _2L, _3L));
+        assertEquals("1null3", join0(_1L, null, _3L));
+        assertEquals("12", join0(new AtomicLong(1), new AtomicLong(2)));
+        assertEquals("12", join0(new Fixture(1), new Fixture(2)));
     }
 
     @Test
-    void testCollectorWithDelimiterOnly_Strings() {
-        assertEquals("", collectWithDelimiterOnly());
-        assertEquals("1", collectWithDelimiterOnly(STRINGS[0]));
-        assertEquals("1-2", collectWithDelimiterOnly(STRINGS[0], STRINGS[1]));
-        assertEquals("1-2-3", collectWithDelimiterOnly(STRINGS));
-        assertEquals("1-null-3", collectWithDelimiterOnly("1", null, "3"));
+    void testJoinCollectNonStrings1Arg() {
+        assertEquals("", join1());
+        assertEquals("1", join1(_1L));
+        assertEquals("1-2", join1(_1L, _2L));
+        assertEquals("1-2-3", join1(_1L, _2L, _3L));
+        assertEquals("1-null-3", join1(_1L, null, _3L));
+        assertEquals("1-2", join1(new AtomicLong(1), new AtomicLong(2)));
+        assertEquals("1-2", join1(new Fixture(1), new Fixture(2)));
     }
 
     @Test
-    void testCollectorWithDelimiterOnly_NonStrings() {
-        assertEquals("", collectWithDelimiterOnly());
-        assertEquals("1", collectWithDelimiterOnly(LONGS[0]));
-        assertEquals("1-2", collectWithDelimiterOnly(LONGS[0], LONGS[1]));
-        assertEquals("1-2-3", collectWithDelimiterOnly(LONGS));
-        assertEquals("1-null-3", collectWithDelimiterOnly(ONE, null, THREE));
-        assertEquals("1-2", collectWithDelimiterOnly(ATOMIC_LONGS));
-        assertEquals("1-2", collectWithDelimiterOnly(FIXTURES));
+    void testJoinCollectNonStrings3Args() {
+        assertEquals("<>", join3());
+        assertEquals("<1>", join3(_1L));
+        assertEquals("<1-2>", join3(_1L, _2L));
+        assertEquals("<1-2-3>", join3(_1L, _2L, _3L));
+        assertEquals("<1-null-3>", join3(_1L, null, _3L));
+        assertEquals("<1-2>", join3(new AtomicLong(1), new AtomicLong(2)));
+        assertEquals("<1-2>", join3(new Fixture(1), new Fixture(2)));
     }
 
     @Test
-    void testCollectorWithDelimiterPrefixSuffix_Strings() {
-        assertEquals("<>", collectWithDelimiterPrefixSuffix());
-        assertEquals("<1>", collectWithDelimiterPrefixSuffix(STRINGS[0]));
-        assertEquals("<1-2>", collectWithDelimiterPrefixSuffix(STRINGS[0], STRINGS[1]));
-        assertEquals("<1-2-3>", collectWithDelimiterPrefixSuffix(STRINGS));
-        assertEquals("<1-null-3>", collectWithDelimiterPrefixSuffix("1", null, "3"));
+    void testJoinCollectNonStrings4Args() {
+        assertEquals("<>", join4());
+        assertEquals("<1>", join4(_1L));
+        assertEquals("<1-2>", join4(_1L, _2L));
+        assertEquals("<1-2-3>", join4(_1L, _2L, _3L));
+        assertEquals("<1-null-3>", join4(_1L, null, _3L));
+        assertEquals("<1-NUL-3>", join4NullToString(_1L, null, _3L));
+        assertEquals("<1-2>", join4(new AtomicLong(1), new AtomicLong(2)));
+        assertEquals("<1-2>", join4(new Fixture(1), new Fixture(2)));
     }
 
     @Test
-    void testCollectorWithDelimiterPrefixSuffix_NonStrings() {
-        assertEquals("<>", collectWithDelimiterPrefixSuffix());
-        assertEquals("<1>", collectWithDelimiterPrefixSuffix(LONGS[0]));
-        assertEquals("<1-2>", collectWithDelimiterPrefixSuffix(LONGS[0], LONGS[1]));
-        assertEquals("<1-2-3>", collectWithDelimiterPrefixSuffix(LONGS));
-        assertEquals("<1-null-3>", collectWithDelimiterPrefixSuffix(ONE, null, THREE));
-        assertEquals("<1-2>", collectWithDelimiterPrefixSuffix(ATOMIC_LONGS));
-        assertEquals("<1-2>", collectWithDelimiterPrefixSuffix(FIXTURES));
+    void testJoinCollectNullArgs() {
+        assertEquals("", join0((Object[]) null));
+        assertEquals("", join1((Object[]) null));
+        assertEquals("<>", join3((Object[]) null));
+        assertEquals("<>", join4NullToString((Object[]) null));
     }
 
     @Test
-    void testCollectorWithDelimiterPrefixSuffixMapper_Strings() {
-        assertEquals("<>", collectWithDelimiterPrefixSuffixMapper());
-        assertEquals("<1>", collectWithDelimiterPrefixSuffixMapper(STRINGS[0]));
-        assertEquals("<1-2>", collectWithDelimiterPrefixSuffixMapper(STRINGS[0], STRINGS[1]));
-        assertEquals("<1-2-3>", collectWithDelimiterPrefixSuffixMapper(STRINGS));
-        assertEquals("<1-null-3>", collectWithDelimiterPrefixSuffixMapper("1", null, "3"));
-        assertEquals("<1-NUL-3>", collectWithDelimiterPrefixSuffixNullMapper("1", null, "3"));
+    void testJoinCollectStrings0Arg() {
+        assertEquals("", join0());
+        assertEquals("1", join0("1"));
+        assertEquals("12", join0("1", "2"));
+        assertEquals("123", join0("1", "2", "3"));
+        assertEquals("1null3", join0("1", null, "3"));
     }
 
     @Test
-    void testCollectorWithDelimiterPrefixSuffixMapper_NonStrings() {
-        assertEquals("<>", collectWithDelimiterPrefixSuffixMapper());
-        assertEquals("<1>", collectWithDelimiterPrefixSuffixMapper(LONGS[0]));
-        assertEquals("<1-2>", collectWithDelimiterPrefixSuffixMapper(LONGS[0], LONGS[1]));
-        assertEquals("<1-2-3>", collectWithDelimiterPrefixSuffixMapper(LONGS));
-        assertEquals("<1-null-3>", collectWithDelimiterPrefixSuffixMapper(ONE, null, THREE));
-        assertEquals("<1-NUL-3>", collectWithDelimiterPrefixSuffixNullMapper(ONE, null, THREE));
-        assertEquals("<1-2>", collectWithDelimiterPrefixSuffixMapper(ATOMIC_LONGS));
-        assertEquals("<1-2>", collectWithDelimiterPrefixSuffixMapper(FIXTURES));
+    void testJoinCollectStrings3Args() {
+        assertEquals("<>", join3());
+        assertEquals("<1>", join3("1"));
+        assertEquals("<1-2>", join3("1", "2"));
+        assertEquals("<1-2-3>", join3("1", "2", "3"));
+        assertEquals("<1-null-3>", join3("1", null, "3"));
     }
 
     @Test
-    void testCollectorWithNullArrayInput() {
-        assertEquals("", collectWithNoDelimiter((Object[]) null));
-        assertEquals("", collectWithDelimiterOnly((Object[]) null));
-        assertEquals("<>", collectWithDelimiterPrefixSuffix((Object[]) null));
-        assertEquals("<>", collectWithDelimiterPrefixSuffixNullMapper((Object[]) null));
+    void testJoinCollectStrings4Args() {
+        assertEquals("<>", join4());
+        assertEquals("<1>", join4("1"));
+        assertEquals("<1-2>", join4("1", "2"));
+        assertEquals("<1-2-3>", join4("1", "2", "3"));
+        assertEquals("<1-null-3>", join4("1", null, "3"));
+        assertEquals("<1-NUL-3>", join4NullToString("1", null, "3"));
     }
 
     @Test
-    void testStreamCollectorWithNoDelimiter_Strings() {
-        assertEquals("", Stream.of().collect(NO_DELIMITER));
-        assertEquals("1", Stream.of("1").collect(NO_DELIMITER));
-        assertEquals("12", Stream.of("1", "2").collect(NO_DELIMITER));
-        assertEquals("123", Stream.of(STRINGS).collect(NO_DELIMITER));
-        assertEquals("1null3", Stream.of("1", null, "3").collect(NO_DELIMITER));
+    void testJoiningNonStrings0Arg() {
+        // Stream.of()
+        assertEquals("", Stream.of().collect(JOINING_0));
+        assertEquals("1", Stream.of(_1L).collect(JOINING_0));
+        assertEquals("12", Stream.of(_1L, _2L).collect(JOINING_0));
+        assertEquals("123", Stream.of(_1L, _2L, _3L).collect(JOINING_0));
+        assertEquals("1null3", Stream.of(_1L, null, _3L).collect(JOINING_0));
+        assertEquals("12", Stream.of(new AtomicLong(1), new AtomicLong(2)).collect(JOINING_0));
+        assertEquals("12", Stream.of(new Fixture(1), new Fixture(2)).collect(JOINING_0));
+        // Arrays.stream()
+        assertEquals("", Arrays.stream(new Object[] {}).collect(JOINING_0));
+        assertEquals("1", Arrays.stream(new Long[] { _1L }).collect(JOINING_0));
+        assertEquals("12", Arrays.stream(new Long[] { _1L, _2L }).collect(JOINING_0));
+        assertEquals("123", Arrays.stream(new Long[] { _1L, _2L, _3L }).collect(JOINING_0));
+        assertEquals("1null3", Arrays.stream(new Long[] { _1L, null, _3L }).collect(JOINING_0));
+        assertEquals("12", Arrays.stream(new AtomicLong[] { new AtomicLong(1), new AtomicLong(2) }).collect(JOINING_0));
+        assertEquals("12", Arrays.stream(new Fixture[] { new Fixture(1), new Fixture(2) }).collect(JOINING_0));
     }
 
     @Test
-    void testStreamCollectorWithNoDelimiter_NonStrings() {
-        assertEquals("", Stream.of().collect(NO_DELIMITER));
-        assertEquals("1", Stream.of(ONE).collect(NO_DELIMITER));
-        assertEquals("12", Stream.of(ONE, TWO).collect(NO_DELIMITER));
-        assertEquals("123", Stream.of(LONGS).collect(NO_DELIMITER));
-        assertEquals("1null3", Stream.of(ONE, null, THREE).collect(NO_DELIMITER));
-        assertEquals("12", Stream.of(ATOMIC_LONGS).collect(NO_DELIMITER));
-        assertEquals("12", Stream.of(FIXTURES).collect(NO_DELIMITER));
+    void testJoiningNonStrings1Arg() {
+        // Stream.of()
+        assertEquals("", Stream.of().collect(JOINING_1));
+        assertEquals("1", Stream.of(_1L).collect(JOINING_1));
+        assertEquals("1-2", Stream.of(_1L, _2L).collect(JOINING_1));
+        assertEquals("1-2-3", Stream.of(_1L, _2L, _3L).collect(JOINING_1));
+        assertEquals("1-null-3", Stream.of(_1L, null, _3L).collect(JOINING_1));
+        assertEquals("1-2", Stream.of(new AtomicLong(1), new AtomicLong(2)).collect(JOINING_1));
+        assertEquals("1-2", Stream.of(new Fixture(1), new Fixture(2)).collect(JOINING_1));
+        // Arrays.stream()
+        assertEquals("", Arrays.stream(new Object[] {}).collect(JOINING_1));
+        assertEquals("1", Arrays.stream(new Long[] { _1L }).collect(JOINING_1));
+        assertEquals("1-2", Arrays.stream(new Long[] { _1L, _2L }).collect(JOINING_1));
+        assertEquals("1-2-3", Arrays.stream(new Long[] { _1L, _2L, _3L }).collect(JOINING_1));
+        assertEquals("1-null-3", Arrays.stream(new Long[] { _1L, null, _3L }).collect(JOINING_1));
+        assertEquals("1-2", Arrays.stream(new AtomicLong[] { new AtomicLong(1), new AtomicLong(2) }).collect(JOINING_1));
+        assertEquals("1-2", Arrays.stream(new Fixture[] { new Fixture(1), new Fixture(2) }).collect(JOINING_1));
     }
 
     @Test
-    void testStreamCollectorWithDelimiterOnly_Strings() {
-        assertEquals("", Stream.of().collect(DELIMITER_ONLY));
-        assertEquals("1", Stream.of("1").collect(DELIMITER_ONLY));
-        assertEquals("1-2", Stream.of("1", "2").collect(DELIMITER_ONLY));
-        assertEquals("1-2-3", Stream.of(STRINGS).collect(DELIMITER_ONLY));
-        assertEquals("1-null-3", Stream.of("1", null, "3").collect(DELIMITER_ONLY));
+    void testJoiningNonStrings3Args() {
+        assertEquals("<>", Stream.of().collect(JOINING_3));
+        assertEquals("<1>", Stream.of(_1L).collect(JOINING_3));
+        assertEquals("<1-2>", Stream.of(_1L, _2L).collect(JOINING_3));
+        assertEquals("<1-2-3>", Stream.of(_1L, _2L, _3L).collect(JOINING_3));
+        assertEquals("<1-null-3>", Stream.of(_1L, null, _3L).collect(JOINING_3));
+        assertEquals("<1-2>", Stream.of(new AtomicLong(1), new AtomicLong(2)).collect(JOINING_3));
+        assertEquals("<1-2>", Stream.of(new Fixture(1), new Fixture(2)).collect(JOINING_3));
     }
 
     @Test
-    void testStreamCollectorWithDelimiterOnly_NonStrings() {
-        assertEquals("", Stream.of().collect(DELIMITER_ONLY));
-        assertEquals("1", Stream.of(ONE).collect(DELIMITER_ONLY));
-        assertEquals("1-2", Stream.of(ONE, TWO).collect(DELIMITER_ONLY));
-        assertEquals("1-2-3", Stream.of(LONGS).collect(DELIMITER_ONLY));
-        assertEquals("1-null-3", Stream.of(ONE, null, THREE).collect(DELIMITER_ONLY));
-        assertEquals("1-2", Stream.of(ATOMIC_LONGS).collect(DELIMITER_ONLY));
-        assertEquals("1-2", Stream.of(FIXTURES).collect(DELIMITER_ONLY));
+    void testJoiningNonStrings4Args() {
+        assertEquals("<>", Stream.of().collect(JOINING_4));
+        assertEquals("<1>", Stream.of(_1L).collect(JOINING_4));
+        assertEquals("<1-2>", Stream.of(_1L, _2L).collect(JOINING_4));
+        assertEquals("<1-2-3>", Stream.of(_1L, _2L, _3L).collect(JOINING_4));
+        assertEquals("<1-null-3>", Stream.of(_1L, null, _3L).collect(JOINING_4));
+        assertEquals("<1-NUL-3>", Stream.of(_1L, null, _3L).collect(JOINING_4_NUL));
+        assertEquals("<1-2>", Stream.of(new AtomicLong(1), new AtomicLong(2)).collect(JOINING_4));
+        assertEquals("<1-2>", Stream.of(new Fixture(1), new Fixture(2)).collect(JOINING_4));
     }
 
     @Test
-    void testStreamCollectorWithDelimiterPrefixSuffix_Strings() {
-        assertEquals("<>", Stream.of().collect(DELIMITER_PREFIX_SUFFIX));
-        assertEquals("<1>", Stream.of("1").collect(DELIMITER_PREFIX_SUFFIX));
-        assertEquals("<1-2>", Stream.of("1", "2").collect(DELIMITER_PREFIX_SUFFIX));
-        assertEquals("<1-2-3>", Stream.of(STRINGS).collect(DELIMITER_PREFIX_SUFFIX));
-        assertEquals("<1-null-3>", Stream.of("1", null, "3").collect(DELIMITER_PREFIX_SUFFIX));
+    void testJoiningStrings0Arg() {
+        assertEquals("", Stream.of().collect(JOINING_0));
+        assertEquals("1", Stream.of("1").collect(JOINING_0));
+        assertEquals("12", Stream.of("1", "2").collect(JOINING_0));
+        assertEquals("123", Stream.of("1", "2", "3").collect(JOINING_0));
+        assertEquals("1null3", Stream.of("1", null, "3").collect(JOINING_0));
     }
 
     @Test
-    void testStreamCollectorWithDelimiterPrefixSuffix_NonStrings() {
-        assertEquals("<>", Stream.of().collect(DELIMITER_PREFIX_SUFFIX));
-        assertEquals("<1>", Stream.of(ONE).collect(DELIMITER_PREFIX_SUFFIX));
-        assertEquals("<1-2>", Stream.of(ONE, TWO).collect(DELIMITER_PREFIX_SUFFIX));
-        assertEquals("<1-2-3>", Stream.of(LONGS).collect(DELIMITER_PREFIX_SUFFIX));
-        assertEquals("<1-null-3>", Stream.of(ONE, null, THREE).collect(DELIMITER_PREFIX_SUFFIX));
-        assertEquals("<1-2>", Stream.of(ATOMIC_LONGS).collect(DELIMITER_PREFIX_SUFFIX));
-        assertEquals("<1-2>", Stream.of(FIXTURES).collect(DELIMITER_PREFIX_SUFFIX));
+    void testJoiningStrings1Arg() {
+        assertEquals("", Stream.of().collect(JOINING_1));
+        assertEquals("1", Stream.of("1").collect(JOINING_1));
+        assertEquals("1-2", Stream.of("1", "2").collect(JOINING_1));
+        assertEquals("1-2-3", Stream.of("1", "2", "3").collect(JOINING_1));
+        assertEquals("1-null-3", Stream.of("1", null, "3").collect(JOINING_1));
     }
 
     @Test
-    void testStreamCollectorWithDelimiterPrefixSuffixMapper_Strings() {
-        assertEquals("<>", Stream.of().collect(DELIMITER_PREFIX_SUFFIX_MAPPER));
-        assertEquals("<1>", Stream.of("1").collect(DELIMITER_PREFIX_SUFFIX_MAPPER));
-        assertEquals("<1-2>", Stream.of("1", "2").collect(DELIMITER_PREFIX_SUFFIX_MAPPER));
-        assertEquals("<1-2-3>", Stream.of(STRINGS).collect(DELIMITER_PREFIX_SUFFIX_MAPPER));
-        assertEquals("<1-null-3>", Stream.of("1", null, "3").collect(DELIMITER_PREFIX_SUFFIX_MAPPER));
-        assertEquals("<1-NUL-3>", Stream.of("1", null, "3").collect(DELIMITER_PREFIX_SUFFIX_NULL_MAPPER));
+    void testJoiningStrings3Args() {
+        assertEquals("<>", Stream.of().collect(JOINING_3));
+        assertEquals("<1>", Stream.of("1").collect(JOINING_3));
+        assertEquals("<1-2>", Stream.of("1", "2").collect(JOINING_3));
+        assertEquals("<1-2-3>", Stream.of("1", "2", "3").collect(JOINING_3));
+        assertEquals("<1-null-3>", Stream.of("1", null, "3").collect(JOINING_3));
     }
 
     @Test
-    void testStreamCollectorWithDelimiterPrefixSuffixMapper_NonStrings() {
-        assertEquals("<>", Stream.of().collect(DELIMITER_PREFIX_SUFFIX_MAPPER));
-        assertEquals("<1>", Stream.of(ONE).collect(DELIMITER_PREFIX_SUFFIX_MAPPER));
-        assertEquals("<1-2>", Stream.of(ONE, TWO).collect(DELIMITER_PREFIX_SUFFIX_MAPPER));
-        assertEquals("<1-2-3>", Stream.of(LONGS).collect(DELIMITER_PREFIX_SUFFIX_MAPPER));
-        assertEquals("<1-null-3>", Stream.of(ONE, null, THREE).collect(DELIMITER_PREFIX_SUFFIX_MAPPER));
-        assertEquals("<1-NUL-3>", Stream.of(ONE, null, THREE).collect(DELIMITER_PREFIX_SUFFIX_NULL_MAPPER));
-        assertEquals("<1-2>", Stream.of(ATOMIC_LONGS).collect(DELIMITER_PREFIX_SUFFIX_MAPPER));
-        assertEquals("<1-2>", Stream.of(FIXTURES).collect(DELIMITER_PREFIX_SUFFIX_MAPPER));
+    void testJoiningStrings4Args() {
+        assertEquals("<>", Stream.of().collect(JOINING_4));
+        assertEquals("<1>", Stream.of("1").collect(JOINING_4));
+        assertEquals("<1-2>", Stream.of("1", "2").collect(JOINING_4));
+        assertEquals("<1-2-3>", Stream.of("1", "2", "3").collect(JOINING_4));
+        assertEquals("<1-null-3>", Stream.of("1", null, "3").collect(JOINING_4));
+        assertEquals("<1-NUL-3>", Stream.of("1", null, "3").collect(JOINING_4_NUL));
     }
 }
