@@ -40,7 +40,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 
 import org.jfree.chart.TestUtils;
-
 import org.jfree.data.Range;
 import org.junit.jupiter.api.Test;
 
@@ -52,52 +51,81 @@ import static org.junit.jupiter.api.Assertions.*;
 public class MeterIntervalTest {
 
     /**
-     * Confirm that the equals method can distinguish all the required fields.
+     * Tests that equal MeterInterval instances are correctly identified.
+     * Covers:
+     * - Equality of identical objects
+     * - Symmetry of equals() method
+     * - Inequality when labels differ
+     * - Equality restoration when labels match
      */
     @Test
     public void testEquals() {
+        // Create two identical intervals
+        MeterInterval interval1 = new MeterInterval(
+            "Label 1", 
+            new Range(1.2, 3.4), 
+            Color.RED, 
+            new BasicStroke(1.0f),
+            Color.BLUE
+        );
+        MeterInterval interval2 = new MeterInterval(
+            "Label 1", 
+            new Range(1.2, 3.4), 
+            Color.RED, 
+            new BasicStroke(1.0f),
+            Color.BLUE
+        );
+        
+        // Verify equality and symmetry
+        assertEquals(interval1, interval2, "Identical intervals should be equal");
+        assertEquals(interval2, interval1, "Equals method should be symmetric");
 
-        MeterInterval m1 = new MeterInterval(
-            "Label 1", new Range(1.2, 3.4), Color.RED, new BasicStroke(1.0f),
+        // Test with different label
+        MeterInterval intervalWithDifferentLabel = new MeterInterval(
+            "Label 2", 
+            new Range(1.2, 3.4), 
+            Color.RED, 
+            new BasicStroke(1.0f),
             Color.BLUE
         );
-        MeterInterval m2 = new MeterInterval(
-            "Label 1", new Range(1.2, 3.4), Color.RED, new BasicStroke(1.0f),
-            Color.BLUE
-        );
-        assertEquals(m1, m2);
-        assertEquals(m2, m1);
+        assertNotEquals(interval1, intervalWithDifferentLabel, 
+            "Intervals with different labels should not be equal");
 
-        m1 = new MeterInterval(
-            "Label 2", new Range(1.2, 3.4), Color.RED, new BasicStroke(1.0f),
+        // Verify equality is restored when labels match
+        MeterInterval intervalWithMatchingLabel = new MeterInterval(
+            "Label 2", 
+            new Range(1.2, 3.4), 
+            Color.RED, 
+            new BasicStroke(1.0f),
             Color.BLUE
         );
-        assertNotEquals(m1, m2);
-        m2 = new MeterInterval(
-            "Label 2", new Range(1.2, 3.4), Color.RED, new BasicStroke(1.0f),
-            Color.BLUE
-        );
-        assertEquals(m1, m2);
-
+        assertEquals(intervalWithDifferentLabel, intervalWithMatchingLabel,
+            "Intervals with same label should be equal");
     }
 
     /**
-     * This class is immutable so cloning isn't required.
+     * Confirms that MeterInterval does not support cloning since it's immutable.
      */
     @Test
     public void testCloning() {
-        MeterInterval m1 = new MeterInterval("X", new Range(1.0, 2.0));
-        assertFalse(m1 instanceof Cloneable);
+        MeterInterval interval = new MeterInterval("Test Interval", new Range(1.0, 2.0));
+        assertFalse(interval instanceof Cloneable, 
+            "Immutable objects should not implement Cloneable");
     }
 
-   /**
-     * Serialize an instance, restore it, and check for equality.
+    /**
+     * Verifies that serialization produces equal objects.
      */
     @Test
     public void testSerialization() {
-        MeterInterval m1 = new MeterInterval("X", new Range(1.0, 2.0));
-        MeterInterval m2 = TestUtils.serialised(m1);
-        assertEquals(m1, m2);
+        // Create original object
+        MeterInterval original = new MeterInterval("Serialized", new Range(1.0, 2.0));
+        
+        // Serialize and deserialize
+        MeterInterval deserialized = TestUtils.serialised(original);
+        
+        // Verify object integrity after round trip
+        assertEquals(original, deserialized, 
+            "Deserialized object should equal original");
     }
-
 }
