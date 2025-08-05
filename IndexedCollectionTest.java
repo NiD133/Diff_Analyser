@@ -1,3 +1,19 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.commons.collections4.collection;
 
 import static java.util.Arrays.asList;
@@ -14,15 +30,12 @@ import org.apache.commons.collections4.Transformer;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test suite for the {@link IndexedCollection} implementation.
- * Extends {@link AbstractCollectionTest} to leverage common collection test utilities.
+ * Extension of {@link AbstractCollectionTest} for exercising the
+ * {@link IndexedCollection} implementation.
  */
 @SuppressWarnings("boxing")
 class IndexedCollectionTest extends AbstractCollectionTest<String> {
 
-    /**
-     * Transformer implementation to convert String to Integer.
-     */
     private static final class IntegerTransformer implements Transformer<String, Integer>, Serializable {
         private static final long serialVersionUID = 809439581555072949L;
 
@@ -32,16 +45,10 @@ class IndexedCollectionTest extends AbstractCollectionTest<String> {
         }
     }
 
-    /**
-     * Decorates a collection with a non-unique {@link IndexedCollection}.
-     */
     protected Collection<String> decorateCollection(final Collection<String> collection) {
         return IndexedCollection.nonUniqueIndexedCollection(collection, new IntegerTransformer());
     }
 
-    /**
-     * Decorates a collection with a unique {@link IndexedCollection}.
-     */
     protected IndexedCollection<Integer, String> decorateUniqueCollection(final Collection<String> collection) {
         return IndexedCollection.uniqueIndexedCollection(collection, new IntegerTransformer());
     }
@@ -53,7 +60,7 @@ class IndexedCollectionTest extends AbstractCollectionTest<String> {
 
     @Override
     public String[] getOtherElements() {
-        return new String[] { "9", "88", "678", "87", "98", "78", "99" };
+        return new String[] {"9", "88", "678", "87", "98", "78", "99"};
     }
 
     @Override
@@ -86,65 +93,65 @@ class IndexedCollectionTest extends AbstractCollectionTest<String> {
 
     @Override
     protected boolean skipSerializedCanonicalTests() {
-        // Skipping serialized canonical tests due to current limitations.
+        // FIXME: support canonical tests
         return true;
     }
 
     @Test
-    void testAddedObjectsCanBeRetrievedByKey() {
-        final Collection<String> collection = makeTestCollection();
-        collection.add("12");
-        collection.add("16");
-        collection.add("1");
-        collection.addAll(asList("2", "3", "4"));
+    void testAddedObjectsCanBeRetrievedByKey() throws Exception {
+        final Collection<String> coll = makeTestCollection();
+        coll.add("12");
+        coll.add("16");
+        coll.add("1");
+        coll.addAll(asList("2", "3", "4"));
 
         @SuppressWarnings("unchecked")
-        final IndexedCollection<Integer, String> indexedCollection = (IndexedCollection<Integer, String>) collection;
-        assertEquals("12", indexedCollection.get(12));
-        assertEquals("16", indexedCollection.get(16));
-        assertEquals("1", indexedCollection.get(1));
-        assertEquals("2", indexedCollection.get(2));
-        assertEquals("3", indexedCollection.get(3));
-        assertEquals("4", indexedCollection.get(4));
+        final IndexedCollection<Integer, String> indexed = (IndexedCollection<Integer, String>) coll;
+        assertEquals("12", indexed.get(12));
+        assertEquals("16", indexed.get(16));
+        assertEquals("1", indexed.get(1));
+        assertEquals("2", indexed.get(2));
+        assertEquals("3", indexed.get(3));
+        assertEquals("4", indexed.get(4));
     }
 
     @Test
-    void testDecoratedCollectionIsIndexedOnCreation() {
-        final Collection<String> originalCollection = makeFullCollection();
-        final IndexedCollection<Integer, String> indexedCollection = decorateUniqueCollection(originalCollection);
+    void testDecoratedCollectionIsIndexedOnCreation() throws Exception {
+        final Collection<String> original = makeFullCollection();
+        final IndexedCollection<Integer, String> indexed = decorateUniqueCollection(original);
 
-        assertEquals("1", indexedCollection.get(1));
-        assertEquals("2", indexedCollection.get(2));
-        assertEquals("3", indexedCollection.get(3));
+        assertEquals("1", indexed.get(1));
+        assertEquals("2", indexed.get(2));
+        assertEquals("3", indexed.get(3));
     }
 
     @Test
-    void testEnsureDuplicateObjectsCauseException() {
-        final Collection<String> uniqueCollection = makeUniqueTestCollection();
-        uniqueCollection.add("1");
+    void testEnsureDuplicateObjectsCauseException() throws Exception {
+        final Collection<String> coll = makeUniqueTestCollection();
 
-        assertThrows(IllegalArgumentException.class, () -> uniqueCollection.add("1"));
+        coll.add("1");
+
+        assertThrows(IllegalArgumentException.class, () -> coll.add("1"));
     }
 
     @Test
-    void testReindexUpdatesIndexWhenDecoratedCollectionIsModifiedSeparately() {
-        final Collection<String> originalCollection = new ArrayList<>();
-        final IndexedCollection<Integer, String> indexedCollection = decorateUniqueCollection(originalCollection);
+    void testReindexUpdatesIndexWhenDecoratedCollectionIsModifiedSeparately() throws Exception {
+        final Collection<String> original = new ArrayList<>();
+        final IndexedCollection<Integer, String> indexed = decorateUniqueCollection(original);
 
-        originalCollection.add("1");
-        originalCollection.add("2");
-        originalCollection.add("3");
+        original.add("1");
+        original.add("2");
+        original.add("3");
 
-        // Before reindexing, the index should not contain the new elements.
-        assertNull(indexedCollection.get(1));
-        assertNull(indexedCollection.get(2));
-        assertNull(indexedCollection.get(3));
+        assertNull(indexed.get(1));
+        assertNull(indexed.get(2));
+        assertNull(indexed.get(3));
 
-        // After reindexing, the index should be updated to reflect the new elements.
-        indexedCollection.reindex();
+        indexed.reindex();
 
-        assertEquals("1", indexedCollection.get(1));
-        assertEquals("2", indexedCollection.get(2));
-        assertEquals("3", indexedCollection.get(3));
+        assertEquals("1", indexed.get(1));
+        assertEquals("2", indexed.get(2));
+        assertEquals("3", indexed.get(3));
     }
+
 }
