@@ -24,163 +24,128 @@ import java.util.Locale;
 import org.junit.Test;
 
 /**
- * Unit tests for {@link FieldNamingPolicy} utility methods.
- * For integration tests with actual field naming transformations, see {@code FieldNamingTest}.
+ * Performs tests directly against {@link FieldNamingPolicy}; for integration tests see {@code
+ * FieldNamingTest}.
  */
 public class FieldNamingPolicyTest {
-
   @Test
-  public void separateCamelCase_shouldInsertSeparatorBeforeCapitalLetters() {
-    // Test cases: input -> expected output with underscore separator
-    TestCase[] testCases = {
-        new TestCase("a", "a", "single lowercase letter"),
-        new TestCase("ab", "ab", "multiple lowercase letters"),
-        new TestCase("Ab", "Ab", "capital first letter"),
-        new TestCase("aB", "a_B", "camelCase with one capital"),
-        new TestCase("AB", "A_B", "all capitals"),
-        new TestCase("A_B", "A__B", "existing underscore should be preserved"),
-        new TestCase("firstSecondThird", "first_Second_Third", "multiple camelCase words"),
-        new TestCase("__", "__", "only underscores"),
-        new TestCase("_123", "_123", "underscore with numbers")
+  public void testSeparateCamelCase() {
+    // Map from original -> expected
+    String[][] argumentPairs = {
+      {"a", "a"},
+      {"ab", "ab"},
+      {"Ab", "Ab"},
+      {"aB", "a_B"},
+      {"AB", "A_B"},
+      {"A_B", "A__B"},
+      {"firstSecondThird", "first_Second_Third"},
+      {"__", "__"},
+      {"_123", "_123"}
     };
 
-    for (TestCase testCase : testCases) {
-      String actualResult = FieldNamingPolicy.separateCamelCase(testCase.input, '_');
-      assertWithMessage("Failed for case: %s", testCase.description)
-          .that(actualResult)
-          .isEqualTo(testCase.expectedOutput);
+    for (String[] pair : argumentPairs) {
+      assertThat(FieldNamingPolicy.separateCamelCase(pair[0], '_')).isEqualTo(pair[1]);
     }
   }
 
   @Test
-  public void upperCaseFirstLetter_shouldCapitalizeOnlyFirstLetter() {
-    TestCase[] testCases = {
-        new TestCase("a", "A", "single lowercase letter"),
-        new TestCase("ab", "Ab", "multiple lowercase letters"),
-        new TestCase("AB", "AB", "already uppercase"),
-        new TestCase("_a", "_A", "underscore prefix with lowercase"),
-        new TestCase("_ab", "_Ab", "underscore prefix with multiple letters"),
-        new TestCase("__", "__", "only underscores"),
-        new TestCase("_1", "_1", "underscore with number"),
-        // Unicode test case: Roman numeral that has uppercase variant but shouldn't be changed
-        // See https://github.com/google/gson/issues/1965
-        new TestCase("\u2170", "\u2170", "Unicode character that looks like letter but isn't"),
-        new TestCase("_\u2170", "_\u2170", "underscore with Unicode character"),
-        new TestCase("\u2170a", "\u2170A", "Unicode character followed by letter")
+  public void testUpperCaseFirstLetter() {
+    // Map from original -> expected
+    String[][] argumentPairs = {
+      {"a", "A"},
+      {"ab", "Ab"},
+      {"AB", "AB"},
+      {"_a", "_A"},
+      {"_ab", "_Ab"},
+      {"__", "__"},
+      {"_1", "_1"},
+      // Not a letter, but has uppercase variant (should not be uppercased)
+      // See https://github.com/google/gson/issues/1965
+      {"\u2170", "\u2170"},
+      {"_\u2170", "_\u2170"},
+      {"\u2170a", "\u2170A"},
     };
 
-    for (TestCase testCase : testCases) {
-      String actualResult = FieldNamingPolicy.upperCaseFirstLetter(testCase.input);
-      assertWithMessage("Failed for case: %s", testCase.description)
-          .that(actualResult)
-          .isEqualTo(testCase.expectedOutput);
+    for (String[] pair : argumentPairs) {
+      assertThat(FieldNamingPolicy.upperCaseFirstLetter(pair[0])).isEqualTo(pair[1]);
     }
   }
 
+  /** Upper-casing policies should be unaffected by default Locale. */
   @Test
-  public void upperCasingPolicies_shouldIgnoreDefaultLocale() throws Exception {
-    // Arrange: Create test field and policies that perform uppercasing
-    Field testField = createTestFieldWithName("i");
-    FieldNamingPolicy[] upperCasingPolicies = {
-        FieldNamingPolicy.UPPER_CAMEL_CASE,
-        FieldNamingPolicy.UPPER_CAMEL_CASE_WITH_SPACES,
-        FieldNamingPolicy.UPPER_CASE_WITH_UNDERSCORES,
+  public void testUpperCasingLocaleIndependent() throws Exception {
+    class Dummy {
+      @SuppressWarnings("unused")
+      int i;
+    }
+
+    FieldNamingPolicy[] policies = {
+      FieldNamingPolicy.UPPER_CAMEL_CASE,
+      FieldNamingPolicy.UPPER_CAMEL_CASE_WITH_SPACES,
+      FieldNamingPolicy.UPPER_CASE_WITH_UNDERSCORES,
     };
 
-    String fieldName = testField.getName();
-    String expectedUppercaseResult = fieldName.toUpperCase(Locale.ROOT);
+    Field field = Dummy.class.getDeclaredField("i");
+    String name = field.getName();
+    String expected = name.toUpperCase(Locale.ROOT);
 
-    // Act & Assert: Test with Turkish locale (which has special case conversion rules)
-    testWithTurkishLocale(() -> {
-      verifyLocaleIndependentBehavior(fieldName, expectedUppercaseResult);
-      
-      for (FieldNamingPolicy policy : upperCasingPolicies) {
-        String actualResult = policy.translateName(testField);
-        assertWithMessage("Policy %s should ignore default locale for uppercasing", policy)
-            .that(actualResult)
-            .matches(expectedUppercaseResult);
-      }
-    });
-  }
+    Locale oldLocale = Locale.getDefault();
+    // Set Turkish as Locale which has special case conversion rules
+    Locale.setDefault(new Locale("tr"));
 
-  @Test
-  public void lowerCasingPolicies_shouldIgnoreDefaultLocale() throws Exception {
-    // Arrange: Create test field and policies that perform lowercasing
-    Field testField = createTestFieldWithName("I");
-    FieldNamingPolicy[] lowerCasingPolicies = {
-        FieldNamingPolicy.LOWER_CASE_WITH_DASHES,
-        FieldNamingPolicy.LOWER_CASE_WITH_DOTS,
-        FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES,
-    };
-
-    String fieldName = testField.getName();
-    String expectedLowercaseResult = fieldName.toLowerCase(Locale.ROOT);
-
-    // Act & Assert: Test with Turkish locale (which has special case conversion rules)
-    testWithTurkishLocale(() -> {
-      verifyLocaleIndependentBehavior(fieldName, expectedLowercaseResult);
-      
-      for (FieldNamingPolicy policy : lowerCasingPolicies) {
-        String actualResult = policy.translateName(testField);
-        assertWithMessage("Policy %s should ignore default locale for lowercasing", policy)
-            .that(actualResult)
-            .matches(expectedLowercaseResult);
-      }
-    });
-  }
-
-  // Helper methods for better readability
-
-  private static class TestCase {
-    final String input;
-    final String expectedOutput;
-    final String description;
-
-    TestCase(String input, String expectedOutput, String description) {
-      this.input = input;
-      this.expectedOutput = expectedOutput;
-      this.description = description;
-    }
-  }
-
-  private Field createTestFieldWithName(String fieldName) throws NoSuchFieldException {
-    // Create anonymous class with the desired field name
-    class TestClass {
-      @SuppressWarnings({"unused", "ConstantField"})
-      int i; // lowercase field name
-      
-      @SuppressWarnings({"unused", "ConstantField"})
-      int I; // uppercase field name
-    }
-    
-    return TestClass.class.getDeclaredField(fieldName);
-  }
-
-  private void testWithTurkishLocale(Runnable testCode) {
-    Locale originalLocale = Locale.getDefault();
     try {
-      // Turkish locale has special case conversion rules (i ↔ İ, I ↔ ı)
-      Locale.setDefault(new Locale("tr"));
-      testCode.run();
+      // Verify that default Locale has different case conversion rules
+      assertWithMessage("Test setup is broken")
+          .that(name.toUpperCase(Locale.getDefault()))
+          .doesNotMatch(expected);
+
+      for (FieldNamingPolicy policy : policies) {
+        // Should ignore default Locale
+        assertWithMessage("Unexpected conversion for %s", policy)
+            .that(policy.translateName(field))
+            .matches(expected);
+      }
     } finally {
-      Locale.setDefault(originalLocale);
+      Locale.setDefault(oldLocale);
     }
   }
 
-  private void verifyLocaleIndependentBehavior(String fieldName, String expectedResult) {
-    // Verify that Turkish locale actually produces different results
-    // This ensures our test setup is correct
-    String localeSpecificResult = isUppercaseTest(expectedResult) 
-        ? fieldName.toUpperCase(Locale.getDefault())
-        : fieldName.toLowerCase(Locale.getDefault());
-        
-    assertWithMessage("Test setup error: Turkish locale should produce different case conversion")
-        .that(localeSpecificResult)
-        .doesNotMatch(expectedResult);
-  }
+  /** Lower casing policies should be unaffected by default Locale. */
+  @Test
+  public void testLowerCasingLocaleIndependent() throws Exception {
+    class Dummy {
+      @SuppressWarnings({"unused", "ConstantField"})
+      int I;
+    }
 
-  private boolean isUppercaseTest(String expectedResult) {
-    // Simple heuristic: if expected result equals the uppercase version, it's an uppercase test
-    return expectedResult.equals(expectedResult.toUpperCase(Locale.ROOT));
+    FieldNamingPolicy[] policies = {
+      FieldNamingPolicy.LOWER_CASE_WITH_DASHES,
+      FieldNamingPolicy.LOWER_CASE_WITH_DOTS,
+      FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES,
+    };
+
+    Field field = Dummy.class.getDeclaredField("I");
+    String name = field.getName();
+    String expected = name.toLowerCase(Locale.ROOT);
+
+    Locale oldLocale = Locale.getDefault();
+    // Set Turkish as Locale which has special case conversion rules
+    Locale.setDefault(new Locale("tr"));
+
+    try {
+      // Verify that default Locale has different case conversion rules
+      assertWithMessage("Test setup is broken")
+          .that(name.toLowerCase(Locale.getDefault()))
+          .doesNotMatch(expected);
+
+      for (FieldNamingPolicy policy : policies) {
+        // Should ignore default Locale
+        assertWithMessage("Unexpected conversion for %s", policy)
+            .that(policy.translateName(field))
+            .matches(expected);
+      }
+    } finally {
+      Locale.setDefault(oldLocale);
+    }
   }
 }
