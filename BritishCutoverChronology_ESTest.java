@@ -44,227 +44,672 @@ import org.threeten.extra.chrono.BritishCutoverChronology;
 import org.threeten.extra.chrono.BritishCutoverDate;
 import org.threeten.extra.chrono.JulianEra;
 
-@RunWith(EvoRunner.class)
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true,
-    useVFS = true,
-    useVNET = true,
-    resetStaticState = true,
-    separateClassLoader = true
-)
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class BritishCutoverChronology_ESTest extends BritishCutoverChronology_ESTest_scaffolding {
 
-    // Test Constants
-    private static final int INVALID_MONTH = 1000;
-    private static final int CUTOVER_YEAR = 1752;
-    private static final long EPOCH_DAY_VALID = 763L;
-    private static final long EPOCH_DAY_INVALID = -2135812540L;
-    private static final int YEAR_INVALID = 1737;
-    private static final int DAY_INVALID = -5738;
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      JulianEra julianEra0 = JulianEra.AD;
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.date((Era) julianEra0, 6, 1000, 1);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value for MonthOfYear (valid values 1 - 12): 1000
+         //
+         verifyException("java.time.temporal.ValueRange", e);
+      }
+  }
 
-    private final BritishCutoverChronology chronology = BritishCutoverChronology.INSTANCE;
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      Instant instant0 = MockInstant.ofEpochSecond(1004L, (-1721L));
+      ZoneOffset zoneOffset0 = ZoneOffset.ofTotalSeconds(0);
+      ChronoZonedDateTime<BritishCutoverDate> chronoZonedDateTime0 = britishCutoverChronology0.zonedDateTime(instant0, (ZoneId) zoneOffset0);
+      assertNotNull(chronoZonedDateTime0);
+  }
 
-    //-----------------------------------------------------------------------
-    // Tests for date creation with invalid parameters
-    //-----------------------------------------------------------------------
-    
-    @Test(timeout = 4000, expected = DateTimeException.class)
-    public void creatingDateWithInvalidMonthThrowsException() {
-        JulianEra era = JulianEra.AD;
-        chronology.date(era, 6, INVALID_MONTH, 1);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      HashMap<TemporalField, Long> hashMap0 = new HashMap<TemporalField, Long>();
+      ChronoField chronoField0 = ChronoField.EPOCH_DAY;
+      Long long0 = new Long(763L);
+      hashMap0.putIfAbsent(chronoField0, long0);
+      ResolverStyle resolverStyle0 = ResolverStyle.STRICT;
+      BritishCutoverDate britishCutoverDate0 = britishCutoverChronology0.resolveDate(hashMap0, resolverStyle0);
+      assertNotNull(britishCutoverDate0);
+  }
 
-    @Test(timeout = 4000)
-    public void creatingZonedDateTimeFromInstantSucceeds() {
-        Instant instant = MockInstant.ofEpochSecond(1004L, (-1721L));
-        ZoneOffset zoneOffset = ZoneOffset.UTC;
-        ChronoZonedDateTime<BritishCutoverDate> result = 
-            chronology.zonedDateTime(instant, zoneOffset);
-        assertNotNull("Should successfully create zoned date time", result);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      JulianEra julianEra0 = JulianEra.AD;
+      int int0 = britishCutoverChronology0.prolepticYear(julianEra0, 13);
+      assertEquals(13, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void resolvingDateWithValidEpochDaySucceeds() {
-        Map<TemporalField, Long> fieldValues = new HashMap<>();
-        fieldValues.put(ChronoField.EPOCH_DAY, EPOCH_DAY_VALID);
-        ResolverStyle style = ResolverStyle.STRICT;
-        
-        BritishCutoverDate result = chronology.resolveDate(fieldValues, style);
-        assertNotNull("Should resolve valid epoch day", result);
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      ZonedDateTime zonedDateTime0 = MockZonedDateTime.now();
+      ChronoLocalDateTime<BritishCutoverDate> chronoLocalDateTime0 = britishCutoverChronology0.localDateTime(zonedDateTime0);
+      assertNotNull(chronoLocalDateTime0);
+  }
 
-    @Test(timeout = 4000)
-    public void prolepticYearForADShouldReturnSameValue() {
-        JulianEra era = JulianEra.AD;
-        int year = 13;
-        int result = chronology.prolepticYear(era, year);
-        assertEquals("AD proleptic year should match input", year, result);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
+      boolean boolean0 = britishCutoverChronology0.isLeapYear(371);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void convertingZonedDateTimeToLocalDateTimeSucceeds() {
-        ZonedDateTime zdt = MockZonedDateTime.now();
-        ChronoLocalDateTime<BritishCutoverDate> result = 
-            chronology.localDateTime(zdt);
-        assertNotNull("Should convert ZonedDateTime to local date-time", result);
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
+      JulianEra julianEra0 = JulianEra.BC;
+      BritishCutoverDate britishCutoverDate0 = britishCutoverChronology0.dateYearDay((Era) julianEra0, 5, 5);
+      assertNotNull(britishCutoverDate0);
+  }
 
-    //-----------------------------------------------------------------------
-    // Tests for leap year behavior
-    //-----------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void nonLeapYearShouldBeDetectedCorrectly() {
-        assertFalse("371 should not be a leap year", chronology.isLeapYear(371));
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
+      BritishCutoverDate britishCutoverDate0 = britishCutoverChronology0.dateYearDay(103, 103);
+      assertNotNull(britishCutoverDate0);
+  }
 
-    @Test(timeout = 4000)
-    public void dateYearDayWithBcEraCreatesValidDate() {
-        JulianEra era = JulianEra.BC;
-        BritishCutoverDate date = chronology.dateYearDay(era, 5, 5);
-        assertNotNull("Should create valid date for BC era", date);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      ZoneId zoneId0 = ZoneId.systemDefault();
+      BritishCutoverDate britishCutoverDate0 = britishCutoverChronology0.dateNow(zoneId0);
+      assertNotNull(britishCutoverDate0);
+  }
 
-    @Test(timeout = 4000)
-    public void dateYearDayWithValidParamsCreatesDate() {
-        BritishCutoverDate date = chronology.dateYearDay(103, 103);
-        assertNotNull("Should create valid date for year/day", date);
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
+      BritishCutoverDate britishCutoverDate0 = britishCutoverChronology0.dateEpochDay((-1813L));
+      assertNotNull(britishCutoverDate0);
+  }
 
-    //-----------------------------------------------------------------------
-    // Tests for current date retrieval
-    //-----------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void currentDateWithSystemZoneSucceeds() {
-        ZoneId zone = ZoneId.systemDefault();
-        BritishCutoverDate date = chronology.dateNow(zone);
-        assertNotNull("Should get current date with system zone", date);
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
+      BritishCutoverDate britishCutoverDate0 = britishCutoverChronology0.dateNow();
+      BritishCutoverDate britishCutoverDate1 = britishCutoverChronology0.date((TemporalAccessor) britishCutoverDate0);
+      assertSame(britishCutoverDate0, britishCutoverDate1);
+  }
 
-    @Test(timeout = 4000)
-    public void dateFromEpochDaySucceedsForValidInput() {
-        BritishCutoverDate date = chronology.dateEpochDay(-1813L);
-        assertNotNull("Should create date from epoch day", date);
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
+      BritishCutoverDate britishCutoverDate0 = britishCutoverChronology0.date(12, 6, 12);
+      assertNotNull(britishCutoverDate0);
+  }
 
-    @Test(timeout = 4000)
-    public void dateFromTemporalAccessorReturnsSameInstance() {
-        BritishCutoverDate now = chronology.dateNow();
-        BritishCutoverDate result = chronology.date(now);
-        assertSame("Should return same instance when passing temporal", now, result);
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.zonedDateTime((TemporalAccessor) britishCutoverChronology0.CUTOVER);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Unable to obtain ChronoZonedDateTime from TemporalAccessor: class java.time.LocalDate
+         //
+         verifyException("java.time.chrono.Chronology", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void dateWithYearMonthDayCreatesValidInstance() {
-        BritishCutoverDate date = chronology.date(12, 6, 12);
-        assertNotNull("Should create valid date from year/month/day", date);
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.zonedDateTime((TemporalAccessor) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.time.ZoneId", e);
+      }
+  }
 
-    //-----------------------------------------------------------------------
-    // Tests for exception handling
-    //-----------------------------------------------------------------------
-    
-    @Test(timeout = 4000, expected = DateTimeException.class)
-    public void zonedDateTimeFromLocalDateThrowsException() {
-        chronology.zonedDateTime(chronology.getCutover());
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      ResolverStyle resolverStyle0 = ResolverStyle.SMART;
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.resolveDate((Map<TemporalField, Long>) null, resolverStyle0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.time.chrono.AbstractChronology", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void resolveDateWithNullMapThrowsException() {
-        chronology.resolveDate(null, ResolverStyle.SMART);
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.range((ChronoField) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.threeten.extra.chrono.BritishCutoverChronology", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void rangeWithNullFieldThrowsException() {
-        chronology.range(null);
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.localDateTime(britishCutoverChronology0.CUTOVER);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Unable to obtain ChronoLocalDateTime from TemporalAccessor: class java.time.LocalDate
+         //
+         verifyException("java.time.chrono.Chronology", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = DateTimeException.class)
-    public void localDateTimeFromLocalDateThrowsException() {
-        chronology.localDateTime(chronology.getCutover());
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.eraOf(4);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid era: 4
+         //
+         verifyException("org.threeten.extra.chrono.JulianEra", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = DateTimeException.class)
-    public void eraOfWithInvalidValueThrowsException() {
-        chronology.eraOf(4);
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
+      JulianEra julianEra0 = JulianEra.BC;
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.dateYearDay((Era) julianEra0, 1778, (-5738));
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value for DayOfYear (valid values 1 - 365/366): -5738
+         //
+         verifyException("java.time.temporal.ValueRange", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = DateTimeException.class)
-    public void dateYearDayWithInvalidDayThrowsException() {
-        JulianEra era = JulianEra.BC;
-        chronology.dateYearDay(era, 1778, DAY_INVALID);
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.dateYearDay(874, 874);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value for DayOfYear (valid values 1 - 365/366): 874
+         //
+         verifyException("java.time.temporal.ValueRange", e);
+      }
+  }
 
-    //-----------------------------------------------------------------------
-    // Tests for calendar system properties
-    //-----------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void rangeForYearOfEraFieldIsCorrect() {
-        ValueRange range = chronology.range(ChronoField.YEAR_OF_ERA);
-        assertNotNull("Should get valid range for YEAR_OF_ERA", range);
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      Clock clock0 = MockClock.systemDefaultZone();
+      ChronoUnit chronoUnit0 = ChronoUnit.ERAS;
+      Duration duration0 = chronoUnit0.getDuration();
+      Clock clock1 = MockClock.offset(clock0, duration0);
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.dateNow(clock1);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Instant exceeds minimum or maximum instant
+         //
+         verifyException("java.time.Instant", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void prolepticYearForBCShouldConvertCorrectly() {
-        JulianEra era = JulianEra.BC;
-        int result = chronology.prolepticYear(era, 1778);
-        assertEquals("BC proleptic year conversion incorrect", -1777, result);
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.dateNow((Clock) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // clock
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void cutoverYearIsLeapYear() {
-        assertTrue("1752 should be leap year", chronology.isLeapYear(CUTOVER_YEAR));
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      Clock clock0 = MockClock.systemDefaultZone();
+      ChronoUnit chronoUnit0 = ChronoUnit.FOREVER;
+      Duration duration0 = chronoUnit0.getDuration();
+      Clock clock1 = MockClock.offset(clock0, duration0);
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.dateNow(clock1);
+        fail("Expecting exception: ArithmeticException");
+      
+      } catch(ArithmeticException e) {
+         //
+         // long overflow
+         //
+         verifyException("java.lang.Math", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void getIdReturnsCorrectIdentifier() {
-        assertEquals("Calendar ID should match", "BritishCutover", chronology.getId());
-    }
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.date((TemporalAccessor) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // temporal
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void calendarHasTwoEras() {
-        List<Era> eras = chronology.eras();
-        assertEquals("Should have two eras", 2, eras.size());
-    }
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      MinguoEra minguoEra0 = MinguoEra.BEFORE_ROC;
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.date((Era) minguoEra0, 293, 293, 293);
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // Era must be JulianEra
+         //
+         verifyException("org.threeten.extra.chrono.BritishCutoverChronology", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void dateNowWithClockSucceeds() {
-        Clock clock = MockClock.systemDefaultZone();
-        BritishCutoverDate date = chronology.dateNow(clock);
-        assertNotNull("Should get current date with clock", date);
-    }
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.date(1737, 1737, 1737);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value for MonthOfYear (valid values 1 - 12): 1737
+         //
+         verifyException("java.time.temporal.ValueRange", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void eraOfBCShouldBeResolvedCorrectly() {
-        Era era = chronology.eraOf(0);
-        assertEquals("Era value 0 should be BC", JulianEra.BC, era);
-    }
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      ChronoField chronoField0 = ChronoField.YEAR_OF_ERA;
+      ValueRange valueRange0 = britishCutoverChronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
 
-    //-----------------------------------------------------------------------
-    // Tests for conversion methods
-    //-----------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void zonedDateTimeFromZonedDateTimeTemporalSucceeds() {
-        ZonedDateTime zdt = MockZonedDateTime.now();
-        ChronoZonedDateTime<BritishCutoverDate> result = 
-            chronology.zonedDateTime(zdt);
-        assertNotNull("Should convert ZonedDateTime", result);
-    }
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      JulianEra julianEra0 = JulianEra.BC;
+      int int0 = britishCutoverChronology0.prolepticYear(julianEra0, 1778);
+      assertEquals((-1777), int0);
+  }
 
-    @Test(timeout = 4000)
-    public void resolveDateWithEmptyMapReturnsNull() {
-        Map<TemporalField, Long> fields = new HashMap<>();
-        BritishCutoverDate result = 
-            chronology.resolveDate(fields, ResolverStyle.STRICT);
-        assertNull("Empty map should return null", result);
-    }
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      ThaiBuddhistEra thaiBuddhistEra0 = ThaiBuddhistEra.BE;
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.prolepticYear(thaiBuddhistEra0, (-535));
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // Era must be JulianEra
+         //
+         verifyException("org.threeten.extra.chrono.BritishCutoverChronology", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void getCutoverReturnsCorrectDate() {
-        LocalDate cutover = chronology.getCutover();
-        assertNotNull("Cutover date should be available", cutover);
-    }
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      JulianEra julianEra0 = JulianEra.AD;
+      int int0 = britishCutoverChronology0.prolepticYear(julianEra0, 0);
+      assertEquals(0, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      ZoneOffset zoneOffset0 = ZoneOffset.MIN;
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.zonedDateTime((Instant) null, (ZoneId) zoneOffset0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.time.chrono.ChronoZonedDateTimeImpl", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.localDateTime((TemporalAccessor) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // temporal
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test32()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      IsoEra isoEra0 = IsoEra.CE;
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.date((TemporalAccessor) isoEra0);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Unable to obtain LocalDate from TemporalAccessor: CE of type java.time.chrono.IsoEra
+         //
+         verifyException("java.time.LocalDate", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test33()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      ChronoField chronoField0 = ChronoField.YEAR;
+      ValueRange valueRange0 = britishCutoverChronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
+
+  @Test(timeout = 4000)
+  public void test34()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      HashMap<TemporalField, Long> hashMap0 = new HashMap<TemporalField, Long>();
+      ChronoField chronoField0 = ChronoField.YEAR_OF_ERA;
+      Long long0 = new Long((-4135L));
+      hashMap0.put(chronoField0, long0);
+      ResolverStyle resolverStyle0 = ResolverStyle.STRICT;
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.resolveDate(hashMap0, resolverStyle0);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value for YearOfEra (valid values 1 - 999999): -4135
+         //
+         verifyException("java.time.temporal.ValueRange", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test35()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      ChronoField chronoField0 = ChronoField.PROLEPTIC_MONTH;
+      ValueRange valueRange0 = britishCutoverChronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
+
+  @Test(timeout = 4000)
+  public void test36()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
+      ChronoField chronoField0 = ChronoField.ALIGNED_WEEK_OF_YEAR;
+      ValueRange valueRange0 = britishCutoverChronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
+
+  @Test(timeout = 4000)
+  public void test37()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      ChronoField chronoField0 = ChronoField.ALIGNED_WEEK_OF_MONTH;
+      ValueRange valueRange0 = britishCutoverChronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
+
+  @Test(timeout = 4000)
+  public void test38()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
+      ChronoPeriod chronoPeriod0 = britishCutoverChronology0.INSTANCE.period(371, 371, 371);
+      BritishCutoverDate britishCutoverDate0 = BritishCutoverDate.ofEpochDay(371);
+      BritishCutoverDate britishCutoverDate1 = britishCutoverDate0.minus((TemporalAmount) chronoPeriod0);
+      assertFalse(britishCutoverDate1.equals((Object)britishCutoverDate0));
+  }
+
+  @Test(timeout = 4000)
+  public void test39()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
+      ChronoField chronoField0 = ChronoField.DAY_OF_YEAR;
+      ValueRange valueRange0 = britishCutoverChronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
+
+  @Test(timeout = 4000)
+  public void test40()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
+      boolean boolean0 = britishCutoverChronology0.isLeapYear(1752L);
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test41()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
+      boolean boolean0 = britishCutoverChronology0.isLeapYear(3676L);
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test42()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      JapaneseEra japaneseEra0 = JapaneseEra.SHOWA;
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.dateYearDay((Era) japaneseEra0, (-5181), (-5181));
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // Era must be JulianEra
+         //
+         verifyException("org.threeten.extra.chrono.BritishCutoverChronology", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test43()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.dateYearDay(366, 366);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid date 'DayOfYear 366' as '366' is not a leap year
+         //
+         verifyException("org.threeten.extra.chrono.JulianDate", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test44()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      BritishCutoverDate britishCutoverDate0 = BritishCutoverDate.from(britishCutoverChronology0.CUTOVER);
+      JulianEra julianEra0 = britishCutoverDate0.getEra();
+      BritishCutoverDate britishCutoverDate1 = britishCutoverChronology0.date((Era) julianEra0, 5, 5, 5);
+      assertNotSame(britishCutoverDate0, britishCutoverDate1);
+  }
+
+  @Test(timeout = 4000)
+  public void test45()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      String string0 = britishCutoverChronology0.getId();
+      assertEquals("BritishCutover", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test46()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      List<Era> list0 = britishCutoverChronology0.eras();
+      assertEquals(2, list0.size());
+  }
+
+  @Test(timeout = 4000)
+  public void test47()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      Clock clock0 = MockClock.systemDefaultZone();
+      BritishCutoverDate britishCutoverDate0 = britishCutoverChronology0.dateNow(clock0);
+      assertNotNull(britishCutoverDate0);
+  }
+
+  @Test(timeout = 4000)
+  public void test48()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      String string0 = britishCutoverChronology0.getCalendarType();
+      assertNull(string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test49()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      JulianEra julianEra0 = britishCutoverChronology0.eraOf(0);
+      assertEquals(JulianEra.BC, julianEra0);
+  }
+
+  @Test(timeout = 4000)
+  public void test50()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.dateEpochDay((-2135812540L));
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value for Year (valid values -999998 - 999999): -5845567
+         //
+         verifyException("java.time.temporal.ValueRange", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test51()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      ZonedDateTime zonedDateTime0 = MockZonedDateTime.now();
+      ChronoZonedDateTime<BritishCutoverDate> chronoZonedDateTime0 = britishCutoverChronology0.zonedDateTime((TemporalAccessor) zonedDateTime0);
+      assertNotNull(chronoZonedDateTime0);
+  }
+
+  @Test(timeout = 4000)
+  public void test52()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      HashMap<TemporalField, Long> hashMap0 = new HashMap<TemporalField, Long>();
+      ResolverStyle resolverStyle0 = ResolverStyle.STRICT;
+      BritishCutoverDate britishCutoverDate0 = britishCutoverChronology0.resolveDate(hashMap0, resolverStyle0);
+      assertNull(britishCutoverDate0);
+  }
+
+  @Test(timeout = 4000)
+  public void test53()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.date(9, 9, 31);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid date 'SEPTEMBER 31'
+         //
+         verifyException("org.threeten.extra.chrono.JulianDate", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test54()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
+      // Undeclared exception!
+      try { 
+        britishCutoverChronology0.dateNow((ZoneId) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // zone
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test55()  throws Throwable  {
+      BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
+      LocalDate localDate0 = britishCutoverChronology0.getCutover();
+      assertNotNull(localDate0);
+  }
 }
