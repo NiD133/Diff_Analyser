@@ -25,471 +25,409 @@ import org.locationtech.spatial4j.shape.impl.RectangleImpl;
 public class BBoxCalculator_ESTest extends BBoxCalculator_ESTest_scaffolding {
 
   @Test(timeout = 4000)
-  public void testExpandXRangeWithNegativeInfinity_DoesNotAffectY() throws Throwable {
-      HashMap<String, String> properties = new HashMap<>();
-      ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-      SpatialContext spatialContext = SpatialContextFactory.makeSpatialContext(properties, classLoader);
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
+  public void test00()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.expandXRange(Double.NEGATIVE_INFINITY, 0.0);
+      double double0 = bBoxCalculator0.getMaxX();
+      assertEquals(0.0, double0, 0.01);
       
-      // Expand X range with negative infinity and zero
-      calculator.expandXRange(Double.NEGATIVE_INFINITY, 0.0);
-      double maxX = calculator.getMaxX();
-      assertEquals(0.0, maxX, 0.01);
-      
-      // Expand X range again with negative infinity and positive value
-      calculator.expandXRange(Double.NEGATIVE_INFINITY, 4108.846834);
-      
-      // Verify Y remains in initial state (minY=+Inf, maxY=-Inf)
-      assertEquals(Double.NEGATIVE_INFINITY, calculator.getMaxY(), 0.01);
-      assertEquals(Double.POSITIVE_INFINITY, calculator.getMinY(), 0.01);
+      bBoxCalculator0.expandXRange(Double.NEGATIVE_INFINITY, 4108.846834);
+      assertEquals(Double.NEGATIVE_INFINITY, bBoxCalculator0.getMaxY(), 0.01);
+      assertEquals(Double.POSITIVE_INFINITY, bBoxCalculator0.getMinY(), 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testExpandRange_ThenGetMaxX() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      // First expand X range
-      calculator.expandXRange(1107.2515, Double.POSITIVE_INFINITY);
-      
-      // Then expand with specific values
-      calculator.expandRange(-59.73795920817872, 6.283185307179586, 1.0, -180.0);
-      
-      // Verify calculated maxX
-      double maxX = calculator.getMaxX();
-      assertEquals(6.283185307179586, maxX, 0.01);
-      assertEquals(1.0, calculator.getMinY(), 0.01);
+  public void test01()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.expandXRange(1107.2515, Double.POSITIVE_INFINITY);
+      bBoxCalculator0.expandRange((-59.73795920817872), 6.283185307179586, 1.0, (-180.0));
+      double double0 = bBoxCalculator0.getMaxX();
+      assertEquals(1.0, bBoxCalculator0.getMinY(), 0.01);
+      assertEquals(6.283185307179586, double0, 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testExpandRange_ThenGetMinY() throws Throwable {
-      SpatialContextFactory factory = new SpatialContextFactory();
-      SpatialContext spatialContext = factory.newSpatialContext();
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      // Expand range with specific values
-      calculator.expandRange(2645.56006566, -1.0, 0.0, -388.0);
-      
-      // Verify minY and maxY
-      double minY = calculator.getMinY();
-      assertEquals(0.0, minY, 0.01);
-      assertEquals(-388.0, calculator.getMaxY(), 0.01);
+  public void test02()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.expandRange(2645.56006566, (-1.0), 0.0, (-388.0));
+      double double0 = bBoxCalculator0.getMinY();
+      assertEquals((-388.0), bBoxCalculator0.getMaxY(), 0.01);
+      assertEquals(0.0, double0, 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testExpandRange_ThenGetMinYWithNegativeValue() throws Throwable {
-      SpatialContextFactory factory = new SpatialContextFactory();
-      SpatialContext spatialContext = factory.newSpatialContext();
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      // Expand range with negative Y values
-      calculator.expandRange(1.0, 1.0, -388.0, 0.0);
-      
-      // Verify minY is negative
-      double minY = calculator.getMinY();
-      assertEquals(-388.0, minY, 0.01);
-  }
-
-  // Additional tests follow the same pattern of:
-  // 1. Descriptive test names
-  // 2. Clear setup/expansion steps
-  // 3. Grouped assertions with explanations
-  // 4. Meaningful variable names
-  
-  @Test(timeout = 4000)
-  public void testExpandRange_ThenGetMinX() throws Throwable {
-      SpatialContextFactory factory = new SpatialContextFactory();
-      SpatialContext spatialContext = factory.newSpatialContext();
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      calculator.expandRange(0.0, 1.0, 1.0, -388.0);
-      
-      double minX = calculator.getMinX();
-      assertEquals(0.0, minX, 0.01);
-      assertEquals(-388.0, calculator.getMaxY(), 0.01);
+  public void test03()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.expandRange(1.0, 1.0, (-388.0), 0.0);
+      double double0 = bBoxCalculator0.getMinY();
+      assertEquals((-388.0), double0, 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testExpandRange_ThenGetMinXWithNegativeValue() throws Throwable {
-      SpatialContextFactory factory = new SpatialContextFactory();
-      SpatialContext spatialContext = factory.newSpatialContext();
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      calculator.expandRange(-388.0, 1.0, -388.0, -2148.3);
-      
-      double minX = calculator.getMinX();
-      assertEquals(-388.0, minX, 0.01);
-      assertEquals(-388.0, calculator.getMinY(), 0.01);
+  public void test04()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.expandRange(0.0, 1.0, 1.0, (-388.0));
+      double double0 = bBoxCalculator0.getMinX();
+      assertEquals((-388.0), bBoxCalculator0.getMaxY(), 0.01);
+      assertEquals(0.0, double0, 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testExpandRange_ThenGetMaxY() throws Throwable {
-      SpatialContextFactory factory = new SpatialContextFactory();
-      SpatialContext spatialContext = factory.newSpatialContext();
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      calculator.expandRange(1.0, 1.0, -388.0, 0.0);
-      
-      double maxY = calculator.getMaxY();
-      assertEquals(0.0, maxY, 0.01);
-      assertEquals(-388.0, calculator.getMinY(), 0.01);
+  public void test05()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.expandRange((-388.0), 1.0, (-388.0), (-2148.3));
+      double double0 = bBoxCalculator0.getMinX();
+      assertEquals((-388.0), bBoxCalculator0.getMinY(), 0.01);
+      assertEquals((-388.0), double0, 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testExpandRange_ThenGetMaxYWithPositiveValue() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      calculator.expandRange(-104.6238989593, 2621.8399556940103, 2621.8399556940103, 1.0);
-      
-      double maxY = calculator.getMaxY();
-      assertEquals(1.0, maxY, 0.01);
-      assertEquals(2621.8399556940103, calculator.getMinY(), 0.01);
+  public void test06()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.expandRange(1.0, 1.0, (-388.0), 0.0);
+      double double0 = bBoxCalculator0.getMaxY();
+      assertEquals((-388.0), bBoxCalculator0.getMinY(), 0.01);
+      assertEquals(0.0, double0, 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testExpandRangeAndXRange_ThenGetBoundary() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      calculator.expandRange(1.0, 488.83, -90.0, -1.0);
-      calculator.expandXRange(-4.508820214381481, -90.0);
-      
-      // Trigger boundary calculation
-      calculator.getBoundary();
-      
-      assertEquals(-90.0, calculator.getMinY(), 0.01);
+  public void test07()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.expandRange((-104.6238989593), 2621.8399556940103, 2621.8399556940103, 1.0);
+      double double0 = bBoxCalculator0.getMaxY();
+      assertEquals(2621.8399556940103, bBoxCalculator0.getMinY(), 0.01);
+      assertEquals(1.0, double0, 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testExpandRangeAndXRange_ThenGetBoundaryWithNegativeMinY() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      calculator.expandRange(1.0, 488.83, -90.0, -1.0);
-      calculator.expandXRange(1.0, -90.0);
-      
-      // Trigger boundary calculation
-      calculator.getBoundary();
-      
-      assertEquals(-90.0, calculator.getMinY(), 0.01);
+  public void test08()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.expandRange(1.0, 488.83, (-90.0), (-1.0));
+      bBoxCalculator0.expandXRange((-4.508820214381481), (-90.0));
+      bBoxCalculator0.getBoundary();
+      assertEquals((-90.0), bBoxCalculator0.getMinY(), 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testExpandRangeWithNaN_ThenGetBoundary() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      assertEquals("Initial minY should be +Inf", Double.POSITIVE_INFINITY, calculator.getMinY(), 0.01);
-      
-      calculator.expandRange(Double.NaN, 0.0, 0.0, 0.0);
-      
-      Rectangle boundary = calculator.getBoundary();
-      assertEquals(0.0, boundary.getMaxX(), 0.01);
+  public void test09()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.expandRange(1.0, 488.83, (-90.0), (-1.0));
+      bBoxCalculator0.expandXRange(1.0, (-90.0));
+      bBoxCalculator0.getBoundary();
+      assertEquals((-90.0), bBoxCalculator0.getMinY(), 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testGetBoundaryWithNullContext_ThrowsNPE() throws Throwable {
-      BBoxCalculator calculator = new BBoxCalculator(null);
-      try {
-          calculator.getBoundary();
-          fail("Expected NullPointerException");
-      } catch (NullPointerException e) {
-          // Expected
+  public void test10()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      assertEquals(Double.POSITIVE_INFINITY, bBoxCalculator0.getMinY(), 0.01);
+      
+      bBoxCalculator0.expandRange(Double.NaN, 0.0, 0.0, 0.0);
+      Rectangle rectangle0 = bBoxCalculator0.getBoundary();
+      assertEquals(0.0, rectangle0.getMaxX(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator((SpatialContext) null);
+      // Undeclared exception!
+      try { 
+        bBoxCalculator0.getBoundary();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.locationtech.spatial4j.shape.impl.BBoxCalculator", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void testExpandXRangeWithNullContext_ThrowsNPE() throws Throwable {
-      BBoxCalculator calculator = new BBoxCalculator(null);
-      try {
-          calculator.expandXRange(-751.777671, -751.777671);
-          fail("Expected NullPointerException");
-      } catch (NullPointerException e) {
-          // Expected
+  public void test12()  throws Throwable  {
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator((SpatialContext) null);
+      // Undeclared exception!
+      try { 
+        bBoxCalculator0.expandXRange((-751.777671), (-751.777671));
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.locationtech.spatial4j.shape.impl.BBoxCalculator", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void testExpandRangeWithNullRectangle_ThrowsNPE() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      try {
-          calculator.expandRange(null);
-          fail("Expected NullPointerException");
-      } catch (NullPointerException e) {
-          // Expected
+  public void test13()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      // Undeclared exception!
+      try { 
+        bBoxCalculator0.expandRange((Rectangle) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.locationtech.spatial4j.shape.impl.BBoxCalculator", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void testExpandRangeWithNullContext_ThrowsNPE() throws Throwable {
-      BBoxCalculator calculator = new BBoxCalculator(null);
-      try {
-          calculator.expandRange(-610.206, -610.206, -610.206, -610.206);
-          fail("Expected NullPointerException");
-      } catch (NullPointerException e) {
-          // Expected
+  public void test14()  throws Throwable  {
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator((SpatialContext) null);
+      // Undeclared exception!
+      try { 
+        bBoxCalculator0.expandRange((-610.206), (-610.206), (-610.206), (-610.206));
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.locationtech.spatial4j.shape.impl.BBoxCalculator", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void testDoesXWorldWrapWithNullContext_ThrowsNPE() throws Throwable {
-      BBoxCalculator calculator = new BBoxCalculator(null);
-      try {
-          calculator.doesXWorldWrap();
-          fail("Expected NullPointerException");
-      } catch (NullPointerException e) {
-          // Expected
+  public void test15()  throws Throwable  {
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator((SpatialContext) null);
+      // Undeclared exception!
+      try { 
+        bBoxCalculator0.doesXWorldWrap();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.locationtech.spatial4j.shape.impl.BBoxCalculator", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void testGetMaxX_InitialState() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      double maxX = calculator.getMaxX();
-      assertEquals(Double.NEGATIVE_INFINITY, maxX, 0.01);
-      assertEquals(Double.NEGATIVE_INFINITY, calculator.getMaxY(), 0.01);
-      assertEquals(Double.POSITIVE_INFINITY, calculator.getMinY(), 0.01);
+  public void test16()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      double double0 = bBoxCalculator0.getMaxX();
+      assertEquals(Double.NEGATIVE_INFINITY, double0, 0.01);
+      assertEquals(Double.NEGATIVE_INFINITY, bBoxCalculator0.getMaxY(), 0.01);
+      assertEquals(Double.POSITIVE_INFINITY, bBoxCalculator0.getMinY(), 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testGetMinX_InitialState() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      double minX = calculator.getMinX();
-      assertEquals(Double.POSITIVE_INFINITY, minX, 0.01);
-      assertEquals(Double.NEGATIVE_INFINITY, calculator.getMaxY(), 0.01);
-      assertEquals(Double.POSITIVE_INFINITY, calculator.getMinY(), 0.01);
+  public void test17()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      double double0 = bBoxCalculator0.getMinX();
+      assertEquals(Double.POSITIVE_INFINITY, double0, 0.01);
+      assertEquals(Double.NEGATIVE_INFINITY, bBoxCalculator0.getMaxY(), 0.01);
+      assertEquals(Double.POSITIVE_INFINITY, bBoxCalculator0.getMinY(), 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testDoesXWorldWrap_AfterExpandRange_ReturnsFalse() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      calculator.expandRange(-180.0, -431.7, -180.0, -431.7);
-      calculator.getMaxX(); // Not used in assert, but preserves original test behavior
-      
-      boolean wraps = calculator.doesXWorldWrap();
-      assertFalse("Should not wrap after normal expand", wraps);
-      assertEquals(-180.0, calculator.getMinY(), 0.01);
+  public void test18()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.expandRange((-180.0), (-431.7), (-180.0), (-431.7));
+      bBoxCalculator0.getMaxX();
+      boolean boolean0 = bBoxCalculator0.doesXWorldWrap();
+      assertEquals((-180.0), bBoxCalculator0.getMinY(), 0.01);
+      assertFalse(boolean0);
   }
 
   @Test(timeout = 4000)
-  public void testDoesXWorldWrap_AfterExpandWorldBounds_ReturnsTrue() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      Rectangle worldBounds = spatialContext.getWorldBounds();
-      calculator.expandRange(worldBounds);
-      calculator.getMaxX(); // Not used in assert, but preserves original test behavior
-      
-      boolean wraps = calculator.doesXWorldWrap();
-      assertTrue("Should wrap after expanding world bounds", wraps);
-      assertEquals(-90.0, calculator.getMinY(), 0.01);
+  public void test19()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      Rectangle rectangle0 = spatialContext0.getWorldBounds();
+      bBoxCalculator0.expandRange(rectangle0);
+      bBoxCalculator0.getMaxX();
+      boolean boolean0 = bBoxCalculator0.doesXWorldWrap();
+      assertEquals((-90.0), bBoxCalculator0.getMinY(), 0.01);
+      assertTrue(boolean0);
   }
 
   @Test(timeout = 4000)
-  public void testDoesXWorldWrap_InitialState() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      calculator.doesXWorldWrap(); // No exception expected
-      
-      // Verify initial Y state remains
-      assertEquals(Double.POSITIVE_INFINITY, calculator.getMinY(), 0.01);
-      assertEquals(Double.NEGATIVE_INFINITY, calculator.getMaxY(), 0.01);
+  public void test20()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.doesXWorldWrap();
+      assertEquals(Double.POSITIVE_INFINITY, bBoxCalculator0.getMinY(), 0.01);
+      assertEquals(Double.NEGATIVE_INFINITY, bBoxCalculator0.getMaxY(), 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testExpandXRange_Twice_ThenCheckYUnchanged() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      calculator.expandXRange(-10.370441159547157, -10.370441159547157);
-      calculator.expandXRange(685.7212616972, -10.370441159547157);
-      
-      // Verify Y remains in initial state
-      assertEquals(Double.POSITIVE_INFINITY, calculator.getMinY(), 0.01);
-      assertEquals(Double.NEGATIVE_INFINITY, calculator.getMaxY(), 0.01);
+  public void test21()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.expandXRange((-10.370441159547157), (-10.370441159547157));
+      bBoxCalculator0.expandXRange(685.7212616972, (-10.370441159547157));
+      assertEquals(Double.POSITIVE_INFINITY, bBoxCalculator0.getMinY(), 0.01);
+      assertEquals(Double.NEGATIVE_INFINITY, bBoxCalculator0.getMaxY(), 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testGetMaxY_InitialState() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      double maxY = calculator.getMaxY();
-      assertEquals(Double.NEGATIVE_INFINITY, maxY, 0.01);
-      assertEquals(Double.POSITIVE_INFINITY, calculator.getMinY(), 0.01);
+  public void test22()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      double double0 = bBoxCalculator0.getMaxY();
+      assertEquals(Double.POSITIVE_INFINITY, bBoxCalculator0.getMinY(), 0.01);
+      assertEquals(Double.NEGATIVE_INFINITY, double0, 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testGetMinY_InitialState() throws Throwable {
-      HashMap<String, String> properties = new HashMap<>();
-      ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-      SpatialContext spatialContext = SpatialContextFactory.makeSpatialContext(properties, classLoader);
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      double minY = calculator.getMinY();
-      assertEquals(Double.POSITIVE_INFINITY, minY, 0.01);
-      assertEquals(Double.NEGATIVE_INFINITY, calculator.getMaxY(), 0.01);
-  }
-
-  // Additional edge case tests for infinity/NaN handling...
-
-  @Test(timeout = 4000)
-  public void testExpandXRange_WithInfinity() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      calculator.expandRange(-180.0, 3844.24, 2361.0, 939.22948782);
-      calculator.getMaxX(); // Original test had this call
-      calculator.expandXRange(3844.24, Double.POSITIVE_INFINITY);
-      
-      assertEquals(939.22948782, calculator.getMaxY(), 0.01);
+  public void test23()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      double double0 = bBoxCalculator0.getMinY();
+      assertEquals(Double.NEGATIVE_INFINITY, bBoxCalculator0.getMaxY(), 0.01);
+      assertEquals(Double.POSITIVE_INFINITY, double0, 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testExpandXRange_WithPositiveInfinity_ThenGetBoundary_ThrowsException() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
+  public void test24()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.expandRange((-180.0), 3844.24, 2361.0, 939.22948782);
+      bBoxCalculator0.getMaxX();
+      bBoxCalculator0.expandXRange(3844.24, Double.POSITIVE_INFINITY);
+      assertEquals(939.22948782, bBoxCalculator0.getMaxY(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.expandXRange(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+      // Undeclared exception!
+      try { 
+        bBoxCalculator0.getBoundary();
+        fail("Expecting exception: RuntimeException");
       
-      calculator.expandXRange(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-      
-      try {
-          calculator.getBoundary();
-          fail("Expected RuntimeException due to invalid Y range");
-      } catch (RuntimeException e) {
-          assertEquals("maxY must be >= minY: Infinity to -Infinity", e.getMessage());
+      } catch(RuntimeException e) {
+         //
+         // maxY must be >= minY: Infinity to -Infinity
+         //
+         verifyException("org.locationtech.spatial4j.shape.impl.ShapeFactoryImpl", e);
       }
   }
 
-  // Remaining tests follow same pattern...
-
   @Test(timeout = 4000)
-  public void testExpandXRange_WithNegativeInfinity_ThenExpandRange() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      calculator.expandXRange(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
-      calculator.expandRange(-5743.7453681, -5743.7453681, Double.NEGATIVE_INFINITY, -5743.7453681);
-      calculator.expandXRange(-5743.7453681, Double.NEGATIVE_INFINITY);
-      
-      assertEquals(Double.NEGATIVE_INFINITY, calculator.getMinY(), 0.01);
+  public void test26()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.expandXRange(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
+      bBoxCalculator0.expandRange((-5743.7453681), (-5743.7453681), Double.NEGATIVE_INFINITY, (-5743.7453681));
+      bBoxCalculator0.expandXRange((-5743.7453681), Double.NEGATIVE_INFINITY);
+      assertEquals(Double.NEGATIVE_INFINITY, bBoxCalculator0.getMinY(), 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testExpandXRange_WithPositiveInfinity_ThenExpandRange() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      calculator.expandXRange(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-      calculator.expandRange(-5743.7453681, -5743.7453681, Double.POSITIVE_INFINITY, -5743.7453681);
-      calculator.expandXRange(-5743.7453681, Double.POSITIVE_INFINITY);
-      
-      assertEquals(-5743.7453681, calculator.getMaxY(), 0.01);
+  public void test27()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.expandXRange(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+      bBoxCalculator0.expandRange((-5743.7453681), (-5743.7453681), Double.POSITIVE_INFINITY, (-5743.7453681));
+      bBoxCalculator0.expandXRange((-5743.7453681), Double.POSITIVE_INFINITY);
+      assertEquals((-5743.7453681), bBoxCalculator0.getMaxY(), 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testExpandXRange_WithNaN_Twice() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      calculator.expandXRange(1198.228879, Double.NaN);
-      calculator.expandXRange(1198.228879, Double.NaN);
-      
-      // Verify Y state remains initial
-      assertEquals(Double.POSITIVE_INFINITY, calculator.getMinY(), 0.01);
-      assertEquals(Double.NEGATIVE_INFINITY, calculator.getMaxY(), 0.01);
+  public void test28()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.expandXRange(1198.228879, Double.NaN);
+      bBoxCalculator0.expandXRange(1198.228879, Double.NaN);
+      assertEquals(Double.POSITIVE_INFINITY, bBoxCalculator0.getMinY(), 0.01);
+      assertEquals(Double.NEGATIVE_INFINITY, bBoxCalculator0.getMaxY(), 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testExpandRange_WithPointOnBearing_ThenExpandXRange() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      GeodesicSphereDistCalc.LawOfCosines bearingCalculator = new GeodesicSphereDistCalc.LawOfCosines();
-      PointImpl startPoint = new PointImpl(0.621371192, 0.621371192, spatialContext);
-      Point endPoint = bearingCalculator.pointOnBearing(startPoint, 0.621371192, 0.621371192, spatialContext, startPoint);
-      RectangleImpl rectangle = new RectangleImpl(endPoint, endPoint, spatialContext);
-      
-      calculator.expandRange(rectangle);
-      calculator.expandXRange(0.621371192, 0.621371192);
-      
-      Rectangle boundary = calculator.getBoundary();
-      assertNotNull(boundary);
-      assertEquals(1.242705837824413, calculator.getMinY(), 0.01);
-  }
-
-  // Additional tests for infinity handling...
-
-  @Test(timeout = 4000)
-  public void testExpandXRange_WithZeroAndPositiveInfinity_ThenWithPositiveInfinity() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      calculator.expandXRange(0.0, Double.POSITIVE_INFINITY);
-      calculator.expandXRange(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-      
-      // Verify Y state remains initial
-      assertEquals(Double.NEGATIVE_INFINITY, calculator.getMaxY(), 0.01);
-      assertEquals(Double.POSITIVE_INFINITY, calculator.getMinY(), 0.01);
+  public void test29()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      GeodesicSphereDistCalc.LawOfCosines geodesicSphereDistCalc_LawOfCosines0 = new GeodesicSphereDistCalc.LawOfCosines();
+      PointImpl pointImpl0 = new PointImpl(0.621371192, 0.621371192, spatialContext0);
+      Point point0 = geodesicSphereDistCalc_LawOfCosines0.pointOnBearing(pointImpl0, 0.621371192, 0.621371192, spatialContext0, pointImpl0);
+      RectangleImpl rectangleImpl0 = new RectangleImpl(point0, point0, spatialContext0);
+      bBoxCalculator0.expandRange((Rectangle) rectangleImpl0);
+      bBoxCalculator0.expandXRange(0.621371192, 0.621371192);
+      bBoxCalculator0.getBoundary();
+      assertEquals(1.242705837824413, bBoxCalculator0.getMinY(), 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testExpandXRange_WithPositiveInfinity_Twice() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      calculator.expandXRange(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-      calculator.expandXRange(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-      
-      // Verify Y state remains initial
-      assertEquals(Double.NEGATIVE_INFINITY, calculator.getMaxY(), 0.01);
-      assertEquals(Double.POSITIVE_INFINITY, calculator.getMinY(), 0.01);
+  public void test30()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.expandXRange(0.0, Double.POSITIVE_INFINITY);
+      bBoxCalculator0.expandXRange(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+      assertEquals(Double.NEGATIVE_INFINITY, bBoxCalculator0.getMaxY(), 0.01);
+      assertEquals(Double.POSITIVE_INFINITY, bBoxCalculator0.getMinY(), 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testExpandXRange_WithPositiveInfinityAndNegative_ThenWithPositiveInfinity() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      calculator.expandXRange(Double.POSITIVE_INFINITY, -1.1667848932113465);
-      calculator.expandXRange(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-      
-      // Verify Y state remains initial
-      assertEquals(Double.POSITIVE_INFINITY, calculator.getMinY(), 0.01);
-      assertEquals(Double.NEGATIVE_INFINITY, calculator.getMaxY(), 0.01);
+  public void test31()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.expandXRange(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+      bBoxCalculator0.expandXRange(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+      assertEquals(Double.NEGATIVE_INFINITY, bBoxCalculator0.getMaxY(), 0.01);
+      assertEquals(Double.POSITIVE_INFINITY, bBoxCalculator0.getMinY(), 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testExpandRange_WithInfinity_ThenExpandXRange_ThenGetBoundary() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      calculator.expandRange(Double.POSITIVE_INFINITY, -3518.505381128807, 1.0, 2.0);
-      calculator.expandXRange(0.0, -1.0);
-      
-      Rectangle boundary = calculator.getBoundary();
-      assertNotNull(boundary);
-      assertEquals(2.0, calculator.getMaxY(), 0.01);
+  public void test32()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.expandXRange(Double.POSITIVE_INFINITY, (-1.1667848932113465));
+      bBoxCalculator0.expandXRange(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+      assertEquals(Double.POSITIVE_INFINITY, bBoxCalculator0.getMinY(), 0.01);
+      assertEquals(Double.NEGATIVE_INFINITY, bBoxCalculator0.getMaxY(), 0.01);
   }
 
   @Test(timeout = 4000)
-  public void testExpandXRange_MultipleTimes() throws Throwable {
-      SpatialContext spatialContext = SpatialContext.GEO;
-      BBoxCalculator calculator = new BBoxCalculator(spatialContext);
-      
-      calculator.expandXRange(1396.8914426933839, -10.370441159547157);
-      calculator.expandXRange(-10.370441159547157, 1396.8914426933839);
-      calculator.expandXRange(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-      
-      // Verify Y state remains initial
-      assertEquals(Double.POSITIVE_INFINITY, calculator.getMinY(), 0.01);
-      assertEquals(Double.NEGATIVE_INFINITY, calculator.getMaxY(), 0.01);
+  public void test33()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.expandRange(Double.POSITIVE_INFINITY, (-3518.505381128807), 1.0, 2.0);
+      bBoxCalculator0.expandXRange(0.0, (-1.0));
+      bBoxCalculator0.getBoundary();
+      assertEquals(2.0, bBoxCalculator0.getMaxY(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test34()  throws Throwable  {
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
+      bBoxCalculator0.expandXRange(1396.8914426933839, (-10.370441159547157));
+      bBoxCalculator0.expandXRange((-10.370441159547157), 1396.8914426933839);
+      bBoxCalculator0.expandXRange(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+      assertEquals(Double.POSITIVE_INFINITY, bBoxCalculator0.getMinY(), 0.01);
+      assertEquals(Double.NEGATIVE_INFINITY, bBoxCalculator0.getMaxY(), 0.01);
   }
 }
