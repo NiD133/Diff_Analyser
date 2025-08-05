@@ -36,68 +36,146 @@
 
 package org.jfree.chart.plot;
 
+import org.jfree.chart.TestUtils;
+import org.jfree.data.Range;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
-
-import org.jfree.chart.TestUtils;
-
-import org.jfree.data.Range;
-import org.junit.jupiter.api.Test;
+import java.awt.Stroke;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for the {@link MeterInterval} class.
+ * Tests for the immutable {@link MeterInterval} class.
  */
-public class MeterIntervalTest {
+@DisplayName("A MeterInterval")
+class MeterIntervalTest {
 
-    /**
-     * Confirm that the equals method can distinguish all the required fields.
-     */
     @Test
-    public void testEquals() {
-
-        MeterInterval m1 = new MeterInterval(
-            "Label 1", new Range(1.2, 3.4), Color.RED, new BasicStroke(1.0f),
-            Color.BLUE
-        );
-        MeterInterval m2 = new MeterInterval(
-            "Label 1", new Range(1.2, 3.4), Color.RED, new BasicStroke(1.0f),
-            Color.BLUE
-        );
-        assertEquals(m1, m2);
-        assertEquals(m2, m1);
-
-        m1 = new MeterInterval(
-            "Label 2", new Range(1.2, 3.4), Color.RED, new BasicStroke(1.0f),
-            Color.BLUE
-        );
-        assertNotEquals(m1, m2);
-        m2 = new MeterInterval(
-            "Label 2", new Range(1.2, 3.4), Color.RED, new BasicStroke(1.0f),
-            Color.BLUE
-        );
-        assertEquals(m1, m2);
-
+    @DisplayName("should not be cloneable, as it is immutable")
+    void isNotCloneable() {
+        MeterInterval interval = new MeterInterval("Test", new Range(1.0, 2.0));
+        assertFalse(interval instanceof Cloneable);
     }
 
-    /**
-     * This class is immutable so cloning isn't required.
-     */
-    @Test
-    public void testCloning() {
-        MeterInterval m1 = new MeterInterval("X", new Range(1.0, 2.0));
-        assertFalse(m1 instanceof Cloneable);
+    @Nested
+    @DisplayName("when serializing")
+    class SerializationTests {
+
+        @Test
+        @DisplayName("should serialize and deserialize correctly with default properties")
+        void serializationWithDefaults() {
+            MeterInterval original = new MeterInterval("Normal", new Range(25.0, 75.0));
+            MeterInterval deserialized = TestUtils.serialised(original);
+            assertEquals(original, deserialized);
+        }
+
+        @Test
+        @DisplayName("should serialize and deserialize correctly with custom transient properties")
+        void serializationWithCustomProperties() {
+            MeterInterval original = new MeterInterval("Warning", new Range(75.0, 90.0),
+                    Color.ORANGE, new BasicStroke(2.0f), Color.YELLOW);
+            MeterInterval deserialized = TestUtils.serialised(original);
+            assertEquals(original, deserialized);
+        }
     }
 
-   /**
-     * Serialize an instance, restore it, and check for equality.
-     */
-    @Test
-    public void testSerialization() {
-        MeterInterval m1 = new MeterInterval("X", new Range(1.0, 2.0));
-        MeterInterval m2 = TestUtils.serialised(m1);
-        assertEquals(m1, m2);
-    }
+    @Nested
+    @DisplayName("when checking for equality")
+    class EqualsContract {
+        private MeterInterval interval;
 
+        @BeforeEach
+        void setUp() {
+            interval = new MeterInterval(
+                "Label", new Range(1.0, 2.0), Color.RED, new BasicStroke(1.0f), Color.BLUE
+            );
+        }
+
+        @Test
+        @DisplayName("is reflexive")
+        void isReflexive() {
+            assertEquals(interval, interval);
+        }
+
+        @Test
+        @DisplayName("is symmetric with an equal object")
+        void isSymmetric() {
+            MeterInterval equalInterval = new MeterInterval(
+                "Label", new Range(1.0, 2.0), Color.RED, new BasicStroke(1.0f), Color.BLUE
+            );
+            assertEquals(interval, equalInterval);
+            assertEquals(equalInterval, interval);
+        }
+
+        @Test
+        @DisplayName("has a consistent hash code with an equal object")
+        void hasConsistentHashCode() {
+            MeterInterval equalInterval = new MeterInterval(
+                "Label", new Range(1.0, 2.0), Color.RED, new BasicStroke(1.0f), Color.BLUE
+            );
+            assertEquals(interval.hashCode(), equalInterval.hashCode());
+        }
+
+        @Test
+        @DisplayName("returns false when compared to null")
+        void returnsFalseForNull() {
+            assertNotEquals(null, interval);
+        }
+
+        @Test
+        @DisplayName("returns false when compared to a different type")
+        void returnsFalseForDifferentType() {
+            assertNotEquals("A String", interval);
+        }
+
+        @Test
+        @DisplayName("distinguishes between different labels")
+        void distinguishesDifferentLabels() {
+            MeterInterval differentInterval = new MeterInterval(
+                "Different Label", new Range(1.0, 2.0), Color.RED, new BasicStroke(1.0f), Color.BLUE
+            );
+            assertNotEquals(interval, differentInterval);
+        }
+
+        @Test
+        @DisplayName("distinguishes between different ranges")
+        void distinguishesDifferentRanges() {
+            MeterInterval differentInterval = new MeterInterval(
+                "Label", new Range(3.0, 4.0), Color.RED, new BasicStroke(1.0f), Color.BLUE
+            );
+            assertNotEquals(interval, differentInterval);
+        }
+
+        @Test
+        @DisplayName("distinguishes between different outline paints")
+        void distinguishesDifferentOutlinePaints() {
+            MeterInterval differentInterval = new MeterInterval(
+                "Label", new Range(1.0, 2.0), Color.GREEN, new BasicStroke(1.0f), Color.BLUE
+            );
+            assertNotEquals(interval, differentInterval);
+        }
+
+        @Test
+        @DisplayName("distinguishes between different outline strokes")
+        void distinguishesDifferentOutlineStrokes() {
+            MeterInterval differentInterval = new MeterInterval(
+                "Label", new Range(1.0, 2.0), Color.RED, new BasicStroke(2.0f), Color.BLUE
+            );
+            assertNotEquals(interval, differentInterval);
+        }
+
+        @Test
+        @DisplayName("distinguishes between different background paints")
+        void distinguishesDifferentBackgroundPaints() {
+            MeterInterval differentInterval = new MeterInterval(
+                "Label", new Range(1.0, 2.0), Color.RED, new BasicStroke(1.0f), Color.CYAN
+            );
+            assertNotEquals(interval, differentInterval);
+        }
+    }
 }
