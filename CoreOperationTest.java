@@ -35,38 +35,32 @@ class CoreOperationTest extends AbstractJXPathTest {
     public void setUp() {
         if (context == null) {
             context = JXPathContext.newContext(null);
-            initializeVariables(context.getVariables());
+            final Variables vars = context.getVariables();
+            vars.declareVariable("integer", Integer.valueOf(1));
+            vars.declareVariable("array", new double[] { 0.25, 0.5, 0.75 });
+            vars.declareVariable("nan", Double.valueOf(Double.NaN));
         }
-    }
-
-    private void initializeVariables(Variables vars) {
-        vars.declareVariable("integer", Integer.valueOf(1));
-        vars.declareVariable("array", new double[] { 0.25, 0.5, 0.75 });
-        vars.declareVariable("nan", Double.valueOf(Double.NaN));
     }
 
     @Test
     void testEmptyNodeSetOperations() {
-        assertXPathValueIsFalse("/idonotexist = 0");
-        assertXPathValueIsFalse("/idonotexist != 0");
-        assertXPathValueIsFalse("/idonotexist < 0");
-        assertXPathValueIsFalse("/idonotexist > 0");
-        assertXPathValueIsFalse("/idonotexist >= 0");
-        assertXPathValueIsFalse("/idonotexist <= 0");
-        assertXPathValueIsFalse("$array[position() < 1] = 0");
-        assertXPathValueIsFalse("$array[position() < 1] != 0");
-        assertXPathValueIsFalse("$array[position() < 1] < 0");
-        assertXPathValueIsFalse("$array[position() < 1] > 0");
-        assertXPathValueIsFalse("$array[position() < 1] >= 0");
-        assertXPathValueIsFalse("$array[position() < 1] <= 0");
-    }
-
-    private void assertXPathValueIsFalse(String xpath) {
-        assertXPathValue(context, xpath, Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "/idonotexist = 0", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "/idonotexist != 0", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "/idonotexist < 0", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "/idonotexist > 0", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "/idonotexist >= 0", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "/idonotexist <= 0", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$array[position() < 1] = 0", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$array[position() < 1] != 0", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$array[position() < 1] < 0", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$array[position() < 1] > 0", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$array[position() < 1] >= 0", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$array[position() < 1] <= 0", Boolean.FALSE, Boolean.class);
     }
 
     @Test
-    void testNumberOperations() {
+    void testInfoSetTypes() {
+        // Numbers
         assertXPathValue(context, "1", Double.valueOf(1.0));
         assertXPathPointer(context, "1", "1");
         assertXPathValueIterator(context, "1", list(Double.valueOf(1.0)));
@@ -75,17 +69,14 @@ class CoreOperationTest extends AbstractJXPathTest {
         assertXPathValue(context, "2 + 2", Double.valueOf(4.0));
         assertXPathValue(context, "3 - 2", Double.valueOf(1.0));
         assertXPathValue(context, "1 + 2 + 3 - 4 + 5", Double.valueOf(7.0));
-        assertXPathValue(context, "3 * 2", Double.valueOf(6.0));
-        assertXPathValue(context, "3 div 2", Double.valueOf(1.5));
+        assertXPathValue(context, "3 * 2", Double.valueOf(3.0 * 2.0));
+        assertXPathValue(context, "3 div 2", Double.valueOf(3.0 / 2.0));
         assertXPathValue(context, "5 mod 2", Double.valueOf(1.0));
+        // This test produces a different result with Xalan?
         assertXPathValue(context, "5.9 mod 2.1", Double.valueOf(1.0));
         assertXPathValue(context, "5 mod -2", Double.valueOf(1.0));
         assertXPathValue(context, "-5 mod 2", Double.valueOf(-1.0));
         assertXPathValue(context, "-5 mod -2", Double.valueOf(-1.0));
-    }
-
-    @Test
-    void testComparisonOperations() {
         assertXPathValue(context, "1 < 2", Boolean.TRUE);
         assertXPathValue(context, "1 > 2", Boolean.FALSE);
         assertXPathValue(context, "1 <= 1", Boolean.TRUE);
@@ -100,10 +91,6 @@ class CoreOperationTest extends AbstractJXPathTest {
         assertXPathValue(context, "1 > 2 = 2 > 3", Boolean.TRUE);
         assertXPathValue(context, "1 > 2 = 0", Boolean.TRUE);
         assertXPathValue(context, "1 = 2", Boolean.FALSE);
-    }
-
-    @Test
-    void testVariableAccess() {
         assertXPathValue(context, "$integer", Double.valueOf(1), Double.class);
         assertXPathValue(context, "2 + 3", "5.0", String.class);
         assertXPathValue(context, "2 + 3", Boolean.TRUE, boolean.class);
@@ -111,32 +98,28 @@ class CoreOperationTest extends AbstractJXPathTest {
     }
 
     @Test
-    void testNaNOperations() {
-        assertNanComparison("$nan > $nan");
-        assertNanComparison("$nan < $nan");
-        assertNanComparison("$nan >= $nan");
-        assertNanComparison("$nan <= $nan");
-        assertNanComparison("$nan >= $nan and $nan <= $nan");
-        assertNanComparison("$nan = $nan");
-        assertNanComparison("$nan != $nan");
-        assertNanComparison("$nan > 0");
-        assertNanComparison("$nan < 0");
-        assertNanComparison("$nan >= 0");
-        assertNanComparison("$nan <= 0");
-        assertNanComparison("$nan >= 0 and $nan <= 0");
-        assertNanComparison("$nan = 0");
-        assertNanComparison("$nan != 0");
-        assertNanComparison("$nan > 1");
-        assertNanComparison("$nan < 1");
-        assertNanComparison("$nan >= 1");
-        assertNanComparison("$nan <= 1");
-        assertNanComparison("$nan >= 1 and $nan <= 1");
-        assertNanComparison("$nan = 1");
-        assertNanComparison("$nan != 1");
-    }
-
-    private void assertNanComparison(String xpath) {
-        assertXPathValue(context, xpath, Boolean.FALSE, Boolean.class);
+    void testNan() {
+        assertXPathValue(context, "$nan > $nan", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$nan < $nan", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$nan >= $nan", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$nan <= $nan", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$nan >= $nan and $nan <= $nan", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$nan = $nan", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$nan != $nan", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$nan > 0", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$nan < 0", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$nan >= 0", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$nan <= 0", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$nan >= 0 and $nan <= 0", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$nan = 0", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$nan != 0", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$nan > 1", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$nan < 1", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$nan >= 1", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$nan <= 1", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$nan >= 1 and $nan <= 1", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$nan = 1", Boolean.FALSE, Boolean.class);
+        assertXPathValue(context, "$nan != 1", Boolean.FALSE, Boolean.class);
     }
 
     @Test
