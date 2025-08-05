@@ -1,69 +1,96 @@
+/* ======================================================
+ * JFreeChart : a chart library for the Java(tm) platform
+ * ======================================================
+ *
+ * (C) Copyright 2000-present, by David Gilbert and Contributors.
+ *
+ * Project Info:  https://www.jfree.org/jfreechart/index.html
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ *
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
+ *
+ * ----------------
+ * NodeKeyTest.java
+ * ----------------
+ * (C) Copyright 2021-present, by David Gilbert.
+ *
+ * Original Author:  David Gilbert;
+ * Contributor(s):   -;
+ *
+ */
+
 package org.jfree.data.flow;
 
 import org.jfree.chart.TestUtils;
+
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for the {@link NodeKey} class.
+ * Tests for the {@link NodeKey} class.
  */
 public class NodeKeyTest {
 
     /**
-     * Tests the {@code equals} method to ensure it correctly identifies
-     * equality and inequality between different {@code NodeKey} instances.
+     * Confirm that the equals method can distinguish all the required fields.
      */
     @Test
     public void testEquals() {
-        // Test equality for identical NodeKey instances
-        NodeKey<String> key1 = new NodeKey<>(0, "A");
-        NodeKey<String> key2 = new NodeKey<>(0, "A");
-        assertEquals(key1, key2, "NodeKeys with same stage and node should be equal");
-        assertEquals(key2, key1, "Equality should be symmetric");
+        NodeKey<String> k1 = new NodeKey<>(0, "A");
+        NodeKey<String> k2 = new NodeKey<>(0, "A");
+        assertEquals(k1, k2);
+        assertEquals(k2, k1);
 
-        // Test inequality for different stages
-        key1 = new NodeKey<>(1, "A");
-        assertNotEquals(key1, key2, "NodeKeys with different stages should not be equal");
-        
-        // Test equality for same stage and node after modification
-        key2 = new NodeKey<>(1, "A");
-        assertEquals(key1, key2, "NodeKeys with same stage and node should be equal");
-
-        // Test inequality for different nodes
-        key1 = new NodeKey<>(1, "B");
-        assertNotEquals(key1, key2, "NodeKeys with different nodes should not be equal");
-        
-        // Test equality for same stage and node after modification
-        key2 = new NodeKey<>(1, "B");
-        assertEquals(key1, key2, "NodeKeys with same stage and node should be equal");
+        k1 = new NodeKey<>(1, "A");
+        assertNotEquals(k1, k2);
+        k2 = new NodeKey<>(1, "A");
+        assertEquals(k1, k2);
+  
+        k1 = new NodeKey<>(1, "B");
+        assertNotEquals(k1, k2);
+        k2 = new NodeKey<>(1, "B");
+        assertEquals(k1, k2);
     }
 
     /**
-     * Tests the cloning functionality to ensure a deep copy of a {@code NodeKey}
-     * instance is created.
-     *
-     * @throws CloneNotSupportedException if cloning is not supported
+     * Confirm that cloning works.
+     * 
+     * @throws CloneNotSupportedException
      */
     @Test
     public void testCloning() throws CloneNotSupportedException {
-        NodeKey<String> originalKey = new NodeKey<>(2, "A");
-        NodeKey<String> clonedKey = (NodeKey<String>) originalKey.clone();
-        
-        assertNotSame(originalKey, clonedKey, "Cloned NodeKey should be a different instance");
-        assertSame(originalKey.getClass(), clonedKey.getClass(), "Cloned NodeKey should be of the same class");
-        assertEquals(originalKey, clonedKey, "Cloned NodeKey should be equal to the original");
+        NodeKey<String> k1 = new NodeKey<>(2, "A");
+        NodeKey<String> k2 = (NodeKey<String>) k1.clone();
+        assertNotSame(k1, k2);
+        assertSame(k1.getClass(), k2.getClass());
+        assertEquals(k1, k2);
     }
 
     /**
-     * Tests the serialization and deserialization process to ensure the
-     * {@code NodeKey} instance remains equal after being serialized and
-     * deserialized.
+     * Serialize an instance, restore it, and check for equality.
      */
     @Test
     public void testSerialization() {
-        NodeKey<String> originalKey = new NodeKey<>(1, "S1");
-        NodeKey<String> deserializedKey = TestUtils.serialised(originalKey);
-        
-        assertEquals(originalKey, deserializedKey, "Deserialized NodeKey should be equal to the original");
+        NodeKey<String> k1 = new NodeKey<>(1, "S1");
+        NodeKey<String> k2 = TestUtils.serialised(k1);
+        assertEquals(k1, k2);
     }
+
 }
+
