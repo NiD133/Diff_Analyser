@@ -52,65 +52,115 @@ import static org.junit.jupiter.api.Assertions.*;
 public class LegendItemEntityTest {
 
     /**
-     * Confirm that the equals method can distinguish all the required fields.
+     * Helper method to create a baseline entity with predefined values for testing.
+     *
+     * @return A {@code LegendItemEntity} configured with baseline attributes.
      */
-    @Test
-    public void testEquals() {
-        LegendItemEntity<String> e1 = new LegendItemEntity<>(
+    private LegendItemEntity<String> createBaselineEntity() {
+        LegendItemEntity<String> entity = new LegendItemEntity<>(
                 new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0));
-        LegendItemEntity<String> e2 = new LegendItemEntity<>(
-                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0));
-        assertEquals(e1, e2);
-
-        e1.setArea(new Rectangle2D.Double(4.0, 3.0, 2.0, 1.0));
-        assertNotEquals(e1, e2);
-        e2.setArea(new Rectangle2D.Double(4.0, 3.0, 2.0, 1.0));
-        assertEquals(e1, e2);
-
-        e1.setToolTipText("New ToolTip");
-        assertNotEquals(e1, e2);
-        e2.setToolTipText("New ToolTip");
-        assertEquals(e1, e2);
-
-        e1.setURLText("New URL");
-        assertNotEquals(e1, e2);
-        e2.setURLText("New URL");
-        assertEquals(e1, e2);
-
-        e1.setDataset(new DefaultCategoryDataset<String, String>());
-        assertNotEquals(e1, e2);
-        e2.setDataset(new DefaultCategoryDataset<String, String>());
-        assertEquals(e1, e2);
-
-        e1.setSeriesKey("A");
-        assertNotEquals(e1, e2);
-        e2.setSeriesKey("A");
-        assertEquals(e1, e2);
-
+        entity.setToolTipText("ToolTip");
+        entity.setURLText("URL");
+        entity.setDataset(new DefaultCategoryDataset<String, String>());
+        entity.setSeriesKey("Key");
+        return entity;
     }
 
     /**
-     * Confirm that cloning works.
+     * Tests that the same object instance is equal to itself.
+     */
+    @Test
+    public void testEqualsWithSameObject() {
+        LegendItemEntity<String> entity = createBaselineEntity();
+        assertEquals(entity, entity, "Object should be equal to itself");
+    }
+
+    /**
+     * Tests that two distinct objects with identical attributes are equal.
+     */
+    @Test
+    public void testEqualsWithEqualObjects() {
+        LegendItemEntity<String> e1 = createBaselineEntity();
+        LegendItemEntity<String> e2 = createBaselineEntity();
+        assertEquals(e1, e2, "Objects with identical attributes should be equal");
+    }
+
+    /**
+     * Tests that objects with different areas are not equal.
+     */
+    @Test
+    public void testEqualsWithDifferentArea() {
+        LegendItemEntity<String> e1 = createBaselineEntity();
+        LegendItemEntity<String> e2 = createBaselineEntity();
+        e2.setArea(new Rectangle2D.Double(99.0, 99.0, 99.0, 99.0));
+        assertNotEquals(e1, e2, "Objects with different areas should not be equal");
+    }
+
+    /**
+     * Tests that objects with different tooltips are not equal.
+     */
+    @Test
+    public void testEqualsWithDifferentToolTip() {
+        LegendItemEntity<String> e1 = createBaselineEntity();
+        LegendItemEntity<String> e2 = createBaselineEntity();
+        e2.setToolTipText("DifferentToolTip");
+        assertNotEquals(e1, e2, "Objects with different tooltips should not be equal");
+    }
+
+    /**
+     * Tests that objects with different URLs are not equal.
+     */
+    @Test
+    public void testEqualsWithDifferentURL() {
+        LegendItemEntity<String> e1 = createBaselineEntity();
+        LegendItemEntity<String> e2 = createBaselineEntity();
+        e2.setURLText("DifferentURL");
+        assertNotEquals(e1, e2, "Objects with different URLs should not be equal");
+    }
+
+    /**
+     * Tests that objects with different datasets are not equal.
+     */
+    @Test
+    public void testEqualsWithDifferentDataset() {
+        LegendItemEntity<String> e1 = createBaselineEntity();
+        LegendItemEntity<String> e2 = createBaselineEntity();
+        e2.setDataset(new DefaultCategoryDataset<String, String>());
+        assertNotEquals(e1, e2, "Objects with different datasets should not be equal");
+    }
+
+    /**
+     * Tests that objects with different series keys are not equal.
+     */
+    @Test
+    public void testEqualsWithDifferentSeriesKey() {
+        LegendItemEntity<String> e1 = createBaselineEntity();
+        LegendItemEntity<String> e2 = createBaselineEntity();
+        e2.setSeriesKey("DifferentKey");
+        assertNotEquals(e1, e2, "Objects with different series keys should not be equal");
+    }
+
+    /**
+     * Tests that cloning creates a distinct object with identical attributes.
      */
     @Test
     public void testCloning() throws CloneNotSupportedException {
-        LegendItemEntity<String> e1 = new LegendItemEntity<>(
-                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0));
+        LegendItemEntity<String> e1 = createBaselineEntity();
         LegendItemEntity<String> e2 = CloneUtils.clone(e1);
-        assertNotSame(e1, e2);
-        assertSame(e1.getClass(), e2.getClass());
-        assertEquals(e1, e2);
+
+        // Verify distinct instances
+        assertNotSame(e1, e2, "Cloned object should be a distinct instance");
+        assertSame(e1.getClass(), e2.getClass(), "Cloned object should have the same class");
+        assertEquals(e1, e2, "Cloned object should be equal to the original");
     }
 
     /**
-     * Serialize an instance, restore it, and check for equality.
+     * Tests that serialization and deserialization produce equal objects.
      */
     @Test
     public void testSerialization() {
-        LegendItemEntity<String> e1 = new LegendItemEntity<>(
-                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0));
+        LegendItemEntity<String> e1 = createBaselineEntity();
         LegendItemEntity<String> e2 = TestUtils.serialised(e1);
-        assertEquals(e1, e2);
+        assertEquals(e1, e2, "Deserialized object should equal the original");
     }
-
 }
