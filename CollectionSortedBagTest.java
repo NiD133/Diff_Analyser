@@ -16,31 +16,26 @@
  */
 package org.apache.commons.collections4.bag;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.stream.IntStream;
 
 import org.apache.commons.collections4.Bag;
+import org.apache.commons.collections4.SortedBag;
 import org.apache.commons.collections4.collection.AbstractCollectionTest;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Verifies the serialization compatibility of {@link CollectionSortedBag}.
+ * Test class for {@link CollectionSortedBag}.
  * <p>
- * The core bag functionality is tested in {@link AbstractSortedBagTest}. This class
- * primarily ensures that the serialization format remains consistent with canonical
- * versions stored on disk.
- * </p>
+ * Note: This test is mainly for serialization support, the CollectionSortedBag decorator
+ * is extensively used and tested in AbstractSortedBagTest.
  */
-@DisplayName("CollectionSortedBag Serialization")
-public class CollectionSortedBagTest extends AbstractCollectionTest<Integer> {
+public class CollectionSortedBagTest<T> extends AbstractCollectionTest<T> {
 
     @Override
     public String getCompatibilityVersion() {
@@ -48,29 +43,34 @@ public class CollectionSortedBagTest extends AbstractCollectionTest<Integer> {
     }
 
     /**
-     * Overridden to return an array of comparable {@link Integer} objects.
+     * Override to return comparable objects.
      */
     @Override
-    public Integer[] getFullNonNullElements() {
-        return IntStream.range(0, 30)
-                .map(i -> i * 2 + 1)
-                .boxed()
-                .toArray(Integer[]::new);
+    @SuppressWarnings("unchecked")
+    public T[] getFullNonNullElements() {
+        final Object[] elements = new Object[30];
+
+        for (int i = 0; i < 30; i++) {
+            elements[i] = Integer.valueOf(i + i + 1);
+        }
+        return (T[]) elements;
     }
 
     /**
-     * Overridden to return an array of other comparable {@link Integer} objects.
+     * Override to return comparable objects.
      */
     @Override
-    public Integer[] getOtherNonNullElements() {
-        return IntStream.range(0, 30)
-                .map(i -> i * 2 + 2)
-                .boxed()
-                .toArray(Integer[]::new);
+    @SuppressWarnings("unchecked")
+    public T[] getOtherNonNullElements() {
+        final Object[] elements = new Object[30];
+        for (int i = 0; i < 30; i++) {
+            elements[i] = Integer.valueOf(i + i + 2);
+        }
+        return (T[]) elements;
     }
 
     /**
-     * Overridden because SortedBags don't allow null elements.
+     * Overridden because SortedBags don't allow null elements (normally).
      * @return false
      */
     @Override
@@ -79,29 +79,29 @@ public class CollectionSortedBagTest extends AbstractCollectionTest<Integer> {
     }
 
     /**
-     * Returns an empty {@link ArrayList} for use in modification testing.
+     * Returns an empty List for use in modification testing.
      *
-     * @return a confirmed empty collection.
+     * @return a confirmed empty collection
      */
     @Override
-    public Collection<Integer> makeConfirmedCollection() {
+    public Collection<T> makeConfirmedCollection() {
         return new ArrayList<>();
     }
 
     /**
-     * Returns a full {@link ArrayList} for use in modification testing.
+     * Returns a full Set for use in modification testing.
      *
-     * @return a confirmed full collection.
+     * @return a confirmed full collection
      */
     @Override
-    public Collection<Integer> makeConfirmedFullCollection() {
-        final Collection<Integer> collection = makeConfirmedCollection();
-        Collections.addAll(collection, getFullElements());
-        return collection;
+    public Collection<T> makeConfirmedFullCollection() {
+        final Collection<T> set = makeConfirmedCollection();
+        set.addAll(Arrays.asList(getFullElements()));
+        return set;
     }
 
     @Override
-    public Bag<Integer> makeObject() {
+    public Bag<T> makeObject() {
         return CollectionSortedBag.collectionSortedBag(new TreeBag<>());
     }
 
@@ -112,49 +112,34 @@ public class CollectionSortedBagTest extends AbstractCollectionTest<Integer> {
 //        writeExternalFormToDisk((java.io.Serializable) getCollection(), "src/test/resources/data/test/CollectionSortedBag.fullCollection.version4.obj");
 //    }
 
+    /**
+     * Compare the current serialized form of the Bag
+     * against the canonical version in SCM.
+     */
     @Test
-    @DisplayName("An empty bag should match its canonical serialized form")
-    void testEmptyBagSerializationCompatibility() throws IOException, ClassNotFoundException {
-        // Arrange
-        final Bag<Integer> bag = makeObject();
-        final String canonicalFileName = getCanonicalEmptyCollectionName(bag);
-
-        // Act & Assert
-        assertSerializationIsCompatible(bag, canonicalFileName);
-    }
-
-    @Test
-    @DisplayName("A full bag should match its canonical serialized form")
-    void testFullBagSerializationCompatibility() throws IOException, ClassNotFoundException {
-        // Arrange
-        final Bag<Integer> bag = makeFullCollection();
-        final String canonicalFileName = getCanonicalFullCollectionName(bag);
-
-        // Act & Assert
-        assertSerializationIsCompatible(bag, canonicalFileName);
+    void testEmptyBagCompatibility() throws IOException, ClassNotFoundException {
+        // test to make sure the canonical form has been preserved
+        final Bag<T> bag = makeObject();
+        if (bag instanceof Serializable && !skipSerializedCanonicalTests() && isTestSerialization()) {
+            final Bag<?> bag2 = (Bag<?>) readExternalFormFromDisk(getCanonicalEmptyCollectionName(bag));
+            assertEquals(0, bag2.size(), "Bag is empty");
+            assertEquals(bag, bag2);
+        }
     }
 
     /**
-     * Asserts that a given bag, when deserialized from a canonical file,
-     * is equal to the original bag.
-     *
-     * @param originalBag The bag to check for compatibility.
-     * @param canonicalFileName The path to the canonical serialized file.
+     * Compare the current serialized form of the Bag
+     * against the canonical version in SCM.
      */
-    private void assertSerializationIsCompatible(final Bag<Integer> originalBag, final String canonicalFileName)
-            throws IOException, ClassNotFoundException {
-        // These checks from the base class ensure we only run serialization tests
-        // when they are enabled and the object is actually serializable.
-        if (originalBag instanceof Serializable && !skipSerializedCanonicalTests() && isTestSerialization()) {
-            // Act: Deserialize the canonical form from a file.
-            @SuppressWarnings("unchecked")
-            final Bag<Integer> deserializedBag = (Bag<Integer>) readExternalFormFromDisk(canonicalFileName);
-
-            // Assert: The deserialized bag should be identical to the original.
-            assertAll("Deserialized bag should be equal to the original",
-                () -> assertEquals(originalBag.size(), deserializedBag.size(), "should have the same size"),
-                () -> assertEquals(originalBag, deserializedBag, "should be equal based on the equals() method")
-            );
+    @Test
+    void testFullBagCompatibility() throws IOException, ClassNotFoundException {
+        // test to make sure the canonical form has been preserved
+        final SortedBag<T> bag = (SortedBag<T>) makeFullCollection();
+        if (bag instanceof Serializable && !skipSerializedCanonicalTests() && isTestSerialization()) {
+            final SortedBag<?> bag2 = (SortedBag<?>) readExternalFormFromDisk(getCanonicalFullCollectionName(bag));
+            assertEquals(bag.size(), bag2.size(), "Bag is the right size");
+            assertEquals(bag, bag2);
         }
     }
+
 }
