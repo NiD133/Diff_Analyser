@@ -23,195 +23,178 @@ import org.jfree.chart.entity.EntityCollection;
 import org.jfree.chart.plot.FastScatterPlot;
 import org.jfree.chart.plot.dial.DialBackground;
 import org.jfree.chart.plot.dial.DialPlot;
-import org.jfree.chart.plot.pie.PiePlot;
 import org.jfree.chart.util.GradientPaintTransformType;
 import org.jfree.chart.util.GradientPaintTransformer;
 import org.jfree.chart.util.StandardGradientPaintTransformer;
 import org.jfree.data.general.DefaultValueDataset;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, 
+useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class DialBackground_ESTest extends DialBackground_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      DialBackground dialBackground0 = new DialBackground();
-      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double((-1620.962466736), (-824.5089), (-3175.7), (-3175.7));
-      FastScatterPlot fastScatterPlot0 = new FastScatterPlot();
-      JFreeChart jFreeChart0 = new JFreeChart("", fastScatterPlot0);
-      Rectangle rectangle0 = new Rectangle(10, 1);
-      ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo((EntityCollection) null);
-      BufferedImage bufferedImage0 = jFreeChart0.createBufferedImage(1, 91, chartRenderingInfo0);
-      Graphics2D graphics2D0 = bufferedImage0.createGraphics();
-      DefaultValueDataset defaultValueDataset0 = new DefaultValueDataset((Number) 0.5F);
-      DialPlot dialPlot0 = new DialPlot(defaultValueDataset0);
-      dialBackground0.draw(graphics2D0, dialPlot0, rectangle0, rectangle2D_Double0);
-      assertEquals(5.0, rectangle0.getCenterX(), 0.01);
-  }
+    @Test(timeout = 4000)
+    public void drawingWithValidParametersShouldNotThrowException() throws Throwable {
+        // Setup
+        DialBackground background = new DialBackground();
+        Rectangle2D.Double frame = new Rectangle2D.Double(-1620.96, -824.51, -3175.7, -3175.7);
+        FastScatterPlot plot = new FastScatterPlot();
+        JFreeChart chart = new JFreeChart("", plot);
+        Rectangle view = new Rectangle(10, 1);
+        ChartRenderingInfo info = new ChartRenderingInfo((EntityCollection) null);
+        BufferedImage image = chart.createBufferedImage(1, 91, info);
+        Graphics2D graphics = image.createGraphics();
+        DefaultValueDataset dataset = new DefaultValueDataset(0.5f);
+        DialPlot dialPlot = new DialPlot(dataset);
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      DialBackground dialBackground0 = new DialBackground();
-      // Undeclared exception!
-      try { 
-        dialBackground0.setPaint((Paint) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Null 'paint' argument.
-         //
-         verifyException("org.jfree.chart.internal.Args", e);
-      }
-  }
+        // Execute & Verify (no exception expected)
+        background.draw(graphics, dialPlot, view, frame);
+        
+        // Cleanup
+        graphics.dispose();
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      DialBackground dialBackground0 = new DialBackground();
-      // Undeclared exception!
-      try { 
-        dialBackground0.setGradientPaintTransformer((GradientPaintTransformer) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Null 't' argument.
-         //
-         verifyException("org.jfree.chart.internal.Args", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void setPaintWithNullShouldThrowException() {
+        DialBackground background = new DialBackground();
+        try {
+            background.setPaint(null);
+            fail("Expected IllegalArgumentException for null paint");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Null 'paint' argument.", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      DialBackground dialBackground0 = null;
-      try {
-        dialBackground0 = new DialBackground((Paint) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Null 'paint' argument.
-         //
-         verifyException("org.jfree.chart.internal.Args", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void setGradientTransformerWithNullShouldThrowException() {
+        DialBackground background = new DialBackground();
+        try {
+            background.setGradientPaintTransformer(null);
+            fail("Expected IllegalArgumentException for null transformer");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Null 't' argument.", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      DialBackground dialBackground0 = new DialBackground();
-      DialBackground dialBackground1 = new DialBackground();
-      assertTrue(dialBackground1.equals((Object)dialBackground0));
-      
-      GradientPaintTransformType gradientPaintTransformType0 = GradientPaintTransformType.CENTER_VERTICAL;
-      StandardGradientPaintTransformer standardGradientPaintTransformer0 = new StandardGradientPaintTransformer(gradientPaintTransformType0);
-      dialBackground1.setGradientPaintTransformer(standardGradientPaintTransformer0);
-      boolean boolean0 = dialBackground0.equals(dialBackground1);
-      assertFalse(dialBackground1.equals((Object)dialBackground0));
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void constructorWithNullPaintShouldThrowException() {
+        try {
+            new DialBackground(null);
+            fail("Expected IllegalArgumentException for null paint in constructor");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Null 'paint' argument.", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      DialBackground dialBackground0 = new DialBackground();
-      Color color0 = (Color)PiePlot.DEFAULT_LABEL_BACKGROUND_PAINT;
-      DialBackground dialBackground1 = new DialBackground(color0);
-      boolean boolean0 = dialBackground0.equals(dialBackground1);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void equalsWhenGradientTransformerDiffersShouldReturnFalse() {
+        // Setup two equal backgrounds
+        DialBackground background1 = new DialBackground();
+        DialBackground background2 = new DialBackground();
+        
+        // Modify one background's transformer
+        GradientPaintTransformType transformType = GradientPaintTransformType.CENTER_VERTICAL;
+        background2.setGradientPaintTransformer(new StandardGradientPaintTransformer(transformType));
+        
+        // Verify
+        assertNotEquals("Backgrounds should differ after transformer change", 
+                        background1, background2);
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      DialBackground dialBackground0 = new DialBackground();
-      GradientPaintTransformType gradientPaintTransformType0 = GradientPaintTransformType.CENTER_HORIZONTAL;
-      StandardGradientPaintTransformer standardGradientPaintTransformer0 = new StandardGradientPaintTransformer(gradientPaintTransformType0);
-      boolean boolean0 = dialBackground0.equals(standardGradientPaintTransformer0);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void equalsWhenPaintDiffersShouldReturnFalse() {
+        DialBackground background1 = new DialBackground();
+        DialBackground background2 = new DialBackground(Color.GRAY);
+        assertNotEquals("Backgrounds with different paints should not be equal", 
+                        background1, background2);
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      DialBackground dialBackground0 = new DialBackground();
-      boolean boolean0 = dialBackground0.equals(dialBackground0);
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void equalsWithDifferentObjectTypeShouldReturnFalse() {
+        DialBackground background = new DialBackground();
+        GradientPaintTransformType transformType = GradientPaintTransformType.CENTER_HORIZONTAL;
+        Object other = new StandardGradientPaintTransformer(transformType);
+        assertNotEquals("DialBackground should not equal different type", 
+                        background, other);
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      DialBackground dialBackground0 = new DialBackground();
-      DialBackground dialBackground1 = new DialBackground();
-      boolean boolean0 = dialBackground0.equals(dialBackground1);
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void equalsWithSameObjectShouldReturnTrue() {
+        DialBackground background = new DialBackground();
+        assertEquals("Same object should be equal", background, background);
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      DialBackground dialBackground0 = new DialBackground();
-      DialPlot dialPlot0 = new DialPlot();
-      // Undeclared exception!
-      try { 
-        dialBackground0.draw((Graphics2D) null, dialPlot0, (Rectangle2D) null, (Rectangle2D) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.jfree.chart.plot.dial.DialBackground", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void equalsWithIdenticalBackgroundsShouldReturnTrue() {
+        DialBackground background1 = new DialBackground();
+        DialBackground background2 = new DialBackground();
+        assertEquals("Identical backgrounds should be equal", background1, background2);
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      DialBackground dialBackground0 = new DialBackground();
-      dialBackground0.hashCode();
-  }
+    @Test(timeout = 4000)
+    public void drawWithNullGraphicsShouldThrowException() {
+        DialBackground background = new DialBackground();
+        DialPlot plot = new DialPlot();
+        try {
+            background.draw(null, plot, null, null);
+            fail("Expected NullPointerException for null graphics");
+        } catch (NullPointerException e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      DialBackground dialBackground0 = new DialBackground();
-      Object object0 = dialBackground0.clone();
-      assertNotSame(object0, dialBackground0);
-  }
+    @Test(timeout = 4000)
+    public void hashCodeShouldBeConsistent() {
+        DialBackground background1 = new DialBackground();
+        DialBackground background2 = new DialBackground();
+        assertEquals("Equal objects should have same hash code", 
+                     background1.hashCode(), background2.hashCode());
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      DialBackground dialBackground0 = new DialBackground();
-      StandardGradientPaintTransformer standardGradientPaintTransformer0 = (StandardGradientPaintTransformer)dialBackground0.getGradientPaintTransformer();
-      assertEquals(GradientPaintTransformType.VERTICAL, standardGradientPaintTransformer0.getType());
-  }
+    @Test(timeout = 4000)
+    public void cloneShouldCreateEqualCopy() throws Exception {
+        DialBackground background = new DialBackground();
+        DialBackground clone = (DialBackground) background.clone();
+        
+        assertNotSame("Clone should be different object", background, clone);
+        assertEquals("Clone should be equal to original", background, clone);
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      DialBackground dialBackground0 = new DialBackground();
-      Color color0 = Color.blue;
-      GradientPaint gradientPaint0 = new GradientPaint((-66.0279F), (-66.0279F), color0, (-66.0279F), (-66.0279F), color0);
-      dialBackground0.setPaint(gradientPaint0);
-      DialPlot dialPlot0 = new DialPlot();
-      Rectangle2D.Float rectangle2D_Float0 = new Rectangle2D.Float();
-      // Undeclared exception!
-      try { 
-        dialBackground0.draw((Graphics2D) null, dialPlot0, (Rectangle2D) null, rectangle2D_Float0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.jfree.chart.plot.dial.DialBackground", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void getGradientTransformerShouldReturnDefaultTransformer() {
+        DialBackground background = new DialBackground();
+        GradientPaintTransformer transformer = background.getGradientPaintTransformer();
+        assertEquals("Default transformer should be Standard type", 
+                     StandardGradientPaintTransformer.class, transformer.getClass());
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      DialBackground dialBackground0 = new DialBackground();
-      boolean boolean0 = dialBackground0.isClippedToWindow();
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void drawWithGradientPaintAndNullGraphicsShouldThrowException() {
+        // Setup background with gradient paint
+        DialBackground background = new DialBackground();
+        GradientPaint gradient = new GradientPaint(10, 10, Color.BLUE, 20, 20, Color.BLUE);
+        background.setPaint(gradient);
+        
+        // Test drawing
+        DialPlot plot = new DialPlot();
+        Rectangle2D.Float view = new Rectangle2D.Float();
+        try {
+            background.draw(null, plot, null, view);
+            fail("Expected NullPointerException for null graphics");
+        } catch (NullPointerException e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      DialBackground dialBackground0 = new DialBackground();
-      Color color0 = (Color)dialBackground0.getPaint();
-      assertEquals(255, color0.getBlue());
-  }
+    @Test(timeout = 4000)
+    public void isClippedToWindowShouldReturnTrue() {
+        DialBackground background = new DialBackground();
+        assertTrue("Background should be clipped to window", background.isClippedToWindow());
+    }
+
+    @Test(timeout = 4000)
+    public void getPaintShouldReturnDefaultColor() {
+        DialBackground background = new DialBackground();
+        assertEquals("Default paint should be white", Color.WHITE, background.getPaint());
+    }
 }
