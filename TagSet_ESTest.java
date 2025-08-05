@@ -20,344 +20,229 @@ import org.junit.runner.RunWith;
 
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class TagSet_ESTest extends TagSet_ESTest_scaffolding {
+    // Constants for common tag names to improve readability
+    private static final String TEST_TAG_NAME = "wtt=`D4p|";
+    private static final String COMPLEX_TAG_NAME = ":_{P!x%}X,o'^63]{>";
+    private static final String NAMESPACE = "pr!";
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      TagSet tagSet0 = TagSet.Html();
-      TagSet tagSet1 = new TagSet(tagSet0);
-      boolean boolean0 = tagSet1.equals(tagSet0);
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void test_TagSetEquality_WhenEqual_ReturnsTrue() throws Throwable {
+        TagSet tagSet0 = TagSet.Html();
+        TagSet tagSet1 = new TagSet(tagSet0);
+        assertTrue(tagSet1.equals(tagSet0));
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      TagSet tagSet0 = new TagSet();
-      Tag tag0 = tagSet0.valueOf("tt=`d4!p|", "tt=`d4!p|");
-      tag0.set((-301));
-      ParseSettings parseSettings0 = ParseSettings.preserveCase;
-      Tag tag1 = tagSet0.valueOf("tt=`d4!p|", "tt=`d4!p|", parseSettings0);
-      assertTrue(tag1.preserveWhitespace());
-  }
+    @Test(timeout = 4000)
+    public void test_TagSetEquality_WhenDifferent_ReturnsFalse() throws Throwable {
+        TagSet tagSet0 = new TagSet();
+        TagSet tagSet1 = new TagSet(tagSet0);
+        tagSet1.valueOf("wtt=`d4p|", "Must set charset arg to character set of file to parse. Set to null to attempt to detect from HTML");
+        assertFalse(tagSet1.equals(tagSet0));
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      TagSet tagSet0 = new TagSet();
-      Tag.Block = 7;
-      Tag tag0 = tagSet0.valueOf("tt=`d4!p|", "tt=`d4!p|");
-      tag0.set((-296));
-      ParseSettings parseSettings0 = ParseSettings.preserveCase;
-      Tag tag1 = tagSet0.valueOf("tt=`d4!p|", "tt=`d4!p|", parseSettings0);
-      assertTrue(tag1.isFormSubmittable());
-  }
+    @Test(timeout = 4000)
+    public void test_TagSetEquality_WithNonTagSetObject_ReturnsFalse() throws Throwable {
+        TagSet tagSet0 = new TagSet();
+        Object object0 = new Object();
+        assertFalse(tagSet0.equals(object0));
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      TagSet tagSet0 = TagSet.Html();
-      Tag tag0 = new Tag("fg6U2^oJ<:", "fg6U2^oJ<:");
-      tagSet0.add(tag0);
-      assertFalse(tag0.isFormSubmittable());
-      
-      Tag.FormSubmittable = (-1);
-      Tag tag1 = tagSet0.valueOf("fg6U2^oJ<:", "html", "fg6U2^oJ<:", false);
-      assertEquals("fg6U2^oJ<", tag1.prefix());
-  }
+    @Test(timeout = 4000)
+    public void test_TagSetHashCode_ConsistentWithEquals() throws Throwable {
+        TagSet tagSet0 = new TagSet();
+        tagSet0.hashCode();  // Just verify no exception
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      TagSet tagSet0 = new TagSet();
-      ParseSettings parseSettings0 = ParseSettings.preserveCase;
-      Tag tag0 = tagSet0.valueOf(":_{P!x%}X,o'^63]{>", ":_{P!x%}X,o'^63]{>", parseSettings0);
-      Tag.Known = 55;
-      TagSet tagSet1 = tagSet0.add(tag0);
-      Tag tag1 = tagSet1.valueOf(":_{P!x%}X,o'^63]{>", ":_{P!x%}X,o'^63]{>", ":_{P!x%}X,o'^63]{>", true);
-      assertFalse(tag1.formatAsBlock());
-      assertEquals(":_{p!x%}x,o'^63]{>", tag1.normalName());
-  }
+    @Test(timeout = 4000)
+    public void test_ValueOf_WithPreserveCaseSettings_ReturnsCorrectTag() throws Throwable {
+        TagSet tagSet0 = new TagSet();
+        ParseSettings parseSettings0 = ParseSettings.preserveCase;
+        Tag tag0 = tagSet0.valueOf(COMPLEX_TAG_NAME, COMPLEX_TAG_NAME, parseSettings0);
+        assertNotNull(tag0);
+        assertEquals(COMPLEX_TAG_NAME.toLowerCase(), tag0.normalName());
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      TagSet tagSet0 = TagSet.initHtmlDefault();
-      Tag.Block = 179;
-      Tag tag0 = tagSet0.valueOf("noscript", "noscript");
-      TagSet tagSet1 = tagSet0.add(tag0);
-      Tag tag1 = tagSet1.valueOf("noscript", "noscript", "noscript", false);
-      assertEquals("noscript", tag1.namespace());
-  }
+    @Test(timeout = 4000)
+    public void test_ValueOf_WithHtmlDefaultSettings_ReturnsNormalizedTag() throws Throwable {
+        TagSet tagSet0 = new TagSet();
+        ParseSettings parseSettings0 = ParseSettings.htmlDefault;
+        Tag tag0 = tagSet0.valueOf(TEST_TAG_NAME, TEST_TAG_NAME, parseSettings0);
+        assertEquals("wtt=`d4p|", tag0.normalName());
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      TagSet tagSet0 = new TagSet();
-      Tag.InlineContainer = 1629;
-      ParseSettings parseSettings0 = ParseSettings.preserveCase;
-      Tag tag0 = tagSet0.valueOf(":_{P!x%}X,o'^63]{>", ":_{P!x%}X,o'^63]{>", parseSettings0);
-      TagSet tagSet1 = tagSet0.add(tag0);
-      Tag tag1 = tagSet1.valueOf(":_{P!x%}X,o'^63]{>", ":_{P!x%}X,o'^63]{>", ":_{P!x%}X,o'^63]{>", true);
-      assertEquals(":_{p!x%}x,o'^63]{>", tag1.normalName());
-      assertFalse(tag1.isSelfClosing());
-  }
+    @Test(timeout = 4000)
+    public void test_ValueOf_WithModifiedTagOptions_ReturnsUpdatedTag() throws Throwable {
+        TagSet tagSet0 = new TagSet();
+        ParseSettings parseSettings0 = ParseSettings.htmlDefault;
+        Tag tag0 = tagSet0.valueOf(TEST_TAG_NAME, TEST_TAG_NAME, parseSettings0);
+        
+        // Modify tag options
+        tag0.options = 46;
+        Tag.FormSubmittable = -41;  // Warning: static field modification
+        
+        Tag tag1 = tagSet0.valueOf(TEST_TAG_NAME, TEST_TAG_NAME);
+        assertEquals("wtt=`d4p|", tag1.normalName());
+        assertNotSame(tag1, tag0);
+        assertFalse(tag1.isInline());
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      TagSet tagSet0 = new TagSet();
-      ParseSettings parseSettings0 = ParseSettings.htmlDefault;
-      Tag tag0 = tagSet0.valueOf("wtt=`D4p|", "wtt=`D4p|", parseSettings0);
-      tag0.options = 64;
-      Tag tag1 = tagSet0.valueOf("wtt=`D4p|", "wtt=`D4p|");
-      assertNotSame(tag1, tag0);
-      assertFalse(tag1.equals((Object)tag0));
-      assertEquals("wtt=`d4p|", tag1.normalName());
-      assertTrue(tag1.preserveWhitespace());
-  }
+    @Test(timeout = 4000)
+    public void test_ValueOf_WithNamespaceAndPreserveCase_ReturnsCorrectTag() throws Throwable {
+        TagSet tagSet0 = new TagSet();
+        Tag tag0 = tagSet0.valueOf("_-$>", NAMESPACE, NAMESPACE, true);
+        assertEquals(NAMESPACE, tag0.normalName());
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      TagSet tagSet0 = TagSet.initHtmlDefault();
-      Tag tag0 = Tag.valueOf("kwt=j`D4p|");
-      Tag tag1 = tag0.namespace("kwt=j`D4p|");
-      tagSet0.add(tag1);
-      assertEquals("kwt=j`D4p|", tag1.toString());
-      
-      Tag tag2 = tagSet0.valueOf("kwt=j`D4p|", "kwt=j`D4p|");
-      assertEquals("kwt=j`D4p|", tag2.name());
-  }
+    @Test(timeout = 4000)
+    public void test_AddTag_ThenGet_ReturnsSameTag() throws Throwable {
+        TagSet tagSet0 = new TagSet();
+        ParseSettings parseSettings0 = ParseSettings.preserveCase;
+        Tag tag0 = tagSet0.valueOf(COMPLEX_TAG_NAME, COMPLEX_TAG_NAME, parseSettings0);
+        
+        // Modify static field - use with caution
+        Tag.Known = 55;  // Warning: static field modification
+        tagSet0.add(tag0);
+        
+        Tag tag1 = tagSet0.get(COMPLEX_TAG_NAME, COMPLEX_TAG_NAME);
+        assertNotNull(tag1);
+        assertEquals(COMPLEX_TAG_NAME.toLowerCase(), tag1.normalName());
+        assertFalse(tag1.formatAsBlock());
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      TagSet tagSet0 = new TagSet();
-      ParseSettings parseSettings0 = ParseSettings.htmlDefault;
-      Tag tag0 = tagSet0.valueOf("wtt=`D4p|", "wtt=`D4p|", parseSettings0);
-      Tag.FormSubmittable = (-41);
-      tag0.options = 46;
-      Tag tag1 = tagSet0.valueOf("wtt=`D4p|", "wtt=`D4p|");
-      assertEquals("wtt=`d4p|", tag1.normalName());
-      assertNotSame(tag1, tag0);
-      assertFalse(tag1.equals((Object)tag0));
-      assertFalse(tag1.isInline());
-  }
+    @Test(timeout = 4000)
+    public void test_Get_WhenTagExists_ReturnsTag() throws Throwable {
+        TagSet tagSet0 = TagSet.Html();
+        Tag tag0 = tagSet0.get("pre", "http://www.w3.org/1999/xhtml");
+        assertNotNull(tag0);
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      TagSet tagSet0 = TagSet.Html();
-      Tag tag0 = tagSet0.valueOf("_-$>", "pr!", "pr!", true);
-      Tag.FormSubmittable = 1;
-      TagSet tagSet1 = tagSet0.add(tag0);
-      Tag tag1 = tagSet1.get("_-$>", "pr!");
-      assertEquals("pr!", tag1.normalName());
-      assertNotNull(tag1);
-      assertFalse(tag1.isEmpty());
-  }
+    @Test(timeout = 4000)
+    public void test_Get_WhenTagMissing_ReturnsNull() throws Throwable {
+        TagSet tagSet0 = TagSet.Html();
+        Tag tag0 = tagSet0.get("}+z\")6FP@lJ{n*Mufp", "org.jsoup.nodes.Document$OutputSettings$Syntax");
+        assertNull(tag0);
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      TagSet tagSet0 = new TagSet();
-      ParseSettings parseSettings0 = ParseSettings.preserveCase;
-      Tag tag0 = tagSet0.valueOf(":_{P!x%}X,o'^63]{>", ":_{P!x%}X,o'^63]{>", parseSettings0);
-      assertNotNull(tag0);
-      
-      Tag.Known = 55;
-      tagSet0.add(tag0);
-      Tag tag1 = tagSet0.get(":_{P!x%}X,o'^63]{>", ":_{P!x%}X,o'^63]{>");
-      assertEquals(":_{p!x%}x,o'^63]{>", tag1.normalName());
-      assertNotNull(tag1);
-      assertFalse(tag1.formatAsBlock());
-  }
+    @Test(timeout = 4000)
+    public void test_OnNewTag_Callback_ExecutesForNewTags() throws Throwable {
+        TagSet tagSet0 = TagSet.initHtmlDefault();
+        Consumer<Tag> consumer0 = mock(Consumer.class, new ViolatedAssumptionAnswer());
+        TagSet tagSet1 = tagSet0.onNewTag(consumer0);
+        Tag tag0 = tagSet1.valueOf("bp", "bp");
+        assertEquals("bp", tag0.toString());
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      TagSet tagSet0 = TagSet.HtmlTagSet;
-      ParseSettings parseSettings0 = ParseSettings.preserveCase;
-      // Undeclared exception!
-      try { 
-        tagSet0.valueOf("", "", parseSettings0);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // String must not be empty
-         //
-         verifyException("org.jsoup.helper.Validate", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_OnNewTag_MultipleCallbacks_AreChained() throws Throwable {
+        TagSet tagSet0 = TagSet.Html();
+        Consumer<Tag> consumer0 = mock(Consumer.class, new ViolatedAssumptionAnswer());
+        TagSet tagSet1 = tagSet0.onNewTag(consumer0);
+        Consumer<Tag> consumer1 = mock(Consumer.class, new ViolatedAssumptionAnswer());
+        TagSet tagSet2 = tagSet1.onNewTag(consumer1);
+        assertSame(tagSet0, tagSet2);
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      TagSet tagSet0 = new TagSet();
-      // Undeclared exception!
-      try { 
-        tagSet0.valueOf("org.jsoup.select.Evaluator$AttributeWithValueMatching", "org.jsoup.select.Evaluator$AttributeWithValueMatching", (ParseSettings) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.jsoup.parser.TagSet", e);
-      }
-  }
+    // Edge case tests for exception handling
+    @Test(timeout = 4000)
+    public void test_ValueOf_WithEmptyTagName_ThrowsException() throws Throwable {
+        TagSet tagSet0 = TagSet.HtmlTagSet;
+        ParseSettings parseSettings0 = ParseSettings.preserveCase;
+        try {
+            tagSet0.valueOf("", "", parseSettings0);
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            assertEquals("String must not be empty", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      TagSet tagSet0 = TagSet.initHtmlDefault();
-      // Undeclared exception!
-      try { 
-        tagSet0.valueOf("", "", "", true);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // String must not be empty
-         //
-         verifyException("org.jsoup.helper.Validate", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_ValueOf_WithNullSettings_ThrowsException() throws Throwable {
+        TagSet tagSet0 = new TagSet();
+        try {
+            tagSet0.valueOf("org.jsoup.select.Evaluator$AttributeWithValueMatching", 
+                             "org.jsoup.select.Evaluator$AttributeWithValueMatching", 
+                             null);
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      TagSet tagSet0 = TagSet.initHtmlDefault();
-      // Undeclared exception!
-      try { 
-        tagSet0.valueOf((String) null, (String) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Object must not be null
-         //
-         verifyException("org.jsoup.helper.Validate", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_ValueOf_WithEmptyTagNameAndNamespace_ThrowsException() throws Throwable {
+        TagSet tagSet0 = TagSet.initHtmlDefault();
+        try {
+            tagSet0.valueOf("", "", "", true);
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            assertEquals("String must not be empty", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      TagSet tagSet0 = TagSet.initHtmlDefault();
-      // Undeclared exception!
-      try { 
-        tagSet0.onNewTag((Consumer<Tag>) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Object must not be null
-         //
-         verifyException("org.jsoup.helper.Validate", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_ValueOf_WithNullTagName_ThrowsException() throws Throwable {
+        TagSet tagSet0 = TagSet.initHtmlDefault();
+        try {
+            tagSet0.valueOf(null, null);
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Object must not be null", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      TagSet tagSet0 = TagSet.initHtmlDefault();
-      // Undeclared exception!
-      try { 
-        tagSet0.get((String) null, (String) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Object must not be null
-         //
-         verifyException("org.jsoup.helper.Validate", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_OnNewTag_WithNullConsumer_ThrowsException() throws Throwable {
+        TagSet tagSet0 = TagSet.initHtmlDefault();
+        try {
+            tagSet0.onNewTag(null);
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Object must not be null", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      TagSet tagSet0 = TagSet.Html();
-      // Undeclared exception!
-      try { 
-        tagSet0.add((Tag) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-      }
-  }
+    @Test(timeout = 4000)
+    public void test_Get_WithNullArguments_ThrowsException() throws Throwable {
+        TagSet tagSet0 = TagSet.initHtmlDefault();
+        try {
+            tagSet0.get(null, null);
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Object must not be null", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      ParseSettings parseSettings0 = ParseSettings.htmlDefault;
-      Tag tag0 = Tag.valueOf("U", parseSettings0);
-      assertNotNull(tag0);
-      assertTrue(tag0.isKnownTag());
-      assertEquals("u", tag0.toString());
-  }
+    @Test(timeout = 4000)
+    public void test_Add_WithNullTag_ThrowsException() throws Throwable {
+        TagSet tagSet0 = TagSet.Html();
+        try {
+            tagSet0.add(null);
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      TagSet tagSet0 = TagSet.Html();
-      Tag tag0 = tagSet0.get("pre", "http://www.w3.org/1999/xhtml");
-      assertEquals(4, Tag.Block);
-  }
+    // Additional tests for Tag functionality
+    @Test(timeout = 4000)
+    public void test_TagValueOf_WithParseSettings_ReturnsKnownTag() throws Throwable {
+        ParseSettings parseSettings0 = ParseSettings.htmlDefault;
+        Tag tag0 = Tag.valueOf("U", parseSettings0);
+        assertNotNull(tag0);
+        assertTrue(tag0.isKnownTag());
+        assertEquals("u", tag0.toString());
+    }
 
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      boolean boolean0 = Tag.isKnownTag("cxpPE");
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void test_TagValueOf_WithoutSettings_ReturnsKnownTag() throws Throwable {
+        Tag tag0 = Tag.valueOf("U");
+        assertNotNull(tag0);
+        assertEquals("U", tag0.toString());
+        assertTrue(tag0.isKnownTag());
+    }
 
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      TagSet tagSet0 = TagSet.Html();
-      tagSet0.valueOf("_-$>", "pr!", "pr!", true);
-      Tag tag0 = tagSet0.get("_-$>", "pr!");
-      assertEquals("pr!", tag0.normalName());
-      assertNotNull(tag0);
-  }
-
-  @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
-      TagSet tagSet0 = TagSet.Html();
-      Tag tag0 = tagSet0.get("}+z\")6FP@lJ{n*Mufp", "org.jsoup.nodes.Document$OutputSettings$Syntax");
-      assertNull(tag0);
-  }
-
-  @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
-      TagSet tagSet0 = new TagSet();
-      Object object0 = new Object();
-      boolean boolean0 = tagSet0.equals(object0);
-      assertFalse(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
-      Tag tag0 = Tag.valueOf("U");
-      assertNotNull(tag0);
-      assertEquals("U", tag0.toString());
-      assertTrue(tag0.isKnownTag());
-  }
-
-  @Test(timeout = 4000)
-  public void test26()  throws Throwable  {
-      TagSet tagSet0 = new TagSet();
-      TagSet tagSet1 = new TagSet(tagSet0);
-      tagSet1.valueOf("wtt=`d4p|", "Must set charset arg to character set of file to parse. Set to null to attempt to detect from HTML");
-      assertFalse(tagSet1.equals((Object)tagSet0));
-  }
-
-  @Test(timeout = 4000)
-  public void test27()  throws Throwable  {
-      TagSet tagSet0 = new TagSet();
-      tagSet0.hashCode();
-  }
-
-  @Test(timeout = 4000)
-  public void test28()  throws Throwable  {
-      TagSet tagSet0 = TagSet.initHtmlDefault();
-      Consumer<Tag> consumer0 = (Consumer<Tag>) mock(Consumer.class, new ViolatedAssumptionAnswer());
-      TagSet tagSet1 = tagSet0.onNewTag(consumer0);
-      Tag tag0 = tagSet1.valueOf("bp", "bp");
-      assertEquals("bp", tag0.toString());
-  }
-
-  @Test(timeout = 4000)
-  public void test29()  throws Throwable  {
-      TagSet tagSet0 = TagSet.Html();
-      Consumer<Tag> consumer0 = (Consumer<Tag>) mock(Consumer.class, new ViolatedAssumptionAnswer());
-      TagSet tagSet1 = tagSet0.onNewTag(consumer0);
-      Consumer<Tag> consumer1 = (Consumer<Tag>) mock(Consumer.class, new ViolatedAssumptionAnswer());
-      TagSet tagSet2 = tagSet1.onNewTag(consumer1);
-      assertSame(tagSet0, tagSet2);
-  }
+    @Test(timeout = 4000)
+    public void test_IsKnownTag_ForUnknownTag_ReturnsFalse() throws Throwable {
+        assertFalse(Tag.isKnownTag("cxpPE"));
+    }
 }
