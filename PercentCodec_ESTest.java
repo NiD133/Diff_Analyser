@@ -13,213 +13,325 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class PercentCodec_ESTest extends PercentCodec_ESTest_scaffolding {
 
+  // Test encoding with custom always-encode characters
   @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      byte[] byteArray0 = new byte[5];
-      byteArray0[3] = (byte)70;
-      PercentCodec percentCodec0 = new PercentCodec(byteArray0, true);
-      byte[] byteArray1 = percentCodec0.encode(byteArray0);
-      assertEquals(15, byteArray1.length);
+  public void testEncodeWithCustomAlwaysEncodeChars() throws Throwable {
+    // Given: A byte array with one non-zero byte at position 3
+    byte[] customEncodeChars = new byte[5];
+    customEncodeChars[3] = (byte) 70; // ASCII 'F'
+    PercentCodec codec = new PercentCodec(customEncodeChars, true);
+    
+    // When: Encoding the same array
+    byte[] encoded = codec.encode(customEncodeChars);
+    
+    // Then: The result should be percent-encoded (3x longer due to %XX format)
+    assertEquals("Encoded array should be 3 times longer", 15, encoded.length);
   }
 
+  // Test decoding with custom always-encode characters
   @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      byte[] byteArray0 = new byte[5];
-      byteArray0[3] = (byte)70;
-      PercentCodec percentCodec0 = new PercentCodec(byteArray0, true);
-      byte[] byteArray1 = percentCodec0.decode(byteArray0);
-      assertArrayEquals(new byte[] {(byte)0, (byte)0, (byte)0, (byte)70, (byte)0}, byteArray1);
+  public void testDecodeWithCustomAlwaysEncodeChars() throws Throwable {
+    // Given: A byte array with one non-zero byte at position 3
+    byte[] customEncodeChars = new byte[5];
+    customEncodeChars[3] = (byte) 70; // ASCII 'F'
+    PercentCodec codec = new PercentCodec(customEncodeChars, true);
+    
+    // When: Decoding the array (assuming it's already encoded)
+    byte[] decoded = codec.decode(customEncodeChars);
+    
+    // Then: Should return the original array
+    assertArrayEquals("Decoded array should match original", 
+                     new byte[] {(byte)0, (byte)0, (byte)0, (byte)70, (byte)0}, decoded);
   }
 
+  // Test round-trip encoding and decoding
   @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      byte[] byteArray0 = new byte[5];
-      PercentCodec percentCodec0 = new PercentCodec(byteArray0, true);
-      byte[] byteArray1 = new byte[9];
-      byteArray1[0] = (byte) (-19);
-      byte[] byteArray2 = percentCodec0.encode(byteArray1);
-      byte[] byteArray3 = percentCodec0.decode(byteArray2);
-      assertEquals(9, byteArray3.length);
-      assertEquals(27, byteArray2.length);
-      assertArrayEquals(new byte[] {(byte) (-19), (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0}, byteArray3);
+  public void testRoundTripEncodingDecoding() throws Throwable {
+    // Given: A codec with custom encode chars and a test array with negative byte
+    byte[] customEncodeChars = new byte[5];
+    PercentCodec codec = new PercentCodec(customEncodeChars, true);
+    
+    byte[] originalData = new byte[9];
+    originalData[0] = (byte) (-19); // Negative byte that needs encoding
+    
+    // When: Encoding then decoding
+    byte[] encoded = codec.encode(originalData);
+    byte[] decoded = codec.decode(encoded);
+    
+    // Then: Should get back original data
+    assertEquals("Decoded array length should match original", 9, decoded.length);
+    assertEquals("Encoded array should be longer", 27, encoded.length);
+    assertArrayEquals("Round-trip should preserve original data", 
+                     new byte[] {(byte) (-19), (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0}, 
+                     decoded);
   }
 
+  // Test encoding with empty custom encode chars (no encoding needed)
   @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      byte[] byteArray0 = new byte[5];
-      byteArray0[3] = (byte)70;
-      byte[] byteArray1 = new byte[0];
-      PercentCodec percentCodec0 = new PercentCodec(byteArray1, true);
-      byte[] byteArray2 = percentCodec0.encode(byteArray0);
-      assertSame(byteArray2, byteArray0);
+  public void testEncodeWithEmptyCustomChars() throws Throwable {
+    // Given: A codec with no custom encode chars
+    byte[] testData = new byte[5];
+    testData[3] = (byte) 70;
+    byte[] emptyEncodeChars = new byte[0];
+    PercentCodec codec = new PercentCodec(emptyEncodeChars, true);
+    
+    // When: Encoding data
+    byte[] encoded = codec.encode(testData);
+    
+    // Then: Should return same array (no encoding needed)
+    assertSame("Should return same array when no encoding needed", encoded, testData);
   }
 
+  // Test decoding empty array
   @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      PercentCodec percentCodec0 = new PercentCodec();
-      byte[] byteArray0 = new byte[0];
-      byte[] byteArray1 = percentCodec0.decode(byteArray0);
-      assertEquals(0, byteArray1.length);
+  public void testDecodeEmptyArray() throws Throwable {
+    // Given: Default codec and empty array
+    PercentCodec codec = new PercentCodec();
+    byte[] emptyArray = new byte[0];
+    
+    // When: Decoding empty array
+    byte[] decoded = codec.decode(emptyArray);
+    
+    // Then: Should return empty array
+    assertEquals("Decoded empty array should be empty", 0, decoded.length);
   }
 
+  // Test constructor validation - negative bytes not allowed
   @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      byte[] byteArray0 = new byte[1];
-      byteArray0[0] = (byte) (-50);
-      PercentCodec percentCodec0 = null;
-      try {
-        percentCodec0 = new PercentCodec(byteArray0, true);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // byte must be >= 0
-         //
-         verifyException("org.apache.commons.codec.net.PercentCodec", e);
-      }
+  public void testConstructorRejectsNegativeBytes() throws Throwable {
+    // Given: Array with negative byte
+    byte[] invalidEncodeChars = new byte[1];
+    invalidEncodeChars[0] = (byte) (-50);
+    
+    // When/Then: Constructor should throw IllegalArgumentException
+    try {
+      new PercentCodec(invalidEncodeChars, true);
+      fail("Constructor should reject negative bytes");
+    } catch(IllegalArgumentException e) {
+      verifyException("org.apache.commons.codec.net.PercentCodec", e);
+      assertTrue("Error message should mention byte constraint", 
+                e.getMessage().contains("byte must be >= 0"));
+    }
   }
 
+  // Test encoding with different byte values
   @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      byte[] byteArray0 = new byte[5];
-      PercentCodec percentCodec0 = new PercentCodec(byteArray0, true);
-      byte[] byteArray1 = new byte[7];
-      byteArray1[6] = (byte)63;
-      byte[] byteArray2 = percentCodec0.encode(byteArray1);
-      assertEquals(19, byteArray2.length);
+  public void testEncodeWithSpecificByteValue() throws Throwable {
+    // Given: Codec with custom encode chars and test data
+    byte[] customEncodeChars = new byte[5];
+    PercentCodec codec = new PercentCodec(customEncodeChars, true);
+    
+    byte[] testData = new byte[7];
+    testData[6] = (byte) 63; // ASCII '?'
+    
+    // When: Encoding
+    byte[] encoded = codec.encode(testData);
+    
+    // Then: Should be percent-encoded
+    assertEquals("Encoded array should be longer", 19, encoded.length);
   }
 
+  // Test encoding null object
   @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      PercentCodec percentCodec0 = new PercentCodec();
-      Object object0 = percentCodec0.encode((Object) null);
-      assertNull(object0);
+  public void testEncodeNullObject() throws Throwable {
+    // Given: Default codec
+    PercentCodec codec = new PercentCodec();
+    
+    // When: Encoding null object
+    Object encoded = codec.encode((Object) null);
+    
+    // Then: Should return null
+    assertNull("Encoding null object should return null", encoded);
   }
 
+  // Test encoding invalid object type
   @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      PercentCodec percentCodec0 = new PercentCodec();
-      try { 
-        percentCodec0.encode((Object) percentCodec0);
-        fail("Expecting exception: Exception");
-      
-      } catch(Exception e) {
-         //
-         // Objects of type org.apache.commons.codec.net.PercentCodec cannot be Percent encoded
-         //
-         verifyException("org.apache.commons.codec.net.PercentCodec", e);
-      }
+  public void testEncodeInvalidObjectType() throws Throwable {
+    // Given: Default codec
+    PercentCodec codec = new PercentCodec();
+    
+    // When/Then: Should throw exception for invalid object type
+    try { 
+      codec.encode((Object) codec);
+      fail("Should throw exception for invalid object type");
+    } catch(Exception e) {
+      verifyException("org.apache.commons.codec.net.PercentCodec", e);
+      assertTrue("Error message should mention object type", 
+                e.getMessage().contains("cannot be Percent encoded"));
+    }
   }
 
+  // Test encoding with default codec (no custom chars)
   @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      PercentCodec percentCodec0 = new PercentCodec();
-      byte[] byteArray0 = new byte[2];
-      byte[] byteArray1 = percentCodec0.encode(byteArray0);
-      assertSame(byteArray1, byteArray0);
+  public void testEncodeWithDefaultCodec() throws Throwable {
+    // Given: Default codec and simple byte array
+    PercentCodec codec = new PercentCodec();
+    byte[] testData = new byte[2];
+    
+    // When: Encoding
+    byte[] encoded = codec.encode(testData);
+    
+    // Then: Should return same array (ASCII zeros don't need encoding)
+    assertSame("Should return same array for ASCII zeros", encoded, testData);
   }
 
+  // Test encoding null byte array
   @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      PercentCodec percentCodec0 = new PercentCodec();
-      byte[] byteArray0 = percentCodec0.encode((byte[]) null);
-      assertNull(byteArray0);
+  public void testEncodeNullByteArray() throws Throwable {
+    // Given: Default codec
+    PercentCodec codec = new PercentCodec();
+    
+    // When: Encoding null byte array
+    byte[] encoded = codec.encode((byte[]) null);
+    
+    // Then: Should return null
+    assertNull("Encoding null byte array should return null", encoded);
   }
 
+  // Test encoding with another specific byte value
   @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      byte[] byteArray0 = new byte[5];
-      PercentCodec percentCodec0 = new PercentCodec(byteArray0, true);
-      byte[] byteArray1 = new byte[9];
-      byteArray1[2] = (byte)22;
-      byte[] byteArray2 = percentCodec0.encode(byteArray1);
-      assertEquals(25, byteArray2.length);
+  public void testEncodeWithAnotherByteValue() throws Throwable {
+    // Given: Codec with custom encode chars
+    byte[] customEncodeChars = new byte[5];
+    PercentCodec codec = new PercentCodec(customEncodeChars, true);
+    
+    byte[] testData = new byte[9];
+    testData[2] = (byte) 22; // Control character
+    
+    // When: Encoding
+    byte[] encoded = codec.encode(testData);
+    
+    // Then: Should be percent-encoded
+    assertEquals("Encoded array should be longer", 25, encoded.length);
   }
 
+  // Test decoding null object
   @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      byte[] byteArray0 = new byte[5];
-      PercentCodec percentCodec0 = new PercentCodec(byteArray0, true);
-      Object object0 = percentCodec0.decode((Object) null);
-      assertNull(object0);
+  public void testDecodeNullObject() throws Throwable {
+    // Given: Codec with custom encode chars
+    byte[] customEncodeChars = new byte[5];
+    PercentCodec codec = new PercentCodec(customEncodeChars, true);
+    
+    // When: Decoding null object
+    Object decoded = codec.decode((Object) null);
+    
+    // Then: Should return null
+    assertNull("Decoding null object should return null", decoded);
   }
 
+  // Test decoding invalid object type
   @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      PercentCodec percentCodec0 = new PercentCodec();
-      try { 
-        percentCodec0.decode((Object) percentCodec0);
-        fail("Expecting exception: Exception");
-      
-      } catch(Exception e) {
-         //
-         // Objects of type org.apache.commons.codec.net.PercentCodec cannot be Percent decoded
-         //
-         verifyException("org.apache.commons.codec.net.PercentCodec", e);
-      }
+  public void testDecodeInvalidObjectType() throws Throwable {
+    // Given: Default codec
+    PercentCodec codec = new PercentCodec();
+    
+    // When/Then: Should throw exception for invalid object type
+    try { 
+      codec.decode((Object) codec);
+      fail("Should throw exception for invalid object type");
+    } catch(Exception e) {
+      verifyException("org.apache.commons.codec.net.PercentCodec", e);
+      assertTrue("Error message should mention object type", 
+                e.getMessage().contains("cannot be Percent decoded"));
+    }
   }
 
+  // Test decoding malformed percent encoding
   @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      PercentCodec percentCodec0 = new PercentCodec();
-      byte[] byteArray0 = new byte[6];
-      byteArray0[5] = (byte)37;
-      try { 
-        percentCodec0.decode(byteArray0);
-        fail("Expecting exception: Exception");
-      
-      } catch(Exception e) {
-         //
-         // Invalid percent decoding: 
-         //
-         verifyException("org.apache.commons.codec.net.PercentCodec", e);
-      }
+  public void testDecodeMalformedPercentEncoding() throws Throwable {
+    // Given: Default codec and malformed percent-encoded data
+    PercentCodec codec = new PercentCodec();
+    byte[] malformedData = new byte[6];
+    malformedData[5] = (byte) 37; // '%' without following hex digits
+    
+    // When/Then: Should throw exception for malformed data
+    try { 
+      codec.decode(malformedData);
+      fail("Should throw exception for malformed percent encoding");
+    } catch(Exception e) {
+      verifyException("org.apache.commons.codec.net.PercentCodec", e);
+      assertTrue("Error message should mention invalid decoding", 
+                e.getMessage().contains("Invalid percent decoding"));
+    }
   }
 
+  // Test decoding null byte array
   @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      PercentCodec percentCodec0 = new PercentCodec();
-      byte[] byteArray0 = percentCodec0.decode((byte[]) null);
-      assertNull(byteArray0);
+  public void testDecodeNullByteArray() throws Throwable {
+    // Given: Default codec
+    PercentCodec codec = new PercentCodec();
+    
+    // When: Decoding null byte array
+    byte[] decoded = codec.decode((byte[]) null);
+    
+    // Then: Should return null
+    assertNull("Decoding null byte array should return null", decoded);
   }
 
+  // Test encoding with null custom chars
   @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      byte[] byteArray0 = new byte[1];
-      PercentCodec percentCodec0 = new PercentCodec((byte[]) null, true);
-      byte[] byteArray1 = percentCodec0.encode(byteArray0);
-      assertSame(byteArray1, byteArray0);
-      assertNotNull(byteArray1);
+  public void testEncodeWithNullCustomChars() throws Throwable {
+    // Given: Codec with null custom chars and test data
+    byte[] testData = new byte[1];
+    PercentCodec codec = new PercentCodec((byte[]) null, true);
+    
+    // When: Encoding
+    byte[] encoded = codec.encode(testData);
+    
+    // Then: Should return same array
+    assertSame("Should return same array with null custom chars", encoded, testData);
+    assertNotNull("Encoded result should not be null", encoded);
   }
 
+  // Test round-trip with specific character
   @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      byte[] byteArray0 = new byte[1];
-      byteArray0[0] = (byte)43;
-      PercentCodec percentCodec0 = new PercentCodec(byteArray0, true);
-      byte[] byteArray1 = percentCodec0.decode(byteArray0);
-      byte[] byteArray2 = percentCodec0.encode(byteArray1);
-      assertArrayEquals(new byte[] {(byte)43}, byteArray2);
+  public void testRoundTripWithSpecificChar() throws Throwable {
+    // Given: Codec configured to always encode '+' character
+    byte[] customEncodeChars = new byte[1];
+    customEncodeChars[0] = (byte) 43; // ASCII '+'
+    PercentCodec codec = new PercentCodec(customEncodeChars, true);
+    
+    // When: Decoding then encoding
+    byte[] decoded = codec.decode(customEncodeChars);
+    byte[] encoded = codec.encode(decoded);
+    
+    // Then: Should get back original character
+    assertArrayEquals("Round-trip should preserve '+' character", 
+                     new byte[] {(byte)43}, encoded);
   }
 
+  // Test encoding empty array with empty custom chars
   @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      byte[] byteArray0 = new byte[0];
-      PercentCodec percentCodec0 = new PercentCodec(byteArray0, true);
-      byte[] byteArray1 = percentCodec0.encode(byteArray0);
-      assertSame(byteArray1, byteArray0);
-      assertNotNull(byteArray1);
+  public void testEncodeEmptyArrayWithEmptyCustomChars() throws Throwable {
+    // Given: Empty arrays for both data and custom chars
+    byte[] emptyData = new byte[0];
+    PercentCodec codec = new PercentCodec(emptyData, true);
+    
+    // When: Encoding empty data
+    byte[] encoded = codec.encode(emptyData);
+    
+    // Then: Should return same empty array
+    assertSame("Should return same empty array", encoded, emptyData);
+    assertNotNull("Encoded result should not be null", encoded);
   }
 
+  // Test encoding negative byte with default codec
   @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      PercentCodec percentCodec0 = new PercentCodec();
-      byte[] byteArray0 = new byte[2];
-      byteArray0[0] = (byte) (-114);
-      byte[] byteArray1 = percentCodec0.encode(byteArray0);
-      assertArrayEquals(new byte[] {(byte)37, (byte)56, (byte)69, (byte)0}, byteArray1);
+  public void testEncodeNegativeByteWithDefaultCodec() throws Throwable {
+    // Given: Default codec and array with negative byte
+    PercentCodec codec = new PercentCodec();
+    byte[] testData = new byte[2];
+    testData[0] = (byte) (-114); // Negative byte that needs encoding
+    
+    // When: Encoding
+    byte[] encoded = codec.encode(testData);
+    
+    // Then: Should be percent-encoded as %8E (hex for 142, which is -114 as unsigned)
+    assertArrayEquals("Negative byte should be percent-encoded correctly", 
+                     new byte[] {(byte)37, (byte)56, (byte)69, (byte)0}, encoded);
   }
 }
