@@ -22,43 +22,107 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for the utility methods in {@link CpioUtil}.
+ */
+@DisplayName("CpioUtil")
 class CpioUtilTest {
 
-    @Test
-    void testByteArray2longThrowsUnsupportedOperationException() {
-        assertThrows(UnsupportedOperationException.class, () -> CpioUtil.byteArray2long(new byte[1], true));
+    // The CPIO "old binary" magic number (0xc771) as a long.
+    private static final long OLD_BINARY_MAGIC_LONG = CpioConstants.MAGIC_OLD_BINARY;
+
+    // Byte representation of the magic number in big-endian format.
+    private static final byte[] OLD_BINARY_MAGIC_BIG_ENDIAN = {(byte) 0xc7, 0x71};
+
+    // Byte representation of the magic number in little-endian format (half-words swapped).
+    private static final byte[] OLD_BINARY_MAGIC_LITTLE_ENDIAN = {0x71, (byte) 0xc7};
+
+    @Nested
+    @DisplayName("long2byteArray()")
+    class LongToByteArrayTests {
+
+        @Test
+        @DisplayName("should convert a long to a big-endian byte array when not swapping")
+        void shouldConvertLongToBigEndianByteArray() {
+            // Arrange: 'swapHalfWord = false' corresponds to big-endian byte order.
+            final boolean swapHalfWord = false;
+
+            // Act
+            final byte[] result = CpioUtil.long2byteArray(OLD_BINARY_MAGIC_LONG, 2, swapHalfWord);
+
+            // Assert
+            assertArrayEquals(OLD_BINARY_MAGIC_BIG_ENDIAN, result);
+        }
+
+        @Test
+        @DisplayName("should convert a long to a little-endian byte array when swapping")
+        void shouldConvertLongToLittleEndianByteArray() {
+            // Arrange: 'swapHalfWord = true' corresponds to little-endian (swapped) byte order.
+            final boolean swapHalfWord = true;
+
+            // Act
+            final byte[] result = CpioUtil.long2byteArray(OLD_BINARY_MAGIC_LONG, 2, swapHalfWord);
+
+            // Assert
+            assertArrayEquals(OLD_BINARY_MAGIC_LITTLE_ENDIAN, result);
+        }
+
+        @Test
+        @DisplayName("should throw UnsupportedOperationException for zero length")
+        void shouldThrowExceptionForZeroLength() {
+            // Per Javadoc, length must be a *positive* multiple of two.
+            assertThrows(UnsupportedOperationException.class, () -> CpioUtil.long2byteArray(0L, 0, false));
+        }
+
+        @Test
+        @DisplayName("should throw UnsupportedOperationException for a non-multiple-of-two length")
+        void shouldThrowExceptionForNonMultipleOfTwoLength() {
+            // Per Javadoc, length must be a positive *multiple of two*.
+            final int invalidLength = 3; // An odd length is not a multiple of two.
+            assertThrows(UnsupportedOperationException.class, () -> CpioUtil.long2byteArray(0L, invalidLength, false));
+        }
     }
 
-    @Test
-    void testLong2byteArrayWithPositiveThrowsUnsupportedOperationException() {
-        assertThrows(UnsupportedOperationException.class, () -> CpioUtil.long2byteArray(0L, 1021, false));
-    }
+    @Nested
+    @DisplayName("byteArray2long()")
+    class ByteArrayToLongTests {
 
-    @Test
-    void testLong2byteArrayWithZeroThrowsUnsupportedOperationException() {
-        assertThrows(UnsupportedOperationException.class, () -> CpioUtil.long2byteArray(0L, 0, false));
-    }
+        @Test
+        @DisplayName("should convert a big-endian byte array to a long when not swapping")
+        void shouldConvertBigEndianByteArrayToLong() {
+            // Arrange: 'swapHalfWord = false' indicates the input is big-endian.
+            final boolean swapHalfWord = false;
 
-    @Test
-    void testOldBinMagic2ByteArrayNotSwapped() {
-        assertArrayEquals(new byte[] { (byte) 0xc7, 0x71 }, CpioUtil.long2byteArray(CpioConstants.MAGIC_OLD_BINARY, 2, false));
-    }
+            // Act
+            final long result = CpioUtil.byteArray2long(OLD_BINARY_MAGIC_BIG_ENDIAN, swapHalfWord);
 
-    @Test
-    void testOldBinMagic2ByteArraySwapped() {
-        assertArrayEquals(new byte[] { 0x71, (byte) 0xc7, }, CpioUtil.long2byteArray(CpioConstants.MAGIC_OLD_BINARY, 2, true));
-    }
+            // Assert
+            assertEquals(OLD_BINARY_MAGIC_LONG, result);
+        }
 
-    @Test
-    void testOldBinMagicFromByteArrayNotSwapped() {
-        assertEquals(CpioConstants.MAGIC_OLD_BINARY, CpioUtil.byteArray2long(new byte[] { (byte) 0xc7, 0x71 }, false));
-    }
+        @Test
+        @DisplayName("should convert a little-endian byte array to a long when swapping")
+        void shouldConvertLittleEndianByteArrayToLong() {
+            // Arrange: 'swapHalfWord = true' indicates the input is little-endian (swapped).
+            final boolean swapHalfWord = true;
 
-    @Test
-    void testOldBinMagicFromByteArraySwapped() {
-        assertEquals(CpioConstants.MAGIC_OLD_BINARY, CpioUtil.byteArray2long(new byte[] { 0x71, (byte) 0xc7 }, true));
-    }
+            // Act
+            final long result = CpioUtil.byteArray2long(OLD_BINARY_MAGIC_LITTLE_ENDIAN, swapHalfWord);
 
+            // Assert
+            assertEquals(OLD_BINARY_MAGIC_LONG, result);
+        }
+
+        @Test
+        @DisplayName("should throw UnsupportedOperationException for an array with an odd number of bytes")
+        void shouldThrowExceptionForOddLengthArray() {
+            // Per Javadoc, the array length must be a multiple of two.
+            final byte[] oddLengthArray = {1};
+            assertThrows(UnsupportedOperationException.class, () -> CpioUtil.byteArray2long(oddLengthArray, true));
+        }
+    }
 }
