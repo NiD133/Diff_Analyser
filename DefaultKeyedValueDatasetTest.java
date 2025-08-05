@@ -48,104 +48,64 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class DefaultKeyedValueDatasetTest {
 
-    // Test data constants for better maintainability
-    private static final String SAMPLE_KEY = "Test";
-    private static final String DIFFERENT_KEY = "Test 2";
-    private static final Double SAMPLE_VALUE = 45.5;
-    private static final Double DIFFERENT_VALUE = 45.6;
-    private static final Double UPDATED_VALUE = 99.9;
-    private static final Double SERIALIZATION_VALUE = 25.3;
-
     /**
-     * Tests that the equals method correctly identifies equal and unequal datasets.
-     * Verifies equality based on both key and value fields.
+     * Confirm that the equals method can distinguish all the required fields.
      */
     @Test
     public void testEquals() {
-        // Test: Identical datasets should be equal
-        DefaultKeyedValueDataset identicalDataset1 = new DefaultKeyedValueDataset(SAMPLE_KEY, SAMPLE_VALUE);
-        DefaultKeyedValueDataset identicalDataset2 = new DefaultKeyedValueDataset(SAMPLE_KEY, SAMPLE_VALUE);
-        
-        assertEquals(identicalDataset1, identicalDataset2, "Datasets with identical key and value should be equal");
-        assertEquals(identicalDataset2, identicalDataset1, "Equality should be symmetric");
 
-        // Test: Datasets with different keys should not be equal
-        DefaultKeyedValueDataset datasetWithDifferentKey = new DefaultKeyedValueDataset(DIFFERENT_KEY, SAMPLE_VALUE);
-        DefaultKeyedValueDataset originalDataset = new DefaultKeyedValueDataset(SAMPLE_KEY, SAMPLE_VALUE);
-        
-        assertNotEquals(originalDataset, datasetWithDifferentKey, 
-            "Datasets with different keys should not be equal");
+        DefaultKeyedValueDataset d1 = new DefaultKeyedValueDataset("Test", 45.5);
+        DefaultKeyedValueDataset d2 = new DefaultKeyedValueDataset("Test", 45.5);
+        assertEquals(d1, d2);
+        assertEquals(d2, d1);
 
-        // Test: Datasets with different values should not be equal
-        DefaultKeyedValueDataset datasetWithDifferentValue = new DefaultKeyedValueDataset(SAMPLE_KEY, DIFFERENT_VALUE);
-        DefaultKeyedValueDataset datasetWithOriginalValue = new DefaultKeyedValueDataset(SAMPLE_KEY, SAMPLE_VALUE);
-        
-        assertNotEquals(datasetWithOriginalValue, datasetWithDifferentValue, 
-            "Datasets with different values should not be equal");
+        d1 = new DefaultKeyedValueDataset("Test 1", 45.5);
+        d2 = new DefaultKeyedValueDataset("Test 2", 45.5);
+        assertNotEquals(d1, d2);
+
+        d1 = new DefaultKeyedValueDataset("Test", 45.5);
+        d2 = new DefaultKeyedValueDataset("Test", 45.6);
+        assertNotEquals(d1, d2);
+
     }
 
     /**
-     * Tests that cloning creates a proper copy of the dataset.
-     * Verifies that the clone is a separate instance but contains equal data.
+     * Confirm that cloning works.
+     * @throws java.lang.CloneNotSupportedException
      */
     @Test
     public void testCloning() throws CloneNotSupportedException {
-        // Given: A dataset with sample data
-        DefaultKeyedValueDataset originalDataset = new DefaultKeyedValueDataset(SAMPLE_KEY, SAMPLE_VALUE);
-        
-        // When: Cloning the dataset
-        DefaultKeyedValueDataset clonedDataset = (DefaultKeyedValueDataset) originalDataset.clone();
-        
-        // Then: Clone should be a separate instance with equal content
-        assertNotSame(originalDataset, clonedDataset, 
-            "Clone should be a different object instance");
-        assertSame(originalDataset.getClass(), clonedDataset.getClass(), 
-            "Clone should be of the same class");
-        assertEquals(originalDataset, clonedDataset, 
-            "Clone should contain equal data to the original");
+        DefaultKeyedValueDataset d1 = new DefaultKeyedValueDataset("Test", 45.5);
+        DefaultKeyedValueDataset d2 = (DefaultKeyedValueDataset) d1.clone();
+        assertNotSame(d1, d2);
+        assertSame(d1.getClass(), d2.getClass());
+        assertEquals(d1, d2);
     }
 
     /**
-     * Tests that cloned datasets are independent of each other.
-     * Verifies that modifying one dataset doesn't affect its clone.
+     * Confirm that the clone is independent of the original.
+     * @throws java.lang.CloneNotSupportedException
      */
     @Test
     public void testCloneIndependence() throws CloneNotSupportedException {
-        // Given: A dataset and its clone
-        DefaultKeyedValueDataset originalDataset = new DefaultKeyedValueDataset("Key", 10.0);
-        DefaultKeyedValueDataset clonedDataset = CloneUtils.clone(originalDataset);
-        
-        assertEquals(originalDataset, clonedDataset, "Initially, clone should equal original");
-        
-        // When: Modifying the clone's value
-        clonedDataset.updateValue(UPDATED_VALUE);
-        
-        // Then: Original and clone should no longer be equal
-        assertNotEquals(originalDataset, clonedDataset, 
-            "After modification, clone should differ from original");
-        
-        // When: Restoring the clone's value to match original
-        clonedDataset.updateValue(10.0);
-        
-        // Then: They should be equal again
-        assertEquals(originalDataset, clonedDataset, 
-            "After restoring value, clone should equal original again");
+        DefaultKeyedValueDataset d1
+            = new DefaultKeyedValueDataset("Key", 10.0);
+        DefaultKeyedValueDataset d2 = CloneUtils.clone(d1);
+        assertEquals(d1, d2);
+        d2.updateValue(99.9);
+        assertNotEquals(d1, d2);
+        d2.updateValue(10.0);
+        assertEquals(d1, d2);
     }
 
     /**
-     * Tests that the dataset can be properly serialized and deserialized.
-     * Verifies that serialization preserves the dataset's state.
+     * Serialize an instance, restore it, and check for equality.
      */
     @Test
     public void testSerialization() {
-        // Given: A dataset with sample data
-        DefaultKeyedValueDataset originalDataset = new DefaultKeyedValueDataset(SAMPLE_KEY, SERIALIZATION_VALUE);
-        
-        // When: Serializing and deserializing the dataset
-        DefaultKeyedValueDataset deserializedDataset = TestUtils.serialised(originalDataset);
-        
-        // Then: Deserialized dataset should equal the original
-        assertEquals(originalDataset, deserializedDataset, 
-            "Deserialized dataset should equal the original");
+        DefaultKeyedValueDataset d1 = new DefaultKeyedValueDataset("Test", 25.3);
+        DefaultKeyedValueDataset d2 = TestUtils.serialised(d1);
+        assertEquals(d1, d2);
     }
+
 }
