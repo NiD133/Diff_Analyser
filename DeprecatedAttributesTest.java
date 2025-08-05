@@ -24,52 +24,61 @@ import org.junit.jupiter.api.Test;
 class DeprecatedAttributesTest {
 
     @Test
-    void testBuilderNonDefaults() {
-        // @formatter:off
-        final DeprecatedAttributes value = DeprecatedAttributes.builder()
+    void testBuilderWithNonDefaultValues() {
+        // Create a DeprecatedAttributes instance with non-default values
+        final DeprecatedAttributes attributes = DeprecatedAttributes.builder()
                 .setDescription("Use Bar instead!")
                 .setForRemoval(true)
                 .setSince("2.0")
                 .get();
-        // @formatter:on
-        assertEquals("Use Bar instead!", value.getDescription());
-        assertEquals("2.0", value.getSince());
-        assertEquals(true, value.isForRemoval());
+
+        // Verify that the attributes are set correctly
+        assertEquals("Use Bar instead!", attributes.getDescription());
+        assertEquals("2.0", attributes.getSince());
+        assertEquals(true, attributes.isForRemoval());
     }
 
     @Test
-    void testBuilderNonDefaultsToString() {
-        // @formatter:off
+    void testBuilderToStringWithVariousCombinations() {
+        // Test toString output with all attributes set
         assertEquals("Deprecated for removal since 2.0: Use Bar instead!", DeprecatedAttributes.builder()
                 .setDescription("Use Bar instead!")
                 .setForRemoval(true)
                 .setSince("2.0")
                 .get().toString());
+
+        // Test toString output with description and forRemoval set
         assertEquals("Deprecated for removal: Use Bar instead!", DeprecatedAttributes.builder()
                 .setDescription("Use Bar instead!")
                 .setForRemoval(true)
                 .get().toString());
-        assertEquals("Deprecated since 2.0: Use Bar instead!",
-                DeprecatedAttributes.builder()
+
+        // Test toString output with description and since set
+        assertEquals("Deprecated since 2.0: Use Bar instead!", DeprecatedAttributes.builder()
                 .setDescription("Use Bar instead!")
                 .setSince("2.0")
                 .get().toString());
+
+        // Test toString output with only description set
         assertEquals("Deprecated: Use Bar instead!", DeprecatedAttributes.builder()
                 .setDescription("Use Bar instead!")
                 .get().toString());
-        // @formatter:on
     }
 
     @Test
-    void testDefaultBuilder() {
-        final DeprecatedAttributes defaultValue = DeprecatedAttributes.builder().get();
-        assertEquals(DeprecatedAttributes.DEFAULT.getDescription(), defaultValue.getDescription());
-        assertEquals(DeprecatedAttributes.DEFAULT.getSince(), defaultValue.getSince());
-        assertEquals(DeprecatedAttributes.DEFAULT.isForRemoval(), defaultValue.isForRemoval());
+    void testDefaultBuilderValues() {
+        // Create a DeprecatedAttributes instance with default values
+        final DeprecatedAttributes defaultAttributes = DeprecatedAttributes.builder().get();
+
+        // Verify that the default values match the DEFAULT instance
+        assertEquals(DeprecatedAttributes.DEFAULT.getDescription(), defaultAttributes.getDescription());
+        assertEquals(DeprecatedAttributes.DEFAULT.getSince(), defaultAttributes.getSince());
+        assertEquals(DeprecatedAttributes.DEFAULT.isForRemoval(), defaultAttributes.isForRemoval());
     }
 
     @Test
-    void testDefaultToString() {
+    void testDefaultToStringOutput() {
+        // Verify the toString output of the DEFAULT instance
         assertEquals("Deprecated", DeprecatedAttributes.DEFAULT.toString());
     }
 }
