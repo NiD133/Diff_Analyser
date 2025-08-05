@@ -9,270 +9,258 @@ import java.util.NoSuchElementException;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class NodeIteratorTest {
-    private static final String HTML = "<div id=1><p>One<p>Two</div><div id=2><p>Three<p>Four</div>";
+    String html = "<div id=1><p>One<p>Two</div><div id=2><p>Three<p>Four</div>";
 
-    @Test
-    void testNodeIteration() {
-        Document document = Jsoup.parse(HTML);
-        NodeIterator<Node> iterator = NodeIterator.from(document);
-        assertNodeSequence(iterator, "#root;html;head;body;div#1;p;One;p;Two;div#2;p;Three;p;Four;");
-        assertFalse(iterator.hasNext());
+    @Test void canIterateNodes() {
+        Document doc = Jsoup.parse(html);
+        NodeIterator<Node> it = NodeIterator.from(doc);
+        assertIterates(it, "#root;html;head;body;div#1;p;One;p;Two;div#2;p;Three;p;Four;");
+        assertFalse(it.hasNext());
 
-        assertThrows(NoSuchElementException.class, iterator::next);
-    }
-
-    @Test
-    void testHasNextIsIdempotent() {
-        Document document = Jsoup.parse(HTML);
-        NodeIterator<Node> iterator = NodeIterator.from(document);
-        assertTrue(iterator.hasNext());
-        assertTrue(iterator.hasNext());
-        assertNodeSequence(iterator, "#root;html;head;body;div#1;p;One;p;Two;div#2;p;Three;p;Four;");
-        assertFalse(iterator.hasNext());
-    }
-
-    @Test
-    void testIterateSubTree() {
-        Document document = Jsoup.parse(HTML);
-
-        Element firstDiv = document.expectFirst("div#1");
-        NodeIterator<Node> iterator1 = NodeIterator.from(firstDiv);
-        assertNodeSequence(iterator1, "div#1;p;One;p;Two;");
-        assertFalse(iterator1.hasNext());
-
-        Element secondDiv = document.expectFirst("div#2");
-        NodeIterator<Node> iterator2 = NodeIterator.from(secondDiv);
-        assertNodeSequence(iterator2, "div#2;p;Three;p;Four;");
-        assertFalse(iterator2.hasNext());
-    }
-
-    @Test
-    void testRestartIterator() {
-        Document document = Jsoup.parse(HTML);
-
-        NodeIterator<Node> iterator = NodeIterator.from(document);
-        assertNodeSequence(iterator, "#root;html;head;body;div#1;p;One;p;Two;div#2;p;Three;p;Four;");
-
-        iterator.restart(document.expectFirst("div#2"));
-        assertNodeSequence(iterator, "div#2;p;Three;p;Four;");
-    }
-
-    @Test
-    void testIterateSingleSibling() {
-        Document document = Jsoup.parse(HTML);
-        Element paragraphTwo = document.expectFirst("p:contains(Two)");
-        assertEquals("Two", paragraphTwo.text());
-
-        NodeIterator<Node> iterator = NodeIterator.from(paragraphTwo);
-        assertNodeSequence(iterator, "p;Two;");
-
-        NodeIterator<Element> elementIterator = new NodeIterator<>(paragraphTwo, Element.class);
-        Element foundElement = elementIterator.next();
-        assertSame(paragraphTwo, foundElement);
-        assertFalse(elementIterator.hasNext());
-    }
-
-    @Test
-    void testIterateFirstEmptySibling() {
-        Document document = Jsoup.parse("<div><p id=1></p><p id=2>.</p><p id=3>..</p>");
-        Element firstParagraph = document.expectFirst("p#1");
-        assertEquals("", firstParagraph.ownText());
-
-        NodeIterator<Node> iterator = NodeIterator.from(firstParagraph);
-        assertTrue(iterator.hasNext());
-        Node node = iterator.next();
-        assertSame(firstParagraph, node);
-        assertFalse(iterator.hasNext());
-    }
-
-    @Test
-    void testRemoveNodeViaIterator() {
-        String htmlContent = "<div id=out1><div id=1><p>One<p>Two</div><div id=2><p>Three<p>Four</div></div><div id=out2>Out2";
-        Document document = Jsoup.parse(htmlContent);
-
-        NodeIterator<Node> iterator = NodeIterator.from(document);
-        StringBuilder seenNodes = new StringBuilder();
-        while (iterator.hasNext()) {
-            Node node = iterator.next();
-            if (node.attr("id").equals("1")) {
-                iterator.remove();
-            }
-            trackSeenNodes(node, seenNodes);
+        boolean threw = false;
+        try {
+            it.next();
+        } catch (NoSuchElementException e) {
+            threw = true;
         }
-        assertEquals("#root;html;head;body;div#out1;div#1;div#2;p;Three;p;Four;div#out2;Out2;", seenNodes.toString());
-        assertDocumentContents(document, "#root;html;head;body;div#out1;div#2;p;Three;p;Four;div#out2;Out2;");
-
-        iterator = NodeIterator.from(document);
-        seenNodes = new StringBuilder();
-        while (iterator.hasNext()) {
-            Node node = iterator.next();
-            if (node.attr("id").equals("2")) {
-                iterator.remove();
-            }
-            trackSeenNodes(node, seenNodes);
-        }
-        assertEquals("#root;html;head;body;div#out1;div#2;div#out2;Out2;", seenNodes.toString());
-        assertDocumentContents(document, "#root;html;head;body;div#out1;div#out2;Out2;");
+        assertTrue(threw);
     }
 
-    @Test
-    void testRemoveNodeDirectly() {
-        String htmlContent = "<div id=out1><div id=1><p>One<p>Two</div><div id=2><p>Three<p>Four</div></div><div id=out2>Out2";
-        Document document = Jsoup.parse(htmlContent);
+    @Test void hasNextIsPure() {
+        Document doc = Jsoup.parse(html);
+        NodeIterator<Node> it = NodeIterator.from(doc);
+        assertTrue(it.hasNext());
+        assertTrue(it.hasNext());
+        assertIterates(it, "#root;html;head;body;div#1;p;One;p;Two;div#2;p;Three;p;Four;");
+        assertFalse(it.hasNext());
+    }
 
-        NodeIterator<Node> iterator = NodeIterator.from(document);
-        StringBuilder seenNodes = new StringBuilder();
-        while (iterator.hasNext()) {
-            Node node = iterator.next();
-            if (node.attr("id").equals("1")) {
+    @Test void iterateSubTree() {
+        Document doc = Jsoup.parse(html);
+
+        Element div1 = doc.expectFirst("div#1");
+        NodeIterator<Node> it = NodeIterator.from(div1);
+        assertIterates(it, "div#1;p;One;p;Two;");
+        assertFalse(it.hasNext());
+
+        Element div2 = doc.expectFirst("div#2");
+        NodeIterator<Node> it2 = NodeIterator.from(div2);
+        assertIterates(it2, "div#2;p;Three;p;Four;");
+        assertFalse(it2.hasNext());
+    }
+
+    @Test void canRestart() {
+        Document doc = Jsoup.parse(html);
+
+        NodeIterator<Node> it = NodeIterator.from(doc);
+        assertIterates(it, "#root;html;head;body;div#1;p;One;p;Two;div#2;p;Three;p;Four;");
+
+        it.restart(doc.expectFirst("div#2"));
+        assertIterates(it, "div#2;p;Three;p;Four;");
+    }
+
+    @Test void canIterateJustOneSibling() {
+        Document doc = Jsoup.parse(html);
+        Element p2 = doc.expectFirst("p:contains(Two)");
+        assertEquals("Two", p2.text());
+
+        NodeIterator<Node> it = NodeIterator.from(p2);
+        assertIterates(it, "p;Two;");
+
+        NodeIterator<Element> elIt = new NodeIterator<>(p2, Element.class);
+        Element found = elIt.next();
+        assertSame(p2, found);
+        assertFalse(elIt.hasNext());
+    }
+
+    @Test void canIterateFirstEmptySibling() {
+        Document doc = Jsoup.parse("<div><p id=1></p><p id=2>.</p><p id=3>..</p>");
+        Element p1 = doc.expectFirst("p#1");
+        assertEquals("", p1.ownText());
+
+        NodeIterator<Node> it = NodeIterator.from(p1);
+        assertTrue(it.hasNext());
+        Node node = it.next();
+        assertSame(p1, node);
+        assertFalse(it.hasNext());
+    }
+
+    @Test void canRemoveViaIterator() {
+        String html = "<div id=out1><div id=1><p>One<p>Two</div><div id=2><p>Three<p>Four</div></div><div id=out2>Out2";
+        Document doc = Jsoup.parse(html);
+
+        NodeIterator<Node> it = NodeIterator.from(doc);
+        StringBuilder seen = new StringBuilder();
+        while (it.hasNext()) {
+            Node node = it.next();
+            if (node.attr("id").equals("1"))
+                it.remove();
+            trackSeen(node, seen);
+        }
+        assertEquals("#root;html;head;body;div#out1;div#1;div#2;p;Three;p;Four;div#out2;Out2;", seen.toString());
+        assertContents(doc, "#root;html;head;body;div#out1;div#2;p;Three;p;Four;div#out2;Out2;");
+
+        it = NodeIterator.from(doc);
+        seen = new StringBuilder();
+        while (it.hasNext()) {
+            Node node = it.next();
+            if (node.attr("id").equals("2"))
+                it.remove();
+            trackSeen(node, seen);
+        }
+        assertEquals("#root;html;head;body;div#out1;div#2;div#out2;Out2;", seen.toString());
+        assertContents(doc, "#root;html;head;body;div#out1;div#out2;Out2;");
+    }
+
+    @Test void canRemoveViaNode() {
+        String html = "<div id=out1><div id=1><p>One<p>Two</div><div id=2><p>Three<p>Four</div></div><div id=out2>Out2";
+        Document doc = Jsoup.parse(html);
+
+        NodeIterator<Node> it = NodeIterator.from(doc);
+        StringBuilder seen = new StringBuilder();
+        while (it.hasNext()) {
+            Node node = it.next();
+            if (node.attr("id").equals("1"))
                 node.remove();
-            }
-            trackSeenNodes(node, seenNodes);
+            trackSeen(node, seen);
         }
-        assertEquals("#root;html;head;body;div#out1;div#1;div#2;p;Three;p;Four;div#out2;Out2;", seenNodes.toString());
-        assertDocumentContents(document, "#root;html;head;body;div#out1;div#2;p;Three;p;Four;div#out2;Out2;");
+        assertEquals("#root;html;head;body;div#out1;div#1;div#2;p;Three;p;Four;div#out2;Out2;", seen.toString());
+        assertContents(doc, "#root;html;head;body;div#out1;div#2;p;Three;p;Four;div#out2;Out2;");
 
-        iterator = NodeIterator.from(document);
-        seenNodes = new StringBuilder();
-        while (iterator.hasNext()) {
-            Node node = iterator.next();
-            if (node.attr("id").equals("2")) {
+        it = NodeIterator.from(doc);
+        seen = new StringBuilder();
+        while (it.hasNext()) {
+            Node node = it.next();
+            if (node.attr("id").equals("2"))
                 node.remove();
-            }
-            trackSeenNodes(node, seenNodes);
+            trackSeen(node, seen);
         }
-        assertEquals("#root;html;head;body;div#out1;div#2;div#out2;Out2;", seenNodes.toString());
-        assertDocumentContents(document, "#root;html;head;body;div#out1;div#out2;Out2;");
+        assertEquals("#root;html;head;body;div#out1;div#2;div#out2;Out2;", seen.toString());
+        assertContents(doc, "#root;html;head;body;div#out1;div#out2;Out2;");
     }
 
-    @Test
-    void testReplaceNode() {
-        String htmlContent = "<div id=out1><div id=1><p>One<p>Two</div><div id=2><p>Three<p>Four</div></div><div id=out2>Out2";
-        Document document = Jsoup.parse(htmlContent);
+    @Test void canReplace() {
+        String html = "<div id=out1><div id=1><p>One<p>Two</div><div id=2><p>Three<p>Four</div></div><div id=out2>Out2";
+        Document doc = Jsoup.parse(html);
 
-        NodeIterator<Node> iterator = NodeIterator.from(document);
-        StringBuilder seenNodes = new StringBuilder();
-        while (iterator.hasNext()) {
-            Node node = iterator.next();
-            trackSeenNodes(node, seenNodes);
+        NodeIterator<Node> it = NodeIterator.from(doc);
+        StringBuilder seen = new StringBuilder();
+        while (it.hasNext()) {
+            Node node = it.next();
+            trackSeen(node, seen);
             if (node.attr("id").equals("1")) {
                 node.replaceWith(new Element("span").text("Foo"));
             }
         }
-        assertEquals("#root;html;head;body;div#out1;div#1;span;Foo;div#2;p;Three;p;Four;div#out2;Out2;", seenNodes.toString());
-        assertDocumentContents(document, "#root;html;head;body;div#out1;span;Foo;div#2;p;Three;p;Four;div#out2;Out2;");
+        assertEquals("#root;html;head;body;div#out1;div#1;span;Foo;div#2;p;Three;p;Four;div#out2;Out2;", seen.toString());
+        // ^^ we don't see <p>One, do see the replaced in <span>, and the subsequent nodes
+        assertContents(doc, "#root;html;head;body;div#out1;span;Foo;div#2;p;Three;p;Four;div#out2;Out2;");
 
-        iterator = NodeIterator.from(document);
-        seenNodes = new StringBuilder();
-        while (iterator.hasNext()) {
-            Node node = iterator.next();
-            trackSeenNodes(node, seenNodes);
+        it = NodeIterator.from(doc);
+        seen = new StringBuilder();
+        while (it.hasNext()) {
+            Node node = it.next();
+            trackSeen(node, seen);
             if (node.attr("id").equals("2")) {
                 node.replaceWith(new Element("span").text("Bar"));
             }
         }
-        assertEquals("#root;html;head;body;div#out1;span;Foo;div#2;span;Bar;div#out2;Out2;", seenNodes.toString());
-        assertDocumentContents(document, "#root;html;head;body;div#out1;span;Foo;span;Bar;div#out2;Out2;");
+        assertEquals("#root;html;head;body;div#out1;span;Foo;div#2;span;Bar;div#out2;Out2;", seen.toString());
+        assertContents(doc, "#root;html;head;body;div#out1;span;Foo;span;Bar;div#out2;Out2;");
     }
 
-    @Test
-    void testWrapNode() {
-        Document document = Jsoup.parse(HTML);
-        NodeIterator<Node> iterator = NodeIterator.from(document);
-        boolean sawInnerText = false;
-        while (iterator.hasNext()) {
-            Node node = iterator.next();
+    @Test void canWrap() {
+        Document doc = Jsoup.parse(html);
+        NodeIterator<Node> it = NodeIterator.from(doc);
+        boolean sawInner = false;
+        while (it.hasNext()) {
+            Node node = it.next();
             if (node.attr("id").equals("1")) {
                 node.wrap("<div id=outer>");
             }
-            if (node instanceof TextNode && ((TextNode) node).text().equals("One")) {
-                sawInnerText = true;
-            }
+            if (node instanceof TextNode && ((TextNode) node).text().equals("One"))
+                sawInner = true;
         }
-        assertDocumentContents(document, "#root;html;head;body;div#outer;div#1;p;One;p;Two;div#2;p;Three;p;Four;");
-        assertTrue(sawInnerText);
+        assertContents(doc, "#root;html;head;body;div#outer;div#1;p;One;p;Two;div#2;p;Three;p;Four;");
+        assertTrue(sawInner);
     }
 
-    @Test
-    void testFilterForElements() {
-        Document document = Jsoup.parse(HTML);
-        NodeIterator<Element> iterator = new NodeIterator<>(document, Element.class);
+    @Test void canFilterForElements() {
+        Document doc = Jsoup.parse(html);
+        NodeIterator<Element> it = new NodeIterator<>(doc, Element.class);
 
-        StringBuilder seenElements = new StringBuilder();
-        while (iterator.hasNext()) {
-            Element element = iterator.next();
-            assertNotNull(element);
-            trackSeenNodes(element, seenElements);
+        StringBuilder seen = new StringBuilder();
+        while (it.hasNext()) {
+            Element el = it.next();
+            assertNotNull(el);
+            trackSeen(el, seen);
         }
 
-        assertEquals("#root;html;head;body;div#1;p;p;div#2;p;p;", seenElements.toString());
+        assertEquals("#root;html;head;body;div#1;p;p;div#2;p;p;", seen.toString());
     }
 
-    @Test
-    void testFilterForTextNodes() {
-        Document document = Jsoup.parse(HTML);
-        NodeIterator<TextNode> iterator = new NodeIterator<>(document, TextNode.class);
+    @Test void canFilterForTextNodes() {
+        Document doc = Jsoup.parse(html);
+        NodeIterator<TextNode> it = new NodeIterator<>(doc, TextNode.class);
 
-        StringBuilder seenTextNodes = new StringBuilder();
-        while (iterator.hasNext()) {
-            TextNode textNode = iterator.next();
-            assertNotNull(textNode);
-            trackSeenNodes(textNode, seenTextNodes);
+        StringBuilder seen = new StringBuilder();
+        while (it.hasNext()) {
+            TextNode text = it.next();
+            assertNotNull(text);
+            trackSeen(text, seen);
         }
 
-        assertEquals("One;Two;Three;Four;", seenTextNodes.toString());
-        assertDocumentContents(document, "#root;html;head;body;div#1;p;One;p;Two;div#2;p;Three;p;Four;");
+        assertEquals("One;Two;Three;Four;", seen.toString());
+        assertContents(doc, "#root;html;head;body;div#1;p;One;p;Two;div#2;p;Three;p;Four;");
     }
 
-    @Test
-    void testModifyFilteredElements() {
-        Document document = Jsoup.parse(HTML);
-        NodeIterator<Element> iterator = new NodeIterator<>(document, Element.class);
+    @Test void canModifyFilteredElements() {
+        Document doc = Jsoup.parse(html);
+        NodeIterator<Element> it = new NodeIterator<>(doc, Element.class);
 
-        StringBuilder seenElements = new StringBuilder();
-        while (iterator.hasNext()) {
-            Element element = iterator.next();
-            if (!element.ownText().isEmpty()) {
-                element.text(element.ownText() + "++");
-            }
-            trackSeenNodes(element, seenElements);
+        StringBuilder seen = new StringBuilder();
+        while (it.hasNext()) {
+            Element el = it.next();
+            if (!el.ownText().isEmpty())
+                el.text(el.ownText() + "++");
+            trackSeen(el, seen);
         }
 
-        assertEquals("#root;html;head;body;div#1;p;p;div#2;p;p;", seenElements.toString());
-        assertDocumentContents(document, "#root;html;head;body;div#1;p;One++;p;Two++;div#2;p;Three++;p;Four++;");
+        assertEquals("#root;html;head;body;div#1;p;p;div#2;p;p;", seen.toString());
+        assertContents(doc, "#root;html;head;body;div#1;p;One++;p;Two++;div#2;p;Three++;p;Four++;");
     }
 
-    private static <T extends Node> void assertNodeSequence(Iterator<T> iterator, String expectedSequence) {
-        Node previousNode = null;
-        StringBuilder actualSequence = new StringBuilder();
-        while (iterator.hasNext()) {
-            Node currentNode = iterator.next();
-            assertNotNull(currentNode);
-            assertNotSame(previousNode, currentNode);
+    static <T extends Node> void assertIterates(Iterator<T> it, String expected) {
+        Node previous = null;
+        StringBuilder actual = new StringBuilder();
+        while (it.hasNext()) {
+            Node node = it.next();
+            assertNotNull(node);
+            assertNotSame(previous, node);
 
-            trackSeenNodes(currentNode, actualSequence);
-            previousNode = currentNode;
+            trackSeen(node, actual);
+            previous = node;
         }
-        assertEquals(expectedSequence, actualSequence.toString());
+        assertEquals(expected, actual.toString());
     }
 
-    private static void assertDocumentContents(Element element, String expectedContents) {
-        NodeIterator<Node> iterator = NodeIterator.from(element);
-        assertNodeSequence(iterator, expectedContents);
+    static void assertContents(Element el, String expected) {
+        NodeIterator<Node> it = NodeIterator.from(el);
+        assertIterates(it, expected);
     }
 
-    private static void trackSeenNodes(Node node, StringBuilder actualSequence) {
+    public static void trackSeen(Node node, StringBuilder actual) {
         if (node instanceof Element) {
-            Element element = (Element) node;
-            actualSequence.append(element.tagName());
-            if (element.hasAttr("id")) {
-                actualSequence.append("#").append(element.id());
-            }
-        } else if (node instanceof TextNode) {
-            actualSequence.append(((TextNode) node).text());
-        } else {
-            actualSequence.append(node.nodeName());
+            Element el = (Element) node;
+            actual.append(el.tagName());
+            if (el.hasAttr("id"))
+                actual.append("#").append(el.id());
         }
-        actualSequence.append(";");
+        else if (node instanceof TextNode)
+            actual.append(((TextNode) node).text());
+        else
+            actual.append(node.nodeName());
+        actual.append(";");
     }
+
 }
