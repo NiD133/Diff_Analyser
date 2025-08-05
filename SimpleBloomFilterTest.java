@@ -31,13 +31,30 @@ class SimpleBloomFilterTest extends AbstractBloomFilterTest<SimpleBloomFilter> {
         return new SimpleBloomFilter(shape);
     }
 
+    /**
+     * Tests that merging a BitMapExtractor that provides fewer bitmaps (longs)
+     * than the filter's shape requires still works correctly. The filter should
+     * merge the bitmaps that are provided.
+     */
     @Test
-    void testMergeShortBitMapExtractor() {
+    void testMergeWithBitMapExtractorShorterThanShape() {
+        // Arrange
+        // The test shape from the abstract class is configured to require 2 longs for its bitmap.
         final SimpleBloomFilter filter = createEmptyFilter(getTestShape());
-        // create a bitMapExtractor that returns too few values
-        // shape expects 2 longs we are sending 1.
-        final BitMapExtractor bitMapExtractor = p -> p.test(2L);
-        assertTrue(filter.merge(bitMapExtractor));
-        assertEquals(1, filter.cardinality());
+
+        // Create a BitMapExtractor that provides only one long, which is fewer than the shape requires.
+        // The value 2L (binary ...0010) has a single bit set, resulting in a cardinality of 1.
+        final long bitmapWithOneBit = 2L;
+        final BitMapExtractor extractorWithFewerBitMaps = consumer -> consumer.test(bitmapWithOneBit);
+
+        // Act
+        final boolean hasChanged = filter.merge(extractorWithFewerBitMaps);
+
+        // Assert
+        assertTrue(hasChanged, "merge() should return true as the filter was modified.");
+
+        final int expectedCardinality = 1;
+        assertEquals(expectedCardinality, filter.cardinality(),
+                "Cardinality should reflect the single bit set in the provided bitmap.");
     }
 }
