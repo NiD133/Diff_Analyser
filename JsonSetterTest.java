@@ -4,103 +4,140 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class JsonSetterTest
-{
-    private final static class Bogus {
-        @JsonSetter(nulls=Nulls.FAIL, contentNulls=Nulls.SKIP)
-        public int field;
+/**
+ * Test suite for JsonSetter.Value class functionality.
+ * Tests the configuration value object that encapsulates JsonSetter annotation settings
+ * for null handling during JSON deserialization.
+ */
+public class JsonSetterTest {
+    
+    /**
+     * Test helper class with JsonSetter annotation configured for:
+     * - nulls=FAIL: Fail when encountering null values
+     * - contentNulls=SKIP: Skip null values in collections/arrays
+     */
+    private final static class TestClassWithJsonSetterAnnotation {
+        @JsonSetter(nulls = Nulls.FAIL, contentNulls = Nulls.SKIP)
+        public int annotatedField;
     }
 
-    private final JsonSetter.Value EMPTY = JsonSetter.Value.empty();
+    private final JsonSetter.Value emptyValue = JsonSetter.Value.empty();
 
     @Test
-    public void testEmpty()
-    {
-        assertEquals(Nulls.DEFAULT, EMPTY.getValueNulls());
-        assertEquals(Nulls.DEFAULT, EMPTY.getContentNulls());
+    public void testEmptyValueHasDefaultSettings() {
+        // Empty value should have default null handling for both value and content nulls
+        assertEquals(Nulls.DEFAULT, emptyValue.getValueNulls());
+        assertEquals(Nulls.DEFAULT, emptyValue.getContentNulls());
 
-        assertEquals(JsonSetter.class, EMPTY.valueFor());
+        // Should be associated with JsonSetter annotation
+        assertEquals(JsonSetter.class, emptyValue.valueFor());
 
-        assertNull(EMPTY.nonDefaultValueNulls());
-        assertNull(EMPTY.nonDefaultContentNulls());
+        // Non-default accessors should return null when values are default
+        assertNull(emptyValue.nonDefaultValueNulls());
+        assertNull(emptyValue.nonDefaultContentNulls());
     }
 
     @Test
-    public void testStdMethods() {
+    public void testStandardObjectMethods() {
+        // Test toString() produces expected format
         assertEquals("JsonSetter.Value(valueNulls=DEFAULT,contentNulls=DEFAULT)",
-                EMPTY.toString());
-        int x = EMPTY.hashCode();
-        if (x == 0) { // no fixed value, but should not evaluate to 0
-            fail();
+                emptyValue.toString());
+        
+        // Test hashCode() returns non-zero value
+        int hashCode = emptyValue.hashCode();
+        if (hashCode == 0) {
+            fail("HashCode should not be zero");
         }
-        assertEquals(EMPTY, EMPTY);
-        assertFalse(EMPTY.equals(null));
-        assertFalse(EMPTY.equals("xyz"));
+        
+        // Test equals() method behavior
+        assertEquals(emptyValue, emptyValue); // reflexive
+        assertFalse(emptyValue.equals(null)); // null comparison
+        assertFalse(emptyValue.equals("xyz")); // different type comparison
     }
 
     @Test
-    public void testFromAnnotation() throws Exception
-    {
-        assertSame(EMPTY, JsonSetter.Value.from(null)); // legal
+    public void testCreatingValueFromAnnotation() throws Exception {
+        // Creating from null annotation should return empty value
+        assertSame(emptyValue, JsonSetter.Value.from(null));
 
-        JsonSetter ann = Bogus.class.getField("field").getAnnotation(JsonSetter.class);
-        JsonSetter.Value v = JsonSetter.Value.from(ann);
-        assertEquals(Nulls.FAIL, v.getValueNulls());
-        assertEquals(Nulls.SKIP, v.getContentNulls());
+        // Extract annotation from test class and create Value from it
+        JsonSetter annotation = TestClassWithJsonSetterAnnotation.class
+                .getField("annotatedField")
+                .getAnnotation(JsonSetter.class);
+        
+        JsonSetter.Value valueFromAnnotation = JsonSetter.Value.from(annotation);
+        
+        // Should match the annotation's configured values
+        assertEquals(Nulls.FAIL, valueFromAnnotation.getValueNulls());
+        assertEquals(Nulls.SKIP, valueFromAnnotation.getContentNulls());
     }
 
     @Test
-    public void testConstruct() throws Exception
-    {
-        JsonSetter.Value v = JsonSetter.Value.construct(null, null);
-        assertSame(EMPTY, v);
+    public void testConstructorWithNullParameters() throws Exception {
+        // Constructing with null parameters should return empty value
+        JsonSetter.Value constructedValue = JsonSetter.Value.construct(null, null);
+        assertSame(emptyValue, constructedValue);
     }
 
     @Test
-    public void testFactories() throws Exception
-    {
-        JsonSetter.Value v = JsonSetter.Value.forContentNulls(Nulls.SET);
-        assertEquals(Nulls.DEFAULT, v.getValueNulls());
-        assertEquals(Nulls.SET, v.getContentNulls());
-        assertEquals(Nulls.SET, v.nonDefaultContentNulls());
+    public void testFactoryMethodsForSpecificNullHandling() throws Exception {
+        // Test factory method for content nulls only
+        JsonSetter.Value contentNullsValue = JsonSetter.Value.forContentNulls(Nulls.SET);
+        assertEquals(Nulls.DEFAULT, contentNullsValue.getValueNulls());
+        assertEquals(Nulls.SET, contentNullsValue.getContentNulls());
+        assertEquals(Nulls.SET, contentNullsValue.nonDefaultContentNulls());
 
-        JsonSetter.Value skip = JsonSetter.Value.forValueNulls(Nulls.SKIP);
-        assertEquals(Nulls.SKIP, skip.getValueNulls());
-        assertEquals(Nulls.DEFAULT, skip.getContentNulls());
-        assertEquals(Nulls.SKIP, skip.nonDefaultValueNulls());
+        // Test factory method for value nulls only
+        JsonSetter.Value valueNullsValue = JsonSetter.Value.forValueNulls(Nulls.SKIP);
+        assertEquals(Nulls.SKIP, valueNullsValue.getValueNulls());
+        assertEquals(Nulls.DEFAULT, valueNullsValue.getContentNulls());
+        assertEquals(Nulls.SKIP, valueNullsValue.nonDefaultValueNulls());
     }
 
     @Test
-    public void testSimpleMerge()
-    {
-        JsonSetter.Value v = EMPTY.withContentNulls(Nulls.SKIP);
-        assertEquals(Nulls.SKIP, v.getContentNulls());
-        v = v.withValueNulls(Nulls.FAIL);
-        assertEquals(Nulls.FAIL, v.getValueNulls());
+    public void testBuildingValueWithChainedMethods() {
+        // Start with empty value and chain modifications
+        JsonSetter.Value modifiedValue = emptyValue.withContentNulls(Nulls.SKIP);
+        assertEquals(Nulls.SKIP, modifiedValue.getContentNulls());
+        
+        // Chain another modification
+        modifiedValue = modifiedValue.withValueNulls(Nulls.FAIL);
+        assertEquals(Nulls.FAIL, modifiedValue.getValueNulls());
     }
 
     @Test
-    public void testWithMethods()
-    {
-        JsonSetter.Value v = EMPTY.withContentNulls(null);
-        assertSame(EMPTY, v);
-        v = v.withContentNulls(Nulls.FAIL);
-        assertEquals(Nulls.FAIL, v.getContentNulls());
-        assertSame(v, v.withContentNulls(Nulls.FAIL));
+    public void testWithMethodsBehaviorAndImmutability() {
+        // Setting null should return same instance (no change)
+        JsonSetter.Value unchangedValue = emptyValue.withContentNulls(null);
+        assertSame(emptyValue, unchangedValue);
+        
+        // Setting actual value should create new instance
+        JsonSetter.Value modifiedValue = unchangedValue.withContentNulls(Nulls.FAIL);
+        assertEquals(Nulls.FAIL, modifiedValue.getContentNulls());
+        
+        // Setting same value again should return same instance (optimization)
+        assertSame(modifiedValue, modifiedValue.withContentNulls(Nulls.FAIL));
 
-        JsonSetter.Value v2 = v.withValueNulls(Nulls.SKIP);
-        assertEquals(Nulls.SKIP, v2.getValueNulls());
-        assertFalse(v.equals(v2));
-        assertFalse(v2.equals(v));
+        // Test value nulls modification
+        JsonSetter.Value valueNullsModified = modifiedValue.withValueNulls(Nulls.SKIP);
+        assertEquals(Nulls.SKIP, valueNullsModified.getValueNulls());
+        
+        // Original and modified should not be equal
+        assertFalse(modifiedValue.equals(valueNullsModified));
+        assertFalse(valueNullsModified.equals(modifiedValue));
 
-        JsonSetter.Value v3 = v2.withValueNulls(null, null);
-        assertEquals(Nulls.DEFAULT, v3.getContentNulls());
-        assertEquals(Nulls.DEFAULT, v3.getValueNulls());
-        assertSame(v3, v3.withValueNulls(null, null));
+        // Test resetting both values to default with null parameters
+        JsonSetter.Value resetToDefault = valueNullsModified.withValueNulls(null, null);
+        assertEquals(Nulls.DEFAULT, resetToDefault.getContentNulls());
+        assertEquals(Nulls.DEFAULT, resetToDefault.getValueNulls());
+        
+        // Setting same values again should return same instance
+        assertSame(resetToDefault, resetToDefault.withValueNulls(null, null));
 
-        JsonSetter.Value merged = v3.withOverrides(v2);
-        assertNotSame(v2, merged);
-        assertEquals(merged, v2);
-        assertEquals(v2, merged);
+        // Test merging with overrides
+        JsonSetter.Value mergedValue = resetToDefault.withOverrides(valueNullsModified);
+        assertNotSame(valueNullsModified, mergedValue);
+        assertEquals(mergedValue, valueNullsModified);
+        assertEquals(valueNullsModified, mergedValue);
     }
 }
