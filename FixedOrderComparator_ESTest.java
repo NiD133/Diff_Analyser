@@ -25,456 +25,399 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class FixedOrderComparator_ESTest extends FixedOrderComparator_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      Comparable<Object>[] comparableArray0 = (Comparable<Object>[]) Array.newInstance(Comparable.class, 8);
-      FixedOrderComparator<Comparable<Object>> fixedOrderComparator0 = new FixedOrderComparator<Comparable<Object>>(comparableArray0);
-      FixedOrderComparator<Object> fixedOrderComparator1 = new FixedOrderComparator<Object>();
-      boolean boolean0 = fixedOrderComparator1.equals(fixedOrderComparator0);
-      assertFalse(boolean0);
-  }
+    // Constructor Tests
+    @Test(timeout = 4000)
+    public void testConstructorWithList() throws Throwable {
+        // Test that constructor initializes correctly with a list
+        LinkedList<Object> list = new LinkedList<>();
+        Object obj = new Object();
+        list.add(obj);
+        FixedOrderComparator<Object> comparator = new FixedOrderComparator<>(list);
+        assertEquals(FixedOrderComparator.UnknownObjectBehavior.EXCEPTION, comparator.getUnknownObjectBehavior());
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      ConstantTransformer<Boolean, Boolean> constantTransformer0 = new ConstantTransformer<Boolean, Boolean>((Boolean) null);
-      Function<Boolean, Boolean>[] functionArray0 = (Function<Boolean, Boolean>[]) Array.newInstance(Function.class, 7);
-      functionArray0[0] = (Function<Boolean, Boolean>) constantTransformer0;
-      FixedOrderComparator<Function<Boolean, Boolean>> fixedOrderComparator0 = new FixedOrderComparator<Function<Boolean, Boolean>>(functionArray0);
-      int int0 = fixedOrderComparator0.compare(constantTransformer0, functionArray0[3]);
-      assertTrue(fixedOrderComparator0.isLocked());
-      assertEquals((-1), int0);
-  }
+    @Test(timeout = 4000)
+    public void testConstructorWithRecursiveArrayThrowsStackOverflow() throws Throwable {
+        // Test handling of recursive array structure in constructor
+        LinkedList<Object> list = new LinkedList<>();
+        Object[] array = new Object[9];
+        array[5] = list; // Create recursive reference
+        list.add(array[5]);
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      Object[] objectArray0 = new Object[2];
-      Object object0 = new Object();
-      FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>(objectArray0);
-      Object object1 = new Object();
-      // Undeclared exception!
-      try { 
-        fixedOrderComparator0.addAsEqual(object1, object0);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // java.lang.Object@2fb7d513 not known to org.apache.commons.collections4.comparators.FixedOrderComparator@1cc73c3c
-         //
-         verifyException("org.apache.commons.collections4.comparators.FixedOrderComparator", e);
-      }
-  }
+        try {
+            new FixedOrderComparator<>(array);
+            fail("Expected StackOverflowError");
+        } catch (StackOverflowError e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>();
-      fixedOrderComparator0.checkLocked();
-      assertEquals(FixedOrderComparator.UnknownObjectBehavior.EXCEPTION, fixedOrderComparator0.getUnknownObjectBehavior());
-  }
+    @Test(timeout = 4000)
+    public void testConstructorWithNullArrayThrowsException() throws Throwable {
+        // Test null array input validation
+        try {
+            new FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior>((FixedOrderComparator.UnknownObjectBehavior[]) null);
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Verify exception message
+            verifyException("java.util.Objects", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      LinkedList<Object> linkedList0 = new LinkedList<Object>();
-      FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>(linkedList0);
-      Object object0 = new Object();
-      FixedOrderComparator.UnknownObjectBehavior fixedOrderComparator_UnknownObjectBehavior0 = FixedOrderComparator.UnknownObjectBehavior.AFTER;
-      fixedOrderComparator0.setUnknownObjectBehavior(fixedOrderComparator_UnknownObjectBehavior0);
-      fixedOrderComparator0.compare(linkedList0, object0);
-      boolean boolean0 = fixedOrderComparator0.isLocked();
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testConstructorWithNullListThrowsException() throws Throwable {
+        // Test null list input validation
+        try {
+            new FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior>((List<FixedOrderComparator.UnknownObjectBehavior>) null);
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Verify exception message
+            verifyException("java.util.Objects", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      LinkedList<Object> linkedList0 = new LinkedList<Object>();
-      Boolean[] booleanArray0 = new Boolean[21];
-      FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>(linkedList0);
-      FixedOrderComparator.UnknownObjectBehavior fixedOrderComparator_UnknownObjectBehavior0 = FixedOrderComparator.UnknownObjectBehavior.AFTER;
-      fixedOrderComparator0.setUnknownObjectBehavior(fixedOrderComparator_UnknownObjectBehavior0);
-      Object object0 = new Object();
-      fixedOrderComparator0.compare(object0, booleanArray0[0]);
-      // Undeclared exception!
-      try { 
-        fixedOrderComparator0.setUnknownObjectBehavior(fixedOrderComparator_UnknownObjectBehavior0);
-        fail("Expecting exception: UnsupportedOperationException");
-      
-      } catch(UnsupportedOperationException e) {
-         //
-         // Cannot modify a FixedOrderComparator after a comparison
-         //
-         verifyException("org.apache.commons.collections4.comparators.FixedOrderComparator", e);
-      }
-  }
+    // Locking Behavior Tests
+    @Test(timeout = 4000)
+    public void testIsLockedWhenNotLocked() throws Throwable {
+        // Test initial unlocked state
+        FixedOrderComparator<Object> comparator = new FixedOrderComparator<>();
+        assertFalse(comparator.isLocked());
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      LinkedList<FixedOrderComparator<Object>> linkedList0 = new LinkedList<FixedOrderComparator<Object>>();
-      FixedOrderComparator<FixedOrderComparator<Object>> fixedOrderComparator0 = new FixedOrderComparator<FixedOrderComparator<Object>>(linkedList0);
-      // Undeclared exception!
-      try { 
-        fixedOrderComparator0.setUnknownObjectBehavior((FixedOrderComparator.UnknownObjectBehavior) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // unknownObjectBehavior
-         //
-         verifyException("java.util.Objects", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testCheckLockedWhenNotLocked() throws Throwable {
+        // Test checkLocked doesn't throw when unlocked
+        FixedOrderComparator<Object> comparator = new FixedOrderComparator<>();
+        comparator.checkLocked(); // Should not throw
+        assertEquals(FixedOrderComparator.UnknownObjectBehavior.EXCEPTION, comparator.getUnknownObjectBehavior());
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      LinkedList<Object> linkedList0 = new LinkedList<Object>();
-      Boolean[] booleanArray0 = new Boolean[21];
-      FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>(linkedList0);
-      FixedOrderComparator.UnknownObjectBehavior fixedOrderComparator_UnknownObjectBehavior0 = FixedOrderComparator.UnknownObjectBehavior.AFTER;
-      fixedOrderComparator0.setUnknownObjectBehavior(fixedOrderComparator_UnknownObjectBehavior0);
-      Object object0 = new Object();
-      fixedOrderComparator0.compare(object0, booleanArray0[0]);
-      // Undeclared exception!
-      try { 
-        fixedOrderComparator0.checkLocked();
-        fail("Expecting exception: UnsupportedOperationException");
-      
-      } catch(UnsupportedOperationException e) {
-         //
-         // Cannot modify a FixedOrderComparator after a comparison
-         //
-         verifyException("org.apache.commons.collections4.comparators.FixedOrderComparator", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testOperationsAfterComparisonThrowException() throws Throwable {
+        // Test that operations are blocked after comparison
+        LinkedList<Object> items = new LinkedList<>();
+        FixedOrderComparator<Object> comparator = new FixedOrderComparator<>(items);
+        Object unknownObj = new Object();
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      LinkedList<Object> linkedList0 = new LinkedList<Object>();
-      FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>(linkedList0);
-      Object object0 = new Object();
-      IdentityPredicate<Object> identityPredicate0 = new IdentityPredicate<Object>(object0);
-      PredicateTransformer<Comparable<Boolean>> predicateTransformer0 = new PredicateTransformer<Comparable<Boolean>>(identityPredicate0);
-      FixedOrderComparator.UnknownObjectBehavior fixedOrderComparator_UnknownObjectBehavior0 = FixedOrderComparator.UnknownObjectBehavior.AFTER;
-      fixedOrderComparator0.setUnknownObjectBehavior(fixedOrderComparator_UnknownObjectBehavior0);
-      Boolean boolean0 = predicateTransformer0.transform(false);
-      fixedOrderComparator0.compare(boolean0, object0);
-      // Undeclared exception!
-      try { 
-        fixedOrderComparator0.add(linkedList0);
-        fail("Expecting exception: UnsupportedOperationException");
-      
-      } catch(UnsupportedOperationException e) {
-         //
-         // Cannot modify a FixedOrderComparator after a comparison
-         //
-         verifyException("org.apache.commons.collections4.comparators.FixedOrderComparator", e);
-      }
-  }
+        // Configure to place unknown objects at end
+        comparator.setUnknownObjectBehavior(FixedOrderComparator.UnknownObjectBehavior.AFTER);
+        
+        // Perform comparison to lock comparator
+        comparator.compare(unknownObj, new Object());
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      LinkedList<Object> linkedList0 = new LinkedList<Object>();
-      Object[] objectArray0 = new Object[9];
-      objectArray0[5] = (Object) linkedList0;
-      linkedList0.add(objectArray0[5]);
-      FixedOrderComparator<Object> fixedOrderComparator0 = null;
-      try {
-        fixedOrderComparator0 = new FixedOrderComparator<Object>(objectArray0);
-        fail("Expecting exception: StackOverflowError");
-      
-      } catch(StackOverflowError e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-      }
-  }
+        // Verify locked state
+        assertTrue(comparator.isLocked());
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior> fixedOrderComparator0 = null;
-      try {
-        fixedOrderComparator0 = new FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior>((FixedOrderComparator.UnknownObjectBehavior[]) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // items
-         //
-         verifyException("java.util.Objects", e);
-      }
-  }
+        // Attempt to modify after locking
+        try {
+            comparator.setUnknownObjectBehavior(FixedOrderComparator.UnknownObjectBehavior.AFTER);
+            fail("Expected UnsupportedOperationException");
+        } catch (UnsupportedOperationException e) {
+            verifyException("org.apache.commons.collections4.comparators.FixedOrderComparator", e);
+        }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior> fixedOrderComparator0 = null;
-      try {
-        fixedOrderComparator0 = new FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior>((List<FixedOrderComparator.UnknownObjectBehavior>) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // items
-         //
-         verifyException("java.util.Objects", e);
-      }
-  }
+        try {
+            comparator.checkLocked();
+            fail("Expected UnsupportedOperationException");
+        } catch (UnsupportedOperationException e) {
+            verifyException("org.apache.commons.collections4.comparators.FixedOrderComparator", e);
+        }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      FixedOrderComparator<Object>[] fixedOrderComparatorArray0 = (FixedOrderComparator<Object>[]) Array.newInstance(FixedOrderComparator.class, 5);
-      LinkedList<Object> linkedList0 = new LinkedList<Object>();
-      FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>(linkedList0);
-      fixedOrderComparatorArray0[0] = fixedOrderComparator0;
-      FixedOrderComparator<FixedOrderComparator<Object>> fixedOrderComparator1 = new FixedOrderComparator<FixedOrderComparator<Object>>(fixedOrderComparatorArray0);
-      boolean boolean0 = fixedOrderComparator1.add(fixedOrderComparator0);
-      assertFalse(boolean0);
-  }
+        try {
+            comparator.add(new Object());
+            fail("Expected UnsupportedOperationException");
+        } catch (UnsupportedOperationException e) {
+            verifyException("org.apache.commons.collections4.comparators.FixedOrderComparator", e);
+        }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>();
-      Object object0 = new Object();
-      boolean boolean0 = fixedOrderComparator0.add(object0);
-      assertTrue(boolean0);
-  }
+        try {
+            comparator.addAsEqual(FixedOrderComparator.UnknownObjectBehavior.AFTER, new Object());
+            fail("Expected UnsupportedOperationException");
+        } catch (UnsupportedOperationException e) {
+            verifyException("org.apache.commons.collections4.comparators.FixedOrderComparator", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      LinkedList<Comparable<Object>> linkedList0 = new LinkedList<Comparable<Object>>();
-      FixedOrderComparator<Comparable<Object>> fixedOrderComparator0 = new FixedOrderComparator<Comparable<Object>>(linkedList0);
-      fixedOrderComparator0.hashCode();
-  }
+    @Test(timeout = 4000)
+    public void testSetUnknownObjectBehaviorNullThrowsException() throws Throwable {
+        // Test null behavior validation
+        FixedOrderComparator<Object> comparator = new FixedOrderComparator<>();
+        try {
+            comparator.setUnknownObjectBehavior(null);
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            verifyException("java.util.Objects", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior> fixedOrderComparator0 = new FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior>();
-      boolean boolean0 = fixedOrderComparator0.isLocked();
-      assertFalse(boolean0);
-  }
+    // Comparison Behavior Tests
+    @Test(timeout = 4000)
+    public void testCompareWithDifferentItemsInFixedOrder() throws Throwable {
+        // Test correct ordering of known items
+        ConstantTransformer<Boolean> transformer = new ConstantTransformer<>(null);
+        Function<Boolean, Boolean>[] functions = (Function<Boolean, Boolean>[]) Array.newInstance(Function.class, 7);
+        functions[0] = transformer;
+        
+        FixedOrderComparator<Function<Boolean, Boolean>> comparator = 
+            new FixedOrderComparator<>(functions);
+        
+        int result = comparator.compare(transformer, functions[3]);
+        assertTrue(comparator.isLocked());
+        assertEquals(-1, result); // transformer comes before functions[3]
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      FixedOrderComparator<Object>[] fixedOrderComparatorArray0 = (FixedOrderComparator<Object>[]) Array.newInstance(FixedOrderComparator.class, 4);
-      FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>(fixedOrderComparatorArray0);
-      fixedOrderComparatorArray0[0] = fixedOrderComparator0;
-      FixedOrderComparator<FixedOrderComparator<Object>> fixedOrderComparator1 = new FixedOrderComparator<FixedOrderComparator<Object>>(fixedOrderComparatorArray0);
-      boolean boolean0 = fixedOrderComparator1.equals(fixedOrderComparator0);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testCompareWithNullObjectAfterBehavior() throws Throwable {
+        // Test AFTER behavior with null input
+        Boolean[] items = new Boolean[21];
+        FixedOrderComparator<Object> comparator = new FixedOrderComparator<>(items);
+        comparator.setUnknownObjectBehavior(FixedOrderComparator.UnknownObjectBehavior.AFTER);
+        
+        int result = comparator.compare(null, FixedOrderComparator.UnknownObjectBehavior.AFTER);
+        assertTrue(comparator.isLocked());
+        assertEquals(-1, result); // null (unknown) comes AFTER known items
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      Boolean[] booleanArray0 = new Boolean[21];
-      FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>();
-      FixedOrderComparator.UnknownObjectBehavior fixedOrderComparator_UnknownObjectBehavior0 = FixedOrderComparator.UnknownObjectBehavior.AFTER;
-      fixedOrderComparator0.setUnknownObjectBehavior(fixedOrderComparator_UnknownObjectBehavior0);
-      Object object0 = new Object();
-      fixedOrderComparator0.compare(object0, booleanArray0[0]);
-      FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior> fixedOrderComparator1 = new FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior>();
-      boolean boolean0 = fixedOrderComparator1.equals(fixedOrderComparator0);
-      assertTrue(fixedOrderComparator0.isLocked());
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testCompareSameObjectWithBeforeBehavior() throws Throwable {
+        // Test BEFORE behavior with same objects
+        FixedOrderComparator<Object> comparator = new FixedOrderComparator<>();
+        comparator.setUnknownObjectBehavior(FixedOrderComparator.UnknownObjectBehavior.BEFORE);
+        
+        int result = comparator.compare(comparator, comparator);
+        assertTrue(comparator.isLocked());
+        assertEquals(0, result); // Objects are equal
+    }
 
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>();
-      FixedOrderComparator<Object>[] fixedOrderComparatorArray0 = (FixedOrderComparator<Object>[]) Array.newInstance(FixedOrderComparator.class, 1);
-      FixedOrderComparator<FixedOrderComparator<Object>> fixedOrderComparator1 = new FixedOrderComparator<FixedOrderComparator<Object>>(fixedOrderComparatorArray0);
-      boolean boolean0 = fixedOrderComparator1.equals(fixedOrderComparator0);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testCompareNullWithObjectWithBeforeBehavior() throws Throwable {
+        // Test BEFORE behavior with null input
+        FixedOrderComparator<Object>[] comparators = (FixedOrderComparator<Object>[]) Array.newInstance(FixedOrderComparator.class, 4);
+        FixedOrderComparator<Object> comparator = new FixedOrderComparator<>(comparators);
+        comparator.setUnknownObjectBehavior(FixedOrderComparator.UnknownObjectBehavior.BEFORE);
+        
+        int result = comparator.compare(null, new Object());
+        assertTrue(comparator.isLocked());
+        assertEquals(1, result); // null (unknown) comes BEFORE known items
+    }
 
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>();
-      FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior> fixedOrderComparator1 = new FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior>();
-      boolean boolean0 = fixedOrderComparator1.equals(fixedOrderComparator0);
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testCompareObjectWithNullWithBeforeBehavior() throws Throwable {
+        // Test BEFORE behavior with null comparison
+        Predicate<Object>[] predicates = (Predicate<Object>[]) Array.newInstance(Predicate.class, 14);
+        FixedOrderComparator<Object> comparator = new FixedOrderComparator<>(predicates);
+        comparator.setUnknownObjectBehavior(FixedOrderComparator.UnknownObjectBehavior.BEFORE);
+        
+        int result = comparator.compare(comparator, null);
+        assertTrue(comparator.isLocked());
+        assertEquals(-1, result); // Known object comes before unknown (null)
+    }
 
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      FixedOrderComparator<FixedOrderComparator<Object>> fixedOrderComparator0 = new FixedOrderComparator<FixedOrderComparator<Object>>();
-      boolean boolean0 = fixedOrderComparator0.equals((Object) null);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testCompareObjectWithNullWithAfterBehavior() throws Throwable {
+        // Test AFTER behavior with null comparison
+        Predicate<Object>[] predicates = (Predicate<Object>[]) Array.newInstance(Predicate.class, 14);
+        FixedOrderComparator<Object> comparator = new FixedOrderComparator<>(predicates);
+        comparator.setUnknownObjectBehavior(FixedOrderComparator.UnknownObjectBehavior.AFTER);
+        
+        int result = comparator.compare(comparator, null);
+        assertTrue(comparator.isLocked());
+        assertEquals(1, result); // Known object comes before unknown (null) when unknown is AFTER
+    }
 
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      LinkedList<Boolean> linkedList0 = new LinkedList<Boolean>();
-      FixedOrderComparator<Boolean> fixedOrderComparator0 = new FixedOrderComparator<Boolean>(linkedList0);
-      boolean boolean0 = fixedOrderComparator0.equals(fixedOrderComparator0);
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testCompareNullWithObjectWithDefaultBehaviorThrowsException() throws Throwable {
+        // Test default EXCEPTION behavior with null input
+        Boolean[] items = new Boolean[21];
+        FixedOrderComparator<Object> comparator = new FixedOrderComparator<>(items);
+        
+        try {
+            comparator.compare(null, FixedOrderComparator.UnknownObjectBehavior.AFTER);
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            verifyException("org.apache.commons.collections4.comparators.FixedOrderComparator", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      Class<Object> class0 = Object.class;
-      FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior> fixedOrderComparator0 = new FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior>();
-      boolean boolean0 = fixedOrderComparator0.equals(class0);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testCompareObjectWithNullWithDefaultBehaviorThrowsException() throws Throwable {
+        // Test default EXCEPTION behavior with null comparison
+        Predicate<Object>[] predicates = (Predicate<Object>[]) Array.newInstance(Predicate.class, 14);
+        FixedOrderComparator<Object> comparator = new FixedOrderComparator<>(predicates);
+        
+        try {
+            comparator.compare(comparator, null);
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            verifyException("org.apache.commons.collections4.comparators.FixedOrderComparator", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
-      Boolean[] booleanArray0 = new Boolean[21];
-      FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>(booleanArray0);
-      FixedOrderComparator.UnknownObjectBehavior fixedOrderComparator_UnknownObjectBehavior0 = FixedOrderComparator.UnknownObjectBehavior.AFTER;
-      fixedOrderComparator0.setUnknownObjectBehavior(fixedOrderComparator_UnknownObjectBehavior0);
-      int int0 = fixedOrderComparator0.compare((Object) null, fixedOrderComparator_UnknownObjectBehavior0);
-      assertTrue(fixedOrderComparator0.isLocked());
-      assertEquals((-1), int0);
-  }
+    @Test(timeout = 4000)
+    public void testGetUnknownObjectBehaviorDefault() throws Throwable {
+        // Test default unknown object behavior
+        FixedOrderComparator<Predicate<Object>> comparator = new FixedOrderComparator<>();
+        assertEquals(FixedOrderComparator.UnknownObjectBehavior.EXCEPTION, comparator.getUnknownObjectBehavior());
+    }
 
-  @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
-      FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>();
-      FixedOrderComparator.UnknownObjectBehavior fixedOrderComparator_UnknownObjectBehavior0 = FixedOrderComparator.UnknownObjectBehavior.BEFORE;
-      fixedOrderComparator0.setUnknownObjectBehavior(fixedOrderComparator_UnknownObjectBehavior0);
-      int int0 = fixedOrderComparator0.compare(fixedOrderComparator0, fixedOrderComparator0);
-      assertTrue(fixedOrderComparator0.isLocked());
-      assertEquals(0, int0);
-  }
+    // Object Addition Tests
+    @Test(timeout = 4000)
+    public void testAddNewItem() throws Throwable {
+        // Test adding new item to comparator
+        FixedOrderComparator<Object> comparator = new FixedOrderComparator<>();
+        assertTrue(comparator.add(new Object()));
+    }
 
-  @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
-      FixedOrderComparator<Boolean>[] fixedOrderComparatorArray0 = (FixedOrderComparator<Boolean>[]) Array.newInstance(FixedOrderComparator.class, 4);
-      FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>(fixedOrderComparatorArray0);
-      FixedOrderComparator.UnknownObjectBehavior fixedOrderComparator_UnknownObjectBehavior0 = FixedOrderComparator.UnknownObjectBehavior.BEFORE;
-      fixedOrderComparator0.setUnknownObjectBehavior(fixedOrderComparator_UnknownObjectBehavior0);
-      Object object0 = new Object();
-      int int0 = fixedOrderComparator0.compare((Object) null, object0);
-      assertTrue(fixedOrderComparator0.isLocked());
-      assertEquals(1, int0);
-  }
+    @Test(timeout = 4000)
+    public void testAddDuplicateItem() throws Throwable {
+        // Test adding duplicate item returns false
+        FixedOrderComparator<Object>[] comparators = (FixedOrderComparator<Object>[]) Array.newInstance(FixedOrderComparator.class, 5);
+        FixedOrderComparator<Object> comparator = new FixedOrderComparator<>();
+        comparators[0] = comparator;
+        
+        FixedOrderComparator<FixedOrderComparator<Object>> mainComparator = 
+            new FixedOrderComparator<>(comparators);
+        
+        assertFalse(mainComparator.add(comparator)); // Already exists
+    }
 
-  @Test(timeout = 4000)
-  public void test26()  throws Throwable  {
-      Predicate<Object>[] predicateArray0 = (Predicate<Object>[]) Array.newInstance(Predicate.class, 14);
-      FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>(predicateArray0);
-      FixedOrderComparator.UnknownObjectBehavior fixedOrderComparator_UnknownObjectBehavior0 = FixedOrderComparator.UnknownObjectBehavior.BEFORE;
-      fixedOrderComparator0.setUnknownObjectBehavior(fixedOrderComparator_UnknownObjectBehavior0);
-      int int0 = fixedOrderComparator0.compare(fixedOrderComparator0, (Object) null);
-      assertTrue(fixedOrderComparator0.isLocked());
-      assertEquals((-1), int0);
-  }
+    @Test(timeout = 4000)
+    public void testAddAsEqualWithNewObject() throws Throwable {
+        // Test adding equal mapping for new object
+        InstanceofPredicate predicate = new InstanceofPredicate(Object.class);
+        PredicateTransformer<Comparable<Boolean>> transformer = new PredicateTransformer<>(predicate);
+        Boolean original = transformer.transform(null);
+        
+        Boolean[] items = new Boolean[4];
+        items[0] = original;
+        FixedOrderComparator<Boolean> comparator = new FixedOrderComparator<>(items);
+        
+        Boolean newObj = transformer.apply(original);
+        assertTrue(comparator.addAsEqual(original, newObj)); // Successfully added
+    }
 
-  @Test(timeout = 4000)
-  public void test27()  throws Throwable  {
-      Boolean[] booleanArray0 = new Boolean[21];
-      FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>(booleanArray0);
-      FixedOrderComparator.UnknownObjectBehavior fixedOrderComparator_UnknownObjectBehavior0 = FixedOrderComparator.UnknownObjectBehavior.AFTER;
-      // Undeclared exception!
-      try { 
-        fixedOrderComparator0.compare((Object) null, fixedOrderComparator_UnknownObjectBehavior0);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Attempting to compare unknown object AFTER
-         //
-         verifyException("org.apache.commons.collections4.comparators.FixedOrderComparator", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testAddAsEqualWithSameObject() throws Throwable {
+        // Test adding equal mapping for same object returns false
+        InstanceofPredicate predicate = new InstanceofPredicate(Object.class);
+        PredicateTransformer<Comparable<Boolean>> transformer = new PredicateTransformer<>(predicate);
+        Boolean obj = transformer.transform(null);
+        
+        Boolean[] items = new Boolean[4];
+        items[0] = obj;
+        FixedOrderComparator<Boolean> comparator = new FixedOrderComparator<>(items);
+        
+        assertFalse(comparator.addAsEqual(obj, obj)); // Already exists
+    }
 
-  @Test(timeout = 4000)
-  public void test28()  throws Throwable  {
-      Class<Object> class0 = Object.class;
-      InstanceofPredicate instanceofPredicate0 = new InstanceofPredicate(class0);
-      PredicateTransformer<Comparable<Boolean>> predicateTransformer0 = new PredicateTransformer<Comparable<Boolean>>(instanceofPredicate0);
-      Boolean boolean0 = predicateTransformer0.transform((Comparable<Boolean>) null);
-      Boolean[] booleanArray0 = new Boolean[4];
-      Boolean boolean1 = predicateTransformer0.apply(boolean0);
-      booleanArray0[0] = boolean0;
-      FixedOrderComparator<Boolean> fixedOrderComparator0 = new FixedOrderComparator<Boolean>(booleanArray0);
-      boolean boolean2 = fixedOrderComparator0.addAsEqual(boolean0, boolean1);
-      assertTrue(boolean2);
-  }
+    @Test(timeout = 4000)
+    public void testAddAsEqualWithUnknownObjectThrowsException() throws Throwable {
+        // Test adding equal mapping for unknown object
+        Object[] items = new Object[2];
+        FixedOrderComparator<Object> comparator = new FixedOrderComparator<>(items);
+        Object unknownObj = new Object();
+        
+        try {
+            comparator.addAsEqual(unknownObj, new Object());
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            verifyException("org.apache.commons.collections4.comparators.FixedOrderComparator", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test29()  throws Throwable  {
-      Class<Object> class0 = Object.class;
-      InstanceofPredicate instanceofPredicate0 = new InstanceofPredicate(class0);
-      PredicateTransformer<Comparable<Boolean>> predicateTransformer0 = new PredicateTransformer<Comparable<Boolean>>(instanceofPredicate0);
-      Boolean boolean0 = predicateTransformer0.transform((Comparable<Boolean>) null);
-      Boolean[] booleanArray0 = new Boolean[4];
-      booleanArray0[0] = boolean0;
-      FixedOrderComparator<Boolean> fixedOrderComparator0 = new FixedOrderComparator<Boolean>(booleanArray0);
-      boolean boolean1 = fixedOrderComparator0.addAsEqual(boolean0, boolean0);
-      assertFalse(boolean1);
-  }
+    // Equality and Hash Code Tests
+    @Test(timeout = 4000)
+    public void testEqualsWithDifferentComparators() throws Throwable {
+        // Test equality with different comparators
+        Comparable<Object>[] items = (Comparable<Object>[]) Array.newInstance(Comparable.class, 8);
+        FixedOrderComparator<Comparable<Object>> comparator1 = new FixedOrderComparator<>(items);
+        FixedOrderComparator<Object> comparator2 = new FixedOrderComparator<>();
+        
+        assertFalse(comparator2.equals(comparator1));
+    }
 
-  @Test(timeout = 4000)
-  public void test30()  throws Throwable  {
-      LinkedList<Object> linkedList0 = new LinkedList<Object>();
-      Object object0 = new Object();
-      linkedList0.add(object0);
-      FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>(linkedList0);
-      assertEquals(FixedOrderComparator.UnknownObjectBehavior.EXCEPTION, fixedOrderComparator0.getUnknownObjectBehavior());
-  }
+    @Test(timeout = 4000)
+    public void testEqualsAfterLocking() throws Throwable {
+        // Test equality after locking comparator
+        Boolean[] items = new Boolean[21];
+        FixedOrderComparator<Object> lockedComparator = new FixedOrderComparator<>(items);
+        lockedComparator.setUnknownObjectBehavior(FixedOrderComparator.UnknownObjectBehavior.AFTER);
+        lockedComparator.compare(new Object(), items[0]); // Lock
+        
+        FixedOrderComparator<Object> unlockedComparator = new FixedOrderComparator<>();
+        assertFalse(unlockedComparator.equals(lockedComparator));
+    }
 
-  @Test(timeout = 4000)
-  public void test31()  throws Throwable  {
-      LinkedList<Object> linkedList0 = new LinkedList<Object>();
-      FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>(linkedList0);
-      FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior> fixedOrderComparator1 = new FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior>();
-      FixedOrderComparator.UnknownObjectBehavior fixedOrderComparator_UnknownObjectBehavior0 = FixedOrderComparator.UnknownObjectBehavior.AFTER;
-      fixedOrderComparator0.setUnknownObjectBehavior(fixedOrderComparator_UnknownObjectBehavior0);
-      boolean boolean0 = fixedOrderComparator1.equals(fixedOrderComparator0);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testEqualsWithDifferentType() throws Throwable {
+        // Test equality with different internal state
+        FixedOrderComparator<Object>[] items = (FixedOrderComparator<Object>[]) Array.newInstance(FixedOrderComparator.class, 4);
+        FixedOrderComparator<Object> comparator1 = new FixedOrderComparator<>(items);
+        items[0] = comparator1;
+        
+        FixedOrderComparator<FixedOrderComparator<Object>> comparator2 = 
+            new FixedOrderComparator<>(items);
+        
+        assertFalse(comparator2.equals(comparator1));
+    }
 
-  @Test(timeout = 4000)
-  public void test32()  throws Throwable  {
-      Predicate<Object>[] predicateArray0 = (Predicate<Object>[]) Array.newInstance(Predicate.class, 14);
-      FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>(predicateArray0);
-      FixedOrderComparator.UnknownObjectBehavior fixedOrderComparator_UnknownObjectBehavior0 = FixedOrderComparator.UnknownObjectBehavior.AFTER;
-      fixedOrderComparator0.setUnknownObjectBehavior(fixedOrderComparator_UnknownObjectBehavior0);
-      int int0 = fixedOrderComparator0.compare(fixedOrderComparator0, (Object) null);
-      assertTrue(fixedOrderComparator0.isLocked());
-      assertEquals(1, int0);
-  }
+    @Test(timeout = 4000)
+    public void testEqualsWithDifferentLength() throws Throwable {
+        // Test equality with different item counts
+        FixedOrderComparator<Object> comparator1 = new FixedOrderComparator<>();
+        FixedOrderComparator<Object>[] items = (FixedOrderComparator<Object>[]) Array.newInstance(FixedOrderComparator.class, 1);
+        
+        FixedOrderComparator<FixedOrderComparator<Object>> comparator2 = 
+            new FixedOrderComparator<>(items);
+        
+        assertFalse(comparator2.equals(comparator1));
+    }
 
-  @Test(timeout = 4000)
-  public void test33()  throws Throwable  {
-      Predicate<Object>[] predicateArray0 = (Predicate<Object>[]) Array.newInstance(Predicate.class, 14);
-      FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>(predicateArray0);
-      // Undeclared exception!
-      try { 
-        fixedOrderComparator0.compare(fixedOrderComparator0, (Object) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Attempting to compare unknown object org.apache.commons.collections4.comparators.FixedOrderComparator@1ccc9b9e
-         //
-         verifyException("org.apache.commons.collections4.comparators.FixedOrderComparator", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testEqualsWithSameEmptyComparator() throws Throwable {
+        // Test equality with empty comparators
+        FixedOrderComparator<Object> comparator1 = new FixedOrderComparator<>();
+        FixedOrderComparator<Object> comparator2 = new FixedOrderComparator<>();
+        assertTrue(comparator1.equals(comparator2));
+    }
 
-  @Test(timeout = 4000)
-  public void test34()  throws Throwable  {
-      FixedOrderComparator<Predicate<Object>> fixedOrderComparator0 = new FixedOrderComparator<Predicate<Object>>();
-      FixedOrderComparator.UnknownObjectBehavior fixedOrderComparator_UnknownObjectBehavior0 = fixedOrderComparator0.getUnknownObjectBehavior();
-      assertEquals(FixedOrderComparator.UnknownObjectBehavior.EXCEPTION, fixedOrderComparator_UnknownObjectBehavior0);
-  }
+    @Test(timeout = 4000)
+    public void testEqualsWithDifferentUnknownObjectBehavior() throws Throwable {
+        // Test equality with different unknown object behaviors
+        LinkedList<Object> list = new LinkedList<>();
+        FixedOrderComparator<Object> comparator1 = new FixedOrderComparator<>(list);
+        comparator1.setUnknownObjectBehavior(FixedOrderComparator.UnknownObjectBehavior.AFTER);
+        
+        FixedOrderComparator<Object> comparator2 = new FixedOrderComparator<>();
+        assertFalse(comparator2.equals(comparator1));
+    }
 
-  @Test(timeout = 4000)
-  public void test35()  throws Throwable  {
-      FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior> fixedOrderComparator0 = new FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior>();
-      LinkedList<Object> linkedList0 = new LinkedList<Object>();
-      FixedOrderComparator<Object> fixedOrderComparator1 = new FixedOrderComparator<Object>(linkedList0);
-      FixedOrderComparator.UnknownObjectBehavior fixedOrderComparator_UnknownObjectBehavior0 = FixedOrderComparator.UnknownObjectBehavior.AFTER;
-      fixedOrderComparator1.setUnknownObjectBehavior(fixedOrderComparator_UnknownObjectBehavior0);
-      fixedOrderComparator1.compare(fixedOrderComparator0, fixedOrderComparator0);
-      // Undeclared exception!
-      try { 
-        fixedOrderComparator1.addAsEqual(fixedOrderComparator_UnknownObjectBehavior0, fixedOrderComparator0);
-        fail("Expecting exception: UnsupportedOperationException");
-      
-      } catch(UnsupportedOperationException e) {
-         //
-         // Cannot modify a FixedOrderComparator after a comparison
-         //
-         verifyException("org.apache.commons.collections4.comparators.FixedOrderComparator", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testEqualsWithNull() throws Throwable {
+        // Test equality with null
+        FixedOrderComparator<Object> comparator = new FixedOrderComparator<>();
+        assertFalse(comparator.equals(null));
+    }
+
+    @Test(timeout = 4000)
+    public void testEqualsWithSameInstance() throws Throwable {
+        // Test equality with same instance
+        FixedOrderComparator<Object> comparator = new FixedOrderComparator<>();
+        assertTrue(comparator.equals(comparator));
+    }
+
+    @Test(timeout = 4000)
+    public void testEqualsWithDifferentClass() throws Throwable {
+        // Test equality with different class
+        FixedOrderComparator<Object> comparator = new FixedOrderComparator<>();
+        assertFalse(comparator.equals(Object.class));
+    }
+
+    @Test(timeout = 4000)
+    public void testHashCode() throws Throwable {
+        // Test consistent hashCode implementation
+        LinkedList<Comparable<Object>> list = new LinkedList<>();
+        FixedOrderComparator<Comparable<Object>> comparator = new FixedOrderComparator<>(list);
+        comparator.hashCode(); // Should not throw
+    }
 }
