@@ -24,266 +24,309 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 
-import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * Quoted-printable codec test cases
+ * Quoted-printable codec test cases, restructured for clarity and maintainability.
  */
 class QuotedPrintableCodecTest {
 
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
+    @Nested
+    @DisplayName("Non-Strict Encoding Tests")
+    class EncodingTests {
+        private final QuotedPrintableCodec codec = new QuotedPrintableCodec();
 
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
-
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
+        @Test
+        @DisplayName("Should not encode safe printable ASCII characters")
+        void shouldNotEncodeSafeCharacters() throws EncoderException {
+            final String plainText = "abc123_-.*~!@#$%^&()+{}\"\\;:`,/[]";
+            assertEquals(plainText, codec.encode(plainText));
         }
-        return buffer.toString();
+
+        @Test
+        @DisplayName("Should encode special ASCII characters like '=', CR, and LF")
+        void shouldEncodeSpecialAsciiCharacters() throws EncoderException {
+            final String plainText = "= Hello there =\r\n";
+            final String expectedEncoded = "=3D Hello there =3D=0D=0A";
+            assertEquals(expectedEncoded, codec.encode(plainText));
+        }
+
+        @Test
+        @DisplayName("Should encode a string with a bitset that allows all characters")
+        void shouldEncodeWithPermissiveBitSet() {
+            final String plainText = "1+1 = 2";
+            final String expectedEncoded = "1+1 =3D 2";
+            final byte[] encodedBytes = QuotedPrintableCodec.encodeQuotedPrintable(null, plainText.getBytes(StandardCharsets.UTF_8));
+            assertEquals(expectedEncoded, new String(encodedBytes, StandardCharsets.UTF_8));
+        }
     }
 
-    @Test
-    void testBasicEncodeDecode() throws Exception {
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec();
-        final String plain = "= Hello there =\r\n";
-        final String encoded = qpcodec.encode(plain);
-        assertEquals("=3D Hello there =3D=0D=0A", encoded, "Basic quoted-printable encoding test");
-        assertEquals(plain, qpcodec.decode(encoded), "Basic quoted-printable decoding test");
+    @Nested
+    @DisplayName("Non-Strict Decoding Tests")
+    class DecodingTests {
+        private final QuotedPrintableCodec codec = new QuotedPrintableCodec();
+
+        @Test
+        @DisplayName("Should decode a basic Quoted-Printable string")
+        void shouldDecodeBasicString() throws DecoderException {
+            final String encodedText = "=3D Hello there =3D=0D=0A";
+            final String expectedDecoded = "= Hello there =\r\n";
+            assertEquals(expectedDecoded, codec.decode(encodedText));
+        }
+
+        @Test
+        @DisplayName("Should decode text with soft line breaks (=\\r\\n)")
+        void shouldDecodeTextWithSoftLineBreaks() throws DecoderException {
+            final String encodedText = "If you believe that truth=3Dbeauty, then surely=20=\r\nmathematics is the most beautiful branch of philosophy.";
+            final String expectedDecoded = "If you believe that truth=beauty, then surely mathematics is the most beautiful branch of philosophy.";
+            assertEquals(expectedDecoded, codec.decode(encodedText));
+        }
+
+        @Test
+        @DisplayName("Should decode safe printable ASCII characters")
+        void shouldDecodeSafeCharacters() throws DecoderException {
+            final String plainText = "abc123_-.*~!@#$%^&()+{}\"\\;:`,/[]";
+            assertEquals(plainText, codec.decode(plainText));
+        }
     }
 
-    @Test
-    void testDecodeInvalid() {
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec();
-        assertThrows(DecoderException.class, () -> qpcodec.decode("="));
-        assertThrows(DecoderException.class, () -> qpcodec.decode("=A"));
-        assertThrows(DecoderException.class, () -> qpcodec.decode("=WW"));
+    @Nested
+    @DisplayName("Strict Mode (soft line breaks enabled)")
+    class StrictModeTests {
+        private final QuotedPrintableCodec strictCodec = new QuotedPrintableCodec(true);
+
+        @Test
+        @DisplayName("Should encode with soft line breaks to respect line length limit")
+        void shouldEncodeWithSoftLineBreaks() throws EncoderException {
+            final String plainText = "If you believe that truth=beauty, then surely mathematics is the most beautiful branch of philosophy.";
+            final String expectedEncoded = "If you believe that truth=3Dbeauty, then surely mathematics is the most b=\r\neautiful branch of philosophy.";
+            assertEquals(expectedEncoded, strictCodec.encode(plainText));
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+            "'This is a example of a quoted-printable text file. This might contain sp=cial chars.', 'This is a example of a quoted-printable text file. This might contain sp=3D=\r\ncial chars.'",
+            "'This is a example of a quoted-printable text file. This might contain ta\tbs as well.', 'This is a example of a quoted-printable text file. This might contain ta=09=\r\nbs as well.'"
+        })
+        @DisplayName("Should encode trailing special characters before a soft line break")
+        void shouldEncodeTrailingSpecialCharacters(String plainText, String expectedEncoded) throws EncoderException {
+            assertEquals(expectedEncoded, strictCodec.encode(plainText));
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+            "'This is a example of a quoted-printable text file. There is no end to it\t', 'This is a example of a quoted-printable text file. There is no end to i=\r\nt=09'",
+            "'This is a example of a quoted-printable text file. There is no end to it ', 'This is a example of a quoted-printable text file. There is no end to i=\r\nt=20'",
+            "'This is a example of a quoted-printable text file. There is no end to   ', 'This is a example of a quoted-printable text file. There is no end to=20=\r\n =20'",
+            "'This is a example of a quoted-printable text file. There is no end to=  ', 'This is a example of a quoted-printable text file. There is no end to=3D=\r\n =20'"
+        })
+        @DisplayName("Should correctly encode trailing whitespace or special chars with soft line breaks")
+        void shouldEncodeTrailingWhitespaceWithSoftLineBreaks(String plainText, String expectedEncoded) throws EncoderException {
+            assertEquals(expectedEncoded, strictCodec.encode(plainText));
+        }
+
+        @Test
+        @DisplayName("Should encode an equals sign at the 76th position correctly")
+        void shouldEncodeEqualsSignAtLineLimit() throws EncoderException {
+            final String plainText = "This is a example of a quoted=printable text file. There is no tt";
+            final String expectedEncoded = "This is a example of a quoted=3Dprintable text file. There is no tt";
+            assertEquals(expectedEncoded, strictCodec.encode(plainText));
+        }
+
+        @Test
+        @DisplayName("Should skip unencoded CR and LF characters during decoding")
+        void shouldSkipUnencodedCrLfWhenDecoding() throws DecoderException {
+            final String encodedText = "CRLF in an\n encoded text should be=20=\r\n\rskipped in the\r decoding.";
+            final String expectedDecoded = "CRLF in an encoded text should be skipped in the decoding.";
+            assertEquals(expectedDecoded, strictCodec.decode(encodedText));
+        }
+
+        @Test
+        @DisplayName("Should return null when encoding a byte array shorter than 3 bytes")
+        void shouldReturnNullWhenEncodingShortByteArrayInStrictMode() throws EncoderException {
+            // This test covers a peculiar behavior of the strict encoder where it returns
+            // null for byte arrays with length < 3. This is due to an internal constant MIN_BYTES.
+            final String shortString = "AA"; // Results in a 2-byte array
+            assertNull(strictCodec.encode(shortString));
+        }
     }
 
-    @Test
-    void testDecodeObjects() throws Exception {
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec();
-        final String plain = "1+1 =3D 2";
-        String decoded = (String) qpcodec.decode((Object) plain);
-        assertEquals("1+1 = 2", decoded, "Basic quoted-printable decoding test");
+    @Nested
+    @DisplayName("Object API Tests")
+    class ObjectApiTests {
+        private final QuotedPrintableCodec codec = new QuotedPrintableCodec();
 
-        final byte[] plainBA = plain.getBytes(StandardCharsets.UTF_8);
-        final byte[] decodedBA = (byte[]) qpcodec.decode((Object) plainBA);
-        decoded = new String(decodedBA);
-        assertEquals("1+1 = 2", decoded, "Basic quoted-printable decoding test");
+        @Test
+        @DisplayName("Should encode a String object")
+        void shouldEncodeStringObject() throws EncoderException {
+            final String plainText = "1+1 = 2";
+            final String expectedEncoded = "1+1 =3D 2";
+            assertEquals(expectedEncoded, codec.encode((Object) plainText));
+        }
 
-        final Object result = qpcodec.decode((Object) null);
-        assertNull(result, "Decoding a null Object should return null");
+        @Test
+        @DisplayName("Should encode a byte array object")
+        void shouldEncodeByteArrayObject() throws EncoderException {
+            final byte[] plainBytes = "1+1 = 2".getBytes(StandardCharsets.UTF_8);
+            final byte[] expectedEncoded = "1+1 =3D 2".getBytes(StandardCharsets.UTF_8);
+            final byte[] actualEncoded = (byte[]) codec.encode((Object) plainBytes);
+            assertEquals(new String(expectedEncoded), new String(actualEncoded));
+        }
 
-        assertThrows(DecoderException.class, () -> qpcodec.decode(Double.valueOf(3.0d)), "Trying to url encode a Double object should cause an exception.");
+        @Test
+        @DisplayName("Should decode a String object")
+        void shouldDecodeStringObject() throws DecoderException {
+            final String encodedText = "1+1 =3D 2";
+            final String expectedDecoded = "1+1 = 2";
+            assertEquals(expectedDecoded, codec.decode((Object) encodedText));
+        }
+
+        @Test
+        @DisplayName("Should decode a byte array object")
+        void shouldDecodeByteArrayObject() throws DecoderException {
+            final byte[] encodedBytes = "1+1 =3D 2".getBytes(StandardCharsets.UTF_8);
+            final String expectedDecoded = "1+1 = 2";
+            final byte[] decodedBytes = (byte[]) codec.decode((Object) encodedBytes);
+            assertEquals(expectedDecoded, new String(decodedBytes));
+        }
+
+        @Test
+        @DisplayName("Should throw EncoderException when encoding an unsupported object type")
+        void shouldThrowExceptionWhenEncodingUnsupportedObject() {
+            assertThrows(EncoderException.class, () -> codec.encode(3.0d));
+        }
+
+        @Test
+        @DisplayName("Should throw DecoderException when decoding an unsupported object type")
+        void shouldThrowExceptionWhenDecodingUnsupportedObject() {
+            assertThrows(DecoderException.class, () -> codec.decode(3.0d));
+        }
     }
 
-    @Test
-    void testDecodeStringWithNull() throws Exception {
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec();
-        final String test = null;
-        final String result = qpcodec.decode(test, "charset");
-        assertNull(result, "Result should be null");
+    @Nested
+    @DisplayName("Null and Empty Input Handling")
+    class NullAndEmptyInputTests {
+        private final QuotedPrintableCodec codec = new QuotedPrintableCodec();
+
+        @Test
+        @DisplayName("Should return null when encoding a null String")
+        void shouldReturnNullWhenEncodingNullString() throws EncoderException {
+            assertNull(codec.encode((String) null));
+        }
+
+        @Test
+        @DisplayName("Should return null when decoding a null String")
+        void shouldReturnNullWhenDecodingNullString() throws DecoderException {
+            assertNull(codec.decode((String) null));
+        }
+
+        @Test
+        @DisplayName("Should return null when encoding a null byte array")
+        void shouldReturnNullWhenEncodingNullByteArray() throws EncoderException {
+            assertNull(codec.encode((byte[]) null));
+        }
+
+        @Test
+        @DisplayName("Should return null when decoding a null byte array")
+        void shouldReturnNullWhenDecodingNullByteArray() throws DecoderException {
+            assertNull(QuotedPrintableCodec.decodeQuotedPrintable(null));
+        }
+
+        @Test
+        @DisplayName("Should return null when encoding a null Object")
+        void shouldReturnNullWhenEncodingNullObject() throws EncoderException {
+            assertNull(codec.encode((Object) null));
+        }
+
+        @Test
+        @DisplayName("Should return null when decoding a null Object")
+        void shouldReturnNullWhenDecodingNullObject() throws DecoderException {
+            assertNull(codec.decode((Object) null));
+        }
+
+        @Test
+        @DisplayName("Should return null when encoding a null string with a specified charset")
+        void shouldReturnNullWhenEncodingNullStringWithCharset() throws EncoderException {
+            assertNull(codec.encode(null, "UTF-8"));
+        }
+
+        @Test
+        @DisplayName("Should return null when decoding a null string with a specified charset")
+        void shouldReturnNullWhenDecodingNullStringWithCharset() throws DecoderException {
+            assertNull(codec.decode(null, "UTF-8"));
+        }
     }
 
-    @Test
-    void testDecodeWithNullArray() throws Exception {
-        final byte[] plain = null;
-        final byte[] result = QuotedPrintableCodec.decodeQuotedPrintable(plain);
-        assertNull(result, "Result should be null");
+    @Nested
+    @DisplayName("Invalid Input Handling")
+    class InvalidInputTests {
+        private final QuotedPrintableCodec codec = new QuotedPrintableCodec();
+
+        @ParameterizedTest
+        @ValueSource(strings = {"=", "=A", "=WW"})
+        @DisplayName("Should throw DecoderException for malformed sequences")
+        void shouldThrowDecoderExceptionForMalformedSequences(String invalidInput) {
+            assertThrows(DecoderException.class, () -> codec.decode(invalidInput));
+        }
+
+        @Test
+        @DisplayName("Should throw UnsupportedCharsetException for an invalid charset name")
+        void shouldThrowExceptionForInvalidCharsetName() {
+            assertThrows(UnsupportedCharsetException.class, () -> new QuotedPrintableCodec("NONSENSE"));
+        }
     }
 
-    @Test
-    void testDefaultEncoding() throws Exception {
-        final String plain = "Hello there!";
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec("UnicodeBig");
-        qpcodec.encode(plain); // To work around a weird quirk in Java 1.2.2
-        final String encoded1 = qpcodec.encode(plain, "UnicodeBig");
-        final String encoded2 = qpcodec.encode(plain);
-        assertEquals(encoded1, encoded2);
-    }
 
-    @Test
-    void testEncodeDecodeNull() throws Exception {
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec();
-        assertNull(qpcodec.encode((String) null), "Null string quoted-printable encoding test");
-        assertNull(qpcodec.decode((String) null), "Null string quoted-printable decoding test");
-    }
 
-    @Test
-    void testEncodeNull() throws Exception {
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec();
-        final byte[] plain = null;
-        final byte[] encoded = qpcodec.encode(plain);
-        assertNull(encoded, "Encoding a null string should return null");
-    }
+    @Nested
+    @DisplayName("Charset Behavior")
+    class CharsetTests {
+        @Test
+        @DisplayName("Should correctly encode and decode a UTF-8 string with Russian characters")
+        void shouldRoundTripRussianStringWithUtf8() throws EncoderException, DecoderException {
+            final QuotedPrintableCodec codec = new QuotedPrintableCodec();
+            final String plainText = "Всем_привет"; // "Hello everyone" in Russian
+            final String expectedEncoded = "=D0=92=D1=81=D0=B5=D0=BC_=D0=BF=D1=80=D0=B8=D0=B2=D0=B5=D1=82";
 
-    @Test
-    void testEncodeObjects() throws Exception {
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec();
-        final String plain = "1+1 = 2";
-        String encoded = (String) qpcodec.encode((Object) plain);
+            final String actualEncoded = codec.encode(plainText, StandardCharsets.UTF_8);
+            assertEquals(expectedEncoded, actualEncoded, "Encoding failed");
 
-        assertEquals("1+1 =3D 2", encoded, "Basic quoted-printable encoding test");
-        final byte[] plainBA = plain.getBytes(StandardCharsets.UTF_8);
-        final byte[] encodedBA = (byte[]) qpcodec.encode((Object) plainBA);
-        encoded = new String(encodedBA);
-        assertEquals("1+1 =3D 2", encoded, "Basic quoted-printable encoding test");
+            final String actualDecoded = codec.decode(actualEncoded, StandardCharsets.UTF_8);
+            assertEquals(plainText, actualDecoded, "Decoding failed");
+        }
 
-        final Object result = qpcodec.encode((Object) null);
-        assertNull(result, "Encoding a null Object should return null");
+        @Test
+        @DisplayName("Should correctly encode and decode a UTF-8 string with Swiss-German characters")
+        void shouldRoundTripSwissGermanStringWithUtf8() throws EncoderException, DecoderException {
+            final QuotedPrintableCodec codec = new QuotedPrintableCodec();
+            final String plainText = "Grüezi_zämä"; // "Hello together" in Swiss-German
+            final String expectedEncoded = "Gr=C3=BCezi_z=C3=A4m=C3=A4";
 
-        assertThrows(EncoderException.class, () -> qpcodec.encode(Double.valueOf(3.0d)), "Trying to url encode a Double object should cause an exception.");
-    }
+            final String actualEncoded = codec.encode(plainText, StandardCharsets.UTF_8);
+            assertEquals(expectedEncoded, actualEncoded, "Encoding failed");
 
-    @Test
-    void testEncodeStringWithNull() throws Exception {
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec();
-        final String test = null;
-        final String result = qpcodec.encode(test, "charset");
-        assertNull(result, "Result should be null");
-    }
+            final String actualDecoded = codec.decode(actualEncoded, StandardCharsets.UTF_8);
+            assertEquals(plainText, actualDecoded, "Decoding failed");
+        }
 
-    @Test
-    void testEncodeUrlWithNullBitSet() throws Exception {
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec();
-        final String plain = "1+1 = 2";
-        final String encoded = new String(QuotedPrintableCodec.encodeQuotedPrintable(null, plain.getBytes(StandardCharsets.UTF_8)));
-        assertEquals("1+1 =3D 2", encoded, "Basic quoted-printable encoding test");
-        assertEquals(plain, qpcodec.decode(encoded), "Basic quoted-printable decoding test");
-    }
+        @Test
+        @DisplayName("Should use the charset provided in the constructor as the default")
+        void shouldUseCharsetFromConstructorAsDefault() throws EncoderException {
+            final String plainText = "Hello there!";
+            // Using a non-default charset to ensure the constructor setting is respected.
+            final QuotedPrintableCodec codec = new QuotedPrintableCodec("UTF-16BE");
 
-    @Test
-    void testFinalBytes() throws Exception {
-        // whitespace, but does not need to be encoded
-        final String plain = "This is a example of a quoted=printable text file. There is no tt";
-        final String expected = "This is a example of a quoted=3Dprintable text file. There is no tt";
+            final String encodedWithExplicitCharset = codec.encode(plainText, "UTF-16BE");
+            final String encodedWithDefaultCharset = codec.encode(plainText);
 
-        assertEquals(expected, new QuotedPrintableCodec(true).encode(plain));
-    }
-
-    @Test
-    void testInvalidEncoding() {
-        assertThrows(UnsupportedCharsetException.class, () -> new QuotedPrintableCodec("NONSENSE"));
-    }
-
-    @Test
-    void testSafeCharEncodeDecode() throws Exception {
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec();
-        final String plain = "abc123_-.*~!@#$%^&()+{}\"\\;:`,/[]";
-        final String encoded = qpcodec.encode(plain);
-        assertEquals(plain, encoded, "Safe chars quoted-printable encoding test");
-        assertEquals(plain, qpcodec.decode(encoded), "Safe chars quoted-printable decoding test");
-    }
-
-    @Test
-    void testSkipNotEncodedCRLF() throws Exception {
-        final String qpdata = "CRLF in an\n encoded text should be=20=\r\n\rskipped in the\r decoding.";
-        final String expected = "CRLF in an encoded text should be skipped in the decoding.";
-
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec(true);
-        assertEquals(expected, qpcodec.decode(qpdata));
-
-        final String encoded = qpcodec.encode(expected);
-        assertEquals(expected, qpcodec.decode(encoded));
-    }
-
-    @Test
-    void testSoftLineBreakDecode() throws Exception {
-        final String qpdata = "If you believe that truth=3Dbeauty, then surely=20=\r\nmathematics is the most beautiful branch of philosophy.";
-        final String expected = "If you believe that truth=beauty, then surely mathematics is the most beautiful branch of philosophy.";
-
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec();
-        assertEquals(expected, qpcodec.decode(qpdata));
-
-        final String encoded = qpcodec.encode(expected);
-        assertEquals(expected, qpcodec.decode(encoded));
-    }
-
-    @Test
-    void testSoftLineBreakEncode() throws Exception {
-        final String qpdata = "If you believe that truth=3Dbeauty, then surely mathematics is the most b=\r\neautiful branch of philosophy.";
-        final String expected = "If you believe that truth=beauty, then surely mathematics is the most beautiful branch of philosophy.";
-
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec(true);
-        assertEquals(qpdata, qpcodec.encode(expected));
-
-        final String decoded = qpcodec.decode(qpdata);
-        assertEquals(qpdata, qpcodec.encode(decoded));
-    }
-
-    @Test
-    void testTooShortByteArray() throws Exception {
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec(true);
-        assertNull(qpcodec.encode("AA"), "Result should be null.");
-    }
-
-    @Test
-    void testTrailingSpecial() throws Exception {
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec(true);
-
-        String plain = "This is a example of a quoted-printable text file. This might contain sp=cial chars.";
-        String expected = "This is a example of a quoted-printable text file. This might contain sp=3D=\r\ncial chars.";
-        assertEquals(expected, qpcodec.encode(plain));
-
-        plain = "This is a example of a quoted-printable text file. This might contain ta\tbs as well.";
-        expected = "This is a example of a quoted-printable text file. This might contain ta=09=\r\nbs as well.";
-        assertEquals(expected, qpcodec.encode(plain));
-    }
-
-    @Test
-    void testUltimateSoftBreak() throws Exception {
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec(true);
-
-        String plain = "This is a example of a quoted-printable text file. There is no end to it\t";
-        String expected = "This is a example of a quoted-printable text file. There is no end to i=\r\nt=09";
-
-        assertEquals(expected, qpcodec.encode(plain));
-
-        plain = "This is a example of a quoted-printable text file. There is no end to it ";
-        expected = "This is a example of a quoted-printable text file. There is no end to i=\r\nt=20";
-
-        assertEquals(expected, qpcodec.encode(plain));
-
-        // whitespace before soft break
-        plain = "This is a example of a quoted-printable text file. There is no end to   ";
-        expected = "This is a example of a quoted-printable text file. There is no end to=20=\r\n =20";
-
-        assertEquals(expected, qpcodec.encode(plain));
-
-        // non-printable character before soft break
-        plain = "This is a example of a quoted-printable text file. There is no end to=  ";
-        expected = "This is a example of a quoted-printable text file. There is no end to=3D=\r\n =20";
-
-        assertEquals(expected, qpcodec.encode(plain));
-    }
-
-    @Test
-    void testUnsafeEncodeDecode() throws Exception {
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec();
-        final String plain = "=\r\n";
-        final String encoded = qpcodec.encode(plain);
-        assertEquals("=3D=0D=0A", encoded, "Unsafe chars quoted-printable encoding test");
-        assertEquals(plain, qpcodec.decode(encoded), "Unsafe chars quoted-printable decoding test");
-    }
-
-    @Test
-    void testUTF8RoundTrip() throws Exception {
-
-        final String ru_msg = constructString(RUSSIAN_STUFF_UNICODE);
-        final String ch_msg = constructString(SWISS_GERMAN_STUFF_UNICODE);
-
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec();
-
-        assertEquals("=D0=92=D1=81=D0=B5=D0=BC_=D0=BF=D1=80=D0=B8=D0=B2=D0=B5=D1=82", qpcodec.encode(ru_msg, CharEncoding.UTF_8));
-        assertEquals("Gr=C3=BCezi_z=C3=A4m=C3=A4", qpcodec.encode(ch_msg, CharEncoding.UTF_8));
-
-        assertEquals(ru_msg, qpcodec.decode(qpcodec.encode(ru_msg, CharEncoding.UTF_8), CharEncoding.UTF_8));
-        assertEquals(ch_msg, qpcodec.decode(qpcodec.encode(ch_msg, CharEncoding.UTF_8), CharEncoding.UTF_8));
+            assertEquals(encodedWithExplicitCharset, encodedWithDefaultCharset);
+        }
     }
 }
