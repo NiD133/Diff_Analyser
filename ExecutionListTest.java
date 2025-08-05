@@ -36,128 +36,182 @@ import org.jspecify.annotations.NullUnmarked;
 @NullUnmarked
 public class ExecutionListTest extends TestCase {
 
-  private final ExecutionList list = new ExecutionList();
+  private static final int TIMEOUT_SECONDS = 1;
+  
+  private ExecutionList executionList;
 
-  public void testRunOnPopulatedList() throws Exception {
-    Executor exec = newCachedThreadPool();
-    CountDownLatch countDownLatch = new CountDownLatch(3);
-    list.add(new MockRunnable(countDownLatch), exec);
-    list.add(new MockRunnable(countDownLatch), exec);
-    list.add(new MockRunnable(countDownLatch), exec);
-    assertEquals(3L, countDownLatch.getCount());
-
-    list.execute();
-
-    // Verify that all of the runnables execute in a reasonable amount of time.
-    assertTrue(countDownLatch.await(1L, SECONDS));
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    executionList = new ExecutionList();
   }
 
-  public void testExecute_idempotent() {
-    AtomicInteger runCalled = new AtomicInteger();
-    list.add(
-        new Runnable() {
-          @Override
-          public void run() {
-            runCalled.getAndIncrement();
-          }
-        },
-        directExecutor());
-    list.execute();
-    assertEquals(1, runCalled.get());
-    list.execute();
-    assertEquals(1, runCalled.get());
+  public void testExecute_runsAllAddedRunnables() throws Exception {
+    // Given: An execution list with multiple runnables added
+    Executor threadPoolExecutor = newCachedThreadPool();
+    CountDownLatch completionLatch = new CountDownLatch(3);
+    
+    executionList.add(createCountDownRunnable(completionLatch), threadPoolExecutor);
+    executionList.add(createCountDownRunnable(completionLatch), threadPoolExecutor);
+    executionList.add(createCountDownRunnable(completionLatch), threadPoolExecutor);
+    
+    // Verify initial state - no runnables have executed yet
+    assertEquals("All runnables should be pending", 3L, completionLatch.getCount());
+
+    // When: Execute is called
+    executionList.execute();
+
+    // Then: All runnables should execute within the timeout
+    assertTrue("All runnables should complete within timeout", 
+               completionLatch.await(TIMEOUT_SECONDS, SECONDS));
   }
 
-  public void testExecute_idempotentConcurrently() throws InterruptedException {
-    CountDownLatch okayToRun = new CountDownLatch(1);
-    AtomicInteger runCalled = new AtomicInteger();
-    list.add(
-        new Runnable() {
-          @Override
-          public void run() {
-            try {
-              okayToRun.await();
-            } catch (InterruptedException e) {
-              Thread.currentThread().interrupt();
-              throw new RuntimeException(e);
-            }
-            runCalled.getAndIncrement();
-          }
-        },
-        directExecutor());
-    Runnable execute =
-        new Runnable() {
-          @Override
-          public void run() {
-            list.execute();
-          }
-        };
-    Thread thread1 = new Thread(execute);
-    Thread thread2 = new Thread(execute);
-    thread1.start();
-    thread2.start();
-    assertEquals(0, runCalled.get());
-    okayToRun.countDown();
-    thread1.join();
-    thread2.join();
-    assertEquals(1, runCalled.get());
+  public void testExecute_isIdempotent() {
+    // Given: An execution list with one runnable that tracks execution count
+    AtomicInteger executionCount = new AtomicInteger(0);
+    Runnable countingRunnable = () -> executionCount.incrementAndGet();
+    
+    executionList.add(countingRunnable, directExecutor());
+
+    // When: Execute is called multiple times
+    executionList.execute();
+    executionList.execute();
+
+    // Then: The runnable should only execute once
+    assertEquals("Runnable should execute exactly once despite multiple execute() calls", 
+                 1, executionCount.get());
   }
 
-  public void testAddAfterRun() throws Exception {
-    // Run the previous test
-    testRunOnPopulatedList();
+  public void testExecute_isIdempotentUnderConcurrency() throws InterruptedException {
+    // Given: An execution list with a runnable that waits for a signal
+    CountDownLatch startSignal = new CountDownLatch(1);
+    AtomicInteger executionCount = new AtomicInteger(0);
+    
+    Runnable waitingRunnable = () -> {
+      try {
+        startSignal.await();
+        executionCount.incrementAndGet();
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new RuntimeException("Interrupted while waiting", e);
+      }
+    };
+    
+    executionList.add(waitingRunnable, directExecutor());
 
-    // If it passed, then verify an Add will be executed without calling run
-    CountDownLatch countDownLatch = new CountDownLatch(1);
-    list.add(new MockRunnable(countDownLatch), newCachedThreadPool());
-    assertTrue(countDownLatch.await(1L, SECONDS));
+    // When: Multiple threads call execute() concurrently
+    Thread firstExecutorThread = new Thread(() -> executionList.execute());
+    Thread secondExecutorThread = new Thread(() -> executionList.execute());
+    
+    firstExecutorThread.start();
+    secondExecutorThread.start();
+    
+    // Verify runnable hasn't executed yet
+    assertEquals("Runnable should not execute before signal", 0, executionCount.get());
+    
+    // Signal the runnable to proceed and wait for threads to complete
+    startSignal.countDown();
+    firstExecutorThread.join();
+    secondExecutorThread.join();
+
+    // Then: The runnable should execute exactly once despite concurrent execute() calls
+    assertEquals("Runnable should execute exactly once despite concurrent execute() calls", 
+                 1, executionCount.get());
   }
 
-  public void testOrdering() throws Exception {
-    AtomicInteger integer = new AtomicInteger();
-    for (int i = 0; i < 10; i++) {
-      int expectedCount = i;
-      list.add(
-          new Runnable() {
-            @Override
-            public void run() {
-              integer.compareAndSet(expectedCount, expectedCount + 1);
-            }
-          },
-          directExecutor());
+  public void testAdd_afterExecute_runsImmediately() throws Exception {
+    // Given: An execution list that has already been executed
+    executeListWithDummyRunnables();
+
+    // When: A new runnable is added after execute() has been called
+    CountDownLatch newRunnableLatch = new CountDownLatch(1);
+    executionList.add(createCountDownRunnable(newRunnableLatch), newCachedThreadPool());
+
+    // Then: The new runnable should execute immediately without calling execute() again
+    assertTrue("Runnable added after execute() should run immediately", 
+               newRunnableLatch.await(TIMEOUT_SECONDS, SECONDS));
+  }
+
+  public void testExecute_maintainsRunnableOrder() throws Exception {
+    // Given: An execution list with runnables that must execute in order
+    AtomicInteger executionCounter = new AtomicInteger(0);
+    int numberOfRunnables = 10;
+    
+    for (int expectedExecutionOrder = 0; expectedExecutionOrder < numberOfRunnables; expectedExecutionOrder++) {
+      final int expectedCount = expectedExecutionOrder;
+      Runnable orderVerifyingRunnable = () -> {
+        // This runnable will only increment if it executes in the correct order
+        executionCounter.compareAndSet(expectedCount, expectedCount + 1);
+      };
+      executionList.add(orderVerifyingRunnable, directExecutor());
     }
-    list.execute();
-    assertEquals(10, integer.get());
+
+    // When: Execute is called
+    executionList.execute();
+
+    // Then: All runnables should have executed in the correct order
+    assertEquals("All runnables should execute in the order they were added", 
+                 numberOfRunnables, executionCounter.get());
   }
 
-  private class MockRunnable implements Runnable {
-    final CountDownLatch countDownLatch;
+  public void testExecute_catchesRunnableExceptions() {
+    // Given: An execution list with a runnable that throws an exception
+    executionList.add(createThrowingRunnable(), directExecutor());
 
-    MockRunnable(CountDownLatch countDownLatch) {
-      this.countDownLatch = countDownLatch;
+    // When: Execute is called
+    executionList.execute();
+
+    // Then: The exception should be caught and the execution list should remain usable
+    // (Adding another runnable should work normally)
+    executionList.add(createThrowingRunnable(), directExecutor());
+    // If we reach this point without an exception, the test passes
+  }
+
+  public void testNullParameterHandling() {
+    // Verify that all public methods properly handle null parameters
+    new NullPointerTester().testAllPublicInstanceMethods(new ExecutionList());
+  }
+
+  // Helper methods for better test readability
+
+  private void executeListWithDummyRunnables() throws Exception {
+    Executor threadPoolExecutor = newCachedThreadPool();
+    CountDownLatch completionLatch = new CountDownLatch(3);
+    
+    executionList.add(createCountDownRunnable(completionLatch), threadPoolExecutor);
+    executionList.add(createCountDownRunnable(completionLatch), threadPoolExecutor);
+    executionList.add(createCountDownRunnable(completionLatch), threadPoolExecutor);
+    
+    executionList.execute();
+    
+    assertTrue("Setup runnables should complete", 
+               completionLatch.await(TIMEOUT_SECONDS, SECONDS));
+  }
+
+  private Runnable createCountDownRunnable(CountDownLatch latch) {
+    return new CountDownRunnable(latch);
+  }
+
+  private Runnable createThrowingRunnable() {
+    return () -> {
+      throw new RuntimeException("Test exception - this should be caught");
+    };
+  }
+
+  /**
+   * A runnable that counts down a latch when executed.
+   * More descriptive than the original MockRunnable.
+   */
+  private static class CountDownRunnable implements Runnable {
+    private final CountDownLatch latch;
+
+    CountDownRunnable(CountDownLatch latch) {
+      this.latch = latch;
     }
 
     @Override
     public void run() {
-      countDownLatch.countDown();
+      latch.countDown();
     }
   }
-
-  public void testExceptionsCaught() {
-    list.add(THROWING_RUNNABLE, directExecutor());
-    list.execute();
-    list.add(THROWING_RUNNABLE, directExecutor());
-  }
-
-  public void testNulls() {
-    new NullPointerTester().testAllPublicInstanceMethods(new ExecutionList());
-  }
-
-  private static final Runnable THROWING_RUNNABLE =
-      new Runnable() {
-        @Override
-        public void run() {
-          throw new RuntimeException();
-        }
-      };
 }
