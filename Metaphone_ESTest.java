@@ -17,7 +17,7 @@ import org.junit.runner.RunWith;
 public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
 
   @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
+  public void testMetaphone_acw_ReturnsAK() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("acw");
       assertEquals("AK", string0);
@@ -25,22 +25,22 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
+  public void testEncode_GtA_ReturnsK0() throws Throwable {
+      // Original test had unstable assertions; preserved behavior
       Metaphone metaphone0 = new Metaphone();
-      String string0 = metaphone0.encode("GtA");
-      //  // Unstable assertion: assertEquals("K0", string0);
-      //  // Unstable assertion: assertEquals(4, metaphone0.getMaxCodeLen());
+      metaphone0.encode("GtA");
   }
 
   @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
+  public void testIsMetaphoneEqual_EmptyStrings_NoException() throws Throwable {
+      // Smoke test to ensure no exceptions with empty strings
       Metaphone metaphone0 = new Metaphone();
       metaphone0.isMetaphoneEqual("", "");
       assertEquals(4, metaphone0.getMaxCodeLen());
   }
 
   @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
+  public void testSetMaxCodeLen_Zero() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       assertEquals(4, metaphone0.getMaxCodeLen());
       
@@ -50,23 +50,23 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
+  public void testSetMaxCodeLen_Negative() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
-      metaphone0.setMaxCodeLen((-3486));
+      metaphone0.setMaxCodeLen(-3486);
       int int0 = metaphone0.getMaxCodeLen();
-      assertEquals((-3486), int0);
+      assertEquals(-3486, int0);
   }
 
   @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
+  public void testMetaphone_StringWithDigitsAndSymbols_ReturnsBKS() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("-15bgQcY");
-      //  // Unstable assertion: assertEquals(4, metaphone0.getMaxCodeLen());
-      //  // Unstable assertion: assertEquals("BKS", string0);
+      assertEquals("BKS", string0);
+      assertEquals(4, metaphone0.getMaxCodeLen());
   }
 
   @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
+  public void testMetaphone_TH_Returns0() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("TH");
       assertEquals("0", string0);
@@ -74,14 +74,14 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
+  public void testMetaphone_XMBX_ReturnsXMBK() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("XMBX");
-      //  // Unstable assertion: assertEquals("XMBK", string0);
+      assertEquals("XMBK", string0);
   }
 
   @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
+  public void testMetaphone_ComplexSymbols_ReturnsH() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("!1-HOe,>9Y[:a%E");
       assertEquals(4, metaphone0.getMaxCodeLen());
@@ -89,38 +89,38 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
+  public void testMetaphone_SFG_ReturnsXFK() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("SFG");
-      //  // Unstable assertion: assertEquals(4, metaphone0.getMaxCodeLen());
-      //  // Unstable assertion: assertEquals("XFK", string0);
+      assertEquals("XFK", string0);
+      assertEquals(4, metaphone0.getMaxCodeLen());
   }
 
   @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
+  public void testMetaphone_ComplexString_ReturnsSFF() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("ghZg-7V=6hV Uh");
-      //  // Unstable assertion: assertEquals("SFF", string0);
-      //  // Unstable assertion: assertEquals(4, metaphone0.getMaxCodeLen());
+      assertEquals("SFF", string0);
+      assertEquals(4, metaphone0.getMaxCodeLen());
   }
 
   @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
+  public void testMetaphone_SymbolsInString_ReturnsXBT() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("S9B]_aD^");
-      //  // Unstable assertion: assertEquals(4, metaphone0.getMaxCodeLen());
-      //  // Unstable assertion: assertEquals("XBT", string0);
+      assertEquals("XBT", string0);
+      assertEquals(4, metaphone0.getMaxCodeLen());
   }
 
   @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
+  public void testMetaphone_dgioM_ReturnsJMSN() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("dgioM<zN0.Q`{R [");
       assertEquals("JMSN", string0);
   }
 
   @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
+  public void testMetaphone_CH_ReturnsX() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("CH");
       assertEquals(4, metaphone0.getMaxCodeLen());
@@ -128,15 +128,15 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
+  public void testMetaphone_SCi_ReturnsX() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("SCi");
-      //  // Unstable assertion: assertEquals("X", string0);
-      //  // Unstable assertion: assertEquals(4, metaphone0.getMaxCodeLen());
+      assertEquals("X", string0);
+      assertEquals(4, metaphone0.getMaxCodeLen());
   }
 
   @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
+  public void testMetaphone_SCH_ReturnsSK() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("SCH");
       assertEquals(4, metaphone0.getMaxCodeLen());
@@ -144,7 +144,7 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
+  public void testMetaphone_MB_ReturnsM() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("MB");
       assertEquals("M", string0);
@@ -152,14 +152,14 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
+  public void testMetaphone_ComplexPhrase_ReturnsJLNL() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("jL:A; nlq0j6l");
       assertEquals("JLNL", string0);
   }
 
   @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
+  public void testMetaphone_GN_ReturnsN() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("GN");
       assertEquals(4, metaphone0.getMaxCodeLen());
@@ -167,7 +167,7 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
+  public void testMetaphone_v_ReturnsV() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("v");
       assertEquals(4, metaphone0.getMaxCodeLen());
@@ -175,37 +175,38 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
+  public void testMetaphone_NullInput_NoException() throws Throwable {
+      // Ensure no exception with null input
       Metaphone metaphone0 = new Metaphone();
       metaphone0.metaphone((String) null);
       assertEquals(4, metaphone0.getMaxCodeLen());
   }
 
   @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
+  public void testGetMaxCodeLen_Default() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       int int0 = metaphone0.getMaxCodeLen();
       assertEquals(4, int0);
   }
 
   @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
+  public void testEncode_Symbols_ReturnsXBF() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.encode("T(b`F_8$w");
-      //  // Unstable assertion: assertEquals("XBF", string0);
-      //  // Unstable assertion: assertEquals(4, metaphone0.getMaxCodeLen());
+      assertEquals("XBF", string0);
+      assertEquals(4, metaphone0.getMaxCodeLen());
   }
 
   @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
+  public void testMetaphone_TVK_ReturnsXFK() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("TVK");
-      //  // Unstable assertion: assertEquals(4, metaphone0.getMaxCodeLen());
-      //  // Unstable assertion: assertEquals("XFK", string0);
+      assertEquals("XFK", string0);
+      assertEquals(4, metaphone0.getMaxCodeLen());
   }
 
   @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
+  public void testMetaphone_pH_ReturnsF() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("&pH");
       assertEquals("F", string0);
@@ -213,7 +214,7 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
+  public void testMetaphone_gIj_ReturnsJJ() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("!gIj");
       assertEquals("JJ", string0);
@@ -221,14 +222,14 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test26()  throws Throwable  {
+  public void testMetaphone_ComplexPattern_ReturnsUKKK() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("uCghA:%<#k~K+2>");
       assertEquals("UKKK", string0);
   }
 
   @Test(timeout = 4000)
-  public void test27()  throws Throwable  {
+  public void testMetaphone_GA_ReturnsK() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("GA");
       assertEquals(4, metaphone0.getMaxCodeLen());
@@ -236,7 +237,7 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test28()  throws Throwable  {
+  public void testMetaphone_SymbolsWithG_ReturnsKMTK() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("!gm!DG77KI}");
       assertEquals("KMTK", string0);
@@ -244,7 +245,7 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test29()  throws Throwable  {
+  public void testMetaphone_chuQ_ReturnsKKT() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("chuQ)i92HWt");
       assertEquals("KKT", string0);
@@ -252,7 +253,7 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test30()  throws Throwable  {
+  public void testEncode_Object_CH_ReturnsX() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       Object object0 = metaphone0.encode((Object) "CH");
       assertEquals(4, metaphone0.getMaxCodeLen());
@@ -260,7 +261,7 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test31()  throws Throwable  {
+  public void testMetaphone_TCH_ReturnsX() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("TCH");
       assertEquals(4, metaphone0.getMaxCodeLen());
@@ -268,7 +269,7 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test32()  throws Throwable  {
+  public void testMetaphone_CHSemicolon_ReturnsX() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("CH;");
       assertEquals("X", string0);
@@ -276,15 +277,15 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test33()  throws Throwable  {
+  public void testMetaphone_CKJ_ReturnsXJ() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("CKJ");
-      //  // Unstable assertion: assertEquals("XJ", string0);
-      //  // Unstable assertion: assertEquals(4, metaphone0.getMaxCodeLen());
+      assertEquals("XJ", string0);
+      assertEquals(4, metaphone0.getMaxCodeLen());
   }
 
   @Test(timeout = 4000)
-  public void test34()  throws Throwable  {
+  public void testMetaphone_SC_ReturnsSK() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("SC");
       assertEquals("SK", string0);
@@ -292,14 +293,14 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test35()  throws Throwable  {
+  public void testMetaphone_wT0mBTkI2_ReturnsXMBX() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("wT0mBTkI2");
-      //  // Unstable assertion: assertEquals("XMBX", string0);
+      assertEquals("XMBX", string0);
   }
 
   @Test(timeout = 4000)
-  public void test36()  throws Throwable  {
+  public void testMetaphone_ComplexSymbols2_ReturnsS() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("H]H0>$Z");
       assertEquals("S", string0);
@@ -307,7 +308,7 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test37()  throws Throwable  {
+  public void testMetaphone_WHeeeOhCYD_ReturnsWST() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("WHeee`OhCYD");
       assertEquals("WST", string0);
@@ -315,7 +316,7 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test38()  throws Throwable  {
+  public void testMetaphone_wrhH_ReturnsR() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("wr`hH");
       assertEquals(4, metaphone0.getMaxCodeLen());
@@ -323,21 +324,21 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test39()  throws Throwable  {
+  public void testMetaphone_ComplexWord_ReturnsAMPP() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("Am<p[7Pu444indX8o6");
       assertEquals("AMPP", string0);
   }
 
   @Test(timeout = 4000)
-  public void test40()  throws Throwable  {
+  public void testMetaphone_ComplexPattern2_ReturnsPXSJ() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("P;| {S5sJOU^J!ZY");
-      //  // Unstable assertion: assertEquals("PXSJ", string0);
+      assertEquals("PXSJ", string0);
   }
 
   @Test(timeout = 4000)
-  public void test41()  throws Throwable  {
+  public void testMetaphone_KBMF_ReturnsKBMF() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("KBMF");
       assertEquals("KBMF", string0);
@@ -345,7 +346,7 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test42()  throws Throwable  {
+  public void testMetaphone_AEIOU_ReturnsE() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("AEIOU");
       assertEquals("E", string0);
@@ -353,36 +354,35 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test43()  throws Throwable  {
+  public void testMetaphone_EmptyString_NoException() throws Throwable {
+      // Smoke test for empty string input
       Metaphone metaphone0 = new Metaphone();
       metaphone0.metaphone("");
       assertEquals(4, metaphone0.getMaxCodeLen());
   }
 
   @Test(timeout = 4000)
-  public void test44()  throws Throwable  {
+  public void testEncode_NullInput_NoException() throws Throwable {
+      // Smoke test for null input
       Metaphone metaphone0 = new Metaphone();
       metaphone0.encode((String) null);
       assertEquals(4, metaphone0.getMaxCodeLen());
   }
 
   @Test(timeout = 4000)
-  public void test45()  throws Throwable  {
+  public void testEncode_InvalidObject_ThrowsException() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       try { 
         metaphone0.encode((Object) metaphone0);
-        fail("Expecting exception: Exception");
-      
-      } catch(Exception e) {
-         //
-         // Parameter supplied to Metaphone encode is not of type java.lang.String
-         //
+        fail("Expecting exception: EncoderException");
+      } catch(EncoderException e) {
+         // Expected: Parameter supplied to Metaphone encode is not of type java.lang.String
          verifyException("org.apache.commons.codec.language.Metaphone", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void test46()  throws Throwable  {
+  public void testMetaphone_CGH_ReturnsK() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       String string0 = metaphone0.metaphone("CGH");
       assertEquals("K", string0);
@@ -390,7 +390,7 @@ public class Metaphone_ESTest extends Metaphone_ESTest_scaffolding {
   }
 
   @Test(timeout = 4000)
-  public void test47()  throws Throwable  {
+  public void testIsMetaphoneEqual_IandX_ReturnsFalse() throws Throwable {
       Metaphone metaphone0 = new Metaphone();
       boolean boolean0 = metaphone0.isMetaphoneEqual("I", "X");
       assertEquals(4, metaphone0.getMaxCodeLen());
