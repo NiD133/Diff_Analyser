@@ -18,182 +18,177 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class VersionUtil_ESTest extends VersionUtil_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      int int0 = VersionUtil.parseVersionPart("0T*A{.*6/lD:1tm E_");
-      assertEquals(0, int0);
-  }
+    // Tests for parseVersionPart method
+    // ================================
+    
+    @Test(timeout = 4000)
+    public void testParseVersionPart_WithLeadingZeroAndNonDigits()  throws Throwable {
+        int result = VersionUtil.parseVersionPart("0T*A{.*6/lD:1tm E_");
+        assertEquals(0, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      int int0 = VersionUtil.parseVersionPart("9c*fdp6?ec}ur$$");
-      assertEquals(9, int0);
-  }
+    @Test(timeout = 4000)
+    public void testParseVersionPart_WithLeadingNineAndNonDigits()  throws Throwable {
+        int result = VersionUtil.parseVersionPart("9c*fdp6?ec}ur$$");
+        assertEquals(9, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      int int0 = VersionUtil.parseVersionPart("");
-      assertEquals(0, int0);
-  }
+    @Test(timeout = 4000)
+    public void testParseVersionPart_EmptyString()  throws Throwable {
+        int result = VersionUtil.parseVersionPart("");
+        assertEquals(0, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      int int0 = VersionUtil.parseVersionPart("3$Qtt~IU2x^1~fgh4]+");
-      assertEquals(3, int0);
-  }
+    @Test(timeout = 4000)
+    public void testParseVersionPart_WithLeadingThreeAndNonDigits()  throws Throwable {
+        int result = VersionUtil.parseVersionPart("3$Qtt~IU2x^1~fgh4]+");
+        assertEquals(3, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      Version version0 = VersionUtil.parseVersion("8juvlng,dux%Z/Gd4", "8juvlng,dux%Z/Gd4", "8juvlng,dux%Z/Gd4");
-      assertEquals(0, version0.getPatchLevel());
-      assertEquals(0, version0.getMinorVersion());
-      assertEquals(8, version0.getMajorVersion());
-  }
+    @Test(timeout = 4000)
+    public void testParseVersionPart_NullInput_ThrowsNPE()  throws Throwable {
+        try { 
+            VersionUtil.parseVersionPart((String) null);
+            fail("Expecting exception: NullPointerException");
+        } catch(NullPointerException e) {
+            verifyException("com.fasterxml.jackson.core.util.VersionUtil", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        VersionUtil.parseVersionPart((String) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.fasterxml.jackson.core.util.VersionUtil", e);
-      }
-  }
+    // Tests for parseVersion method
+    // =============================
+    
+    @Test(timeout = 4000)
+    public void testParseVersion_WithLeading8_ReturnsMajor8()  throws Throwable {
+        Version version = VersionUtil.parseVersion("8juvlng,dux%Z/Gd4", "8juvlng,dux%Z/Gd4", "8juvlng,dux%Z/Gd4");
+        assertEquals(8, version.getMajorVersion());
+        assertEquals(0, version.getMinorVersion());
+        assertEquals(0, version.getPatchLevel());
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        VersionUtil.parseVersion(";", ";", ";");
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
-      
-      } catch(ArrayIndexOutOfBoundsException e) {
-         //
-         // 0
-         //
-         verifyException("com.fasterxml.jackson.core.util.VersionUtil", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testParseVersion_With73InMiddle_ReturnsMinor73()  throws Throwable {
+        Version version = VersionUtil.parseVersion("iQT[E/73*QBf", "iQT[E/73*QBf", "iQT[E/73*QBf");
+        assertEquals(0, version.getMajorVersion());
+        assertEquals(73, version.getMinorVersion());
+        assertEquals(0, version.getPatchLevel());
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        VersionUtil.mavenVersionFor((ClassLoader) null, "", "");
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.fasterxml.jackson.core.util.VersionUtil", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testParseVersion_WithPackageName_ReturnsSnapshot()  throws Throwable {
+        Version version = VersionUtil.parseVersion("com.fasterxml.jackson.core.util.VersionUtil", 
+            "com.fasterxml.jackson.core.util.VersionUtil", 
+            "com.fasterxml.jackson.core.util.VersionUtil");
+        assertTrue(version.isSnapshot());
+        assertEquals(0, version.getMinorVersion());
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      Class<JsonFactory> class0 = JsonFactory.class;
-      Version version0 = VersionUtil.versionFor(class0);
-      assertEquals(0, version0.getPatchLevel());
-  }
+    @Test(timeout = 4000)
+    public void testParseVersion_WithTrailing6_ReturnsPatch6()  throws Throwable {
+        Version version = VersionUtil.parseVersion("yf;Hr?-6", "yf;Hr?-6", "yf;Hr?-6");
+        assertEquals(0, version.getMajorVersion());
+        assertEquals(6, version.getPatchLevel());
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      Version version0 = VersionUtil.parseVersion("iQT[E/73*QBf", "iQT[E/73*QBf", "iQT[E/73*QBf");
-      assertEquals(0, version0.getMajorVersion());
-      assertEquals(73, version0.getMinorVersion());
-      assertEquals(0, version0.getPatchLevel());
-  }
+    @Test(timeout = 4000)
+    public void testParseVersion_EmptyString_ReturnsUnknownVersion()  throws Throwable {
+        Version version = VersionUtil.parseVersion("", "", "");
+        assertTrue(version.isUknownVersion());
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      Version version0 = VersionUtil.parseVersion("com.fasterxml.jackson.core.util.VersionUtil", "com.fasterxml.jackson.core.util.VersionUtil", "com.fasterxml.jackson.core.util.VersionUtil");
-      assertTrue(version0.isSnapshot());
-      assertEquals(0, version0.getMinorVersion());
-  }
+    @Test(timeout = 4000)
+    public void testParseVersion_ShortVersionString_ReturnsBaseVersion()  throws Throwable {
+        Version version = VersionUtil.parseVersion("Ve", "GR", "");
+        assertEquals("", version.getArtifactId());
+        assertEquals(0, version.getPatchLevel());
+        assertEquals(0, version.getMajorVersion());
+        assertEquals("GR", version.getGroupId());
+        assertEquals(0, version.getMinorVersion());
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      Version version0 = VersionUtil.parseVersion("yf;Hr?-6", "yf;Hr?-6", "yf;Hr?-6");
-      assertEquals(6, version0.getPatchLevel());
-      assertEquals(0, version0.getMajorVersion());
-  }
+    @Test(timeout = 4000)
+    public void testParseVersion_NullInput_ReturnsVersionWithEmptyArtifactId()  throws Throwable {
+        Version version = VersionUtil.parseVersion((String) null, (String) null, (String) null);
+        assertEquals("", version.getArtifactId());
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      Version version0 = VersionUtil.parseVersion("", "", "");
-      assertTrue(version0.isUknownVersion());
-  }
+    @Test(timeout = 4000)
+    public void testParseVersion_InvalidString_ThrowsArrayIndexOutOfBounds()  throws Throwable {
+        try { 
+            VersionUtil.parseVersion(";", ";", ";");
+            fail("Expecting exception: ArrayIndexOutOfBoundsException");
+        } catch(ArrayIndexOutOfBoundsException e) {
+            verifyException("com.fasterxml.jackson.core.util.VersionUtil", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      Version version0 = VersionUtil.parseVersion("Ve", "GR", "");
-      assertEquals("", version0.getArtifactId());
-      assertEquals(0, version0.getPatchLevel());
-      assertEquals(0, version0.getMajorVersion());
-      assertEquals("GR", version0.getGroupId());
-      assertEquals(0, version0.getMinorVersion());
-  }
+    // Tests for mavenVersionFor method
+    // ================================
+    
+    @Test(timeout = 4000)
+    public void testMavenVersionFor_NullClassLoader_ThrowsNPE()  throws Throwable {
+        try { 
+            VersionUtil.mavenVersionFor((ClassLoader) null, "", "");
+            fail("Expecting exception: NullPointerException");
+        } catch(NullPointerException e) {
+            verifyException("com.fasterxml.jackson.core.util.VersionUtil", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      Version version0 = VersionUtil.parseVersion((String) null, (String) null, (String) null);
-      assertEquals("", version0.getArtifactId());
-  }
+    @Test(timeout = 4000)
+    public void testMavenVersionFor_NonExistentModule_ReturnsDefaultVersion()  throws Throwable {
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        Version version = VersionUtil.mavenVersionFor(classLoader, "[][.~r)|i/l/", "Ve");
+        assertEquals(0, version.getMajorVersion());
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
-      Version version0 = VersionUtil.mavenVersionFor(classLoader0, "[][.~r)|i/l/", "Ve");
-      assertEquals(0, version0.getMajorVersion());
-  }
+    // Tests for versionFor and packageVersionFor methods
+    // =================================================
+    
+    @Test(timeout = 4000)
+    public void testVersionFor_JsonFactoryClass_ReturnsNonUnknownVersion()  throws Throwable {
+        Class<JsonFactory> jsonFactoryClass = JsonFactory.class;
+        Version version = VersionUtil.versionFor(jsonFactoryClass);
+        assertEquals(0, version.getPatchLevel());
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        VersionUtil.throwInternalReturnAny();
-        fail("Expecting exception: RuntimeException");
-      
-      } catch(RuntimeException e) {
-         //
-         // Internal error: this code path should never get executed
-         //
-         verifyException("com.fasterxml.jackson.core.util.VersionUtil", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testPackageVersionFor_ObjectClass_ReturnsUnknownVersion()  throws Throwable {
+        Class<Object> objectClass = Object.class;
+        Version version = VersionUtil.packageVersionFor(objectClass);
+        assertTrue(version.isUknownVersion());
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        VersionUtil.throwInternal();
-        fail("Expecting exception: RuntimeException");
-      
-      } catch(RuntimeException e) {
-         //
-         // Internal error: this code path should never get executed
-         //
-         verifyException("com.fasterxml.jackson.core.util.VersionUtil", e);
-      }
-  }
+    // Tests for deprecated version() method
+    // =====================================
+    
+    @Test(timeout = 4000)
+    public void testVersionUtilInstanceVersion_ReturnsNonSnapshot()  throws Throwable {
+        VersionUtil versionUtil = new VersionUtil();
+        Version version = versionUtil.version();
+        assertFalse(version.isSnapshot());
+    }
 
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      Class<Object> class0 = Object.class;
-      Version version0 = VersionUtil.packageVersionFor(class0);
-      assertTrue(version0.isUknownVersion());
-  }
+    // Tests for internal exception throwing utilities
+    // ==============================================
+    
+    @Test(timeout = 4000)
+    public void testThrowInternal_ThrowsRuntimeException()  throws Throwable {
+        try { 
+            VersionUtil.throwInternal();
+            fail("Expecting exception: RuntimeException");
+        } catch(RuntimeException e) {
+            verifyException("com.fasterxml.jackson.core.util.VersionUtil", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      VersionUtil versionUtil0 = new VersionUtil();
-      Version version0 = versionUtil0.version();
-      assertFalse(version0.isSnapshot());
-  }
+    @Test(timeout = 4000)
+    public void testThrowInternalReturnAny_ThrowsRuntimeException()  throws Throwable {
+        try { 
+            VersionUtil.throwInternalReturnAny();
+            fail("Expecting exception: RuntimeException");
+        } catch(RuntimeException e) {
+            verifyException("com.fasterxml.jackson.core.util.VersionUtil", e);
+        }
+    }
 }
