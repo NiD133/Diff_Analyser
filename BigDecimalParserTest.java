@@ -7,119 +7,79 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class BigDecimalParserTest extends com.fasterxml.jackson.core.JUnit5TestBase {
-    // Precomputed test data
-    private static final String LONG_INVALID_STRING = generateLongInvalidString();
-    private static final String LONG_VALID_STRING = generateLongValidString(500);
-    private static final BigDecimal LONG_VALID_EXPECTED = new BigDecimal(LONG_VALID_STRING);
-    private static final String ISSUE_DATABIND_4694_STRING = generateIssueDatabind4694String();
-    private static final BigDecimal ISSUE_DATABIND_4694_EXPECTED = new BigDecimal(ISSUE_DATABIND_4694_STRING);
-
-    // Tests for invalid inputs ================================================
-
+class BigDecimalParserTest extends com.fasterxml.jackson.core.JUnit5TestBase
+{
     @Test
     void longInvalidStringParse() {
-        NumberFormatException nfe = assertThrows(
-            NumberFormatException.class,
-            () -> BigDecimalParser.parse(LONG_INVALID_STRING),
-            "Should throw NumberFormatException for invalid input"
-        );
-        verifyExceptionMessage(nfe);
+        try {
+            BigDecimalParser.parse(genLongInvalidString());
+            fail("expected NumberFormatException");
+        } catch (NumberFormatException nfe) {
+            assertTrue(nfe.getMessage().startsWith("Value \"AAAAA"), "exception message starts as expected?");
+            assertTrue(nfe.getMessage().contains("truncated"), "exception message value contains truncated");
+        }
     }
 
     @Test
     void longInvalidStringFastParse() {
-        NumberFormatException nfe = assertThrows(
-            NumberFormatException.class,
-            () -> BigDecimalParser.parseWithFastParser(LONG_INVALID_STRING),
-            "Should throw NumberFormatException for invalid input"
-        );
-        verifyExceptionMessage(nfe);
+        try {
+            BigDecimalParser.parseWithFastParser(genLongInvalidString());
+            fail("expected NumberFormatException");
+        } catch (NumberFormatException nfe) {
+            assertTrue(nfe.getMessage().startsWith("Value \"AAAAA"), "exception message starts as expected?");
+            assertTrue(nfe.getMessage().contains("truncated"), "exception message value contains truncated");
+        }
     }
-
-    // Tests for valid inputs =================================================
 
     @Test
     void longValidStringParse() {
-        // Test both String and char[] parsing methods
-        assertEquals(LONG_VALID_EXPECTED, BigDecimalParser.parse(LONG_VALID_STRING));
-        assertEquals(LONG_VALID_EXPECTED, 
-            BigDecimalParser.parse(
-                LONG_VALID_STRING.toCharArray(), 
-                0, 
-                LONG_VALID_STRING.length()
-            )
-        );
+        String num = genLongValidString(500);
+        final BigDecimal EXP = new BigDecimal(num);
+
+        // Parse from String first, then char[]
+
+        assertEquals(EXP, BigDecimalParser.parse(num));
+        assertEquals(EXP, BigDecimalParser.parse(num.toCharArray(), 0, num.length()));
     }
 
     @Test
     void longValidStringFastParse() {
-        // Test both String and char[] parsing methods
-        assertEquals(LONG_VALID_EXPECTED, 
-            BigDecimalParser.parseWithFastParser(LONG_VALID_STRING)
-        );
-        assertEquals(LONG_VALID_EXPECTED,
-            BigDecimalParser.parseWithFastParser(
-                LONG_VALID_STRING.toCharArray(), 
-                0, 
-                LONG_VALID_STRING.length()
-            )
-        );
+        String num = genLongValidString(500);
+        final BigDecimal EXP = new BigDecimal(num);
+
+        // Parse from String first, then char[]
+        assertEquals(EXP, BigDecimalParser.parseWithFastParser(num));
+        assertEquals(EXP, BigDecimalParser.parseWithFastParser(num.toCharArray(), 0, num.length()));
     }
 
-    // Regression test for specific issue =====================================
     @Test
     void issueDatabind4694() {
-        // Verify all parsing methods handle extremely long decimals correctly
-        assertEquals(ISSUE_DATABIND_4694_EXPECTED, 
-            JavaBigDecimalParser.parseBigDecimal(ISSUE_DATABIND_4694_STRING)
-        );
-        assertEquals(ISSUE_DATABIND_4694_EXPECTED, 
-            BigDecimalParser.parse(ISSUE_DATABIND_4694_STRING)
-        );
-        assertEquals(ISSUE_DATABIND_4694_EXPECTED,
-            BigDecimalParser.parseWithFastParser(ISSUE_DATABIND_4694_STRING)
-        );
-        
-        final char[] arr = ISSUE_DATABIND_4694_STRING.toCharArray();
-        assertEquals(ISSUE_DATABIND_4694_EXPECTED, 
-            BigDecimalParser.parse(arr, 0, arr.length)
-        );
-        assertEquals(ISSUE_DATABIND_4694_EXPECTED,
-            BigDecimalParser.parseWithFastParser(arr, 0, arr.length)
-        );
+        final String str = "-11000.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        final BigDecimal expected = new BigDecimal(str);
+        assertEquals(expected, JavaBigDecimalParser.parseBigDecimal(str));
+        assertEquals(expected, BigDecimalParser.parse(str));
+        assertEquals(expected, BigDecimalParser.parseWithFastParser(str));
+        final char[] arr = str.toCharArray();
+        assertEquals(expected, BigDecimalParser.parse(arr, 0, arr.length));
+        assertEquals(expected, BigDecimalParser.parseWithFastParser(arr, 0, arr.length));
     }
 
-    // Helper methods =========================================================
-
-    /**
-     * Verifies common properties of NumberFormatException messages
-     */
-    private void verifyExceptionMessage(NumberFormatException nfe) {
-        assertTrue(nfe.getMessage().startsWith("Value \"AAAAA"),
-            "Exception message should start with prefix");
-        assertTrue(nfe.getMessage().contains("truncated"),
-            "Exception message should indicate truncation");
+    static String genLongInvalidString() {
+        final int len = 1500;
+        final StringBuilder sb = new StringBuilder(len);
+        for (int i = 0; i < len; i++) {
+            sb.append("A");
+        }
+        return sb.toString();
     }
 
-    /**
-     * Generates an invalid numeric string of 1500 'A' characters
-     */
-    private static String generateLongInvalidString() {
-        return "A".repeat(1500);
-    }
-
-    /**
-     * Generates a valid decimal string in the format "0.000...01" with specified zeros
-     */
-    private static String generateLongValidString(int zeroCount) {
-        return "0." + "0".repeat(zeroCount) + "1";
-    }
-
-    /**
-     * Provides the decimal string from Jackson databind issue #4694
-     */
-    private static String generateIssueDatabind4694String() {
-        return "-11000" + "0".repeat(1000);
+    static String genLongValidString(int len) {
+        final StringBuilder sb = new StringBuilder(len+5);
+        sb.append("0.");
+        for (int i = 0; i < len; i++) {
+            sb.append('0');
+        }
+        sb.append('1');
+        return sb.toString();
     }
 }
