@@ -1,3 +1,19 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.commons.io.output;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -13,83 +29,84 @@ import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.DefaultLocale;
 
 /**
- * Unit tests for {@link XmlStreamWriter}.
+ * Tests {@link XmlStreamWriter}.
  */
 class XmlStreamWriterTest {
 
-    // Sample text in various encodings
-    private static final String TEXT_FRENCH = "eacute: \u00E9"; // Latin-1
-    private static final String TEXT_GREEK = "alpha: \u03B1"; // Latin-7
-    private static final String TEXT_EURO = "euro: \u20AC"; // Latin-15
-    private static final String TEXT_JAPANESE = "hiragana A: \u3042"; // EUC-JP
-    private static final String TEXT_UNICODE = TEXT_FRENCH + ", " + TEXT_GREEK + ", " + TEXT_EURO + ", " + TEXT_JAPANESE;
+    /** French */
+    private static final String TEXT_LATIN1 = "eacute: \u00E9";
 
-    /**
-     * Verifies that the XML content is correctly written with the specified encoding.
-     */
-    private static void verifyXmlContent(final String xml, final String expectedEncoding, final String defaultEncoding) throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        XmlStreamWriter writerCheck;
+    /** Greek */
+    private static final String TEXT_LATIN7 = "alpha: \u03B1";
 
-        try (XmlStreamWriter writer = XmlStreamWriter.builder().setOutputStream(outputStream).setCharset(defaultEncoding).get()) {
+    /** Euro support */
+    private static final String TEXT_LATIN15 = "euro: \u20AC";
+
+    /** Japanese */
+    private static final String TEXT_EUC_JP = "hiragana A: \u3042";
+
+    /** Unicode: support everything */
+    private static final String TEXT_UNICODE = TEXT_LATIN1 + ", " + TEXT_LATIN7
+            + ", " + TEXT_LATIN15 + ", " + TEXT_EUC_JP;
+
+    @SuppressWarnings("resource")
+    private static void checkXmlContent(final String xml, final String encodingName, final String defaultEncodingName)
+            throws IOException {
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        final XmlStreamWriter writerCheck;
+        try (XmlStreamWriter writer = XmlStreamWriter.builder().setOutputStream(out).setCharset(defaultEncodingName).get()) {
             writerCheck = writer;
             writer.write(xml);
         }
-
-        byte[] actualXmlContent = outputStream.toByteArray();
-        Charset expectedCharset = Charset.forName(expectedEncoding);
-        Charset actualCharset = Charset.forName(writerCheck.getEncoding());
-
-        assertEquals(expectedCharset, actualCharset, "Charset mismatch");
-        assertTrue(actualCharset.contains(expectedCharset), "Charset containment mismatch");
-        assertArrayEquals(xml.getBytes(expectedEncoding), actualXmlContent, "XML content mismatch");
+        final byte[] xmlContent = out.toByteArray();
+        final Charset charset = Charset.forName(encodingName);
+        final Charset writerCharset = Charset.forName(writerCheck.getEncoding());
+        assertEquals(charset, writerCharset);
+        assertTrue(writerCharset.contains(charset), writerCharset.name());
+        assertArrayEquals(xml.getBytes(encodingName), xmlContent);
     }
 
-    /**
-     * Helper method to test XML writing with specified text and encoding.
-     */
-    private static void testXmlWriter(final String text, final String encoding) throws IOException {
-        testXmlWriter(text, encoding, null);
+    private static void checkXmlWriter(final String text, final String encoding)
+            throws IOException {
+        checkXmlWriter(text, encoding, null);
     }
 
-    /**
-     * Helper method to test XML writing with specified text, encoding, and default encoding.
-     */
-    private static void testXmlWriter(final String text, final String encoding, final String defaultEncoding) throws IOException {
-        String xmlContent = createXmlDeclaration(text, encoding);
-        String effectiveEncoding = encoding != null ? encoding : (defaultEncoding != null ? defaultEncoding : StandardCharsets.UTF_8.name());
-        verifyXmlContent(xmlContent, effectiveEncoding, defaultEncoding);
-    }
-
-    /**
-     * Creates an XML declaration with the specified text and encoding.
-     */
-    private static String createXmlDeclaration(final String text, final String encoding) {
-        String xmlDeclaration = "<?xml version=\"1.0\"?>";
-        if (encoding != null) {
-            xmlDeclaration = "<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>";
+    private static void checkXmlWriter(final String text, final String encoding, final String defaultEncoding)
+            throws IOException {
+        final String xml = createXmlContent(text, encoding);
+        String effectiveEncoding = encoding;
+        if (effectiveEncoding == null) {
+            effectiveEncoding = defaultEncoding == null ? StandardCharsets.UTF_8.name() : defaultEncoding;
         }
-        return xmlDeclaration + "\n<text>" + text + "</text>";
+        checkXmlContent(xml, effectiveEncoding, defaultEncoding);
+    }
+
+    private static String createXmlContent(final String text, final String encoding) {
+        String xmlDecl = "<?xml version=\"1.0\"?>";
+        if (encoding != null) {
+            xmlDecl = "<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>";
+        }
+        return xmlDecl + "\n<text>" + text + "</text>";
     }
 
     @Test
     void testDefaultEncoding() throws IOException {
-        testXmlWriter(TEXT_UNICODE, null, null);
-        testXmlWriter(TEXT_UNICODE, null, StandardCharsets.UTF_8.name());
-        testXmlWriter(TEXT_UNICODE, null, StandardCharsets.UTF_16.name());
-        testXmlWriter(TEXT_UNICODE, null, StandardCharsets.UTF_16BE.name());
-        testXmlWriter(TEXT_UNICODE, null, StandardCharsets.ISO_8859_1.name());
+        checkXmlWriter(TEXT_UNICODE, null, null);
+        checkXmlWriter(TEXT_UNICODE, null, StandardCharsets.UTF_8.name());
+        checkXmlWriter(TEXT_UNICODE, null, StandardCharsets.UTF_16.name());
+        checkXmlWriter(TEXT_UNICODE, null, StandardCharsets.UTF_16BE.name());
+        checkXmlWriter(TEXT_UNICODE, null, StandardCharsets.ISO_8859_1.name());
     }
 
     @Test
     void testEBCDICEncoding() throws IOException {
-        testXmlWriter("simple text in EBCDIC", "CP1047");
+        checkXmlWriter("simple text in EBCDIC", "CP1047");
     }
 
     @Test
-    void testEmptyContent() throws IOException {
+    void testEmpty() throws IOException {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream();
-             XmlStreamWriter writer = new XmlStreamWriter(out)) {
+                XmlStreamWriter writer = new XmlStreamWriter(out)) {
             writer.flush();
             writer.write("");
             writer.flush();
@@ -97,7 +114,7 @@ class XmlStreamWriterTest {
             writer.flush();
         }
         try (ByteArrayOutputStream out = new ByteArrayOutputStream();
-             XmlStreamWriter writer = XmlStreamWriter.builder().setOutputStream(out).get()) {
+                XmlStreamWriter writer = XmlStreamWriter.builder().setOutputStream(out).get()) {
             writer.flush();
             writer.write("");
             writer.flush();
@@ -108,54 +125,55 @@ class XmlStreamWriterTest {
 
     @Test
     void testEUC_JPEncoding() throws IOException {
-        testXmlWriter(TEXT_JAPANESE, "EUC-JP");
+        checkXmlWriter(TEXT_EUC_JP, "EUC-JP");
     }
 
     @Test
     void testLatin15Encoding() throws IOException {
-        testXmlWriter(TEXT_EURO, "ISO-8859-15");
+        checkXmlWriter(TEXT_LATIN15, "ISO-8859-15");
     }
 
     @Test
     void testLatin1Encoding() throws IOException {
-        testXmlWriter(TEXT_FRENCH, StandardCharsets.ISO_8859_1.name());
+        checkXmlWriter(TEXT_LATIN1, StandardCharsets.ISO_8859_1.name());
     }
 
     @Test
     void testLatin7Encoding() throws IOException {
-        testXmlWriter(TEXT_GREEK, "ISO-8859-7");
+        checkXmlWriter(TEXT_LATIN7, "ISO-8859-7");
     }
 
+    /** Turkish language has specific rules to convert dotted and dotless i character. */
     @Test
     @DefaultLocale(language = "tr")
-    void testLowerCaseEncodingWithTurkishLocale() throws IOException {
-        testXmlWriter(TEXT_UNICODE, "utf-8");
-        testXmlWriter(TEXT_FRENCH, "iso-8859-1");
-        testXmlWriter(TEXT_GREEK, "iso-8859-7");
+    void testLowerCaseEncodingWithTurkishLocale_IO_557() throws IOException {
+        checkXmlWriter(TEXT_UNICODE, "utf-8");
+        checkXmlWriter(TEXT_LATIN1, "iso-8859-1");
+        checkXmlWriter(TEXT_LATIN7, "iso-8859-7");
     }
 
     @Test
     void testNoXmlHeader() throws IOException {
-        verifyXmlContent("<text>text with no XML header</text>", StandardCharsets.UTF_8.name(), null);
+        checkXmlContent("<text>text with no XML header</text>", StandardCharsets.UTF_8.name(), null);
     }
 
     @Test
     void testUTF16BEEncoding() throws IOException {
-        testXmlWriter(TEXT_UNICODE, StandardCharsets.UTF_16BE.name());
+        checkXmlWriter(TEXT_UNICODE, StandardCharsets.UTF_16BE.name());
     }
 
     @Test
     void testUTF16Encoding() throws IOException {
-        testXmlWriter(TEXT_UNICODE, StandardCharsets.UTF_16.name());
+        checkXmlWriter(TEXT_UNICODE, StandardCharsets.UTF_16.name());
     }
 
     @Test
     void testUTF16LEEncoding() throws IOException {
-        testXmlWriter(TEXT_UNICODE, StandardCharsets.UTF_16LE.name());
+        checkXmlWriter(TEXT_UNICODE, StandardCharsets.UTF_16LE.name());
     }
 
     @Test
     void testUTF8Encoding() throws IOException {
-        testXmlWriter(TEXT_UNICODE, StandardCharsets.UTF_8.name());
+        checkXmlWriter(TEXT_UNICODE, StandardCharsets.UTF_8.name());
     }
 }
