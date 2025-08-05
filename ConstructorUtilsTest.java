@@ -35,10 +35,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests ConstructorUtils
+ * Tests for ConstructorUtils utility class.
+ * 
+ * This test suite verifies the functionality of constructor reflection utilities including:
+ * - Finding accessible constructors
+ * - Matching constructors with compatible parameter types
+ * - Invoking constructors with type conversion
+ * - Exact constructor matching and invocation
  */
 public class ConstructorUtilsTest extends AbstractLangTest {
+
+    // Test helper classes for constructor testing scenarios
     private static class BaseClass {
+    }
+
+    private static final class SubClass extends BaseClass {
     }
 
     static class PrivateClass {
@@ -53,193 +64,300 @@ public class ConstructorUtilsTest extends AbstractLangTest {
         }
     }
 
-    private static final class SubClass extends BaseClass {
-    }
-
+    /**
+     * Test bean with multiple constructor overloads to test parameter matching.
+     * Each constructor sets a toString value to identify which constructor was called.
+     */
     public static class TestBean {
-        private final String toString;
+        private final String constructorSignature;
         final String[] varArgs;
 
         public TestBean() {
-            toString = "()";
+            constructorSignature = "()";
             varArgs = null;
         }
 
-        public TestBean(final BaseClass bc, final String... s) {
-            toString = "(BaseClass, String...)";
-            varArgs = s;
+        public TestBean(final String s) {
+            constructorSignature = "(String)";
+            varArgs = null;
         }
 
-        public TestBean(final double d) {
-            toString = "(double)";
+        public TestBean(final Object o) {
+            constructorSignature = "(Object)";
             varArgs = null;
         }
 
         public TestBean(final int i) {
-            toString = "(int)";
+            constructorSignature = "(int)";
             varArgs = null;
         }
 
         public TestBean(final Integer i) {
-            toString = "(Integer)";
+            constructorSignature = "(Integer)";
             varArgs = null;
         }
 
+        public TestBean(final double d) {
+            constructorSignature = "(double)";
+            varArgs = null;
+        }
+
+        public TestBean(final String... s) {
+            constructorSignature = "(String...)";
+            varArgs = s;
+        }
+
+        public TestBean(final Integer i, final String... s) {
+            constructorSignature = "(Integer, String...)";
+            varArgs = s;
+        }
+
         public TestBean(final Integer first, final int... args) {
-            toString = "(Integer, String...)";
+            constructorSignature = "(Integer, String...)";
             varArgs = new String[args.length];
             for (int i = 0; i < args.length; ++i) {
                 varArgs[i] = Integer.toString(args[i]);
             }
         }
 
-        public TestBean(final Integer i, final String... s) {
-            toString = "(Integer, String...)";
-            varArgs = s;
-        }
-
-        public TestBean(final Object o) {
-            toString = "(Object)";
-            varArgs = null;
-        }
-
-        public TestBean(final String s) {
-            toString = "(String)";
-            varArgs = null;
-        }
-
-        public TestBean(final String... s) {
-            toString = "(String...)";
+        public TestBean(final BaseClass bc, final String... s) {
+            constructorSignature = "(BaseClass, String...)";
             varArgs = s;
         }
 
         @Override
         public String toString() {
-            return toString;
+            return constructorSignature;
         }
 
-        void verify(final String str, final String[] args) {
-            assertEquals(str, toString);
-            assertArrayEquals(args, varArgs);
+        /**
+         * Verifies that the correct constructor was called with expected parameters.
+         */
+        void verify(final String expectedSignature, final String[] expectedArgs) {
+            assertEquals(expectedSignature, constructorSignature);
+            assertArrayEquals(expectedArgs, varArgs);
         }
     }
 
-    private final Map<Class<?>, Class<?>[]> classCache;
+    // Cache for parameter type arrays to avoid repeated array creation
+    private final Map<Class<?>, Class<?>[]> parameterTypeCache;
 
     public ConstructorUtilsTest() {
-        classCache = new HashMap<>();
-    }
-
-    private void expectMatchingAccessibleConstructorParameterTypes(final Class<?> cls, final Class<?>[] requestTypes, final Class<?>[] actualTypes) {
-        final Constructor<?> c = ConstructorUtils.getMatchingAccessibleConstructor(cls, requestTypes);
-        assertArrayEquals(actualTypes, c.getParameterTypes(), toString(c.getParameterTypes()) + " not equals " + toString(actualTypes));
+        parameterTypeCache = new HashMap<>();
     }
 
     @BeforeEach
     public void setUp() {
-        classCache.clear();
+        parameterTypeCache.clear();
     }
 
-    private Class<?>[] singletonArray(final Class<?> c) {
-        Class<?>[] result = classCache.get(c);
+    // Helper methods
+
+    /**
+     * Creates a singleton array containing the specified class, using cache for efficiency.
+     */
+    private Class<?>[] createSingleParameterTypeArray(final Class<?> parameterType) {
+        Class<?>[] result = parameterTypeCache.get(parameterType);
         if (result == null) {
-            result = new Class[] { c };
-            classCache.put(c, result);
+            result = new Class[] { parameterType };
+            parameterTypeCache.put(parameterType, result);
         }
         return result;
     }
 
+    /**
+     * Helper method to verify that getMatchingAccessibleConstructor returns a constructor
+     * with the expected parameter types.
+     */
+    private void verifyMatchingConstructorParameterTypes(final Class<?> targetClass, 
+            final Class<?>[] requestedTypes, final Class<?>[] expectedTypes) {
+        final Constructor<?> constructor = ConstructorUtils.getMatchingAccessibleConstructor(targetClass, requestedTypes);
+        assertArrayEquals(expectedTypes, constructor.getParameterTypes(), 
+            "Expected parameter types " + Arrays.toString(expectedTypes) + 
+            " but got " + Arrays.toString(constructor.getParameterTypes()));
+    }
+
+    private String formatClassArray(final Class<?>[] classes) {
+        return Arrays.asList(classes).toString();
+    }
+
+    // Test cases
+
     @Test
-    void testConstructor() throws Exception {
+    void testConstructorUtilsCanBeInstantiated() throws Exception {
+        // Verify that ConstructorUtils can be instantiated (though it's a utility class)
         assertNotNull(MethodUtils.class.getConstructor().newInstance());
     }
 
     @Test
-    void testGetAccessibleConstructor() throws Exception {
-        assertNotNull(ConstructorUtils.getAccessibleConstructor(Object.class.getConstructor(ArrayUtils.EMPTY_CLASS_ARRAY)));
-        assertNull(ConstructorUtils.getAccessibleConstructor(PrivateClass.class.getConstructor(ArrayUtils.EMPTY_CLASS_ARRAY)));
+    void testGetAccessibleConstructor_WithConstructorObject() throws Exception {
+        // Test getting accessible constructor from a Constructor object
+        Constructor<Object> objectConstructor = Object.class.getConstructor(ArrayUtils.EMPTY_CLASS_ARRAY);
+        assertNotNull(ConstructorUtils.getAccessibleConstructor(objectConstructor));
+        
+        // Private class constructor should not be accessible
+        Constructor<PrivateClass> privateConstructor = PrivateClass.class.getConstructor(ArrayUtils.EMPTY_CLASS_ARRAY);
+        assertNull(ConstructorUtils.getAccessibleConstructor(privateConstructor));
+        
+        // Public inner class of private class should not be accessible
         assertNull(ConstructorUtils.getAccessibleConstructor(PrivateClass.PublicInnerClass.class));
     }
 
     @Test
-    void testGetAccessibleConstructorFromDescription() {
+    void testGetAccessibleConstructor_WithClassAndParameterTypes() {
+        // Test getting accessible constructor by class and parameter types
         assertNotNull(ConstructorUtils.getAccessibleConstructor(Object.class, ArrayUtils.EMPTY_CLASS_ARRAY));
+        
+        // Private class constructor should not be accessible
         assertNull(ConstructorUtils.getAccessibleConstructor(PrivateClass.class, ArrayUtils.EMPTY_CLASS_ARRAY));
     }
 
     @Test
-    void testGetMatchingAccessibleMethod() {
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, ArrayUtils.EMPTY_CLASS_ARRAY, ArrayUtils.EMPTY_CLASS_ARRAY);
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, null, ArrayUtils.EMPTY_CLASS_ARRAY);
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(String.class), singletonArray(String.class));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Object.class), singletonArray(Object.class));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Boolean.class), singletonArray(Object.class));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Byte.class), singletonArray(Integer.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Byte.TYPE), singletonArray(Integer.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Short.class), singletonArray(Integer.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Short.TYPE), singletonArray(Integer.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Character.class), singletonArray(Integer.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Character.TYPE), singletonArray(Integer.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Integer.class), singletonArray(Integer.class));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Integer.TYPE), singletonArray(Integer.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Long.class), singletonArray(Double.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Long.TYPE), singletonArray(Double.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Float.class), singletonArray(Double.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Float.TYPE), singletonArray(Double.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Double.class), singletonArray(Double.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Double.TYPE), singletonArray(Double.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, new Class<?>[] { SubClass.class, String[].class },
-                new Class<?>[] { BaseClass.class, String[].class });
+    void testGetMatchingAccessibleConstructor_BasicTypes() {
+        // Test no-argument constructor
+        verifyMatchingConstructorParameterTypes(TestBean.class, 
+            ArrayUtils.EMPTY_CLASS_ARRAY, ArrayUtils.EMPTY_CLASS_ARRAY);
+        verifyMatchingConstructorParameterTypes(TestBean.class, 
+            null, ArrayUtils.EMPTY_CLASS_ARRAY);
+
+        // Test exact type matches
+        verifyMatchingConstructorParameterTypes(TestBean.class, 
+            createSingleParameterTypeArray(String.class), createSingleParameterTypeArray(String.class));
+        verifyMatchingConstructorParameterTypes(TestBean.class, 
+            createSingleParameterTypeArray(Object.class), createSingleParameterTypeArray(Object.class));
+        verifyMatchingConstructorParameterTypes(TestBean.class, 
+            createSingleParameterTypeArray(Integer.class), createSingleParameterTypeArray(Integer.class));
+        verifyMatchingConstructorParameterTypes(TestBean.class, 
+            createSingleParameterTypeArray(Integer.TYPE), createSingleParameterTypeArray(Integer.TYPE));
     }
 
     @Test
-    void testInvokeConstructor() throws Exception {
+    void testGetMatchingAccessibleConstructor_TypeConversions() {
+        // Test type conversions - wrapper types that don't have exact matches should fall back to Object
+        verifyMatchingConstructorParameterTypes(TestBean.class, 
+            createSingleParameterTypeArray(Boolean.class), createSingleParameterTypeArray(Object.class));
+
+        // Test numeric type promotions to int
+        verifyMatchingConstructorParameterTypes(TestBean.class, 
+            createSingleParameterTypeArray(Byte.class), createSingleParameterTypeArray(Integer.TYPE));
+        verifyMatchingConstructorParameterTypes(TestBean.class, 
+            createSingleParameterTypeArray(Byte.TYPE), createSingleParameterTypeArray(Integer.TYPE));
+        verifyMatchingConstructorParameterTypes(TestBean.class, 
+            createSingleParameterTypeArray(Short.class), createSingleParameterTypeArray(Integer.TYPE));
+        verifyMatchingConstructorParameterTypes(TestBean.class, 
+            createSingleParameterTypeArray(Short.TYPE), createSingleParameterTypeArray(Integer.TYPE));
+        verifyMatchingConstructorParameterTypes(TestBean.class, 
+            createSingleParameterTypeArray(Character.class), createSingleParameterTypeArray(Integer.TYPE));
+        verifyMatchingConstructorParameterTypes(TestBean.class, 
+            createSingleParameterTypeArray(Character.TYPE), createSingleParameterTypeArray(Integer.TYPE));
+
+        // Test numeric type promotions to double
+        verifyMatchingConstructorParameterTypes(TestBean.class, 
+            createSingleParameterTypeArray(Long.class), createSingleParameterTypeArray(Double.TYPE));
+        verifyMatchingConstructorParameterTypes(TestBean.class, 
+            createSingleParameterTypeArray(Long.TYPE), createSingleParameterTypeArray(Double.TYPE));
+        verifyMatchingConstructorParameterTypes(TestBean.class, 
+            createSingleParameterTypeArray(Float.class), createSingleParameterTypeArray(Double.TYPE));
+        verifyMatchingConstructorParameterTypes(TestBean.class, 
+            createSingleParameterTypeArray(Float.TYPE), createSingleParameterTypeArray(Double.TYPE));
+        verifyMatchingConstructorParameterTypes(TestBean.class, 
+            createSingleParameterTypeArray(Double.class), createSingleParameterTypeArray(Double.TYPE));
+        verifyMatchingConstructorParameterTypes(TestBean.class, 
+            createSingleParameterTypeArray(Double.TYPE), createSingleParameterTypeArray(Double.TYPE));
+    }
+
+    @Test
+    void testGetMatchingAccessibleConstructor_InheritanceAndVarArgs() {
+        // Test inheritance - SubClass should match BaseClass parameter
+        verifyMatchingConstructorParameterTypes(TestBean.class, 
+            new Class<?>[] { SubClass.class, String[].class },
+            new Class<?>[] { BaseClass.class, String[].class });
+    }
+
+    @Test
+    void testGetMatchingAccessibleConstructor_NullArgument() {
+        // Test null argument matching
+        verifyMatchingConstructorParameterTypes(MutableObject.class, 
+            createSingleParameterTypeArray(null), createSingleParameterTypeArray(Object.class));
+    }
+
+    @Test
+    void testInvokeConstructor_NoArguments() throws Exception {
+        // Test no-argument constructor invocation
         assertEquals("()", ConstructorUtils.invokeConstructor(TestBean.class, (Object[]) ArrayUtils.EMPTY_CLASS_ARRAY).toString());
         assertEquals("()", ConstructorUtils.invokeConstructor(TestBean.class, (Object[]) null).toString());
         assertEquals("()", ConstructorUtils.invokeConstructor(TestBean.class).toString());
+    }
+
+    @Test
+    void testInvokeConstructor_SingleArguments() throws Exception {
+        // Test single argument constructors with various types
         assertEquals("(String)", ConstructorUtils.invokeConstructor(TestBean.class, "").toString());
         assertEquals("(Object)", ConstructorUtils.invokeConstructor(TestBean.class, new Object()).toString());
         assertEquals("(Object)", ConstructorUtils.invokeConstructor(TestBean.class, Boolean.TRUE).toString());
         assertEquals("(Integer)", ConstructorUtils.invokeConstructor(TestBean.class, NumberUtils.INTEGER_ONE).toString());
+        
+        // Test numeric type conversions
         assertEquals("(int)", ConstructorUtils.invokeConstructor(TestBean.class, NumberUtils.BYTE_ONE).toString());
         assertEquals("(double)", ConstructorUtils.invokeConstructor(TestBean.class, NumberUtils.LONG_ONE).toString());
         assertEquals("(double)", ConstructorUtils.invokeConstructor(TestBean.class, NumberUtils.DOUBLE_ONE).toString());
-        ConstructorUtils.invokeConstructor(TestBean.class, NumberUtils.INTEGER_ONE).verify("(Integer)", null);
-        ConstructorUtils.invokeConstructor(TestBean.class, "a", "b").verify("(String...)", new String[] { "a", "b" });
-        ConstructorUtils.invokeConstructor(TestBean.class, NumberUtils.INTEGER_ONE, "a", "b").verify("(Integer, String...)", new String[] { "a", "b" });
-        ConstructorUtils.invokeConstructor(TestBean.class, new SubClass(), new String[] { "a", "b" }).verify("(BaseClass, String...)",
-                new String[] { "a", "b" });
     }
 
     @Test
-    void testInvokeExactConstructor() throws Exception {
+    void testInvokeConstructor_VarArgs() throws Exception {
+        // Test variable arguments constructors
+        ConstructorUtils.invokeConstructor(TestBean.class, NumberUtils.INTEGER_ONE)
+            .verify("(Integer)", null);
+        
+        ConstructorUtils.invokeConstructor(TestBean.class, "a", "b")
+            .verify("(String...)", new String[] { "a", "b" });
+        
+        ConstructorUtils.invokeConstructor(TestBean.class, NumberUtils.INTEGER_ONE, "a", "b")
+            .verify("(Integer, String...)", new String[] { "a", "b" });
+        
+        ConstructorUtils.invokeConstructor(TestBean.class, new SubClass(), new String[] { "a", "b" })
+            .verify("(BaseClass, String...)", new String[] { "a", "b" });
+    }
+
+    @Test
+    void testInvokeConstructor_VarArgsUnboxing() throws Exception {
+        // Test that varargs with Integer values are properly handled
+        final TestBean testBean = ConstructorUtils.invokeConstructor(TestBean.class, 
+            Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3));
+
+        // First Integer becomes the fixed parameter, remaining become varargs
+        assertArrayEquals(new String[] { "2", "3" }, testBean.varArgs);
+    }
+
+    @Test
+    void testInvokeExactConstructor_ValidCases() throws Exception {
+        // Test exact constructor matching (no type conversion)
         assertEquals("()", ConstructorUtils.invokeExactConstructor(TestBean.class, (Object[]) ArrayUtils.EMPTY_CLASS_ARRAY).toString());
         assertEquals("()", ConstructorUtils.invokeExactConstructor(TestBean.class, (Object[]) null).toString());
         assertEquals("(String)", ConstructorUtils.invokeExactConstructor(TestBean.class, "").toString());
         assertEquals("(Object)", ConstructorUtils.invokeExactConstructor(TestBean.class, new Object()).toString());
         assertEquals("(Integer)", ConstructorUtils.invokeExactConstructor(TestBean.class, NumberUtils.INTEGER_ONE).toString());
+        
+        // Test exact constructor with explicit parameter types
         assertEquals("(double)",
-                ConstructorUtils.invokeExactConstructor(TestBean.class, new Object[] { NumberUtils.DOUBLE_ONE }, new Class[] { Double.TYPE }).toString());
-
-        assertThrows(NoSuchMethodException.class, () -> ConstructorUtils.invokeExactConstructor(TestBean.class, NumberUtils.BYTE_ONE));
-        assertThrows(NoSuchMethodException.class, () -> ConstructorUtils.invokeExactConstructor(TestBean.class, NumberUtils.LONG_ONE));
-        assertThrows(NoSuchMethodException.class, () -> ConstructorUtils.invokeExactConstructor(TestBean.class, Boolean.TRUE));
+                ConstructorUtils.invokeExactConstructor(TestBean.class, 
+                    new Object[] { NumberUtils.DOUBLE_ONE }, 
+                    new Class[] { Double.TYPE }).toString());
     }
 
     @Test
-    void testNullArgument() {
-        expectMatchingAccessibleConstructorParameterTypes(MutableObject.class, singletonArray(null), singletonArray(Object.class));
+    void testInvokeExactConstructor_NoTypeConversion() {
+        // Test that exact constructor matching fails when type conversion would be needed
+        assertThrows(NoSuchMethodException.class, 
+            () -> ConstructorUtils.invokeExactConstructor(TestBean.class, NumberUtils.BYTE_ONE),
+            "Should not find constructor for Byte when only int constructor exists");
+        
+        assertThrows(NoSuchMethodException.class, 
+            () -> ConstructorUtils.invokeExactConstructor(TestBean.class, NumberUtils.LONG_ONE),
+            "Should not find constructor for Long when only double constructor exists");
+        
+        assertThrows(NoSuchMethodException.class, 
+            () -> ConstructorUtils.invokeExactConstructor(TestBean.class, Boolean.TRUE),
+            "Should not find constructor for Boolean when only Object constructor exists");
     }
-
-    @Test
-    void testVarArgsUnboxing() throws Exception {
-        final TestBean testBean = ConstructorUtils.invokeConstructor(TestBean.class, Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3));
-
-        assertArrayEquals(new String[] { "2", "3" }, testBean.varArgs);
-    }
-
-    private String toString(final Class<?>[] c) {
-        return Arrays.asList(c).toString();
-    }
-
 }
