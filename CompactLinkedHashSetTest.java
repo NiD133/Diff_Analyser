@@ -87,26 +87,43 @@ public class CompactLinkedHashSetTest extends TestCase {
     return suite;
   }
 
-  public void testAllocArraysDefault() {
-    CompactHashSet<Integer> set = CompactHashSet.create();
+  public void testCreate_initializationIsLazy() {
+    // Arrange: Create a set using the default constructor.
+    CompactLinkedHashSet<Integer> set = CompactLinkedHashSet.create();
+
+    // Assert: Backing arrays are not allocated upon creation. The set is in a state
+    // where it needs to allocate arrays before storing elements.
     assertThat(set.needsAllocArrays()).isTrue();
     assertThat(set.elements).isNull();
 
+    // Act: Add an element to trigger the lazy initialization.
     set.add(1);
+
+    // Assert: After adding an element, the backing arrays are allocated with the default size.
     assertThat(set.needsAllocArrays()).isFalse();
     assertThat(set.elements).hasLength(CompactHashing.DEFAULT_SIZE);
   }
 
-  public void testAllocArraysExpectedSize() {
-    for (int i = 0; i <= CompactHashing.DEFAULT_SIZE; i++) {
-      CompactHashSet<Integer> set = CompactHashSet.createWithExpectedSize(i);
-      assertThat(set.needsAllocArrays()).isTrue();
-      assertThat(set.elements).isNull();
+  public void testCreateWithExpectedSize_initializationIsLazy() {
+    // Test a range of expected sizes to ensure lazy allocation works consistently.
+    for (int expectedSize = 0; expectedSize <= CompactHashing.DEFAULT_SIZE; expectedSize++) {
+      String message = "Failure for expectedSize = " + expectedSize;
 
+      // Arrange: Create a set with a specific expected size.
+      CompactLinkedHashSet<Integer> set = CompactLinkedHashSet.createWithExpectedSize(expectedSize);
+
+      // Assert: Backing arrays are not allocated upon creation, regardless of the expected size.
+      assertThat(set.needsAllocArrays()).withMessage(message).isTrue();
+      assertThat(set.elements).withMessage(message).isNull();
+
+      // Act: Add an element to trigger the lazy initialization.
       set.add(1);
-      assertThat(set.needsAllocArrays()).isFalse();
-      int expectedSize = max(1, i);
-      assertThat(set.elements).hasLength(expectedSize);
+
+      // Assert: After adding an element, the backing arrays are allocated to a size
+      // based on the initial expectation (with a minimum size of 1).
+      assertThat(set.needsAllocArrays()).withMessage(message).isFalse();
+      int allocatedSize = max(1, expectedSize);
+      assertThat(set.elements).withMessage(message).hasLength(allocatedSize);
     }
   }
 }
