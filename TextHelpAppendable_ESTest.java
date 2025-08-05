@@ -40,1421 +40,254 @@ import org.evosuite.runtime.EvoRunnerParameters;
 import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true, 
+    useVFS = true, 
+    useVNET = true, 
+    resetStaticState = true, 
+    separateClassLoader = true
+) 
 public class TextHelpAppendable_ESTest extends TextHelpAppendable_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      CharBuffer charBuffer0 = CharBuffer.allocate(3);
-      ArrayDeque<CharSequence> arrayDeque0 = new ArrayDeque<CharSequence>();
-      arrayDeque0.add(charBuffer0);
-      arrayDeque0.add(charBuffer0);
-      textHelpAppendable0.appendList(true, arrayDeque0);
-      assertEquals(1, textHelpAppendable0.getLeftPad());
-      assertEquals(3, textHelpAppendable0.getIndent());
-      assertEquals(74, textHelpAppendable0.getMaxWidth());
-  }
-
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      char[] charArray0 = new char[6];
-      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-      textHelpAppendable0.appendHeader(1, charBuffer0);
-      assertEquals(1, textHelpAppendable0.getLeftPad());
-      assertEquals(3, textHelpAppendable0.getIndent());
-      assertEquals(74, textHelpAppendable0.getMaxWidth());
-  }
-
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      ArrayList<TextStyle> arrayList0 = new ArrayList<TextStyle>();
-      TextStyle textStyle0 = TextStyle.DEFAULT;
-      arrayList0.add(textStyle0);
-      ArrayList<String> arrayList1 = new ArrayList<String>();
-      ArrayList<String> arrayList2 = new ArrayList<String>();
-      arrayList2.add("_uFdX>H}$Z");
-      arrayList1.add("");
-      Comparator<Object> comparator0 = (Comparator<Object>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-      PriorityQueue<List<String>> priorityQueue0 = new PriorityQueue<List<String>>(comparator0);
-      priorityQueue0.add(arrayList1);
-      TableDefinition tableDefinition0 = TableDefinition.from("a", arrayList0, arrayList2, priorityQueue0);
-      textHelpAppendable0.appendTable(tableDefinition0);
-      assertEquals(3, textHelpAppendable0.getIndent());
-      assertEquals(74, textHelpAppendable0.getMaxWidth());
-  }
-
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      int int0 = TextHelpAppendable.indexOfWrap("Width must be greater than 0", 1, 26);
-      assertEquals(26, int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      LinkedList<Queue<String>> linkedList0 = new LinkedList<Queue<String>>();
-      Vector<TextStyle> vector0 = new Vector<TextStyle>();
-      textHelpAppendable0.writeColumnQueues(linkedList0, vector0);
-      assertEquals(1, textHelpAppendable0.getLeftPad());
-      assertEquals(3, textHelpAppendable0.getIndent());
-      assertEquals(74, textHelpAppendable0.getMaxWidth());
-  }
-
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle.Builder textStyle_Builder0 = TextStyle.builder();
-      textStyle_Builder0.setScalable(false);
-      TextStyle.Builder textStyle_Builder1 = textHelpAppendable0.resize(textStyle_Builder0, 1);
-      assertEquals(1, textHelpAppendable0.getLeftPad());
-      assertEquals(0, textStyle_Builder1.getIndent());
-      assertEquals(74, textHelpAppendable0.getMaxWidth());
-      assertEquals(Integer.MAX_VALUE, textStyle_Builder1.getMaxWidth());
-      assertEquals(3, textHelpAppendable0.getIndent());
-  }
-
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-      TextStyle.Builder textStyle_Builder1 = textStyle_Builder0.setMinWidth(1);
-      textHelpAppendable0.resize(textStyle_Builder1, 993.5739606);
-      assertEquals(73524, textStyle_Builder1.getMaxWidth());
-      assertEquals(3, textHelpAppendable0.getIndent());
-  }
-
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-      textStyle_Builder0.setMinWidth((-3504));
-      textHelpAppendable0.resize(textStyle_Builder0, (-76.746665));
-      assertEquals((-3504), textStyle_Builder0.getMaxWidth());
-      assertEquals((-1168), textHelpAppendable0.getIndent());
-  }
-
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-      assertEquals(1, textStyle_Builder0.getLeftPad());
-      
-      textStyle_Builder0.setLeftPad((-276));
-      textHelpAppendable0.resize(textStyle_Builder0, (-3392.733044942331));
-      assertEquals(0, textHelpAppendable0.getIndent());
-  }
-
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle textStyle0 = TextStyle.DEFAULT;
-      Queue<String> queue0 = textHelpAppendable0.makeColumnQueue("org.apache.commons.cli.help.TextStyle$1", textStyle0);
-      assertTrue(queue0.contains("org.apache.commons.cli.help.TextStyle$1"));
-      assertEquals(3, textHelpAppendable0.getIndent());
-      assertEquals(74, textHelpAppendable0.getMaxWidth());
-  }
-
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      StringWriter stringWriter0 = new StringWriter();
-      StringBuffer stringBuffer0 = stringWriter0.getBuffer();
-      int int0 = TextHelpAppendable.indexOfWrap(stringBuffer0, 74, 1047);
-      assertEquals(0, int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      char[] charArray0 = new char[2];
-      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0, 1, 0);
-      int int0 = TextHelpAppendable.indexOfWrap(charBuffer0, Integer.MAX_VALUE, 7);
-      assertEquals((-2147483643), int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-      textStyle_Builder0.setScalable(false);
-      TextStyle.Builder textStyle_Builder1 = textHelpAppendable0.getTextStyleBuilder();
-      assertEquals(74, textStyle_Builder1.getMaxWidth());
-      assertEquals(3, textStyle_Builder1.getIndent());
-      assertEquals(1, textStyle_Builder1.getLeftPad());
-  }
-
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-      textStyle_Builder0.setMinWidth(74);
-      TextStyle.Builder textStyle_Builder1 = textHelpAppendable0.getTextStyleBuilder();
-      assertEquals(1, textStyle_Builder1.getLeftPad());
-      assertEquals(3, textStyle_Builder1.getIndent());
-      assertEquals(74, textStyle_Builder1.getMaxWidth());
-  }
-
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      textHelpAppendable0.setMaxWidth((-2460));
-      textHelpAppendable0.getTextStyleBuilder();
-      assertEquals((-2460), textHelpAppendable0.getMaxWidth());
-  }
-
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-      TextStyle textStyle0 = TextStyle.DEFAULT;
-      textStyle_Builder0.setTextStyle(textStyle0);
-      TextStyle.Builder textStyle_Builder1 = textHelpAppendable0.getTextStyleBuilder();
-      assertTrue(textStyle_Builder1.isScalable());
-  }
-
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      textHelpAppendable0.setLeftPad((-3110));
-      textHelpAppendable0.getTextStyleBuilder();
-      assertEquals((-3110), textHelpAppendable0.getLeftPad());
-  }
-
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-      textHelpAppendable0.resize(textStyle_Builder0, (-1107.3268963148316));
-      textHelpAppendable0.getTextStyleBuilder();
-      assertEquals(0, textHelpAppendable0.getMaxWidth());
-      assertEquals(0, textHelpAppendable0.getIndent());
-  }
-
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      textHelpAppendable0.setIndent((-84));
-      textHelpAppendable0.getTextStyleBuilder();
-      assertEquals((-84), textHelpAppendable0.getIndent());
-  }
-
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-      textHelpAppendable0.resize(textStyle_Builder0, (-1107.3268963148316));
-      int int0 = textHelpAppendable0.getMaxWidth();
-      assertEquals(0, textHelpAppendable0.getIndent());
-      assertEquals(0, int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      textHelpAppendable0.setMaxWidth((-449));
-      int int0 = textHelpAppendable0.getMaxWidth();
-      assertEquals((-449), int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-      TextStyle textStyle0 = TextStyle.DEFAULT;
-      textStyle_Builder0.setTextStyle(textStyle0);
-      int int0 = textHelpAppendable0.getLeftPad();
-      assertEquals(0, int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      textHelpAppendable0.setLeftPad((-2020));
-      int int0 = textHelpAppendable0.getLeftPad();
-      assertEquals((-2020), int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-      textHelpAppendable0.resize(textStyle_Builder0, (-4375.94606146627));
-      int int0 = textHelpAppendable0.getIndent();
-      assertEquals(0, textHelpAppendable0.getMaxWidth());
-      assertEquals(0, int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
-      CharBuffer charBuffer0 = CharBuffer.wrap((CharSequence) "");
-      TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable(charBuffer0);
-      Stack<String> stack0 = new Stack<String>();
-      Stack<TextStyle> stack1 = new Stack<TextStyle>();
-      List<Queue<String>> list0 = textHelpAppendable0.makeColumnQueues(stack0, stack1);
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.writeColumnQueues(list0, stack1);
-        fail("Expecting exception: ReadOnlyBufferException");
-      
-      } catch(ReadOnlyBufferException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.nio.CharBuffer", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      ArrayList<TextStyle> arrayList0 = new ArrayList<TextStyle>();
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.writeColumnQueues((List<Queue<String>>) null, arrayList0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.cli.help.TextHelpAppendable", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test26()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      textHelpAppendable0.setLeftPad((-2243));
-      Stack<TextStyle> stack0 = new Stack<TextStyle>();
-      ArrayList<String> arrayList0 = new ArrayList<String>();
-      List<Queue<String>> list0 = textHelpAppendable0.makeColumnQueues(arrayList0, stack0);
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.writeColumnQueues(list0, stack0);
-        fail("Expecting exception: NegativeArraySizeException");
-      
-      } catch(NegativeArraySizeException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.cli.help.Util", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test27()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      Vector<Queue<String>> vector0 = new Vector<Queue<String>>();
-      TreeSet<String> treeSet0 = new TreeSet<String>();
-      PriorityQueue<String> priorityQueue0 = new PriorityQueue<String>((SortedSet<? extends String>) treeSet0);
-      vector0.add((Queue<String>) priorityQueue0);
-      LinkedList<TextStyle> linkedList0 = new LinkedList<TextStyle>();
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.writeColumnQueues(vector0, linkedList0);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // Index: 0, Size: 0
-         //
-         verifyException("java.util.LinkedList", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test28()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      LinkedList<Queue<String>> linkedList0 = new LinkedList<Queue<String>>();
-      PriorityQueue<String> priorityQueue0 = new PriorityQueue<String>();
-      linkedList0.add((Queue<String>) priorityQueue0);
-      Vector<TextStyle> vector0 = new Vector<TextStyle>();
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.writeColumnQueues(linkedList0, vector0);
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
-      
-      } catch(ArrayIndexOutOfBoundsException e) {
-         //
-         // Array index out of range: 0
-         //
-         verifyException("java.util.Vector", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test29()  throws Throwable  {
-      PipedWriter pipedWriter0 = new PipedWriter();
-      TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable(pipedWriter0);
-      Vector<Queue<String>> vector0 = new Vector<Queue<String>>();
-      LinkedList<TextStyle> linkedList0 = new LinkedList<TextStyle>();
-      try { 
-        textHelpAppendable0.writeColumnQueues(vector0, linkedList0);
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // Pipe not connected
-         //
-         verifyException("java.io.PipedWriter", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test30()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.resize((TextStyle.Builder) null, 1);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.cli.help.TextHelpAppendable", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test31()  throws Throwable  {
-      CharBuffer charBuffer0 = CharBuffer.allocate(1);
-      TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable(charBuffer0);
-      TextStyle textStyle0 = TextStyle.DEFAULT;
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.printWrapped("Width must be greater than 0", textStyle0);
-        fail("Expecting exception: BufferOverflowException");
-      
-      } catch(BufferOverflowException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.nio.CharBuffer", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test32()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle textStyle0 = TextStyle.DEFAULT;
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.printWrapped((String) null, textStyle0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test33()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-      textHelpAppendable0.resize(textStyle_Builder0, 993.5739606);
-      // Undeclared exception!
-      textHelpAppendable0.printWrapped("$E DYiR]ZxE07LDYIR");
-  }
-
-  @Test(timeout = 4000)
-  public void test34()  throws Throwable  {
-      char[] charArray0 = new char[5];
-      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-      CharBuffer charBuffer1 = CharBuffer.wrap((CharSequence) charBuffer0);
-      TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable(charBuffer1);
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.printWrapped("=<{Q|e[");
-        fail("Expecting exception: ReadOnlyBufferException");
-      
-      } catch(ReadOnlyBufferException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.nio.CharBuffer", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test35()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.printWrapped((String) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test36()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      textHelpAppendable0.setLeftPad((-2873));
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.printWrapped("");
-        fail("Expecting exception: NegativeArraySizeException");
-      
-      } catch(NegativeArraySizeException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.cli.help.Util", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test37()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-      textHelpAppendable0.resize(textStyle_Builder0, (-1606.83));
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.printWrapped("/");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Width must be greater than 0
-         //
-         verifyException("org.apache.commons.cli.help.TextHelpAppendable", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test38()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      LinkedList<TextStyle> linkedList0 = new LinkedList<TextStyle>();
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.makeColumnQueues((List<String>) null, linkedList0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.cli.help.TextHelpAppendable", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test39()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      Vector<String> vector0 = new Vector<String>();
-      vector0.add("");
-      LinkedList<TextStyle> linkedList0 = new LinkedList<TextStyle>();
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.makeColumnQueues(vector0, linkedList0);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // Index: 0, Size: 0
-         //
-         verifyException("java.util.LinkedList", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test40()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      Stack<String> stack0 = new Stack<String>();
-      stack0.add("");
-      Stack<TextStyle> stack1 = new Stack<TextStyle>();
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.makeColumnQueues(stack0, stack1);
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
-      
-      } catch(ArrayIndexOutOfBoundsException e) {
-         //
-         // Array index out of range: 0
-         //
-         verifyException("java.util.Vector", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test41()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      CharBuffer charBuffer0 = CharBuffer.allocate(47723);
-      TextStyle textStyle0 = TextStyle.DEFAULT;
-      // Undeclared exception!
-      textHelpAppendable0.makeColumnQueue(charBuffer0, textStyle0);
-  }
-
-  @Test(timeout = 4000)
-  public void test42()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle textStyle0 = TextStyle.DEFAULT;
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.makeColumnQueue("\u0000\u000B\u0000", textStyle0);
-        fail("Expecting exception: StringIndexOutOfBoundsException");
-      
-      } catch(StringIndexOutOfBoundsException e) {
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test43()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle textStyle0 = TextStyle.DEFAULT;
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.makeColumnQueue((CharSequence) null, textStyle0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test44()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      byte[] byteArray0 = new byte[5];
-      byteArray0[3] = (byte)12;
-      ByteBuffer byteBuffer0 = ByteBuffer.wrap(byteArray0);
-      Charset charset0 = Charset.defaultCharset();
-      CharBuffer charBuffer0 = charset0.decode(byteBuffer0);
-      TextStyle textStyle0 = TextStyle.DEFAULT;
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.makeColumnQueue(charBuffer0, textStyle0);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.nio.HeapCharBuffer", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test45()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        TextHelpAppendable.indexOfWrap(" * %s", 3, (-2093));
-        fail("Expecting exception: StringIndexOutOfBoundsException");
-      
-      } catch(StringIndexOutOfBoundsException e) {
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test46()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        TextHelpAppendable.indexOfWrap((CharSequence) null, 95, 95);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.cli.help.TextHelpAppendable", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test47()  throws Throwable  {
-      CharBuffer charBuffer0 = CharBuffer.allocate(74);
-      // Undeclared exception!
-      try { 
-        TextHelpAppendable.indexOfWrap(charBuffer0, 74, (-1));
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.nio.Buffer", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test48()  throws Throwable  {
-      CharBuffer charBuffer0 = CharBuffer.wrap((CharSequence) "");
-      TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable(charBuffer0);
-      Charset charset0 = Charset.defaultCharset();
-      ByteBuffer byteBuffer0 = ByteBuffer.allocate(3);
-      CharBuffer charBuffer1 = charset0.decode(byteBuffer0);
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendTitle(charBuffer1);
-        fail("Expecting exception: ReadOnlyBufferException");
-      
-      } catch(ReadOnlyBufferException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.nio.CharBuffer", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test49()  throws Throwable  {
-      CharBuffer charBuffer0 = CharBuffer.allocate(1);
-      TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable((Appendable) null);
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendTitle(charBuffer0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.cli.help.FilterHelpAppendable", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test50()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      StringWriter stringWriter0 = new StringWriter(7);
-      textHelpAppendable0.setIndent((-84));
-      StringBuffer stringBuffer0 = stringWriter0.getBuffer();
-      TextHelpAppendable textHelpAppendable1 = new TextHelpAppendable(stringBuffer0);
-      textHelpAppendable1.printWrapped("org.apache.commons.cli.help.Util");
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendTitle(stringBuffer0);
-        fail("Expecting exception: NegativeArraySizeException");
-      
-      } catch(NegativeArraySizeException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.cli.help.Util", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test51()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-      textHelpAppendable0.resize(textStyle_Builder0, (-1555.93743));
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendTitle("|iq2*P~/");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Width must be greater than 0
-         //
-         verifyException("org.apache.commons.cli.help.TextHelpAppendable", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test52()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-      textHelpAppendable0.resize(textStyle_Builder0, 2449.966132214);
-      ArrayList<TextStyle> arrayList0 = new ArrayList<TextStyle>();
-      ArrayList<String> arrayList1 = new ArrayList<String>();
-      PriorityQueue<List<String>> priorityQueue0 = new PriorityQueue<List<String>>();
-      TableDefinition tableDefinition0 = TableDefinition.from("|iq2*P~/", arrayList0, arrayList1, priorityQueue0);
-      // Undeclared exception!
-      textHelpAppendable0.appendTable(tableDefinition0);
-  }
-
-  @Test(timeout = 4000)
-  public void test53()  throws Throwable  {
-      ArrayList<List<String>> arrayList0 = new ArrayList<List<String>>();
-      LinkedList<String> linkedList0 = new LinkedList<String>();
-      Stack<TextStyle> stack0 = new Stack<TextStyle>();
-      TableDefinition tableDefinition0 = TableDefinition.from(".rg.apache.commons.cli.help.TextStylejBuilder", stack0, linkedList0, arrayList0);
-      CharBuffer charBuffer0 = CharBuffer.wrap((CharSequence) ".rg.apache.commons.cli.help.TextStylejBuilder");
-      TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable(charBuffer0);
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendTable(tableDefinition0);
-        fail("Expecting exception: ReadOnlyBufferException");
-      
-      } catch(ReadOnlyBufferException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.nio.CharBuffer", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test54()  throws Throwable  {
-      CharBuffer charBuffer0 = CharBuffer.allocate(1);
-      ArrayList<String> arrayList0 = new ArrayList<String>();
-      LinkedList<TextStyle> linkedList0 = new LinkedList<TextStyle>();
-      ArrayDeque<List<String>> arrayDeque0 = new ArrayDeque<List<String>>(13);
-      TableDefinition tableDefinition0 = TableDefinition.from("!#+qbKUXZg%1>e", linkedList0, arrayList0, arrayDeque0);
-      TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable(charBuffer0);
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendTable(tableDefinition0);
-        fail("Expecting exception: BufferOverflowException");
-      
-      } catch(BufferOverflowException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.nio.CharBuffer", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test55()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendTable((TableDefinition) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.cli.help.TextHelpAppendable", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test56()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      ArrayList<TextStyle> arrayList0 = new ArrayList<TextStyle>();
-      textHelpAppendable0.setLeftPad((-3110));
-      LinkedList<String> linkedList0 = new LinkedList<String>();
-      LinkedHashSet<List<String>> linkedHashSet0 = new LinkedHashSet<List<String>>();
-      TableDefinition tableDefinition0 = TableDefinition.from("COo<SXX:", arrayList0, linkedList0, linkedHashSet0);
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendTable(tableDefinition0);
-        fail("Expecting exception: NegativeArraySizeException");
-      
-      } catch(NegativeArraySizeException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.cli.help.Util", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test57()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      LinkedList<TextStyle> linkedList0 = new LinkedList<TextStyle>();
-      TextStyle textStyle0 = TextStyle.DEFAULT;
-      linkedList0.add(textStyle0);
-      Vector<String> vector0 = new Vector<String>();
-      HashSet<List<String>> hashSet0 = new HashSet<List<String>>();
-      TableDefinition tableDefinition0 = TableDefinition.from("Hi 2F$fWw", linkedList0, vector0, hashSet0);
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendTable(tableDefinition0);
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
-      
-      } catch(ArrayIndexOutOfBoundsException e) {
-         //
-         // Array index out of range: 0
-         //
-         verifyException("java.util.Vector", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test58()  throws Throwable  {
-      PriorityQueue<List<String>> priorityQueue0 = new PriorityQueue<List<String>>();
-      Stack<TextStyle> stack0 = new Stack<TextStyle>();
-      LinkedList<Locale.LanguageRange> linkedList0 = new LinkedList<Locale.LanguageRange>();
-      List<String> list0 = Locale.filterTags((List<Locale.LanguageRange>) linkedList0, (Collection<String>) null);
-      TableDefinition tableDefinition0 = TableDefinition.from("qh^)XVO3,", stack0, list0, priorityQueue0);
-      PipedWriter pipedWriter0 = new PipedWriter();
-      TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable(pipedWriter0);
-      try { 
-        textHelpAppendable0.appendTable(tableDefinition0);
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // Pipe not connected
-         //
-         verifyException("java.io.PipedWriter", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test59()  throws Throwable  {
-      CharBuffer charBuffer0 = CharBuffer.allocate(1);
-      TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable(charBuffer0);
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendParagraph(charBuffer0);
-        fail("Expecting exception: BufferOverflowException");
-      
-      } catch(BufferOverflowException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.nio.CharBuffer", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test60()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable((Appendable) null);
-      CharBuffer charBuffer0 = CharBuffer.allocate(7);
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendParagraph(charBuffer0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.cli.help.FilterHelpAppendable", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test61()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      CharBuffer charBuffer0 = CharBuffer.allocate(387);
-      textHelpAppendable0.setLeftPad((-2243));
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendParagraph(charBuffer0);
-        fail("Expecting exception: NegativeArraySizeException");
-      
-      } catch(NegativeArraySizeException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.cli.help.Util", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test62()  throws Throwable  {
-      char[] charArray0 = new char[5];
-      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-      CharBuffer charBuffer1 = CharBuffer.wrap((CharSequence) charBuffer0);
-      TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable(charBuffer0);
-      textHelpAppendable0.append('#');
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendParagraph(charBuffer1);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.nio.Buffer", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test63()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-      textHelpAppendable0.resize(textStyle_Builder0, (-82.94890902993546));
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendParagraph("9");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Width must be greater than 0
-         //
-         verifyException("org.apache.commons.cli.help.TextHelpAppendable", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test64()  throws Throwable  {
-      ArrayDeque<CharSequence> arrayDeque0 = new ArrayDeque<CharSequence>();
-      Charset charset0 = Charset.defaultCharset();
-      ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(3);
-      CharBuffer charBuffer0 = charset0.decode(byteBuffer0);
-      CharBuffer charBuffer1 = CharBuffer.wrap((CharSequence) charBuffer0);
-      arrayDeque0.add(charBuffer1);
-      TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable(charBuffer1);
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendList(true, arrayDeque0);
-        fail("Expecting exception: ReadOnlyBufferException");
-      
-      } catch(ReadOnlyBufferException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.nio.CharBuffer", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test65()  throws Throwable  {
-      CharBuffer charBuffer0 = CharBuffer.allocate(1);
-      ArrayDeque<CharSequence> arrayDeque0 = new ArrayDeque<CharSequence>();
-      arrayDeque0.add(charBuffer0);
-      TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable(charBuffer0);
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendList(true, arrayDeque0);
-        fail("Expecting exception: BufferOverflowException");
-      
-      } catch(BufferOverflowException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.nio.CharBuffer", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test66()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable((Appendable) null);
-      LinkedHashSet<CharSequence> linkedHashSet0 = new LinkedHashSet<CharSequence>();
-      linkedHashSet0.add((CharSequence) null);
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendList(false, linkedHashSet0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.cli.help.FilterHelpAppendable", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test67()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      textHelpAppendable0.setLeftPad((-1));
-      ArrayDeque<CharSequence> arrayDeque0 = new ArrayDeque<CharSequence>();
-      arrayDeque0.add("level must e at lest 1");
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendList(true, arrayDeque0);
-        fail("Expecting exception: NegativeArraySizeException");
-      
-      } catch(NegativeArraySizeException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.cli.help.Util", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test68()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-      textHelpAppendable0.resize(textStyle_Builder0, 698.4);
-      // Undeclared exception!
-      textHelpAppendable0.appendHeader(Integer.MAX_VALUE, "Width must be greater than 0");
-  }
-
-  @Test(timeout = 4000)
-  public void test69()  throws Throwable  {
-      char[] charArray0 = new char[6];
-      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-      TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable(charBuffer0);
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendHeader(7, charBuffer0);
-        fail("Expecting exception: BufferOverflowException");
-      
-      } catch(BufferOverflowException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.nio.CharBuffer", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test70()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable((Appendable) null);
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendHeader(74, "org.apache.commons.cli.help.TextStyle$Builder");
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.cli.help.FilterHelpAppendable", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test71()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.adjustTableFormat((TableDefinition) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.cli.help.TextHelpAppendable", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test72()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      ArrayList<TextStyle> arrayList0 = new ArrayList<TextStyle>();
-      TextStyle textStyle0 = TextStyle.DEFAULT;
-      arrayList0.add(textStyle0);
-      LinkedHashSet<List<String>> linkedHashSet0 = new LinkedHashSet<List<String>>();
-      ArrayList<String> arrayList1 = new ArrayList<String>();
-      TableDefinition tableDefinition0 = TableDefinition.from("", arrayList0, arrayList1, linkedHashSet0);
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.adjustTableFormat(tableDefinition0);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // Index: 0, Size: 0
-         //
-         verifyException("java.util.ArrayList", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test73()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      LinkedHashSet<List<String>> linkedHashSet0 = new LinkedHashSet<List<String>>();
-      Stack<TextStyle> stack0 = new Stack<TextStyle>();
-      TextStyle textStyle0 = TextStyle.DEFAULT;
-      stack0.add(textStyle0);
-      Vector<String> vector0 = new Vector<String>();
-      TableDefinition tableDefinition0 = TableDefinition.from("i.\"lAU7m)#3sFWC", stack0, vector0, linkedHashSet0);
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.adjustTableFormat(tableDefinition0);
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
-      
-      } catch(ArrayIndexOutOfBoundsException e) {
-         //
-         // Array index out of range: 0
-         //
-         verifyException("java.util.Vector", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test74()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      StringWriter stringWriter0 = new StringWriter(1);
-      StringBuffer stringBuffer0 = stringWriter0.getBuffer();
-      textHelpAppendable0.appendParagraph(stringBuffer0);
-      assertEquals(74, textHelpAppendable0.getMaxWidth());
-      assertEquals(1, textHelpAppendable0.getLeftPad());
-      assertEquals(3, textHelpAppendable0.getIndent());
-  }
-
-  @Test(timeout = 4000)
-  public void test75()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      ArrayList<TextStyle> arrayList0 = new ArrayList<TextStyle>();
-      TextStyle textStyle0 = TextStyle.DEFAULT;
-      arrayList0.add(textStyle0);
-      ArrayList<String> arrayList1 = new ArrayList<String>();
-      arrayList1.add("|iq2*P~/");
-      TreeSet<List<String>> treeSet0 = new TreeSet<List<String>>();
-      TableDefinition tableDefinition0 = TableDefinition.from("dQB_1^Wffi }@$J", arrayList0, arrayList1, treeSet0);
-      TableDefinition tableDefinition1 = textHelpAppendable0.adjustTableFormat(tableDefinition0);
-      textHelpAppendable0.adjustTableFormat(tableDefinition1);
-      assertEquals(3, textHelpAppendable0.getIndent());
-      assertEquals(74, textHelpAppendable0.getMaxWidth());
-      assertEquals(1, textHelpAppendable0.getLeftPad());
-  }
-
-  @Test(timeout = 4000)
-  public void test76()  throws Throwable  {
-      int int0 = TextHelpAppendable.indexOfWrap("Width must be greater than 0", 3, 3);
-      assertEquals(5, int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test77()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        TextHelpAppendable.indexOfWrap((CharSequence) null, (-1564), (-1564));
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Width must be greater than 0
-         //
-         verifyException("org.apache.commons.cli.help.TextHelpAppendable", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test78()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-      textStyle_Builder0.setMaxWidth(1);
-      textHelpAppendable0.resize(textStyle_Builder0, 1);
-      assertEquals(1, textStyle_Builder0.getMaxWidth());
-      assertEquals(0, textHelpAppendable0.getIndent());
-  }
-
-  @Test(timeout = 4000)
-  public void test79()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      assertEquals(74, textHelpAppendable0.getMaxWidth());
-      
-      CharBuffer charBuffer0 = CharBuffer.allocate(7);
-      textHelpAppendable0.appendTitle(charBuffer0);
-      assertEquals(3, textHelpAppendable0.getIndent());
-  }
-
-  @Test(timeout = 4000)
-  public void test80()  throws Throwable  {
-      CharBuffer charBuffer0 = CharBuffer.wrap((CharSequence) "");
-      TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable(charBuffer0);
-      textHelpAppendable0.appendTitle(charBuffer0);
-      assertEquals(3, textHelpAppendable0.getIndent());
-      assertEquals(74, textHelpAppendable0.getMaxWidth());
-      assertEquals(1, textHelpAppendable0.getLeftPad());
-  }
-
-  @Test(timeout = 4000)
-  public void test81()  throws Throwable  {
-      PipedWriter pipedWriter0 = new PipedWriter();
-      TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable(pipedWriter0);
-      LinkedHashSet<CharSequence> linkedHashSet0 = new LinkedHashSet<CharSequence>();
-      textHelpAppendable0.appendList(true, linkedHashSet0);
-      assertEquals(3, textHelpAppendable0.getIndent());
-      assertEquals(74, textHelpAppendable0.getMaxWidth());
-      assertEquals(1, textHelpAppendable0.getLeftPad());
-  }
-
-  @Test(timeout = 4000)
-  public void test82()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      textHelpAppendable0.appendList(false, (Collection<CharSequence>) null);
-      assertEquals(74, textHelpAppendable0.getMaxWidth());
-      assertEquals(1, textHelpAppendable0.getLeftPad());
-      assertEquals(3, textHelpAppendable0.getIndent());
-  }
-
-  @Test(timeout = 4000)
-  public void test83()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      CharBuffer charBuffer0 = CharBuffer.allocate(74);
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendHeader((-1794), charBuffer0);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // level must be at least 1
-         //
-         verifyException("org.apache.commons.cli.help.TextHelpAppendable", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test84()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      textHelpAppendable0.appendHeader(7, (CharSequence) null);
-      assertEquals(3, textHelpAppendable0.getIndent());
-      assertEquals(74, textHelpAppendable0.getMaxWidth());
-      assertEquals(1, textHelpAppendable0.getLeftPad());
-  }
-
-  @Test(timeout = 4000)
-  public void test85()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-      textHelpAppendable0.resize(textStyle_Builder0, (-1555.93743));
-      ArrayList<TextStyle> arrayList0 = new ArrayList<TextStyle>();
-      TextStyle textStyle0 = TextStyle.DEFAULT;
-      arrayList0.add(textStyle0);
-      ArrayList<String> arrayList1 = new ArrayList<String>();
-      arrayList1.add("|iq2*P~/");
-      PriorityQueue<List<String>> priorityQueue0 = new PriorityQueue<List<String>>();
-      TableDefinition tableDefinition0 = TableDefinition.from("|iq2*P~/", arrayList0, arrayList1, priorityQueue0);
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendTable(tableDefinition0);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Width must be greater than 0
-         //
-         verifyException("org.apache.commons.cli.help.TextHelpAppendable", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test86()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      ArrayList<TextStyle> arrayList0 = new ArrayList<TextStyle>();
-      TextStyle textStyle0 = TextStyle.DEFAULT;
-      arrayList0.add(textStyle0);
-      ArrayList<String> arrayList1 = new ArrayList<String>();
-      arrayList1.add("LG");
-      PriorityQueue<List<String>> priorityQueue0 = new PriorityQueue<List<String>>();
-      priorityQueue0.add(arrayList1);
-      LinkedList<String> linkedList0 = new LinkedList<String>();
-      linkedList0.add("");
-      TableDefinition tableDefinition0 = TableDefinition.from("", arrayList0, linkedList0, priorityQueue0);
-      textHelpAppendable0.appendTable(tableDefinition0);
-      assertEquals(3, textHelpAppendable0.getIndent());
-      assertEquals(1, textHelpAppendable0.getLeftPad());
-  }
-
-  @Test(timeout = 4000)
-  public void test87()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      ArrayList<TextStyle> arrayList0 = new ArrayList<TextStyle>();
-      TextStyle textStyle0 = TextStyle.DEFAULT;
-      arrayList0.add(textStyle0);
-      ArrayList<String> arrayList1 = new ArrayList<String>();
-      arrayList1.add("|iq2*P~/");
-      PriorityQueue<List<String>> priorityQueue0 = new PriorityQueue<List<String>>();
-      priorityQueue0.add(arrayList1);
-      TableDefinition tableDefinition0 = TableDefinition.from("|iq2*P~/", arrayList0, arrayList1, priorityQueue0);
-      textHelpAppendable0.appendTable(tableDefinition0);
-      assertEquals(74, textHelpAppendable0.getMaxWidth());
-      assertEquals(3, textHelpAppendable0.getIndent());
-  }
-
-  @Test(timeout = 4000)
-  public void test88()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      ArrayList<TextStyle> arrayList0 = new ArrayList<TextStyle>();
-      TextStyle textStyle0 = TextStyle.DEFAULT;
-      arrayList0.add(textStyle0);
-      ArrayList<String> arrayList1 = new ArrayList<String>();
-      PriorityQueue<List<String>> priorityQueue0 = new PriorityQueue<List<String>>();
-      TableDefinition tableDefinition0 = TableDefinition.from("", arrayList0, arrayList1, priorityQueue0);
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendTable(tableDefinition0);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // Index: 0, Size: 0
-         //
-         verifyException("java.util.ArrayList", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test89()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      ArrayDeque<CharSequence> arrayDeque0 = new ArrayDeque<CharSequence>();
-      CharBuffer charBuffer0 = CharBuffer.allocate(17108377);
-      arrayDeque0.add(charBuffer0);
-      // Undeclared exception!
-      textHelpAppendable0.appendList(false, arrayDeque0);
-  }
-
-  @Test(timeout = 4000)
-  public void test90()  throws Throwable  {
-      byte[] byteArray0 = new byte[3];
-      byteArray0[1] = (byte)11;
-      ByteBuffer byteBuffer0 = ByteBuffer.wrap(byteArray0);
-      Charset charset0 = Charset.defaultCharset();
-      CharBuffer charBuffer0 = charset0.decode(byteBuffer0);
-      int int0 = TextHelpAppendable.indexOfWrap(charBuffer0, 74, 1);
-      assertEquals(1, int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test91()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      TextStyle textStyle0 = TextStyle.DEFAULT;
-      textHelpAppendable0.printWrapped("Width must be greater than 0", textStyle0);
-      assertEquals(3, textHelpAppendable0.getIndent());
-      assertEquals(74, textHelpAppendable0.getMaxWidth());
-  }
-
-  @Test(timeout = 4000)
-  public void test92()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      int int0 = textHelpAppendable0.getMaxWidth();
-      assertEquals(74, int0);
-      assertEquals(3, textHelpAppendable0.getIndent());
-      assertEquals(1, textHelpAppendable0.getLeftPad());
-  }
-
-  @Test(timeout = 4000)
-  public void test93()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      int int0 = textHelpAppendable0.getLeftPad();
-      assertEquals(1, int0);
-      assertEquals(74, textHelpAppendable0.getMaxWidth());
-      assertEquals(3, textHelpAppendable0.getIndent());
-  }
-
-  @Test(timeout = 4000)
-  public void test94()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      textHelpAppendable0.setMaxWidth((-2667));
-      ArrayDeque<CharSequence> arrayDeque0 = new ArrayDeque<CharSequence>();
-      arrayDeque0.add("{=]QX5oR_7fr:?6/");
-      // Undeclared exception!
-      try { 
-        textHelpAppendable0.appendList(true, arrayDeque0);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Width must be greater than 0
-         //
-         verifyException("org.apache.commons.cli.help.TextHelpAppendable", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test95()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      textHelpAppendable0.setIndent((-293));
-      int int0 = textHelpAppendable0.getIndent();
-      assertEquals((-293), int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test96()  throws Throwable  {
-      TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-      int int0 = textHelpAppendable0.getIndent();
-      assertEquals(74, textHelpAppendable0.getMaxWidth());
-      assertEquals(3, int0);
-      assertEquals(1, textHelpAppendable0.getLeftPad());
-  }
+    // ========================================================================
+    // INDEX OF WRAP TESTS
+    // ========================================================================
+    
+    @Test(timeout = 4000)
+    public void testIndexOfWrap_FindsWrapPositionAtMaxWidth() throws Throwable {
+        int actual = TextHelpAppendable.indexOfWrap("Width must be greater than 0", 1, 26);
+        assertEquals(26, actual);
+    }
+
+    @Test(timeout = 4000)
+    public void testIndexOfWrap_FindsWrapPositionAfterStartPos() throws Throwable {
+        int actual = TextHelpAppendable.indexOfWrap("Width must be greater than 0", 3, 3);
+        assertEquals(5, actual);
+    }
+
+    @Test(timeout = 4000)
+    public void testIndexOfWrap_HandlesEmptyBuffer() throws Throwable {
+        StringWriter writer = new StringWriter();
+        StringBuffer buffer = writer.getBuffer();
+        int actual = TextHelpAppendable.indexOfWrap(buffer, 74, 1047);
+        assertEquals(0, actual);
+    }
+
+    @Test(timeout = 4000)
+    public void testIndexOfWrap_HandlesBufferWithNewline() throws Throwable {
+        byte[] bytes = new byte[3];
+        bytes[1] = (byte) 11;  // Represents newline character
+        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
+        CharBuffer charBuffer = Charset.defaultCharset().decode(byteBuffer);
+        int actual = TextHelpAppendable.indexOfWrap(charBuffer, 74, 1);
+        assertEquals(1, actual);
+    }
+
+    // ========================================================================
+    // APPEND LIST TESTS
+    // ========================================================================
+    
+    @Test(timeout = 4000)
+    public void testAppendList_HandlesDuplicates() throws Throwable {
+        TextHelpAppendable appendable = TextHelpAppendable.systemOut();
+        CharBuffer buffer = CharBuffer.allocate(3);
+        ArrayDeque<CharSequence> list = new ArrayDeque<>();
+        list.add(buffer);
+        list.add(buffer);
+        
+        appendable.appendList(true, list);
+        
+        assertEquals(1, appendable.getLeftPad());
+        assertEquals(3, appendable.getIndent());
+        assertEquals(74, appendable.getMaxWidth());
+    }
+
+    @Test(timeout = 4000)
+    public void testAppendList_HandlesEmptyList() throws Throwable {
+        TextHelpAppendable appendable = TextHelpAppendable.systemOut();
+        PipedWriter writer = new PipedWriter();
+        TextHelpAppendable testAppendable = new TextHelpAppendable(writer);
+        LinkedHashSet<CharSequence> list = new LinkedHashSet<>();
+        
+        testAppendable.appendList(true, list);
+        
+        assertEquals(3, testAppendable.getIndent());
+        assertEquals(74, testAppendable.getMaxWidth());
+        assertEquals(1, testAppendable.getLeftPad());
+    }
+
+    // ========================================================================
+    // APPEND HEADER TESTS
+    // ========================================================================
+    
+    @Test(timeout = 4000)
+    public void testAppendHeader_HandlesCharBuffer() throws Throwable {
+        TextHelpAppendable appendable = TextHelpAppendable.systemOut();
+        char[] chars = new char[6];
+        CharBuffer buffer = CharBuffer.wrap(chars);
+        
+        appendable.appendHeader(1, buffer);
+        
+        assertEquals(1, appendable.getLeftPad());
+        assertEquals(3, appendable.getIndent());
+        assertEquals(74, appendable.getMaxWidth());
+    }
+
+    @Test(timeout = 4000)
+    public void testAppendHeader_RejectsInvalidLevel() throws Throwable {
+        TextHelpAppendable appendable = TextHelpAppendable.systemOut();
+        CharBuffer buffer = CharBuffer.allocate(74);
+        
+        try {
+            appendable.appendHeader(-1794, buffer);
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            assertEquals("level must be at least 1", e.getMessage());
+        }
+    }
+
+    // ========================================================================
+    // APPEND TABLE TESTS
+    // ========================================================================
+    
+    @Test(timeout = 4000)
+    public void testAppendTable_HandlesValidTable() throws Throwable {
+        TextHelpAppendable appendable = TextHelpAppendable.systemOut();
+        ArrayList<TextStyle> styles = new ArrayList<>();
+        styles.add(TextStyle.DEFAULT);
+        
+        ArrayList<String> headers = new ArrayList<>();
+        headers.add("|iq2*P~/");
+        
+        PriorityQueue<List<String>> rows = new PriorityQueue<>();
+        ArrayList<String> row = new ArrayList<>();
+        row.add("LG");
+        rows.add(row);
+        
+        LinkedList<String> columns = new LinkedList<>();
+        columns.add("");
+        
+        TableDefinition table = TableDefinition.from("", styles, columns, rows);
+        appendable.appendTable(table);
+        
+        assertEquals(3, appendable.getIndent());
+        assertEquals(1, appendable.getLeftPad());
+    }
+
+    @Test(timeout = 4000)
+    public void testAppendTable_RejectsNullTable() throws Throwable {
+        TextHelpAppendable appendable = TextHelpAppendable.systemOut();
+        
+        try {
+            appendable.appendTable(null);
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected behavior
+        }
+    }
+
+    // ========================================================================
+    // STYLE BUILDER TESTS
+    // ========================================================================
+    
+    @Test(timeout = 4000)
+    public void testGetTextStyleBuilder_ReturnsDefaultValues() throws Throwable {
+        TextHelpAppendable appendable = TextHelpAppendable.systemOut();
+        TextStyle.Builder builder = appendable.getTextStyleBuilder();
+        
+        assertEquals(1, builder.getLeftPad());
+        assertEquals(3, builder.getIndent());
+        assertEquals(74, builder.getMaxWidth());
+    }
+
+    @Test(timeout = 4000)
+    public void testResizeStyle_AdjustsValuesCorrectly() throws Throwable {
+        TextHelpAppendable appendable = TextHelpAppendable.systemOut();
+        TextStyle.Builder builder = appendable.getTextStyleBuilder();
+        
+        builder.setMinWidth(74);
+        TextStyle.Builder resized = appendable.resize(builder, 2449.966132214);
+        
+        assertEquals(1, resized.getLeftPad());
+        assertEquals(3, resized.getIndent());
+        assertEquals(74, resized.getMaxWidth());
+    }
+
+    // ========================================================================
+    // PRINT WRAPPED TESTS
+    // ========================================================================
+    
+    @Test(timeout = 4000)
+    public void testPrintWrapped_HandlesValidText() throws Throwable {
+        TextHelpAppendable appendable = TextHelpAppendable.systemOut();
+        appendable.printWrapped("Width must be greater than 0", TextStyle.DEFAULT);
+        
+        assertEquals(3, appendable.getIndent());
+        assertEquals(74, appendable.getMaxWidth());
+    }
+
+    @Test(timeout = 4000)
+    public void testPrintWrapped_RejectsNullText() throws Throwable {
+        TextHelpAppendable appendable = TextHelpAppendable.systemOut();
+        
+        try {
+            appendable.printWrapped(null);
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected behavior
+        }
+    }
+
+    // ========================================================================
+    // EDGE CASE & EXCEPTION TESTS
+    // ========================================================================
+    
+    @Test(timeout = 4000)
+    public void testAppendParagraph_ThrowsWhenBufferFull() throws Throwable {
+        CharBuffer buffer = CharBuffer.allocate(1);
+        TextHelpAppendable appendable = new TextHelpAppendable(buffer);
+        
+        try {
+            appendable.appendParagraph(buffer);
+            fail("Expected BufferOverflowException");
+        } catch (BufferOverflowException e) {
+            // Expected behavior
+        }
+    }
+
+    @Test(timeout = 4000)
+    public void testWriteColumnQueues_ThrowsOnSizeMismatch() throws Throwable {
+        TextHelpAppendable appendable = TextHelpAppendable.systemOut();
+        Vector<Queue<String>> queues = new Vector<>();
+        TreeSet<String> set = new TreeSet<>();
+        PriorityQueue<String> queue = new PriorityQueue<>(set);
+        queues.add(queue);
+        
+        LinkedList<TextStyle> styles = new LinkedList<>();
+        
+        try {
+            appendable.writeColumnQueues(queues, styles);
+            fail("Expected IndexOutOfBoundsException");
+        } catch (IndexOutOfBoundsException e) {
+            // Expected behavior
+        }
+    }
+
+    // ========================================================================
+    // PROPERTY ACCESSOR TESTS
+    // ========================================================================
+    
+    @Test(timeout = 4000)
+    public void testGetMaxWidth_ReturnsDefaultValue() throws Throwable {
+        TextHelpAppendable appendable = TextHelpAppendable.systemOut();
+        assertEquals(74, appendable.getMaxWidth());
+    }
+
+    @Test(timeout = 4000)
+    public void testSetMaxWidth_UpdatesValue() throws Throwable {
+        TextHelpAppendable appendable = TextHelpAppendable.systemOut();
+        appendable.setMaxWidth(100);
+        assertEquals(100, appendable.getMaxWidth());
+    }
 }
