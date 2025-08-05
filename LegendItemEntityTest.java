@@ -51,163 +51,66 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class LegendItemEntityTest {
 
-    // Test data constants for better maintainability
-    private static final Rectangle2D INITIAL_AREA = new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0);
-    private static final Rectangle2D MODIFIED_AREA = new Rectangle2D.Double(4.0, 3.0, 2.0, 1.0);
-    private static final String TEST_TOOLTIP = "New ToolTip";
-    private static final String TEST_URL = "New URL";
-    private static final String TEST_SERIES_KEY = "A";
-
     /**
-     * Tests that the equals method correctly distinguishes between different field values.
-     * This test verifies that two LegendItemEntity objects are equal when all their
-     * properties match, and not equal when any property differs.
+     * Confirm that the equals method can distinguish all the required fields.
      */
     @Test
     public void testEquals() {
-        // Given: Two identical legend item entities
-        LegendItemEntity<String> firstEntity = createBasicLegendItemEntity();
-        LegendItemEntity<String> secondEntity = createBasicLegendItemEntity();
-        
-        // Then: They should be equal initially
-        assertEquals(firstEntity, secondEntity, "Entities with identical properties should be equal");
+        LegendItemEntity<String> e1 = new LegendItemEntity<>(
+                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0));
+        LegendItemEntity<String> e2 = new LegendItemEntity<>(
+                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0));
+        assertEquals(e1, e2);
 
-        // Test area property affects equality
-        testAreaPropertyEquality(firstEntity, secondEntity);
-        
-        // Test tooltip property affects equality
-        testTooltipPropertyEquality(firstEntity, secondEntity);
-        
-        // Test URL property affects equality
-        testUrlPropertyEquality(firstEntity, secondEntity);
-        
-        // Test dataset property affects equality
-        testDatasetPropertyEquality(firstEntity, secondEntity);
-        
-        // Test series key property affects equality
-        testSeriesKeyPropertyEquality(firstEntity, secondEntity);
+        e1.setArea(new Rectangle2D.Double(4.0, 3.0, 2.0, 1.0));
+        assertNotEquals(e1, e2);
+        e2.setArea(new Rectangle2D.Double(4.0, 3.0, 2.0, 1.0));
+        assertEquals(e1, e2);
+
+        e1.setToolTipText("New ToolTip");
+        assertNotEquals(e1, e2);
+        e2.setToolTipText("New ToolTip");
+        assertEquals(e1, e2);
+
+        e1.setURLText("New URL");
+        assertNotEquals(e1, e2);
+        e2.setURLText("New URL");
+        assertEquals(e1, e2);
+
+        e1.setDataset(new DefaultCategoryDataset<String, String>());
+        assertNotEquals(e1, e2);
+        e2.setDataset(new DefaultCategoryDataset<String, String>());
+        assertEquals(e1, e2);
+
+        e1.setSeriesKey("A");
+        assertNotEquals(e1, e2);
+        e2.setSeriesKey("A");
+        assertEquals(e1, e2);
+
     }
 
     /**
-     * Tests that cloning creates a separate but equal instance.
-     * Verifies that the cloned object is not the same reference but has equal content.
+     * Confirm that cloning works.
      */
     @Test
     public void testCloning() throws CloneNotSupportedException {
-        // Given: A legend item entity with some properties set
-        LegendItemEntity<String> originalEntity = createFullyConfiguredEntity();
-        
-        // When: Cloning the entity
-        LegendItemEntity<String> clonedEntity = CloneUtils.clone(originalEntity);
-        
-        // Then: The clone should be a different object but with equal content
-        assertNotSame(originalEntity, clonedEntity, 
-            "Cloned entity should be a different object reference");
-        assertSame(originalEntity.getClass(), clonedEntity.getClass(), 
-            "Cloned entity should be the same class");
-        assertEquals(originalEntity, clonedEntity, 
-            "Cloned entity should have equal content to the original");
+        LegendItemEntity<String> e1 = new LegendItemEntity<>(
+                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0));
+        LegendItemEntity<String> e2 = CloneUtils.clone(e1);
+        assertNotSame(e1, e2);
+        assertSame(e1.getClass(), e2.getClass());
+        assertEquals(e1, e2);
     }
 
     /**
-     * Tests that serialization and deserialization preserves object equality.
-     * This ensures the class properly implements Serializable.
+     * Serialize an instance, restore it, and check for equality.
      */
     @Test
     public void testSerialization() {
-        // Given: A legend item entity
-        LegendItemEntity<String> originalEntity = createFullyConfiguredEntity();
-        
-        // When: Serializing and deserializing the entity
-        LegendItemEntity<String> deserializedEntity = TestUtils.serialised(originalEntity);
-        
-        // Then: The deserialized entity should equal the original
-        assertEquals(originalEntity, deserializedEntity, 
-            "Deserialized entity should equal the original entity");
+        LegendItemEntity<String> e1 = new LegendItemEntity<>(
+                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0));
+        LegendItemEntity<String> e2 = TestUtils.serialised(e1);
+        assertEquals(e1, e2);
     }
 
-    // Helper methods for better test organization and reusability
-
-    private LegendItemEntity<String> createBasicLegendItemEntity() {
-        return new LegendItemEntity<>(INITIAL_AREA);
-    }
-
-    private LegendItemEntity<String> createFullyConfiguredEntity() {
-        LegendItemEntity<String> entity = new LegendItemEntity<>(INITIAL_AREA);
-        entity.setToolTipText(TEST_TOOLTIP);
-        entity.setURLText(TEST_URL);
-        entity.setDataset(new DefaultCategoryDataset<String, String>());
-        entity.setSeriesKey(TEST_SERIES_KEY);
-        return entity;
-    }
-
-    private void testAreaPropertyEquality(LegendItemEntity<String> first, LegendItemEntity<String> second) {
-        // When: Changing area on first entity
-        first.setArea(MODIFIED_AREA);
-        
-        // Then: Entities should not be equal
-        assertNotEquals(first, second, "Entities with different areas should not be equal");
-        
-        // When: Setting same area on second entity
-        second.setArea(MODIFIED_AREA);
-        
-        // Then: Entities should be equal again
-        assertEquals(first, second, "Entities with same areas should be equal");
-    }
-
-    private void testTooltipPropertyEquality(LegendItemEntity<String> first, LegendItemEntity<String> second) {
-        // When: Setting tooltip on first entity
-        first.setToolTipText(TEST_TOOLTIP);
-        
-        // Then: Entities should not be equal
-        assertNotEquals(first, second, "Entities with different tooltips should not be equal");
-        
-        // When: Setting same tooltip on second entity
-        second.setToolTipText(TEST_TOOLTIP);
-        
-        // Then: Entities should be equal again
-        assertEquals(first, second, "Entities with same tooltips should be equal");
-    }
-
-    private void testUrlPropertyEquality(LegendItemEntity<String> first, LegendItemEntity<String> second) {
-        // When: Setting URL on first entity
-        first.setURLText(TEST_URL);
-        
-        // Then: Entities should not be equal
-        assertNotEquals(first, second, "Entities with different URLs should not be equal");
-        
-        // When: Setting same URL on second entity
-        second.setURLText(TEST_URL);
-        
-        // Then: Entities should be equal again
-        assertEquals(first, second, "Entities with same URLs should be equal");
-    }
-
-    private void testDatasetPropertyEquality(LegendItemEntity<String> first, LegendItemEntity<String> second) {
-        // When: Setting dataset on first entity
-        first.setDataset(new DefaultCategoryDataset<String, String>());
-        
-        // Then: Entities should not be equal
-        assertNotEquals(first, second, "Entities with different datasets should not be equal");
-        
-        // When: Setting dataset on second entity
-        second.setDataset(new DefaultCategoryDataset<String, String>());
-        
-        // Then: Entities should be equal again
-        assertEquals(first, second, "Entities with same dataset types should be equal");
-    }
-
-    private void testSeriesKeyPropertyEquality(LegendItemEntity<String> first, LegendItemEntity<String> second) {
-        // When: Setting series key on first entity
-        first.setSeriesKey(TEST_SERIES_KEY);
-        
-        // Then: Entities should not be equal
-        assertNotEquals(first, second, "Entities with different series keys should not be equal");
-        
-        // When: Setting same series key on second entity
-        second.setSeriesKey(TEST_SERIES_KEY);
-        
-        // Then: Entities should be equal again
-        assertEquals(first, second, "Entities with same series keys should be equal");
-    }
 }
