@@ -44,311 +44,633 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class StringConverter_ESTest extends StringConverter_ESTest_scaffolding {
 
-    private final StringConverter converter = StringConverter.INSTANCE;
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      StringConverter stringConverter0 = StringConverter.INSTANCE;
+      // Undeclared exception!
+      try { 
+        stringConverter0.getDurationMillis("Pt,v.y");
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid format: \"Pt,v.y\"
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
 
-    //---------------------------------------------------------------------
-    // Tests for getDurationMillis
-    //---------------------------------------------------------------------
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      StringConverter stringConverter0 = new StringConverter();
+      // Undeclared exception!
+      try { 
+        stringConverter0.getDurationMillis("Pt!8CF");
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid format: \"Pt!8CF\"
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetDurationMillis_ValidPeriodString_ReturnsCorrectMillis() throws Throwable {
-        long duration = converter.getDurationMillis("Pt2s");
-        assertEquals(2000L, duration);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      StringConverter stringConverter0 = StringConverter.INSTANCE;
+      // Undeclared exception!
+      try { 
+        stringConverter0.getDurationMillis("Pvb");
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid format: \"Pvb\"
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetDurationMillis_ValidPeriodWithDecimal_ReturnsCorrectMillis() throws Throwable {
-        long duration = converter.getDurationMillis("Pt2.s");
-        assertEquals(2000L, duration);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      StringConverter stringConverter0 = StringConverter.INSTANCE;
+      // Undeclared exception!
+      try { 
+        stringConverter0.getDurationMillis("~]TNU:z]");
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid format: \"~]TNU:z]\"
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetDurationMillis_InvalidFormat_MissingTimeDesignator_ThrowsIllegalArgumentException() throws Throwable {
-        try {
-            converter.getDurationMillis("Pvb");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch(IllegalArgumentException e) {
-            assertEquals("Invalid format: \"Pvb\"", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      StringConverter stringConverter0 = new StringConverter();
+      // Undeclared exception!
+      try { 
+        stringConverter0.setInto((ReadWritablePeriod) null, (Object) null, (Chronology) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetDurationMillis_InvalidFormat_NonNumericValue_ThrowsIllegalArgumentException() throws Throwable {
-        try {
-            converter.getDurationMillis("Pt,v.y");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch(IllegalArgumentException e) {
-            assertEquals("Invalid format: \"Pt,v.y\"", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      MutablePeriod mutablePeriod0 = new MutablePeriod();
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
+      StringConverter stringConverter0 = new StringConverter();
+      // Undeclared exception!
+      try { 
+        stringConverter0.setInto((ReadWritablePeriod) mutablePeriod0, (Object) mutablePeriod0, (Chronology) islamicChronology0);
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // org.joda.time.MutablePeriod cannot be cast to java.lang.String
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetDurationMillis_InvalidFormat_UnsupportedUnit_ThrowsIllegalArgumentException() throws Throwable {
-        try {
-            converter.getDurationMillis("PT2f");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch(IllegalArgumentException e) {
-            assertEquals("Invalid format: \"PT2f\"", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      StringConverter stringConverter0 = new StringConverter();
+      JulianChronology julianChronology0 = JulianChronology.getInstanceUTC();
+      // Undeclared exception!
+      try { 
+        stringConverter0.setInto((ReadWritableInterval) null, (Object) null, (Chronology) julianChronology0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetDurationMillis_InvalidFormat_MalformedPeriod_ThrowsIllegalArgumentException() throws Throwable {
-        try {
-            converter.getDurationMillis("p3@QA9'OLT&K_7a]X<");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch(IllegalArgumentException e) {
-            assertEquals("Invalid format: \"p3@QA9'OLT&K_7a]X<\"", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      StringConverter stringConverter0 = StringConverter.INSTANCE;
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      MutableInterval mutableInterval0 = new MutableInterval();
+      // Undeclared exception!
+      try { 
+        stringConverter0.setInto((ReadWritableInterval) mutableInterval0, (Object) "The chronology of ehe time does not match", (Chronology) islamicChronology0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Format requires a '/' separator: The chronology of ehe time does not match
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetDurationMillis_InvalidFormat_EmptyString_ThrowsIllegalArgumentException() throws Throwable {
-        try {
-            converter.getDurationMillis("");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch(IllegalArgumentException e) {
-            assertEquals("Invalid format: \"\"", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      StringConverter stringConverter0 = new StringConverter();
+      MutableInterval mutableInterval0 = new MutableInterval();
+      // Undeclared exception!
+      try { 
+        stringConverter0.setInto((ReadWritableInterval) mutableInterval0, (Object) mutableInterval0, (Chronology) null);
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // org.joda.time.MutableInterval cannot be cast to java.lang.String
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetDurationMillis_InvalidFormat_IntervalString_ThrowsIllegalArgumentException() throws Throwable {
-        try {
-            converter.getDurationMillis("6/P7m");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch(IllegalArgumentException e) {
-            assertEquals("Invalid format: \"6/P7m\"", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      StringConverter stringConverter0 = new StringConverter();
+      DateTimePrinter dateTimePrinter0 = mock(DateTimePrinter.class, new ViolatedAssumptionAnswer());
+      DateTimeFormatter dateTimeFormatter0 = new DateTimeFormatter(dateTimePrinter0, (DateTimeParser) null);
+      // Undeclared exception!
+      try { 
+        stringConverter0.getPartialValues((ReadablePartial) null, (Object) "Pt2s", (Chronology) null, dateTimeFormatter0);
+        fail("Expecting exception: UnsupportedOperationException");
+      
+      } catch(UnsupportedOperationException e) {
+         //
+         // Parsing not supported
+         //
+         verifyException("org.joda.time.format.DateTimeFormatter", e);
+      }
+  }
 
-    //---------------------------------------------------------------------
-    // Tests for setInto (ReadWritablePeriod)
-    //---------------------------------------------------------------------
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      StringConverter stringConverter0 = StringConverter.INSTANCE;
+      DateTimeZone dateTimeZone0 = DateTimeZone.UTC;
+      GregorianChronology gregorianChronology0 = GregorianChronology.getInstance(dateTimeZone0);
+      LocalDate localDate0 = new LocalDate((Chronology) gregorianChronology0);
+      // Undeclared exception!
+      try { 
+        stringConverter0.getPartialValues((ReadablePartial) localDate0, (Object) "org/joda/time/tz/data", (Chronology) gregorianChronology0, (DateTimeFormatter) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testSetIntoPeriod_NullPeriod_ThrowsNullPointerException() throws Throwable {
-        try {
-            converter.setInto((ReadWritablePeriod) null, (Object) null, (Chronology) null);
-            fail("Expecting exception: NullPointerException");
-        } catch(NullPointerException e) {
-            // Expected - details not specified
-        }
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      StringConverter stringConverter0 = new StringConverter();
+      DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.year();
+      Partial partial0 = new Partial(dateTimeFieldType0, (-448));
+      DateTimeFormatter dateTimeFormatter0 = partial0.getFormatter();
+      // Undeclared exception!
+      try { 
+        stringConverter0.getPartialValues((ReadablePartial) partial0, (Object) ";Xb=I|6d!0*'jzM0/", (Chronology) null, dateTimeFormatter0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid format: \";Xb=I|6d!0*'jzM0/\"
+         //
+         verifyException("org.joda.time.format.DateTimeParserBucket", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testSetIntoPeriod_InvalidObjectType_ThrowsClassCastException() throws Throwable {
-        MutablePeriod period = new MutablePeriod();
-        try {
-            converter.setInto(period, period, IslamicChronology.getInstanceUTC());
-            fail("Expecting exception: ClassCastException");
-        } catch(ClassCastException e) {
-            // Expected - object not a String
-        }
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      StringConverter stringConverter0 = new StringConverter();
+      CopticChronology copticChronology0 = CopticChronology.getInstance();
+      // Undeclared exception!
+      try { 
+        stringConverter0.getInstantMillis("000", copticChronology0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Cannot parse \"000\": Value 0 for year is not supported
+         //
+         verifyException("org.joda.time.field.SkipDateTimeField", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testSetIntoPeriod_ValidPeriodString_SetsCorrectly() throws Throwable {
-        MutablePeriod period = new MutablePeriod();
-        DateTimeZone zone = DateTimeZone.UTC;
-        GJChronology chrono = GJChronology.getInstance(zone, new MutableDateTime(0L));
-        converter.setInto(period, "Pt2s", ZonedChronology.getInstance(chrono, zone));
-        // Verify by checking no exception thrown
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      StringConverter stringConverter0 = new StringConverter();
+      // Undeclared exception!
+      try { 
+        stringConverter0.getInstantMillis((Object) null, (Chronology) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.joda.time.format.DateTimeFormatterBuilder$CharacterLiteral", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testSetIntoPeriod_EmptyString_ThrowsIllegalArgumentException() throws Throwable {
-        MutablePeriod period = new MutablePeriod();
-        try {
-            converter.setInto(period, "", GregorianChronology.getInstanceUTC());
-            fail("Expecting exception: IllegalArgumentException");
-        } catch(IllegalArgumentException e) {
-            assertEquals("Invalid format: \"\"", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      StringConverter stringConverter0 = StringConverter.INSTANCE;
+      CopticChronology copticChronology0 = CopticChronology.getInstanceUTC();
+      // Undeclared exception!
+      try { 
+        stringConverter0.getInstantMillis(" cannot be compared to ", copticChronology0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid format: \" cannot be compared to \"
+         //
+         verifyException("org.joda.time.format.DateTimeParserBucket", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testSetIntoPeriod_InvalidFormat_ThrowsIllegalArgumentException() throws Throwable {
-        MutablePeriod period = new MutablePeriod();
-        try {
-            converter.setInto(period, "p3@QA9'OLT&K_7a]X<", IslamicChronology.getInstanceUTC());
-            fail("Expecting exception: IllegalArgumentException");
-        } catch(IllegalArgumentException e) {
-            assertEquals("Invalid format: \"p3@QA9'OLT&K_7a]X<\"", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      StringConverter stringConverter0 = new StringConverter();
+      EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstanceUTC();
+      // Undeclared exception!
+      try { 
+        stringConverter0.getInstantMillis(ethiopicChronology0, ethiopicChronology0);
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // org.joda.time.chrono.EthiopicChronology cannot be cast to java.lang.String
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
 
-    //---------------------------------------------------------------------
-    // Tests for setInto (ReadWritableInterval)
-    //---------------------------------------------------------------------
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      StringConverter stringConverter0 = StringConverter.INSTANCE;
+      // Undeclared exception!
+      try { 
+        stringConverter0.getDurationMillis((Object) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testSetIntoInterval_NullInterval_ThrowsNullPointerException() throws Throwable {
-        try {
-            converter.setInto((ReadWritableInterval) null, (Object) null, JulianChronology.getInstanceUTC());
-            fail("Expecting exception: NullPointerException");
-        } catch(NullPointerException e) {
-            // Expected - details not specified
-        }
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      StringConverter stringConverter0 = new StringConverter();
+      // Undeclared exception!
+      try { 
+        stringConverter0.getDurationMillis(stringConverter0);
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // org.joda.time.convert.StringConverter cannot be cast to java.lang.String
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testSetIntoInterval_InvalidObjectType_ThrowsClassCastException() throws Throwable {
-        MutableInterval interval = new MutableInterval();
-        try {
-            converter.setInto(interval, interval, (Chronology) null);
-            fail("Expecting exception: ClassCastException");
-        } catch(ClassCastException e) {
-            // Expected - object not a String
-        }
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      MutableInterval mutableInterval0 = MutableInterval.parse("6/8");
+      StringConverter stringConverter0 = StringConverter.INSTANCE;
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      stringConverter0.setInto((ReadWritableInterval) mutableInterval0, (Object) "6/8", (Chronology) islamicChronology0);
+      assertEquals((-42368486400000L), mutableInterval0.getStartMillis());
+  }
 
-    @Test(timeout = 4000)
-    public void testSetIntoInterval_ValidIntervalString_SetsCorrectly() throws Throwable {
-        MutableInterval interval = new MutableInterval();
-        converter.setInto(interval, "6/8", IslamicChronology.getInstanceUTC());
-        assertEquals(-42368486400000L, interval.getStartMillis());
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      MutableInterval mutableInterval0 = MutableInterval.parse("6/P7m");
+      assertEquals((-61959513600000L), mutableInterval0.getEndMillis());
+  }
 
-    @Test(timeout = 4000)
-    public void testSetIntoInterval_ValidPeriodInIntervalString_SetsCorrectly() throws Throwable {
-        MutableInterval interval = new MutableInterval(31556952000L, 31556952000L, ISOChronology.getInstance());
-        converter.setInto(interval, "6/P7m", ISOChronology.getInstance());
-        assertEquals(-61959513600000L, interval.getEndMillis());
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        MutableInterval.parse("p%/=-V$,Z");
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid format: \"p%\" is malformed at \"%\"
+         //
+         verifyException("org.joda.time.format.PeriodFormatter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testSetIntoInterval_MissingSeparator_ThrowsIllegalArgumentException() throws Throwable {
-        MutableInterval interval = new MutableInterval();
-        try {
-            converter.setInto(interval, "The chronology of ehe time does not match", IslamicChronology.getInstanceUTC());
-            fail("Expecting exception: IllegalArgumentException");
-        } catch(IllegalArgumentException e) {
-            assertEquals("Format requires a '/' separator: The chronology of ehe time does not match", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        MutableInterval.parse("Pd5jsFsKo?2`R/V");
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid format: \"Pd5jsFsKo?2`R\" is malformed at \"d5jsFsKo?2`R\"
+         //
+         verifyException("org.joda.time.format.PeriodFormatter", e);
+      }
+  }
 
-    //---------------------------------------------------------------------
-    // Tests for getPartialValues
-    //---------------------------------------------------------------------
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        MutableInterval.parse(";Xb='|Z!0*'jzM0/");
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Format invalid: ;Xb='|Z!0*'jzM0/
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetPartialValues_NullFormatter_ThrowsNullPointerException() throws Throwable {
-        LocalDate date = new LocalDate(GregorianChronology.getInstance(DateTimeZone.UTC));
-        try {
-            converter.getPartialValues(date, "org/joda/time/tz/data", GregorianChronology.getInstance(DateTimeZone.UTC), null);
-            fail("Expecting exception: NullPointerException");
-        } catch(NullPointerException e) {
-            // Expected - details not specified
-        }
-    }
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      MutableInterval mutableInterval0 = null;
+      try {
+        mutableInterval0 = new MutableInterval("/UkrB+[Yx$");
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Format invalid: /UkrB+[Yx$
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetPartialValues_UnsupportedFormatter_ThrowsUnsupportedOperationException() throws Throwable {
-        DateTimePrinter printer = mock(DateTimePrinter.class);
-        DateTimeFormatter formatter = new DateTimeFormatter(printer, null);
-        try {
-            converter.getPartialValues(null, "Pt2s", null, formatter);
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch(UnsupportedOperationException e) {
-            assertEquals("Parsing not supported", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      StringConverter stringConverter0 = new StringConverter();
+      DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
+      ISOChronology iSOChronology0 = ISOChronology.getInstance(dateTimeZone0);
+      MutableInterval mutableInterval0 = new MutableInterval(31556952000L, 31556952000L, iSOChronology0);
+      stringConverter0.setInto((ReadWritableInterval) mutableInterval0, (Object) "6/P7m", (Chronology) iSOChronology0);
+      assertEquals((-61959513600000L), mutableInterval0.getEndMillis());
+  }
 
-    @Test(timeout = 4000)
-    public void testGetPartialValues_InvalidFormat_ThrowsIllegalArgumentException() throws Throwable {
-        Partial partial = new Partial(DateTimeFieldType.year(), -2212);
-        DateTimeFormatter formatter = partial.getFormatter();
-        try {
-            converter.getPartialValues(partial, ";Xb=I|6d!0*'jzM0/", null, formatter);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch(IllegalArgumentException e) {
-            assertEquals("Invalid format: \";Xb=I|6d!0*'jzM0/\"", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      StringConverter stringConverter0 = new StringConverter();
+      MutablePeriod mutablePeriod0 = new MutablePeriod(48L, 1068L);
+      IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
+      // Undeclared exception!
+      try { 
+        stringConverter0.setInto((ReadWritablePeriod) mutablePeriod0, (Object) "p3@QA9'OLT&K_7a]X<", (Chronology) islamicChronology0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid format: \"p3@QA9'OLT&K_7a]X<\"
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetPartialValues_ValidString_ReturnsCorrectValues() throws Throwable {
-        MonthDay monthDay = new MonthDay(2454L, EthiopicChronology.getInstanceUTC());
-        DateTimePrinter printer = mock(DateTimePrinter.class);
-        DateTimeParser parser = mock(DateTimeParser.class);
-        when(parser.parseInto(any(), anyString(), anyInt())).thenReturn(1);
-        DateTimeFormatter formatter = new DateTimeFormatter(printer, parser).withZoneUTC();
-        int[] values = converter.getPartialValues(monthDay, "0", EthiopicChronology.getInstanceUTC(), formatter);
-        assertArrayEquals(new int[]{4, 23}, values);
-    }
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      StringConverter stringConverter0 = new StringConverter();
+      GregorianChronology gregorianChronology0 = GregorianChronology.getInstanceUTC();
+      MutablePeriod mutablePeriod0 = new MutablePeriod();
+      // Undeclared exception!
+      try { 
+        stringConverter0.setInto((ReadWritablePeriod) mutablePeriod0, (Object) "", (Chronology) gregorianChronology0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid format: \"\"
+         //
+         verifyException("org.joda.time.format.PeriodFormatter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetPartialValues_InvalidObjectType_ThrowsClassCastException() throws Throwable {
-        MonthDay monthDay = MonthDay.now(ISOChronology.getInstance());
-        Partial partial = new Partial(DateTimeFieldType.year(), -2212);
-        DateTimeFormatter formatter = partial.getFormatter();
-        try {
-            converter.getPartialValues(monthDay, monthDay, ISOChronology.getInstance(), formatter);
-            fail("Expecting exception: ClassCastException");
-        } catch(ClassCastException e) {
-            // Expected - object not a String
-        }
-    }
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      StringConverter stringConverter0 = new StringConverter();
+      MutableDateTime mutableDateTime0 = new MutableDateTime(0L);
+      DateTime dateTime0 = mutableDateTime0.toDateTimeISO();
+      MutablePeriod mutablePeriod0 = new MutablePeriod(dateTime0, dateTime0, (PeriodType) null);
+      DateTimeZone dateTimeZone0 = DateTimeZone.UTC;
+      GJChronology gJChronology0 = GJChronology.getInstance(dateTimeZone0, (ReadableInstant) mutableDateTime0);
+      ZonedChronology zonedChronology0 = ZonedChronology.getInstance(gJChronology0, dateTimeZone0);
+      stringConverter0.setInto((ReadWritablePeriod) mutablePeriod0, (Object) "Pt2s", (Chronology) zonedChronology0);
+  }
 
-    //---------------------------------------------------------------------
-    // Tests for getInstantMillis
-    //---------------------------------------------------------------------
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      StringConverter stringConverter0 = new StringConverter();
+      long long0 = stringConverter0.getDurationMillis("Pt2s");
+      assertEquals(2000L, long0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetInstantMillis_ValidString_ReturnsCorrectMillis() throws Throwable {
-        long instant = converter.getInstantMillis("000", ISOChronology.getInstance());
-        assertEquals(-62167219200000L, instant);
-    }
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      StringConverter stringConverter0 = StringConverter.INSTANCE;
+      // Undeclared exception!
+      try { 
+        stringConverter0.getDurationMillis("Pt-is");
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid format: \"Pt-is\"
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetInstantMillis_NullInput_ThrowsNullPointerException() throws Throwable {
-        try {
-            converter.getInstantMillis(null, null);
-            fail("Expecting exception: NullPointerException");
-        } catch(NullPointerException e) {
-            // Expected - details not specified
-        }
-    }
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      StringConverter stringConverter0 = StringConverter.INSTANCE;
+      // Undeclared exception!
+      try { 
+        stringConverter0.getDurationMillis("Pt-s");
+        fail("Expecting exception: NumberFormatException");
+      
+      } catch(NumberFormatException e) {
+         //
+         // For input string: \"\"
+         //
+         verifyException("java.lang.NumberFormatException", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetInstantMillis_InvalidObjectType_ThrowsClassCastException() throws Throwable {
-        EthiopicChronology chrono = EthiopicChronology.getInstanceUTC();
-        try {
-            converter.getInstantMillis(chrono, chrono);
-            fail("Expecting exception: ClassCastException");
-        } catch(ClassCastException e) {
-            // Expected - object not a String
-        }
-    }
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      StringConverter stringConverter0 = new StringConverter();
+      // Undeclared exception!
+      try { 
+        stringConverter0.getDurationMillis("PtZv!s");
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid format: \"PtZv!s\"
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetInstantMillis_InvalidFormat_ThrowsIllegalArgumentException() throws Throwable {
-        try {
-            converter.getInstantMillis(" cannot be compared to ", CopticChronology.getInstanceUTC());
-            fail("Expecting exception: IllegalArgumentException");
-        } catch(IllegalArgumentException e) {
-            assertEquals("Invalid format: \" cannot be compared to \"", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test32()  throws Throwable  {
+      StringConverter stringConverter0 = StringConverter.INSTANCE;
+      // Undeclared exception!
+      try { 
+        stringConverter0.getDurationMillis("Pt2.is");
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid format: \"Pt2.is\"
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetInstantMillis_UnsupportedDate_ThrowsIllegalArgumentException() throws Throwable {
-        try {
-            converter.getInstantMillis("000", CopticChronology.getInstance());
-            fail("Expecting exception: IllegalArgumentException");
-        } catch(IllegalArgumentException e) {
-            assertEquals("Cannot parse \"000\": Value 0 for year is not supported", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test33()  throws Throwable  {
+      StringConverter stringConverter0 = new StringConverter();
+      // Undeclared exception!
+      try { 
+        stringConverter0.getDurationMillis("PT2f");
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid format: \"PT2f\"
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
 
-    //---------------------------------------------------------------------
-    // Tests for getSupportedType
-    //---------------------------------------------------------------------
+  @Test(timeout = 4000)
+  public void test34()  throws Throwable  {
+      StringConverter stringConverter0 = StringConverter.INSTANCE;
+      // Undeclared exception!
+      try { 
+        stringConverter0.getDurationMillis("p3@QA9'OLT&K_7a]X<");
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid format: \"p3@QA9'OLT&K_7a]X<\"
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetSupportedType_ReturnsStringClass() throws Throwable {
-        Class<?> type = converter.getSupportedType();
-        assertEquals(String.class, type);
-    }
+  @Test(timeout = 4000)
+  public void test35()  throws Throwable  {
+      StringConverter stringConverter0 = new StringConverter();
+      long long0 = stringConverter0.getDurationMillis("Pt2.s");
+      assertEquals(2000L, long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test36()  throws Throwable  {
+      StringConverter stringConverter0 = StringConverter.INSTANCE;
+      // Undeclared exception!
+      try { 
+        stringConverter0.getDurationMillis("");
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid format: \"\"
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test37()  throws Throwable  {
+      StringConverter stringConverter0 = StringConverter.INSTANCE;
+      EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstanceUTC();
+      MonthDay monthDay0 = new MonthDay(2454L, (Chronology) ethiopicChronology0);
+      DateTimePrinter dateTimePrinter0 = mock(DateTimePrinter.class, new ViolatedAssumptionAnswer());
+      DateTimeParser dateTimeParser0 = mock(DateTimeParser.class, new ViolatedAssumptionAnswer());
+      doReturn(1).when(dateTimeParser0).parseInto(any(org.joda.time.format.DateTimeParserBucket.class) , anyString() , anyInt());
+      DateTimeFormatter dateTimeFormatter0 = new DateTimeFormatter(dateTimePrinter0, dateTimeParser0);
+      DateTimeFormatter dateTimeFormatter1 = dateTimeFormatter0.withZoneUTC();
+      int[] intArray0 = stringConverter0.getPartialValues((ReadablePartial) monthDay0, (Object) "0", (Chronology) ethiopicChronology0, dateTimeFormatter1);
+      assertArrayEquals(new int[] {4, 23}, intArray0);
+  }
+
+  @Test(timeout = 4000)
+  public void test38()  throws Throwable  {
+      ISOChronology iSOChronology0 = ISOChronology.getInstance();
+      StringConverter stringConverter0 = new StringConverter();
+      MonthDay monthDay0 = MonthDay.now((Chronology) iSOChronology0);
+      DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.year();
+      Partial partial0 = new Partial(dateTimeFieldType0, (-2212));
+      DateTimeFormatter dateTimeFormatter0 = partial0.getFormatter();
+      // Undeclared exception!
+      try { 
+        stringConverter0.getPartialValues((ReadablePartial) monthDay0, (Object) monthDay0, (Chronology) iSOChronology0, dateTimeFormatter0);
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // org.joda.time.MonthDay cannot be cast to java.lang.String
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test39()  throws Throwable  {
+      StringConverter stringConverter0 = new StringConverter();
+      // Undeclared exception!
+      try { 
+        stringConverter0.getDurationMillis("6/P7m");
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid format: \"6/P7m\"
+         //
+         verifyException("org.joda.time.convert.StringConverter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test40()  throws Throwable  {
+      StringConverter stringConverter0 = StringConverter.INSTANCE;
+      Class<?> class0 = stringConverter0.getSupportedType();
+      assertEquals("class java.lang.String", class0.toString());
+  }
+
+  @Test(timeout = 4000)
+  public void test41()  throws Throwable  {
+      StringConverter stringConverter0 = StringConverter.INSTANCE;
+      ISOChronology iSOChronology0 = ISOChronology.getInstance();
+      long long0 = stringConverter0.getInstantMillis("000", iSOChronology0);
+      assertEquals((-62167219200000L), long0);
+  }
 }
