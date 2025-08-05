@@ -32,24 +32,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import org.junit.Test;
 
-/**
- * Tests for {@code TypeAdapterRuntimeTypeWrapper}, which handles polymorphic serialization.
- *
- * <p>These tests verify which adapter Gson selects when the runtime type of a value (e.g.
- * {@code Subclass}) is more specific than its declared type (e.g. {@code Base}). The choice
- * depends on whether a custom adapter is registered for the base type and whether that adapter is
- * considered 'reflective'.
- */
 public class TypeAdapterRuntimeTypeWrapperTest {
-  // Expected JSON output when the Subclass is serialized using its reflective adapter
-  private static final String SUBCLASS_REFLECTIVE_JSON = "{\"b\":{\"f\":\"test\"}}";
-  // Expected JSON output when a custom serializer for the Base class is used
-  private static final String BASE_CUSTOM_SERIALIZER_JSON = "{\"b\":\"serializer\"}";
-  // Expected JSON output when a custom delegate adapter for the Base class is used
-  private static final String BASE_CUSTOM_DELEGATE_JSON = "{\"b\":\"custom delegate\"}";
-
-  // Test fixtures
-
   private static class Base {}
 
   private static class Subclass extends Base {
@@ -57,26 +40,24 @@ public class TypeAdapterRuntimeTypeWrapperTest {
     String f = "test";
   }
 
-  /** Contains a field of the base type, but holds an instance of the subclass. */
   private static class Container {
     @SuppressWarnings("unused")
     Base b = new Subclass();
   }
 
-  /** A deserializer which is not intended to be called in these serialization tests. */
-  private static class DeserializerOnly implements JsonDeserializer<Base> {
+  private static class Deserializer implements JsonDeserializer<Base> {
     @Override
     public Base deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
-      throw new AssertionError("Deserializer should not be called during serialization test");
+      throw new AssertionError("not needed for this test");
     }
   }
 
   /**
-   * Verifies that a custom {@link JsonSerializer} for a base type is used for serializing a
-   * subclass instance.
+   * When custom {@link JsonSerializer} is registered for Base should prefer that over reflective
+   * adapter for Subclass for serialization.
    */
   @Test
-  public void serialization_usesBaseTypeSerializer_forSubclassInstance() {
+  public void testJsonSerializer() {
     Gson gson =
         new GsonBuilder()
             .registerTypeAdapter(
@@ -85,122 +66,115 @@ public class TypeAdapterRuntimeTypeWrapperTest {
             .create();
 
     String json = gson.toJson(new Container());
-    assertThat(json).isEqualTo(BASE_CUSTOM_SERIALIZER_JSON);
+    assertThat(json).isEqualTo("{\"b\":\"serializer\"}");
   }
 
   /**
-   * Verifies that when only a {@link JsonDeserializer} is registered for the base type, Gson falls
-   * back to the reflective serializer for the base type. This 'reflective' nature causes Gson to
-   * prefer the more specific reflective adapter for the subclass at runtime.
+   * When only {@link JsonDeserializer} is registered for Base, then on serialization should prefer
+   * reflective adapter for Subclass since Base would use reflective adapter as delegate.
    */
   @Test
-  public void serialization_usesSubclassReflectiveAdapter_whenBaseTypeHasDeserializerOnly() {
-    Gson gson = new GsonBuilder().registerTypeAdapter(Base.class, new DeserializerOnly()).create();
+  public void testJsonDeserializer_ReflectiveSerializerDelegate() {
+    Gson gson = new GsonBuilder().registerTypeAdapter(Base.class, new Deserializer()).create();
 
     String json = gson.toJson(new Container());
-    assertThat(json).isEqualTo(SUBCLASS_REFLECTIVE_JSON);
+    assertThat(json).isEqualTo("{\"b\":{\"f\":\"test\"}}");
   }
 
   /**
-   * Verifies that when a full {@link TypeAdapter} with a custom serializer is registered for the
-   * base type, its serializer is preferred over the subclass's reflective adapter, even if a
-   * separate {@link JsonDeserializer} is also registered.
+   * When {@link JsonDeserializer} with custom adapter as delegate is registered for Base, then on
+   * serialization should prefer custom adapter delegate for Base over reflective adapter for
+   * Subclass.
    */
   @Test
-  public void serialization_usesBaseTypeCustomDelegateAdapter_forSubclassInstance() {
+  public void testJsonDeserializer_CustomSerializerDelegate() {
     Gson gson =
         new GsonBuilder()
-            // Register a full TypeAdapter with a custom serializer (write method)
+            // Register custom delegate
             .registerTypeAdapter(
                 Base.class,
                 new TypeAdapter<Base>() {
                   @Override
-                  public void write(JsonWriter out, Base value) throws IOException {
-                    out.value("custom delegate");
+                  public Base read(JsonReader in) throws IOException {
+                    throw new UnsupportedOperationException();
                   }
 
                   @Override
-                  public Base read(JsonReader in) {
-                    throw new UnsupportedOperationException();
+                  public void write(JsonWriter out, Base value) throws IOException {
+                    out.value("custom delegate");
                   }
                 })
-            // This registration for the same type only affects deserialization
-            .registerTypeAdapter(Base.class, new DeserializerOnly())
+            .registerTypeAdapter(Base.class, new Deserializer())
             .create();
 
     String json = gson.toJson(new Container());
-    assertThat(json).isEqualTo(BASE_CUSTOM_DELEGATE_JSON);
+    assertThat(json).isEqualTo("{\"b\":\"custom delegate\"}");
   }
 
   /**
-   * Verifies that when multiple {@link JsonDeserializer}s are registered for the base type, Gson
-   * still falls back to reflective serialization, causing it to prefer the subclass's reflective
-   * adapter.
+   * When two (or more) {@link JsonDeserializer}s are registered for Base which eventually fall back
+   * to reflective adapter as delegate, then on serialization should prefer reflective adapter for
+   * Subclass.
    */
   @Test
-  public void serialization_usesSubclassReflectiveAdapter_whenBaseTypeHasMultipleDeserializers() {
+  public void testJsonDeserializer_ReflectiveTreeSerializerDelegate() {
     Gson gson =
         new GsonBuilder()
-            // Registering multiple deserializers still results in a reflective serializer
-            .registerTypeAdapter(Base.class, new DeserializerOnly())
-            .registerTypeAdapter(Base.class, new DeserializerOnly())
+            // Register delegate which itself falls back to reflective serialization
+            .registerTypeAdapter(Base.class, new Deserializer())
+            .registerTypeAdapter(Base.class, new Deserializer())
             .create();
 
     String json = gson.toJson(new Container());
-    assertThat(json).isEqualTo(SUBCLASS_REFLECTIVE_JSON);
+    assertThat(json).isEqualTo("{\"b\":{\"f\":\"test\"}}");
   }
 
   /**
-   * Verifies that if a {@link JsonSerializer} is provided as a delegate for the base type, it is
-   * preferred over the subclass's reflective adapter.
+   * When {@link JsonDeserializer} with {@link JsonSerializer} as delegate is registered for Base,
+   * then on serialization should prefer {@code JsonSerializer} over reflective adapter for
+   * Subclass.
    */
   @Test
-  public void serialization_usesBaseTypeSerializerDelegate_forSubclassInstance() {
+  public void testJsonDeserializer_JsonSerializerDelegate() {
     Gson gson =
         new GsonBuilder()
-            // Register a custom JsonSerializer as a delegate
+            // Register JsonSerializer as delegate
             .registerTypeAdapter(
                 Base.class,
                 (JsonSerializer<Base>)
                     (src, typeOfSrc, context) -> new JsonPrimitive("custom delegate"))
-            // Registering a deserializer alongside it does not change serialization behavior
-            .registerTypeAdapter(Base.class, new DeserializerOnly())
+            .registerTypeAdapter(Base.class, new Deserializer())
             .create();
 
     String json = gson.toJson(new Container());
-    assertThat(json).isEqualTo(BASE_CUSTOM_DELEGATE_JSON);
+    assertThat(json).isEqualTo("{\"b\":\"custom delegate\"}");
   }
 
   /**
-   * Verifies a backward compatibility case: if any adapter is registered for the subclass, Gson
-   * prefers the subclass's reflective adapter for serialization, even if a custom serializer
-   * exists for the base class.
-   *
-   * @see <a href="https://github.com/google/gson/pull/1787#issuecomment-1222175189">GitHub
-   *     Comment</a>
+   * When a {@link JsonDeserializer} is registered for Subclass, and a custom {@link JsonSerializer}
+   * is registered for Base, then Gson should prefer the reflective adapter for Subclass for
+   * backward compatibility (see https://github.com/google/gson/pull/1787#issuecomment-1222175189)
+   * even though normally TypeAdapterRuntimeTypeWrapper should prefer the custom serializer for
+   * Base.
    */
   @Test
-  public void serialization_prefersSubclassReflectiveAdapter_forBackwardCompatibility() {
+  public void testJsonDeserializer_SubclassBackwardCompatibility() {
     Gson gson =
         new GsonBuilder()
-            // Registering any adapter for the subclass triggers this behavior
             .registerTypeAdapter(
                 Subclass.class,
                 (JsonDeserializer<Subclass>)
                     (json, typeOfT, context) -> {
                       throw new AssertionError("not needed for this test");
                     })
-            // This custom serializer for the base class would normally be used, but is ignored
             .registerTypeAdapter(
                 Base.class,
                 (JsonSerializer<Base>) (src, typeOfSrc, context) -> new JsonPrimitive("base"))
             .create();
 
     String json = gson.toJson(new Container());
-    assertThat(json).isEqualTo(SUBCLASS_REFLECTIVE_JSON);
+    assertThat(json).isEqualTo("{\"b\":{\"f\":\"test\"}}");
   }
-
-  // Test fixtures for cyclic type test
 
   private static class CyclicBase {
     @SuppressWarnings("unused")
@@ -211,26 +185,21 @@ public class TypeAdapterRuntimeTypeWrapperTest {
     @SuppressWarnings("unused")
     int i;
 
-    public CyclicSub(int i) {
+    CyclicSub(int i) {
       this.i = i;
     }
   }
 
   /**
-   * Tests that runtime type resolution works correctly even for cyclic types where Gson uses a
-   * future-style adapter internally to break the creation cycle.
+   * Tests behavior when the type of a field refers to a type whose adapter is currently in the
+   * process of being created. For these cases {@link Gson} uses a future adapter for the type. That
+   * adapter later uses the actual adapter as delegate.
    */
   @Test
-  public void serialization_handlesRuntimeType_withCyclicTypes() {
-    // Arrange
-    CyclicBase cyclicObject = new CyclicBase();
-    cyclicObject.f = new CyclicSub(2);
-    Gson gson = new Gson();
-
-    // Act
-    String json = gson.toJson(cyclicObject);
-
-    // Assert
+  public void testGsonFutureAdapter() {
+    CyclicBase b = new CyclicBase();
+    b.f = new CyclicSub(2);
+    String json = new Gson().toJson(b);
     assertThat(json).isEqualTo("{\"f\":{\"i\":2}}");
   }
 }
