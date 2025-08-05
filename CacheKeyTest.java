@@ -1,3 +1,18 @@
+/*
+ *    Copyright 2009-2024 the original author or authors.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package org.apache.ibatis.cache;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,105 +31,95 @@ import org.junit.jupiter.api.Test;
 class CacheKeyTest {
 
   @Test
-  void testCacheKeysEquality() {
+  void shouldTestCacheKeysEqual() {
     Date date = new Date();
-    CacheKey key1 = createCacheKey(1, "hello", null, new Date(date.getTime()));
-    CacheKey key2 = createCacheKey(1, "hello", null, new Date(date.getTime()));
-
-    assertCacheKeysAreEqual(key1, key2);
-  }
-
-  @Test
-  void testCacheKeysInequalityDueToDateDifference() throws InterruptedException {
-    CacheKey key1 = createCacheKey(1, "hello", null, new Date());
-    Thread.sleep(1000);
-    CacheKey key2 = createCacheKey(1, "hello", null, new Date());
-
-    assertCacheKeysAreNotEqual(key1, key2);
-  }
-
-  @Test
-  void testCacheKeysInequalityDueToOrder() {
-    CacheKey key1 = createCacheKey(1, "hello", null);
-    CacheKey key2 = createCacheKey(1, null, "hello");
-
-    assertCacheKeysAreNotEqual(key1, key2);
-  }
-
-  @Test
-  void testEmptyAndNullKeysEquality() {
-    CacheKey key1 = new CacheKey();
-    CacheKey key2 = new CacheKey();
-
-    assertCacheKeysAreEqual(key1, key2);
-
-    key1.update(null);
-    key2.update(null);
-    assertCacheKeysAreEqual(key1, key2);
-  }
-
-  @Test
-  void testCacheKeysWithBinaryArraysEquality() {
-    byte[] array1 = { 1 };
-    byte[] array2 = { 1 };
-    CacheKey key1 = createCacheKey(array1);
-    CacheKey key2 = createCacheKey(array2);
-
-    assertCacheKeysAreEqual(key1, key2);
-  }
-
-  @Test
-  void testExceptionOnUpdatingNullCacheKey() {
-    CacheKey cacheKey = CacheKey.NULL_CACHE_KEY;
-    assertThrows(CacheException.class, () -> cacheKey.update("null"));
-  }
-
-  @Test
-  void testExceptionOnUpdatingAllNullCacheKey() {
-    CacheKey cacheKey = CacheKey.NULL_CACHE_KEY;
-    assertThrows(CacheException.class, () -> cacheKey.updateAll(new Object[] { "null", "null" }));
-  }
-
-  @Test
-  void testClonedNullCacheKeysEquality() throws CloneNotSupportedException {
-    CacheKey cacheKey = CacheKey.NULL_CACHE_KEY;
-    CacheKey clonedCacheKey = cacheKey.clone();
-
-    assertCacheKeysAreEqual(cacheKey, clonedCacheKey);
-  }
-
-  @Test
-  void testSerializationException() {
-    CacheKey cacheKey = new CacheKey();
-    cacheKey.update(new Object());
-
-    assertThrows(NotSerializableException.class, () -> serialize(cacheKey));
-  }
-
-  @Test
-  void testSerialization() throws Exception {
-    CacheKey cacheKey = new CacheKey();
-    cacheKey.update("serializable");
-
-    assertEquals(cacheKey, serialize(cacheKey));
-  }
-
-  private CacheKey createCacheKey(Object... objects) {
-    return new CacheKey(objects);
-  }
-
-  private void assertCacheKeysAreEqual(CacheKey key1, CacheKey key2) {
+    CacheKey key1 = new CacheKey(new Object[] { 1, "hello", null, new Date(date.getTime()) });
+    CacheKey key2 = new CacheKey(new Object[] { 1, "hello", null, new Date(date.getTime()) });
     assertEquals(key1, key2);
     assertEquals(key2, key1);
     assertEquals(key1.hashCode(), key2.hashCode());
     assertEquals(key1.toString(), key2.toString());
   }
 
-  private void assertCacheKeysAreNotEqual(CacheKey key1, CacheKey key2) {
+  @Test
+  void shouldTestCacheKeysNotEqualDueToDateDifference() throws Exception {
+    CacheKey key1 = new CacheKey(new Object[] { 1, "hello", null, new Date() });
+    Thread.sleep(1000);
+    CacheKey key2 = new CacheKey(new Object[] { 1, "hello", null, new Date() });
     assertNotEquals(key1, key2);
     assertNotEquals(key2, key1);
     assertNotEquals(key1.hashCode(), key2.hashCode());
     assertNotEquals(key1.toString(), key2.toString());
+  }
+
+  @Test
+  void shouldTestCacheKeysNotEqualDueToOrder() throws Exception {
+    CacheKey key1 = new CacheKey(new Object[] { 1, "hello", null });
+    Thread.sleep(1000);
+    CacheKey key2 = new CacheKey(new Object[] { 1, null, "hello" });
+    assertNotEquals(key1, key2);
+    assertNotEquals(key2, key1);
+    assertNotEquals(key1.hashCode(), key2.hashCode());
+    assertNotEquals(key1.toString(), key2.toString());
+  }
+
+  @Test
+  void shouldDemonstrateEmptyAndNullKeysAreEqual() {
+    CacheKey key1 = new CacheKey();
+    CacheKey key2 = new CacheKey();
+    assertEquals(key1, key2);
+    assertEquals(key2, key1);
+    key1.update(null);
+    key2.update(null);
+    assertEquals(key1, key2);
+    assertEquals(key2, key1);
+    key1.update(null);
+    key2.update(null);
+    assertEquals(key1, key2);
+    assertEquals(key2, key1);
+  }
+
+  @Test
+  void shouldTestCacheKeysWithBinaryArrays() {
+    byte[] array1 = { 1 };
+    byte[] array2 = { 1 };
+    CacheKey key1 = new CacheKey(new Object[] { array1 });
+    CacheKey key2 = new CacheKey(new Object[] { array2 });
+    assertEquals(key1, key2);
+  }
+
+  @Test
+  void throwExceptionWhenTryingToUpdateNullCacheKey() {
+    CacheKey cacheKey = CacheKey.NULL_CACHE_KEY;
+    assertThrows(CacheException.class, () -> cacheKey.update("null"));
+  }
+
+  @Test
+  void throwExceptionWhenTryingToUpdateAllNullCacheKey() {
+    CacheKey cacheKey = CacheKey.NULL_CACHE_KEY;
+    assertThrows(CacheException.class, () -> cacheKey.updateAll(new Object[] { "null", "null" }));
+  }
+
+  @Test
+  void shouldDemonstrateClonedNullCacheKeysAreEqual() throws Exception {
+    CacheKey cacheKey = CacheKey.NULL_CACHE_KEY;
+    CacheKey clonedCacheKey = cacheKey.clone();
+    assertEquals(cacheKey, clonedCacheKey);
+    assertEquals(cacheKey.hashCode(), clonedCacheKey.hashCode());
+  }
+
+  @Test
+  void serializationExceptionTest() {
+    CacheKey cacheKey = new CacheKey();
+    cacheKey.update(new Object());
+    assertThrows(NotSerializableException.class, () -> serialize(cacheKey));
+  }
+
+  @Test
+  void serializationTest() throws Exception {
+    CacheKey cacheKey = new CacheKey();
+    cacheKey.update("serializable");
+    assertEquals(cacheKey, serialize(cacheKey));
   }
 
   private static <T> T serialize(T object) throws Exception {
@@ -124,4 +129,5 @@ class CacheKeyTest {
     ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
     return (T) new ObjectInputStream(bais).readObject();
   }
+
 }
