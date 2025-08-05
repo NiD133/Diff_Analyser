@@ -14,226 +14,178 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class)
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true,
+    useVFS = true,
+    useVNET = true,
+    resetStaticState = true,
+    separateClassLoader = true
+)
 public class BigDecimalParser_ESTest extends BigDecimalParser_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      char[] charArray0 = new char[1];
-      // Undeclared exception!
-      try { 
-        BigDecimalParser.parse(charArray0, (-1747), 771);
-        fail("Expecting exception: NoClassDefFoundError");
-      
-      } catch(NoClassDefFoundError e) {
-         //
-         // ch/randelshofer/fastdoubleparser/JavaBigDecimalParser
-         //
-         verifyException("com.fasterxml.jackson.core.io.BigDecimalParser", e);
-      }
-  }
+    // Tests for parsing valid numeric representations
+    @Test(timeout = 4000)
+    public void parseSingleDigitFromCharArray() throws Throwable {
+        char[] input = new char[9];
+        input[1] = '2';
+        BigDecimal result = BigDecimalParser.parse(input, 1, 1);
+        assertEquals(2, result.shortValue());
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      char[] charArray0 = new char[9];
-      charArray0[1] = '2';
-      BigDecimal bigDecimal0 = BigDecimalParser.parse(charArray0, 1, 1);
-      assertEquals((short)2, bigDecimal0.shortValue());
-  }
+    @Test(timeout = 4000)
+    public void parseNegativeZeroFromCharArray() throws Throwable {
+        char[] input = new char[]{'-', '0'};
+        BigDecimal result = BigDecimalParser.parse(input);
+        assertEquals(0, result.shortValue());
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      char[] charArray0 = new char[2];
-      charArray0[0] = '-';
-      charArray0[1] = '0';
-      BigDecimal bigDecimal0 = BigDecimalParser.parse(charArray0);
-      assertEquals((short)0, bigDecimal0.shortValue());
-  }
+    @Test(timeout = 4000)
+    public void parseSingleDigitFourFromCharArray() throws Throwable {
+        char[] input = new char[]{'4'};
+        BigDecimal result = BigDecimalParser.parse(input);
+        assertEquals(4, result.byteValue());
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      char[] charArray0 = new char[1];
-      charArray0[0] = '4';
-      BigDecimal bigDecimal0 = BigDecimalParser.parse(charArray0);
-      assertEquals((byte)4, bigDecimal0.byteValue());
-  }
+    @Test(timeout = 4000)
+    public void parseExponentialNotationFromCharArray() throws Throwable {
+        char[] input = new char[]{'2', 'E', '2'};
+        BigDecimal result = BigDecimalParser.parse(input);
+        assertEquals(-56, result.byteValue()); // 2E2 = 200, byteValue() truncates to -56
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      char[] charArray0 = new char[3];
-      charArray0[0] = '2';
-      charArray0[1] = 'E';
-      charArray0[2] = '2';
-      BigDecimal bigDecimal0 = BigDecimalParser.parse(charArray0);
-      assertEquals((byte) (-56), bigDecimal0.byteValue());
-  }
+    @Test(timeout = 4000)
+    public void parseSingleDigitString() throws Throwable {
+        BigDecimal result = BigDecimalParser.parse("8");
+        assertEquals(8, result.byteValue());
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      BigDecimal bigDecimal0 = BigDecimalParser.parse("8");
-      assertEquals((byte)8, bigDecimal0.byteValue());
-  }
+    @Test(timeout = 4000)
+    public void parseExponentialNotationString() throws Throwable {
+        BigDecimal result = BigDecimalParser.parse("7e2");
+        assertEquals(700, result.shortValue());
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      BigDecimal bigDecimal0 = BigDecimalParser.parse("7e2");
-      assertEquals((short)700, bigDecimal0.shortValue());
-  }
+    @Test(timeout = 4000)
+    public void parseDotOneString() throws Throwable {
+        BigDecimal result = BigDecimalParser.parse(".1");
+        assertEquals(0, result.byteValue()); // 0.1 truncates to 0 in byte
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      char[] charArray0 = new char[1];
-      // Undeclared exception!
-      try { 
-        BigDecimalParser.parse(charArray0, (int) '\u0000', (int) '\u0000');
-        fail("Expecting exception: NumberFormatException");
-      
-      } catch(NumberFormatException e) {
-         //
-         // Value \"\" can not be deserialized as `java.math.BigDecimal`, reason:  Not a valid number representation
-         //
-         verifyException("com.fasterxml.jackson.core.io.BigDecimalParser", e);
-      }
-  }
+    // Tests for expected exceptions during parsing
+    @Test(timeout = 4000)
+    public void parseNegativeOffsetThrowsNoClassDefError() throws Throwable {
+        char[] input = new char[1];
+        try {
+            BigDecimalParser.parse(input, -1747, 771);
+            fail("Expecting exception: NoClassDefFoundError");
+        } catch (NoClassDefFoundError e) {
+            verifyException("com.fasterxml.jackson.core.io.BigDecimalParser", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        BigDecimalParser.parse((char[]) null, 486, 486);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.math.BigDecimal", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void parseEmptyCharArrayThrowsNumberFormatException() throws Throwable {
+        char[] input = new char[1];
+        try {
+            BigDecimalParser.parse(input, 0, 0);
+            fail("Expecting exception: NumberFormatException");
+        } catch (NumberFormatException e) {
+            verifyException("com.fasterxml.jackson.core.io.BigDecimalParser", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        BigDecimalParser.parse((char[]) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.fasterxml.jackson.core.io.BigDecimalParser", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void parseNullCharArrayThrowsNullPointerException() throws Throwable {
+        try {
+            BigDecimalParser.parse((char[]) null, 486, 486);
+            fail("Expecting exception: NullPointerException");
+        } catch (NullPointerException e) {
+            verifyException("java.math.BigDecimal", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        BigDecimalParser.parse((String) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.fasterxml.jackson.core.io.BigDecimalParser", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void parseNullCharArrayWithoutOffsetThrowsNullPointerException() throws Throwable {
+        try {
+            BigDecimalParser.parse((char[]) null);
+            fail("Expecting exception: NullPointerException");
+        } catch (NullPointerException e) {
+            verifyException("com.fasterxml.jackson.core.io.BigDecimalParser", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      char[] charArray0 = new char[0];
-      // Undeclared exception!
-      try { 
-        BigDecimalParser.parse(charArray0, 265, 265);
-        fail("Expecting exception: StringIndexOutOfBoundsException");
-      
-      } catch(StringIndexOutOfBoundsException e) {
-      }
-  }
+    @Test(timeout = 4000)
+    public void parseNullStringThrowsNullPointerException() throws Throwable {
+        try {
+            BigDecimalParser.parse((String) null);
+            fail("Expecting exception: NullPointerException");
+        } catch (NullPointerException e) {
+            verifyException("com.fasterxml.jackson.core.io.BigDecimalParser", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        BigDecimalParser.parse("eA8ojpN");
-        fail("Expecting exception: NumberFormatException");
-      
-      } catch(NumberFormatException e) {
-         //
-         // Value \"eA8ojpN\" can not be deserialized as `java.math.BigDecimal`, reason:  Not a valid number representation
-         //
-         verifyException("com.fasterxml.jackson.core.io.BigDecimalParser", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void parseInvalidLengthThrowsIndexException() throws Throwable {
+        char[] input = new char[0];
+        try {
+            BigDecimalParser.parse(input, 265, 265);
+            fail("Expecting exception: StringIndexOutOfBoundsException");
+        } catch (StringIndexOutOfBoundsException e) {
+            // Expected
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      char[] charArray0 = new char[0];
-      // Undeclared exception!
-      try { 
-        BigDecimalParser.parse(charArray0, 500, 500);
-        fail("Expecting exception: NoClassDefFoundError");
-      
-      } catch(NoClassDefFoundError e) {
-         //
-         // ch/randelshofer/fastdoubleparser/JavaBigDecimalParser
-         //
-         verifyException("com.fasterxml.jackson.core.io.BigDecimalParser", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void parseInvalidStringThrowsNumberFormatException() throws Throwable {
+        try {
+            BigDecimalParser.parse("eA8ojpN");
+            fail("Expecting exception: NumberFormatException");
+        } catch (NumberFormatException e) {
+            verifyException("com.fasterxml.jackson.core.io.BigDecimalParser", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      BigDecimal bigDecimal0 = BigDecimalParser.parse(".1");
-      assertEquals((byte)0, bigDecimal0.byteValue());
-  }
+    @Test(timeout = 4000)
+    public void parseEmptyCharArrayWithLargeOffsetThrowsNoClassDefError() throws Throwable {
+        char[] input = new char[0];
+        try {
+            BigDecimalParser.parse(input, 500, 500);
+            fail("Expecting exception: NoClassDefFoundError");
+        } catch (NoClassDefFoundError e) {
+            verifyException("com.fasterxml.jackson.core.io.BigDecimalParser", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      char[] charArray0 = new char[6];
-      // Undeclared exception!
-      try { 
-        BigDecimalParser.parseWithFastParser(charArray0, 1754, (-2552));
-        fail("Expecting exception: NoClassDefFoundError");
-      
-      } catch(NoClassDefFoundError e) {
-         //
-         // ch/randelshofer/fastdoubleparser/JavaBigDecimalParser
-         //
-         verifyException("com.fasterxml.jackson.core.io.BigDecimalParser", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void parseWithFastParserNegativeLengthThrowsNoClassDefError() throws Throwable {
+        char[] input = new char[6];
+        try {
+            BigDecimalParser.parseWithFastParser(input, 1754, -2552);
+            fail("Expecting exception: NoClassDefFoundError");
+        } catch (NoClassDefFoundError e) {
+            verifyException("com.fasterxml.jackson.core.io.BigDecimalParser", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        BigDecimalParser.parseWithFastParser("");
-        fail("Expecting exception: NoClassDefFoundError");
-      
-      } catch(NoClassDefFoundError e) {
-         //
-         // ch/randelshofer/fastdoubleparser/JavaBigDecimalParser
-         //
-         verifyException("com.fasterxml.jackson.core.io.BigDecimalParser", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void parseWithFastParserEmptyStringThrowsNoClassDefError() throws Throwable {
+        try {
+            BigDecimalParser.parseWithFastParser("");
+            fail("Expecting exception: NoClassDefFoundError");
+        } catch (NoClassDefFoundError e) {
+            verifyException("com.fasterxml.jackson.core.io.BigDecimalParser", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      char[] charArray0 = new char[3];
-      // Undeclared exception!
-      try { 
-        BigDecimalParser.parse(charArray0);
-        fail("Expecting exception: NumberFormatException");
-      
-      } catch(NumberFormatException e) {
-         //
-         // Value \"\u0000\u0000\u0000\" can not be deserialized as `java.math.BigDecimal`, reason:  Not a valid number representation
-         //
-         verifyException("com.fasterxml.jackson.core.io.BigDecimalParser", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void parseNullCharArrayThrowsNumberFormatException() throws Throwable {
+        char[] input = new char[3]; // Defaults to null chars
+        try {
+            BigDecimalParser.parse(input);
+            fail("Expecting exception: NumberFormatException");
+        } catch (NumberFormatException e) {
+            verifyException("com.fasterxml.jackson.core.io.BigDecimalParser", e);
+        }
+    }
 }
