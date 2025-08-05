@@ -22,120 +22,121 @@ import org.jfree.data.xy.DefaultTableXYDataset;
 import org.jfree.data.xy.XYDataset;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class)
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true, 
-    useVFS = true, 
-    useVNET = true, 
-    resetStaticState = true, 
-    separateClassLoader = true
-)
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class SymbolicXYItemLabelGenerator_ESTest extends SymbolicXYItemLabelGenerator_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void generateToolTip_OnDynamicTimeSeriesWithInvalidData_ThrowsNullPointerException() throws Throwable {
-        SymbolicXYItemLabelGenerator generator = new SymbolicXYItemLabelGenerator();
-        DynamicTimeSeriesCollection dataset = new DynamicTimeSeriesCollection(6, 6);
-        float[] data = new float[5];
-        dataset.appendData(data, 2, 0);
-        
-        try {
-            generator.generateToolTip(dataset, 1, 2);
-            fail("Expected NullPointerException due to incomplete dataset initialization");
-        } catch (NullPointerException e) {
-            // Verify correct exception type is thrown
-            verifyException("org.jfree.data.time.DynamicTimeSeriesCollection", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test0()  throws Throwable  {
+      SymbolicXYItemLabelGenerator symbolicXYItemLabelGenerator0 = new SymbolicXYItemLabelGenerator();
+      DynamicTimeSeriesCollection dynamicTimeSeriesCollection0 = new DynamicTimeSeriesCollection(6, 6);
+      float[] floatArray0 = new float[5];
+      dynamicTimeSeriesCollection0.appendData(floatArray0, 2, 0);
+      // Undeclared exception!
+      try { 
+        symbolicXYItemLabelGenerator0.generateToolTip(dynamicTimeSeriesCollection0, 1, 2);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.jfree.data.time.DynamicTimeSeriesCollection", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void generateToolTip_OnValidHighLowDataset_ReturnsCorrectString() throws Throwable {
-        SymbolicXYItemLabelGenerator generator = new SymbolicXYItemLabelGenerator();
-        MockDate date = new MockDate(102L);
-        SerialDate serialDate = SerialDate.createInstance((Date) date);
-        
-        Date[] dates = new Date[3];
-        dates[0] = date;
-        double[] values = new double[1]; // Defaults to 0.0
-        
-        DefaultHighLowDataset dataset = new DefaultHighLowDataset(
-            serialDate, dates, values, values, values, values, values
-        );
-        
-        String tooltip = generator.generateToolTip(dataset, 0, 0);
-        assertEquals("Tooltip should show X value from date and Y as 0.0", 
-                     "X: 102.0, Y: 0.0", tooltip);
-    }
+  @Test(timeout = 4000)
+  public void test1()  throws Throwable  {
+      SymbolicXYItemLabelGenerator symbolicXYItemLabelGenerator0 = new SymbolicXYItemLabelGenerator();
+      MockDate mockDate0 = new MockDate(102L);
+      SerialDate serialDate0 = SerialDate.createInstance((Date) mockDate0);
+      Date[] dateArray0 = new Date[3];
+      dateArray0[0] = (Date) mockDate0;
+      double[] doubleArray0 = new double[1];
+      DefaultHighLowDataset defaultHighLowDataset0 = new DefaultHighLowDataset(serialDate0, dateArray0, doubleArray0, doubleArray0, doubleArray0, doubleArray0, doubleArray0);
+      String string0 = symbolicXYItemLabelGenerator0.generateToolTip(defaultHighLowDataset0, 0, 0);
+      assertEquals("X: 102.0, Y: 0.0", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void generateToolTip_WithOutOfBoundsIndex_ThrowsIndexOutOfBoundsException() throws Throwable {
-        SymbolicXYItemLabelGenerator generator = new SymbolicXYItemLabelGenerator();
-        DefaultTableXYDataset<ChronoLocalDate> dataset = new DefaultTableXYDataset<>();
-        
-        try {
-            generator.generateToolTip(dataset, 1970, 1970);
-            fail("Expected IndexOutOfBoundsException for invalid index");
-        } catch (IndexOutOfBoundsException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test2()  throws Throwable  {
+      SymbolicXYItemLabelGenerator symbolicXYItemLabelGenerator0 = new SymbolicXYItemLabelGenerator();
+      DefaultTableXYDataset<ChronoLocalDate> defaultTableXYDataset0 = new DefaultTableXYDataset<ChronoLocalDate>();
+      // Undeclared exception!
+      try { 
+        symbolicXYItemLabelGenerator0.generateToolTip(defaultTableXYDataset0, 1970, 1970);
+        fail("Expecting exception: IndexOutOfBoundsException");
+      
+      } catch(IndexOutOfBoundsException e) {
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void generateToolTip_WithNullDataset_ThrowsIllegalArgumentException() throws Throwable {
-        SymbolicXYItemLabelGenerator generator = new SymbolicXYItemLabelGenerator();
-        
-        try {
-            generator.generateToolTip(null, 44, 44);
-            fail("Expected IllegalArgumentException for null dataset");
-        } catch (IllegalArgumentException e) {
-            verifyException("org.jfree.chart.internal.Args", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test3()  throws Throwable  {
+      SymbolicXYItemLabelGenerator symbolicXYItemLabelGenerator0 = new SymbolicXYItemLabelGenerator();
+      // Undeclared exception!
+      try { 
+        symbolicXYItemLabelGenerator0.generateToolTip((XYDataset) null, 44, 44);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Null 'dataset' argument.
+         //
+         verifyException("org.jfree.chart.internal.Args", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void generateToolTip_WithInvalidSeriesIndex_ThrowsArrayIndexOutOfBoundsException() throws Throwable {
-        SymbolicXYItemLabelGenerator generator = new SymbolicXYItemLabelGenerator();
-        DynamicTimeSeriesCollection dataset = new DynamicTimeSeriesCollection(1970, 1970);
-        
-        try {
-            generator.generateToolTip(dataset, 1970, 2);
-            fail("Expected ArrayIndexOutOfBoundsException for invalid series index");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            verifyException("org.jfree.data.time.DynamicTimeSeriesCollection", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test4()  throws Throwable  {
+      SymbolicXYItemLabelGenerator symbolicXYItemLabelGenerator0 = new SymbolicXYItemLabelGenerator();
+      DynamicTimeSeriesCollection dynamicTimeSeriesCollection0 = new DynamicTimeSeriesCollection(1970, 1970);
+      // Undeclared exception!
+      try { 
+        symbolicXYItemLabelGenerator0.generateToolTip(dynamicTimeSeriesCollection0, 1970, 2);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // Index 1970 out of bounds for length 1970
+         //
+         verifyException("org.jfree.data.time.DynamicTimeSeriesCollection", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void equals_WithDifferentObject_ReturnsFalse() throws Throwable {
-        SymbolicXYItemLabelGenerator generator = new SymbolicXYItemLabelGenerator();
-        Object other = new Object();
-        assertFalse("Should not equal arbitrary object", generator.equals(other));
-    }
+  @Test(timeout = 4000)
+  public void test5()  throws Throwable  {
+      SymbolicXYItemLabelGenerator symbolicXYItemLabelGenerator0 = new SymbolicXYItemLabelGenerator();
+      Object object0 = new Object();
+      boolean boolean0 = symbolicXYItemLabelGenerator0.equals(object0);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void equals_WithSameInstance_ReturnsTrue() throws Throwable {
-        SymbolicXYItemLabelGenerator generator = new SymbolicXYItemLabelGenerator();
-        assertTrue("Should equal itself", generator.equals(generator));
-    }
+  @Test(timeout = 4000)
+  public void test6()  throws Throwable  {
+      SymbolicXYItemLabelGenerator symbolicXYItemLabelGenerator0 = new SymbolicXYItemLabelGenerator();
+      boolean boolean0 = symbolicXYItemLabelGenerator0.equals(symbolicXYItemLabelGenerator0);
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void hashCode_ReturnsConsistentValue() throws Throwable {
-        SymbolicXYItemLabelGenerator generator = new SymbolicXYItemLabelGenerator();
-        generator.hashCode(); // Verify no exception
-    }
+  @Test(timeout = 4000)
+  public void test7()  throws Throwable  {
+      SymbolicXYItemLabelGenerator symbolicXYItemLabelGenerator0 = new SymbolicXYItemLabelGenerator();
+      symbolicXYItemLabelGenerator0.hashCode();
+  }
 
-    @Test(timeout = 4000)
-    public void generateLabel_WithInvalidIndices_ReturnsNull() throws Throwable {
-        SymbolicXYItemLabelGenerator generator = new SymbolicXYItemLabelGenerator();
-        TimeSeriesCollection<ChronoLocalDate> dataset = new TimeSeriesCollection<>();
-        assertNull("Should return null for invalid indices", 
-                   generator.generateLabel(dataset, -1034, -4019));
-    }
+  @Test(timeout = 4000)
+  public void test8()  throws Throwable  {
+      SymbolicXYItemLabelGenerator symbolicXYItemLabelGenerator0 = new SymbolicXYItemLabelGenerator();
+      TimeSeriesCollection<ChronoLocalDate> timeSeriesCollection0 = new TimeSeriesCollection<ChronoLocalDate>();
+      String string0 = symbolicXYItemLabelGenerator0.generateLabel(timeSeriesCollection0, (-1034), (-4019));
+      assertNull(string0);
+  }
 
-    @Test(timeout = 4000)
-    public void equals_WithClone_ReturnsTrue() throws Throwable {
-        SymbolicXYItemLabelGenerator generator = new SymbolicXYItemLabelGenerator();
-        Object clone = generator.clone();
-        assertTrue("Should equal its clone", generator.equals(clone));
-    }
+  @Test(timeout = 4000)
+  public void test9()  throws Throwable  {
+      SymbolicXYItemLabelGenerator symbolicXYItemLabelGenerator0 = new SymbolicXYItemLabelGenerator();
+      Object object0 = symbolicXYItemLabelGenerator0.clone();
+      boolean boolean0 = symbolicXYItemLabelGenerator0.equals(object0);
+      assertTrue(boolean0);
+  }
 }
