@@ -1,3 +1,39 @@
+/* ======================================================
+ * JFreeChart : a chart library for the Java(tm) platform
+ * ======================================================
+ *
+ * (C) Copyright 2000-present, by David Gilbert and Contributors.
+ *
+ * Project Info:  https://www.jfree.org/jfreechart/index.html
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ *
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
+ *
+ * -----------------------
+ * ShortTextTitleTest.java
+ * -----------------------
+ * (C) Copyright 2008-present, by David Gilbert and Contributors.
+ *
+ * Original Author:  David Gilbert;
+ * Contributor(s):   -;
+ *
+ */
+
 package org.jfree.chart.title;
 
 import org.jfree.chart.TestUtils;
@@ -7,66 +43,58 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for the {@link ShortTextTitle} class.
+ * Tests for the {@link ShortTextTitle} class.
  */
 public class ShortTextTitleTest {
 
     /**
-     * Tests the {@code equals()} method to ensure it correctly distinguishes
-     * between different field values.
+     * Check that the equals() method distinguishes all fields.
      */
     @Test
-    public void testEqualsMethod() {
-        ShortTextTitle title1 = new ShortTextTitle("ABC");
-        ShortTextTitle title2 = new ShortTextTitle("ABC");
-        
-        // Initially, both titles should be equal
-        assertEquals(title1, title2);
+    public void testEquals() {
+        ShortTextTitle t1 = new ShortTextTitle("ABC");
+        ShortTextTitle t2 = new ShortTextTitle("ABC");
+        assertEquals(t1, t2);
 
-        // Change the text of title1 and verify they are no longer equal
-        title1.setText("Test 1");
-        assertNotEquals(title1, title2);
-
-        // Set the text of title2 to match title1 and verify they are equal again
-        title2.setText("Test 1");
-        assertEquals(title1, title2);
+        t1.setText("Test 1");
+        assertNotEquals(t1, t2);
+        t2.setText("Test 1");
+        assertEquals(t1, t2);
     }
 
     /**
-     * Tests that two equal objects have the same hash code.
+     * Two objects that are equal are required to return the same hashCode.
      */
     @Test
-    public void testHashCodeConsistency() {
-        ShortTextTitle title1 = new ShortTextTitle("ABC");
-        ShortTextTitle title2 = new ShortTextTitle("ABC");
-
-        // Verify that equal objects have the same hash code
-        assertEquals(title1, title2);
-        assertEquals(title1.hashCode(), title2.hashCode());
+    public void testHashcode() {
+        ShortTextTitle t1 = new ShortTextTitle("ABC");
+        ShortTextTitle t2 = new ShortTextTitle("ABC");
+        assertEquals(t1, t2);
+        int h1 = t1.hashCode();
+        int h2 = t2.hashCode();
+        assertEquals(h1, h2);
     }
 
     /**
-     * Tests that the {@code clone()} method creates a distinct but equal copy.
+     * Confirm that cloning works.
      */
     @Test
-    public void testCloningFunctionality() throws CloneNotSupportedException {
-        ShortTextTitle originalTitle = new ShortTextTitle("ABC");
-        ShortTextTitle clonedTitle = CloneUtils.clone(originalTitle);
-
-        // Verify that the cloned object is not the same instance but is equal
-        assertNotSame(originalTitle, clonedTitle);
-        assertEquals(originalTitle, clonedTitle);
+    public void testCloning() throws CloneNotSupportedException {
+        ShortTextTitle t1 = new ShortTextTitle("ABC");
+        ShortTextTitle t2 = CloneUtils.clone(t1);
+        assertNotSame(t1, t2);
+        assertSame(t1.getClass(), t2.getClass());
+        assertEquals(t1, t2);
     }
 
     /**
-     * Tests that serialization and deserialization maintain object equality.
+     * Serialize an instance, restore it, and check for equality.
      */
     @Test
-    public void testSerializationIntegrity() {
-        ShortTextTitle originalTitle = new ShortTextTitle("ABC");
-        ShortTextTitle deserializedTitle = TestUtils.serialised(originalTitle);
-
-        // Verify that the deserialized object is equal to the original
-        assertEquals(originalTitle, deserializedTitle);
+    public void testSerialization() {
+        ShortTextTitle t1 = new ShortTextTitle("ABC");
+        ShortTextTitle t2 = TestUtils.serialised(t1);
+        assertEquals(t1, t2);
     }
+
 }
