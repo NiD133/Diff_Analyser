@@ -31,65 +31,118 @@ import org.junit.jupiter.params.provider.MethodSource;
  */
 class PhoneticEngineTest {
 
-    private static final Integer TEN = Integer.valueOf(10);
+    private static final int MAX_PHONEMES_DEFAULT = 10;
 
-    public static Stream<Arguments> data() {
+    public static Stream<Arguments> validInputsProvider() {
         // @formatter:off
         return Stream.of(
-                Arguments.of("Renault", "rinD|rinDlt|rina|rinalt|rino|rinolt|rinu|rinult", NameType.GENERIC, RuleType.APPROX, Boolean.TRUE, TEN),
-                Arguments.of("Renault", "rYnDlt|rYnalt|rYnult|rinDlt|rinalt|rinolt|rinult", NameType.ASHKENAZI, RuleType.APPROX, Boolean.TRUE, TEN),
-                Arguments.of("Renault", "rinDlt", NameType.ASHKENAZI, RuleType.APPROX, Boolean.TRUE, Integer.valueOf(1)),
-                Arguments.of("Renault", "rinDlt", NameType.SEPHARDIC, RuleType.APPROX, Boolean.TRUE, TEN),
-                Arguments.of("SntJohn-Smith", "sntjonsmit", NameType.GENERIC, RuleType.EXACT, Boolean.TRUE, TEN),
-                Arguments.of("d'ortley", "(ortlaj|ortlej)-(dortlaj|dortlej)", NameType.GENERIC, RuleType.EXACT, Boolean.TRUE, TEN),
-                Arguments.of("van helsing", "(elSink|elsink|helSink|helsink|helzink|xelsink)-(banhelsink|fanhelsink|fanhelzink|vanhelsink|vanhelzink|vanjelsink)", NameType.GENERIC, RuleType.EXACT, Boolean.FALSE, TEN),
-                Arguments.of("Judenburg", "iudnbYrk|iudnbirk|iudnburk|xudnbirk|xudnburk|zudnbirk|zudnburk", NameType.GENERIC, RuleType.APPROX, Boolean.TRUE, TEN),
-                Arguments.of("Judenburg", "iudnbYrk|iudnbirk|iudnburk|xudnbirk|xudnburk|zudnbirk|zudnburk", NameType.GENERIC, RuleType.APPROX, Boolean.TRUE, Integer.MAX_VALUE)
-                );
+            // Test cases with valid inputs covering different configurations
+            Arguments.of("Renault", "rinD|rinDlt|rina|rinalt|rino|rinolt|rinu|rinult", 
+                         NameType.GENERIC, RuleType.APPROX, true, MAX_PHONEMES_DEFAULT),
+            
+            Arguments.of("Renault", "rYnDlt|rYnalt|rYnult|rinDlt|rinalt|rinolt|rinult", 
+                         NameType.ASHKENAZI, RuleType.APPROX, true, MAX_PHONEMES_DEFAULT),
+            
+            Arguments.of("Renault", "rinDlt", 
+                         NameType.ASHKENAZI, RuleType.APPROX, true, 1),
+            
+            Arguments.of("Renault", "rinDlt", 
+                         NameType.SEPHARDIC, RuleType.APPROX, true, MAX_PHONEMES_DEFAULT),
+            
+            Arguments.of("SntJohn-Smith", "sntjonsmit", 
+                         NameType.GENERIC, RuleType.EXACT, true, MAX_PHONEMES_DEFAULT),
+            
+            Arguments.of("d'ortley", "(ortlaj|ortlej)-(dortlaj|dortlej)", 
+                         NameType.GENERIC, RuleType.EXACT, true, MAX_PHONEMES_DEFAULT),
+            
+            Arguments.of("van helsing", "(elSink|elsink|helSink|helsink|helzink|xelsink)-(banhelsink|fanhelsink|fanhelzink|vanhelsink|vanhelzink|vanjelsink)", 
+                         NameType.GENERIC, RuleType.EXACT, false, MAX_PHONEMES_DEFAULT),
+            
+            Arguments.of("Judenburg", "iudnbYrk|iudnbirk|iudnburk|xudnbirk|xudnburk|zudnbirk|zudnburk", 
+                         NameType.GENERIC, RuleType.APPROX, true, MAX_PHONEMES_DEFAULT),
+            
+            Arguments.of("Judenburg", "iudnbYrk|iudnbirk|iudnburk|xudnbirk|xudnburk|zudnbirk|zudnburk", 
+                         NameType.GENERIC, RuleType.APPROX, true, Integer.MAX_VALUE)
+        );
         // @formatter:on
     }
 
-    public static Stream<Arguments> invalidData() {
+    public static Stream<Arguments> invalidInputsProvider() {
         // @formatter:off
         return Stream.of(
-                Arguments.of("bar", "bar|bor|var|vor", NameType.ASHKENAZI, RuleType.APPROX, Boolean.FALSE, TEN),
-                Arguments.of("al", "|al", NameType.SEPHARDIC, RuleType.APPROX, Boolean.FALSE, TEN),
-                Arguments.of("da", "da|di", NameType.GENERIC, RuleType.EXACT, Boolean.FALSE, TEN),
-                Arguments.of("'''", "", NameType.SEPHARDIC, RuleType.APPROX, Boolean.FALSE, TEN),
-                Arguments.of("'''", "", NameType.SEPHARDIC, RuleType.APPROX, Boolean.FALSE, Integer.MAX_VALUE)
-                );
+            // Test cases with edge-case/invalid inputs
+            Arguments.of("bar", "bar|bor|var|vor", 
+                         NameType.ASHKENAZI, RuleType.APPROX, false, MAX_PHONEMES_DEFAULT),
+            
+            Arguments.of("al", "|al", 
+                         NameType.SEPHARDIC, RuleType.APPROX, false, MAX_PHONEMES_DEFAULT),
+            
+            Arguments.of("da", "da|di", 
+                         NameType.GENERIC, RuleType.EXACT, false, MAX_PHONEMES_DEFAULT),
+            
+            Arguments.of("'''", "", 
+                         NameType.SEPHARDIC, RuleType.APPROX, false, MAX_PHONEMES_DEFAULT),
+            
+            Arguments.of("'''", "", 
+                         NameType.SEPHARDIC, RuleType.APPROX, false, Integer.MAX_VALUE)
+        );
         // @formatter:on
     }
 
-    // TODO Identify if there is a need to an assertTimeout(Duration.ofMillis(10000L) in some point, since this method was marked as @Test(timeout = 10000L)
     @ParameterizedTest
-    @MethodSource("data")
-    void testEncode(final String name, final String phoneticExpected, final NameType nameType,
-                           final RuleType ruleType, final boolean concat, final int maxPhonemes) {
-        final PhoneticEngine engine = new PhoneticEngine(nameType, ruleType, concat, maxPhonemes);
+    @MethodSource("validInputsProvider")
+    void encode_ValidInputs_ProducesExpectedPhoneticRepresentation(
+        final String inputName,
+        final String expectedPhonetic,
+        final NameType nameType,
+        final RuleType ruleType,
+        final boolean shouldConcat,
+        final int maxPhonemes
+    ) {
+        final PhoneticEngine engine = new PhoneticEngine(nameType, ruleType, shouldConcat, maxPhonemes);
+        final String actualPhonetic = engine.encode(inputName);
 
-        final String phoneticActual = engine.encode(name);
+        assertEquals(expectedPhonetic, actualPhonetic, 
+            "Phonetic representation mismatch for input: " + inputName);
+        
+        assertPhonemeCountWithinLimit(actualPhonetic, shouldConcat, maxPhonemes);
+    }
 
-        assertEquals(phoneticExpected, phoneticActual, "phoneme incorrect");
+    @ParameterizedTest
+    @MethodSource("invalidInputsProvider")
+    void encode_InvalidInputs_ProducesExpectedPhoneticRepresentation(
+        final String inputName,
+        final String expectedPhonetic,
+        final NameType nameType,
+        final RuleType ruleType,
+        final boolean shouldConcat,
+        final int maxPhonemes
+    ) {
+        final PhoneticEngine engine = new PhoneticEngine(nameType, ruleType, shouldConcat, maxPhonemes);
+        final String actualPhonetic = engine.encode(inputName);
 
-        if (concat) {
-            final String[] split = phoneticActual.split("\\|");
-            assertTrue(split.length <= maxPhonemes);
+        assertEquals(expectedPhonetic, actualPhonetic,
+            "Phonetic representation mismatch for invalid input: " + inputName);
+    }
+
+    /**
+     * Helper method to verify phoneme count doesn't exceed max limit
+     */
+    private void assertPhonemeCountWithinLimit(
+        final String phoneticResult, 
+        final boolean shouldConcat, 
+        final int maxPhonemes
+    ) {
+        if (shouldConcat) {
+            final String[] phonemes = phoneticResult.split("\\|");
+            assertTrue(phonemes.length <= maxPhonemes,
+                "Phoneme count (" + phonemes.length + ") exceeds max (" + maxPhonemes + ")");
         } else {
-            final String[] words = phoneticActual.split("-");
-            for (final String word : words) {
-                final String[] split = word.split("\\|");
-                assertTrue(split.length <= maxPhonemes);
+            for (final String word : phoneticResult.split("-")) {
+                final String[] phonemes = word.split("\\|");
+                assertTrue(phonemes.length <= maxPhonemes,
+                    "Word phoneme count (" + phonemes.length + ") exceeds max (" + maxPhonemes + ")");
             }
         }
-    }
-
-    @ParameterizedTest
-    @MethodSource("invalidData")
-    void testInvalidEncode(final String input, final String phoneticExpected, final NameType nameType,
-                                  final RuleType ruleType, final boolean concat, final int maxPhonemes) {
-        final PhoneticEngine engine = new PhoneticEngine(nameType, ruleType, concat, maxPhonemes);
-
-        assertEquals(engine.encode(input), phoneticExpected);
     }
 }
