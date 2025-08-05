@@ -55,90 +55,46 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-/**
- * Test suite for verifying PDF image handling in iText.
- */
 public class PdfImageTest {
+    private static final String target = "./target/com/itextpdf/test/pdf/PdfImageTest/";
+    private static final String source = "./src/test/resources/com/itextpdf/text/pdf/PdfImageTest/";
 
-    private static final String TARGET_DIRECTORY = "./target/com/itextpdf/test/pdf/PdfImageTest/";
-    private static final String SOURCE_DIRECTORY = "./src/test/resources/com/itextpdf/text/pdf/PdfImageTest/";
-
-    /**
-     * Sets up the test environment by creating necessary directories.
-     */
     @BeforeClass
     public static void setUp() {
-        new File(TARGET_DIRECTORY).mkdirs();
+        new File(target).mkdirs();
     }
 
-    /**
-     * Test for verifying PNG images with a color profile.
-     */
     @Test
-    public void testPngColorProfile() throws DocumentException, InterruptedException, IOException {
-        verifyImageProcessing("pngColorProfileImage.pdf", "test_icc.png");
+    public void pngColorProfileTest() throws DocumentException, InterruptedException, IOException {
+        simpleImageTest("pngColorProfileImage.pdf", "test_icc.png");
     }
 
-    /**
-     * Test for verifying PNG images with a color profile and palette.
-     */
     @Test
-    public void testPngColorProfilePalette() throws DocumentException, InterruptedException, IOException {
-        verifyImageProcessing("pngColorProfilePalletImage.pdf", "test_icc_pallet.png");
+    public void pngColorProfilePalletTest() throws DocumentException, InterruptedException, IOException {
+        simpleImageTest("pngColorProfilePalletImage.pdf", "test_icc_pallet.png");
     }
 
-    /**
-     * Test for verifying PNG images with an incorrect color profile.
-     */
     @Test
-    public void testPngIncorrectColorProfile() throws DocumentException, InterruptedException, IOException {
-        verifyImageProcessing("pngIncorrectProfileImage.pdf", "test_incorrect_icc.png");
+    public void pngIncorrectColorProfileTest() throws DocumentException, InterruptedException, IOException {
+        simpleImageTest("pngIncorrectProfileImage.pdf", "test_incorrect_icc.png");
     }
 
-    /**
-     * Helper method to perform image processing and comparison.
-     *
-     * @param outputFileName Name of the output PDF file.
-     * @param imageFileName  Name of the image file to be processed.
-     */
-    private void verifyImageProcessing(String outputFileName, String imageFileName) throws IOException, DocumentException, InterruptedException {
-        String outputPath = TARGET_DIRECTORY + outputFileName;
-        String comparisonPath = SOURCE_DIRECTORY + "cmp_" + outputFileName;
-        String imagePath = SOURCE_DIRECTORY + imageFileName;
-        String diffPrefix = "diff_" + outputFileName + "_";
+    private void simpleImageTest(String fileName, String imageName) throws IOException, DocumentException, InterruptedException {
+        String outPath = target + fileName;
+        String cmpPath = source + "cmp_" + fileName;
+        String imgPath = source + imageName;
+        String diff = "diff_" + fileName + "_";
 
-        createPdfWithImage(outputPath, imagePath);
-        comparePdfWithExpected(outputPath, comparisonPath, diffPrefix);
-    }
-
-    /**
-     * Creates a PDF document with the specified image.
-     *
-     * @param outputPath Path where the PDF will be saved.
-     * @param imagePath  Path of the image to be added to the PDF.
-     */
-    private void createPdfWithImage(String outputPath, String imagePath) throws DocumentException, IOException {
         Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(outputPath));
+        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(outPath));
 
         document.open();
-        Image image = Image.getInstance(imagePath);
+        Image image = Image.getInstance(imgPath);
         image.scaleToFit(new Rectangle(document.left(), document.bottom(), document.right(), document.top()));
         document.add(image);
         document.close();
         writer.close();
-    }
 
-    /**
-     * Compares the generated PDF with the expected PDF.
-     *
-     * @param outputPath      Path of the generated PDF.
-     * @param comparisonPath  Path of the expected PDF.
-     * @param diffPrefix      Prefix for the diff file.
-     */
-    private void comparePdfWithExpected(String outputPath, String comparisonPath, String diffPrefix) throws IOException, InterruptedException {
-        CompareTool compareTool = new CompareTool();
-        String errorMessage = compareTool.compareByContent(outputPath, comparisonPath, TARGET_DIRECTORY, diffPrefix);
-        Assert.assertNull("PDF content does not match expected output.", errorMessage);
+        Assert.assertNull(new CompareTool().compareByContent(outPath, cmpPath, target, diff));
     }
 }
