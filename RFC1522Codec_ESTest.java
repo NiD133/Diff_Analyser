@@ -19,260 +19,244 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-/**
- * Test suite for RFC1522Codec functionality using BCodec and QCodec implementations.
- * Tests cover encoding/decoding operations, null handling, error conditions, and RFC 1522 compliance.
- */
-@RunWith(EvoRunner.class) 
-@EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class RFC1522Codec_ESTest extends RFC1522Codec_ESTest_scaffolding {
 
-  // ========== NULL INPUT HANDLING TESTS ==========
-  
   @Test(timeout = 4000)
-  public void testEncodeText_WithNullInput_ReturnsNull() throws Throwable {
-      QCodec qCodec = new QCodec();
-      Charset defaultCharset = Charset.defaultCharset();
-      
-      String result = qCodec.encodeText(null, defaultCharset);
-      
-      assertNull("Encoding null text should return null", result);
+  public void test00()  throws Throwable  {
+      QCodec qCodec0 = new QCodec();
+      Charset charset0 = Charset.defaultCharset();
+      String string0 = qCodec0.encodeText((String) null, charset0);
+      assertNull(string0);
   }
 
   @Test(timeout = 4000)
-  public void testEncodeText_WithNullInputAndStringCharset_ReturnsNull() throws Throwable {
-      BCodec bCodec = new BCodec();
-      
-      String result = bCodec.encodeText(null, "RFC 1522 violation: malformed encoded content");
-      
-      assertNull("Encoding null text should return null", result);
+  public void test01()  throws Throwable  {
+      QCodec qCodec0 = new QCodec();
+      Charset charset0 = qCodec0.getCharset();
+      CodecPolicy codecPolicy0 = CodecPolicy.STRICT;
+      BCodec bCodec0 = new BCodec(charset0, codecPolicy0);
+      String string0 = bCodec0.encodeText("=?=?=?UTF-8?Q?Q?=", charset0);
+      assertNotNull(string0);
+      assertEquals("=?UTF-8?B?PT89Pz0/VVRGLTg/UT9RPz0=?=", string0);
   }
 
   @Test(timeout = 4000)
-  public void testDecodeText_WithNullInput_ReturnsNull() throws Throwable {
-      QCodec qCodec = new QCodec();
-      
-      String result = qCodec.decodeText(null);
-      
-      assertNull("Decoding null text should return null", result);
-  }
-
-  // ========== SUCCESSFUL ENCODING/DECODING TESTS ==========
-  
-  @Test(timeout = 4000)
-  public void testEncodeText_WithValidInput_ReturnsEncodedString() throws Throwable {
-      QCodec qCodec = new QCodec();
-      Charset charset = qCodec.getCharset();
-      CodecPolicy strictPolicy = CodecPolicy.STRICT;
-      BCodec bCodec = new BCodec(charset, strictPolicy);
-      
-      String textToEncode = "=?=?=?UTF-8?Q?Q?=";
-      String result = bCodec.encodeText(textToEncode, charset);
-      
-      assertNotNull("Encoded result should not be null", result);
-      assertEquals("Encoded text should match expected RFC 1522 format", 
-                   "=?UTF-8?B?PT85Pz0/VVRGLTg/UT9RPz0=?=", result);
+  public void test02()  throws Throwable  {
+      BCodec bCodec0 = new BCodec();
+      String string0 = bCodec0.encodeText((String) null, "RFC 1522 violation: malformed encoded content");
+      assertNull(string0);
   }
 
   @Test(timeout = 4000)
-  public void testEncodeText_WithSimpleString_ReturnsCorrectEncoding() throws Throwable {
-      BCodec bCodec = new BCodec();
-      String simpleText = "@~_=I";
-      
-      String result = bCodec.encodeText(simpleText, "UTF-8");
-      
-      assertNotNull("Encoded result should not be null", result);
-      assertEquals("Simple text should be correctly encoded", 
-                   "=?UTF-8?B?QH5fPUk=?=", result);
+  public void test03()  throws Throwable  {
+      QCodec qCodec0 = new QCodec();
+      String string0 = qCodec0.decodeText((String) null);
+      assertNull(string0);
   }
 
   @Test(timeout = 4000)
-  public void testDecodeText_WithValidEncodedString_ReturnsDecodedText() throws Throwable {
-      QCodec qCodec = new QCodec();
-      Charset charset = qCodec.getCharset();
-      CodecPolicy strictPolicy = CodecPolicy.STRICT;
-      BCodec bCodec = new BCodec(charset, strictPolicy);
-      
-      String encodedText = "=?UTF-8?B?PT9eLT89Pz0=?=";
-      String result = bCodec.decodeText(encodedText);
-      
-      assertEquals("Decoded text should match original", "=?^-?=?=", result);
+  public void test04()  throws Throwable  {
+      QCodec qCodec0 = new QCodec();
+      Charset charset0 = qCodec0.getCharset();
+      CodecPolicy codecPolicy0 = CodecPolicy.STRICT;
+      BCodec bCodec0 = new BCodec(charset0, codecPolicy0);
+      String string0 = bCodec0.decodeText("=?UTF-8?B?PT9eLT89Pz0=?=");
+      assertEquals("=?^-?=?=", string0);
   }
 
   @Test(timeout = 4000)
-  public void testDecodeText_WithEmptyEncodedContent_ReturnsEmptyString() throws Throwable {
-      BCodec bCodec = new BCodec();
-      String encodedEmptyText = "=?UTF-8?B??=";
-      
-      String result = bCodec.decodeText(encodedEmptyText);
-      
-      assertEquals("Empty encoded content should decode to empty string", "", result);
+  public void test05()  throws Throwable  {
+      BCodec bCodec0 = new BCodec();
+      String string0 = bCodec0.decodeText("=?UTF-8?B??=");
+      assertEquals("", string0);
   }
 
-  // ========== CHARSET ERROR HANDLING TESTS ==========
-  
   @Test(timeout = 4000)
-  public void testEncodeText_WithNullCharset_ThrowsNullPointerException() throws Throwable {
-      QCodec qCodec = new QCodec();
-      
+  public void test06()  throws Throwable  {
+      QCodec qCodec0 = new QCodec();
+      // Undeclared exception!
       try { 
-        qCodec.encodeText("{i", (Charset) null);
-        fail("Should throw NullPointerException for null charset");
+        qCodec0.encodeText("{i", (Charset) null);
+        fail("Expecting exception: NullPointerException");
+      
       } catch(NullPointerException e) {
-        // Expected exception
       }
   }
 
   @Test(timeout = 4000)
-  public void testEncodeText_WithUnsupportedCharsetName_ThrowsUnsupportedCharsetException() throws Throwable {
-      BCodec bCodec = new BCodec();
-      String invalidCharsetName = "org.apache.commons.codec.net.RFC1522Codec";
-      
+  public void test07()  throws Throwable  {
+      BCodec bCodec0 = new BCodec();
+      // Undeclared exception!
       try { 
-        bCodec.encodeText("test text", invalidCharsetName);
-        fail("Should throw UnsupportedCharsetException for invalid charset name");
+        bCodec0.encodeText("org.apache.commons.codec.net.RFC1522Codec", "org.apache.commons.codec.net.RFC1522Codec");
+        fail("Expecting exception: UnsupportedCharsetException");
+      
       } catch(UnsupportedCharsetException e) {
-        verifyException("java.nio.charset.Charset", e);
+         //
+         // org.apache.commons.codec.net.RFC1522Codec
+         //
+         verifyException("java.nio.charset.Charset", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void testEncodeText_WithIllegalCharsetName_ThrowsIllegalCharsetNameException() throws Throwable {
-      BCodec bCodec = new BCodec();
-      String illegalCharsetName = "This codec cannot decode ";
-      
+  public void test08()  throws Throwable  {
+      BCodec bCodec0 = new BCodec();
+      // Undeclared exception!
       try { 
-        bCodec.encodeText("test text", illegalCharsetName);
-        fail("Should throw IllegalCharsetNameException for illegal charset name");
+        bCodec0.encodeText("This codec cannot decode ", "This codec cannot decode ");
+        fail("Expecting exception: IllegalCharsetNameException");
+      
       } catch(IllegalCharsetNameException e) {
-        verifyException("java.nio.charset.Charset", e);
+         //
+         // This codec cannot decode 
+         //
+         verifyException("java.nio.charset.Charset", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void testEncodeText_WithNullCharsetName_ThrowsIllegalArgumentException() throws Throwable {
-      BCodec bCodec = new BCodec();
-      
+  public void test09()  throws Throwable  {
+      BCodec bCodec0 = new BCodec();
+      // Undeclared exception!
       try { 
-        bCodec.encodeText("0T5`BTkU*|f-hr", (String) null);
-        fail("Should throw IllegalArgumentException for null charset name");
+        bCodec0.encodeText("0T5`BTkU*|f-hr", (String) null);
+        fail("Expecting exception: IllegalArgumentException");
+      
       } catch(IllegalArgumentException e) {
-        // Expected exception
+         //
+         // Null charset name
+         //
+         verifyException("java.nio.charset.Charset", e);
       }
   }
 
-  // ========== RFC 1522 VIOLATION TESTS ==========
-  
   @Test(timeout = 4000)
-  public void testDecodeText_WithMalformedInput_ThrowsStringIndexOutOfBoundsException() throws Throwable {
-      BCodec bCodec = new BCodec();
-      
+  public void test10()  throws Throwable  {
+      BCodec bCodec0 = new BCodec();
+      // Undeclared exception!
       try { 
-        bCodec.decodeText("=?=");
-        fail("Should throw exception for malformed RFC 1522 input");
+        bCodec0.decodeText("=?=");
+        fail("Expecting exception: StringIndexOutOfBoundsException");
+      
       } catch(StringIndexOutOfBoundsException e) {
-        // Expected exception for malformed input
       }
   }
 
   @Test(timeout = 4000)
-  public void testDecodeText_WithUnsupportedCharset_ThrowsUnsupportedEncodingException() throws Throwable {
-      BCodec bCodec = new BCodec();
-      
+  public void test11()  throws Throwable  {
+      BCodec bCodec0 = new BCodec();
       try { 
-        bCodec.decodeText("=?TF-?B??=?=");
-        fail("Should throw UnsupportedEncodingException for unsupported charset");
+        bCodec0.decodeText("=?TF-?B??=?=");
+        fail("Expecting exception: UnsupportedEncodingException");
+      
       } catch(UnsupportedEncodingException e) {
-        // Expected exception
       }
   }
 
   @Test(timeout = 4000)
-  public void testDecodeText_WithWrongEncodingType_ThrowsException() throws Throwable {
-      BCodec bCodec = new BCodec();
-      
+  public void test12()  throws Throwable  {
+      BCodec bCodec0 = new BCodec();
+      String string0 = bCodec0.encodeText("@~_=I", "UTF-8");
+      assertNotNull(string0);
+      assertEquals("=?UTF-8?B?QH5fPUk=?=", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      BCodec bCodec0 = new BCodec();
       try { 
-        bCodec.decodeText("=?UTF-8?Q?Q?=?=");
-        fail("BCodec should not be able to decode Q-encoded content");
+        bCodec0.decodeText("=?UTF-8?Q?Q?=?=");
+        fail("Expecting exception: Exception");
+      
       } catch(Exception e) {
-        assertEquals("Should indicate codec mismatch", 
-                     "This codec cannot decode Q encoded content", e.getMessage());
+         //
+         // This codec cannot decode Q encoded content
+         //
+         verifyException("org.apache.commons.codec.net.RFC1522Codec", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void testDecodeText_WithMissingEncodingToken_ThrowsException() throws Throwable {
-      BCodec bCodec = new BCodec();
-      
+  public void test14()  throws Throwable  {
+      BCodec bCodec0 = new BCodec();
       try { 
-        bCodec.decodeText("=?=?SRq9'.C?=");
-        fail("Should throw exception when encoding token is missing");
+        bCodec0.decodeText("=?=?SRq9'.C?=");
+        fail("Expecting exception: Exception");
+      
       } catch(Exception e) {
-        assertEquals("Should indicate missing encoding token", 
-                     "RFC 1522 violation: encoding token not found", e.getMessage());
+         //
+         // RFC 1522 violation: encoding token not found
+         //
+         verifyException("org.apache.commons.codec.net.RFC1522Codec", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void testDecodeText_WithMissingCharset_ThrowsException() throws Throwable {
-      BCodec bCodec = new BCodec();
-      
+  public void test15()  throws Throwable  {
+      BCodec bCodec0 = new BCodec();
       try { 
-        bCodec.decodeText("=??-?=");
-        fail("Should throw exception when charset is not specified");
+        bCodec0.decodeText("=??-?=");
+        fail("Expecting exception: Exception");
+      
       } catch(Exception e) {
-        assertEquals("Should indicate missing charset", 
-                     "RFC 1522 violation: charset not specified", e.getMessage());
+         //
+         // RFC 1522 violation: charset not specified
+         //
+         verifyException("org.apache.commons.codec.net.RFC1522Codec", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void testDecodeText_WithMissingCharsetToken_ThrowsException() throws Throwable {
-      BCodec bCodec = new BCodec();
-      
+  public void test16()  throws Throwable  {
+      BCodec bCodec0 = new BCodec();
       try { 
-        bCodec.decodeText("=?^-?=");
-        fail("Should throw exception when charset token is not found");
+        bCodec0.decodeText("=?^-?=");
+        fail("Expecting exception: Exception");
+      
       } catch(Exception e) {
-        assertEquals("Should indicate missing charset token", 
-                     "RFC 1522 violation: charset token not found", e.getMessage());
+         //
+         // RFC 1522 violation: charset token not found
+         //
+         verifyException("org.apache.commons.codec.net.RFC1522Codec", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void testDecodeText_WithMalformedEncodedContent_ThrowsException() throws Throwable {
-      BCodec bCodec = new BCodec();
-      
+  public void test17()  throws Throwable  {
+      BCodec bCodec0 = new BCodec();
       try { 
-        bCodec.decodeText("=?=?=?ZCg05nk5fYK>>");
-        fail("Should throw exception for malformed encoded content");
+        bCodec0.decodeText("=?=?=?ZCg05nk5fYK>>");
+        fail("Expecting exception: Exception");
+      
       } catch(Exception e) {
-        assertEquals("Should indicate malformed content", 
-                     "RFC 1522 violation: malformed encoded content", e.getMessage());
+         //
+         // RFC 1522 violation: malformed encoded content
+         //
+         verifyException("org.apache.commons.codec.net.RFC1522Codec", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void testDecodeText_WithEmptyString_ThrowsException() throws Throwable {
-      BCodec bCodec = new BCodec();
-      
+  public void test18()  throws Throwable  {
+      BCodec bCodec0 = new BCodec();
       try { 
-        bCodec.decodeText("");
-        fail("Should throw exception for empty input string");
+        bCodec0.decodeText("");
+        fail("Expecting exception: Exception");
+      
       } catch(Exception e) {
-        assertEquals("Should indicate malformed content for empty string", 
-                     "RFC 1522 violation: malformed encoded content", e.getMessage());
+         //
+         // RFC 1522 violation: malformed encoded content
+         //
+         verifyException("org.apache.commons.codec.net.RFC1522Codec", e);
       }
   }
 
-  // ========== UTILITY METHOD TESTS ==========
-  
   @Test(timeout = 4000)
-  public void testGetDefaultCharset_ReturnsUTF8() throws Throwable {
-      BCodec bCodec = new BCodec();
-      
-      String defaultCharset = bCodec.getDefaultCharset();
-      
-      assertEquals("Default charset should be UTF-8", "UTF-8", defaultCharset);
+  public void test19()  throws Throwable  {
+      BCodec bCodec0 = new BCodec();
+      String string0 = bCodec0.getDefaultCharset();
+      assertEquals("UTF-8", string0);
   }
 }
