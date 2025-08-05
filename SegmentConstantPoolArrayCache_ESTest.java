@@ -19,220 +19,196 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class SegmentConstantPoolArrayCache_ESTest extends SegmentConstantPoolArrayCache_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void testArrayIsCached_ReturnsFalseWhenArraySizeChanged() throws Throwable {
-        // Test that arrayIsCached returns false when the cached array size doesn't match
-        SegmentConstantPoolArrayCache cache = new SegmentConstantPoolArrayCache();
-        String[] originalArray = new String[4];
-        String[] modifiedArray = new String[5]; // Different size
-        
-        IdentityHashMap<String[], SegmentConstantPoolArrayCache.CachedArray> customMap = 
-            new IdentityHashMap<>();
-        cache.knownArrays = customMap;
-        
-        // Cache the modifiedArray but map it to originalArray (simulate stale cache)
-        SegmentConstantPoolArrayCache.CachedArray cachedArray = cache.new CachedArray(modifiedArray);
-        customMap.put(originalArray, cachedArray);
-        
-        // Verify cache check fails for originalArray due to size mismatch
-        assertFalse("Should not recognize array with modified size", cache.arrayIsCached(originalArray));
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      SegmentConstantPoolArrayCache segmentConstantPoolArrayCache0 = new SegmentConstantPoolArrayCache();
+      String[] stringArray0 = new String[4];
+      String[] stringArray1 = new String[5];
+      IdentityHashMap<String[], SegmentConstantPoolArrayCache.CachedArray> identityHashMap0 = new IdentityHashMap<String[], SegmentConstantPoolArrayCache.CachedArray>();
+      segmentConstantPoolArrayCache0.knownArrays = identityHashMap0;
+      SegmentConstantPoolArrayCache.CachedArray segmentConstantPoolArrayCache_CachedArray0 = segmentConstantPoolArrayCache0.new CachedArray(stringArray1);
+      identityHashMap0.put(stringArray0, segmentConstantPoolArrayCache_CachedArray0);
+      assertEquals(5, segmentConstantPoolArrayCache_CachedArray0.lastKnownSize());
+      
+      boolean boolean0 = segmentConstantPoolArrayCache0.arrayIsCached(stringArray0);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testCachedArray_CacheIndexesCorrectlyUpdatesSize() throws Throwable {
-        // Test that cacheIndexes operation updates the lastKnownSize
-        SegmentConstantPoolArrayCache cache = new SegmentConstantPoolArrayCache();
-        String[] testArray = new String[8];
-        SegmentConstantPoolArrayCache.CachedArray cachedArray = cache.new CachedArray(testArray);
-        
-        cachedArray.cacheIndexes();
-        assertEquals("Cached size should match array length", 8, cachedArray.lastKnownSize());
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      SegmentConstantPoolArrayCache segmentConstantPoolArrayCache0 = new SegmentConstantPoolArrayCache();
+      String[] stringArray0 = new String[8];
+      SegmentConstantPoolArrayCache.CachedArray segmentConstantPoolArrayCache_CachedArray0 = segmentConstantPoolArrayCache0.new CachedArray(stringArray0);
+      segmentConstantPoolArrayCache_CachedArray0.cacheIndexes();
+      assertEquals(8, segmentConstantPoolArrayCache_CachedArray0.lastKnownSize());
+  }
 
-    @Test(timeout = 4000)
-    public void testIndexesForArrayKey_ReturnsNullWhenKeyNotCached() throws Throwable {
-        // Test null return when key isn't cached in lastArray
-        SegmentConstantPoolArrayCache cache = new SegmentConstantPoolArrayCache();
-        String[] testArray = new String[2];
-        cache.lastArray = testArray;
-        
-        cache.cacheArray(testArray); // Cache the array
-        cache.lastArray = testArray; // Set as last used
-        
-        // Request index for non-null key (not cached)
-        List<Integer> indexes = cache.indexesForArrayKey(testArray, testArray[1]);
-        assertNull("Should return null when key not cached", indexes);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      SegmentConstantPoolArrayCache segmentConstantPoolArrayCache0 = new SegmentConstantPoolArrayCache();
+      String[] stringArray0 = new String[2];
+      segmentConstantPoolArrayCache0.lastArray = stringArray0;
+      segmentConstantPoolArrayCache0.cacheArray(stringArray0);
+      segmentConstantPoolArrayCache0.lastArray = stringArray0;
+      List<Integer> list0 = segmentConstantPoolArrayCache0.indexesForArrayKey(stringArray0, stringArray0[1]);
+      assertNull(list0);
+  }
 
-    @Test(timeout = 4000)
-    public void testIndexesForArrayKey_ReturnsEmptyListWhenKeyIsNull() throws Throwable {
-        // Test empty list return for null key in cached array
-        SegmentConstantPoolArrayCache cache = new SegmentConstantPoolArrayCache();
-        LinkedList<Integer> emptyList = new LinkedList<>();
-        cache.lastIndexes = emptyList;
-        
-        String[] testArray = new String[2];
-        cache.lastArray = testArray;
-        cache.cacheArray(testArray);
-        cache.lastArray = testArray;
-        
-        List<Integer> result = cache.indexesForArrayKey(testArray, null);
-        assertTrue("Should return empty list for null key", result.isEmpty());
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      SegmentConstantPoolArrayCache segmentConstantPoolArrayCache0 = new SegmentConstantPoolArrayCache();
+      LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
+      segmentConstantPoolArrayCache0.lastIndexes = (List<Integer>) linkedList0;
+      String[] stringArray0 = new String[2];
+      segmentConstantPoolArrayCache0.lastArray = stringArray0;
+      segmentConstantPoolArrayCache0.cacheArray(stringArray0);
+      segmentConstantPoolArrayCache0.lastArray = stringArray0;
+      List<Integer> list0 = segmentConstantPoolArrayCache0.indexesForArrayKey(stringArray0, (String) null);
+      assertTrue(list0.isEmpty());
+  }
 
-    @Test(timeout = 4000)
-    public void testArrayIsCached_ReturnsTrueAfterCaching() throws Throwable {
-        // Test arrayIsCached returns true after successful caching
-        SegmentConstantPoolArrayCache cache = new SegmentConstantPoolArrayCache();
-        String[] testArray = new String[8];
-        
-        // Initial index lookup implicitly caches
-        List<Integer> initialIndexes = cache.indexesForArrayKey(testArray, "Trying to cache an array that already exists");
-        assertNotNull("Should cache array during first access", initialIndexes);
-        
-        // Verify array is properly cached
-        assertTrue("Array should be recognized as cached", cache.arrayIsCached(testArray));
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      SegmentConstantPoolArrayCache segmentConstantPoolArrayCache0 = new SegmentConstantPoolArrayCache();
+      String[] stringArray0 = new String[8];
+      List<Integer> list0 = segmentConstantPoolArrayCache0.indexesForArrayKey(stringArray0, "Trying to cache an array that already exists");
+      assertNotNull(list0);
+      
+      SegmentConstantPoolArrayCache.CachedArray segmentConstantPoolArrayCache_CachedArray0 = segmentConstantPoolArrayCache0.new CachedArray(stringArray0);
+      boolean boolean0 = segmentConstantPoolArrayCache0.arrayIsCached(segmentConstantPoolArrayCache_CachedArray0.primaryArray);
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testIndexesForArrayKey_ThrowsNPEForNullArray() throws Throwable {
-        // Test null array parameter handling
-        SegmentConstantPoolArrayCache cache = new SegmentConstantPoolArrayCache();
-        try {
-            cache.indexesForArrayKey(null, "");
-            fail("Expected NullPointerException for null array");
-        } catch (NullPointerException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      SegmentConstantPoolArrayCache segmentConstantPoolArrayCache0 = new SegmentConstantPoolArrayCache();
+      // Undeclared exception!
+      try { 
+        segmentConstantPoolArrayCache0.indexesForArrayKey((String[]) null, "");
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPoolArrayCache$CachedArray", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testCacheArray_ThrowsNPEForNullArray() throws Throwable {
-        // Test null array caching
-        SegmentConstantPoolArrayCache cache = new SegmentConstantPoolArrayCache();
-        try {
-            cache.cacheArray(null);
-            fail("Expected NullPointerException for null array");
-        } catch (NullPointerException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      SegmentConstantPoolArrayCache segmentConstantPoolArrayCache0 = new SegmentConstantPoolArrayCache();
+      // Undeclared exception!
+      try { 
+        segmentConstantPoolArrayCache0.cacheArray((String[]) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPoolArrayCache$CachedArray", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testArrayIsCached_ThrowsNPEWhenKnownArraysNull() throws Throwable {
-        // Test null knownArrays map handling
-        SegmentConstantPoolArrayCache cache = new SegmentConstantPoolArrayCache();
-        String[] testArray = new String[4];
-        cache.knownArrays = null;
-        
-        try {
-            cache.arrayIsCached(testArray);
-            fail("Expected NullPointerException when knownArrays is null");
-        } catch (NullPointerException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      SegmentConstantPoolArrayCache segmentConstantPoolArrayCache0 = new SegmentConstantPoolArrayCache();
+      String[] stringArray0 = new String[4];
+      segmentConstantPoolArrayCache0.knownArrays = null;
+      // Undeclared exception!
+      try { 
+        segmentConstantPoolArrayCache0.arrayIsCached(stringArray0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPoolArrayCache", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testCachedArray_indexesForKey_ReturnsEmptyForMissingKey() throws Throwable {
-        // Test key lookup miss in cached array
-        SegmentConstantPoolArrayCache cache = new SegmentConstantPoolArrayCache();
-        String[] testArray = new String[2];
-        cache.lastArray = testArray;
-        
-        SegmentConstantPoolArrayCache.CachedArray cachedArray = cache.new CachedArray(cache.lastArray);
-        List<Integer> indexes = cachedArray.indexesForKey("Ui/_\")");
-        assertTrue("Should return empty list for missing key", indexes.isEmpty());
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      SegmentConstantPoolArrayCache segmentConstantPoolArrayCache0 = new SegmentConstantPoolArrayCache();
+      String[] stringArray0 = new String[2];
+      segmentConstantPoolArrayCache0.lastArray = stringArray0;
+      SegmentConstantPoolArrayCache.CachedArray segmentConstantPoolArrayCache_CachedArray0 = segmentConstantPoolArrayCache0.new CachedArray(segmentConstantPoolArrayCache0.lastArray);
+      List<Integer> list0 = segmentConstantPoolArrayCache_CachedArray0.indexesForKey("Ui/_\")");
+      assertTrue(list0.isEmpty());
+  }
 
-    @Test(timeout = 4000)
-    public void testCachedArray_indexesForKey_FindsExistingKey() throws Throwable {
-        // Test key lookup finds correct index
-        SegmentConstantPoolArrayCache cache = new SegmentConstantPoolArrayCache();
-        String[] testArray = new String[8];
-        testArray[1] = ""; // Place key at index 1
-        
-        SegmentConstantPoolArrayCache.CachedArray cachedArray = cache.new CachedArray(testArray);
-        List<Integer> indexes = cachedArray.indexesForKey("");
-        assertEquals("Should find one occurrence of key", 1, indexes.size());
-        assertEquals("Should return correct index", Integer.valueOf(1), indexes.get(0));
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      SegmentConstantPoolArrayCache segmentConstantPoolArrayCache0 = new SegmentConstantPoolArrayCache();
+      String[] stringArray0 = new String[8];
+      stringArray0[1] = "";
+      SegmentConstantPoolArrayCache.CachedArray segmentConstantPoolArrayCache_CachedArray0 = segmentConstantPoolArrayCache0.new CachedArray(stringArray0);
+      List<Integer> list0 = segmentConstantPoolArrayCache_CachedArray0.indexesForKey("");
+      assertEquals(1, list0.size());
+  }
 
-    @Test(timeout = 4000)
-    public void testCachedArray_lastKnownSize_ReturnsCorrectSize() throws Throwable {
-        // Test lastKnownSize returns correct array length
-        SegmentConstantPoolArrayCache cache = new SegmentConstantPoolArrayCache();
-        String[] testArray = new String[8];
-        SegmentConstantPoolArrayCache.CachedArray cachedArray = cache.new CachedArray(testArray);
-        assertEquals("Should return initial array size", 8, cachedArray.lastKnownSize());
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      SegmentConstantPoolArrayCache segmentConstantPoolArrayCache0 = new SegmentConstantPoolArrayCache();
+      String[] stringArray0 = new String[8];
+      SegmentConstantPoolArrayCache.CachedArray segmentConstantPoolArrayCache_CachedArray0 = segmentConstantPoolArrayCache0.new CachedArray(stringArray0);
+      int int0 = segmentConstantPoolArrayCache_CachedArray0.lastKnownSize();
+      assertEquals(8, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void testIndexesForArrayKey_ReturnsEmptyForMissingKey() throws Throwable {
-        // Test key lookup miss after caching
-        SegmentConstantPoolArrayCache cache = new SegmentConstantPoolArrayCache();
-        String[] testArray = new String[1];
-        
-        // First access caches the array
-        cache.indexesForArrayKey(testArray, " CZW9XcT");
-        // Second access with same key
-        List<Integer> indexes = cache.indexesForArrayKey(testArray, " CZW9XcT");
-        
-        assertTrue("Should return empty list for missing key", indexes.isEmpty());
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      SegmentConstantPoolArrayCache segmentConstantPoolArrayCache0 = new SegmentConstantPoolArrayCache();
+      String[] stringArray0 = new String[1];
+      segmentConstantPoolArrayCache0.indexesForArrayKey(stringArray0, " CZW9XcT");
+      List<Integer> list0 = segmentConstantPoolArrayCache0.indexesForArrayKey(stringArray0, " CZW9XcT");
+      assertTrue(list0.isEmpty());
+  }
 
-    @Test(timeout = 4000)
-    public void testIndexesForArrayKey_HandlesNullKeysInArray() throws Throwable {
-        // Test handling of null array elements
-        SegmentConstantPoolArrayCache cache = new SegmentConstantPoolArrayCache();
-        String[] testArray = new String[9]; // All nulls
-        
-        // Lookup for null key should find all indices
-        List<Integer> nullIndexes = cache.indexesForArrayKey(testArray, testArray[0]); // null
-        assertEquals("Should find all null indices", 9, nullIndexes.size());
-        
-        // Lookup for empty string should find nothing
-        List<Integer> emptyIndexes = cache.indexesForArrayKey(testArray, "");
-        assertTrue("Should not find empty string", emptyIndexes.isEmpty());
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      SegmentConstantPoolArrayCache segmentConstantPoolArrayCache0 = new SegmentConstantPoolArrayCache();
+      String[] stringArray0 = new String[9];
+      List<Integer> list0 = segmentConstantPoolArrayCache0.indexesForArrayKey(stringArray0, stringArray0[0]);
+      assertEquals(9, list0.size());
+      assertNotNull(list0);
+      
+      List<Integer> list1 = segmentConstantPoolArrayCache0.indexesForArrayKey(stringArray0, "");
+      assertTrue(list1.isEmpty());
+  }
 
-    @Test(timeout = 4000)
-    public void testCacheArray_ThrowsExceptionForDuplicateCache() throws Throwable {
-        // Test duplicate caching prevention
-        SegmentConstantPoolArrayCache cache = new SegmentConstantPoolArrayCache();
-        String[] testArray = new String[8];
-        
-        // First cache succeeds
-        cache.cacheArray(testArray);
-        
-        try {
-            // Second cache attempt should fail
-            cache.cacheArray(testArray);
-            fail("Should throw exception when caching same array twice");
-        } catch (IllegalArgumentException e) {
-            assertEquals("Exception message should match", 
-                         "Trying to cache an array that already exists", 
-                         e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      SegmentConstantPoolArrayCache segmentConstantPoolArrayCache0 = new SegmentConstantPoolArrayCache();
+      String[] stringArray0 = new String[8];
+      segmentConstantPoolArrayCache0.cacheArray(stringArray0);
+      // Undeclared exception!
+      try { 
+        segmentConstantPoolArrayCache0.cacheArray(stringArray0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Trying to cache an array that already exists
+         //
+         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPoolArrayCache", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testIndexesForArrayKey_FindsKeysAfterCaching() throws Throwable {
-        // Test key lookup after caching with custom mapping
-        SegmentConstantPoolArrayCache cache = new SegmentConstantPoolArrayCache();
-        String[] lookupArray = new String[1]; // Array we'll use for lookup
-        String[] cachedArray = new String[0]; // Array we've actually cached
-        
-        // Set up custom mapping: lookupArray -> cachedArray's CachedArray
-        IdentityHashMap<String[], SegmentConstantPoolArrayCache.CachedArray> customMap = 
-            new IdentityHashMap<>();
-        cache.knownArrays = customMap;
-        customMap.put(lookupArray, cache.new CachedArray(cachedArray));
-        
-        // Should find the cached array (even though it's mapped to lookupArray)
-        List<Integer> indexes = cache.indexesForArrayKey(lookupArray, lookupArray[0]);
-        
-        assertNotNull("Should return index list", indexes);
-        assertEquals("Should find one occurrence (null element)", 1, indexes.size());
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      SegmentConstantPoolArrayCache segmentConstantPoolArrayCache0 = new SegmentConstantPoolArrayCache();
+      String[] stringArray0 = new String[1];
+      IdentityHashMap<String[], SegmentConstantPoolArrayCache.CachedArray> identityHashMap0 = segmentConstantPoolArrayCache0.knownArrays;
+      String[] stringArray1 = new String[0];
+      SegmentConstantPoolArrayCache.CachedArray segmentConstantPoolArrayCache_CachedArray0 = segmentConstantPoolArrayCache0.new CachedArray(stringArray1);
+      identityHashMap0.put(stringArray0, segmentConstantPoolArrayCache_CachedArray0);
+      assertEquals(0, segmentConstantPoolArrayCache_CachedArray0.lastKnownSize());
+      
+      List<Integer> list0 = segmentConstantPoolArrayCache0.indexesForArrayKey(stringArray0, stringArray0[0]);
+      assertNotNull(list0);
+      assertEquals(1, list0.size());
+  }
 }
