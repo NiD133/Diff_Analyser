@@ -29,11 +29,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class SegmentUtilsTest {
 
-    private static final class MultipleMatches implements IMatcher {
+    /**
+     * Matcher implementation that checks if a value is divisible by a given number.
+     */
+    private static final class ModuloMatcher implements IMatcher {
 
         private final int divisor;
 
-        MultipleMatches(final int divisor) {
+        ModuloMatcher(final int divisor) {
             this.divisor = divisor;
         }
 
@@ -41,43 +44,101 @@ class SegmentUtilsTest {
         public boolean matches(final long value) {
             return value % divisor == 0;
         }
-
     }
 
-    public static final IMatcher even = new MultipleMatches(2);
-    public static final IMatcher five = new MultipleMatches(5);
+    private static final IMatcher EVEN_MATCHER = new ModuloMatcher(2);
+    private static final IMatcher FIVE_MATCHER = new ModuloMatcher(5);
 
     static Stream<Arguments> countArgs() {
-        return Stream.of(Arguments.of("()V", 0), Arguments.of("(D)V", 1), Arguments.of("([D)V", 1), Arguments.of("([[D)V", 1), Arguments.of("(DD)V", 2),
-                Arguments.of("(DDD)V", 3), Arguments.of("(Lblah/blah;D)V", 2), Arguments.of("(Lblah/blah;DLbLah;)V", 3));
+        return Stream.of(
+            Arguments.of("()V", 0),
+            Arguments.of("(D)V", 1),
+            Arguments.of("([D)V", 1),
+            Arguments.of("([[D)V", 1),
+            Arguments.of("(DD)V", 2),
+            Arguments.of("(DDD)V", 3),
+            Arguments.of("(Lblah/blah;D)V", 2),
+            Arguments.of("(Lblah/blah;DLbLah;)V", 3)
+        );
     }
 
     static Stream<Arguments> countInvokeInterfaceArgs() {
-        return Stream.of(Arguments.of("(Z)V", 1), Arguments.of("(D)V", 2), Arguments.of("(J)V", 2), Arguments.of("([D)V", 1), Arguments.of("([[D)V", 1),
-                Arguments.of("(DD)V", 4), Arguments.of("(Lblah/blah;D)V", 3), Arguments.of("(Lblah/blah;DLbLah;)V", 4),
-                Arguments.of("([Lblah/blah;DLbLah;)V", 4));
+        return Stream.of(
+            Arguments.of("(Z)V", 1),
+            Arguments.of("(D)V", 2),
+            Arguments.of("(J)V", 2),
+            Arguments.of("([D)V", 1),
+            Arguments.of("([[D)V", 1),
+            Arguments.of("(DD)V", 4),
+            Arguments.of("(Lblah/blah;D)V", 3),
+            Arguments.of("(Lblah/blah;DLbLah;)V", 4),
+            Arguments.of("([Lblah/blah;DLbLah;)V", 4)
+        );
     }
 
+    /**
+     * Tests countArgs with various method descriptors.
+     * 
+     * @param descriptor method descriptor string
+     * @param expectedArgsCount expected number of arguments
+     */
     @ParameterizedTest
     @MethodSource("countArgs")
     void testCountArgs(final String descriptor, final int expectedArgsCount) {
         assertEquals(expectedArgsCount, SegmentUtils.countArgs(descriptor));
     }
 
+    /**
+     * Tests countInvokeInterfaceArgs with various method descriptors.
+     * 
+     * @param descriptor method descriptor string
+     * @param expectedCount expected argument count
+     */
     @ParameterizedTest
     @MethodSource("countInvokeInterfaceArgs")
-    void testCountInvokeInterfaceArgs(final String descriptor, final int expectedCountInvokeInterfaceArgs) {
-        assertEquals(expectedCountInvokeInterfaceArgs, SegmentUtils.countInvokeInterfaceArgs(descriptor));
+    void testCountInvokeInterfaceArgs(final String descriptor, final int expectedCount) {
+        assertEquals(expectedCount, SegmentUtils.countInvokeInterfaceArgs(descriptor));
     }
 
+    /**
+     * Tests countMatches with a single array using the even matcher.
+     */
     @Test
-    void testMatches() {
-        final long[] oneToTen = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-        assertEquals(6, SegmentUtils.countMatches(new long[][] { oneToTen, new long[] { 5, 6, 7 } }, even));
-        assertEquals(5, SegmentUtils.countMatches(new long[][] { oneToTen }, even));
-        assertEquals(5, SegmentUtils.countMatches(oneToTen, even));
-        assertEquals(3, SegmentUtils.countMatches(new long[][] { oneToTen, new long[] { 5, 6, 7 } }, five));
-        assertEquals(2, SegmentUtils.countMatches(new long[][] { oneToTen }, five));
-        assertEquals(2, SegmentUtils.countMatches(oneToTen, five));
+    void testCountMatches_SingleArray_WithEvenMatcher() {
+        final long[] numbers = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        assertEquals(5, SegmentUtils.countMatches(numbers, EVEN_MATCHER));
+    }
+
+    /**
+     * Tests countMatches with a single array using the five matcher.
+     */
+    @Test
+    void testCountMatches_SingleArray_WithFiveMatcher() {
+        final long[] numbers = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        assertEquals(2, SegmentUtils.countMatches(numbers, FIVE_MATCHER));
+    }
+
+    /**
+     * Tests countMatches with multiple arrays using the even matcher.
+     */
+    @Test
+    void testCountMatches_MultipleArrays_WithEvenMatcher() {
+        final long[] firstArray = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        final long[] secondArray = {5, 6, 7};
+        final long[][] arrays = {firstArray, secondArray};
+        
+        assertEquals(6, SegmentUtils.countMatches(arrays, EVEN_MATCHER));
+    }
+
+    /**
+     * Tests countMatches with multiple arrays using the five matcher.
+     */
+    @Test
+    void testCountMatches_MultipleArrays_WithFiveMatcher() {
+        final long[] firstArray = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        final long[] secondArray = {5, 6, 7};
+        final long[][] arrays = {firstArray, secondArray};
+        
+        assertEquals(3, SegmentUtils.countMatches(arrays, FIVE_MATCHER));
     }
 }
