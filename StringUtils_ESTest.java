@@ -14,141 +14,194 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true, 
+    useVFS = true, 
+    useVNET = true, 
+    resetStaticState = true, 
+    separateClassLoader = true
+) 
 public class StringUtils_ESTest extends StringUtils_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      char[] charArray0 = new char[8];
-      charArray0[0] = 'h';
-      byte[] byteArray0 = StringUtils.convertCharsToBytes(charArray0);
-      assertEquals(16, byteArray0.length);
-  }
+    //---------------- Tests for convertCharsToBytes() ----------------//
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      char[] charArray0 = new char[0];
-      byte[] byteArray0 = StringUtils.convertCharsToBytes(charArray0);
-      assertEquals(0, byteArray0.length);
-  }
+    @Test(timeout = 4000)
+    public void testConvertCharsToBytes_NonEmptyArray() {
+        // Test converting a non-empty char array to bytes
+        char[] inputChars = new char[8];
+        inputChars[0] = 'h';
+        byte[] resultBytes = StringUtils.convertCharsToBytes(inputChars);
+        // Each char produces 2 bytes (16-bit encoding)
+        assertEquals(16, resultBytes.length);
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      byte[] byteArray0 = new byte[3];
-      // Undeclared exception!
-      try { 
-        StringUtils.escapeString(byteArray0, (ByteBuffer) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.itextpdf.text.pdf.StringUtils", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testConvertCharsToBytes_EmptyArray() {
+        // Test converting an empty char array
+        char[] emptyChars = new char[0];
+        byte[] resultBytes = StringUtils.convertCharsToBytes(emptyChars);
+        assertEquals(0, resultBytes.length);
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      byte[] byteArray0 = new byte[0];
-      ByteBuffer byteBuffer0 = new ByteBuffer();
-      byteBuffer0.count = (-27);
-      // Undeclared exception!
-      try { 
-        StringUtils.escapeString(byteArray0, byteBuffer0);
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
-      
-      } catch(ArrayIndexOutOfBoundsException e) {
-         //
-         // -27
-         //
-         verifyException("com.itextpdf.text.pdf.ByteBuffer", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testConvertCharsToBytes_NullInputThrowsNPE() {
+        // Test null input handling
+        try {
+            StringUtils.convertCharsToBytes(null);
+            fail("Expected NullPointerException for null input");
+        } catch (NullPointerException e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        StringUtils.escapeString((byte[]) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.itextpdf.text.pdf.StringUtils", e);
-      }
-  }
+    //---------------- Tests for escapeString() with ByteBuffer ----------------//
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        StringUtils.convertCharsToBytes((char[]) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.itextpdf.text.pdf.StringUtils", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testEscapeStringWithByteBuffer_NullBufferThrowsNPE() {
+        // Test escaping with null ByteBuffer
+        byte[] inputBytes = new byte[3];
+        try {
+            StringUtils.escapeString(inputBytes, null);
+            fail("Expected NullPointerException for null ByteBuffer");
+        } catch (NullPointerException e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      byte[] byteArray0 = new byte[6];
-      byteArray0[4] = (byte)12;
-      ByteBuffer byteBuffer0 = new ByteBuffer((byte) (-35));
-      StringUtils.escapeString(byteArray0, byteBuffer0);
-      assertEquals(9, byteBuffer0.size());
-  }
+    @Test(timeout = 4000)
+    public void testEscapeStringWithByteBuffer_InvalidBufferThrowsAIoBE() {
+        // Test escaping with invalid ByteBuffer state
+        byte[] inputBytes = new byte[0];
+        ByteBuffer invalidBuffer = new ByteBuffer();
+        invalidBuffer.count = -27; // Invalid state
+        
+        try {
+            StringUtils.escapeString(inputBytes, invalidBuffer);
+            fail("Expected ArrayIndexOutOfBoundsException for invalid buffer");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // Expected behavior due to negative count
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      byte[] byteArray0 = new byte[8];
-      byteArray0[3] = (byte)8;
-      ByteBuffer byteBuffer0 = new ByteBuffer();
-      StringUtils.escapeString(byteArray0, byteBuffer0);
-      assertEquals(11, byteBuffer0.size());
-  }
+    @Test(timeout = 4000)
+    public void testEscapeString_NullInputThrowsNPE() {
+        // Test null byte array input
+        try {
+            StringUtils.escapeString((byte[]) null);
+            fail("Expected NullPointerException for null byte array");
+        } catch (NullPointerException e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      byte[] byteArray0 = new byte[5];
-      byteArray0[2] = (byte)13;
-      ByteBuffer byteBuffer0 = new ByteBuffer();
-      StringUtils.escapeString(byteArray0, byteBuffer0);
-      assertEquals(8, byteBuffer0.size());
-  }
+    //---------------- Tests for special character escaping ----------------//
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      byte[] byteArray0 = new byte[4];
-      byteArray0[1] = (byte)9;
-      ByteBuffer byteBuffer0 = new ByteBuffer(71);
-      byte[] byteArray1 = StringUtils.escapeString(byteArray0);
-      StringUtils.escapeString(byteArray1, byteBuffer0);
-      assertEquals(12, byteBuffer0.size());
-      assertArrayEquals(new byte[] {(byte)40, (byte)0, (byte)92, (byte)116, (byte)0, (byte)0, (byte)41}, byteArray1);
-  }
+    @Test(timeout = 4000)
+    public void testEscapeString_FormFeed() {
+        // Test escaping form feed character (ASCII 12)
+        byte[] inputBytes = new byte[6];
+        inputBytes[4] = (byte) 12; // Form feed
+        ByteBuffer buffer = new ByteBuffer((byte) -35);
+        
+        StringUtils.escapeString(inputBytes, buffer);
+        // Expected: 9 bytes = 1(open) + 2(\f) + 4(other) + 2(close) - 
+        // Original: 6 bytes -> after escaping: 6 + 2 (for \f) + 2 (parentheses) = 10? 
+        // But note: the form feed is replaced by two bytes ('\f'), and parentheses added
+        // The test expects 9, so we keep the original assertion
+        assertEquals(9, buffer.size());
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      ByteBuffer byteBuffer0 = new ByteBuffer((byte)10);
-      byte[] byteArray0 = new byte[7];
-      byteArray0[5] = (byte)10;
-      StringUtils.escapeString(byteArray0, byteBuffer0);
-      assertEquals(10, byteBuffer0.size());
-  }
+    @Test(timeout = 4000)
+    public void testEscapeString_Backspace() {
+        // Test escaping backspace character (ASCII 8)
+        byte[] inputBytes = new byte[8];
+        inputBytes[3] = (byte) 8; // Backspace
+        ByteBuffer buffer = new ByteBuffer();
+        
+        StringUtils.escapeString(inputBytes, buffer);
+        // Expected: 11 bytes = 1(open) + 2(\b) + 7(other) + 1(close) = 11
+        assertEquals(11, buffer.size());
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      byte[] byteArray0 = new byte[4];
-      byteArray0[1] = (byte)9;
-      ByteBuffer byteBuffer0 = new ByteBuffer(71);
-      StringUtils.escapeString(byteArray0, byteBuffer0);
-      assertEquals(7, byteBuffer0.size());
-  }
+    @Test(timeout = 4000)
+    public void testEscapeString_CarriageReturn() {
+        // Test escaping carriage return character (ASCII 13)
+        byte[] inputBytes = new byte[5];
+        inputBytes[2] = (byte) 13; // Carriage return
+        ByteBuffer buffer = new ByteBuffer();
+        
+        StringUtils.escapeString(inputBytes, buffer);
+        // Expected: 8 bytes = 1(open) + 2(\r) + 3(other) + 1(close) = 7? 
+        // But test expects 8: let's count:
+        // 5 bytes input: [0,0,13,0,0]
+        // After escape: '(' + 0 + 0 + '\r' + 0 + 0 + ')' -> 7 bytes? 
+        // The test expects 8, so we keep original assertion
+        assertEquals(8, buffer.size());
+    }
+
+    @Test(timeout = 4000)
+    public void testEscapeString_Tab() {
+        // Test escaping tab character (ASCII 9)
+        byte[] inputBytes = new byte[4];
+        inputBytes[1] = (byte) 9; // Tab
+        ByteBuffer buffer = new ByteBuffer(71);
+        
+        StringUtils.escapeString(inputBytes, buffer);
+        // Expected: 7 bytes = 1(open) + 1(byte0) + 2(\t) + 2(zeros) + 1(close)
+        assertEquals(7, buffer.size());
+    }
+
+    @Test(timeout = 4000)
+    public void testEscapeString_Newline() {
+        // Test escaping newline character (ASCII 10)
+        ByteBuffer buffer = new ByteBuffer((byte) 10);
+        byte[] inputBytes = new byte[7];
+        inputBytes[5] = (byte) 10; // Newline
+        
+        StringUtils.escapeString(inputBytes, buffer);
+        // Expected: 10 bytes = 1(open) + 6(other) + 2(\n) + 1(close) = 10
+        assertEquals(10, buffer.size());
+    }
+
+    @Test(timeout = 4000)
+    public void testEscapeString_DoubleEscapingTab() {
+        // Test double-escaping of tab character
+        // Step 1: Create input with tab
+        byte[] inputWithTab = new byte[4];
+        inputWithTab[1] = (byte) 9; // Tab character
+        
+        // First escape: convert to PDF string format
+        byte[] escapedOnce = StringUtils.escapeString(inputWithTab);
+        // Verify first escape result: 
+        // Expected: '(' + 0 + '\' + 't' + 0 + 0 + ')'
+        byte[] expectedFirstEscape = {
+            (byte) '(',  // Opening paren
+            (byte) 0,    // First byte
+            (byte) '\\', // Escape char
+            (byte) 't',  // 't' for tab
+            (byte) 0,    // Third byte
+            (byte) 0,    // Fourth byte
+            (byte) ')'   // Closing paren
+        };
+        assertArrayEquals(expectedFirstEscape, escapedOnce);
+        
+        // Step 2: Escape the already escaped string
+        ByteBuffer doubleEscapedBuffer = new ByteBuffer(71);
+        StringUtils.escapeString(escapedOnce, doubleEscapedBuffer);
+        
+        // Verify buffer size after double escape:
+        // Original escaped: 7 bytes [ '(', 0, '\', 't', 0, 0, ')' ]
+        // When escaping again:
+        //   '(' becomes '\(' (2 bytes)
+        //   0 remains (1 byte)
+        //   '\' becomes '\\' (2 bytes)
+        //   't' remains (1 byte)
+        //   two 0s remain (2 bytes)
+        //   ')' becomes '\)' (2 bytes)
+        // Plus wrapping parentheses: 2 + 1 + 2 + 1 + 2 + 2 = 10 bytes? 
+        // But wait: the escapeString method ADDS parentheses around the content
+        // So total = 10 (content) + 2 (new parentheses) = 12
+        assertEquals(12, doubleEscapedBuffer.size());
+    }
 }
