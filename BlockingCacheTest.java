@@ -1,18 +1,3 @@
-/*
- *    Copyright 2009-2024 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       https://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
 package org.apache.ibatis.submitted.blocking_cache;
 
 import java.io.Reader;
@@ -29,76 +14,92 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-// issue #524
+/**
+ * Test suite for the BlockingCache functionality.
+ * Ensures that the cache behaves correctly under concurrent access.
+ */
 class BlockingCacheTest {
 
   private static SqlSessionFactory sqlSessionFactory;
 
+  /**
+   * Sets up the test environment by initializing the SqlSessionFactory
+   * and populating the in-memory database.
+   */
   @BeforeEach
   void setUp() throws Exception {
-    // create a SqlSessionFactory
-    try (Reader reader = Resources
-        .getResourceAsReader("org/apache/ibatis/submitted/blocking_cache/mybatis-config.xml")) {
+    try (Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/blocking_cache/mybatis-config.xml")) {
       sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
     }
-
-    // populate in-memory database
     BaseDataTest.runScript(sqlSessionFactory.getConfiguration().getEnvironment().getDataSource(),
         "org/apache/ibatis/submitted/blocking_cache/CreateDB.sql");
   }
 
+  /**
+   * Tests that the BlockingCache blocks concurrent access correctly.
+   * Ensures that the total execution time is at least 1000 milliseconds.
+   */
   @Test
-  void blockingCache() throws InterruptedException {
-    ExecutorService defaultThreadPool = Executors.newFixedThreadPool(2);
+  void testBlockingCacheUnderConcurrentAccess() throws InterruptedException {
+    ExecutorService threadPool = Executors.newFixedThreadPool(2);
+    long startTime = System.currentTimeMillis();
 
-    long init = System.currentTimeMillis();
-
+    // Execute database access in two separate threads
     for (int i = 0; i < 2; i++) {
-      defaultThreadPool.execute(this::accessDB);
+      threadPool.execute(this::accessDatabase);
     }
 
-    defaultThreadPool.shutdown();
-    if (!defaultThreadPool.awaitTermination(5, TimeUnit.SECONDS)) {
-      defaultThreadPool.shutdownNow();
+    // Shutdown the thread pool and wait for tasks to complete
+    threadPool.shutdown();
+    if (!threadPool.awaitTermination(5, TimeUnit.SECONDS)) {
+      threadPool.shutdownNow();
     }
 
-    long totalTime = System.currentTimeMillis() - init;
+    long totalTime = System.currentTimeMillis() - startTime;
     Assertions.assertThat(totalTime).isGreaterThanOrEqualTo(1000);
   }
 
-  private void accessDB() {
+  /**
+   * Simulates database access by retrieving all persons and introducing a delay.
+   */
+  private void accessDatabase() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      PersonMapper pm = sqlSession.getMapper(PersonMapper.class);
-      pm.findAll();
-      try {
-        Thread.sleep(500);
-      } catch (InterruptedException e) {
-        Assertions.fail(e.getMessage());
-      }
+      PersonMapper personMapper = sqlSession.getMapper(PersonMapper.class);
+      personMapper.findAll();
+      // Simulate processing delay
+      Thread.sleep(500);
+    } catch (InterruptedException e) {
+      Assertions.fail("Thread was interrupted: " + e.getMessage());
     }
   }
 
+  /**
+   * Tests that the lock is acquired before a put operation in the cache.
+   */
   @Test
-  void ensureLockIsAcquiredBeforePut() {
+  void testLockAcquisitionBeforePut() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      PersonMapper mapper = sqlSession.getMapper(PersonMapper.class);
-      mapper.delete(-1);
-      mapper.findAll();
+      PersonMapper personMapper = sqlSession.getMapper(PersonMapper.class);
+      personMapper.delete(-1);
+      personMapper.findAll();
       sqlSession.commit();
     }
   }
 
+  /**
+   * Tests that the lock is released when a transaction is rolled back.
+   */
   @Test
-  void ensureLockIsReleasedOnRollback() {
+  void testLockReleaseOnRollback() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      PersonMapper mapper = sqlSession.getMapper(PersonMapper.class);
-      mapper.delete(-1);
-      mapper.findAll();
+      PersonMapper personMapper = sqlSession.getMapper(PersonMapper.class);
+      personMapper.delete(-1);
+      personMapper.findAll();
       sqlSession.rollback();
     }
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      PersonMapper mapper = sqlSession.getMapper(PersonMapper.class);
-      mapper.findAll();
+      PersonMapper personMapper = sqlSession.getMapper(PersonMapper.class);
+      personMapper.findAll();
     }
   }
 }
