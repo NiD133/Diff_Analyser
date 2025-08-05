@@ -3,117 +3,245 @@ package org.jsoup.nodes;
 import org.jsoup.Jsoup;
 import org.jsoup.parser.ParseSettings;
 import org.jsoup.parser.Parser;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AttributeTest {
-    @Test
-    public void html() {
-        Attribute attr = new Attribute("key", "value &");
-        assertEquals("key=\"value &amp;\"", attr.html());
-        assertEquals(attr.html(), attr.toString());
+/**
+ * Tests for the {@link Attribute} class, focusing on its construction, validation,
+ * HTML representation, and behavior as a boolean or valued attribute.
+ */
+class AttributeTest {
+
+    @Nested
+    @DisplayName("HTML Output")
+    class HtmlOutput {
+
+        @Test
+        @DisplayName("should escape ampersands in value")
+        void shouldEscapeAmpersandInValue() {
+            // Given
+            Attribute attr = new Attribute("key", "value &");
+
+            // When
+            String html = attr.html();
+
+            // Then
+            assertEquals("key=\"value &amp;\"", html);
+            assertEquals(html, attr.toString());
+        }
+
+
+
+        @Test
+        @DisplayName("should escape angle brackets in value")
+        void shouldEscapeAngleBracketsInValue() {
+            // Given
+            Attribute attr = new Attribute("key", "<value>");
+
+            // When
+            String html = attr.html();
+
+            // Then
+            assertEquals("key=\"&lt;value&gt;\"", html);
+        }
+
+        @Test
+        @DisplayName("should correctly render supplementary characters in key and value")
+        void shouldCorrectlyRenderSupplementaryCharacters() {
+            // Given a supplementary character (U+210C1)
+            String supplementaryChar = new String(Character.toChars(135361));
+            Attribute attr = new Attribute(supplementaryChar, "A" + supplementaryChar + "B");
+
+            // When
+            String html = attr.html();
+
+            // Then
+            assertEquals(supplementaryChar + "=\"A" + supplementaryChar + "B\"", html);
+            assertEquals(html, attr.toString());
+        }
     }
 
-    @Test
-    public void htmlWithLtAndGtInValue() {
-        Attribute attr = new Attribute("key", "<value>");
-        assertEquals("key=\"&lt;value&gt;\"", attr.html());
-    }
+    @Nested
+    @DisplayName("Validation")
+    class Validation {
 
-    @Test public void testWithSupplementaryCharacterInAttributeKeyAndValue() {
-        String s = new String(Character.toChars(135361));
-        Attribute attr = new Attribute(s, "A" + s + "B");
-        assertEquals(s + "=\"A" + s + "B\"", attr.html());
-        assertEquals(attr.html(), attr.toString());
-    }
+        @Test
+        @DisplayName("constructor should throw an exception for a blank key")
+        void constructorShouldThrowExceptionForBlankKey() {
+            // Expect an IllegalArgumentException when creating an attribute with a key containing only whitespace.
+            assertThrows(IllegalArgumentException.class, () -> new Attribute(" ", "Check"));
+        }
 
-    @Test public void validatesKeysNotEmpty() {
-        assertThrows(IllegalArgumentException.class, () -> new Attribute(" ", "Check"));
-    }
-
-    @Test public void validatesKeysNotEmptyViaSet() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        @Test
+        @DisplayName("setKey should throw an exception for a blank key")
+        void setKeyShouldThrowExceptionForBlankKey() {
+            // Given
             Attribute attr = new Attribute("One", "Check");
-            attr.setKey(" ");
-        });
+
+            // Expect an IllegalArgumentException when setting the key to a value containing only whitespace.
+            assertThrows(IllegalArgumentException.class, () -> attr.setKey(" "));
+        }
     }
 
-    @Test public void booleanAttributesAreEmptyStringValues() {
-        Document doc = Jsoup.parse("<div hidden>");
-        Attributes attributes = doc.body().child(0).attributes();
-        assertEquals("", attributes.get("hidden"));
+    @Nested
+    @DisplayName("Value Handling")
+    class ValueHandling {
 
-        Attribute first = attributes.iterator().next();
-        assertEquals("hidden", first.getKey());
-        assertEquals("", first.getValue());
-        assertFalse(first.hasDeclaredValue());
-        assertTrue(Attribute.isBooleanAttribute(first.getKey()));
+        @Test
+        @DisplayName("hasDeclaredValue should be correct for null, empty, and non-empty values")
+        void hasDeclaredValueIsCorrectForVariousValueStates() {
+            // Given attributes with different value states
+            Attribute attrWithEmptyValue = new Attribute("one", "");
+            Attribute attrWithNullValue = new Attribute("two", null); // Represents a boolean attribute
+            Attribute attrWithRealValue = new Attribute("thr", "thr");
+
+            // Then
+            assertTrue(attrWithEmptyValue.hasDeclaredValue());
+            assertFalse(attrWithNullValue.hasDeclaredValue());
+            assertTrue(attrWithRealValue.hasDeclaredValue());
+        }
+
+        @Test
+        @DisplayName("setting value to null should convert it to a boolean attribute")
+        void settingValueToNullMakesAttributeBoolean() {
+            // Given an attribute with a value
+            Attribute attr = new Attribute("one", "val");
+
+            // When setting the value to null
+            String oldVal = attr.setValue(null);
+
+            // Then it should behave like a boolean attribute
+            assertEquals("one", attr.html());
+            assertEquals("val", oldVal);
+            assertFalse(attr.hasDeclaredValue());
+
+            // When setting a value again
+            String previousVal = attr.setValue("foo");
+
+            // Then the previous value should be an empty string (as it was a boolean attribute)
+            assertEquals("", previousVal);
+            assertTrue(attr.hasDeclaredValue());
+        }
     }
 
-    @Test public void settersOnOrphanAttribute() {
-        Attribute attr = new Attribute("one", "two");
-        attr.setKey("three");
-        String oldVal = attr.setValue("four");
-        assertEquals("two", oldVal);
-        assertEquals("three", attr.getKey());
-        assertEquals("four", attr.getValue());
-        assertNull(attr.parent);
+    @Nested
+    @DisplayName("Lifecycle and Mutation")
+    class LifecycleAndMutation {
+
+        @Test
+        @DisplayName("setters should work correctly on a detached attribute")
+        void settersShouldWorkOnDetachedAttribute() {
+            // Given an attribute that has no parent
+            Attribute attr = new Attribute("one", "two");
+
+            // When
+            attr.setKey("three");
+            String oldVal = attr.setValue("four");
+
+            // Then
+            assertEquals("two", oldVal);
+            assertEquals("three", attr.getKey());
+            assertEquals("four", attr.getValue());
+            assertNull(attr.parent);
+        }
+
+        @Test
+        @DisplayName("setters should work correctly after an attribute is removed from its parent")
+        void settersShouldWorkAfterRemovingAttributeFromParent() {
+            // Given an attribute that is part of an Attributes collection
+            Attributes attrs = new Attributes();
+            attrs.put("foo", "bar");
+            Attribute attr = attrs.attribute("foo");
+            assertNotNull(attr);
+
+            // When the attribute is removed from its parent
+            attrs.remove("foo");
+            assertEquals("foo", attr.getKey()); // State is retained
+            assertEquals("bar", attr.getValue());
+
+            // And then mutated
+            attr.setKey("new");
+            attr.setValue("newer");
+
+            // Then the mutations should be applied
+            assertEquals("new", attr.getKey());
+            assertEquals("newer", attr.getValue());
+        }
     }
 
-    @Test void settersAfterParentRemoval() {
-        // tests key and value set on a retained attribute after disconnected from parent
-        Attributes attrs = new Attributes();
-        attrs.put("foo", "bar");
-        Attribute attr = attrs.attribute("foo");
-        assertNotNull(attr);
-        attrs.remove("foo");
-        assertEquals("foo", attr.getKey());
-        assertEquals("bar", attr.getValue());
-        attr.setKey("new");
-        attr.setValue("newer");
-        assertEquals("new", attr.getKey());
-        assertEquals("newer", attr.getValue());
+    @Nested
+    @DisplayName("Boolean Attributes")
+    class BooleanAttributes {
+
+        @Test
+        @DisplayName("should be parsed with an empty string value")
+        void parsedBooleanAttributeShouldHaveEmptyValue() {
+            // Given HTML with a boolean attribute
+            Document doc = Jsoup.parse("<div hidden>");
+            Attributes attributes = doc.body().child(0).attributes();
+            Attribute hiddenAttr = attributes.iterator().next();
+
+            // Then the attribute value should be an empty string
+            assertEquals("", attributes.get("hidden"));
+            assertEquals("hidden", hiddenAttr.getKey());
+            assertEquals("", hiddenAttr.getValue());
+
+            // And it should be identified as a boolean attribute without a declared value
+            assertFalse(hiddenAttr.hasDeclaredValue());
+            assertTrue(Attribute.isBooleanAttribute(hiddenAttr.getKey()));
+        }
+
+        @Test
+        @DisplayName("isBooleanAttribute check should be case-insensitive")
+        void isBooleanAttributeShouldBeCaseInsensitive() {
+            assertTrue(Attribute.isBooleanAttribute("required"));
+            assertTrue(Attribute.isBooleanAttribute("REQUIRED"));
+            assertTrue(Attribute.isBooleanAttribute("rEQUIREd"));
+            assertFalse(Attribute.isBooleanAttribute("random string"));
+        }
+
+        @Test
+        @DisplayName("parser should normalize boolean attribute case by default")
+        void parserShouldNormalizeBooleanAttributeCaseByDefault() {
+            // Given HTML with a boolean attribute in uppercase
+            String html = "<a href=autofocus REQUIRED>One</a>";
+
+            // When parsed with default settings
+            Document doc = Jsoup.parse(html);
+
+            // Then the boolean attribute key should be lower-cased
+            assertEquals("<a href=\"autofocus\" required>One</a>", doc.selectFirst("a").outerHtml());
+        }
+
+        @Test
+        @DisplayName("parser should preserve boolean attribute case when configured")
+        void parserShouldPreserveBooleanAttributeCaseWhenConfigured() {
+            // Given HTML with a boolean attribute in uppercase
+            String html = "<a href=autofocus REQUIRED>One</a>";
+            Parser parser = Parser.htmlParser().settings(ParseSettings.preserveCase);
+
+            // When parsed with case preservation enabled
+            Document doc = Jsoup.parse(html, parser);
+
+            // Then the boolean attribute key case should be preserved
+            assertEquals("<a href=\"autofocus\" REQUIRED>One</a>", doc.selectFirst("a").outerHtml());
+        }
     }
 
-    @Test public void hasValue() {
-        Attribute a1 = new Attribute("one", "");
-        Attribute a2 = new Attribute("two", null);
-        Attribute a3 = new Attribute("thr", "thr");
+    @Nested
+    @DisplayName("Namespace")
+    class Namespace {
+        @Test
+        @DisplayName("a newly created attribute should have an empty namespace")
+        void newAttributeShouldHaveEmptyNamespace() {
+            // Given
+            Attribute attr = new Attribute("one", "two");
 
-        assertTrue(a1.hasDeclaredValue());
-        assertFalse(a2.hasDeclaredValue());
-        assertTrue(a3.hasDeclaredValue());
-    }
-
-    @Test public void canSetValueToNull() {
-        Attribute attr = new Attribute("one", "val");
-        String oldVal = attr.setValue(null);
-        assertEquals("one", attr.html());
-        assertEquals("val", oldVal);
-
-        oldVal = attr.setValue("foo");
-        assertEquals("", oldVal); // string, not null
-    }
-
-    @Test void booleanAttributesAreNotCaseSensitive() {
-        // https://github.com/jhy/jsoup/issues/1656
-        assertTrue(Attribute.isBooleanAttribute("required"));
-        assertTrue(Attribute.isBooleanAttribute("REQUIRED"));
-        assertTrue(Attribute.isBooleanAttribute("rEQUIREd"));
-        assertFalse(Attribute.isBooleanAttribute("random string"));
-
-        String html = "<a href=autofocus REQUIRED>One</a>";
-        Document doc = Jsoup.parse(html);
-        assertEquals("<a href=\"autofocus\" required>One</a>", doc.selectFirst("a").outerHtml());
-
-        Document doc2 = Jsoup.parse(html, Parser.htmlParser().settings(ParseSettings.preserveCase));
-        assertEquals("<a href=\"autofocus\" REQUIRED>One</a>", doc2.selectFirst("a").outerHtml());
-    }
-
-    @Test void orphanNamespace() {
-        Attribute attr = new Attribute("one", "two");
-        assertEquals("", attr.namespace());
+            // Then
+            assertEquals("", attr.namespace());
+        }
     }
 }
