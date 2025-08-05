@@ -19,11 +19,19 @@ import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+/**
+ * Provides a base contract and common mocks for testing {@link TypeHandler} implementations.
+ * <p>
+ * Subclasses should extend this class and implement the abstract test methods to ensure
+ * their custom {@link TypeHandler} behaves as expected.
+ */
 @ExtendWith(MockitoExtension.class)
 abstract class BaseTypeHandlerTest {
 
@@ -36,17 +44,56 @@ abstract class BaseTypeHandlerTest {
   @Mock
   protected ResultSetMetaData rsmd;
 
-  public abstract void shouldSetParameter() throws Exception;
+  /**
+   * Tests for {@link TypeHandler#setParameter(PreparedStatement, int, Object, JdbcType)}.
+   */
+  @Nested
+  @DisplayName("Setting Parameters")
+  class SetParameterTests {
 
-  public abstract void shouldGetResultFromResultSetByName() throws Exception;
+    @Test
+    @DisplayName("should set a non-null parameter on a PreparedStatement")
+    public abstract void shouldSetParameter() throws Exception;
+  }
 
-  public abstract void shouldGetResultNullFromResultSetByName() throws Exception;
+  /**
+   * Tests for {@link TypeHandler#getResult(ResultSet, String)} and
+   * {@link TypeHandler#getResult(ResultSet, int)}.
+   */
+  @Nested
+  @DisplayName("Getting Results from ResultSet")
+  class GetResultFromResultSetTests {
 
-  public abstract void shouldGetResultFromResultSetByPosition() throws Exception;
+    @Test
+    @DisplayName("should get a non-null result by column name")
+    public abstract void shouldGetResultFromResultSetByName() throws Exception;
 
-  public abstract void shouldGetResultNullFromResultSetByPosition() throws Exception;
+    @Test
+    @DisplayName("should get a null result by column name when value is SQL NULL")
+    public abstract void shouldGetResultNullFromResultSetByName() throws Exception;
 
-  public abstract void shouldGetResultFromCallableStatement() throws Exception;
+    @Test
+    @DisplayName("should get a non-null result by column index")
+    public abstract void shouldGetResultFromResultSetByPosition() throws Exception;
 
-  public abstract void shouldGetResultNullFromCallableStatement() throws Exception;
+    @Test
+    @DisplayName("should get a null result by column index when value is SQL NULL")
+    public abstract void shouldGetResultNullFromResultSetByPosition() throws Exception;
+  }
+
+  /**
+   * Tests for {@link TypeHandler#getResult(CallableStatement, int)}.
+   */
+  @Nested
+  @DisplayName("Getting Results from CallableStatement")
+  class GetResultFromCallableStatementTests {
+
+    @Test
+    @DisplayName("should get a non-null result by column index")
+    public abstract void shouldGetResultFromCallableStatement() throws Exception;
+
+    @Test
+    @DisplayName("should get a null result by column index when value is SQL NULL")
+    public abstract void shouldGetResultNullFromCallableStatement() throws Exception;
+  }
 }
