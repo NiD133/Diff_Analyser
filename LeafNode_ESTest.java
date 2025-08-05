@@ -24,395 +24,352 @@ import org.jsoup.nodes.XmlDeclaration;
 import org.jsoup.parser.Parser;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true, 
+    useVFS = true, 
+    useVNET = true, 
+    resetStaticState = true, 
+    separateClassLoader = true
+) 
 public class LeafNode_ESTest extends LeafNode_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode("Gl&1]d*:{^7FUW]?uZ");
-      List<Node> list0 = cDataNode0.ensureChildNodes();
-      assertTrue(list0.isEmpty());
-  }
+    // Tests for child nodes
+    @Test(timeout = 4000)
+    public void testCDataNodeHasNoChildNodes() throws Throwable {
+        CDataNode node = new CDataNode("Gl&1]d*:{^7FUW]?uZ");
+        List<Node> childNodes = node.ensureChildNodes();
+        assertTrue("New CDataNode should have no children", childNodes.isEmpty());
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      DocumentType documentType0 = new DocumentType("Gyb$AWbT${", "Gyb$AWbT${", "Gyb$AWbT${");
-      documentType0.doSetBaseUri("");
-      assertFalse(documentType0.hasParent());
-  }
+    @Test(timeout = 4000)
+    public void testChildNodeSizeIsAlwaysZero() throws Throwable {
+        DataNode node = new DataNode("7mqe");
+        assertEquals("LeafNode should have 0 children", 0, node.childNodeSize());
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode("~p1SkcF]Q'5D");
-      cDataNode0.coreValue("");
-      assertEquals(0, cDataNode0.siblingIndex());
-  }
+    // Tests for base URI handling
+    @Test(timeout = 4000)
+    public void testSetBaseUriOnDocumentType() throws Throwable {
+        DocumentType docType = new DocumentType("Gyb$AWbT${", "Gyb$AWbT${", "Gyb$AWbT${");
+        docType.doSetBaseUri("");
+        assertFalse("DocumentType should not have a parent", docType.hasParent());
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode("%:~n@");
-      cDataNode0.setSiblingIndex(1);
-      Node node0 = cDataNode0.removeAttr("");
-      assertEquals(0, node0.childNodeSize());
-  }
+    @Test(timeout = 4000)
+    public void testBaseUriWithoutParent() throws Throwable {
+        CDataNode node = new CDataNode("Gyb$AWbT${");
+        assertEquals("Base URI should be empty without parent", "", node.baseUri());
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      DataNode dataNode0 = new DataNode("gMz?D>{rCwB%:");
-      dataNode0.setSiblingIndex((-1447));
-      Node node0 = dataNode0.removeAttr("gMz?D>{rCwB%:");
-      assertFalse(node0.hasParent());
-  }
+    @Test(timeout = 4000)
+    public void testBaseUriWithParent() throws Throwable {
+        TextNode node = new TextNode("body");
+        Document parent = Parser.parseBodyFragment("body", "org.jsoup.internal.Normalizer");
+        node.setParentNode(parent);
+        assertEquals("Base URI should match parent's", "org.jsoup.internal.Normalizer", node.baseUri());
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode("Gyb$AWbT${");
-      cDataNode0.attr("PUBLIC", (String) null);
-      boolean boolean0 = cDataNode0.hasAttributes();
-      assertTrue(boolean0);
-  }
+    // Tests for core value operations
+    @Test(timeout = 4000)
+    public void testSetCoreValue() throws Throwable {
+        CDataNode node = new CDataNode("~p1SkcF]Q'5D");
+        node.coreValue("");
+        assertEquals("Sibling index should remain 0", 0, node.siblingIndex());
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode("");
-      boolean boolean0 = cDataNode0.hasAttributes();
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testGetCoreValue() throws Throwable {
+        TextNode node = new TextNode("gMz?D>{rCwB%:");
+        assertEquals("Core value should match constructor", "gMz?D>{rCwB%:", node.coreValue());
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode("");
-      boolean boolean0 = cDataNode0.hasAttr("#cdata");
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testGetEmptyCoreValue() throws Throwable {
+        XmlDeclaration node = new XmlDeclaration("", false);
+        assertEquals("Empty core value should be preserved", "", node.coreValue());
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      Comment comment0 = new Comment("H4Q{hWcU$Y*");
-      boolean boolean0 = comment0.hasAttr("W");
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testSetWholeDataToNull() throws Throwable {
+        DataNode node = new DataNode("oML5cI2?Z,t2RXsqa");
+        DataNode result = node.setWholeData(null);
+        assertNull("Core value should be null after setting", result.coreValue());
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      XmlDeclaration xmlDeclaration0 = new XmlDeclaration("<eaHch", false);
-      xmlDeclaration0.siblingIndex = 1574;
-      Node node0 = xmlDeclaration0.empty();
-      assertSame(xmlDeclaration0, node0);
-  }
+    // Tests for attribute handling
+    @Test(timeout = 4000)
+    public void testNewNodeHasNoAttributes() throws Throwable {
+        CDataNode node = new CDataNode("");
+        assertFalse("New node should have no attributes", node.hasAttributes());
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      TextNode textNode0 = TextNode.createFromEncoded(".");
-      textNode0.setSiblingIndex((-2159));
-      Node node0 = textNode0.empty();
-      assertSame(node0, textNode0);
-  }
+    @Test(timeout = 4000)
+    public void testHasAttributesAfterSetting() throws Throwable {
+        CDataNode node = new CDataNode("Gyb$AWbT${");
+        node.attr("PUBLIC", null);
+        assertTrue("Node should have attributes after setting", node.hasAttributes());
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode("%:~n@");
-      LeafNode leafNode0 = cDataNode0.doClone(cDataNode0);
-      Node node0 = leafNode0.empty();
-      assertTrue(node0.hasParent());
-  }
+    @Test(timeout = 4000)
+    public void testHasCDataAttribute() throws Throwable {
+        CDataNode node = new CDataNode("");
+        assertTrue("#cdata attribute should always exist", node.hasAttr("#cdata"));
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      DataNode dataNode0 = new DataNode("org.jsoup.select.Evaluator$IndexGreaterThan");
-      dataNode0.siblingIndex = 74;
-      CDataNode cDataNode0 = new CDataNode("'mMH");
-      LeafNode leafNode0 = dataNode0.doClone(cDataNode0);
-      assertTrue(leafNode0.hasParent());
-  }
+    @Test(timeout = 4000)
+    public void testDoesNotHaveNonExistentAttribute() throws Throwable {
+        Comment node = new Comment("H4Q{hWcU$Y*");
+        assertFalse("Non-existent attribute should return false", node.hasAttr("W"));
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode(">eaHx`");
-      Comment comment0 = new Comment("");
-      cDataNode0.siblingIndex = (-1);
-      LeafNode leafNode0 = cDataNode0.doClone(comment0);
-      assertTrue(leafNode0.hasParent());
-  }
+    @Test(timeout = 4000)
+    public void testGetCDataAttribute() throws Throwable {
+        CDataNode node = new CDataNode("roS]");
+        assertEquals("#cdata attribute should match core value", "roS]", node.attr("#cdata"));
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      TextNode textNode0 = new TextNode("$j");
-      LeafNode leafNode0 = textNode0.doClone((Node) null);
-      assertNotSame(leafNode0, textNode0);
-  }
+    @Test(timeout = 4000)
+    public void testGetNonExistentAttribute() throws Throwable {
+        CDataNode node = new CDataNode("Gyb$AWbT${");
+        assertEquals("Non-existent attribute should return empty string", "", node.attr("Gyb$AWbT${"));
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode(">eaHxh");
-      Document document0 = new Document("/4k>HzZAM{i:j+  b");
-      LeafNode leafNode0 = cDataNode0.doClone(document0);
-      Node node0 = leafNode0.removeAttr("/4k>HzZAM{i:j+  b");
-      assertTrue(node0.hasParent());
-  }
+    @Test(timeout = 4000)
+    public void testSetAttribute() throws Throwable {
+        CDataNode node = new CDataNode("6'z rm]|lT");
+        Node result = node.attr("#cdata", "Accept-Encoding");
+        assertEquals("Sibling index should remain unchanged", 0, result.siblingIndex());
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      TextNode textNode0 = new TextNode("gMz?D>{rCwB%:");
-      String string0 = textNode0.coreValue();
-      assertEquals("gMz?D>{rCwB%:", string0);
-  }
+    @Test(timeout = 4000)
+    public void testGetEmptyCDataAttribute() throws Throwable {
+        CDataNode node = new CDataNode("");
+        assertEquals("Empty #cdata attribute should be preserved", "", node.attr("#cdata"));
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      XmlDeclaration xmlDeclaration0 = new XmlDeclaration("", false);
-      String string0 = xmlDeclaration0.coreValue();
-      assertEquals("", string0);
-  }
+    @Test(timeout = 4000)
+    public void testAbsUrlForNonExistentAttribute() throws Throwable {
+        Comment node = new Comment("QuR~!GB`!_");
+        assertEquals("absUrl for non-existent attribute should be empty", "", node.absUrl("QuR~!GB`!_"));
+    }
 
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      DataNode dataNode0 = new DataNode("7mqe");
-      int int0 = dataNode0.childNodeSize();
-      assertEquals(0, int0);
-  }
+    @Test(timeout = 4000)
+    public void testSetSameAttributeTwice() throws Throwable {
+        CDataNode node = new CDataNode(">eaHx`");
+        Node result = node.attr(">eaHx`", ">eaHx`").attr(">eaHx`", ">eaHx`");
+        assertFalse("Setting attribute twice shouldn't add parent", result.hasParent());
+    }
 
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode("SYSTEM");
-      cDataNode0.setSiblingIndex(5696);
-      Node node0 = cDataNode0.attr("", "<![CDATA[SYSTEM]]>");
-      assertEquals(0, node0.childNodeSize());
-  }
+    // Tests for cloning and empty operations
+    @Test(timeout = 4000)
+    public void testEmptyAfterSettingSiblingIndex() throws Throwable {
+        XmlDeclaration node = new XmlDeclaration("<eaHch", false);
+        node.setSiblingIndex(1574);
+        Node result = node.empty();
+        assertSame("empty() should return self", node, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      DataNode dataNode0 = new DataNode("gMz?D>{rCwB%:");
-      dataNode0.setSiblingIndex((-1447));
-      Node node0 = dataNode0.attr("                 ", (String) null);
-      assertEquals(0, node0.childNodeSize());
-  }
+    @Test(timeout = 4000)
+    public void testEmptyWithNegativeSiblingIndex() throws Throwable {
+        TextNode node = TextNode.createFromEncoded(".");
+        node.setSiblingIndex(-2159);
+        Node result = node.empty();
+        assertSame("empty() should return self", node, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      DataNode dataNode0 = new DataNode("PUBLIC");
-      Node node0 = dataNode0.wrap("org.jsoup.nodes.LeafNode");
-      Node node1 = node0.attr("org.jsoup.nodes.LeafNode", "1jNKR5#n*");
-      assertSame(node1, node0);
-  }
+    @Test(timeout = 4000)
+    public void testCloneAfterCloning() throws Throwable {
+        CDataNode original = new CDataNode("%:~n@");
+        LeafNode clone = original.doClone(original);
+        Node result = clone.empty();
+        assertTrue("Cloned node should retain parent", result.hasParent());
+    }
 
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode("roS]");
-      String string0 = cDataNode0.attr("#cdata");
-      assertEquals("roS]", string0);
-  }
+    @Test(timeout = 4000)
+    public void testCloneWithSiblingIndex() throws Throwable {
+        DataNode original = new DataNode("org.jsoup.select.Evaluator$IndexGreaterThan");
+        original.setSiblingIndex(74);
+        CDataNode target = new CDataNode("'mMH");
+        LeafNode clone = original.doClone(target);
+        assertTrue("Cloned node should have parent", clone.hasParent());
+    }
 
-  @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode("org.jsoup.nodes.LeafNode");
-      // Undeclared exception!
-      try { 
-        cDataNode0.removeAttr((String) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Object must not be null
-         //
-         verifyException("org.jsoup.helper.Validate", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testCloneWithNegativeSiblingIndex() throws Throwable {
+        CDataNode original = new CDataNode(">eaHx`");
+        original.setSiblingIndex(-1);
+        Comment target = new Comment("");
+        LeafNode clone = original.doClone(target);
+        assertTrue("Cloned node should have parent", clone.hasParent());
+    }
 
-  @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode("org.jsoup.nodes.LeafNode");
-      cDataNode0.value = (Object) cDataNode0;
-      // Undeclared exception!
-      try { 
-        cDataNode0.removeAttr("org.jsoup.nodes.LeafNode");
-        fail("Expecting exception: ClassCastException");
-      
-      } catch(ClassCastException e) {
-         //
-         // org.jsoup.nodes.CDataNode cannot be cast to java.lang.String
-         //
-         verifyException("org.jsoup.nodes.LeafNode", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testCloneWithNull() throws Throwable {
+        TextNode original = new TextNode("$j");
+        LeafNode clone = original.doClone(null);
+        assertNotSame("Cloning with null should create new instance", original, clone);
+    }
 
-  @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode("-/9fsuZ");
-      cDataNode0.value = (Object) cDataNode0;
-      // Undeclared exception!
-      try { 
-        cDataNode0.attributes();
-        fail("Expecting exception: ClassCastException");
-      
-      } catch(ClassCastException e) {
-         //
-         // org.jsoup.nodes.CDataNode cannot be cast to java.lang.String
-         //
-         verifyException("org.jsoup.nodes.LeafNode", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testShallowCloneAfterAttributesInitialized() throws Throwable {
+        TextNode node = new TextNode("body");
+        node.attributes(); // Force attributes initialization
+        Node clone = node.shallowClone();
+        assertNotSame("Shallow clone should be different instance", node, clone);
+    }
 
-  @Test(timeout = 4000)
-  public void test26()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode("-cOata");
-      cDataNode0.parentNode = (Node) cDataNode0;
-      // Undeclared exception!
-      cDataNode0.attr("-cOata", "-cOata");
-  }
+    // Tests for edge cases and exceptions
+    @Test(timeout = 4000)
+    public void testRemoveAttrAfterSettingSiblingIndex() throws Throwable {
+        CDataNode node = new CDataNode("%:~n@");
+        node.setSiblingIndex(1);
+        Node result = node.removeAttr("");
+        assertEquals("Child count should remain 0", 0, result.childNodeSize());
+    }
 
-  @Test(timeout = 4000)
-  public void test27()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode("%:~n@");
-      // Undeclared exception!
-      try { 
-        cDataNode0.attr((String) null, (String) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-      }
-  }
+    @Test(timeout = 4000)
+    public void testRemoveAttrWithNegativeSiblingIndex() throws Throwable {
+        DataNode node = new DataNode("gMz?D>{rCwB%:");
+        node.setSiblingIndex(-1447);
+        Node result = node.removeAttr("gMz?D>{rCwB%:");
+        assertFalse("Node should have no parent after removal", result.hasParent());
+    }
 
-  @Test(timeout = 4000)
-  public void test28()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode(">eaHxh");
-      Object object0 = new Object();
-      cDataNode0.value = object0;
-      // Undeclared exception!
-      try { 
-        cDataNode0.attr(">eaHxh", ">eaHxh");
-        fail("Expecting exception: ClassCastException");
-      
-      } catch(ClassCastException e) {
-         //
-         // java.lang.Object cannot be cast to java.lang.String
-         //
-         verifyException("org.jsoup.nodes.LeafNode", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testSetAttrAfterSettingSiblingIndex() throws Throwable {
+        CDataNode node = new CDataNode("SYSTEM");
+        node.setSiblingIndex(5696);
+        Node result = node.attr("", "<![CDATA[SYSTEM]]>");
+        assertEquals("Child count should remain 0", 0, result.childNodeSize());
+    }
 
-  @Test(timeout = 4000)
-  public void test29()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode("Rcdata");
-      Node node0 = cDataNode0.attr("Rcdata", "Rcdata");
-      // Undeclared exception!
-      try { 
-        node0.attr((String) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Object must not be null
-         //
-         verifyException("org.jsoup.helper.Validate", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testSetAttrToNullAfterSettingNegativeSiblingIndex() throws Throwable {
+        DataNode node = new DataNode("gMz?D>{rCwB%:");
+        node.setSiblingIndex(-1447);
+        Node result = node.attr("                 ", null);
+        assertEquals("Child count should remain 0", 0, result.childNodeSize());
+    }
 
-  @Test(timeout = 4000)
-  public void test30()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode("iX.>E!");
-      // Undeclared exception!
-      try { 
-        cDataNode0.absUrl("");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // String must not be empty
-         //
-         verifyException("org.jsoup.helper.Validate", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testWrapThenSetAttr() throws Throwable {
+        DataNode node = new DataNode("PUBLIC");
+        Node wrapped = node.wrap("org.jsoup.nodes.LeafNode");
+        Node result = wrapped.attr("org.jsoup.nodes.LeafNode", "1jNKR5#n*");
+        assertSame("Setting attribute should return same node", wrapped, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test31()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode("6'z rm]|lT");
-      Node node0 = cDataNode0.attr("#cdata", "Accept-Encoding");
-      assertEquals(0, node0.childNodeSize());
-  }
+    @Test(timeout = 4000)
+    public void testOuterHtmlTail() throws Throwable {
+        CDataNode node = new CDataNode("Must set charset arg to character set of file to parse. Set to null to attempt to detect from HTML");
+        Document.OutputSettings settings = new Document.OutputSettings();
+        node.outerHtmlTail((QuietAppendable) null, settings);
+        assertEquals("Sibling index should remain 0", 0, node.siblingIndex());
+    }
 
-  @Test(timeout = 4000)
-  public void test32()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode("");
-      String string0 = cDataNode0.attr("#cdata");
-      assertEquals("", string0);
-  }
+    // Exception tests
+    @Test(timeout = 4000)
+    public void testRemoveNullAttrThrows() throws Throwable {
+        CDataNode node = new CDataNode("org.jsoup.nodes.LeafNode");
+        try {
+            node.removeAttr(null);
+            fail("Expected IllegalArgumentException for null attribute");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Object must not be null", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test33()  throws Throwable  {
-      TextNode textNode0 = new TextNode("body");
-      textNode0.attributes();
-      Node node0 = textNode0.shallowClone();
-      assertNotSame(node0, textNode0);
-  }
+    @Test(timeout = 4000)
+    public void testRemoveAttrWhenValueIsSelfThrows() throws Throwable {
+        CDataNode node = new CDataNode("org.jsoup.nodes.LeafNode");
+        node.value = node; // Set value to itself
+        try {
+            node.removeAttr("org.jsoup.nodes.LeafNode");
+            fail("Expected ClassCastException for invalid value type");
+        } catch (ClassCastException e) {
+            assertTrue(e.getMessage().contains("org.jsoup.nodes.CDataNode cannot be cast to java.lang.String"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test34()  throws Throwable  {
-      TextNode textNode0 = new TextNode("body");
-      Document document0 = Parser.parseBodyFragment("body", "org.jsoup.internal.Normalizer");
-      textNode0.parentNode = (Node) document0;
-      String string0 = textNode0.baseUri();
-      assertEquals("org.jsoup.internal.Normalizer", string0);
-  }
+    @Test(timeout = 4000)
+    public void testAttributesWhenValueIsSelfThrows() throws Throwable {
+        CDataNode node = new CDataNode("-/9fsuZ");
+        node.value = node; // Set value to itself
+        try {
+            node.attributes();
+            fail("Expected ClassCastException for invalid value type");
+        } catch (ClassCastException e) {
+            assertTrue(e.getMessage().contains("org.jsoup.nodes.CDataNode cannot be cast to java.lang.String"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test35()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode("Gyb$AWbT${");
-      String string0 = cDataNode0.baseUri();
-      assertEquals("", string0);
-  }
+    @Test(timeout = 4000)
+    public void testSetAttrWhenParentIsSelfThrows() throws Throwable {
+        CDataNode node = new CDataNode("-cOata");
+        node.parentNode = node; // Set parent to itself
+        try {
+            node.attr("-cOata", "-cOata");
+            fail("Expected StackOverflowError due to recursive parent");
+        } catch (StackOverflowError e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test36()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode(">eaHx`");
-      cDataNode0.attr(">eaHx`", ">eaHx`");
-      Node node0 = cDataNode0.attr(">eaHx`", ">eaHx`");
-      assertFalse(node0.hasParent());
-  }
+    @Test(timeout = 4000)
+    public void testSetAttrWithNullKeyThrows() throws Throwable {
+        CDataNode node = new CDataNode("%:~n@");
+        try {
+            node.attr(null, null);
+            fail("Expected NullPointerException for null key");
+        } catch (NullPointerException e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test37()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode("Gyb$AWbT${");
-      String string0 = cDataNode0.attr("Gyb$AWbT${");
-      assertEquals("", string0);
-  }
+    @Test(timeout = 4000)
+    public void testSetAttrWhenValueIsObjectThrows() throws Throwable {
+        CDataNode node = new CDataNode(">eaHxh");
+        node.value = new Object(); // Invalid value type
+        try {
+            node.attr(">eaHxh", ">eaHxh");
+            fail("Expected ClassCastException for invalid value type");
+        } catch (ClassCastException e) {
+            assertTrue(e.getMessage().contains("java.lang.Object cannot be cast to java.lang.String"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test38()  throws Throwable  {
-      Comment comment0 = new Comment("QuR~!GB`!_");
-      String string0 = comment0.absUrl("QuR~!GB`!_");
-      assertEquals("", string0);
-  }
+    @Test(timeout = 4000)
+    public void testGetAttrNullKeyAfterSettingThrows() throws Throwable {
+        CDataNode node = new CDataNode("Rcdata");
+        node.attr("Rcdata", "Rcdata");
+        try {
+            node.attr(null);
+            fail("Expected IllegalArgumentException for null key");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Object must not be null", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test39()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode("Must set charset arg to character set of file to parse. Set to null to attempt to detect from HTML");
-      Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-      cDataNode0.outerHtmlTail((QuietAppendable) null, document_OutputSettings0);
-      assertEquals(0, cDataNode0.siblingIndex());
-  }
+    @Test(timeout = 4000)
+    public void testAbsUrlEmptyStringThrows() throws Throwable {
+        CDataNode node = new CDataNode("iX.>E!");
+        try {
+            node.absUrl("");
+            fail("Expected IllegalArgumentException for empty key");
+        } catch (IllegalArgumentException e) {
+            assertEquals("String must not be empty", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test40()  throws Throwable  {
-      DataNode dataNode0 = new DataNode("oML5cI2?Z,t2RXsqa");
-      DataNode dataNode1 = dataNode0.setWholeData((String) null);
-      String string0 = dataNode1.coreValue();
-      assertNull(string0);
-  }
-
-  @Test(timeout = 4000)
-  public void test41()  throws Throwable  {
-      CDataNode cDataNode0 = new CDataNode("1");
-      // Undeclared exception!
-      try { 
-        cDataNode0.hasAttr((String) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Object must not be null
-         //
-         verifyException("org.jsoup.helper.Validate", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testHasAttrNullThrows() throws Throwable {
+        CDataNode node = new CDataNode("1");
+        try {
+            node.hasAttr(null);
+            fail("Expected IllegalArgumentException for null key");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Object must not be null", e.getMessage());
+        }
+    }
 }
