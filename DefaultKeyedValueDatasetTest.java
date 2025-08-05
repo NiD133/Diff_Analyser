@@ -37,8 +37,8 @@
 package org.jfree.data.general;
 
 import org.jfree.chart.TestUtils;
-import org.jfree.chart.internal.CloneUtils;
-
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,66 +46,97 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Tests for the {@link DefaultKeyedValueDataset} class.
  */
-public class DefaultKeyedValueDatasetTest {
+@DisplayName("A DefaultKeyedValueDataset")
+class DefaultKeyedValueDatasetTest {
 
-    /**
-     * Confirm that the equals method can distinguish all the required fields.
-     */
-    @Test
-    public void testEquals() {
+    @Nested
+    @DisplayName("equals contract")
+    class EqualsContract {
 
-        DefaultKeyedValueDataset d1 = new DefaultKeyedValueDataset("Test", 45.5);
-        DefaultKeyedValueDataset d2 = new DefaultKeyedValueDataset("Test", 45.5);
-        assertEquals(d1, d2);
-        assertEquals(d2, d1);
+        @Test
+        @DisplayName("is true for two instances with the same key and value")
+        void equals_withSameState_shouldBeTrue() {
+            // Arrange
+            DefaultKeyedValueDataset dataset1 = new DefaultKeyedValueDataset("Test", 45.5);
+            DefaultKeyedValueDataset dataset2 = new DefaultKeyedValueDataset("Test", 45.5);
 
-        d1 = new DefaultKeyedValueDataset("Test 1", 45.5);
-        d2 = new DefaultKeyedValueDataset("Test 2", 45.5);
-        assertNotEquals(d1, d2);
+            // Assert
+            assertTrue(dataset1.equals(dataset2), "Datasets with the same state should be equal.");
+            assertEquals(dataset1.hashCode(), dataset2.hashCode(), "Hashcodes of equal objects must be equal.");
+        }
 
-        d1 = new DefaultKeyedValueDataset("Test", 45.5);
-        d2 = new DefaultKeyedValueDataset("Test", 45.6);
-        assertNotEquals(d1, d2);
+        @Test
+        @DisplayName("is false for two instances with different keys")
+        void equals_withDifferentKeys_shouldBeFalse() {
+            // Arrange
+            DefaultKeyedValueDataset dataset1 = new DefaultKeyedValueDataset("Test 1", 45.5);
+            DefaultKeyedValueDataset dataset2 = new DefaultKeyedValueDataset("Test 2", 45.5);
 
+            // Assert
+            assertFalse(dataset1.equals(dataset2));
+        }
+
+        @Test
+        @DisplayName("is false for two instances with different values")
+        void equals_withDifferentValues_shouldBeFalse() {
+            // Arrange
+            DefaultKeyedValueDataset dataset1 = new DefaultKeyedValueDataset("Test", 45.5);
+            DefaultKeyedValueDataset dataset2 = new DefaultKeyedValueDataset("Test", 45.6);
+
+            // Assert
+            assertFalse(dataset1.equals(dataset2));
+        }
     }
 
-    /**
-     * Confirm that cloning works.
-     * @throws java.lang.CloneNotSupportedException
-     */
-    @Test
-    public void testCloning() throws CloneNotSupportedException {
-        DefaultKeyedValueDataset d1 = new DefaultKeyedValueDataset("Test", 45.5);
-        DefaultKeyedValueDataset d2 = (DefaultKeyedValueDataset) d1.clone();
-        assertNotSame(d1, d2);
-        assertSame(d1.getClass(), d2.getClass());
-        assertEquals(d1, d2);
+    @Nested
+    @DisplayName("cloning")
+    class Cloning {
+
+        @Test
+        @DisplayName("produces a separate but equal instance")
+        void clone_shouldReturnDifferentButEqualInstance() throws CloneNotSupportedException {
+            // Arrange
+            DefaultKeyedValueDataset original = new DefaultKeyedValueDataset("Test", 45.5);
+
+            // Act
+            DefaultKeyedValueDataset cloned = (DefaultKeyedValueDataset) original.clone();
+
+            // Assert
+            assertNotSame(original, cloned, "A clone must be a different object instance.");
+            assertEquals(original, cloned, "A clone should be equal to the original object.");
+        }
+
+        @Test
+        @DisplayName("produces an independent copy")
+        void clone_shouldBeIndependentOfOriginal() throws CloneNotSupportedException {
+            // Arrange
+            DefaultKeyedValueDataset original = new DefaultKeyedValueDataset("Key", 10.0);
+            DefaultKeyedValueDataset cloned = (DefaultKeyedValueDataset) original.clone();
+
+            // Act: Modify the state of the clone
+            cloned.updateValue(99.9);
+
+            // Assert: The original remains unchanged
+            assertNotEquals(original, cloned, "A modified clone should not be equal to the original.");
+            assertEquals(10.0, original.getValue(), "Modifying the clone should not change the original's value.");
+        }
     }
 
-    /**
-     * Confirm that the clone is independent of the original.
-     * @throws java.lang.CloneNotSupportedException
-     */
-    @Test
-    public void testCloneIndependence() throws CloneNotSupportedException {
-        DefaultKeyedValueDataset d1
-            = new DefaultKeyedValueDataset("Key", 10.0);
-        DefaultKeyedValueDataset d2 = CloneUtils.clone(d1);
-        assertEquals(d1, d2);
-        d2.updateValue(99.9);
-        assertNotEquals(d1, d2);
-        d2.updateValue(10.0);
-        assertEquals(d1, d2);
-    }
+    @Nested
+    @DisplayName("serialization")
+    class Serialization {
 
-    /**
-     * Serialize an instance, restore it, and check for equality.
-     */
-    @Test
-    public void testSerialization() {
-        DefaultKeyedValueDataset d1 = new DefaultKeyedValueDataset("Test", 25.3);
-        DefaultKeyedValueDataset d2 = TestUtils.serialised(d1);
-        assertEquals(d1, d2);
-    }
+        @Test
+        @DisplayName("preserves the object's state")
+        void serialization_shouldPreserveDatasetState() {
+            // Arrange
+            DefaultKeyedValueDataset original = new DefaultKeyedValueDataset("Test", 25.3);
 
+            // Act
+            DefaultKeyedValueDataset deserialized = TestUtils.serialised(original);
+
+            // Assert
+            assertEquals(original, deserialized, "The deserialized dataset should be equal to the original.");
+        }
+    }
 }
