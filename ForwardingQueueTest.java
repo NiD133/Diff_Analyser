@@ -42,6 +42,16 @@ import org.jspecify.annotations.Nullable;
 @NullUnmarked
 public class ForwardingQueueTest extends TestCase {
 
+  // -------------------------------------------------------------------
+  // SECTION 1: Test suite for StandardImplForwardingQueue
+  // This section verifies that the standard implementation methods
+  // in ForwardingQueue work correctly when backed by a LinkedList.
+  // -------------------------------------------------------------------
+
+  /**
+   * Test class that uses all standard implementations from ForwardingQueue.
+   * This exercises the default method behaviors in the forwarding class.
+   */
   static final class StandardImplForwardingQueue<T> extends ForwardingQueue<T> {
     private final Queue<T> backingQueue;
 
@@ -54,6 +64,7 @@ public class ForwardingQueueTest extends TestCase {
       return backingQueue;
     }
 
+    // All methods below use the standard implementations from ForwardingQueue
     @Override
     public boolean addAll(Collection<? extends T> collection) {
       return standardAddAll(collection);
@@ -124,13 +135,16 @@ public class ForwardingQueueTest extends TestCase {
   public static Test suite() {
     TestSuite suite = new TestSuite();
 
+    // Add manual tests in this class
     suite.addTestSuite(ForwardingQueueTest.class);
+
+    // Generated tests for StandardImplForwardingQueue with LinkedList
     suite.addTest(
         QueueTestSuiteBuilder.using(
                 new TestStringQueueGenerator() {
-
                   @Override
                   protected Queue<String> create(String[] elements) {
+                    // Create forwarding queue with standard implementations
                     return new StandardImplForwardingQueue<>(new LinkedList<>(asList(elements)));
                   }
                 })
@@ -144,19 +158,24 @@ public class ForwardingQueueTest extends TestCase {
     return suite;
   }
 
+  // -------------------------------------------------------------------
+  // SECTION 2: ForwardingWrapperTester tests
+  // This section verifies that every method in the ForwardingQueue
+  // properly forwards calls to the delegate.
+  // -------------------------------------------------------------------
+
   @SuppressWarnings({"rawtypes", "unchecked"})
   public void testForwarding() {
     new ForwardingWrapperTester()
         .testForwarding(
             Queue.class,
-            new Function<Queue, Queue>() {
-              @Override
-              public Queue apply(Queue delegate) {
-                return wrap(delegate);
-              }
-            });
+            (Function<Queue, Queue>) delegate -> wrap(delegate));
   }
 
+  /**
+   * Wraps a delegate queue in a minimal ForwardingQueue implementation.
+   * Used to test basic forwarding behavior.
+   */
   private static <T> Queue<T> wrap(Queue<T> delegate) {
     return new ForwardingQueue<T>() {
       @Override
