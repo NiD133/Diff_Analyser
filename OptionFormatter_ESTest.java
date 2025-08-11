@@ -17,350 +17,424 @@ import org.evosuite.runtime.EvoRunnerParameters;
 import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, 
-useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class OptionFormatter_ESTest extends OptionFormatter_ESTest_scaffolding {
 
-    private static final String TEST_VALUE = "testValue";
-    private static final String DEPRECATED_TEXT = "[Deprecated";
-    private static final String EMPTY_STRING = "";
-    private static final String OPTION_WITH_ARG = "optionWithArg";
-    private static final String LONG_OPT_PREFIX = "--";
-    private static final String OPT_PREFIX = "-";
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      Option option0 = new Option("?Wf", "?Wf", true, "?Wf");
+      OptionFormatter.Builder optionFormatter_Builder0 = OptionFormatter.builder();
+      OptionFormatter.Builder optionFormatter_Builder1 = optionFormatter_Builder0.setLongOptPrefix("?Wf");
+      OptionFormatter optionFormatter0 = optionFormatter_Builder1.build(option0);
+      String string0 = optionFormatter0.getLongOpt();
+      assertEquals("?Wf?Wf", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testBuilderSetLongOptPrefix() throws Throwable {
-        // Arrange
-        Option option = new Option("?Wf", "?Wf", true, "?Wf");
-        OptionFormatter.Builder builder = OptionFormatter.builder();
-        
-        // Act
-        builder.setLongOptPrefix("?Wf");
-        OptionFormatter formatter = builder.build(option);
-        String result = formatter.getLongOpt();
-        
-        // Assert
-        assertEquals("?Wf?Wf", result);
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      Option option0 = new Option((String) null, (String) null, true, (String) null);
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      OptionFormatter.Builder optionFormatter_Builder0 = new OptionFormatter.Builder(optionFormatter0);
+      OptionFormatter.Builder optionFormatter_Builder1 = optionFormatter_Builder0.setDefaultArgName("[Deprecated");
+      OptionFormatter optionFormatter1 = optionFormatter_Builder1.build(option0);
+      String string0 = optionFormatter1.toSyntaxOption();
+      assertEquals("[ <[Deprecated>]", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testBuilderSetDefaultArgName() throws Throwable {
-        // Arrange
-        Option option = new Option(null, null, true, null);
-        OptionFormatter initialFormatter = OptionFormatter.from(option);
-        OptionFormatter.Builder builder = new OptionFormatter.Builder(initialFormatter);
-        
-        // Act
-        builder.setDefaultArgName("[Deprecated");
-        OptionFormatter formatter = builder.build(option);
-        String syntax = formatter.toSyntaxOption();
-        
-        // Assert
-        assertEquals("[ <[Deprecated>]", syntax);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      Option option0 = new Option((String) null, (String) null, true, (String) null);
+      OptionFormatter.Builder optionFormatter_Builder0 = OptionFormatter.builder();
+      optionFormatter_Builder0.setOptArgSeparator("Deprecated");
+      OptionFormatter optionFormatter0 = optionFormatter_Builder0.build(option0);
+      String string0 = optionFormatter0.toSyntaxOption();
+      assertEquals("[Deprecated<arg>]", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testBuilderSetOptArgSeparator() throws Throwable {
-        // Arrange
-        Option option = new Option(null, null, true, null);
-        OptionFormatter.Builder builder = OptionFormatter.builder();
-        
-        // Act
-        builder.setOptArgSeparator("Deprecated");
-        OptionFormatter formatter = builder.build(option);
-        String syntax = formatter.toSyntaxOption();
-        
-        // Assert
-        assertEquals("[Deprecated<arg>]", syntax);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      Option option0 = new Option("NO_ARGS_ALLOWED", "iRi[{-|Um");
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      OptionFormatter.Builder optionFormatter_Builder0 = new OptionFormatter.Builder(optionFormatter0);
+      BiFunction<OptionFormatter, Boolean, String> biFunction0 = (BiFunction<OptionFormatter, Boolean, String>) mock(BiFunction.class, new ViolatedAssumptionAnswer());
+      doReturn((Object) null).when(biFunction0).apply(any(org.apache.commons.cli.help.OptionFormatter.class) , anyBoolean());
+      optionFormatter_Builder0.setSyntaxFormatFunction(biFunction0);
+      OptionFormatter optionFormatter1 = optionFormatter_Builder0.build(option0);
+      String string0 = optionFormatter1.toSyntaxOption(false);
+      assertNull(string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testCustomSyntaxFormatFunctionReturnsNull() throws Throwable {
-        // Arrange
-        Option option = new Option("NO_ARGS_ALLOWED", "iRi[{-|Um");
-        OptionFormatter initialFormatter = OptionFormatter.from(option);
-        OptionFormatter.Builder builder = new OptionFormatter.Builder(initialFormatter);
-        BiFunction<OptionFormatter, Boolean, String> mockFunction = 
-            mock(BiFunction.class, new ViolatedAssumptionAnswer());
-        doReturn(null).when(mockFunction).apply(any(), anyBoolean());
-        
-        // Act
-        builder.setSyntaxFormatFunction(mockFunction);
-        OptionFormatter formatter = builder.build(option);
-        String syntax = formatter.toSyntaxOption(false);
-        
-        // Assert
-        assertNull(syntax);
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      Option option0 = new Option((String) null, (String) null);
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      String string0 = optionFormatter0.toSyntaxOption(false);
+      assertEquals("", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testToSyntaxOptionForOptionWithNoValues() throws Throwable {
-        // Arrange
-        Option option = new Option(null, null);
-        OptionFormatter formatter = OptionFormatter.from(option);
-        
-        // Act
-        String syntax = formatter.toSyntaxOption(false);
-        
-        // Assert
-        assertEquals(EMPTY_STRING, syntax);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      Option option0 = new Option((String) null, (String) null, true, (String) null);
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      OptionFormatter.Builder optionFormatter_Builder0 = new OptionFormatter.Builder(optionFormatter0);
+      BiFunction<OptionFormatter, Boolean, String> biFunction0 = (BiFunction<OptionFormatter, Boolean, String>) mock(BiFunction.class, new ViolatedAssumptionAnswer());
+      doReturn((Object) null).when(biFunction0).apply(any(org.apache.commons.cli.help.OptionFormatter.class) , anyBoolean());
+      OptionFormatter.Builder optionFormatter_Builder1 = optionFormatter_Builder0.setSyntaxFormatFunction(biFunction0);
+      OptionFormatter optionFormatter1 = optionFormatter_Builder1.build(option0);
+      String string0 = optionFormatter1.toSyntaxOption();
+      assertNull(string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testCustomSyntaxFormatFunctionReturnsNullForDefaultSyntax() throws Throwable {
-        // Arrange
-        Option option = new Option(null, null, true, null);
-        OptionFormatter initialFormatter = OptionFormatter.from(option);
-        OptionFormatter.Builder builder = new OptionFormatter.Builder(initialFormatter);
-        BiFunction<OptionFormatter, Boolean, String> mockFunction = 
-            mock(BiFunction.class, new ViolatedAssumptionAnswer());
-        doReturn(null).when(mockFunction).apply(any(), anyBoolean());
-        
-        // Act
-        builder.setSyntaxFormatFunction(mockFunction);
-        OptionFormatter formatter = builder.build(option);
-        String syntax = formatter.toSyntaxOption();
-        
-        // Assert
-        assertNull(syntax);
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      Option option0 = new Option("?Wf", "?Wf", true, "?Wf");
+      option0.setRequired(true);
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      boolean boolean0 = optionFormatter0.isRequired();
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testIsRequiredForRequiredOption() throws Throwable {
-        // Arrange
-        Option option = new Option("?Wf", "?Wf", true, "?Wf");
-        option.setRequired(true);
-        OptionFormatter formatter = OptionFormatter.from(option);
-        
-        // Act & Assert
-        assertTrue(formatter.isRequired());
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      Option option0 = new Option((String) null, (String) null, true, (String) null);
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      String string0 = optionFormatter0.getSince();
+      assertEquals("--", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetSinceForOptionWithoutSince() throws Throwable {
-        // Arrange
-        Option option = new Option(null, null, true, null);
-        OptionFormatter formatter = OptionFormatter.from(option);
-        
-        // Act
-        String since = formatter.getSince();
-        
-        // Assert
-        assertEquals("--", since);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      Option option0 = new Option((String) null, (String) null);
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      String string0 = optionFormatter0.getDescription();
+      assertEquals("", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetDescriptionForOptionWithoutDescription() throws Throwable {
-        // Arrange
-        Option option = new Option(null, null);
-        OptionFormatter formatter = OptionFormatter.from(option);
-        
-        // Act
-        String description = formatter.getDescription();
-        
-        // Assert
-        assertEquals(EMPTY_STRING, description);
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      OptionFormatter optionFormatter0 = OptionFormatter.from((Option) null);
+      // Undeclared exception!
+      try { 
+        optionFormatter0.toSyntaxOption(true);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.cli.help.OptionFormatter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testToSyntaxOptionWithNullOptionThrowsException() throws Throwable {
-        // Arrange
-        OptionFormatter formatter = OptionFormatter.from(null);
-        
-        // Act & Assert
-        assertThrows(NullPointerException.class, () -> formatter.toSyntaxOption(true));
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      OptionFormatter optionFormatter0 = OptionFormatter.from((Option) null);
+      // Undeclared exception!
+      try { 
+        optionFormatter0.toSyntaxOption();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.cli.help.OptionFormatter", e);
+      }
+  }
 
-    // Additional null-handling tests follow the same pattern...
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      OptionFormatter optionFormatter0 = OptionFormatter.from((Option) null);
+      // Undeclared exception!
+      try { 
+        optionFormatter0.isRequired();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.cli.help.OptionFormatter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testToOptionalWithEmptyString() throws Throwable {
-        // Arrange
-        Option option = new Option(null, null);
-        OptionFormatter formatter = OptionFormatter.from(option);
-        
-        // Act
-        String result = formatter.toOptional(EMPTY_STRING);
-        
-        // Assert
-        assertEquals(EMPTY_STRING, result);
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      OptionFormatter optionFormatter0 = OptionFormatter.from((Option) null);
+      // Undeclared exception!
+      try { 
+        optionFormatter0.getOpt();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.cli.help.OptionFormatter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testToOptionalWithNonEmptyString() throws Throwable {
-        // Arrange
-        OptionFormatter formatter = OptionFormatter.from(null);
-        
-        // Act
-        String result = formatter.toOptional(", ");
-        
-        // Assert
-        assertEquals("[, ]", result);
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      OptionFormatter optionFormatter0 = OptionFormatter.from((Option) null);
+      // Undeclared exception!
+      try { 
+        optionFormatter0.getLongOpt();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.cli.help.OptionFormatter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetOptForOptionWithShortOpt() throws Throwable {
-        // Arrange
-        Option option = new Option("7", "TjJ+)m", false, "");
-        OptionFormatter formatter = OptionFormatter.from(option);
-        
-        // Act
-        String opt = formatter.getOpt();
-        
-        // Assert
-        assertEquals("-7", opt);
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      OptionFormatter optionFormatter0 = OptionFormatter.from((Option) null);
+      // Undeclared exception!
+      try { 
+        optionFormatter0.getDescription();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.cli.help.OptionFormatter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetLongOptForOptionWithoutLongOpt() throws Throwable {
-        // Arrange
-        Option option = new Option("o", "o");
-        OptionFormatter formatter = OptionFormatter.from(option);
-        
-        // Act
-        String longOpt = formatter.getLongOpt();
-        
-        // Assert
-        assertEquals(EMPTY_STRING, longOpt);
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      OptionFormatter optionFormatter0 = OptionFormatter.from((Option) null);
+      // Undeclared exception!
+      try { 
+        optionFormatter0.getBothOpt();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.cli.help.OptionFormatter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetArgNameForOptionWithArguments() throws Throwable {
-        // Arrange
-        Option option = new Option(null, null, true, "");
-        OptionFormatter formatter = OptionFormatter.from(option);
-        
-        // Act
-        String argName = formatter.getArgName();
-        
-        // Assert
-        assertEquals("<arg>", argName);
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      OptionFormatter optionFormatter0 = OptionFormatter.from((Option) null);
+      // Undeclared exception!
+      try { 
+        optionFormatter0.getArgName();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.cli.help.OptionFormatter", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetArgNameForOptionWithoutArguments() throws Throwable {
-        // Arrange
-        Option option = new Option(null, null);
-        OptionFormatter formatter = OptionFormatter.from(option);
-        
-        // Act
-        String argName = formatter.getArgName();
-        
-        // Assert
-        assertEquals(EMPTY_STRING, argName);
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      Option option0 = new Option((String) null, (String) null);
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      String string0 = optionFormatter0.toOptional("");
+      assertEquals("", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testIsRequiredForNonRequiredOption() throws Throwable {
-        // Arrange
-        Option option = new Option(null, null, true, "");
-        OptionFormatter formatter = OptionFormatter.from(option);
-        
-        // Act & Assert
-        assertFalse(formatter.isRequired());
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      OptionFormatter optionFormatter0 = OptionFormatter.from((Option) null);
+      String string0 = optionFormatter0.toOptional(", ");
+      assertEquals("[, ]", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testToSyntaxOptionForOptionWithShortOptAndArgument() throws Throwable {
-        // Arrange
-        Option option = new Option("?Wf", "?Wf", true, "");
-        OptionFormatter formatter = OptionFormatter.from(option);
-        
-        // Act
-        String syntax = formatter.toSyntaxOption(true);
-        
-        // Assert
-        assertEquals("-?Wf <arg>", syntax);
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      Option option0 = new Option((String) null, (String) null);
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      String string0 = optionFormatter0.getOpt();
+      assertEquals("", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetDescriptionForOptionWithDescription() throws Throwable {
-        // Arrange
-        Option option = new Option("NO_ARGS_ALLOWED", "iRi[{-|Um");
-        OptionFormatter formatter = OptionFormatter.from(option);
-        
-        // Act
-        String description = formatter.getDescription();
-        
-        // Assert
-        assertEquals("iRi[{-|Um", description);
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      Option option0 = new Option("7", "TjJ+)m", false, "");
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      String string0 = optionFormatter0.getOpt();
+      assertEquals("-7", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetBothOptForOptionWithShortOptOnly() throws Throwable {
-        // Arrange
-        Option option = new Option("?Wf", "?Wf");
-        OptionFormatter formatter = OptionFormatter.from(option);
-        
-        // Act
-        String bothOpt = formatter.getBothOpt();
-        
-        // Assert
-        assertEquals("-?Wf", bothOpt);
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      Option option0 = new Option("o", "o");
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      String string0 = optionFormatter0.getLongOpt();
+      assertEquals("", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetBothOptForOptionWithBothOpts() throws Throwable {
-        // Arrange
-        Option option = new Option("?Wf", "?Wf", true, "");
-        OptionFormatter formatter = OptionFormatter.from(option);
-        
-        // Act
-        String bothOpt = formatter.getBothOpt();
-        
-        // Assert
-        assertEquals("-?Wf, --?Wf", bothOpt);
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      Option option0 = new Option((String) null, (String) null, true, "");
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      String string0 = optionFormatter0.getArgName();
+      assertEquals("<arg>", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetBothOptForOptionWithoutOpts() throws Throwable {
-        // Arrange
-        Option option = new Option(null, null);
-        OptionFormatter formatter = OptionFormatter.from(option);
-        
-        // Act
-        String bothOpt = formatter.getBothOpt();
-        
-        // Assert
-        assertEquals(EMPTY_STRING, bothOpt);
-    }
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      Option option0 = new Option((String) null, (String) null);
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      String string0 = optionFormatter0.getArgName();
+      assertEquals("", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testToSyntaxOptionForOptionWithoutValues() throws Throwable {
-        // Arrange
-        Option option = new Option(null, null);
-        OptionFormatter formatter = OptionFormatter.from(option);
-        
-        // Act
-        String syntax = formatter.toSyntaxOption();
-        
-        // Assert
-        assertEquals(EMPTY_STRING, syntax);
-    }
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      Option option0 = new Option("?Wf", true, "?Wf");
+      OptionFormatter.Builder optionFormatter_Builder0 = OptionFormatter.builder();
+      BiFunction<OptionFormatter, Boolean, String> biFunction0 = (BiFunction<OptionFormatter, Boolean, String>) mock(BiFunction.class, new ViolatedAssumptionAnswer());
+      optionFormatter_Builder0.setSyntaxFormatFunction(biFunction0);
+      OptionFormatter optionFormatter0 = optionFormatter_Builder0.build(option0);
+      assertFalse(optionFormatter0.isRequired());
+  }
 
-    @Test(timeout = 4000)
-    public void testBuilderSetOptionalDelimiters() throws Throwable {
-        // Arrange
-        Option option = new Option(null, null);
-        OptionFormatter initialFormatter = OptionFormatter.from(option);
-        OptionFormatter.Builder builder = new OptionFormatter.Builder(initialFormatter);
-        
-        // Act
-        OptionFormatter.Builder returnedBuilder = 
-            builder.setOptionalDelimiters("U\"7]OxTl:%M:~HkH", " ]");
-        
-        // Assert
-        assertSame(builder, returnedBuilder);
-    }
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      Option option0 = new Option((String) null, (String) null, true, "");
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      boolean boolean0 = optionFormatter0.isRequired();
+      assertFalse(boolean0);
+  }
 
-    // Additional builder configuration tests follow...
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      Option option0 = new Option("?Wf", "?Wf", true, "");
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      String string0 = optionFormatter0.toSyntaxOption(true);
+      assertEquals("-?Wf <arg>", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetSinceWithNullOptionThrowsException() throws Throwable {
-        // Arrange
-        OptionFormatter formatter = OptionFormatter.from(null);
-        
-        // Act & Assert
-        assertThrows(NullPointerException.class, () -> formatter.getSince());
-    }
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      Option option0 = new Option("NO_ARGS_ALLOWED", "iRi[{-|Um");
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      String string0 = optionFormatter0.getDescription();
+      assertEquals("iRi[{-|Um", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      Option option0 = new Option("?Wf", "?Wf");
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      String string0 = optionFormatter0.getBothOpt();
+      assertEquals("-?Wf", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      Option option0 = new Option("?Wf", "?Wf", true, "");
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      String string0 = optionFormatter0.getBothOpt();
+      assertEquals("-?Wf, --?Wf", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      Option option0 = new Option((String) null, (String) null);
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      String string0 = optionFormatter0.getBothOpt();
+      assertEquals("", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      Option option0 = new Option((String) null, (String) null);
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      String string0 = optionFormatter0.toSyntaxOption();
+      assertEquals("", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test32()  throws Throwable  {
+      Option option0 = new Option((String) null, (String) null);
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      OptionFormatter.Builder optionFormatter_Builder0 = new OptionFormatter.Builder(optionFormatter0);
+      OptionFormatter.Builder optionFormatter_Builder1 = optionFormatter_Builder0.setOptionalDelimiters("U\"7]OxTl:%M:~HkH", " ]");
+      assertSame(optionFormatter_Builder0, optionFormatter_Builder1);
+  }
+
+  @Test(timeout = 4000)
+  public void test33()  throws Throwable  {
+      Option option0 = new Option("NO_ARGS_ALLOWED", "iRi[{-|Um");
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      OptionFormatter.Builder optionFormatter_Builder0 = new OptionFormatter.Builder(optionFormatter0);
+      OptionFormatter.Builder optionFormatter_Builder1 = optionFormatter_Builder0.setArgumentNameDelimiters("<EEE MMM dd HH:mm:ss zzz yyyy>", "usage: ");
+      assertSame(optionFormatter_Builder1, optionFormatter_Builder0);
+  }
+
+  @Test(timeout = 4000)
+  public void test34()  throws Throwable  {
+      Option option0 = new Option((String) null, "n> #GB(6W.[&nb>qttA");
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      OptionFormatter.Builder optionFormatter_Builder0 = new OptionFormatter.Builder(optionFormatter0);
+      String string0 = optionFormatter_Builder0.toArgName("n6mk~");
+      assertEquals("<n6mk~>", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test35()  throws Throwable  {
+      Option option0 = new Option((String) null, (String) null);
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      OptionFormatter.Builder optionFormatter_Builder0 = new OptionFormatter.Builder(optionFormatter0);
+      OptionFormatter optionFormatter1 = optionFormatter_Builder0.get();
+      assertNull(optionFormatter1);
+  }
+
+  @Test(timeout = 4000)
+  public void test36()  throws Throwable  {
+      Option option0 = new Option((String) null, (String) null, true, "");
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      OptionFormatter.Builder optionFormatter_Builder0 = new OptionFormatter.Builder(optionFormatter0);
+      OptionFormatter.Builder optionFormatter_Builder1 = optionFormatter_Builder0.setOptSeparator("");
+      assertSame(optionFormatter_Builder1, optionFormatter_Builder0);
+  }
+
+  @Test(timeout = 4000)
+  public void test37()  throws Throwable  {
+      Option option0 = new Option((String) null, (String) null);
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      OptionFormatter.Builder optionFormatter_Builder0 = new OptionFormatter.Builder(optionFormatter0);
+      OptionFormatter.Builder optionFormatter_Builder1 = optionFormatter_Builder0.setDeprecatedFormatFunction(optionFormatter0.COMPLEX_DEPRECATED_FORMAT);
+      assertSame(optionFormatter_Builder0, optionFormatter_Builder1);
+  }
+
+  @Test(timeout = 4000)
+  public void test38()  throws Throwable  {
+      Option option0 = new Option((String) null, (String) null);
+      OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
+      OptionFormatter.Builder optionFormatter_Builder0 = new OptionFormatter.Builder(optionFormatter0);
+      OptionFormatter.Builder optionFormatter_Builder1 = optionFormatter_Builder0.setOptPrefix("-");
+      assertSame(optionFormatter_Builder1, optionFormatter_Builder0);
+  }
+
+  @Test(timeout = 4000)
+  public void test39()  throws Throwable  {
+      OptionFormatter optionFormatter0 = OptionFormatter.from((Option) null);
+      // Undeclared exception!
+      try { 
+        optionFormatter0.getSince();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.cli.help.OptionFormatter", e);
+      }
+  }
 }
