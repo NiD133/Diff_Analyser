@@ -33,208 +33,190 @@ import java.util.Random;
 import org.junit.Test;
 
 public final class LinkedTreeMapTest {
-    private static final int RANDOM_KEYS_COUNT = 1000;
-    private static final long RANDOM_SEED = 1367593214724L;
 
-    // Tests for basic insertion and iteration order
-    @Test
-    public void insertionOrder_maintainedInKeySetAndValues() {
-        LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
-        map.put("a", "android");
-        map.put("c", "cola");
-        map.put("b", "bbq");
-        
-        assertThat(map.keySet()).containsExactly("a", "c", "b").inOrder();
-        assertThat(map.values()).containsExactly("android", "cola", "bbq").inOrder();
+  @Test
+  public void testIterationOrder() {
+    LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
+    map.put("a", "android");
+    map.put("c", "cola");
+    map.put("b", "bbq");
+    assertThat(map.keySet()).containsExactly("a", "c", "b").inOrder();
+    assertThat(map.values()).containsExactly("android", "cola", "bbq").inOrder();
+  }
+
+  @Test
+  public void testRemoveRootDoesNotDoubleUnlink() {
+    LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
+    map.put("a", "android");
+    map.put("c", "cola");
+    map.put("b", "bbq");
+    Iterator<Map.Entry<String, String>> it = map.entrySet().iterator();
+    it.next();
+    it.next();
+    it.next();
+    it.remove();
+    assertThat(map.keySet()).containsExactly("a", "c").inOrder();
+  }
+
+  @Test
+  @SuppressWarnings("ModifiedButNotUsed")
+  public void testPutNullKeyFails() {
+    LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
+    var e = assertThrows(NullPointerException.class, () -> map.put(null, "android"));
+    assertThat(e).hasMessageThat().isEqualTo("key == null");
+  }
+
+  @Test
+  @SuppressWarnings("ModifiedButNotUsed")
+  public void testPutNonComparableKeyFails() {
+    LinkedTreeMap<Object, String> map = new LinkedTreeMap<>();
+    assertThrows(ClassCastException.class, () -> map.put(new Object(), "android"));
+  }
+
+  @Test
+  public void testPutNullValue() {
+    LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
+    map.put("a", null);
+
+    assertThat(map).hasSize(1);
+    assertThat(map.containsKey("a")).isTrue();
+    assertThat(map.containsValue(null)).isTrue();
+    assertThat(map.get("a")).isNull();
+  }
+
+  @Test
+  public void testPutNullValue_Forbidden() {
+    LinkedTreeMap<String, String> map = new LinkedTreeMap<>(false);
+    var e = assertThrows(NullPointerException.class, () -> map.put("a", null));
+    assertThat(e).hasMessageThat().isEqualTo("value == null");
+
+    assertThat(map).hasSize(0);
+    assertThat(map).doesNotContainKey("a");
+    assertThat(map.containsValue(null)).isFalse();
+  }
+
+  @Test
+  public void testEntrySetValueNull() {
+    LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
+    map.put("a", "1");
+    assertThat(map.get("a")).isEqualTo("1");
+    Entry<String, String> entry = map.entrySet().iterator().next();
+    assertThat(entry.getKey()).isEqualTo("a");
+    assertThat(entry.getValue()).isEqualTo("1");
+    entry.setValue(null);
+    assertThat(entry.getValue()).isNull();
+
+    assertThat(map.containsKey("a")).isTrue();
+    assertThat(map.containsValue(null)).isTrue();
+    assertThat(map.get("a")).isNull();
+  }
+
+  @Test
+  public void testEntrySetValueNull_Forbidden() {
+    LinkedTreeMap<String, String> map = new LinkedTreeMap<>(false);
+    map.put("a", "1");
+    Entry<String, String> entry = map.entrySet().iterator().next();
+    var e = assertThrows(NullPointerException.class, () -> entry.setValue(null));
+    assertThat(e).hasMessageThat().isEqualTo("value == null");
+
+    assertThat(entry.getValue()).isEqualTo("1");
+    assertThat(map.get("a")).isEqualTo("1");
+    assertThat(map.containsValue(null)).isFalse();
+  }
+
+  @Test
+  public void testContainsNonComparableKeyReturnsFalse() {
+    LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
+    map.put("a", "android");
+    assertThat(map).doesNotContainKey(new Object());
+  }
+
+  @Test
+  public void testContainsNullKeyIsAlwaysFalse() {
+    LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
+    assertThat(map.containsKey(null)).isFalse();
+    map.put("a", "android");
+    assertThat(map.containsKey(null)).isFalse();
+  }
+
+  @Test
+  public void testPutOverrides() throws Exception {
+    LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
+    assertThat(map.put("d", "donut")).isNull();
+    assertThat(map.put("e", "eclair")).isNull();
+    assertThat(map.put("f", "froyo")).isNull();
+    assertThat(map).hasSize(3);
+
+    assertThat(map.get("d")).isEqualTo("donut");
+    assertThat(map.put("d", "done")).isEqualTo("donut");
+    assertThat(map).hasSize(3);
+  }
+
+  @Test
+  public void testEmptyStringValues() {
+    LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
+    map.put("a", "");
+    assertThat(map.containsKey("a")).isTrue();
+    assertThat(map.get("a")).isEqualTo("");
+  }
+
+  @Test
+  public void testLargeSetOfRandomKeys() {
+    Random random = new Random(1367593214724L);
+    LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
+    String[] keys = new String[1000];
+    for (int i = 0; i < keys.length; i++) {
+      keys[i] = Integer.toString(random.nextInt(), 36) + "-" + i;
+      map.put(keys[i], "" + i);
     }
 
-    // Tests for removal operations
-    @Test
-    public void removeLastNodeViaIterator_maintainsCorrectIterationOrder() {
-        LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
-        map.put("a", "android");
-        map.put("c", "cola");
-        map.put("b", "bbq");
-        
-        Iterator<Map.Entry<String, String>> it = map.entrySet().iterator();
-        it.next(); // "a"
-        it.next(); // "c"
-        it.next(); // "b"
-        it.remove();
-        
-        assertThat(map.keySet()).containsExactly("a", "c").inOrder();
+    for (int i = 0; i < keys.length; i++) {
+      String key = keys[i];
+      assertThat(map.containsKey(key)).isTrue();
+      assertThat(map.get(key)).isEqualTo("" + i);
     }
+  }
 
-    @Test
-    public void clear_removesAllEntries() {
-        LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
-        map.put("a", "android");
-        map.put("c", "cola");
-        map.put("b", "bbq");
-        
-        map.clear();
-        assertThat(map).isEmpty();
-        assertThat(map.keySet()).isEmpty();
-    }
+  @Test
+  public void testClear() {
+    LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
+    map.put("a", "android");
+    map.put("c", "cola");
+    map.put("b", "bbq");
+    map.clear();
+    assertThat(map.keySet()).isEmpty();
+    assertThat(map).isEmpty();
+  }
 
-    // Tests for null key handling
-    @Test
-    @SuppressWarnings("ModifiedButNotUsed")
-    public void put_nullKey_throwsNullPointerException() {
-        LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
-        var e = assertThrows(NullPointerException.class, () -> map.put(null, "android"));
-        assertThat(e).hasMessageThat().isEqualTo("key == null");
-    }
+  @Test
+  public void testEqualsAndHashCode() throws Exception {
+    LinkedTreeMap<String, Integer> map1 = new LinkedTreeMap<>();
+    map1.put("A", 1);
+    map1.put("B", 2);
+    map1.put("C", 3);
+    map1.put("D", 4);
 
-    @Test
-    public void containsKey_nullKey_alwaysReturnsFalse() {
-        LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
-        assertThat(map.containsKey(null)).isFalse();
-        
-        map.put("a", "android");
-        assertThat(map.containsKey(null)).isFalse();
-    }
+    LinkedTreeMap<String, Integer> map2 = new LinkedTreeMap<>();
+    map2.put("C", 3);
+    map2.put("B", 2);
+    map2.put("D", 4);
+    map2.put("A", 1);
 
-    // Tests for non-comparable keys
-    @Test
-    @SuppressWarnings("ModifiedButNotUsed")
-    public void put_nonComparableKey_throwsClassCastException() {
-        LinkedTreeMap<Object, String> map = new LinkedTreeMap<>();
-        assertThrows(ClassCastException.class, () -> map.put(new Object(), "android"));
-    }
+    MoreAsserts.assertEqualsAndHashCode(map1, map2);
+  }
 
-    @Test
-    public void containsKey_nonComparableKey_returnsFalse() {
-        LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
-        map.put("a", "android");
-        assertThat(map.containsKey(new Object())).isFalse();
-    }
+  @Test
+  public void testJavaSerialization() throws IOException, ClassNotFoundException {
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    ObjectOutputStream objOut = new ObjectOutputStream(out);
+    Map<String, Integer> map = new LinkedTreeMap<>();
+    map.put("a", 1);
+    objOut.writeObject(map);
+    objOut.close();
 
-    // Tests for null value handling
-    @Test
-    public void put_nullValue_whenAllowed_succeeds() {
-        LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
-        map.put("a", null);
-        
-        assertThat(map).hasSize(1);
-        assertThat(map).containsKey("a");
-        assertThat(map).containsValue(null);
-        assertThat(map.get("a")).isNull();
-    }
-
-    @Test
-    public void put_nullValue_whenDisallowed_throwsNullPointerException() {
-        LinkedTreeMap<String, String> map = new LinkedTreeMap<>(false);
-        var e = assertThrows(NullPointerException.class, () -> map.put("a", null));
-        assertThat(e).hasMessageThat().isEqualTo("value == null");
-        
-        assertThat(map).isEmpty();
-        assertThat(map).doesNotContainKey("a");
-    }
-
-    @Test
-    public void entrySet_setValueToNull_whenAllowed_succeeds() {
-        LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
-        map.put("a", "1");
-        Entry<String, String> entry = map.entrySet().iterator().next();
-        
-        entry.setValue(null);
-        assertThat(entry.getValue()).isNull();
-        assertThat(map.get("a")).isNull();
-    }
-
-    @Test
-    public void entrySet_setValueToNull_whenDisallowed_throwsNullPointerException() {
-        LinkedTreeMap<String, String> map = new LinkedTreeMap<>(false);
-        map.put("a", "1");
-        Entry<String, String> entry = map.entrySet().iterator().next();
-        
-        var e = assertThrows(NullPointerException.class, () -> entry.setValue(null));
-        assertThat(e).hasMessageThat().isEqualTo("value == null");
-        
-        assertThat(entry.getValue()).isEqualTo("1");
-        assertThat(map.get("a")).isEqualTo("1");
-    }
-
-    // Tests for value handling
-    @Test
-    public void put_emptyStringValue_succeeds() {
-        LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
-        map.put("a", "");
-        
-        assertThat(map).containsKey("a");
-        assertThat(map.get("a")).isEmpty();
-    }
-
-    // Tests for put/get operations
-    @Test
-    public void put_existingKey_overridesValue() {
-        LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
-        assertThat(map.put("d", "donut")).isNull();
-        assertThat(map.put("e", "eclair")).isNull();
-        assertThat(map.put("f", "froyo")).isNull();
-        assertThat(map).hasSize(3);
-        
-        assertThat(map.put("d", "done")).isEqualTo("donut");
-        assertThat(map).hasSize(3);
-        assertThat(map.get("d")).isEqualTo("done");
-    }
-
-    @Test
-    public void putAndGet_withRandomKeys_succeeds() {
-        Random random = new Random(RANDOM_SEED);
-        LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
-        String[] keys = new String[RANDOM_KEYS_COUNT];
-        
-        // Insert random keys
-        for (int i = 0; i < keys.length; i++) {
-            keys[i] = Integer.toString(random.nextInt(), 36) + "-" + i;
-            map.put(keys[i], "" + i);
-        }
-        
-        // Verify all keys are present with correct values
-        for (int i = 0; i < keys.length; i++) {
-            String key = keys[i];
-            assertThat(map).containsKey(key);
-            assertThat(map.get(key)).isEqualTo("" + i);
-        }
-    }
-
-    // Tests for equals and hashCode
-    @Test
-    public void equalsAndHashCode_consistentWithMapBehavior() {
-        LinkedTreeMap<String, Integer> map1 = new LinkedTreeMap<>();
-        map1.put("A", 1);
-        map1.put("B", 2);
-        map1.put("C", 3);
-        map1.put("D", 4);
-        
-        // Different insertion order should still be equal
-        LinkedTreeMap<String, Integer> map2 = new LinkedTreeMap<>();
-        map2.put("C", 3);
-        map2.put("B", 2);
-        map2.put("D", 4);
-        map2.put("A", 1);
-        
-        MoreAsserts.assertEqualsAndHashCode(map1, map2);
-    }
-
-    // Tests for serialization
-    @Test
-    public void javaSerialization_deserializedMapEqualsOriginal() 
-            throws IOException, ClassNotFoundException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ObjectOutputStream objOut = new ObjectOutputStream(out);
-        
-        Map<String, Integer> map = new LinkedTreeMap<>();
-        map.put("a", 1);
-        objOut.writeObject(map);
-        objOut.close();
-        
-        ObjectInputStream objIn = new ObjectInputStream(new ByteArrayInputStream(out.toByteArray()));
-        @SuppressWarnings("unchecked")
-        Map<String, Integer> deserialized = (Map<String, Integer>) objIn.readObject();
-        
-        assertThat(deserialized).isEqualTo(Collections.singletonMap("a", 1));
-    }
+    ObjectInputStream objIn = new ObjectInputStream(new ByteArrayInputStream(out.toByteArray()));
+    @SuppressWarnings("unchecked")
+    Map<String, Integer> deserialized = (Map<String, Integer>) objIn.readObject();
+    assertThat(deserialized).isEqualTo(Collections.singletonMap("a", 1));
+  }
 }
