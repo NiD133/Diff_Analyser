@@ -80,287 +80,234 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.google.common.testing.EqualsTester;
 
 /**
- * Unit tests for {@link JulianChronology} and {@link JulianDate}.
+ * Test.
  */
 public class TestJulianChronology {
 
     //-----------------------------------------------------------------------
-    // Chronology Lookup Tests
+    // Chronology.of(String)
     //-----------------------------------------------------------------------
-
     @Test
-    public void test_chronologyLookup_byName_shouldReturnJulianChronology() {
+    public void test_chronology_of_name() {
         Chronology chrono = Chronology.of("Julian");
-        assertNotNull(chrono, "Chronology should not be null");
-        assertEquals(JulianChronology.INSTANCE, chrono, "Chronology should be JulianChronology");
-        assertEquals("Julian", chrono.getId(), "Chronology ID should be 'Julian'");
-        assertEquals("julian", chrono.getCalendarType(), "Calendar type should be 'julian'");
+        assertNotNull(chrono);
+        assertEquals(JulianChronology.INSTANCE, chrono);
+        assertEquals("Julian", chrono.getId());
+        assertEquals("julian", chrono.getCalendarType());
     }
 
     @Test
-    public void test_chronologyLookup_byNameId_shouldReturnJulianChronology() {
+    public void test_chronology_of_name_id() {
         Chronology chrono = Chronology.of("julian");
-        assertNotNull(chrono, "Chronology should not be null");
-        assertEquals(JulianChronology.INSTANCE, chrono, "Chronology should be JulianChronology");
-        assertEquals("Julian", chrono.getId(), "Chronology ID should be 'Julian'");
-        assertEquals("julian", chrono.getCalendarType(), "Calendar type should be 'julian'");
+        assertNotNull(chrono);
+        assertEquals(JulianChronology.INSTANCE, chrono);
+        assertEquals("Julian", chrono.getId());
+        assertEquals("julian", chrono.getCalendarType());
     }
 
     //-----------------------------------------------------------------------
-    // Date Conversion Tests
+    // creation, toLocalDate()
     //-----------------------------------------------------------------------
-
-    /**
-     * Test data for Julian to ISO date conversions.
-     * Each entry contains a JulianDate and its corresponding ISO LocalDate.
-     */
-    public static Object[][] julianToIsoSamples() {
+    public static Object[][] data_samples() {
         return new Object[][] {
-            // Julian Year 1 starts on ISO date 0000-12-30
             {JulianDate.of(1, 1, 1), LocalDate.of(0, 12, 30)},
             {JulianDate.of(1, 1, 2), LocalDate.of(0, 12, 31)},
             {JulianDate.of(1, 1, 3), LocalDate.of(1, 1, 1)},
 
-            // Regular month boundaries
             {JulianDate.of(1, 2, 28), LocalDate.of(1, 2, 26)},
             {JulianDate.of(1, 3, 1), LocalDate.of(1, 2, 27)},
             {JulianDate.of(1, 3, 2), LocalDate.of(1, 2, 28)},
             {JulianDate.of(1, 3, 3), LocalDate.of(1, 3, 1)},
 
-            // Leap year handling (year 4 is leap)
             {JulianDate.of(4, 2, 28), LocalDate.of(4, 2, 26)},
             {JulianDate.of(4, 2, 29), LocalDate.of(4, 2, 27)},
             {JulianDate.of(4, 3, 1), LocalDate.of(4, 2, 28)},
             {JulianDate.of(4, 3, 2), LocalDate.of(4, 2, 29)},
             {JulianDate.of(4, 3, 3), LocalDate.of(4, 3, 1)},
 
-            // Century year (non-leap in Julian but leap in Gregorian)
             {JulianDate.of(100, 2, 28), LocalDate.of(100, 2, 26)},
             {JulianDate.of(100, 2, 29), LocalDate.of(100, 2, 27)},
             {JulianDate.of(100, 3, 1), LocalDate.of(100, 2, 28)},
             {JulianDate.of(100, 3, 2), LocalDate.of(100, 3, 1)},
             {JulianDate.of(100, 3, 3), LocalDate.of(100, 3, 2)},
 
-            // Year 0 (1 BC) handling
             {JulianDate.of(0, 12, 31), LocalDate.of(0, 12, 29)},
             {JulianDate.of(0, 12, 30), LocalDate.of(0, 12, 28)},
 
-            // Gregorian cutover dates
             {JulianDate.of(1582, 10, 4), LocalDate.of(1582, 10, 14)},
             {JulianDate.of(1582, 10, 5), LocalDate.of(1582, 10, 15)},
             {JulianDate.of(1945, 10, 30), LocalDate.of(1945, 11, 12)},
 
-            // Modern dates
             {JulianDate.of(2012, 6, 22), LocalDate.of(2012, 7, 5)},
             {JulianDate.of(2012, 6, 23), LocalDate.of(2012, 7, 6)},
         };
     }
 
     @ParameterizedTest
-    @MethodSource("julianToIsoSamples")
-    public void test_conversion_fromJulianDate_toIsoLocalDate(JulianDate julian, LocalDate iso) {
-        assertEquals(iso, LocalDate.from(julian), "Conversion from JulianDate to LocalDate failed");
+    @MethodSource("data_samples")
+    public void test_LocalDate_from_JulianDate(JulianDate julian, LocalDate iso) {
+        assertEquals(iso, LocalDate.from(julian));
     }
 
     @ParameterizedTest
-    @MethodSource("julianToIsoSamples")
-    public void test_conversion_fromIsoLocalDate_toJulianDate(JulianDate julian, LocalDate iso) {
-        assertEquals(julian, JulianDate.from(iso), "Conversion from LocalDate to JulianDate failed");
+    @MethodSource("data_samples")
+    public void test_JulianDate_from_LocalDate(JulianDate julian, LocalDate iso) {
+        assertEquals(julian, JulianDate.from(iso));
     }
 
     @ParameterizedTest
-    @MethodSource("julianToIsoSamples")
-    public void test_epochDayConversion_usingDateEpochDay(JulianDate julian, LocalDate iso) {
-        assertEquals(julian, JulianChronology.INSTANCE.dateEpochDay(iso.toEpochDay()),
-            "Epoch day conversion failed for JulianChronology.dateEpochDay");
+    @MethodSource("data_samples")
+    public void test_JulianDate_chronology_dateEpochDay(JulianDate julian, LocalDate iso) {
+        assertEquals(julian, JulianChronology.INSTANCE.dateEpochDay(iso.toEpochDay()));
     }
 
     @ParameterizedTest
-    @MethodSource("julianToIsoSamples")
-    public void test_epochDayConversion_usingToEpochDay(JulianDate julian, LocalDate iso) {
-        assertEquals(iso.toEpochDay(), julian.toEpochDay(),
-            "Epoch day value mismatch between JulianDate and LocalDate");
+    @MethodSource("data_samples")
+    public void test_JulianDate_toEpochDay(JulianDate julian, LocalDate iso) {
+        assertEquals(iso.toEpochDay(), julian.toEpochDay());
     }
 
     @ParameterizedTest
-    @MethodSource("julianToIsoSamples")
-    public void test_periodCalculation_sameDate_shouldBeZero(JulianDate julian, LocalDate iso) {
-        assertEquals(JulianChronology.INSTANCE.period(0, 0, 0), julian.until(julian),
-            "Period between same JulianDate should be zero");
-        assertEquals(JulianChronology.INSTANCE.period(0, 0, 0), julian.until(iso),
-            "Period between JulianDate and equivalent LocalDate should be zero");
-        assertEquals(Period.ZERO, iso.until(julian),
-            "Period between LocalDate and equivalent JulianDate should be zero");
+    @MethodSource("data_samples")
+    public void test_JulianDate_until_JulianDate(JulianDate julian, LocalDate iso) {
+        assertEquals(JulianChronology.INSTANCE.period(0, 0, 0), julian.until(julian));
     }
 
     @ParameterizedTest
-    @MethodSource("julianToIsoSamples")
-    public void test_chronologyDateCreation_fromTemporal(JulianDate julian, LocalDate iso) {
-        assertEquals(julian, JulianChronology.INSTANCE.date(iso),
-            "JulianChronology.date() should create correct JulianDate from Temporal");
-    }
-
-    //-----------------------------------------------------------------------
-    // Date Arithmetic Tests
-    //-----------------------------------------------------------------------
-
-    @ParameterizedTest
-    @MethodSource("julianToIsoSamples")
-    public void test_dayArithmetic_plusDays(JulianDate julian, LocalDate iso) {
-        assertEquals(iso, LocalDate.from(julian.plus(0, DAYS)),
-            "Adding zero days should yield same date");
-        assertEquals(iso.plusDays(1), LocalDate.from(julian.plus(1, DAYS)),
-            "Adding one day failed");
-        assertEquals(iso.plusDays(35), LocalDate.from(julian.plus(35, DAYS)),
-            "Adding 35 days failed");
-        assertEquals(iso.plusDays(-1), LocalDate.from(julian.plus(-1, DAYS)),
-            "Subtracting one day (plus negative) failed");
-        assertEquals(iso.plusDays(-60), LocalDate.from(julian.plus(-60, DAYS)),
-            "Subtracting 60 days (plus negative) failed");
+    @MethodSource("data_samples")
+    public void test_JulianDate_until_LocalDate(JulianDate julian, LocalDate iso) {
+        assertEquals(JulianChronology.INSTANCE.period(0, 0, 0), julian.until(iso));
     }
 
     @ParameterizedTest
-    @MethodSource("julianToIsoSamples")
-    public void test_dayArithmetic_minusDays(JulianDate julian, LocalDate iso) {
-        assertEquals(iso, LocalDate.from(julian.minus(0, DAYS)),
-            "Subtracting zero days should yield same date");
-        assertEquals(iso.minusDays(1), LocalDate.from(julian.minus(1, DAYS)),
-            "Subtracting one day failed");
-        assertEquals(iso.minusDays(35), LocalDate.from(julian.minus(35, DAYS)),
-            "Subtracting 35 days failed");
-        assertEquals(iso.minusDays(-1), LocalDate.from(julian.minus(-1, DAYS)),
-            "Adding one day (minus negative) failed");
-        assertEquals(iso.minusDays(-60), LocalDate.from(julian.minus(-60, DAYS)),
-            "Adding 60 days (minus negative) failed");
+    @MethodSource("data_samples")
+    public void test_LocalDate_until_JulianDate(JulianDate julian, LocalDate iso) {
+        assertEquals(Period.ZERO, iso.until(julian));
     }
 
     @ParameterizedTest
-    @MethodSource("julianToIsoSamples")
-    public void test_dayDifferenceCalculation(JulianDate julian, LocalDate iso) {
-        assertEquals(0, julian.until(iso.plusDays(0), DAYS),
-            "Days until same date should be zero");
-        assertEquals(1, julian.until(iso.plusDays(1), DAYS),
-            "Days until next day should be one");
-        assertEquals(35, julian.until(iso.plusDays(35), DAYS),
-            "Days until 35 days later should be 35");
-        assertEquals(-40, julian.until(iso.minusDays(40), DAYS),
-            "Days until 40 days earlier should be -40");
+    @MethodSource("data_samples")
+    public void test_Chronology_date_Temporal(JulianDate julian, LocalDate iso) {
+        assertEquals(julian, JulianChronology.INSTANCE.date(iso));
     }
 
-    //-----------------------------------------------------------------------
-    // Invalid Date Handling Tests
-    //-----------------------------------------------------------------------
+    @ParameterizedTest
+    @MethodSource("data_samples")
+    public void test_plusDays(JulianDate julian, LocalDate iso) {
+        assertEquals(iso, LocalDate.from(julian.plus(0, DAYS)));
+        assertEquals(iso.plusDays(1), LocalDate.from(julian.plus(1, DAYS)));
+        assertEquals(iso.plusDays(35), LocalDate.from(julian.plus(35, DAYS)));
+        assertEquals(iso.plusDays(-1), LocalDate.from(julian.plus(-1, DAYS)));
+        assertEquals(iso.plusDays(-60), LocalDate.from(julian.plus(-60, DAYS)));
+    }
 
-    /**
-     * Test data for invalid Julian dates.
-     * Each entry contains {year, month, day-of-month} that should be invalid.
-     */
-    public static Object[][] invalidJulianDates() {
+    @ParameterizedTest
+    @MethodSource("data_samples")
+    public void test_minusDays(JulianDate julian, LocalDate iso) {
+        assertEquals(iso, LocalDate.from(julian.minus(0, DAYS)));
+        assertEquals(iso.minusDays(1), LocalDate.from(julian.minus(1, DAYS)));
+        assertEquals(iso.minusDays(35), LocalDate.from(julian.minus(35, DAYS)));
+        assertEquals(iso.minusDays(-1), LocalDate.from(julian.minus(-1, DAYS)));
+        assertEquals(iso.minusDays(-60), LocalDate.from(julian.minus(-60, DAYS)));
+    }
+
+    @ParameterizedTest
+    @MethodSource("data_samples")
+    public void test_until_DAYS(JulianDate julian, LocalDate iso) {
+        assertEquals(0, julian.until(iso.plusDays(0), DAYS));
+        assertEquals(1, julian.until(iso.plusDays(1), DAYS));
+        assertEquals(35, julian.until(iso.plusDays(35), DAYS));
+        assertEquals(-40, julian.until(iso.minusDays(40), DAYS));
+    }
+
+    public static Object[][] data_badDates() {
         return new Object[][] {
-            // Invalid month values
             {1900, 0, 0},
+
             {1900, -1, 1},
             {1900, 0, 1},
             {1900, 13, 1},
             {1900, 14, 1},
 
-            // Invalid day-of-month values (general)
             {1900, 1, -1},
             {1900, 1, 0},
             {1900, 1, 32},
 
-            // February invalid days (non-leap year)
             {1900, 2, -1},
             {1900, 2, 0},
-            {1900, 2, 30},  // 1900 is not leap in Julian calendar
+            {1900, 2, 30},
             {1900, 2, 31},
             {1900, 2, 32},
 
-            // February invalid days (leap year 1899? Note: 1899 mod 4 = 3 -> not leap)
             {1899, 2, -1},
             {1899, 2, 0},
-            {1899, 2, 29},  // 1899 is not leap
+            {1899, 2, 29},
             {1899, 2, 30},
             {1899, 2, 31},
             {1899, 2, 32},
 
-            // December invalid days
             {1900, 12, -1},
             {1900, 12, 0},
             {1900, 12, 32},
 
-            // Months with 30 days (invalid 31st)
-            {1900, 4, 31},
-            {1900, 6, 31},
-            {1900, 9, 31},
-            {1900, 11, 31},
-
-            // Months with 31 days (invalid 32nd)
             {1900, 3, 32},
+            {1900, 4, 31},
             {1900, 5, 32},
+            {1900, 6, 31},
             {1900, 7, 32},
             {1900, 8, 32},
+            {1900, 9, 31},
             {1900, 10, 32},
-            {1900, 12, 32},
+            {1900, 11, 31},
         };
     }
 
     @ParameterizedTest
-    @MethodSource("invalidJulianDates")
-    public void test_invalidDateCreation_shouldThrowException(int year, int month, int dom) {
-        assertThrows(DateTimeException.class, () -> JulianDate.of(year, month, dom),
-            "Creating invalid Julian date should throw DateTimeException");
+    @MethodSource("data_badDates")
+    public void test_badDates(int year, int month, int dom) {
+        assertThrows(DateTimeException.class, () -> JulianDate.of(year, month, dom));
     }
 
     @Test
-    public void test_invalidDateYearDayCreation_shouldThrowException() {
-        // 2001 is not a leap year (2001 % 4 = 1), so day 366 is invalid
-        assertThrows(DateTimeException.class, () -> JulianChronology.INSTANCE.dateYearDay(2001, 366),
-            "Creating Julian date with invalid day-of-year should throw DateTimeException");
+    public void test_chronology_dateYearDay_badDate() {
+        assertThrows(DateTimeException.class, () -> JulianChronology.INSTANCE.dateYearDay(2001, 366));
     }
 
     //-----------------------------------------------------------------------
-    // Leap Year Handling Tests
+    // isLeapYear()
     //-----------------------------------------------------------------------
-
     @Test
-    public void test_leapYearDetection_usingLoop() {
-        // Verify leap year rule: divisible by 4
+    public void test_isLeapYear_loop() {
         for (int year = -200; year < 200; year++) {
             JulianDate base = JulianDate.of(year, 1, 1);
-            boolean expectedLeap = (year % 4) == 0;
-            assertEquals(expectedLeap, base.isLeapYear(),
-                "Year " + year + " should " + (expectedLeap ? "" : "not ") + "be leap");
-            assertEquals(expectedLeap, JulianChronology.INSTANCE.isLeapYear(year),
-                "Year " + year + " should " + (expectedLeap ? "" : "not ") + "be leap (via Chronology)");
+            assertEquals((year % 4) == 0, base.isLeapYear());
+            assertEquals((year % 4) == 0, JulianChronology.INSTANCE.isLeapYear(year));
         }
     }
 
     @Test
-    public void test_leapYearDetection_specificCases() {
-        // Positive leap years
-        assertEquals(true, JulianChronology.INSTANCE.isLeapYear(8), "Year 8 should be leap");
-        assertEquals(true, JulianChronology.INSTANCE.isLeapYear(4), "Year 4 should be leap");
-        assertEquals(true, JulianChronology.INSTANCE.isLeapYear(0), "Year 0 should be leap");
-        assertEquals(true, JulianChronology.INSTANCE.isLeapYear(-4), "Year -4 should be leap");
-
-        // Non-leap years
-        assertEquals(false, JulianChronology.INSTANCE.isLeapYear(7), "Year 7 should not be leap");
-        assertEquals(false, JulianChronology.INSTANCE.isLeapYear(3), "Year 3 should not be leap");
-        assertEquals(false, JulianChronology.INSTANCE.isLeapYear(1), "Year 1 should not be leap");
-        assertEquals(false, JulianChronology.INSTANCE.isLeapYear(-1), "Year -1 should not be leap");
-        assertEquals(false, JulianChronology.INSTANCE.isLeapYear(-5), "Year -5 should not be leap");
+    public void test_isLeapYear_specific() {
+        assertEquals(true, JulianChronology.INSTANCE.isLeapYear(8));
+        assertEquals(false, JulianChronology.INSTANCE.isLeapYear(7));
+        assertEquals(false, JulianChronology.INSTANCE.isLeapYear(6));
+        assertEquals(false, JulianChronology.INSTANCE.isLeapYear(5));
+        assertEquals(true, JulianChronology.INSTANCE.isLeapYear(4));
+        assertEquals(false, JulianChronology.INSTANCE.isLeapYear(3));
+        assertEquals(false, JulianChronology.INSTANCE.isLeapYear(2));
+        assertEquals(false, JulianChronology.INSTANCE.isLeapYear(1));
+        assertEquals(true, JulianChronology.INSTANCE.isLeapYear(0));
+        assertEquals(false, JulianChronology.INSTANCE.isLeapYear(-1));
+        assertEquals(false, JulianChronology.INSTANCE.isLeapYear(-2));
+        assertEquals(false, JulianChronology.INSTANCE.isLeapYear(-3));
+        assertEquals(true, JulianChronology.INSTANCE.isLeapYear(-4));
+        assertEquals(false, JulianChronology.INSTANCE.isLeapYear(-5));
+        assertEquals(false, JulianChronology.INSTANCE.isLeapYear(-6));
     }
 
-    /**
-     * Test data for month lengths in Julian calendar.
-     * Format: {year, month, expectedLength}
-     */
-    public static Object[][] monthLengths() {
+    public static Object[][] data_lengthOfMonth() {
         return new Object[][] {
-            // Common year months
             {1900, 1, 31},
-            {1900, 2, 29},  // 1900 is leap in Julian (divisible by 4)
+            {1900, 2, 29},
             {1900, 3, 31},
             {1900, 4, 30},
             {1900, 5, 31},
@@ -372,75 +319,54 @@ public class TestJulianChronology {
             {1900, 11, 30},
             {1900, 12, 31},
 
-            // February in non-leap years
             {1901, 2, 28},
             {1902, 2, 28},
             {1903, 2, 28},
-            
-            // February in leap years
             {1904, 2, 29},
             {2000, 2, 29},
-            {2100, 2, 29},  // 2100 is leap in Julian (divisible by 4)
+            {2100, 2, 29},
         };
     }
 
     @ParameterizedTest
-    @MethodSource("monthLengths")
-    public void test_monthLengthCalculation(int year, int month, int length) {
-        assertEquals(length, JulianDate.of(year, month, 1).lengthOfMonth(),
-            "Month length mismatch for year=" + year + ", month=" + month);
+    @MethodSource("data_lengthOfMonth")
+    public void test_lengthOfMonth(int year, int month, int length) {
+        assertEquals(length, JulianDate.of(year, month, 1).lengthOfMonth());
     }
 
     //-----------------------------------------------------------------------
-    // Era and Year Calculation Tests
+    // era, prolepticYear and dateYearDay
     //-----------------------------------------------------------------------
-
     @Test
-    public void test_eraAndYearFields_usingLoop() {
+    public void test_era_loop() {
         for (int year = -200; year < 200; year++) {
             JulianDate base = JulianChronology.INSTANCE.date(year, 1, 1);
-            
-            // Verify proleptic year
-            assertEquals(year, base.get(YEAR), "Proleptic year mismatch for " + year);
-            
-            // Verify era
-            JulianEra expectedEra = (year <= 0 ? JulianEra.BC : JulianEra.AD);
-            assertEquals(expectedEra, base.getEra(), "Era mismatch for year " + year);
-            
-            // Verify year-of-era
-            int expectedYearOfEra = (year <= 0 ? 1 - year : year);
-            assertEquals(expectedYearOfEra, base.get(YEAR_OF_ERA), "Year-of-era mismatch for year " + year);
-            
-            // Verify era-based date creation
-            JulianDate eraBased = JulianChronology.INSTANCE.date(expectedEra, expectedYearOfEra, 1, 1);
-            assertEquals(base, eraBased, "Era-based date should match proleptic date for year " + year);
+            assertEquals(year, base.get(YEAR));
+            JulianEra era = (year <= 0 ? JulianEra.BC : JulianEra.AD);
+            assertEquals(era, base.getEra());
+            int yoe = (year <= 0 ? 1 - year : year);
+            assertEquals(yoe, base.get(YEAR_OF_ERA));
+            JulianDate eraBased = JulianChronology.INSTANCE.date(era, yoe, 1, 1);
+            assertEquals(base, eraBased);
         }
     }
 
     @Test
-    public void test_eraAndYearFields_yearDay_usingLoop() {
+    public void test_era_yearDay_loop() {
         for (int year = -200; year < 200; year++) {
             JulianDate base = JulianChronology.INSTANCE.dateYearDay(year, 1);
-            
-            // Verify proleptic year
-            assertEquals(year, base.get(YEAR), "Proleptic year mismatch for " + year);
-            
-            // Verify era
-            JulianEra expectedEra = (year <= 0 ? JulianEra.BC : JulianEra.AD);
-            assertEquals(expectedEra, base.getEra(), "Era mismatch for year " + year);
-            
-            // Verify year-of-era
-            int expectedYearOfEra = (year <= 0 ? 1 - year : year);
-            assertEquals(expectedYearOfEra, base.get(YEAR_OF_ERA), "Year-of-era mismatch for year " + year);
-            
-            // Verify era-based date creation
-            JulianDate eraBased = JulianChronology.INSTANCE.dateYearDay(expectedEra, expectedYearOfEra, 1);
-            assertEquals(base, eraBased, "Era-based date should match proleptic date for year " + year);
+            assertEquals(year, base.get(YEAR));
+            JulianEra era = (year <= 0 ? JulianEra.BC : JulianEra.AD);
+            assertEquals(era, base.getEra());
+            int yoe = (year <= 0 ? 1 - year : year);
+            assertEquals(yoe, base.get(YEAR_OF_ERA));
+            JulianDate eraBased = JulianChronology.INSTANCE.dateYearDay(era, yoe, 1);
+            assertEquals(base, eraBased);
         }
     }
 
     @Test
-    public void test_prolepticYearCalculation() {
+    public void test_prolepticYear_specific() {
         assertEquals(4, JulianChronology.INSTANCE.prolepticYear(JulianEra.AD, 4));
         assertEquals(3, JulianChronology.INSTANCE.prolepticYear(JulianEra.AD, 3));
         assertEquals(2, JulianChronology.INSTANCE.prolepticYear(JulianEra.AD, 2));
@@ -452,54 +378,47 @@ public class TestJulianChronology {
     }
 
     @Test
-    public void test_prolepticYearCalculation_withInvalidEra_shouldThrowException() {
-        assertThrows(ClassCastException.class, 
-            () -> JulianChronology.INSTANCE.prolepticYear(IsoEra.CE, 4),
-            "Using ISO era with Julian chronology should throw ClassCastException");
+    public void test_prolepticYear_badEra() {
+        assertThrows(ClassCastException.class, () -> JulianChronology.INSTANCE.prolepticYear(IsoEra.CE, 4));
     }
 
     @Test
-    public void test_eraLookup() {
+    public void test_Chronology_eraOf() {
         assertEquals(JulianEra.AD, JulianChronology.INSTANCE.eraOf(1));
         assertEquals(JulianEra.BC, JulianChronology.INSTANCE.eraOf(0));
     }
 
     @Test
-    public void test_eraLookup_withInvalidValue_shouldThrowException() {
-        assertThrows(DateTimeException.class, 
-            () -> JulianChronology.INSTANCE.eraOf(2),
-            "Invalid era value should throw DateTimeException");
+    public void test_Chronology_eraOf_invalid() {
+        assertThrows(DateTimeException.class, () -> JulianChronology.INSTANCE.eraOf(2));
     }
 
     @Test
-    public void test_availableEras() {
+    public void test_Chronology_eras() {
         List<Era> eras = JulianChronology.INSTANCE.eras();
-        assertEquals(2, eras.size(), "Should have two eras");
-        assertEquals(true, eras.contains(JulianEra.BC), "Should contain BC era");
-        assertEquals(true, eras.contains(JulianEra.AD), "Should contain AD era");
+        assertEquals(2, eras.size());
+        assertEquals(true, eras.contains(JulianEra.BC));
+        assertEquals(true, eras.contains(JulianEra.AD));
     }
 
     //-----------------------------------------------------------------------
-    // Field Range Tests
+    // Chronology.range
     //-----------------------------------------------------------------------
-
     @Test
-    public void test_chronologyFieldRanges() {
+    public void test_Chronology_range() {
         assertEquals(ValueRange.of(1, 7), JulianChronology.INSTANCE.range(DAY_OF_WEEK));
         assertEquals(ValueRange.of(1, 28, 31), JulianChronology.INSTANCE.range(DAY_OF_MONTH));
         assertEquals(ValueRange.of(1, 365, 366), JulianChronology.INSTANCE.range(DAY_OF_YEAR));
         assertEquals(ValueRange.of(1, 12), JulianChronology.INSTANCE.range(MONTH_OF_YEAR));
     }
 
-    /**
-     * Test data for JulianDate.range().
-     * Format: {year, month, day, field, expectedMin, expectedMax}
-     */
-    public static Object[][] fieldRanges() {
+    //-----------------------------------------------------------------------
+    // JulianDate.range
+    //-----------------------------------------------------------------------
+    public static Object[][] data_ranges() {
         return new Object[][] {
-            // 2012 is leap year
             {2012, 1, 23, DAY_OF_MONTH, 1, 31},
-            {2012, 2, 23, DAY_OF_MONTH, 1, 29},  // February in leap year
+            {2012, 2, 23, DAY_OF_MONTH, 1, 29},
             {2012, 3, 23, DAY_OF_MONTH, 1, 31},
             {2012, 4, 23, DAY_OF_MONTH, 1, 30},
             {2012, 5, 23, DAY_OF_MONTH, 1, 31},
@@ -510,412 +429,303 @@ public class TestJulianChronology {
             {2012, 10, 23, DAY_OF_MONTH, 1, 31},
             {2012, 11, 23, DAY_OF_MONTH, 1, 30},
             {2012, 12, 23, DAY_OF_MONTH, 1, 31},
-            {2012, 1, 23, DAY_OF_YEAR, 1, 366},  // Leap year
-            
-            // Aligned week fields
+            {2012, 1, 23, DAY_OF_YEAR, 1, 366},
             {2012, 1, 23, ALIGNED_WEEK_OF_MONTH, 1, 5},
             {2012, 2, 23, ALIGNED_WEEK_OF_MONTH, 1, 5},
             {2012, 3, 23, ALIGNED_WEEK_OF_MONTH, 1, 5},
 
-            // 2011 is not leap
-            {2011, 2, 23, DAY_OF_MONTH, 1, 28},  // February in non-leap year
-            {2011, 2, 23, DAY_OF_YEAR, 1, 365},  // Non-leap year
-            {2011, 2, 23, ALIGNED_WEEK_OF_MONTH, 1, 4},  // February with 28 days
+            {2011, 2, 23, DAY_OF_MONTH, 1, 28},
+            {2011, 2, 23, DAY_OF_YEAR, 1, 365},
+            {2011, 2, 23, ALIGNED_WEEK_OF_MONTH, 1, 4},
         };
     }
 
     @ParameterizedTest
-    @MethodSource("fieldRanges")
-    public void test_dateFieldRanges(int year, int month, int dom, TemporalField field, int expectedMin, int expectedMax) {
-        ValueRange range = JulianDate.of(year, month, dom).range(field);
-        assertEquals(ValueRange.of(expectedMin, expectedMax), range,
-            "Field range mismatch for " + field + " at " + year + "-" + month + "-" + dom);
+    @MethodSource("data_ranges")
+    public void test_range(int year, int month, int dom, TemporalField field, int expectedMin, int expectedMax) {
+        assertEquals(ValueRange.of(expectedMin, expectedMax), JulianDate.of(year, month, dom).range(field));
     }
 
     @Test
-    public void test_unsupportedFieldRange_shouldThrowException() {
-        JulianDate date = JulianDate.of(2012, 6, 30);
-        assertThrows(UnsupportedTemporalTypeException.class, 
-            () -> date.range(MINUTE_OF_DAY),
-            "MINUTE_OF_DAY should be unsupported for JulianDate");
+    public void test_range_unsupported() {
+        assertThrows(UnsupportedTemporalTypeException.class, () -> JulianDate.of(2012, 6, 30).range(MINUTE_OF_DAY));
     }
 
     //-----------------------------------------------------------------------
-    // Field Value Tests
+    // JulianDate.getLong
     //-----------------------------------------------------------------------
-
-    /**
-     * Test data for JulianDate.getLong().
-     * Format: {year, month, day, field, expectedValue}
-     */
-    public static Object[][] fieldValues() {
+    public static Object[][] data_getLong() {
         return new Object[][] {
-            {2014, 5, 26, DAY_OF_WEEK, 7},  // Monday (ISO Sunday=7)
+            {2014, 5, 26, DAY_OF_WEEK, 7},
             {2014, 5, 26, DAY_OF_MONTH, 26},
-            {2014, 5, 26, DAY_OF_YEAR, 31 + 28 + 31 + 30 + 26},  // Jan(31) + Feb(28) + Mar(31) + Apr(30) + May(26)
-            {2014, 5, 26, ALIGNED_DAY_OF_WEEK_IN_MONTH, 5},  // 26th is 5th aligned day (Mon-Sun alignment)
-            {2014, 5, 26, ALIGNED_WEEK_OF_MONTH, 4},  // Fourth aligned week
-            {2014, 5, 26, ALIGNED_DAY_OF_WEEK_IN_YEAR, 6},  // Sixth aligned day in year
-            {2014, 5, 26, ALIGNED_WEEK_OF_YEAR, 21},  // 21st aligned week
+            {2014, 5, 26, DAY_OF_YEAR, 31 + 28 + 31 + 30 + 26},
+            {2014, 5, 26, ALIGNED_DAY_OF_WEEK_IN_MONTH, 5},
+            {2014, 5, 26, ALIGNED_WEEK_OF_MONTH, 4},
+            {2014, 5, 26, ALIGNED_DAY_OF_WEEK_IN_YEAR, 6},
+            {2014, 5, 26, ALIGNED_WEEK_OF_YEAR, 21},
             {2014, 5, 26, MONTH_OF_YEAR, 5},
-            {2014, 5, 26, PROLEPTIC_MONTH, 2014 * 12 + 5 - 1},  // Months since epoch
+            {2014, 5, 26, PROLEPTIC_MONTH, 2014 * 12 + 5 - 1},
             {2014, 5, 26, YEAR, 2014},
-            {2014, 5, 26, ERA, 1},  // AD
-            {1, 6, 8, ERA, 1},      // AD
-            {0, 6, 8, ERA, 0},      // BC
+            {2014, 5, 26, ERA, 1},
+            {1, 6, 8, ERA, 1},
+            {0, 6, 8, ERA, 0},
 
-            // WeekFields integration
-            {2014, 5, 26, WeekFields.ISO.dayOfWeek(), 7},  // Monday (ISO Sunday=7)
+            {2014, 5, 26, WeekFields.ISO.dayOfWeek(), 7},
         };
     }
 
     @ParameterizedTest
-    @MethodSource("fieldValues")
-    public void test_fieldValueRetrieval(int year, int month, int dom, TemporalField field, long expected) {
-        long value = JulianDate.of(year, month, dom).getLong(field);
-        assertEquals(expected, value, 
-            "Field value mismatch for " + field + " at " + year + "-" + month + "-" + dom);
+    @MethodSource("data_getLong")
+    public void test_getLong(int year, int month, int dom, TemporalField field, long expected) {
+        assertEquals(expected, JulianDate.of(year, month, dom).getLong(field));
     }
 
     @Test
-    public void test_unsupportedFieldValue_shouldThrowException() {
-        JulianDate date = JulianDate.of(2012, 6, 30);
-        assertThrows(UnsupportedTemporalTypeException.class, 
-            () -> date.getLong(MINUTE_OF_DAY),
-            "MINUTE_OF_DAY should be unsupported for JulianDate");
+    public void test_getLong_unsupported() {
+        assertThrows(UnsupportedTemporalTypeException.class, () -> JulianDate.of(2012, 6, 30).getLong(MINUTE_OF_DAY));
     }
 
     //-----------------------------------------------------------------------
-    // Date Manipulation Tests
+    // JulianDate.with
     //-----------------------------------------------------------------------
-
-    /**
-     * Test data for JulianDate.with().
-     * Format: {originalYear, originalMonth, originalDay, field, newValue, expectedYear, expectedMonth, expectedDay}
-     */
-    public static Object[][] dateAdjustments() {
+    public static Object[][] data_with() {
         return new Object[][] {
-            // Day adjustments
-            {2014, 5, 26, DAY_OF_WEEK, 3, 2014, 5, 22},  // Set to 3rd day of week (Wednesday)
+            {2014, 5, 26, DAY_OF_WEEK, 3, 2014, 5, 22},
+            {2014, 5, 26, DAY_OF_WEEK, 7, 2014, 5, 26},
             {2014, 5, 26, DAY_OF_MONTH, 31, 2014, 5, 31},
+            {2014, 5, 26, DAY_OF_MONTH, 26, 2014, 5, 26},
             {2014, 5, 26, DAY_OF_YEAR, 365, 2014, 12, 31},
-            
-            // Aligned week adjustments
+            {2014, 5, 26, DAY_OF_YEAR, 146, 2014, 5, 26},
             {2014, 5, 26, ALIGNED_DAY_OF_WEEK_IN_MONTH, 3, 2014, 5, 24},
+            {2014, 5, 26, ALIGNED_DAY_OF_WEEK_IN_MONTH, 5, 2014, 5, 26},
             {2014, 5, 26, ALIGNED_WEEK_OF_MONTH, 1, 2014, 5, 5},
+            {2014, 5, 26, ALIGNED_WEEK_OF_MONTH, 4, 2014, 5, 26},
             {2014, 5, 26, ALIGNED_DAY_OF_WEEK_IN_YEAR, 2, 2014, 5, 22},
+            {2014, 5, 26, ALIGNED_DAY_OF_WEEK_IN_YEAR, 6, 2014, 5, 26},
             {2014, 5, 26, ALIGNED_WEEK_OF_YEAR, 23, 2014, 6, 9},
-            
-            // Month adjustments
+            {2014, 5, 26, ALIGNED_WEEK_OF_YEAR, 21, 2014, 5, 26},
             {2014, 5, 26, MONTH_OF_YEAR, 7, 2014, 7, 26},
-            {2011, 3, 31, MONTH_OF_YEAR, 2, 2011, 2, 28},  // Non-leap year
-            {2012, 3, 31, MONTH_OF_YEAR, 2, 2012, 2, 29},  // Leap year
-            {2012, 3, 31, MONTH_OF_YEAR, 6, 2012, 6, 30},  // June has 30 days
-            
-            // Year adjustments
-            {2014, 5, 26, YEAR, 2012, 2012, 5, 26},
-            {2012, 2, 29, YEAR, 2011, 2011, 2, 28},  // 2011 not leap
-            
-            // Proleptic month adjustments
+            {2014, 5, 26, MONTH_OF_YEAR, 5, 2014, 5, 26},
             {2014, 5, 26, PROLEPTIC_MONTH, 2013 * 12 + 3 - 1, 2013, 3, 26},
-            
-            // Era adjustments
-            {2014, 5, 26, ERA, 0, -2013, 5, 26},  // Switch to BC
-            {2014, 5, 26, ERA, 1, 2014, 5, 26},   // Stay in AD
-            
-            // Year-of-era adjustments
+            {2014, 5, 26, PROLEPTIC_MONTH, 2014 * 12 + 5 - 1, 2014, 5, 26},
+            {2014, 5, 26, YEAR, 2012, 2012, 5, 26},
+            {2014, 5, 26, YEAR, 2014, 2014, 5, 26},
             {2014, 5, 26, YEAR_OF_ERA, 2012, 2012, 5, 26},
-            {-2013, 6, 8, YEAR_OF_ERA, 2012, -2011, 6, 8}, // BC: yearOfEra 2012 = proleptic year -2011
-            
-            // WeekFields integration
-            {2014, 5, 26, WeekFields.ISO.dayOfWeek(), 3, 2014, 5, 22},  // Set to Wednesday (ISO)
+            {2014, 5, 26, YEAR_OF_ERA, 2014, 2014, 5, 26},
+            {2014, 5, 26, ERA, 0, -2013, 5, 26},
+            {2014, 5, 26, ERA, 1, 2014, 5, 26},
+
+            {2011, 3, 31, MONTH_OF_YEAR, 2, 2011, 2, 28},
+            {2012, 3, 31, MONTH_OF_YEAR, 2, 2012, 2, 29},
+            {2012, 3, 31, MONTH_OF_YEAR, 6, 2012, 6, 30},
+            {2012, 2, 29, YEAR, 2011, 2011, 2, 28},
+            {-2013, 6, 8, YEAR_OF_ERA, 2012, -2011, 6, 8},
+            {2014, 5, 26, WeekFields.ISO.dayOfWeek(), 3, 2014, 5, 22},
         };
     }
 
     @ParameterizedTest
-    @MethodSource("dateAdjustments")
-    public void test_dateAdjustment_withTemporalField(
-            int year, int month, int dom,
+    @MethodSource("data_with")
+    public void test_with_TemporalField(int year, int month, int dom,
             TemporalField field, long value,
             int expectedYear, int expectedMonth, int expectedDom) {
-        JulianDate original = JulianDate.of(year, month, dom);
-        JulianDate adjusted = original.with(field, value);
-        assertEquals(JulianDate.of(expectedYear, expectedMonth, expectedDom), adjusted,
-            "Date adjustment with " + field + " failed");
+        assertEquals(JulianDate.of(expectedYear, expectedMonth, expectedDom), JulianDate.of(year, month, dom).with(field, value));
     }
 
     @Test
-    public void test_unsupportedDateAdjustment_shouldThrowException() {
-        JulianDate date = JulianDate.of(2012, 6, 30);
-        assertThrows(UnsupportedTemporalTypeException.class, 
-            () -> date.with(MINUTE_OF_DAY, 0),
-            "Adjusting MINUTE_OF_DAY should be unsupported");
+    public void test_with_TemporalField_unsupported() {
+        assertThrows(UnsupportedTemporalTypeException.class, () -> JulianDate.of(2012, 6, 30).with(MINUTE_OF_DAY, 0));
     }
 
     //-----------------------------------------------------------------------
-    // TemporalAdjuster Tests
+    // JulianDate.with(TemporalAdjuster)
     //-----------------------------------------------------------------------
-
     @Test
-    public void test_temporalAdjuster_lastDayOfMonth_nonLeapFebruary() {
-        JulianDate base = JulianDate.of(2011, 2, 23);  // 2011 not leap
-        JulianDate adjusted = base.with(TemporalAdjusters.lastDayOfMonth());
-        assertEquals(JulianDate.of(2011, 2, 28), adjusted,
-            "Last day of February in non-leap year should be 28");
-    }
-
-    @Test
-    public void test_temporalAdjuster_lastDayOfMonth_leapFebruary() {
-        JulianDate base = JulianDate.of(2012, 2, 23);  // 2012 is leap
-        JulianDate adjusted = base.with(TemporalAdjusters.lastDayOfMonth());
-        assertEquals(JulianDate.of(2012, 2, 29), adjusted,
-            "Last day of February in leap year should be 29");
-    }
-
-    @Test
-    public void test_temporalAdjuster_lastDayOfMonth_regularMonth() {
+    public void test_adjust1() {
         JulianDate base = JulianDate.of(2012, 6, 23);
-        JulianDate adjusted = base.with(TemporalAdjusters.lastDayOfMonth());
-        assertEquals(JulianDate.of(2012, 6, 30), adjusted,
-            "Last day of June should be 30");
+        JulianDate test = base.with(TemporalAdjusters.lastDayOfMonth());
+        assertEquals(JulianDate.of(2012, 6, 30), test);
     }
 
     @Test
-    public void test_adjustToLocalDate() {
+    public void test_adjust2() {
+        JulianDate base = JulianDate.of(2012, 2, 23);
+        JulianDate test = base.with(TemporalAdjusters.lastDayOfMonth());
+        assertEquals(JulianDate.of(2012, 2, 29), test);
+    }
+
+    //-----------------------------------------------------------------------
+    // JulianDate.with(Local*)
+    //-----------------------------------------------------------------------
+    @Test
+    public void test_adjust_toLocalDate() {
         JulianDate julian = JulianDate.of(2000, 1, 4);
-        JulianDate adjusted = julian.with(LocalDate.of(2012, 7, 6));
-        assertEquals(JulianDate.of(2012, 6, 23), adjusted,
-            "Adjusting to LocalDate should convert correctly");
+        JulianDate test = julian.with(LocalDate.of(2012, 7, 6));
+        assertEquals(JulianDate.of(2012, 6, 23), test);
     }
 
     @Test
-    public void test_adjustToMonth_shouldThrowException() {
+    public void test_adjust_toMonth() {
         JulianDate julian = JulianDate.of(2000, 1, 4);
-        assertThrows(DateTimeException.class, 
-            () -> julian.with(Month.APRIL),
-            "Adjusting to Month should throw since it requires conversion");
+        assertThrows(DateTimeException.class, () -> julian.with(Month.APRIL));
     }
 
     //-----------------------------------------------------------------------
-    // Conversion Integration Tests
+    // LocalDate.with(JulianDate)
     //-----------------------------------------------------------------------
-
     @Test
-    public void test_localDateAdjustToJulianDate() {
+    public void test_LocalDate_adjustToJulianDate() {
         JulianDate julian = JulianDate.of(2012, 6, 23);
-        LocalDate adjusted = LocalDate.MIN.with(julian);
-        assertEquals(LocalDate.of(2012, 7, 6), adjusted,
-            "LocalDate adjustment to JulianDate should convert correctly");
+        LocalDate test = LocalDate.MIN.with(julian);
+        assertEquals(LocalDate.of(2012, 7, 6), test);
     }
 
     @Test
-    public void test_localDateTimeAdjustToJulianDate() {
+    public void test_LocalDateTime_adjustToJulianDate() {
         JulianDate julian = JulianDate.of(2012, 6, 23);
-        LocalDateTime adjusted = LocalDateTime.MIN.with(julian);
-        assertEquals(LocalDateTime.of(2012, 7, 6, 0, 0), adjusted,
-            "LocalDateTime adjustment to JulianDate should convert correctly");
+        LocalDateTime test = LocalDateTime.MIN.with(julian);
+        assertEquals(LocalDateTime.of(2012, 7, 6, 0, 0), test);
     }
 
     //-----------------------------------------------------------------------
-    // Date Arithmetic (Plus/Minus) Tests
+    // JulianDate.plus
     //-----------------------------------------------------------------------
-
-    /**
-     * Test data for date arithmetic.
-     * Format: {year, month, day, amount, unit, expectedYear, expectedMonth, expectedDay}
-     */
-    public static Object[][] dateArithmetic() {
+    public static Object[][] data_plus() {
         return new Object[][] {
-            // Days
             {2014, 5, 26, 0, DAYS, 2014, 5, 26},
             {2014, 5, 26, 8, DAYS, 2014, 6, 3},
             {2014, 5, 26, -3, DAYS, 2014, 5, 23},
-            
-            // Weeks
             {2014, 5, 26, 0, WEEKS, 2014, 5, 26},
             {2014, 5, 26, 3, WEEKS, 2014, 6, 16},
             {2014, 5, 26, -5, WEEKS, 2014, 4, 21},
-            
-            // Months
             {2014, 5, 26, 0, MONTHS, 2014, 5, 26},
             {2014, 5, 26, 3, MONTHS, 2014, 8, 26},
             {2014, 5, 26, -5, MONTHS, 2013, 12, 26},
-            
-            // Years
             {2014, 5, 26, 0, YEARS, 2014, 5, 26},
             {2014, 5, 26, 3, YEARS, 2017, 5, 26},
             {2014, 5, 26, -5, YEARS, 2009, 5, 26},
-            
-            // Decades
             {2014, 5, 26, 0, DECADES, 2014, 5, 26},
             {2014, 5, 26, 3, DECADES, 2044, 5, 26},
             {2014, 5, 26, -5, DECADES, 1964, 5, 26},
-            
-            // Centuries
             {2014, 5, 26, 0, CENTURIES, 2014, 5, 26},
             {2014, 5, 26, 3, CENTURIES, 2314, 5, 26},
             {2014, 5, 26, -5, CENTURIES, 1514, 5, 26},
-            
-            // Millennia
             {2014, 5, 26, 0, MILLENNIA, 2014, 5, 26},
             {2014, 5, 26, 3, MILLENNIA, 5014, 5, 26},
             {2014, 5, 26, -5, MILLENNIA, 2014 - 5000, 5, 26},
-            
-            // Eras
-            {2014, 5, 26, -1, ERAS, -2013, 5, 26},  // Switch from AD to BC
+            {2014, 5, 26, -1, ERAS, -2013, 5, 26},
         };
     }
 
     @ParameterizedTest
-    @MethodSource("dateArithmetic")
-    public void test_dateArithmetic_plusTemporalUnit(
-            int year, int month, int dom,
+    @MethodSource("data_plus")
+    public void test_plus_TemporalUnit(int year, int month, int dom,
             long amount, TemporalUnit unit,
             int expectedYear, int expectedMonth, int expectedDom) {
-        JulianDate base = JulianDate.of(year, month, dom);
-        JulianDate result = base.plus(amount, unit);
-        assertEquals(JulianDate.of(expectedYear, expectedMonth, expectedDom), result,
-            "Adding " + amount + " " + unit + " failed");
+        assertEquals(JulianDate.of(expectedYear, expectedMonth, expectedDom), JulianDate.of(year, month, dom).plus(amount, unit));
     }
 
     @ParameterizedTest
-    @MethodSource("dateArithmetic")
-    public void test_dateArithmetic_minusTemporalUnit(
+    @MethodSource("data_plus")
+    public void test_minus_TemporalUnit(
             int expectedYear, int expectedMonth, int expectedDom,
             long amount, TemporalUnit unit,
             int year, int month, int dom) {
-        JulianDate base = JulianDate.of(year, month, dom);
-        JulianDate result = base.minus(amount, unit);
-        assertEquals(JulianDate.of(expectedYear, expectedMonth, expectedDom), result,
-            "Subtracting " + amount + " " + unit + " failed");
+        assertEquals(JulianDate.of(expectedYear, expectedMonth, expectedDom), JulianDate.of(year, month, dom).minus(amount, unit));
     }
 
     @Test
-    public void test_unsupportedTemporalUnit_shouldThrowException() {
-        JulianDate date = JulianDate.of(2012, 6, 30);
-        assertThrows(UnsupportedTemporalTypeException.class, 
-            () -> date.plus(0, MINUTES),
-            "Adding MINUTES should be unsupported");
+    public void test_plus_TemporalUnit_unsupported() {
+        assertThrows(UnsupportedTemporalTypeException.class, () -> JulianDate.of(2012, 6, 30).plus(0, MINUTES));
     }
 
     //-----------------------------------------------------------------------
-    // Period Calculation Tests
+    // JulianDate.until
     //-----------------------------------------------------------------------
-
-    /**
-     * Test data for period calculations.
-     * Format: {year1, month1, dom1, year2, month2, dom2, unit, expected}
-     */
-    public static Object[][] periodCalculations() {
+    public static Object[][] data_until() {
         return new Object[][] {
-            // Days
             {2014, 5, 26, 2014, 5, 26, DAYS, 0},
             {2014, 5, 26, 2014, 6, 1, DAYS, 6},
             {2014, 5, 26, 2014, 5, 20, DAYS, -6},
-            
-            // Weeks
             {2014, 5, 26, 2014, 5, 26, WEEKS, 0},
-            {2014, 5, 26, 2014, 6, 1, WEEKS, 0},   // 6 days is less than a week
-            {2014, 5, 26, 2014, 6, 2, WEEKS, 1},   // Exactly 7 days
-            
-            // Months
+            {2014, 5, 26, 2014, 6, 1, WEEKS, 0},
+            {2014, 5, 26, 2014, 6, 2, WEEKS, 1},
             {2014, 5, 26, 2014, 5, 26, MONTHS, 0},
-            {2014, 5, 26, 2014, 6, 25, MONTHS, 0}, // Not full month
-            {2014, 5, 26, 2014, 6, 26, MONTHS, 1}, // Exactly one month
-            
-            // Years
+            {2014, 5, 26, 2014, 6, 25, MONTHS, 0},
+            {2014, 5, 26, 2014, 6, 26, MONTHS, 1},
             {2014, 5, 26, 2014, 5, 26, YEARS, 0},
-            {2014, 5, 26, 2015, 5, 25, YEARS, 0},  // Not full year
-            {2014, 5, 26, 2015, 5, 26, YEARS, 1},  // Exactly one year
-            
-            // Decades
+            {2014, 5, 26, 2015, 5, 25, YEARS, 0},
+            {2014, 5, 26, 2015, 5, 26, YEARS, 1},
             {2014, 5, 26, 2014, 5, 26, DECADES, 0},
-            {2014, 5, 26, 2024, 5, 25, DECADES, 0}, // Not full decade
-            {2014, 5, 26, 2024, 5, 26, DECADES, 1}, // Exactly one decade
-            
-            // Eras
-            {-2013, 5, 26, 0, 5, 26, ERAS, 0},     // Same era (BC)
-            {-2013, 5, 26, 2014, 5, 26, ERAS, 1},  // Different era (BC to AD)
+            {2014, 5, 26, 2024, 5, 25, DECADES, 0},
+            {2014, 5, 26, 2024, 5, 26, DECADES, 1},
+            {2014, 5, 26, 2014, 5, 26, CENTURIES, 0},
+            {2014, 5, 26, 2114, 5, 25, CENTURIES, 0},
+            {2014, 5, 26, 2114, 5, 26, CENTURIES, 1},
+            {2014, 5, 26, 2014, 5, 26, MILLENNIA, 0},
+            {2014, 5, 26, 3014, 5, 25, MILLENNIA, 0},
+            {2014, 5, 26, 3014, 5, 26, MILLENNIA, 1},
+            {-2013, 5, 26, 0, 5, 26, ERAS, 0},
+            {-2013, 5, 26, 2014, 5, 26, ERAS, 1},
         };
     }
 
     @ParameterizedTest
-    @MethodSource("periodCalculations")
-    public void test_periodCalculation_betweenDates(
+    @MethodSource("data_until")
+    public void test_until_TemporalUnit(
             int year1, int month1, int dom1,
             int year2, int month2, int dom2,
             TemporalUnit unit, long expected) {
         JulianDate start = JulianDate.of(year1, month1, dom1);
         JulianDate end = JulianDate.of(year2, month2, dom2);
-        long result = start.until(end, unit);
-        assertEquals(expected, result,
-            "Period between " + start + " and " + end + " in " + unit + " should be " + expected);
+        assertEquals(expected, start.until(end, unit));
     }
 
     @Test
-    public void test_unsupportedPeriodUnit_shouldThrowException() {
+    public void test_until_TemporalUnit_unsupported() {
         JulianDate start = JulianDate.of(2012, 6, 30);
         JulianDate end = JulianDate.of(2012, 7, 1);
-        assertThrows(UnsupportedTemporalTypeException.class, 
-            () -> start.until(end, MINUTES),
-            "Period calculation in MINUTES should be unsupported");
+        assertThrows(UnsupportedTemporalTypeException.class, () -> start.until(end, MINUTES));
     }
 
     //-----------------------------------------------------------------------
-    // Period Arithmetic Tests
-    //-----------------------------------------------------------------------
-
     @Test
-    public void test_periodArithmetic_plusJulianPeriod() {
-        JulianDate start = JulianDate.of(2014, 5, 26);
-        JulianDate result = start.plus(JulianChronology.INSTANCE.period(0, 2, 3));
-        assertEquals(JulianDate.of(2014, 7, 29), result,
-            "Adding 2 months and 3 days should yield correct date");
+    public void test_plus_Period() {
+        assertEquals(JulianDate.of(2014, 7, 29), JulianDate.of(2014, 5, 26).plus(JulianChronology.INSTANCE.period(0, 2, 3)));
     }
 
     @Test
-    public void test_periodArithmetic_plusIsoPeriod_shouldThrowException() {
-        JulianDate start = JulianDate.of(2014, 5, 26);
-        assertThrows(DateTimeException.class, 
-            () -> start.plus(Period.ofMonths(2)),
-            "Adding ISO period to JulianDate should throw");
+    public void test_plus_Period_ISO() {
+        assertThrows(DateTimeException.class, () -> JulianDate.of(2014, 5, 26).plus(Period.ofMonths(2)));
     }
 
     @Test
-    public void test_periodArithmetic_minusJulianPeriod() {
-        JulianDate start = JulianDate.of(2014, 5, 26);
-        JulianDate result = start.minus(JulianChronology.INSTANCE.period(0, 2, 3));
-        assertEquals(JulianDate.of(2014, 3, 23), result,
-            "Subtracting 2 months and 3 days should yield correct date");
+    public void test_minus_Period() {
+        assertEquals(JulianDate.of(2014, 3, 23), JulianDate.of(2014, 5, 26).minus(JulianChronology.INSTANCE.period(0, 2, 3)));
     }
 
     @Test
-    public void test_periodArithmetic_minusIsoPeriod_shouldThrowException() {
-        JulianDate start = JulianDate.of(2014, 5, 26);
-        assertThrows(DateTimeException.class, 
-            () -> start.minus(Period.ofMonths(2)),
-            "Subtracting ISO period from JulianDate should throw");
+    public void test_minus_Period_ISO() {
+        assertThrows(DateTimeException.class, () -> JulianDate.of(2014, 5, 26).minus(Period.ofMonths(2)));
     }
 
     //-----------------------------------------------------------------------
-    // Object Contract Tests
+    // equals() / hashCode()
     //-----------------------------------------------------------------------
-
     @Test
-    public void test_equalsAndHashCode() {
+    public void test_equals_and_hashCode() {
         new EqualsTester()
             .addEqualityGroup(JulianDate.of(2000, 1, 3), JulianDate.of(2000, 1, 3))
-            .addEqualityGroup(JulianDate.of(2000, 1, 4))
-            .addEqualityGroup(JulianDate.of(2000, 2, 3))
-            .addEqualityGroup(JulianDate.of(2001, 1, 3))
+            .addEqualityGroup(JulianDate.of(2000, 1, 4), JulianDate.of(2000, 1, 4))
+            .addEqualityGroup(JulianDate.of(2000, 2, 3), JulianDate.of(2000, 2, 3))
+            .addEqualityGroup(JulianDate.of(2001, 1, 3), JulianDate.of(2001, 1, 3))
             .testEquals();
     }
 
     //-----------------------------------------------------------------------
-    // String Representation Tests
+    // toString()
     //-----------------------------------------------------------------------
-
-    public static Object[][] stringRepresentations() {
+    public static Object[][] data_toString() {
         return new Object[][] {
             {JulianDate.of(1, 1, 1), "Julian AD 1-01-01"},
             {JulianDate.of(2012, 6, 23), "Julian AD 2012-06-23"},
@@ -923,9 +733,9 @@ public class TestJulianChronology {
     }
 
     @ParameterizedTest
-    @MethodSource("stringRepresentations")
+    @MethodSource("data_toString")
     public void test_toString(JulianDate julian, String expected) {
-        assertEquals(expected, julian.toString(),
-            "String representation should match expected format");
+        assertEquals(expected, julian.toString());
     }
+
 }
