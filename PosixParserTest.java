@@ -22,9 +22,26 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test case for the PosixParser.
+ * Tests for the deprecated {@link PosixParser}.
  *
- * TODO Needs a rework using JUnit parameterized tests.
+ * <p>
+ * This class inherits from {@link AbstractParserTestCase}, which provides a suite of
+ * tests for common command-line parsing behavior. However, the {@link PosixParser}
+ * implements a stricter, more traditional interpretation of POSIX-style options
+ * and does not support certain features found in other parsers like {@link GnuParser}.
+ * </p>
+ * <p>
+ * Specifically, {@code PosixParser} does not support:
+ * </p>
+ * <ul>
+ *   <li>Long options with a single dash (e.g., {@code -longoption}).</li>
+ *   <li>Attaching arguments to short options with an equals sign (e.g., {@code -f=bar}).</li>
+ *   <li>Handling of negative numbers as arguments.</li>
+ * </ul>
+ * <p>
+ * Consequently, this test class overrides and disables the corresponding tests
+ * from the base class that cover these unsupported features.
+ * </p>
  */
 class PosixParserTest extends AbstractParserTestCase {
     @Override
@@ -35,63 +52,70 @@ class PosixParserTest extends AbstractParserTestCase {
         parser = new PosixParser();
     }
 
+    // ----------------------------------------------------------------------
+    // Disabled Tests from AbstractParserTestCase
+    //
+    // The following tests are inherited from the base class but disabled
+    // because PosixParser does not support the tested features.
+    // ----------------------------------------------------------------------
+
     @Override
     @Test
-    @Disabled("not supported by the PosixParser")
-    void testAmbiguousLongWithoutEqualSingleDash() throws Exception {
+    @Disabled("Unsupported by PosixParser: long options with a single dash.")
+    void testAmbiguousLongWithoutEqualSingleDash() {
     }
 
     @Override
     @Test
-    @Disabled("not supported by the PosixParser")
-    void testAmbiguousLongWithoutEqualSingleDash2() throws Exception {
+    @Disabled("Unsupported by PosixParser: long options with a single dash.")
+    void testAmbiguousLongWithoutEqualSingleDash2() {
     }
 
     @Override
     @Test
-    @Disabled("not supported by the PosixParser")
-    void testAmbiguousPartialLongOption4() throws Exception {
+    @Disabled("Unsupported by PosixParser: partial long options with a single dash.")
+    void testAmbiguousPartialLongOption4() {
     }
 
     @Override
     @Test
-    @Disabled("not supported by the PosixParser")
-    void testDoubleDash2() throws Exception {
+    @Disabled("Unsupported by PosixParser: specific behavior of '--' token.")
+    void testDoubleDash2() {
     }
 
     @Override
     @Test
-    @Disabled("not supported by the PosixParser")
-    void testLongWithEqualSingleDash() throws Exception {
+    @Disabled("Unsupported by PosixParser: long options with a single dash (e.g. -file=name).")
+    void testLongWithEqualSingleDash() {
     }
 
     @Override
     @Test
-    @Disabled("not supported by the PosixParser")
-    void testLongWithoutEqualSingleDash() throws Exception {
+    @Disabled("Unsupported by PosixParser: long options with a single dash (e.g. -file name).")
+    void testLongWithoutEqualSingleDash() {
     }
 
     @Override
     @Test
-    @Disabled("not supported by the PosixParser")
-    void testLongWithUnexpectedArgument1() throws Exception {
+    @Disabled("Unsupported by PosixParser: long options with a single dash.")
+    void testLongWithUnexpectedArgument1() {
     }
 
     @Override
     @Test
-    @Disabled("not supported by the PosixParser (CLI-184)")
-    void testNegativeOption() throws Exception {
+    @Disabled("Unsupported by PosixParser: negative numbers as arguments (CLI-184).")
+    void testNegativeOption() {
     }
 
     @Override
     @Test
-    @Disabled("not supported by the PosixParser")
-    void testShortWithEqual() throws Exception {
+    @Disabled("Unsupported by PosixParser: short options with '=' for arguments (e.g. -f=bar).")
+    void testShortWithEqual() {
     }
 
     @Override
     @Test
-    @Disabled("not supported by the PosixParser")
-    void testUnambiguousPartialLongOption4() throws Exception {
+    @Disabled("Unsupported by PosixParser: partial long options with a single dash.")
+    void testUnambiguousPartialLongOption4() {
     }
 }
