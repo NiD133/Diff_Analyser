@@ -47,98 +47,54 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class ShortTextTitleTest {
 
-    // Test data constants
-    private static final String INITIAL_TEXT = "ABC";
-    private static final String MODIFIED_TEXT = "Test 1";
-
     /**
-     * Verifies that the equals() method correctly compares ShortTextTitle objects
-     * based on their text content.
+     * Check that the equals() method distinguishes all fields.
      */
     @Test
     public void testEquals() {
-        // Given: Two ShortTextTitle objects with identical text
-        ShortTextTitle firstTitle = new ShortTextTitle(INITIAL_TEXT);
-        ShortTextTitle secondTitle = new ShortTextTitle(INITIAL_TEXT);
-        
-        // Then: They should be equal
-        assertEquals(firstTitle, secondTitle, 
-            "Two ShortTextTitle objects with same text should be equal");
+        ShortTextTitle t1 = new ShortTextTitle("ABC");
+        ShortTextTitle t2 = new ShortTextTitle("ABC");
+        assertEquals(t1, t2);
 
-        // When: First title's text is changed
-        firstTitle.setText(MODIFIED_TEXT);
-        
-        // Then: They should no longer be equal
-        assertNotEquals(firstTitle, secondTitle, 
-            "ShortTextTitle objects with different text should not be equal");
-        
-        // When: Second title's text is updated to match the first
-        secondTitle.setText(MODIFIED_TEXT);
-        
-        // Then: They should be equal again
-        assertEquals(firstTitle, secondTitle, 
-            "ShortTextTitle objects with same modified text should be equal");
+        t1.setText("Test 1");
+        assertNotEquals(t1, t2);
+        t2.setText("Test 1");
+        assertEquals(t1, t2);
     }
 
     /**
-     * Verifies that equal ShortTextTitle objects produce the same hash code,
-     * which is required for proper behavior in hash-based collections.
+     * Two objects that are equal are required to return the same hashCode.
      */
     @Test
-    public void testHashCode() {
-        // Given: Two ShortTextTitle objects with identical text
-        ShortTextTitle firstTitle = new ShortTextTitle(INITIAL_TEXT);
-        ShortTextTitle secondTitle = new ShortTextTitle(INITIAL_TEXT);
-        
-        // When: Objects are equal
-        assertEquals(firstTitle, secondTitle, "Titles should be equal for hash code test");
-        
-        // Then: Their hash codes must be identical
-        int firstHashCode = firstTitle.hashCode();
-        int secondHashCode = secondTitle.hashCode();
-        assertEquals(firstHashCode, secondHashCode, 
-            "Equal ShortTextTitle objects must have identical hash codes");
+    public void testHashcode() {
+        ShortTextTitle t1 = new ShortTextTitle("ABC");
+        ShortTextTitle t2 = new ShortTextTitle("ABC");
+        assertEquals(t1, t2);
+        int h1 = t1.hashCode();
+        int h2 = t2.hashCode();
+        assertEquals(h1, h2);
     }
 
     /**
-     * Verifies that ShortTextTitle objects can be properly cloned,
-     * creating independent copies with the same content.
+     * Confirm that cloning works.
      */
     @Test
     public void testCloning() throws CloneNotSupportedException {
-        // Given: A ShortTextTitle object
-        ShortTextTitle originalTitle = new ShortTextTitle(INITIAL_TEXT);
-        
-        // When: The object is cloned
-        ShortTextTitle clonedTitle = CloneUtils.clone(originalTitle);
-        
-        // Then: The clone should be a separate instance
-        assertNotSame(originalTitle, clonedTitle, 
-            "Cloned object should be a different instance");
-        
-        // And: Should have the same class
-        assertSame(originalTitle.getClass(), clonedTitle.getClass(), 
-            "Cloned object should have the same class as original");
-        
-        // And: Should be equal in content
-        assertEquals(originalTitle, clonedTitle, 
-            "Cloned object should be equal to original in content");
+        ShortTextTitle t1 = new ShortTextTitle("ABC");
+        ShortTextTitle t2 = CloneUtils.clone(t1);
+        assertNotSame(t1, t2);
+        assertSame(t1.getClass(), t2.getClass());
+        assertEquals(t1, t2);
     }
 
     /**
-     * Verifies that ShortTextTitle objects can be serialized and deserialized
-     * while maintaining their equality and state.
+     * Serialize an instance, restore it, and check for equality.
      */
     @Test
     public void testSerialization() {
-        // Given: A ShortTextTitle object
-        ShortTextTitle originalTitle = new ShortTextTitle(INITIAL_TEXT);
-        
-        // When: The object is serialized and then deserialized
-        ShortTextTitle deserializedTitle = TestUtils.serialised(originalTitle);
-        
-        // Then: The deserialized object should equal the original
-        assertEquals(originalTitle, deserializedTitle, 
-            "Deserialized ShortTextTitle should equal the original");
+        ShortTextTitle t1 = new ShortTextTitle("ABC");
+        ShortTextTitle t2 = TestUtils.serialised(t1);
+        assertEquals(t1, t2);
     }
+
 }
