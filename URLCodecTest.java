@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.commons.codec.net;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,21 +29,15 @@ import org.apache.commons.codec.EncoderException;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test suite for the URLCodec class, which handles URL encoding and decoding.
+ * URL codec test cases
  */
 class URLCodecTest {
 
-    // Unicode representations for test strings
-    private static final int[] SWISS_GERMAN_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
-    private static final int[] RUSSIAN_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
+    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
 
-    /**
-     * Constructs a string from an array of Unicode code points.
-     *
-     * @param unicodeChars Array of Unicode code points.
-     * @return Constructed string.
-     */
-    private String constructStringFromUnicode(final int[] unicodeChars) {
+    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
+
+    private String constructString(final int[] unicodeChars) {
         final StringBuilder buffer = new StringBuilder();
         if (unicodeChars != null) {
             for (final int unicodeChar : unicodeChars) {
@@ -39,230 +50,183 @@ class URLCodecTest {
     @Test
     void testBasicEncodeDecode() throws Exception {
         final URLCodec urlCodec = new URLCodec();
-        final String plainText = "Hello there!";
-        final String encodedText = urlCodec.encode(plainText);
-
-        assertEquals("Hello+there%21", encodedText, "Basic URL encoding test");
-        assertEquals(plainText, urlCodec.decode(encodedText), "Basic URL decoding test");
-        validateCodecState(urlCodec);
+        final String plain = "Hello there!";
+        final String encoded = urlCodec.encode(plain);
+        assertEquals("Hello+there%21", encoded, "Basic URL encoding test");
+        assertEquals(plain, urlCodec.decode(encoded), "Basic URL decoding test");
+        validateState(urlCodec);
     }
 
     @Test
-    void testDecodeInvalidInputs() throws Exception {
+    void testDecodeInvalid() throws Exception {
         final URLCodec urlCodec = new URLCodec();
-
         assertThrows(DecoderException.class, () -> urlCodec.decode("%"));
         assertThrows(DecoderException.class, () -> urlCodec.decode("%A"));
-        assertThrows(DecoderException.class, () -> urlCodec.decode("%WW")); // Invalid first char after %
-        assertThrows(DecoderException.class, () -> urlCodec.decode("%0W")); // Invalid second char after %
-
-        validateCodecState(urlCodec);
+        // Bad 1st char after %
+        assertThrows(DecoderException.class, () -> urlCodec.decode("%WW"));
+        // Bad 2nd char after %
+        assertThrows(DecoderException.class, () -> urlCodec.decode("%0W"));
+        validateState(urlCodec);
     }
 
     @Test
     void testDecodeInvalidContent() throws DecoderException {
-        final String swissGermanText = constructStringFromUnicode(SWISS_GERMAN_UNICODE);
+        final String ch_msg = constructString(SWISS_GERMAN_STUFF_UNICODE);
         final URLCodec urlCodec = new URLCodec();
-        final byte[] inputBytes = swissGermanText.getBytes(StandardCharsets.ISO_8859_1);
-        final byte[] outputBytes = urlCodec.decode(inputBytes);
-
-        assertEquals(inputBytes.length, outputBytes.length);
-        for (int i = 0; i < inputBytes.length; i++) {
-            assertEquals(inputBytes[i], outputBytes[i]);
+        final byte[] input = ch_msg.getBytes(StandardCharsets.ISO_8859_1);
+        final byte[] output = urlCodec.decode(input);
+        assertEquals(input.length, output.length);
+        for (int i = 0; i < input.length; i++) {
+            assertEquals(input[i], output[i]);
         }
-
-        validateCodecState(urlCodec);
+        validateState(urlCodec);
     }
 
     @Test
     void testDecodeObjects() throws Exception {
         final URLCodec urlCodec = new URLCodec();
-        final String encodedText = "Hello+there%21";
-
-        // Decode from String
-        String decodedText = (String) urlCodec.decode((Object) encodedText);
-        assertEquals("Hello there!", decodedText, "Basic URL decoding test");
-
-        // Decode from byte array
-        final byte[] encodedBytes = encodedText.getBytes(StandardCharsets.UTF_8);
-        final byte[] decodedBytes = (byte[]) urlCodec.decode((Object) encodedBytes);
-        decodedText = new String(decodedBytes);
-        assertEquals("Hello there!", decodedText, "Basic URL decoding test");
-
-        // Decode null object
+        final String plain = "Hello+there%21";
+        String decoded = (String) urlCodec.decode((Object) plain);
+        assertEquals("Hello there!", decoded, "Basic URL decoding test");
+        final byte[] plainBA = plain.getBytes(StandardCharsets.UTF_8);
+        final byte[] decodedBA = (byte[]) urlCodec.decode((Object) plainBA);
+        decoded = new String(decodedBA);
+        assertEquals("Hello there!", decoded, "Basic URL decoding test");
         final Object result = urlCodec.decode((Object) null);
+
         assertNull(result, "Decoding a null Object should return null");
 
-        // Decode invalid object type
-        assertThrows(DecoderException.class, () -> urlCodec.decode(Double.valueOf(3.0d)), "Decoding a Double object should cause an exception.");
-
-        validateCodecState(urlCodec);
+        assertThrows(DecoderException.class, () -> urlCodec.decode(Double.valueOf(3.0d)), "Trying to url encode a Double object should cause an exception.");
+        validateState(urlCodec);
     }
 
     @Test
     void testDecodeStringWithNull() throws Exception {
         final URLCodec urlCodec = new URLCodec();
-        final String testString = null;
-        final String result = urlCodec.decode(testString, "charset");
-
-        assertNull(result, "Decoding a null string should return null");
+        final String test = null;
+        final String result = urlCodec.decode(test, "charset");
+        assertNull(result, "Result should be null");
     }
 
     @Test
     void testDecodeWithNullArray() throws Exception {
-        final byte[] nullBytes = null;
-        final byte[] result = URLCodec.decodeUrl(nullBytes);
-
-        assertNull(result, "Decoding a null byte array should return null");
+        final byte[] plain = null;
+        final byte[] result = URLCodec.decodeUrl(plain);
+        assertNull(result, "Result should be null");
     }
 
     @Test
     void testDefaultEncoding() throws Exception {
-        final String plainText = "Hello there!";
+        final String plain = "Hello there!";
         final URLCodec urlCodec = new URLCodec("UnicodeBig");
-
-        // Encode to ensure no issues with default encoding
-        urlCodec.encode(plainText);
-
-        final String encoded1 = urlCodec.encode(plainText, "UnicodeBig");
-        final String encoded2 = urlCodec.encode(plainText);
-
-        assertEquals(encoded1, encoded2, "Encoding with specified and default charset should match");
-        validateCodecState(urlCodec);
+        urlCodec.encode(plain); // To work around a weird quirk in Java 1.2.2
+        final String encoded1 = urlCodec.encode(plain, "UnicodeBig");
+        final String encoded2 = urlCodec.encode(plain);
+        assertEquals(encoded1, encoded2);
+        validateState(urlCodec);
     }
 
     @Test
     void testEncodeDecodeNull() throws Exception {
         final URLCodec urlCodec = new URLCodec();
-
-        assertNull(urlCodec.encode((String) null), "Encoding a null string should return null");
-        assertNull(urlCodec.decode((String) null), "Decoding a null string should return null");
-
-        validateCodecState(urlCodec);
+        assertNull(urlCodec.encode((String) null), "Null string URL encoding test");
+        assertNull(urlCodec.decode((String) null), "Null string URL decoding test");
+        validateState(urlCodec);
     }
 
     @Test
     void testEncodeNull() throws Exception {
         final URLCodec urlCodec = new URLCodec();
-        final byte[] nullBytes = null;
-        final byte[] encodedBytes = urlCodec.encode(nullBytes);
-
-        assertNull(encodedBytes, "Encoding a null byte array should return null");
-        validateCodecState(urlCodec);
+        final byte[] plain = null;
+        final byte[] encoded = urlCodec.encode(plain);
+        assertNull(encoded, "Encoding a null string should return null");
+        validateState(urlCodec);
     }
 
     @Test
     void testEncodeObjects() throws Exception {
         final URLCodec urlCodec = new URLCodec();
-        final String plainText = "Hello there!";
+        final String plain = "Hello there!";
+        String encoded = (String) urlCodec.encode((Object) plain);
+        assertEquals("Hello+there%21", encoded, "Basic URL encoding test");
 
-        // Encode from String
-        String encodedText = (String) urlCodec.encode((Object) plainText);
-        assertEquals("Hello+there%21", encodedText, "Basic URL encoding test");
+        final byte[] plainBA = plain.getBytes(StandardCharsets.UTF_8);
+        final byte[] encodedBA = (byte[]) urlCodec.encode((Object) plainBA);
+        encoded = new String(encodedBA);
+        assertEquals("Hello+there%21", encoded, "Basic URL encoding test");
 
-        // Encode from byte array
-        final byte[] plainBytes = plainText.getBytes(StandardCharsets.UTF_8);
-        final byte[] encodedBytes = (byte[]) urlCodec.encode((Object) plainBytes);
-        encodedText = new String(encodedBytes);
-        assertEquals("Hello+there%21", encodedText, "Basic URL encoding test");
-
-        // Encode null object
         final Object result = urlCodec.encode((Object) null);
         assertNull(result, "Encoding a null Object should return null");
 
-        // Encode invalid object type
-        assertThrows(EncoderException.class, () -> urlCodec.encode(Double.valueOf(3.0d)), "Encoding a Double object should cause an exception.");
-
-        validateCodecState(urlCodec);
+        assertThrows(EncoderException.class, () -> urlCodec.encode(Double.valueOf(3.0d)), "Trying to url encode a Double object should cause an exception.");
+        validateState(urlCodec);
     }
 
     @Test
     void testEncodeStringWithNull() throws Exception {
         final URLCodec urlCodec = new URLCodec();
-        final String testString = null;
-        final String result = urlCodec.encode(testString, "charset");
-
-        assertNull(result, "Encoding a null string should return null");
+        final String test = null;
+        final String result = urlCodec.encode(test, "charset");
+        assertNull(result, "Result should be null");
     }
 
     @Test
     void testEncodeUrlWithNullBitSet() throws Exception {
         final URLCodec urlCodec = new URLCodec();
-        final String plainText = "Hello there!";
-        final String encodedText = new String(URLCodec.encodeUrl(null, plainText.getBytes(StandardCharsets.UTF_8)));
-
-        assertEquals("Hello+there%21", encodedText, "Basic URL encoding test");
-        assertEquals(plainText, urlCodec.decode(encodedText), "Basic URL decoding test");
-
-        validateCodecState(urlCodec);
+        final String plain = "Hello there!";
+        final String encoded = new String(URLCodec.encodeUrl(null, plain.getBytes(StandardCharsets.UTF_8)));
+        assertEquals("Hello+there%21", encoded, "Basic URL encoding test");
+        assertEquals(plain, urlCodec.decode(encoded), "Basic URL decoding test");
+        validateState(urlCodec);
     }
 
     @Test
     void testInvalidEncoding() {
         final URLCodec urlCodec = new URLCodec("NONSENSE");
-        final String plainText = "Hello there!";
-
-        assertThrows(EncoderException.class, () -> urlCodec.encode(plainText), "Encoding with a bogus charset should cause an exception.");
-        assertThrows(DecoderException.class, () -> urlCodec.decode(plainText), "Decoding with a bogus charset should cause an exception.");
-
-        validateCodecState(urlCodec);
+        final String plain = "Hello there!";
+        assertThrows(EncoderException.class, () -> urlCodec.encode(plain), "We set the encoding to a bogus NONSENSE value");
+        assertThrows(DecoderException.class, () -> urlCodec.decode(plain), "We set the encoding to a bogus NONSENSE value");
+        validateState(urlCodec);
     }
 
     @Test
     void testSafeCharEncodeDecode() throws Exception {
         final URLCodec urlCodec = new URLCodec();
-        final String safeChars = "abc123_-.*";
-
-        final String encodedText = urlCodec.encode(safeChars);
-        assertEquals(safeChars, encodedText, "Safe chars should not be encoded");
-
-        final String decodedText = urlCodec.decode(encodedText);
-        assertEquals(safeChars, decodedText, "Safe chars should decode back to original");
-
-        validateCodecState(urlCodec);
+        final String plain = "abc123_-.*";
+        final String encoded = urlCodec.encode(plain);
+        assertEquals(plain, encoded, "Safe chars URL encoding test");
+        assertEquals(plain, urlCodec.decode(encoded), "Safe chars URL decoding test");
+        validateState(urlCodec);
     }
 
     @Test
     void testUnsafeEncodeDecode() throws Exception {
         final URLCodec urlCodec = new URLCodec();
-        final String unsafeChars = "~!@#$%^&()+{}\"\\;:`,/[]";
-
-        final String encodedText = urlCodec.encode(unsafeChars);
-        assertEquals("%7E%21%40%23%24%25%5E%26%28%29%2B%7B%7D%22%5C%3B%3A%60%2C%2F%5B%5D", encodedText, "Unsafe chars URL encoding test");
-
-        final String decodedText = urlCodec.decode(encodedText);
-        assertEquals(unsafeChars, decodedText, "Unsafe chars should decode back to original");
-
-        validateCodecState(urlCodec);
+        final String plain = "~!@#$%^&()+{}\"\\;:`,/[]";
+        final String encoded = urlCodec.encode(plain);
+        assertEquals("%7E%21%40%23%24%25%5E%26%28%29%2B%7B%7D%22%5C%3B%3A%60%2C%2F%5B%5D", encoded, "Unsafe chars URL encoding test");
+        assertEquals(plain, urlCodec.decode(encoded), "Unsafe chars URL decoding test");
+        validateState(urlCodec);
     }
 
     @Test
     void testUTF8RoundTrip() throws Exception {
-        final String russianText = constructStringFromUnicode(RUSSIAN_UNICODE);
-        final String swissGermanText = constructStringFromUnicode(SWISS_GERMAN_UNICODE);
+
+        final String ru_msg = constructString(RUSSIAN_STUFF_UNICODE);
+        final String ch_msg = constructString(SWISS_GERMAN_STUFF_UNICODE);
 
         final URLCodec urlCodec = new URLCodec();
+        validateState(urlCodec);
 
-        // Encode and decode Russian text
-        final String encodedRussian = urlCodec.encode(russianText, CharEncoding.UTF_8);
-        assertEquals("%D0%92%D1%81%D0%B5%D0%BC_%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82", encodedRussian);
-        assertEquals(russianText, urlCodec.decode(encodedRussian, CharEncoding.UTF_8));
+        assertEquals("%D0%92%D1%81%D0%B5%D0%BC_%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82", urlCodec.encode(ru_msg, CharEncoding.UTF_8));
+        assertEquals("Gr%C3%BCezi_z%C3%A4m%C3%A4", urlCodec.encode(ch_msg, CharEncoding.UTF_8));
 
-        // Encode and decode Swiss German text
-        final String encodedSwissGerman = urlCodec.encode(swissGermanText, CharEncoding.UTF_8);
-        assertEquals("Gr%C3%BCezi_z%C3%A4m%C3%A4", encodedSwissGerman);
-        assertEquals(swissGermanText, urlCodec.decode(encodedSwissGerman, CharEncoding.UTF_8));
-
-        validateCodecState(urlCodec);
+        assertEquals(ru_msg, urlCodec.decode(urlCodec.encode(ru_msg, CharEncoding.UTF_8), CharEncoding.UTF_8));
+        assertEquals(ch_msg, urlCodec.decode(urlCodec.encode(ch_msg, CharEncoding.UTF_8), CharEncoding.UTF_8));
+        validateState(urlCodec);
     }
 
-    /**
-     * Validates the state of the URLCodec instance.
-     * Currently, this method does not perform any checks.
-     *
-     * @param urlCodec The URLCodec instance to validate.
-     */
-    private void validateCodecState(final URLCodec urlCodec) {
-        // No state validation needed at the moment.
+    private void validateState(final URLCodec urlCodec) {
+        // no tests for now.
     }
 }
