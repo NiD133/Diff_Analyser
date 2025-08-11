@@ -6,149 +6,156 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UTF8WriterTest extends com.fasterxml.jackson.core.JUnit5TestBase {
-
+class UTF8WriterTest
+        extends com.fasterxml.jackson.core.JUnit5TestBase
+{
     @Test
-    void testWritingMultipleTimes() throws Exception {
-        // Setup: Create a ByteArrayOutputStream and a UTF8Writer
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        UTF8Writer writer = new UTF8Writer(_ioContext(), outputStream);
+    void simple() throws Exception
+    {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        UTF8Writer w = new UTF8Writer(_ioContext(), out);
 
-        // Test data: A string with a mix of ASCII and non-ASCII characters
-        String testString = "AB\u00A0\u1AE9\uFFFC";
-        char[] charArray = testString.toCharArray();
+        String str = "AB\u00A0\u1AE9\uFFFC";
+        char[] ch = str.toCharArray();
 
-        // Action: Write the string multiple times using different methods
-        writer.write(testString);
-        writer.append(charArray[0]);
-        writer.write(charArray[1]);
-        writer.write(charArray, 2, 3);
-        writer.flush();
+        // Let's write 3 times, using different methods
+        w.write(str);
 
-        writer.write(testString, 0, testString.length());
-        writer.close();
+        w.append(ch[0]);
+        w.write(ch[1]);
+        w.write(ch, 2, 3);
+        w.flush();
 
-        // Verification: Check that the output contains the string written three times
-        byte[] outputData = outputStream.toByteArray();
-        assertEquals(3 * 10, outputData.length); // 10 bytes per string
-        String actualOutput = utf8String(outputStream);
-        assertEquals(3 * testString.length(), actualOutput.length());
-        assertEquals(testString + testString + testString, actualOutput);
+        w.write(str, 0, str.length());
+        w.close();
+
+        // and thus should have 3 times contents
+        byte[] data = out.toByteArray();
+        assertEquals(3*10, data.length);
+        String act = utf8String(out);
+        assertEquals(15, act.length());
+
+        assertEquals(3 * str.length(), act.length());
+        assertEquals(str+str+str, act);
     }
 
     @Test
-    void testWritingAsciiCharacters() throws Exception {
-        // Setup: Create a ByteArrayOutputStream and a UTF8Writer
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        UTF8Writer writer = new UTF8Writer(_ioContext(), outputStream);
+    void simpleAscii() throws Exception
+    {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        UTF8Writer w = new UTF8Writer(_ioContext(), out);
 
-        // Test data: A string with ASCII characters and one non-ASCII character
-        String asciiString = "abcdefghijklmnopqrst\u00A0";
-        char[] charArray = asciiString.toCharArray();
+        String str = "abcdefghijklmnopqrst\u00A0";
+        char[] ch = str.toCharArray();
 
-        // Action: Write the entire character array and flush
-        writer.write(charArray, 0, charArray.length);
-        writer.flush();
-        writer.close();
+        w.write(ch, 0, ch.length);
+        w.flush(); // trigger different code path for close
+        w.close();
 
-        // Verification: Check that the output length matches the input length
-        byte[] outputData = outputStream.toByteArray();
-        assertEquals(charArray.length + 1, outputData.length); // +1 for the non-ASCII character
-        String actualOutput = utf8String(outputStream);
-        assertEquals(asciiString, actualOutput);
+        byte[] data = out.toByteArray();
+        // one 2-byte encoded char
+        assertEquals(ch.length+1, data.length);
+        String act = utf8String(out);
+        assertEquals(str, act);
     }
 
     @Test
-    void testFlushAfterClose() throws Exception {
-        // Setup: Create a ByteArrayOutputStream and a UTF8Writer
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        UTF8Writer writer = new UTF8Writer(_ioContext(), outputStream);
+    void flushAfterClose() throws Exception
+    {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        UTF8Writer w = new UTF8Writer(_ioContext(), out);
 
-        // Action: Write characters and close the writer
-        writer.write('X');
-        char[] charArray = { 'Y' };
-        writer.write(charArray);
-        writer.close();
+        w.write('X');
+        char[] ch = { 'Y' };
+        w.write(ch);
 
-        // Verification: Ensure the output size is correct and flushing after close does not throw an exception
-        assertEquals(2, outputStream.size());
-        writer.flush(); // Should not throw an exception
-        writer.close(); // Should not throw an exception
-        writer.flush(); // Should not throw an exception
+        w.close();
+        assertEquals(2, out.size());
+
+        // and this ought to be fine...
+        w.flush();
+        // as well as some more...
+        w.close();
+        w.flush();
     }
 
     @Test
-    void testValidSurrogatePairs() throws Exception {
-        // Setup: Create a ByteArrayOutputStream and a UTF8Writer
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        UTF8Writer writer = new UTF8Writer(_ioContext(), outputStream);
+    void surrogatesOk() throws Exception
+    {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        UTF8Writer w = new UTF8Writer(_ioContext(), out);
 
-        // Action: Write valid surrogate pairs character by character
-        writer.write(0xD83D);
-        writer.write(0xDE03);
-        writer.close();
+        // First, valid case, char by char
+        w.write(0xD83D);
+        w.write(0xDE03);
+        w.close();
+        assertEquals(4, out.size());
+        final byte[] EXP_SURROGATES = new byte[] { (byte) 0xF0, (byte) 0x9F,
+               (byte) 0x98, (byte) 0x83 };
+        assertArrayEquals(EXP_SURROGATES, out.toByteArray());
 
-        // Verification: Ensure the output matches the expected byte sequence
-        assertEquals(4, outputStream.size());
-        final byte[] expectedSurrogates = new byte[] { (byte) 0xF0, (byte) 0x9F, (byte) 0x98, (byte) 0x83 };
-        assertArrayEquals(expectedSurrogates, outputStream.toByteArray());
-
-        // Test writing surrogate pairs as a string
-        outputStream = new ByteArrayOutputStream();
-        writer = new UTF8Writer(_ioContext(), outputStream);
-        writer.write("\uD83D\uDE03");
-        writer.close();
-        assertEquals(4, outputStream.size());
-        assertArrayEquals(expectedSurrogates, outputStream.toByteArray());
+        // and then as String
+        out = new ByteArrayOutputStream();
+        w = new UTF8Writer(_ioContext(), out);
+        w.write("\uD83D\uDE03");
+        w.close();
+        assertEquals(4, out.size());
+        assertArrayEquals(EXP_SURROGATES, out.toByteArray());
     }
 
     @SuppressWarnings("resource")
     @Test
-    void testInvalidSurrogatePairs() throws Exception {
-        // Test various invalid surrogate pair scenarios
+    void surrogatesFail() throws Exception
+    {
+        ByteArrayOutputStream out;
 
-        // Unmatched second part
-        assertThrows(IOException.class, () -> {
-            try (UTF8Writer writer = new UTF8Writer(_ioContext(), new ByteArrayOutputStream())) {
-                writer.write(0xDE03);
-            }
-        }, "Unmatched second part");
+        out = new ByteArrayOutputStream();
+        try (UTF8Writer w = new UTF8Writer(_ioContext(), out)) {
+            w.write(0xDE03);
+            fail("should not pass");
+        } catch (IOException e) {
+            verifyException(e, "Unmatched second part");
+        }
 
-        // Broken surrogate pair
-        assertThrows(IOException.class, () -> {
-            try (UTF8Writer writer = new UTF8Writer(_ioContext(), new ByteArrayOutputStream())) {
-                writer.write(0xD83D);
-                writer.write('a');
-            }
-        }, "Broken surrogate pair");
+        out = new ByteArrayOutputStream();
+        try (UTF8Writer w = new UTF8Writer(_ioContext(), out)) {
+            w.write(0xD83D);
+            w.write('a');
+            fail("should not pass");
+        } catch (IOException e) {
+            verifyException(e, "Broken surrogate pair");
+        }
 
-        // Unmatched second part in string
-        assertThrows(IOException.class, () -> {
-            try (UTF8Writer writer = new UTF8Writer(_ioContext(), new ByteArrayOutputStream())) {
-                writer.write("\uDE03");
-            }
-        }, "Unmatched second part");
+        out = new ByteArrayOutputStream();
+        try (UTF8Writer w = new UTF8Writer(_ioContext(), out)) {
+            w.write("\uDE03");
+            fail("should not pass");
+        } catch (IOException e) {
+            verifyException(e, "Unmatched second part");
+        }
 
-        // Broken surrogate pair in string
-        assertThrows(IOException.class, () -> {
-            try (UTF8Writer writer = new UTF8Writer(_ioContext(), new ByteArrayOutputStream())) {
-                writer.write("\uD83Da");
-            }
-        }, "Broken surrogate pair");
+        out = new ByteArrayOutputStream();
+        try (UTF8Writer w = new UTF8Writer(_ioContext(), out)) {
+            w.write("\uD83Da");
+            fail("should not pass");
+        } catch (IOException e) {
+            verifyException(e, "Broken surrogate pair");
+        }
     }
 
     // For [core#1218]
     // @since 2.17
     @Test
-    void testSurrogateConversion() {
-        // Test conversion of surrogate pairs to Unicode code points
+    void surrogateConversion()
+    {
         for (int first = UTF8Writer.SURR1_FIRST; first <= UTF8Writer.SURR1_LAST; first++) {
             for (int second = UTF8Writer.SURR2_FIRST; second <= UTF8Writer.SURR2_LAST; second++) {
-                int expectedCodePoint = 0x10000 + ((first - UTF8Writer.SURR1_FIRST) << 10) + (second - UTF8Writer.SURR2_FIRST);
-                int actualCodePoint = (first << 10) + second + UTF8Writer.SURROGATE_BASE;
-                assertEquals(expectedCodePoint, actualCodePoint, 
-                    String.format("Mismatch on: %s %s; expected: %d, actual: %d",
-                        Integer.toHexString(first), Integer.toHexString(second), expectedCodePoint, actualCodePoint));
+                int expected = 0x10000 + ((first - UTF8Writer.SURR1_FIRST) << 10) + (second - UTF8Writer.SURR2_FIRST);
+                int actual = (first << 10) + second + UTF8Writer.SURROGATE_BASE;
+                if (expected != actual) {
+                    fail("Mismatch on: "+Integer.toHexString(first) + " " + Integer.toHexString(second)
+                        +"; expected: "+expected+", actual: "+actual);
+                }
             }
         }
     }
