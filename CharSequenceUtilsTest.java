@@ -38,134 +38,136 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * Tests CharSequenceUtils
+ * Tests for CharSequenceUtils utility class
  */
 class CharSequenceUtilsTest extends AbstractLangTest {
 
-    private abstract static class RunTest {
-
-        abstract boolean invoke();
-
-        void run(final TestData data, final String id) {
-            if (data.throwable != null) {
-                assertThrows(data.throwable, this::invoke, id + " Expected " + data.throwable);
-            } else {
-                final boolean stringCheck = invoke();
-                assertEquals(data.expected, stringCheck, id + " Failed test " + data);
-            }
-        }
-
-    }
-
-    static class TestData {
-        final String source;
+    /**
+     * Test data for regionMatches method testing.
+     * Contains various combinations of source strings, target strings, offsets, and expected results.
+     */
+    static class RegionMatchesTestCase {
+        final String sourceString;
         final boolean ignoreCase;
-        final int toffset;
-        final String other;
-        final int ooffset;
-        final int len;
-        final boolean expected;
-        final Class<? extends Throwable> throwable;
+        final int sourceOffset;
+        final String targetString;
+        final int targetOffset;
+        final int length;
+        final boolean expectedResult;
+        final Class<? extends Throwable> expectedException;
 
-        TestData(final String source, final boolean ignoreCase, final int toffset, final String other, final int ooffset, final int len,
-                final boolean expected) {
-            this.source = source;
+        /**
+         * Constructor for test cases that should return a boolean result
+         */
+        RegionMatchesTestCase(String sourceString, boolean ignoreCase, int sourceOffset, 
+                             String targetString, int targetOffset, int length, boolean expectedResult) {
+            this.sourceString = sourceString;
             this.ignoreCase = ignoreCase;
-            this.toffset = toffset;
-            this.other = other;
-            this.ooffset = ooffset;
-            this.len = len;
-            this.expected = expected;
-            this.throwable = null;
+            this.sourceOffset = sourceOffset;
+            this.targetString = targetString;
+            this.targetOffset = targetOffset;
+            this.length = length;
+            this.expectedResult = expectedResult;
+            this.expectedException = null;
         }
 
-        TestData(final String source, final boolean ignoreCase, final int toffset, final String other, final int ooffset, final int len,
-                final Class<? extends Throwable> throwable) {
-            this.source = source;
+        /**
+         * Constructor for test cases that should throw an exception
+         */
+        RegionMatchesTestCase(String sourceString, boolean ignoreCase, int sourceOffset, 
+                             String targetString, int targetOffset, int length, 
+                             Class<? extends Throwable> expectedException) {
+            this.sourceString = sourceString;
             this.ignoreCase = ignoreCase;
-            this.toffset = toffset;
-            this.other = other;
-            this.ooffset = ooffset;
-            this.len = len;
-            this.expected = false;
-            this.throwable = throwable;
+            this.sourceOffset = sourceOffset;
+            this.targetString = targetString;
+            this.targetOffset = targetOffset;
+            this.length = length;
+            this.expectedResult = false;
+            this.expectedException = expectedException;
         }
 
         @Override
         public String toString() {
-            final StringBuilder sb = new StringBuilder();
-            sb.append(source).append("[").append(toffset).append("]");
-            sb.append(ignoreCase ? " caseblind " : " samecase ");
-            sb.append(other).append("[").append(ooffset).append("]");
-            sb.append(" ").append(len).append(" => ");
-            if (throwable != null) {
-                sb.append(throwable);
-            } else {
-                sb.append(expected);
-            }
-            return sb.toString();
+            return String.format("RegionMatches[source='%s'[%d], target='%s'[%d], len=%d, ignoreCase=%s] -> %s",
+                    sourceString, sourceOffset, targetString, targetOffset, length, ignoreCase,
+                    expectedException != null ? expectedException.getSimpleName() : expectedResult);
         }
     }
 
-    static class WrapperString implements CharSequence {
-        private final CharSequence inner;
+    /**
+     * Simple wrapper around CharSequence to test non-String implementations
+     */
+    static class CharSequenceWrapper implements CharSequence {
+        private final CharSequence wrapped;
 
-        WrapperString(final CharSequence inner) {
-            this.inner = inner;
+        CharSequenceWrapper(CharSequence wrapped) {
+            this.wrapped = wrapped;
         }
 
         @Override
-        public char charAt(final int index) {
-            return inner.charAt(index);
+        public char charAt(int index) {
+            return wrapped.charAt(index);
         }
 
         @Override
         public IntStream chars() {
-            return inner.chars();
+            return wrapped.chars();
         }
 
         @Override
         public IntStream codePoints() {
-            return inner.codePoints();
+            return wrapped.codePoints();
         }
 
         @Override
         public int length() {
-            return inner.length();
+            return wrapped.length();
         }
 
         @Override
-        public CharSequence subSequence(final int start, final int end) {
-            return inner.subSequence(start, end);
+        public CharSequence subSequence(int start, int end) {
+            return wrapped.subSequence(start, end);
         }
 
         @Override
         public String toString() {
-            return inner.toString();
+            return wrapped.toString();
         }
     }
 
-    private static final TestData[] TEST_DATA = {
-            // @formatter:off
-            //           Source  IgnoreCase Offset Other  Offset Length Result
-            new TestData("",     true,      -1,     "",    -1,    -1,    false),
-            new TestData("",     true,       0,     "",     0,     1,    false),
-            new TestData("a",    true,       0,     "abc",  0,     0,    true),
-            new TestData("a",    true,       0,     "abc",  0,     1,    true),
-            new TestData("a",    true,       0,     null,   0,     0,    NullPointerException.class),
-            new TestData(null,   true,       0,     null,   0,     0,    NullPointerException.class),
-            new TestData(null,   true,       0,     "",     0,     0,    NullPointerException.class),
-            new TestData("Abc",  true,       0,     "abc",  0,     3,    true),
-            new TestData("Abc",  false,      0,     "abc",  0,     3,    false),
-            new TestData("Abc",  true,       1,     "abc",  1,     2,    true),
-            new TestData("Abc",  false,      1,     "abc",  1,     2,    true),
-            new TestData("Abcd", true,       1,     "abcD", 1,     2,    true),
-            new TestData("Abcd", false,      1,     "abcD", 1,     2,    true),
-            // @formatter:on
+    /**
+     * Test data for regionMatches functionality
+     */
+    private static final RegionMatchesTestCase[] REGION_MATCHES_TEST_CASES = {
+            // Basic empty string cases
+            new RegionMatchesTestCase("", true, -1, "", -1, -1, false),
+            new RegionMatchesTestCase("", true, 0, "", 0, 1, false),
+            
+            // Simple matching cases
+            new RegionMatchesTestCase("a", true, 0, "abc", 0, 0, true),
+            new RegionMatchesTestCase("a", true, 0, "abc", 0, 1, true),
+            
+            // Null handling cases
+            new RegionMatchesTestCase("a", true, 0, null, 0, 0, NullPointerException.class),
+            new RegionMatchesTestCase(null, true, 0, null, 0, 0, NullPointerException.class),
+            new RegionMatchesTestCase(null, true, 0, "", 0, 0, NullPointerException.class),
+            
+            // Case sensitivity tests
+            new RegionMatchesTestCase("Abc", true, 0, "abc", 0, 3, true),   // ignore case
+            new RegionMatchesTestCase("Abc", false, 0, "abc", 0, 3, false), // case sensitive
+            
+            // Offset tests
+            new RegionMatchesTestCase("Abc", true, 1, "abc", 1, 2, true),   // both with offset
+            new RegionMatchesTestCase("Abc", false, 1, "abc", 1, 2, true),  // case matches with offset
+            new RegionMatchesTestCase("Abcd", true, 1, "abcD", 1, 2, true), // ignore case with offset
+            new RegionMatchesTestCase("Abcd", false, 1, "abcD", 1, 2, true), // case matches with offset
     };
 
-    static Stream<Arguments> lastIndexWithStandardCharSequence() {
-        // @formatter:off
+    /**
+     * Provides test data for lastIndexOf tests with different CharSequence implementations
+     */
+    static Stream<Arguments> lastIndexOfTestData() {
         return Stream.of(
             arguments("abc", "b", 2, 1),
             arguments(new StringBuilder("abc"), "b", 2, 1),
@@ -175,119 +177,200 @@ class CharSequenceUtilsTest extends AbstractLangTest {
             arguments(new StringBuffer("abc"), new StringBuffer("b"), 2, 1),
             arguments(new StringBuilder("abc"), new StringBuffer("b"), 2, 1)
         );
-        // @formatter:on
     }
 
     @Test
-    void testConstructor() {
+    void testConstructorAccessibility() {
+        // Verify constructor can be instantiated
         assertNotNull(new CharSequenceUtils());
-        final Constructor<?>[] cons = CharSequenceUtils.class.getDeclaredConstructors();
-        assertEquals(1, cons.length);
-        assertTrue(Modifier.isPublic(cons[0].getModifiers()));
+        
+        // Verify class structure
+        Constructor<?>[] constructors = CharSequenceUtils.class.getDeclaredConstructors();
+        assertEquals(1, constructors.length);
+        assertTrue(Modifier.isPublic(constructors[0].getModifiers()));
         assertTrue(Modifier.isPublic(CharSequenceUtils.class.getModifiers()));
         assertFalse(Modifier.isFinal(CharSequenceUtils.class.getModifiers()));
     }
 
     @ParameterizedTest
-    @MethodSource("lastIndexWithStandardCharSequence")
-    void testLastIndexOfWithDifferentCharSequences(final CharSequence cs, final CharSequence search, final int start, final int expected) {
-        assertEquals(expected, CharSequenceUtils.lastIndexOf(cs, search, start));
+    @MethodSource("lastIndexOfTestData")
+    void testLastIndexOfWithVariousCharSequenceTypes(CharSequence source, CharSequence searchString, 
+                                                     int startIndex, int expectedIndex) {
+        int actualIndex = CharSequenceUtils.lastIndexOf(source, searchString, startIndex);
+        assertEquals(expectedIndex, actualIndex, 
+                String.format("lastIndexOf failed for source='%s', search='%s', start=%d", 
+                        source, searchString, startIndex));
     }
 
     @Test
-    void testNewLastIndexOf() {
-        testNewLastIndexOfSingle("808087847-1321060740-635567660180086727-925755305", "-1321060740-635567660", 21);
-        testNewLastIndexOfSingle("", "");
-        testNewLastIndexOfSingle("1", "");
-        testNewLastIndexOfSingle("", "1");
-        testNewLastIndexOfSingle("1", "1");
-        testNewLastIndexOfSingle("11", "1");
-        testNewLastIndexOfSingle("1", "11");
+    void testLastIndexOfComprehensive() {
+        // Test specific known cases
+        verifyLastIndexOfBehavior("808087847-1321060740-635567660180086727-925755305", 
+                                 "-1321060740-635567660", 21);
+        
+        // Test edge cases
+        verifyLastIndexOfBehavior("", "");
+        verifyLastIndexOfBehavior("1", "");
+        verifyLastIndexOfBehavior("", "1");
+        verifyLastIndexOfBehavior("1", "1");
+        verifyLastIndexOfBehavior("11", "1");
+        verifyLastIndexOfBehavior("1", "11");
 
-        testNewLastIndexOfSingle("apache", "a");
-        testNewLastIndexOfSingle("apache", "p");
-        testNewLastIndexOfSingle("apache", "e");
-        testNewLastIndexOfSingle("apache", "x");
-        testNewLastIndexOfSingle("oraoraoraora", "r");
-        testNewLastIndexOfSingle("mudamudamudamuda", "d");
-        // There is a route through checkLaterThan1#checkLaterThan1
-        // which only gets touched if there is a two letter (or more) partial match
-        // (in this case "st") earlier in the searched string.
-        testNewLastIndexOfSingle("junk-ststarting", "starting");
+        // Test common patterns
+        verifyLastIndexOfBehavior("apache", "a");
+        verifyLastIndexOfBehavior("apache", "p");
+        verifyLastIndexOfBehavior("apache", "e");
+        verifyLastIndexOfBehavior("apache", "x");
+        verifyLastIndexOfBehavior("oraoraoraora", "r");
+        verifyLastIndexOfBehavior("mudamudamudamuda", "d");
+        
+        // Test partial match scenario - ensures proper handling of partial matches
+        verifyLastIndexOfBehavior("junk-ststarting", "starting");
 
-        final Random random = new Random();
-        final StringBuilder seg = new StringBuilder();
-        while (seg.length() <= CharSequenceUtils.TO_STRING_LIMIT) {
-            seg.append(random.nextInt());
+        // Test with large strings to verify performance edge cases
+        testLastIndexOfWithLargeStrings();
+    }
+
+    /**
+     * Tests lastIndexOf with randomly generated large strings to verify behavior
+     * matches String.lastIndexOf in all cases
+     */
+    private void testLastIndexOfWithLargeStrings() {
+        Random random = new Random(12345); // Fixed seed for reproducible tests
+        StringBuilder segment = new StringBuilder();
+        
+        // Build a segment longer than TO_STRING_LIMIT
+        while (segment.length() <= CharSequenceUtils.TO_STRING_LIMIT) {
+            segment.append(random.nextInt());
         }
-        StringBuilder original = new StringBuilder(seg);
-        testNewLastIndexOfSingle(original, seg);
+        
+        StringBuilder testString = new StringBuilder(segment);
+        verifyLastIndexOfBehavior(testString, segment);
+        
+        // Test with variations of the original string
         for (int i = 0; i < 100; i++) {
             if (random.nextDouble() < 0.5) {
-                original.append(random.nextInt() % 10);
+                testString.append(random.nextInt() % 10);
             } else {
-                original = new StringBuilder().append(random.nextInt() % 100).append(original);
+                testString = new StringBuilder().append(random.nextInt() % 100).append(testString);
             }
-            testNewLastIndexOfSingle(original, seg);
+            verifyLastIndexOfBehavior(testString, segment);
         }
     }
 
-    private void testNewLastIndexOfSingle(final CharSequence a, final CharSequence b) {
-        final int maxa = Math.max(a.length(), b.length());
-        for (int i = -maxa - 10; i <= maxa + 10; i++) {
-            testNewLastIndexOfSingle(a, b, i);
+    /**
+     * Verifies that CharSequenceUtils.lastIndexOf behaves identically to String.lastIndexOf
+     * for all reasonable start positions
+     */
+    private void verifyLastIndexOfBehavior(CharSequence source, CharSequence searchString) {
+        int maxLength = Math.max(source.length(), searchString.length());
+        
+        // Test a range of start positions around the string boundaries
+        for (int startPos = -maxLength - 10; startPos <= maxLength + 10; startPos++) {
+            verifyLastIndexOfAtPosition(source, searchString, startPos);
         }
-        testNewLastIndexOfSingle(a, b, Integer.MIN_VALUE);
-        testNewLastIndexOfSingle(a, b, Integer.MAX_VALUE);
+        
+        // Test extreme values
+        verifyLastIndexOfAtPosition(source, searchString, Integer.MIN_VALUE);
+        verifyLastIndexOfAtPosition(source, searchString, Integer.MAX_VALUE);
     }
 
-    private void testNewLastIndexOfSingle(final CharSequence a, final CharSequence b, final int start) {
-        testNewLastIndexOfSingleSingle(a, b, start);
-        testNewLastIndexOfSingleSingle(b, a, start);
+    /**
+     * Verifies lastIndexOf behavior at a specific start position
+     */
+    private void verifyLastIndexOfAtPosition(CharSequence source, CharSequence searchString, int startPos) {
+        // Test both directions to ensure symmetry
+        compareWithStringLastIndexOf(source, searchString, startPos);
+        compareWithStringLastIndexOf(searchString, source, startPos);
     }
 
-    private void testNewLastIndexOfSingleSingle(final CharSequence a, final CharSequence b, final int start) {
-        assertEquals(a.toString().lastIndexOf(b.toString(), start),
-                CharSequenceUtils.lastIndexOf(new WrapperString(a.toString()), new WrapperString(b.toString()), start),
-                "testNewLastIndexOf fails! original : " + a + " seg : " + b + " start : " + start);
+    /**
+     * Compares CharSequenceUtils.lastIndexOf with String.lastIndexOf for the given parameters
+     */
+    private void compareWithStringLastIndexOf(CharSequence source, CharSequence searchString, int startPos) {
+        String sourceStr = source.toString();
+        String searchStr = searchString.toString();
+        
+        int expectedResult = sourceStr.lastIndexOf(searchStr, startPos);
+        int actualResult = CharSequenceUtils.lastIndexOf(
+                new CharSequenceWrapper(sourceStr), 
+                new CharSequenceWrapper(searchStr), 
+                startPos);
+        
+        assertEquals(expectedResult, actualResult,
+                String.format("lastIndexOf mismatch: source='%s', search='%s', start=%d", 
+                        source, searchString, startPos));
     }
 
     @Test
     void testRegionMatches() {
-        for (final TestData data : TEST_DATA) {
-            new RunTest() {
-                @Override
-                boolean invoke() {
-                    return data.source.regionMatches(data.ignoreCase, data.toffset, data.other, data.ooffset, data.len);
-                }
-            }.run(data, "String");
-            new RunTest() {
-                @Override
-                boolean invoke() {
-                    return CharSequenceUtils.regionMatches(data.source, data.ignoreCase, data.toffset, data.other, data.ooffset, data.len);
-                }
-            }.run(data, "CSString");
-            new RunTest() {
-                @Override
-                boolean invoke() {
-                    return CharSequenceUtils.regionMatches(new StringBuilder(data.source), data.ignoreCase, data.toffset, data.other, data.ooffset, data.len);
-                }
-            }.run(data, "CSNonString");
+        for (RegionMatchesTestCase testCase : REGION_MATCHES_TEST_CASES) {
+            testRegionMatchesWithString(testCase);
+            testRegionMatchesWithCharSequenceUtils(testCase);
+            testRegionMatchesWithNonStringCharSequence(testCase);
+        }
+    }
+
+    /**
+     * Tests String.regionMatches with the given test case
+     */
+    private void testRegionMatchesWithString(RegionMatchesTestCase testCase) {
+        if (testCase.expectedException != null) {
+            assertThrows(testCase.expectedException, 
+                    () -> testCase.sourceString.regionMatches(testCase.ignoreCase, testCase.sourceOffset, 
+                            testCase.targetString, testCase.targetOffset, testCase.length),
+                    "String.regionMatches should throw " + testCase.expectedException.getSimpleName());
+        } else {
+            boolean result = testCase.sourceString.regionMatches(testCase.ignoreCase, testCase.sourceOffset, 
+                    testCase.targetString, testCase.targetOffset, testCase.length);
+            assertEquals(testCase.expectedResult, result, 
+                    "String.regionMatches failed for: " + testCase);
+        }
+    }
+
+    /**
+     * Tests CharSequenceUtils.regionMatches with String inputs
+     */
+    private void testRegionMatchesWithCharSequenceUtils(RegionMatchesTestCase testCase) {
+        if (testCase.expectedException != null) {
+            assertThrows(testCase.expectedException, 
+                    () -> CharSequenceUtils.regionMatches(testCase.sourceString, testCase.ignoreCase, 
+                            testCase.sourceOffset, testCase.targetString, testCase.targetOffset, testCase.length),
+                    "CharSequenceUtils.regionMatches should throw " + testCase.expectedException.getSimpleName());
+        } else {
+            boolean result = CharSequenceUtils.regionMatches(testCase.sourceString, testCase.ignoreCase, 
+                    testCase.sourceOffset, testCase.targetString, testCase.targetOffset, testCase.length);
+            assertEquals(testCase.expectedResult, result, 
+                    "CharSequenceUtils.regionMatches failed for: " + testCase);
+        }
+    }
+
+    /**
+     * Tests CharSequenceUtils.regionMatches with StringBuilder (non-String CharSequence)
+     */
+    private void testRegionMatchesWithNonStringCharSequence(RegionMatchesTestCase testCase) {
+        if (testCase.expectedException != null) {
+            assertThrows(testCase.expectedException, 
+                    () -> CharSequenceUtils.regionMatches(new StringBuilder(testCase.sourceString), 
+                            testCase.ignoreCase, testCase.sourceOffset, testCase.targetString, 
+                            testCase.targetOffset, testCase.length),
+                    "CharSequenceUtils.regionMatches with StringBuilder should throw " + 
+                    testCase.expectedException.getSimpleName());
+        } else {
+            boolean result = CharSequenceUtils.regionMatches(new StringBuilder(testCase.sourceString), 
+                    testCase.ignoreCase, testCase.sourceOffset, testCase.targetString, 
+                    testCase.targetOffset, testCase.length);
+            assertEquals(testCase.expectedResult, result, 
+                    "CharSequenceUtils.regionMatches with StringBuilder failed for: " + testCase);
         }
     }
 
     @Test
-    void testSubSequence() {
-        //
-        // null input
-        //
-        assertNull(CharSequenceUtils.subSequence(null, -1));
-        assertNull(CharSequenceUtils.subSequence(null, 0));
-        assertNull(CharSequenceUtils.subSequence(null, 1));
-        //
-        // non-null input
-        //
+    void testSubSequenceWithValidInputs() {
+        // Test with empty string
         assertEquals(StringUtils.EMPTY, CharSequenceUtils.subSequence(StringUtils.EMPTY, 0));
+        
+        // Test with normal string
         assertEquals("012", CharSequenceUtils.subSequence("012", 0));
         assertEquals("12", CharSequenceUtils.subSequence("012", 1));
         assertEquals("2", CharSequenceUtils.subSequence("012", 2));
@@ -295,21 +378,38 @@ class CharSequenceUtilsTest extends AbstractLangTest {
     }
 
     @Test
-    void testSubSequenceNegativeStart() {
-        assertIndexOutOfBoundsException(() -> CharSequenceUtils.subSequence(StringUtils.EMPTY, -1));
+    void testSubSequenceWithNullInput() {
+        assertNull(CharSequenceUtils.subSequence(null, -1));
+        assertNull(CharSequenceUtils.subSequence(null, 0));
+        assertNull(CharSequenceUtils.subSequence(null, 1));
     }
 
     @Test
-    void testSubSequenceTooLong() {
-        assertIndexOutOfBoundsException(() -> CharSequenceUtils.subSequence(StringUtils.EMPTY, 1));
+    void testSubSequenceWithNegativeStart() {
+        assertIndexOutOfBoundsException(() -> CharSequenceUtils.subSequence(StringUtils.EMPTY, -1),
+                "subSequence should throw IndexOutOfBoundsException for negative start");
+    }
+
+    @Test
+    void testSubSequenceWithStartBeyondLength() {
+        assertIndexOutOfBoundsException(() -> CharSequenceUtils.subSequence(StringUtils.EMPTY, 1),
+                "subSequence should throw IndexOutOfBoundsException when start > length");
     }
 
     @Test
     void testToCharArray() {
-        final StringBuilder builder = new StringBuilder("abcdefg");
-        final char[] expected = builder.toString().toCharArray();
-        assertArrayEquals(expected, CharSequenceUtils.toCharArray(builder));
-        assertArrayEquals(expected, CharSequenceUtils.toCharArray(builder.toString()));
-        assertArrayEquals(ArrayUtils.EMPTY_CHAR_ARRAY, CharSequenceUtils.toCharArray(null));
+        // Test with StringBuilder
+        StringBuilder builder = new StringBuilder("abcdefg");
+        char[] expected = builder.toString().toCharArray();
+        assertArrayEquals(expected, CharSequenceUtils.toCharArray(builder),
+                "toCharArray should work correctly with StringBuilder");
+        
+        // Test with String
+        assertArrayEquals(expected, CharSequenceUtils.toCharArray(builder.toString()),
+                "toCharArray should work correctly with String");
+        
+        // Test with null
+        assertArrayEquals(ArrayUtils.EMPTY_CHAR_ARRAY, CharSequenceUtils.toCharArray(null),
+                "toCharArray should return empty array for null input");
     }
 }
