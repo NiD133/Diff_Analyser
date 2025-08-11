@@ -1,140 +1,176 @@
+/* ======================================================
+ * JFreeChart : a chart library for the Java(tm) platform
+ * ======================================================
+ *
+ * (C) Copyright 2000-present, by David Gilbert and Contributors.
+ *
+ * Project Info:  https://www.jfree.org/jfreechart/index.html
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ *
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
+ *
+ * -------------------
+ * PieDatasetTest.java
+ * -------------------
+ * (C) Copyright 2003-present, by David Gilbert and Contributors.
+ *
+ * Original Author:  David Gilbert;
+ * Contributor(s):   -;
+ *
+ */
+
 package org.jfree.data.general;
 
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.internal.CloneUtils;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Tests for the {@link org.jfree.data.general.PieDataset} class.
+ */
 public class DefaultPieDatasetTest implements DatasetChangeListener {
 
     private DatasetChangeEvent lastEvent;
 
+    /**
+     * Records the last event.
+     *
+     * @param event  the last event.
+     */
     @Override
     public void datasetChanged(DatasetChangeEvent event) {
         this.lastEvent = event;
     }
 
-    @BeforeEach
-    public void setup() {
+    /**
+     * Some tests for the clear() method.
+     */
+    @Test
+    public void testClear() {
+        DefaultPieDataset<String> d = new DefaultPieDataset<>();
+        d.addChangeListener(this);
+        // no event is generated if the dataset is already empty
+        d.clear();
+        assertNull(this.lastEvent);
+        d.setValue("A", 1.0);
+        assertEquals(1, d.getItemCount());
         this.lastEvent = null;
+        d.clear();
+        assertNotNull(this.lastEvent);
+        assertEquals(0, d.getItemCount());
     }
 
+    /**
+     * Some checks for the getKey(int) method.
+     */
     @Test
-    public void clear_WhenDatasetIsEmpty_ShouldNotFireChangeEvent() {
-        DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
-        dataset.addChangeListener(this);
-        
-        dataset.clear();
-        assertNull(lastEvent, "No event should be fired when clearing empty dataset");
+    public void testGetKey() {
+        DefaultPieDataset<String> d = new DefaultPieDataset<>();
+        d.setValue("A", 1.0);
+        d.setValue("B", 2.0);
+        assertEquals("A", d.getKey(0));
+        assertEquals("B", d.getKey(1));
+
+        boolean pass = false;
+        try {
+            d.getKey(-1);
+        }
+        catch (IndexOutOfBoundsException e) {
+            pass = true;
+        }
+        assertTrue(pass);
+
+        pass = false;
+        try {
+            d.getKey(2);
+        }
+        catch (IndexOutOfBoundsException e) {
+            pass = true;
+        }
+        assertTrue(pass);
     }
 
+    /**
+     * Some checks for the getIndex() method.
+     */
     @Test
-    public void clear_WhenDatasetHasData_ShouldFireChangeEventAndClearData() {
-        DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
-        dataset.addChangeListener(this);
-        dataset.setValue("A", 1.0);
-        
-        dataset.clear();
-        
-        assertNotNull(lastEvent, "Change event should be fired");
-        assertEquals(0, dataset.getItemCount(), "Dataset should be empty after clear");
+    public void testGetIndex() {
+        DefaultPieDataset<String> d = new DefaultPieDataset<>();
+        d.setValue("A", 1.0);
+        d.setValue("B", 2.0);
+        assertEquals(0, d.getIndex("A"));
+        assertEquals(1, d.getIndex("B"));
+        assertEquals(-1, d.getIndex("XX"));
+
+        boolean pass = false;
+        try {
+            d.getIndex(null);
+        }
+        catch (IllegalArgumentException e) {
+            pass = true;
+        }
+        assertTrue(pass);
     }
 
+    /**
+     * Confirm that cloning works.
+     * @throws java.lang.CloneNotSupportedException
+     */
     @Test
-    public void getKey_WithValidIndex_ShouldReturnCorrectKey() {
-        DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
-        dataset.setValue("A", 1.0);
-        dataset.setValue("B", 2.0);
-        
-        assertEquals("A", dataset.getKey(0), "Key at index 0 should be 'A'");
-        assertEquals("B", dataset.getKey(1), "Key at index 1 should be 'B'");
+    public void testCloning() throws CloneNotSupportedException {
+        DefaultPieDataset<String> d1 = new DefaultPieDataset<>();
+        d1.setValue("V1", 1);
+        d1.setValue("V2", null);
+        d1.setValue("V3", 3);
+        DefaultPieDataset<String> d2 = CloneUtils.clone(d1);
+
+        assertNotSame(d1, d2);
+        assertSame(d1.getClass(), d2.getClass());
+        assertEquals(d1, d2);
     }
 
+    /**
+     * Serialize an instance, restore it, and check for equality.
+     */
     @Test
-    public void getKey_WithNegativeIndex_ShouldThrowIndexOutOfBoundsException() {
-        DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
-        dataset.setValue("A", 1.0);
-        
-        assertThrows(IndexOutOfBoundsException.class, () -> dataset.getKey(-1),
-            "Should throw when accessing negative index");
+    public void testSerialization() {
+        DefaultPieDataset<String> d1 = new DefaultPieDataset<>();
+        d1.setValue("C1", 234.2);
+        d1.setValue("C2", null);
+        d1.setValue("C3", 345.9);
+        d1.setValue("C4", 452.7);
+
+        DefaultPieDataset<String> d2 = TestUtils.serialised(d1);
+        assertEquals(d1, d2);
     }
 
+    /**
+     * A test for bug report https://github.com/jfree/jfreechart/issues/212
+     */
     @Test
-    public void getKey_WithIndexOutOfBounds_ShouldThrowIndexOutOfBoundsException() {
-        DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
-        dataset.setValue("A", 1.0);
-        
-        assertThrows(IndexOutOfBoundsException.class, () -> dataset.getKey(1),
-            "Should throw when accessing index beyond dataset size");
-    }
-
-    @Test
-    public void getIndex_WithExistingKey_ShouldReturnCorrectIndex() {
-        DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
-        dataset.setValue("A", 1.0);
-        dataset.setValue("B", 2.0);
-        
-        assertEquals(0, dataset.getIndex("A"), "Index of 'A' should be 0");
-        assertEquals(1, dataset.getIndex("B"), "Index of 'B' should be 1");
-    }
-
-    @Test
-    public void getIndex_WithNonExistingKey_ShouldReturnNegativeOne() {
-        DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
-        dataset.setValue("A", 1.0);
-        
-        assertEquals(-1, dataset.getIndex("XX"), "Should return -1 for unknown key");
-    }
-
-    @Test
-    public void getIndex_WithNullKey_ShouldThrowIllegalArgumentException() {
-        DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
-        
-        assertThrows(IllegalArgumentException.class, () -> dataset.getIndex(null),
-            "Should throw when key is null");
-    }
-
-    @Test
-    public void cloning_ShouldCreateEqualButDistinctInstance() throws CloneNotSupportedException {
-        DefaultPieDataset<String> original = new DefaultPieDataset<>();
-        original.setValue("V1", 1);
-        original.setValue("V2", null);
-        original.setValue("V3", 3);
-        
-        DefaultPieDataset<String> clone = CloneUtils.clone(original);
-        
-        assertNotSame(original, clone, "Clone should be distinct instance");
-        assertSame(original.getClass(), clone.getClass(), "Clone should have same class");
-        assertEquals(original, clone, "Clone should be equal to original");
-    }
-
-    @Test
-    public void serialization_ShouldProduceEqualDataset() {
-        DefaultPieDataset<String> original = new DefaultPieDataset<>();
-        original.setValue("C1", 234.2);
-        original.setValue("C2", null);
-        original.setValue("C3", 345.9);
-        original.setValue("C4", 452.7);
-
-        DefaultPieDataset<String> deserialized = TestUtils.serialised(original);
-        assertEquals(original, deserialized, "Deserialized dataset should equal original");
-    }
-
-    @Test
-    public void getValue_WithInvalidIndex_ShouldThrowIndexOutOfBoundsException() {
-        DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
-        
-        // Test empty dataset
-        assertThrows(IndexOutOfBoundsException.class, () -> dataset.getValue(-1),
-            "Should throw for negative index on empty dataset");
-        assertThrows(IndexOutOfBoundsException.class, () -> dataset.getValue(0),
-            "Should throw for valid index on empty dataset");
-        
-        // Test populated dataset
-        dataset.setValue("A", 1.0);
-        assertEquals(1.0, dataset.getValue(0), "Valid index should return correct value");
-        assertThrows(IndexOutOfBoundsException.class, () -> dataset.getValue(1),
-            "Should throw for index beyond dataset size");
+    public void testBug212() {
+        DefaultPieDataset<String> d = new DefaultPieDataset<>();
+        assertThrows(IndexOutOfBoundsException.class, () ->  d.getValue(-1));
+        assertThrows(IndexOutOfBoundsException.class, () ->  d.getValue(0));
+        d.setValue("A", 1.0);
+        assertEquals(1.0, d.getValue(0));
+        assertThrows(IndexOutOfBoundsException.class, () ->  d.getValue(1));        
     }
 }
