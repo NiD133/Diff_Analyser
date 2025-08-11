@@ -22,208 +22,185 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class QueueInputStream_ESTest extends QueueInputStream_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      QueueInputStream.Builder queueInputStream_Builder0 = QueueInputStream.builder();
-      ChronoUnit chronoUnit0 = ChronoUnit.HOURS;
-      Duration duration0 = chronoUnit0.getDuration();
-      QueueInputStream.Builder queueInputStream_Builder1 = queueInputStream_Builder0.setTimeout(duration0);
-      assertSame(queueInputStream_Builder0, queueInputStream_Builder1);
-  }
+    // Tests for Builder methods
+    @Test(timeout = 4000)
+    public void testBuilderSetTimeoutReturnsSameBuilder() throws Throwable {
+        QueueInputStream.Builder builder = QueueInputStream.builder();
+        Duration timeout = ChronoUnit.HOURS.getDuration();
+        QueueInputStream.Builder sameBuilder = builder.setTimeout(timeout);
+        assertSame(builder, sameBuilder);
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      QueueInputStream.Builder queueInputStream_Builder0 = new QueueInputStream.Builder();
-      LinkedBlockingDeque<Integer> linkedBlockingDeque0 = new LinkedBlockingDeque<Integer>();
-      QueueInputStream.Builder queueInputStream_Builder1 = queueInputStream_Builder0.setBlockingQueue(linkedBlockingDeque0);
-      assertSame(queueInputStream_Builder0, queueInputStream_Builder1);
-  }
+    @Test(timeout = 4000)
+    public void testBuilderSetBlockingQueueReturnsSameBuilder() throws Throwable {
+        QueueInputStream.Builder builder = new QueueInputStream.Builder();
+        LinkedBlockingDeque<Integer> queue = new LinkedBlockingDeque<>();
+        QueueInputStream.Builder sameBuilder = builder.setBlockingQueue(queue);
+        assertSame(builder, sameBuilder);
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      PriorityBlockingQueue<Integer> priorityBlockingQueue0 = new PriorityBlockingQueue<Integer>();
-      Integer integer0 = new Integer((-728));
-      priorityBlockingQueue0.add(integer0);
-      QueueInputStream queueInputStream0 = new QueueInputStream(priorityBlockingQueue0);
-      byte[] byteArray0 = new byte[8];
-      int int0 = queueInputStream0.read(byteArray0, 1, 1);
-      assertEquals(1, int0);
-  }
+    @Test(timeout = 4000)
+    public void testBuilderSetNegativeTimeoutThrowsIllegalArgumentException() throws Throwable {
+        QueueInputStream.Builder builder = QueueInputStream.builder();
+        Duration negativeDuration = Duration.ofHours(-2277L);
+        try {
+            builder.setTimeout(negativeDuration);
+            fail("Expected IllegalArgumentException for negative timeout");
+        } catch (IllegalArgumentException e) {
+            assertEquals("timeout must not be negative", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      QueueInputStream queueInputStream0 = new QueueInputStream();
-      byte[] byteArray0 = new byte[4];
-      int int0 = queueInputStream0.read(byteArray0, 1, 1);
-      assertEquals((-1), int0);
-  }
+    @Test(timeout = 4000)
+    public void testBuilderSetNullTimeoutReturnsSameBuilder() throws Throwable {
+        QueueInputStream.Builder builder = new QueueInputStream.Builder();
+        QueueInputStream.Builder sameBuilder = builder.setTimeout(null);
+        assertSame(builder, sameBuilder);
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      PriorityBlockingQueue<Integer> priorityBlockingQueue0 = new PriorityBlockingQueue<Integer>();
-      Integer integer0 = new Integer(0);
-      priorityBlockingQueue0.add(integer0);
-      QueueInputStream queueInputStream0 = new QueueInputStream(priorityBlockingQueue0);
-      int int0 = queueInputStream0.read();
-      assertEquals(0, int0);
-  }
+    @Test(timeout = 4000)
+    public void testBuilderGetReturnsNonNullInstance() throws Throwable {
+        QueueInputStream.Builder builder = QueueInputStream.builder();
+        QueueInputStream stream = builder.get();
+        assertNotNull(stream);
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      PriorityBlockingQueue<Integer> priorityBlockingQueue0 = new PriorityBlockingQueue<Integer>();
-      QueueInputStream queueInputStream0 = new QueueInputStream(priorityBlockingQueue0);
-      int int0 = queueInputStream0.read();
-      assertEquals((-1), int0);
-  }
+    @Test(timeout = 4000)
+    public void testBuilderSetTimeoutWithSameDurationReturnsSameBuilder() throws Throwable {
+        QueueInputStream stream = new QueueInputStream();
+        Duration timeout = stream.getTimeout();
+        QueueInputStream.Builder builder = QueueInputStream.builder();
+        QueueInputStream.Builder sameBuilder = builder.setTimeout(timeout);
+        assertSame(builder, sameBuilder);
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      PriorityBlockingQueue<Integer> priorityBlockingQueue0 = new PriorityBlockingQueue<Integer>();
-      Integer integer0 = new Integer((-728));
-      priorityBlockingQueue0.add(integer0);
-      QueueInputStream queueInputStream0 = new QueueInputStream(priorityBlockingQueue0);
-      long long0 = queueInputStream0.skip(4014L);
-      assertEquals(1L, long0);
-  }
+    // Tests for read operations
+    @Test(timeout = 4000)
+    public void testReadByteArrayWithOffsetAndLengthFromNonEmptyQueue() throws Throwable {
+        PriorityBlockingQueue<Integer> queue = new PriorityBlockingQueue<>();
+        Integer value = -728;
+        queue.add(value);
+        QueueInputStream stream = new QueueInputStream(queue);
+        byte[] buffer = new byte[8];
+        int bytesRead = stream.read(buffer, 1, 1);
+        assertEquals(1, bytesRead);
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      PriorityBlockingQueue<Integer> priorityBlockingQueue0 = new PriorityBlockingQueue<Integer>();
-      QueueInputStream queueInputStream0 = new QueueInputStream(priorityBlockingQueue0);
-      byte[] byteArray0 = new byte[8];
-      int int0 = queueInputStream0.read(byteArray0, (int) (byte)0, (int) (byte)0);
-      assertEquals(0, int0);
-  }
+    @Test(timeout = 4000)
+    public void testReadByteArrayWithOffsetAndLengthFromEmptyQueueReturnsMinusOne() throws Throwable {
+        QueueInputStream stream = new QueueInputStream();
+        byte[] buffer = new byte[4];
+        int bytesRead = stream.read(buffer, 1, 1);
+        assertEquals(-1, bytesRead);
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      QueueInputStream queueInputStream0 = new QueueInputStream();
-      byte[] byteArray0 = new byte[0];
-      // Undeclared exception!
-      try { 
-        queueInputStream0.read(byteArray0, 2005, 2005);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // Range [2005, 2005 + 2005) out of bounds for length 0
-         //
-         verifyException("org.apache.commons.io.input.QueueInputStream", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testReadReturnsZero() throws Throwable {
+        PriorityBlockingQueue<Integer> queue = new PriorityBlockingQueue<>();
+        Integer value = 0;
+        queue.add(value);
+        QueueInputStream stream = new QueueInputStream(queue);
+        int byteValue = stream.read();
+        assertEquals(0, byteValue);
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      QueueInputStream queueInputStream0 = new QueueInputStream();
-      byte[] byteArray0 = new byte[19];
-      // Undeclared exception!
-      try { 
-        queueInputStream0.read(byteArray0, 1557, (-1357));
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // Range [1557, 1557 + -1357) out of bounds for length 19
-         //
-         verifyException("org.apache.commons.io.input.QueueInputStream", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testReadFromEmptyQueueReturnsMinusOne() throws Throwable {
+        PriorityBlockingQueue<Integer> queue = new PriorityBlockingQueue<>();
+        QueueInputStream stream = new QueueInputStream(queue);
+        int byteValue = stream.read();
+        assertEquals(-1, byteValue);
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      QueueInputStream queueInputStream0 = new QueueInputStream();
-      byte[] byteArray0 = new byte[0];
-      // Undeclared exception!
-      try { 
-        queueInputStream0.read(byteArray0, (-3123), (-3123));
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // Range [-3123, -3123 + -3123) out of bounds for length 0
-         //
-         verifyException("org.apache.commons.io.input.QueueInputStream", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testSkipOneElement() throws Throwable {
+        PriorityBlockingQueue<Integer> queue = new PriorityBlockingQueue<>();
+        Integer value = -728;
+        queue.add(value);
+        QueueInputStream stream = new QueueInputStream(queue);
+        long skipped = stream.skip(4014L);
+        assertEquals(1L, skipped);
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      QueueInputStream queueInputStream0 = new QueueInputStream();
-      // Undeclared exception!
-      try { 
-        queueInputStream0.read((byte[]) null, 16, 16);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.input.QueueInputStream", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testReadZeroBytesReturnsZero() throws Throwable {
+        PriorityBlockingQueue<Integer> queue = new PriorityBlockingQueue<>();
+        QueueInputStream stream = new QueueInputStream(queue);
+        byte[] buffer = new byte[8];
+        int bytesRead = stream.read(buffer, 0, 0);
+        assertEquals(0, bytesRead);
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      PriorityBlockingQueue<Integer> priorityBlockingQueue0 = new PriorityBlockingQueue<Integer>();
-      Integer integer0 = new Integer((-728));
-      priorityBlockingQueue0.add(integer0);
-      QueueInputStream queueInputStream0 = new QueueInputStream(priorityBlockingQueue0);
-      int int0 = queueInputStream0.read();
-      assertEquals(40, int0);
-  }
+    @Test(timeout = 4000)
+    public void testReadNegativeIntegerReturnsExpectedByte() throws Throwable {
+        PriorityBlockingQueue<Integer> queue = new PriorityBlockingQueue<>();
+        Integer value = -728;
+        queue.add(value);
+        QueueInputStream stream = new QueueInputStream(queue);
+        int byteValue = stream.read();
+        assertEquals(40, byteValue); // Least significant byte of -728
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      QueueInputStream.Builder queueInputStream_Builder0 = QueueInputStream.builder();
-      Duration duration0 = Duration.ofHours((-2277L));
-      // Undeclared exception!
-      try { 
-        queueInputStream_Builder0.setTimeout(duration0);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // timeout must not be negative
-         //
-         verifyException("org.apache.commons.io.input.QueueInputStream$Builder", e);
-      }
-  }
+    // Tests for exception cases
+    @Test(timeout = 4000)
+    public void testReadByteArrayWithInvalidOffsetAndLengthThrowsIndexOutOfBoundsException() throws Throwable {
+        QueueInputStream stream = new QueueInputStream();
+        byte[] buffer = new byte[0];
+        try {
+            stream.read(buffer, 2005, 2005);
+            fail("Expected IndexOutOfBoundsException for invalid range");
+        } catch (IndexOutOfBoundsException e) {
+            assertEquals("Range [2005, 2005 + 2005) out of bounds for length 0", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      QueueInputStream.Builder queueInputStream_Builder0 = new QueueInputStream.Builder();
-      QueueInputStream.Builder queueInputStream_Builder1 = queueInputStream_Builder0.setTimeout((Duration) null);
-      assertSame(queueInputStream_Builder0, queueInputStream_Builder1);
-  }
+    @Test(timeout = 4000)
+    public void testReadByteArrayWithNegativeLengthThrowsIndexOutOfBoundsException() throws Throwable {
+        QueueInputStream stream = new QueueInputStream();
+        byte[] buffer = new byte[19];
+        try {
+            stream.read(buffer, 1557, -1357);
+            fail("Expected IndexOutOfBoundsException for negative length");
+        } catch (IndexOutOfBoundsException e) {
+            assertEquals("Range [1557, 1557 + -1357) out of bounds for length 19", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      QueueInputStream.Builder queueInputStream_Builder0 = QueueInputStream.builder();
-      QueueInputStream queueInputStream0 = queueInputStream_Builder0.get();
-      assertNotNull(queueInputStream0);
-  }
+    @Test(timeout = 4000)
+    public void testReadByteArrayWithNegativeOffsetThrowsIndexOutOfBoundsException() throws Throwable {
+        QueueInputStream stream = new QueueInputStream();
+        byte[] buffer = new byte[0];
+        try {
+            stream.read(buffer, -3123, -3123);
+            fail("Expected IndexOutOfBoundsException for negative offset");
+        } catch (IndexOutOfBoundsException e) {
+            assertEquals("Range [-3123, -3123 + -3123) out of bounds for length 0", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      QueueInputStream queueInputStream0 = new QueueInputStream((BlockingQueue<Integer>) null);
-      BlockingQueue<Integer> blockingQueue0 = queueInputStream0.getBlockingQueue();
-      assertNotNull(blockingQueue0);
-  }
+    @Test(timeout = 4000)
+    public void testReadNullByteArrayThrowsNullPointerException() throws Throwable {
+        QueueInputStream stream = new QueueInputStream();
+        try {
+            stream.read(null, 16, 16);
+            fail("Expected NullPointerException for null buffer");
+        } catch (NullPointerException e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      QueueInputStream queueInputStream0 = new QueueInputStream();
-      QueueOutputStream queueOutputStream0 = queueInputStream0.newQueueOutputStream();
-      assertNotNull(queueOutputStream0);
-  }
+    // Tests for other functionality
+    @Test(timeout = 4000)
+    public void testGetBlockingQueueReturnsNonNullWhenConstructedWithNull() throws Throwable {
+        QueueInputStream stream = new QueueInputStream((BlockingQueue<Integer>) null);
+        BlockingQueue<Integer> queue = stream.getBlockingQueue();
+        assertNotNull(queue);
+    }
 
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      PriorityBlockingQueue<Integer> priorityBlockingQueue0 = new PriorityBlockingQueue<Integer>();
-      QueueInputStream queueInputStream0 = new QueueInputStream(priorityBlockingQueue0);
-      Duration duration0 = queueInputStream0.getTimeout();
-      QueueInputStream.Builder queueInputStream_Builder0 = QueueInputStream.builder();
-      QueueInputStream.Builder queueInputStream_Builder1 = queueInputStream_Builder0.setTimeout(duration0);
-      assertSame(queueInputStream_Builder0, queueInputStream_Builder1);
-  }
+    @Test(timeout = 4000)
+    public void testNewQueueOutputStreamReturnsNonNull() throws Throwable {
+        QueueInputStream stream = new QueueInputStream();
+        QueueOutputStream outputStream = stream.newQueueOutputStream();
+        assertNotNull(outputStream);
+    }
 }
