@@ -16,333 +16,447 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) 
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true, 
-    useVFS = true, 
-    useVNET = true, 
-    resetStaticState = true, 
-    separateClassLoader = true
-) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class CharSequenceReader_ESTest extends CharSequenceReader_ESTest_scaffolding {
 
-    // Basic Functionality Tests
-    @Test(timeout = 4000)
-    public void markSupportedAfterMark_returnsTrue() throws Throwable {
-        char[] chars = new char[6];
-        CharBuffer buffer = CharBuffer.wrap(chars);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        reader.mark(666);
-        assertTrue(reader.markSupported());
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      char[] charArray0 = new char[6];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      charSequenceReader0.mark(666);
+      assertTrue(charSequenceReader0.markSupported());
+  }
 
-    @Test(timeout = 4000)
-    public void readIntoSmallerCharArray_returnsBytesRead() throws Throwable {
-        char[] targetArray = new char[6];
-        char[] sourceArray = new char[1];
-        CharBuffer buffer = CharBuffer.wrap(sourceArray);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        int bytesRead = reader.read(targetArray);
-        assertEquals(1, bytesRead);
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      char[] charArray0 = new char[6];
+      char[] charArray1 = new char[1];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray1);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      int int0 = charSequenceReader0.read(charArray0);
+      assertEquals(1, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void skipAllBytes_returnsBytesSkipped() throws Throwable {
-        CharBuffer buffer = CharBuffer.allocate(1191);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        long skipped = reader.skip(1191);
-        assertEquals(1191L, skipped);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      CharBuffer charBuffer0 = CharBuffer.allocate(1191);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      long long0 = charSequenceReader0.skip(1191);
+      assertEquals(1191L, long0);
+  }
 
-    @Test(timeout = 4000)
-    public void readCharBufferWithZeroLength_returnsZero() throws Throwable {
-        char[] chars = new char[2];
-        CharBuffer buffer = CharBuffer.wrap(chars);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        int bytesRead = reader.read(chars, 0, 0);
-        assertEquals(0, bytesRead);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      char[] charArray0 = new char[6];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      charBuffer0.append('B');
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      charBuffer0.flip();
+      charSequenceReader0.read(charBuffer0);
+      long long0 = charSequenceReader0.skip(0);
+      assertEquals("", charBuffer0.toString());
+      assertEquals((-1L), long0);
+  }
 
-    @Test(timeout = 4000)
-    public void readCharBufferWithLength_returnsBytesRead() throws Throwable {
-        char[] chars = new char[6];
-        CharBuffer buffer = CharBuffer.wrap(chars);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        int bytesRead = reader.read(chars, 0, 4);
-        assertEquals(4, bytesRead);
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      char[] charArray0 = new char[2];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      int int0 = charSequenceReader0.read(charArray0, 0, 0);
+      assertEquals(0, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void readSingleChar_returnsCorrectChar() throws Throwable {
-        char[] chars = new char[6];
-        chars[0] = 'g';
-        CharBuffer buffer = CharBuffer.wrap(chars);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        int charRead = reader.read();
-        assertEquals('g', charRead);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      char[] charArray0 = new char[6];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      int int0 = charSequenceReader0.read(charArray0, 0, 4);
+      assertEquals(4, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void readSingleCharFromEmptyBuffer_returnsEOF() throws Throwable {
-        char[] chars = new char[0];
-        CharBuffer buffer = CharBuffer.wrap(chars);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        int charRead = reader.read();
-        assertEquals(-1, charRead);
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      char[] charArray0 = new char[1];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharBuffer charBuffer1 = CharBuffer.wrap(charArray0);
+      CharBuffer charBuffer2 = charBuffer0.append('2');
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer1);
+      int int0 = charSequenceReader0.read(charBuffer2);
+      assertEquals(0, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void skipZeroBytes_returnsZero() throws Throwable {
-        CharBuffer buffer = CharBuffer.allocate(0);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        long skipped = reader.skip(0);
-        assertEquals(0L, skipped);
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      char[] charArray0 = new char[6];
+      charArray0[0] = 'g';
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      int int0 = charSequenceReader0.read();
+      assertEquals(103, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void markSupported_returnsTrue() throws Throwable {
-        char[] chars = new char[1];
-        CharBuffer buffer = CharBuffer.wrap(chars);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        assertTrue(reader.markSupported());
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      char[] charArray0 = new char[1];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      charSequenceReader0.close();
+      try { 
+        charSequenceReader0.skip(2031L);
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // reader closed
+         //
+         verifyException("com.google.common.io.CharSequenceReader", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void resetWithoutMark_succeeds() throws Throwable {
-        char[] chars = new char[2];
-        CharBuffer buffer = CharBuffer.wrap(chars);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        reader.reset();
-        assertTrue(reader.markSupported());
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      char[] charArray0 = new char[2];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      charSequenceReader0.close();
+      try { 
+        charSequenceReader0.reset();
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // reader closed
+         //
+         verifyException("com.google.common.io.CharSequenceReader", e);
+      }
+  }
 
-    // Edge Case Tests
-    @Test(timeout = 4000)
-    public void skipAfterReading_returnsRemainingBytes() throws Throwable {
-        char[] chars = new char[6];
-        CharBuffer buffer = CharBuffer.wrap(chars);
-        buffer.append('B');
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        buffer.flip();
-        reader.read(buffer);
-        long skipped = reader.skip(0);
-        assertEquals(-1L, skipped);
-        assertEquals("", buffer.toString());
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      char[] charArray0 = new char[1];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      charSequenceReader0.close();
+      try { 
+        charSequenceReader0.ready();
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // reader closed
+         //
+         verifyException("com.google.common.io.CharSequenceReader", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void readCharBufferAfterReadingAll_returnsEOF() throws Throwable {
-        char[] chars = new char[1];
-        CharBuffer buffer = CharBuffer.wrap(chars);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        reader.read(buffer);
-        int bytesRead = reader.read(buffer);
-        assertEquals(0, buffer.length());
-        assertEquals(-1, bytesRead);
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      CharBuffer charBuffer0 = CharBuffer.allocate(93);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      // Undeclared exception!
+      try { 
+        charSequenceReader0.read((char[]) null, 93, 93);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.io.CharSequenceReader", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void readCharArrayAfterReadingAll_returnsEOF() throws Throwable {
-        char[] chars = new char[6];
-        CharBuffer buffer = CharBuffer.wrap(chars);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        reader.read(chars);
-        int bytesRead = reader.read(chars, 0, 0);
-        assertEquals(-1, bytesRead);
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      char[] charArray0 = new char[6];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      // Undeclared exception!
+      try { 
+        charSequenceReader0.read(charArray0, (-1), (-1));
+        fail("Expecting exception: IndexOutOfBoundsException");
+      
+      } catch(IndexOutOfBoundsException e) {
+         //
+         // java.lang.String@0000000002 (java.lang.Integer@0000000003) must not be negative
+         //
+         verifyException("com.google.common.base.Preconditions", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void readyWhenBufferEmpty_returnsTrue() throws Throwable {
-        CharBuffer buffer = CharBuffer.allocate(0);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        assertTrue(reader.ready());
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      char[] charArray0 = new char[1];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      CharBuffer charBuffer1 = CharBuffer.wrap((CharSequence) charBuffer0);
+      // Undeclared exception!
+      try { 
+        charSequenceReader0.read(charBuffer1);
+        fail("Expecting exception: ReadOnlyBufferException");
+      
+      } catch(ReadOnlyBufferException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.nio.StringCharBuffer", e);
+      }
+  }
 
-    // Exception Handling Tests
-    @Test(timeout = 4000)
-    public void constructorWithNull_throwsNullPointerException() {
-        try {
-            new CharSequenceReader(null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      char[] charArray0 = new char[1];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      // Undeclared exception!
+      try { 
+        charSequenceReader0.read((CharBuffer) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.base.Preconditions", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void readNullCharArray_throwsNullPointerException() throws Throwable {
-        CharBuffer buffer = CharBuffer.allocate(93);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        try {
-            reader.read(null, 93, 93);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      char[] charArray0 = new char[1];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      charSequenceReader0.close();
+      try { 
+        charSequenceReader0.read(charBuffer0);
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // reader closed
+         //
+         verifyException("com.google.common.io.CharSequenceReader", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void readCharArrayWithNegativeParams_throwsIndexOutOfBounds() throws Throwable {
-        char[] chars = new char[6];
-        CharBuffer buffer = CharBuffer.wrap(chars);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        try {
-            reader.read(chars, -1, -1);
-            fail("Expected IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      char[] charArray0 = new char[6];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharBuffer charBuffer1 = CharBuffer.wrap((CharSequence) charBuffer0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer1);
+      charBuffer0.append((CharSequence) charBuffer1);
+      // Undeclared exception!
+      try { 
+        charSequenceReader0.read();
+        fail("Expecting exception: IndexOutOfBoundsException");
+      
+      } catch(IndexOutOfBoundsException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.nio.Buffer", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void readIntoReadOnlyCharBuffer_throwsReadOnlyBufferException() throws Throwable {
-        char[] source = new char[1];
-        CharBuffer buffer = CharBuffer.wrap(source);
-        CharBuffer readOnlyBuffer = CharBuffer.wrap(source).asReadOnlyBuffer();
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        try {
-            reader.read(readOnlyBuffer);
-            fail("Expected ReadOnlyBufferException");
-        } catch (ReadOnlyBufferException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      char[] charArray0 = new char[6];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      charSequenceReader0.close();
+      try { 
+        charSequenceReader0.read();
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // reader closed
+         //
+         verifyException("com.google.common.io.CharSequenceReader", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void readNullCharBuffer_throwsNullPointerException() throws Throwable {
-        char[] chars = new char[1];
-        CharBuffer buffer = CharBuffer.wrap(chars);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        try {
-            reader.read((CharBuffer) null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      char[] charArray0 = new char[1];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      charSequenceReader0.close();
+      try { 
+        charSequenceReader0.mark(0);
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // reader closed
+         //
+         verifyException("com.google.common.io.CharSequenceReader", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void markWithNegativeLimit_throwsIllegalArgumentException() throws Throwable {
-        char[] chars = new char[1];
-        CharBuffer buffer = CharBuffer.wrap(chars);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        try {
-            reader.mark(-1897);
-            fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      CharSequenceReader charSequenceReader0 = null;
+      try {
+        charSequenceReader0 = new CharSequenceReader((CharSequence) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.common.base.Preconditions", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void skipNegativeBytes_throwsIllegalArgumentException() throws Throwable {
-        char[] chars = new char[3];
-        CharBuffer buffer = CharBuffer.wrap(chars);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        try {
-            reader.skip(-1L);
-            fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      char[] charArray0 = new char[1];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      // Undeclared exception!
+      try { 
+        charSequenceReader0.mark((-1897));
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // readAheadLimit (java.lang.Integer@0000000002) may not be negative
+         //
+         verifyException("com.google.common.base.Preconditions", e);
+      }
+  }
 
-    // Closed Reader Behavior Tests
-    @Test(timeout = 4000)
-    public void skipAfterClose_throwsIOException() throws Throwable {
-        char[] chars = new char[1];
-        CharBuffer buffer = CharBuffer.wrap(chars);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        reader.close();
-        try {
-            reader.skip(2031L);
-            fail("Expected IOException: reader closed");
-        } catch (IOException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      CharBuffer charBuffer0 = CharBuffer.allocate(0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      long long0 = charSequenceReader0.skip(0);
+      assertEquals(0L, long0);
+  }
 
-    @Test(timeout = 4000)
-    public void resetAfterClose_throwsIOException() throws Throwable {
-        char[] chars = new char[2];
-        CharBuffer buffer = CharBuffer.wrap(chars);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        reader.close();
-        try {
-            reader.reset();
-            fail("Expected IOException: reader closed");
-        } catch (IOException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      char[] charArray0 = new char[3];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      // Undeclared exception!
+      try { 
+        charSequenceReader0.skip((-1L));
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // n (java.lang.Long@0000000002) may not be negative
+         //
+         verifyException("com.google.common.base.Preconditions", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void readyAfterClose_throwsIOException() throws Throwable {
-        char[] chars = new char[1];
-        CharBuffer buffer = CharBuffer.wrap(chars);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        reader.close();
-        try {
-            reader.ready();
-            fail("Expected IOException: reader closed");
-        } catch (IOException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      char[] charArray0 = new char[1];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      int int0 = charSequenceReader0.read();
+      assertEquals(0, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void readAfterClose_throwsIOException() throws Throwable {
-        char[] chars = new char[1];
-        CharBuffer buffer = CharBuffer.wrap(chars);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        reader.close();
-        try {
-            reader.read(buffer);
-            fail("Expected IOException: reader closed");
-        } catch (IOException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      char[] charArray0 = new char[0];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      int int0 = charSequenceReader0.read();
+      assertEquals((-1), int0);
+  }
 
-    @Test(timeout = 4000)
-    public void readSingleCharAfterClose_throwsIOException() throws Throwable {
-        char[] chars = new char[6];
-        CharBuffer buffer = CharBuffer.wrap(chars);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        reader.close();
-        try {
-            reader.read();
-            fail("Expected IOException: reader closed");
-        } catch (IOException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      char[] charArray0 = new char[1];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      charSequenceReader0.read(charBuffer0);
+      int int0 = charSequenceReader0.read(charBuffer0);
+      assertEquals(0, charBuffer0.length());
+      assertEquals((-1), int0);
+  }
 
-    @Test(timeout = 4000)
-    public void markAfterClose_throwsIOException() throws Throwable {
-        char[] chars = new char[1];
-        CharBuffer buffer = CharBuffer.wrap(chars);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        reader.close();
-        try {
-            reader.mark(0);
-            fail("Expected IOException: reader closed");
-        } catch (IOException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      char[] charArray0 = new char[6];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      // Undeclared exception!
+      try { 
+        charSequenceReader0.read(charBuffer0);
+        fail("Expecting exception: IndexOutOfBoundsException");
+      
+      } catch(IndexOutOfBoundsException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.nio.Buffer", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void readCharArrayAfterClose_throwsIOException() throws Throwable {
-        char[] chars = new char[3];
-        CharBuffer buffer = CharBuffer.wrap(chars);
-        CharSequenceReader reader = new CharSequenceReader(buffer);
-        reader.close();
-        try {
-            reader.read(chars, 0, 0);
-            fail("Expected IOException: reader closed");
-        } catch (IOException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      char[] charArray0 = new char[1];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      boolean boolean0 = charSequenceReader0.markSupported();
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      char[] charArray0 = new char[6];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      int int0 = charSequenceReader0.read(charArray0);
+      assertEquals(6, int0);
+      
+      int int1 = charSequenceReader0.read(charArray0, 0, 0);
+      assertEquals((-1), int1);
+  }
+
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      char[] charArray0 = new char[3];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      charSequenceReader0.close();
+      try { 
+        charSequenceReader0.read(charArray0, 0, 0);
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // reader closed
+         //
+         verifyException("com.google.common.io.CharSequenceReader", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      CharBuffer charBuffer0 = CharBuffer.allocate(0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      boolean boolean0 = charSequenceReader0.ready();
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      char[] charArray0 = new char[2];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
+      charSequenceReader0.reset();
+      assertTrue(charSequenceReader0.markSupported());
+  }
 }
