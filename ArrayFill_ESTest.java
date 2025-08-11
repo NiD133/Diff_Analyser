@@ -16,248 +16,236 @@ import org.evosuite.runtime.EvoRunnerParameters;
 import org.evosuite.runtime.mock.java.lang.MockThrowable;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class)
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true,
-    useVFS = true,
-    useVNET = true,
-    resetStaticState = true,
-    separateClassLoader = true
-)
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class ArrayFill_ESTest extends ArrayFill_ESTest_scaffolding {
 
-    // Tests for fill(boolean[], boolean)
-    @Test(timeout = 4000)
-    public void testFillBoolean_EmptyArray() throws Throwable {
-        boolean[] input = new boolean[0];
-        boolean[] result = ArrayFill.fill(input, true);
-        assertSame(input, result);
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      boolean[] booleanArray0 = new boolean[0];
+      boolean[] booleanArray1 = ArrayFill.fill(booleanArray0, true);
+      assertSame(booleanArray0, booleanArray1);
+  }
 
-    @Test(timeout = 4000)
-    public void testFillBoolean_NonEmptyArray() throws Throwable {
-        boolean[] input = new boolean[4];
-        boolean[] result = ArrayFill.fill(input, true);
-        assertTrue(Arrays.equals(new boolean[]{true, true, true, true}, result));
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      short[] shortArray0 = new short[6];
+      short[] shortArray1 = ArrayFill.fill(shortArray0, (short) (-838));
+      assertArrayEquals(new short[] {(short) (-838), (short) (-838), (short) (-838), (short) (-838), (short) (-838), (short) (-838)}, shortArray1);
+  }
 
-    @Test(timeout = 4000)
-    public void testFillBoolean_NullArray() throws Throwable {
-        boolean[] result = ArrayFill.fill((boolean[]) null, true);
-        assertNull(result);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      Object[] objectArray0 = new Object[0];
+      FailableIntFunction<Object, Throwable> failableIntFunction0 = FailableIntFunction.nop();
+      Object[] objectArray1 = ArrayFill.fill(objectArray0, (FailableIntFunction<?, Throwable>) failableIntFunction0);
+      assertSame(objectArray1, objectArray0);
+  }
 
-    // Tests for fill(byte[], byte)
-    @Test(timeout = 4000)
-    public void testFillByte_NonEmptyArray() throws Throwable {
-        byte[] input = new byte[1];
-        byte[] result = ArrayFill.fill(input, (byte) 76);
-        assertArrayEquals(new byte[]{76}, result);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      Throwable[] throwableArray0 = new Throwable[8];
+      MockThrowable mockThrowable0 = new MockThrowable();
+      Throwable[] throwableArray1 = ArrayFill.fill(throwableArray0, (Throwable) mockThrowable0);
+      assertSame(throwableArray1, throwableArray0);
+  }
 
-    @Test(timeout = 4000)
-    public void testFillByte_EmptyArray() throws Throwable {
-        byte[] input = new byte[0];
-        byte[] result = ArrayFill.fill(input, (byte) 0);
-        assertSame(input, result);
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      long[] longArray0 = new long[0];
+      long[] longArray1 = ArrayFill.fill(longArray0, 0L);
+      assertSame(longArray1, longArray0);
+  }
 
-    @Test(timeout = 4000)
-    public void testFillByte_NullArray() throws Throwable {
-        byte[] result = ArrayFill.fill((byte[]) null, (byte) 87);
-        assertNull(result);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      int[] intArray0 = new int[7];
+      int[] intArray1 = ArrayFill.fill(intArray0, (-1));
+      assertArrayEquals(new int[] {(-1), (-1), (-1), (-1), (-1), (-1), (-1)}, intArray1);
+  }
 
-    // Tests for fill(char[], char)
-    @Test(timeout = 4000)
-    public void testFillChar_NonEmptyArray() throws Throwable {
-        char[] input = new char[1];
-        char[] result = ArrayFill.fill(input, ']');
-        assertArrayEquals(new char[]{']'}, result);
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      float[] floatArray0 = new float[5];
+      float[] floatArray1 = ArrayFill.fill(floatArray0, 95.0F);
+      assertArrayEquals(new float[] {95.0F, 95.0F, 95.0F, 95.0F, 95.0F}, floatArray1, 0.01F);
+  }
 
-    @Test(timeout = 4000)
-    public void testFillChar_EmptyArray() throws Throwable {
-        char[] input = new char[0];
-        char[] result = ArrayFill.fill(input, 's');
-        assertEquals(0, result.length);
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      double[] doubleArray0 = new double[0];
+      double[] doubleArray1 = ArrayFill.fill(doubleArray0, (double) (-259));
+      assertEquals(0, doubleArray1.length);
+  }
 
-    @Test(timeout = 4000)
-    public void testFillChar_NullArray() throws Throwable {
-        char[] result = ArrayFill.fill((char[]) null, 'B');
-        assertNull(result);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      char[] charArray0 = new char[1];
+      char[] charArray1 = ArrayFill.fill(charArray0, ']');
+      assertArrayEquals(new char[] {']'}, charArray1);
+  }
 
-    // Tests for fill(short[], short)
-    @Test(timeout = 4000)
-    public void testFillShort_NonEmptyArray() throws Throwable {
-        short[] input = new short[6];
-        short[] result = ArrayFill.fill(input, (short) -838);
-        assertArrayEquals(new short[]{-838, -838, -838, -838, -838, -838}, result);
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      byte[] byteArray0 = new byte[1];
+      byte[] byteArray1 = ArrayFill.fill(byteArray0, (byte)76);
+      assertArrayEquals(new byte[] {(byte)76}, byteArray1);
+  }
 
-    @Test(timeout = 4000)
-    public void testFillShort_EmptyArray() throws Throwable {
-        short[] input = new short[0];
-        short[] result = ArrayFill.fill(input, (short) 2);
-        assertSame(input, result);
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      Throwable[] throwableArray0 = new Throwable[3];
+      FailableIntFunction<Object, Throwable> failableIntFunction0 = FailableIntFunction.nop();
+      // Undeclared exception!
+      try { 
+        ArrayFill.fill((Object[]) throwableArray0, (Object) failableIntFunction0);
+        fail("Expecting exception: ArrayStoreException");
+      
+      } catch(ArrayStoreException e) {
+         //
+         // org.apache.commons.lang3.function.FailableIntFunction$$Lambda$153/1790855301
+         //
+         verifyException("java.util.Arrays", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testFillShort_NullArray() throws Throwable {
-        short[] result = ArrayFill.fill((short[]) null, (short) -3333);
-        assertNull(result);
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      Object[] objectArray0 = new Object[0];
+      FailableIntFunction<Object, Throwable> failableIntFunction0 = FailableIntFunction.nop();
+      Object[] objectArray1 = ArrayFill.fill(objectArray0, (Object) failableIntFunction0);
+      assertSame(objectArray1, objectArray0);
+  }
 
-    // Tests for fill(int[], int)
-    @Test(timeout = 4000)
-    public void testFillInt_NonEmptyArray() throws Throwable {
-        int[] input = new int[7];
-        int[] result = ArrayFill.fill(input, -1);
-        assertArrayEquals(new int[]{-1, -1, -1, -1, -1, -1, -1}, result);
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      MockThrowable mockThrowable0 = new MockThrowable(".MLY42", (Throwable) null);
+      Object[] objectArray0 = ArrayFill.fill((Object[]) null, (Object) mockThrowable0);
+      assertNull(objectArray0);
+  }
 
-    @Test(timeout = 4000)
-    public void testFillInt_EmptyArray() throws Throwable {
-        int[] input = new int[0];
-        int[] result = ArrayFill.fill(input, 0);
-        assertSame(input, result);
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      Object[] objectArray0 = new Object[4];
+      Object[] objectArray1 = ArrayFill.fill(objectArray0, (FailableIntFunction<?, Throwable>) null);
+      assertSame(objectArray0, objectArray1);
+  }
 
-    @Test(timeout = 4000)
-    public void testFillInt_NullArray() throws Throwable {
-        int[] result = ArrayFill.fill((int[]) null, 0);
-        assertNull(result);
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      Object[] objectArray0 = new Object[6];
+      FailableIntFunction<Object, Throwable> failableIntFunction0 = FailableIntFunction.nop();
+      Object[] objectArray1 = ArrayFill.fill(objectArray0, (FailableIntFunction<?, Throwable>) failableIntFunction0);
+      assertSame(objectArray0, objectArray1);
+  }
 
-    // Tests for fill(long[], long)
-    @Test(timeout = 4000)
-    public void testFillLong_NonEmptyArray() throws Throwable {
-        long[] input = new long[8];
-        long[] result = ArrayFill.fill(input, -1L);
-        assertArrayEquals(new long[]{-1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L}, result);
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      FailableIntFunction<Throwable, Throwable> failableIntFunction0 = FailableIntFunction.nop();
+      Throwable[] throwableArray0 = ArrayFill.fill((Throwable[]) null, (FailableIntFunction<? extends Throwable, Throwable>) failableIntFunction0);
+      assertNull(throwableArray0);
+  }
 
-    @Test(timeout = 4000)
-    public void testFillLong_EmptyArray() throws Throwable {
-        long[] input = new long[0];
-        long[] result = ArrayFill.fill(input, 0L);
-        assertSame(input, result);
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      short[] shortArray0 = new short[0];
+      short[] shortArray1 = ArrayFill.fill(shortArray0, (short)2);
+      assertSame(shortArray0, shortArray1);
+  }
 
-    @Test(timeout = 4000)
-    public void testFillLong_NullArray() throws Throwable {
-        long[] result = ArrayFill.fill((long[]) null, 1003L);
-        assertNull(result);
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      short[] shortArray0 = ArrayFill.fill((short[]) null, (short) (-3333));
+      assertNull(shortArray0);
+  }
 
-    // Tests for fill(float[], float)
-    @Test(timeout = 4000)
-    public void testFillFloat_NonEmptyArray() throws Throwable {
-        float[] input = new float[5];
-        float[] result = ArrayFill.fill(input, 95.0F);
-        assertArrayEquals(new float[]{95.0F, 95.0F, 95.0F, 95.0F, 95.0F}, result, 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      long[] longArray0 = new long[8];
+      long[] longArray1 = ArrayFill.fill(longArray0, (-1L));
+      assertArrayEquals(new long[] {(-1L), (-1L), (-1L), (-1L), (-1L), (-1L), (-1L), (-1L)}, longArray1);
+  }
 
-    @Test(timeout = 4000)
-    public void testFillFloat_EmptyArray() throws Throwable {
-        float[] input = new float[0];
-        float[] result = ArrayFill.fill(input, 1.0F);
-        assertSame(input, result);
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      long[] longArray0 = ArrayFill.fill((long[]) null, 1003L);
+      assertNull(longArray0);
+  }
 
-    @Test(timeout = 4000)
-    public void testFillFloat_NullArray() throws Throwable {
-        float[] result = ArrayFill.fill((float[]) null, -4645.361F);
-        assertNull(result);
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      int[] intArray0 = new int[0];
+      int[] intArray1 = ArrayFill.fill(intArray0, 0);
+      assertSame(intArray1, intArray0);
+  }
 
-    // Tests for fill(double[], double)
-    @Test(timeout = 4000)
-    public void testFillDouble_NonEmptyArray() throws Throwable {
-        double[] input = new double[8];
-        double[] result = ArrayFill.fill(input, 0.0);
-        assertArrayEquals(new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}, result, 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      int[] intArray0 = ArrayFill.fill((int[]) null, 0);
+      assertNull(intArray0);
+  }
 
-    @Test(timeout = 4000)
-    public void testFillDouble_EmptyArray() throws Throwable {
-        double[] input = new double[0];
-        double[] result = ArrayFill.fill(input, -259.0);
-        assertEquals(0, result.length);
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      float[] floatArray0 = new float[0];
+      float[] floatArray1 = ArrayFill.fill(floatArray0, 1.0F);
+      assertSame(floatArray0, floatArray1);
+  }
 
-    @Test(timeout = 4000)
-    public void testFillDouble_NullArray() throws Throwable {
-        double[] result = ArrayFill.fill((double[]) null, -3333.0);
-        assertNull(result);
-    }
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      float[] floatArray0 = ArrayFill.fill((float[]) null, (-4645.361F));
+      assertNull(floatArray0);
+  }
 
-    // Tests for fill(T[], T) - Object arrays with constant value
-    @Test(timeout = 4000)
-    public void testFillObjectArray_NonEmptyArray() throws Throwable {
-        Throwable[] input = new Throwable[8];
-        MockThrowable value = new MockThrowable();
-        Throwable[] result = ArrayFill.fill(input, value);
-        assertSame(input, result);
-    }
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      double[] doubleArray0 = new double[8];
+      double[] doubleArray1 = ArrayFill.fill(doubleArray0, 0.0);
+      assertArrayEquals(new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}, doubleArray1, 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testFillObjectArray_EmptyArray() throws Throwable {
-        Object[] input = new Object[0];
-        FailableIntFunction<Object, Throwable> value = FailableIntFunction.nop();
-        Object[] result = ArrayFill.fill(input, value);
-        assertSame(input, result);
-    }
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      double[] doubleArray0 = ArrayFill.fill((double[]) null, (double) (short) (-3333));
+      assertNull(doubleArray0);
+  }
 
-    @Test(timeout = 4000)
-    public void testFillObjectArray_NullArray() throws Throwable {
-        MockThrowable value = new MockThrowable(".MLY42", null);
-        Object[] result = ArrayFill.fill((Object[]) null, value);
-        assertNull(result);
-    }
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      char[] charArray0 = new char[0];
+      char[] charArray1 = ArrayFill.fill(charArray0, 's');
+      assertEquals(0, charArray1.length);
+  }
 
-    @Test(timeout = 4000)
-    public void testFillObjectArray_ArrayStoreException() throws Throwable {
-        Throwable[] input = new Throwable[3];
-        FailableIntFunction<Object, Throwable> value = FailableIntFunction.nop();
-        try {
-            ArrayFill.fill((Object[]) input, value);
-            fail("Expecting exception: ArrayStoreException");
-        } catch (ArrayStoreException e) {
-            // Expected: FailableIntFunction cannot be stored in Throwable array
-        }
-    }
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      char[] charArray0 = ArrayFill.fill((char[]) null, 'B');
+      assertNull(charArray0);
+  }
 
-    // Tests for fill(T[], FailableIntFunction) - Object arrays with generator
-    @Test(timeout = 4000)
-    public void testFillObjectArrayWithGenerator_NonEmptyArray() throws Throwable {
-        Object[] input = new Object[6];
-        FailableIntFunction<Object, Throwable> generator = FailableIntFunction.nop();
-        Object[] result = ArrayFill.fill(input, generator);
-        assertSame(input, result);
-    }
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      byte[] byteArray0 = new byte[0];
+      byte[] byteArray1 = ArrayFill.fill(byteArray0, (byte)0);
+      assertSame(byteArray0, byteArray1);
+  }
 
-    @Test(timeout = 4000)
-    public void testFillObjectArrayWithGenerator_EmptyArray() throws Throwable {
-        Object[] input = new Object[0];
-        FailableIntFunction<Object, Throwable> generator = FailableIntFunction.nop();
-        Object[] result = ArrayFill.fill(input, generator);
-        assertSame(input, result);
-    }
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      byte[] byteArray0 = ArrayFill.fill((byte[]) null, (byte)87);
+      assertNull(byteArray0);
+  }
 
-    @Test(timeout = 4000)
-    public void testFillObjectArrayWithGenerator_NullArray() throws Throwable {
-        FailableIntFunction<Throwable, Throwable> generator = FailableIntFunction.nop();
-        Throwable[] result = ArrayFill.fill((Throwable[]) null, generator);
-        assertNull(result);
-    }
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      boolean[] booleanArray0 = new boolean[4];
+      boolean[] booleanArray1 = ArrayFill.fill(booleanArray0, true);
+      assertTrue(Arrays.equals(new boolean[] {true, true, true, true}, booleanArray1));
+  }
 
-    @Test(timeout = 4000)
-    public void testFillObjectArrayWithGenerator_NullGenerator() throws Throwable {
-        Object[] input = new Object[4];
-        Object[] result = ArrayFill.fill(input, (FailableIntFunction<?, Throwable>) null);
-        assertSame(input, result);
-    }
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      boolean[] booleanArray0 = ArrayFill.fill((boolean[]) null, true);
+      assertNull(booleanArray0);
+  }
 }
