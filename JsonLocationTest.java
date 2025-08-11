@@ -9,15 +9,166 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.core.io.ContentReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for verifying internal working of {@link JsonLocation} class itself,
  * as opposed to accuracy of reported location information by parsers.
  */
-class JsonLocationTest extends JUnit5TestBase {
+class JsonLocationTest
+        extends JUnit5TestBase
+{
     static class Foobar { }
 
-    // Helper methods for creating ContentReferences
+    @Test
+    void basics()
+    {
+        JsonLocation loc1 = new JsonLocation(_sourceRef("src"),
+                10L, 10L, 1, 2);
+        JsonLocation loc2 = new JsonLocation(null, 10L, 10L, 3, 2);
+        assertEquals(loc1, loc1);
+        assertNotEquals(null, loc1);
+        assertNotEquals(loc1, loc2);
+        assertNotEquals(loc2, loc1);
+
+        // don't care about what it is; should not compute to 0 with data above
+        assertTrue(loc1.hashCode() != 0);
+        assertTrue(loc2.hashCode() != 0);
+    }
+
+    @Test
+    void basicToString() throws Exception
+    {
+        // no location; presumed to be Binary due to defaulting
+        assertEquals("[Source: UNKNOWN; line: 3, column: 2]",
+                new JsonLocation(null, 10L, 10L, 3, 2).toString());
+
+        // Short String
+        assertEquals("[Source: (String)\"string-source\"; line: 1, column: 2]",
+                new JsonLocation(_sourceRef("string-source"), 10L, 10L, 1, 2).toString());
+
+        // Short char[]
+        assertEquals("[Source: (char[])\"chars-source\"; line: 1, column: 2]",
+                new JsonLocation(_sourceRef("chars-source".toCharArray()), 10L, 10L, 1, 2).toString());
+
+        // Short byte[]
+        assertEquals("[Source: (byte[])\"bytes-source\"; line: 1, column: 2]",
+                new JsonLocation(_sourceRef("bytes-source".getBytes("UTF-8")),
+                        10L, 10L, 1, 2).toString());
+
+        // InputStream
+        assertEquals("[Source: (ByteArrayInputStream); line: 1, column: 2]",
+                new JsonLocation(_sourceRef(new ByteArrayInputStream(new byte[0])),
+                        10L, 10L, 1, 2).toString());
+
+        // Class<?> that specifies source type
+        assertEquals("[Source: (InputStream); line: 1, column: 2]",
+                new JsonLocation(_rawSourceRef(true, InputStream.class), 10L, 10L, 1, 2).toString());
+
+        // misc other
+        Foobar srcRef = new Foobar();
+        assertEquals("[Source: ("+srcRef.getClass().getName()+"); line: 1, column: 2]",
+                new JsonLocation(_rawSourceRef(true, srcRef), 10L, 10L, 1, 2).toString());
+    }
+
+    @Test
+    void truncatedSource() throws Exception
+    {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < ErrorReportConfiguration.DEFAULT_MAX_RAW_CONTENT_LENGTH; ++i) {
+            sb.append("x");
+        }
+        String main = sb.toString();
+        String json = main + "yyy";
+        JsonLocation loc = new JsonLocation(_sourceRef(json), 0L, 0L, 1, 1);
+        String desc = loc.sourceDescription();
+        assertEquals(String.format("(String)\"%s\"[truncated 3 chars]", main), desc);
+
+        // and same with bytes
+        loc = new JsonLocation(_sourceRef(json.getBytes("UTF-8")), 0L, 0L, 1, 1);
+        desc = loc.sourceDescription();
+        assertEquals(String.format("(byte[])\"%s\"[truncated 3 bytes]", main), desc);
+    }
+
+    // for [jackson-core#658]
+    @Test
+    void escapeNonPrintable() throws Exception
+    {
+        final String DOC = "[ \"tab:[\t]/null:[\0]\" ]";
+        JsonLocation loc = new JsonLocation(_sourceRef(DOC), 0L, 0L, -1, -1);
+        final String sourceDesc = loc.sourceDescription();
+        assertEquals(String.format("(String)\"[ \"tab:[%s]/null:[%s]\" ]\"",
+                "\\u0009", "\\u0000"), sourceDesc);
+    }
+
+    // for [jackson-core#356]
+    @Test
+    void disableSourceInclusion() throws Exception
+    {
+        JsonFactory f = JsonFactory.builder()
+                .disable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
+                .build();
+
+        try (JsonParser p = f.createParser("[ foobar ]")) {
+            assertToken(JsonToken.START_ARRAY, p.nextToken());
+            try {
+                p.nextToken();
+                fail("Shouldn't have passed");
+            } catch (JsonParseException e) {
+                _verifyContentDisabled(e);
+            }
+        }
+
+        // and verify same works for byte-based too
+        try (JsonParser p = f.createParser("[ foobar ]".getBytes("UTF-8"))) {
+            assertToken(JsonToken.START_ARRAY, p.nextToken());
+            try {
+                p.nextToken();
+                fail("Shouldn't have passed");
+            } catch (JsonParseException e) {
+                _verifyContentDisabled(e);
+            }
+        }
+    }
+
+    private void _verifyContentDisabled(JsonParseException e) {
+        verifyException(e, "unrecognized token");
+        JsonLocation loc = e.getLocation();
+        assertNull(loc.contentReference().getRawContent());
+        assertThat(loc.sourceDescription()).startsWith("REDACTED");
+    }
+
+    // for [jackson-core#739]: try to support equality
+    @Test
+    void locationEquality() throws Exception
+    {
+        // important: create separate but equal instances
+        File src1 = new File("/tmp/foo");
+        File src2 = new File("/tmp/foo");
+        assertEquals(src1, src2);
+
+        JsonLocation loc1 = new JsonLocation(_sourceRef(src1),
+                10L, 10L, 1, 2);
+        JsonLocation loc2 = new JsonLocation(_sourceRef(src2),
+                10L, 10L, 1, 2);
+        assertEquals(loc1, loc2);
+
+        // Also make sure to consider offset/length
+        final byte[] bogus = "BOGUS".getBytes();
+
+        // If same, equals:
+        assertEquals(new JsonLocation(_sourceRef(bogus, 0, 5), 5L, 0L, 1, 2),
+                new JsonLocation(_sourceRef(bogus, 0, 5), 5L, 0L, 1, 2));
+
+        // If different, not equals
+        loc1 = new JsonLocation(_sourceRef(bogus, 0, 5),
+                5L, 0L, 1, 2);
+        loc2 = new JsonLocation(_sourceRef(bogus, 1, 4),
+                5L, 0L, 1, 2);
+        assertNotEquals(loc1, loc2);
+        assertNotEquals(loc2, loc1);
+    }
+
     private ContentReference _sourceRef(String rawSrc) {
         return ContentReference.construct(true, rawSrc, 0, rawSrc.length(),
                 ErrorReportConfiguration.defaults());
@@ -50,176 +201,5 @@ class JsonLocationTest extends JUnit5TestBase {
 
     private ContentReference _rawSourceRef(boolean textual, Object rawSrc) {
         return ContentReference.rawReference(textual, rawSrc);
-    }
-
-    // Test cases
-    @Test
-    void equals_shouldReturnTrueForSameInstance() {
-        JsonLocation loc = new JsonLocation(_sourceRef("src"), 10L, 10L, 1, 2);
-        assertThat(loc).isEqualTo(loc);
-    }
-
-    @Test
-    void equals_shouldReturnFalseForNull() {
-        JsonLocation loc = new JsonLocation(_sourceRef("src"), 10L, 10L, 1, 2);
-        assertThat(loc).isNotNull();
-    }
-
-    @Test
-    void equals_shouldReturnFalseWhenSourcesDiffer() {
-        JsonLocation loc1 = new JsonLocation(_sourceRef("src1"), 10L, 10L, 1, 2);
-        JsonLocation loc2 = new JsonLocation(_sourceRef("src2"), 10L, 10L, 1, 2);
-        assertThat(loc1).isNotEqualTo(loc2);
-    }
-
-    @Test
-    void hashCode_shouldNotBeZero() {
-        JsonLocation loc1 = new JsonLocation(_sourceRef("src"), 10L, 10L, 1, 2);
-        JsonLocation loc2 = new JsonLocation(null, 10L, 10L, 3, 2);
-        assertThat(loc1.hashCode()).isNotZero();
-        assertThat(loc2.hashCode()).isNotZero();
-    }
-
-    @Test
-    void toString_shouldHandleUnknownSource() {
-        JsonLocation loc = new JsonLocation(null, 10L, 10L, 3, 2);
-        assertThat(loc.toString()).isEqualTo("[Source: UNKNOWN; line: 3, column: 2]");
-    }
-
-    @Test
-    void toString_shouldHandleStringSource() {
-        JsonLocation loc = new JsonLocation(_sourceRef("string-source"), 10L, 10L, 1, 2);
-        assertThat(loc.toString()).isEqualTo("[Source: (String)\"string-source\"; line: 1, column: 2]");
-    }
-
-    @Test
-    void toString_shouldHandleCharArraySource() {
-        JsonLocation loc = new JsonLocation(_sourceRef("chars-source".toCharArray()), 10L, 10L, 1, 2);
-        assertThat(loc.toString()).isEqualTo("[Source: (char[])\"chars-source\"; line: 1, column: 2]");
-    }
-
-    @Test
-    void toString_shouldHandleByteArraySource() throws Exception {
-        JsonLocation loc = new JsonLocation(_sourceRef("bytes-source".getBytes("UTF-8")), 10L, 10L, 1, 2);
-        assertThat(loc.toString()).isEqualTo("[Source: (byte[])\"bytes-source\"; line: 1, column: 2]");
-    }
-
-    @Test
-    void toString_shouldHandleInputStreamSource() {
-        JsonLocation loc = new JsonLocation(_sourceRef(new ByteArrayInputStream(new byte[0])), 10L, 10L, 1, 2);
-        assertThat(loc.toString()).isEqualTo("[Source: (ByteArrayInputStream); line: 1, column: 2]");
-    }
-
-    @Test
-    void toString_shouldHandleSourceTypeClass() {
-        JsonLocation loc = new JsonLocation(_rawSourceRef(true, InputStream.class), 10L, 10L, 1, 2);
-        assertThat(loc.toString()).isEqualTo("[Source: (InputStream); line: 1, column: 2]");
-    }
-
-    @Test
-    void toString_shouldHandleOtherSourceTypes() {
-        Foobar srcRef = new Foobar();
-        JsonLocation loc = new JsonLocation(_rawSourceRef(true, srcRef), 10L, 10L, 1, 2);
-        assertThat(loc.toString()).isEqualTo("[Source: (" + srcRef.getClass().getName() + "); line: 1, column: 2]");
-    }
-
-    @Test
-    void sourceDescription_shouldTruncateLongStrings() {
-        int length = ErrorReportConfiguration.DEFAULT_MAX_RAW_CONTENT_LENGTH;
-        StringBuilder sb = new StringBuilder(length);
-        for (int i = 0; i < length; i++) {
-            sb.append('x');
-        }
-        String json = sb + "yyy";
-        
-        JsonLocation loc = new JsonLocation(_sourceRef(json), 0L, 0L, 1, 1);
-        assertThat(loc.sourceDescription())
-            .isEqualTo("(String)\"" + sb + "\"[truncated 3 chars]");
-    }
-
-    @Test
-    void sourceDescription_shouldTruncateLongByteArrays() throws Exception {
-        int length = ErrorReportConfiguration.DEFAULT_MAX_RAW_CONTENT_LENGTH;
-        StringBuilder sb = new StringBuilder(length);
-        for (int i = 0; i < length; i++) {
-            sb.append('x');
-        }
-        String json = sb + "yyy";
-        
-        JsonLocation loc = new JsonLocation(_sourceRef(json.getBytes("UTF-8")), 0L, 0L, 1, 1);
-        assertThat(loc.sourceDescription())
-            .isEqualTo("(byte[])\"" + sb + "\"[truncated 3 bytes]");
-    }
-
-    @Test
-    void sourceDescription_shouldEscapeNonPrintableCharacters() {
-        final String DOC = "[ \"tab:[\t]/null:[\0]\" ]";
-        JsonLocation loc = new JsonLocation(_sourceRef(DOC), 0L, 0L, -1, -1);
-        assertThat(loc.sourceDescription())
-            .isEqualTo("(String)\"[ \"tab:[\\u0009]/null:[\\u0000]\" ]\"");
-    }
-
-    @Test
-    void shouldDisableSourceInclusionForReader() throws Exception {
-        JsonFactory f = JsonFactory.builder()
-                .disable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
-                .build();
-
-        try (JsonParser p = f.createParser("[ foobar ]")) {
-            assertToken(JsonToken.START_ARRAY, p.nextToken());
-            assertThatThrownBy(p::nextToken)
-                .isInstanceOf(JsonParseException.class)
-                .satisfies(e -> verifyContentDisabled((JsonParseException) e));
-        }
-    }
-
-    @Test
-    void shouldDisableSourceInclusionForInputStream() throws Exception {
-        JsonFactory f = JsonFactory.builder()
-                .disable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
-                .build();
-
-        try (JsonParser p = f.createParser("[ foobar ]".getBytes("UTF-8"))) {
-            assertToken(JsonToken.START_ARRAY, p.nextToken());
-            assertThatThrownBy(p::nextToken)
-                .isInstanceOf(JsonParseException.class)
-                .satisfies(e -> verifyContentDisabled((JsonParseException) e));
-        }
-    }
-
-    private void verifyContentDisabled(JsonParseException e) {
-        verifyException(e, "unrecognized token");
-        JsonLocation loc = e.getLocation();
-        assertThat(loc.contentReference().getRawContent()).isNull();
-        assertThat(loc.sourceDescription()).startsWith("REDACTED");
-    }
-
-    @Test
-    void equals_shouldConsiderEqualFileReferencesEqual() {
-        File src1 = new File("/tmp/foo");
-        File src2 = new File("/tmp/foo");
-        
-        JsonLocation loc1 = new JsonLocation(_sourceRef(src1), 10L, 10L, 1, 2);
-        JsonLocation loc2 = new JsonLocation(_sourceRef(src2), 10L, 10L, 1, 2);
-        
-        assertThat(loc1).isEqualTo(loc2);
-    }
-
-    @Test
-    void equals_shouldConsiderSameByteArrayEqual() {
-        final byte[] bogus = "BOGUS".getBytes();
-        JsonLocation loc1 = new JsonLocation(_sourceRef(bogus, 0, 5), 5L, 0L, 1, 2);
-        JsonLocation loc2 = new JsonLocation(_sourceRef(bogus, 0, 5), 5L, 0L, 1, 2);
-        
-        assertThat(loc1).isEqualTo(loc2);
-    }
-
-    @Test
-    void equals_shouldDetectDifferentByteArrayOffsets() {
-        final byte[] bogus = "BOGUS".getBytes();
-        JsonLocation loc1 = new JsonLocation(_sourceRef(bogus, 0, 5), 5L, 0L, 1, 2);
-        JsonLocation loc2 = new JsonLocation(_sourceRef(bogus, 1, 4), 5L, 0L, 1, 2);
-        
-        assertThat(loc1).isNotEqualTo(loc2);
     }
 }
