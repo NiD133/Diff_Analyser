@@ -20,33 +20,21 @@ package org.apache.commons.codec.net;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.codec.DecoderException;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * Tests for RFC1522Codec behavior.
- * Uses a pass-through codec stub so assertions focus on the RFC 1522 envelope parsing (not the inner encoding).
+ * RFC 1522 compliant codec test cases
  */
 class RFC1522CodecTest {
 
-    private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
+    static class RFC1522TestCodec extends RFC1522Codec {
 
-    /**
-     * Minimal pass-through implementation:
-     * - Uses UTF-8 as the default charset.
-     * - Returns the bytes unchanged for doEncoding/doDecoding.
-     * - Reports a dummy encoding token ("T").
-     */
-    private static final class PassThroughRFC1522Codec extends RFC1522Codec {
-        PassThroughRFC1522Codec() {
-            super(DEFAULT_CHARSET);
+        RFC1522TestCodec() {
+            super(StandardCharsets.UTF_8);
         }
 
         @Override
@@ -63,46 +51,34 @@ class RFC1522CodecTest {
         protected String getEncoding() {
             return "T";
         }
+
     }
 
-    private final RFC1522Codec codec = new PassThroughRFC1522Codec();
-
-    private void assertDecodeFails(final String text) {
-        assertThrows(DecoderException.class, () -> codec.decodeText(text));
-    }
-
-    @DisplayName("decodeText: rejects malformed encoded-words per RFC 1522")
-    @ParameterizedTest(name = "[{index}] \"{0}\"")
-    @ValueSource(strings = {
-        "whatever",
-        "=?",
-        "?=",
-        "==",
-        "=??=",
-        "=?stuff?=",
-        "=?UTF-8??=",
-        "=?UTF-8?stuff?=",
-        "=?UTF-8?T?stuff",
-        "=??T?stuff?=",
-        "=?UTF-8??stuff?=",
-        "=?UTF-8?W?stuff?="
-    })
-    void decodeText_rejectsMalformedEncodedWords(final String invalidEncodedWord) {
-        assertDecodeFails(invalidEncodedWord);
+    private void assertExpectedDecoderException(final String s) {
+        assertThrows(DecoderException.class, () -> new RFC1522TestCodec().decodeText(s));
     }
 
     @Test
-    void decodeText_returnsNull_whenInputIsNull() throws Exception {
-        assertNull(codec.decodeText(null));
+    void testDecodeInvalid() throws Exception {
+        assertExpectedDecoderException("whatever");
+        assertExpectedDecoderException("=?");
+        assertExpectedDecoderException("?=");
+        assertExpectedDecoderException("==");
+        assertExpectedDecoderException("=??=");
+        assertExpectedDecoderException("=?stuff?=");
+        assertExpectedDecoderException("=?UTF-8??=");
+        assertExpectedDecoderException("=?UTF-8?stuff?=");
+        assertExpectedDecoderException("=?UTF-8?T?stuff");
+        assertExpectedDecoderException("=??T?stuff?=");
+        assertExpectedDecoderException("=?UTF-8??stuff?=");
+        assertExpectedDecoderException("=?UTF-8?W?stuff?=");
     }
 
     @Test
-    void encodeText_returnsNull_whenInputIsNull_charsetName() throws Exception {
-        assertNull(codec.encodeText(null, CharEncoding.UTF_8));
+    void testNullInput() throws Exception {
+        final RFC1522TestCodec testCodec = new RFC1522TestCodec();
+        assertNull(testCodec.decodeText(null));
+        assertNull(testCodec.encodeText(null, CharEncoding.UTF_8));
     }
 
-    @Test
-    void encodeText_returnsNull_whenInputIsNull_charsetObject() throws Exception {
-        assertNull(codec.encodeText(null, DEFAULT_CHARSET));
-    }
 }
