@@ -32,18 +32,42 @@ import org.junit.jupiter.params.provider.MethodSource;
 class ListerTest {
 
     /**
-     * Creates a stream of paths of test fixtures with file names that don't end with {@code "-fail"} for specific file extensions.
+     * Provides paths to valid archive test fixtures.
      *
-     * @return a stream of paths.
-     * @throws IOException if an I/O error is thrown.
+     * <p>Walks through the test resources directory to find files matching:
+     * <ul>
+     *   <li>Archive extensions: tar, ar, arj, apk, dump</li>
+     *   <li>Excludes files with "-fail" in their names</li>
+     * </ul>
+     * 
+     * The regex pattern {@code ^(?!.*(-fail)).*\.(tar|ar|arj|apk|dump)$} ensures:
+     * <ul>
+     *   <li>{@code ^(?!.*(-fail))} - Negative lookahead to exclude filenames containing "-fail"</li>
+     *   <li>{@code .*\.(tar|ar|arj|apk|dump)$} - Matches the specified archive extensions</li>
+     * </ul>
+     *
+     * @return Stream of paths to valid test archives
+     * @throws IOException if an I/O error occurs during file traversal
      */
-    public static Stream<Path> getFixtures() throws IOException {
-        return PathUtils.walk(Paths.get("src/test/resources"), new RegexFileFilter("^(?!.*(-fail)).*\\.(tar|ar|arj|apk|dump)$"), 10, false);
+    public static Stream<Path> provideValidArchiveFixtures() throws IOException {
+        final Path testResourcesDir = Paths.get("src/test/resources");
+        final String validArchivePattern = "^(?!.*(-fail)).*\\.(tar|ar|arj|apk|dump)$";
+        return PathUtils.walk(testResourcesDir, new RegexFileFilter(validArchivePattern), 10, false);
     }
 
-    @ParameterizedTest
-    @MethodSource("getFixtures")
-    void testMain(final Path path) throws ArchiveException, IOException {
-        new Lister(true, path.toString()).go();
+    /**
+     * Tests that {@link Lister} can process valid archives without exceptions.
+     *
+     * <p>Each archive in the test fixtures is processed by {@link Lister#go()},
+     * verifying it can handle the archive structure without errors.
+     *
+     * @param archivePath path to an archive file from the test fixtures
+     * @throws ArchiveException if an archive processing error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @ParameterizedTest(name = "Test valid archive: {0}")
+    @MethodSource("provideValidArchiveFixtures")
+    void testListerOnValidArchive(final Path archivePath) throws ArchiveException, IOException {
+        new Lister(true, archivePath.toString()).go();
     }
 }
