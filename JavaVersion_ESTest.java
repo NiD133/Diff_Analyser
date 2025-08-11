@@ -13,63 +13,73 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class)
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true,
+    useVFS = true,
+    useVNET = true,
+    resetStaticState = true,
+    separateClassLoader = true
+)
 public class JavaVersion_ESTest extends JavaVersion_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test0()  throws Throwable  {
-      int int0 = JavaVersion.parseMajorJavaVersion("0Q?");
-      assertEquals(0, int0);
-  }
+    @Test(timeout = 4000)
+    public void testParseVersion_InvalidString_ReturnsZero() throws Throwable {
+        // Test parsing an invalid version string
+        int version = JavaVersion.parseMajorJavaVersion("0Q?");
+        assertEquals(0, version);
+    }
 
-  @Test(timeout = 4000)
-  public void test1()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        JavaVersion.parseMajorJavaVersion((String) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.google.gson.internal.JavaVersion", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testParseVersion_NullInput_ThrowsNullPointerException() throws Throwable {
+        // Test that parsing a null version string throws NullPointerException
+        try {
+            JavaVersion.parseMajorJavaVersion(null);
+            fail("Expecting exception: NullPointerException");
+        } catch (NullPointerException e) {
+            verifyException("com.google.gson.internal.JavaVersion", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test2()  throws Throwable  {
-      boolean boolean0 = JavaVersion.isJava9OrLater();
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testIsJava9OrLater_Java8_ReturnsFalse() throws Throwable {
+        // Test that isJava9OrLater returns false for Java 8
+        boolean isJava9OrLater = JavaVersion.isJava9OrLater();
+        assertFalse(isJava9OrLater);
+    }
 
-  @Test(timeout = 4000)
-  public void test3()  throws Throwable  {
-      int int0 = JavaVersion.parseMajorJavaVersion("");
-      assertEquals(6, int0);
-  }
+    @Test(timeout = 4000)
+    public void testParseVersion_EmptyString_DefaultsTo6() throws Throwable {
+        // Test parsing an empty version string defaults to 6
+        int version = JavaVersion.parseMajorJavaVersion("");
+        assertEquals(6, version);
+    }
 
-  @Test(timeout = 4000)
-  public void test4()  throws Throwable  {
-      int int0 = JavaVersion.parseMajorJavaVersion("-8");
-      assertEquals((-8), int0);
-  }
+    @Test(timeout = 4000)
+    public void testParseVersion_NegativeNumber_ReturnsNegative() throws Throwable {
+        // Test parsing a negative version string
+        int version = JavaVersion.parseMajorJavaVersion("-8");
+        assertEquals(-8, version);
+    }
 
-  @Test(timeout = 4000)
-  public void test5()  throws Throwable  {
-      int int0 = JavaVersion.parseMajorJavaVersion("1.&N<+EILs/Cn\",");
-      assertEquals(1, int0);
-  }
+    @Test(timeout = 4000)
+    public void testParseVersion_LegacyFormatWithExtraText_Returns1() throws Throwable {
+        // Test parsing a legacy version string with extra text
+        int version = JavaVersion.parseMajorJavaVersion("1.&N<+EILs/Cn\",");
+        assertEquals(1, version);
+    }
 
-  @Test(timeout = 4000)
-  public void test6()  throws Throwable  {
-      int int0 = JavaVersion.parseMajorJavaVersion("1");
-      assertEquals(1, int0);
-  }
+    @Test(timeout = 4000)
+    public void testParseVersion_SingleDigit_ReturnsDigit() throws Throwable {
+        // Test parsing a single-digit version string
+        int version = JavaVersion.parseMajorJavaVersion("1");
+        assertEquals(1, version);
+    }
 
-  @Test(timeout = 4000)
-  public void test7()  throws Throwable  {
-      int int0 = JavaVersion.getMajorJavaVersion();
-      assertEquals(8, int0);
-  }
+    @Test(timeout = 4000)
+    public void testGetMajorJavaVersion_Returns8() throws Throwable {
+        // Test that the detected major Java version is 8
+        int version = JavaVersion.getMajorJavaVersion();
+        assertEquals(8, version);
+    }
 }
