@@ -28,158 +28,122 @@ import org.junit.runners.JUnit4;
 @NullUnmarked
 public class ImmutableNetworkTest {
 
-  // Test nodes and edges for better readability
-  private static final String NODE_A = "A";
-  private static final String NODE_B = "B";
-  private static final String EDGE_AA = "AA";
-  private static final String EDGE_AB = "AB";
-  private static final Integer EDGE_10 = 10;
-
   @Test
-  public void copyOf_createsCopyThatIsImmutableAndIndependent() {
-    // Given: A mutable network with one node
-    MutableNetwork<String, Integer> originalMutableNetwork = NetworkBuilder.directed().build();
-    originalMutableNetwork.addNode(NODE_A);
-    
-    // When: Creating an immutable copy
-    ImmutableNetwork<String, Integer> immutableCopy = ImmutableNetwork.copyOf(originalMutableNetwork);
+  public void immutableNetwork() {
+    MutableNetwork<String, Integer> mutableNetwork = NetworkBuilder.directed().build();
+    mutableNetwork.addNode("A");
+    ImmutableNetwork<String, Integer> immutableNetwork = ImmutableNetwork.copyOf(mutableNetwork);
 
-    // Then: The copy should be immutable and equal to the original
-    assertThat(immutableCopy.asGraph()).isInstanceOf(ImmutableGraph.class);
-    assertThat(immutableCopy).isNotInstanceOf(MutableNetwork.class);
-    assertThat(immutableCopy).isEqualTo(originalMutableNetwork);
+    assertThat(immutableNetwork.asGraph()).isInstanceOf(ImmutableGraph.class);
+    assertThat(immutableNetwork).isNotInstanceOf(MutableNetwork.class);
+    assertThat(immutableNetwork).isEqualTo(mutableNetwork);
 
-    // And: Changes to the original should not affect the immutable copy
-    originalMutableNetwork.addNode(NODE_B);
-    assertThat(immutableCopy).isNotEqualTo(originalMutableNetwork);
+    mutableNetwork.addNode("B");
+    assertThat(immutableNetwork).isNotEqualTo(mutableNetwork);
   }
 
   @Test
-  public void copyOf_whenGivenImmutableNetwork_returnsOriginalInstance() {
-    // Given: An existing immutable network
-    Network<String, String> originalImmutableNetwork =
+  public void copyOfImmutableNetwork_optimized() {
+    Network<String, String> network1 =
         ImmutableNetwork.copyOf(NetworkBuilder.directed().<String, String>build());
-    
-    // When: Creating a copy of the immutable network
-    Network<String, String> copyOfImmutableNetwork = ImmutableNetwork.copyOf(originalImmutableNetwork);
+    Network<String, String> network2 = ImmutableNetwork.copyOf(network1);
 
-    // Then: Should return the same instance (optimization)
-    assertThat(copyOfImmutableNetwork).isSameInstanceAs(originalImmutableNetwork);
+    assertThat(network2).isSameInstanceAs(network1);
   }
 
   @Test
-  public void edgesConnecting_inDirectedNetwork_respectsDirection() {
-    // Given: A directed network with self-loop and regular edge
-    MutableNetwork<String, String> mutableDirectedNetwork =
+  public void edgesConnecting_directed() {
+    MutableNetwork<String, String> mutableNetwork =
         NetworkBuilder.directed().allowsSelfLoops(true).build();
-    mutableDirectedNetwork.addEdge(NODE_A, NODE_A, EDGE_AA);
-    mutableDirectedNetwork.addEdge(NODE_A, NODE_B, EDGE_AB);
-    Network<String, String> directedNetwork = ImmutableNetwork.copyOf(mutableDirectedNetwork);
+    mutableNetwork.addEdge("A", "A", "AA");
+    mutableNetwork.addEdge("A", "B", "AB");
+    Network<String, String> network = ImmutableNetwork.copyOf(mutableNetwork);
 
-    // Then: Self-loop should be found
-    assertThat(directedNetwork.edgesConnecting(NODE_A, NODE_A)).containsExactly(EDGE_AA);
-    
-    // And: Edge should be found in correct direction
-    assertThat(directedNetwork.edgesConnecting(NODE_A, NODE_B)).containsExactly(EDGE_AB);
-    
-    // And: No edge should be found in reverse direction
-    assertThat(directedNetwork.edgesConnecting(NODE_B, NODE_A)).isEmpty();
+    assertThat(network.edgesConnecting("A", "A")).containsExactly("AA");
+    assertThat(network.edgesConnecting("A", "B")).containsExactly("AB");
+    assertThat(network.edgesConnecting("B", "A")).isEmpty();
   }
 
   @Test
-  public void edgesConnecting_inUndirectedNetwork_ignoresDirection() {
-    // Given: An undirected network with self-loop and regular edge
-    MutableNetwork<String, String> mutableUndirectedNetwork =
+  public void edgesConnecting_undirected() {
+    MutableNetwork<String, String> mutableNetwork =
         NetworkBuilder.undirected().allowsSelfLoops(true).build();
-    mutableUndirectedNetwork.addEdge(NODE_A, NODE_A, EDGE_AA);
-    mutableUndirectedNetwork.addEdge(NODE_A, NODE_B, EDGE_AB);
-    Network<String, String> undirectedNetwork = ImmutableNetwork.copyOf(mutableUndirectedNetwork);
+    mutableNetwork.addEdge("A", "A", "AA");
+    mutableNetwork.addEdge("A", "B", "AB");
+    Network<String, String> network = ImmutableNetwork.copyOf(mutableNetwork);
 
-    // Then: Self-loop should be found
-    assertThat(undirectedNetwork.edgesConnecting(NODE_A, NODE_A)).containsExactly(EDGE_AA);
-    
-    // And: Edge should be found in both directions
-    assertThat(undirectedNetwork.edgesConnecting(NODE_A, NODE_B)).containsExactly(EDGE_AB);
-    assertThat(undirectedNetwork.edgesConnecting(NODE_B, NODE_A)).containsExactly(EDGE_AB);
+    assertThat(network.edgesConnecting("A", "A")).containsExactly("AA");
+    assertThat(network.edgesConnecting("A", "B")).containsExactly("AB");
+    assertThat(network.edgesConnecting("B", "A")).containsExactly("AB");
   }
 
   @Test
-  public void builder_appliesNetworkBuilderConfiguration() {
-    // When: Building an immutable network with specific configuration
-    ImmutableNetwork<String, Integer> configuredNetwork =
+  public void immutableNetworkBuilder_appliesNetworkBuilderConfig() {
+    ImmutableNetwork<String, Integer> emptyNetwork =
         NetworkBuilder.directed()
             .allowsSelfLoops(true)
             .nodeOrder(ElementOrder.<String>natural())
             .<String, Integer>immutable()
             .build();
 
-    // Then: Configuration should be preserved
-    assertThat(configuredNetwork.isDirected()).isTrue();
-    assertThat(configuredNetwork.allowsSelfLoops()).isTrue();
-    assertThat(configuredNetwork.nodeOrder()).isEqualTo(ElementOrder.<String>natural());
+    assertThat(emptyNetwork.isDirected()).isTrue();
+    assertThat(emptyNetwork.allowsSelfLoops()).isTrue();
+    assertThat(emptyNetwork.nodeOrder()).isEqualTo(ElementOrder.<String>natural());
   }
 
+  /**
+   * Tests that the ImmutableNetwork.Builder doesn't change when the creating NetworkBuilder
+   * changes.
+   */
   @Test
   @SuppressWarnings("CheckReturnValue")
-  public void builder_isIsolatedFromOriginalNetworkBuilderChanges() {
-    // Given: A network builder with initial configuration
-    NetworkBuilder<String, Object> originalNetworkBuilder =
+  public void immutableNetworkBuilder_copiesNetworkBuilder() {
+    NetworkBuilder<String, Object> networkBuilder =
         NetworkBuilder.directed()
             .allowsSelfLoops(true)
             .<String>nodeOrder(ElementOrder.<String>natural());
-    
-    // When: Creating an immutable builder from the network builder
-    ImmutableNetwork.Builder<String, Integer> immutableBuilder =
-        originalNetworkBuilder.<String, Integer>immutable();
+    ImmutableNetwork.Builder<String, Integer> immutableNetworkBuilder =
+        networkBuilder.<String, Integer>immutable();
 
-    // And: Modifying the original network builder
-    originalNetworkBuilder.allowsSelfLoops(false).nodeOrder(ElementOrder.<String>unordered());
+    // Update NetworkBuilder, but this shouldn't impact immutableNetworkBuilder
+    networkBuilder.allowsSelfLoops(false).nodeOrder(ElementOrder.<String>unordered());
 
-    // Then: The immutable builder should retain the original configuration
-    ImmutableNetwork<String, Integer> builtNetwork = immutableBuilder.build();
-    assertThat(builtNetwork.isDirected()).isTrue();
-    assertThat(builtNetwork.allowsSelfLoops()).isTrue();
-    assertThat(builtNetwork.nodeOrder()).isEqualTo(ElementOrder.<String>natural());
+    ImmutableNetwork<String, Integer> emptyNetwork = immutableNetworkBuilder.build();
+
+    assertThat(emptyNetwork.isDirected()).isTrue();
+    assertThat(emptyNetwork.allowsSelfLoops()).isTrue();
+    assertThat(emptyNetwork.nodeOrder()).isEqualTo(ElementOrder.<String>natural());
   }
 
   @Test
-  public void builder_addNode_createsNetworkWithSingleNode() {
-    // When: Building a network with a single node
-    ImmutableNetwork<String, Integer> networkWithSingleNode =
-        NetworkBuilder.directed().<String, Integer>immutable()
-            .addNode(NODE_A)
-            .build();
+  public void immutableNetworkBuilder_addNode() {
+    ImmutableNetwork<String, Integer> network =
+        NetworkBuilder.directed().<String, Integer>immutable().addNode("A").build();
 
-    // Then: Network should contain only the added node and no edges
-    assertThat(networkWithSingleNode.nodes()).containsExactly(NODE_A);
-    assertThat(networkWithSingleNode.edges()).isEmpty();
+    assertThat(network.nodes()).containsExactly("A");
+    assertThat(network.edges()).isEmpty();
   }
 
   @Test
-  public void builder_addEdgeWithNodes_createsNetworkWithEdgeAndNodes() {
-    // When: Building a network by adding an edge between two nodes
-    ImmutableNetwork<String, Integer> networkWithEdge =
-        NetworkBuilder.directed().<String, Integer>immutable()
-            .addEdge(NODE_A, NODE_B, EDGE_10)
-            .build();
+  public void immutableNetworkBuilder_putEdgeFromNodes() {
+    ImmutableNetwork<String, Integer> network =
+        NetworkBuilder.directed().<String, Integer>immutable().addEdge("A", "B", 10).build();
 
-    // Then: Network should contain both nodes and the connecting edge
-    assertThat(networkWithEdge.nodes()).containsExactly(NODE_A, NODE_B);
-    assertThat(networkWithEdge.edges()).containsExactly(EDGE_10);
-    assertThat(networkWithEdge.incidentNodes(EDGE_10)).isEqualTo(EndpointPair.ordered(NODE_A, NODE_B));
+    assertThat(network.nodes()).containsExactly("A", "B");
+    assertThat(network.edges()).containsExactly(10);
+    assertThat(network.incidentNodes(10)).isEqualTo(EndpointPair.ordered("A", "B"));
   }
 
   @Test
-  public void builder_addEdgeWithEndpointPair_createsNetworkWithEdgeAndNodes() {
-    // When: Building a network by adding an edge using EndpointPair
-    ImmutableNetwork<String, Integer> networkWithEdge =
-        NetworkBuilder.directed().<String, Integer>immutable()
-            .addEdge(EndpointPair.ordered(NODE_A, NODE_B), EDGE_10)
+  public void immutableNetworkBuilder_putEdgeFromEndpointPair() {
+    ImmutableNetwork<String, Integer> network =
+        NetworkBuilder.directed()
+            .<String, Integer>immutable()
+            .addEdge(EndpointPair.ordered("A", "B"), 10)
             .build();
 
-    // Then: Network should contain both nodes and the connecting edge
-    assertThat(networkWithEdge.nodes()).containsExactly(NODE_A, NODE_B);
-    assertThat(networkWithEdge.edges()).containsExactly(EDGE_10);
-    assertThat(networkWithEdge.incidentNodes(EDGE_10)).isEqualTo(EndpointPair.ordered(NODE_A, NODE_B));
+    assertThat(network.nodes()).containsExactly("A", "B");
+    assertThat(network.edges()).containsExactly(10);
+    assertThat(network.incidentNodes(10)).isEqualTo(EndpointPair.ordered("A", "B"));
   }
 }
