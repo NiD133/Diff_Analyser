@@ -1,96 +1,99 @@
-/* ======================================================
- * JFreeChart : a chart library for the Java(tm) platform
- * ======================================================
- *
- * (C) Copyright 2000-present, by David Gilbert and Contributors.
- *
- * Project Info:  https://www.jfree.org/jfreechart/index.html
- *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2.1 of the License, or
- * (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- * License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
- * USA.
- *
- * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
- * Other names may be trademarks of their respective owners.]
- *
- * ----------------
- * NodeKeyTest.java
- * ----------------
- * (C) Copyright 2021-present, by David Gilbert.
- *
- * Original Author:  David Gilbert;
- * Contributor(s):   -;
- *
- */
-
 package org.jfree.data.flow;
 
 import org.jfree.chart.TestUtils;
-
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for the {@link NodeKey} class.
+ * Readable, focused tests for NodeKey.
+ * Emphasizes small, intention‑revealing test methods and names.
  */
 public class NodeKeyTest {
 
-    /**
-     * Confirm that the equals method can distinguish all the required fields.
-     */
-    @Test
-    public void testEquals() {
-        NodeKey<String> k1 = new NodeKey<>(0, "A");
-        NodeKey<String> k2 = new NodeKey<>(0, "A");
-        assertEquals(k1, k2);
-        assertEquals(k2, k1);
-
-        k1 = new NodeKey<>(1, "A");
-        assertNotEquals(k1, k2);
-        k2 = new NodeKey<>(1, "A");
-        assertEquals(k1, k2);
-  
-        k1 = new NodeKey<>(1, "B");
-        assertNotEquals(k1, k2);
-        k2 = new NodeKey<>(1, "B");
-        assertEquals(k1, k2);
+    // Helper to reduce duplication
+    private static NodeKey<String> key(int stage, String node) {
+        return new NodeKey<>(stage, node);
     }
 
-    /**
-     * Confirm that cloning works.
-     * 
-     * @throws CloneNotSupportedException
-     */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
-        NodeKey<String> k1 = new NodeKey<>(2, "A");
-        NodeKey<String> k2 = (NodeKey<String>) k1.clone();
-        assertNotSame(k1, k2);
-        assertSame(k1.getClass(), k2.getClass());
-        assertEquals(k1, k2);
+    @DisplayName("Constructor: rejects null node")
+    public void constructorRejectsNullNode() {
+        assertThrows(IllegalArgumentException.class, () -> new NodeKey<>(0, null));
     }
 
-    /**
-     * Serialize an instance, restore it, and check for equality.
-     */
     @Test
-    public void testSerialization() {
-        NodeKey<String> k1 = new NodeKey<>(1, "S1");
-        NodeKey<String> k2 = TestUtils.serialised(k1);
-        assertEquals(k1, k2);
+    @DisplayName("Accessors: return the values supplied to the constructor")
+    public void accessorsReturnConstructorValues() {
+        NodeKey<String> k = key(3, "A");
+        assertAll(
+                () -> assertEquals(3, k.getStage(), "stage"),
+                () -> assertEquals("A", k.getNode(), "node")
+        );
     }
 
+    @Test
+    @DisplayName("equals: reflexive and symmetric for identical data")
+    public void equals_reflexiveAndSymmetric() {
+        NodeKey<String> k1 = key(0, "A");
+        NodeKey<String> k2 = key(0, "A");
+
+        assertEquals(k1, k1, "reflexive");
+        assertEquals(k1, k2, "symmetric (k1 == k2)");
+        assertEquals(k2, k1, "symmetric (k2 == k1)");
+    }
+
+    @Test
+    @DisplayName("equals: distinguishes different stage")
+    public void equals_distinguishesStage() {
+        NodeKey<String> a = key(0, "A");
+        NodeKey<String> b = key(1, "A");
+        assertNotEquals(a, b);
+    }
+
+    @Test
+    @DisplayName("equals: distinguishes different node")
+    public void equals_distinguishesNode() {
+        NodeKey<String> a = key(1, "A");
+        NodeKey<String> b = key(1, "B");
+        assertNotEquals(a, b);
+    }
+
+    @Test
+    @DisplayName("equals: handles null and different types")
+    public void equals_handlesNullAndDifferentType() {
+        NodeKey<String> a = key(0, "A");
+        assertNotEquals(a, null);
+        assertNotEquals(a, "A");
+    }
+
+    @Test
+    @DisplayName("hashCode: equal objects have equal hash codes")
+    public void hashCode_consistentWithEquals() {
+        NodeKey<String> a = key(2, "X");
+        NodeKey<String> b = key(2, "X");
+        assertEquals(a, b);
+        assertEquals(a.hashCode(), b.hashCode());
+    }
+
+    @Test
+    @DisplayName("clone: creates a distinct but equal instance")
+    @SuppressWarnings("unchecked")
+    public void clone_createsEqualButDistinctInstance() throws CloneNotSupportedException {
+        NodeKey<String> original = key(2, "A");
+        NodeKey<String> copy = (NodeKey<String>) original.clone();
+
+        assertNotSame(original, copy);
+        assertSame(original.getClass(), copy.getClass());
+        assertEquals(original, copy);
+    }
+
+    @Test
+    @DisplayName("serialization: round-trip preserves equality")
+    public void serialization_roundTripPreservesEquality() {
+        NodeKey<String> original = key(1, "S1");
+        NodeKey<String> restored = TestUtils.serialised(original);
+        assertEquals(original, restored);
+    }
 }
-
