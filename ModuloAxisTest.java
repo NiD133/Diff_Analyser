@@ -1,101 +1,80 @@
-/* ======================================================
- * JFreeChart : a chart library for the Java(tm) platform
- * ======================================================
- *
- * (C) Copyright 2000-present, by David Gilbert and Contributors.
- *
- * Project Info:  https://www.jfree.org/jfreechart/index.html
- *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2.1 of the License, or
- * (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- * License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
- * USA.
- *
- * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
- * Other names may be trademarks of their respective owners.]
- *
- * -------------------
- * ModuloAxisTest.java
- * -------------------
- * (C) Copyright 2007-present, by David Gilbert and Contributors.
- *
- * Original Author:  David Gilbert;
- * Contributor(s):   -;
- *
- */
-
 package org.jfree.chart.axis;
 
 import org.jfree.chart.TestUtils;
-
 import org.jfree.data.Range;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for the {@link ModuloAxis} class.
+ * Tests for the ModuloAxis class with an emphasis on clarity and maintainability.
  */
+@DisplayNameGeneration(ReplaceUnderscores.class)
 public class ModuloAxisTest {
 
-    /**
-     * Confirm that cloning works.
-     */
-    @Test
-    public void testCloning() throws CloneNotSupportedException {
-        ModuloAxis a1 = new ModuloAxis("Test", new Range(0.0, 1.0));
-        ModuloAxis a2 = (ModuloAxis) a1.clone();
-        assertNotSame(a1, a2);
-        assertSame(a1.getClass(), a2.getClass());
-        assertEquals(a1, a2);
+    private static final String AXIS_LABEL = "Test Axis";
+    private static final Range FIXED_RANGE = new Range(0.0, 1.0);
+
+    private static ModuloAxis newDefaultAxis() {
+        return new ModuloAxis(AXIS_LABEL, FIXED_RANGE);
     }
 
-    /**
-     * Confirm that the equals method can distinguish all the required fields.
-     */
     @Test
-    public void testEquals() {
-        ModuloAxis a1 = new ModuloAxis("Test", new Range(0.0, 1.0));
-        ModuloAxis a2 = new ModuloAxis("Test", new Range(0.0, 1.0));
-        assertEquals(a1, a2);
+    public void testCloning_creates_distinct_but_equal_copy() throws CloneNotSupportedException {
+        // Arrange
+        ModuloAxis original = newDefaultAxis();
 
+        // Act
+        ModuloAxis copy = (ModuloAxis) original.clone();
+
+        // Assert
+        assertNotSame(original, copy, "Clone should be a different instance");
+        assertSame(original.getClass(), copy.getClass(), "Clone should be the same runtime type");
+        assertEquals(original, copy, "Clone should be equal in state to the original");
+    }
+
+    @Test
+    public void testEquals_reflects_changes_to_display_range() {
+        // Arrange
+        ModuloAxis a1 = newDefaultAxis();
+        ModuloAxis a2 = newDefaultAxis();
+        assertEquals(a1, a2, "Freshly constructed axes with same inputs should be equal");
+
+        // Act + Assert: modifying one axis' display range should break equality
         a1.setDisplayRange(0.1, 1.1);
-        assertNotEquals(a1, a2);
+        assertNotEquals(a1, a2, "Changing display range on one axis should break equality");
+
+        // Act + Assert: bring the other axis to the same state => equality restored
         a2.setDisplayRange(0.1, 1.1);
-        assertEquals(a1, a2);
+        assertEquals(a1, a2, "Axes with the same display range should be equal");
     }
 
-    /**
-     * Two objects that are equal are required to return the same hashCode.
-     */
     @Test
-    public void testHashCode() {
-        ModuloAxis a1 = new ModuloAxis("Test", new Range(0.0, 1.0));
-        ModuloAxis a2 = new ModuloAxis("Test", new Range(0.0, 1.0));
-        assertEquals(a1, a2);
+    public void testHashCode_same_for_equal_instances() {
+        // Arrange
+        ModuloAxis a1 = newDefaultAxis();
+        ModuloAxis a2 = newDefaultAxis();
+        assertEquals(a1, a2, "Precondition: instances must be equal before comparing hash codes");
+
+        // Act
         int h1 = a1.hashCode();
         int h2 = a2.hashCode();
-        assertEquals(h1, h2);
+
+        // Assert
+        assertEquals(h1, h2, "Equal objects must have equal hash codes");
     }
 
-    /**
-     * Serialize an instance, restore it, and check for equality.
-     */
     @Test
-    public void testSerialization() {
-        ModuloAxis a1 = new ModuloAxis("Test", new Range(0.0, 1.0));
-        ModuloAxis a2 = TestUtils.serialised(a1);
-        assertEquals(a1, a2);
-    }
+    public void testSerialization_round_trips_with_equality() {
+        // Arrange
+        ModuloAxis original = newDefaultAxis();
 
+        // Act
+        ModuloAxis restored = TestUtils.serialised(original);
+
+        // Assert
+        assertEquals(original, restored, "Deserialised axis should be equal to the original");
+    }
 }
