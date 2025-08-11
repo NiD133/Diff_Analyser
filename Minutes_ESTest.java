@@ -31,646 +31,448 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class Minutes_ESTest extends Minutes_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      Minutes minutes0 = Minutes.TWO;
-      Minutes minutes1 = Minutes.MAX_VALUE;
-      boolean boolean0 = minutes1.isLessThan(minutes0);
-      assertFalse(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      Minutes minutes0 = Minutes.ZERO;
-      boolean boolean0 = minutes0.isLessThan((Minutes) null);
-      assertFalse(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      Minutes minutes0 = Minutes.TWO;
-      Minutes minutes1 = Minutes.THREE;
-      boolean boolean0 = minutes0.isGreaterThan(minutes1);
-      assertFalse(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      Minutes minutes0 = Minutes.minutesIn((ReadableInterval) null);
-      boolean boolean0 = minutes0.isGreaterThan((Minutes) null);
-      assertFalse(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      Minutes minutes0 = Minutes.MAX_VALUE;
-      Weeks weeks0 = minutes0.toStandardWeeks();
-      assertEquals(213044, weeks0.getWeeks());
-  }
-
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      Minutes minutes0 = Minutes.MIN_VALUE;
-      Weeks weeks0 = minutes0.toStandardWeeks();
-      assertEquals((-213044), weeks0.getWeeks());
-  }
-
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      Minutes minutes0 = Minutes.ZERO;
-      Seconds seconds0 = minutes0.toStandardSeconds();
-      assertEquals(1, seconds0.size());
-  }
-
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      Minutes minutes0 = Minutes.ONE;
-      Seconds seconds0 = minutes0.toStandardSeconds();
-      assertEquals(60, seconds0.getSeconds());
-  }
-
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      Minutes minutes0 = Minutes.minutes(1431);
-      Hours hours0 = minutes0.toStandardHours();
-      assertEquals(1431, minutes0.getMinutes());
-      assertEquals(23, hours0.getHours());
-  }
-
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      Minutes minutes0 = Minutes.MAX_VALUE;
-      Duration duration0 = minutes0.toStandardDuration();
-      assertEquals(1491308L, duration0.getStandardDays());
-  }
-
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      Minutes minutes0 = Minutes.ONE;
-      Duration duration0 = minutes0.toStandardDuration();
-      assertEquals(60000L, duration0.getMillis());
-  }
-
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      Minutes minutes0 = Minutes.MIN_VALUE;
-      Duration duration0 = minutes0.toStandardDuration();
-      assertEquals((-2147483648L), duration0.getStandardMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      Minutes minutes0 = Minutes.minutesIn((ReadableInterval) null);
-      Days days0 = minutes0.MAX_VALUE.toStandardDays();
-      assertEquals(1491308, days0.getDays());
-  }
-
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      Minutes minutes0 = Minutes.ZERO;
-      Minutes minutes1 = minutes0.plus((Minutes) null);
-      assertSame(minutes1, minutes0);
-  }
-
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      Seconds seconds0 = Seconds.MAX_VALUE;
-      Minutes minutes0 = seconds0.toStandardMinutes();
-      Minutes minutes1 = minutes0.MAX_VALUE.dividedBy((-82));
-      Minutes minutes2 = minutes1.plus(minutes1);
-      assertEquals((-26188824), minutes1.getMinutes());
-      assertEquals((-52377648), minutes2.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      Minutes minutes0 = Minutes.TWO;
-      Minutes minutes1 = minutes0.plus((-2));
-      assertEquals(0, minutes1.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      Minutes minutes0 = Minutes.ZERO;
-      Minutes minutes1 = minutes0.plus((-2104));
-      assertEquals((-2104), minutes1.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      Minutes minutes0 = Minutes.minutesIn((ReadableInterval) null);
-      Minutes minutes1 = minutes0.negated();
-      assertEquals(0, minutes1.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      Minutes minutes0 = Minutes.THREE;
-      Minutes minutes1 = minutes0.negated();
-      assertEquals((-3), minutes1.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      Minutes minutes0 = Minutes.minutesIn((ReadableInterval) null);
-      Minutes minutes1 = minutes0.multipliedBy(1995);
-      assertEquals(0, minutes1.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      Minutes minutes0 = Minutes.minutes(1431);
-      Minutes minutes1 = minutes0.multipliedBy(3012);
-      assertEquals(1431, minutes0.getMinutes());
-      assertEquals(4310172, minutes1.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      Minutes minutes0 = Minutes.ONE;
-      Minutes minutes1 = minutes0.multipliedBy((-5447));
-      assertEquals((-5447), minutes1.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      Minutes minutes0 = Minutes.ONE;
-      Minutes minutes1 = Minutes.minutes(0);
-      Minutes minutes2 = minutes0.ONE.minus(minutes1);
-      assertEquals(1, minutes2.getMinutes());
-      assertEquals(0, minutes1.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
-      Minutes minutes0 = Minutes.TWO;
-      Minutes minutes1 = Minutes.THREE;
-      Minutes minutes2 = minutes0.minus(minutes1);
-      assertEquals((-1), minutes2.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
-      Minutes minutes0 = Minutes.ZERO;
-      Minutes minutes1 = minutes0.minus(0);
-      assertEquals(0, minutes1.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
-      Minutes minutes0 = Minutes.ONE;
-      Minutes minutes1 = minutes0.minus((-241));
-      assertEquals(242, minutes1.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test26()  throws Throwable  {
-      Minutes minutes0 = Minutes.ONE;
-      Minutes minutes1 = minutes0.minus(192);
-      assertEquals((-191), minutes1.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test27()  throws Throwable  {
-      Minutes minutes0 = Minutes.minutesIn((ReadableInterval) null);
-      int int0 = minutes0.getMinutes();
-      assertEquals(0, int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test28()  throws Throwable  {
-      Seconds seconds0 = Seconds.MAX_VALUE;
-      Minutes minutes0 = seconds0.toStandardMinutes();
-      int int0 = minutes0.getMinutes();
-      assertEquals(35791394, int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test29()  throws Throwable  {
-      Minutes minutes0 = Minutes.THREE;
-      Minutes minutes1 = minutes0.dividedBy(2);
-      assertEquals(1, minutes1.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test30()  throws Throwable  {
-      Minutes minutes0 = Minutes.MIN_VALUE;
-      Minutes minutes1 = minutes0.MAX_VALUE.dividedBy((-82));
-      minutes1.negated();
-      assertEquals((-26188824), minutes1.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test31()  throws Throwable  {
-      Minutes minutes0 = Minutes.MIN_VALUE;
-      // Undeclared exception!
-      try { 
-        minutes0.toStandardSeconds();
-        fail("Expecting exception: ArithmeticException");
-      
-      } catch(ArithmeticException e) {
-         //
-         // Multiplication overflows an int: -2147483648 * 60
-         //
-         verifyException("org.joda.time.field.FieldUtils", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test32()  throws Throwable  {
-      Days days0 = Days.THREE;
-      Minutes minutes0 = Minutes.standardMinutesIn(days0);
-      assertEquals(4320, minutes0.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test33()  throws Throwable  {
-      Minutes minutes0 = Minutes.MAX_VALUE;
-      // Undeclared exception!
-      try { 
-        minutes0.plus(minutes0);
-        fail("Expecting exception: ArithmeticException");
-      
-      } catch(ArithmeticException e) {
-         //
-         // The calculation caused an overflow: 2147483647 + 2147483647
-         //
-         verifyException("org.joda.time.field.FieldUtils", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test34()  throws Throwable  {
-      DateTimeFieldType[] dateTimeFieldTypeArray0 = new DateTimeFieldType[1];
-      DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.year();
-      dateTimeFieldTypeArray0[0] = dateTimeFieldType0;
-      int[] intArray0 = new int[9];
-      Partial partial0 = new Partial((Chronology) null, dateTimeFieldTypeArray0, intArray0);
-      Minutes minutes0 = Minutes.minutesBetween((ReadablePartial) partial0, (ReadablePartial) partial0);
-      assertEquals(0, minutes0.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test35()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        Minutes.minutesBetween((ReadablePartial) null, (ReadablePartial) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // ReadablePartial objects must not be null
-         //
-         verifyException("org.joda.time.base.BaseSingleFieldPeriod", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test36()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        Minutes.minutesBetween((ReadableInstant) null, (ReadableInstant) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // ReadableInstant objects must not be null
-         //
-         verifyException("org.joda.time.base.BaseSingleFieldPeriod", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test37()  throws Throwable  {
-      Minutes minutes0 = Minutes.MIN_VALUE;
-      // Undeclared exception!
-      try { 
-        minutes0.minus(minutes0);
-        fail("Expecting exception: ArithmeticException");
-      
-      } catch(ArithmeticException e) {
-         //
-         // Integer.MIN_VALUE cannot be negated
-         //
-         verifyException("org.joda.time.field.FieldUtils", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test38()  throws Throwable  {
-      Minutes minutes0 = Minutes.minutesIn((ReadableInterval) null);
-      // Undeclared exception!
-      try { 
-        minutes0.dividedBy(0);
-        fail("Expecting exception: ArithmeticException");
-      
-      } catch(ArithmeticException e) {
-         //
-         // / by zero
-         //
-         verifyException("org.joda.time.Minutes", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test39()  throws Throwable  {
-      Minutes minutes0 = Minutes.TWO;
-      // Undeclared exception!
-      try { 
-        minutes0.plus(Integer.MAX_VALUE);
-        fail("Expecting exception: ArithmeticException");
-      
-      } catch(ArithmeticException e) {
-         //
-         // The calculation caused an overflow: 2 + 2147483647
-         //
-         verifyException("org.joda.time.field.FieldUtils", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test40()  throws Throwable  {
-      Minutes minutes0 = Minutes.MAX_VALUE;
-      Minutes minutes1 = minutes0.plus(0);
-      assertEquals(Integer.MAX_VALUE, minutes1.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test41()  throws Throwable  {
-      Minutes minutes0 = Minutes.minutes(3);
-      assertEquals(3, minutes0.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test42()  throws Throwable  {
-      Minutes minutes0 = Minutes.minutes(31);
-      Minutes minutes1 = Minutes.TWO;
-      boolean boolean0 = minutes1.isLessThan(minutes0);
-      assertTrue(boolean0);
-      assertEquals(31, minutes0.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test43()  throws Throwable  {
-      Minutes minutes0 = Minutes.ONE;
-      boolean boolean0 = minutes0.isLessThan((Minutes) null);
-      assertFalse(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test44()  throws Throwable  {
-      Minutes minutes0 = Minutes.MIN_VALUE;
-      boolean boolean0 = minutes0.isLessThan((Minutes) null);
-      assertTrue(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test45()  throws Throwable  {
-      Minutes minutes0 = Minutes.minutes(31);
-      boolean boolean0 = minutes0.isLessThan(minutes0);
-      assertFalse(boolean0);
-      assertEquals(31, minutes0.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test46()  throws Throwable  {
-      Minutes minutes0 = Minutes.TWO;
-      Minutes minutes1 = Minutes.ZERO;
-      boolean boolean0 = minutes0.isGreaterThan(minutes1);
-      assertTrue(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test47()  throws Throwable  {
-      Minutes minutes0 = Minutes.MIN_VALUE;
-      boolean boolean0 = minutes0.isGreaterThan((Minutes) null);
-      assertFalse(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test48()  throws Throwable  {
-      Minutes minutes0 = Minutes.minutes(1431);
-      boolean boolean0 = minutes0.isGreaterThan((Minutes) null);
-      assertTrue(boolean0);
-      assertEquals(1431, minutes0.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test49()  throws Throwable  {
-      Minutes minutes0 = Minutes.ONE;
-      boolean boolean0 = minutes0.isGreaterThan(minutes0);
-      assertFalse(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test50()  throws Throwable  {
-      Minutes minutes0 = Minutes.ZERO;
-      Minutes minutes1 = minutes0.dividedBy(1);
-      assertSame(minutes0, minutes1);
-  }
-
-  @Test(timeout = 4000)
-  public void test51()  throws Throwable  {
-      Minutes minutes0 = Minutes.ZERO;
-      Minutes minutes1 = minutes0.minus((Minutes) null);
-      assertSame(minutes0, minutes1);
-  }
-
-  @Test(timeout = 4000)
-  public void test52()  throws Throwable  {
-      Minutes minutes0 = Minutes.ONE;
-      Minutes minutes1 = minutes0.plus((Minutes) null);
-      assertSame(minutes0, minutes1);
-  }
-
-  @Test(timeout = 4000)
-  public void test53()  throws Throwable  {
-      Minutes minutes0 = Minutes.parseMinutes((String) null);
-      assertEquals(1, minutes0.size());
-  }
-
-  @Test(timeout = 4000)
-  public void test54()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        Minutes.parseMinutes("UT");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid format: \"UT\"
-         //
-         verifyException("org.joda.time.format.PeriodFormatter", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test55()  throws Throwable  {
-      Minutes minutes0 = Minutes.minutesIn((ReadableInterval) null);
-      Duration duration0 = minutes0.toStandardDuration();
-      Minutes minutes1 = duration0.toStandardMinutes();
-      assertEquals(0, minutes1.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test56()  throws Throwable  {
-      int[] intArray0 = new int[1];
-      Partial partial0 = new Partial((Chronology) null, (DateTimeFieldType[]) null, intArray0);
-      // Undeclared exception!
-      try { 
-        Minutes.minutesBetween((ReadablePartial) partial0, (ReadablePartial) partial0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.joda.time.Partial", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test57()  throws Throwable  {
-      Minutes minutes0 = Minutes.minutes(Integer.MAX_VALUE);
-      assertEquals(Integer.MAX_VALUE, minutes0.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test58()  throws Throwable  {
-      Minutes minutes0 = Minutes.minutes(2);
-      assertEquals(2, minutes0.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test59()  throws Throwable  {
-      Minutes minutes0 = Minutes.minutes(1);
-      assertEquals(1, minutes0.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test60()  throws Throwable  {
-      Minutes minutes0 = Minutes.minutes(Integer.MIN_VALUE);
-      Hours hours0 = minutes0.toStandardHours();
-      assertEquals(Integer.MIN_VALUE, minutes0.getMinutes());
-      assertEquals((-35791394), hours0.getHours());
-  }
-
-  @Test(timeout = 4000)
-  public void test61()  throws Throwable  {
-      Minutes minutes0 = Minutes.MAX_VALUE;
-      // Undeclared exception!
-      try { 
-        minutes0.multipliedBy((-4433));
-        fail("Expecting exception: ArithmeticException");
-      
-      } catch(ArithmeticException e) {
-         //
-         // Multiplication overflows an int: 2147483647 * -4433
-         //
-         verifyException("org.joda.time.field.FieldUtils", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test62()  throws Throwable  {
-      Seconds seconds0 = Seconds.MIN_VALUE;
-      Minutes minutes0 = seconds0.toStandardMinutes();
-      Seconds seconds1 = minutes0.toStandardSeconds();
-      assertEquals((-35791394), minutes0.getMinutes());
-      assertEquals((-2147483640), seconds1.getSeconds());
-  }
-
-  @Test(timeout = 4000)
-  public void test63()  throws Throwable  {
-      Minutes minutes0 = Minutes.MAX_VALUE;
-      // Undeclared exception!
-      try { 
-        minutes0.minus((-2550));
-        fail("Expecting exception: ArithmeticException");
-      
-      } catch(ArithmeticException e) {
-         //
-         // The calculation caused an overflow: 2147483647 + 2550
-         //
-         verifyException("org.joda.time.field.FieldUtils", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test64()  throws Throwable  {
-      Minutes minutes0 = Minutes.MIN_VALUE;
-      DurationFieldType durationFieldType0 = minutes0.getFieldType();
-      assertEquals("minutes", durationFieldType0.toString());
-  }
-
-  @Test(timeout = 4000)
-  public void test65()  throws Throwable  {
-      Minutes minutes0 = Minutes.ZERO;
-      Hours hours0 = minutes0.toStandardHours();
-      assertEquals(0, hours0.getHours());
-  }
-
-  @Test(timeout = 4000)
-  public void test66()  throws Throwable  {
-      Minutes minutes0 = Minutes.MAX_VALUE;
-      String string0 = minutes0.toString();
-      assertEquals("PT2147483647M", string0);
-  }
-
-  @Test(timeout = 4000)
-  public void test67()  throws Throwable  {
-      Minutes minutes0 = Minutes.standardMinutesIn((ReadablePeriod) null);
-      assertEquals(0, minutes0.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test68()  throws Throwable  {
-      Instant instant0 = Instant.now();
-      Minutes minutes0 = Minutes.minutesBetween((ReadableInstant) instant0, (ReadableInstant) instant0);
-      assertEquals(0, minutes0.getMinutes());
-  }
-
-  @Test(timeout = 4000)
-  public void test69()  throws Throwable  {
-      Minutes minutes0 = Minutes.MIN_VALUE;
-      int int0 = minutes0.getMinutes();
-      assertEquals(Integer.MIN_VALUE, int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test70()  throws Throwable  {
-      Minutes minutes0 = Minutes.MAX_VALUE;
-      PeriodType periodType0 = minutes0.getPeriodType();
-      assertEquals(1, periodType0.size());
-  }
-
-  @Test(timeout = 4000)
-  public void test71()  throws Throwable  {
-      Minutes minutes0 = Minutes.ZERO;
-      Days days0 = minutes0.toStandardDays();
-      assertEquals(0, days0.getDays());
-  }
-
-  @Test(timeout = 4000)
-  public void test72()  throws Throwable  {
-      Minutes minutes0 = Minutes.MIN_VALUE;
-      // Undeclared exception!
-      try { 
-        minutes0.negated();
-        fail("Expecting exception: ArithmeticException");
-      
-      } catch(ArithmeticException e) {
-         //
-         // Integer.MIN_VALUE cannot be negated
-         //
-         verifyException("org.joda.time.field.FieldUtils", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test73()  throws Throwable  {
-      Minutes minutes0 = Minutes.ONE;
-      Weeks weeks0 = minutes0.toStandardWeeks();
-      assertEquals(0, weeks0.getWeeks());
-  }
+    // Comparison Tests: isLessThan()
+    @Test(timeout = 4000)
+    public void testIsLessThanWhenMaxValueComparedWithSmallerValue() {
+        Minutes twoMinutes = Minutes.TWO;
+        Minutes maxMinutes = Minutes.MAX_VALUE;
+        assertFalse(maxMinutes.isLessThan(twoMinutes));
+    }
+
+    @Test(timeout = 4000)
+    public void testIsLessThanWhenZeroComparedWithNull() {
+        Minutes zeroMinutes = Minutes.ZERO;
+        assertFalse(zeroMinutes.isLessThan(null));
+    }
+
+    @Test(timeout = 4000)
+    public void testIsLessThanWhenMinValueComparedWithNull() {
+        Minutes minMinutes = Minutes.MIN_VALUE;
+        assertTrue(minMinutes.isLessThan(null));
+    }
+
+    @Test(timeout = 4000)
+    public void testIsLessThanWhenValueComparedWithSameValue() {
+        Minutes minutes = Minutes.minutes(31);
+        assertFalse(minutes.isLessThan(minutes));
+    }
+
+    @Test(timeout = 4000)
+    public void testIsLessThanWhenSmallerComparedWithLarger() {
+        Minutes twoMinutes = Minutes.TWO;
+        Minutes thirtyOneMinutes = Minutes.minutes(31);
+        assertTrue(twoMinutes.isLessThan(thirtyOneMinutes));
+    }
+
+    // Comparison Tests: isGreaterThan()
+    @Test(timeout = 4000)
+    public void testIsGreaterThanWhenTwoComparedWithThree() {
+        Minutes twoMinutes = Minutes.TWO;
+        Minutes threeMinutes = Minutes.THREE;
+        assertFalse(twoMinutes.isGreaterThan(threeMinutes));
+    }
+
+    @Test(timeout = 4000)
+    public void testIsGreaterThanWhenZeroComparedWithNull() {
+        Minutes zeroMinutes = Minutes.ZERO;
+        assertFalse(zeroMinutes.isGreaterThan(null));
+    }
+
+    @Test(timeout = 4000)
+    public void testIsGreaterThanWhenPositiveValueComparedWithNull() {
+        Minutes minutes = Minutes.minutes(1431);
+        assertTrue(minutes.isGreaterThan(null));
+    }
+
+    @Test(timeout = 4000)
+    public void testIsGreaterThanWhenTwoComparedWithZero() {
+        Minutes twoMinutes = Minutes.TWO;
+        Minutes zeroMinutes = Minutes.ZERO;
+        assertTrue(twoMinutes.isGreaterThan(zeroMinutes));
+    }
+
+    @Test(timeout = 4000)
+    public void testIsGreaterThanWhenValueComparedWithItself() {
+        Minutes oneMinute = Minutes.ONE;
+        assertFalse(oneMinute.isGreaterThan(oneMinute));
+    }
+
+    // Conversion Tests: toStandardWeeks()
+    @Test(timeout = 4000)
+    public void testToStandardWeeksForMaxValue() {
+        Minutes maxMinutes = Minutes.MAX_VALUE;
+        Weeks weeks = maxMinutes.toStandardWeeks();
+        assertEquals(213044, weeks.getWeeks());
+    }
+
+    @Test(timeout = 4000)
+    public void testToStandardWeeksForMinValue() {
+        Minutes minMinutes = Minutes.MIN_VALUE;
+        Weeks weeks = minMinutes.toStandardWeeks();
+        assertEquals(-213044, weeks.getWeeks());
+    }
+
+    // Conversion Tests: toStandardSeconds()
+    @Test(timeout = 4000)
+    public void testToStandardSecondsForZero() {
+        Minutes zeroMinutes = Minutes.ZERO;
+        Seconds seconds = zeroMinutes.toStandardSeconds();
+        assertEquals(0, seconds.getSeconds());
+    }
+
+    @Test(timeout = 4000)
+    public void testToStandardSecondsForOne() {
+        Minutes oneMinute = Minutes.ONE;
+        Seconds seconds = oneMinute.toStandardSeconds();
+        assertEquals(60, seconds.getSeconds());
+    }
+
+    @Test(timeout = 4000)
+    public void testToStandardSecondsForMinValueThrowsException() {
+        Minutes minMinutes = Minutes.MIN_VALUE;
+        try {
+            minMinutes.toStandardSeconds();
+            fail("Expected ArithmeticException for overflow");
+        } catch (ArithmeticException e) {
+            // Multiplication overflows an int: -2147483648 * 60
+        }
+    }
+
+    // Conversion Tests: toStandardHours()
+    @Test(timeout = 4000)
+    public void testToStandardHours() {
+        Minutes minutes = Minutes.minutes(1431);
+        Hours hours = minutes.toStandardHours();
+        assertEquals(23, hours.getHours());
+    }
+
+    @Test(timeout = 4000)
+    public void testToStandardHoursForMinValue() {
+        Minutes minMinutes = Minutes.minutes(Integer.MIN_VALUE);
+        Hours hours = minMinutes.toStandardHours();
+        assertEquals(-35791394, hours.getHours());
+    }
+
+    // Conversion Tests: toStandardDuration()
+    @Test(timeout = 4000)
+    public void testToStandardDurationForMaxValue() {
+        Minutes maxMinutes = Minutes.MAX_VALUE;
+        Duration duration = maxMinutes.toStandardDuration();
+        assertEquals(1491308L, duration.getStandardDays());
+    }
+
+    @Test(timeout = 4000)
+    public void testToStandardDurationForOne() {
+        Minutes oneMinute = Minutes.ONE;
+        Duration duration = oneMinute.toStandardDuration();
+        assertEquals(60000L, duration.getMillis());
+    }
+
+    @Test(timeout = 4000)
+    public void testToStandardDurationForMinValue() {
+        Minutes minMinutes = Minutes.MIN_VALUE;
+        Duration duration = minMinutes.toStandardDuration();
+        assertEquals(-2147483648L, duration.getStandardMinutes());
+    }
+
+    // Arithmetic Tests: plus()
+    @Test(timeout = 4000)
+    public void testPlusMinutesWithNull() {
+        Minutes zeroMinutes = Minutes.ZERO;
+        Minutes result = zeroMinutes.plus((Minutes) null);
+        assertSame(zeroMinutes, result);
+    }
+
+    @Test(timeout = 4000)
+    public void testPlusMinutes() {
+        Minutes twoMinutes = Minutes.TWO;
+        Minutes result = twoMinutes.plus(-2);
+        assertEquals(0, result.getMinutes());
+    }
+
+    @Test(timeout = 4000)
+    public void testPlusValue() {
+        Minutes zeroMinutes = Minutes.ZERO;
+        Minutes result = zeroMinutes.plus(-2104);
+        assertEquals(-2104, result.getMinutes());
+    }
+
+    @Test(timeout = 4000)
+    public void testPlusWhenResultIsZero() {
+        Minutes oneMinute = Minutes.ONE;
+        Minutes zeroMinutes = Minutes.minutes(0);
+        Minutes result = oneMinute.minus(oneMinute);
+        assertEquals(0, result.getMinutes());
+    }
+
+    @Test(timeout = 4000)
+    public void testPlusMaxValueThrowsException() {
+        Minutes maxMinutes = Minutes.MAX_VALUE;
+        try {
+            maxMinutes.plus(Integer.MAX_VALUE);
+            fail("Expected ArithmeticException for overflow");
+        } catch (ArithmeticException e) {
+            // The calculation caused an overflow: 2147483647 + 2147483647
+        }
+    }
+
+    // Arithmetic Tests: minus()
+    @Test(timeout = 4000)
+    public void testMinusMinutesWithNull() {
+        Minutes zeroMinutes = Minutes.ZERO;
+        Minutes result = zeroMinutes.minus((Minutes) null);
+        assertSame(zeroMinutes, result);
+    }
+
+    @Test(timeout = 4000)
+    public void testMinusMinutes() {
+        Minutes twoMinutes = Minutes.TWO;
+        Minutes threeMinutes = Minutes.THREE;
+        Minutes result = twoMinutes.minus(threeMinutes);
+        assertEquals(-1, result.getMinutes());
+    }
+
+    @Test(timeout = 4000)
+    public void testMinusValue() {
+        Minutes oneMinute = Minutes.ONE;
+        Minutes result = oneMinute.minus(-241);
+        assertEquals(242, result.getMinutes());
+    }
+
+    @Test(timeout = 4000)
+    public void testMinusMinValueThrowsException() {
+        Minutes minMinutes = Minutes.MIN_VALUE;
+        try {
+            minMinutes.minus(minMinutes);
+            fail("Expected ArithmeticException for overflow");
+        } catch (ArithmeticException e) {
+            // Integer.MIN_VALUE cannot be negated
+        }
+    }
+
+    // Arithmetic Tests: multipliedBy()
+    @Test(timeout = 4000)
+    public void testMultipliedByForZero() {
+        Minutes zeroMinutes = Minutes.minutesIn(null);
+        Minutes result = zeroMinutes.multipliedBy(1995);
+        assertEquals(0, result.getMinutes());
+    }
+
+    @Test(timeout = 4000)
+    public void testMultipliedByPositive() {
+        Minutes minutes = Minutes.minutes(1431);
+        Minutes result = minutes.multipliedBy(3012);
+        assertEquals(4310172, result.getMinutes());
+    }
+
+    @Test(timeout = 4000)
+    public void testMultipliedByNegative() {
+        Minutes oneMinute = Minutes.ONE;
+        Minutes result = oneMinute.multipliedBy(-5447);
+        assertEquals(-5447, result.getMinutes());
+    }
+
+    @Test(timeout = 4000)
+    public void testMultipliedByMaxValueThrowsException() {
+        Minutes maxMinutes = Minutes.MAX_VALUE;
+        try {
+            maxMinutes.multipliedBy(-4433);
+            fail("Expected ArithmeticException for overflow");
+        } catch (ArithmeticException e) {
+            // Multiplication overflows an int: 2147483647 * -4433
+        }
+    }
+
+    // Arithmetic Tests: dividedBy()
+    @Test(timeout = 4000)
+    public void testDividedBy() {
+        Minutes threeMinutes = Minutes.THREE;
+        Minutes result = threeMinutes.dividedBy(2);
+        assertEquals(1, result.getMinutes());
+    }
+
+    @Test(timeout = 4000)
+    public void testDividedByForZero() {
+        Minutes zeroMinutes = Minutes.ZERO;
+        Minutes result = zeroMinutes.dividedBy(1);
+        assertSame(zeroMinutes, result);
+    }
+
+    @Test(timeout = 4000)
+    public void testDividedByByZeroThrowsException() {
+        Minutes minutes = Minutes.minutesIn(null);
+        try {
+            minutes.dividedBy(0);
+            fail("Expected ArithmeticException for division by zero");
+        } catch (ArithmeticException e) {
+            // / by zero
+        }
+    }
+
+    // Arithmetic Tests: negated()
+    @Test(timeout = 4000)
+    public void testNegatedForZero() {
+        Minutes zeroMinutes = Minutes.minutesIn(null);
+        Minutes result = zeroMinutes.negated();
+        assertEquals(0, result.getMinutes());
+    }
+
+    @Test(timeout = 4000)
+    public void testNegated() {
+        Minutes threeMinutes = Minutes.THREE;
+        Minutes result = threeMinutes.negated();
+        assertEquals(-3, result.getMinutes());
+    }
+
+    @Test(timeout = 4000)
+    public void testNegatedMinValueThrowsException() {
+        Minutes minMinutes = Minutes.MIN_VALUE;
+        try {
+            minMinutes.negated();
+            fail("Expected ArithmeticException for overflow");
+        } catch (ArithmeticException e) {
+            // Integer.MIN_VALUE cannot be negated
+        }
+    }
+
+    // Factory Tests: minutesIn()
+    @Test(timeout = 4000)
+    public void testMinutesInWithNullInterval() {
+        Minutes minutes = Minutes.minutesIn(null);
+        assertEquals(0, minutes.getMinutes());
+    }
+
+    // Factory Tests: minutesBetween()
+    @Test(timeout = 4000)
+    public void testMinutesBetweenSameInstants() {
+        Instant instant = Instant.now();
+        Minutes minutes = Minutes.minutesBetween(instant, instant);
+        assertEquals(0, minutes.getMinutes());
+    }
+
+    @Test(timeout = 4000)
+    public void testMinutesBetweenSamePartials() {
+        DateTimeFieldType[] types = { DateTimeFieldType.year() };
+        int[] values = { 2023 };
+        Partial partial = new Partial(types, values);
+        Minutes minutes = Minutes.minutesBetween(partial, partial);
+        assertEquals(0, minutes.getMinutes());
+    }
+
+    @Test(timeout = 4000)
+    public void testMinutesBetweenNullPartialsThrowsException() {
+        try {
+            Minutes.minutesBetween((ReadablePartial) null, (ReadablePartial) null);
+            fail("Expected IllegalArgumentException for null partials");
+        } catch (IllegalArgumentException e) {
+            // ReadablePartial objects must not be null
+        }
+    }
+
+    @Test(timeout = 4000)
+    public void testMinutesBetweenNullInstantsThrowsException() {
+        try {
+            Minutes.minutesBetween((ReadableInstant) null, (ReadableInstant) null);
+            fail("Expected IllegalArgumentException for null instants");
+        } catch (IllegalArgumentException e) {
+            // ReadableInstant objects must not be null
+        }
+    }
+
+    // Factory Tests: minutes()
+    @Test(timeout = 4000)
+    public void testMinutes() {
+        Minutes minutes = Minutes.minutes(3);
+        assertEquals(3, minutes.getMinutes());
+    }
+
+    @Test(timeout = 4000)
+    public void testMinutesMaxValue() {
+        Minutes minutes = Minutes.minutes(Integer.MAX_VALUE);
+        assertEquals(Integer.MAX_VALUE, minutes.getMinutes());
+    }
+
+    @Test(timeout = 4000)
+    public void testMinutesMinValue() {
+        Minutes minutes = Minutes.minutes(Integer.MIN_VALUE);
+        assertEquals(Integer.MIN_VALUE, minutes.getMinutes());
+    }
+
+    // Getter Tests
+    @Test(timeout = 4000)
+    public void testGetMinutesForZero() {
+        Minutes zeroMinutes = Minutes.minutesIn(null);
+        assertEquals(0, zeroMinutes.getMinutes());
+    }
+
+    @Test(timeout = 4000)
+    public void testGetMinutesForMaxValue() {
+        Seconds seconds = Seconds.MAX_VALUE;
+        Minutes minutes = seconds.toStandardMinutes();
+        assertEquals(35791394, minutes.getMinutes());
+    }
+
+    @Test(timeout = 4000)
+    public void testGetMinutesForMinValue() {
+        Minutes minMinutes = Minutes.MIN_VALUE;
+        assertEquals(Integer.MIN_VALUE, minMinutes.getMinutes());
+    }
+
+    @Test(timeout = 4000)
+    public void testGetFieldType() {
+        Minutes minMinutes = Minutes.MIN_VALUE;
+        assertEquals("minutes", minMinutes.getFieldType().toString());
+    }
+
+    @Test(timeout = 4000)
+    public void testGetPeriodType() {
+        Minutes maxMinutes = Minutes.MAX_VALUE;
+        assertEquals(1, maxMinutes.getPeriodType().size());
+    }
+
+    // Conversion Tests: toStandardDays()
+    @Test(timeout = 4000)
+    public void testToStandardDaysForMaxValue() {
+        Minutes maxMinutes = Minutes.MAX_VALUE;
+        Days days = maxMinutes.toStandardDays();
+        assertEquals(1491308, days.getDays());
+    }
+
+    @Test(timeout = 4000)
+    public void testToStandardDaysForZero() {
+        Minutes zeroMinutes = Minutes.ZERO;
+        Days days = zeroMinutes.toStandardDays();
+        assertEquals(0, days.getDays());
+    }
+
+    // toString() Tests
+    @Test(timeout = 4000)
+    public void testToString() {
+        Minutes maxMinutes = Minutes.MAX_VALUE;
+        assertEquals("PT2147483647M", maxMinutes.toString());
+    }
+
+    // parseMinutes() Tests
+    @Test(timeout = 4000)
+    public void testParseMinutesNull() {
+        Minutes minutes = Minutes.parseMinutes(null);
+        assertEquals(0, minutes.getMinutes());
+    }
+
+    @Test(timeout = 4000)
+    public void testParseMinutesInvalidFormat() {
+        try {
+            Minutes.parseMinutes("UT");
+            fail("Expected IllegalArgumentException for invalid format");
+        } catch (IllegalArgumentException e) {
+            // Invalid format: "UT"
+        }
+    }
+
+    // standardMinutesIn() Tests
+    @Test(timeout = 4000)
+    public void testStandardMinutesInNullPeriod() {
+        Minutes minutes = Minutes.standardMinutesIn(null);
+        assertEquals(0, minutes.getMinutes());
+    }
 }
