@@ -18,6 +18,7 @@ package org.apache.commons.lang3.math;
 
 import static org.apache.commons.lang3.LangAssertions.assertIllegalArgumentException;
 import static org.apache.commons.lang3.LangAssertions.assertNullPointerException;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -34,42 +35,140 @@ class IEEE754rUtilsTest extends AbstractLangTest {
         new IEEE754rUtils();
     }
 
+    // Exception Tests
+    // ===============
+
     @Test
-    void testEnforceExceptions() {
-        assertNullPointerException(() -> IEEE754rUtils.min((float[]) null), "IllegalArgumentException expected for null input");
-        assertIllegalArgumentException(IEEE754rUtils::min, "IllegalArgumentException expected for empty input");
-        assertNullPointerException(() -> IEEE754rUtils.max((float[]) null), "IllegalArgumentException expected for null input");
-        assertIllegalArgumentException(IEEE754rUtils::max, "IllegalArgumentException expected for empty input");
-        assertNullPointerException(() -> IEEE754rUtils.min((double[]) null), "IllegalArgumentException expected for null input");
-        assertIllegalArgumentException(IEEE754rUtils::min, "IllegalArgumentException expected for empty input");
-        assertNullPointerException(() -> IEEE754rUtils.max((double[]) null), "IllegalArgumentException expected for null input");
-        assertIllegalArgumentException(IEEE754rUtils::max, "IllegalArgumentException expected for empty input");
+    void testMinDoubleArrayThrowsExceptions() {
+        // Test null input
+        assertNullPointerException(() -> IEEE754rUtils.min((double[]) null), 
+            "NullPointerException expected for null input");
+        
+        // Test empty array
+        assertIllegalArgumentException(() -> IEEE754rUtils.min(new double[0]), 
+            "IllegalArgumentException expected for empty input");
     }
 
     @Test
-    void testLang381() {
+    void testMaxDoubleArrayThrowsExceptions() {
+        // Test null input
+        assertNullPointerException(() -> IEEE754rUtils.max((double[]) null), 
+            "NullPointerException expected for null input");
+        
+        // Test empty array
+        assertIllegalArgumentException(() -> IEEE754rUtils.max(new double[0]), 
+            "IllegalArgumentException expected for empty input");
+    }
+
+    @Test
+    void testMinFloatArrayThrowsExceptions() {
+        // Test null input
+        assertNullPointerException(() -> IEEE754rUtils.min((float[]) null), 
+            "NullPointerException expected for null input");
+        
+        // Test empty array
+        assertIllegalArgumentException(() -> IEEE754rUtils.min(new float[0]), 
+            "IllegalArgumentException expected for empty input");
+    }
+
+    @Test
+    void testMaxFloatArrayThrowsExceptions() {
+        // Test null input
+        assertNullPointerException(() -> IEEE754rUtils.max((float[]) null), 
+            "NullPointerException expected for null input");
+        
+        // Test empty array
+        assertIllegalArgumentException(() -> IEEE754rUtils.max(new float[0]), 
+            "IllegalArgumentException expected for empty input");
+    }
+
+    // Double Tests
+    // ============
+
+    @Test
+    void testMinDoubleWithNaNInArguments() {
+        // NaN should be ignored when determining min value
         assertEquals(1.2, IEEE754rUtils.min(1.2, 2.5, Double.NaN), 0.01);
-        assertEquals(2.5, IEEE754rUtils.max(1.2, 2.5, Double.NaN), 0.01);
-        assertTrue(Double.isNaN(IEEE754rUtils.max(Double.NaN, Double.NaN, Double.NaN)));
-        assertEquals(1.2f, IEEE754rUtils.min(1.2f, 2.5f, Float.NaN), 0.01);
-        assertEquals(2.5f, IEEE754rUtils.max(1.2f, 2.5f, Float.NaN), 0.01);
-        assertTrue(Float.isNaN(IEEE754rUtils.max(Float.NaN, Float.NaN, Float.NaN)));
-
-        final double[] a = { 1.2, Double.NaN, 3.7, 27.0, 42.0, Double.NaN };
-        assertEquals(42.0, IEEE754rUtils.max(a), 0.01);
-        assertEquals(1.2, IEEE754rUtils.min(a), 0.01);
-
-        final double[] b = { Double.NaN, 1.2, Double.NaN, 3.7, 27.0, 42.0, Double.NaN };
-        assertEquals(42.0, IEEE754rUtils.max(b), 0.01);
-        assertEquals(1.2, IEEE754rUtils.min(b), 0.01);
-
-        final float[] aF = { 1.2f, Float.NaN, 3.7f, 27.0f, 42.0f, Float.NaN };
-        assertEquals(1.2f, IEEE754rUtils.min(aF), 0.01);
-        assertEquals(42.0f, IEEE754rUtils.max(aF), 0.01);
-
-        final float[] bF = { Float.NaN, 1.2f, Float.NaN, 3.7f, 27.0f, 42.0f, Float.NaN };
-        assertEquals(1.2f, IEEE754rUtils.min(bF), 0.01);
-        assertEquals(42.0f, IEEE754rUtils.max(bF), 0.01);
     }
 
+    @Test
+    void testMaxDoubleWithNaNInArguments() {
+        // NaN should be ignored when determining max value
+        assertEquals(2.5, IEEE754rUtils.max(1.2, 2.5, Double.NaN), 0.01);
+    }
+
+    @Test
+    void testMaxDoubleWithAllNaN() {
+        // Should return NaN when all values are NaN
+        assertTrue(Double.isNaN(IEEE754rUtils.max(Double.NaN, Double.NaN, Double.NaN)));
+    }
+
+    @Test
+    void testMinDoubleArrayWithNaN() {
+        final double[] arrayA = { 1.2, Double.NaN, 3.7, 27.0, 42.0, Double.NaN };
+        final double[] arrayB = { Double.NaN, 1.2, Double.NaN, 3.7, 27.0, 42.0, Double.NaN };
+
+        // NaN values should be ignored when determining min value
+        assertAll(
+            () -> assertEquals(1.2, IEEE754rUtils.min(arrayA), 0.01, "Array A"),
+            () -> assertEquals(1.2, IEEE754rUtils.min(arrayB), 0.01, "Array B")
+        );
+    }
+
+    @Test
+    void testMaxDoubleArrayWithNaN() {
+        final double[] arrayA = { 1.2, Double.NaN, 3.7, 27.0, 42.0, Double.NaN };
+        final double[] arrayB = { Double.NaN, 1.2, Double.NaN, 3.7, 27.0, 42.0, Double.NaN };
+
+        // NaN values should be ignored when determining max value
+        assertAll(
+            () -> assertEquals(42.0, IEEE754rUtils.max(arrayA), 0.01, "Array A"),
+            () -> assertEquals(42.0, IEEE754rUtils.max(arrayB), 0.01, "Array B")
+        );
+    }
+
+    // Float Tests
+    // ===========
+
+    @Test
+    void testMinFloatWithNaNInArguments() {
+        // NaN should be ignored when determining min value
+        assertEquals(1.2f, IEEE754rUtils.min(1.2f, 2.5f, Float.NaN), 0.01f);
+    }
+
+    @Test
+    void testMaxFloatWithNaNInArguments() {
+        // NaN should be ignored when determining max value
+        assertEquals(2.5f, IEEE754rUtils.max(1.2f, 2.5f, Float.NaN), 0.01f);
+    }
+
+    @Test
+    void testMaxFloatWithAllNaN() {
+        // Should return NaN when all values are NaN
+        assertTrue(Float.isNaN(IEEE754rUtils.max(Float.NaN, Float.NaN, Float.NaN)));
+    }
+
+    @Test
+    void testMinFloatArrayWithNaN() {
+        final float[] arrayA = { 1.2f, Float.NaN, 3.7f, 27.0f, 42.0f, Float.NaN };
+        final float[] arrayB = { Float.NaN, 1.2f, Float.NaN, 3.7f, 27.0f, 42.0f, Float.NaN };
+
+        // NaN values should be ignored when determining min value
+        assertAll(
+            () -> assertEquals(1.2f, IEEE754rUtils.min(arrayA), 0.01f, "Array A"),
+            () -> assertEquals(1.2f, IEEE754rUtils.min(arrayB), 0.01f, "Array B")
+        );
+    }
+
+    @Test
+    void testMaxFloatArrayWithNaN() {
+        final float[] arrayA = { 1.2f, Float.NaN, 3.7f, 27.0f, 42.0f, Float.NaN };
+        final float[] arrayB = { Float.NaN, 1.2f, Float.NaN, 3.7f, 27.0f, 42.0f, Float.NaN };
+
+        // NaN values should be ignored when determining max value
+        assertAll(
+            () -> assertEquals(42.0f, IEEE754rUtils.max(arrayA), 0.01f, "Array A"),
+            () -> assertEquals(42.0f, IEEE754rUtils.max(arrayB), 0.01f, "Array B")
+        );
+    }
 }
