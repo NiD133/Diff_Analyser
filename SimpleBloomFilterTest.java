@@ -31,28 +31,13 @@ class SimpleBloomFilterTest extends AbstractBloomFilterTest<SimpleBloomFilter> {
         return new SimpleBloomFilter(shape);
     }
 
-    /**
-     * Tests that merging a BitMapExtractor with fewer values than expected by the shape
-     * still works correctly. This verifies the filter's robustness when handling
-     * incomplete bitmap data.
-     */
     @Test
-    void testMergeWithIncompleteBitMapExtractor() {
-        // Given: An empty bloom filter with a shape that expects 2 longs
-        final SimpleBloomFilter bloomFilter = createEmptyFilter(getTestShape());
-        
-        // And: A BitMapExtractor that provides only 1 long value (2L) instead of the expected 2
-        final BitMapExtractor incompleteBitMapExtractor = predicate -> predicate.test(2L);
-        
-        // When: We merge the incomplete BitMapExtractor into the bloom filter
-        final boolean mergeSuccessful = bloomFilter.merge(incompleteBitMapExtractor);
-        
-        // Then: The merge operation should succeed
-        assertTrue(mergeSuccessful, "Merge operation should succeed even with incomplete bitmap data");
-        
-        // And: The bloom filter should have exactly 1 bit set (cardinality = 1)
-        final int expectedCardinality = 1;
-        assertEquals(expectedCardinality, bloomFilter.cardinality(), 
-            "Bloom filter should have cardinality of 1 after merging single bit value");
+    void testMergeShortBitMapExtractor() {
+        final SimpleBloomFilter filter = createEmptyFilter(getTestShape());
+        // create a bitMapExtractor that returns too few values
+        // shape expects 2 longs we are sending 1.
+        final BitMapExtractor bitMapExtractor = p -> p.test(2L);
+        assertTrue(filter.merge(bitMapExtractor));
+        assertEquals(1, filter.cardinality());
     }
 }
