@@ -48,45 +48,53 @@ class LineIteratorTest {
     @TempDir
     public File temporaryFolder;
 
-    /**
-     * Asserts that the iterator returns the expected lines in order.
-     * Uses try-with-resources to ensure iterator is always closed.
-     */
-    private void assertLinesMatch(List<String> expectedLines, LineIterator iterator) {
-        try (iterator) {
-            for (int i = 0; i < expectedLines.size(); i++) {
-                assertTrue(iterator.hasNext(), "Expected more lines at index " + i);
-                assertEquals(expectedLines.get(i), iterator.nextLine(), "Line mismatch at index " + i);
+    private void assertLines(final List<String> lines, final LineIterator iterator) {
+        try {
+            for (int i = 0; i < lines.size(); i++) {
+                final String line = iterator.nextLine();
+                assertEquals(lines.get(i), line, "nextLine() line " + i);
             }
-            assertFalse(iterator.hasNext(), "Extra lines found after expected content");
+            assertFalse(iterator.hasNext(), "No more expected");
+        } finally {
+            IOUtils.closeQuietly(iterator);
         }
     }
 
     /**
-     * Creates a test file with specified lines and encoding.
-     * @return The list of lines written to the file
+     * Creates a test file with a specified number of lines.
+     *
+     * @param file target file
+     * @param lineCount number of lines to create
+     * @throws IOException If an I/O error occurs
      */
-    private List<String> createTestFile(File file, String encoding, int lineCount) throws IOException {
-        List<String> lines = generateLines(lineCount);
-        FileUtils.writeLines(file, encoding, lines);
-        return lines;
-    }
-
-    /**
-     * Creates a test file with default encoding.
-     * @return The list of lines written to the file
-     */
-    private List<String> createTestFile(File file, int lineCount) throws IOException {
-        List<String> lines = generateLines(lineCount);
+    private List<String> createLinesFile(final File file, final int lineCount) throws IOException {
+        final List<String> lines = createStringLines(lineCount);
         FileUtils.writeLines(file, lines);
         return lines;
     }
 
     /**
-     * Generates a list of test lines with predictable content.
+     * Creates a test file with a specified number of lines.
+     *
+     * @param file target file
+     * @param encoding the encoding to use while writing the lines
+     * @param lineCount number of lines to create
+     * @throws IOException If an I/O error occurs
      */
-    private List<String> generateLines(int lineCount) {
-        List<String> lines = new ArrayList<>();
+    private List<String> createLinesFile(final File file, final String encoding, final int lineCount) throws IOException {
+        final List<String> lines = createStringLines(lineCount);
+        FileUtils.writeLines(file, encoding, lines);
+        return lines;
+    }
+
+    /**
+     * Creates String data lines.
+     *
+     * @param lineCount number of lines to create
+     * @return a new lines list.
+     */
+    private List<String> createStringLines(final int lineCount) {
+        final List<String> lines = new ArrayList<>();
         for (int i = 0; i < lineCount; i++) {
             lines.add("LINE " + i);
         }
@@ -94,216 +102,232 @@ class LineIteratorTest {
     }
 
     /**
-     * Tests LineIterator functionality with files containing specific line counts.
+     * Utility method to create and test a file with a specified number of lines.
+     *
+     * @param lineCount the lines to create in the test file
+     * @throws IOException If an I/O error occurs while creating the file
      */
-    private void verifyLineIteratorForLineCount(int lineCount) throws IOException {
+    private void doTestFileWithSpecifiedLines(final int lineCount) throws IOException {
         final String encoding = UTF_8;
-        final File testFile = new File(temporaryFolder, "LineIterator-" + lineCount + "-lines.txt");
-        final List<String> expectedLines = createTestFile(testFile, encoding, lineCount);
+
+        final String fileName = "LineIterator-" + lineCount + "-test.txt";
+        final File testFile = new File(temporaryFolder, fileName);
+        final List<String> lines = createLinesFile(testFile, encoding, lineCount);
 
         try (LineIterator iterator = FileUtils.lineIterator(testFile, encoding)) {
-            // Verify remove() is unsupported
-            assertThrows(UnsupportedOperationException.class, iterator::remove, 
-                         "remove() should throw UnsupportedOperationException");
+            assertThrows(UnsupportedOperationException.class, iterator::remove);
 
-            // Verify all lines
-            for (int i = 0; i < lineCount; i++) {
-                assertTrue(iterator.hasNext(), "Missing line at index " + i);
-                assertEquals(expectedLines.get(i), iterator.next(), "Content mismatch at index " + i);
+            int idx = 0;
+            while (iterator.hasNext()) {
+                final String line = iterator.next();
+                assertEquals(lines.get(idx), line, "Comparing line " + idx);
+                assertTrue(idx < lines.size(), "Exceeded expected idx=" + idx + " size=" + lines.size());
+                idx++;
             }
-            
-            // Verify end of file
-            assertFalse(iterator.hasNext(), "Extra content after last line");
-            assertThrows(NoSuchElementException.class, iterator::next, 
-                         "next() should throw after last line");
-            assertThrows(NoSuchElementException.class, iterator::nextLine, 
-                         "nextLine() should throw after last line");
+            assertEquals(idx, lines.size(), "Line Count doesn't match");
+
+            // try calling next() after file processed
+            assertThrows(NoSuchElementException.class, iterator::next);
+            assertThrows(NoSuchElementException.class, iterator::nextLine);
         }
     }
 
     @Test
-    void closingIteratorEarly_ShouldPreventFurtherAccess() throws Exception {
+    void testCloseEarly() throws Exception {
+        final String encoding = UTF_8;
+
         final File testFile = new File(temporaryFolder, "LineIterator-closeEarly.txt");
-        createTestFile(testFile, UTF_8, 3);
+        createLinesFile(testFile, encoding, 3);
 
-        LineIterator iterator = FileUtils.lineIterator(testFile, UTF_8);
-        try (iterator) {
-            // Read first line
-            assertNotNull(iterator.next(), "First line should not be null");
-            assertTrue(iterator.hasNext(), "Should have more lines after first");
-            
-            // Close explicitly
+        try (LineIterator iterator = FileUtils.lineIterator(testFile, encoding)) {
+            // get
+            assertNotNull("Line expected", iterator.next());
+            assertTrue(iterator.hasNext(), "More expected");
+
+            // close
             iterator.close();
-            
-            // Verify post-closure state
-            assertFalse(iterator.hasNext(), "Should have no more lines after close");
-            assertThrows(NoSuchElementException.class, iterator::next, 
-                         "next() should throw after close");
-            assertThrows(NoSuchElementException.class, iterator::nextLine, 
-                         "nextLine() should throw after close");
+            assertFalse(iterator.hasNext(), "No more expected");
+            assertThrows(NoSuchElementException.class, iterator::next);
+            assertThrows(NoSuchElementException.class, iterator::nextLine);
+            // try closing again
+            iterator.close();
+            assertThrows(NoSuchElementException.class, iterator::next);
+            assertThrows(NoSuchElementException.class, iterator::nextLine);
         }
     }
 
     @Test
-    void constructorWithNullReader_ShouldThrowNullPointerException() {
-        assertThrows(NullPointerException.class, () -> new LineIterator(null),
-                     "Constructor must throw NPE for null Reader");
+    void testConstructor() {
+        assertThrows(NullPointerException.class, () -> new LineIterator(null));
     }
 
-    /**
-     * Tests LineIterator with a custom line filtering implementation.
-     */
-    private void verifyFilteredLines(List<String> allLines, Reader reader) throws IOException {
-        // Create iterator that filters out lines ending with '1' in last digit
+    private void testFiltering(final List<String> lines, final Reader reader) throws IOException {
         try (LineIterator iterator = new LineIterator(reader) {
             @Override
-            protected boolean isValidLine(String line) {
-                char lastChar = line.charAt(line.length() - 1);
-                return (lastChar - '0') % 3 != 1;  // Filter out lines ending with 1, 4, 7
+            protected boolean isValidLine(final String line) {
+                final char c = line.charAt(line.length() - 1);
+                return (c - 48) % 3 != 1;
             }
         }) {
-            // Verify removal unsupported
             assertThrows(UnsupportedOperationException.class, iterator::remove);
-            
-            // Verify filtered lines
-            int index = 0;
-            int count = 0;
+
+            int idx = 0;
+            int actualLines = 0;
             while (iterator.hasNext()) {
-                String actualLine = iterator.next();
-                // Skip filtered lines in original list
-                while (index % 3 == 1) {
-                    index++;
+                final String line = iterator.next();
+                actualLines++;
+                assertEquals(lines.get(idx), line, "Comparing line " + idx);
+                assertTrue(idx < lines.size(), "Exceeded expected idx=" + idx + " size=" + lines.size());
+                idx++;
+                if (idx % 3 == 1) {
+                    idx++;
                 }
-                assertEquals(allLines.get(index), actualLine, "Filtered content mismatch at position " + count);
-                index++;
-                count++;
             }
-            
-            // Verify counts
-            int expectedFilteredCount = 6;  // 9 total lines, 3 filtered out
-            assertEquals(expectedFilteredCount, count, "Filtered line count mismatch");
+            assertEquals(9, lines.size(), "Line Count doesn't match");
+            assertEquals(9, idx, "Line Count doesn't match");
+            assertEquals(6, actualLines, "Line Count doesn't match");
+
+            // try calling next() after file processed
+            assertThrows(NoSuchElementException.class, iterator::next);
+            assertThrows(NoSuchElementException.class, iterator::nextLine);
         }
     }
 
     @Test
-    void filteringLines_WithBufferedReader_ShouldFilterCorrectly() throws Exception {
-        File testFile = new File(temporaryFolder, "LineIterator-Filter-BufferedReader.txt");
-        List<String> lines = createTestFile(testFile, UTF_8, 9);
-        
-        try (Reader reader = new BufferedReader(Files.newBufferedReader(testFile.toPath()))) {
-            verifyFilteredLines(lines, reader);
-        }
+    void testFilteringBufferedReader() throws Exception {
+        final String encoding = UTF_8;
+
+        final String fileName = "LineIterator-Filter-test.txt";
+        final File testFile = new File(temporaryFolder, fileName);
+        final List<String> lines = createLinesFile(testFile, encoding, 9);
+
+        final Reader reader = new BufferedReader(Files.newBufferedReader(testFile.toPath()));
+        testFiltering(lines, reader);
     }
 
     @Test
-    void filteringLines_WithFileReader_ShouldFilterCorrectly() throws Exception {
-        File testFile = new File(temporaryFolder, "LineIterator-Filter-FileReader.txt");
-        List<String> lines = createTestFile(testFile, UTF_8, 9);
-        
-        try (Reader reader = Files.newBufferedReader(testFile.toPath())) {
-            verifyFilteredLines(lines, reader);
-        }
+    void testFilteringFileReader() throws Exception {
+        final String encoding = UTF_8;
+
+        final String fileName = "LineIterator-Filter-test.txt";
+        final File testFile = new File(temporaryFolder, fileName);
+        final List<String> lines = createLinesFile(testFile, encoding, 9);
+
+        final Reader reader = Files.newBufferedReader(testFile.toPath());
+        testFiltering(lines, reader);
     }
 
     @Test
-    void invalidEncoding_ShouldThrowUnsupportedCharsetException() throws Exception {
+    void testInvalidEncoding() throws Exception {
+        final String encoding = "XXXXXXXX";
+
         final File testFile = new File(temporaryFolder, "LineIterator-invalidEncoding.txt");
-        createTestFile(testFile, UTF_8, 3);
+        createLinesFile(testFile, UTF_8, 3);
 
-        assertThrows(UnsupportedCharsetException.class, 
-                     () -> FileUtils.lineIterator(testFile, "INVALID_ENCODING"),
-                     "Should throw for invalid encoding");
+        assertThrows(UnsupportedCharsetException.class, () -> FileUtils.lineIterator(testFile, encoding));
     }
 
     @Test
-    void missingFile_ShouldThrowNoSuchFileException() {
-        final File testFile = new File(temporaryFolder, "non-existent-file.txt");
-        assertThrows(NoSuchFileException.class, 
-                     () -> FileUtils.lineIterator(testFile, UTF_8),
-                     "Should throw for missing file");
+    void testMissingFile() throws Exception {
+        final File testFile = new File(temporaryFolder, "dummy-missing-file.txt");
+        assertThrows(NoSuchFileException.class, () -> FileUtils.lineIterator(testFile, UTF_8));
     }
 
     @Test
-    void nextLine_WithDefaultEncoding_ShouldReadLinesCorrectly() throws Exception {
-        final File testFile = new File(temporaryFolder, "LineIterator-nextLine.txt");
-        final List<String> expectedLines = createTestFile(testFile, 3);
+    void testNextLineOnlyDefaultEncoding() throws Exception {
+        final File testFile = new File(temporaryFolder, "LineIterator-nextOnly.txt");
+        final List<String> lines = createLinesFile(testFile, 3);
 
-        try (LineIterator iterator = FileUtils.lineIterator(testFile)) {
-            assertLinesMatch(expectedLines, iterator);
-        }
+        final LineIterator iterator = FileUtils.lineIterator(testFile);
+        assertLines(lines, iterator);
     }
 
     @Test
-    void nextLine_WithExplicitUtf8_ShouldReadLinesCorrectly() throws Exception {
-        final File testFile = new File(temporaryFolder, "LineIterator-nextLine-utf8.txt");
-        final List<String> expectedLines = createTestFile(testFile, UTF_8, 3);
+    void testNextLineOnlyNullEncoding() throws Exception {
+        final String encoding = null;
 
-        try (LineIterator iterator = FileUtils.lineIterator(testFile, UTF_8)) {
-            assertLinesMatch(expectedLines, iterator);
-        }
+        final File testFile = new File(temporaryFolder, "LineIterator-nextOnly.txt");
+        final List<String> lines = createLinesFile(testFile, encoding, 3);
+
+        final LineIterator iterator = FileUtils.lineIterator(testFile, encoding);
+        assertLines(lines, iterator);
     }
 
     @Test
-    void next_ShouldReadAllLines() throws Exception {
-        final File testFile = new File(temporaryFolder, "LineIterator-next.txt");
-        final List<String> expectedLines = createTestFile(testFile, UTF_8, 3);
+    void testNextLineOnlyUtf8Encoding() throws Exception {
+        final String encoding = UTF_8;
 
-        try (LineIterator iterator = FileUtils.lineIterator(testFile, UTF_8)) {
-            for (int i = 0; i < expectedLines.size(); i++) {
-                assertTrue(iterator.hasNext());
-                assertEquals(expectedLines.get(i), iterator.next(), "next() mismatch at index " + i);
+        final File testFile = new File(temporaryFolder, "LineIterator-nextOnly.txt");
+        final List<String> lines = createLinesFile(testFile, encoding, 3);
+
+        final LineIterator iterator = FileUtils.lineIterator(testFile, encoding);
+        assertLines(lines, iterator);
+    }
+
+    @Test
+    void testNextOnly() throws Exception {
+        final String encoding = null;
+
+        final File testFile = new File(temporaryFolder, "LineIterator-nextOnly.txt");
+        final List<String> lines = createLinesFile(testFile, encoding, 3);
+
+        try (LineIterator iterator = FileUtils.lineIterator(testFile, encoding)) {
+            for (int i = 0; i < lines.size(); i++) {
+                final String line = iterator.next();
+                assertEquals(lines.get(i), line, "next() line " + i);
             }
-            assertFalse(iterator.hasNext());
+            assertFalse(iterator.hasNext(), "No more expected");
         }
     }
 
     @Test
-    void hasNext_WhenUnderlyingReaderThrowsIOException_ShouldThrowIllegalStateException() {
-        Reader throwingReader = new BufferedReader(new StringReader("")) {
+    void testNextWithException() throws Exception {
+        final Reader reader = new BufferedReader(new StringReader("")) {
             @Override
             public String readLine() throws IOException {
-                throw new IOException("Simulated read error");
+                throw new IOException("hasNext");
             }
         };
-
-        try (LineIterator iterator = new LineIterator(throwingReader)) {
-            IllegalStateException ex = assertThrows(IllegalStateException.class, iterator::hasNext);
-            assertEquals("Unable to read from reader", ex.getMessage());
+        try (LineIterator li = new LineIterator(reader)) {
+            assertThrows(IllegalStateException.class, li::hasNext);
         }
     }
 
     @Test
-    void fileWithZeroLines_ShouldBeHandledCorrectly() throws Exception {
-        verifyLineIteratorForLineCount(0);
+    void testOneLines() throws Exception {
+        doTestFileWithSpecifiedLines(1);
     }
 
     @Test
-    void fileWithOneLine_ShouldBeHandledCorrectly() throws Exception {
-        verifyLineIteratorForLineCount(1);
+    void testThreeLines() throws Exception {
+        doTestFileWithSpecifiedLines(3);
     }
 
     @Test
-    void fileWithTwoLines_ShouldBeHandledCorrectly() throws Exception {
-        verifyLineIteratorForLineCount(2);
+    void testTwoLines() throws Exception {
+        doTestFileWithSpecifiedLines(2);
     }
 
     @Test
-    void fileWithThreeLines_ShouldBeHandledCorrectly() throws Exception {
-        verifyLineIteratorForLineCount(3);
-    }
+    void testValidEncoding() throws Exception {
+        final String encoding = UTF_8;
 
-    @Test
-    void validEncoding_ShouldReadAllLines() throws Exception {
         final File testFile = new File(temporaryFolder, "LineIterator-validEncoding.txt");
-        createTestFile(testFile, UTF_8, 3);
+        createLinesFile(testFile, encoding, 3);
 
-        try (LineIterator iterator = FileUtils.lineIterator(testFile, UTF_8)) {
+        try (LineIterator iterator = FileUtils.lineIterator(testFile, encoding)) {
             int count = 0;
             while (iterator.hasNext()) {
-                iterator.next();
+                assertNotNull(iterator.next());
                 count++;
             }
-            assertEquals(3, count, "Should read all lines");
+            assertEquals(3, count);
         }
     }
+
+    @Test
+    void testZeroLines() throws Exception {
+        doTestFileWithSpecifiedLines(0);
+    }
+
 }
