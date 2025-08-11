@@ -23,167 +23,183 @@ import org.junit.runner.RunWith;
 public class IndexExtractor_ESTest extends IndexExtractor_ESTest_scaffolding {
 
   @Test(timeout = 4000)
-  public void testEmptyBloomFilterAsIndexArrayReturnsEmpty()  throws Throwable  {
-      // Test that an empty bloom filter returns an empty index array
-      Shape shape = Shape.fromKM(1856, 1856);
-      SimpleBloomFilter emptyFilter = new SimpleBloomFilter(shape);
-      int[] indices = emptyFilter.asIndexArray();
-      assertEquals(0, indices.length);
+  public void test00()  throws Throwable  {
+      Shape shape0 = Shape.fromKM(1856, 1856);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      int[] intArray0 = simpleBloomFilter0.asIndexArray();
+      assertEquals(0, intArray0.length);
   }
 
   @Test(timeout = 4000)
-  public void testUniqueIndicesWithInvalidShapeThrowsException()  throws Throwable  {
-      // Test that uniqueIndices() throws when shape causes invalid indices
-      EnhancedDoubleHasher hasher = new EnhancedDoubleHasher((-2285L), (-2285L));
-      Shape invalidShape = Shape.fromNM(6, 2147352576);
-      IndexExtractor extractor = hasher.indices(invalidShape);
-      
-      // Expecting exception due to invalid indices from hasher with given shape
+  public void test01()  throws Throwable  {
+      EnhancedDoubleHasher enhancedDoubleHasher0 = new EnhancedDoubleHasher((-2285L), (-2285L));
+      Shape shape0 = Shape.fromNM(6, 2147352576);
+      IndexExtractor indexExtractor0 = enhancedDoubleHasher0.indices(shape0);
+      // Undeclared exception!
+      indexExtractor0.uniqueIndices();
+  }
+
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      IndexExtractor indexExtractor0 = IndexExtractor.fromIndexArray((int[]) null);
+      // Undeclared exception!
       try { 
-          extractor.uniqueIndices();
-          fail("Expected exception due to invalid indices");
-      } catch (Exception e) {
-          // Expected exception
+        indexExtractor0.uniqueIndices();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.collections4.bloomfilter.IndexExtractor$2", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void testUniqueIndicesFromNullArrayThrowsNPE()  throws Throwable  {
-      // Test that uniqueIndices() throws NPE when created from null array
-      IndexExtractor nullArrayExtractor = IndexExtractor.fromIndexArray((int[]) null);
-      
+  public void test03()  throws Throwable  {
+      int[] intArray0 = new int[1];
+      intArray0[0] = (-1);
+      IndexExtractor indexExtractor0 = IndexExtractor.fromIndexArray(intArray0);
+      // Undeclared exception!
       try { 
-          nullArrayExtractor.uniqueIndices();
-          fail("Expected NullPointerException");
-      } catch (NullPointerException e) {
-          // Expected exception
+        indexExtractor0.uniqueIndices();
+        fail("Expecting exception: IndexOutOfBoundsException");
+      
+      } catch(IndexOutOfBoundsException e) {
+         //
+         // bitIndex < 0: -1
+         //
+         verifyException("java.util.BitSet", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void testUniqueIndicesWithNegativeIndexThrowsIOOBE()  throws Throwable  {
-      // Test that uniqueIndices() throws when index is negative
-      int[] negativeIndexArray = new int[]{-1};
-      IndexExtractor extractor = IndexExtractor.fromIndexArray(negativeIndexArray);
-      
+  public void test04()  throws Throwable  {
+      // Undeclared exception!
       try { 
-          extractor.uniqueIndices();
-          fail("Expected IndexOutOfBoundsException for negative index");
-      } catch (IndexOutOfBoundsException e) {
-          // Verify exception message
-          assertTrue(e.getMessage().contains("bitIndex < 0"));
+        IndexExtractor.fromBitMapExtractor((BitMapExtractor) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // bitMapExtractor
+         //
+         verifyException("java.util.Objects", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void testFromBitMapExtractorWithNullThrowsNPE()  throws Throwable  {
-      // Test that fromBitMapExtractor() validates null input
+  public void test05()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(2147352576, 2147352576);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      // Undeclared exception!
+      simpleBloomFilter0.asIndexArray();
+  }
+
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      IndexExtractor indexExtractor0 = IndexExtractor.fromIndexArray((int[]) null);
+      // Undeclared exception!
       try { 
-          IndexExtractor.fromBitMapExtractor((BitMapExtractor) null);
-          fail("Expected NullPointerException for null input");
-      } catch (NullPointerException e) {
-          // Verify exception message
-          assertTrue(e.getMessage().contains("bitMapExtractor"));
+        indexExtractor0.asIndexArray();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.collections4.bloomfilter.IndexExtractor$2", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void testAsIndexArrayFromNullArrayThrowsNPE()  throws Throwable  {
-      // Test that asIndexArray() throws NPE when created from null array
-      IndexExtractor nullArrayExtractor = IndexExtractor.fromIndexArray((int[]) null);
-      
+  public void test07()  throws Throwable  {
+      int[] intArray0 = new int[3];
+      intArray0[0] = Integer.MAX_VALUE;
+      IndexExtractor indexExtractor0 = IndexExtractor.fromIndexArray(intArray0);
+      IndexExtractor indexExtractor1 = indexExtractor0.uniqueIndices();
+      // Undeclared exception!
       try { 
-          nullArrayExtractor.asIndexArray();
-          fail("Expected NullPointerException");
-      } catch (NullPointerException e) {
-          // Expected exception
+        indexExtractor1.asIndexArray();
+        fail("Expecting exception: IndexOutOfBoundsException");
+      
+      } catch(IndexOutOfBoundsException e) {
+         //
+         // fromIndex < 0: -2147483648
+         //
+         verifyException("java.util.BitSet", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void testUniqueIndicesWithMaxIntIndexThrowsDuringConversion()  throws Throwable  {
-      // Test boundary condition with maximum integer index
-      int[] maxIndexArray = {Integer.MAX_VALUE, 0, 0};
-      IndexExtractor extractor = IndexExtractor.fromIndexArray(maxIndexArray);
-      IndexExtractor uniqueExtractor = extractor.uniqueIndices();
-      
-      try { 
-          uniqueExtractor.asIndexArray();
-          fail("Expected IndexOutOfBoundsException due to integer overflow");
-      } catch (IndexOutOfBoundsException e) {
-          // Verify exception message
-          assertTrue(e.getMessage().contains("fromIndex < 0"));
-      }
+  public void test08()  throws Throwable  {
+      int[] intArray0 = new int[4];
+      IndexExtractor indexExtractor0 = IndexExtractor.fromIndexArray(intArray0);
+      IndexExtractor indexExtractor1 = indexExtractor0.uniqueIndices();
+      Shape shape0 = Shape.fromKM(1867, 31);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      boolean boolean0 = simpleBloomFilter0.contains(indexExtractor1);
+      assertFalse(boolean0);
   }
 
   @Test(timeout = 4000)
-  public void testContainsWithUniqueIndicesReturnsFalseForEmptyFilter()  throws Throwable  {
-      // Test that empty filter doesn't contain any indices
-      int[] duplicateIndices = {0, 0, 0, 0};
-      IndexExtractor extractor = IndexExtractor.fromIndexArray(duplicateIndices);
-      IndexExtractor uniqueExtractor = extractor.uniqueIndices();
-      
-      Shape shape = Shape.fromKM(1867, 31);
-      SimpleBloomFilter emptyFilter = new SimpleBloomFilter(shape);
-      
-      assertFalse(emptyFilter.contains(uniqueExtractor));
+  public void test09()  throws Throwable  {
+      long[] longArray0 = new long[3];
+      longArray0[2] = (-1L);
+      BitMapExtractor bitMapExtractor0 = BitMapExtractor.fromBitMapArray(longArray0);
+      IndexExtractor indexExtractor0 = IndexExtractor.fromBitMapExtractor(bitMapExtractor0);
+      int[] intArray0 = indexExtractor0.asIndexArray();
+      assertEquals(64, intArray0.length);
   }
 
   @Test(timeout = 4000)
-  public void testAsIndexArrayFromBitMapExtractorReturnsCorrectSize()  throws Throwable  {
-      // Test bit map extraction with specific bit pattern
-      long[] bitMap = new long[3];
-      bitMap[2] = -1L; // All bits set in last long
-      BitMapExtractor bitmapExtractor = BitMapExtractor.fromBitMapArray(bitMap);
-      IndexExtractor extractor = IndexExtractor.fromBitMapExtractor(bitmapExtractor);
-      
-      // Should return 64 indices (bits set in one long)
-      int[] indices = extractor.asIndexArray();
-      assertEquals(64, indices.length);
+  public void test10()  throws Throwable  {
+      int[] intArray0 = new int[1];
+      IndexExtractor indexExtractor0 = IndexExtractor.fromIndexArray(intArray0);
+      Shape shape0 = Shape.fromNM(1624, 1624);
+      ArrayCountingBloomFilter arrayCountingBloomFilter0 = new ArrayCountingBloomFilter(shape0);
+      boolean boolean0 = arrayCountingBloomFilter0.contains(indexExtractor0);
+      assertFalse(boolean0);
   }
 
   @Test(timeout = 4000)
-  public void testContainsWithSingleZeroIndexReturnsFalse()  throws Throwable  {
-      // Test that empty filter doesn't contain even the zero index
-      int[] zeroIndexArray = {0};
-      IndexExtractor extractor = IndexExtractor.fromIndexArray(zeroIndexArray);
-      
-      Shape shape = Shape.fromNM(1624, 1624);
-      ArrayCountingBloomFilter emptyFilter = new ArrayCountingBloomFilter(shape);
-      
-      assertFalse(emptyFilter.contains(extractor));
+  public void test11()  throws Throwable  {
+      long[] longArray0 = new long[1];
+      longArray0[0] = (-2401L);
+      BitMapExtractor bitMapExtractor0 = BitMapExtractor.fromBitMapArray(longArray0);
+      IndexExtractor indexExtractor0 = IndexExtractor.fromBitMapExtractor(bitMapExtractor0);
+      int[] intArray0 = indexExtractor0.asIndexArray();
+      assertEquals(60, intArray0.length);
   }
 
   @Test(timeout = 4000)
-  public void testAsIndexArrayFromBitMapExtractorWithSpecificValue()  throws Throwable  {
-      // Test bit map extraction with specific numeric value
-      long[] bitMap = {-2401L}; // Has 60 bits set
-      BitMapExtractor bitmapExtractor = BitMapExtractor.fromBitMapArray(bitMap);
-      IndexExtractor extractor = IndexExtractor.fromBitMapExtractor(bitmapExtractor);
-      
-      int[] indices = extractor.asIndexArray();
-      assertEquals(60, indices.length);
+  public void test12()  throws Throwable  {
+      long[] longArray0 = new long[18];
+      longArray0[2] = (-1L);
+      BitMapExtractor bitMapExtractor0 = BitMapExtractor.fromBitMapArray(longArray0);
+      IndexExtractor indexExtractor0 = IndexExtractor.fromBitMapExtractor(bitMapExtractor0);
+      Shape shape0 = Shape.fromNM(2147479552, 2147479552);
+      SparseBloomFilter sparseBloomFilter0 = new SparseBloomFilter(shape0);
+      boolean boolean0 = sparseBloomFilter0.contains(indexExtractor0);
+      assertFalse(boolean0);
   }
 
   @Test(timeout = 4000)
-  public void testUniqueIndicesRemovesDuplicates()  throws Throwable  {
-      // Test that uniqueIndices() removes duplicate indices
-      int[] duplicateIndices = {0, 0, 0, 0};
-      IndexExtractor extractor = IndexExtractor.fromIndexArray(duplicateIndices);
-      IndexExtractor uniqueExtractor = extractor.uniqueIndices();
-      
-      int[] uniqueIndices = uniqueExtractor.asIndexArray();
-      assertArrayEquals(new int[] {0}, uniqueIndices);
+  public void test13()  throws Throwable  {
+      int[] intArray0 = new int[4];
+      IndexExtractor indexExtractor0 = IndexExtractor.fromIndexArray(intArray0);
+      IndexExtractor indexExtractor1 = indexExtractor0.uniqueIndices();
+      int[] intArray1 = indexExtractor1.asIndexArray();
+      assertEquals(1, intArray1.length);
+      assertArrayEquals(new int[] {0}, intArray1);
   }
 
   @Test(timeout = 4000)
-  public void testUniqueIndicesOnUniqueExtractorReturnsSameInstance()  throws Throwable  {
-      // Test that uniqueIndices() is idempotent for unique extractors
-      int[] uniqueIndices = {1, 2, 3};
-      IndexExtractor extractor = IndexExtractor.fromIndexArray(uniqueIndices);
-      IndexExtractor uniqueExtractor = extractor.uniqueIndices();
-      IndexExtractor doubleUniqueExtractor = uniqueExtractor.uniqueIndices();
-      
-      assertSame(uniqueExtractor, doubleUniqueExtractor);
+  public void test14()  throws Throwable  {
+      int[] intArray0 = new int[4];
+      IndexExtractor indexExtractor0 = IndexExtractor.fromIndexArray(intArray0);
+      IndexExtractor indexExtractor1 = indexExtractor0.uniqueIndices();
+      IndexExtractor indexExtractor2 = indexExtractor1.uniqueIndices();
+      assertSame(indexExtractor1, indexExtractor2);
   }
 }
