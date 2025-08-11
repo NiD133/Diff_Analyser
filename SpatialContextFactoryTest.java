@@ -8,9 +8,6 @@
 
 package org.locationtech.spatial4j.context;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.locationtech.spatial4j.context.jts.DatelineRule;
 import org.locationtech.spatial4j.context.jts.JtsSpatialContext;
 import org.locationtech.spatial4j.context.jts.JtsSpatialContextFactory;
@@ -20,182 +17,114 @@ import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
 import org.locationtech.spatial4j.io.ShapeIO;
 import org.locationtech.spatial4j.io.WKTReader;
 import org.locationtech.spatial4j.shape.impl.RectangleImpl;
+import org.junit.After;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 
 public class SpatialContextFactoryTest {
-
-  // System property key used by SpatialContextFactory for factory lookup
-  public static final String FACTORY_PROP = "SpatialContextFactory";
-
-  @Before
-  public void setUp() {
-    // Ensure side-effect flags from previous tests are cleared
-    CustomWktShapeParser.once = false;
-  }
+  public static final String PROP = "SpatialContextFactory";
 
   @After
   public void tearDown() {
-    // Ensure system property does not leak between tests
-    System.getProperties().remove(FACTORY_PROP);
+    System.getProperties().remove(PROP);
   }
-
-  // -------- Helper methods --------
-
-  /**
-   * Creates a SpatialContext using provided key-value pairs.
-   * Expects an even number of args: key1, value1, key2, value2, ...
-   */
-  private SpatialContext createContext(String... kvPairs) {
-    Map<String, String> args = toArgsMap(kvPairs);
+  
+  private SpatialContext call(String... argsStr) {
+    Map<String,String> args = new HashMap<>();
+    for (int i = 0; i < argsStr.length; i+=2) {
+      String key = argsStr[i];
+      String val = argsStr[i+1];
+      args.put(key,val);
+    }
     return SpatialContextFactory.makeSpatialContext(args, getClass().getClassLoader());
   }
-
-  /**
-   * Convenience for creating a SpatialContext with a specific factory class.
-   */
-  private SpatialContext createContextWithFactory(Class<? extends SpatialContextFactory> factoryClass,
-                                                  String... kvPairs) {
-    Map<String, String> args = toArgsMap(kvPairs);
-    args.put("spatialContextFactory", factoryClass.getName());
-    return SpatialContextFactory.makeSpatialContext(args, getClass().getClassLoader());
-  }
-
-  private Map<String, String> toArgsMap(String... kvPairs) {
-    if (kvPairs.length % 2 != 0) {
-      throw new IllegalArgumentException("Arguments must be in key/value pairs");
-    }
-    Map<String, String> args = new HashMap<>();
-    for (int i = 0; i < kvPairs.length; i += 2) {
-      args.put(kvPairs[i], kvPairs[i + 1]);
-    }
-    return args;
-  }
-
-  // -------- Tests: defaults --------
-
+  
   @Test
-  public void testDefaultsMatchSpatialContextGeo() {
-    // Given the library-provided default GEO context
-    SpatialContext expected = SpatialContext.GEO;
-
-    // When creating a context with no configuration
-    SpatialContext actual = createContext();
-
-    // Then the defaults should match
-    assertEquals(expected.getClass(), actual.getClass());
-    assertEquals(expected.isGeo(), actual.isGeo());
-    assertEquals(expected.getDistCalc(), actual.getDistCalc());
-    assertEquals(expected.getWorldBounds(), actual.getWorldBounds());
+  public void testDefault() {
+    SpatialContext ctx = SpatialContext.GEO;
+    SpatialContext ctx2 = call();//default
+    assertEquals(ctx.getClass(), ctx2.getClass());
+    assertEquals(ctx.isGeo(), ctx2.isGeo());
+    assertEquals(ctx.getDistCalc(),ctx2.getDistCalc());
+    assertEquals(ctx.getWorldBounds(), ctx2.getWorldBounds());
   }
-
-  // -------- Tests: custom simple configurations --------
-
+  
   @Test
-  public void testNonGeoDefaults() {
-    // When geo=false is specified
-    SpatialContext ctx = createContext("geo", "false");
-
-    // Then a cartesian calculator is used and geo flag is false
-    assertFalse(ctx.isGeo());
+  public void testCustom() {
+    SpatialContext ctx = call("geo","false");
+    assertTrue(!ctx.isGeo());
     assertEquals(new CartesianDistCalc(), ctx.getDistCalc());
-  }
 
-  @Test
-  public void testNonGeoWithSquaredCartesianAndWorldBounds() {
-    // ENVELOPE order is: ENVELOPE(xMin, xMax, yMax, yMin)
-    SpatialContext ctx = createContext(
-        "geo", "false",
-        "distCalculator", "cartesian^2",
-        "worldBounds", "ENVELOPE(-100, 75, 200, 0)"
-    );
-
-    assertEquals(new CartesianDistCalc(true), ctx.getDistCalc());
+    ctx = call("geo","false",
+        "distCalculator","cartesian^2",
+        "worldBounds","ENVELOPE(-100, 75, 200, 0)");//xMin, xMax, yMax, yMin
+    assertEquals(new CartesianDistCalc(true),ctx.getDistCalc());
     assertEquals(new RectangleImpl(-100, 75, 0, 200, ctx), ctx.getWorldBounds());
-  }
 
-  @Test
-  public void testGeoWithLawOfCosines() {
-    SpatialContext ctx = createContext(
-        "geo", "true",
-        "distCalculator", "lawOfCosines"
-    );
-
+    ctx = call("geo","true",
+        "distCalculator","lawOfCosines");
     assertTrue(ctx.isGeo());
-    assertEquals(new GeodesicSphereDistCalc.LawOfCosines(), ctx.getDistCalc());
+    assertEquals(new GeodesicSphereDistCalc.LawOfCosines(),
+        ctx.getDistCalc());
   }
 
-  // -------- Tests: JTS factory configurations --------
-
   @Test
-  public void testJtsContextFactory_withAdvancedOptions() {
-    JtsSpatialContext ctx = (JtsSpatialContext) createContextWithFactory(
-        JtsSpatialContextFactory.class,
+  public void testJtsContextFactory() {
+    JtsSpatialContext ctx = (JtsSpatialContext) call(
+        "spatialContextFactory", JtsSpatialContextFactory.class.getName(),
         "geo", "true",
         "normWrapLongitude", "true",
         "precisionScale", "2.0",
-        "wktShapeParserClass", CustomWktShapeParser.class.getName(), // legacy option still supported
+        "wktShapeParserClass", CustomWktShapeParser.class.getName(),
         "datelineRule", "ccwRect",
         "validationRule", "repairConvexHull",
-        "autoIndex", "true"
-    );
-
-    assertTrue("Expected longitude to be wrap-normalized", ctx.isNormWrapLongitude());
+        "autoIndex", "true");
+    assertTrue(ctx.isNormWrapLongitude());
     assertEquals(2.0, ctx.getGeometryFactory().getPrecisionModel().getScale(), 0.0);
-    assertTrue("Custom WKT parser should have been instantiated", CustomWktShapeParser.once);
-    assertEquals(DatelineRule.ccwRect, ctx.getDatelineRule());
-    assertEquals(ValidationRule.repairConvexHull, ctx.getValidationRule());
-  }
+    assertTrue(CustomWktShapeParser.once);//cheap way to test it was created
+    assertEquals(DatelineRule.ccwRect,
+        ctx.getDatelineRule());
+    assertEquals(ValidationRule.repairConvexHull,
+        ctx.getValidationRule());
 
-  @Test
-  public void testJtsContextFactory_nonGeoWithCustomWorldBounds() {
-    // Ensure geo=false with worldBounds works (regression for #72)
-    JtsSpatialContext ctx = (JtsSpatialContext) createContextWithFactory(
-        JtsSpatialContextFactory.class,
-        "geo", "false",
+    //ensure geo=false with worldbounds works -- fixes #72
+    ctx = (JtsSpatialContext) call(
+        "spatialContextFactory", JtsSpatialContextFactory.class.getName(),
+        "geo", "false",//set to false
         "worldBounds", "ENVELOPE(-500,500,300,-300)",
         "normWrapLongitude", "true",
         "precisionScale", "2.0",
         "wktShapeParserClass", CustomWktShapeParser.class.getName(),
         "datelineRule", "ccwRect",
         "validationRule", "repairConvexHull",
-        "autoIndex", "true"
-    );
-
-    assertEquals(300.0, ctx.getWorldBounds().getMaxY(), 0.0);
+        "autoIndex", "true");
+    assertEquals(300, ctx.getWorldBounds().getMaxY(), 0.0);
   }
-
-  // -------- Tests: formats configuration --------
+  
 
   @Test
-  public void testFormatsConfig_registersCustomReader() {
-    JtsSpatialContext ctx = (JtsSpatialContext) createContextWithFactory(
-        JtsSpatialContextFactory.class,
-        "readers", CustomWktShapeParser.class.getName()
-    );
-
-    assertTrue(ctx.getFormats().getReader(ShapeIO.WKT) instanceof CustomWktShapeParser);
+  public void testFormatsConfig() {
+    JtsSpatialContext ctx = (JtsSpatialContext) call(
+        "spatialContextFactory", JtsSpatialContextFactory.class.getName(),
+        "readers", CustomWktShapeParser.class.getName());
+    
+    assertTrue( ctx.getFormats().getReader(ShapeIO.WKT) instanceof CustomWktShapeParser );
   }
-
-  // -------- Tests: factory lookup via system property --------
-
+  
   @Test
-  public void testFactoryLookup_viaSystemProperty() {
-    System.setProperty(FACTORY_PROP, DSCF.class.getName());
-
-    // DSCF.newSpatialContext sets geo=false
-    assertFalse(createContext().isGeo());
+  public void testSystemPropertyLookup() {
+    System.setProperty(PROP,DSCF.class.getName());
+    assertTrue(!call().isGeo());//DSCF returns this
   }
 
-  // -------- Test support classes --------
-
-  /**
-   * Test factory used to verify system property factory lookup behavior.
-   */
   public static class DSCF extends SpatialContextFactory {
+
     @Override
     public SpatialContext newSpatialContext() {
       geo = false;
@@ -203,12 +132,8 @@ public class SpatialContextFactoryTest {
     }
   }
 
-  /**
-   * Custom WKT parser used to verify that a provided reader class is instantiated.
-   */
   public static class CustomWktShapeParser extends WKTReader {
-    static boolean once = false; // Flag to verify instantiation in tests
-
+    static boolean once = false;//cheap way to test it was created
     public CustomWktShapeParser(JtsSpatialContext ctx, JtsSpatialContextFactory factory) {
       super(ctx, factory);
       once = true;
