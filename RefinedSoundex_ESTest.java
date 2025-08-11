@@ -13,151 +13,179 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class RefinedSoundex_ESTest extends RefinedSoundex_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      RefinedSoundex refinedSoundex0 = new RefinedSoundex("U>");
-      int int0 = refinedSoundex0.difference("org.apache.commons.codec.EncoderException", "org.apache.commons.codec.EncoderException");
-      assertEquals(3, int0);
-  }
+    // Test data constants
+    private static final String SAMPLE_PACKAGE_NAME = "org.apache.commons.codec.EncoderException";
+    private static final String CUSTOM_MAPPING = "U>";
+    private static final String LONG_PACKAGE_NAME = "org.apache.commons.codec.language.RefinedSoundex";
+    private static final String SPECIAL_CHARS_STRING = "<+Eq|qK!wg0f\u0006n_~";
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      char[] charArray0 = new char[0];
-      RefinedSoundex refinedSoundex0 = new RefinedSoundex(charArray0);
-  }
+    @Test(timeout = 4000)
+    public void testDifference_SameStrings_ReturnsExpectedScore() throws Throwable {
+        RefinedSoundex soundex = new RefinedSoundex(CUSTOM_MAPPING);
+        
+        int differenceScore = soundex.difference(SAMPLE_PACKAGE_NAME, SAMPLE_PACKAGE_NAME);
+        
+        assertEquals("Identical strings should have difference score of 3", 3, differenceScore);
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      RefinedSoundex refinedSoundex0 = RefinedSoundex.US_ENGLISH;
-      char char0 = refinedSoundex0.getMappingCode('y');
-      assertEquals('0', char0);
-  }
+    @Test(timeout = 4000)
+    public void testConstructor_EmptyCharArray_CreatesInstance() throws Throwable {
+        char[] emptyMapping = new char[0];
+        
+        RefinedSoundex soundex = new RefinedSoundex(emptyMapping);
+        
+        assertNotNull("Should create instance with empty mapping", soundex);
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      RefinedSoundex refinedSoundex0 = new RefinedSoundex("org.apache.commons.codec.language.RefinedSoundex");
-      char char0 = refinedSoundex0.getMappingCode('X');
-      assertEquals('c', char0);
-  }
+    @Test(timeout = 4000)
+    public void testGetMappingCode_USEnglish_ReturnsCorrectCode() throws Throwable {
+        RefinedSoundex soundex = RefinedSoundex.US_ENGLISH;
+        
+        char mappingCode = soundex.getMappingCode('y');
+        
+        assertEquals("Letter 'y' should map to '0' in US English mapping", '0', mappingCode);
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      RefinedSoundex refinedSoundex0 = new RefinedSoundex();
-      String string0 = refinedSoundex0.encode((String) null);
-      assertNull(string0);
-  }
+    @Test(timeout = 4000)
+    public void testGetMappingCode_CustomMapping_ReturnsCorrectCode() throws Throwable {
+        RefinedSoundex soundex = new RefinedSoundex(LONG_PACKAGE_NAME);
+        
+        char mappingCode = soundex.getMappingCode('X');
+        
+        assertEquals("Letter 'X' should map to 'c' with custom mapping", 'c', mappingCode);
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      RefinedSoundex refinedSoundex0 = new RefinedSoundex();
-      String string0 = refinedSoundex0.encode("");
-      assertEquals("", string0);
-  }
+    @Test(timeout = 4000)
+    public void testEncode_NullString_ReturnsNull() throws Throwable {
+        RefinedSoundex soundex = new RefinedSoundex();
+        
+        String result = soundex.encode((String) null);
+        
+        assertNull("Encoding null string should return null", result);
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      RefinedSoundex refinedSoundex0 = null;
-      try {
-        refinedSoundex0 = new RefinedSoundex((String) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.codec.language.RefinedSoundex", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testEncode_EmptyString_ReturnsEmptyString() throws Throwable {
+        RefinedSoundex soundex = new RefinedSoundex();
+        
+        String result = soundex.encode("");
+        
+        assertEquals("Encoding empty string should return empty string", "", result);
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      RefinedSoundex refinedSoundex0 = new RefinedSoundex("org.apache.commons.codec.language.RefinedSoundex");
-      String string0 = refinedSoundex0.US_ENGLISH.soundex("org.apache.commons.codec.language.RefinedSoundex");
-      assertEquals("O09401030308083060370840409020806308605", string0);
-  }
+    @Test(timeout = 4000)
+    public void testConstructor_NullStringMapping_ThrowsNullPointerException() throws Throwable {
+        try {
+            new RefinedSoundex((String) null);
+            fail("Constructor with null string mapping should throw NullPointerException");
+        } catch(NullPointerException e) {
+            verifyException("org.apache.commons.codec.language.RefinedSoundex", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      RefinedSoundex refinedSoundex0 = new RefinedSoundex("org.apache.commons.codec.language.RefinedSoundex");
-      String string0 = refinedSoundex0.soundex("");
-      assertEquals("", string0);
-  }
+    @Test(timeout = 4000)
+    public void testSoundex_LongPackageName_ReturnsExpectedCode() throws Throwable {
+        RefinedSoundex soundex = new RefinedSoundex(LONG_PACKAGE_NAME);
+        
+        String soundexCode = soundex.US_ENGLISH.soundex(LONG_PACKAGE_NAME);
+        
+        assertEquals("Package name should encode to expected soundex code", 
+                    "O09401030308083060370840409020806308605", soundexCode);
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      RefinedSoundex refinedSoundex0 = new RefinedSoundex();
-      String string0 = refinedSoundex0.soundex((String) null);
-      assertNull(string0);
-  }
+    @Test(timeout = 4000)
+    public void testSoundex_EmptyString_ReturnsEmptyString() throws Throwable {
+        RefinedSoundex soundex = new RefinedSoundex(LONG_PACKAGE_NAME);
+        
+        String result = soundex.soundex("");
+        
+        assertEquals("Soundex of empty string should return empty string", "", result);
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      RefinedSoundex refinedSoundex0 = new RefinedSoundex();
-      int int0 = refinedSoundex0.difference((String) null, (String) null);
-      assertEquals(0, int0);
-  }
+    @Test(timeout = 4000)
+    public void testSoundex_NullString_ReturnsNull() throws Throwable {
+        RefinedSoundex soundex = new RefinedSoundex();
+        
+        String result = soundex.soundex((String) null);
+        
+        assertNull("Soundex of null string should return null", result);
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      RefinedSoundex refinedSoundex0 = new RefinedSoundex("org.apache.commons.codec.language.RefinedSoundex");
-      char char0 = refinedSoundex0.getMappingCode('+');
-      assertEquals('\u0000', char0);
-  }
+    @Test(timeout = 4000)
+    public void testDifference_BothNullStrings_ReturnsZero() throws Throwable {
+        RefinedSoundex soundex = new RefinedSoundex();
+        
+        int differenceScore = soundex.difference((String) null, (String) null);
+        
+        assertEquals("Difference between two null strings should be 0", 0, differenceScore);
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      RefinedSoundex refinedSoundex0 = new RefinedSoundex("org.apache.commons.codec.language.RefinedSoundex");
-      Object object0 = refinedSoundex0.US_ENGLISH.encode((Object) "O0");
-      assertEquals("O0", object0);
-      assertNotNull(object0);
-  }
+    @Test(timeout = 4000)
+    public void testGetMappingCode_NonAlphabeticChar_ReturnsNullChar() throws Throwable {
+        RefinedSoundex soundex = new RefinedSoundex(LONG_PACKAGE_NAME);
+        
+        char mappingCode = soundex.getMappingCode('+');
+        
+        assertEquals("Non-alphabetic character should map to null character", '\u0000', mappingCode);
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      RefinedSoundex refinedSoundex0 = new RefinedSoundex("org.apache.commons.codec.language.RefinedSoundex");
-      String string0 = refinedSoundex0.encode("org.apache.commons.codec.language.RefinedSoundex");
-      assertEquals("Omsaogcagmom.gm.agcomaoasaphma.mom.ac", string0);
-      assertNotNull(string0);
-  }
+    @Test(timeout = 4000)
+    public void testEncodeObject_ValidString_ReturnsEncodedString() throws Throwable {
+        RefinedSoundex soundex = new RefinedSoundex(LONG_PACKAGE_NAME);
+        
+        Object result = soundex.US_ENGLISH.encode((Object) "O0");
+        
+        assertEquals("Object encoding should return the encoded string", "O0", result);
+        assertNotNull("Result should not be null", result);
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      RefinedSoundex refinedSoundex0 = null;
-      try {
-        refinedSoundex0 = new RefinedSoundex((char[]) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.codec.language.RefinedSoundex", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testEncode_CustomMappingString_ReturnsExpectedCode() throws Throwable {
+        RefinedSoundex soundex = new RefinedSoundex(LONG_PACKAGE_NAME);
+        
+        String result = soundex.encode(LONG_PACKAGE_NAME);
+        
+        assertEquals("Custom mapping should produce expected encoding", 
+                    "Omsaogcagmom.gm.agcomaoasaphma.mom.ac", result);
+        assertNotNull("Result should not be null", result);
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      RefinedSoundex refinedSoundex0 = new RefinedSoundex();
-      try { 
-        refinedSoundex0.encode((Object) null);
-        fail("Expecting exception: Exception");
-      
-      } catch(Exception e) {
-         //
-         // Parameter supplied to RefinedSoundex encode is not of type java.lang.String
-         //
-         verifyException("org.apache.commons.codec.language.RefinedSoundex", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testConstructor_NullCharArrayMapping_ThrowsNullPointerException() throws Throwable {
+        try {
+            new RefinedSoundex((char[]) null);
+            fail("Constructor with null char array mapping should throw NullPointerException");
+        } catch(NullPointerException e) {
+            verifyException("org.apache.commons.codec.language.RefinedSoundex", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      RefinedSoundex refinedSoundex0 = new RefinedSoundex("U>");
-      String string0 = refinedSoundex0.soundex("<+Eq|qK!wg0f\u0006n_~");
-      assertEquals("E", string0);
-      assertNotNull(string0);
-  }
+    @Test(timeout = 4000)
+    public void testEncodeObject_NullObject_ThrowsException() throws Throwable {
+        RefinedSoundex soundex = new RefinedSoundex();
+        
+        try { 
+            soundex.encode((Object) null);
+            fail("Encoding null object should throw Exception");
+        } catch(Exception e) {
+            assertEquals("Should throw exception with specific message",
+                        "Parameter supplied to RefinedSoundex encode is not of type java.lang.String", 
+                        e.getMessage());
+            verifyException("org.apache.commons.codec.language.RefinedSoundex", e);
+        }
+    }
+
+    @Test(timeout = 4000)
+    public void testSoundex_SpecialCharacters_ReturnsFilteredCode() throws Throwable {
+        RefinedSoundex soundex = new RefinedSoundex(CUSTOM_MAPPING);
+        
+        String result = soundex.soundex(SPECIAL_CHARS_STRING);
+        
+        assertEquals("Special characters should be filtered, leaving only 'E'", "E", result);
+        assertNotNull("Result should not be null", result);
+    }
 }
