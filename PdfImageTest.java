@@ -55,112 +55,46 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-/**
- * Test suite for PdfImage functionality, specifically testing PNG images with various color profiles.
- * These tests verify that PNG images with different color profile configurations are correctly
- * embedded in PDF documents and produce the expected output.
- */
 public class PdfImageTest {
-    
-    // Test output directory where generated PDFs will be saved
-    private static final String OUTPUT_DIRECTORY = "./target/com/itextpdf/test/pdf/PdfImageTest/";
-    
-    // Test resources directory containing reference PDFs and test images
-    private static final String RESOURCES_DIRECTORY = "./src/test/resources/com/itextpdf/text/pdf/PdfImageTest/";
-    
-    // Test image file names
-    private static final String PNG_WITH_ICC_PROFILE = "test_icc.png";
-    private static final String PNG_WITH_ICC_PALETTE_PROFILE = "test_icc_pallet.png";
-    private static final String PNG_WITH_INCORRECT_ICC_PROFILE = "test_incorrect_icc.png";
-    
-    // Expected output PDF file names
-    private static final String PNG_ICC_PROFILE_OUTPUT = "pngColorProfileImage.pdf";
-    private static final String PNG_ICC_PALETTE_OUTPUT = "pngColorProfilePalletImage.pdf";
-    private static final String PNG_INCORRECT_ICC_OUTPUT = "pngIncorrectProfileImage.pdf";
+    private static final String target = "./target/com/itextpdf/test/pdf/PdfImageTest/";
+    private static final String source = "./src/test/resources/com/itextpdf/text/pdf/PdfImageTest/";
 
     @BeforeClass
-    public static void createOutputDirectory() {
-        new File(OUTPUT_DIRECTORY).mkdirs();
+    public static void setUp() {
+        new File(target).mkdirs();
     }
 
-    /**
-     * Tests that a PNG image with an ICC color profile is correctly embedded in a PDF.
-     * This verifies that color profile information is preserved during PDF generation.
-     */
     @Test
-    public void shouldEmbedPngWithIccColorProfile() throws DocumentException, InterruptedException, IOException {
-        createPdfWithImageAndCompareToExpected(PNG_ICC_PROFILE_OUTPUT, PNG_WITH_ICC_PROFILE);
+    public void pngColorProfileTest() throws DocumentException, InterruptedException, IOException {
+        simpleImageTest("pngColorProfileImage.pdf", "test_icc.png");
     }
 
-    /**
-     * Tests that a PNG image with an ICC palette color profile is correctly embedded in a PDF.
-     * This verifies that palette-based color profiles are handled properly.
-     */
     @Test
-    public void shouldEmbedPngWithIccPaletteColorProfile() throws DocumentException, InterruptedException, IOException {
-        createPdfWithImageAndCompareToExpected(PNG_ICC_PALETTE_OUTPUT, PNG_WITH_ICC_PALETTE_PROFILE);
+    public void pngColorProfilePalletTest() throws DocumentException, InterruptedException, IOException {
+        simpleImageTest("pngColorProfilePalletImage.pdf", "test_icc_pallet.png");
     }
 
-    /**
-     * Tests that a PNG image with an incorrect/malformed ICC color profile is handled gracefully.
-     * This verifies that the PDF generation doesn't fail when encountering invalid color profiles.
-     */
     @Test
-    public void shouldHandlePngWithIncorrectIccColorProfile() throws DocumentException, InterruptedException, IOException {
-        createPdfWithImageAndCompareToExpected(PNG_INCORRECT_ICC_OUTPUT, PNG_WITH_INCORRECT_ICC_PROFILE);
+    public void pngIncorrectColorProfileTest() throws DocumentException, InterruptedException, IOException {
+        simpleImageTest("pngIncorrectProfileImage.pdf", "test_incorrect_icc.png");
     }
 
-    /**
-     * Creates a PDF document containing the specified image and compares it to the expected output.
-     * 
-     * @param outputFileName The name of the PDF file to generate
-     * @param imageFileName The name of the image file to embed in the PDF
-     * @throws IOException If file operations fail
-     * @throws DocumentException If PDF document creation fails
-     * @throws InterruptedException If the comparison process is interrupted
-     */
-    private void createPdfWithImageAndCompareToExpected(String outputFileName, String imageFileName) 
-            throws IOException, DocumentException, InterruptedException {
-        
-        // Setup file paths
-        String generatedPdfPath = OUTPUT_DIRECTORY + outputFileName;
-        String expectedPdfPath = RESOURCES_DIRECTORY + "cmp_" + outputFileName;
-        String imagePath = RESOURCES_DIRECTORY + imageFileName;
-        String differenceFilePrefix = "diff_" + outputFileName + "_";
+    private void simpleImageTest(String fileName, String imageName) throws IOException, DocumentException, InterruptedException {
+        String outPath = target + fileName;
+        String cmpPath = source + "cmp_" + fileName;
+        String imgPath = source + imageName;
+        String diff = "diff_" + fileName + "_";
 
-        // Create PDF document with the test image
         Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(generatedPdfPath));
+        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(outPath));
 
         document.open();
-        
-        // Load and scale the image to fit the document
-        Image testImage = Image.getInstance(imagePath);
-        Rectangle documentBounds = new Rectangle(
-            document.left(), 
-            document.bottom(), 
-            document.right(), 
-            document.top()
-        );
-        testImage.scaleToFit(documentBounds);
-        
-        document.add(testImage);
+        Image image = Image.getInstance(imgPath);
+        image.scaleToFit(new Rectangle(document.left(), document.bottom(), document.right(), document.top()));
+        document.add(image);
         document.close();
         writer.close();
 
-        // Compare generated PDF with expected reference PDF
-        CompareTool compareTool = new CompareTool();
-        String comparisonResult = compareTool.compareByContent(
-            generatedPdfPath, 
-            expectedPdfPath, 
-            OUTPUT_DIRECTORY, 
-            differenceFilePrefix
-        );
-        
-        // Assert that the PDFs are identical (null result means no differences found)
-        Assert.assertNull(
-            "Generated PDF does not match expected output. Check difference files for details.", 
-            comparisonResult
-        );
+        Assert.assertNull(new CompareTool().compareByContent(outPath, cmpPath, target, diff));
     }
 }
