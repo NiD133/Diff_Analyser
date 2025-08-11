@@ -25,164 +25,163 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.apache.commons.codec.AbstractStringEncoderTest;
 import org.apache.commons.codec.EncoderException;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * Tests {@link Soundex}.
  *
- * Keep this file in UTF-8 encoding for proper Javadoc processing.
- *
- * The tests are grouped by behavior and use small helpers/parameterized inputs
- * to make intent and expectations obvious.
+ * <p>Keep this file in UTF-8 encoding for proper Javadoc processing.</p>
  */
 class SoundexTest extends AbstractStringEncoderTest<Soundex> {
-
-    // ---------------------------------------------------------------------
-    // Test harness
-    // ---------------------------------------------------------------------
 
     @Override
     protected Soundex createStringEncoder() {
         return new Soundex();
     }
 
-    /** Shorthand for default encoder. */
-    private String enc(final String input) {
-        return getStringEncoder().encode(input);
-    }
-
-    // ---------------------------------------------------------------------
-    // Core encoding examples (single-word checks)
-    // ---------------------------------------------------------------------
-
-    @ParameterizedTest(name = "enc(\"{0}\") = {1}")
-    @CsvSource({
-        // A classic pangram-like sentence split into words
-        "testing, T235",
-        "The,     T000",
-        "quick,   Q200",
-        "brown,   B650",
-        "fox,     F200",
-        "jumped,  J513",
-        "over,    O160",
-        "the,     T000",
-        "lazy,    L200",
-        "dogs,    D200"
-    })
-    void encodesBasicExamples(final String input, final String expected) {
-        assertEquals(expected, enc(input));
+    @Test
+    void testB650() throws EncoderException {
+        checkEncodingVariations("B650", new String[]{
+            "BARHAM",
+            "BARONE",
+            "BARRON",
+            "BERNA",
+            "BIRNEY",
+            "BIRNIE",
+            "BOOROM",
+            "BOREN",
+            "BORN",
+            "BOURN",
+            "BOURNE",
+            "BOWRON",
+            "BRAIN",
+            "BRAME",
+            "BRANN",
+            "BRAUN",
+            "BREEN",
+            "BRIEN",
+            "BRIM",
+            "BRIMM",
+            "BRINN",
+            "BRION",
+            "BROOM",
+            "BROOME",
+            "BROWN",
+            "BROWNE",
+            "BRUEN",
+            "BRUHN",
+            "BRUIN",
+            "BRUMM",
+            "BRUN",
+            "BRUNO",
+            "BRYAN",
+            "BURIAN",
+            "BURN",
+            "BURNEY",
+            "BYRAM",
+            "BYRNE",
+            "BYRON",
+            "BYRUM"});
     }
 
     @Test
-    @DisplayName("Non-letters are ignored (e.g., '>')")
-    void ignoresNonLetters() {
-        assertEquals("H452", enc("HOL>MES"));
+    void testBadCharacters() {
+        assertEquals("H452", getStringEncoder().encode("HOL>MES"));
+
     }
 
-    // ---------------------------------------------------------------------
-    // Known datasets/examples from external references
-    // ---------------------------------------------------------------------
+    @Test
+    void testDifference() throws EncoderException {
+        // Edge cases
+        assertEquals(0, getStringEncoder().difference(null, null));
+        assertEquals(0, getStringEncoder().difference("", ""));
+        assertEquals(0, getStringEncoder().difference(" ", " "));
+        // Normal cases
+        assertEquals(4, getStringEncoder().difference("Smith", "Smythe"));
+        assertEquals(2, getStringEncoder().difference("Ann", "Andrew"));
+        assertEquals(1, getStringEncoder().difference("Margaret", "Andrew"));
+        assertEquals(0, getStringEncoder().difference("Janet", "Margaret"));
+        // Examples from https://msdn.microsoft.com/library/default.asp?url=/library/en-us/tsqlref/ts_de-dz_8co5.asp
+        assertEquals(4, getStringEncoder().difference("Green", "Greene"));
+        assertEquals(0, getStringEncoder().difference("Blotchet-Halls", "Greene"));
+        // Examples from https://msdn.microsoft.com/library/default.asp?url=/library/en-us/tsqlref/ts_setu-sus_3o6w.asp
+        assertEquals(4, getStringEncoder().difference("Smith", "Smythe"));
+        assertEquals(4, getStringEncoder().difference("Smithers", "Smythers"));
+        assertEquals(2, getStringEncoder().difference("Anothers", "Brothers"));
+    }
+
+    @Test
+    void testEncodeBasic() {
+        assertEquals("T235", getStringEncoder().encode("testing"));
+        assertEquals("T000", getStringEncoder().encode("The"));
+        assertEquals("Q200", getStringEncoder().encode("quick"));
+        assertEquals("B650", getStringEncoder().encode("brown"));
+        assertEquals("F200", getStringEncoder().encode("fox"));
+        assertEquals("J513", getStringEncoder().encode("jumped"));
+        assertEquals("O160", getStringEncoder().encode("over"));
+        assertEquals("T000", getStringEncoder().encode("the"));
+        assertEquals("L200", getStringEncoder().encode("lazy"));
+        assertEquals("D200", getStringEncoder().encode("dogs"));
+    }
 
     /**
      * Examples from http://www.bradandkathy.com/genealogy/overviewofsoundex.html
      */
-    @ParameterizedTest(name = "enc(\"{0}\") = {1}")
-    @CsvSource({
-        "Allricht,      A462",
-        "Eberhard,      E166",
-        "Engebrethson,  E521",
-        "Heimbach,      H512",
-        "Hanselmann,    H524",
-        "Hildebrand,    H431",
-        "Kavanagh,      K152",
-        "Lind,          L530",
-        "Lukaschowsky,  L222",
-        "McDonnell,     M235",
-        "McGee,         M200",
-        "Opnian,        O155",
-        "Oppenheimer,   O155",
-        "Riedemanas,    R355",
-        "Zita,          Z300",
-        "Zitzmeinn,     Z325"
-    })
-    void encodesBatchFromBradAndKathy(final String input, final String expected) {
-        assertEquals(expected, enc(input));
+    @Test
+    void testEncodeBatch2() {
+        assertEquals("A462", getStringEncoder().encode("Allricht"));
+        assertEquals("E166", getStringEncoder().encode("Eberhard"));
+        assertEquals("E521", getStringEncoder().encode("Engebrethson"));
+        assertEquals("H512", getStringEncoder().encode("Heimbach"));
+        assertEquals("H524", getStringEncoder().encode("Hanselmann"));
+        assertEquals("H431", getStringEncoder().encode("Hildebrand"));
+        assertEquals("K152", getStringEncoder().encode("Kavanagh"));
+        assertEquals("L530", getStringEncoder().encode("Lind"));
+        assertEquals("L222", getStringEncoder().encode("Lukaschowsky"));
+        assertEquals("M235", getStringEncoder().encode("McDonnell"));
+        assertEquals("M200", getStringEncoder().encode("McGee"));
+        assertEquals("O155", getStringEncoder().encode("Opnian"));
+        assertEquals("O155", getStringEncoder().encode("Oppenheimer"));
+        assertEquals("R355", getStringEncoder().encode("Riedemanas"));
+        assertEquals("Z300", getStringEncoder().encode("Zita"));
+        assertEquals("Z325", getStringEncoder().encode("Zitzmeinn"));
     }
 
     /**
      * Examples from http://www.archives.gov/research_room/genealogy/census/soundex.html
      */
-    @ParameterizedTest(name = "enc(\"{0}\") = {1}")
-    @CsvSource({
-        "Washington, W252",
-        "Lee,        L000",
-        "Gutierrez,  G362",
-        "Pfister,    P236",
-        "Jackson,    J250",
-        "Tymczak,    T522",
-        // For VanDeusen: D-250 is also possible,
-        // but the algorithm here yields V532
-        "VanDeusen,  V532"
-    })
-    void encodesBatchFromUSArchives(final String input, final String expected) {
-        assertEquals(expected, enc(input));
+    @Test
+    void testEncodeBatch3() {
+        assertEquals("W252", getStringEncoder().encode("Washington"));
+        assertEquals("L000", getStringEncoder().encode("Lee"));
+        assertEquals("G362", getStringEncoder().encode("Gutierrez"));
+        assertEquals("P236", getStringEncoder().encode("Pfister"));
+        assertEquals("J250", getStringEncoder().encode("Jackson"));
+        assertEquals("T522", getStringEncoder().encode("Tymczak"));
+        // For VanDeusen: D-250 (D, 2 for the S, 5 for the N, 0 added) is also
+        // possible.
+        assertEquals("V532", getStringEncoder().encode("VanDeusen"));
     }
 
     /**
      * Examples from: http://www.myatt.demon.co.uk/sxalg.htm
      */
-    @ParameterizedTest(name = "enc(\"{0}\") = {1}")
-    @CsvSource({
-        "HOLMES,     H452",
-        "ADOMOMI,    A355",
-        "VONDERLEHR, V536",
-        "BALL,       B400",
-        "SHAW,       S000",
-        "JACKSON,    J250",
-        "SCANLON,    S545",
-        "SAINTJOHN,  S532"
-    })
-    void encodesBatchFromMyatt(final String input, final String expected) {
-        assertEquals(expected, enc(input));
-    }
-
-    /**
-     * Tests example from https://en.wikipedia.org/wiki/Soundex#American_Soundex
-     */
-    @ParameterizedTest(name = "enc(\"{0}\") = {1}")
-    @CsvSource({
-        "Robert,   R163",
-        "Rupert,   R163",
-        "Ashcraft, A261",
-        "Ashcroft, A261",
-        "Tymczak,  T522",
-        "Pfister,  P236"
-    })
-    void encodesWikipediaAmericanSoundexExamples(final String input, final String expected) {
-        assertEquals(expected, enc(input));
-    }
-
-    // ---------------------------------------------------------------------
-    // Variations and normalization
-    // ---------------------------------------------------------------------
-
     @Test
-    void encodesManyNamesToB650() throws EncoderException {
-        // All of these are known to map to B650
-        checkEncodingVariations("B650", new String[] {
-            "BARHAM","BARONE","BARRON","BERNA","BIRNEY","BIRNIE","BOOROM","BOREN","BORN","BOURN","BOURNE","BOWRON",
-            "BRAIN","BRAME","BRANN","BRAUN","BREEN","BRIEN","BRIM","BRIMM","BRINN","BRION","BROOM","BROOME","BROWN",
-            "BROWNE","BRUEN","BRUHN","BRUIN","BRUMM","BRUN","BRUNO","BRYAN","BURIAN","BURN","BURNEY","BYRAM","BYRNE",
-            "BYRON","BYRUM"
-        });
+    void testEncodeBatch4() {
+        assertEquals("H452", getStringEncoder().encode("HOLMES"));
+        assertEquals("A355", getStringEncoder().encode("ADOMOMI"));
+        assertEquals("V536", getStringEncoder().encode("VONDERLEHR"));
+        assertEquals("B400", getStringEncoder().encode("BALL"));
+        assertEquals("S000", getStringEncoder().encode("SHAW"));
+        assertEquals("J250", getStringEncoder().encode("JACKSON"));
+        assertEquals("S545", getStringEncoder().encode("SCANLON"));
+        assertEquals("S532", getStringEncoder().encode("SAINTJOHN"));
+
     }
 
     @Test
-    void ignoresApostrophes() throws EncoderException {
-        checkEncodingVariations("O165", new String[] {
+    void testEncodeIgnoreApostrophes() throws EncoderException {
+        checkEncodingVariations("O165", new String[]{
             "OBrien",
             "'OBrien",
             "O'Brien",
@@ -190,230 +189,235 @@ class SoundexTest extends AbstractStringEncoderTest<Soundex> {
             "OBr'ien",
             "OBri'en",
             "OBrie'n",
-            "OBrien'"
-        });
+            "OBrien'"});
     }
 
     /**
      * Test data from http://www.myatt.demon.co.uk/sxalg.htm
-     */
+     *
+     * @throws EncoderException for some failure scenarios     */
     @Test
-    void ignoresHyphens() throws EncoderException {
-        checkEncodingVariations("K525", new String[] {
-            "KINGSMITH", "-KINGSMITH", "K-INGSMITH", "KI-NGSMITH", "KIN-GSMITH",
-            "KING-SMITH", "KINGS-MITH", "KINGSM-ITH", "KINGSMI-TH", "KINGSMIT-H", "KINGSMITH-"
-        });
+    void testEncodeIgnoreHyphens() throws EncoderException {
+        checkEncodingVariations("K525", new String[]{
+            "KINGSMITH",
+            "-KINGSMITH",
+            "K-INGSMITH",
+            "KI-NGSMITH",
+            "KIN-GSMITH",
+            "KING-SMITH",
+            "KINGS-MITH",
+            "KINGSM-ITH",
+            "KINGSMI-TH",
+            "KINGSMIT-H",
+            "KINGSMITH-"});
     }
 
     @Test
-    void trimsSurroundingWhitespace() {
-        assertEquals("W252", enc(" \t\n\r Washington \t\n\r "));
+    void testEncodeIgnoreTrimmable() {
+        assertEquals("W252", getStringEncoder().encode(" \t\n\r Washington \t\n\r "));
     }
 
-    // ---------------------------------------------------------------------
-    // Difference() similarity metric
-    // ---------------------------------------------------------------------
-
     @Test
-    void differenceCountsMatchingCodeCharacters() throws EncoderException {
-        // Edge cases
-        assertEquals(0, getStringEncoder().difference(null, null));
-        assertEquals(0, getStringEncoder().difference("", ""));
-        assertEquals(0, getStringEncoder().difference(" ", " "));
-
-        // Normal cases
-        assertEquals(4, getStringEncoder().difference("Smith", "Smythe"));
-        assertEquals(2, getStringEncoder().difference("Ann", "Andrew"));
-        assertEquals(1, getStringEncoder().difference("Margaret", "Andrew"));
-        assertEquals(0, getStringEncoder().difference("Janet", "Margaret"));
-
-        // Examples from MS T-SQL docs
-        assertEquals(4, getStringEncoder().difference("Green", "Greene"));
-        assertEquals(0, getStringEncoder().difference("Blotchet-Halls", "Greene"));
-
-        // More MS SQL examples
-        assertEquals(4, getStringEncoder().difference("Smith", "Smythe"));
-        assertEquals(4, getStringEncoder().difference("Smithers", "Smythers"));
-        assertEquals(2, getStringEncoder().difference("Anothers", "Brothers"));
-    }
-
-    // ---------------------------------------------------------------------
-    // HW rule behavior (treatment of H and W)
-    // ---------------------------------------------------------------------
-
-    /**
-     * Consonants from the same code group separated by W or H are treated as one.
-     * From US Archives examples.
-     */
-    @Test
-    void hwRule_Ashcraft_Ashcroft() {
-        assertEquals("A261", enc("Ashcraft"));
-        assertEquals("A261", enc("Ashcroft"));
-        assertEquals("Y330", enc("yehudit"));
-        assertEquals("Y330", enc("yhwdyt"));
-    }
-
-    /**
-     * Consonants from the same code group separated by W or H are treated as one.
-     * Test data from http://www.myatt.demon.co.uk/sxalg.htm
-     */
-    @Test
-    void hwRule_BoothDavis() {
-        assertEquals("B312", enc("BOOTHDAVIS"));
-        assertEquals("B312", enc("BOOTH-DAVIS"));
-    }
-
-    /**
-     * Consonants from the same code group separated by W or H are treated as one.
-     */
-    @Test
-    void hwRule_MultipleVariants() throws EncoderException {
-        assertEquals("S460", enc("Sgler"));
-        assertEquals("S460", enc("Swhgler"));
-        checkEncodingVariations("S460", new String[] {
-            "SAILOR","SALYER","SAYLOR","SCHALLER","SCHELLER","SCHILLER","SCHOOLER","SCHULER","SCHUYLER",
-            "SEILER","SEYLER","SHOLAR","SHULER","SILAR","SILER","SILLER"
-        });
-    }
-
-    // ---------------------------------------------------------------------
-    // Alternative mappings (simplified, genealogy)
-    // ---------------------------------------------------------------------
-
-    @Test
-    @DisplayName("Genealogy mapping: treat vowels and HW as silent")
-    void genealogyMapping() {
+// examples and algorithm rules from:  http://www.genealogy.com/articles/research/00000060.html
+    void testGenealogy() { // treat vowels and HW as silent
         final Soundex s = Soundex.US_ENGLISH_GENEALOGY;
         assertEquals("H251", s.encode("Heggenburger"));
         assertEquals("B425", s.encode("Blackman"));
         assertEquals("S530", s.encode("Schmidt"));
         assertEquals("L150", s.encode("Lippmann"));
+        // Additional local example
+        assertEquals("D200", s.encode("Dodds")); // 'o' is not a separator here - it is silent
+        assertEquals("D200", s.encode("Dhdds")); // 'h' is silent
+        assertEquals("D200", s.encode("Dwdds")); // 'w' is silent
+    }
 
-        // Local additions
-        assertEquals("D200", s.encode("Dodds")); // 'o' silent here (not a separator)
-        assertEquals("D200", s.encode("Dhdds")); // 'h' silent
-        assertEquals("D200", s.encode("Dwdds")); // 'w' silent
+    /**
+     * Consonants from the same code group separated by W or H are treated as one.
+     */
+    @Test
+    void testHWRuleEx1() {
+        // From
+        // http://www.archives.gov/research_room/genealogy/census/soundex.html:
+        // Ashcraft is coded A-261 (A, 2 for the S, C ignored, 6 for the R, 1
+        // for the F). It is not coded A-226.
+        assertEquals("A261", getStringEncoder().encode("Ashcraft"));
+        assertEquals("A261", getStringEncoder().encode("Ashcroft"));
+        assertEquals("Y330", getStringEncoder().encode("yehudit"));
+        assertEquals("Y330", getStringEncoder().encode("yhwdyt"));
+    }
+
+    /**
+     * Consonants from the same code group separated by W or H are treated as one.
+     *
+     * Test data from http://www.myatt.demon.co.uk/sxalg.htm
+     */
+    @Test
+    void testHWRuleEx2() {
+        assertEquals("B312", getStringEncoder().encode("BOOTHDAVIS"));
+        assertEquals("B312", getStringEncoder().encode("BOOTH-DAVIS"));
+    }
+
+    /**
+     * Consonants from the same code group separated by W or H are treated as one.
+     *
+     * @throws EncoderException for some failure scenarios     */
+    @Test
+    void testHWRuleEx3() throws EncoderException {
+        assertEquals("S460", getStringEncoder().encode("Sgler"));
+        assertEquals("S460", getStringEncoder().encode("Swhgler"));
+        // Also S460:
+        checkEncodingVariations("S460", new String[]{
+            "SAILOR",
+            "SALYER",
+            "SAYLOR",
+            "SCHALLER",
+            "SCHELLER",
+            "SCHILLER",
+            "SCHOOLER",
+            "SCHULER",
+            "SCHUYLER",
+            "SEILER",
+            "SEYLER",
+            "SHOLAR",
+            "SHULER",
+            "SILAR",
+            "SILER",
+            "SILLER"});
+    }
+
+    /**
+     * Examples for MS SQLServer from
+     * https://msdn.microsoft.com/library/default.asp?url=/library/en-us/tsqlref/ts_setu-sus_3o6w.asp
+     */
+    @Test
+    void testMsSqlServer1() {
+        assertEquals("S530", getStringEncoder().encode("Smith"));
+        assertEquals("S530", getStringEncoder().encode("Smythe"));
+    }
+
+    /**
+     * Examples for MS SQLServer from
+     * https://support.microsoft.com/default.aspx?scid=https://support.microsoft.com:80/support
+     * /kb/articles/Q100/3/65.asp&NoWebContent=1
+     *
+     * @throws EncoderException for some failure scenarios     */
+    @Test
+    void testMsSqlServer2() throws EncoderException {
+        checkEncodingVariations("E625", new String[]{"Erickson", "Erickson", "Erikson", "Ericson", "Ericksen", "Ericsen"});
+    }
+
+    /**
+     * Examples for MS SQLServer from https://databases.about.com/library/weekly/aa042901a.htm
+     */
+    @Test
+    void testMsSqlServer3() {
+        assertEquals("A500", getStringEncoder().encode("Ann"));
+        assertEquals("A536", getStringEncoder().encode("Andrew"));
+        assertEquals("J530", getStringEncoder().encode("Janet"));
+        assertEquals("M626", getStringEncoder().encode("Margaret"));
+        assertEquals("S315", getStringEncoder().encode("Steven"));
+        assertEquals("M240", getStringEncoder().encode("Michael"));
+        assertEquals("R163", getStringEncoder().encode("Robert"));
+        assertEquals("L600", getStringEncoder().encode("Laura"));
+        assertEquals("A500", getStringEncoder().encode("Anne"));
+    }
+
+    /**
+     * https://issues.apache.org/jira/browse/CODEC-54 https://issues.apache.org/jira/browse/CODEC-56
+     */
+    @Test
+    void testNewInstance() {
+        assertEquals("W452", new Soundex().soundex("Williams"));
     }
 
     @Test
-    @DisplayName("Simplified mapping: treat vowels and HW as separators")
-    void simplifiedMapping() {
+    void testNewInstance2() {
+        assertEquals("W452", new Soundex(Soundex.US_ENGLISH_MAPPING_STRING.toCharArray()).soundex("Williams"));
+    }
+
+    @Test
+    void testNewInstance3() {
+        assertEquals("W452", new Soundex(Soundex.US_ENGLISH_MAPPING_STRING).soundex("Williams"));
+    }
+
+    @Test
+// examples and algorithm rules from:  http://west-penwith.org.uk/misc/soundex.htm
+    void testSimplifiedSoundex() { // treat vowels and HW as separators
         final Soundex s = Soundex.US_ENGLISH_SIMPLIFIED;
         assertEquals("W452", s.encode("WILLIAMS"));
         assertEquals("B625", s.encode("BARAGWANATH"));
         assertEquals("D540", s.encode("DONNELL"));
         assertEquals("L300", s.encode("LLOYD"));
         assertEquals("W422", s.encode("WOOLCOCK"));
-
-        // Local additions
+        // Additional local examples
         assertEquals("D320", s.encode("Dodds"));
-        assertEquals("D320", s.encode("Dwdds")); // 'w' is a separator
-        assertEquals("D320", s.encode("Dhdds")); // 'h' is a separator
-    }
-
-    // ---------------------------------------------------------------------
-    // SQL Server documentation examples
-    // ---------------------------------------------------------------------
-
-    @Test
-    void msSqlServer_Examples1() {
-        assertEquals("S530", enc("Smith"));
-        assertEquals("S530", enc("Smythe"));
+        assertEquals("D320", s.encode("Dwdds")); // w is a separator
+        assertEquals("D320", s.encode("Dhdds")); // h is a separator
     }
 
     @Test
-    void msSqlServer_Examples2() throws EncoderException {
-        checkEncodingVariations("E625", new String[] {
-            "Erickson", "Erickson", "Erikson", "Ericson", "Ericksen", "Ericsen"
-        });
-    }
-
-    @ParameterizedTest(name = "enc(\"{0}\") = {1}")
-    @CsvSource({
-        "Ann,      A500",
-        "Andrew,   A536",
-        "Janet,    J530",
-        "Margaret, M626",
-        "Steven,   S315",
-        "Michael,  M240",
-        "Robert,   R163",
-        "Laura,    L600",
-        "Anne,     A500"
-    })
-    void msSqlServer_Examples3(final String input, final String expected) {
-        assertEquals(expected, enc(input));
-    }
-
-    // ---------------------------------------------------------------------
-    // Constructors and static instances
-    // ---------------------------------------------------------------------
-
-    @Test
-    void newInstance_usesDefaultMapping() {
-        assertEquals("W452", new Soundex().soundex("Williams"));
-    }
-
-    @Test
-    void newInstance_charArrayMapping() {
-        assertEquals("W452", new Soundex(Soundex.US_ENGLISH_MAPPING_STRING.toCharArray()).soundex("Williams"));
-    }
-
-    @Test
-    void newInstance_stringMapping() {
-        assertEquals("W452", new Soundex(Soundex.US_ENGLISH_MAPPING_STRING).soundex("Williams"));
-    }
-
-    @Test
-    void usEnglishStaticInstance() {
-        assertEquals("W452", Soundex.US_ENGLISH.soundex("Williams"));
-    }
-
-    // ---------------------------------------------------------------------
-    // SoundexUtils
-    // ---------------------------------------------------------------------
-
-    @Test
-    void soundexUtilsConstructable() {
+    void testSoundexUtilsConstructable() {
         new SoundexUtils();
     }
 
     @Test
-    void soundexUtilsNullAndEmptyInput() {
+    void testSoundexUtilsNullBehaviour() {
         assertNull(SoundexUtils.clean(null));
         assertEquals("", SoundexUtils.clean(""));
         assertEquals(0, SoundexUtils.differenceEncoded(null, ""));
         assertEquals(0, SoundexUtils.differenceEncoded("", null));
     }
 
-    // ---------------------------------------------------------------------
-    // Non-ASCII letters behavior (default US mapping)
-    // ---------------------------------------------------------------------
+    /**
+     * https://issues.apache.org/jira/browse/CODEC-54 https://issues.apache.org/jira/browse/CODEC-56
+     */
+    @Test
+    void testUsEnglishStatic() {
+        assertEquals("W452", Soundex.US_ENGLISH.soundex("Williams"));
+    }
 
     /**
      * Fancy characters are not mapped by the default US mapping.
+     *
      * https://issues.apache.org/jira/browse/CODEC-30
      */
     @Test
-    void usMapping_EWithAcute() {
-        assertEquals("E000", enc("e"));
+    void testUsMappingEWithAcute() {
+        assertEquals("E000", getStringEncoder().encode("e"));
         if (Character.isLetter('\u00e9')) { // e-acute
-            assertThrows(IllegalArgumentException.class, () -> enc("\u00e9"));
+            //         uppercase E-acute
+            assertThrows(IllegalArgumentException.class, () -> getStringEncoder().encode("\u00e9"));
         } else {
-            assertEquals("", enc("\u00e9"));
+            assertEquals("", getStringEncoder().encode("\u00e9"));
         }
     }
 
     /**
      * Fancy characters are not mapped by the default US mapping.
+     *
      * https://issues.apache.org/jira/browse/CODEC-30
      */
     @Test
-    void usMapping_OWithDiaeresis() {
-        assertEquals("O000", enc("o"));
+    void testUsMappingOWithDiaeresis() {
+        assertEquals("O000", getStringEncoder().encode("o"));
         if (Character.isLetter('\u00f6')) { // o-umlaut
-            assertThrows(IllegalArgumentException.class, () -> enc("\u00f6"));
+            //         uppercase O-umlaut
+            assertThrows(IllegalArgumentException.class, () -> getStringEncoder().encode("\u00f6"));
         } else {
-            assertEquals("", enc("\u00f6"));
+            assertEquals("", getStringEncoder().encode("\u00f6"));
         }
+    }
+
+    /**
+     * Tests example from https://en.wikipedia.org/wiki/Soundex#American_Soundex as of 2015-03-22.
+     */
+    @Test
+    void testWikipediaAmericanSoundex() {
+        assertEquals("R163", getStringEncoder().encode("Robert"));
+        assertEquals("R163", getStringEncoder().encode("Rupert"));
+        assertEquals("A261", getStringEncoder().encode("Ashcraft"));
+        assertEquals("A261", getStringEncoder().encode("Ashcroft"));
+        assertEquals("T522", getStringEncoder().encode("Tymczak"));
+        assertEquals("P236", getStringEncoder().encode("Pfister"));
     }
 }
