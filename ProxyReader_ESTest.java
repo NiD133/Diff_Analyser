@@ -21,298 +21,605 @@ import org.evosuite.runtime.EvoRunnerParameters;
 import org.evosuite.runtime.mock.java.io.MockIOException;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class)
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true, 
-    useVFS = true, 
-    useVNET = true, 
-    resetStaticState = true, 
-    separateClassLoader = true
-) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class ProxyReader_ESTest extends ProxyReader_ESTest_scaffolding {
 
-    // ========================================================================
-    // TeeReader Tests
-    // ========================================================================
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader(1018);
+      CharArrayWriter charArrayWriter0 = new CharArrayWriter(1018);
+      TeeReader teeReader0 = new TeeReader(pipedReader0, charArrayWriter0);
+      teeReader0.beforeRead(0);
+  }
 
-    @Test(timeout = 4000)
-    public void teeReader_beforeRead_zeroBytes_doesNotThrow() throws Throwable {
-        PipedReader pipedReader = new PipedReader(1018);
-        CharArrayWriter writer = new CharArrayWriter(1018);
-        TeeReader teeReader = new TeeReader(pipedReader, writer);
-        
-        // Should handle zero read count without exceptions
-        teeReader.beforeRead(0);
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("");
+      CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(stringReader0);
+      closeShieldReader0.afterRead(1139);
+  }
 
-    // ========================================================================
-    // CloseShieldReader Tests
-    // ========================================================================
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("*=jeP");
+      TaggedReader taggedReader0 = new TaggedReader(stringReader0);
+      taggedReader0.reset();
+  }
 
-    @Test(timeout = 4000)
-    public void closeShieldReader_afterRead_doesNotThrow() throws Throwable {
-        StringReader baseReader = new StringReader("");
-        CloseShieldReader reader = CloseShieldReader.wrap(baseReader);
-        
-        // After read should execute without exceptions
-        reader.afterRead(1139);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("*=jeP");
+      TaggedReader taggedReader0 = new TaggedReader(stringReader0);
+      taggedReader0.mark(47);
+  }
 
-    @Test(timeout = 4000)
-    public void closeShieldReader_ready_afterClose_returnsFalse() throws Throwable {
-        StringReader baseReader = new StringReader("content");
-        CloseShieldReader reader = CloseShieldReader.wrap(baseReader);
-        reader.close();
-        
-        assertFalse("Reader should not be ready after close", reader.ready());
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("6+pe[XK?~jcz*N&o]");
+      TaggedReader taggedReader0 = new TaggedReader(stringReader0);
+      long long0 = taggedReader0.skip(75);
+      assertEquals(17L, long0);
+  }
 
-    @Test(timeout = 4000)
-    public void closeShieldReader_readCharBuffer_emptySource_returnsMinusOne() throws Throwable {
-        StringReader baseReader = new StringReader("");
-        CloseShieldReader reader = CloseShieldReader.wrap(baseReader);
-        CharBuffer buffer = CharBuffer.allocate(10);
-        
-        int result = reader.read(buffer);
-        assertEquals("Should return -1 for empty source", -1, result);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("$^pT");
+      CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(stringReader0);
+      closeShieldReader0.close();
+      boolean boolean0 = closeShieldReader0.ready();
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void closeShieldReader_readCharBuffer_nonEmptySource_returnsBytesRead() throws Throwable {
-        StringReader baseReader = new StringReader("org.apache.commons.io.input.ProxyReader");
-        CloseShieldReader reader = CloseShieldReader.wrap(baseReader);
-        CharBuffer buffer = CharBuffer.allocate(1366);
-        
-        int result = reader.read(buffer);
-        assertEquals("Should return number of characters read", 39, result);
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("6+pe[XK?~jcz*N&o]");
+      TaggedReader taggedReader0 = new TaggedReader(stringReader0);
+      char[] charArray0 = new char[1];
+      int int0 = taggedReader0.read(charArray0, 0, 0);
+      assertEquals(0, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void closeShieldReader_readSingleChar_returnsCharacter() throws Throwable {
-        StringReader baseReader = new StringReader("$");
-        CloseShieldReader reader = CloseShieldReader.wrap(baseReader);
-        
-        int result = reader.read();
-        assertEquals("Should return correct character", '$', result);
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("6+pe[XK?~jcz*N&o]");
+      TaggedReader taggedReader0 = new TaggedReader(stringReader0);
+      CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(taggedReader0);
+      char[] charArray0 = new char[4];
+      int int0 = closeShieldReader0.read(charArray0, 1, 1);
+      assertArrayEquals(new char[] {'\u0000', '6', '\u0000', '\u0000'}, charArray0);
+      assertEquals(1, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void closeShieldReader_readCharArray_zeroLength_returnsZero() throws Throwable {
-        StringReader baseReader = new StringReader("content");
-        CloseShieldReader reader = CloseShieldReader.wrap(baseReader);
-        char[] buffer = new char[0];
-        
-        int result = reader.read(buffer);
-        assertEquals("Zero-length read should return 0", 0, result);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(pipedReader0);
+      char[] charArray0 = new char[4];
+      closeShieldReader0.close();
+      int int0 = closeShieldReader0.read(charArray0, 0, 1041);
+      assertEquals((-1), int0);
+  }
 
-    @Test(timeout = 4000)
-    public void closeShieldReader_readCharArray_afterClose_returnsMinusOne() throws Throwable {
-        StringReader baseReader = new StringReader("content");
-        CloseShieldReader reader = CloseShieldReader.wrap(baseReader);
-        reader.close();
-        char[] buffer = new char[10];
-        
-        int result = reader.read(buffer, 0, 1041);
-        assertEquals("Should return -1 after close", -1, result);
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("6+pe[XK?~jcz*N&o]");
+      TaggedReader taggedReader0 = new TaggedReader(stringReader0);
+      char[] charArray0 = new char[6];
+      int int0 = taggedReader0.read(charArray0);
+      assertEquals(6, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void closeShieldReader_ready_withContent_returnsTrue() throws Throwable {
-        StringReader baseReader = new StringReader("content");
-        CloseShieldReader reader = CloseShieldReader.wrap(baseReader);
-        
-        assertTrue("Reader should be ready with content", reader.ready());
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("");
+      TaggedReader taggedReader0 = new TaggedReader(stringReader0);
+      char[] charArray0 = new char[3];
+      int int0 = taggedReader0.read(charArray0);
+      assertEquals((-1), int0);
+  }
 
-    @Test(timeout = 4000)
-    public void closeShieldReader_skip_negativeValue_throwsException() {
-        PipedReader baseReader = new PipedReader();
-        CloseShieldReader reader = CloseShieldReader.wrap(baseReader);
-        
-        try {
-            reader.skip(-1);
-            fail("Expected IllegalArgumentException for negative skip value");
-        } catch (IOException e) {
-            verifyException("java.io.Reader", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("");
+      TaggedReader taggedReader0 = new TaggedReader(stringReader0);
+      CharBuffer charBuffer0 = CharBuffer.wrap((CharSequence) "");
+      int int0 = taggedReader0.read(charBuffer0);
+      assertEquals(0, int0);
+  }
 
-    // ========================================================================
-    // TaggedReader Tests
-    // ========================================================================
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("");
+      TaggedReader taggedReader0 = new TaggedReader(stringReader0);
+      char[] charArray0 = new char[4];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      int int0 = taggedReader0.read(charBuffer0);
+      assertEquals((-1), int0);
+  }
 
-    @Test(timeout = 4000)
-    public void taggedReader_reset_doesNotThrow() throws Throwable {
-        StringReader baseReader = new StringReader("content");
-        TaggedReader reader = new TaggedReader(baseReader);
-        
-        // Should execute without exceptions
-        reader.reset();
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("6+pe[XK?~jcz*N&o]");
+      CharArrayWriter charArrayWriter0 = new CharArrayWriter(1018);
+      TeeReader teeReader0 = new TeeReader(stringReader0, charArrayWriter0);
+      boolean boolean0 = teeReader0.markSupported();
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void taggedReader_mark_doesNotThrow() throws Throwable {
-        StringReader baseReader = new StringReader("content");
-        TaggedReader reader = new TaggedReader(baseReader);
-        
-        // Should execute without exceptions
-        reader.mark(47);
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader(1018);
+      TaggedReader taggedReader0 = new TaggedReader(pipedReader0);
+      try { 
+        taggedReader0.skip(1018);
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // Pipe not connected
+         //
+         verifyException("org.apache.commons.io.input.TaggedReader", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void taggedReader_skip_validValue_returnsBytesSkipped() throws Throwable {
-        StringReader baseReader = new StringReader("sample content");
-        TaggedReader reader = new TaggedReader(baseReader);
-        
-        long skipped = reader.skip(75);
-        assertEquals("Should return number of characters skipped", 14, skipped);
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      TaggedReader taggedReader0 = new TaggedReader(pipedReader0);
+      // Undeclared exception!
+      try { 
+        taggedReader0.skip((-1L));
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // skip value is negative
+         //
+         verifyException("java.io.Reader", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void taggedReader_readCharArrayOffset_validData_returnsBytesRead() throws Throwable {
-        StringReader baseReader = new StringReader("content");
-        TaggedReader reader = new TaggedReader(baseReader);
-        char[] buffer = new char[4];
-        
-        int read = reader.read(buffer, 1, 1);
-        assertArrayEquals("Buffer should contain read data", 
-            new char[] {'\u0000', 'c', '\u0000', '\u0000'}, buffer);
-        assertEquals("Should return correct read count", 1, read);
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(pipedReader0);
+      try { 
+        closeShieldReader0.skip(2443L);
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // Pipe not connected
+         //
+         verifyException("java.io.PipedReader", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void taggedReader_readCharArray_validData_returnsBytesRead() throws Throwable {
-        StringReader baseReader = new StringReader("content");
-        TaggedReader reader = new TaggedReader(baseReader);
-        char[] buffer = new char[6];
-        
-        int read = reader.read(buffer);
-        assertEquals("Should return number of characters read", 6, read);
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      TaggedReader taggedReader0 = new TaggedReader(pipedReader0);
+      try { 
+        taggedReader0.reset();
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // reset() not supported
+         //
+         verifyException("org.apache.commons.io.input.TaggedReader", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void taggedReader_readCharArray_emptySource_returnsMinusOne() throws Throwable {
-        StringReader baseReader = new StringReader("");
-        TaggedReader reader = new TaggedReader(baseReader);
-        char[] buffer = new char[3];
-        
-        int result = reader.read(buffer);
-        assertEquals("Should return -1 for empty source", -1, result);
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      TaggedReader taggedReader0 = new TaggedReader(pipedReader0);
+      try { 
+        taggedReader0.ready();
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // Pipe not connected
+         //
+         verifyException("org.apache.commons.io.input.TaggedReader", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void taggedReader_markSupported_stringReader_returnsTrue() throws Throwable {
-        StringReader baseReader = new StringReader("content");
-        TaggedReader reader = new TaggedReader(baseReader);
-        
-        assertTrue("markSupported should delegate to underlying reader", reader.markSupported());
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(pipedReader0);
+      try { 
+        closeShieldReader0.ready();
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // Pipe not connected
+         //
+         verifyException("java.io.PipedReader", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void taggedReader_readSingleChar_emptySource_returnsMinusOne() throws Throwable {
-        StringReader baseReader = new StringReader("");
-        TaggedReader reader = new TaggedReader(baseReader);
-        
-        int result = reader.read();
-        assertEquals("Should return -1 for empty source", -1, result);
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(pipedReader0);
+      TaggedReader taggedReader0 = new TaggedReader(closeShieldReader0);
+      try { 
+        taggedReader0.read((char[]) null, 477, 477);
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // Pipe not connected
+         //
+         verifyException("org.apache.commons.io.input.TaggedReader", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void taggedReader_skip_negativeValue_throwsException() {
-        PipedReader baseReader = new PipedReader();
-        TaggedReader reader = new TaggedReader(baseReader);
-        
-        try {
-            reader.skip(-1);
-            fail("Expected IllegalArgumentException for negative skip value");
-        } catch (IOException e) {
-            verifyException("java.io.Reader", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("");
+      CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(stringReader0);
+      // Undeclared exception!
+      try { 
+        closeShieldReader0.read((char[]) null, 63, 63);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.io.StringReader", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void taggedReader_mark_negativeValue_throwsException() {
-        StringReader baseReader = new StringReader("content");
-        TaggedReader reader = new TaggedReader(baseReader);
-        
-        try {
-            reader.mark(-1520);
-            fail("Expected IllegalArgumentException for negative mark value");
-        } catch (IOException e) {
-            verifyException("java.io.StringReader", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("");
+      CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(stringReader0);
+      char[] charArray0 = new char[0];
+      // Undeclared exception!
+      try { 
+        closeShieldReader0.read(charArray0, 49, 49);
+        fail("Expecting exception: IndexOutOfBoundsException");
+      
+      } catch(IndexOutOfBoundsException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.io.StringReader", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void taggedReader_handleIOException_validException_throwsTaggedException() {
-        PipedReader baseReader = new PipedReader(2398);
-        TaggedReader reader = new TaggedReader(baseReader);
-        MockIOException ex = new MockIOException("test");
-        
-        try {
-            reader.handleIOException(ex);
-            fail("Expected IOException to be rethrown");
-        } catch (IOException e) {
-            assertEquals("Exception message should be preserved", "test", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(pipedReader0);
+      try { 
+        closeShieldReader0.read((char[]) null, 477, 477);
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // Pipe not connected
+         //
+         verifyException("java.io.PipedReader", e);
+      }
+  }
 
-    // ========================================================================
-    // Exception Handling Tests
-    // ========================================================================
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      TaggedReader taggedReader0 = new TaggedReader(pipedReader0);
+      CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(taggedReader0);
+      char[] charArray0 = new char[0];
+      try { 
+        closeShieldReader0.read(charArray0);
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // Pipe not connected
+         //
+         verifyException("org.apache.commons.io.input.TaggedReader", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void pipedReader_read_unconnected_throwsIOException() {
-        PipedReader baseReader = new PipedReader();
-        TaggedReader reader = new TaggedReader(baseReader);
-        
-        try {
-            reader.read();
-            fail("Expected IOException for unconnected PipedReader");
-        } catch (IOException e) {
-            verifyException("org.apache.commons.io.input.TaggedReader", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(pipedReader0);
+      // Undeclared exception!
+      try { 
+        closeShieldReader0.read((char[]) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.io.Reader", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void pipedReader_ready_unconnected_throwsIOException() {
-        PipedReader baseReader = new PipedReader();
-        TaggedReader reader = new TaggedReader(baseReader);
-        
-        try {
-            reader.ready();
-            fail("Expected IOException for unconnected PipedReader");
-        } catch (IOException e) {
-            verifyException("org.apache.commons.io.input.TaggedReader", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(pipedReader0);
+      char[] charArray0 = new char[0];
+      try { 
+        closeShieldReader0.read(charArray0);
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // Pipe not connected
+         //
+         verifyException("java.io.PipedReader", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void pipedReader_readCharArray_unconnected_throwsIOException() {
-        PipedReader baseReader = new PipedReader();
-        TaggedReader reader = new TaggedReader(baseReader);
-        char[] buffer = new char[10];
-        
-        try {
-            reader.read(buffer, 0, 10);
-            fail("Expected IOException for unconnected PipedReader");
-        } catch (IOException e) {
-            verifyException("org.apache.commons.io.input.TaggedReader", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      TaggedReader taggedReader0 = new TaggedReader(pipedReader0);
+      CharBuffer charBuffer0 = CharBuffer.allocate(1);
+      try { 
+        taggedReader0.read(charBuffer0);
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // Pipe not connected
+         //
+         verifyException("org.apache.commons.io.input.TaggedReader", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void pipedReader_readCharBuffer_unconnected_throwsIOException() {
-        PipedReader baseReader = new PipedReader();
-        TaggedReader reader = new TaggedReader(baseReader);
-        CharBuffer buffer = CharBuffer.allocate(10);
-        
-        try {
-            reader.read(buffer);
-            fail("Expected IOException for unconnected PipedReader");
-        } catch (IOException e) {
-            verifyException("org.apache.commons.io.input.TaggedReader", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      TaggedReader taggedReader0 = new TaggedReader(pipedReader0);
+      // Undeclared exception!
+      try { 
+        taggedReader0.read((CharBuffer) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.io.Reader", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(pipedReader0);
+      CharBuffer charBuffer0 = CharBuffer.allocate(13);
+      try { 
+        closeShieldReader0.read(charBuffer0);
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // Pipe not connected
+         //
+         verifyException("java.io.PipedReader", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      TaggedReader taggedReader0 = new TaggedReader(pipedReader0);
+      try { 
+        taggedReader0.read();
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // Pipe not connected
+         //
+         verifyException("org.apache.commons.io.input.TaggedReader", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(pipedReader0);
+      try { 
+        closeShieldReader0.read();
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // Pipe not connected
+         //
+         verifyException("java.io.PipedReader", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test32()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      TaggedReader taggedReader0 = new TaggedReader(pipedReader0);
+      try { 
+        taggedReader0.mark(1027);
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // mark() not supported
+         //
+         verifyException("org.apache.commons.io.input.TaggedReader", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test33()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(pipedReader0);
+      try { 
+        closeShieldReader0.mark(308);
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // mark() not supported
+         //
+         verifyException("java.io.Reader", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test34()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader(2398);
+      TaggedReader taggedReader0 = new TaggedReader(pipedReader0);
+      MockIOException mockIOException0 = new MockIOException("Y-XdQt@");
+      try { 
+        taggedReader0.handleIOException(mockIOException0);
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // Y-XdQt@
+         //
+         verifyException("org.apache.commons.io.input.TaggedReader", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test35()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(pipedReader0);
+      // Undeclared exception!
+      try { 
+        closeShieldReader0.handleIOException((IOException) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.io.input.ProxyReader", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test36()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(pipedReader0);
+      MockIOException mockIOException0 = new MockIOException();
+      try { 
+        closeShieldReader0.handleIOException(mockIOException0);
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test37()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("");
+      TaggedReader taggedReader0 = new TaggedReader(stringReader0);
+      int int0 = taggedReader0.read();
+      assertEquals((-1), int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test38()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("org.apache.commons.io.input.ProxyReader");
+      TaggedReader taggedReader0 = new TaggedReader(stringReader0);
+      CharBuffer charBuffer0 = CharBuffer.allocate(1366);
+      int int0 = taggedReader0.read(charBuffer0);
+      assertEquals(39, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test39()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      TaggedReader taggedReader0 = new TaggedReader(pipedReader0);
+      boolean boolean0 = taggedReader0.markSupported();
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test40()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("$^pT");
+      CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(stringReader0);
+      boolean boolean0 = closeShieldReader0.ready();
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test41()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      TaggedReader taggedReader0 = new TaggedReader(pipedReader0);
+      taggedReader0.close();
+  }
+
+  @Test(timeout = 4000)
+  public void test42()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("");
+      TaggedReader taggedReader0 = new TaggedReader(stringReader0);
+      char[] charArray0 = new char[0];
+      int int0 = taggedReader0.read(charArray0);
+      assertEquals(0, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test43()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("6+pe[XK?~jcz*N&o]");
+      TaggedReader taggedReader0 = new TaggedReader(stringReader0);
+      // Undeclared exception!
+      try { 
+        taggedReader0.mark((-1520));
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Read-ahead limit < 0
+         //
+         verifyException("java.io.StringReader", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test44()  throws Throwable  {
+      PipedReader pipedReader0 = new PipedReader();
+      CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(pipedReader0);
+      try { 
+        closeShieldReader0.reset();
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // reset() not supported
+         //
+         verifyException("java.io.Reader", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test45()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("$^pT");
+      CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(stringReader0);
+      int int0 = closeShieldReader0.read();
+      assertEquals(36, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test46()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("");
+      TaggedReader taggedReader0 = new TaggedReader(stringReader0);
+      long long0 = taggedReader0.skip((-1));
+      assertEquals(0L, long0);
+  }
 }
