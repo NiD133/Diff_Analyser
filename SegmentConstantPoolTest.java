@@ -22,21 +22,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit tests for the SegmentConstantPool class.
+ * Tests for org.apache.commons.compress.harmony.unpack200.SegmentConstantPool.
  */
 class SegmentConstantPoolTest {
 
-    private MockSegmentConstantPool mockPool;
-    private String[] classNames;
-    private String[] methodNames;
-
-    /**
-     * Mock implementation of SegmentConstantPool for testing purposes.
-     */
     public class MockSegmentConstantPool extends SegmentConstantPool {
 
         MockSegmentConstantPool() {
@@ -59,48 +51,48 @@ class SegmentConstantPoolTest {
         }
     }
 
-    @BeforeEach
-    void setUp() {
-        mockPool = new MockSegmentConstantPool();
-        classNames = new String[] { "Object", "Object", "java/lang/String", "java/lang/String", "Object", "Other" };
-        methodNames = new String[] { "<init>()", "clone()", "equals()", "<init>", "isNull()", "Other" };
+    String[] testClassArray = { "Object", "Object", "java/lang/String", "java/lang/String", "Object", "Other" };
+    String[] testMethodArray = { "<init>()", "clone()", "equals()", "<init>", "isNull()", "Other" };
+
+    @Test
+    void testMatchSpecificPoolEntryIndex_DoubleArray() {
+        final MockSegmentConstantPool mockInstance = new MockSegmentConstantPool();
+        // Elements should be found at the proper position.
+        assertEquals(0, mockInstance.matchSpecificPoolEntryIndex(testClassArray, testMethodArray, "Object", "^<init>.*", 0));
+        assertEquals(2, mockInstance.matchSpecificPoolEntryIndex(testClassArray, testMethodArray, "java/lang/String", ".*", 0));
+        assertEquals(3, mockInstance.matchSpecificPoolEntryIndex(testClassArray, testMethodArray, "java/lang/String", "^<init>.*", 0));
+        assertEquals(5, mockInstance.matchSpecificPoolEntryIndex(testClassArray, testMethodArray, "Other", ".*", 0));
+
+        // Elements that don't exist shouldn't be found
+        assertEquals(-1, mockInstance.matchSpecificPoolEntryIndex(testClassArray, testMethodArray, "NotThere", "^<init>.*", 0));
+
+        // Elements that exist but don't have the requisite number
+        // of hits shouldn't be found.
+        assertEquals(-1, mockInstance.matchSpecificPoolEntryIndex(testClassArray, testMethodArray, "java/lang/String", "^<init>.*", 1));
     }
 
     @Test
-    void testMatchSpecificPoolEntryIndex_WithClassAndMethodNames() {
-        // Test matching class and method names with regex
-        assertEquals(0, mockPool.matchSpecificPoolEntryIndex(classNames, methodNames, "Object", "^<init>.*", 0));
-        assertEquals(2, mockPool.matchSpecificPoolEntryIndex(classNames, methodNames, "java/lang/String", ".*", 0));
-        assertEquals(3, mockPool.matchSpecificPoolEntryIndex(classNames, methodNames, "java/lang/String", "^<init>.*", 0));
-        assertEquals(5, mockPool.matchSpecificPoolEntryIndex(classNames, methodNames, "Other", ".*", 0));
+    void testMatchSpecificPoolEntryIndex_SingleArray() {
+        final MockSegmentConstantPool mockInstance = new MockSegmentConstantPool();
+        // Elements should be found at the proper position.
+        assertEquals(0, mockInstance.matchSpecificPoolEntryIndex(testClassArray, "Object", 0));
+        assertEquals(1, mockInstance.matchSpecificPoolEntryIndex(testClassArray, "Object", 1));
+        assertEquals(2, mockInstance.matchSpecificPoolEntryIndex(testClassArray, "java/lang/String", 0));
+        assertEquals(3, mockInstance.matchSpecificPoolEntryIndex(testClassArray, "java/lang/String", 1));
+        assertEquals(4, mockInstance.matchSpecificPoolEntryIndex(testClassArray, "Object", 2));
+        assertEquals(5, mockInstance.matchSpecificPoolEntryIndex(testClassArray, "Other", 0));
 
-        // Test non-existing elements
-        assertEquals(-1, mockPool.matchSpecificPoolEntryIndex(classNames, methodNames, "NotThere", "^<init>.*", 0));
+        // Elements that don't exist shouldn't be found
+        assertEquals(-1, mockInstance.matchSpecificPoolEntryIndex(testClassArray, "NotThere", 0));
 
-        // Test existing elements with insufficient matches
-        assertEquals(-1, mockPool.matchSpecificPoolEntryIndex(classNames, methodNames, "java/lang/String", "^<init>.*", 1));
+        // Elements that exist but don't have the requisite number
+        // of hits shouldn't be found.
+        assertEquals(-1, mockInstance.matchSpecificPoolEntryIndex(testClassArray, "java/lang/String", 2));
     }
 
     @Test
-    void testMatchSpecificPoolEntryIndex_WithClassNamesOnly() {
-        // Test matching class names only
-        assertEquals(0, mockPool.matchSpecificPoolEntryIndex(classNames, "Object", 0));
-        assertEquals(1, mockPool.matchSpecificPoolEntryIndex(classNames, "Object", 1));
-        assertEquals(2, mockPool.matchSpecificPoolEntryIndex(classNames, "java/lang/String", 0));
-        assertEquals(3, mockPool.matchSpecificPoolEntryIndex(classNames, "java/lang/String", 1));
-        assertEquals(4, mockPool.matchSpecificPoolEntryIndex(classNames, "Object", 2));
-        assertEquals(5, mockPool.matchSpecificPoolEntryIndex(classNames, "Other", 0));
-
-        // Test non-existing elements
-        assertEquals(-1, mockPool.matchSpecificPoolEntryIndex(classNames, "NotThere", 0));
-
-        // Test existing elements with insufficient matches
-        assertEquals(-1, mockPool.matchSpecificPoolEntryIndex(classNames, "java/lang/String", 2));
-    }
-
-    @Test
-    void testRegexMatches() {
-        // Test regex matching functionality
+    void testRegexReplacement() {
+        final MockSegmentConstantPool mockPool = new MockSegmentConstantPool();
         assertTrue(mockPool.regexMatchesVisible(".*", "anything"));
         assertTrue(mockPool.regexMatchesVisible(".*", ""));
         assertTrue(mockPool.regexMatchesVisible("^<init>.*", "<init>"));
