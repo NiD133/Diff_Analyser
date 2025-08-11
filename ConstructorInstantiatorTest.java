@@ -13,115 +13,91 @@ import org.mockitoutil.TestBase;
 
 public class ConstructorInstantiatorTest extends TestBase {
 
-    static class ClassWithDefaultConstructor {}
-    
-    class InnerClass {}
-    
+    static class SomeClass {}
+
+    class SomeInnerClass {}
+
     class ChildOfThis extends ConstructorInstantiatorTest {}
-    
-    static class ClassWithStringConstructor {
-        ClassWithStringConstructor(String x) {}
+
+    static class SomeClass2 {
+
+        SomeClass2(String x) {}
     }
-    
-    static class ClassWithPrimitiveConstructor {
-        ClassWithPrimitiveConstructor(int i) {}
+
+    static class SomeClass3 {
+
+        SomeClass3(int i) {}
     }
 
     @Test
-    public void shouldInstantiateClassWithDefaultConstructor() {
-        // Arrange
-        ConstructorInstantiator instantiator = createInstantiator(false);
-        
-        // Act
-        Object instance = instantiator.newInstance(ClassWithDefaultConstructor.class);
-        
-        // Assert
-        assertThat(instance).isExactlyInstanceOf(ClassWithDefaultConstructor.class);
+    public void creates_instances() {
+        assertThat(
+                        new ConstructorInstantiator(false, new Object[0])
+                                .newInstance(SomeClass.class)
+                                .getClass())
+                .isEqualTo(SomeClass.class);
     }
 
     @Test
-    public void shouldInstantiateInnerClassWhenOuterInstanceIsProvided() {
-        // Arrange
-        ConstructorInstantiator instantiatorWithThis = createInstantiator(true, this);
-        ConstructorInstantiator instantiatorWithChild = createInstantiator(true, new ChildOfThis());
-        
-        // Act
-        Object instance1 = instantiatorWithThis.newInstance(InnerClass.class);
-        Object instance2 = instantiatorWithChild.newInstance(InnerClass.class);
-        
-        // Assert
-        assertThat(instance1).isExactlyInstanceOf(InnerClass.class);
-        assertThat(instance2).isExactlyInstanceOf(InnerClass.class);
+    public void creates_instances_of_inner_classes() {
+        assertThat(
+                        new ConstructorInstantiator(true, this)
+                                .newInstance(SomeInnerClass.class)
+                                .getClass())
+                .isEqualTo(SomeInnerClass.class);
+        assertThat(
+                        new ConstructorInstantiator(true, new ChildOfThis())
+                                .newInstance(SomeInnerClass.class)
+                                .getClass())
+                .isEqualTo(SomeInnerClass.class);
     }
 
     @Test
-    public void shouldInstantiateClassUsingStringArgument() {
-        // Arrange
-        ConstructorInstantiator instantiator = createInstantiator(false, "arg");
-        
-        // Act
-        Object instance = instantiator.newInstance(ClassWithStringConstructor.class);
-        
-        // Assert
-        assertThat(instance).isExactlyInstanceOf(ClassWithStringConstructor.class);
+    public void creates_instances_with_arguments() {
+        assertThat(
+                        new ConstructorInstantiator(false, "someString")
+                                .newInstance(SomeClass2.class)
+                                .getClass())
+                .isEqualTo(SomeClass2.class);
     }
 
     @Test
-    public void shouldInstantiateClassUsingNullArgument() {
-        // Arrange
-        ConstructorInstantiator instantiator = createInstantiator(false, new Object[] { null });
-        
-        // Act
-        Object instance = instantiator.newInstance(ClassWithStringConstructor.class);
-        
-        // Assert
-        assertThat(instance).isExactlyInstanceOf(ClassWithStringConstructor.class);
+    public void creates_instances_with_null_arguments() {
+        assertThat(
+                        new ConstructorInstantiator(false, new Object[] {null})
+                                .newInstance(SomeClass2.class)
+                                .getClass())
+                .isEqualTo(SomeClass2.class);
     }
 
     @Test
-    public void shouldInstantiateClassUsingPrimitiveArgument() {
-        // Arrange
-        ConstructorInstantiator instantiator = createInstantiator(false, 123);
-        
-        // Act
-        Object instance = instantiator.newInstance(ClassWithPrimitiveConstructor.class);
-        
-        // Assert
-        assertThat(instance).isExactlyInstanceOf(ClassWithPrimitiveConstructor.class);
+    public void creates_instances_with_primitive_arguments() {
+        assertThat(new ConstructorInstantiator(false, 123).newInstance(SomeClass3.class).getClass())
+                .isEqualTo(SomeClass3.class);
     }
 
     @Test
-    public void shouldThrowExceptionWhenNullProvidedForPrimitiveParameter() {
-        // Arrange
-        ConstructorInstantiator instantiator = createInstantiator(false, new Object[] { null });
-        
-        // Act & Assert
-        assertThatThrownBy(() -> instantiator.newInstance(ClassWithPrimitiveConstructor.class))
-            .isInstanceOf(org.mockito.creation.instance.InstantiationException.class)
-            .hasMessageContaining("Unable to create instance of 'ClassWithPrimitiveConstructor'");
+    public void fails_when_null_is_passed_for_a_primitive() {
+        assertThatThrownBy(
+                        () -> {
+                            new ConstructorInstantiator(false, new Object[] {null})
+                                    .newInstance(SomeClass3.class)
+                                    .getClass();
+                        })
+                .isInstanceOf(org.mockito.creation.instance.InstantiationException.class)
+                .hasMessageContaining("Unable to create instance of 'SomeClass3'.");
     }
 
     @Test
-    public void shouldThrowDescriptiveExceptionWhenNoMatchingConstructorFound() {
-        // Arrange
-        ConstructorInstantiator instantiator = createInstantiator(false);
-        Class<?> targetClass = ClassWithStringConstructor.class;
-        
-        // Act
+    public void explains_when_constructor_cannot_be_found() {
         try {
-            instantiator.newInstance(targetClass);
-            fail("Expected InstantiationException");
-        } 
-        catch (org.mockito.creation.instance.InstantiationException e) {
-            // Assert
+            new ConstructorInstantiator(false, new Object[0]).newInstance(SomeClass2.class);
+            fail();
+        } catch (org.mockito.creation.instance.InstantiationException e) {
             assertThat(e)
-                .hasMessageContaining("Unable to create instance of 'ClassWithStringConstructor'")
-                .hasMessageContaining("0-arg constructor");
+                    .hasMessageContaining(
+                            "Unable to create instance of 'SomeClass2'.\n"
+                                    + "Please ensure that the target class has a 0-arg constructor.");
         }
-    }
-
-    // Helper method for consistent instantiator creation
-    private ConstructorInstantiator createInstantiator(boolean requiresOuterInstance, Object... args) {
-        return new ConstructorInstantiator(requiresOuterInstance, args);
     }
 }
