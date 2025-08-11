@@ -21,7 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.]
  *
  * -----------------------------
@@ -36,160 +36,170 @@
 
 package org.jfree.chart.annotations;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 
-import org.jfree.chart.TestUtils;
 import org.jfree.chart.Drawable;
+import org.jfree.chart.TestUtils;
 import org.jfree.chart.api.PublicCloneable;
-
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for the {@link XYDrawableAnnotation} class.
+ *
+ * These tests favor readability by:
+ * - Using clear Arrange / Act / Assert sections
+ * - Isolating each field-specific equality check in its own test
+ * - Providing small factory methods to reduce duplication
+ * - Using assertion messages to explain failures
  */
 public class XYDrawableAnnotationTest {
 
+    // Baseline values used to construct instances for most tests
+    private static final double BASE_X = 10.0;
+    private static final double BASE_Y = 20.0;
+    private static final double BASE_WIDTH = 100.0;
+    private static final double BASE_HEIGHT = 200.0;
+    private static final double BASE_SCALE = 1.0;
+
+    /**
+     * Minimal stub Drawable that is cloneable and serializable.
+     * Its equals() returns true for any other TestDrawable instance.
+     */
     static class TestDrawable implements Drawable, Cloneable, Serializable {
-        /**
-         * Default constructor.
-         */
-        public TestDrawable() {
-        }
-        /**
-         * Draws something.
-         * @param g2  the graphics device.
-         * @param area  the area in which to draw.
-         */
         @Override
         public void draw(Graphics2D g2, Rectangle2D area) {
-            // do nothing
+            // Intentionally empty: drawing is not under test here
         }
-        /**
-         * Tests this object for equality with an arbitrary object.
-         * @param obj  the object to test against ({@code null} permitted).
-         * @return A boolean.
-         */
+
         @Override
         public boolean equals(Object obj) {
-            if (obj == this) {
-                return true;
-            }
-            if (!(obj instanceof TestDrawable)) {
-                return false;
-            }
-            return true;
+            return obj instanceof TestDrawable;
         }
-        /**
-         * Returns a clone.
-         *
-         * @return A clone.
-         *
-         * @throws CloneNotSupportedException if there is a problem cloning.
-         */
+
         @Override
         public Object clone() throws CloneNotSupportedException {
             return super.clone();
         }
     }
 
-    /**
-     * Confirm that the equals method can distinguish all the required fields.
-     */
-    @Test
-    public void testEquals() {
-        XYDrawableAnnotation a1 = new XYDrawableAnnotation(10.0, 20.0, 100.0,
-                200.0, new TestDrawable());
-        XYDrawableAnnotation a2 = new XYDrawableAnnotation(10.0, 20.0, 100.0,
-                200.0, new TestDrawable());
-        assertEquals(a1, a2);
+    // Factory methods to reduce noise in tests
 
-        a1 = new XYDrawableAnnotation(11.0, 20.0, 100.0, 200.0,
-                new TestDrawable());
-        assertNotEquals(a1, a2);
-        a2 = new XYDrawableAnnotation(11.0, 20.0, 100.0, 200.0,
-                new TestDrawable());
-        assertEquals(a1, a2);
-
-        a1 = new XYDrawableAnnotation(11.0, 22.0, 100.0, 200.0,
-                new TestDrawable());
-        assertNotEquals(a1, a2);
-        a2 = new XYDrawableAnnotation(11.0, 22.0, 100.0, 200.0,
-                new TestDrawable());
-        assertEquals(a1, a2);
-
-        a1 = new XYDrawableAnnotation(11.0, 22.0, 101.0, 200.0,
-                new TestDrawable());
-        assertNotEquals(a1, a2);
-        a2 = new XYDrawableAnnotation(11.0, 22.0, 101.0, 200.0,
-                new TestDrawable());
-        assertEquals(a1, a2);
-
-        a1 = new XYDrawableAnnotation(11.0, 22.0, 101.0, 202.0,
-                new TestDrawable());
-        assertNotEquals(a1, a2);
-        a2 = new XYDrawableAnnotation(11.0, 22.0, 101.0, 202.0,
-                new TestDrawable());
-        assertEquals(a1, a2);
-
-        a1 = new XYDrawableAnnotation(11.0, 22.0, 101.0, 202.0, 2.0,
-                new TestDrawable());
-        assertNotEquals(a1, a2);
-        a2 = new XYDrawableAnnotation(11.0, 22.0, 101.0, 202.0, 2.0,
-                new TestDrawable());
-        assertEquals(a1, a2);
+    private static XYDrawableAnnotation annotation(double x, double y, double w, double h) {
+        return new XYDrawableAnnotation(x, y, w, h, new TestDrawable());
     }
 
-    /**
-     * Two objects that are equal are required to return the same hashCode.
-     */
+    private static XYDrawableAnnotation annotation(
+            double x, double y, double w, double h, double scale) {
+        return new XYDrawableAnnotation(x, y, w, h, scale, new TestDrawable());
+    }
+
     @Test
-    public void testHashCode() {
-        XYDrawableAnnotation a1 = new XYDrawableAnnotation(10.0, 20.0, 100.0,
-                200.0, new TestDrawable());
-        XYDrawableAnnotation a2 = new XYDrawableAnnotation(10.0, 20.0, 100.0,
-                200.0, new TestDrawable());
-        assertEquals(a1, a2);
+    @DisplayName("equals: same values -> objects are equal")
+    public void equals_sameValues_returnsTrue() {
+        // Arrange
+        XYDrawableAnnotation a1 = annotation(BASE_X, BASE_Y, BASE_WIDTH, BASE_HEIGHT);
+        XYDrawableAnnotation a2 = annotation(BASE_X, BASE_Y, BASE_WIDTH, BASE_HEIGHT);
+
+        // Assert
+        assertEquals(a1, a2, "Two annotations with identical state should be equal");
+    }
+
+    @Test
+    @DisplayName("equals: different x -> not equal")
+    public void equals_differentX_returnsFalse() {
+        XYDrawableAnnotation baseline = annotation(BASE_X, BASE_Y, BASE_WIDTH, BASE_HEIGHT);
+        XYDrawableAnnotation changed = annotation(BASE_X + 1, BASE_Y, BASE_WIDTH, BASE_HEIGHT);
+
+        assertNotEquals(baseline, changed, "Changing x should break equality");
+    }
+
+    @Test
+    @DisplayName("equals: different y -> not equal")
+    public void equals_differentY_returnsFalse() {
+        XYDrawableAnnotation baseline = annotation(BASE_X, BASE_Y, BASE_WIDTH, BASE_HEIGHT);
+        XYDrawableAnnotation changed = annotation(BASE_X, BASE_Y + 2, BASE_WIDTH, BASE_HEIGHT);
+
+        assertNotEquals(baseline, changed, "Changing y should break equality");
+    }
+
+    @Test
+    @DisplayName("equals: different display width -> not equal")
+    public void equals_differentWidth_returnsFalse() {
+        XYDrawableAnnotation baseline = annotation(BASE_X, BASE_Y, BASE_WIDTH, BASE_HEIGHT);
+        XYDrawableAnnotation changed = annotation(BASE_X, BASE_Y, BASE_WIDTH + 1, BASE_HEIGHT);
+
+        assertNotEquals(baseline, changed, "Changing display width should break equality");
+    }
+
+    @Test
+    @DisplayName("equals: different display height -> not equal")
+    public void equals_differentHeight_returnsFalse() {
+        XYDrawableAnnotation baseline = annotation(BASE_X, BASE_Y, BASE_WIDTH, BASE_HEIGHT);
+        XYDrawableAnnotation changed = annotation(BASE_X, BASE_Y, BASE_WIDTH, BASE_HEIGHT + 2);
+
+        assertNotEquals(baseline, changed, "Changing display height should break equality");
+    }
+
+    @Test
+    @DisplayName("equals: different draw scale factor -> not equal")
+    public void equals_differentScale_returnsFalse() {
+        XYDrawableAnnotation baseline = annotation(BASE_X, BASE_Y, BASE_WIDTH, BASE_HEIGHT, BASE_SCALE);
+        XYDrawableAnnotation changed = annotation(BASE_X, BASE_Y, BASE_WIDTH, BASE_HEIGHT, BASE_SCALE + 1);
+
+        assertNotEquals(baseline, changed, "Changing draw scale factor should break equality");
+    }
+
+    @Test
+    @DisplayName("hashCode: equal objects have equal hash codes")
+    public void hashCode_consistentWithEquals() {
+        // Arrange
+        XYDrawableAnnotation a1 = annotation(BASE_X, BASE_Y, BASE_WIDTH, BASE_HEIGHT);
+        XYDrawableAnnotation a2 = annotation(BASE_X, BASE_Y, BASE_WIDTH, BASE_HEIGHT);
+
+        // Precondition
+        assertEquals(a1, a2, "Precondition: objects must be equal to compare hash codes");
+
+        // Act
         int h1 = a1.hashCode();
         int h2 = a2.hashCode();
-        assertEquals(h1, h2);
+
+        // Assert
+        assertEquals(h1, h2, "Equal objects must have the same hash code");
     }
 
-    /**
-     * Confirm that cloning works.
-     */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
-        XYDrawableAnnotation a1 = new XYDrawableAnnotation(10.0, 20.0, 100.0,
-                200.0, new TestDrawable());
-        XYDrawableAnnotation a2 = (XYDrawableAnnotation) a1.clone();
-        assertNotSame(a1, a2);
-        assertSame(a1.getClass(), a2.getClass());
-        assertEquals(a1, a2);
+    @DisplayName("clone: produces an equal but distinct instance")
+    public void cloning_producesEqualButDistinctInstance() throws CloneNotSupportedException {
+        // Arrange
+        XYDrawableAnnotation original = annotation(BASE_X, BASE_Y, BASE_WIDTH, BASE_HEIGHT);
+
+        // Act
+        XYDrawableAnnotation clone = (XYDrawableAnnotation) original.clone();
+
+        // Assert
+        assertNotSame(original, clone, "Clone should be a different instance");
+        assertSame(original.getClass(), clone.getClass(), "Clone should be of the same runtime type");
+        assertEquals(original, clone, "Clone should be equal to the original");
     }
 
-    /**
-     * Checks that this class implements PublicCloneable.
-     */
     @Test
-    public void testPublicCloneable() {
-        XYDrawableAnnotation a1 = new XYDrawableAnnotation(10.0, 20.0, 100.0,
-                200.0, new TestDrawable());
-        assertTrue(a1 instanceof PublicCloneable);
+    @DisplayName("implements PublicCloneable marker interface")
+    public void implementsPublicCloneable() {
+        XYDrawableAnnotation a = annotation(BASE_X, BASE_Y, BASE_WIDTH, BASE_HEIGHT);
+        assertTrue(a instanceof PublicCloneable, "XYDrawableAnnotation should implement PublicCloneable");
     }
 
-    /**
-     * Serialize an instance, restore it, and check for equality.
-     */
     @Test
-    public void testSerialization() {
-        XYDrawableAnnotation a1 = new XYDrawableAnnotation(10.0, 20.0, 100.0,
-                200.0, new TestDrawable());
-        XYDrawableAnnotation a2 = TestUtils.serialised(a1);
-        assertEquals(a1, a2);
-    }
+    @DisplayName("serialization: round-trip preserves equality")
+    public void serialization_roundTrip_preservesEquality() {
+        XYDrawableAnnotation original = annotation(BASE_X, BASE_Y, BASE_WIDTH, BASE_HEIGHT);
+        XYDrawableAnnotation restored = TestUtils.serialised(original);
 
+        assertEquals(original, restored, "Deserialized instance should be equal to the original");
+    }
 }
