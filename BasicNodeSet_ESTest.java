@@ -19,195 +19,213 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class)
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true,
-    useVFS = true,
-    useVNET = true,
-    resetStaticState = true,
-    separateClassLoader = true
-)
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class BasicNodeSet_ESTest extends BasicNodeSet_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void toString_WithUndefinedVariable_ThrowsIllegalArgumentException() throws Throwable {
-        BasicVariables variables = new BasicVariables();
-        QName undefinedVarName = new QName("5>?Fr~\"n B, <j");
-        VariablePointer pointer = new VariablePointer(variables, undefinedVarName);
-        pointer.setIndex(1805);
-        
-        BasicNodeSet nodeSet = new BasicNodeSet();
-        nodeSet.add(pointer);
-        
-        try {
-            nodeSet.toString();
-            fail("Expected IllegalArgumentException for undefined variable");
-        } catch (IllegalArgumentException e) {
-            verifyException("org.apache.commons.jxpath.BasicVariables", e);
-            assertTrue(e.getMessage().contains("No such variable: '5>?Fr~\"n B, <j'"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      BasicVariables basicVariables0 = new BasicVariables();
+      QName qName0 = new QName("5>?Fr~\"n B, <j");
+      VariablePointer variablePointer0 = new VariablePointer(basicVariables0, qName0);
+      variablePointer0.setIndex(1805);
+      BasicNodeSet basicNodeSet0 = new BasicNodeSet();
+      basicNodeSet0.add((Pointer) variablePointer0);
+      // Undeclared exception!
+      try { 
+        basicNodeSet0.toString();
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // No such variable: '5>?Fr~\"n B, <j'
+         //
+         verifyException("org.apache.commons.jxpath.BasicVariables", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void getValues_WithNullQNameVariable_ThrowsRuntimeException() throws Throwable {
-        VariablePointer pointer = new VariablePointer((QName) null);
-        BasicNodeSet nodeSet = new BasicNodeSet();
-        nodeSet.add(pointer);
-        
-        try {
-            nodeSet.getValues();
-            fail("Expected RuntimeException for undefined variable with null QName");
-        } catch (RuntimeException e) {
-            assertTrue(e.getMessage().contains("Undefined variable: null"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      BasicNodeSet basicNodeSet0 = new BasicNodeSet();
+      VariablePointer variablePointer0 = new VariablePointer((QName) null);
+      basicNodeSet0.add((Pointer) variablePointer0);
+      // Undeclared exception!
+      try { 
+        basicNodeSet0.getValues();
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // Undefined variable: null
+         //
+         verifyException("org.apache.commons.jxpath.ri.model.VariablePointer$1", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void getValues_WithNullPointer_ThrowsNullPointerException() throws Throwable {
-        BasicNodeSet nodeSet = new BasicNodeSet();
-        nodeSet.add((Pointer) null);
-        
-        try {
-            nodeSet.getValues();
-            fail("Expected NullPointerException when dereferencing null pointer");
-        } catch (NullPointerException e) {
-            // Expected when processing null pointer in stream
-        }
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      BasicNodeSet basicNodeSet0 = new BasicNodeSet();
+      basicNodeSet0.add((Pointer) null);
+      // Undeclared exception!
+      try { 
+        basicNodeSet0.getValues();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.util.stream.ReferencePipeline$3$1", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void getValues_WithUndefinedVariable_ThrowsIllegalArgumentException() throws Throwable {
-        BasicVariables variables = new BasicVariables();
-        QName undefinedVarName = new QName("Y2:%V(;/u");
-        VariablePointer pointer = new VariablePointer(variables, undefinedVarName);
-        
-        BasicNodeSet nodeSet = new BasicNodeSet();
-        nodeSet.add(pointer);
-        
-        try {
-            nodeSet.getValues();
-            fail("Expected IllegalArgumentException for undefined variable");
-        } catch (IllegalArgumentException e) {
-            verifyException("org.apache.commons.jxpath.BasicVariables", e);
-            assertTrue(e.getMessage().contains("No such variable: 'Y2:%V(;/u'"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      BasicNodeSet basicNodeSet0 = new BasicNodeSet();
+      BasicVariables basicVariables0 = new BasicVariables();
+      QName qName0 = new QName("Y2:%V(;/u");
+      VariablePointer variablePointer0 = new VariablePointer(basicVariables0, qName0);
+      basicNodeSet0.add((Pointer) variablePointer0);
+      // Undeclared exception!
+      try { 
+        basicNodeSet0.getValues();
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // No such variable: 'Y2:%V(;/u'
+         //
+         verifyException("org.apache.commons.jxpath.BasicVariables", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void getNodes_WithNullQNameVariable_ThrowsRuntimeException() throws Throwable {
-        VariablePointer pointer = new VariablePointer((QName) null);
-        BasicNodeSet nodeSet = new BasicNodeSet();
-        nodeSet.add(pointer);
-        
-        try {
-            nodeSet.getNodes();
-            fail("Expected RuntimeException for undefined variable with null QName");
-        } catch (RuntimeException e) {
-            assertTrue(e.getMessage().contains("Undefined variable: null"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      BasicNodeSet basicNodeSet0 = new BasicNodeSet();
+      VariablePointer variablePointer0 = new VariablePointer((QName) null);
+      basicNodeSet0.add((Pointer) variablePointer0);
+      // Undeclared exception!
+      try { 
+        basicNodeSet0.getNodes();
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // Undefined variable: null
+         //
+         verifyException("org.apache.commons.jxpath.ri.model.VariablePointer$1", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void getNodes_WithNullPointer_ThrowsNullPointerException() throws Throwable {
-        BasicNodeSet nodeSet = new BasicNodeSet();
-        nodeSet.add((Pointer) null);
-        
-        try {
-            nodeSet.getNodes();
-            fail("Expected NullPointerException when dereferencing null pointer");
-        } catch (NullPointerException e) {
-            // Expected when processing null pointer in stream
-        }
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      BasicNodeSet basicNodeSet0 = new BasicNodeSet();
+      basicNodeSet0.add((Pointer) null);
+      // Undeclared exception!
+      try { 
+        basicNodeSet0.getNodes();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.util.stream.ReferencePipeline$3$1", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void getNodes_WithEmptyQName_ThrowsIllegalArgumentException() throws Throwable {
-        BasicVariables variables = new BasicVariables();
-        QName emptyName = new QName("", "");
-        VariablePointer pointer = new VariablePointer(variables, emptyName);
-        
-        BasicNodeSet nodeSet = new BasicNodeSet();
-        nodeSet.add(pointer);
-        
-        try {
-            nodeSet.getNodes();
-            fail("Expected IllegalArgumentException for empty QName variable");
-        } catch (IllegalArgumentException e) {
-            verifyException("org.apache.commons.jxpath.BasicVariables", e);
-            assertTrue(e.getMessage().contains("No such variable: ':'"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      BasicNodeSet basicNodeSet0 = new BasicNodeSet();
+      BasicVariables basicVariables0 = new BasicVariables();
+      QName qName0 = new QName("", "");
+      VariablePointer variablePointer0 = new VariablePointer(basicVariables0, qName0);
+      basicNodeSet0.add((Pointer) variablePointer0);
+      // Undeclared exception!
+      try { 
+        basicNodeSet0.getNodes();
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // No such variable: ':'
+         //
+         verifyException("org.apache.commons.jxpath.BasicVariables", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void add_NullNodeSet_ThrowsNullPointerException() throws Throwable {
-        BasicNodeSet nodeSet = new BasicNodeSet();
-        try {
-            nodeSet.add((NodeSet) null);
-            fail("Expected NullPointerException when adding null NodeSet");
-        } catch (NullPointerException e) {
-            // Expected when adding null NodeSet
-        }
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      BasicNodeSet basicNodeSet0 = new BasicNodeSet();
+      // Undeclared exception!
+      try { 
+        basicNodeSet0.add((NodeSet) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.jxpath.BasicNodeSet", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void remove_NullPointer_DoesNothing() throws Throwable {
-        BasicNodeSet nodeSet = new BasicNodeSet();
-        // Should not throw exception
-        nodeSet.remove((Pointer) null);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      BasicNodeSet basicNodeSet0 = new BasicNodeSet();
+      basicNodeSet0.remove((Pointer) null);
+  }
 
-    @Test(timeout = 4000)
-    public void getValues_WhenEmpty_ReturnsEmptyList() throws Throwable {
-        BasicNodeSet nodeSet = new BasicNodeSet();
-        List<Object> values = nodeSet.getValues();
-        assertTrue("Empty node set should return empty values list", values.isEmpty());
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      BasicNodeSet basicNodeSet0 = new BasicNodeSet();
+      basicNodeSet0.getValues();
+      List list0 = basicNodeSet0.getValues();
+      assertEquals(0, list0.size());
+  }
 
-    @Test(timeout = 4000)
-    public void getPointers_WhenCalledTwice_ReturnsSameList() throws Throwable {
-        BasicNodeSet nodeSet = new BasicNodeSet();
-        List<Pointer> firstCall = nodeSet.getPointers();
-        List<Pointer> secondCall = nodeSet.getPointers();
-        assertSame("Multiple calls to getPointers should return same list instance", firstCall, secondCall);
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      BasicNodeSet basicNodeSet0 = new BasicNodeSet();
+      List<Pointer> list0 = basicNodeSet0.getPointers();
+      List<Pointer> list1 = basicNodeSet0.getPointers();
+      assertSame(list1, list0);
+  }
 
-    @Test(timeout = 4000)
-    public void getNodes_WhenEmpty_ReturnsEmptyList() throws Throwable {
-        BasicNodeSet nodeSet = new BasicNodeSet();
-        List<Object> nodes = nodeSet.getNodes();
-        assertTrue("Empty node set should return empty nodes list", nodes.isEmpty());
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      BasicNodeSet basicNodeSet0 = new BasicNodeSet();
+      basicNodeSet0.getNodes();
+      List list0 = basicNodeSet0.getNodes();
+      assertTrue(list0.isEmpty());
+  }
 
-    @Test(timeout = 4000)
-    public void add_NodeSetAfterAddingPointer_Succeeds() throws Throwable {
-        BasicVariables variables = new BasicVariables();
-        QName varName = new QName("D@-&EQH");
-        VariablePointer pointer = new VariablePointer(variables, varName);
-        
-        BasicNodeSet nodeSet = new BasicNodeSet();
-        nodeSet.add(pointer);
-        // Should not throw when adding NodeSet containing pointers
-        nodeSet.add((NodeSet) nodeSet);
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      BasicNodeSet basicNodeSet0 = new BasicNodeSet();
+      QName qName0 = new QName("D@-&EQH");
+      BasicVariables basicVariables0 = new BasicVariables();
+      VariablePointer variablePointer0 = new VariablePointer(basicVariables0, qName0);
+      basicNodeSet0.add((Pointer) variablePointer0);
+      basicNodeSet0.add((NodeSet) basicNodeSet0);
+  }
 
-    @Test(timeout = 4000)
-    public void add_SelfNodeSet_Succeeds() throws Throwable {
-        BasicNodeSet nodeSet = new BasicNodeSet();
-        // Should not throw when adding self as NodeSet
-        nodeSet.add((NodeSet) nodeSet);
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      BasicNodeSet basicNodeSet0 = new BasicNodeSet();
+      basicNodeSet0.add((NodeSet) basicNodeSet0);
+  }
 
-    @Test(timeout = 4000)
-    public void toString_WhenEmpty_ReturnsEmptyBrackets() throws Throwable {
-        BasicNodeSet nodeSet = new BasicNodeSet();
-        assertEquals("Empty node set should have empty bracket representation", "[]", nodeSet.toString());
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      BasicNodeSet basicNodeSet0 = new BasicNodeSet();
+      String string0 = basicNodeSet0.toString();
+      assertEquals("[]", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void addThenRemoveNullPointer_Succeeds() throws Throwable {
-        BasicNodeSet nodeSet = new BasicNodeSet();
-        nodeSet.add((Pointer) null);
-        // Should not throw when removing null pointer
-        nodeSet.remove((Pointer) null);
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      BasicNodeSet basicNodeSet0 = new BasicNodeSet();
+      basicNodeSet0.add((Pointer) null);
+      basicNodeSet0.remove((Pointer) null);
+  }
 }
