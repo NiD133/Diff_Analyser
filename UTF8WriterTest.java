@@ -1,169 +1,160 @@
 package com.fasterxml.jackson.core.io;
 
 import java.io.*;
-import org.junit.jupiter.api.*;
+
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UTF8WriterTest extends com.fasterxml.jackson.core.JUnit5TestBase {
-    private static final String TEST_STRING = "AB\u00A0\u1AE9\uFFFC";
-    private static final String ASCII_STRING = "abcdefghijklmnopqrst\u00A0";
-    private static final String SURROGATE_STRING = "\uD83D\uDE03";
-    private static final byte[] EXPECTED_SURROGATE_BYTES = {
-        (byte) 0xF0, (byte) 0x9F, (byte) 0x98, (byte) 0x83
-    };
+class UTF8WriterTest
+        extends com.fasterxml.jackson.core.JUnit5TestBase
+{
+    @Test
+    void simple() throws Exception
+    {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        UTF8Writer w = new UTF8Writer(_ioContext(), out);
 
-    private UTF8Writer buildWriter(ByteArrayOutputStream out) {
-        return new UTF8Writer(_ioContext(), out);
-    }
+        String str = "AB\u00A0\u1AE9\uFFFC";
+        char[] ch = str.toCharArray();
 
-    @Nested
-    @DisplayName("Basic Write Operations")
-    class BasicWriteOperations {
-        @Test
-        void writeUsingMultipleMethods() throws Exception {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            try (UTF8Writer w = buildWriter(out)) {
-                // Write using different method variants
-                w.write(TEST_STRING);               // String write
-                w.append(TEST_STRING.charAt(0));    // Append char
-                w.write(TEST_STRING.charAt(1));     // Single char write
-                w.write(TEST_STRING.toCharArray(), 2, 3);  // Char array segment
-                w.write(TEST_STRING, 0, TEST_STRING.length());  // String segment
-            }
+        // Let's write 3 times, using different methods
+        w.write(str);
 
-            // Verify combined output
-            String result = out.toString("UTF-8");
-            assertEquals(TEST_STRING.length() * 3, result.length());
-            assertEquals(TEST_STRING + TEST_STRING + TEST_STRING, result);
-        }
+        w.append(ch[0]);
+        w.write(ch[1]);
+        w.write(ch, 2, 3);
+        w.flush();
 
-        @Test
-        void writeAsciiWithNonAsciiCharacter() throws Exception {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            try (UTF8Writer w = buildWriter(out)) {
-                w.write(ASCII_STRING.toCharArray());
-            }
+        w.write(str, 0, str.length());
+        w.close();
 
-            // ASCII characters: 1 byte, non-ASCII: 2 bytes (total = 21 chars + 1 extra byte)
-            byte[] data = out.toByteArray();
-            assertEquals(ASCII_STRING.length() + 1, data.length);
-            assertEquals(ASCII_STRING, out.toString("UTF-8"));
-        }
-    }
+        // and thus should have 3 times contents
+        byte[] data = out.toByteArray();
+        assertEquals(3*10, data.length);
+        String act = utf8String(out);
+        assertEquals(15, act.length());
 
-    @Nested
-    @DisplayName("Special Case Handling")
-    class SpecialCaseHandling {
-        @Test
-        void flushAndCloseAfterWriterClosed() throws Exception {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            UTF8Writer w = buildWriter(out);
-            
-            // Write some data and close normally
-            w.write('X');
-            w.write(new char[]{'Y'});
-            w.close();
-            assertEquals(2, out.size());
-            
-            // Verify post-close operations are safe
-            w.flush();
-            w.close();
-        }
-
-        @Test
-        void flushBeforeCloseTriggersDifferentCodePath() throws Exception {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            try (UTF8Writer w = buildWriter(out)) {
-                w.write(ASCII_STRING);
-                w.flush();  // Explicit flush before close
-            }
-            assertEquals(ASCII_STRING, out.toString("UTF-8"));
-        }
-    }
-
-    @Nested
-    @DisplayName("Surrogate Pair Handling")
-    class SurrogatePairHandling {
-        @Test
-        void validSurrogatePairWrittenAsChars() throws Exception {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            try (UTF8Writer w = buildWriter(out)) {
-                w.write(0xD83D);  // High surrogate
-                w.write(0xDE03);  // Low surrogate
-            }
-            assertArrayEquals(EXPECTED_SURROGATE_BYTES, out.toByteArray());
-        }
-
-        @Test
-        void validSurrogatePairWrittenAsString() throws Exception {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            try (UTF8Writer w = buildWriter(out)) {
-                w.write(SURROGATE_STRING);
-            }
-            assertArrayEquals(EXPECTED_SURROGATE_BYTES, out.toByteArray());
-        }
-
-        @Test
-        void unpairedLowSurrogateThrowsException() {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            try (UTF8Writer w = buildWriter(out)) {
-                w.write(0xDE03);  // Unpaired low surrogate
-                fail("Should throw IOException for unpaired low surrogate");
-            } catch (IOException e) {
-                verifyException(e, "Unmatched second part");
-            }
-        }
-
-        @Test
-        void brokenSurrogatePairThrowsException() {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            try (UTF8Writer w = buildWriter(out)) {
-                w.write(0xD83D);  // High surrogate
-                w.write('a');     // Non-surrogate character breaks pair
-                fail("Should throw IOException for broken surrogate pair");
-            } catch (IOException e) {
-                verifyException(e, "Broken surrogate pair");
-            }
-        }
-
-        @Test
-        void unpairedLowSurrogateStringThrowsException() {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            try (UTF8Writer w = buildWriter(out)) {
-                w.write("\uDE03");  // Unpaired low surrogate in string
-                fail("Should throw IOException for unpaired low surrogate");
-            } catch (IOException e) {
-                verifyException(e, "Unmatched second part");
-            }
-        }
-
-        @Test
-        void brokenSurrogatePairStringThrowsException() {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            try (UTF8Writer w = buildWriter(out)) {
-                w.write("\uD83Da");  // High surrogate followed by non-surrogate
-                fail("Should throw IOException for broken surrogate pair");
-            } catch (IOException e) {
-                verifyException(e, "Broken surrogate pair");
-            }
-        }
+        assertEquals(3 * str.length(), act.length());
+        assertEquals(str+str+str, act);
     }
 
     @Test
-    @DisplayName("Verify Surrogate Conversion Logic")
-    void surrogateConversion() {
+    void simpleAscii() throws Exception
+    {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        UTF8Writer w = new UTF8Writer(_ioContext(), out);
+
+        String str = "abcdefghijklmnopqrst\u00A0";
+        char[] ch = str.toCharArray();
+
+        w.write(ch, 0, ch.length);
+        w.flush(); // trigger different code path for close
+        w.close();
+
+        byte[] data = out.toByteArray();
+        // one 2-byte encoded char
+        assertEquals(ch.length+1, data.length);
+        String act = utf8String(out);
+        assertEquals(str, act);
+    }
+
+    @Test
+    void flushAfterClose() throws Exception
+    {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        UTF8Writer w = new UTF8Writer(_ioContext(), out);
+
+        w.write('X');
+        char[] ch = { 'Y' };
+        w.write(ch);
+
+        w.close();
+        assertEquals(2, out.size());
+
+        // and this ought to be fine...
+        w.flush();
+        // as well as some more...
+        w.close();
+        w.flush();
+    }
+
+    @Test
+    void surrogatesOk() throws Exception
+    {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        UTF8Writer w = new UTF8Writer(_ioContext(), out);
+
+        // First, valid case, char by char
+        w.write(0xD83D);
+        w.write(0xDE03);
+        w.close();
+        assertEquals(4, out.size());
+        final byte[] EXP_SURROGATES = new byte[] { (byte) 0xF0, (byte) 0x9F,
+               (byte) 0x98, (byte) 0x83 };
+        assertArrayEquals(EXP_SURROGATES, out.toByteArray());
+
+        // and then as String
+        out = new ByteArrayOutputStream();
+        w = new UTF8Writer(_ioContext(), out);
+        w.write("\uD83D\uDE03");
+        w.close();
+        assertEquals(4, out.size());
+        assertArrayEquals(EXP_SURROGATES, out.toByteArray());
+    }
+
+    @SuppressWarnings("resource")
+    @Test
+    void surrogatesFail() throws Exception
+    {
+        ByteArrayOutputStream out;
+
+        out = new ByteArrayOutputStream();
+        try (UTF8Writer w = new UTF8Writer(_ioContext(), out)) {
+            w.write(0xDE03);
+            fail("should not pass");
+        } catch (IOException e) {
+            verifyException(e, "Unmatched second part");
+        }
+
+        out = new ByteArrayOutputStream();
+        try (UTF8Writer w = new UTF8Writer(_ioContext(), out)) {
+            w.write(0xD83D);
+            w.write('a');
+            fail("should not pass");
+        } catch (IOException e) {
+            verifyException(e, "Broken surrogate pair");
+        }
+
+        out = new ByteArrayOutputStream();
+        try (UTF8Writer w = new UTF8Writer(_ioContext(), out)) {
+            w.write("\uDE03");
+            fail("should not pass");
+        } catch (IOException e) {
+            verifyException(e, "Unmatched second part");
+        }
+
+        out = new ByteArrayOutputStream();
+        try (UTF8Writer w = new UTF8Writer(_ioContext(), out)) {
+            w.write("\uD83Da");
+            fail("should not pass");
+        } catch (IOException e) {
+            verifyException(e, "Broken surrogate pair");
+        }
+    }
+
+    // For [core#1218]
+    // @since 2.17
+    @Test
+    void surrogateConversion()
+    {
         for (int first = UTF8Writer.SURR1_FIRST; first <= UTF8Writer.SURR1_LAST; first++) {
             for (int second = UTF8Writer.SURR2_FIRST; second <= UTF8Writer.SURR2_LAST; second++) {
-                int expected = 0x10000 + ((first - UTF8Writer.SURR1_FIRST) << 10)
-                    + (second - UTF8Writer.SURR2_FIRST);
+                int expected = 0x10000 + ((first - UTF8Writer.SURR1_FIRST) << 10) + (second - UTF8Writer.SURR2_FIRST);
                 int actual = (first << 10) + second + UTF8Writer.SURROGATE_BASE;
-                
                 if (expected != actual) {
-                    fail(String.format(
-                        "Mismatch for surrogates U+%04X U+%04X: expected 0x%X, actual 0x%X",
-                        first, second, expected, actual
-                    ));
+                    fail("Mismatch on: "+Integer.toHexString(first) + " " + Integer.toHexString(second)
+                        +"; expected: "+expected+", actual: "+actual);
                 }
             }
         }
