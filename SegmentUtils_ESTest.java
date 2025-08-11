@@ -17,216 +17,330 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class SegmentUtils_ESTest extends SegmentUtils_ESTest_scaffolding {
 
-    //---------------- Tests for countMatches(long[][], IMatcher) ----------------//
-    @Test(timeout = 4000)
-    public void test_countMatches_2DArrayWithNullMatcherThrowsNPE() throws Throwable {
-        long[][] array2D = new long[4][7];
-        array2D[0] = new long[0]; // Empty row
-        try {
-            SegmentUtils.countMatches(array2D, null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      long[][] longArray0 = new long[4][7];
+      long[] longArray1 = new long[0];
+      longArray0[0] = longArray1;
+      // Undeclared exception!
+      try { 
+        SegmentUtils.countMatches(longArray0, (IMatcher) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void test_countMatches_empty2DArrayReturnsZero() throws Throwable {
-        long[][] empty2DArray = new long[0][5];
-        int count = SegmentUtils.countMatches(empty2DArray, null);
-        assertEquals(0, count);
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      int int0 = SegmentUtils.countArgs("Can't read beyond end of stream (n = %,d, count = %,d, maxLength = %,d, remaining  %,d)", 103);
+      assertEquals(26, int0);
+  }
 
-    //---------------- Tests for countArgs(String) ----------------//
-    @Test(timeout = 4000)
-    public void test_countArgs_validDescriptorReturnsCount() throws Throwable {
-        assertEquals(0, SegmentUtils.countArgs("1.8()JbKnQPYyNxq!"));
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      int int0 = SegmentUtils.countInvokeInterfaceArgs("1.8()JbKnQPeYyNxq!");
+      assertEquals(0, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void test_countArgs_nullDescriptorThrowsNPE() throws Throwable {
-        try {
-            SegmentUtils.countArgs(null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      int int0 = SegmentUtils.countArgs("1.8()JbKnQPeYyNxq!", 0);
+      assertEquals(0, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void test_countArgs_malformedDescriptorThrowsIAE() throws Throwable {
-        try {
-            SegmentUtils.countArgs("tp!Hgy");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            assertEquals("No arguments", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      int int0 = SegmentUtils.countArgs("1.8()JbKnQPYyNxq!");
+      assertEquals(0, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void test_countArgs_validDescriptorWithArguments() throws Throwable {
-        assertEquals(2, SegmentUtils.countArgs("&L(LkEf;|)7g<"));
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        SegmentUtils.countInvokeInterfaceArgs((String) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
+      }
+  }
 
-    //---------------- Tests for countInvokeInterfaceArgs(String) ----------------//
-    @Test(timeout = 4000)
-    public void test_countInvokeInterfaceArgs_validDescriptorReturnsZero() throws Throwable {
-        assertEquals(0, SegmentUtils.countInvokeInterfaceArgs("1.8()JbKnQPeYyNxq!"));
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        SegmentUtils.countBit16((long[][]) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void test_countInvokeInterfaceArgs_nullDescriptorThrowsNPE() throws Throwable {
-        try {
-            SegmentUtils.countInvokeInterfaceArgs(null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        SegmentUtils.countBit16((long[]) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void test_countInvokeInterfaceArgs_validDescriptorWithArguments() throws Throwable {
-        assertEquals(5, SegmentUtils.countInvokeInterfaceArgs("(X=K[}a)\"3/[Ns"));
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        SegmentUtils.countBit16((int[]) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void test_countInvokeInterfaceArgs_malformedDescriptorThrowsIAE() throws Throwable {
-        try {
-            SegmentUtils.countInvokeInterfaceArgs("Aw2<'N6_{7~h_K?(gZ");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            assertEquals("No arguments", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        SegmentUtils.countArgs((String) null, 1);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
+      }
+  }
 
-    //---------------- Tests for countArgs(String, int) ----------------//
-    @Test(timeout = 4000)
-    public void test_countArgsWithWidth_complexDescriptor() throws Throwable {
-        String descriptor = "Can't read beyond end of stream (n = %,d, count = %,d, maxLength = %,d, remaining  %,d)";
-        assertEquals(26, SegmentUtils.countArgs(descriptor, 103));
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        SegmentUtils.countArgs((String) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void test_countArgsWithWidth_validDescriptorWithZeroWidth() throws Throwable {
-        assertEquals(0, SegmentUtils.countArgs("1.8()JbKnQPeYyNxq!", 0));
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        SegmentUtils.countArgs("tp!Hgy");
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // No arguments
+         //
+         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void test_countArgsWithWidth_nullDescriptorThrowsNPE() throws Throwable {
-        try {
-            SegmentUtils.countArgs(null, 1);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      int int0 = SegmentUtils.countArgs("_l((aDZ!yS3=O)=z/R2Z", 10);
+      assertEquals(19, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void test_countArgsWithWidth_malformedDescriptorThrowsIAE() throws Throwable {
-        try {
-            SegmentUtils.countArgs("xYt>#a(6={", 3540);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            assertEquals("No arguments", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      int int0 = SegmentUtils.countArgs("(X=K[}a)\"3/[Ns", 5);
+      assertEquals(5, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void test_countArgsWithWidth_negativeWidth() throws Throwable {
-        String descriptor = "l<<(6JNLi@g)";
-        assertEquals(-1653, SegmentUtils.countArgs(descriptor, -1656));
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      int int0 = SegmentUtils.countArgs("&L(LkEf;|)yg<", 2);
+      assertEquals(2, int0);
+  }
 
-    //---------------- Tests for countBit16(long[][]) ----------------//
-    @Test(timeout = 4000)
-    public void test_countBit16_2DArrayNullThrowsNPE() throws Throwable {
-        try {
-            SegmentUtils.countBit16((long[][]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        SegmentUtils.countArgs("xYt>#a(6={", 3540);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // No arguments
+         //
+         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void test_countBit16_2DArrayWithBit16Set() throws Throwable {
-        long[][] array2D = new long[6][0];
-        long[] rowWithBitSet = new long[6];
-        rowWithBitSet[5] = 65536L; // Sets bit 16
-        array2D[4] = rowWithBitSet;
-        assertEquals(1, SegmentUtils.countBit16(array2D));
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        SegmentUtils.countArgs("org.apache.commons.compress.harmony.unpack200.SegmentUtils", (-4538));
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // No arguments
+         //
+         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void test_countBit16_2DArrayWithoutBit16Set() throws Throwable {
-        long[][] array2D = new long[6][0];
-        array2D[0] = new long[2]; // All zeros
-        assertEquals(0, SegmentUtils.countBit16(array2D));
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      long[][] longArray0 = new long[0][5];
+      int int0 = SegmentUtils.countMatches(longArray0, (IMatcher) null);
+      assertEquals(0, int0);
+  }
 
-    //---------------- Tests for countMatches(long[], IMatcher) ----------------//
-    @Test(timeout = 4000)
-    public void test_countMatches_longArrayWithNullMatcherThrowsNPE() throws Throwable {
-        long[] array = new long[4];
-        try {
-            SegmentUtils.countMatches(array, null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      long[] longArray0 = new long[4];
+      // Undeclared exception!
+      try { 
+        SegmentUtils.countMatches(longArray0, (IMatcher) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void test_countMatches_emptyLongArrayReturnsZero() throws Throwable {
-        long[] emptyArray = new long[0];
-        assertEquals(0, SegmentUtils.countMatches(emptyArray, null));
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      long[] longArray0 = new long[0];
+      int int0 = SegmentUtils.countMatches(longArray0, (IMatcher) null);
+      assertEquals(0, int0);
+  }
 
-    //---------------- Tests for countBit16(long[]) ----------------//
-    @Test(timeout = 4000)
-    public void test_countBit16_longArrayNullThrowsNPE() throws Throwable {
-        try {
-            SegmentUtils.countBit16((long[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      long[][] longArray0 = new long[6][0];
+      long[] longArray1 = new long[6];
+      longArray1[5] = 65536L;
+      longArray0[4] = longArray1;
+      int int0 = SegmentUtils.countBit16(longArray0);
+      assertEquals(1, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void test_countBit16_longArrayWithBit16Set() throws Throwable {
-        long[] array = new long[5];
-        array[1] = -1653L; // Sets bit 16
-        assertEquals(1, SegmentUtils.countBit16(array));
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      long[][] longArray0 = new long[6][0];
+      long[] longArray1 = new long[2];
+      longArray0[0] = longArray1;
+      int int0 = SegmentUtils.countBit16(longArray0);
+      assertEquals(0, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void test_countBit16_longArrayWithoutBit16Set() throws Throwable {
-        long[] array = new long[5]; // All zeros
-        assertEquals(0, SegmentUtils.countBit16(array));
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      long[] longArray0 = new long[5];
+      longArray0[1] = (long) (-1653);
+      int int0 = SegmentUtils.countBit16(longArray0);
+      assertEquals(1, int0);
+  }
 
-    //---------------- Tests for countBit16(int[]) ----------------//
-    @Test(timeout = 4000)
-    public void test_countBit16_intArrayNullThrowsNPE() throws Throwable {
-        try {
-            SegmentUtils.countBit16((int[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      long[] longArray0 = new long[5];
+      int int0 = SegmentUtils.countBit16(longArray0);
+      assertEquals(0, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void test_countBit16_intArrayWithBit16Set() throws Throwable {
-        int[] array = new int[1];
-        array[0] = -142; // Sets bit 16
-        assertEquals(1, SegmentUtils.countBit16(array));
-    }
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      int[] intArray0 = new int[1];
+      intArray0[0] = (-142);
+      int int0 = SegmentUtils.countBit16(intArray0);
+      assertEquals(1, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void test_countBit16_intArrayWithoutBit16Set() throws Throwable {
-        int[] array = new int[1]; // Zero
-        assertEquals(0, SegmentUtils.countBit16(array));
-    }
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      int[] intArray0 = new int[1];
+      int int0 = SegmentUtils.countBit16(intArray0);
+      assertEquals(0, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      int int0 = SegmentUtils.countInvokeInterfaceArgs("(X=K[}a)\"3/[Ns");
+      assertEquals(5, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      int int0 = SegmentUtils.countArgs("&L(LkEf;|)7g<");
+      assertEquals(2, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      int int0 = SegmentUtils.countArgs("l<<(6JNLi@g)", (-1656));
+      assertEquals((-1653), int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        SegmentUtils.countArgs(") 8FhA()w", 10);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // No arguments
+         //
+         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        SegmentUtils.countInvokeInterfaceArgs("Aw2<'N6_{7~h_K?(gZ");
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // No arguments
+         //
+         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      SegmentUtils segmentUtils0 = new SegmentUtils();
+  }
 }
