@@ -19,113 +19,113 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class ToNumberPolicy_ESTest extends ToNumberPolicy_ESTest_scaffolding {
 
-    // Test constants for input data
-    private static final String INVALID_JSON_1 = "\"*.\"{/";
-    private static final String INVALID_JSON_2 = "p(ppj%8[r\u0000>Md]";
-    private static final String INVALID_JSON_3 = ".a&;-m";
-    
-    // Test constants for expected error messages
-    private static final String ERROR_MSG_1 = "Cannot parse *.; at path $";
-    private static final String ERROR_MSG_2 = "Cannot parse p(ppj%8; at path $";
-    private static final String ERROR_MSG_3 = "Cannot parse .a&; at path $";
+  @Test(timeout = 4000)
+  public void test0()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("\"*.\"{/");
+      JsonReader jsonReader0 = new JsonReader(stringReader0);
+      ToNumberPolicy toNumberPolicy0 = ToNumberPolicy.LONG_OR_DOUBLE;
+      // Undeclared exception!
+      try { 
+        toNumberPolicy0.readNumber(jsonReader0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // Cannot parse *.; at path $
+         //
+         verifyException("com.google.gson.ToNumberPolicy$3", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void readNumber_LONG_OR_DOUBLE_InvalidInput_ThrowsException() throws Throwable {
-        // Arrange: Create JSON reader with invalid input
-        JsonReader jsonReader = new JsonReader(new StringReader(INVALID_JSON_1));
-        ToNumberPolicy policy = ToNumberPolicy.LONG_OR_DOUBLE;
+  @Test(timeout = 4000)
+  public void test1()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("p(ppj%8[r\u0000>Md]");
+      JsonReader jsonReader0 = new JsonReader(stringReader0);
+      Strictness strictness0 = Strictness.LENIENT;
+      jsonReader0.setStrictness(strictness0);
+      ToNumberPolicy toNumberPolicy0 = ToNumberPolicy.BIG_DECIMAL;
+      // Undeclared exception!
+      try { 
+        toNumberPolicy0.readNumber(jsonReader0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // Cannot parse p(ppj%8; at path $
+         //
+         verifyException("com.google.gson.ToNumberPolicy$4", e);
+      }
+  }
 
-        // Act & Assert: Verify expected exception
-        try {
-            policy.readNumber(jsonReader);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            verifyException("com.google.gson.ToNumberPolicy$3", e);
-            assertTrue(e.getMessage().contains(ERROR_MSG_1));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test2()  throws Throwable  {
+      StringReader stringReader0 = new StringReader(".a&;-m");
+      JsonReader jsonReader0 = new JsonReader(stringReader0);
+      Strictness strictness0 = Strictness.LENIENT;
+      jsonReader0.setStrictness(strictness0);
+      ToNumberPolicy toNumberPolicy0 = ToNumberPolicy.LONG_OR_DOUBLE;
+      // Undeclared exception!
+      try { 
+        toNumberPolicy0.readNumber(jsonReader0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // Cannot parse .a&; at path $
+         //
+         verifyException("com.google.gson.ToNumberPolicy$3", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void readNumber_BIG_DECIMAL_LenientInvalidInput_ThrowsException() throws Throwable {
-        // Arrange: Create lenient JSON reader with invalid input
-        StringReader reader = new StringReader(INVALID_JSON_2);
-        JsonReader jsonReader = new JsonReader(reader);
-        jsonReader.setStrictness(Strictness.LENIENT);
-        ToNumberPolicy policy = ToNumberPolicy.BIG_DECIMAL;
+  @Test(timeout = 4000)
+  public void test3()  throws Throwable  {
+      StringReader stringReader0 = new StringReader("p(ppj%8[r\u0000>Md]");
+      JsonReader jsonReader0 = new JsonReader(stringReader0);
+      Strictness strictness0 = Strictness.LENIENT;
+      jsonReader0.setStrictness(strictness0);
+      ToNumberPolicy toNumberPolicy0 = ToNumberPolicy.LONG_OR_DOUBLE;
+      // Undeclared exception!
+      try { 
+        toNumberPolicy0.readNumber(jsonReader0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // Cannot parse p(ppj%8; at path $
+         //
+         verifyException("com.google.gson.ToNumberPolicy$3", e);
+      }
+  }
 
-        // Act & Assert: Verify expected exception
-        try {
-            policy.readNumber(jsonReader);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            verifyException("com.google.gson.ToNumberPolicy$4", e);
-            assertTrue(e.getMessage().contains(ERROR_MSG_2));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test4()  throws Throwable  {
+      ToNumberPolicy toNumberPolicy0 = ToNumberPolicy.LAZILY_PARSED_NUMBER;
+      // Undeclared exception!
+      try { 
+        toNumberPolicy0.readNumber((JsonReader) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.ToNumberPolicy$2", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void readNumber_LONG_OR_DOUBLE_LenientInvalidInput_ThrowsException() throws Throwable {
-        // Arrange: Create lenient JSON reader with invalid input
-        StringReader reader = new StringReader(INVALID_JSON_3);
-        JsonReader jsonReader = new JsonReader(reader);
-        jsonReader.setStrictness(Strictness.LENIENT);
-        ToNumberPolicy policy = ToNumberPolicy.LONG_OR_DOUBLE;
-
-        // Act & Assert: Verify expected exception
-        try {
-            policy.readNumber(jsonReader);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            verifyException("com.google.gson.ToNumberPolicy$3", e);
-            assertTrue(e.getMessage().contains(ERROR_MSG_3));
-        }
-    }
-
-    @Test(timeout = 4000)
-    public void readNumber_LONG_OR_DOUBLE_AnotherInvalidInput_ThrowsException() throws Throwable {
-        // Arrange: Create lenient JSON reader with invalid input
-        StringReader reader = new StringReader(INVALID_JSON_2);
-        JsonReader jsonReader = new JsonReader(reader);
-        jsonReader.setStrictness(Strictness.LENIENT);
-        ToNumberPolicy policy = ToNumberPolicy.LONG_OR_DOUBLE;
-
-        // Act & Assert: Verify expected exception
-        try {
-            policy.readNumber(jsonReader);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            verifyException("com.google.gson.ToNumberPolicy$3", e);
-            assertTrue(e.getMessage().contains(ERROR_MSG_2));
-        }
-    }
-
-    @Test(timeout = 4000)
-    public void readNumber_LAZILY_PARSED_NUMBER_NullReader_ThrowsNullPointerException() throws Throwable {
-        // Arrange: Use null JSON reader
-        ToNumberPolicy policy = ToNumberPolicy.LAZILY_PARSED_NUMBER;
-
-        // Act & Assert: Verify NullPointerException
-        try {
-            policy.readNumber(null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            verifyException("com.google.gson.ToNumberPolicy$2", e);
-            assertNull(e.getMessage());
-        }
-    }
-
-    @Test(timeout = 4000)
-    public void readNumber_DOUBLE_NullReader_ThrowsNullPointerException() throws Throwable {
-        // Arrange: Use null JSON reader
-        ToNumberPolicy policy = ToNumberPolicy.DOUBLE;
-
-        // Act & Assert: Verify NullPointerException
-        try {
-            policy.readNumber(null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            verifyException("com.google.gson.ToNumberPolicy$1", e);
-            assertNull(e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test5()  throws Throwable  {
+      ToNumberPolicy toNumberPolicy0 = ToNumberPolicy.DOUBLE;
+      // Undeclared exception!
+      try { 
+        toNumberPolicy0.readNumber((JsonReader) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.google.gson.ToNumberPolicy$1", e);
+      }
+  }
 }
