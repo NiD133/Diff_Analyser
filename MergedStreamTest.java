@@ -1,8 +1,6 @@
 package com.fasterxml.jackson.core.io;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.io.*;
 
 import org.junit.jupiter.api.Test;
 
@@ -10,77 +8,47 @@ import com.fasterxml.jackson.core.JsonEncoding;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MergedStreamTest extends com.fasterxml.jackson.core.JUnit5TestBase {
-
-    private static final String FIRST_CHUNK = "ABCDE";
-    private static final String SECOND_CHUNK = "FGHIJ";
-    private static final int FIRST_CHUNK_OFFSET = 99;
-
+class MergedStreamTest
+        extends com.fasterxml.jackson.core.JUnit5TestBase
+{
     @Test
-    void readsPrefetchedBytesThenDelegatesAndSupportsSkip() throws Exception {
-        IOContext ctx = testIOContext();
+    void simple() throws Exception
+    {
+        IOContext ctxt = testIOContext();
+        // bit complicated; must use recyclable buffer...
+        byte[] first = ctxt.allocReadIOBuffer();
+        System.arraycopy("ABCDE".getBytes("UTF-8"), 0, first, 99, 5);
+        byte[] second = "FGHIJ".getBytes("UTF-8");
 
-        // Sanity-check initial IOContext state (not strictly required by MergedStream)
-        assertNull(ctx.contentReference().getRawContent());
-        assertFalse(ctx.isResourceManaged());
+        assertNull(ctxt.contentReference().getRawContent());
+        assertFalse(ctxt.isResourceManaged());
+        ctxt.setEncoding(JsonEncoding.UTF8);
+        MergedStream ms = new MergedStream(ctxt, new ByteArrayInputStream(second),
+                                           first, 99, 99+5);
+        ctxt.close();
 
-        ctx.setEncoding(JsonEncoding.UTF8);
+        // Ok, first, should have 5 bytes from first buffer:
+        assertEquals(5, ms.available());
+        // not supported when there's buffered stuff...
+        assertFalse(ms.markSupported());
+        // so this won't work, but shouldn't throw exception
+        ms.mark(1);
+        assertEquals((byte) 'A', ms.read());
+        assertEquals(3, ms.skip(3));
+        byte[] buffer = new byte[5];
+        // Ok, now, code is allowed to return anywhere between 1 and 3,
+        // but we now it will return 1...
+        assertEquals(1, ms.read(buffer, 1, 3));
+        assertEquals((byte) 'E', buffer[1]);
+        // So let's read bit more
+        assertEquals(3, ms.read(buffer, 0, 3));
+        assertEquals((byte) 'F', buffer[0]);
+        assertEquals((byte) 'G', buffer[1]);
+        assertEquals((byte) 'H', buffer[2]);
+        assertEquals(2, ms.available());
+        // And then skip the reset
+        assertEquals(2, ms.skip(200));
 
-        try (MergedStream ms = newMergedStream(ctx, FIRST_CHUNK, SECOND_CHUNK, FIRST_CHUNK_OFFSET)) {
-            // 1) All bytes from the prefetched buffer should be available initially
-            assertEquals(FIRST_CHUNK.length(), ms.available(), "available() should equal prefetched size");
-
-            // 2) mark/reset is not supported while buffered bytes exist
-            assertFalse(ms.markSupported(), "mark/reset should not be supported");
-            ms.mark(1); // should be a no-op and not throw
-
-            // 3) Read from the prefetched buffer
-            assertEquals((byte) 'A', ms.read(), "first byte must come from the prefetched buffer");
-
-            // Skip the next three buffered bytes: B, C, D
-            assertEquals(3, ms.skip(3), "should skip the next three buffered bytes");
-
-            // Read the last buffered byte ('E') using read(byte[], off, len)
-            byte[] buf = new byte[5];
-            int read = ms.read(buf, 1, 1);
-            assertEquals(1, read, "should read the last buffered byte only");
-            assertEquals((byte) 'E', buf[1]);
-
-            // 4) After buffered bytes are consumed, read from the underlying stream
-            int n = ms.read(buf, 0, 3);
-            assertEquals(3, n, "should read three bytes from the underlying stream");
-            assertEquals((byte) 'F', buf[0]);
-            assertEquals((byte) 'G', buf[1]);
-            assertEquals((byte) 'H', buf[2]);
-
-            // Two bytes ('I', 'J') should remain
-            assertEquals(2, ms.available(), "two bytes should remain available in the underlying stream");
-
-            // Skipping beyond the remaining length should only skip what's left
-            assertEquals(2, ms.skip(200), "should skip only the remaining two bytes");
-
-            // Closing the stream should be safe and close the underlying input
-            // (no assertion; absence of exception is sufficient)
-        }
-    }
-
-    private MergedStream newMergedStream(IOContext ctx, String first, String second, int offset) throws IOException {
-        byte[] reusableBuf = ctx.allocReadIOBuffer();
-
-        byte[] firstBytes = first.getBytes(StandardCharsets.UTF_8);
-        System.arraycopy(firstBytes, 0, reusableBuf, offset, firstBytes.length);
-
-        byte[] secondBytes = second.getBytes(StandardCharsets.UTF_8);
-        MergedStream ms = new MergedStream(
-                ctx,
-                new ByteArrayInputStream(secondBytes),
-                reusableBuf,
-                offset,
-                offset + firstBytes.length
-        );
-
-        // After creation, MergedStream owns the buffer/stream; IOContext can be closed.
-        ctx.close();
-        return ms;
+        ms.close();
     }
 }
