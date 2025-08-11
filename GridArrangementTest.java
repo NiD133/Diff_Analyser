@@ -37,6 +37,7 @@
 package org.jfree.chart.block;
 
 import org.jfree.chart.TestUtils;
+
 import org.jfree.data.Range;
 import org.junit.jupiter.api.Test;
 
@@ -47,303 +48,249 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class GridArrangementTest {
 
-    private static final double EPSILON = 0.000000001;
-    
-    // Test data constants for better maintainability
-    private static final int ROWS_1 = 11;
-    private static final int COLS_1 = 22;
-    private static final int ROWS_2 = 33;
-    private static final int COLS_2 = 44;
-
     /**
-     * Verify that equals() method correctly compares GridArrangement instances
-     * based on their rows and columns values.
+     * Confirm that the equals() method can distinguish all the required fields.
      */
     @Test
     public void testEquals() {
-        // Test equal instances
-        GridArrangement arrangement1 = new GridArrangement(ROWS_1, COLS_1);
-        GridArrangement arrangement2 = new GridArrangement(ROWS_1, COLS_1);
-        assertEquals(arrangement1, arrangement2);
-        assertEquals(arrangement2, arrangement1);
+        GridArrangement f1 = new GridArrangement(11, 22);
+        GridArrangement f2 = new GridArrangement(11, 22);
+        assertEquals(f1, f2);
+        assertEquals(f2, f1);
 
-        // Test different rows
-        GridArrangement differentRows = new GridArrangement(ROWS_2, COLS_1);
-        assertNotEquals(arrangement1, differentRows);
-        
-        GridArrangement matchingRows = new GridArrangement(ROWS_2, COLS_1);
-        assertEquals(differentRows, matchingRows);
+        f1 = new GridArrangement(33, 22);
+        assertNotEquals(f1, f2);
+        f2 = new GridArrangement(33, 22);
+        assertEquals(f1, f2);
 
-        // Test different columns
-        GridArrangement differentCols = new GridArrangement(ROWS_2, COLS_2);
-        assertNotEquals(differentRows, differentCols);
-        
-        GridArrangement matchingCols = new GridArrangement(ROWS_2, COLS_2);
-        assertEquals(differentCols, matchingCols);
+        f1 = new GridArrangement(33, 44);
+        assertNotEquals(f1, f2);
+        f2 = new GridArrangement(33, 44);
+        assertEquals(f1, f2);
     }
 
     /**
-     * Verify that GridArrangement is immutable and doesn't implement Cloneable.
+     * Immutable - cloning is not necessary.
      */
     @Test
     public void testCloning() {
-        GridArrangement arrangement = new GridArrangement(1, 2);
-        assertFalse(arrangement instanceof Cloneable, 
-                   "GridArrangement should not implement Cloneable since it's immutable");
+        GridArrangement f1 = new GridArrangement(1, 2);
+        assertFalse(f1 instanceof Cloneable);
     }
 
     /**
-     * Verify that GridArrangement can be serialized and deserialized correctly.
+     * Serialize an instance, restore it, and check for equality.
      */
     @Test
     public void testSerialization() {
-        GridArrangement original = new GridArrangement(ROWS_2, COLS_2);
-        GridArrangement deserialized = TestUtils.serialised(original);
-        assertEquals(original, deserialized, 
-                    "Serialized and deserialized instances should be equal");
+        GridArrangement f1 = new GridArrangement(33, 44);
+        GridArrangement f2 = TestUtils.serialised(f1);
+        assertEquals(f1, f2);
     }
 
-    // ========== Layout Arrangement Tests ==========
-    // Test naming convention: test[WidthConstraint][HeightConstraint]
-    // N = None, F = Fixed, R = Range
+    private static final double EPSILON = 0.000000001;
 
     /**
-     * Test arrangement with no width or height constraints.
-     * Expected: Natural size based on content.
+     * Test arrangement with no constraints.
      */
     @Test
-    public void testArrangement_NoConstraints() {
-        BlockContainer container = createTestContainer();
-        Size2D actualSize = container.arrange(null, RectangleConstraint.NONE);
-        
-        assertSize(90.0, 33.0, actualSize, "No constraints should use natural size");
+    public void testNN() {
+        BlockContainer c = createTestContainer1();
+        Size2D s = c.arrange(null, RectangleConstraint.NONE);
+        assertEquals(90.0, s.width, EPSILON);
+        assertEquals(33.0, s.height, EPSILON);
     }
 
     /**
-     * Test arrangement with fixed width and no height constraint.
-     * Expected: Uses specified width, natural height.
+     * Test arrangement with a fixed width and no height constraint.
      */
     @Test
-    public void testArrangement_FixedWidth_NoHeightConstraint() {
-        BlockContainer container = createTestContainer();
-        RectangleConstraint constraint = new RectangleConstraint(
-            100.0, null, LengthConstraintType.FIXED, 
-            0.0, null, LengthConstraintType.NONE
-        );
-        
-        Size2D actualSize = container.arrange(null, constraint);
-        assertSize(100.0, 33.0, actualSize, "Fixed width should be respected, height natural");
+    public void testFN() {
+        BlockContainer c = createTestContainer1();
+        RectangleConstraint constraint = new RectangleConstraint(100.0, null,
+                LengthConstraintType.FIXED, 0.0, null,
+                LengthConstraintType.NONE);
+        Size2D s = c.arrange(null, constraint);
+        assertEquals(100.0, s.width, EPSILON);
+        assertEquals(33.0, s.height, EPSILON);
     }
 
     /**
-     * Test arrangement with no width constraint and fixed height.
-     * Expected: Natural width, uses specified height.
+     * Test arrangement with a fixed height and no width constraint.
      */
     @Test
-    public void testArrangement_NoWidthConstraint_FixedHeight() {
-        BlockContainer container = createTestContainer();
-        RectangleConstraint constraint = RectangleConstraint.NONE.toFixedHeight(100.0);
-        
-        Size2D actualSize = container.arrange(null, constraint);
-        assertSize(90.0, 100.0, actualSize, "Width should be natural, fixed height respected");
+    public void testNF() {
+        BlockContainer c = createTestContainer1();
+        RectangleConstraint constraint = RectangleConstraint.NONE.toFixedHeight(
+                100.0);
+        Size2D s = c.arrange(null, constraint);
+        assertEquals(90.0, s.width, EPSILON);
+        assertEquals(100.0, s.height, EPSILON);
     }
 
     /**
-     * Test arrangement with width range and fixed height.
-     * Expected: Uses maximum width from range, specified height.
+     * Test arrangement with a range for the width and a fixed height.
      */
     @Test
-    public void testArrangement_WidthRange_FixedHeight() {
-        BlockContainer container = createTestContainer();
-        RectangleConstraint constraint = new RectangleConstraint(
-            new Range(40.0, 60.0), 100.0
-        );
-        
-        Size2D actualSize = container.arrange(null, constraint);
-        assertSize(60.0, 100.0, actualSize, "Should use max width from range and fixed height");
+    public void testRF() {
+        BlockContainer c = createTestContainer1();
+        RectangleConstraint constraint = new RectangleConstraint(new Range(40.0,
+                60.0), 100.0);
+        Size2D s = c.arrange(null, constraint);
+        assertEquals(60.0, s.width, EPSILON);
+        assertEquals(100.0, s.height, EPSILON);
     }
 
     /**
-     * Test arrangement with width and height ranges.
-     * Expected: Uses maximum width and minimum height from ranges.
+     * Test arrangement with a range for the width and height.
      */
     @Test
-    public void testArrangement_WidthRange_HeightRange() {
-        BlockContainer container = createTestContainer();
-        RectangleConstraint constraint = new RectangleConstraint(
-            new Range(40.0, 60.0), new Range(50.0, 70.0)
-        );
-        
-        Size2D actualSize = container.arrange(null, constraint);
-        assertSize(60.0, 50.0, actualSize, "Should use max width and min height from ranges");
+    public void testRR() {
+        BlockContainer c = createTestContainer1();
+        RectangleConstraint constraint = new RectangleConstraint(new Range(40.0,
+                60.0), new Range(50.0, 70.0));
+        Size2D s = c.arrange(null, constraint);
+        assertEquals(60.0, s.width, EPSILON);
+        assertEquals(50.0, s.height, EPSILON);
     }
 
     /**
-     * Test arrangement with width range and no height constraint.
-     * Expected: Uses maximum width from range, natural height.
+     * Test arrangement with a range for the width and no height constraint.
      */
     @Test
-    public void testArrangement_WidthRange_NoHeightConstraint() {
-        BlockContainer container = createTestContainer();
+    public void testRN() {
+        BlockContainer c = createTestContainer1();
         RectangleConstraint constraint = RectangleConstraint.NONE.toRangeWidth(
-            new Range(40.0, 60.0)
-        );
-        
-        Size2D actualSize = container.arrange(null, constraint);
-        assertSize(60.0, 33.0, actualSize, "Should use max width from range and natural height");
+                new Range(40.0, 60.0));
+        Size2D s = c.arrange(null, constraint);
+        assertEquals(60.0, s.width, EPSILON);
+        assertEquals(33.0, s.height, EPSILON);
     }
 
     /**
-     * Test arrangement with no width constraint and height range.
-     * Expected: Natural width, uses minimum height from range.
+     * Test arrangement with a range for the height and no width constraint.
      */
     @Test
-    public void testArrangement_NoWidthConstraint_HeightRange() {
-        BlockContainer container = createTestContainer();
+    public void testNR() {
+        BlockContainer c = createTestContainer1();
         RectangleConstraint constraint = RectangleConstraint.NONE.toRangeHeight(
-            new Range(40.0, 60.0)
-        );
-        
-        Size2D actualSize = container.arrange(null, constraint);
-        assertSize(90.0, 40.0, actualSize, "Should use natural width and min height from range");
+                new Range(40.0, 60.0));
+        Size2D s = c.arrange(null, constraint);
+        assertEquals(90.0, s.width, EPSILON);
+        assertEquals(40.0, s.height, EPSILON);
     }
 
-    // ========== Edge Case Tests ==========
+    private BlockContainer createTestContainer1() {
+        Block b1 = new EmptyBlock(10, 11);
+        Block b2 = new EmptyBlock(20, 22);
+        Block b3 = new EmptyBlock(30, 33);
+        BlockContainer result = new BlockContainer(new GridArrangement(1, 3));
+        result.add(b1);
+        result.add(b2);
+        result.add(b3);
+        return result;
+    }
 
     /**
-     * Test that null blocks in the grid are handled gracefully with fixed constraints.
+     * The arrangement should be able to handle null blocks in the layout.
      */
     @Test
-    public void testNullBlock_FixedWidthAndHeight() {
-        BlockContainer container = createContainerWithNullBlock();
-        Size2D actualSize = container.arrange(null, new RectangleConstraint(20, 10));
-        
-        assertSize(20.0, 10.0, actualSize, "Fixed constraints should be respected even with null blocks");
+    public void testNullBlock_FF() {
+        BlockContainer c = new BlockContainer(new GridArrangement(1, 1));
+        c.add(null);
+        Size2D s = c.arrange(null, new RectangleConstraint(20, 10));
+        assertEquals(20.0, s.getWidth(), EPSILON);
+        assertEquals(10.0, s.getHeight(), EPSILON);
     }
 
     /**
-     * Test that null blocks in the grid are handled gracefully with fixed width only.
+     * The arrangement should be able to handle null blocks in the layout.
      */
     @Test
-    public void testNullBlock_FixedWidth_NoHeightConstraint() {
-        BlockContainer container = createContainerWithNullBlock();
-        Size2D actualSize = container.arrange(null, RectangleConstraint.NONE.toFixedWidth(10));
-        
-        assertSize(10.0, 0.0, actualSize, "Null block should result in zero height with fixed width");
+    public void testNullBlock_FN() {
+        BlockContainer c = new BlockContainer(new GridArrangement(1, 1));
+        c.add(null);
+        Size2D s = c.arrange(null, RectangleConstraint.NONE.toFixedWidth(10));
+        assertEquals(10.0, s.getWidth(), EPSILON);
+        assertEquals(0.0, s.getHeight(), EPSILON);
     }
 
     /**
-     * Test that null blocks in the grid are handled gracefully with fixed width and height range.
+     * The arrangement should be able to handle null blocks in the layout.
      */
     @Test
-    public void testNullBlock_FixedWidth_HeightRange() {
-        BlockContainer container = createContainerWithNullBlock();
-        Size2D actualSize = container.arrange(null, new RectangleConstraint(30.0, new Range(5.0, 10.0)));
-        
-        assertSize(30.0, 5.0, actualSize, "Should use fixed width and minimum height from range");
+    public void testNullBlock_FR() {
+        BlockContainer c = new BlockContainer(new GridArrangement(1, 1));
+        c.add(null);
+        Size2D s = c.arrange(null, new RectangleConstraint(30.0, new Range(5.0,
+                10.0)));
+        assertEquals(30.0, s.getWidth(), EPSILON);
+        assertEquals(5.0, s.getHeight(), EPSILON);
     }
 
     /**
-     * Test that null blocks in the grid are handled gracefully with no constraints.
+     * The arrangement should be able to handle null blocks in the layout.
      */
     @Test
-    public void testNullBlock_NoConstraints() {
-        BlockContainer container = createContainerWithNullBlock();
-        Size2D actualSize = container.arrange(null, RectangleConstraint.NONE);
-        
-        assertSize(0.0, 0.0, actualSize, "Null block with no constraints should result in zero size");
+    public void testNullBlock_NN() {
+        BlockContainer c = new BlockContainer(new GridArrangement(1, 1));
+        c.add(null);
+        Size2D s = c.arrange(null, RectangleConstraint.NONE);
+        assertEquals(0.0, s.getWidth(), EPSILON);
+        assertEquals(0.0, s.getHeight(), EPSILON);
     }
 
     /**
-     * Test that grids with fewer blocks than grid spaces are handled correctly with fixed constraints.
+     * The arrangement should be able to handle less blocks than grid spaces.
      */
     @Test
-    public void testPartiallyFilledGrid_FixedWidthAndHeight() {
-        BlockContainer container = createPartiallyFilledGrid();
-        Size2D actualSize = container.arrange(null, new RectangleConstraint(200, 100));
-        
-        assertSize(200.0, 100.0, actualSize, "Fixed constraints should be respected for partially filled grid");
+    public void testGridNotFull_FF() {
+        Block b1 = new EmptyBlock(5, 5);
+        BlockContainer c = new BlockContainer(new GridArrangement(2, 3));
+        c.add(b1);
+        Size2D s = c.arrange(null, new RectangleConstraint(200, 100));
+        assertEquals(200.0, s.getWidth(), EPSILON);
+        assertEquals(100.0, s.getHeight(), EPSILON);
     }
 
     /**
-     * Test that grids with fewer blocks than grid spaces are handled correctly with fixed width only.
+     * The arrangement should be able to handle less blocks than grid spaces.
      */
     @Test
-    public void testPartiallyFilledGrid_FixedWidth_NoHeightConstraint() {
-        BlockContainer container = createPartiallyFilledGrid();
-        Size2D actualSize = container.arrange(null, RectangleConstraint.NONE.toFixedWidth(30.0));
-        
-        assertSize(30.0, 10.0, actualSize, "Should use fixed width and calculate height based on content");
+    public void testGridNotFull_FN() {
+        Block b1 = new EmptyBlock(5, 5);
+        BlockContainer c = new BlockContainer(new GridArrangement(2, 3));
+        c.add(b1);
+        Size2D s = c.arrange(null, RectangleConstraint.NONE.toFixedWidth(30.0));
+        assertEquals(30.0, s.getWidth(), EPSILON);
+        assertEquals(10.0, s.getHeight(), EPSILON);
     }
 
     /**
-     * Test that grids with fewer blocks than grid spaces are handled correctly with fixed width and height range.
+     * The arrangement should be able to handle less blocks than grid spaces.
      */
     @Test
-    public void testPartiallyFilledGrid_FixedWidth_HeightRange() {
-        BlockContainer container = createPartiallyFilledGrid();
-        Size2D actualSize = container.arrange(null, new RectangleConstraint(30.0, new Range(5.0, 10.0)));
-        
-        assertSize(30.0, 10.0, actualSize, "Should use fixed width and maximum height from range");
+    public void testGridNotFull_FR() {
+        Block b1 = new EmptyBlock(5, 5);
+        BlockContainer c = new BlockContainer(new GridArrangement(2, 3));
+        c.add(b1);
+        Size2D s = c.arrange(null, new RectangleConstraint(30.0, new Range(5.0,
+                10.0)));
+        assertEquals(30.0, s.getWidth(), EPSILON);
+        assertEquals(10.0, s.getHeight(), EPSILON);
     }
 
     /**
-     * Test that grids with fewer blocks than grid spaces are handled correctly with no constraints.
+     * The arrangement should be able to handle less blocks than grid spaces.
      */
     @Test
-    public void testPartiallyFilledGrid_NoConstraints() {
-        BlockContainer container = createPartiallyFilledGrid();
-        Size2D actualSize = container.arrange(null, RectangleConstraint.NONE);
-        
-        assertSize(15.0, 10.0, actualSize, "Should calculate natural size for partially filled grid");
+    public void testGridNotFull_NN() {
+        Block b1 = new EmptyBlock(5, 5);
+        BlockContainer c = new BlockContainer(new GridArrangement(2, 3));
+        c.add(b1);
+        Size2D s = c.arrange(null, RectangleConstraint.NONE);
+        assertEquals(15.0, s.getWidth(), EPSILON);
+        assertEquals(10.0, s.getHeight(), EPSILON);
     }
 
-    // ========== Helper Methods ==========
-
-    /**
-     * Creates a test container with three blocks arranged in a 1x3 grid.
-     * Block dimensions: 10x11, 20x22, 30x33
-     * Expected total size: 60x33 (sum of widths x max height)
-     */
-    private BlockContainer createTestContainer() {
-        Block block1 = new EmptyBlock(10, 11);
-        Block block2 = new EmptyBlock(20, 22);
-        Block block3 = new EmptyBlock(30, 33);
-        
-        BlockContainer container = new BlockContainer(new GridArrangement(1, 3));
-        container.add(block1);
-        container.add(block2);
-        container.add(block3);
-        
-        return container;
-    }
-
-    /**
-     * Creates a container with a single null block in a 1x1 grid.
-     */
-    private BlockContainer createContainerWithNullBlock() {
-        BlockContainer container = new BlockContainer(new GridArrangement(1, 1));
-        container.add(null);
-        return container;
-    }
-
-    /**
-     * Creates a 2x3 grid with only one block (5x5), leaving other positions empty.
-     */
-    private BlockContainer createPartiallyFilledGrid() {
-        Block block = new EmptyBlock(5, 5);
-        BlockContainer container = new BlockContainer(new GridArrangement(2, 3));
-        container.add(block);
-        return container;
-    }
-
-    /**
-     * Asserts that the actual size matches the expected dimensions within epsilon tolerance.
-     */
-    private void assertSize(double expectedWidth, double expectedHeight, Size2D actualSize, String message) {
-        assertEquals(expectedWidth, actualSize.width, EPSILON, 
-                    message + " - Width mismatch");
-        assertEquals(expectedHeight, actualSize.height, EPSILON, 
-                    message + " - Height mismatch");
-    }
 }
