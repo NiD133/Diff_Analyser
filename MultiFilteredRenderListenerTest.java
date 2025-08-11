@@ -45,69 +45,121 @@ package com.itextpdf.text.pdf.parser;
 import com.itextpdf.testutils.TestResourceUtils;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfReader;
-import junit.framework.Assert;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Tests the {@link MultiFilteredRenderListener} to ensure it correctly delegates
+ * rendering events to multiple listeners based on specified filters.
+ */
 public class MultiFilteredRenderListenerTest {
 
-    @Test
-    public void test() throws IOException {
-        final PdfReader pdfReader = TestResourceUtils.getResourceAsPdfReader(this, "test.pdf");
+    private static final String TEST_PDF = "test.pdf";
+    private PdfReader pdfReader;
 
-        final String expectedText[] = new String[] {
-                "PostScript Compatibility",
-                "Because the PostScript language does not support the transparent imaging \n" +
-                        "model, PDF 1.4 consumer applications must have some means for converting the \n" +
-                        "appearance of a document that uses transparency to a purely opaque description \n" +
-                        "for printing on PostScript output devices. Similar techniques can also be used to \n" +
-                        "convert such documents to a form that can be correctly viewed by PDF 1.3 and \n" +
-                        "earlier consumers. ",
-                "Otherwise, flatten the colors to some assumed device color space with pre-\n" +
-                        "determined calibration. In the generated PostScript output, paint the flattened \n" +
-                        "colors in a CIE-based color space having that calibration. "};
+    @Before
+    public void setUp() throws IOException {
+        pdfReader = TestResourceUtils.getResourceAsPdfReader(this, TEST_PDF);
+    }
 
-        final Rectangle[] regions = new Rectangle[] {new Rectangle(90, 605, 220, 581),
-                new Rectangle(80, 578, 450, 486), new Rectangle(103, 196, 460, 143)};
-
-        final RegionTextRenderFilter[] regionFilters = new RegionTextRenderFilter[regions.length];
-        for (int i = 0; i < regions.length; i++)
-            regionFilters[i] = new RegionTextRenderFilter(regions[i]);
-
-
-        MultiFilteredRenderListener listener = new MultiFilteredRenderListener();
-        LocationTextExtractionStrategy[] extractionStrategies = new LocationTextExtractionStrategy[regions.length];
-        for (int i = 0; i < regions.length; i++)
-            extractionStrategies[i] = (LocationTextExtractionStrategy)listener.attachRenderListener(new LocationTextExtractionStrategy(), regionFilters[i]);
-
-        new PdfReaderContentParser(pdfReader).processContent(1, listener);
-
-        for (int i = 0; i < regions.length; i++)
-        {
-            String actualText = extractionStrategies[i].getResultantText() ;
-            Assert.assertEquals(expectedText[i], actualText);
+    @After
+    public void tearDown() {
+        if (pdfReader != null) {
+            pdfReader.close();
         }
     }
 
+    /**
+     * Tests that a MultiFilteredRenderListener can process a PDF page once and delegate
+     * content from different, non-overlapping regions to separate, dedicated listeners.
+     */
     @Test
-    public void multipleFiltersForOneRegionTest() throws IOException {
-        final PdfReader pdfReader = TestResourceUtils.getResourceAsPdfReader(this, "test.pdf");
+    public void extractsTextFromDistinctRegionsIntoSeparateStrategies() throws IOException {
+        // Arrange
+        // Define the specific regions of the PDF to extract text from.
+        final Rectangle titleRegion = new Rectangle(90, 605, 220, 581);
+        final Rectangle firstParagraphRegion = new Rectangle(80, 578, 450, 486);
+        final Rectangle secondParagraphRegion = new Rectangle(103, 196, 460, 143);
 
-        final Rectangle[] regions = new Rectangle[] {new Rectangle(0, 0, 500, 650),
-                new Rectangle(0, 0, 400, 400), new Rectangle(200, 200, 500, 600), new Rectangle(100, 100, 450, 400)};
+        // Define the expected text content for each region.
+        final String expectedTitleText = "PostScript Compatibility";
+        final String expectedFirstParagraphText = "Because the PostScript language does not support the transparent imaging \n" +
+                "model, PDF 1.4 consumer applications must have some means for converting the \n" +
+                "appearance of a document that uses transparency to a purely opaque description \n" +
+                "for printing on PostScript output devices. Similar techniques can also be used to \n" +
+                "convert such documents to a form that can be correctly viewed by PDF 1.3 and \n" +
+                "earlier consumers. ";
+        final String expectedSecondParagraphText = "Otherwise, flatten the colors to some assumed device color space with pre-\n" +
+                "determined calibration. In the generated PostScript output, paint the flattened \n" +
+                "colors in a CIE-based color space having that calibration. ";
 
-        final RegionTextRenderFilter[] regionFilters = new RegionTextRenderFilter[regions.length];
-        for (int i = 0; i < regions.length; i++)
+        MultiFilteredRenderListener multiListener = new MultiFilteredRenderListener();
+
+        // Attach a separate extraction strategy for each region of interest.
+        LocationTextExtractionStrategy titleStrategy = multiListener.attachRenderListener(
+                new LocationTextExtractionStrategy(), new RegionTextRenderFilter(titleRegion));
+        LocationTextExtractionStrategy firstParagraphStrategy = multiListener.attachRenderListener(
+                new LocationTextExtractionStrategy(), new RegionTextRenderFilter(firstParagraphRegion));
+        LocationTextExtractionStrategy secondParagraphStrategy = multiListener.attachRenderListener(
+                new LocationTextExtractionStrategy(), new RegionTextRenderFilter(secondParagraphRegion));
+
+        // Act
+        // Process the first page of the PDF, which will trigger the appropriate listeners.
+        new PdfReaderContentParser(pdfReader).processContent(1, multiListener);
+
+        // Assert
+        // Verify that each strategy has captured the correct text from its designated region.
+        assertEquals("Title text should be extracted correctly.",
+                expectedTitleText, titleStrategy.getResultantText());
+        assertEquals("First paragraph text should be extracted correctly.",
+                expectedFirstParagraphText, firstParagraphStrategy.getResultantText());
+        assertEquals("Second paragraph text should be extracted correctly.",
+                expectedSecondParagraphText, secondParagraphStrategy.getResultantText());
+    }
+
+    /**
+     * Tests that a single listener attached with multiple filters is only invoked
+     * when ALL filters are satisfied (i.e., for content in the intersection of all filter regions).
+     * This behavior is verified by comparing the result with FilteredTextRenderListener,
+     * which serves as the baseline for this type of filtering.
+     */
+    @Test
+    public void extractsTextFromIntersectionOfMultipleOverlappingFilters() throws IOException {
+        // Arrange
+        // Define several overlapping regions. Text should only be extracted from their intersection.
+        final Rectangle[] regions = {
+                new Rectangle(0, 0, 500, 650),
+                new Rectangle(0, 0, 400, 400),
+                new Rectangle(200, 200, 500, 600),
+                new Rectangle(100, 100, 450, 400)
+        };
+
+        RegionTextRenderFilter[] regionFilters = new RegionTextRenderFilter[regions.length];
+        for (int i = 0; i < regions.length; i++) {
             regionFilters[i] = new RegionTextRenderFilter(regions[i]);
+        }
 
-        MultiFilteredRenderListener listener = new MultiFilteredRenderListener();
-        LocationTextExtractionStrategy extractionStrategy = (LocationTextExtractionStrategy)listener.attachRenderListener(new LocationTextExtractionStrategy(), regionFilters);
-        new PdfReaderContentParser(pdfReader).processContent(1, listener);
+        // Create the listener and attach a single strategy with ALL the filters.
+        MultiFilteredRenderListener multiListener = new MultiFilteredRenderListener();
+        LocationTextExtractionStrategy extractionStrategy = multiListener.attachRenderListener(
+                new LocationTextExtractionStrategy(), regionFilters);
+
+        // Act
+        // Process the content; the listener will only be triggered for text inside all specified regions.
+        new PdfReaderContentParser(pdfReader).processContent(1, multiListener);
         String actualText = extractionStrategy.getResultantText();
 
-        String expectedText = PdfTextExtractor.getTextFromPage(pdfReader, 1, new FilteredTextRenderListener(new LocationTextExtractionStrategy(), regionFilters));
+        // Assert
+        // The result must be identical to using the standard FilteredTextRenderListener with the same set of filters.
+        String expectedText = PdfTextExtractor.getTextFromPage(pdfReader, 1,
+                new FilteredTextRenderListener(new LocationTextExtractionStrategy(), regionFilters));
 
-        Assert.assertEquals(expectedText, actualText);
+        assertEquals("Text from the intersection of filters should match the baseline.",
+                expectedText, actualText);
     }
 }
