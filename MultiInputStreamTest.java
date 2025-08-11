@@ -26,121 +26,173 @@ import java.util.List;
 import org.jspecify.annotations.NullUnmarked;
 
 /**
- * Test class for {@link MultiInputStream}.
+ * Tests for {@link MultiInputStream}.
  *
- * @author Chris Nokleberg
+ * These tests focus on:
+ * - Correct concatenation behavior for various source sizes and orders
+ * - Guarantee that only one substream is open at a time
+ * - Reading semantics (single-byte, array, available, mark support)
+ * - Skipping behavior when underlying streams don't support skipping well
+ * - Robustness against very large numbers of empty sources (no stack overflow)
  */
 @NullUnmarked
 public class MultiInputStreamTest extends IoTestCase {
 
-  public void testJoin() throws Exception {
-    joinHelper(0);
-    joinHelper(1);
-    joinHelper(0, 0, 0);
-    joinHelper(10, 20);
-    joinHelper(10, 0, 20);
-    joinHelper(0, 10, 20);
-    joinHelper(10, 20, 0);
-    joinHelper(10, 20, 1);
-    joinHelper(1, 1, 1, 1, 1, 1, 1, 1);
-    joinHelper(1, 0, 1, 0, 1, 0, 1, 0);
+  /**
+   * Verifies that concatenating sources produces the same content as a single sequential source,
+   * across a variety of segment sizes and orders (including zeros).
+   */
+  public void testConcatenation_producesSequentialBytes() throws Exception {
+    assertConcatenatedContentMatches(); // No segments -> empty
+    assertConcatenatedContentMatches(1);
+    assertConcatenatedContentMatches(0, 0, 0);
+    assertConcatenatedContentMatches(10, 20);
+    assertConcatenatedContentMatches(10, 0, 20);
+    assertConcatenatedContentMatches(0, 10, 20);
+    assertConcatenatedContentMatches(10, 20, 0);
+    assertConcatenatedContentMatches(10, 20, 1);
+    assertConcatenatedContentMatches(1, 1, 1, 1, 1, 1, 1, 1);
+    assertConcatenatedContentMatches(1, 0, 1, 0, 1, 0, 1, 0);
   }
 
-  public void testOnlyOneOpen() throws Exception {
-    ByteSource source = newByteSource(0, 50);
-    int[] counter = new int[1];
-    ByteSource checker =
+  /**
+   * Asserts that at most one substream is open at any time while reading a concatenated stream.
+   */
+  public void testConcatenation_opensAtMostOneSubstreamAtATime() throws Exception {
+    ByteSource base = byteSourceWithSequentialBytes(0, 50);
+
+    final int[] openStreamCount = new int[1];
+    ByteSource countingSource =
         new ByteSource() {
           @Override
           public InputStream openStream() throws IOException {
-            if (counter[0]++ != 0) {
-              throw new IllegalStateException("More than one source open");
+            if (openStreamCount[0]++ != 0) {
+              throw new IllegalStateException("More than one source open at the same time");
             }
-            return new FilterInputStream(source.openStream()) {
+            return new FilterInputStream(base.openStream()) {
               @Override
               public void close() throws IOException {
-                super.close();
-                counter[0]--;
+                try {
+                  super.close();
+                } finally {
+                  openStreamCount[0]--;
+                }
               }
             };
           }
         };
-    byte[] result = ByteSource.concat(checker, checker, checker).read();
+
+    byte[] result = ByteSource.concat(countingSource, countingSource, countingSource).read();
     assertEquals(150, result.length);
   }
 
-  private void joinHelper(Integer... spans) throws Exception {
-    List<ByteSource> sources = new ArrayList<>();
-    int start = 0;
-    for (Integer span : spans) {
-      sources.add(newByteSource(start, span));
-      start += span;
+  /**
+   * Verifies that single-byte reads iterate across substreams correctly and expose expected
+   * InputStream properties.
+   */
+  public void testSingleByteRead_overMultipleSources() throws Exception {
+    ByteSource source = byteSourceWithSequentialBytes(0, 10);
+    ByteSource concatenated = ByteSource.concat(source, source);
+
+    assertEquals(20, concatenated.size());
+
+    try (InputStream in = concatenated.openStream()) {
+      assertFalse(in.markSupported()); // MultiInputStream does not support mark/reset
+      assertEquals(10, in.available()); // from the first substream
+
+      int count = 0;
+      while (in.read() != -1) {
+        count++;
+      }
+
+      assertEquals(0, in.available());
+      assertEquals(20, count);
     }
-    ByteSource joined = ByteSource.concat(sources);
-    assertTrue(newByteSource(0, start).contentEquals(joined));
   }
 
-  public void testReadSingleByte() throws Exception {
-    ByteSource source = newByteSource(0, 10);
-    ByteSource joined = ByteSource.concat(source, source);
-    assertEquals(20, joined.size());
-    InputStream in = joined.openStream();
-    assertFalse(in.markSupported());
-    assertEquals(10, in.available());
-    int total = 0;
-    while (in.read() != -1) {
-      total++;
+  /**
+   * Verifies skip behavior when the underlying stream's skip method always returns 0.
+   * - skip with negative or zero should return 0
+   * - ByteStreams.skipFully should still advance using reads
+   */
+  @SuppressWarnings("CheckReturnValue") // these calls to skip always return 0 by design
+  public void testSkip_handlesNonSkippingUnderlyingStream() throws Exception {
+    ByteSource nonSkippingSource =
+        new ByteSource() {
+          @Override
+          public InputStream openStream() {
+            return new ByteArrayInputStream(sequentialBytes(0, 50)) {
+              @Override
+              public long skip(long n) {
+                return 0; // simulate an InputStream that doesn't support skipping
+              }
+            };
+          }
+        };
+
+    try (MultiInputStream multi =
+        new MultiInputStream(Collections.singleton(nonSkippingSource).iterator())) {
+
+      assertEquals(0, multi.skip(-1));
+      assertEquals(0, multi.skip(-1));
+      assertEquals(0, multi.skip(0));
+
+      ByteStreams.skipFully(multi, 20);
+      assertEquals(20, multi.read()); // now positioned at byte value 20
     }
-    assertEquals(0, in.available());
-    assertEquals(20, total);
   }
 
-  @SuppressWarnings("CheckReturnValue") // these calls to skip always return 0
-  public void testSkip() throws Exception {
-    MultiInputStream multi =
-        new MultiInputStream(
-            Collections.singleton(
-                    new ByteSource() {
-                      @Override
-                      public InputStream openStream() {
-                        return new ByteArrayInputStream(newPreFilledByteArray(0, 50)) {
-                          @Override
-                          public long skip(long n) {
-                            return 0;
-                          }
-                        };
-                      }
-                    })
-                .iterator());
-    assertEquals(0, multi.skip(-1));
-    assertEquals(0, multi.skip(-1));
-    assertEquals(0, multi.skip(0));
-    ByteStreams.skipFully(multi, 20);
-    assertEquals(20, multi.read());
-  }
-
+  /**
+   * Regression test for https://github.com/google/guava/issues/2996.
+   * Ensures single-byte read does not cause a StackOverflowError with many empty sources.
+   */
   public void testReadSingle_noStackOverflow() throws IOException {
-    // https://github.com/google/guava/issues/2996
-    // no data, just testing that there's no StackOverflowException
     assertEquals(-1, tenMillionEmptySources().read());
   }
 
+  /**
+   * Regression test for https://github.com/google/guava/issues/2996.
+   * Ensures array read does not cause a StackOverflowError with many empty sources.
+   */
   public void testReadArray_noStackOverflow() throws IOException {
-    // https://github.com/google/guava/issues/2996
-    // no data, just testing that there's no StackOverflowException
     assertEquals(-1, tenMillionEmptySources().read(new byte[1]));
+  }
+
+  // --- Helpers -------------------------------------------------------------------------------
+
+  /**
+   * Concatenates a set of ByteSources whose contents are sequential byte ranges, then verifies that
+   * the concatenated content matches a single sequential source of the combined length.
+   */
+  private void assertConcatenatedContentMatches(Integer... spans) throws Exception {
+    List<ByteSource> sources = new ArrayList<>();
+    int start = 0;
+    for (int span : spans) {
+      sources.add(byteSourceWithSequentialBytes(start, span));
+      start += span;
+    }
+    ByteSource concatenated = ByteSource.concat(sources);
+    assertTrue(byteSourceWithSequentialBytes(0, start).contentEquals(concatenated));
   }
 
   private static MultiInputStream tenMillionEmptySources() throws IOException {
     return new MultiInputStream(Collections.nCopies(10_000_000, ByteSource.empty()).iterator());
   }
 
-  private static ByteSource newByteSource(int start, int size) {
+  /**
+   * Returns a ByteSource whose content is a sequence of bytes starting at 'start' of length 'size'.
+   * This uses IoTestCase.newPreFilledByteArray to produce predictable content.
+   */
+  private static ByteSource byteSourceWithSequentialBytes(int start, int size) {
     return new ByteSource() {
       @Override
       public InputStream openStream() {
-        return new ByteArrayInputStream(newPreFilledByteArray(start, size));
+        return new ByteArrayInputStream(sequentialBytes(start, size));
       }
     };
+  }
+
+  private static byte[] sequentialBytes(int start, int size) {
+    return newPreFilledByteArray(start, size);
   }
 }
