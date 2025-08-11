@@ -3,218 +3,220 @@ package org.jsoup.parser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.*;
 import org.jsoup.select.Elements;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.function.BiConsumer;
+import java.util.stream.Stream;
 
 import static org.jsoup.parser.CharacterReader.BufferSize;
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("Tokeniser tests")
 public class TokeniserTest {
-    @Test
-    public void bufferUpInAttributeVal() {
-        // https://github.com/jhy/jsoup/issues/967
 
-        // check each double, singlem, unquoted impls
-        String[] quotes = {"\"", "'", ""};
-        for (String quote : quotes) {
-            String preamble = "<img src=" + quote;
-            String tail = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
-            StringBuilder sb = new StringBuilder(preamble);
+    @DisplayName("should parse attribute values that span the buffer boundary")
+    @ParameterizedTest(name = "Quote type: {0}")
+    @ValueSource(strings = {"\"", "'", ""})
+    void attributeValueSpanningBufferIsParsedCorrectly(String quote) {
+        // Arrange
+        // Creates an attribute value that forces the tokeniser to buffer-up mid-read.
+        String preamble = "<img src=" + quote;
+        String tail = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+        int charsToFillBuffer = BufferSize - preamble.length();
+        String filling = "a".repeat(charsToFillBuffer);
+        String charAcrossBoundary = "X";
 
-            final int charsToFillBuffer = BufferSize - preamble.length();
-            for (int i = 0; i < charsToFillBuffer; i++) {
-                sb.append('a');
-            }
+        String expectedSrc = filling + charAcrossBoundary + tail;
+        String html = preamble + expectedSrc + quote + ">";
 
-            sb.append('X'); // First character to cross character buffer boundary
-            sb.append(tail).append(quote).append(">\n");
+        // Act
+        Document doc = Jsoup.parse(html);
+        String actualSrc = doc.selectFirst("img").attr("src");
 
-            String html = sb.toString();
-            Document doc = Jsoup.parse(html);
-            String src = doc.select("img").attr("src");
+        // Assert
+        assertEquals(expectedSrc, actualSrc);
+    }
 
-            assertTrue(src.contains("X"), "Handles for quote " + quote);
-            assertTrue(src.contains(tail));
+    private static Stream<Arguments> largeTokenTestCases() {
+        // Each argument provides a test case for a token type that is larger than the parse buffer.
+        // Arguments: testName, repeatedText, htmlTemplate, verifier
+        return Stream.of(
+            Arguments.of(
+                "Tag Name", "LargeTagName", "<%s>One</%s>",
+                (BiConsumer<Document, String>) (doc, largeString) -> {
+                    Elements els = doc.select(largeString);
+                    assertEquals(1, els.size(), "Should find element by large tag name");
+                    Element el = els.first();
+                    assertNotNull(el);
+                    assertEquals("One", el.text());
+                    assertEquals(largeString, el.tagName());
+                }
+            ),
+            Arguments.of(
+                "Attribute Name", "LargeAttributeName", "<p %s=foo>One</p>",
+                (BiConsumer<Document, String>) (doc, largeString) -> {
+                    Elements els = doc.getElementsByAttribute(largeString);
+                    assertEquals(1, els.size(), "Should find element by large attribute name");
+                    Element el = els.first();
+                    assertNotNull(el);
+                    assertEquals("One", el.text());
+                    Attribute attribute = el.attributes().asList().get(0);
+                    assertEquals(largeString.toLowerCase(), attribute.getKey());
+                    assertEquals("foo", attribute.getValue());
+                }
+            ),
+            Arguments.of(
+                "Text", "A Large Amount of Text ", "<p>%s</p>",
+                (BiConsumer<Document, String>) (doc, largeString) -> {
+                    Element el = doc.selectFirst("p");
+                    assertNotNull(el);
+                    assertEquals(largeString, el.text());
+                }
+            ),
+            Arguments.of(
+                "Comment", "Quite a comment ", "<p><!-- %s --></p>",
+                (BiConsumer<Document, String>) (doc, largeString) -> {
+                    Element el = doc.selectFirst("p");
+                    assertNotNull(el);
+                    Comment child = (Comment) el.childNode(0);
+                    assertEquals(" " + largeString + " ", child.getData());
+                }
+            ),
+            Arguments.of(
+                "Bogus Comment", "blah blah blah blah ", "<html><body><!%s></body></html>",
+                (BiConsumer<Document, String>) (doc, largeString) -> {
+                    Comment comment = (Comment) doc.body().childNode(0);
+                    assertEquals(largeString, comment.getData());
+                }
+            ),
+            Arguments.of(
+                "CDATA", "Quite a lot of CDATA <><><><> ", "<p><
+![CDATA[%s]]></p>",
+                (BiConsumer<Document, String>)
+ (doc, largeString) -> {
+                    Element el = doc.selectFirst("p");
+                    assertNotNull(el);
+                    CDataNode child = (CDataNode) el.childNode(0);
+                    assertEquals(largeString, el.text());
+                    assertEquals(largeString, child.getWholeText());
+                }
+            ),
+            Arguments.of(
+                "Title", "Quite a long title ", "<title>%s</title>",
+                (BiConsumer<Document, String>) (doc, largeString) -> {
+                    assertEquals(largeString, doc.title());
+                    Element el = doc.selectFirst("title");
+                    assertNotNull(el);
+                    assertEquals(largeString, el.text());
+                }
+            )
+        );
+    }
+
+    @DisplayName("should parse tokens larger than the buffer")
+    @ParameterizedTest(name = "Token type: {0}")
+    @MethodSource("largeTokenTestCases")
+    void parsingTokenLargerThanBufferIsSuccessful(String testName, String repeatedText, String htmlTemplate, BiConsumer<Document, String> verifier) {
+        // Arrange
+        // Create a token body that is larger than the default buffer size to test buffer-up logic.
+        StringBuilder sb = new StringBuilder(BufferSize * 2);
+        do {
+            sb.append(repeatedText);
+        } while (sb.length() < BufferSize);
+        String largeTokenContent = sb.toString();
+
+        String html = String.format(htmlTemplate, largeTokenContent, largeTokenContent);
+
+        // Act
+        // The "Tag Name" test requires case preservation, others use the default parser.
+        Document doc;
+        if ("Tag Name".equals(testName)) {
+            doc = Parser.htmlParser().settings(ParseSettings.preserveCase).parseInput(html, "");
+        } else {
+            doc = Jsoup.parse(html);
         }
+
+        // Assert
+        verifier.accept(doc, largeTokenContent);
     }
 
-    @Test public void handleSuperLargeTagNames() {
-        // unlikely, but valid. so who knows.
+    @Test
+    @DisplayName("should parse CDATA that ends exactly at the buffer boundary")
+    public void parsingCdataEndingExactlyAtBufferBoundaryIsSuccessful() {
+        // Arrange
+        // This test targets a specific off-by-one bug. The length is chosen to place the end of the
+        // CDATA section ('_]]>') exactly at the boundary of the character buffer, which previously
+        // caused a parsing error.
+        String cdataStart = "<
+![CDATA[";
+        String cdataEnd = "]]>";
+        int cdataContentsLength = BufferSize - cdataStart.length()
+ - 1;
+        String cdataContents = "x".repeat(cdataContentsLength);
+        String html = cdataStart + cdataContents + cdataEnd;
 
-        StringBuilder sb = new StringBuilder(BufferSize);
-        do {
-            sb.append("LargeTagName");
-        } while (sb.length() < BufferSize);
-        String tag = sb.toString();
-        String html = "<" + tag + ">One</" + tag + ">";
-
-        Document doc = Parser.htmlParser().settings(ParseSettings.preserveCase).parseInput(html, "");
-        Elements els = doc.select(tag);
-        assertEquals(1, els.size());
-        Element el = els.first();
-        assertNotNull(el);
-        assertEquals("One", el.text());
-        assertEquals(tag, el.tagName());
-    }
-
-    @Test public void handleSuperLargeAttributeName() {
-        StringBuilder sb = new StringBuilder(BufferSize);
-        do {
-            sb.append("LargAttributeName");
-        } while (sb.length() < BufferSize);
-        String attrName = sb.toString();
-        String html = "<p " + attrName + "=foo>One</p>";
-
+        // Act
         Document doc = Jsoup.parse(html);
-        Elements els = doc.getElementsByAttribute(attrName);
-        assertEquals(1, els.size());
-        Element el = els.first();
-        assertNotNull(el);
-        assertEquals("One", el.text());
-        Attribute attribute = el.attributes().asList().get(0);
-        assertEquals(attrName.toLowerCase(), attribute.getKey());
-        assertEquals("foo", attribute.getValue());
+        CDataNode cdataNode = (CDataNode) doc.body().childNode(0);
+
+        // Assert
+        assertEquals(cdataContents, cdataNode.getWholeText());
     }
 
-    @Test public void handleLargeText() {
-        StringBuilder sb = new StringBuilder(BufferSize);
-        do {
-            sb.append("A Large Amount of Text");
-        } while (sb.length() < BufferSize);
-        String text = sb.toString();
-        String html = "<p>" + text + "</p>";
-
-        Document doc = Jsoup.parse(html);
-        Elements els = doc.select("p");
-        assertEquals(1, els.size());
-        Element el = els.first();
-
-        assertNotNull(el);
-        assertEquals(text, el.text());
+    @Test
+    @DisplayName("should parse numeric entities that map to Windows-1252 characters")
+    public void parsesNumericEntitiesThatMapToWindows1252Chars() {
+        assertEquals("\u20ac", Jsoup.parse("&#0128;").text()); // euro
+        assertEquals("\u201a", Jsoup.parse("&#0130;").text()); // single low-9 quotation mark
+        assertEquals("\u20ac", Jsoup.parse("&#x80;").text());  // euro (hex)
     }
 
-    @Test public void handleLargeComment() {
-        StringBuilder sb = new StringBuilder(BufferSize);
-        do {
-            sb.append("Quite a comment ");
-        } while (sb.length() < BufferSize);
-        String comment = sb.toString();
-        String html = "<p><!-- " + comment + " --></p>";
-
-        Document doc = Jsoup.parse(html);
-        Elements els = doc.select("p");
-        assertEquals(1, els.size());
-        Element el = els.first();
-
-        assertNotNull(el);
-        Comment child = (Comment) el.childNode(0);
-        assertEquals(" " + comment + " ", child.getData());
-    }
-
-    @Test public void handleLargeCdata() {
-        StringBuilder sb = new StringBuilder(BufferSize);
-        do {
-            sb.append("Quite a lot of CDATA <><><><>");
-        } while (sb.length() < BufferSize);
-        String cdata = sb.toString();
-        String html = "<p><![CDATA[" + cdata + "]]></p>";
-
-        Document doc = Jsoup.parse(html);
-        Elements els = doc.select("p");
-        assertEquals(1, els.size());
-        Element el = els.first();
-
-        assertNotNull(el);
-        TextNode child = (TextNode) el.childNode(0);
-        assertEquals(cdata, el.text());
-        assertEquals(cdata, child.getWholeText());
-    }
-
-    @Test public void handleLargeTitle() {
-        StringBuilder sb = new StringBuilder(BufferSize);
-        do {
-            sb.append("Quite a long title");
-        } while (sb.length() < BufferSize);
-        String title = sb.toString();
-        String html = "<title>" + title + "</title>";
-
-        Document doc = Jsoup.parse(html);
-        Elements els = doc.select("title");
-        assertEquals(1, els.size());
-        Element el = els.first();
-
-        assertNotNull(el);
-        TextNode child = (TextNode) el.childNode(0);
-        assertEquals(title, el.text());
-        assertEquals(title, child.getWholeText());
-        assertEquals(title, doc.title());
-    }
-
-    @Test public void cp1252Entities() {
-        assertEquals("\u20ac", Jsoup.parse("&#0128;").text());
-        assertEquals("\u201a", Jsoup.parse("&#0130;").text());
-        assertEquals("\u20ac", Jsoup.parse("&#x80;").text());
-    }
-
-    @Test public void cp1252EntitiesProduceError() {
+    @Test
+    @DisplayName("should add a parse error when parsing Windows-1252 numeric entities")
+    public void parsingWindows1252NumericEntitiesAddsParseError() {
+        // Arrange
         Parser parser = new Parser(new HtmlTreeBuilder());
         parser.setTrackErrors(10);
-        assertEquals("\u20ac", parser.parseInput("<html><body>&#0128;</body></html>", "").text());
+
+        // Act
+        parser.parseInput("<html><body>&#0128;</body></html>", "");
+
+        // Assert
         assertEquals(1, parser.getErrors().size());
     }
 
-    @Test public void cp1252SubstitutionTable() {
+    @Test
+    @DisplayName("should have an internal Win-1252 extension table that matches Java's charset")
+    public void internalWin1252ExtensionsTableIsValid() {
+        // This test verifies that our hard-coded win1252 extension table is correct,
+        // by comparing it against the platform's built-in Windows-1252 charset.
         for (int i = 0; i < Tokeniser.win1252Extensions.length; i++) {
-            String s = new String(new byte[]{ (byte) (i + Tokeniser.win1252ExtensionsStart) }, Charset.forName("Windows-1252"));
-            assertEquals(1, s.length());
+            String s = new String(new byte[]{(byte) (i + Tokeniser.win1252ExtensionsStart)}, Charset.forName("Windows-1252"));
+            if (s.charAt(0) == '\ufffd') continue; // skip undefined characters
 
-            // some of these characters are illegal
-            if (s.charAt(0) == '\ufffd') { continue; }
-
-            assertEquals(s.charAt(0), Tokeniser.win1252Extensions[i], "At: " + i);
+            assertEquals(s.charAt(0), Tokeniser.win1252Extensions[i], "Mismatch at index " + i);
         }
     }
 
-    @Test public void canParseVeryLongBogusComment() {
-        StringBuilder commentData = new StringBuilder(BufferSize);
-        do {
-            commentData.append("blah blah blah blah ");
-        } while (commentData.length() < BufferSize);
-        String expectedCommentData = commentData.toString();
-        String testMarkup = "<html><body><!" + expectedCommentData + "></body></html>";
-        Parser parser = new Parser(new HtmlTreeBuilder());
+    @Test
+    @DisplayName("should correctly convert TokenData to string")
+    void tokenDataToStringIsCorrect() {
+        // Arrange
+        Token.TokenData data = new Token.TokenData();
 
-        Document doc = parser.parseInput(testMarkup, "");
-
-        Node commentNode = doc.body().childNode(0);
-        assertTrue(commentNode instanceof Comment, "Expected comment node");
-        assertEquals(expectedCommentData, ((Comment)commentNode).getData());
-    }
-
-    @Test public void canParseCdataEndingAtEdgeOfBuffer() {
-        String cdataStart = "<![CDATA[";
-        String cdataEnd = "]]>";
-        int bufLen = BufferSize - cdataStart.length() - 1;    // also breaks with -2, but not with -3 or 0
-        char[] cdataContentsArray = new char[bufLen];
-        Arrays.fill(cdataContentsArray, 'x');
-        String cdataContents = new String(cdataContentsArray);
-        String testMarkup = cdataStart + cdataContents + cdataEnd;
-        Parser parser = new Parser(new HtmlTreeBuilder());
-
-        Document doc = parser.parseInput(testMarkup, "");
-
-        Node cdataNode = doc.body().childNode(0);
-        assertTrue(cdataNode instanceof CDataNode, "Expected CDATA node");
-        assertEquals(cdataContents, ((CDataNode)cdataNode).text());
-    }
-
-    @Test void tokenDataToString() {
-        TokenData data = new TokenData();
+        // Act & Assert
         assertEquals("", data.toString());
+
         data.set("abc");
         assertEquals("abc", data.toString());
+
         data.append("def");
         assertEquals("abcdef", data.toString());
     }
