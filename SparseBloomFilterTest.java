@@ -32,92 +32,61 @@ class SparseBloomFilterTest extends AbstractBloomFilterTest<SparseBloomFilter> {
     }
 
     @Test
-    void testProcessBitMapsExitsEarlyBeforeBitmapBoundary() {
-        // Create filter with multiple indices across bitmaps
-        final int[] values = {1, 2, 3, 4, 5, 6, 7, 8, 9, 65, 66, 67, 68, 69, 70, 71};
-        final BloomFilter bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
-        
-        // Track predicate invocations
-        final int[] predicateCalls = {0};
-        final boolean shouldContinue = bf.processBitMaps(l -> {
-            predicateCalls[0]++;
-            // Return false immediately to test early exit
+    void testBitMapExtractorEdgeCases() {
+        int[] values = {1, 2, 3, 4, 5, 6, 7, 8, 9, 65, 66, 67, 68, 69, 70, 71};
+        BloomFilter bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
+
+        // verify exit early before bitmap boundary
+        final int[] passes = new int[1];
+        assertFalse(bf.processBitMaps(l -> {
+            passes[0]++;
             return false;
-        });
-        
-        // Verify exit after first bitmap
-        assertFalse(shouldContinue);
-        assertEquals(1, predicateCalls[0]);
-    }
+        }));
+        assertEquals(1, passes[0]);
 
-    @Test
-    void testProcessBitMapsExitsEarlyAtBitmapBoundary() {
-        // Create filter with indices spanning multiple bitmaps
-        final int[] values = {1, 2, 3, 4, 5, 6, 7, 8, 9, 65, 66, 67, 68, 69, 70, 71};
-        final BloomFilter bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
-        
-        // Track predicate invocations
-        final int[] predicateCalls = {0};
-        final boolean shouldContinue = bf.processBitMaps(l -> {
-            predicateCalls[0]++;
-            // Only allow processing of first bitmap
-            return predicateCalls[0] < 1;
-        });
-        
-        // Verify exit after first bitmap
-        assertFalse(shouldContinue);
-        assertEquals(1, predicateCalls[0]);
-    }
+        // verify exit early at bitmap boundary
+        bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
+        passes[0] = 0;
+        assertFalse(bf.processBitMaps(l -> {
+            final boolean result = passes[0] == 0;
+            if (result) {
+                passes[0]++;
+            }
+            return result;
+        }));
+        assertEquals(1, passes[0]);
 
-    @Test
-    void testProcessBitMapsProcessesExtraBlockWhenAllValuesInFirstBitmap() {
-        // Create filter with indices only in first bitmap
-        final int[] values = {1, 2, 3, 4};
-        final BloomFilter bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
-        
-        // Track predicate invocations
-        final int[] predicateCalls = {0};
-        final boolean shouldContinue = bf.processBitMaps(l -> {
-            predicateCalls[0]++;
-            // Process all bitmaps
+        // verify add extra if all values in first bitmap
+        values = new int[] {1, 2, 3, 4};
+        bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
+        passes[0] = 0;
+        assertTrue(bf.processBitMaps(l -> {
+            passes[0]++;
             return true;
-        });
-        
-        // Verify both bitmaps processed
-        assertTrue(shouldContinue);
-        assertEquals(2, predicateCalls[0]);
+        }));
+        assertEquals(2, passes[0]);
+
+        // verify exit early if all values in first bitmap and predicate returns false
+        // on 2nd block
+        values = new int[] {1, 2, 3, 4};
+        bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
+        passes[0] = 0;
+        assertFalse(bf.processBitMaps(l -> {
+            final boolean result = passes[0] == 0;
+            if (result) {
+                passes[0]++;
+            }
+            return result;
+        }));
+        assertEquals(1, passes[0]);
     }
 
     @Test
-    void testProcessBitMapsExitsEarlyWhenAllValuesInFirstBitmap() {
-        // Create filter with indices only in first bitmap
-        final int[] values = {1, 2, 3, 4};
-        final BloomFilter bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
-        
-        // Track predicate invocations
-        final int[] predicateCalls = {0};
-        final boolean shouldContinue = bf.processBitMaps(l -> {
-            predicateCalls[0]++;
-            // Break after processing first bitmap
-            return predicateCalls[0] < 1;
-        });
-        
-        // Verify exit after first bitmap
-        assertFalse(shouldContinue);
-        assertEquals(1, predicateCalls[0]);
-    }
-
-    @Test
-    void testMergeWithSimpleBloomFilterProducesEqualBitMaps() {
-        // Create empty filter and populated SimpleBloomFilter
-        final BloomFilter sparse = createEmptyFilter(getTestShape());
-        final BloomFilter simple = new SimpleBloomFilter(getTestShape());
-        simple.merge(TestingHashers.FROM1);
-        
-        // Merge data into sparse filter
-        sparse.merge(simple);
-        
-        // Verify both filters have identical bitmap representations
-        assertTrue(simple.processBitMapPairs(sparse, (x, y) -> x == y));
+    void testBloomFilterBasedMergeEdgeCases() {
+        final BloomFilter bf1 = createEmptyFilter(getTestShape());
+        final BloomFilter bf2 = new SimpleBloomFilter(getTestShape());
+        bf2.merge(TestingHashers.FROM1);
+        bf1.merge(bf2);
+        assertTrue(bf2.processBitMapPairs(bf1, (x, y) -> x == y));
     }
 }
