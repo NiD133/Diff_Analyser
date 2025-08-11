@@ -47,51 +47,105 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the {@link StandardXYBarPainter} class.
+ * 
+ * This test suite verifies the core object behavior of StandardXYBarPainter,
+ * including equality, hashing, cloning restrictions, and serialization.
  */
 public class StandardXYBarPainterTest {
 
+    // Test Data Factory Methods
+    
     /**
-     * Check that the equals() method distinguishes all fields.
+     * Creates a standard StandardXYBarPainter instance for testing.
+     * 
+     * @return a new StandardXYBarPainter instance
+     */
+    private StandardXYBarPainter createStandardPainter() {
+        return new StandardXYBarPainter();
+    }
+
+    // Equality Contract Tests
+    
+    /**
+     * Verifies that two StandardXYBarPainter instances are equal.
+     * 
+     * Since StandardXYBarPainter has no configurable fields, all instances
+     * should be considered equal to each other.
      */
     @Test
-    public void testEquals() {
-        StandardXYBarPainter p1 = new StandardXYBarPainter();
-        StandardXYBarPainter p2 = new StandardXYBarPainter();
-        assertEquals(p1, p2);
+    public void testEquals_TwoInstancesAreEqual() {
+        // Given: Two StandardXYBarPainter instances
+        StandardXYBarPainter firstPainter = createStandardPainter();
+        StandardXYBarPainter secondPainter = createStandardPainter();
+        
+        // When & Then: They should be equal
+        assertEquals(firstPainter, secondPainter, 
+            "Two StandardXYBarPainter instances should be equal");
     }
 
     /**
-     * Two objects that are equal are required to return the same hashCode.
+     * Verifies that equal StandardXYBarPainter instances have the same hash code.
+     * 
+     * This test ensures compliance with the Java equals/hashCode contract:
+     * if two objects are equal, they must have the same hash code.
      */
     @Test
-    public void testHashcode() {
-        StandardXYBarPainter p1 = new StandardXYBarPainter();
-        StandardXYBarPainter p2 = new StandardXYBarPainter();
-        assertEquals(p1, p2);
-        int h1 = p1.hashCode();
-        int h2 = p2.hashCode();
-        assertEquals(h1, h2);
+    public void testHashCode_EqualInstancesHaveSameHashCode() {
+        // Given: Two equal StandardXYBarPainter instances
+        StandardXYBarPainter firstPainter = createStandardPainter();
+        StandardXYBarPainter secondPainter = createStandardPainter();
+        assertEquals(firstPainter, secondPainter, "Precondition: instances should be equal");
+        
+        // When: Getting hash codes from both instances
+        int firstHashCode = firstPainter.hashCode();
+        int secondHashCode = secondPainter.hashCode();
+        
+        // Then: Hash codes should be identical
+        assertEquals(firstHashCode, secondHashCode, 
+            "Equal StandardXYBarPainter instances must have identical hash codes");
     }
 
+    // Cloning Behavior Tests
+    
     /**
-     * Confirm that cloning isn't implemented (it isn't required, because
-     * instances of the class are immutable).
+     * Verifies that StandardXYBarPainter does not implement cloning interfaces.
+     * 
+     * StandardXYBarPainter instances are immutable, so cloning is not necessary
+     * or supported. This test confirms that the class correctly does not
+     * implement Cloneable or PublicCloneable interfaces.
      */
     @Test
-    public void testCloning() {
-        StandardXYBarPainter p1 = new StandardXYBarPainter();
-        assertFalse(p1 instanceof Cloneable);
-        assertFalse(p1 instanceof PublicCloneable);
+    public void testCloning_DoesNotSupportCloning() {
+        // Given: A StandardXYBarPainter instance
+        StandardXYBarPainter painter = createStandardPainter();
+        
+        // When & Then: It should not implement cloning interfaces
+        assertFalse(painter instanceof Cloneable, 
+            "StandardXYBarPainter should not implement Cloneable (immutable objects don't need cloning)");
+        assertFalse(painter instanceof PublicCloneable, 
+            "StandardXYBarPainter should not implement PublicCloneable (immutable objects don't need cloning)");
     }
 
+    // Serialization Tests
+    
     /**
-     * Serialize an instance, restore it, and check for equality.
+     * Verifies that StandardXYBarPainter can be serialized and deserialized correctly.
+     * 
+     * This test ensures that:
+     * 1. The object can be serialized without errors
+     * 2. The deserialized object is equal to the original
+     * 3. Serialization preserves object state
      */
     @Test
-    public void testSerialization() {
-        StandardXYBarPainter p1 = new StandardXYBarPainter();
-        StandardXYBarPainter p2 = TestUtils.serialised(p1);
-        assertEquals(p1, p2);
+    public void testSerialization_PreservesEqualityAfterSerialization() {
+        // Given: A StandardXYBarPainter instance
+        StandardXYBarPainter originalPainter = createStandardPainter();
+        
+        // When: Serializing and deserializing the instance
+        StandardXYBarPainter deserializedPainter = TestUtils.serialised(originalPainter);
+        
+        // Then: The deserialized instance should equal the original
+        assertEquals(originalPainter, deserializedPainter, 
+            "Deserialized StandardXYBarPainter should be equal to the original instance");
     }
-
 }
