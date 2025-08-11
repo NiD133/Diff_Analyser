@@ -1,84 +1,133 @@
 package com.fasterxml.jackson.core.util;
 
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.json.PackageVersion;
 import com.fasterxml.jackson.core.json.UTF8JsonGenerator;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for class {@link VersionUtil}.
- *
- * @see VersionUtil
+ * Unit tests for the utility class {@link VersionUtil}.
  */
-class VersionUtilTest
-{
-    @Test
-    void versionPartParsing()
-    {
-        assertEquals(13, VersionUtil.parseVersionPart("13"));
-        assertEquals(27, VersionUtil.parseVersionPart("27.8"));
-        assertEquals(0, VersionUtil.parseVersionPart("-3"));
+@DisplayName("VersionUtil")
+class VersionUtilTest {
+
+    @Nested
+    @DisplayName("Method: parseVersionPart(String)")
+    class ParseVersionPartTest {
+
+        @ParameterizedTest(name = "Input: \"{0}\" -> Expected: {1}")
+        @CsvSource({
+                "13,    13",  // Should parse a simple integer
+                "27.8,  27",  // Should stop parsing at the first non-digit
+                "66R,   66",  // Should stop parsing at a trailing character
+                "-3,    0",   // Should treat negative numbers as zero
+                "foo,   0",   // Should return zero for non-numeric input
+                "'',    0"    // Should return zero for an empty string
+        })
+        void shouldParseIntegerComponent(String input, int expected) {
+            assertEquals(expected, VersionUtil.parseVersionPart(input));
+        }
     }
 
-    @Test
-    void versionParsing()
-    {
-        assertEquals(new Version(1, 2, 15, "foo", "group", "artifact"),
-                VersionUtil.parseVersion("1.2.15-foo", "group", "artifact"));
-        Version v = VersionUtil.parseVersion("1.2.3-SNAPSHOT", "group", "artifact");
-        assertEquals("group/artifact/1.2.3-SNAPSHOT", v.toFullString());
+    @Nested
+    @DisplayName("Method: parseVersion(String, String, String)")
+    class ParseVersionTest {
+
+        @Test
+        void shouldParseStandardVersionString() {
+            Version expected = new Version(1, 2, 15, "foo", "group", "artifact");
+            Version actual = VersionUtil.parseVersion("1.2.15-foo", "group", "artifact");
+            assertEquals(expected, actual);
+        }
+
+        @Test
+        void shouldParseSnapshotVersionString() {
+            Version version = VersionUtil.parseVersion("1.2.3-SNAPSHOT", "group", "artifact");
+
+            assertAll("Snapshot Version",
+                    () -> assertEquals(1, version.getMajorVersion()),
+                    () -> assertEquals(2, version.getMinorVersion()),
+                    () -> assertEquals(3, version.getPatchLevel()),
+                    () -> assertTrue(version.isSnapshot()),
+                    () -> assertEquals("SNAPSHOT", version.getSnapshotInfo()),
+                    () -> assertEquals("group", version.getGroupId()),
+                    () -> assertEquals("artifact", version.getArtifactId())
+            );
+        }
+
+        @Test
+        void shouldReturnZeroVersionForMalformedString() {
+            // When parsing fails on a non-empty version string, it defaults to 0.0.0.
+            // It is not "unknown" because an attempt to parse was made.
+            Version version = VersionUtil.parseVersion("not-a-version", "some-group", "some-artifact");
+
+            assertEquals(0, version.getMajorVersion());
+            assertEquals(0, version.getMinorVersion());
+            assertEquals(0, version.getPatchLevel());
+            assertFalse(version.isSnapshot());
+            assertFalse(version.isUnknownVersion(), "Should be a parsed 'zero' version, not an 'unknown' version");
+        }
+
+        @Test
+        void shouldReturnUnknownVersionForNullString() {
+            Version version = VersionUtil.parseVersion(null, "some-group", "some-artifact");
+            assertEquals(Version.unknownVersion(), version);
+            assertTrue(version.isUnknownVersion());
+        }
+
+        @Test
+        void shouldReturnUnknownVersionForEmptyString() {
+            Version version = VersionUtil.parseVersion("", "some-group", "some-artifact");
+            assertEquals(Version.unknownVersion(), version);
+            assertTrue(version.isUnknownVersion());
+        }
     }
 
-    @Test
-    void parseVersionPartReturningPositive() {
-        assertEquals(66, VersionUtil.parseVersionPart("66R"));
+    @Nested
+    @DisplayName("Method: versionFor(Class)")
+    class VersionForTest {
+
+        @Test
+        void shouldFindVersionForClassWithPackageVersion() {
+            // UTF8JsonGenerator is in a package that has a PackageVersion class, which should be found.
+            Version expectedVersion = PackageVersion.VERSION;
+            Version actualVersion = VersionUtil.versionFor(UTF8JsonGenerator.class);
+
+            assertEquals(expectedVersion, actualVersion);
+        }
+
+        @Test
+        void shouldReturnUnknownVersionForClassWithoutPackageVersion() {
+            // This test class itself does not have a sibling PackageVersion class.
+            // The method should return the singleton "unknown" version, not null.
+            Version version = VersionUtil.versionFor(VersionUtilTest.class);
+
+            assertEquals(Version.unknownVersion(), version);
+            assertTrue(version.isUnknownVersion());
+        }
     }
 
-    @Test
-    void parseVersionReturningVersionWhereGetMajorVersionIsZero() {
-        Version version = VersionUtil.parseVersion("#M&+m@569P", "#M&+m@569P", "com.fasterxml.jackson.core.util.VersionUtil");
+    @Nested
+    @DisplayName("Deprecated Methods")
+    class DeprecatedApiTest {
 
-        assertEquals(0, version.getMinorVersion());
-        assertEquals(0, version.getPatchLevel());
-        assertEquals(0, version.getMajorVersion());
-        assertFalse(version.isSnapshot());
-        assertFalse(version.isUnknownVersion());
-    }
+        @Test
+        @SuppressWarnings("deprecation")
+        void shouldParseMavenVersionFromPomProperties() {
+            // This test relies on a "pom.properties" file being available on the classpath
+            // at META-INF/maven/foo.bar/foo-bar/pom.properties for test purposes.
+            Version expected = new Version(1, 2, 3, "SNAPSHOT", "foo.bar", "foo-bar");
 
-    @Test
-    void parseVersionWithEmptyStringAndEmptyString() {
-        Version version = VersionUtil.parseVersion("", "", "\"g2AT");
-        assertTrue(version.isUnknownVersion());
-    }
+            Version actual = VersionUtil.mavenVersionFor(
+                    VersionUtilTest.class.getClassLoader(), "foo.bar", "foo-bar");
 
-    @Test
-    void parseVersionWithNullAndEmptyString() {
-        Version version = VersionUtil.parseVersion(null, "/nUmRN)3", "");
-
-        assertFalse(version.isSnapshot());
-    }
-
-    @Test
-    void packageVersionMatches() {
-        assertEquals(PackageVersion.VERSION, VersionUtil.versionFor(UTF8JsonGenerator.class));
-    }
-
-    // [core#248]: make sure not to return `null` but `Version.unknownVersion()`
-    @Test
-    void versionForUnknownVersion() {
-        // expecting return version.unknownVersion() instead of null
-        assertEquals(Version.unknownVersion(), VersionUtil.versionFor(VersionUtilTest.class));
-    }
-
-    // // // Deprecated functionality
-
-    @SuppressWarnings("deprecation")
-    @Test
-    void mavenVersionParsing() {
-        assertEquals(new Version(1, 2, 3, "SNAPSHOT", "foo.bar", "foo-bar"),
-                VersionUtil.mavenVersionFor(VersionUtilTest.class.getClassLoader(), "foo.bar", "foo-bar"));
+            assertEquals(expected, actual);
+        }
     }
 }
