@@ -18,7 +18,6 @@ package com.google.common.collect;
 
 import static java.util.Arrays.asList;
 
-import com.google.common.base.Function;
 import com.google.common.collect.testing.QueueTestSuiteBuilder;
 import com.google.common.collect.testing.TestStringQueueGenerator;
 import com.google.common.collect.testing.features.CollectionFeature;
@@ -27,6 +26,7 @@ import com.google.common.testing.ForwardingWrapperTester;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.function.Function;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -34,7 +34,20 @@ import org.jspecify.annotations.NullUnmarked;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Tests for {@code ForwardingQueue}.
+ * Tests for {@link ForwardingQueue}.
+ *
+ * <p>This test class employs two primary strategies:
+ *
+ * <ol>
+ *   <li><b>Forwarding Verification</b>: The {@link #testForwarding()} method uses {@link
+ *       ForwardingWrapperTester} to ensure that a simple {@code ForwardingQueue} instance correctly
+ *       delegates all of its methods to the backing queue.
+ *   <li><b>Standard Method Implementation Testing</b>: The {@link #suite()} method uses {@code
+ *       guava-testlib} to run a comprehensive suite of tests against {@link
+ *       StandardImplForwardingQueue}. This special implementation overrides every method to call
+ *       the corresponding {@code standard*} implementation (e.g., {@link #standardAddAll(Collection)}),
+ *       thereby testing the correctness of these provided helper methods.
+ * </ol>
  *
  * @author Robert Konigsberg
  * @author Louis Wasserman
@@ -42,6 +55,11 @@ import org.jspecify.annotations.Nullable;
 @NullUnmarked
 public class ForwardingQueueTest extends TestCase {
 
+  /**
+   * A custom {@link ForwardingQueue} that overrides all public methods to delegate to the
+   * corresponding {@code standard*} implementations. This class is used to verify the correctness
+   * of the standard implementations provided by {@link ForwardingQueue}.
+   */
   static final class StandardImplForwardingQueue<T> extends ForwardingQueue<T> {
     private final Queue<T> backingQueue;
 
@@ -89,6 +107,8 @@ public class ForwardingQueueTest extends TestCase {
       return standardRetainAll(collection);
     }
 
+
+
     @Override
     public Object[] toArray() {
       return standardToArray();
@@ -124,16 +144,12 @@ public class ForwardingQueueTest extends TestCase {
   public static Test suite() {
     TestSuite suite = new TestSuite();
 
+    // 1. Test that a simple ForwardingQueue delegates all methods.
     suite.addTestSuite(ForwardingQueueTest.class);
-    suite.addTest(
-        QueueTestSuiteBuilder.using(
-                new TestStringQueueGenerator() {
 
-                  @Override
-                  protected Queue<String> create(String[] elements) {
-                    return new StandardImplForwardingQueue<>(new LinkedList<>(asList(elements)));
-                  }
-                })
+    // 2. Test the standard* implementations using guava-testlib.
+    suite.addTest(
+        QueueTestSuiteBuilder.using(createStandardQueueGenerator())
             .named("ForwardingQueue[LinkedList] with standard implementations")
             .withFeatures(
                 CollectionSize.ANY,
@@ -144,19 +160,32 @@ public class ForwardingQueueTest extends TestCase {
     return suite;
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
-  public void testForwarding() {
-    new ForwardingWrapperTester()
-        .testForwarding(
-            Queue.class,
-            new Function<Queue, Queue>() {
-              @Override
-              public Queue apply(Queue delegate) {
-                return wrap(delegate);
-              }
-            });
+  /**
+   * Creates a generator for {@link StandardImplForwardingQueue} instances, used by the
+   * guava-testlib suite.
+   */
+  private static TestStringQueueGenerator createStandardQueueGenerator() {
+    return new TestStringQueueGenerator() {
+      @Override
+      protected Queue<String> create(String[] elements) {
+        return new StandardImplForwardingQueue<>(new LinkedList<>(asList(elements)));
+      }
+    };
   }
 
+  /**
+   * Tests that a basic {@link ForwardingQueue} wrapper correctly forwards all interface methods to
+   * the delegate, using {@link ForwardingWrapperTester}.
+   */
+  public void testForwarding() {
+    // ForwardingWrapperTester requires raw types for its arguments.
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    Function<Queue, Queue> wrapperFunction = ForwardingQueueTest::wrap;
+
+    new ForwardingWrapperTester().testForwarding(Queue.class, wrapperFunction);
+  }
+
+  /** Wraps a queue in a basic {@link ForwardingQueue} that strictly delegates all calls. */
   private static <T> Queue<T> wrap(Queue<T> delegate) {
     return new ForwardingQueue<T>() {
       @Override
