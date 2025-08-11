@@ -18,57 +18,36 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Test suite for BufferedLineString class.
- */
 public class BufferedLineStringTest extends RandomizedTest {
 
-  // Spatial context with custom world bounds
-  private final SpatialContext ctx = new SpatialContextFactory() {{
-    geo = false; 
-    worldBounds = new RectangleImpl(-100, 100, -50, 50, null);
-  }}.newSpatialContext();
+  private final SpatialContext ctx = new SpatialContextFactory()
+    {{geo = false; worldBounds = new RectangleImpl(-100, 100, -50, 50, null);}}.newSpatialContext();
 
-  /**
-   * Tests the intersection of BufferedLineString with rectangles.
-   */
+
   @Test
-  public void testRectangleIntersection() {
+  public void testRectIntersect() {
     new RectIntersectionTestHelper<BufferedLineString>(ctx) {
 
-      /**
-       * Generates a random BufferedLineString near a given point.
-       *
-       * @param nearPoint The point near which the BufferedLineString should be generated.
-       * @return A random BufferedLineString.
-       */
       @Override
-      protected BufferedLineString generateRandomShape(Point nearPoint) {
-        Rectangle nearbyRectangle = randomRectangle(nearPoint);
-        int numberOfPoints = 2 + randomInt(3); // Generates between 2 and 5 points
+      protected BufferedLineString generateRandomShape(Point nearP) {
+        Rectangle nearR = randomRectangle(nearP);
+        int numPoints = 2 + randomInt(3);//2-5 points
 
-        List<Point> points = new ArrayList<>(numberOfPoints);
-        while (points.size() < numberOfPoints) {
-          points.add(randomPointIn(nearbyRectangle));
+        ArrayList<Point> points = new ArrayList<>(numPoints);
+        while (points.size() < numPoints) {
+          points.add(randomPointIn(nearR));
         }
-
-        double maxBuffer = Math.max(nearbyRectangle.getWidth(), nearbyRectangle.getHeight());
-        double buffer = Math.abs(randomGaussian()) * maxBuffer / 4;
-        buffer = randomInt((int) divisible(buffer));
-
-        return new BufferedLineString(points, buffer, ctx);
+        double maxBuf = Math.max(nearR.getWidth(), nearR.getHeight());
+        double buf = Math.abs(randomGaussian()) * maxBuf / 4;
+        buf = randomInt((int) divisible(buf));
+        return new BufferedLineString(points, buf, ctx);
       }
 
-      /**
-       * Selects a random point from the points of a BufferedLineString.
-       *
-       * @param shape The BufferedLineString from which to select a point.
-       * @return A random point from the BufferedLineString.
-       */
       protected Point randomPointInEmptyShape(BufferedLineString shape) {
         List<Point> points = shape.getPoints();
         return points.get(randomInt(points.size() - 1));
       }
     }.testRelateWithRectangle();
   }
+
 }
