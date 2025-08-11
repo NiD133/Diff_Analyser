@@ -51,131 +51,69 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class PlotRenderingInfoTest {
 
-    // Test data constants for better readability and maintainability
-    private static final Rectangle PLOT_AREA_1 = new Rectangle(2, 3, 4, 5);
-    private static final Rectangle PLOT_AREA_2 = new Rectangle(2, 3, 4, 5);
-    private static final Rectangle DATA_AREA_1 = new Rectangle(2, 4, 6, 8);
-    private static final Rectangle DATA_AREA_2 = new Rectangle(2, 4, 6, 8);
-    private static final Rectangle SUBPLOT_DATA_AREA = new Rectangle(1, 2, 3, 4);
-
     /**
-     * Creates a basic PlotRenderingInfo instance for testing.
-     */
-    private PlotRenderingInfo createBasicPlotRenderingInfo() {
-        return new PlotRenderingInfo(new ChartRenderingInfo());
-    }
-
-    /**
-     * Test the equals() method to ensure proper equality comparison.
-     * This test verifies that two PlotRenderingInfo objects are equal when they have
-     * the same plot area, data area, and subplot information.
+     * Test the equals() method.
      */
     @Test
     public void testEquals() {
-        // Given: Two identical PlotRenderingInfo instances
-        PlotRenderingInfo firstInfo = createBasicPlotRenderingInfo();
-        PlotRenderingInfo secondInfo = createBasicPlotRenderingInfo();
-        
-        // Then: They should be equal initially
-        assertEquals(firstInfo, secondInfo, "Two basic PlotRenderingInfo instances should be equal");
-        assertEquals(secondInfo, firstInfo, "Equality should be symmetric");
+        PlotRenderingInfo p1 = new PlotRenderingInfo(new ChartRenderingInfo());
+        PlotRenderingInfo p2 = new PlotRenderingInfo(new ChartRenderingInfo());
+        assertEquals(p1, p2);
+        assertEquals(p2, p1);
 
-        // When: Setting different plot areas
-        firstInfo.setPlotArea(PLOT_AREA_1);
-        // Then: They should not be equal
-        assertNotEquals(firstInfo, secondInfo, "PlotRenderingInfo instances with different plot areas should not be equal");
-        
-        // When: Setting the same plot area on both
-        secondInfo.setPlotArea(PLOT_AREA_2);
-        // Then: They should be equal again
-        assertEquals(firstInfo, secondInfo, "PlotRenderingInfo instances with same plot areas should be equal");
+        p1.setPlotArea(new Rectangle(2, 3, 4, 5));
+        assertNotEquals(p1, p2);
+        p2.setPlotArea(new Rectangle(2, 3, 4, 5));
+        assertEquals(p1, p2);
 
-        // When: Setting different data areas
-        firstInfo.setDataArea(DATA_AREA_1);
-        // Then: They should not be equal
-        assertNotEquals(firstInfo, secondInfo, "PlotRenderingInfo instances with different data areas should not be equal");
-        
-        // When: Setting the same data area on both
-        secondInfo.setDataArea(DATA_AREA_2);
-        // Then: They should be equal again
-        assertEquals(firstInfo, secondInfo, "PlotRenderingInfo instances with same data areas should be equal");
+        p1.setDataArea(new Rectangle(2, 4, 6, 8));
+        assertNotEquals(p1, p2);
+        p2.setDataArea(new Rectangle(2, 4, 6, 8));
+        assertEquals(p1, p2);
 
-        // When: Adding subplot info to only one instance
-        firstInfo.addSubplotInfo(new PlotRenderingInfo(null));
-        // Then: They should not be equal
-        assertNotEquals(firstInfo, secondInfo, "PlotRenderingInfo instances with different subplot counts should not be equal");
-        
-        // When: Adding the same subplot info to both
-        secondInfo.addSubplotInfo(new PlotRenderingInfo(null));
-        // Then: They should be equal again
-        assertEquals(firstInfo, secondInfo, "PlotRenderingInfo instances with same subplot info should be equal");
+        p1.addSubplotInfo(new PlotRenderingInfo(null));
+        assertNotEquals(p1, p2);
+        p2.addSubplotInfo(new PlotRenderingInfo(null));
+        assertEquals(p1, p2);
 
-        // When: Modifying subplot data area in only one instance
-        firstInfo.getSubplotInfo(0).setDataArea(SUBPLOT_DATA_AREA);
-        // Then: They should not be equal
-        assertNotEquals(firstInfo, secondInfo, "PlotRenderingInfo instances with different subplot data areas should not be equal");
-        
-        // When: Setting the same subplot data area on both
-        secondInfo.getSubplotInfo(0).setDataArea(new Rectangle(1, 2, 3, 4));
-        // Then: They should be equal again
-        assertEquals(firstInfo, secondInfo, "PlotRenderingInfo instances with same subplot data areas should be equal");
+        p1.getSubplotInfo(0).setDataArea(new Rectangle(1, 2, 3, 4));
+        assertNotEquals(p1, p2);
+        p2.getSubplotInfo(0).setDataArea(new Rectangle(1, 2, 3, 4));
+        assertEquals(p1, p2);
     }
 
     /**
-     * Test cloning functionality to ensure deep copying works correctly.
-     * This test verifies that cloned objects are independent of their originals.
+     * Confirm that cloning works.
      */
     @Test
     public void testCloning() throws CloneNotSupportedException {
-        // Given: A PlotRenderingInfo with a plot area
-        PlotRenderingInfo originalInfo = createBasicPlotRenderingInfo();
-        originalInfo.setPlotArea(new Rectangle2D.Double());
-        
-        // When: Cloning the object
-        PlotRenderingInfo clonedInfo = CloneUtils.clone(originalInfo);
-        
-        // Then: The clone should be a different object but equal in content
-        assertNotSame(originalInfo, clonedInfo, "Cloned object should be a different instance");
-        assertSame(originalInfo.getClass(), clonedInfo.getClass(), "Cloned object should be of the same class");
-        assertEquals(originalInfo, clonedInfo, "Cloned object should be equal to original");
+        PlotRenderingInfo p1 = new PlotRenderingInfo(new ChartRenderingInfo());
+        p1.setPlotArea(new Rectangle2D.Double());
+        PlotRenderingInfo p2 = CloneUtils.clone(p1);
+        assertNotSame(p1, p2);
+        assertSame(p1.getClass(), p2.getClass());
+        assertEquals(p1, p2);
 
-        // Test independence: Modifying plot area
-        // When: Changing the original's plot area
-        originalInfo.getPlotArea().setRect(1.0, 2.0, 3.0, 4.0);
-        // Then: The clone should remain unchanged
-        assertNotEquals(originalInfo, clonedInfo, "Original and clone should be independent after modifying plot area");
-        
-        // When: Applying the same change to the clone
-        clonedInfo.getPlotArea().setRect(1.0, 2.0, 3.0, 4.0);
-        // Then: They should be equal again
-        assertEquals(originalInfo, clonedInfo, "Objects should be equal after applying same changes");
+        // check independence
+        p1.getPlotArea().setRect(1.0, 2.0, 3.0, 4.0);
+        assertNotEquals(p1, p2);
+        p2.getPlotArea().setRect(1.0, 2.0, 3.0, 4.0);
+        assertEquals(p1, p2);
 
-        // Test independence: Modifying data area
-        // When: Changing the original's data area
-        originalInfo.getDataArea().setRect(4.0, 3.0, 2.0, 1.0);
-        // Then: The clone should remain unchanged
-        assertNotEquals(originalInfo, clonedInfo, "Original and clone should be independent after modifying data area");
-        
-        // When: Applying the same change to the clone
-        clonedInfo.getDataArea().setRect(4.0, 3.0, 2.0, 1.0);
-        // Then: They should be equal again
-        assertEquals(originalInfo, clonedInfo, "Objects should be equal after applying same data area changes");
+        p1.getDataArea().setRect(4.0, 3.0, 2.0, 1.0);
+        assertNotEquals(p1, p2);
+        p2.getDataArea().setRect(4.0, 3.0, 2.0, 1.0);
+        assertEquals(p1, p2);
     }
 
     /**
-     * Test serialization to ensure objects can be properly serialized and deserialized.
-     * This test verifies that the serialization process preserves object equality.
+     * Serialize an instance, restore it, and check for equality.
      */
     @Test
     public void testSerialization() {
-        // Given: A PlotRenderingInfo instance
-        PlotRenderingInfo originalInfo = createBasicPlotRenderingInfo();
-        
-        // When: Serializing and deserializing the object
-        PlotRenderingInfo deserializedInfo = TestUtils.serialised(originalInfo);
-        
-        // Then: The deserialized object should be equal to the original
-        assertEquals(originalInfo, deserializedInfo, 
-            "Deserialized PlotRenderingInfo should be equal to the original");
+        PlotRenderingInfo p1 = new PlotRenderingInfo(new ChartRenderingInfo());
+        PlotRenderingInfo p2 = TestUtils.serialised(p1);
+        assertEquals(p1, p2);
     }
+
 }
