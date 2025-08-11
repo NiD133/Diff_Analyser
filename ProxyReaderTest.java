@@ -16,6 +16,8 @@
  */
 package org.apache.commons.io.input;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.CharBuffer;
@@ -23,11 +25,21 @@ import java.nio.CharBuffer;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests {@link ProxyReader}.
+ * Tests the {@link ProxyReader} to ensure it correctly delegates method calls
+ * to the underlying reader.
  */
 class ProxyReaderTest {
 
-    /** Custom NullReader implementation. */
+    /**
+     * A test-specific stub that extends {@link NullReader} to provide non-standard
+     * behavior for testing purposes.
+     * <p>
+     * This reader is designed to return {@code 0} when a {@code null} buffer is
+     * passed to its read methods, instead of throwing a {@link NullPointerException}.
+     * This allows us to verify that {@link ProxyReader} correctly delegates calls
+     * with null arguments, rather than handling them itself.
+     * </p>
+     */
     private static final class CustomNullReader extends NullReader {
         CustomNullReader(final int len) {
             super(len);
@@ -35,16 +47,20 @@ class ProxyReaderTest {
 
         @Override
         public int read(final char[] chars) throws IOException {
+            // Return 0 for a null array, otherwise delegate to standard NullReader behavior.
             return chars == null ? 0 : super.read(chars);
         }
 
         @Override
         public int read(final CharBuffer target) throws IOException {
+            // Return 0 for a null buffer, otherwise delegate to standard NullReader behavior.
             return target == null ? 0 : super.read(target);
         }
     }
 
-    /** ProxyReader implementation. */
+    /**
+     * A minimal concrete implementation of the abstract {@link ProxyReader} for testing.
+     */
     private static final class ProxyReaderImpl extends ProxyReader {
         ProxyReaderImpl(final Reader proxy) {
             super(proxy);
@@ -52,17 +68,27 @@ class ProxyReaderTest {
     }
 
     @Test
-    void testNullCharArray() throws Exception {
-        try (ProxyReader proxy = new ProxyReaderImpl(new CustomNullReader(0))) {
-            proxy.read((char[]) null);
-            proxy.read(null, 0, 0);
+    void readWithNullCharArrayShouldDelegateCall() throws IOException {
+        // Create a custom reader that returns 0 for a null char array.
+        final Reader customReader = new CustomNullReader(0);
+        try (final ProxyReader proxy = new ProxyReaderImpl(customReader)) {
+            // Verify that the proxy delegates the call with the null array
+            // and returns the value from our custom reader (0), instead of
+            // throwing a NullPointerException itself.
+            assertEquals(0, proxy.read((char[]) null), "read(char[]) should be delegated");
+            assertEquals(0, proxy.read(null, 0, 0), "read(char[], int, int) should be delegated");
         }
     }
 
     @Test
-    void testNullCharBuffer() throws Exception {
-        try (ProxyReader proxy = new ProxyReaderImpl(new CustomNullReader(0))) {
-            proxy.read((CharBuffer) null);
+    void readWithNullCharBufferShouldDelegateCall() throws IOException {
+        // Create a custom reader that returns 0 for a null CharBuffer.
+        final Reader customReader = new CustomNullReader(0);
+        try (final ProxyReader proxy = new ProxyReaderImpl(customReader)) {
+            // Verify that the proxy delegates the call with the null buffer
+            // and returns the value from our custom reader (0), instead of
+            // throwing a NullPointerException itself.
+            assertEquals(0, proxy.read((CharBuffer) null), "read(CharBuffer) should be delegated");
         }
     }
 }
