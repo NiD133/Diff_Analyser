@@ -1,189 +1,195 @@
-/*
-    This file is part of the iText (R) project.
-    Copyright (c) 1998-2022 iText Group NV
-    Authors: iText Software.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License version 3
-    as published by the Free Software Foundation with the addition of the
-    following permission added to Section 15 as permitted in Section 7(a):
-    FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
-    ITEXT GROUP. ITEXT GROUP DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
-    OF THIRD PARTY RIGHTS
-    
-    This program is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Affero General Public License for more details.
-    You should have received a copy of the GNU Affero General Public License
-    along with this program; if not, see http://www.gnu.org/licenses or write to
-    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-    Boston, MA, 02110-1301 USA, or download the license from the following URL:
-    http://itextpdf.com/terms-of-use/
-    
-    The interactive user interfaces in modified source and object code versions
-    of this program must display Appropriate Legal Notices, as required under
-    Section 5 of the GNU Affero General Public License.
-    
-    In accordance with Section 7(b) of the GNU Affero General Public License,
-    a covered work must retain the producer line in every PDF that is created
-    or manipulated using iText.
-    
-    You can be released from the requirements of the license by purchasing
-    a commercial license. Buying such a license is mandatory as soon as you
-    develop commercial activities involving the iText software without
-    disclosing the source code of your own applications.
-    These activities include: offering paid services to customers as an ASP,
-    serving PDFs on the fly in a web application, shipping iText with a closed
-    source product.
-    
-    For more information, please contact iText Software Corp. at this
-    address: sales@itextpdf.com
- */
 package com.itextpdf.text.io;
-
-import java.io.ByteArrayOutputStream;
-
-import junit.framework.Assert;
-import junit.framework.AssertionFailedError;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.util.Arrays;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Tests for GroupedRandomAccessSource.
+ * 
+ * The tests operate on three concatenated in-memory sources. Each source
+ * contains bytes 0..99, so the grouped source effectively exposes 300 bytes:
+ * - positions 0..99   -> 0..99
+ * - positions 100..199 -> 0..99
+ * - positions 200..299 -> 0..99
+ */
 public class GroupedRandomAccessSourceTest {
-	byte[] data;
-	
-	@Before
-	public void setUp() throws Exception {
-		
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		for (int i = 0; i < 100; i++){
-			baos.write((byte)i);
-		}
-		
-		data = baos.toByteArray();
-	}
 
-	@After
-	public void tearDown() throws Exception {
-	}
+    private static final int SEGMENT_SIZE = 100;
+    private static final int SEGMENT_COUNT = 3;
+    private static final int TOTAL_SIZE = SEGMENT_SIZE * SEGMENT_COUNT;
 
+    private byte[] segmentData;
 
-	@Test
-	public void testGet() throws Exception {
-		ArrayRandomAccessSource source1 = new ArrayRandomAccessSource(data);
-		ArrayRandomAccessSource source2 = new ArrayRandomAccessSource(data);
-		ArrayRandomAccessSource source3 = new ArrayRandomAccessSource(data);
-		
-		RandomAccessSource[] inputs = new RandomAccessSource[]{
-				source1, source2, source3
-		};
-		
-		GroupedRandomAccessSource grouped = new GroupedRandomAccessSource(inputs);
-		
-		Assert.assertEquals(source1.length() + source2.length() + source3.length(), grouped.length());
+    @Before
+    public void setUp() {
+        // Build one segment of predictable data: [0, 1, 2, ... 99]
+        segmentData = new byte[SEGMENT_SIZE];
+        for (int i = 0; i < SEGMENT_SIZE; i++) {
+            segmentData[i] = (byte) i;
+        }
+    }
 
-		Assert.assertEquals(source1.get(99),  grouped.get(99));
-		Assert.assertEquals(source2.get(0),  grouped.get(100));
-		Assert.assertEquals(source2.get(1),  grouped.get(101));
-		Assert.assertEquals(source1.get(99),  grouped.get(99));
-		Assert.assertEquals(source3.get(99),  grouped.get(299));
+    @After
+    public void tearDown() {
+        // no-op
+    }
 
-		Assert.assertEquals(-1, grouped.get(300));
-	}
+    @Test
+    public void testLengthAndSingleByteReads() throws Exception {
+        GroupedRandomAccessSource grouped = newGrouped(SEGMENT_COUNT);
 
-	private byte[] rangeArray(int start, int count){
-		byte[] rslt = new byte[count];
-		for(int i = 0; i < count; i++){
-			rslt[i] = (byte)(i + start);
-		}
-		return rslt;
-	}
-	
-	private void assertArrayEqual(byte[] a, int offa, byte[] b, int offb, int len){
-		for(int i = 0; i < len; i++){
-			if (a[i+offa] != b[i + offb]){
-				throw new AssertionFailedError("Differ at index " + (i+offa) + " and " + (i + offb) + " -> " + a[i+offa] + " != " + b[i + offb]);
-			}
-			
-		}
-	}
-	
-	@Test
-	public void testGetArray() throws Exception {
-		ArrayRandomAccessSource source1 = new ArrayRandomAccessSource(data); // 0 - 99
-		ArrayRandomAccessSource source2 = new ArrayRandomAccessSource(data); // 100 - 199
-		ArrayRandomAccessSource source3 = new ArrayRandomAccessSource(data); // 200 - 299
-		
-		RandomAccessSource[] inputs = new RandomAccessSource[]{
-				source1, source2, source3
-		};
-		
-		GroupedRandomAccessSource grouped = new GroupedRandomAccessSource(inputs);
+        // Length should be the sum of all segment lengths
+        assertEquals(TOTAL_SIZE, grouped.length());
 
-		byte[] out = new byte[500];
+        // Read the last byte of the first segment
+        assertEquals(expectedValueAt(SEGMENT_SIZE - 1), grouped.get(SEGMENT_SIZE - 1));
 
-		Assert.assertEquals(300, grouped.get(0, out, 0, 300));
-		assertArrayEqual(rangeArray(0, 100), 0, out, 0, 100);
-		assertArrayEqual(rangeArray(0, 100), 0, out, 100, 100);
-		assertArrayEqual(rangeArray(0, 100), 0, out, 200, 100);
-		
-		Assert.assertEquals(300, grouped.get(0, out, 0, 301));
-		assertArrayEqual(rangeArray(0, 100), 0, out, 0, 100);
-		assertArrayEqual(rangeArray(0, 100), 0, out, 100, 100);
-		assertArrayEqual(rangeArray(0, 100), 0, out, 200, 100);
-		
-		Assert.assertEquals(100, grouped.get(150, out, 0, 100));
-		assertArrayEqual(rangeArray(50, 50), 0, out, 0, 50);
-		assertArrayEqual(rangeArray(0, 50), 0, out, 50, 50);
-	}
-	
-	@Test
-	public void testRelease() throws Exception{
-		
-		ArrayRandomAccessSource source1 = new ArrayRandomAccessSource(data); // 0 - 99
-		ArrayRandomAccessSource source2 = new ArrayRandomAccessSource(data); // 100 - 199
-		ArrayRandomAccessSource source3 = new ArrayRandomAccessSource(data); // 200 - 299
-		
-		RandomAccessSource[] sources = new RandomAccessSource[]{
-				source1, source2, source3
-		};
-		
-		final RandomAccessSource[] current = new RandomAccessSource[]{null};
-		final int[] openCount = new int[]{0};
-		GroupedRandomAccessSource grouped = new GroupedRandomAccessSource(sources){
-			protected void sourceReleased(RandomAccessSource source) throws java.io.IOException {
-				openCount[0]--;
-				if (current[0] != source)
-					throw new AssertionFailedError("Released source isn't the current source");
-				current[0] = null;
-			}
-			
-			protected void sourceInUse(RandomAccessSource source) throws java.io.IOException {
-				if (current[0] != null)
-					throw new AssertionFailedError("Current source wasn't released properly");
-				openCount[0]++;
-				current[0] = source;
-			}
-		};
+        // Read the first two bytes of the second segment
+        assertEquals(expectedValueAt(SEGMENT_SIZE), grouped.get(SEGMENT_SIZE));
+        assertEquals(expectedValueAt(SEGMENT_SIZE + 1), grouped.get(SEGMENT_SIZE + 1));
 
-		grouped.get(250);
-		grouped.get(251);
-		Assert.assertEquals(1, openCount[0]);
-		grouped.get(150);
-		grouped.get(151);
-		Assert.assertEquals(1, openCount[0]);
-		grouped.get(50);
-		grouped.get(51);
-		Assert.assertEquals(1, openCount[0]);
-		grouped.get(150);
-		grouped.get(151);
-		Assert.assertEquals(1, openCount[0]);
-		grouped.get(250);
-		grouped.get(251);
-		Assert.assertEquals(1, openCount[0]);
+        // Re-read to ensure no internal state issue
+        assertEquals(expectedValueAt(SEGMENT_SIZE - 1), grouped.get(SEGMENT_SIZE - 1));
 
-		grouped.close();
-	}
+        // Read the last byte of the third segment
+        assertEquals(expectedValueAt(TOTAL_SIZE - 1), grouped.get(TOTAL_SIZE - 1));
+
+        // Out-of-bounds should return -1
+        assertEquals(-1, grouped.get(TOTAL_SIZE));
+    }
+
+    @Test
+    public void testBulkReadSpanningSegments() throws Exception {
+        GroupedRandomAccessSource grouped = newGrouped(SEGMENT_COUNT);
+        byte[] out = new byte[TOTAL_SIZE + 200]; // a bit larger than necessary
+
+        // Read exactly TOTAL_SIZE bytes starting from 0
+        assertEquals(TOTAL_SIZE, grouped.get(0, out, 0, TOTAL_SIZE));
+        assertRegionEquals(sequentialBytes(0, SEGMENT_SIZE), out, 0);
+        assertRegionEquals(sequentialBytes(0, SEGMENT_SIZE), out, SEGMENT_SIZE);
+        assertRegionEquals(sequentialBytes(0, SEGMENT_SIZE), out, 2 * SEGMENT_SIZE);
+
+        // Request more than available; should still read only TOTAL_SIZE
+        Arrays.fill(out, (byte) 0);
+        assertEquals(TOTAL_SIZE, grouped.get(0, out, 0, TOTAL_SIZE + 1));
+        assertRegionEquals(sequentialBytes(0, SEGMENT_SIZE), out, 0);
+        assertRegionEquals(sequentialBytes(0, SEGMENT_SIZE), out, SEGMENT_SIZE);
+        assertRegionEquals(sequentialBytes(0, SEGMENT_SIZE), out, 2 * SEGMENT_SIZE);
+
+        // Read 100 bytes starting from position 150 (crosses segment boundary)
+        Arrays.fill(out, (byte) 0);
+        assertEquals(100, grouped.get(150, out, 0, 100));
+        assertRegionEquals(sequentialBytes(50, 50), out, 0);   // bytes 50..99 from segment 2
+        assertRegionEquals(sequentialBytes(0, 50), out, 50);   // bytes 0..49 from segment 3
+    }
+
+    @Test
+    public void testSourceSwitchingNotifiesHooks() throws Exception {
+        // Build three segments
+        RandomAccessSource[] sources = new RandomAccessSource[]{
+                new ArrayRandomAccessSource(segmentData), // 0..99
+                new ArrayRandomAccessSource(segmentData), // 100..199
+                new ArrayRandomAccessSource(segmentData)  // 200..299
+        };
+
+        // Track source switching via overridden hooks
+        TrackingGroupedRandomAccessSource grouped = new TrackingGroupedRandomAccessSource(sources);
+
+        // All reads below should keep exactly one active source at any moment.
+        readTwoBytes(grouped, 250); // segment 3
+        readTwoBytes(grouped, 150); // switch to segment 2
+        assertEquals(1, grouped.getActiveCount());
+
+        readTwoBytes(grouped, 50);  // switch to segment 1
+        assertEquals(1, grouped.getActiveCount());
+
+        readTwoBytes(grouped, 150); // switch to segment 2
+        assertEquals(1, grouped.getActiveCount());
+
+        readTwoBytes(grouped, 250); // switch to segment 3
+        assertEquals(1, grouped.getActiveCount());
+
+        grouped.close();
+    }
+
+    // Helpers
+
+    private GroupedRandomAccessSource newGrouped(int segmentCount) throws IOException {
+        RandomAccessSource[] segments = new RandomAccessSource[segmentCount];
+        for (int i = 0; i < segmentCount; i++) {
+            segments[i] = new ArrayRandomAccessSource(segmentData);
+        }
+        return new GroupedRandomAccessSource(segments);
+    }
+
+    private static void readTwoBytes(RandomAccessSource source, long position) throws IOException {
+        source.get(position);
+        source.get(position + 1);
+    }
+
+    // Expected value for a global position in the grouped source: cycles 0..99 per segment
+    private static int expectedValueAt(long position) {
+        if (position < 0 || position >= TOTAL_SIZE) {
+            return -1;
+        }
+        return (int) (position % SEGMENT_SIZE);
+    }
+
+    // Build a byte array of count bytes, starting at 'start' (values wrap naturally via byte cast)
+    private static byte[] sequentialBytes(int start, int count) {
+        byte[] rslt = new byte[count];
+        for (int i = 0; i < count; i++) {
+            rslt[i] = (byte) (start + i);
+        }
+        return rslt;
+    }
+
+    // Assert that a region inside 'actual' equals 'expected'
+    private static void assertRegionEquals(byte[] expected, byte[] actual, int actualOffset) {
+        assertArrayEquals(
+                expected,
+                Arrays.copyOfRange(actual, actualOffset, actualOffset + expected.length)
+        );
+    }
+
+    /**
+     * Test-only subclass that tracks source switch notifications.
+     */
+    private static class TrackingGroupedRandomAccessSource extends GroupedRandomAccessSource {
+        private RandomAccessSource active;
+        private int activeCount = 0;
+
+        TrackingGroupedRandomAccessSource(RandomAccessSource[] sources) throws IOException {
+            super(sources);
+        }
+
+        int getActiveCount() {
+            return activeCount;
+        }
+
+        @Override
+        protected void sourceReleased(RandomAccessSource source) throws IOException {
+            activeCount--;
+            if (active != source) {
+                throw new AssertionError("Released source isn't the current source");
+            }
+            active = null;
+        }
+
+        @Override
+        protected void sourceInUse(RandomAccessSource source) throws IOException {
+            if (active != null) {
+                throw new AssertionError("Current source wasn't released properly");
+            }
+            activeCount++;
+            active = source;
+        }
+    }
 }
