@@ -32,21 +32,12 @@ class SimpleBloomFilterTest extends AbstractBloomFilterTest<SimpleBloomFilter> {
     }
 
     @Test
-    void testMergeWhenBitMapExtractorHasFewerLongsThanShape() {
-        // Given: 
-        // - A filter with shape requiring 2 longs
-        // - An extractor providing only 1 long (value 2L = binary '10')
+    void testMergeShortBitMapExtractor() {
         final SimpleBloomFilter filter = createEmptyFilter(getTestShape());
-        final BitMapExtractor extractorWithOneLong = consumer -> consumer.test(2L);
-
-        // When: Merging the extractor into the filter
-        final boolean changed = filter.merge(extractorWithOneLong);
-
-        // Then:
-        // - Merge should report the filter was modified
-        // - Exactly one bit should be set in the filter
-        assertTrue(changed, "Merge should return true indicating filter changed");
-        assertEquals(1, filter.cardinality(), 
-            "Cardinality should reflect single bit set from extractor's 2L value");
+        // create a bitMapExtractor that returns too few values
+        // shape expects 2 longs we are sending 1.
+        final BitMapExtractor bitMapExtractor = p -> p.test(2L);
+        assertTrue(filter.merge(bitMapExtractor));
+        assertEquals(1, filter.cardinality());
     }
 }
