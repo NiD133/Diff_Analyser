@@ -1,77 +1,77 @@
-/*
-    This file is part of the iText (R) project.
-    Copyright (c) 1998-2022 iText Group NV
-    Authors: iText Software.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License version 3
-    as published by the Free Software Foundation with the addition of the
-    following permission added to Section 15 as permitted in Section 7(a):
-    FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
-    ITEXT GROUP. ITEXT GROUP DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
-    OF THIRD PARTY RIGHTS
-    
-    This program is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Affero General Public License for more details.
-    You should have received a copy of the GNU Affero General Public License
-    along with this program; if not, see http://www.gnu.org/licenses or write to
-    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-    Boston, MA, 02110-1301 USA, or download the license from the following URL:
-    http://itextpdf.com/terms-of-use/
-    
-    The interactive user interfaces in modified source and object code versions
-    of this program must display Appropriate Legal Notices, as required under
-    Section 5 of the GNU Affero General Public License.
-    
-    In accordance with Section 7(b) of the GNU Affero General Public License,
-    a covered work must retain the producer line in every PDF that is created
-    or manipulated using iText.
-    
-    You can be released from the requirements of the license by purchasing
-    a commercial license. Buying such a license is mandatory as soon as you
-    develop commercial activities involving the iText software without
-    disclosing the source code of your own applications.
-    These activities include: offering paid services to customers as an ASP,
-    serving PDFs on the fly in a web application, shipping iText with a closed
-    source product.
-    
-    For more information, please contact iText Software Corp. at this
-    address: sales@itextpdf.com
- */
 package com.itextpdf.text.pdf;
 
-import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
+/**
+ * Tests for DefaultSplitCharacter focusing on hyphen splitting behavior
+ * in normal text versus dates. Hyphens inside dates (e.g., yyyy-MM-dd, dd-MM-yyyy)
+ * should not be used as split points, while hyphens in regular text should.
+ */
 public class DefaultSplitCharacterTest {
-    private final String[] INPUT_TEXT =
-            new String[]{"tha111-is one that should-be-splitted-right-herel-2018-12-18", "anddate format2 01-01-1920"};
 
-    @Test
-    public void splitCharacterDateFormatTest() {
-        Assert.assertFalse(isPsplitCharacter(21, INPUT_TEXT[1]));
+    private static final char HYPHEN = '-';
+
+    // Test fixtures
+    private static final String TEXT_WITH_MIXED_HYPHENS =
+            "tha111-is one that should-be-splitted-right-herel-2018-12-18";
+    private static final String TEXT_WITH_DATE =
+            "anddate format2 01-01-1920";
+
+    private DefaultSplitCharacter sut;
+
+    @Before
+    public void setUp() {
+        sut = new DefaultSplitCharacter();
     }
 
     @Test
-    public void hypenInsideDateTest() {
-        Assert.assertFalse(isPsplitCharacter(21, INPUT_TEXT[1]));
+    public void doesNotSplitAtHyphensInsideDate_dd_MM_yyyy() {
+        // "01-01-1920" -> both hyphens are inside a date and must not split
+        int firstHyphen = indexOf(TEXT_WITH_DATE, HYPHEN, 1);
+        int secondHyphen = indexOf(TEXT_WITH_DATE, HYPHEN, 2);
+
+        assertFalse(splitAllowedAt(TEXT_WITH_DATE, firstHyphen));
+        assertFalse(splitAllowedAt(TEXT_WITH_DATE, secondHyphen));
     }
 
     @Test
-    public void hypenBeforeDateTest() {
-        //check HyphenBeforeAdate ex. '-2019-01-01'
-        Assert.assertTrue(isPsplitCharacter(49, INPUT_TEXT[0]));
+    public void doesNotSplitAtHyphenInsideDate_yyyy_MM_dd() {
+        // The trailing date "2018-12-18" -> hyphens are part of a date and must not split
+        int startOfDate = TEXT_WITH_MIXED_HYPHENS.indexOf("2018-12-18"); // index of '2' in "2018"
+        int firstHyphenInDate = startOfDate + "2018".length(); // position of the hyphen after "2018"
+
+        assertFalse(splitAllowedAt(TEXT_WITH_MIXED_HYPHENS, firstHyphenInDate));
     }
 
     @Test
-    public void hypenInsideTextTest() {
-        //checHyphenInsideText ex. 'some-text-here'
-        Assert.assertTrue(isPsplitCharacter(6, INPUT_TEXT[0]));
+    public void splitsAtHyphenWithinPlainText() {
+        int hyphenAfterTha111 = indexOf(TEXT_WITH_MIXED_HYPHENS, HYPHEN, 1);
+        assertTrue(splitAllowedAt(TEXT_WITH_MIXED_HYPHENS, hyphenAfterTha111));
     }
 
-    private boolean isPsplitCharacter(int current, String text) {
-        return new DefaultSplitCharacter().isSplitCharacter(75, current, text.length() + 1, text.toCharArray(), null);
+    @Test
+    public void splitsAtHyphenImmediatelyBeforeDate() {
+        // The hyphen directly before "2018-12-18" is a normal text hyphen and may split
+        int hyphenBeforeDate = TEXT_WITH_MIXED_HYPHENS.indexOf("-2018");
+        assertTrue(splitAllowedAt(TEXT_WITH_MIXED_HYPHENS, hyphenBeforeDate));
+    }
+
+    private boolean splitAllowedAt(String text, int currentIndex) {
+        // DefaultSplitCharacter.isSplitCharacter uses a [start, end) window of a char array.
+        // Using end as length + 1 (exclusive) mirrors existing usage in legacy tests.
+        return sut.isSplitCharacter(0, currentIndex, text.length() + 1, text.toCharArray(), null);
+    }
+
+    private static int indexOf(String text, char ch, int occurrence) {
+        int count = 0;
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) == ch && ++count == occurrence) {
+                return i;
+            }
+        }
+        throw new AssertionError("Character '" + ch + "' not found " + occurrence + " times in: " + text);
     }
 }
