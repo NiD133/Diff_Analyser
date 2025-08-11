@@ -47,104 +47,51 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the {@link StandardBarPainter} class.
- * 
- * This test suite verifies the core object behavior of StandardBarPainter,
- * including equality, hashing, cloning restrictions, and serialization.
  */
 public class StandardBarPainterTest {
 
-    // Test Data Factory Methods
-    
     /**
-     * Creates a new StandardBarPainter instance for testing.
-     * 
-     * @return a new StandardBarPainter instance
-     */
-    private StandardBarPainter createStandardBarPainter() {
-        return new StandardBarPainter();
-    }
-
-    // Equality Contract Tests
-
-    /**
-     * Verifies that two StandardBarPainter instances are equal.
-     * 
-     * Since StandardBarPainter has no configurable fields, all instances
-     * should be considered equal to each other.
+     * Check that the equals() method distinguishes all fields.
      */
     @Test
-    public void testEquals_TwoInstancesAreEqual() {
-        // Given
-        StandardBarPainter firstPainter = createStandardBarPainter();
-        StandardBarPainter secondPainter = createStandardBarPainter();
-        
-        // When & Then
-        assertEquals(firstPainter, secondPainter, 
-            "Two StandardBarPainter instances should be equal");
+    public void testEquals() {
+        StandardBarPainter p1 = new StandardBarPainter();
+        StandardBarPainter p2 = new StandardBarPainter();
+        assertEquals(p1, p2);
     }
 
     /**
-     * Verifies that equal StandardBarPainter instances have the same hash code.
-     * 
-     * This test ensures compliance with the Java hashCode contract:
-     * if two objects are equal according to equals(), they must have the same hash code.
+     * Two objects that are equal are required to return the same hashCode.
      */
     @Test
-    public void testHashCode_EqualInstancesHaveSameHashCode() {
-        // Given
-        StandardBarPainter firstPainter = createStandardBarPainter();
-        StandardBarPainter secondPainter = createStandardBarPainter();
-        
-        // When
-        int firstHashCode = firstPainter.hashCode();
-        int secondHashCode = secondPainter.hashCode();
-        
-        // Then
-        assertEquals(firstPainter, secondPainter, 
-            "Painters should be equal before comparing hash codes");
-        assertEquals(firstHashCode, secondHashCode, 
-            "Equal StandardBarPainter instances must have identical hash codes");
+    public void testHashcode() {
+        StandardBarPainter p1 = new StandardBarPainter();
+        StandardBarPainter p2 = new StandardBarPainter();
+        assertEquals(p1, p2);
+        int h1 = p1.hashCode();
+        int h2 = p2.hashCode();
+        assertEquals(h1, h2);
     }
-
-    // Cloning Behavior Tests
 
     /**
-     * Verifies that StandardBarPainter does not implement cloning interfaces.
-     * 
-     * StandardBarPainter instances are immutable, so cloning is not necessary
-     * or supported. This test confirms that the class correctly does not
-     * implement Cloneable or PublicCloneable interfaces.
+     * Confirm that cloning isn't implemented (it isn't required, because
+     * instances of the class are immutable).
      */
     @Test
-    public void testCloning_NotSupported() {
-        // Given
-        StandardBarPainter painter = createStandardBarPainter();
-        
-        // When & Then
-        assertFalse(painter instanceof Cloneable, 
-            "StandardBarPainter should not implement Cloneable interface");
-        assertFalse(painter instanceof PublicCloneable, 
-            "StandardBarPainter should not implement PublicCloneable interface");
+    public void testCloning() {
+        StandardBarPainter p1 = new StandardBarPainter();
+        assertFalse(p1 instanceof Cloneable);
+        assertFalse(p1 instanceof PublicCloneable);
     }
-
-    // Serialization Tests
 
     /**
-     * Verifies that StandardBarPainter can be serialized and deserialized correctly.
-     * 
-     * After serialization and deserialization, the restored instance should
-     * be equal to the original instance.
+     * Serialize an instance, restore it, and check for equality.
      */
     @Test
-    public void testSerialization_PreservesEquality() {
-        // Given
-        StandardBarPainter originalPainter = createStandardBarPainter();
-        
-        // When
-        StandardBarPainter deserializedPainter = TestUtils.serialised(originalPainter);
-        
-        // Then
-        assertEquals(originalPainter, deserializedPainter, 
-            "Deserialized StandardBarPainter should be equal to the original");
+    public void testSerialization() {
+        StandardBarPainter p1 = new StandardBarPainter();
+        StandardBarPainter p2 = TestUtils.serialised(p1);
+        assertEquals(p1, p2);
     }
+
 }
