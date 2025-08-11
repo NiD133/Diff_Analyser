@@ -1,80 +1,75 @@
+/*
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      https://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+ */
+
 package org.apache.commons.cli;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
 class DeprecatedAttributesTest {
 
-    private static final String SAMPLE_DESCRIPTION = "Use Bar instead!";
-    private static final String SAMPLE_SINCE = "2.0";
-
     @Test
-    void builderAppliesNonDefaultValues() {
-        final DeprecatedAttributes value = create(SAMPLE_DESCRIPTION, SAMPLE_SINCE, true);
-
-        assertAll(
-                () -> assertEquals(SAMPLE_DESCRIPTION, value.getDescription()),
-                () -> assertEquals(SAMPLE_SINCE, value.getSince()),
-                () -> assertTrue(value.isForRemoval())
-        );
+    void testBuilderNonDefaults() {
+        // @formatter:off
+        final DeprecatedAttributes value = DeprecatedAttributes.builder()
+                .setDescription("Use Bar instead!")
+                .setForRemoval(true)
+                .setSince("2.0")
+                .get();
+        // @formatter:on
+        assertEquals("Use Bar instead!", value.getDescription());
+        assertEquals("2.0", value.getSince());
+        assertEquals(true, value.isForRemoval());
     }
 
     @Test
-    void toString_withDescriptionSinceAndForRemoval() {
-        final DeprecatedAttributes value = create(SAMPLE_DESCRIPTION, SAMPLE_SINCE, true);
-        assertEquals("Deprecated for removal since 2.0: Use Bar instead!", value.toString());
+    void testBuilderNonDefaultsToString() {
+        // @formatter:off
+        assertEquals("Deprecated for removal since 2.0: Use Bar instead!", DeprecatedAttributes.builder()
+                .setDescription("Use Bar instead!")
+                .setForRemoval(true)
+                .setSince("2.0")
+                .get().toString());
+        assertEquals("Deprecated for removal: Use Bar instead!", DeprecatedAttributes.builder()
+                .setDescription("Use Bar instead!")
+                .setForRemoval(true)
+                .get().toString());
+        assertEquals("Deprecated since 2.0: Use Bar instead!",
+                DeprecatedAttributes.builder()
+                .setDescription("Use Bar instead!")
+                .setSince("2.0")
+                .get().toString());
+        assertEquals("Deprecated: Use Bar instead!", DeprecatedAttributes.builder()
+                .setDescription("Use Bar instead!")
+                .get().toString());
+        // @formatter:on
     }
 
     @Test
-    void toString_withDescriptionAndForRemovalOnly() {
-        final DeprecatedAttributes value = create(SAMPLE_DESCRIPTION, "", true);
-        assertEquals("Deprecated for removal: Use Bar instead!", value.toString());
+    void testDefaultBuilder() {
+        final DeprecatedAttributes defaultValue = DeprecatedAttributes.builder().get();
+        assertEquals(DeprecatedAttributes.DEFAULT.getDescription(), defaultValue.getDescription());
+        assertEquals(DeprecatedAttributes.DEFAULT.getSince(), defaultValue.getSince());
+        assertEquals(DeprecatedAttributes.DEFAULT.isForRemoval(), defaultValue.isForRemoval());
     }
 
     @Test
-    void toString_withDescriptionAndSinceOnly() {
-        final DeprecatedAttributes value = create(SAMPLE_DESCRIPTION, SAMPLE_SINCE, false);
-        assertEquals("Deprecated since 2.0: Use Bar instead!", value.toString());
-    }
-
-    @Test
-    void toString_withDescriptionOnly() {
-        final DeprecatedAttributes value = withDescription(SAMPLE_DESCRIPTION);
-        assertEquals("Deprecated: Use Bar instead!", value.toString());
-    }
-
-    @Test
-    void builderWithoutSettersUsesDefaultValues() {
-        final DeprecatedAttributes built = DeprecatedAttributes.builder().get();
-
-        assertAll(
-                () -> assertEquals(DeprecatedAttributes.DEFAULT.getDescription(), built.getDescription()),
-                () -> assertEquals(DeprecatedAttributes.DEFAULT.getSince(), built.getSince()),
-                () -> assertEquals(DeprecatedAttributes.DEFAULT.isForRemoval(), built.isForRemoval())
-        );
-    }
-
-    @Test
-    void defaultToString_isJustDeprecated() {
+    void testDefaultToString() {
         assertEquals("Deprecated", DeprecatedAttributes.DEFAULT.toString());
-    }
-
-    // Helpers
-
-    private DeprecatedAttributes create(final String description, final String since, final boolean forRemoval) {
-        return DeprecatedAttributes.builder()
-                .setDescription(description)
-                .setSince(since)
-                .setForRemoval(forRemoval)
-                .get();
-    }
-
-    private DeprecatedAttributes withDescription(final String description) {
-        return DeprecatedAttributes.builder()
-                .setDescription(description)
-                .get();
     }
 }
