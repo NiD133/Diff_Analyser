@@ -21,114 +21,17 @@ import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests for XNode's toString() method functionality.
- * Verifies that XNode correctly formats XML content with proper indentation
- * and handles variable substitution.
- */
 class XNodeTest {
 
   @Test
-  void shouldFormatNestedXmlWithProperIndentation() {
-    // Given: A complex nested XML structure with users, user details, and cars
-    String inputXml = buildUserXmlWithCars();
-    XPathParser parser = new XPathParser(inputXml);
-    
-    // When: Converting different node levels to string representation
-    String actualUsersNode = parser.evalNode("/users").toString();
-    String actualUserNode = parser.evalNode("/users/user").toString();
-    String actualCarsNode = parser.evalNode("/users/user/cars").toString();
+  void formatXNodeToString() {
+    XPathParser parser = new XPathParser(
+        "<users><user><id>100</id><name>Tom</name><age>30</age><cars><car index=\"1\">BMW</car><car index=\"2\">Audi</car><car index=\"3\">Benz</car></cars></user></users>");
+    String usersNodeToString = parser.evalNode("/users").toString();
+    String userNodeToString = parser.evalNode("/users/user").toString();
+    String carsNodeToString = parser.evalNode("/users/user/cars").toString();
 
-    // Then: Each node should be formatted with proper indentation
-    assertEquals(getExpectedUsersNodeString(), actualUsersNode);
-    assertEquals(getExpectedUserNodeString(), actualUserNode);
-    assertEquals(getExpectedCarsNodeString(), actualCarsNode);
-  }
-
-  @Test
-  void shouldFormatMyBatisMapperXmlCorrectly() {
-    // Given: A MyBatis mapper XML with select statement and dynamic SQL elements
-    String mapperXml = buildMyBatisMapperXml();
-    String expectedFormattedOutput = getExpectedMapperOutput();
-
-    // When: Parsing and converting the select node to string
-    XPathParser parser = new XPathParser(mapperXml);
-    XNode selectNode = parser.evalNode("/mapper/select");
-    String actualOutput = selectNode.toString();
-
-    // Then: The output should match expected formatting (with known formatting quirks)
-    assertEquals(expectedFormattedOutput, actualOutput);
-  }
-
-  @Test
-  void shouldSubstituteVariablesInXmlContent() {
-    // Given: XML with variable placeholders and corresponding variable values
-    String xmlWithVariables = "<root attr='${x}'>y = ${y}<sub attr='${y}'>x = ${x}</sub></root>";
-    Properties variables = createTestVariables();
-    String expectedWithSubstitution = "<root attr=\"foo\">\n  y = bar\n  <sub attr=\"bar\">\n    x = foo\n  </sub>\n</root>\n";
-    
-    // When: Parsing XML with variable substitution enabled
-    XPathParser parser = new XPathParser(xmlWithVariables, false, variables);
-    XNode rootNode = parser.evalNode("/root");
-    String actualOutput = rootNode.toString();
-    
-    // Then: Variables should be properly substituted in both attributes and content
-    assertEquals(expectedWithSubstitution, actualOutput);
-  }
-
-  // Helper methods to improve readability and reduce duplication
-
-  private String buildUserXmlWithCars() {
-    return "<users>" +
-           "<user>" +
-           "<id>100</id>" +
-           "<name>Tom</name>" +
-           "<age>30</age>" +
-           "<cars>" +
-           "<car index=\"1\">BMW</car>" +
-           "<car index=\"2\">Audi</car>" +
-           "<car index=\"3\">Benz</car>" +
-           "</cars>" +
-           "</user>" +
-           "</users>";
-  }
-
-  private String buildMyBatisMapperXml() {
-    return """
-        <mapper>
-          <select id='select' resultType='map'>
-            select
-            <var set='foo' value='bar' />
-              ID,
-              NAME
-            from STUDENT
-            <where>
-              <if test="name != null">
-                NAME = #{name}
-              </if>
-              and DISABLED = false
-            </where>
-            order by ID
-            <choose>
-              <when test='limit10'>
-                limit 10
-              </when>
-              <otherwise>limit 20</otherwise>
-            </choose>
-          </select>
-        </mapper>
-        """;
-  }
-
-  private Properties createTestVariables() {
-    Properties variables = new Properties();
-    variables.put("x", "foo");
-    variables.put("y", "bar");
-    return variables;
-  }
-
-  private String getExpectedUsersNodeString() {
-    return """
+    String usersNodeToStringExpect = """
         <users>
           <user>
             <id>
@@ -154,10 +57,8 @@ class XNodeTest {
           </user>
         </users>
         """;
-  }
 
-  private String getExpectedUserNodeString() {
-    return """
+    String userNodeToStringExpect = """
         <user>
           <id>
             100
@@ -181,10 +82,8 @@ class XNodeTest {
           </cars>
         </user>
         """;
-  }
 
-  private String getExpectedCarsNodeString() {
-    return """
+    String carsNodeToStringExpect = """
         <cars>
           <car index="1">
             BMW
@@ -197,11 +96,41 @@ class XNodeTest {
           </car>
         </cars>
         """;
+
+    assertEquals(usersNodeToStringExpect, usersNodeToString);
+    assertEquals(userNodeToStringExpect, userNodeToString);
+    assertEquals(carsNodeToStringExpect, carsNodeToString);
   }
 
-  private String getExpectedMapperOutput() {
-    // Note: Contains known formatting quirks with ID/NAME line breaks
-    return """
+  @Test
+  void xNodeToString() {
+    String xml = """
+        <mapper>
+          <select id='select' resultType='map'>
+            select
+            <var set='foo' value='bar' />
+              ID,
+              NAME
+            from STUDENT
+            <where>
+              <if test="name != null">
+                NAME = #{name}
+              </if>
+              and DISABLED = false
+            </where>
+            order by ID
+            <choose>
+              <when test='limit10'>
+                limit 10
+              </when>
+              <otherwise>limit 20</otherwise>
+            </choose>
+          </select>
+        </mapper>
+        """;
+
+    // a little bit ugly with id/name break, but not a blocker
+    String expected = """
         <select id="select" resultType="map">
           select
           <var set="foo" value="bar" />
@@ -225,5 +154,22 @@ class XNodeTest {
           </choose>
         </select>
         """;
+
+    XPathParser parser = new XPathParser(xml);
+    XNode selectNode = parser.evalNode("/mapper/select");
+    assertEquals(expected, selectNode.toString());
   }
+
+  @Test
+  void xnodeToStringVariables() throws Exception {
+    String src = "<root attr='${x}'>y = ${y}<sub attr='${y}'>x = ${x}</sub></root>";
+    String expected = "<root attr=\"foo\">\n  y = bar\n  <sub attr=\"bar\">\n    x = foo\n  </sub>\n</root>\n";
+    Properties vars = new Properties();
+    vars.put("x", "foo");
+    vars.put("y", "bar");
+    XPathParser parser = new XPathParser(src, false, vars);
+    XNode selectNode = parser.evalNode("/root");
+    assertEquals(expected, selectNode.toString());
+  }
+
 }
