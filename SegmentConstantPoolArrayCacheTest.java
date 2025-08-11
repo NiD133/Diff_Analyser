@@ -20,64 +20,96 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for {@link SegmentConstantPoolArrayCache}.
+ */
+@DisplayName("SegmentConstantPoolArrayCache")
 class SegmentConstantPoolArrayCacheTest {
 
+    private SegmentConstantPoolArrayCache arrayCache;
+
+    @BeforeEach
+    void setUp() {
+        arrayCache = new SegmentConstantPoolArrayCache();
+    }
+
     @Test
-    void testMultipleArrayMultipleHit() {
-        final SegmentConstantPoolArrayCache arrayCache = new SegmentConstantPoolArrayCache();
+    @DisplayName("Should find the single index of a unique element")
+    void shouldFindSingleIndexForUniqueElement() {
+        // Arrange
+        final String[] arrayWithUniqueElements = { "Zero", "One", "Two", "Three", "Four" };
+        final String keyToFind = "Three";
+        final List<Integer> expectedIndices = List.of(3);
+
+        // Act
+        final List<Integer> actualIndices = arrayCache.indexesForArrayKey(arrayWithUniqueElements, keyToFind);
+
+        // Assert
+        assertEquals(expectedIndices, actualIndices);
+    }
+
+    @Test
+    @DisplayName("Should find all indices of a duplicated element")
+    void shouldFindAllIndicesForDuplicateElement() {
+        // Arrange
+        final String[] arrayWithDuplicates = { "Zero", "OneThreeFour", "Two", "OneThreeFour", "OneThreeFour" };
+        final String keyToFind = "OneThreeFour";
+        final List<Integer> expectedIndices = List.of(1, 3, 4);
+
+        // Act
+        final List<Integer> actualIndices = arrayCache.indexesForArrayKey(arrayWithDuplicates, keyToFind);
+
+        // Assert
+        assertEquals(expectedIndices, actualIndices);
+    }
+
+    @Test
+    @DisplayName("Should return an empty list when an element is not found")
+    void shouldReturnEmptyListForNotFoundElement() {
+        // Arrange
+        final String[] array = { "Zero", "One", "Two" };
+        final String keyToFind = "NotFound";
+
+        // Act
+        final List<Integer> actualIndices = arrayCache.indexesForArrayKey(array, keyToFind);
+
+        // Assert
+        assertTrue(actualIndices.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Should cache lookups and handle multiple arrays independently")
+    void shouldCacheLookupsForMultipleArraysIndependently() {
+        // Arrange: Two distinct array instances with some overlapping values.
         final String[] arrayOne = { "Zero", "Shared", "Two", "Shared", "Shared" };
         final String[] arrayTwo = { "Shared", "One", "Shared", "Shared", "Shared" };
 
-        List<Integer> listOne = arrayCache.indexesForArrayKey(arrayOne, "Shared");
-        List<Integer> listTwo = arrayCache.indexesForArrayKey(arrayTwo, "Shared");
-        // Make sure we're using the cached values. First trip
-        // through builds the cache.
-        listOne = arrayCache.indexesForArrayKey(arrayOne, "Two");
-        listTwo = arrayCache.indexesForArrayKey(arrayTwo, "Shared");
+        // Act & Assert: First lookup on arrayOne. This should build its cache.
+        final List<Integer> sharedIndicesInArrayOne = arrayCache.indexesForArrayKey(arrayOne, "Shared");
+        assertEquals(List.of(1, 3, 4), sharedIndicesInArrayOne, "First lookup for 'Shared' in arrayOne should be correct.");
 
-        assertEquals(1, listOne.size());
-        assertEquals(2, listOne.get(0).intValue());
+        // Act & Assert: First lookup on arrayTwo. This should build its cache, independent of arrayOne.
+        final List<Integer> sharedIndicesInArrayTwo = arrayCache.indexesForArrayKey(arrayTwo, "Shared");
+        assertEquals(List.of(0, 2, 3, 4), sharedIndicesInArrayTwo, "First lookup for 'Shared' in arrayTwo should be correct.");
 
-        // Now look for a different element in list one
-        listOne = arrayCache.indexesForArrayKey(arrayOne, "Shared");
-        assertEquals(3, listOne.size());
-        assertEquals(1, listOne.get(0).intValue());
-        assertEquals(3, listOne.get(1).intValue());
-        assertEquals(4, listOne.get(2).intValue());
+        // Act & Assert: Second lookup on arrayOne with a different key, using the existing cache.
+        final List<Integer> twoIndicesInArrayOne = arrayCache.indexesForArrayKey(arrayOne, "Two");
+        assertEquals(List.of(2), twoIndicesInArrayOne, "Cached lookup for 'Two' in arrayOne should be correct.");
 
-        assertEquals(4, listTwo.size());
-        assertEquals(0, listTwo.get(0).intValue());
-        assertEquals(2, listTwo.get(1).intValue());
-        assertEquals(3, listTwo.get(2).intValue());
-        assertEquals(4, listTwo.get(3).intValue());
+        // Act & Assert: Re-query the first key on arrayOne to ensure the cache is stable.
+        final List<Integer> sharedIndicesInArrayOneAgain = arrayCache.indexesForArrayKey(arrayOne, "Shared");
+        assertEquals(sharedIndicesInArrayOne, sharedIndicesInArrayOneAgain, "Second lookup for 'Shared' in arrayOne should return the same cached result.");
 
-        final List<Integer> listThree = arrayCache.indexesForArrayKey(arrayOne, "Not found");
-        assertEquals(0, listThree.size());
+        // Act & Assert: Re-query arrayTwo to ensure its cache was unaffected by lookups on arrayOne.
+        final List<Integer> sharedIndicesInArrayTwoAgain = arrayCache.indexesForArrayKey(arrayTwo, "Shared");
+        assertEquals(sharedIndicesInArrayTwo, sharedIndicesInArrayTwoAgain, "Second lookup for 'Shared' in arrayTwo should return the same cached result.");
     }
-
-    @Test
-    void testSingleMultipleHitArray() {
-        final SegmentConstantPoolArrayCache arrayCache = new SegmentConstantPoolArrayCache();
-        final String[] array = { "Zero", "OneThreeFour", "Two", "OneThreeFour", "OneThreeFour" };
-        final List<Integer> list = arrayCache.indexesForArrayKey(array, "OneThreeFour");
-        assertEquals(3, list.size());
-        assertEquals(1, list.get(0).intValue());
-        assertEquals(3, list.get(1).intValue());
-        assertEquals(4, list.get(2).intValue());
-    }
-
-    @Test
-    void testSingleSimpleArray() {
-        final SegmentConstantPoolArrayCache arrayCache = new SegmentConstantPoolArrayCache();
-        final String[] array = { "Zero", "One", "Two", "Three", "Four" };
-        final List<Integer> list = arrayCache.indexesForArrayKey(array, "Three");
-        assertEquals(1, list.size());
-        assertEquals(3, list.get(0).intValue());
-    }
-
 }
