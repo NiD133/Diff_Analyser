@@ -22,271 +22,281 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class CustomCategoryURLGenerator_ESTest extends CustomCategoryURLGenerator_ESTest_scaffolding {
 
-    // ============================================================
-    // Tests for getURL()
-    // ============================================================
-    
-    @Test(timeout = 4000)
-    public void testGetURL_WithNonNullEntry_ReturnsCorrectURL() throws Throwable {
-        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
-        Vector<String> urlSeries = new Vector<>();
-        urlSeries.add("anchor");
-        generator.addURLSeries(urlSeries);
-        
-        String url = generator.getURL(0, 0);
-        assertEquals("anchor", url);
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      Vector<String> vector0 = new Vector<String>();
+      vector0.add(",ql\"(}:Q!;Ew");
+      vector0.add(",ql\"(}:Q!;Ew");
+      customCategoryURLGenerator0.addURLSeries(vector0);
+      Object object0 = customCategoryURLGenerator0.clone();
+      boolean boolean0 = customCategoryURLGenerator0.equals(object0);
+      assertTrue(boolean0);
+      assertNotSame(object0, customCategoryURLGenerator0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetURL_WithEmptySeries_ReturnsNull() throws Throwable {
-        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
-        generator.addURLSeries(new ArrayList<>());
-        
-        String url = generator.getURL(0, 0);
-        assertNull(url);
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      List<String> list0 = List.of("");
+      customCategoryURLGenerator0.addURLSeries(list0);
+      CustomCategoryURLGenerator customCategoryURLGenerator1 = new CustomCategoryURLGenerator();
+      customCategoryURLGenerator1.addURLSeries((List<String>) null);
+      boolean boolean0 = customCategoryURLGenerator0.equals(customCategoryURLGenerator1);
+      assertFalse(boolean0);
+      assertFalse(customCategoryURLGenerator1.equals((Object)customCategoryURLGenerator0));
+  }
 
-    @Test(timeout = 4000)
-    public void testGetURL_WithNullSeries_ReturnsNull() throws Throwable {
-        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
-        generator.addURLSeries(null);
-        
-        String url = generator.getURL(0, 0);
-        assertNull(url);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      List<String> list0 = List.of("2p8~6Bu{q8c&Ro)", "2p8~6Bu{q8c&Ro)", "2p8~6Bu{q8c&Ro)", "2p8~6Bu{q8c&Ro)", "", "");
+      customCategoryURLGenerator0.addURLSeries(list0);
+      CustomCategoryURLGenerator customCategoryURLGenerator1 = new CustomCategoryURLGenerator();
+      boolean boolean0 = customCategoryURLGenerator0.equals(customCategoryURLGenerator1);
+      assertFalse(boolean0);
+      assertFalse(customCategoryURLGenerator1.equals((Object)customCategoryURLGenerator0));
+  }
 
-    @Test(timeout = 4000)
-    public void testGetURL_WithOutOfBoundsSeriesIndex_ReturnsNull() throws Throwable {
-        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
-        String url = generator.getURL(5, -1785);
-        assertNull(url);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      ArrayList<String> arrayList0 = new ArrayList<String>();
+      customCategoryURLGenerator0.addURLSeries(arrayList0);
+      // Undeclared exception!
+      try { 
+        customCategoryURLGenerator0.getURL(0, (-1052));
+        fail("Expecting exception: IndexOutOfBoundsException");
+      
+      } catch(IndexOutOfBoundsException e) {
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetURL_WithOutOfBoundsItemIndexInEmptySeries_ThrowsException() throws Throwable {
-        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
-        generator.addURLSeries(new ArrayList<>());
-        
-        try {
-            generator.getURL(0, -1052);
-            fail("Expected IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      ArrayList<String> arrayList0 = new ArrayList<String>();
+      customCategoryURLGenerator0.addURLSeries(arrayList0);
+      String string0 = customCategoryURLGenerator0.getURL(0, 2440);
+      assertNull(string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetURL_WithOutOfBoundsItemIndexInNonEmptySeries_ReturnsNull() throws Throwable {
-        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
-        generator.addURLSeries(new ArrayList<>());
-        
-        String url = generator.getURL(0, 2440);
-        assertNull(url);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      ArrayList<String> arrayList0 = new ArrayList<String>();
+      customCategoryURLGenerator0.addURLSeries(arrayList0);
+      customCategoryURLGenerator0.addURLSeries((List<String>) null);
+      customCategoryURLGenerator0.addURLSeries((List<String>) null);
+      customCategoryURLGenerator0.addURLSeries((List<String>) null);
+      customCategoryURLGenerator0.addURLSeries(arrayList0);
+      String string0 = customCategoryURLGenerator0.getURL(5, (-1785));
+      assertNull(string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetURL_WithNullSeriesInMultiSeriesGenerator_ReturnsNull() throws Throwable {
-        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
-        generator.addURLSeries(new ArrayList<>());
-        generator.addURLSeries(null);
-        generator.addURLSeries(null);
-        generator.addURLSeries(null);
-        generator.addURLSeries(new ArrayList<>());
-        
-        String url = generator.getURL(5, -1785);
-        assertNull(url);
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      List<String> list0 = List.of("2p8~6Bu{q8c&Ro)", "2p8~6Bu{q8c&Ro)", "2p8~6Bu{q8c&Ro)", "2p8~6Bu{q8c&Ro)", "", "");
+      customCategoryURLGenerator0.addURLSeries(list0);
+      int int0 = customCategoryURLGenerator0.getURLCount(0);
+      assertEquals(6, int0);
+  }
 
-    // ============================================================
-    // Tests for getURLCount()
-    // ============================================================
-    
-    @Test(timeout = 4000)
-    public void testGetURLCount_ForNonEmptySeries_ReturnsCorrectCount() throws Throwable {
-        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
-        List<String> urlList = List.of("A", "B", "C", "D", "E", "F");
-        generator.addURLSeries(urlList);
-        
-        int count = generator.getURLCount(0);
-        assertEquals(6, count);
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      Stack<String> stack0 = new Stack<String>();
+      stack0.add("");
+      customCategoryURLGenerator0.addURLSeries(stack0);
+      String string0 = customCategoryURLGenerator0.getURL(0, 0);
+      assertEquals("", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetURLCount_ForEmptySeries_ReturnsZero() throws Throwable {
-        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
-        generator.addURLSeries(new ArrayList<>());
-        
-        int count = generator.getURLCount(0);
-        assertEquals(0, count);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      ArrayList<String> arrayList0 = new ArrayList<String>();
+      customCategoryURLGenerator0.addURLSeries(arrayList0);
+      int int0 = customCategoryURLGenerator0.getListCount();
+      assertEquals(1, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetURLCount_ForNullSeries_ReturnsZero() throws Throwable {
-        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
-        generator.addURLSeries(null);
-        
-        int count = generator.getURLCount(0);
-        assertEquals(0, count);
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      // Undeclared exception!
+      try { 
+        customCategoryURLGenerator0.getURLCount(5570);
+        fail("Expecting exception: IndexOutOfBoundsException");
+      
+      } catch(IndexOutOfBoundsException e) {
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetURLCount_WithInvalidSeriesIndex_ThrowsException() throws Throwable {
-        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
-        try {
-            generator.getURLCount(5570);
-            fail("Expected IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      DefaultKeyedValues2DDataset<String, String> defaultKeyedValues2DDataset0 = new DefaultKeyedValues2DDataset<String, String>();
+      // Undeclared exception!
+      try { 
+        customCategoryURLGenerator0.generateURL(defaultKeyedValues2DDataset0, (-3864), (-3864));
+        fail("Expecting exception: IndexOutOfBoundsException");
+      
+      } catch(IndexOutOfBoundsException e) {
+      }
+  }
 
-    // ============================================================
-    // Tests for getListCount()
-    // ============================================================
-    
-    @Test(timeout = 4000)
-    public void testGetListCount_Initially_ReturnsZero() throws Throwable {
-        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
-        int count = generator.getListCount();
-        assertEquals(0, count);
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      Vector<String> vector0 = new Vector<String>(3458);
+      vector0.add("anchor");
+      customCategoryURLGenerator0.addURLSeries(vector0);
+      String string0 = customCategoryURLGenerator0.getURL(0, 0);
+      assertEquals("anchor", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetListCount_AfterAddingSeries_ReturnsCorrectCount() throws Throwable {
-        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
-        generator.addURLSeries(new ArrayList<>());
-        int count = generator.getListCount();
-        assertEquals(1, count);
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      String string0 = customCategoryURLGenerator0.getURL(5, (-1785));
+      assertNull(string0);
+  }
 
-    // ============================================================
-    // Tests for generateURL()
-    // ============================================================
-    
-    @Test(timeout = 4000)
-    public void testGenerateURL_WithNegativeIndices_ThrowsException() throws Throwable {
-        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
-        DefaultKeyedValues2DDataset dataset = new DefaultKeyedValues2DDataset();
-        try {
-            generator.generateURL(dataset, -3864, -3864);
-            fail("Expected IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      ArrayList<String> arrayList0 = new ArrayList<String>();
+      customCategoryURLGenerator0.addURLSeries(arrayList0);
+      int int0 = customCategoryURLGenerator0.getURLCount(0);
+      assertEquals(0, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGenerateURL_WithOutOfBoundsIndices_ReturnsNull() throws Throwable {
-        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        String url = generator.generateURL(dataset, 860, 0);
-        assertNull(url);
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      customCategoryURLGenerator0.addURLSeries((List<String>) null);
+      int int0 = customCategoryURLGenerator0.getURLCount(0);
+      assertEquals(0, int0);
+  }
 
-    // ============================================================
-    // Tests for equals()
-    // ============================================================
-    
-    @Test(timeout = 4000)
-    public void testEquals_WithSameObject_ReturnsTrue() throws Throwable {
-        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
-        boolean result = generator.equals(generator);
-        assertTrue(result);
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      int int0 = customCategoryURLGenerator0.getListCount();
+      assertEquals(0, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void testEquals_WithDifferentClass_ReturnsFalse() throws Throwable {
-        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
-        boolean result = generator.equals("I8p");
-        assertFalse(result);
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      CustomCategoryURLGenerator customCategoryURLGenerator1 = new CustomCategoryURLGenerator();
+      assertTrue(customCategoryURLGenerator1.equals((Object)customCategoryURLGenerator0));
+      
+      Vector<String> vector0 = new Vector<String>();
+      vector0.add("N8)j");
+      customCategoryURLGenerator1.addURLSeries(vector0);
+      Stack<String> stack0 = new Stack<String>();
+      stack0.add((String) null);
+      customCategoryURLGenerator0.addURLSeries(stack0);
+      boolean boolean0 = customCategoryURLGenerator0.equals(customCategoryURLGenerator1);
+      assertFalse(customCategoryURLGenerator1.equals((Object)customCategoryURLGenerator0));
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testEquals_WithDifferentURLSeriesCount_ReturnsFalse() throws Throwable {
-        CustomCategoryURLGenerator generator1 = new CustomCategoryURLGenerator();
-        List<String> urlList = List.of("A");
-        generator1.addURLSeries(urlList);
-        
-        CustomCategoryURLGenerator generator2 = new CustomCategoryURLGenerator();
-        generator2.addURLSeries(null);
-        
-        boolean result = generator1.equals(generator2);
-        assertFalse(result);
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      Stack<String> stack0 = new Stack<String>();
+      stack0.add((String) null);
+      customCategoryURLGenerator0.addURLSeries(stack0);
+      Object object0 = customCategoryURLGenerator0.clone();
+      boolean boolean0 = customCategoryURLGenerator0.equals(object0);
+      assertNotSame(object0, customCategoryURLGenerator0);
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testEquals_WithDifferentSeriesContent_ReturnsFalse() throws Throwable {
-        CustomCategoryURLGenerator generator1 = new CustomCategoryURLGenerator();
-        Vector<String> series1 = new Vector<>();
-        series1.add("N8)j");
-        generator1.addURLSeries(series1);
-        
-        CustomCategoryURLGenerator generator2 = new CustomCategoryURLGenerator();
-        Stack<String> series2 = new Stack<>();
-        series2.add("NmY|");
-        generator2.addURLSeries(series2);
-        
-        boolean result = generator1.equals(generator2);
-        assertFalse(result);
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      List<String> list0 = List.of("o<]R");
+      customCategoryURLGenerator0.addURLSeries(list0);
+      CustomCategoryURLGenerator customCategoryURLGenerator1 = new CustomCategoryURLGenerator();
+      Stack<String> stack0 = new Stack<String>();
+      customCategoryURLGenerator1.addURLSeries(stack0);
+      boolean boolean0 = customCategoryURLGenerator1.equals(customCategoryURLGenerator0);
+      assertFalse(customCategoryURLGenerator1.equals((Object)customCategoryURLGenerator0));
+      assertFalse(customCategoryURLGenerator0.equals((Object)customCategoryURLGenerator1));
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testEquals_WithNullContentVsNonNull_ReturnsFalse() throws Throwable {
-        CustomCategoryURLGenerator generator1 = new CustomCategoryURLGenerator();
-        Stack<String> series1 = new Stack<>();
-        series1.add(null);
-        generator1.addURLSeries(series1);
-        
-        CustomCategoryURLGenerator generator2 = new CustomCategoryURLGenerator();
-        Vector<String> series2 = new Vector<>();
-        series2.add("N8)j");
-        generator2.addURLSeries(series2);
-        
-        boolean result = generator1.equals(generator2);
-        assertFalse(result);
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      boolean boolean0 = customCategoryURLGenerator0.equals("I8p");
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testEquals_AfterAddingEmptySeries_ReturnsFalse() throws Throwable {
-        CustomCategoryURLGenerator generator1 = new CustomCategoryURLGenerator();
-        CustomCategoryURLGenerator generator2 = new CustomCategoryURLGenerator();
-        assertTrue(generator1.equals(generator2));
-        
-        generator2.addURLSeries(new Vector<>());
-        boolean result = generator1.equals(generator2);
-        assertFalse(result);
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      boolean boolean0 = customCategoryURLGenerator0.equals(customCategoryURLGenerator0);
+      assertTrue(boolean0);
+  }
 
-    // ============================================================
-    // Tests for clone()
-    // ============================================================
-    
-    @Test(timeout = 4000)
-    public void testClone_ProducesEqualButNotSameObject() throws Throwable {
-        CustomCategoryURLGenerator original = new CustomCategoryURLGenerator();
-        Vector<String> series = new Vector<>();
-        series.add("URL1");
-        series.add("URL2");
-        original.addURLSeries(series);
-        
-        Object clone = original.clone();
-        boolean areEqual = original.equals(clone);
-        
-        assertNotSame(clone, original);
-        assertTrue(areEqual);
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      Stack<String> stack0 = new Stack<String>();
+      customCategoryURLGenerator0.addURLSeries(stack0);
+      String string0 = customCategoryURLGenerator0.getURL(0, 0);
+      assertNull(string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testClone_WithNullInSeries_ProducesEqualObject() throws Throwable {
-        CustomCategoryURLGenerator original = new CustomCategoryURLGenerator();
-        Stack<String> series = new Stack<>();
-        series.add(null);
-        original.addURLSeries(series);
-        
-        Object clone = original.clone();
-        boolean areEqual = original.equals(clone);
-        
-        assertNotSame(clone, original);
-        assertTrue(areEqual);
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      customCategoryURLGenerator0.addURLSeries((List<String>) null);
+      String string0 = customCategoryURLGenerator0.getURL(0, 0);
+      assertNull(string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      CustomCategoryURLGenerator customCategoryURLGenerator1 = new CustomCategoryURLGenerator();
+      assertTrue(customCategoryURLGenerator1.equals((Object)customCategoryURLGenerator0));
+      
+      Vector<String> vector0 = new Vector<String>();
+      vector0.add("N8)j");
+      customCategoryURLGenerator0.addURLSeries(vector0);
+      Stack<String> stack0 = new Stack<String>();
+      stack0.add("NmY|");
+      customCategoryURLGenerator1.addURLSeries(stack0);
+      boolean boolean0 = customCategoryURLGenerator0.equals(customCategoryURLGenerator1);
+      assertFalse(customCategoryURLGenerator1.equals((Object)customCategoryURLGenerator0));
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      DefaultCategoryDataset<String, String> defaultCategoryDataset0 = new DefaultCategoryDataset<String, String>();
+      String string0 = customCategoryURLGenerator0.generateURL(defaultCategoryDataset0, 860, 0);
+      assertNull(string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
+      CustomCategoryURLGenerator customCategoryURLGenerator1 = (CustomCategoryURLGenerator)customCategoryURLGenerator0.clone();
+      assertTrue(customCategoryURLGenerator1.equals((Object)customCategoryURLGenerator0));
+      
+      Vector<String> vector0 = new Vector<String>();
+      customCategoryURLGenerator1.addURLSeries(vector0);
+      boolean boolean0 = customCategoryURLGenerator0.equals(customCategoryURLGenerator1);
+      assertFalse(boolean0);
+      assertFalse(customCategoryURLGenerator1.equals((Object)customCategoryURLGenerator0));
+  }
 }
