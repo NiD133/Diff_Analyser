@@ -17,384 +17,209 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true,
+    useVFS = true,
+    useVNET = true,
+    resetStaticState = true,
+    separateClassLoader = true
+) 
 public class BCodec_ESTest extends BCodec_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      BCodec bCodec0 = new BCodec();
-      String string0 = bCodec0.getEncoding();
-      assertEquals("B", string0);
-  }
+    // Constructor Tests
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testConstructorWithNullCharsetThrowsException() {
+        new BCodec((Charset) null);
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      Charset charset0 = Charset.defaultCharset();
-      CodecPolicy codecPolicy0 = CodecPolicy.STRICT;
-      BCodec bCodec0 = new BCodec(charset0, codecPolicy0);
-      String string0 = bCodec0.encode((String) null, charset0);
-      assertNull(string0);
-  }
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testConstructorWithNullCharsetAndStrictPolicyThrowsException() {
+        new BCodec((Charset) null, CodecPolicy.STRICT);
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      BCodec bCodec0 = new BCodec();
-      Charset charset0 = Charset.defaultCharset();
-      String string0 = bCodec0.encode("^QOTD7,4PZ$(<r", charset0);
-      assertEquals("=?UTF-8?B?XlFPVEQ3LDRQWiQoPHI=?=", string0);
-  }
+    @Test(timeout = 4000, expected = UnsupportedCharsetException.class)
+    public void testConstructorWithUnsupportedCharsetThrowsException() {
+        new BCodec("p-Ubb");
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      BCodec bCodec0 = new BCodec();
-      String string0 = bCodec0.encode((String) null, (String) null);
-      assertNull(string0);
-  }
+    @Test(timeout = 4000, expected = IllegalCharsetNameException.class)
+    public void testConstructorWithInvalidCharsetNameThrowsException() {
+        new BCodec("encodeTable must have exactly 64 entries.");
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      BCodec bCodec0 = new BCodec();
-      String string0 = bCodec0.encode((String) null);
-      assertNull(string0);
-  }
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testConstructorWithNullCharsetNameThrowsException() {
+        new BCodec((String) null);
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      Charset charset0 = Charset.defaultCharset();
-      BCodec bCodec0 = new BCodec(charset0);
-      byte[] byteArray0 = new byte[7];
-      byte[] byteArray1 = bCodec0.doEncoding(byteArray0);
-      assertEquals(12, byteArray1.length);
-  }
+    // Getter Tests
+    @Test(timeout = 4000)
+    public void testGetEncodingReturnsB() {
+        BCodec bCodec = new BCodec();
+        assertEquals("B", bCodec.getEncoding());
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      BCodec bCodec0 = new BCodec();
-      byte[] byteArray0 = new byte[6];
-      byte[] byteArray1 = bCodec0.doDecoding(byteArray0);
-      byte[] byteArray2 = bCodec0.doEncoding(byteArray1);
-      assertNotSame(byteArray2, byteArray0);
-  }
+    @Test(timeout = 4000)
+    public void testIsStrictDecodingReturnsTrueWhenStrictPolicy() {
+        Charset charset = Charset.defaultCharset();
+        BCodec bCodec = new BCodec(charset, CodecPolicy.STRICT);
+        assertTrue(bCodec.isStrictDecoding());
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      BCodec bCodec0 = new BCodec();
-      byte[] byteArray0 = new byte[7];
-      byteArray0[0] = (byte)52;
-      byteArray0[6] = (byte)75;
-      byte[] byteArray1 = bCodec0.doDecoding(byteArray0);
-      assertEquals(1, byteArray1.length);
-  }
+    @Test(timeout = 4000)
+    public void testIsStrictDecodingReturnsFalseByDefault() {
+        BCodec bCodec = new BCodec();
+        assertFalse(bCodec.isStrictDecoding());
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      BCodec bCodec0 = new BCodec();
-      String string0 = bCodec0.decode((String) null);
-      assertNull(string0);
-  }
+    // Encoding Tests
+    @Test(timeout = 4000)
+    public void testEncodeWithNullInputReturnsNull() {
+        BCodec bCodec = new BCodec();
+        assertNull(bCodec.encode((String) null));
+        assertNull(bCodec.encode((String) null, (String) null));
+        assertNull(bCodec.encode((String) null, Charset.defaultCharset()));
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      Charset charset0 = Charset.defaultCharset();
-      BCodec bCodec0 = new BCodec(charset0);
-      String string0 = bCodec0.decode("=?UTF-8?B??=");
-      assertEquals("", string0);
-  }
+    @Test(timeout = 4000)
+    public void testEncodeWithValidString() {
+        BCodec bCodec = new BCodec();
+        String encoded = bCodec.encode("^QOTD7,4PZ$(<r", Charset.defaultCharset());
+        assertEquals("=?UTF-8?B?XlFPVEQ3LDRQWiQoPHI=?=", encoded);
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      BCodec bCodec0 = new BCodec();
-      try { 
-        bCodec0.encode("B", "B");
-        fail("Expecting exception: Exception");
-      
-      } catch(Exception e) {
-         //
-         // B
-         //
-         verifyException("org.apache.commons.codec.net.BCodec", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testEncodeWithGivenCharset() {
+        BCodec bCodec = new BCodec("l9");
+        assertEquals("=?ISO-8859-15?B?bDk=?=", bCodec.encode("l9"));
+        assertEquals("=?ISO-8859-15?B?bDk=?=", bCodec.encode("l9", "l9"));
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      BCodec bCodec0 = new BCodec();
-      // Undeclared exception!
-      try { 
-        bCodec0.encode("gK1C.|((", "");
-        fail("Expecting exception: IllegalCharsetNameException");
-      
-      } catch(IllegalCharsetNameException e) {
-         //
-         // 
-         //
-         verifyException("java.nio.charset.Charset", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testEncodeObjectHandlesString() {
+        BCodec bCodec = new BCodec();
+        Object result = bCodec.encode((Object) " encoded content");
+        assertEquals("=?UTF-8?B?IGVuY29kZWQgY29udGVudA==?=", result);
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      BCodec bCodec0 = new BCodec();
-      // Undeclared exception!
-      try { 
-        bCodec0.encode(" encoded content", (String) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Null charset name
-         //
-         verifyException("java.nio.charset.Charset", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testEncodeObjectWithNullReturnsNull() {
+        BCodec bCodec = new BCodec();
+        assertNull(bCodec.encode((Object) null));
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      Charset charset0 = Charset.defaultCharset();
-      BCodec bCodec0 = new BCodec(charset0, (CodecPolicy) null);
-      byte[] byteArray0 = new byte[22];
-      // Undeclared exception!
-      try { 
-        bCodec0.doDecoding(byteArray0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // codecPolicy
-         //
-         verifyException("java.util.Objects", e);
-      }
-  }
+    @Test(timeout = 4000, expected = EncoderException.class)
+    public void testEncodeObjectWithInvalidTypeThrowsException() throws Exception {
+        BCodec bCodec = new BCodec();
+        bCodec.encode((Object) bCodec);
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      Charset charset0 = Charset.defaultCharset();
-      CodecPolicy codecPolicy0 = CodecPolicy.STRICT;
-      BCodec bCodec0 = new BCodec(charset0, codecPolicy0);
-      byte[] byteArray0 = new byte[22];
-      byteArray0[3] = (byte)45;
-      // Undeclared exception!
-      try { 
-        bCodec0.doDecoding(byteArray0);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Strict decoding: Last encoded character (before the paddings if any) is a valid base 64 alphabet but not a possible encoding. Decoding requires at least two trailing 6-bit characters to create bytes.
-         //
-         verifyException("org.apache.commons.codec.binary.Base64", e);
-      }
-  }
+    // Decoding Tests
+    @Test(timeout = 4000)
+    public void testDecodeWithNullInputReturnsNull() {
+        BCodec bCodec = new BCodec();
+        assertNull(bCodec.decode((String) null));
+        assertNull(bCodec.decode((Object) null));
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      BCodec bCodec0 = new BCodec();
-      try { 
-        bCodec0.decode("WgJp7)");
-        fail("Expecting exception: Exception");
-      
-      } catch(Exception e) {
-         //
-         // RFC 1522 violation: malformed encoded content
-         //
-         verifyException("org.apache.commons.codec.net.RFC1522Codec", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testDecodeEmptyStringReturnsEmpty() {
+        BCodec bCodec = new BCodec(Charset.defaultCharset());
+        assertEquals("", bCodec.decode("=?UTF-8?B??="));
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      CodecPolicy codecPolicy0 = CodecPolicy.STRICT;
-      BCodec bCodec0 = null;
-      try {
-        bCodec0 = new BCodec((Charset) null, codecPolicy0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // charset
-         //
-         verifyException("java.util.Objects", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testDecodeValidContent() {
+        BCodec bCodec = new BCodec();
+        assertEquals(" encoded content", bCodec.decode("=?UTF-8?B?IGVuY29kZWQgY29udGVudA==?="));
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      BCodec bCodec0 = null;
-      try {
-        bCodec0 = new BCodec((Charset) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // charset
-         //
-         verifyException("java.util.Objects", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testDecodeObjectWithEncodedString() {
+        BCodec bCodec = new BCodec();
+        Object result = bCodec.decode((Object) "=?UTF-8?B?LHcuLHAlKw==?=");
+        assertEquals(",w.,p%+", result);
+    }
 
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      BCodec bCodec0 = null;
-      try {
-        bCodec0 = new BCodec("p-Ubb");
-        fail("Expecting exception: UnsupportedCharsetException");
-      
-      } catch(UnsupportedCharsetException e) {
-         //
-         // p-Ubb
-         //
-         verifyException("java.nio.charset.Charset", e);
-      }
-  }
+    @Test(timeout = 4000, expected = DecoderException.class)
+    public void testDecodeObjectWithInvalidTypeThrowsException() throws Exception {
+        BCodec bCodec = new BCodec();
+        bCodec.decode((Object) bCodec);
+    }
 
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      BCodec bCodec0 = null;
-      try {
-        bCodec0 = new BCodec("encodeTable must have exactly 64 entries.");
-        fail("Expecting exception: IllegalCharsetNameException");
-      
-      } catch(IllegalCharsetNameException e) {
-         //
-         // encodeTable must have exactly 64 entries.
-         //
-         verifyException("java.nio.charset.Charset", e);
-      }
-  }
+    // Internal Method Tests
+    @Test(timeout = 4000)
+    public void testDoEncodingWithNullReturnsNull() {
+        BCodec bCodec = new BCodec();
+        assertNull(bCodec.doEncoding(null));
+    }
 
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      BCodec bCodec0 = null;
-      try {
-        bCodec0 = new BCodec((String) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Null charset name
-         //
-         verifyException("java.nio.charset.Charset", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testDoDecodingWithNullReturnsNull() {
+        BCodec bCodec = new BCodec();
+        assertNull(bCodec.doDecoding(null));
+    }
 
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      BCodec bCodec0 = new BCodec();
-      // Undeclared exception!
-      try { 
-        bCodec0.encode(".LC", (Charset) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-      }
-  }
+    @Test(timeout = 4000)
+    public void testDoEncodingProducesExpectedLength() {
+        BCodec bCodec = new BCodec(Charset.defaultCharset());
+        byte[] input = new byte[7];
+        assertEquals(12, bCodec.doEncoding(input).length);
+    }
 
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      Charset charset0 = Charset.defaultCharset();
-      CodecPolicy codecPolicy0 = CodecPolicy.STRICT;
-      BCodec bCodec0 = new BCodec(charset0, codecPolicy0);
-      boolean boolean0 = bCodec0.isStrictDecoding();
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testDoDecodingHandlesSpecificBytePattern() {
+        BCodec bCodec = new BCodec();
+        byte[] input = new byte[7];
+        input[0] = (byte) 52;
+        input[6] = (byte) 75;
+        assertEquals(1, bCodec.doDecoding(input).length);
+    }
 
-  @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
-      BCodec bCodec0 = new BCodec();
-      boolean boolean0 = bCodec0.isStrictDecoding();
-      assertFalse(boolean0);
-  }
+    // Error Handling Tests
+    @Test(timeout = 4000, expected = EncoderException.class)
+    public void testEncodeWithInvalidCharsetNameThrowsException() throws Exception {
+        BCodec bCodec = new BCodec();
+        bCodec.encode("B", "B");
+    }
 
-  @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
-      BCodec bCodec0 = new BCodec();
-      Object object0 = bCodec0.encode((Object) " encoded content");
-      assertEquals("=?UTF-8?B?IGVuY29kZWQgY29udGVudA==?=", object0);
-  }
+    @Test(timeout = 4000, expected = IllegalCharsetNameException.class)
+    public void testEncodeWithEmptyCharsetNameThrowsException() {
+        BCodec bCodec = new BCodec();
+        bCodec.encode("gK1C.|((", "");
+    }
 
-  @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
-      BCodec bCodec0 = new BCodec();
-      Object object0 = bCodec0.encode((Object) null);
-      assertNull(object0);
-  }
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testEncodeWithNullCharsetNameThrowsException() {
+        BCodec bCodec = new BCodec();
+        bCodec.encode(" encoded content", (String) null);
+    }
 
-  @Test(timeout = 4000)
-  public void test26()  throws Throwable  {
-      BCodec bCodec0 = new BCodec();
-      try { 
-        bCodec0.encode((Object) bCodec0);
-        fail("Expecting exception: Exception");
-      
-      } catch(Exception e) {
-         //
-         // Objects of type org.apache.commons.codec.net.BCodec cannot be encoded using BCodec
-         //
-         verifyException("org.apache.commons.codec.net.BCodec", e);
-      }
-  }
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testEncodeWithNullCharsetThrowsException() {
+        BCodec bCodec = new BCodec();
+        bCodec.encode(".LC", (Charset) null);
+    }
 
-  @Test(timeout = 4000)
-  public void test27()  throws Throwable  {
-      BCodec bCodec0 = new BCodec();
-      byte[] byteArray0 = bCodec0.doEncoding((byte[]) null);
-      assertNull(byteArray0);
-  }
+    @Test(timeout = 4000, expected = DecoderException.class)
+    public void testDecodeMalformedContentThrowsException() throws Exception {
+        BCodec bCodec = new BCodec();
+        bCodec.decode("WgJp7)");
+    }
 
-  @Test(timeout = 4000)
-  public void test28()  throws Throwable  {
-      BCodec bCodec0 = new BCodec();
-      byte[] byteArray0 = bCodec0.doDecoding((byte[]) null);
-      assertNull(byteArray0);
-  }
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testDoDecodingWithNullPolicyThrowsException() {
+        BCodec bCodec = new BCodec(Charset.defaultCharset(), null);
+        bCodec.doDecoding(new byte[22]);
+    }
 
-  @Test(timeout = 4000)
-  public void test29()  throws Throwable  {
-      BCodec bCodec0 = new BCodec();
-      try { 
-        bCodec0.decode((Object) bCodec0);
-        fail("Expecting exception: Exception");
-      
-      } catch(Exception e) {
-         //
-         // Objects of type org.apache.commons.codec.net.BCodec cannot be decoded using BCodec
-         //
-         verifyException("org.apache.commons.codec.net.BCodec", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test30()  throws Throwable  {
-      BCodec bCodec0 = new BCodec();
-      Object object0 = bCodec0.decode((Object) null);
-      assertNull(object0);
-  }
-
-  @Test(timeout = 4000)
-  public void test31()  throws Throwable  {
-      BCodec bCodec0 = new BCodec();
-      Object object0 = bCodec0.decode((Object) "=?UTF-8?B?LHcuLHAlKw==?=");
-      assertEquals(",w.,p%+", object0);
-  }
-
-  @Test(timeout = 4000)
-  public void test32()  throws Throwable  {
-      BCodec bCodec0 = new BCodec();
-      String string0 = bCodec0.decode("=?UTF-8?B?IGVuY29kZWQgY29udGVudA==?=");
-      assertEquals(" encoded content", string0);
-  }
-
-  @Test(timeout = 4000)
-  public void test33()  throws Throwable  {
-      BCodec bCodec0 = new BCodec("l9");
-      String string0 = bCodec0.encode("l9");
-      assertEquals("=?ISO-8859-15?B?bDk=?=", string0);
-  }
-
-  @Test(timeout = 4000)
-  public void test34()  throws Throwable  {
-      BCodec bCodec0 = new BCodec("l9");
-      String string0 = bCodec0.encode("l9", "l9");
-      assertEquals("=?ISO-8859-15?B?bDk=?=", string0);
-  }
+    @Test(timeout = 4000, expected = IllegalArgumentException.class)
+    public void testStrictDecodingWithInvalidTrailingCharacterThrowsException() {
+        Charset charset = Charset.defaultCharset();
+        BCodec bCodec = new BCodec(charset, CodecPolicy.STRICT);
+        byte[] input = new byte[22];
+        input[3] = (byte) 45;
+        bCodec.doDecoding(input);
+    }
 }
