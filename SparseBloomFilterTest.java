@@ -23,82 +23,70 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit tests for the {@link SparseBloomFilter}.
+ * Tests for the {@link SparseBloomFilter}.
  */
 class SparseBloomFilterTest extends AbstractBloomFilterTest<SparseBloomFilter> {
-
     @Override
     protected SparseBloomFilter createEmptyFilter(final Shape shape) {
         return new SparseBloomFilter(shape);
     }
 
-    /**
-     * Tests the behavior of the processBitMaps method with edge cases.
-     */
     @Test
     void testBitMapExtractorEdgeCases() {
-        // Test case: Verify early exit before bitmap boundary
-        int[] indicesBeforeBoundary = {1, 2, 3, 4, 5, 6, 7, 8, 9, 65, 66, 67, 68, 69, 70, 71};
-        BloomFilter bloomFilter = createFilter(getTestShape(), IndexExtractor.fromIndexArray(indicesBeforeBoundary));
+        int[] values = {1, 2, 3, 4, 5, 6, 7, 8, 9, 65, 66, 67, 68, 69, 70, 71};
+        BloomFilter bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
 
-        final int[] earlyExitCounter = new int[1];
-        assertFalse(bloomFilter.processBitMaps(bitmap -> {
-            earlyExitCounter[0]++;
+        // verify exit early before bitmap boundary
+        final int[] passes = new int[1];
+        assertFalse(bf.processBitMaps(l -> {
+            passes[0]++;
             return false;
         }));
-        assertEquals(1, earlyExitCounter[0]);
+        assertEquals(1, passes[0]);
 
-        // Test case: Verify early exit at bitmap boundary
-        bloomFilter = createFilter(getTestShape(), IndexExtractor.fromIndexArray(indicesBeforeBoundary));
-        earlyExitCounter[0] = 0;
-        assertFalse(bloomFilter.processBitMaps(bitmap -> {
-            boolean shouldContinue = earlyExitCounter[0] == 0;
-            if (shouldContinue) {
-                earlyExitCounter[0]++;
+        // verify exit early at bitmap boundary
+        bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
+        passes[0] = 0;
+        assertFalse(bf.processBitMaps(l -> {
+            final boolean result = passes[0] == 0;
+            if (result) {
+                passes[0]++;
             }
-            return shouldContinue;
+            return result;
         }));
-        assertEquals(1, earlyExitCounter[0]);
+        assertEquals(1, passes[0]);
 
-        // Test case: Verify additional processing if all values are in the first bitmap
-        int[] indicesInFirstBitmap = {1, 2, 3, 4};
-        bloomFilter = createFilter(getTestShape(), IndexExtractor.fromIndexArray(indicesInFirstBitmap));
-        final int[] processingCounter = new int[1];
-        assertTrue(bloomFilter.processBitMaps(bitmap -> {
-            processingCounter[0]++;
+        // verify add extra if all values in first bitmap
+        values = new int[] {1, 2, 3, 4};
+        bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
+        passes[0] = 0;
+        assertTrue(bf.processBitMaps(l -> {
+            passes[0]++;
             return true;
         }));
-        assertEquals(2, processingCounter[0]);
+        assertEquals(2, passes[0]);
 
-        // Test case: Verify early exit if predicate returns false on the second block
-        bloomFilter = createFilter(getTestShape(), IndexExtractor.fromIndexArray(indicesInFirstBitmap));
-        processingCounter[0] = 0;
-        assertFalse(bloomFilter.processBitMaps(bitmap -> {
-            boolean shouldContinue = processingCounter[0] == 0;
-            if (shouldContinue) {
-                processingCounter[0]++;
+        // verify exit early if all values in first bitmap and predicate returns false
+        // on 2nd block
+        values = new int[] {1, 2, 3, 4};
+        bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
+        passes[0] = 0;
+        assertFalse(bf.processBitMaps(l -> {
+            final boolean result = passes[0] == 0;
+            if (result) {
+                passes[0]++;
             }
-            return shouldContinue;
+            return result;
         }));
-        assertEquals(1, processingCounter[0]);
+        assertEquals(1, passes[0]);
     }
 
-    /**
-     * Tests the merge functionality of Bloom filters with edge cases.
-     */
     @Test
     void testBloomFilterBasedMergeEdgeCases() {
-        // Create two Bloom filters
-        final BloomFilter emptyFilter = createEmptyFilter(getTestShape());
-        final BloomFilter simpleFilter = new SimpleBloomFilter(getTestShape());
-        
-        // Merge a hasher into the simple filter
-        simpleFilter.merge(TestingHashers.FROM1);
-        
-        // Merge the simple filter into the empty filter
-        emptyFilter.merge(simpleFilter);
-        
-        // Verify that the merged filters have identical bitmaps
-        assertTrue(simpleFilter.processBitMapPairs(emptyFilter, (bitmap1, bitmap2) -> bitmap1 == bitmap2));
+        final BloomFilter bf1 = createEmptyFilter(getTestShape());
+        final BloomFilter bf2 = new SimpleBloomFilter(getTestShape());
+        bf2.merge(TestingHashers.FROM1);
+        bf1.merge(bf2);
+        assertTrue(bf2.processBitMapPairs(bf1, (x, y) -> x == y));
     }
 }
