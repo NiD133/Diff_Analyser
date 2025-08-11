@@ -21,6 +21,601 @@ import org.locationtech.spatial4j.shape.ShapeFactory;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class SpatialContextFactory_ESTest extends SpatialContextFactory_ESTest_scaffolding {
 
-  // ... (30+ generated, hard-to-read test cases) ...
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      hashMap0.put("shapeFactoryClass", "org.locationtech.spatial4j.shape.impl.BufferedLineString");
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      // Undeclared exception!
+      try { 
+        SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // class org.locationtech.spatial4j.shape.impl.BufferedLineString needs a constructor that takes: [SpatialContext{geo=true, calculator=null, worldBounds=null}, org.locationtech.spatial4j.context.SpatialContextFactory@1]
+         //
+         verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+      }
+  }
 
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      hashMap0.put("writers", ", worldBounds=");
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      // Undeclared exception!
+      try { 
+        SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // Unable to find format class
+         //
+         verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      hashMap0.put("readers", "%{Y,*MT'j<t9mHJr/M_");
+      // Undeclared exception!
+      try { 
+        SpatialContextFactory.makeSpatialContext(hashMap0, (ClassLoader) null);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // Unable to find format class
+         //
+         verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      spatialContextFactory0.init(hashMap0, classLoader0);
+      spatialContextFactory0.initWorldBounds();
+      assertFalse(spatialContextFactory0.hasFormatConfig);
+      assertFalse(spatialContextFactory0.normWrapLongitude);
+      assertTrue(spatialContextFactory0.geo);
+  }
+
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      spatialContextFactory0.init(hashMap0, (ClassLoader) null);
+      spatialContextFactory0.initFormats();
+      assertFalse(spatialContextFactory0.hasFormatConfig);
+      assertTrue(spatialContextFactory0.geo);
+      assertFalse(spatialContextFactory0.normWrapLongitude);
+  }
+
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      spatialContextFactory0.args = (Map<String, String>) hashMap0;
+      spatialContextFactory0.initField("readers");
+      assertFalse(spatialContextFactory0.normWrapLongitude);
+      assertTrue(spatialContextFactory0.geo);
+      assertFalse(spatialContextFactory0.hasFormatConfig);
+  }
+
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      spatialContextFactory0.args = (Map<String, String>) hashMap0;
+      spatialContextFactory0.initCalculator();
+      assertTrue(spatialContextFactory0.geo);
+      assertFalse(spatialContextFactory0.hasFormatConfig);
+      assertFalse(spatialContextFactory0.normWrapLongitude);
+  }
+
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      spatialContextFactory0.checkDefaultFormats();
+      assertFalse(spatialContextFactory0.hasFormatConfig);
+      assertFalse(spatialContextFactory0.normWrapLongitude);
+      assertTrue(spatialContextFactory0.geo);
+  }
+
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      hashMap0.put("spatialContextFactory", "spatialContextFactory");
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      // Undeclared exception!
+      try { 
+        SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // java.lang.ClassNotFoundException: spatialContextFactory
+         //
+         verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      // Undeclared exception!
+      try { 
+        spatialContextFactory0.initField("");
+        fail("Expecting exception: Error");
+      
+      } catch(Error e) {
+         //
+         // java.lang.NoSuchFieldException: 
+         //
+         verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
+      spatialContextFactory0.makeShapeFactory(spatialContext0);
+      assertFalse(spatialContextFactory0.hasFormatConfig);
+      assertTrue(spatialContextFactory0.geo);
+      assertFalse(spatialContextFactory0.normWrapLongitude);
+  }
+
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
+      spatialContextFactory0.makeBinaryCodec(spatialContext0);
+      assertTrue(spatialContextFactory0.geo);
+      assertFalse(spatialContextFactory0.normWrapLongitude);
+  }
+
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      Class<ShapeFactory> class0 = ShapeFactory.class;
+      spatialContextFactory0.shapeFactoryClass = class0;
+      // Undeclared exception!
+      try { 
+        spatialContextFactory0.newSpatialContext();
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // interface org.locationtech.spatial4j.shape.ShapeFactory needs a constructor that takes: [SpatialContext{geo=true, calculator=null, worldBounds=null}, org.locationtech.spatial4j.context.SpatialContextFactory@1]
+         //
+         verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      // Undeclared exception!
+      try { 
+        SpatialContextFactory.makeSpatialContext((Map<String, String>) null, classLoader0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      hashMap0.putIfAbsent("shapeFactoryClass", "org.locationtech.spatial4j.context.spatialcontext");
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      // Undeclared exception!
+      try { 
+        SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
+        fail("Expecting exception: NoClassDefFoundError");
+      
+      } catch(NoClassDefFoundError e) {
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      // Undeclared exception!
+      try { 
+        spatialContextFactory0.makeShapeFactory((SpatialContext) null);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // java.lang.NullPointerException
+         //
+         verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      // Undeclared exception!
+      try { 
+        spatialContextFactory0.makeFormats((SpatialContext) null);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // org.evosuite.runtime.mock.java.lang.MockThrowable: java.lang.NullPointerException
+         //
+         verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      // Undeclared exception!
+      try { 
+        spatialContextFactory0.makeBinaryCodec((SpatialContext) null);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // java.lang.NullPointerException
+         //
+         verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      // Undeclared exception!
+      try { 
+        spatialContextFactory0.initWorldBounds();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      hashMap0.put("readers", "readers");
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      spatialContextFactory0.args = (Map<String, String>) hashMap0;
+      // Undeclared exception!
+      try { 
+        spatialContextFactory0.initFormats();
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // Unable to find format class
+         //
+         verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      // Undeclared exception!
+      try { 
+        spatialContextFactory0.initFormats();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      // Undeclared exception!
+      try { 
+        spatialContextFactory0.initField("shapeFactoryClass");
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      // Undeclared exception!
+      try { 
+        spatialContextFactory0.initCalculator();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      hashMap0.put("shapeFactoryClass", "shapeFactoryClass");
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      // Undeclared exception!
+      try { 
+        spatialContextFactory0.init(hashMap0, classLoader0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // Invalid value 'shapeFactoryClass' on field shapeFactoryClass of type class java.lang.Class
+         //
+         verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      // Undeclared exception!
+      try { 
+        spatialContextFactory0.init((Map<String, String>) null, classLoader0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      spatialContextFactory0.init(hashMap0, classLoader0);
+      Class<PolyshapeReader> class0 = PolyshapeReader.class;
+      spatialContextFactory0.addReaderIfNoggitExists(class0);
+      assertTrue(spatialContextFactory0.geo);
+      assertFalse(spatialContextFactory0.hasFormatConfig);
+      assertFalse(spatialContextFactory0.normWrapLongitude);
+  }
+
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      Class<PolyshapeReader> class0 = PolyshapeReader.class;
+      spatialContextFactory0.addReaderIfNoggitExists(class0);
+      assertTrue(spatialContextFactory0.geo);
+      assertFalse(spatialContextFactory0.normWrapLongitude);
+      assertFalse(spatialContextFactory0.hasFormatConfig);
+  }
+
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      spatialContextFactory0.newSpatialContext();
+      assertFalse(spatialContextFactory0.normWrapLongitude);
+      assertTrue(spatialContextFactory0.geo);
+      assertFalse(spatialContextFactory0.hasFormatConfig);
+  }
+
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      hashMap0.put("shapeFactoryClass", "org.locationtech.spatial4j.io.LegacyShapeWriter");
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      // Undeclared exception!
+      try { 
+        SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // class org.locationtech.spatial4j.io.LegacyShapeWriter needs a constructor that takes: [SpatialContext{geo=true, calculator=null, worldBounds=null}, org.locationtech.spatial4j.context.SpatialContextFactory@1]
+         //
+         verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      hashMap0.put("worldBounds", "KLjy(V*@=mG*& @#o");
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
+      assertTrue(spatialContext0.isGeo());
+  }
+
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
+      spatialContextFactory0.makeFormats(spatialContext0);
+      assertFalse(spatialContextFactory0.normWrapLongitude);
+      assertFalse(spatialContextFactory0.hasFormatConfig);
+      assertTrue(spatialContextFactory0.geo);
+  }
+
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      hashMap0.putIfAbsent("writers", "org.locationtech.spatial4j.shape.impl.RectangleImpl");
+      // Undeclared exception!
+      try { 
+        SpatialContextFactory.makeSpatialContext(hashMap0, (ClassLoader) null);
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test32()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      hashMap0.putIfAbsent("writers", ",");
+      SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, (ClassLoader) null);
+      assertTrue(spatialContext0.isGeo());
+  }
+
+  @Test(timeout = 4000)
+  public void test33()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      hashMap0.put("wktShapeParserClass", "wktShapeParserClass");
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      // Undeclared exception!
+      try { 
+        SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // Unable to find format class
+         //
+         verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test34()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      hashMap0.put("readers", ",");
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
+      assertTrue(spatialContext0.isGeo());
+      assertFalse(spatialContext0.isNormWrapLongitude());
+  }
+
+  @Test(timeout = 4000)
+  public void test35()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      hashMap0.putIfAbsent("distCalculator", "distCalculator");
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      // Undeclared exception!
+      try { 
+        SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // Unknown calculator: distCalculator
+         //
+         verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test36()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      hashMap0.put("distCalculator", "cartesian^2");
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
+      assertFalse(spatialContext0.isNormWrapLongitude());
+  }
+
+  @Test(timeout = 4000)
+  public void test37()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      hashMap0.putIfAbsent("distCalculator", "vincentysphere");
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
+      assertTrue(spatialContext0.isGeo());
+      assertFalse(spatialContext0.isNormWrapLongitude());
+  }
+
+  @Test(timeout = 4000)
+  public void test38()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      hashMap0.put("distCalculator", "lawofcosines");
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
+      assertFalse(spatialContext0.isNormWrapLongitude());
+  }
+
+  @Test(timeout = 4000)
+  public void test39()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      hashMap0.put("distCalculator", "haversine");
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
+      assertTrue(spatialContext0.isGeo());
+      assertFalse(spatialContext0.isNormWrapLongitude());
+  }
+
+  @Test(timeout = 4000)
+  public void test40()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      hashMap0.putIfAbsent("distCalculator", "cartesian");
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
+      assertFalse(spatialContext0.isNormWrapLongitude());
+      assertTrue(spatialContext0.isGeo());
+  }
+
+  @Test(timeout = 4000)
+  public void test41()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      hashMap0.put("readers", ",");
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      spatialContextFactory0.args = (Map<String, String>) hashMap0;
+      // Undeclared exception!
+      try { 
+        spatialContextFactory0.initField("readers");
+        fail("Expecting exception: Error");
+      
+      } catch(Error e) {
+         //
+         // unsupported field type: interface java.util.List
+         //
+         verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test42()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      hashMap0.put("geo", "geo");
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
+      assertFalse(spatialContext0.isNormWrapLongitude());
+  }
+
+  @Test(timeout = 4000)
+  public void test43()  throws Throwable  {
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      hashMap0.put("spatialContextFactory", "org.locationtech.spatial4j.context.SpatialContextFactory");
+      SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, (ClassLoader) null);
+      assertFalse(spatialContext0.isNormWrapLongitude());
+      assertTrue(spatialContext0.isGeo());
+  }
 }
