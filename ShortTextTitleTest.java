@@ -38,63 +38,98 @@ package org.jfree.chart.title;
 
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.internal.CloneUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for the {@link ShortTextTitle} class.
+ * <p>
+ * This test suite focuses on the basic object contract methods like
+ * {@code equals()}, {@code hashCode()}, cloning, and serialization.
+ * The core rendering logic in {@code arrange()} and {@code draw()} is not
+ * covered here.
  */
-public class ShortTextTitleTest {
+@DisplayName("ShortTextTitle")
+class ShortTextTitleTest {
 
     /**
-     * Check that the equals() method distinguishes all fields.
+     * Verifies that the equals() method correctly compares instances based on
+     * their text content.
      */
     @Test
-    public void testEquals() {
-        ShortTextTitle t1 = new ShortTextTitle("ABC");
-        ShortTextTitle t2 = new ShortTextTitle("ABC");
-        assertEquals(t1, t2);
+    @DisplayName("equals() should distinguish instances based on their text")
+    void equals_shouldDistinguishInstancesBasedOnText() {
+        // Arrange: Create two titles with the same initial text
+        ShortTextTitle title1 = new ShortTextTitle("ABC");
+        ShortTextTitle title2 = new ShortTextTitle("ABC");
 
-        t1.setText("Test 1");
-        assertNotEquals(t1, t2);
-        t2.setText("Test 1");
-        assertEquals(t1, t2);
+        // Assert: Initially, they should be equal
+        assertEquals(title1, title2, "Titles with the same initial text should be equal.");
+
+        // Act: Change the text of the first title
+        title1.setText("XYZ");
+
+        // Assert: Now they should not be equal
+        assertNotEquals(title1, title2, "Titles should be unequal after changing one's text.");
+
+        // Act: Change the text of the second title to match the first
+        title2.setText("XYZ");
+
+        // Assert: They should be equal again
+        assertEquals(title1, title2, "Titles should be equal again after their texts are made the same.");
     }
 
     /**
-     * Two objects that are equal are required to return the same hashCode.
+     * Verifies that two equal objects produce the same hash code, fulfilling the
+     * hashCode() contract.
      */
     @Test
-    public void testHashcode() {
-        ShortTextTitle t1 = new ShortTextTitle("ABC");
-        ShortTextTitle t2 = new ShortTextTitle("ABC");
-        assertEquals(t1, t2);
-        int h1 = t1.hashCode();
-        int h2 = t2.hashCode();
-        assertEquals(h1, h2);
+    @DisplayName("hashCode() should be consistent with equals()")
+    void hashCode_shouldBeConsistentWithEquals() {
+        // Arrange
+        ShortTextTitle title1 = new ShortTextTitle("ABC");
+        ShortTextTitle title2 = new ShortTextTitle("ABC");
+
+        // Assert
+        assertEquals(title1, title2, "Precondition: Objects must be equal for this test.");
+        assertEquals(title1.hashCode(), title2.hashCode(), "Equal objects must have the same hash code.");
     }
 
     /**
-     * Confirm that cloning works.
+     * Verifies that cloning produces an independent object that is equal to the
+     * original.
      */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
-        ShortTextTitle t1 = new ShortTextTitle("ABC");
-        ShortTextTitle t2 = CloneUtils.clone(t1);
-        assertNotSame(t1, t2);
-        assertSame(t1.getClass(), t2.getClass());
-        assertEquals(t1, t2);
+    @DisplayName("clone() should create an independent and equal copy")
+    void cloning_shouldCreateIndependentAndEqualCopy() throws CloneNotSupportedException {
+        // Arrange
+        ShortTextTitle original = new ShortTextTitle("ABC");
+
+        // Act
+        ShortTextTitle clone = CloneUtils.clone(original);
+
+        // Assert
+        assertNotSame(original, clone, "Cloned object should be a different instance.");
+        assertSame(original.getClass(), clone.getClass(), "Cloned object should be of the same class.");
+        assertEquals(original, clone, "Cloned object should be equal to the original.");
     }
 
     /**
-     * Serialize an instance, restore it, and check for equality.
+     * Verifies that a serialized and then deserialized instance remains equal
+     * to the original object.
      */
     @Test
-    public void testSerialization() {
-        ShortTextTitle t1 = new ShortTextTitle("ABC");
-        ShortTextTitle t2 = TestUtils.serialised(t1);
-        assertEquals(t1, t2);
-    }
+    @DisplayName("A serialized and deserialized instance should remain equal to the original")
+    void serialization_shouldPreserveEquality() {
+        // Arrange
+        ShortTextTitle original = new ShortTextTitle("ABC");
 
+        // Act
+        ShortTextTitle deserialized = TestUtils.serialised(original);
+
+        // Assert
+        assertEquals(original, deserialized, "Deserialized object should be equal to the original.");
+    }
 }
