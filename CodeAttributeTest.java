@@ -18,6 +18,8 @@
  */
 package org.apache.commons.compress.harmony.unpack200;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
@@ -32,17 +34,120 @@ import org.apache.commons.compress.harmony.unpack200.bytecode.CodeAttribute;
 import org.apache.commons.compress.harmony.unpack200.bytecode.ExceptionTableEntry;
 import org.apache.commons.compress.harmony.unpack200.bytecode.LocalVariableTableAttribute;
 import org.apache.commons.compress.harmony.unpack200.bytecode.OperandManager;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for CodeAttribute
+ * Tests for the CodeAttribute class, focusing on its constructor logic for parsing
+ * packed bytecodes and calculating offsets and attribute length.
+ *
+ * <p>This test class uses a set of private static mock classes to provide the necessary
+ * dependencies (Segment, CpBands, OperandManager) for instantiating a CodeAttribute.</p>
  */
 class CodeAttributeTest {
 
-    public class MockCodeAttribute extends CodeAttribute {
+    // Bytecodes with single-byte and multi-byte instructions.
+    private static final byte[] MIXED_WIDTH_BYTE_CODES = {
+        -47, // aload_0_getstatic_this (multi-byte)
+        -46, // aload_0_putstatic_this (multi-byte)
+        1,   // aconst_null (single-byte)
+        -45, // aload_0_getfield_this (multi-byte)
+        -44, // aload_0_putfield_this (multi-byte)
+    };
 
-        MockCodeAttribute(final int maxStack, final int maxLocals, final byte[] codePacked, final Segment segment, final OperandManager operandManager,
-                final List<ExceptionTableEntry> exceptionTable) throws Pack200Exception {
+    // Bytecodes with only single-byte instructions.
+    private static final byte[] SINGLE_BYTE_CODES = {
+        42,  // aload_0
+        1,   // aconst_null
+        18,  // ldc
+        -49, // return (custom invokespecial_this)
+    };
+
+    private Segment segment;
+    private OperandManager operandManager;
+
+    @BeforeEach
+    void setUp() {
+        segment = new MockSegment();
+        operandManager = new MockOperandManager();
+        operandManager.setSegment(segment);
+        operandManager.setCurrentClass("java/lang/Foo");
+    }
+
+    @Test
+    @DisplayName("Length should be calculated correctly and updated when nested attributes are added")
+    void length_whenAttributeAdded_isRecalculatedCorrectly() throws Pack200Exception {
+        // Arrange
+        final ExposedLengthCodeAttribute attribute = new ExposedLengthCodeAttribute(3, 2, MIXED_WIDTH_BYTE_CODES,
+            segment, operandManager, new ArrayList<>());
+
+        // Assert initial length
+        // The length is derived from the size of the parsed bytecodes, header, and other components.
+        assertEquals(29, attribute.getLength(), "Initial attribute length should be calculated correctly.");
+
+        // Act: Add a nested attribute
+        attribute.attributes.add(new LocalVariableTableAttribute(0, null, null, null, null, null));
+
+        // Assert new length
+        assertEquals(37, attribute.getLength(), "Attribute length should increase after adding a nested attribute.");
+    }
+
+    @Test
+    @DisplayName("Constructor should correctly parse bytecodes with mixed widths")
+    void constructor_withMixedByteCodes_parsesCorrectly() throws Pack200Exception {
+        // Arrange
+        final int maxStack = 3;
+        final int maxLocals = 2;
+        final int[] expectedOffsets = {0, 1, 4, 5, 8, 9, 10, 13, 14};
+
+        // Act
+        final CodeAttribute attribute = new CodeAttribute(maxStack, maxLocals, MIXED_WIDTH_BYTE_CODES, segment,
+            operandManager, new ArrayList<>());
+        final int[] actualOffsets = attribute.byteCodeOffsets.stream().mapToInt(Integer::intValue).toArray();
+
+        // Assert
+        assertAll("Attribute properties for mixed-width bytecodes",
+            () -> assertEquals(maxLocals, attribute.maxLocals, "maxLocals should be set correctly"),
+            () -> assertEquals(maxStack, attribute.maxStack, "maxStack should be set correctly"),
+            // This assertion checks the string representation of the last parsed bytecode instruction.
+            () -> assertEquals("aload_0_putfield_this", attribute.byteCodes.get(4).toString()),
+            () -> assertArrayEquals(expectedOffsets, actualOffsets, "Bytecode offsets should be calculated correctly")
+        );
+    }
+
+    @Test
+    @DisplayName("Constructor should correctly parse single-byte bytecodes")
+    void constructor_withSingleByteCodes_parsesCorrectly() throws Pack200Exception {
+        // Arrange
+        final int maxStack = 4;
+        final int maxLocals = 3;
+        final int[] expectedOffsets = {0, 1, 2, 4};
+
+        // Act
+        final CodeAttribute attribute = new CodeAttribute(maxStack, maxLocals, SINGLE_BYTE_CODES, segment,
+            operandManager, new ArrayList<>());
+        final int[] actualOffsets = attribute.byteCodeOffsets.stream().mapToInt(Integer::intValue).toArray();
+
+        // Assert
+        assertAll("Attribute properties for single-byte bytecodes",
+            () -> assertEquals(maxLocals, attribute.maxLocals, "maxLocals should be set correctly"),
+            () -> assertEquals(maxStack, attribute.maxStack, "maxStack should be set correctly"),
+            // This assertion checks the string representation of the last parsed bytecode instruction.
+            () -> assertEquals("invokespecial_this", attribute.byteCodes.get(3).toString()),
+            () -> assertArrayEquals(expectedOffsets, actualOffsets, "Bytecode offsets should be calculated correctly")
+        );
+    }
+
+    // --- Helper Mocks ---
+
+    /**
+     * A mock CodeAttribute that exposes the protected getLength() method for testing.
+     */
+    private static class ExposedLengthCodeAttribute extends CodeAttribute {
+        ExposedLengthCodeAttribute(final int maxStack, final int maxLocals, final byte[] codePacked,
+            final Segment segment, final OperandManager operandManager, final List<ExceptionTableEntry> exceptionTable)
+            throws Pack200Exception {
             super(maxStack, maxLocals, codePacked, segment, operandManager, exceptionTable);
         }
 
@@ -52,8 +157,36 @@ class CodeAttributeTest {
         }
     }
 
-    public class MockCpBands extends CpBands {
+    /**
+     * Mock OperandManager that provides the necessary operand streams for the test bytecodes.
+     * The non-empty arrays are consumed by the bytecode parsing logic in CodeAttribute.
+     */
+    private static class MockOperandManager extends OperandManager {
+        MockOperandManager() {
+            super(new int[]{}, new int[]{}, new int[]{}, new int[]{}, new int[]{}, new int[]{}, new int[]{},
+                new int[]{}, new int[]{}, new int[]{}, new int[]{0, 1, 2, 3, 4}, // bcStringRef
+                new int[]{}, new int[]{}, new int[]{}, new int[]{}, new int[]{0, 0, 0, 0, 0, 0}, // bcThisField
+                new int[]{}, new int[]{0}, // bcThisMethod
+                new int[]{}, new int[]{}, null);
+        }
+    }
 
+    /**
+     * Mock Segment that provides a mock Constant Pool.
+     */
+    private static class MockSegment extends Segment {
+        private final CpBands cpBands = new MockCpBands(this);
+
+        @Override
+        public SegmentConstantPool getConstantPool() {
+            return new MockSegmentConstantPool(cpBands);
+        }
+    }
+
+    /**
+     * Mock CpBands that returns a dummy CPString, needed for bytecodes like 'ldc'.
+     */
+    private static class MockCpBands extends CpBands {
         MockCpBands(final Segment segment) {
             super(segment);
         }
@@ -72,134 +205,20 @@ class CodeAttributeTest {
         public CPString cpStringValue(final int index) {
             return new CPString(new CPUTF8("Hello"), -1);
         }
-
     }
 
-    public class MockOperandManager extends OperandManager {
-
-        MockOperandManager() {
-            super(new int[] {}, // bcCaseCount
-                    new int[] {}, // bcCaseValues
-                    new int[] {}, // bcByte
-                    new int[] {}, // bcShort
-                    new int[] {}, // bcLocal
-                    new int[] {}, // bcLabel
-                    new int[] {}, // bcIntRef
-                    new int[] {}, // bcFloatRef
-                    new int[] {}, // bcLongRef
-                    new int[] {}, // bcDoubleRef
-                    new int[] { 0, 1, 2, 3, 4 }, // bcStringRef
-                    new int[] {}, // bcClassRef
-                    new int[] {}, // bcFieldRef
-                    new int[] {}, // bcMethodRef
-                    new int[] {}, // bcIMethodRef
-                    new int[] { 0, 0, 0, 0, 0, 0 }, // bcThisField
-                    new int[] {}, // bcSuperField
-                    new int[] { 0 }, // bcThisMethod
-                    new int[] {}, // bcSuperMethod
-                    new int[] {} // bcInitRef
-                    , null);
-        }
-    }
-
-    public class MockSegment extends Segment {
-
-        @Override
-        public SegmentConstantPool getConstantPool() {
-            return new MockSegmentConstantPool(cpBands);
-        }
-    }
-
-    public class MockSegmentConstantPool extends SegmentConstantPool {
-
+    /**
+     * Mock SegmentConstantPool that returns a fixed index for pool entry lookups.
+     */
+    private static class MockSegmentConstantPool extends SegmentConstantPool {
         MockSegmentConstantPool(final CpBands bands) {
             super(bands);
         }
 
         @Override
-        protected int matchSpecificPoolEntryIndex(final String[] nameArray, final String compareString, final int desiredIndex) {
+        protected int matchSpecificPoolEntryIndex(final String[] nameArray, final String compareString,
+            final int desiredIndex) {
             return 1;
         }
     }
-
-    Segment segment = new MockSegment();
-    CpBands cpBands = new MockCpBands(segment);
-
-    public byte[] mixedByteArray = { -47, // aload_0_getstatic_this 0, 1
-            -46, // aload_0_putstatic_this 4, 5
-            1, // aconst_null 8
-            -45, // aload_0_getfield_this 9, 10
-            // Should always end with a multibyte
-            // instruction
-            -44, // aload_0_putfield_this (int) 13, 14
-    };
-
-    public byte[] singleByteArray = { 42, // aload_0 0
-            1, // aconst_null 1
-            18, // ldc 2
-            -49, // return 4
-    };
-
-    @Test
-    void testLength() throws Pack200Exception {
-        final OperandManager operandManager = new MockOperandManager();
-        operandManager.setSegment(segment);
-        operandManager.setCurrentClass("java/lang/Foo");
-
-        final MockCodeAttribute attribute = new MockCodeAttribute(3, // maxStack
-                2, // maxLocals
-                mixedByteArray, // codePacked
-                segment, // segment
-                operandManager, // operandManager
-                new ArrayList<>());
-        assertEquals(29, attribute.getLength());
-
-        attribute.attributes.add(new LocalVariableTableAttribute(0, null, null, null, null, null));
-        assertEquals(37, attribute.getLength());
-    }
-
-    @Test
-    void testMixedByteCodes() throws Pack200Exception {
-        final OperandManager operandManager = new MockOperandManager();
-        operandManager.setSegment(segment);
-        operandManager.setCurrentClass("java/lang/Foo");
-
-        final CodeAttribute attribute = new CodeAttribute(3, // maxStack
-                2, // maxLocals
-                mixedByteArray, // codePacked
-                segment, // segment
-                operandManager, // operandManager
-                new ArrayList<>());
-        assertEquals(2, attribute.maxLocals);
-        assertEquals(3, attribute.maxStack);
-        assertEquals("aload_0_putfield_this", attribute.byteCodes.get(4).toString());
-
-        final int[] expectedLabels = { 0, 1, 4, 5, 8, 9, 10, 13, 14 };
-        for (int index = 0; index < expectedLabels.length; index++) {
-            assertEquals(expectedLabels[index], attribute.byteCodeOffsets.get(index).intValue());
-        }
-    }
-
-    @Test
-    void testSingleByteCodes() throws Pack200Exception {
-        final OperandManager operandManager = new MockOperandManager();
-        operandManager.setSegment(segment);
-        operandManager.setCurrentClass("java/lang/Foo");
-
-        final CodeAttribute attribute = new CodeAttribute(4, // maxStack
-                3, // maxLocals
-                singleByteArray, // codePacked
-                segment, // segment
-                operandManager, // operandManager
-                new ArrayList<>());
-        assertEquals(3, attribute.maxLocals);
-        assertEquals(4, attribute.maxStack);
-        assertEquals("invokespecial_this", attribute.byteCodes.get(3).toString());
-
-        final int[] expectedLabels = { 0, 1, 2, 4 };
-        for (int index = 0; index < expectedLabels.length; index++) {
-            assertEquals(expectedLabels[index], attribute.byteCodeOffsets.get(index).intValue());
-        }
-    }
-
 }
