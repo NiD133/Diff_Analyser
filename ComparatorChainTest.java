@@ -30,107 +30,85 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests for ComparatorChain.
- *
- * The domain used here is a "row" with three integer columns.
- * The default chain used by AbstractComparatorTest sorts by:
- * - column 0: ascending
- * - column 1: descending
- * - column 2: ascending
  */
 class ComparatorChainTest extends AbstractComparatorTest<ComparatorChainTest.PseudoRow> {
 
-    /**
-     * Simple comparator that compares PseudoRow values by a single column index.
-     */
     public static class ColumnComparator implements Comparator<PseudoRow>, Serializable {
         private static final long serialVersionUID = -2284880866328872105L;
 
-        private final int columnIndex;
+        protected int colIndex;
 
-        ColumnComparator(final int columnIndex) {
-            this.columnIndex = columnIndex;
+        ColumnComparator(final int colIndex) {
+            this.colIndex = colIndex;
         }
 
         @Override
-        public int compare(final PseudoRow left, final PseudoRow right) {
-            return Integer.compare(left.getColumn(columnIndex), right.getColumn(columnIndex));
+        public int compare(final PseudoRow o1, final PseudoRow o2) {
+            return Integer.compare(o1.getColumn(colIndex), o2.getColumn(colIndex));
         }
 
         @Override
-        public boolean equals(final Object other) {
-            return other instanceof ColumnComparator
-                && columnIndex == ((ColumnComparator) other).columnIndex;
+        public boolean equals(final Object that) {
+            return that instanceof ColumnComparator && colIndex == ((ColumnComparator) that).colIndex;
         }
 
         @Override
         public int hashCode() {
-            return columnIndex;
+            return colIndex;
         }
     }
 
-    /**
-     * Simple value-object with three integer "columns".
-     */
     public static class PseudoRow implements Serializable {
 
+        /**
+         * Generated serial version ID.
+         */
         private static final long serialVersionUID = 8085570439751032499L;
+        public int[] cols = new int[3];
 
-        // Column values in order: 0, 1, 2.
-        private final int[] columns = new int[3];
-
-        PseudoRow(final int col0, final int col1, final int col2) {
-            columns[0] = col0;
-            columns[1] = col1;
-            columns[2] = col2;
-        }
-
-        public int getColumn(final int index) {
-            return columns[index];
+        PseudoRow(final int col1, final int col2, final int col3) {
+            cols[0] = col1;
+            cols[1] = col2;
+            cols[2] = col3;
         }
 
         @Override
-        public boolean equals(final Object obj) {
-            if (!(obj instanceof PseudoRow)) {
+        public boolean equals(final Object o) {
+            if (!(o instanceof PseudoRow)) {
                 return false;
             }
-            final PseudoRow other = (PseudoRow) obj;
-            return getColumn(0) == other.getColumn(0)
-                && getColumn(1) == other.getColumn(1)
-                && getColumn(2) == other.getColumn(2);
+
+            final PseudoRow row = (PseudoRow) o;
+
+            return getColumn(0) == row.getColumn(0) && getColumn(1) == row.getColumn(1) && getColumn(2) == row.getColumn(2);
+        }
+
+        public int getColumn(final int colIndex) {
+            return cols[colIndex];
         }
 
         @Override
         public int hashCode() {
-            return Arrays.hashCode(columns);
+            return Arrays.hashCode(cols);
         }
 
         @Override
         public String toString() {
-            return "[" + columns[0] + "," + columns[1] + "," + columns[2] + "]";
+            return "[" + cols[0] + "," + cols[1] + "," + cols[2] + "]";
         }
     }
 
-    // Serialization compatibility helper (kept for reference).
-    // To regenerate, uncomment and run locally:
-    // void testCreate() throws Exception {
-    //     writeExternalFormToDisk((java.io.Serializable) makeObject(), "src/test/resources/data/test/ComparatorChain.version4.obj");
-    // }
+//    void testCreate() throws Exception {
+//        writeExternalFormToDisk((java.io.Serializable) makeObject(), "src/test/resources/data/test/ComparatorChain.version4.obj");
+//    }
 
     @Override
     public List<PseudoRow> getComparableObjectsOrdered() {
-        // Expected order when sorting by:
-        // - column 0 ascending
-        // - column 1 descending
-        // - column 2 ascending
-        return new LinkedList<>(Arrays.asList(
-            new PseudoRow(1, 2, 3),
-            new PseudoRow(2, 3, 5),
-            new PseudoRow(2, 2, 4),
-            new PseudoRow(2, 2, 8),
-            new PseudoRow(3, 1, 0),
-            new PseudoRow(4, 4, 4),
-            new PseudoRow(4, 4, 7)
-        ));
+        // this is the correct order assuming a
+        // "0th forward, 1st reverse, 2nd forward" sort
+        return new LinkedList<>(Arrays.asList(new PseudoRow(1, 2, 3), new PseudoRow(2, 3, 5),
+                new PseudoRow(2, 2, 4), new PseudoRow(2, 2, 8), new PseudoRow(3, 1, 0),
+                new PseudoRow(4, 4, 4), new PseudoRow(4, 4, 7)));
     }
 
     @Override
@@ -140,49 +118,37 @@ class ComparatorChainTest extends AbstractComparatorTest<ComparatorChainTest.Pse
 
     @Override
     public Comparator<PseudoRow> makeObject() {
-        // Build the chain used by AbstractComparatorTest:
-        // 0th: ascending, 1st: descending, 2nd: ascending.
         final ComparatorChain<PseudoRow> chain = new ComparatorChain<>(new ColumnComparator(0));
-        chain.addComparator(new ColumnComparator(1), true);   // reverse the second column (descending)
-        chain.addComparator(new ColumnComparator(2), false);  // third column ascending
+        chain.addComparator(new ColumnComparator(1), true); // reverse the second column
+        chain.addComparator(new ColumnComparator(2), false);
         return chain;
     }
 
     @Test
-    void compareThrowsWhenChainConstructedWithEmptyComparatorList() {
-        // Arrange
-        final List<Comparator<Integer>> emptyComparators = new LinkedList<>();
-        final ComparatorChain<Integer> chainUnderTest = new ComparatorChain<>(emptyComparators);
-        final Integer left = 4;
-        final Integer right = 6;
+    void testBadListComparatorChain() {
+        final List<Comparator<Integer>> list = new LinkedList<>();
+        final ComparatorChain<Integer> chain = new ComparatorChain<>(list);
+        final Integer i1 = 4;
+        final Integer i2 = 6;
 
-        // Act + Assert
-        assertThrows(UnsupportedOperationException.class, () -> chainUnderTest.compare(left, right));
+        assertThrows(UnsupportedOperationException.class, () -> chain.compare(i1, i2));
     }
 
     @Test
-    void compareThrowsWhenChainHasNoComparatorsAdded() {
-        // Arrange
-        final ComparatorChain<Integer> chainUnderTest = new ComparatorChain<>();
-        final Integer left = 4;
-        final Integer right = 6;
+    void testBadNoopComparatorChain() {
+        final ComparatorChain<Integer> chain = new ComparatorChain<>();
+        final Integer i1 = 4;
+        final Integer i2 = 6;
 
-        // Act + Assert
-        assertThrows(
-            UnsupportedOperationException.class,
-            () -> chainUnderTest.compare(left, right),
-            "An exception should be thrown when a chain contains zero comparators."
-        );
+        assertThrows(UnsupportedOperationException.class, () -> chain.compare(i1, i2), "An exception should be thrown when a chain contains zero comparators.");
     }
 
     @Test
-    void compareWithReversedComparatorHandlesIntegerMinSentinelCorrectly() {
-        // Arrange
-        // This comparator deliberately returns Integer.MIN_VALUE/Integer.MAX_VALUE
-        // for less/greater results. When reversed, ComparatorChain must not negate
-        // Integer.MIN_VALUE (which would overflow). It should still give the correct sign.
-        final ComparatorChain<Integer> chainUnderTest = new ComparatorChain<>();
-        chainUnderTest.addComparator((a, b) -> {
+    void testComparatorChainOnMinValuedComparator() {
+        // -1 * Integer.MIN_VALUE is less than 0,
+        // test that ComparatorChain handles this edge case correctly
+        final ComparatorChain<Integer> chain = new ComparatorChain<>();
+        chain.addComparator((a, b) -> {
             final int result = a.compareTo(b);
             if (result < 0) {
                 return Integer.MIN_VALUE;
@@ -191,46 +157,34 @@ class ComparatorChainTest extends AbstractComparatorTest<ComparatorChainTest.Pse
                 return Integer.MAX_VALUE;
             }
             return 0;
-        }, true); // reversed
+        }, true);
 
-        // Act + Assert
-        assertTrue(chainUnderTest.compare(4, 5) > 0, "4 vs 5 should be 'greater' when reversed");
-        assertTrue(chainUnderTest.compare(5, 4) < 0, "5 vs 4 should be 'less' when reversed");
-        assertEquals(0, chainUnderTest.compare(4, 4), "Equal values should compare as 0");
+        assertTrue(chain.compare(4, 5) > 0);
+        assertTrue(chain.compare(5, 4) < 0);
+        assertEquals(0, chain.compare(4, 4));
     }
 
     @Test
-    void compareDelegatesToComparatorProvidedViaListConstructor() {
-        // Arrange
-        final List<Comparator<Integer>> comparators = new LinkedList<>();
-        comparators.add(new ComparableComparator<>());
-        final ComparatorChain<Integer> chainUnderTest = new ComparatorChain<>(comparators);
-        final Integer left = 4;
-        final Integer right = 6;
+    void testListComparatorChain() {
+        final List<Comparator<Integer>> list = new LinkedList<>();
+        list.add(new ComparableComparator<>());
+        final ComparatorChain<Integer> chain = new ComparatorChain<>(list);
+        final Integer i1 = 4;
+        final Integer i2 = 6;
 
-        final int expected = left.compareTo(right);
-
-        // Act
-        final int actual = chainUnderTest.compare(left, right);
-
-        // Assert
-        assertEquals(expected, actual, "Comparison returns the right order");
+        final int correctValue = i1.compareTo(i2);
+        assertEquals(chain.compare(i1, i2), correctValue, "Comparison returns the right order");
     }
 
     @Test
-    void compareDelegatesToComparatorAddedAfterDefaultConstructor() {
-        // Arrange
-        final ComparatorChain<Integer> chainUnderTest = new ComparatorChain<>();
-        chainUnderTest.addComparator(new ComparableComparator<>());
-        final Integer left = 4;
-        final Integer right = 6;
+    void testNoopComparatorChain() {
+        final ComparatorChain<Integer> chain = new ComparatorChain<>();
+        final Integer i1 = 4;
+        final Integer i2 = 6;
+        chain.addComparator(new ComparableComparator<>());
 
-        final int expected = left.compareTo(right);
-
-        // Act
-        final int actual = chainUnderTest.compare(left, right);
-
-        // Assert
-        assertEquals(expected, actual, "Comparison returns the right order");
+        final int correctValue = i1.compareTo(i2);
+        assertEquals(chain.compare(i1, i2), correctValue, "Comparison returns the right order");
     }
+
 }
