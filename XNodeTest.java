@@ -1,3 +1,18 @@
+/*
+ *    Copyright 2009-2024 the original author or authors.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package org.apache.ibatis.parsing;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -9,31 +24,14 @@ import org.junit.jupiter.api.Test;
 class XNodeTest {
 
   @Test
-  void testFormatXNodeToString() {
-    // Arrange: Create an XML structure for testing
-    String xml = """
-        <users>
-          <user>
-            <id>100</id>
-            <name>Tom</name>
-            <age>30</age>
-            <cars>
-              <car index="1">BMW</car>
-              <car index="2">Audi</car>
-              <car index="3">Benz</car>
-            </cars>
-          </user>
-        </users>
-        """;
-    XPathParser parser = new XPathParser(xml);
+  void formatXNodeToString() {
+    XPathParser parser = new XPathParser(
+        "<users><user><id>100</id><name>Tom</name><age>30</age><cars><car index=\"1\">BMW</car><car index=\"2\">Audi</car><car index=\"3\">Benz</car></cars></user></users>");
+    String usersNodeToString = parser.evalNode("/users").toString();
+    String userNodeToString = parser.evalNode("/users/user").toString();
+    String carsNodeToString = parser.evalNode("/users/user/cars").toString();
 
-    // Act: Evaluate nodes to string representations
-    String actualUsersNode = parser.evalNode("/users").toString();
-    String actualUserNode = parser.evalNode("/users/user").toString();
-    String actualCarsNode = parser.evalNode("/users/user/cars").toString();
-
-    // Expected string representations
-    String expectedUsersNode = """
+    String usersNodeToStringExpect = """
         <users>
           <user>
             <id>
@@ -60,7 +58,7 @@ class XNodeTest {
         </users>
         """;
 
-    String expectedUserNode = """
+    String userNodeToStringExpect = """
         <user>
           <id>
             100
@@ -85,7 +83,7 @@ class XNodeTest {
         </user>
         """;
 
-    String expectedCarsNode = """
+    String carsNodeToStringExpect = """
         <cars>
           <car index="1">
             BMW
@@ -99,15 +97,13 @@ class XNodeTest {
         </cars>
         """;
 
-    // Assert: Verify that the actual strings match the expected strings
-    assertEquals(expectedUsersNode, actualUsersNode);
-    assertEquals(expectedUserNode, actualUserNode);
-    assertEquals(expectedCarsNode, actualCarsNode);
+    assertEquals(usersNodeToStringExpect, usersNodeToString);
+    assertEquals(userNodeToStringExpect, userNodeToString);
+    assertEquals(carsNodeToStringExpect, carsNodeToString);
   }
 
   @Test
-  void testXNodeToString() {
-    // Arrange: Define an XML with a SQL-like structure
+  void xNodeToString() {
     String xml = """
         <mapper>
           <select id='select' resultType='map'>
@@ -133,8 +129,8 @@ class XNodeTest {
         </mapper>
         """;
 
-    // Expected string representation
-    String expectedSelectNode = """
+    // a little bit ugly with id/name break, but not a blocker
+    String expected = """
         <select id="select" resultType="map">
           select
           <var set="foo" value="bar" />
@@ -159,37 +155,21 @@ class XNodeTest {
         </select>
         """;
 
-    // Act: Parse the XML and evaluate the select node
     XPathParser parser = new XPathParser(xml);
     XNode selectNode = parser.evalNode("/mapper/select");
-
-    // Assert: Verify that the actual string matches the expected string
-    assertEquals(expectedSelectNode, selectNode.toString());
+    assertEquals(expected, selectNode.toString());
   }
 
   @Test
-  void testXNodeToStringWithVariables() throws Exception {
-    // Arrange: Define an XML with variables
-    String xmlWithVariables = "<root attr='${x}'>y = ${y}<sub attr='${y}'>x = ${x}</sub></root>";
-    Properties variables = new Properties();
-    variables.put("x", "foo");
-    variables.put("y", "bar");
-
-    // Expected string representation after variable substitution
-    String expected = """
-        <root attr="foo">
-          y = bar
-          <sub attr="bar">
-            x = foo
-          </sub>
-        </root>
-        """;
-
-    // Act: Parse the XML with variables
-    XPathParser parser = new XPathParser(xmlWithVariables, false, variables);
-    XNode rootNode = parser.evalNode("/root");
-
-    // Assert: Verify that the actual string matches the expected string
-    assertEquals(expected, rootNode.toString());
+  void xnodeToStringVariables() throws Exception {
+    String src = "<root attr='${x}'>y = ${y}<sub attr='${y}'>x = ${x}</sub></root>";
+    String expected = "<root attr=\"foo\">\n  y = bar\n  <sub attr=\"bar\">\n    x = foo\n  </sub>\n</root>\n";
+    Properties vars = new Properties();
+    vars.put("x", "foo");
+    vars.put("y", "bar");
+    XPathParser parser = new XPathParser(src, false, vars);
+    XNode selectNode = parser.evalNode("/root");
+    assertEquals(expected, selectNode.toString());
   }
+
 }
