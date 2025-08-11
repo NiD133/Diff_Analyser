@@ -26,7 +26,12 @@ import org.jspecify.annotations.NullUnmarked;
 @NullUnmarked
 public class AtomicDoubleArrayTest extends JSR166TestCase {
 
-  private static final double[] VALUES = {
+  // Test constants
+  private static final int DEFAULT_ARRAY_SIZE = 10; // Renamed from SIZE for clarity
+  private static final long CONCURRENT_UPDATE_COUNT = 100000; // Renamed from COUNTDOWN
+  
+  // Special double values used for testing edge cases
+  private static final double[] SPECIAL_DOUBLE_VALUES = {
     Double.NEGATIVE_INFINITY,
     -Double.MAX_VALUE,
     (double) Long.MIN_VALUE,
@@ -47,411 +52,444 @@ public class AtomicDoubleArrayTest extends JSR166TestCase {
     Float.MAX_VALUE,
   };
 
-  /** The notion of equality used by AtomicDoubleArray */
-  static boolean bitEquals(double x, double y) {
+  // Helper methods
+  
+  /** 
+   * Checks if two doubles are bitwise equal.
+   * AtomicDoubleArray uses bitwise comparison, not standard double equality.
+   */
+  private static boolean areBitwiseEqual(double x, double y) {
     return Double.doubleToRawLongBits(x) == Double.doubleToRawLongBits(y);
   }
 
-  static void assertBitEquals(double x, double y) {
-    assertEquals(Double.doubleToRawLongBits(x), Double.doubleToRawLongBits(y));
+  /** Asserts that two doubles are bitwise equal. */
+  private static void assertBitwiseEquals(double expected, double actual) {
+    assertEquals(
+        "Doubles are not bitwise equal", 
+        Double.doubleToRawLongBits(expected), 
+        Double.doubleToRawLongBits(actual)
+    );
+  }
+
+  // Constructor tests
+  
+  @Test
+  public void testConstructor_WithSize_CreatesArrayWithZeroValues() {
+    int size = 5;
+    AtomicDoubleArray array = new AtomicDoubleArray(size);
+    
+    assertEquals(size, array.length());
+    for (int i = 0; i < size; i++) {
+      assertBitwiseEquals(0.0, array.get(i));
+    }
+  }
+
+  @Test
+  public void testConstructor_WithDoubleArray_CopiesAllValues() {
+    AtomicDoubleArray array = new AtomicDoubleArray(SPECIAL_DOUBLE_VALUES);
+    
+    assertEquals(SPECIAL_DOUBLE_VALUES.length, array.length());
+    for (int i = 0; i < SPECIAL_DOUBLE_VALUES.length; i++) {
+      assertBitwiseEquals(SPECIAL_DOUBLE_VALUES[i], array.get(i));
+    }
+  }
+
+  @Test
+  public void testConstructor_WithNullArray_ThrowsNPE() {
+    double[] nullArray = null;
+    assertThrows(NullPointerException.class, () -> new AtomicDoubleArray(nullArray));
+  }
+
+  @Test
+  public void testConstructor_WithEmptyArray_CreatesEmptyAtomicArray() {
+    AtomicDoubleArray array = new AtomicDoubleArray(new double[0]);
+    assertEquals(0, array.length());
+    assertThrows(IndexOutOfBoundsException.class, () -> array.get(0));
+  }
+
+  @Test
+  public void testConstructor_WithZeroSize_CreatesEmptyArray() {
+    AtomicDoubleArray array = new AtomicDoubleArray(0);
+    assertEquals(0, array.length());
+    assertThrows(IndexOutOfBoundsException.class, () -> array.get(0));
+  }
+
+  // Boundary tests
+  
+  @Test
+  public void testArrayBounds_InvalidIndices_ThrowIndexOutOfBoundsException() {
+    AtomicDoubleArray array = new AtomicDoubleArray(DEFAULT_ARRAY_SIZE);
+    int[] invalidIndices = {-1, DEFAULT_ARRAY_SIZE};
+    
+    for (int invalidIndex : invalidIndices) {
+      assertThrows(IndexOutOfBoundsException.class, () -> array.get(invalidIndex));
+      assertThrows(IndexOutOfBoundsException.class, () -> array.set(invalidIndex, 1.0));
+      assertThrows(IndexOutOfBoundsException.class, () -> array.lazySet(invalidIndex, 1.0));
+      assertThrows(IndexOutOfBoundsException.class, () -> array.compareAndSet(invalidIndex, 1.0, 2.0));
+      assertThrows(IndexOutOfBoundsException.class, () -> array.weakCompareAndSet(invalidIndex, 1.0, 2.0));
+      assertThrows(IndexOutOfBoundsException.class, () -> array.getAndAdd(invalidIndex, 1.0));
+      assertThrows(IndexOutOfBoundsException.class, () -> array.addAndGet(invalidIndex, 1.0));
+    }
+  }
+
+  // Basic operations tests
+  
+  @Test
+  public void testGetAndSet_StoresAndRetrievesValues() {
+    AtomicDoubleArray array = new AtomicDoubleArray(SPECIAL_DOUBLE_VALUES.length);
+    
+    for (int i = 0; i < SPECIAL_DOUBLE_VALUES.length; i++) {
+      // Initial value should be 0.0
+      assertBitwiseEquals(0.0, array.get(i));
+      
+      // Set and verify special value
+      array.set(i, SPECIAL_DOUBLE_VALUES[i]);
+      assertBitwiseEquals(SPECIAL_DOUBLE_VALUES[i], array.get(i));
+      
+      // Set and verify another value
+      array.set(i, -3.0);
+      assertBitwiseEquals(-3.0, array.get(i));
+    }
+  }
+
+  @Test
+  public void testLazySet_StoresValues() {
+    AtomicDoubleArray array = new AtomicDoubleArray(SPECIAL_DOUBLE_VALUES.length);
+    
+    for (int i = 0; i < SPECIAL_DOUBLE_VALUES.length; i++) {
+      assertBitwiseEquals(0.0, array.get(i));
+      
+      array.lazySet(i, SPECIAL_DOUBLE_VALUES[i]);
+      assertBitwiseEquals(SPECIAL_DOUBLE_VALUES[i], array.get(i));
+      
+      array.lazySet(i, -3.0);
+      assertBitwiseEquals(-3.0, array.get(i));
+    }
+  }
+
+  @Test
+  public void testGetAndSet_ReturnsOldValueAndSetsNewValue() {
+    AtomicDoubleArray array = new AtomicDoubleArray(DEFAULT_ARRAY_SIZE);
+    int[] testIndices = {0, DEFAULT_ARRAY_SIZE - 1};
+    
+    for (int index : testIndices) {
+      double previousValue = 0.0;
+      for (double newValue : SPECIAL_DOUBLE_VALUES) {
+        double returnedValue = array.getAndSet(index, newValue);
+        assertBitwiseEquals(previousValue, returnedValue);
+        previousValue = newValue;
+      }
+    }
+  }
+
+  // Compare-and-set tests
+  
+  @Test
+  public void testCompareAndSet_UpdatesOnlyWhenExpectedValueMatches() {
+    AtomicDoubleArray array = new AtomicDoubleArray(DEFAULT_ARRAY_SIZE);
+    int[] testIndices = {0, DEFAULT_ARRAY_SIZE - 1};
+    
+    for (int index : testIndices) {
+      double currentValue = 0.0;
+      double wrongExpectedValue = Math.E + Math.PI;
+      
+      for (double newValue : SPECIAL_DOUBLE_VALUES) {
+        // Should fail with wrong expected value
+        assertFalse(array.compareAndSet(index, wrongExpectedValue, newValue));
+        assertBitwiseEquals(currentValue, array.get(index));
+        
+        // Should succeed with correct expected value
+        assertTrue(array.compareAndSet(index, currentValue, newValue));
+        assertBitwiseEquals(newValue, array.get(index));
+        
+        currentValue = newValue;
+      }
+    }
+  }
+
+  @Test
+  public void testWeakCompareAndSet_EventuallySucceedsWithCorrectExpectedValue() {
+    AtomicDoubleArray array = new AtomicDoubleArray(DEFAULT_ARRAY_SIZE);
+    int[] testIndices = {0, DEFAULT_ARRAY_SIZE - 1};
+    
+    for (int index : testIndices) {
+      double currentValue = 0.0;
+      double wrongExpectedValue = Math.E + Math.PI;
+      
+      for (double newValue : SPECIAL_DOUBLE_VALUES) {
+        // Should fail with wrong expected value
+        assertFalse(array.weakCompareAndSet(index, wrongExpectedValue, newValue));
+        assertBitwiseEquals(currentValue, array.get(index));
+        
+        // Should eventually succeed with correct expected value
+        while (!array.weakCompareAndSet(index, currentValue, newValue)) {
+          // Retry until successful
+        }
+        assertBitwiseEquals(newValue, array.get(index));
+        currentValue = newValue;
+      }
+    }
+  }
+
+  @Test
+  public void testCompareAndSet_DistinguishesPlusAndMinusZero() {
+    AtomicDoubleArray array = new AtomicDoubleArray(DEFAULT_ARRAY_SIZE);
+    int[] testIndices = {0, DEFAULT_ARRAY_SIZE - 1};
+    
+    for (int index : testIndices) {
+      // Array starts with +0.0
+      assertBitwiseEquals(+0.0, array.get(index));
+      
+      // Should fail when expecting -0.0 but actual is +0.0
+      assertFalse(array.compareAndSet(index, -0.0, 7.0));
+      assertFalse(array.weakCompareAndSet(index, -0.0, 7.0));
+      assertBitwiseEquals(+0.0, array.get(index));
+      
+      // Should succeed when expecting +0.0
+      assertTrue(array.compareAndSet(index, +0.0, -0.0));
+      assertBitwiseEquals(-0.0, array.get(index));
+      
+      // Should fail when expecting +0.0 but actual is -0.0
+      assertFalse(array.compareAndSet(index, +0.0, 7.0));
+      assertFalse(array.weakCompareAndSet(index, +0.0, 7.0));
+      assertBitwiseEquals(-0.0, array.get(index));
+    }
+  }
+
+  // Arithmetic operations tests
+  
+  @Test
+  public void testGetAndAdd_ReturnsOldValueAndAddsToElement() {
+    AtomicDoubleArray array = new AtomicDoubleArray(DEFAULT_ARRAY_SIZE);
+    int[] testIndices = {0, DEFAULT_ARRAY_SIZE - 1};
+    
+    for (int index : testIndices) {
+      for (double initialValue : SPECIAL_DOUBLE_VALUES) {
+        for (double delta : SPECIAL_DOUBLE_VALUES) {
+          array.set(index, initialValue);
+          
+          double returnedValue = array.getAndAdd(index, delta);
+          assertBitwiseEquals(initialValue, returnedValue);
+          assertBitwiseEquals(initialValue + delta, array.get(index));
+        }
+      }
+    }
+  }
+
+  @Test
+  public void testAddAndGet_AddsAndReturnsNewValue() {
+    AtomicDoubleArray array = new AtomicDoubleArray(DEFAULT_ARRAY_SIZE);
+    int[] testIndices = {0, DEFAULT_ARRAY_SIZE - 1};
+    
+    for (int index : testIndices) {
+      for (double initialValue : SPECIAL_DOUBLE_VALUES) {
+        for (double delta : SPECIAL_DOUBLE_VALUES) {
+          array.set(index, initialValue);
+          
+          double returnedValue = array.addAndGet(index, delta);
+          assertBitwiseEquals(initialValue + delta, returnedValue);
+          assertBitwiseEquals(initialValue + delta, array.get(index));
+        }
+      }
+    }
+  }
+
+  // Functional update tests
+  
+  @Test
+  public void testGetAndAccumulate_WithSum_ReturnsOldValueAndAppliesFunction() {
+    AtomicDoubleArray array = new AtomicDoubleArray(DEFAULT_ARRAY_SIZE);
+    int[] testIndices = {0, DEFAULT_ARRAY_SIZE - 1};
+    
+    for (int index : testIndices) {
+      for (double initialValue : SPECIAL_DOUBLE_VALUES) {
+        for (double argument : SPECIAL_DOUBLE_VALUES) {
+          array.set(index, initialValue);
+          
+          double returnedValue = array.getAndAccumulate(index, argument, Double::sum);
+          assertBitwiseEquals(initialValue, returnedValue);
+          assertBitwiseEquals(initialValue + argument, array.get(index));
+        }
+      }
+    }
+  }
+
+  @Test
+  public void testAccumulateAndGet_WithMax_AppliesFunctionAndReturnsNewValue() {
+    AtomicDoubleArray array = new AtomicDoubleArray(DEFAULT_ARRAY_SIZE);
+    int[] testIndices = {0, DEFAULT_ARRAY_SIZE - 1};
+    
+    for (int index : testIndices) {
+      for (double initialValue : SPECIAL_DOUBLE_VALUES) {
+        for (double argument : SPECIAL_DOUBLE_VALUES) {
+          array.set(index, initialValue);
+          
+          double expectedMax = max(initialValue, argument);
+          double returnedValue = array.accumulateAndGet(index, argument, Double::max);
+          assertBitwiseEquals(expectedMax, returnedValue);
+          assertBitwiseEquals(expectedMax, array.get(index));
+        }
+      }
+    }
+  }
+
+  @Test
+  public void testGetAndUpdate_AppliesUnaryOperator() {
+    AtomicDoubleArray array = new AtomicDoubleArray(DEFAULT_ARRAY_SIZE);
+    int[] testIndices = {0, DEFAULT_ARRAY_SIZE - 1};
+    
+    for (int index : testIndices) {
+      for (double initialValue : SPECIAL_DOUBLE_VALUES) {
+        for (double operand : SPECIAL_DOUBLE_VALUES) {
+          array.set(index, initialValue);
+          
+          // Test addition
+          double returnedValue = array.getAndUpdate(index, value -> value + operand);
+          assertBitwiseEquals(initialValue, returnedValue);
+          assertBitwiseEquals(initialValue + operand, array.get(index));
+          
+          // Reset and test subtraction
+          array.set(index, initialValue);
+          returnedValue = array.getAndUpdate(index, value -> value - operand);
+          assertBitwiseEquals(initialValue, returnedValue);
+          assertBitwiseEquals(initialValue - operand, array.get(index));
+        }
+      }
+    }
+  }
+
+  // Concurrency tests
+  
+  @Test
+  public void testCompareAndSet_EnablesConcurrentThreadCoordination() throws InterruptedException {
+    AtomicDoubleArray array = new AtomicDoubleArray(1);
+    array.set(0, 1.0);
+    
+    Thread updaterThread = newStartedThread(new CheckedRunnable() {
+      @Override
+      @SuppressWarnings("ThreadPriorityCheck")
+      public void realRun() {
+        // Wait until main thread updates value to 2.0, then update to 3.0
+        while (!array.compareAndSet(0, 2.0, 3.0)) {
+          Thread.yield();
+        }
+      }
+    });
+
+    // Update from 1.0 to 2.0, allowing updater thread to proceed
+    assertTrue(array.compareAndSet(0, 1.0, 2.0));
+    awaitTermination(updaterThread);
+    
+    // Verify updater thread successfully changed value to 3.0
+    assertBitwiseEquals(3.0, array.get(0));
+  }
+
+  @Test
+  public void testConcurrentCountdown_MultipleThreadsDecrementCorrectly() throws InterruptedException {
+    AtomicDoubleArray counters = new AtomicDoubleArray(DEFAULT_ARRAY_SIZE);
+    
+    // Initialize all counters
+    for (int i = 0; i < DEFAULT_ARRAY_SIZE; i++) {
+      counters.set(i, (double) CONCURRENT_UPDATE_COUNT);
+    }
+    
+    CountdownWorker worker1 = new CountdownWorker(counters);
+    CountdownWorker worker2 = new CountdownWorker(counters);
+    
+    Thread thread1 = newStartedThread(worker1);
+    Thread thread2 = newStartedThread(worker2);
+    
+    awaitTermination(thread1);
+    awaitTermination(thread2);
+    
+    // Verify total decrements equals initial total
+    assertEquals(DEFAULT_ARRAY_SIZE * CONCURRENT_UPDATE_COUNT, 
+                 worker1.getDecrementCount() + worker2.getDecrementCount());
+  }
+
+  // Serialization tests
+  
+  @Test
+  public void testSerialization_PreservesArrayContents() throws Exception {
+    // Test with regular values
+    AtomicDoubleArray original = new AtomicDoubleArray(DEFAULT_ARRAY_SIZE);
+    for (int i = 0; i < DEFAULT_ARRAY_SIZE; i++) {
+      original.set(i, (double) -i);
+    }
+    
+    AtomicDoubleArray deserialized = serialClone(original);
+    assertNotSame(original, deserialized);
+    assertEquals(original.length(), deserialized.length());
+    for (int i = 0; i < DEFAULT_ARRAY_SIZE; i++) {
+      assertBitwiseEquals(original.get(i), deserialized.get(i));
+    }
+    
+    // Test with special values
+    AtomicDoubleArray specialArray = new AtomicDoubleArray(SPECIAL_DOUBLE_VALUES);
+    AtomicDoubleArray deserializedSpecial = serialClone(specialArray);
+    
+    assertNotSame(specialArray, deserializedSpecial);
+    assertEquals(specialArray.length(), deserializedSpecial.length());
+    for (int i = 0; i < SPECIAL_DOUBLE_VALUES.length; i++) {
+      assertBitwiseEquals(specialArray.get(i), deserializedSpecial.get(i));
+    }
+  }
+
+  // Other tests
+  
+  @Test
+  public void testToString_ReturnsArrayRepresentation() {
+    AtomicDoubleArray array = new AtomicDoubleArray(SPECIAL_DOUBLE_VALUES);
+    assertEquals(Arrays.toString(SPECIAL_DOUBLE_VALUES), array.toString());
+    
+    assertEquals("[]", new AtomicDoubleArray(0).toString());
+    assertEquals("[]", new AtomicDoubleArray(new double[0]).toString());
   }
 
   @J2ktIncompatible
   @GwtIncompatible // NullPointerTester
-  public void testNulls() {
+  @Test
+  public void testNullPointerExceptions() {
     new NullPointerTester().testAllPublicStaticMethods(AtomicDoubleArray.class);
     new NullPointerTester().testAllPublicConstructors(AtomicDoubleArray.class);
     new NullPointerTester().testAllPublicInstanceMethods(new AtomicDoubleArray(1));
   }
 
-  /** constructor creates array of given size with all elements zero */
-  public void testConstructor() {
-    AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-    for (int i = 0; i < SIZE; i++) {
-      assertBitEquals(0.0, aa.get(i));
-    }
-  }
+  // Helper class for concurrent countdown test
+  private static class CountdownWorker extends CheckedRunnable {
+    private final AtomicDoubleArray counters;
+    private volatile long decrementCount;
 
-  /** constructor with null array throws NPE */
-  public void testConstructor2NPE() {
-    double[] a = null;
-    assertThrows(NullPointerException.class, () -> new AtomicDoubleArray(a));
-  }
-
-  /** constructor with array is of same size and has all elements */
-  public void testConstructor2() {
-    AtomicDoubleArray aa = new AtomicDoubleArray(VALUES);
-    assertEquals(VALUES.length, aa.length());
-    for (int i = 0; i < VALUES.length; i++) {
-      assertBitEquals(VALUES[i], aa.get(i));
-    }
-  }
-
-  /** constructor with empty array has size 0 and contains no elements */
-  public void testConstructorEmptyArray() {
-    AtomicDoubleArray aa = new AtomicDoubleArray(new double[0]);
-    assertEquals(0, aa.length());
-    assertThrows(IndexOutOfBoundsException.class, () -> aa.get(0));
-  }
-
-  /** constructor with length zero has size 0 and contains no elements */
-  public void testConstructorZeroLength() {
-    AtomicDoubleArray aa = new AtomicDoubleArray(0);
-    assertEquals(0, aa.length());
-    assertThrows(IndexOutOfBoundsException.class, () -> aa.get(0));
-  }
-
-  /** get and set for out of bound indices throw IndexOutOfBoundsException */
-  public void testIndexing() {
-    AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-    for (int index : new int[] {-1, SIZE}) {
-      assertThrows(IndexOutOfBoundsException.class, () -> aa.get(index));
-      assertThrows(IndexOutOfBoundsException.class, () -> aa.set(index, 1.0));
-      assertThrows(IndexOutOfBoundsException.class, () -> aa.lazySet(index, 1.0));
-      assertThrows(IndexOutOfBoundsException.class, () -> aa.compareAndSet(index, 1.0, 2.0));
-      assertThrows(IndexOutOfBoundsException.class, () -> aa.weakCompareAndSet(index, 1.0, 2.0));
-      assertThrows(IndexOutOfBoundsException.class, () -> aa.getAndAdd(index, 1.0));
-      assertThrows(IndexOutOfBoundsException.class, () -> aa.addAndGet(index, 1.0));
-    }
-  }
-
-  /** get returns the last value set at index */
-  public void testGetSet() {
-    AtomicDoubleArray aa = new AtomicDoubleArray(VALUES.length);
-    for (int i = 0; i < VALUES.length; i++) {
-      assertBitEquals(0.0, aa.get(i));
-      aa.set(i, VALUES[i]);
-      assertBitEquals(VALUES[i], aa.get(i));
-      aa.set(i, -3.0);
-      assertBitEquals(-3.0, aa.get(i));
-    }
-  }
-
-  /** get returns the last value lazySet at index by same thread */
-  public void testGetLazySet() {
-    AtomicDoubleArray aa = new AtomicDoubleArray(VALUES.length);
-    for (int i = 0; i < VALUES.length; i++) {
-      assertBitEquals(0.0, aa.get(i));
-      aa.lazySet(i, VALUES[i]);
-      assertBitEquals(VALUES[i], aa.get(i));
-      aa.lazySet(i, -3.0);
-      assertBitEquals(-3.0, aa.get(i));
-    }
-  }
-
-  /** compareAndSet succeeds in changing value if equal to expected else fails */
-  public void testCompareAndSet() {
-    AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-    for (int i : new int[] {0, SIZE - 1}) {
-      double prev = 0.0;
-      double unused = Math.E + Math.PI;
-      for (double x : VALUES) {
-        assertBitEquals(prev, aa.get(i));
-        assertFalse(aa.compareAndSet(i, unused, x));
-        assertBitEquals(prev, aa.get(i));
-        assertTrue(aa.compareAndSet(i, prev, x));
-        assertBitEquals(x, aa.get(i));
-        prev = x;
-      }
-    }
-  }
-
-  /** compareAndSet in one thread enables another waiting for value to succeed */
-  public void testCompareAndSetInMultipleThreads() throws InterruptedException {
-    AtomicDoubleArray a = new AtomicDoubleArray(1);
-    a.set(0, 1.0);
-    Thread t =
-        newStartedThread(
-            new CheckedRunnable() {
-              @Override
-              @SuppressWarnings("ThreadPriorityCheck") // doing our best to test for races
-              public void realRun() {
-                while (!a.compareAndSet(0, 2.0, 3.0)) {
-                  Thread.yield();
-                }
-              }
-            });
-
-    assertTrue(a.compareAndSet(0, 1.0, 2.0));
-    awaitTermination(t);
-    assertBitEquals(3.0, a.get(0));
-  }
-
-  /** repeated weakCompareAndSet succeeds in changing value when equal to expected */
-  public void testWeakCompareAndSet() {
-    AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-    for (int i : new int[] {0, SIZE - 1}) {
-      double prev = 0.0;
-      double unused = Math.E + Math.PI;
-      for (double x : VALUES) {
-        assertBitEquals(prev, aa.get(i));
-        assertFalse(aa.weakCompareAndSet(i, unused, x));
-        assertBitEquals(prev, aa.get(i));
-        while (!aa.weakCompareAndSet(i, prev, x)) {
-          ;
-        }
-        assertBitEquals(x, aa.get(i));
-        prev = x;
-      }
-    }
-  }
-
-  /** getAndSet returns previous value and sets to given value at given index */
-  public void testGetAndSet() {
-    AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-    for (int i : new int[] {0, SIZE - 1}) {
-      double prev = 0.0;
-      for (double x : VALUES) {
-        assertBitEquals(prev, aa.getAndSet(i, x));
-        prev = x;
-      }
-    }
-  }
-
-  /** getAndAdd returns previous value and adds given value */
-  public void testGetAndAdd() {
-    AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-    for (int i : new int[] {0, SIZE - 1}) {
-      for (double x : VALUES) {
-        for (double y : VALUES) {
-          aa.set(i, x);
-          double z = aa.getAndAdd(i, y);
-          assertBitEquals(x, z);
-          assertBitEquals(x + y, aa.get(i));
-        }
-      }
-    }
-  }
-
-  /** addAndGet adds given value to current, and returns current value */
-  public void testAddAndGet() {
-    AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-    for (int i : new int[] {0, SIZE - 1}) {
-      for (double x : VALUES) {
-        for (double y : VALUES) {
-          aa.set(i, x);
-          double z = aa.addAndGet(i, y);
-          assertBitEquals(x + y, z);
-          assertBitEquals(x + y, aa.get(i));
-        }
-      }
-    }
-  }
-
-  /** getAndAccumulate with sum adds given value to current, and returns previous value */
-  public void testGetAndAccumulateWithSum() {
-    AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-    for (int i : new int[] {0, SIZE - 1}) {
-      for (double x : VALUES) {
-        for (double y : VALUES) {
-          aa.set(i, x);
-          double z = aa.getAndAccumulate(i, y, Double::sum);
-          assertBitEquals(x, z);
-          assertBitEquals(x + y, aa.get(i));
-        }
-      }
-    }
-  }
-
-  /** getAndAccumulate with max stores max of given value to current, and returns previous value */
-  public void testGetAndAccumulateWithMax() {
-    AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-    for (int i : new int[] {0, SIZE - 1}) {
-      for (double x : VALUES) {
-        for (double y : VALUES) {
-          aa.set(i, x);
-          double z = aa.getAndAccumulate(i, y, Double::max);
-          double expectedMax = max(x, y);
-          assertBitEquals(x, z);
-          assertBitEquals(expectedMax, aa.get(i));
-        }
-      }
-    }
-  }
-
-  /** accumulateAndGet with sum adds given value to current, and returns current value */
-  public void testAccumulateAndGetWithSum() {
-    AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-    for (int i : new int[] {0, SIZE - 1}) {
-      for (double x : VALUES) {
-        for (double y : VALUES) {
-          aa.set(i, x);
-          double z = aa.accumulateAndGet(i, y, Double::sum);
-          assertBitEquals(x + y, z);
-          assertBitEquals(x + y, aa.get(i));
-        }
-      }
-    }
-  }
-
-  /** accumulateAndGet with max stores max of given value to current, and returns current value */
-  public void testAccumulateAndGetWithMax() {
-    AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-    for (int i : new int[] {0, SIZE - 1}) {
-      for (double x : VALUES) {
-        for (double y : VALUES) {
-          aa.set(i, x);
-          double z = aa.accumulateAndGet(i, y, Double::max);
-          double expectedMax = max(x, y);
-          assertBitEquals(expectedMax, z);
-          assertBitEquals(expectedMax, aa.get(i));
-        }
-      }
-    }
-  }
-
-  /** getAndUpdate adds given value to current, and returns previous value */
-  public void testGetAndUpdateWithSum() {
-    AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-    for (int i : new int[] {0, SIZE - 1}) {
-      for (double x : VALUES) {
-        for (double y : VALUES) {
-          aa.set(i, x);
-          double z = aa.getAndUpdate(i, value -> value + y);
-          assertBitEquals(x, z);
-          assertBitEquals(x + y, aa.get(i));
-        }
-      }
-    }
-  }
-
-  /** getAndUpdate subtracts given value to current, and returns previous value */
-  public void testGetAndUpdateWithSubtract() {
-    AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-    for (int i : new int[] {0, SIZE - 1}) {
-      for (double x : VALUES) {
-        for (double y : VALUES) {
-          aa.set(i, x);
-          double z = aa.getAndUpdate(i, value -> value - y);
-          assertBitEquals(x, z);
-          assertBitEquals(x - y, aa.get(i));
-        }
-      }
-    }
-  }
-
-  /** updateAndGet adds given value to current, and returns current value */
-  public void testUpdateAndGetWithSum() {
-    AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-    for (int i : new int[] {0, SIZE - 1}) {
-      for (double x : VALUES) {
-        for (double y : VALUES) {
-          aa.set(i, x);
-          double z = aa.updateAndGet(i, value -> value + y);
-          assertBitEquals(x + y, z);
-          assertBitEquals(x + y, aa.get(i));
-        }
-      }
-    }
-  }
-
-  /** updateAndGet subtracts given value to current, and returns current value */
-  public void testUpdateAndGetWithSubtract() {
-    AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-    for (int i : new int[] {0, SIZE - 1}) {
-      for (double x : VALUES) {
-        for (double y : VALUES) {
-          aa.set(i, x);
-          double z = aa.updateAndGet(i, value -> value - y);
-          assertBitEquals(x - y, z);
-          assertBitEquals(x - y, aa.get(i));
-        }
-      }
-    }
-  }
-
-  static final long COUNTDOWN = 100000;
-
-  class Counter extends CheckedRunnable {
-    final AtomicDoubleArray aa;
-    volatile long counts;
-
-    Counter(AtomicDoubleArray a) {
-      aa = a;
+    CountdownWorker(AtomicDoubleArray counters) {
+      this.counters = counters;
     }
 
     @Override
     public void realRun() {
-      for (; ; ) {
-        boolean done = true;
-        for (int i = 0; i < aa.length(); i++) {
-          double v = aa.get(i);
-          assertTrue(v >= 0);
-          if (v != 0) {
-            done = false;
-            if (aa.compareAndSet(i, v, v - 1.0)) {
-              ++counts;
+      while (true) {
+        boolean allZero = true;
+        
+        for (int i = 0; i < counters.length(); i++) {
+          double currentValue = counters.get(i);
+          assertTrue("Counter should not be negative", currentValue >= 0);
+          
+          if (currentValue != 0) {
+            allZero = false;
+            // Try to decrement by 1
+            if (counters.compareAndSet(i, currentValue, currentValue - 1.0)) {
+              decrementCount++;
             }
           }
         }
-        if (done) {
-          break;
+        
+        if (allZero) {
+          break; // All counters reached zero
         }
       }
     }
-  }
-
-  /**
-   * Multiple threads using same array of counters successfully update a number of times equal to
-   * total count
-   */
-  public void testCountingInMultipleThreads() throws InterruptedException {
-    AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-    for (int i = 0; i < SIZE; i++) {
-      aa.set(i, (double) COUNTDOWN);
-    }
-    Counter c1 = new Counter(aa);
-    Counter c2 = new Counter(aa);
-    Thread t1 = newStartedThread(c1);
-    Thread t2 = newStartedThread(c2);
-    awaitTermination(t1);
-    awaitTermination(t2);
-    assertEquals(SIZE * COUNTDOWN, c1.counts + c2.counts);
-  }
-
-  /** a deserialized serialized array holds same values */
-  public void testSerialization() throws Exception {
-    AtomicDoubleArray x = new AtomicDoubleArray(SIZE);
-    for (int i = 0; i < SIZE; i++) {
-      x.set(i, (double) -i);
-    }
-    AtomicDoubleArray y = serialClone(x);
-    assertTrue(x != y);
-    assertEquals(x.length(), y.length());
-    for (int i = 0; i < SIZE; i++) {
-      assertBitEquals(x.get(i), y.get(i));
-    }
-
-    AtomicDoubleArray a = new AtomicDoubleArray(VALUES);
-    AtomicDoubleArray b = serialClone(a);
-    assertFalse(a.equals(b));
-    assertFalse(b.equals(a));
-    assertEquals(a.length(), b.length());
-    for (int i = 0; i < VALUES.length; i++) {
-      assertBitEquals(a.get(i), b.get(i));
-    }
-  }
-
-  /** toString returns current value */
-  public void testToString() {
-    AtomicDoubleArray aa = new AtomicDoubleArray(VALUES);
-    assertEquals(Arrays.toString(VALUES), aa.toString());
-    assertEquals("[]", new AtomicDoubleArray(0).toString());
-    assertEquals("[]", new AtomicDoubleArray(new double[0]).toString());
-  }
-
-  /** compareAndSet treats +0.0 and -0.0 as distinct values */
-  public void testDistinctZeros() {
-    AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-    for (int i : new int[] {0, SIZE - 1}) {
-      assertFalse(aa.compareAndSet(i, -0.0, 7.0));
-      assertFalse(aa.weakCompareAndSet(i, -0.0, 7.0));
-      assertBitEquals(+0.0, aa.get(i));
-      assertTrue(aa.compareAndSet(i, +0.0, -0.0));
-      assertBitEquals(-0.0, aa.get(i));
-      assertFalse(aa.compareAndSet(i, +0.0, 7.0));
-      assertFalse(aa.weakCompareAndSet(i, +0.0, 7.0));
-      assertBitEquals(-0.0, aa.get(i));
+    
+    long getDecrementCount() {
+      return decrementCount;
     }
   }
 }
