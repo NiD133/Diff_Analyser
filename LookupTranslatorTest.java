@@ -31,23 +31,46 @@ import org.junit.jupiter.api.Test;
 @Deprecated
 class LookupTranslatorTest extends AbstractLangTest {
 
+    /**
+     * Tests basic translation functionality with String inputs.
+     */
     @Test
-    void testBasicLookup() throws IOException {
-        final LookupTranslator lt = new LookupTranslator(new CharSequence[][] { { "one", "two" } });
-        final StringWriter out = new StringWriter();
-        final int result = lt.translate("one", 0, out);
-        assertEquals(3, result, "Incorrect code point consumption");
-        assertEquals("two", out.toString(), "Incorrect value");
+    void translate_StringInput_TranslatesCorrectly() throws IOException {
+        // Arrange: Prepare translator with mapping and output buffer
+        final LookupTranslator translator = new LookupTranslator(
+            new CharSequence[][]{{"one", "two"}}
+        );
+        final StringWriter outputWriter = new StringWriter();
+
+        // Act: Perform translation
+        final int consumedCodePoints = translator.translate("one", 0, outputWriter);
+
+        // Assert: Verify consumed characters and output
+        assertEquals(3, consumedCodePoints, "Should consume entire input length");
+        assertEquals("two", outputWriter.toString(), "Should produce correct translation");
     }
 
-    // Tests: https://issues.apache.org/jira/browse/LANG-882
+    /**
+     * Tests translation with StringBuffer inputs, verifying fix for LANG-882.
+     * @see <a href="https://issues.apache.org/jira/browse/LANG-882">LANG-882</a>
+     */
     @Test
-    void testLang882() throws IOException {
-        final LookupTranslator lt = new LookupTranslator(new CharSequence[][] { { new StringBuffer("one"), new StringBuffer("two") } });
-        final StringWriter out = new StringWriter();
-        final int result = lt.translate(new StringBuffer("one"), 0, out);
-        assertEquals(3, result, "Incorrect code point consumption");
-        assertEquals("two", out.toString(), "Incorrect value");
+    void translate_StringBufferInput_HandlesDifferentCharSequenceTypes() throws IOException {
+        // Arrange: Prepare translator with StringBuffer-based mapping
+        final CharSequence[][] lookupTable = {
+            {new StringBuffer("one"), new StringBuffer("two")}
+        };
+        final LookupTranslator translator = new LookupTranslator(lookupTable);
+        final StringWriter outputWriter = new StringWriter();
+
+        // Act: Perform translation with StringBuffer input
+        final int consumedCodePoints = translator.translate(
+            new StringBuffer("one"), 0, outputWriter
+        );
+
+        // Assert: Verify consumed characters and output
+        assertEquals(3, consumedCodePoints, "Should consume entire input length");
+        assertEquals("two", outputWriter.toString(), "Should produce correct translation");
     }
 
 }
