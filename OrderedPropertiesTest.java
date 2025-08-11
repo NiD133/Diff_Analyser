@@ -22,11 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -38,344 +36,267 @@ import org.junit.jupiter.api.Test;
  */
 class OrderedPropertiesTest {
 
-    private static final int NUMERIC_FIRST = 1;
-    private static final int NUMERIC_LAST = 11;
-
-    private void assertOrder(OrderedProperties properties, List<String> expectedKeys, List<String> expectedValues) {
-        // Verify keys() enumeration
-        Enumeration<Object> keysEnum = properties.keys();
-        for (String key : expectedKeys) {
-            assertEquals(key, keysEnum.nextElement());
+    private void assertAscendingOrder(final OrderedProperties orderedProperties) {
+        final int first = 1;
+        final int last = 11;
+        final Enumeration<Object> enumObjects = orderedProperties.keys();
+        for (int i = first; i <= last; i++) {
+            assertEquals("key" + i, enumObjects.nextElement());
         }
-        assertFalse(keysEnum.hasMoreElements());
-
-        // Verify keySet() iterator
-        Iterator<Object> keySetIterator = properties.keySet().iterator();
-        for (String key : expectedKeys) {
-            assertEquals(key, keySetIterator.next());
+        final Iterator<Object> iterSet = orderedProperties.keySet().iterator();
+        for (int i = first; i <= last; i++) {
+            assertEquals("key" + i, iterSet.next());
         }
-        assertFalse(keySetIterator.hasNext());
-
-        // Verify entrySet() iterator
-        Iterator<Entry<Object, Object>> entrySetIterator = properties.entrySet().iterator();
-        for (int i = 0; i < expectedKeys.size(); i++) {
-            Entry<Object, Object> entry = entrySetIterator.next();
-            assertEquals(expectedKeys.get(i), entry.getKey());
-            assertEquals(expectedValues.get(i), entry.getValue());
+        final Iterator<Entry<Object, Object>> iterEntrySet = orderedProperties.entrySet().iterator();
+        for (int i = first; i <= last; i++) {
+            final Entry<Object, Object> next = iterEntrySet.next();
+            assertEquals("key" + i, next.getKey());
+            assertEquals("value" + i, next.getValue());
         }
-        assertFalse(entrySetIterator.hasNext());
-
-        // Verify propertyNames() enumeration
-        Enumeration<?> propertyNamesEnum = properties.propertyNames();
-        for (String key : expectedKeys) {
-            assertEquals(key, propertyNamesEnum.nextElement());
+        final Enumeration<?> propertyNames = orderedProperties.propertyNames();
+        for (int i = first; i <= last; i++) {
+            assertEquals("key" + i, propertyNames.nextElement());
         }
-        assertFalse(propertyNamesEnum.hasMoreElements());
     }
 
-    private List<String> generateNumericKeys(int start, int end, int step) {
-        List<String> keys = new ArrayList<>();
-        for (int i = start; step > 0 ? i <= end : i >= end; i += step) {
-            keys.add("key" + i);
+    private OrderedProperties assertDescendingOrder(final OrderedProperties orderedProperties) {
+        final int first = 11;
+        final int last = 1;
+        final Enumeration<Object> enumObjects = orderedProperties.keys();
+        for (int i = first; i <= last; i--) {
+            assertEquals("key" + i, enumObjects.nextElement());
         }
-        return keys;
+        final Iterator<Object> iterSet = orderedProperties.keySet().iterator();
+        for (int i = first; i <= last; i--) {
+            assertEquals("key" + i, iterSet.next());
+        }
+        final Iterator<Entry<Object, Object>> iterEntrySet = orderedProperties.entrySet().iterator();
+        for (int i = first; i <= last; i--) {
+            final Entry<Object, Object> next = iterEntrySet.next();
+            assertEquals("key" + i, next.getKey());
+            assertEquals("value" + i, next.getValue());
+        }
+        final Enumeration<?> propertyNames = orderedProperties.propertyNames();
+        for (int i = first; i <= last; i--) {
+            assertEquals("key" + i, propertyNames.nextElement());
+        }
+        return orderedProperties;
     }
 
-    private List<String> generateNumericValues(int start, int end, int step) {
-        List<String> values = new ArrayList<>();
-        for (int i = start; step > 0 ? i <= end : i >= end; i += step) {
-            values.add("value" + i);
+    private OrderedProperties loadOrderedKeysReverse() throws FileNotFoundException, IOException {
+        final OrderedProperties orderedProperties = new OrderedProperties();
+        try (FileReader reader = new FileReader("src/test/resources/org/apache/commons/collections4/properties/test-reverse.properties")) {
+            orderedProperties.load(reader);
         }
-        return values;
-    }
-
-    private List<String> generateCharacterKeysDescending() {
-        List<String> keys = new ArrayList<>();
-        for (char ch = 'Z'; ch >= 'A'; ch--) {
-            keys.add(String.valueOf(ch));
-        }
-        return keys;
-    }
-
-    private List<String> generateCharacterValuesDescending() {
-        List<String> values = new ArrayList<>();
-        for (char ch = 'Z'; ch >= 'A'; ch--) {
-            values.add("Value" + ch);
-        }
-        return values;
-    }
-
-    private void assertKeyAbsent(OrderedProperties props, String key) {
-        assertFalse(props.contains(key));
-        assertFalse(props.containsKey(key));
-        assertFalse(Collections.list(props.keys()).contains(key));
-        assertFalse(Collections.list(props.propertyNames()).contains(key));
-    }
-
-    private OrderedProperties loadPropertiesFromFile(String filename) throws IOException {
-        OrderedProperties properties = new OrderedProperties();
-        try (FileReader reader = new FileReader(filename)) {
-            properties.load(reader);
-        }
-        return properties;
+        return assertDescendingOrder(orderedProperties);
     }
 
     @Test
     void testCompute() {
-        OrderedProperties props = new OrderedProperties();
-        
-        // Ascending insertion
-        for (int i = NUMERIC_FIRST; i <= NUMERIC_LAST; i++) {
-            props.compute("key" + i, (k, v) -> "value" + i);
+        final OrderedProperties orderedProperties = new OrderedProperties();
+        int first = 1;
+        int last = 11;
+        for (int i = first; i <= last; i++) {
+            final AtomicInteger aInt = new AtomicInteger(i);
+            orderedProperties.compute("key" + i, (k, v) -> "value" + aInt.get());
         }
-        assertOrder(props, 
-            generateNumericKeys(NUMERIC_FIRST, NUMERIC_LAST, 1),
-            generateNumericValues(NUMERIC_FIRST, NUMERIC_LAST, 1)
-        );
-
-        props.clear();
-        
-        // Descending insertion
-        for (int i = NUMERIC_LAST; i >= NUMERIC_FIRST; i--) {
-            props.compute("key" + i, (k, v) -> "value" + i);
+        assertAscendingOrder(orderedProperties);
+        orderedProperties.clear();
+        first = 11;
+        last = 1;
+        for (int i = first; i >= last; i--) {
+            final AtomicInteger aInt = new AtomicInteger(i);
+            orderedProperties.compute("key" + i, (k, v) -> "value" + aInt.get());
         }
-        assertOrder(props,
-            generateNumericKeys(NUMERIC_LAST, NUMERIC_FIRST, -1),
-            generateNumericValues(NUMERIC_LAST, NUMERIC_FIRST, -1)
-        );
+        assertDescendingOrder(orderedProperties);
     }
 
     @Test
     void testComputeIfAbsent() {
-        OrderedProperties props = new OrderedProperties();
-        
-        // Ascending insertion
-        for (int i = NUMERIC_FIRST; i <= NUMERIC_LAST; i++) {
-            props.computeIfAbsent("key" + i, k -> "value" + i);
+        final OrderedProperties orderedProperties = new OrderedProperties();
+        int first = 1;
+        int last = 11;
+        for (int i = first; i <= last; i++) {
+            final AtomicInteger aInt = new AtomicInteger(i);
+            orderedProperties.computeIfAbsent("key" + i, k -> "value" + aInt.get());
         }
-        assertOrder(props,
-            generateNumericKeys(NUMERIC_FIRST, NUMERIC_LAST, 1),
-            generateNumericValues(NUMERIC_FIRST, NUMERIC_LAST, 1)
-        );
-
-        props.clear();
-        
-        // Descending insertion
-        for (int i = NUMERIC_LAST; i >= NUMERIC_FIRST; i--) {
-            props.computeIfAbsent("key" + i, k -> "value" + i);
+        assertAscendingOrder(orderedProperties);
+        orderedProperties.clear();
+        first = 11;
+        last = 1;
+        for (int i = first; i >= last; i--) {
+            final AtomicInteger aInt = new AtomicInteger(i);
+            orderedProperties.computeIfAbsent("key" + i, k -> "value" + aInt.get());
         }
-        assertOrder(props,
-            generateNumericKeys(NUMERIC_LAST, NUMERIC_FIRST, -1),
-            generateNumericValues(NUMERIC_LAST, NUMERIC_FIRST, -1)
-        );
+        assertDescendingOrder(orderedProperties);
     }
 
     @Test
     void testEntrySet() {
-        OrderedProperties props = new OrderedProperties();
-        List<String> expectedKeys = generateCharacterKeysDescending();
-        List<String> expectedValues = generateCharacterValuesDescending();
-        
-        // Insert in descending order
-        for (char ch = 'Z'; ch >= 'A'; ch--) {
-            props.put(String.valueOf(ch), "Value" + ch);
+        final OrderedProperties orderedProperties = new OrderedProperties();
+        final char first = 'Z';
+        final char last = 'A';
+        for (char ch = first; ch >= last; ch--) {
+            orderedProperties.put(String.valueOf(ch), "Value" + ch);
         }
-
-        // Verify entrySet order
-        Iterator<Entry<Object, Object>> entries = props.entrySet().iterator();
-        for (int i = 0; i < expectedKeys.size(); i++) {
-            Entry<Object, Object> entry = entries.next();
-            assertEquals(expectedKeys.get(i), entry.getKey());
-            assertEquals(expectedValues.get(i), entry.getValue());
+        final Iterator<Map.Entry<Object, Object>> entries = orderedProperties.entrySet().iterator();
+        for (char ch = first; ch <= last; ch++) {
+            final Map.Entry<Object, Object> entry = entries.next();
+            assertEquals(String.valueOf(ch), entry.getKey());
+            assertEquals("Value" + ch, entry.getValue());
         }
     }
 
     @Test
     void testForEach() {
-        OrderedProperties props = new OrderedProperties();
-        List<String> expectedKeys = generateCharacterKeysDescending();
-        List<String> expectedValues = generateCharacterValuesDescending();
-        
-        // Insert in descending order
-        for (char ch = 'Z'; ch >= 'A'; ch--) {
-            props.put(String.valueOf(ch), "Value" + ch);
+        final OrderedProperties orderedProperties = new OrderedProperties();
+        final char first = 'Z';
+        final char last = 'A';
+        for (char ch = first; ch >= last; ch--) {
+            orderedProperties.put(String.valueOf(ch), "Value" + ch);
         }
-
-        // Verify forEach order
-        AtomicInteger index = new AtomicInteger(0);
-        props.forEach((k, v) -> {
-            int i = index.getAndIncrement();
-            assertEquals(expectedKeys.get(i), k);
-            assertEquals(expectedValues.get(i), v);
+        final AtomicInteger aCh = new AtomicInteger(first);
+        orderedProperties.forEach((k, v) -> {
+            final char ch = (char) aCh.getAndDecrement();
+            assertEquals(String.valueOf(ch), k);
+            assertEquals("Value" + ch, v);
         });
     }
 
     @Test
     void testKeys() {
-        OrderedProperties props = new OrderedProperties();
-        List<String> expectedKeys = generateCharacterKeysDescending();
-        
-        // Insert in descending order
-        for (char ch = 'Z'; ch >= 'A'; ch--) {
-            props.put(String.valueOf(ch), "Value" + ch);
+        final OrderedProperties orderedProperties = new OrderedProperties();
+        final char first = 'Z';
+        final char last = 'A';
+        for (char ch = first; ch >= last; ch--) {
+            orderedProperties.put(String.valueOf(ch), "Value" + ch);
         }
-
-        // Verify keys enumeration
-        Enumeration<Object> keys = props.keys();
-        for (String expectedKey : expectedKeys) {
-            assertEquals(expectedKey, keys.nextElement());
+        final Enumeration<Object> keys = orderedProperties.keys();
+        for (char ch = first; ch <= last; ch++) {
+            assertEquals(String.valueOf(ch), keys.nextElement());
         }
     }
 
     @Test
     void testLoadOrderedKeys() throws IOException {
-        OrderedProperties props = loadPropertiesFromFile(
-            "src/test/resources/org/apache/commons/collections4/properties/test.properties"
-        );
-        assertOrder(props,
-            generateNumericKeys(NUMERIC_FIRST, NUMERIC_LAST, 1),
-            generateNumericValues(NUMERIC_FIRST, NUMERIC_LAST, 1)
-        );
+        final OrderedProperties orderedProperties = new OrderedProperties();
+        try (FileReader reader = new FileReader("src/test/resources/org/apache/commons/collections4/properties/test.properties")) {
+            orderedProperties.load(reader);
+        }
+        assertAscendingOrder(orderedProperties);
     }
 
     @Test
     void testLoadOrderedKeysReverse() throws IOException {
-        OrderedProperties props = loadPropertiesFromFile(
-            "src/test/resources/org/apache/commons/collections4/properties/test-reverse.properties"
-        );
-        assertOrder(props,
-            generateNumericKeys(NUMERIC_LAST, NUMERIC_FIRST, -1),
-            generateNumericValues(NUMERIC_LAST, NUMERIC_FIRST, -1)
-        );
+        loadOrderedKeysReverse();
     }
 
     @Test
     void testMerge() {
-        OrderedProperties props = new OrderedProperties();
-        
-        // Ascending insertion
-        for (int i = NUMERIC_FIRST; i <= NUMERIC_LAST; i++) {
-            props.merge("key" + i, "value" + i, (k, v) -> v);
+        final OrderedProperties orderedProperties = new OrderedProperties();
+        int first = 1;
+        int last = 11;
+        for (int i = first; i <= last; i++) {
+            orderedProperties.merge("key" + i, "value" + i, (k, v) -> v);
         }
-        assertOrder(props,
-            generateNumericKeys(NUMERIC_FIRST, NUMERIC_LAST, 1),
-            generateNumericValues(NUMERIC_FIRST, NUMERIC_LAST, 1)
-        );
-
-        props.clear();
-        
-        // Descending insertion
-        for (int i = NUMERIC_LAST; i >= NUMERIC_FIRST; i--) {
-            props.merge("key" + i, "value" + i, (k, v) -> v);
+        assertAscendingOrder(orderedProperties);
+        orderedProperties.clear();
+        first = 11;
+        last = 1;
+        for (int i = first; i >= last; i--) {
+            orderedProperties.merge("key" + i, "value" + i, (k, v) -> v);
         }
-        assertOrder(props,
-            generateNumericKeys(NUMERIC_LAST, NUMERIC_FIRST, -1),
-            generateNumericValues(NUMERIC_LAST, NUMERIC_FIRST, -1)
-        );
+        assertDescendingOrder(orderedProperties);
     }
 
     @Test
     void testPut() {
-        OrderedProperties props = new OrderedProperties();
-        
-        // Ascending insertion
-        for (int i = NUMERIC_FIRST; i <= NUMERIC_LAST; i++) {
-            props.put("key" + i, "value" + i);
+        final OrderedProperties orderedProperties = new OrderedProperties();
+        int first = 1;
+        int last = 11;
+        for (int i = first; i <= last; i++) {
+            orderedProperties.put("key" + i, "value" + i);
         }
-        assertOrder(props,
-            generateNumericKeys(NUMERIC_FIRST, NUMERIC_LAST, 1),
-            generateNumericValues(NUMERIC_FIRST, NUMERIC_LAST, 1)
-        );
-
-        props.clear();
-        
-        // Descending insertion
-        for (int i = NUMERIC_LAST; i >= NUMERIC_FIRST; i--) {
-            props.put("key" + i, "value" + i);
+        assertAscendingOrder(orderedProperties);
+        orderedProperties.clear();
+        first = 11;
+        last = 1;
+        for (int i = first; i >= last; i--) {
+            orderedProperties.put("key" + i, "value" + i);
         }
-        assertOrder(props,
-            generateNumericKeys(NUMERIC_LAST, NUMERIC_FIRST, -1),
-            generateNumericValues(NUMERIC_LAST, NUMERIC_FIRST, -1)
-        );
+        assertDescendingOrder(orderedProperties);
     }
 
     @Test
     void testPutAll() {
-        // Create source properties in ascending order
-        OrderedProperties source = new OrderedProperties();
-        for (int i = NUMERIC_FIRST; i <= NUMERIC_LAST; i++) {
-            source.put("key" + i, "value" + i);
+        final OrderedProperties sourceProperties = new OrderedProperties();
+        int first = 1;
+        int last = 11;
+        for (int i = first; i <= last; i++) {
+            sourceProperties.put("key" + i, "value" + i);
         }
-
-        // Verify putAll maintains order
-        OrderedProperties target = new OrderedProperties();
-        target.putAll(source);
-        assertOrder(target,
-            generateNumericKeys(NUMERIC_FIRST, NUMERIC_LAST, 1),
-            generateNumericValues(NUMERIC_FIRST, NUMERIC_LAST, 1)
-        );
+        final OrderedProperties orderedProperties = new OrderedProperties();
+        orderedProperties.putAll(sourceProperties);
+        assertAscendingOrder(orderedProperties);
+        orderedProperties.clear();
+        first = 11;
+        last = 1;
+        for (int i = first; i >= last; i--) {
+            orderedProperties.put("key" + i, "value" + i);
+        }
+        assertDescendingOrder(orderedProperties);
     }
 
     @Test
     void testPutIfAbsent() {
-        OrderedProperties props = new OrderedProperties();
-        
-        // Ascending insertion
-        for (int i = NUMERIC_FIRST; i <= NUMERIC_LAST; i++) {
-            props.putIfAbsent("key" + i, "value" + i);
+        final OrderedProperties orderedProperties = new OrderedProperties();
+        int first = 1;
+        int last = 11;
+        for (int i = first; i <= last; i++) {
+            orderedProperties.putIfAbsent("key" + i, "value" + i);
         }
-        assertOrder(props,
-            generateNumericKeys(NUMERIC_FIRST, NUMERIC_LAST, 1),
-            generateNumericValues(NUMERIC_FIRST, NUMERIC_LAST, 1)
-        );
-
-        props.clear();
-        
-        // Descending insertion
-        for (int i = NUMERIC_LAST; i >= NUMERIC_FIRST; i--) {
-            props.putIfAbsent("key" + i, "value" + i);
+        assertAscendingOrder(orderedProperties);
+        orderedProperties.clear();
+        first = 11;
+        last = 1;
+        for (int i = first; i >= last; i--) {
+            orderedProperties.putIfAbsent("key" + i, "value" + i);
         }
-        assertOrder(props,
-            generateNumericKeys(NUMERIC_LAST, NUMERIC_FIRST, -1),
-            generateNumericValues(NUMERIC_LAST, NUMERIC_FIRST, -1)
-        );
+        assertDescendingOrder(orderedProperties);
     }
 
     @Test
-    void testRemoveKey() throws IOException {
-        OrderedProperties props = loadPropertiesFromFile(
-            "src/test/resources/org/apache/commons/collections4/properties/test-reverse.properties"
-        );
-        String keyToRemove = "key1";
-        props.remove(keyToRemove);
-        assertKeyAbsent(props, keyToRemove);
+    void testRemoveKey() throws FileNotFoundException, IOException {
+        final OrderedProperties props = loadOrderedKeysReverse();
+        final String k = "key1";
+        props.remove(k);
+        assertFalse(props.contains(k));
+        assertFalse(props.containsKey(k));
+        assertFalse(Collections.list(props.keys()).contains(k));
+        assertFalse(Collections.list(props.propertyNames()).contains(k));
     }
 
     @Test
-    void testRemoveKeyValue() throws IOException {
-        OrderedProperties props = loadPropertiesFromFile(
-            "src/test/resources/org/apache/commons/collections4/properties/test-reverse.properties"
-        );
-        String keyToRemove = "key1";
-        props.remove(keyToRemove, "value1");
-        assertKeyAbsent(props, keyToRemove);
+    void testRemoveKeyValue() throws FileNotFoundException, IOException {
+        final OrderedProperties props = loadOrderedKeysReverse();
+        final String k = "key1";
+        props.remove(k, "value1");
+        assertFalse(props.contains(k));
+        assertFalse(props.containsKey(k));
+        assertFalse(Collections.list(props.keys()).contains(k));
+        assertFalse(Collections.list(props.propertyNames()).contains(k));
     }
 
     @Test
     void testToString() {
-        OrderedProperties props = new OrderedProperties();
-        StringBuilder expected = new StringBuilder("{");
-        
-        // Insert in descending order and build expected string
-        for (char ch = 'Z'; ch >= 'A'; ch--) {
-            props.put(String.valueOf(ch), "Value" + ch);
-            expected.append(ch).append("=Value").append(ch);
-            if (ch > 'A') {
-                expected.append(", ");
-            }
+        final OrderedProperties orderedProperties = new OrderedProperties();
+        final char first = 'Z';
+        final char last = 'A';
+        for (char ch = first; ch >= last; ch--) {
+            orderedProperties.put(String.valueOf(ch), "Value" + ch);
         }
-        expected.append("}");
-        
-        assertEquals(expected.toString(), props.toString());
+        assertEquals(
+                "{Z=ValueZ, Y=ValueY, X=ValueX, W=ValueW, V=ValueV, U=ValueU, T=ValueT, S=ValueS, R=ValueR, Q=ValueQ, P=ValueP, O=ValueO, N=ValueN, M=ValueM, L=ValueL, K=ValueK, J=ValueJ, I=ValueI, H=ValueH, G=ValueG, F=ValueF, E=ValueE, D=ValueD, C=ValueC, B=ValueB, A=ValueA}",
+                orderedProperties.toString());
     }
 }
