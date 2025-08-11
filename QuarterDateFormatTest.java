@@ -48,78 +48,75 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class QuarterDateFormatTest {
 
-    /**
-     * Confirm that the equals method can distinguish all the required fields.
-     */
+    private static final TimeZone GMT = TimeZone.getTimeZone("GMT");
+    private static final TimeZone PST = TimeZone.getTimeZone("PST");
+    private static final String[] DEFAULT_SYMBOLS = new String[] {"1", "2", "3", "4"};
+    private static final String[] MODIFIED_SYMBOLS = new String[] {"A", "2", "3", "4"};
+
     @Test
-    public void testEquals() {
-        QuarterDateFormat qf1 = new QuarterDateFormat(TimeZone.getTimeZone(
-                "GMT"), new String[] {"1", "2", "3", "4"});
-        QuarterDateFormat qf2 = new QuarterDateFormat(TimeZone.getTimeZone(
-                "GMT"), new String[] {"1", "2", "3", "4"});
-        assertEquals(qf1, qf2);
-        assertEquals(qf2, qf1);
-
-        qf1 = new QuarterDateFormat(TimeZone.getTimeZone("PST"),
-                new String[] {"1", "2", "3", "4"});
-        assertNotEquals(qf1, qf2);
-        qf2 = new QuarterDateFormat(TimeZone.getTimeZone("PST"),
-                new String[] {"1", "2", "3", "4"});
-        assertEquals(qf1, qf2);
-
-        qf1 = new QuarterDateFormat(TimeZone.getTimeZone("PST"),
-                new String[] {"A", "2", "3", "4"});
-        assertNotEquals(qf1, qf2);
-        qf2 = new QuarterDateFormat(TimeZone.getTimeZone("PST"),
-                new String[] {"A", "2", "3", "4"});
-        assertEquals(qf1, qf2);
-
-        qf1 = new QuarterDateFormat(TimeZone.getTimeZone("PST"),
-                new String[] {"A", "2", "3", "4"}, true);
-        assertNotEquals(qf1, qf2);
-        qf2 = new QuarterDateFormat(TimeZone.getTimeZone("PST"),
-                new String[] {"A", "2", "3", "4"}, true);
-        assertEquals(qf1, qf2);
+    public void identicalInstancesShouldBeEqual() {
+        QuarterDateFormat qf1 = new QuarterDateFormat(GMT, DEFAULT_SYMBOLS);
+        QuarterDateFormat qf2 = new QuarterDateFormat(GMT, DEFAULT_SYMBOLS);
+        assertEquals(qf1, qf2, "Instances with same configuration should be equal");
     }
 
-    /**
-     * Two objects that are equal are required to return the same hashCode.
-     */
     @Test
-    public void testHashCode() {
-        QuarterDateFormat qf1 = new QuarterDateFormat(TimeZone.getTimeZone(
-                "GMT"), new String[] {"1", "2", "3", "4"});
-        QuarterDateFormat qf2 = new QuarterDateFormat(TimeZone.getTimeZone(
-                "GMT"), new String[] {"1", "2", "3", "4"});
-        assertEquals(qf1, qf2);
-        int h1 = qf1.hashCode();
-        int h2 = qf2.hashCode();
-        assertEquals(h1, h2);
+    public void differentTimeZonesShouldNotBeEqual() {
+        QuarterDateFormat qf1 = new QuarterDateFormat(PST, DEFAULT_SYMBOLS);
+        QuarterDateFormat qf2 = new QuarterDateFormat(GMT, DEFAULT_SYMBOLS);
+        assertNotEquals(qf1, qf2, "Instances with different time zones should not be equal");
     }
 
-    /**
-     * Confirm that cloning works.
-     */
     @Test
-    public void testCloning() {
-        QuarterDateFormat qf1 = new QuarterDateFormat(TimeZone.getTimeZone(
-                "GMT"), new String[] {"1", "2", "3", "4"});
-        QuarterDateFormat qf2 = null;
-        qf2 = (QuarterDateFormat) qf1.clone();
-        assertNotSame(qf1, qf2);
-        assertSame(qf1.getClass(), qf2.getClass());
-        assertEquals(qf1, qf2);
+    public void differentQuarterSymbolsShouldNotBeEqual() {
+        QuarterDateFormat qf1 = new QuarterDateFormat(GMT, MODIFIED_SYMBOLS);
+        QuarterDateFormat qf2 = new QuarterDateFormat(GMT, DEFAULT_SYMBOLS);
+        assertNotEquals(qf1, qf2, "Instances with different quarter symbols should not be equal");
     }
 
-    /**
-     * Serialize an instance, restore it, and check for equality.
-     */
     @Test
-    public void testSerialization() {
-        QuarterDateFormat qf1 = new QuarterDateFormat(TimeZone.getTimeZone(
-                "GMT"), new String[] {"1", "2", "3", "4"});
-        QuarterDateFormat qf2 = TestUtils.serialised(qf1);
-        assertEquals(qf1, qf2);
+    public void identicalQuarterSymbolsShouldBeEqual() {
+        QuarterDateFormat qf1 = new QuarterDateFormat(GMT, MODIFIED_SYMBOLS);
+        QuarterDateFormat qf2 = new QuarterDateFormat(GMT, MODIFIED_SYMBOLS);
+        assertEquals(qf1, qf2, "Instances with same quarter symbols should be equal");
+    }
+
+    @Test
+    public void differentQuarterFirstFlagsShouldNotBeEqual() {
+        QuarterDateFormat qf1 = new QuarterDateFormat(GMT, DEFAULT_SYMBOLS, true);
+        QuarterDateFormat qf2 = new QuarterDateFormat(GMT, DEFAULT_SYMBOLS, false);
+        assertNotEquals(qf1, qf2, "Instances with different quarterFirst flags should not be equal");
+    }
+
+    @Test
+    public void identicalQuarterFirstFlagsShouldBeEqual() {
+        QuarterDateFormat qf1 = new QuarterDateFormat(GMT, DEFAULT_SYMBOLS, true);
+        QuarterDateFormat qf2 = new QuarterDateFormat(GMT, DEFAULT_SYMBOLS, true);
+        assertEquals(qf1, qf2, "Instances with same quarterFirst flags should be equal");
+    }
+
+    @Test
+    public void equalInstancesShouldHaveSameHashCode() {
+        QuarterDateFormat qf1 = new QuarterDateFormat(GMT, DEFAULT_SYMBOLS);
+        QuarterDateFormat qf2 = new QuarterDateFormat(GMT, DEFAULT_SYMBOLS);
+        assertEquals(qf1.hashCode(), qf2.hashCode(), "Equal instances must have same hashCode");
+    }
+
+    @Test
+    public void clonedInstanceShouldBeEqualButNotSame() {
+        QuarterDateFormat original = new QuarterDateFormat(GMT, DEFAULT_SYMBOLS);
+        QuarterDateFormat clone = (QuarterDateFormat) original.clone();
+        
+        assertNotSame(original, clone, "Clone should be a different object");
+        assertSame(original.getClass(), clone.getClass(), "Clone should have same class");
+        assertEquals(original, clone, "Clone should be equal to original");
+    }
+
+    @Test
+    public void serializedInstanceShouldEqualOriginal() {
+        QuarterDateFormat original = new QuarterDateFormat(GMT, DEFAULT_SYMBOLS);
+        QuarterDateFormat deserialized = TestUtils.serialised(original);
+        assertEquals(original, deserialized, "Deserialized instance should equal original");
     }
 
 }
