@@ -25,40 +25,56 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.compress.AbstractTest;
-import org.apache.commons.compress.archivers.ArchiveException;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for {@link ArArchiveOutputStream} concerning long file name handling.
+ * The "ar" format traditionally has a 16-character limit for file names.
+ */
 class ArArchiveOutputStreamTest extends AbstractTest {
 
+    private static final String LONG_FILE_NAME = "this_is_a_long_name_that_exceeds_16_chars.txt";
+
     @Test
-    void testLongFileNamesCauseExceptionByDefault() throws IOException {
-        final ArArchiveOutputStream ref;
-        try (ArArchiveOutputStream outputStream = new ArArchiveOutputStream(new ByteArrayOutputStream())) {
-            ref = outputStream;
-            final ArArchiveEntry ae = new ArArchiveEntry("this_is_a_long_name.txt", 0);
-            final IOException ex = assertThrows(ArchiveException.class, () -> outputStream.putArchiveEntry(ae));
-            assertTrue(ex.getMessage().startsWith("File name too long"));
+    void longFileNameShouldThrowExceptionByDefault() throws IOException {
+        // Arrange
+        final ArArchiveEntry entry = new ArArchiveEntry(LONG_FILE_NAME, 0);
+
+        try (ArArchiveOutputStream arOut = new ArArchiveOutputStream(new ByteArrayOutputStream())) {
+            // Act & Assert
+            // The default mode is LONGFILE_ERROR, which should reject file names > 16 chars.
+            final IOException ex = assertThrows(IOException.class, () -> arOut.putArchiveEntry(entry),
+                    "Expected an exception for a long file name in default mode.");
+
+            assertTrue(ex.getMessage().startsWith("File name too long"),
+                    "Exception message should indicate the file name is too long.");
         }
-        assertTrue(ref.isClosed());
+        // The try-with-resources statement ensures the stream is closed automatically.
     }
 
     @Test
-    void testLongFileNamesWorkUsingBSDDialect() throws Exception {
-        final File file = createTempFile();
-        try (ArArchiveOutputStream outputStream = new ArArchiveOutputStream(Files.newOutputStream(file.toPath()))) {
-            outputStream.setLongFileMode(ArArchiveOutputStream.LONGFILE_BSD);
-            final ArArchiveEntry ae = new ArArchiveEntry("this_is_a_long_name.txt", 14);
-            outputStream.putArchiveEntry(ae);
-            outputStream.write(new byte[] { 'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\n' });
-            outputStream.closeArchiveEntry();
-            final List<String> expected = new ArrayList<>();
-            expected.add("this_is_a_long_name.txt");
-            checkArchiveContent(file, expected);
+    void longFileNameShouldBeAllowedWithBsdDialect() throws Exception {
+        // Arrange
+        final File archive = createTempFile();
+        final byte[] content = "Hello, world!\n".getBytes(StandardCharsets.UTF_8);
+        final ArArchiveEntry entry = new ArArchiveEntry(LONG_FILE_NAME, content.length);
+
+        // Act
+        try (ArArchiveOutputStream arOut = new ArArchiveOutputStream(Files.newOutputStream(archive.toPath()))) {
+            arOut.setLongFileMode(ArArchiveOutputStream.LONGFILE_BSD);
+            arOut.putArchiveEntry(entry);
+            arOut.write(content);
+            arOut.closeArchiveEntry();
         }
+
+        // Assert
+        final List<String> expectedEntryNames = Collections.singletonList(LONG_FILE_NAME);
+        checkArchiveContent(archive, expectedEntryNames);
     }
 }
