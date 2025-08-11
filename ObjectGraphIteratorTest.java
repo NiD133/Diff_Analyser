@@ -1,6 +1,26 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.commons.collections4.iterators;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,54 +33,64 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit tests for ObjectGraphIterator.
+ * Testcase.
  */
 class ObjectGraphIteratorTest extends AbstractIteratorTest<Object> {
 
-    // Helper classes to build a tree-like structure
     static class Branch {
+
         List<Leaf> leaves = new ArrayList<>();
 
         Leaf addLeaf() {
-            Leaf leaf = new Leaf();
-            leaves.add(leaf);
-            return leaf;
+            leaves.add(new Leaf());
+            return getLeaf(leaves.size() - 1);
+        }
+
+        Leaf getLeaf(final int index) {
+            return leaves.get(index);
         }
 
         Iterator<Leaf> leafIterator() {
             return leaves.iterator();
         }
+
     }
 
     static class Forest {
+
         List<Tree> trees = new ArrayList<>();
 
         Tree addTree() {
-            Tree tree = new Tree();
-            trees.add(tree);
-            return tree;
+            trees.add(new Tree());
+            return getTree(trees.size() - 1);
+        }
+
+        Tree getTree(final int index) {
+            return trees.get(index);
         }
 
         Iterator<Tree> treeIterator() {
             return trees.iterator();
         }
-    }
 
+    }
     static class Leaf {
+
         String color;
 
         String getColor() {
             return color;
         }
 
-        void setColor(String color) {
+        void setColor(final String color) {
             this.color = color;
         }
-    }
 
+    }
     static class LeafFinder implements Transformer<Object, Object> {
+
         @Override
-        public Object transform(Object input) {
+        public Object transform(final Object input) {
             if (input instanceof Forest) {
                 return ((Forest) input).treeIterator();
             }
@@ -73,33 +103,43 @@ class ObjectGraphIteratorTest extends AbstractIteratorTest<Object> {
             if (input instanceof Leaf) {
                 return input;
             }
-            throw new ClassCastException("Unsupported object type");
+            throw new ClassCastException();
         }
-    }
 
+    }
     static class Tree {
+
         List<Branch> branches = new ArrayList<>();
 
         Branch addBranch() {
-            Branch branch = new Branch();
-            branches.add(branch);
-            return branch;
+            branches.add(new Branch());
+            return getBranch(branches.size() - 1);
         }
 
         Iterator<Branch> branchIterator() {
             return branches.iterator();
         }
+
+        Branch getBranch(final int index) {
+            return branches.get(index);
+        }
+
     }
 
-    private String[] expectedElements = {"One", "Two", "Three", "Four", "Five", "Six"};
-    private List<String> list1;
-    private List<String> list2;
-    private List<String> list3;
-    private List<Iterator<String>> iteratorList;
+    protected String[] testArray = { "One", "Two", "Three", "Four", "Five", "Six" };
+
+    protected List<String> list1;
+
+    protected List<String> list2;
+
+    protected List<String> list3;
+
+    protected List<Iterator<String>> iteratorList;
 
     @Override
     public ObjectGraphIterator<Object> makeEmptyIterator() {
-        return new ObjectGraphIterator<>(new ArrayList<>().iterator());
+        final ArrayList<Object> list = new ArrayList<>();
+        return new ObjectGraphIterator<>(list.iterator());
     }
 
     @Override
@@ -110,185 +150,263 @@ class ObjectGraphIteratorTest extends AbstractIteratorTest<Object> {
 
     @BeforeEach
     public void setUp() {
-        list1 = List.of("One", "Two", "Three");
-        list2 = List.of("Four");
-        list3 = List.of("Five", "Six");
-        iteratorList = List.of(list1.iterator(), list2.iterator(), list3.iterator());
+        list1 = new ArrayList<>();
+        list1.add("One");
+        list1.add("Two");
+        list1.add("Three");
+        list2 = new ArrayList<>();
+        list2.add("Four");
+        list3 = new ArrayList<>();
+        list3.add("Five");
+        list3.add("Six");
+        iteratorList = new ArrayList<>();
+        iteratorList.add(list1.iterator());
+        iteratorList.add(list2.iterator());
+        iteratorList.add(list3.iterator());
     }
 
     @Test
-    void testIterationOverIteratorOfIterators() {
-        Iterator<Object> iterator = new ObjectGraphIterator<>(iteratorList.iterator(), null);
+    void testIteration_IteratorOfIterators() {
+        final List<Iterator<String>> iteratorList = new ArrayList<>();
+        iteratorList.add(list1.iterator());
+        iteratorList.add(list2.iterator());
+        iteratorList.add(list3.iterator());
+        final Iterator<Object> it = new ObjectGraphIterator<>(iteratorList.iterator(), null);
 
-        for (String expected : expectedElements) {
-            assertTrue(iterator.hasNext());
-            assertEquals(expected, iterator.next());
+        for (int i = 0; i < 6; i++) {
+            assertTrue(it.hasNext());
+            assertEquals(testArray[i], it.next());
         }
-        assertFalse(iterator.hasNext());
+        assertFalse(it.hasNext());
     }
 
     @Test
-    void testIterationWithEmptyIterators() {
-        List<Iterator<String>> iteratorsWithEmpty = List.of(
-            IteratorUtils.emptyIterator(),
-            list1.iterator(),
-            IteratorUtils.emptyIterator(),
-            list2.iterator(),
-            IteratorUtils.emptyIterator(),
-            list3.iterator(),
-            IteratorUtils.emptyIterator()
-        );
+    void testIteration_IteratorOfIteratorsWithEmptyIterators() {
+        final List<Iterator<String>> iteratorList = new ArrayList<>();
+        iteratorList.add(IteratorUtils.<String>emptyIterator());
+        iteratorList.add(list1.iterator());
+        iteratorList.add(IteratorUtils.<String>emptyIterator());
+        iteratorList.add(list2.iterator());
+        iteratorList.add(IteratorUtils.<String>emptyIterator());
+        iteratorList.add(list3.iterator());
+        iteratorList.add(IteratorUtils.<String>emptyIterator());
+        final Iterator<Object> it = new ObjectGraphIterator<>(iteratorList.iterator(), null);
 
-        Iterator<Object> iterator = new ObjectGraphIterator<>(iteratorsWithEmpty.iterator(), null);
-
-        for (String expected : expectedElements) {
-            assertTrue(iterator.hasNext());
-            assertEquals(expected, iterator.next());
+        for (int i = 0; i < 6; i++) {
+            assertTrue(it.hasNext());
+            assertEquals(testArray[i], it.next());
         }
-        assertFalse(iterator.hasNext());
+        assertFalse(it.hasNext());
     }
 
     @Test
-    void testIterationWithRootNoTransformer() {
-        Forest forest = new Forest();
-        Iterator<Object> iterator = new ObjectGraphIterator<>(forest, null);
+    void testIteration_RootNoTransformer() {
+        final Forest forest = new Forest();
+        final Iterator<Object> it = new ObjectGraphIterator<>(forest, null);
 
-        assertTrue(iterator.hasNext());
-        assertSame(forest, iterator.next());
-        assertFalse(iterator.hasNext());
+        assertTrue(it.hasNext());
+        assertSame(forest, it.next());
+        assertFalse(it.hasNext());
 
-        assertThrows(NoSuchElementException.class, iterator::next);
+        assertThrows(NoSuchElementException.class, () -> it.next());
     }
 
     @Test
-    void testIterationWithNullRoot() {
-        Iterator<Object> iterator = new ObjectGraphIterator<>(null, null);
+    void testIteration_RootNull() {
+        final Iterator<Object> it = new ObjectGraphIterator<>(null, null);
 
-        assertFalse(iterator.hasNext());
-        assertThrows(NoSuchElementException.class, iterator::next);
-        assertThrows(IllegalStateException.class, iterator::remove);
+        assertFalse(it.hasNext());
+
+        assertThrows(NoSuchElementException.class, () -> it.next());
+
+        assertThrows(IllegalStateException.class, () -> it.remove());
     }
 
     @Test
-    void testTransformedIteration() {
-        Forest forest = new Forest();
-        Leaf leaf1 = forest.addTree().addBranch().addLeaf();
-        Iterator<Object> iterator = new ObjectGraphIterator<>(forest, new LeafFinder());
+    void testIteration_Transformed1() {
+        final Forest forest = new Forest();
+        final Leaf l1 = forest.addTree().addBranch().addLeaf();
+        final Iterator<Object> it = new ObjectGraphIterator<>(forest, new LeafFinder());
 
-        assertTrue(iterator.hasNext());
-        assertSame(leaf1, iterator.next());
-        assertFalse(iterator.hasNext());
+        assertTrue(it.hasNext());
+        assertSame(l1, it.next());
+        assertFalse(it.hasNext());
 
-        assertThrows(NoSuchElementException.class, iterator::next);
+        assertThrows(NoSuchElementException.class, () -> it.next());
     }
 
     @Test
-    void testComplexTransformedIteration() {
-        Forest forest = new Forest();
+    void testIteration_Transformed2() {
+        final Forest forest = new Forest();
         forest.addTree();
         forest.addTree();
         forest.addTree();
-        Branch branch1 = forest.getTree(0).addBranch();
-        Branch branch2 = forest.getTree(0).addBranch();
-        Branch branch3 = forest.getTree(2).addBranch();
-        Branch branch4 = forest.getTree(2).addBranch();
-        Branch branch5 = forest.getTree(2).addBranch();
-        Leaf leaf1 = branch1.addLeaf();
-        Leaf leaf2 = branch1.addLeaf();
-        Leaf leaf3 = branch2.addLeaf();
-        Leaf leaf4 = branch3.addLeaf();
-        Leaf leaf5 = branch5.addLeaf();
+        final Branch b1 = forest.getTree(0).addBranch();
+        final Branch b2 = forest.getTree(0).addBranch();
+        final Branch b3 = forest.getTree(2).addBranch();
+        /* Branch b4 = */ forest.getTree(2).addBranch();
+        final Branch b5 = forest.getTree(2).addBranch();
+        final Leaf l1 = b1.addLeaf();
+        final Leaf l2 = b1.addLeaf();
+        final Leaf l3 = b2.addLeaf();
+        final Leaf l4 = b3.addLeaf();
+        final Leaf l5 = b5.addLeaf();
 
-        Iterator<Object> iterator = new ObjectGraphIterator<>(forest, new LeafFinder());
+        final Iterator<Object> it = new ObjectGraphIterator<>(forest, new LeafFinder());
 
-        assertTrue(iterator.hasNext());
-        assertSame(leaf1, iterator.next());
-        assertTrue(iterator.hasNext());
-        assertSame(leaf2, iterator.next());
-        assertTrue(iterator.hasNext());
-        assertSame(leaf3, iterator.next());
-        assertTrue(iterator.hasNext());
-        assertSame(leaf4, iterator.next());
-        assertTrue(iterator.hasNext());
-        assertSame(leaf5, iterator.next());
-        assertFalse(iterator.hasNext());
+        assertTrue(it.hasNext());
+        assertSame(l1, it.next());
+        assertTrue(it.hasNext());
+        assertSame(l2, it.next());
+        assertTrue(it.hasNext());
+        assertSame(l3, it.next());
+        assertTrue(it.hasNext());
+        assertSame(l4, it.next());
+        assertTrue(it.hasNext());
+        assertSame(l5, it.next());
+        assertFalse(it.hasNext());
 
-        assertThrows(NoSuchElementException.class, iterator::next);
+        assertThrows(NoSuchElementException.class, () -> it.next());
     }
 
     @Test
-    void testIteratorConstructorWithNull() {
-        Iterator<Object> iterator = new ObjectGraphIterator<>(null);
-        assertFalse(iterator.hasNext());
-        assertThrows(NoSuchElementException.class, iterator::next);
-        assertThrows(IllegalStateException.class, iterator::remove);
+    void testIteration_Transformed3() {
+        final Forest forest = new Forest();
+        forest.addTree();
+        forest.addTree();
+        forest.addTree();
+        final Branch b1 = forest.getTree(1).addBranch();
+        final Branch b2 = forest.getTree(1).addBranch();
+        final Branch b3 = forest.getTree(2).addBranch();
+        final Branch b4 = forest.getTree(2).addBranch();
+        /* Branch b5 = */ forest.getTree(2).addBranch();
+        final Leaf l1 = b1.addLeaf();
+        final Leaf l2 = b1.addLeaf();
+        final Leaf l3 = b2.addLeaf();
+        final Leaf l4 = b3.addLeaf();
+        final Leaf l5 = b4.addLeaf();
+
+        final Iterator<Object> it = new ObjectGraphIterator<>(forest, new LeafFinder());
+
+        assertTrue(it.hasNext());
+        assertSame(l1, it.next());
+        assertTrue(it.hasNext());
+        assertSame(l2, it.next());
+        assertTrue(it.hasNext());
+        assertSame(l3, it.next());
+        assertTrue(it.hasNext());
+        assertSame(l4, it.next());
+        assertTrue(it.hasNext());
+        assertSame(l5, it.next());
+        assertFalse(it.hasNext());
+
+        assertThrows(NoSuchElementException.class, () -> it.next());
     }
 
     @Test
-    void testEmptyIteratorConstructor() {
-        List<Iterator<Object>> emptyIteratorList = new ArrayList<>();
-        Iterator<Object> iterator = new ObjectGraphIterator<>(emptyIteratorList.iterator());
-
-        assertFalse(iterator.hasNext());
-        assertThrows(NoSuchElementException.class, iterator::next);
-        assertThrows(IllegalStateException.class, iterator::remove);
+    void testIteratorConstructor_null_next() {
+        final Iterator<Object> it = new ObjectGraphIterator<>(null);
+        assertThrows(NoSuchElementException.class, () -> it.next());
     }
 
     @Test
-    void testSimpleIteratorConstructor() {
-        Iterator<Object> iterator = new ObjectGraphIterator<>(iteratorList.iterator());
+    void testIteratorConstructor_null_remove() {
+        final Iterator<Object> it = new ObjectGraphIterator<>(null);
+        assertThrows(IllegalStateException.class, () -> it.remove());
+    }
 
-        for (String expected : expectedElements) {
-            assertTrue(iterator.hasNext());
-            assertEquals(expected, iterator.next());
+    @Test
+    void testIteratorConstructor_null1() {
+        final Iterator<Object> it = new ObjectGraphIterator<>(null);
+
+        assertFalse(it.hasNext());
+
+        assertThrows(NoSuchElementException.class, () -> it.next());
+
+        assertThrows(IllegalStateException.class, () -> it.remove());
+    }
+
+    @Test
+    void testIteratorConstructorIteration_Empty() {
+        final List<Iterator<Object>> iteratorList = new ArrayList<>();
+        final Iterator<Object> it = new ObjectGraphIterator<>(iteratorList.iterator());
+
+        assertFalse(it.hasNext());
+
+        assertThrows(NoSuchElementException.class, () -> it.next());
+
+        assertThrows(IllegalStateException.class, () -> it.remove());
+    }
+
+    @Test
+    void testIteratorConstructorIteration_Simple() {
+        final List<Iterator<String>> iteratorList = new ArrayList<>();
+        iteratorList.add(list1.iterator());
+        iteratorList.add(list2.iterator());
+        iteratorList.add(list3.iterator());
+        final Iterator<Object> it = new ObjectGraphIterator<>(iteratorList.iterator());
+
+        for (int i = 0; i < 6; i++) {
+            assertTrue(it.hasNext());
+            assertEquals(testArray[i], it.next());
         }
-        assertFalse(iterator.hasNext());
-        assertThrows(NoSuchElementException.class, iterator::next);
+        assertFalse(it.hasNext());
+
+        assertThrows(NoSuchElementException.class, () -> it.next());
     }
 
     @Test
-    void testSimpleIteratorWithoutHasNext() {
-        Iterator<Object> iterator = new ObjectGraphIterator<>(iteratorList.iterator());
+    void testIteratorConstructorIteration_SimpleNoHasNext() {
+        final List<Iterator<String>> iteratorList = new ArrayList<>();
+        iteratorList.add(list1.iterator());
+        iteratorList.add(list2.iterator());
+        iteratorList.add(list3.iterator());
+        final Iterator<Object> it = new ObjectGraphIterator<>(iteratorList.iterator());
 
-        for (String expected : expectedElements) {
-            assertEquals(expected, iterator.next());
+        for (int i = 0; i < 6; i++) {
+            assertEquals(testArray[i], it.next());
         }
-        assertThrows(NoSuchElementException.class, iterator::next);
+
+        assertThrows(NoSuchElementException.class, () -> it.next());
     }
 
     @Test
-    void testIteratorWithEmptyIterators() {
-        List<Iterator<String>> iteratorsWithEmpty = List.of(
-            IteratorUtils.emptyIterator(),
-            list1.iterator(),
-            IteratorUtils.emptyIterator(),
-            list2.iterator(),
-            IteratorUtils.emptyIterator(),
-            list3.iterator(),
-            IteratorUtils.emptyIterator()
-        );
+    void testIteratorConstructorIteration_WithEmptyIterators() {
+        final List<Iterator<String>> iteratorList = new ArrayList<>();
+        iteratorList.add(IteratorUtils.<String>emptyIterator());
+        iteratorList.add(list1.iterator());
+        iteratorList.add(IteratorUtils.<String>emptyIterator());
+        iteratorList.add(list2.iterator());
+        iteratorList.add(IteratorUtils.<String>emptyIterator());
+        iteratorList.add(list3.iterator());
+        iteratorList.add(IteratorUtils.<String>emptyIterator());
+        final Iterator<Object> it = new ObjectGraphIterator<>(iteratorList.iterator());
 
-        Iterator<Object> iterator = new ObjectGraphIterator<>(iteratorsWithEmpty.iterator());
-
-        for (String expected : expectedElements) {
-            assertTrue(iterator.hasNext());
-            assertEquals(expected, iterator.next());
+        for (int i = 0; i < 6; i++) {
+            assertTrue(it.hasNext());
+            assertEquals(testArray[i], it.next());
         }
-        assertFalse(iterator.hasNext());
-        assertThrows(NoSuchElementException.class, iterator::next);
+        assertFalse(it.hasNext());
+
+        assertThrows(NoSuchElementException.class, () -> it.next());
     }
 
     @Test
-    void testIteratorRemove() {
-        Iterator<Object> iterator = new ObjectGraphIterator<>(iteratorList.iterator());
+    void testIteratorConstructorRemove() {
+        final List<Iterator<String>> iteratorList = new ArrayList<>();
+        iteratorList.add(list1.iterator());
+        iteratorList.add(list2.iterator());
+        iteratorList.add(list3.iterator());
+        final Iterator<Object> it = new ObjectGraphIterator<>(iteratorList.iterator());
 
-        for (String ignored : expectedElements) {
-            assertEquals(ignored, iterator.next());
-            iterator.remove();
+        for (int i = 0; i < 6; i++) {
+            assertEquals(testArray[i], it.next());
+            it.remove();
         }
-        assertFalse(iterator.hasNext());
+        assertFalse(it.hasNext());
         assertEquals(0, list1.size());
         assertEquals(0, list2.size());
         assertEquals(0, list3.size());
     }
+
 }
