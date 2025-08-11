@@ -14,196 +14,173 @@ import org.evosuite.runtime.mock.java.lang.MockThrowable;
 import org.junit.runner.RunWith;
 import org.mockito.internal.exceptions.stacktrace.StackTraceFilter;
 
-@RunWith(EvoRunner.class)
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true,
-    useVFS = true,
-    useVNET = true,
-    resetStaticState = true,
-    separateClassLoader = true
-)
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class StackTraceFilter_ESTest extends StackTraceFilter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void findSourceFile_EmptyStackTrace_ReturnsDefaultValue() throws Throwable {
-        StackTraceFilter filter = new StackTraceFilter();
-        StackTraceElement[] emptyTrace = new StackTraceElement[0];
-        String result = filter.findSourceFile(emptyTrace, "");
-        assertEquals("", result);
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      StackTraceFilter stackTraceFilter0 = new StackTraceFilter();
+      StackTraceElement[] stackTraceElementArray0 = new StackTraceElement[0];
+      String string0 = stackTraceFilter0.findSourceFile(stackTraceElementArray0, "");
+      assertEquals("", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void filterFirst_SingleElementStackTrace_ReturnsElement() throws Throwable {
-        StackTraceFilter filter = new StackTraceFilter();
-        StackTraceElement element = new StackTraceElement("", "", "", 0);
-        StackTraceElement[] stackTrace = {element};
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      StackTraceFilter stackTraceFilter0 = new StackTraceFilter();
+      StackTraceElement[] stackTraceElementArray0 = new StackTraceElement[1];
+      StackTraceElement stackTraceElement0 = new StackTraceElement("", "", "", 0);
+      stackTraceElementArray0[0] = stackTraceElement0;
+      MockThrowable mockThrowable0 = new MockThrowable();
+      mockThrowable0.setStackTrace(stackTraceElementArray0);
+      StackTraceElement stackTraceElement1 = stackTraceFilter0.filterFirst(mockThrowable0, false);
+      assertEquals("", stackTraceElement1.getMethodName());
+  }
 
-        MockThrowable throwable = new MockThrowable();
-        throwable.setStackTrace(stackTrace);
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      StackTraceFilter stackTraceFilter0 = new StackTraceFilter();
+      MockThrowable mockThrowable0 = new MockThrowable();
+      StackTraceElement[] stackTraceElementArray0 = new StackTraceElement[8];
+      StackTraceElement stackTraceElement0 = new StackTraceElement("A", "$cbz1,wrBLR'*'t`%<", "$cbz1,wrBLR'*'t`%<", 6);
+      stackTraceElementArray0[0] = stackTraceElement0;
+      stackTraceElementArray0[1] = stackTraceElementArray0[0];
+      stackTraceElementArray0[2] = stackTraceElementArray0[0];
+      stackTraceElementArray0[3] = stackTraceElementArray0[0];
+      stackTraceElementArray0[4] = stackTraceElementArray0[3];
+      stackTraceElementArray0[5] = stackTraceElementArray0[1];
+      stackTraceElementArray0[6] = stackTraceElementArray0[4];
+      stackTraceElementArray0[7] = stackTraceElementArray0[4];
+      mockThrowable0.setStackTrace(stackTraceElementArray0);
+      StackTraceElement stackTraceElement1 = stackTraceFilter0.filterFirst(mockThrowable0, true);
+      assertFalse(stackTraceElement1.isNativeMethod());
+  }
 
-        StackTraceElement result = filter.filterFirst(throwable, false);
-        assertEquals("", result.getMethodName());
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      MockThrowable mockThrowable0 = new MockThrowable();
+      StackTraceFilter stackTraceFilter0 = new StackTraceFilter();
+      mockThrowable0.setOriginForDelegate((StackTraceElement) null);
+      // Undeclared exception!
+      try { 
+        stackTraceFilter0.filterFirst(mockThrowable0, true);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.mockito.internal.exceptions.stacktrace.DefaultStackTraceCleaner", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void filterFirst_ComplexStackTrace_ReturnsValidElement() throws Throwable {
-        StackTraceFilter filter = new StackTraceFilter();
-        StackTraceElement element = new StackTraceElement(
-            "A", "$cbz1,wrBLR'*'t`%<", "$cbz1,wrBLR'*'t`%<", 6
-        );
-        StackTraceElement[] stackTrace = new StackTraceElement[8];
-        // Fill array with repeated elements
-        for (int i = 0; i < stackTrace.length; i++) {
-            stackTrace[i] = element;
-        }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      StackTraceFilter stackTraceFilter0 = new StackTraceFilter();
+      StackTraceElement[] stackTraceElementArray0 = new StackTraceElement[1];
+      // Undeclared exception!
+      try { 
+        stackTraceFilter0.filter(stackTraceElementArray0, false);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.mockito.internal.exceptions.stacktrace.DefaultStackTraceCleaner", e);
+      }
+  }
 
-        MockThrowable throwable = new MockThrowable();
-        throwable.setStackTrace(stackTrace);
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      StackTraceFilter stackTraceFilter0 = new StackTraceFilter();
+      MockThrowable mockThrowable0 = new MockThrowable();
+      StackTraceElement stackTraceElement0 = stackTraceFilter0.filterFirst(mockThrowable0, false);
+      StackTraceElement[] stackTraceElementArray0 = new StackTraceElement[1];
+      stackTraceElementArray0[0] = stackTraceElement0;
+      String string0 = stackTraceFilter0.findSourceFile(stackTraceElementArray0, "org.mockito.internal.configuration.plugins.DefaultMockitoPlugins");
+      //  // Unstable assertion: assertNull(string0);
+  }
 
-        StackTraceElement result = filter.filterFirst(throwable, true);
-        assertFalse(result.isNativeMethod());
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      StackTraceFilter stackTraceFilter0 = new StackTraceFilter();
+      StackTraceElement[] stackTraceElementArray0 = new StackTraceElement[1];
+      StackTraceElement stackTraceElement0 = new StackTraceElement((String) null, (String) null, (String) null, "org.mockito.internal.exceptions.stacktrace.StackTraceFilter", "org.mockito.internal.exceptions.stacktrace.StackTraceFilter", "org.mockito.internal.exceptions.stacktrace.StackTraceFilter", 2);
+      stackTraceElementArray0[0] = stackTraceElement0;
+      String string0 = stackTraceFilter0.findSourceFile(stackTraceElementArray0, (String) null);
+      assertNull(string0);
+  }
 
-    @Test(timeout = 4000)
-    public void filterFirst_NullOrigin_ThrowsNullPointerException() throws Throwable {
-        StackTraceFilter filter = new StackTraceFilter();
-        MockThrowable throwable = new MockThrowable();
-        throwable.setOriginForDelegate((StackTraceElement) null);
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      StackTraceFilter stackTraceFilter0 = new StackTraceFilter();
+      StackTraceElement[] stackTraceElementArray0 = new StackTraceElement[1];
+      // Undeclared exception!
+      try { 
+        stackTraceFilter0.findSourceFile(stackTraceElementArray0, "org.mockito.internal.configuration.plugins.DefaultMockitoPlugins");
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.mockito.internal.exceptions.stacktrace.DefaultStackTraceCleaner", e);
+      }
+  }
 
-        try {
-            filter.filterFirst(throwable, true);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      StackTraceFilter stackTraceFilter0 = new StackTraceFilter();
+      StackTraceElement[] stackTraceElementArray0 = new StackTraceElement[0];
+      StackTraceElement[] stackTraceElementArray1 = stackTraceFilter0.filter(stackTraceElementArray0, false);
+      stackTraceFilter0.findSourceFile(stackTraceElementArray1, "S-pOJA?<SA5#B9J&^;");
+      assertNotSame(stackTraceElementArray1, stackTraceElementArray0);
+      assertNotSame(stackTraceElementArray0, stackTraceElementArray1);
+  }
 
-    @Test(timeout = 4000)
-    public void filter_NullElement_ThrowsNullPointerException() throws Throwable {
-        StackTraceFilter filter = new StackTraceFilter();
-        StackTraceElement[] stackTrace = new StackTraceElement[1]; // Contains null
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      StackTraceFilter stackTraceFilter0 = new StackTraceFilter();
+      MockThrowable mockThrowable0 = new MockThrowable();
+      StackTraceElement stackTraceElement0 = new StackTraceElement("/34KVo", "org.mockito.internal.configuration.plugins.DefaultPluginSwitch", "/34KVo", "org.mockito.internal.configuration.plugins.DefaultPluginSwitch", "/34KVo", "org.mockito.internal.configuration.plugins.DefaultPluginSwitch", 1);
+      mockThrowable0.setOriginForDelegate(stackTraceElement0);
+      StackTraceElement stackTraceElement1 = stackTraceFilter0.filterFirst(mockThrowable0, true);
+      assertEquals("<evosuite>", stackTraceElement1.getFileName());
+  }
 
-        try {
-            filter.filter(stackTrace, false);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      StackTraceFilter stackTraceFilter0 = new StackTraceFilter();
+      StackTraceElement[] stackTraceElementArray0 = new StackTraceElement[0];
+      MockThrowable mockThrowable0 = new MockThrowable();
+      mockThrowable0.setStackTrace(stackTraceElementArray0);
+      StackTraceElement stackTraceElement0 = stackTraceFilter0.filterFirst(mockThrowable0, false);
+      assertNull(stackTraceElement0);
+  }
 
-    @Test(timeout = 4000)
-    public void findSourceFile_ElementWithoutSource_ReturnsNull() throws Throwable {
-        StackTraceFilter filter = new StackTraceFilter();
-        MockThrowable throwable = new MockThrowable();
-        StackTraceElement element = filter.filterFirst(throwable, false);
-        
-        StackTraceElement[] stackTrace = {element};
-        String result = filter.findSourceFile(
-            stackTrace, 
-            "org.mockito.internal.configuration.plugins.DefaultMockitoPlugins"
-        );
-        assertNull(result);
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      StackTraceFilter stackTraceFilter0 = new StackTraceFilter();
+      StackTraceElement[] stackTraceElementArray0 = new StackTraceElement[1];
+      StackTraceElement stackTraceElement0 = new StackTraceElement("org.mockito.internal.PremainAttach", "org.mockito.internal.PremainAttach", "org.mockito.internal.PremainAttach", (-1512));
+      stackTraceElementArray0[0] = stackTraceElement0;
+      StackTraceElement[] stackTraceElementArray1 = stackTraceFilter0.filter(stackTraceElementArray0, false);
+      assertEquals(0, stackTraceElementArray1.length);
+  }
 
-    @Test(timeout = 4000)
-    public void findSourceFile_NullFileName_ReturnsNull() throws Throwable {
-        StackTraceFilter filter = new StackTraceFilter();
-        StackTraceElement element = new StackTraceElement(
-            null, null, null,
-            "org.mockito.internal.exceptions.stacktrace.StackTraceFilter",
-            "org.mockito.internal.exceptions.stacktrace.StackTraceFilter",
-            "org.mockito.internal.exceptions.stacktrace.StackTraceFilter",
-            2
-        );
-        StackTraceElement[] stackTrace = {element};
-        
-        String result = filter.findSourceFile(stackTrace, null);
-        assertNull(result);
-    }
-
-    @Test(timeout = 4000)
-    public void findSourceFile_NullStackTraceElement_ThrowsException() throws Throwable {
-        StackTraceFilter filter = new StackTraceFilter();
-        StackTraceElement[] stackTrace = new StackTraceElement[1]; // Contains null
-
-        try {
-            filter.findSourceFile(
-                stackTrace,
-                "org.mockito.internal.configuration.plugins.DefaultMockitoPlugins"
-            );
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected exception
-        }
-    }
-
-    @Test(timeout = 4000)
-    public void filter_EmptyArray_ReturnsNewArrayInstance() throws Throwable {
-        StackTraceFilter filter = new StackTraceFilter();
-        StackTraceElement[] emptyTrace = new StackTraceElement[0];
-        
-        StackTraceElement[] filtered = filter.filter(emptyTrace, false);
-        filter.findSourceFile(filtered, "S-pOJA?<SA5#B9J&^;");
-        
-        assertNotSame(emptyTrace, filtered);
-    }
-
-    @Test(timeout = 4000)
-    public void filterFirst_WithDelegate_ReturnsMockFileName() throws Throwable {
-        StackTraceFilter filter = new StackTraceFilter();
-        StackTraceElement element = new StackTraceElement(
-            "/34KVo", 
-            "org.mockito.internal.configuration.plugins.DefaultPluginSwitch",
-            "/34KVo",
-            "org.mockito.internal.configuration.plugins.DefaultPluginSwitch",
-            "/34KVo",
-            "org.mockito.internal.configuration.plugins.DefaultPluginSwitch",
-            1
-        );
-
-        MockThrowable throwable = new MockThrowable();
-        throwable.setOriginForDelegate(element);
-
-        StackTraceElement result = filter.filterFirst(throwable, true);
-        assertEquals("<evosuite>", result.getFileName());
-    }
-
-    @Test(timeout = 4000)
-    public void filterFirst_EmptyStackTrace_ReturnsNull() throws Throwable {
-        StackTraceFilter filter = new StackTraceFilter();
-        MockThrowable throwable = new MockThrowable();
-        throwable.setStackTrace(new StackTraceElement[0]);
-        
-        StackTraceElement result = filter.filterFirst(throwable, false);
-        assertNull(result);
-    }
-
-    @Test(timeout = 4000)
-    public void filter_InternalMockitoClass_ReturnsEmptyArray() throws Throwable {
-        StackTraceFilter filter = new StackTraceFilter();
-        StackTraceElement element = new StackTraceElement(
-            "org.mockito.internal.PremainAttach",
-            "org.mockito.internal.PremainAttach",
-            "org.mockito.internal.PremainAttach",
-            -1512
-        );
-        StackTraceElement[] stackTrace = {element};
-        
-        StackTraceElement[] result = filter.filter(stackTrace, false);
-        assertEquals(0, result.length);
-    }
-
-    @Test(timeout = 4000)
-    public void filter_AfterFilterFirst_ReturnsValidElement() throws Throwable {
-        StackTraceFilter filter = new StackTraceFilter();
-        MockThrowable throwable = new MockThrowable();
-        StackTraceElement element = filter.filterFirst(throwable, false);
-        assertNotNull(element);
-
-        StackTraceElement[] stackTrace = {element};
-        StackTraceElement[] result = filter.filter(stackTrace, false);
-        
-        assertEquals(1, result.length);
-        assertNotSame(stackTrace, result);
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      StackTraceFilter stackTraceFilter0 = new StackTraceFilter();
+      MockThrowable mockThrowable0 = new MockThrowable();
+      StackTraceElement stackTraceElement0 = stackTraceFilter0.filterFirst(mockThrowable0, false);
+      //  // Unstable assertion: assertNotNull(stackTraceElement0);
+      //  // Unstable assertion: assertEquals("jdk.internal.reflect.GeneratedConstructorAccessor44", stackTraceElement0.getClassName());
+      
+      StackTraceElement[] stackTraceElementArray0 = new StackTraceElement[1];
+      stackTraceElementArray0[0] = stackTraceElement0;
+      StackTraceElement[] stackTraceElementArray1 = stackTraceFilter0.filter(stackTraceElementArray0, false);
+      //  // Unstable assertion: assertEquals(1, stackTraceElementArray1.length);
+      //  // Unstable assertion: assertNotSame(stackTraceElementArray1, stackTraceElementArray0);
+  }
 }
