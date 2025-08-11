@@ -1,11 +1,23 @@
+/*
+ *    Copyright 2009-2022 the original author or authors.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package org.apache.ibatis.logging;
 
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.params.provider.Arguments.arguments;
-import static org.junit.jupiter.params.provider.Named.named;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.Reader;
-import java.util.stream.Stream;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.logging.commons.JakartaCommonsLoggingImpl;
@@ -16,67 +28,88 @@ import org.apache.ibatis.logging.nologging.NoLoggingImpl;
 import org.apache.ibatis.logging.slf4j.Slf4jImpl;
 import org.apache.ibatis.logging.stdout.StdOutImpl;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 
 class LogFactoryTest {
 
-  // Reset global logging choice after each test to avoid cross-test interference.
-  @AfterEach
-  void resetLogFactory() {
+  @AfterAll
+  static void restore() {
     LogFactory.useSlf4jLogging();
   }
 
-  @ParameterizedTest(name = "{index}: {0}")
-  @MethodSource("knownImplementations")
-  @DisplayName("LogFactory chooses the requested logging implementation")
-  void usesExpectedImplementation(Runnable configure, Class<? extends Log> expectedImpl) {
-    Log log = getConfiguredLogger(configure);
-    assertSame(expectedImpl, log.getClass(), "LogFactory should use " + expectedImpl.getSimpleName());
-  }
-
-  // Provides all built-in implementations and how to activate them.
-  @SuppressWarnings("deprecation") // useLog4JLogging() is intentionally tested for backward compatibility.
-  static Stream<Arguments> knownImplementations() {
-    return Stream.of(
-        arguments(named("Commons Logging", (Runnable) LogFactory::useCommonsLogging), JakartaCommonsLoggingImpl.class),
-        arguments(named("Log4j 1.x", (Runnable) LogFactory::useLog4JLogging), Log4jImpl.class),
-        arguments(named("Log4j 2", (Runnable) LogFactory::useLog4J2Logging), Log4j2Impl.class),
-        arguments(named("JDK logging (java.util.logging)", (Runnable) LogFactory::useJdkLogging), Jdk14LoggingImpl.class),
-        arguments(named("SLF4J", (Runnable) LogFactory::useSlf4jLogging), Slf4jImpl.class),
-        arguments(named("StdOut", (Runnable) LogFactory::useStdOutLogging), StdOutImpl.class),
-        arguments(named("NoLogging", (Runnable) LogFactory::useNoLogging), NoLoggingImpl.class)
-    );
+  @Test
+  void shouldUseCommonsLogging() {
+    LogFactory.useCommonsLogging();
+    Log log = LogFactory.getLog(Object.class);
+    logSomething(log);
+    assertEquals(log.getClass().getName(), JakartaCommonsLoggingImpl.class.getName());
   }
 
   @Test
-  @DisplayName("Logging implementation can be set via mybatis-config.xml settings")
-  void readsLogImplFromSettings() throws Exception {
+  void shouldUseLog4J() {
+    LogFactory.useLog4JLogging();
+    Log log = LogFactory.getLog(Object.class);
+    logSomething(log);
+    assertEquals(log.getClass().getName(), Log4jImpl.class.getName());
+  }
+
+  @Test
+  void shouldUseLog4J2() {
+    LogFactory.useLog4J2Logging();
+    Log log = LogFactory.getLog(Object.class);
+    logSomething(log);
+    assertEquals(log.getClass().getName(), Log4j2Impl.class.getName());
+  }
+
+  @Test
+  void shouldUseJdKLogging() {
+    LogFactory.useJdkLogging();
+    Log log = LogFactory.getLog(Object.class);
+    logSomething(log);
+    assertEquals(log.getClass().getName(), Jdk14LoggingImpl.class.getName());
+  }
+
+  @Test
+  void shouldUseSlf4j() {
+    LogFactory.useSlf4jLogging();
+    Log log = LogFactory.getLog(Object.class);
+    logSomething(log);
+    assertEquals(log.getClass().getName(), Slf4jImpl.class.getName());
+  }
+
+  @Test
+  void shouldUseStdOut() {
+    LogFactory.useStdOutLogging();
+    Log log = LogFactory.getLog(Object.class);
+    logSomething(log);
+    assertEquals(log.getClass().getName(), StdOutImpl.class.getName());
+  }
+
+  @Test
+  void shouldUseNoLogging() {
+    LogFactory.useNoLogging();
+    Log log = LogFactory.getLog(Object.class);
+    logSomething(log);
+    assertEquals(log.getClass().getName(), NoLoggingImpl.class.getName());
+  }
+
+  @Test
+  void shouldReadLogImplFromSettings() throws Exception {
     try (Reader reader = Resources.getResourceAsReader("org/apache/ibatis/logging/mybatis-config.xml")) {
       new SqlSessionFactoryBuilder().build(reader);
     }
+
     Log log = LogFactory.getLog(Object.class);
-    exerciseLogging(log);
-    assertSame(NoLoggingImpl.class, log.getClass(), "Settings should select NoLoggingImpl");
+    log.debug("Debug message.");
+    assertEquals(log.getClass().getName(), NoLoggingImpl.class.getName());
   }
 
-  // Helpers
-
-  private static Log getConfiguredLogger(Runnable configure) {
-    configure.run(); // Arrange
-    Log log = LogFactory.getLog(Object.class); // Act
-    exerciseLogging(log); // Sanity check that the logger is usable
-    return log;
-  }
-
-  private static void exerciseLogging(Log log) {
+  private void logSomething(Log log) {
     log.warn("Warning message.");
     log.debug("Debug message.");
     log.error("Error message.");
     log.error("Error with Exception.", new Exception("Test exception."));
   }
+
 }
