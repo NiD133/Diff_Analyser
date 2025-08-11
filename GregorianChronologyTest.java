@@ -30,45 +30,41 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.YearMonthDay;
 
 /**
- * JUnit test suite for the GregorianChronology class.
- * Tests various functionalities of the GregorianChronology.
+ * This class is a Junit unit test for GregorianChronology.
+ *
+ * @author Stephen Colebourne
  */
 @SuppressWarnings("deprecation")
 public class TestGregorianChronology extends TestCase {
 
-    // Constants for time zones used in tests
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
     private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
 
-    // Number of days from year 0 to 2002, used for calculating test time
-    private static final long DAYS_TO_2002 = 365 * 30 + 7; // Simplified calculation for brevity
+    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 
+                     366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 
+                     365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 +
+                     366 + 365;
+    // 2002-06-09
+    private long TEST_TIME_NOW =
+            (y2002days + 31L + 28L + 31L + 30L + 31L + 9L -1L) * DateTimeConstants.MILLIS_PER_DAY;
 
-    // Test time set to 2002-06-09
-    private static final long TEST_TIME_NOW = 
-            (DAYS_TO_2002 + 31 + 28 + 31 + 30 + 31 + 9 - 1) * DateTimeConstants.MILLIS_PER_DAY;
-
-    // Original system settings to restore after tests
     private DateTimeZone originalDateTimeZone = null;
     private TimeZone originalTimeZone = null;
     private Locale originalLocale = null;
 
-    // Main method to run the test suite
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
 
-    // Create a test suite containing all test cases
     public static TestSuite suite() {
         return new TestSuite(TestGregorianChronology.class);
     }
 
-    // Constructor
     public TestGregorianChronology(String name) {
         super(name);
     }
 
-    // Set up the test environment
     @Override
     protected void setUp() throws Exception {
         DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
@@ -80,16 +76,18 @@ public class TestGregorianChronology extends TestCase {
         Locale.setDefault(Locale.UK);
     }
 
-    // Tear down the test environment
     @Override
     protected void tearDown() throws Exception {
         DateTimeUtils.setCurrentMillisSystem();
         DateTimeZone.setDefault(originalDateTimeZone);
         TimeZone.setDefault(originalTimeZone);
         Locale.setDefault(originalLocale);
+        originalDateTimeZone = null;
+        originalTimeZone = null;
+        originalLocale = null;
     }
 
-    // Test cases for GregorianChronology factory methods
+    //-----------------------------------------------------------------------
     public void testFactoryUTC() {
         assertEquals(DateTimeZone.UTC, GregorianChronology.getInstanceUTC().getZone());
         assertSame(GregorianChronology.class, GregorianChronology.getInstanceUTC().getClass());
@@ -111,20 +109,18 @@ public class TestGregorianChronology extends TestCase {
         GregorianChronology chrono = GregorianChronology.getInstance(TOKYO, 2);
         assertEquals(TOKYO, chrono.getZone());
         assertEquals(2, chrono.getMinimumDaysInFirstWeek());
-
-        // Test invalid minimum days in first week
+        
         try {
             GregorianChronology.getInstance(TOKYO, 0);
-            fail("Expected IllegalArgumentException for minDaysInFirstWeek = 0");
+            fail();
         } catch (IllegalArgumentException ex) {}
-
         try {
             GregorianChronology.getInstance(TOKYO, 8);
-            fail("Expected IllegalArgumentException for minDaysInFirstWeek = 8");
+            fail();
         } catch (IllegalArgumentException ex) {}
     }
 
-    // Test cases for equality and zone conversion
+    //-----------------------------------------------------------------------
     public void testEquality() {
         assertSame(GregorianChronology.getInstance(TOKYO), GregorianChronology.getInstance(TOKYO));
         assertSame(GregorianChronology.getInstance(LONDON), GregorianChronology.getInstance(LONDON));
@@ -149,7 +145,6 @@ public class TestGregorianChronology extends TestCase {
         assertSame(GregorianChronology.getInstance(PARIS), GregorianChronology.getInstanceUTC().withZone(PARIS));
     }
 
-    // Test case for toString method
     public void testToString() {
         assertEquals("GregorianChronology[Europe/London]", GregorianChronology.getInstance(LONDON).toString());
         assertEquals("GregorianChronology[Asia/Tokyo]", GregorianChronology.getInstance(TOKYO).toString());
@@ -158,7 +153,7 @@ public class TestGregorianChronology extends TestCase {
         assertEquals("GregorianChronology[UTC,mdfw=2]", GregorianChronology.getInstance(DateTimeZone.UTC, 2).toString());
     }
 
-    // Test cases for duration fields
+    //-----------------------------------------------------------------------
     public void testDurationFields() {
         final GregorianChronology greg = GregorianChronology.getInstance();
         assertEquals("eras", greg.eras().getName());
@@ -173,61 +168,60 @@ public class TestGregorianChronology extends TestCase {
         assertEquals("minutes", greg.minutes().getName());
         assertEquals("seconds", greg.seconds().getName());
         assertEquals("millis", greg.millis().getName());
-
-        assertFalse(greg.eras().isSupported());
-        assertTrue(greg.centuries().isSupported());
-        assertTrue(greg.years().isSupported());
-        assertTrue(greg.weekyears().isSupported());
-        assertTrue(greg.months().isSupported());
-        assertTrue(greg.weeks().isSupported());
-        assertTrue(greg.days().isSupported());
-        assertTrue(greg.halfdays().isSupported());
-        assertTrue(greg.hours().isSupported());
-        assertTrue(greg.minutes().isSupported());
-        assertTrue(greg.seconds().isSupported());
-        assertTrue(greg.millis().isSupported());
-
-        assertFalse(greg.centuries().isPrecise());
-        assertFalse(greg.years().isPrecise());
-        assertFalse(greg.weekyears().isPrecise());
-        assertFalse(greg.months().isPrecise());
-        assertFalse(greg.weeks().isPrecise());
-        assertFalse(greg.days().isPrecise());
-        assertFalse(greg.halfdays().isPrecise());
-        assertTrue(greg.hours().isPrecise());
-        assertTrue(greg.minutes().isPrecise());
-        assertTrue(greg.seconds().isPrecise());
-        assertTrue(greg.millis().isPrecise());
-
+        
+        assertEquals(false, greg.eras().isSupported());
+        assertEquals(true, greg.centuries().isSupported());
+        assertEquals(true, greg.years().isSupported());
+        assertEquals(true, greg.weekyears().isSupported());
+        assertEquals(true, greg.months().isSupported());
+        assertEquals(true, greg.weeks().isSupported());
+        assertEquals(true, greg.days().isSupported());
+        assertEquals(true, greg.halfdays().isSupported());
+        assertEquals(true, greg.hours().isSupported());
+        assertEquals(true, greg.minutes().isSupported());
+        assertEquals(true, greg.seconds().isSupported());
+        assertEquals(true, greg.millis().isSupported());
+        
+        assertEquals(false, greg.centuries().isPrecise());
+        assertEquals(false, greg.years().isPrecise());
+        assertEquals(false, greg.weekyears().isPrecise());
+        assertEquals(false, greg.months().isPrecise());
+        assertEquals(false, greg.weeks().isPrecise());
+        assertEquals(false, greg.days().isPrecise());
+        assertEquals(false, greg.halfdays().isPrecise());
+        assertEquals(true, greg.hours().isPrecise());
+        assertEquals(true, greg.minutes().isPrecise());
+        assertEquals(true, greg.seconds().isPrecise());
+        assertEquals(true, greg.millis().isPrecise());
+        
         final GregorianChronology gregUTC = GregorianChronology.getInstanceUTC();
-        assertFalse(gregUTC.centuries().isPrecise());
-        assertFalse(gregUTC.years().isPrecise());
-        assertFalse(gregUTC.weekyears().isPrecise());
-        assertFalse(gregUTC.months().isPrecise());
-        assertTrue(gregUTC.weeks().isPrecise());
-        assertTrue(gregUTC.days().isPrecise());
-        assertTrue(gregUTC.halfdays().isPrecise());
-        assertTrue(gregUTC.hours().isPrecise());
-        assertTrue(gregUTC.minutes().isPrecise());
-        assertTrue(gregUTC.seconds().isPrecise());
-        assertTrue(gregUTC.millis().isPrecise());
-
+        assertEquals(false, gregUTC.centuries().isPrecise());
+        assertEquals(false, gregUTC.years().isPrecise());
+        assertEquals(false, gregUTC.weekyears().isPrecise());
+        assertEquals(false, gregUTC.months().isPrecise());
+        assertEquals(true, gregUTC.weeks().isPrecise());
+        assertEquals(true, gregUTC.days().isPrecise());
+        assertEquals(true, gregUTC.halfdays().isPrecise());
+        assertEquals(true, gregUTC.hours().isPrecise());
+        assertEquals(true, gregUTC.minutes().isPrecise());
+        assertEquals(true, gregUTC.seconds().isPrecise());
+        assertEquals(true, gregUTC.millis().isPrecise());
+        
         final DateTimeZone gmt = DateTimeZone.forID("Etc/GMT");
         final GregorianChronology gregGMT = GregorianChronology.getInstance(gmt);
-        assertFalse(gregGMT.centuries().isPrecise());
-        assertFalse(gregGMT.years().isPrecise());
-        assertFalse(gregGMT.weekyears().isPrecise());
-        assertFalse(gregGMT.months().isPrecise());
-        assertTrue(gregGMT.weeks().isPrecise());
-        assertTrue(gregGMT.days().isPrecise());
-        assertTrue(gregGMT.halfdays().isPrecise());
-        assertTrue(gregGMT.hours().isPrecise());
-        assertTrue(gregGMT.minutes().isPrecise());
-        assertTrue(gregGMT.seconds().isPrecise());
-        assertTrue(gregGMT.millis().isPrecise());
+        assertEquals(false, gregGMT.centuries().isPrecise());
+        assertEquals(false, gregGMT.years().isPrecise());
+        assertEquals(false, gregGMT.weekyears().isPrecise());
+        assertEquals(false, gregGMT.months().isPrecise());
+        assertEquals(true, gregGMT.weeks().isPrecise());
+        assertEquals(true, gregGMT.days().isPrecise());
+        assertEquals(true, gregGMT.halfdays().isPrecise());
+        assertEquals(true, gregGMT.hours().isPrecise());
+        assertEquals(true, gregGMT.minutes().isPrecise());
+        assertEquals(true, gregGMT.seconds().isPrecise());
+        assertEquals(true, gregGMT.millis().isPrecise());
     }
 
-    // Test cases for date fields
     public void testDateFields() {
         final GregorianChronology greg = GregorianChronology.getInstance();
         assertEquals("era", greg.era().getName());
@@ -242,20 +236,20 @@ public class TestGregorianChronology extends TestCase {
         assertEquals("dayOfYear", greg.dayOfYear().getName());
         assertEquals("dayOfMonth", greg.dayOfMonth().getName());
         assertEquals("dayOfWeek", greg.dayOfWeek().getName());
-
-        assertTrue(greg.era().isSupported());
-        assertTrue(greg.centuryOfEra().isSupported());
-        assertTrue(greg.yearOfCentury().isSupported());
-        assertTrue(greg.yearOfEra().isSupported());
-        assertTrue(greg.year().isSupported());
-        assertTrue(greg.monthOfYear().isSupported());
-        assertTrue(greg.weekyearOfCentury().isSupported());
-        assertTrue(greg.weekyear().isSupported());
-        assertTrue(greg.weekOfWeekyear().isSupported());
-        assertTrue(greg.dayOfYear().isSupported());
-        assertTrue(greg.dayOfMonth().isSupported());
-        assertTrue(greg.dayOfWeek().isSupported());
-
+        
+        assertEquals(true, greg.era().isSupported());
+        assertEquals(true, greg.centuryOfEra().isSupported());
+        assertEquals(true, greg.yearOfCentury().isSupported());
+        assertEquals(true, greg.yearOfEra().isSupported());
+        assertEquals(true, greg.year().isSupported());
+        assertEquals(true, greg.monthOfYear().isSupported());
+        assertEquals(true, greg.weekyearOfCentury().isSupported());
+        assertEquals(true, greg.weekyear().isSupported());
+        assertEquals(true, greg.weekOfWeekyear().isSupported());
+        assertEquals(true, greg.dayOfYear().isSupported());
+        assertEquals(true, greg.dayOfMonth().isSupported());
+        assertEquals(true, greg.dayOfWeek().isSupported());
+        
         assertEquals(greg.eras(), greg.era().getDurationField());
         assertEquals(greg.centuries(), greg.centuryOfEra().getDurationField());
         assertEquals(greg.years(), greg.yearOfCentury().getDurationField());
@@ -268,22 +262,21 @@ public class TestGregorianChronology extends TestCase {
         assertEquals(greg.days(), greg.dayOfYear().getDurationField());
         assertEquals(greg.days(), greg.dayOfMonth().getDurationField());
         assertEquals(greg.days(), greg.dayOfWeek().getDurationField());
-
-        assertNull(greg.era().getRangeDurationField());
+        
+        assertEquals(null, greg.era().getRangeDurationField());
         assertEquals(greg.eras(), greg.centuryOfEra().getRangeDurationField());
         assertEquals(greg.centuries(), greg.yearOfCentury().getRangeDurationField());
         assertEquals(greg.eras(), greg.yearOfEra().getRangeDurationField());
-        assertNull(greg.year().getRangeDurationField());
+        assertEquals(null, greg.year().getRangeDurationField());
         assertEquals(greg.years(), greg.monthOfYear().getRangeDurationField());
         assertEquals(greg.centuries(), greg.weekyearOfCentury().getRangeDurationField());
-        assertNull(greg.weekyear().getRangeDurationField());
+        assertEquals(null, greg.weekyear().getRangeDurationField());
         assertEquals(greg.weekyears(), greg.weekOfWeekyear().getRangeDurationField());
         assertEquals(greg.years(), greg.dayOfYear().getRangeDurationField());
         assertEquals(greg.months(), greg.dayOfMonth().getRangeDurationField());
         assertEquals(greg.weeks(), greg.dayOfWeek().getRangeDurationField());
     }
 
-    // Test cases for time fields
     public void testTimeFields() {
         final GregorianChronology greg = GregorianChronology.getInstance();
         assertEquals("halfdayOfDay", greg.halfdayOfDay().getName());
@@ -297,21 +290,20 @@ public class TestGregorianChronology extends TestCase {
         assertEquals("secondOfMinute", greg.secondOfMinute().getName());
         assertEquals("millisOfDay", greg.millisOfDay().getName());
         assertEquals("millisOfSecond", greg.millisOfSecond().getName());
-
-        assertTrue(greg.halfdayOfDay().isSupported());
-        assertTrue(greg.clockhourOfHalfday().isSupported());
-        assertTrue(greg.hourOfHalfday().isSupported());
-        assertTrue(greg.clockhourOfDay().isSupported());
-        assertTrue(greg.hourOfDay().isSupported());
-        assertTrue(greg.minuteOfDay().isSupported());
-        assertTrue(greg.minuteOfHour().isSupported());
-        assertTrue(greg.secondOfDay().isSupported());
-        assertTrue(greg.secondOfMinute().isSupported());
-        assertTrue(greg.millisOfDay().isSupported());
-        assertTrue(greg.millisOfSecond().isSupported());
+        
+        assertEquals(true, greg.halfdayOfDay().isSupported());
+        assertEquals(true, greg.clockhourOfHalfday().isSupported());
+        assertEquals(true, greg.hourOfHalfday().isSupported());
+        assertEquals(true, greg.clockhourOfDay().isSupported());
+        assertEquals(true, greg.hourOfDay().isSupported());
+        assertEquals(true, greg.minuteOfDay().isSupported());
+        assertEquals(true, greg.minuteOfHour().isSupported());
+        assertEquals(true, greg.secondOfDay().isSupported());
+        assertEquals(true, greg.secondOfMinute().isSupported());
+        assertEquals(true, greg.millisOfDay().isSupported());
+        assertEquals(true, greg.millisOfSecond().isSupported());
     }
 
-    // Test cases for maximum value calculations
     public void testMaximumValue() {
         YearMonthDay ymd1 = new YearMonthDay(1999, DateTimeConstants.FEBRUARY, 1);
         DateMidnight dm1 = new DateMidnight(1999, DateTimeConstants.FEBRUARY, 1);
@@ -320,22 +312,22 @@ public class TestGregorianChronology extends TestCase {
         assertEquals(28, chrono.dayOfMonth().getMaximumValue(dm1.getMillis()));
     }
 
-    // Test cases for leap year calculations
     public void testLeap_28feb() {
         Chronology chrono = GregorianChronology.getInstance();
         DateTime dt = new DateTime(2012, 2, 28, 0, 0, chrono);
-        assertTrue(dt.year().isLeap());
-        assertTrue(dt.monthOfYear().isLeap());
-        assertFalse(dt.dayOfMonth().isLeap());
-        assertFalse(dt.dayOfYear().isLeap());
+        assertEquals(true, dt.year().isLeap());
+        assertEquals(true, dt.monthOfYear().isLeap());
+        assertEquals(false, dt.dayOfMonth().isLeap());
+        assertEquals(false, dt.dayOfYear().isLeap());
     }
 
     public void testLeap_29feb() {
         Chronology chrono = GregorianChronology.getInstance();
         DateTime dt = new DateTime(2012, 2, 29, 0, 0, chrono);
-        assertTrue(dt.year().isLeap());
-        assertTrue(dt.monthOfYear().isLeap());
-        assertTrue(dt.dayOfMonth().isLeap());
-        assertTrue(dt.dayOfYear().isLeap());
+        assertEquals(true, dt.year().isLeap());
+        assertEquals(true, dt.monthOfYear().isLeap());
+        assertEquals(true, dt.dayOfMonth().isLeap());
+        assertEquals(true, dt.dayOfYear().isLeap());
     }
+
 }
