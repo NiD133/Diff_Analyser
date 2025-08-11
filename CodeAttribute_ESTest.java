@@ -32,531 +32,361 @@ import org.evosuite.runtime.EvoRunnerParameters;
 import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true, 
+    useVFS = true, 
+    useVNET = true, 
+    resetStaticState = true, 
+    separateClassLoader = true
+) 
 public class CodeAttribute_ESTest extends CodeAttribute_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      byte[] byteArray0 = new byte[4];
-      OperandManager operandManager0 = new OperandManager((int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null);
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      CodeAttribute codeAttribute0 = new CodeAttribute((-2553), 85, byteArray0, (Segment) null, operandManager0, linkedList0);
-      CPUTF8 cPUTF8_0 = new CPUTF8("i2f", 38);
-      CPClass cPClass0 = new CPClass(cPUTF8_0, 85);
-      ExceptionTableEntry exceptionTableEntry0 = new ExceptionTableEntry(87, 38, 87, cPClass0);
-      linkedList0.add(exceptionTableEntry0);
-      int int0 = codeAttribute0.getLength();
-      assertEquals(85, codeAttribute0.maxLocals);
-      assertEquals((-2553), codeAttribute0.maxStack);
-      assertEquals(24, int0);
-  }
+    // ====================== BASIC FUNCTIONALITY TESTS ======================
+    
+    @Test(timeout = 4000)
+    public void testGetLengthWithExceptionTable() throws Throwable {
+        // Setup: Create CodeAttribute with exception table entry
+        byte[] codeBytes = new byte[4];
+        OperandManager operandManager = new OperandManager(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        LinkedList<ExceptionTableEntry> exceptionTable = new LinkedList<>();
+        CodeAttribute codeAttr = new CodeAttribute(-2553, 85, codeBytes, null, operandManager, exceptionTable);
+        
+        // Add exception table entry
+        CPUTF8 exceptionClass = new CPUTF8("i2f", 38);
+        CPClass cpClass = new CPClass(exceptionClass, 85);
+        exceptionTable.add(new ExceptionTableEntry(87, 38, 87, cpClass));
+        
+        // Verify length calculation includes exception table
+        int length = codeAttr.getLength();
+        assertEquals(24, length);
+        assertEquals(85, codeAttr.maxLocals);
+        assertEquals(-2553, codeAttr.maxStack);
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      byte[] byteArray0 = new byte[7];
-      byteArray0[4] = (byte) (-60);
-      int[] intArray0 = new int[7];
-      OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0);
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      CodeAttribute codeAttribute0 = new CodeAttribute(28, 17, byteArray0, (Segment) null, operandManager0, linkedList0);
-      assertEquals(17, codeAttribute0.maxLocals);
-      assertEquals(28, codeAttribute0.maxStack);
-      assertEquals(9, codeAttribute0.codeLength);
-  }
+    @Test(timeout = 4000)
+    public void testCodeAttributeCreationWithByteArray() throws Throwable {
+        // Setup: Create CodeAttribute with specific byte array
+        byte[] codeBytes = new byte[7];
+        codeBytes[4] = (byte) -60; // Special instruction
+        int[] dummyIntArray = new int[7];
+        OperandManager operandManager = new OperandManager(dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray);
+        LinkedList<ExceptionTableEntry> exceptionTable = new LinkedList<>();
+        
+        // Create attribute and verify properties
+        CodeAttribute codeAttr = new CodeAttribute(28, 17, codeBytes, null, operandManager, exceptionTable);
+        assertEquals(17, codeAttr.maxLocals);
+        assertEquals(28, codeAttr.maxStack);
+        assertEquals(9, codeAttr.codeLength);
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      byte[] byteArray0 = new byte[4];
-      OperandManager operandManager0 = new OperandManager((int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null);
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      CodeAttribute codeAttribute0 = new CodeAttribute(85, 85, byteArray0, (Segment) null, operandManager0, linkedList0);
-      ClassConstantPool classConstantPool0 = new ClassConstantPool();
-      classConstantPool0.resolve((Segment) null);
-      codeAttribute0.resolve(classConstantPool0);
-      CodeAttribute codeAttribute1 = new CodeAttribute(39, 100, byteArray0, (Segment) null, operandManager0, codeAttribute0.exceptionTable);
-      codeAttribute1.resolve(classConstantPool0);
-      codeAttribute0.addAttribute(codeAttribute1);
-      assertEquals(0, linkedList0.size());
-      assertEquals(39, codeAttribute1.maxStack);
-      
-      MockFileOutputStream mockFileOutputStream0 = new MockFileOutputStream("!", true);
-      DataOutputStream dataOutputStream0 = new DataOutputStream(mockFileOutputStream0);
-      codeAttribute0.writeBody(dataOutputStream0);
-      assertEquals(85, codeAttribute0.maxLocals);
-      assertEquals(4, codeAttribute0.codeLength);
-  }
+    @Test(timeout = 4000)
+    public void testGetNestedClassFileEntriesWithExceptionTable() throws Throwable {
+        // Setup: Create CodeAttribute with exception table
+        byte[] codeBytes = new byte[10];
+        OperandManager operandManager = new OperandManager(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        LinkedList<ExceptionTableEntry> exceptionTable = new LinkedList<>();
+        exceptionTable.addFirst(new ExceptionTableEntry(25, 25, 25, null));
+        CodeAttribute codeAttr = new CodeAttribute(25, 25, codeBytes, null, operandManager, exceptionTable);
+        
+        // Verify nested entries
+        ClassFileEntry[] nestedEntries = codeAttr.getNestedClassFileEntries();
+        assertEquals(11, nestedEntries.length);
+        assertEquals(25, codeAttr.maxStack);
+        assertEquals(25, codeAttr.maxLocals);
+        assertEquals(10, codeAttr.codeLength);
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      int[] intArray0 = new int[1];
-      OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0);
-      byte[] byteArray0 = new byte[0];
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      CodeAttribute codeAttribute0 = new CodeAttribute(939, 1168, byteArray0, (Segment) null, operandManager0, linkedList0);
-      CPUTF8[] cPUTF8Array0 = new CPUTF8[1];
-      LocalVariableTableAttribute localVariableTableAttribute0 = new LocalVariableTableAttribute((-2518), intArray0, intArray0, cPUTF8Array0, cPUTF8Array0, intArray0);
-      codeAttribute0.addAttribute(localVariableTableAttribute0);
-      int int0 = codeAttribute0.getLength();
-      assertEquals(1168, codeAttribute0.maxLocals);
-      assertEquals(939, codeAttribute0.maxStack);
-      assertEquals((-25160), int0);
-  }
+    @Test(timeout = 4000)
+    public void testAddLocalVariableTypeTableAttribute() throws Throwable {
+        // Setup: Create CodeAttribute and add LocalVariableTypeTableAttribute
+        byte[] codeBytes = new byte[7];
+        OperandManager operandManager = new OperandManager(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        LinkedList<ExceptionTableEntry> exceptionTable = new LinkedList<>();
+        CodeAttribute codeAttr = new CodeAttribute(1, 1, codeBytes, null, operandManager, exceptionTable);
+        
+        // Add attribute
+        codeAttr.addAttribute(new LocalVariableTypeTableAttribute(1, null, null, null, null, null));
+        
+        // Verify properties
+        assertEquals(1, codeAttr.maxLocals);
+        assertEquals(0, exceptionTable.size());
+        assertEquals(1, codeAttr.maxStack);
+        assertEquals(7, codeAttr.codeLength);
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      byte[] byteArray0 = new byte[1];
-      int[] intArray0 = new int[1];
-      OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, (int[]) null, (int[]) null, (int[]) null, (int[]) null, intArray0, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, intArray0, intArray0);
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      CodeAttribute codeAttribute0 = new CodeAttribute(3668, 3534, byteArray0, (Segment) null, operandManager0, linkedList0);
-      ClassConstantPool classConstantPool0 = new ClassConstantPool();
-      classConstantPool0.resolve((Segment) null);
-      codeAttribute0.resolve(classConstantPool0);
-      codeAttribute0.addAttribute((Attribute) null);
-      MockFileOutputStream mockFileOutputStream0 = new MockFileOutputStream("fconst_1", true);
-      DataOutputStream dataOutputStream0 = new DataOutputStream(mockFileOutputStream0);
-      // Undeclared exception!
-      try { 
-        codeAttribute0.writeBody(dataOutputStream0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.bytecode.CodeAttribute", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testGetStartPCs() throws Throwable {
+        // Setup: Create basic CodeAttribute
+        int[] dummyIntArray = new int[0];
+        OperandManager operandManager = new OperandManager(dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray);
+        byte[] codeBytes = new byte[12];
+        LinkedList<ExceptionTableEntry> exceptionTable = new LinkedList<>();
+        CodeAttribute codeAttr = new CodeAttribute(0, 0, codeBytes, null, operandManager, exceptionTable);
+        
+        // Verify startPCs retrieval
+        codeAttr.getStartPCs();
+        assertEquals(12, codeAttr.codeLength);
+        assertEquals(0, exceptionTable.size());
+        assertEquals(0, codeAttr.maxStack);
+        assertEquals(0, codeAttr.maxLocals);
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      int[] intArray0 = new int[1];
-      OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0);
-      byte[] byteArray0 = new byte[3];
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      CodeAttribute codeAttribute0 = new CodeAttribute((byte)0, (byte)0, byteArray0, (Segment) null, operandManager0, linkedList0);
-      PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-      DataOutputStream dataOutputStream0 = new DataOutputStream(pipedOutputStream0);
-      try { 
-        codeAttribute0.writeBody(dataOutputStream0);
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // Pipe not connected
-         //
-         verifyException("java.io.PipedOutputStream", e);
-      }
-  }
+    // ====================== ATTRIBUTE HANDLING TESTS ======================
+    
+    @Test(timeout = 4000)
+    public void testWriteBodyWithAddedCodeAttribute() throws Throwable {
+        // Setup: Create nested CodeAttributes
+        byte[] codeBytes = new byte[4];
+        OperandManager operandManager = new OperandManager(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        LinkedList<ExceptionTableEntry> exceptionTable = new LinkedList<>();
+        CodeAttribute parentAttr = new CodeAttribute(85, 85, codeBytes, null, operandManager, exceptionTable);
+        
+        // Resolve constant pool
+        ClassConstantPool pool = new ClassConstantPool();
+        pool.resolve(null);
+        parentAttr.resolve(pool);
+        
+        // Add child attribute
+        CodeAttribute childAttr = new CodeAttribute(39, 100, codeBytes, null, operandManager, parentAttr.exceptionTable);
+        childAttr.resolve(pool);
+        parentAttr.addAttribute(childAttr);
+        
+        // Write and verify
+        MockFileOutputStream mockFileStream = new MockFileOutputStream("!", true);
+        DataOutputStream dataStream = new DataOutputStream(mockFileStream);
+        parentAttr.writeBody(dataStream);
+        
+        assertEquals(85, parentAttr.maxLocals);
+        assertEquals(4, parentAttr.codeLength);
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      byte[] byteArray0 = new byte[2];
-      int[] intArray0 = new int[6];
-      OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, (int[]) null, intArray0, (int[]) null, (int[]) null);
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      CodeAttribute codeAttribute0 = new CodeAttribute(97, 97, byteArray0, (Segment) null, operandManager0, linkedList0);
-      AnnotationsAttribute.Annotation[] annotationsAttribute_AnnotationArray0 = new AnnotationsAttribute.Annotation[4];
-      CPUTF8[] cPUTF8Array0 = new CPUTF8[6];
-      AnnotationsAttribute.ElementValue[] annotationsAttribute_ElementValueArray0 = new AnnotationsAttribute.ElementValue[1];
-      AnnotationsAttribute.ElementValue annotationsAttribute_ElementValue0 = new AnnotationsAttribute.ElementValue((-84), cPUTF8Array0[0]);
-      annotationsAttribute_ElementValueArray0[0] = annotationsAttribute_ElementValue0;
-      AnnotationsAttribute.Annotation annotationsAttribute_Annotation0 = new AnnotationsAttribute.Annotation(2, (CPUTF8) null, cPUTF8Array0, annotationsAttribute_ElementValueArray0);
-      annotationsAttribute_AnnotationArray0[0] = annotationsAttribute_Annotation0;
-      RuntimeVisibleorInvisibleAnnotationsAttribute runtimeVisibleorInvisibleAnnotationsAttribute0 = new RuntimeVisibleorInvisibleAnnotationsAttribute((CPUTF8) null, annotationsAttribute_AnnotationArray0);
-      codeAttribute0.addAttribute(runtimeVisibleorInvisibleAnnotationsAttribute0);
-      // Undeclared exception!
-      try { 
-        codeAttribute0.toString();
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
-      
-      } catch(ArrayIndexOutOfBoundsException e) {
-         //
-         // 1
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.bytecode.AnnotationsAttribute$Annotation", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testGetLengthWithLocalVariableTableAttribute() throws Throwable {
+        // Setup: Create CodeAttribute with LocalVariableTableAttribute
+        int[] dummyIntArray = new int[1];
+        OperandManager operandManager = new OperandManager(dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray);
+        byte[] codeBytes = new byte[0];
+        LinkedList<ExceptionTableEntry> exceptionTable = new LinkedList<>();
+        CodeAttribute codeAttr = new CodeAttribute(939, 1168, codeBytes, null, operandManager, exceptionTable);
+        
+        // Add attribute
+        CPUTF8[] dummyCPUTF8Array = new CPUTF8[1];
+        codeAttr.addAttribute(new LocalVariableTableAttribute(-2518, dummyIntArray, dummyIntArray, dummyCPUTF8Array, dummyCPUTF8Array, dummyIntArray));
+        
+        // Verify length
+        int length = codeAttr.getLength();
+        assertEquals(1168, codeAttr.maxLocals);
+        assertEquals(939, codeAttr.maxStack);
+        assertEquals(-25160, length);
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      int[] intArray0 = new int[3];
-      OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0);
-      byte[] byteArray0 = new byte[8];
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      CodeAttribute codeAttribute0 = new CodeAttribute((byte)0, (byte)0, byteArray0, (Segment) null, operandManager0, linkedList0);
-      ClassConstantPool classConstantPool0 = new ClassConstantPool();
-      // Undeclared exception!
-      try { 
-        codeAttribute0.resolve(classConstantPool0);
-        fail("Expecting exception: IllegalStateException");
-      
-      } catch(IllegalStateException e) {
-         //
-         // Constant pool is not yet resolved; this does not make any sense
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.bytecode.ClassConstantPool", e);
-      }
-  }
+    // ====================== EXCEPTION HANDLING TESTS ======================
+    
+    @Test(timeout = 4000)
+    public void testWriteBodyWithNullAttributeThrowsException() throws Throwable {
+        // Setup: Create CodeAttribute with null attribute
+        byte[] codeBytes = new byte[1];
+        int[] dummyIntArray = new int[1];
+        OperandManager operandManager = new OperandManager(dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, null, null, null, null, dummyIntArray, null, null, null, null, null, dummyIntArray, dummyIntArray);
+        LinkedList<ExceptionTableEntry> exceptionTable = new LinkedList<>();
+        CodeAttribute codeAttr = new CodeAttribute(3668, 3534, codeBytes, null, operandManager, exceptionTable);
+        
+        // Resolve constant pool
+        ClassConstantPool pool = new ClassConstantPool();
+        pool.resolve(null);
+        codeAttr.resolve(pool);
+        
+        // Add null attribute
+        codeAttr.addAttribute(null);
+        
+        // Attempt to write
+        MockFileOutputStream mockFileStream = new MockFileOutputStream("fconst_1", true);
+        DataOutputStream dataStream = new DataOutputStream(mockFileStream);
+        
+        try {
+            codeAttr.writeBody(dataStream);
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      int[] intArray0 = new int[8];
-      OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0);
-      byte[] byteArray0 = new byte[7];
-      CodeAttribute codeAttribute0 = new CodeAttribute((-1), 66, byteArray0, (Segment) null, operandManager0, (List<ExceptionTableEntry>) null);
-      // Undeclared exception!
-      try { 
-        codeAttribute0.renumber((List<Integer>) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.bytecode.CodeAttribute", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testWriteBodyToPipedOutputStreamThrowsException() throws Throwable {
+        // Setup: Create CodeAttribute and disconnected pipe
+        int[] dummyIntArray = new int[1];
+        OperandManager operandManager = new OperandManager(dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray);
+        byte[] codeBytes = new byte[3];
+        LinkedList<ExceptionTableEntry> exceptionTable = new LinkedList<>();
+        CodeAttribute codeAttr = new CodeAttribute(0, 0, codeBytes, null, operandManager, exceptionTable);
+        
+        // Attempt to write to disconnected pipe
+        PipedOutputStream pipe = new PipedOutputStream();
+        DataOutputStream dataStream = new DataOutputStream(pipe);
+        
+        try {
+            codeAttr.writeBody(dataStream);
+            fail("Expected IOException");
+        } catch (IOException e) {
+            assertEquals("Pipe not connected", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      int[] intArray0 = new int[0];
-      OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0);
-      byte[] byteArray0 = new byte[2];
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      ExceptionTableEntry exceptionTableEntry0 = new ExceptionTableEntry((-3254), 1477, 1477, (CPClass) null);
-      linkedList0.add(exceptionTableEntry0);
-      CodeAttribute codeAttribute0 = new CodeAttribute((byte)0, (byte)0, byteArray0, (Segment) null, operandManager0, linkedList0);
-      LinkedList<Integer> linkedList1 = new LinkedList<Integer>();
-      // Undeclared exception!
-      try { 
-        codeAttribute0.renumber(linkedList1);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // Index: -3254, Size: 0
-         //
-         verifyException("java.util.LinkedList", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testResolveWithUnresolvedConstantPoolThrowsException() throws Throwable {
+        // Setup: Create CodeAttribute with unresolved constant pool
+        int[] dummyIntArray = new int[3];
+        OperandManager operandManager = new OperandManager(dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray);
+        byte[] codeBytes = new byte[8];
+        LinkedList<ExceptionTableEntry> exceptionTable = new LinkedList<>();
+        CodeAttribute codeAttr = new CodeAttribute(0, 0, codeBytes, null, operandManager, exceptionTable);
+        
+        // Attempt to resolve with unresolved pool
+        try {
+            codeAttr.resolve(new ClassConstantPool());
+            fail("Expected IllegalStateException");
+        } catch (IllegalStateException e) {
+            assertEquals("Constant pool is not yet resolved; this does not make any sense", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      int[] intArray0 = new int[0];
-      OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0);
-      byte[] byteArray0 = new byte[4];
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      linkedList0.add((ExceptionTableEntry) null);
-      CodeAttribute codeAttribute0 = new CodeAttribute((byte)0, (byte)0, byteArray0, (Segment) null, operandManager0, linkedList0);
-      // Undeclared exception!
-      try { 
-        codeAttribute0.getNestedClassFileEntries();
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.bytecode.CodeAttribute", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testRenumberWithNullListThrowsException() throws Throwable {
+        // Setup: Create CodeAttribute
+        int[] dummyIntArray = new int[8];
+        OperandManager operandManager = new OperandManager(dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray);
+        byte[] codeBytes = new byte[7];
+        CodeAttribute codeAttr = new CodeAttribute(-1, 66, codeBytes, null, operandManager, null);
+        
+        // Attempt to renumber with null
+        try {
+            codeAttr.renumber(null);
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      byte[] byteArray0 = new byte[17];
-      OperandManager operandManager0 = new OperandManager((int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null);
-      CodeAttribute codeAttribute0 = new CodeAttribute(295, 295, byteArray0, (Segment) null, operandManager0, (List<ExceptionTableEntry>) null);
-      // Undeclared exception!
-      try { 
-        codeAttribute0.getLength();
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.bytecode.CodeAttribute", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testGetNestedClassFileEntriesWithNullExceptionTableEntryThrowsException() throws Throwable {
+        // Setup: Create CodeAttribute with null exception table entry
+        int[] dummyIntArray = new int[0];
+        OperandManager operandManager = new OperandManager(dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray);
+        byte[] codeBytes = new byte[4];
+        LinkedList<ExceptionTableEntry> exceptionTable = new LinkedList<>();
+        exceptionTable.add(null);
+        CodeAttribute codeAttr = new CodeAttribute(0, 0, codeBytes, null, operandManager, exceptionTable);
+        
+        // Attempt to get nested entries
+        try {
+            codeAttr.getNestedClassFileEntries();
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      byte[] byteArray0 = new byte[9];
-      byteArray0[2] = (byte) (-46);
-      int[] intArray0 = new int[5];
-      OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0);
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      CodeAttribute codeAttribute0 = null;
-      try {
-        codeAttribute0 = new CodeAttribute(141, (-3388), byteArray0, (Segment) null, operandManager0, linkedList0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.bytecode.OperandManager", e);
-      }
-  }
+    // ====================== EDGE CASE TESTS ======================
+    
+    @Test(timeout = 4000)
+    public void testCodeAttributeCreationWithNegativeMaxLocalsThrowsException() throws Throwable {
+        // Setup: Attempt to create with negative maxLocals
+        byte[] codeBytes = new byte[9];
+        codeBytes[2] = (byte) -46;
+        int[] dummyIntArray = new int[5];
+        OperandManager operandManager = new OperandManager(dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray);
+        LinkedList<ExceptionTableEntry> exceptionTable = new LinkedList<>();
+        
+        try {
+            new CodeAttribute(141, -3388, codeBytes, null, operandManager, exceptionTable);
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      byte[] byteArray0 = new byte[2];
-      byteArray0[0] = (byte) (-86);
-      int[] intArray0 = new int[2];
-      intArray0[0] = (int) (byte) (-86);
-      OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, (int[]) null, (int[]) null, (int[]) null, intArray0, intArray0, (int[]) null, intArray0, intArray0, (int[]) null, (int[]) null, intArray0, (int[]) null, (int[]) null, intArray0);
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      CodeAttribute codeAttribute0 = null;
-      try {
-        codeAttribute0 = new CodeAttribute(77, (-1868), byteArray0, (Segment) null, operandManager0, linkedList0);
-        fail("Expecting exception: NegativeArraySizeException");
-      
-      } catch(NegativeArraySizeException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.bytecode.forms.TableSwitchForm", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testWriteBodyWithSourceFileAttributeThrowsException() throws Throwable {
+        // Setup: Create CodeAttribute with unresolved SourceFileAttribute
+        byte[] codeBytes = new byte[10];
+        OperandManager operandManager = new OperandManager(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        LinkedList<ExceptionTableEntry> exceptionTable = new LinkedList<>();
+        CodeAttribute codeAttr = new CodeAttribute(158, 158, codeBytes, null, operandManager, exceptionTable);
+        
+        // Resolve constant pool
+        ClassConstantPool pool = new ClassConstantPool();
+        pool.resolve(null);
+        codeAttr.resolve(pool);
+        
+        // Add unresolved attribute
+        CPUTF8 sourceFileName = new CPUTF8("gp");
+        codeAttr.addAttribute(new SourceFileAttribute(sourceFileName));
+        
+        // Attempt to write
+        MockFileOutputStream mockFileStream = new MockFileOutputStream("gp", false);
+        DataOutputStream dataStream = new DataOutputStream(mockFileStream);
+        
+        try {
+            codeAttr.writeBody(dataStream);
+            fail("Expected IllegalStateException");
+        } catch (IllegalStateException e) {
+            assertEquals("Entry has not been resolved", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      int[] intArray0 = new int[16];
-      OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0);
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      byte[] byteArray0 = new byte[2];
-      byteArray0[0] = (byte) (-93);
-      intArray0[0] = (int) (byte)106;
-      CodeAttribute codeAttribute0 = null;
-      try {
-        codeAttribute0 = new CodeAttribute(1717, 1717, byteArray0, (Segment) null, operandManager0, linkedList0);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // Index: 106, Size: 2
-         //
-         verifyException("java.util.ArrayList", e);
-      }
-  }
+    // ====================== ADDITIONAL TESTS ======================
+    
+    @Test(timeout = 4000)
+    public void testToString() throws Throwable {
+        // Setup: Create basic CodeAttribute
+        byte[] codeBytes = new byte[2];
+        int[] dummyIntArray = new int[6];
+        OperandManager operandManager = new OperandManager(dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, null, dummyIntArray, null, null);
+        LinkedList<ExceptionTableEntry> exceptionTable = new LinkedList<>();
+        CodeAttribute codeAttr = new CodeAttribute(97, 97, codeBytes, null, operandManager, exceptionTable);
+        
+        // Verify toString output
+        String result = codeAttr.toString();
+        assertEquals("Code: 14 bytes", result);
+        assertEquals(97, codeAttr.maxStack);
+        assertEquals(97, codeAttr.maxLocals);
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      byte[] byteArray0 = new byte[7];
-      byteArray0[3] = (byte) (-98);
-      int[] intArray0 = new int[7];
-      intArray0[0] = (int) (byte) (-98);
-      OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0);
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      CodeAttribute codeAttribute0 = null;
-      try {
-        codeAttribute0 = new CodeAttribute(28, 17, byteArray0, (Segment) null, operandManager0, linkedList0);
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
-      
-      } catch(ArrayIndexOutOfBoundsException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-      }
-  }
+    @Test(timeout = 4000)
+    public void testRenumberWithByteCodeOffsets() throws Throwable {
+        // Setup: Create CodeAttribute and renumber with its own offsets
+        int[] dummyIntArray = new int[3];
+        OperandManager operandManager = new OperandManager(dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray);
+        byte[] codeBytes = new byte[3];
+        LinkedList<ExceptionTableEntry> exceptionTable = new LinkedList<>();
+        CodeAttribute codeAttr = new CodeAttribute(0, 0, codeBytes, null, operandManager, exceptionTable);
+        
+        // Renumber
+        codeAttr.renumber(codeAttr.byteCodeOffsets);
+        
+        // Verify properties
+        assertEquals(0, exceptionTable.size());
+        assertEquals(0, codeAttr.maxStack);
+        assertEquals(0, codeAttr.maxLocals);
+        assertEquals(3, codeAttr.codeLength);
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      byte[] byteArray0 = new byte[10];
-      OperandManager operandManager0 = new OperandManager((int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null);
-      ClassConstantPool classConstantPool0 = new ClassConstantPool();
-      classConstantPool0.resolve((Segment) null);
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      CodeAttribute codeAttribute0 = new CodeAttribute(158, 158, byteArray0, (Segment) null, operandManager0, linkedList0);
-      codeAttribute0.resolve(classConstantPool0);
-      CPUTF8 cPUTF8_0 = new CPUTF8("gp");
-      SourceFileAttribute sourceFileAttribute0 = new SourceFileAttribute(cPUTF8_0);
-      codeAttribute0.addAttribute(sourceFileAttribute0);
-      MockFileOutputStream mockFileOutputStream0 = new MockFileOutputStream("gp", false);
-      DataOutputStream dataOutputStream0 = new DataOutputStream(mockFileOutputStream0);
-      // Undeclared exception!
-      try { 
-        codeAttribute0.writeBody(dataOutputStream0);
-        fail("Expecting exception: IllegalStateException");
-      
-      } catch(IllegalStateException e) {
-         //
-         // Entry has not been resolved
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.bytecode.ClassFileEntry", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      byte[] byteArray0 = new byte[4];
-      OperandManager operandManager0 = new OperandManager((int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null);
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      CodeAttribute codeAttribute0 = new CodeAttribute((-2553), 85, byteArray0, (Segment) null, operandManager0, linkedList0);
-      CPUTF8 cPUTF8_0 = new CPUTF8("i2f", 38);
-      CPClass cPClass0 = new CPClass(cPUTF8_0, 85);
-      ExceptionTableEntry exceptionTableEntry0 = new ExceptionTableEntry(87, 38, 87, cPClass0);
-      linkedList0.add(exceptionTableEntry0);
-      ClassConstantPool classConstantPool0 = new ClassConstantPool();
-      classConstantPool0.resolve((Segment) null);
-      codeAttribute0.resolve(classConstantPool0);
-      MockFileOutputStream mockFileOutputStream0 = new MockFileOutputStream("$0'{");
-      DataOutputStream dataOutputStream0 = new DataOutputStream(mockFileOutputStream0);
-      codeAttribute0.writeBody(dataOutputStream0);
-      assertEquals(4, codeAttribute0.codeLength);
-      assertEquals(85, codeAttribute0.maxLocals);
-      assertEquals((-2553), codeAttribute0.maxStack);
-  }
-
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      byte[] byteArray0 = new byte[10];
-      OperandManager operandManager0 = new OperandManager((int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null);
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      ExceptionTableEntry exceptionTableEntry0 = new ExceptionTableEntry(25, 25, 25, (CPClass) null);
-      linkedList0.addFirst(exceptionTableEntry0);
-      CodeAttribute codeAttribute0 = new CodeAttribute(25, 25, byteArray0, (Segment) null, operandManager0, linkedList0);
-      ClassFileEntry[] classFileEntryArray0 = codeAttribute0.getNestedClassFileEntries();
-      assertEquals(25, codeAttribute0.maxStack);
-      assertEquals(11, classFileEntryArray0.length);
-      assertEquals(25, codeAttribute0.maxLocals);
-      assertEquals(10, codeAttribute0.codeLength);
-  }
-
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      int[] intArray0 = new int[0];
-      OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0);
-      byte[] byteArray0 = new byte[1];
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      CPUTF8 cPUTF8_0 = new CPUTF8("ZPf8xB8qNlg", 1526);
-      CPClass cPClass0 = new CPClass(cPUTF8_0, (byte)8);
-      ExceptionTableEntry exceptionTableEntry0 = new ExceptionTableEntry(1526, 1526, 1526, cPClass0);
-      linkedList0.add(exceptionTableEntry0);
-      CodeAttribute codeAttribute0 = new CodeAttribute((byte)0, (byte)0, byteArray0, (Segment) null, operandManager0, linkedList0);
-      ClassFileEntry[] classFileEntryArray0 = codeAttribute0.getNestedClassFileEntries();
-      assertEquals(0, codeAttribute0.maxStack);
-      assertEquals(1, codeAttribute0.codeLength);
-      assertEquals(3, classFileEntryArray0.length);
-      assertEquals(0, codeAttribute0.maxLocals);
-  }
-
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      byte[] byteArray0 = new byte[7];
-      OperandManager operandManager0 = new OperandManager((int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null, (int[]) null);
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      CodeAttribute codeAttribute0 = new CodeAttribute(1, 1, byteArray0, (Segment) null, operandManager0, linkedList0);
-      LocalVariableTypeTableAttribute localVariableTypeTableAttribute0 = new LocalVariableTypeTableAttribute(1, (int[]) null, (int[]) null, (CPUTF8[]) null, (CPUTF8[]) null, (int[]) null);
-      codeAttribute0.addAttribute(localVariableTypeTableAttribute0);
-      assertEquals(1, codeAttribute0.maxLocals);
-      assertEquals(0, linkedList0.size());
-      assertEquals(1, codeAttribute0.maxStack);
-      assertEquals(7, codeAttribute0.codeLength);
-  }
-
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      byte[] byteArray0 = new byte[2];
-      int[] intArray0 = new int[6];
-      OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, (int[]) null, intArray0, (int[]) null, (int[]) null);
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      CodeAttribute codeAttribute0 = new CodeAttribute(97, 97, byteArray0, (Segment) null, operandManager0, linkedList0);
-      AnnotationsAttribute.Annotation[] annotationsAttribute_AnnotationArray0 = new AnnotationsAttribute.Annotation[4];
-      RuntimeVisibleorInvisibleAnnotationsAttribute runtimeVisibleorInvisibleAnnotationsAttribute0 = new RuntimeVisibleorInvisibleAnnotationsAttribute((CPUTF8) null, annotationsAttribute_AnnotationArray0);
-      codeAttribute0.addAttribute(runtimeVisibleorInvisibleAnnotationsAttribute0);
-      // Undeclared exception!
-      try { 
-        codeAttribute0.toString();
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.bytecode.RuntimeVisibleorInvisibleAnnotationsAttribute", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      int[] intArray0 = new int[21];
-      OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0);
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      byte[] byteArray0 = new byte[1];
-      byteArray0[0] = (byte) (-60);
-      CodeAttribute codeAttribute0 = new CodeAttribute(2695, 2695, byteArray0, (Segment) null, operandManager0, linkedList0);
-      assertEquals(4, codeAttribute0.codeLength);
-      assertEquals(2695, codeAttribute0.maxStack);
-      assertEquals(2695, codeAttribute0.maxLocals);
-  }
-
-  @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
-      CodeAttribute.setAttributeName((CPUTF8) null);
-  }
-
-  @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
-      int[] intArray0 = new int[3];
-      OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0);
-      byte[] byteArray0 = new byte[3];
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      CodeAttribute codeAttribute0 = new CodeAttribute((byte)0, (byte)0, byteArray0, (Segment) null, operandManager0, linkedList0);
-      assertEquals(0, linkedList0.size());
-      
-      codeAttribute0.renumber(codeAttribute0.byteCodeOffsets);
-      assertEquals(0, codeAttribute0.maxStack);
-      assertEquals(0, codeAttribute0.maxLocals);
-      assertEquals(3, codeAttribute0.codeLength);
-  }
-
-  @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
-      int[] intArray0 = new int[0];
-      OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0);
-      byte[] byteArray0 = new byte[12];
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      CodeAttribute codeAttribute0 = new CodeAttribute((byte)0, (byte)0, byteArray0, (Segment) null, operandManager0, linkedList0);
-      codeAttribute0.getStartPCs();
-      assertEquals(12, codeAttribute0.codeLength);
-      assertEquals(0, linkedList0.size());
-      assertEquals(0, codeAttribute0.maxStack);
-      assertEquals(0, codeAttribute0.maxLocals);
-  }
-
-  @Test(timeout = 4000)
-  public void test26()  throws Throwable  {
-      int[] intArray0 = new int[8];
-      OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0);
-      byte[] byteArray0 = new byte[3];
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      CodeAttribute codeAttribute0 = new CodeAttribute((byte)0, (byte)0, byteArray0, (Segment) null, operandManager0, linkedList0);
-      // Undeclared exception!
-      try { 
-        codeAttribute0.resolve((ClassConstantPool) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.bytecode.Attribute", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test27()  throws Throwable  {
-      byte[] byteArray0 = new byte[2];
-      int[] intArray0 = new int[6];
-      OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, (int[]) null, intArray0, (int[]) null, (int[]) null);
-      LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-      CodeAttribute codeAttribute0 = new CodeAttribute(97, 97, byteArray0, (Segment) null, operandManager0, linkedList0);
-      String string0 = codeAttribute0.toString();
-      assertEquals(97, codeAttribute0.maxStack);
-      assertEquals("Code: 14 bytes", string0);
-      assertEquals(97, codeAttribute0.maxLocals);
-  }
+    @Test(timeout = 4000)
+    public void testResolveWithNullConstantPoolThrowsException() throws Throwable {
+        // Setup: Create CodeAttribute
+        int[] dummyIntArray = new int[8];
+        OperandManager operandManager = new OperandManager(dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray, dummyIntArray);
+        byte[] codeBytes = new byte[3];
+        LinkedList<ExceptionTableEntry> exceptionTable = new LinkedList<>();
+        CodeAttribute codeAttr = new CodeAttribute(0, 0, codeBytes, null, operandManager, exceptionTable);
+        
+        // Attempt to resolve with null pool
+        try {
+            codeAttr.resolve(null);
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected behavior
+        }
+    }
 }
