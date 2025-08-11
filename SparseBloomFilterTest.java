@@ -1,128 +1,92 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.commons.collections4.bloomfilter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the {@link SparseBloomFilter}.
- * 
- * The tests below focus on edge cases around processBitMaps, i.e. iteration
- * over 64-bit words that back the Bloom filter. They purposely use indices
- * that either:
- * - Stay within the first 64-bit word, or
- * - Cross the 64-bit word boundary (into the second word),
- * so we can verify early-exit behavior and the extra invocation after the last
- * non-empty word.
  */
 class SparseBloomFilterTest extends AbstractBloomFilterTest<SparseBloomFilter> {
-
-    // Indices that span two 64-bit words (1..9 in the first word, 65..71 in the second).
-    private static final int[] INDICES_CROSSING_WORD_BOUNDARY =
-        {1, 2, 3, 4, 5, 6, 7, 8, 9, 65, 66, 67, 68, 69, 70, 71};
-
-    // A small set of indices entirely within the first 64-bit word.
-    private static final int[] INDICES_FIRST_WORD_ONLY = {1, 2, 3, 4};
-
     @Override
     protected SparseBloomFilter createEmptyFilter(final Shape shape) {
         return new SparseBloomFilter(shape);
     }
 
-    private BloomFilter<?> createFilterWithIndices(final int... indices) {
-        return createFilter(getTestShape(), IndexExtractor.fromIndexArray(indices));
-    }
-
     @Test
-    void processBitMaps_stopsImmediately_whenPredicateIsFalse() {
-        final BloomFilter<?> bf = createFilterWithIndices(INDICES_CROSSING_WORD_BOUNDARY);
+    void testBitMapExtractorEdgeCases() {
+        int[] values = {1, 2, 3, 4, 5, 6, 7, 8, 9, 65, 66, 67, 68, 69, 70, 71};
+        BloomFilter bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
 
-        final AtomicInteger callCount = new AtomicInteger();
+        // verify exit early before bitmap boundary
+        final int[] passes = new int[1];
+        assertFalse(bf.processBitMaps(l -> {
+            passes[0]++;
+            return false;
+        }));
+        assertEquals(1, passes[0]);
 
-        final boolean result = bf.processBitMaps(bits -> {
-            callCount.incrementAndGet();
-            return false; // stop immediately
-        });
-
-        assertFalse(result, "processBitMaps should stop when the predicate returns false");
-        assertEquals(1, callCount.get(), "Predicate should be called exactly once");
-    }
-
-    @Test
-    void processBitMaps_stopsAtWordBoundary_whenPredicateTurnsFalseOnSecondCall() {
-        final BloomFilter<?> bf = createFilterWithIndices(INDICES_CROSSING_WORD_BOUNDARY);
-
-        final AtomicInteger callCount = new AtomicInteger();
-        final AtomicInteger trueCount = new AtomicInteger();
-
-        final boolean result = bf.processBitMaps(bits -> {
-            final int n = callCount.getAndIncrement();
-            final boolean keepGoing = (n == 0); // true on first word, false on second
-            if (keepGoing) {
-                trueCount.incrementAndGet();
+        // verify exit early at bitmap boundary
+        bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
+        passes[0] = 0;
+        assertFalse(bf.processBitMaps(l -> {
+            final boolean result = passes[0] == 0;
+            if (result) {
+                passes[0]++;
             }
-            return keepGoing;
-        });
+            return result;
+        }));
+        assertEquals(1, passes[0]);
 
-        assertFalse(result, "processBitMaps should return false when the predicate eventually returns false");
-        assertEquals(2, callCount.get(), "Expected two invocations across the 64-bit word boundary");
-        assertEquals(1, trueCount.get(), "Only the first invocation should have returned true");
-    }
+        // verify add extra if all values in first bitmap
+        values = new int[] {1, 2, 3, 4};
+        bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
+        passes[0] = 0;
+        assertTrue(bf.processBitMaps(l -> {
+            passes[0]++;
+            return true;
+        }));
+        assertEquals(2, passes[0]);
 
-    @Test
-    void processBitMaps_invokesTrailingBlock_whenAllIndicesAreInFirstWord() {
-        final BloomFilter<?> bf = createFilterWithIndices(INDICES_FIRST_WORD_ONLY);
-
-        final AtomicInteger callCount = new AtomicInteger();
-
-        final boolean result = bf.processBitMaps(bits -> {
-            callCount.incrementAndGet();
-            return true; // never stop
-        });
-
-        // Implementation detail: When all bits are in the first word, the iteration will
-        // also include the next (empty) word to signal the end boundary. Hence two calls.
-        assertTrue(result, "processBitMaps should return true when the predicate never returns false");
-        assertEquals(2, callCount.get(),
-                "Expected two invocations: the first non-empty word and a trailing (empty) word after it");
-    }
-
-    @Test
-    void processBitMaps_stopsOnSecondBlock_whenPredicateTurnsFalse_withAllIndicesInFirstWord() {
-        final BloomFilter<?> bf = createFilterWithIndices(INDICES_FIRST_WORD_ONLY);
-
-        final AtomicInteger callCount = new AtomicInteger();
-        final AtomicInteger trueCount = new AtomicInteger();
-
-        final boolean result = bf.processBitMaps(bits -> {
-            final int n = callCount.getAndIncrement();
-            final boolean keepGoing = (n == 0); // true on first (non-empty) word, false on trailing word
-            if (keepGoing) {
-                trueCount.incrementAndGet();
+        // verify exit early if all values in first bitmap and predicate returns false
+        // on 2nd block
+        values = new int[] {1, 2, 3, 4};
+        bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
+        passes[0] = 0;
+        assertFalse(bf.processBitMaps(l -> {
+            final boolean result = passes[0] == 0;
+            if (result) {
+                passes[0]++;
             }
-            return keepGoing;
-        });
-
-        assertFalse(result, "processBitMaps should return false when the predicate turns false on the trailing word");
-        assertEquals(2, callCount.get(), "Expected two invocations due to the trailing word");
-        assertEquals(1, trueCount.get(), "Only the first invocation should have returned true");
+            return result;
+        }));
+        assertEquals(1, passes[0]);
     }
 
     @Test
-    void mergeFromAnotherBloomFilter_preservesCompatibilityInBitMapPairsProcessing() {
-        final BloomFilter<?> emptySparse = createEmptyFilter(getTestShape());
-        final BloomFilter<?> simple = new SimpleBloomFilter(getTestShape());
-
-        // Populate the SimpleBloomFilter and then merge into the SparseBloomFilter.
-        simple.merge(TestingHashers.FROM1);
-        emptySparse.merge(simple);
-
-        // Validate that processing pairs of bitmaps between the two filters does not diverge.
-        assertTrue(simple.processBitMapPairs(emptySparse, (x, y) -> x == y),
-                "After merge, corresponding bitmaps should match when processed in pairs");
+    void testBloomFilterBasedMergeEdgeCases() {
+        final BloomFilter bf1 = createEmptyFilter(getTestShape());
+        final BloomFilter bf2 = new SimpleBloomFilter(getTestShape());
+        bf2.merge(TestingHashers.FROM1);
+        bf1.merge(bf2);
+        assertTrue(bf2.processBitMapPairs(bf1, (x, y) -> x == y));
     }
 }
