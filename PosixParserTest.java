@@ -21,18 +21,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
 /**
  * Test case for the PosixParser.
  *
- * <p>Note: These tests intentionally disable unsupported functionality
- * specific to PosixParser's limitations.</p>
- *
- * <p>TODO: Consider reworking using JUnit parameterized tests in the future.</p>
+ * TODO Needs a rework using JUnit parameterized tests.
  */
 class PosixParserTest extends AbstractParserTestCase {
-
     @Override
     @SuppressWarnings("deprecation")
     @BeforeEach
@@ -41,107 +35,63 @@ class PosixParserTest extends AbstractParserTestCase {
         parser = new PosixParser();
     }
 
-    //--------------------------------------------------------------------------
-    // Overridden tests that are explicitly disabled for PosixParser
-    //--------------------------------------------------------------------------
-    
-    /**
-     * PosixParser doesn't support ambiguous long options without equals sign and single dash.
-     */
     @Override
     @Test
-    @Disabled("PosixParser doesn't support ambiguous long options without equals sign")
-    void testAmbiguousLongWithoutEqualSingleDash() {
-        fail("PosixParser doesn't support ambiguous long options without equals sign");
+    @Disabled("not supported by the PosixParser")
+    void testAmbiguousLongWithoutEqualSingleDash() throws Exception {
     }
 
-    /**
-     * PosixParser doesn't support ambiguous long options without equals sign (variant 2).
-     */
     @Override
     @Test
-    @Disabled("PosixParser doesn't support ambiguous long options without equals sign")
-    void testAmbiguousLongWithoutEqualSingleDash2() {
-        fail("PosixParser doesn't support ambiguous long options without equals sign");
+    @Disabled("not supported by the PosixParser")
+    void testAmbiguousLongWithoutEqualSingleDash2() throws Exception {
     }
 
-    /**
-     * PosixParser doesn't support ambiguous partial long options (case 4).
-     */
     @Override
     @Test
-    @Disabled("PosixParser doesn't support ambiguous partial long options")
-    void testAmbiguousPartialLongOption4() {
-        fail("PosixParser doesn't support ambiguous partial long options");
+    @Disabled("not supported by the PosixParser")
+    void testAmbiguousPartialLongOption4() throws Exception {
     }
 
-    /**
-     * PosixParser doesn't support double dash handling (case 2).
-     */
     @Override
     @Test
-    @Disabled("PosixParser doesn't support double dash in this context")
-    void testDoubleDash2() {
-        fail("PosixParser doesn't support double dash in this context");
+    @Disabled("not supported by the PosixParser")
+    void testDoubleDash2() throws Exception {
     }
 
-    /**
-     * PosixParser doesn't support long options with equals sign and single dash.
-     */
     @Override
     @Test
-    @Disabled("PosixParser doesn't support long options with equals sign and single dash")
-    void testLongWithEqualSingleDash() {
-        fail("PosixParser doesn't support long options with equals sign and single dash");
+    @Disabled("not supported by the PosixParser")
+    void testLongWithEqualSingleDash() throws Exception {
     }
 
-    /**
-     * PosixParser doesn't support long options without equals sign and single dash.
-     */
     @Override
     @Test
-    @Disabled("PosixParser doesn't support long options without equals sign")
-    void testLongWithoutEqualSingleDash() {
-        fail("PosixParser doesn't support long options without equals sign");
+    @Disabled("not supported by the PosixParser")
+    void testLongWithoutEqualSingleDash() throws Exception {
     }
 
-    /**
-     * PosixParser doesn't support long options with unexpected arguments.
-     */
     @Override
     @Test
-    @Disabled("PosixParser doesn't support long options with unexpected arguments")
-    void testLongWithUnexpectedArgument1() {
-        fail("PosixParser doesn't support long options with unexpected arguments");
+    @Disabled("not supported by the PosixParser")
+    void testLongWithUnexpectedArgument1() throws Exception {
     }
 
-    /**
-     * PosixParser doesn't support negative options (CLI-184).
-     */
     @Override
     @Test
-    @Disabled("PosixParser doesn't support negative options (see CLI-184)")
-    void testNegativeOption() {
-        fail("PosixParser doesn't support negative options (see CLI-184)");
+    @Disabled("not supported by the PosixParser (CLI-184)")
+    void testNegativeOption() throws Exception {
     }
 
-    /**
-     * PosixParser doesn't support short options with equals sign.
-     */
     @Override
     @Test
-    @Disabled("PosixParser doesn't support short options with equals sign")
-    void testShortWithEqual() {
-        fail("PosixParser doesn't support short options with equals sign");
+    @Disabled("not supported by the PosixParser")
+    void testShortWithEqual() throws Exception {
     }
 
-    /**
-     * PosixParser doesn't support unambiguous partial long options (case 4).
-     */
     @Override
     @Test
-    @Disabled("PosixParser doesn't support unambiguous partial long options")
-    void testUnambiguousPartialLongOption4() {
-        fail("PosixParser doesn't support unambiguous partial long options");
+    @Disabled("not supported by the PosixParser")
+    void testUnambiguousPartialLongOption4() throws Exception {
     }
 }
