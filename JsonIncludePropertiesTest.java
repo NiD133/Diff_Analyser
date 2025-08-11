@@ -6,103 +6,72 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class JsonIncludePropertiesTest {
+/**
+ * Tests to verify that it is possibly to merge {@link JsonIncludeProperties.Value}
+ * instances for overrides
+ */
+public class JsonIncludePropertiesTest
+{
     @JsonIncludeProperties(value = {"foo", "bar"})
-    private static class Bogus { }
+    private final static class Bogus
+    {
+    }
 
-    private static final JsonIncludeProperties.Value ALL = JsonIncludeProperties.Value.all();
+    private final JsonIncludeProperties.Value ALL = JsonIncludeProperties.Value.all();
 
-    // Helper to create predictable ordered sets
-    private Set<String> createSet(String... elements) {
-        return new LinkedHashSet<>(Arrays.asList(elements));
+    @Test
+    public void testAll()
+    {
+        assertSame(ALL, JsonIncludeProperties.Value.from(null));
+        assertNull(ALL.getIncluded());
+        assertEquals(ALL, ALL);
+        assertEquals("JsonIncludeProperties.Value(included=null)", ALL.toString());
+        assertEquals(0, ALL.hashCode());
     }
 
     @Test
-    void testAllValueProperties() {
-        // Verify static 'ALL' instance behavior
-        assertSame(ALL, JsonIncludeProperties.Value.from(null),
-            "Value.from(null) should return ALL instance");
-        assertNull(ALL.getIncluded(),
-            "ALL instance should have null included set");
-        assertEquals(ALL, ALL,
-            "ALL instance should equal itself");
-        assertEquals(0, ALL.hashCode(),
-            "ALL instance hashcode should be 0");
-        assertEquals("JsonIncludeProperties.Value(included=null)", ALL.toString(),
-            "ALL instance should have expected string representation");
+    public void testFromAnnotation()
+    {
+        JsonIncludeProperties.Value v = JsonIncludeProperties.Value.from(Bogus.class.getAnnotation(JsonIncludeProperties.class));
+        assertNotNull(v);
+        Set<String> included = v.getIncluded();
+        assertEquals(2, v.getIncluded().size());
+        assertEquals(_set("foo", "bar"), included);
+        String tmp = v.toString();
+        boolean test1 = tmp.equals("JsonIncludeProperties.Value(included=[foo, bar])");
+        boolean test2 = tmp.equals("JsonIncludeProperties.Value(included=[bar, foo])");
+        assertTrue(test1 || test2);
+        assertEquals(v, JsonIncludeProperties.Value.from(Bogus.class.getAnnotation(JsonIncludeProperties.class)));
     }
 
     @Test
-    void testValueCreationFromAnnotation() {
-        // Create Value from class annotation and verify contents
-        JsonIncludeProperties ann = Bogus.class.getAnnotation(JsonIncludeProperties.class);
-        JsonIncludeProperties.Value value = JsonIncludeProperties.Value.from(ann);
-
-        assertNotNull(value, "Created Value should not be null");
-        Set<String> included = value.getIncluded();
-        assertEquals(2, included.size(),
-            "Should contain exactly 2 properties");
-        assertEquals(createSet("foo", "bar"), included,
-            "Should contain 'foo' and 'bar'");
-
-        // Validate toString() has one of the expected outputs
-        String stringRep = value.toString();
-        Set<String> validReps = new HashSet<>(Arrays.asList(
-            "JsonIncludeProperties.Value(included=[foo, bar])",
-            "JsonIncludeProperties.Value(included=[bar, foo])"
-        ));
-        assertTrue(validReps.contains(stringRep),
-            "Unexpected string representation: " + stringRep);
-
-        // Check equality
-        JsonIncludeProperties.Value sameValue = JsonIncludeProperties.Value.from(ann);
-        assertEquals(value, sameValue,
-            "Equivalent annotations should produce equal Value instances");
+    public void testWithOverridesAll() {
+        JsonIncludeProperties.Value v = JsonIncludeProperties.Value.from(Bogus.class.getAnnotation(JsonIncludeProperties.class));
+        v = v.withOverrides(ALL);
+        Set<String> included = v.getIncluded();
+        assertEquals(2, included.size());
+        assertEquals(_set("foo", "bar"), included);
     }
 
     @Test
-    void testOverridesWithAllValue() {
-        // Verify ALL override doesn't change original properties
-        JsonIncludeProperties.Value original = getBogusValue();
-        JsonIncludeProperties.Value merged = original.withOverrides(ALL);
-
-        Set<String> included = merged.getIncluded();
-        assertEquals(2, included.size(),
-            "Merged with ALL should retain original 2 properties");
-        assertEquals(createSet("foo", "bar"), included,
-            "Merged with ALL should retain 'foo' and 'bar'");
+    public void testWithOverridesEmpty() {
+        JsonIncludeProperties.Value v = JsonIncludeProperties.Value.from(Bogus.class.getAnnotation(JsonIncludeProperties.class));
+        v = v.withOverrides(new JsonIncludeProperties.Value(Collections.<String>emptySet()));
+        Set<String> included = v.getIncluded();
+        assertEquals(0, included.size());
     }
 
     @Test
-    void testOverridesWithEmptyValue() {
-        // Verify empty override clears all properties
-        JsonIncludeProperties.Value original = getBogusValue();
-        JsonIncludeProperties.Value emptyOverride = new JsonIncludeProperties.Value(Collections.emptySet());
-        JsonIncludeProperties.Value merged = original.withOverrides(emptyOverride);
-
-        Set<String> included = merged.getIncluded();
-        assertTrue(included.isEmpty(),
-            "Merged with empty override should result in no included properties");
+    public void testWithOverridesMerge() {
+        JsonIncludeProperties.Value v = JsonIncludeProperties.Value.from(Bogus.class.getAnnotation(JsonIncludeProperties.class));
+        v = v.withOverrides(new JsonIncludeProperties.Value(_set("foo")));
+        Set<String> included = v.getIncluded();
+        assertEquals(1, included.size());
+        assertEquals(_set("foo"), included);
     }
 
-    @Test
-    void testOverridesWithPropertyIntersection() {
-        // Verify override intersects with original properties
-        JsonIncludeProperties.Value original = getBogusValue();
-        JsonIncludeProperties.Value partialOverride = new JsonIncludeProperties.Value(createSet("foo"));
-        JsonIncludeProperties.Value merged = original.withOverrides(partialOverride);
-
-        Set<String> included = merged.getIncluded();
-        assertEquals(1, included.size(),
-            "Merged with partial override should retain only matching property");
-        assertEquals(createSet("foo"), included,
-            "Merged with partial override should retain only 'foo'");
-    }
-
-    // Helper to get Value instance from Bogus annotation
-    private JsonIncludeProperties.Value getBogusValue() {
-        return JsonIncludeProperties.Value.from(
-            Bogus.class.getAnnotation(JsonIncludeProperties.class)
-        );
+    private Set<String> _set(String... args)
+    {
+        return new LinkedHashSet<String>(Arrays.asList(args));
     }
 }
