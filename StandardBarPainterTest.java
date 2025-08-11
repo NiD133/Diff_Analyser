@@ -29,69 +29,97 @@
  * ---------------------------
  * (C) Copyright 2008-present, by David Gilbert and Contributors.
  *
- * Original Author:  David Gilbert;
- * Contributor(s):   -;
- *
  */
 
 package org.jfree.chart.renderer.category;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.api.PublicCloneable;
-
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
- * Tests for the {@link StandardBarPainter} class.
+ * Tests for the {@link StandardBarPainter} class, focusing on its contract
+ * compliance for equals, hashCode, serialization, and cloning.
  */
-public class StandardBarPainterTest {
+class StandardBarPainterTest {
 
     /**
-     * Check that the equals() method distinguishes all fields.
+     * Tests the equals() method for the general contract. Since the class is
+     * stateless, all instances should be equal. This test verifies:
+     * 1. Reflexivity: an object equals itself.
+     * 2. Symmetry: if a.equals(b) then b.equals(a).
+     * 3. Inequality with null.
+     * 4. Inequality with a different object type.
      */
     @Test
-    public void testEquals() {
-        StandardBarPainter p1 = new StandardBarPainter();
-        StandardBarPainter p2 = new StandardBarPainter();
-        assertEquals(p1, p2);
+    @DisplayName("equals() should adhere to its contract")
+    void equals_shouldAdhereToContract() {
+        // Arrange
+        StandardBarPainter painter1 = new StandardBarPainter();
+        StandardBarPainter painter2 = new StandardBarPainter();
+
+        // Assert: an object is equal to itself (reflexive)
+        assertEquals(painter1, painter1);
+
+        // Assert: two distinct instances are equal (symmetric)
+        assertEquals(painter1, painter2);
+        assertEquals(painter2, painter1);
+
+        // Assert: an object is not equal to null
+        assertNotEquals(null, painter1);
+
+        // Assert: an object is not equal to an object of a different type
+        assertNotEquals(new Object(), painter1);
     }
 
     /**
-     * Two objects that are equal are required to return the same hashCode.
+     * Verifies that two equal objects return the same hash code, fulfilling
+     * the hashCode() contract.
      */
     @Test
-    public void testHashcode() {
-        StandardBarPainter p1 = new StandardBarPainter();
-        StandardBarPainter p2 = new StandardBarPainter();
-        assertEquals(p1, p2);
-        int h1 = p1.hashCode();
-        int h2 = p2.hashCode();
-        assertEquals(h1, h2);
+    @DisplayName("hashCode() should be consistent for equal objects")
+    void hashCode_shouldBeConsistentForEqualObjects() {
+        // Arrange
+        StandardBarPainter painter1 = new StandardBarPainter();
+        StandardBarPainter painter2 = new StandardBarPainter();
+
+        // Assert
+        assertEquals(painter1, painter2, "Precondition: The two painters must be equal.");
+        assertEquals(painter1.hashCode(), painter2.hashCode());
     }
 
     /**
-     * Confirm that cloning isn't implemented (it isn't required, because
-     * instances of the class are immutable).
+     * Verifies that StandardBarPainter is not cloneable, which is the
+     * expected behavior for an immutable class that does not need to be copied.
      */
     @Test
-    public void testCloning() {
-        StandardBarPainter p1 = new StandardBarPainter();
-        assertFalse(p1 instanceof Cloneable);
-        assertFalse(p1 instanceof PublicCloneable);
+    @DisplayName("A StandardBarPainter instance should not be cloneable")
+    void shouldNotBeCloneable() {
+        // Arrange
+        StandardBarPainter painter = new StandardBarPainter();
+
+        // Assert
+        assertFalse(painter instanceof Cloneable, "Should not implement Cloneable.");
+        assertFalse(painter instanceof PublicCloneable, "Should not implement PublicCloneable.");
     }
 
     /**
-     * Serialize an instance, restore it, and check for equality.
+     * Verifies that an instance can be serialized and deserialized, and that
+     * the resulting object is equal to the original.
      */
     @Test
-    public void testSerialization() {
-        StandardBarPainter p1 = new StandardBarPainter();
-        StandardBarPainter p2 = TestUtils.serialised(p1);
-        assertEquals(p1, p2);
-    }
+    @DisplayName("A StandardBarPainter instance should be serializable")
+    void shouldBeSerializable() {
+        // Arrange
+        StandardBarPainter originalPainter = new StandardBarPainter();
 
+        // Act
+        StandardBarPainter deserializedPainter = TestUtils.serialised(originalPainter);
+
+        // Assert
+        assertEquals(originalPainter, deserializedPainter);
+    }
 }
