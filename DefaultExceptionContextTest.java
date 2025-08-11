@@ -36,35 +36,60 @@ class DefaultExceptionContextTest extends AbstractExceptionContextTest<DefaultEx
     }
 
     @Test
-    void testFormattedExceptionMessageExceptionHandling() {
-        exceptionContext = new DefaultExceptionContext();
+    void testGetFormattedExceptionMessage_WithExceptionContextValues() {
+        // Given
+        final DefaultExceptionContext context = new DefaultExceptionContext();
         final String label1 = "throws 1";
         final String label2 = "throws 2";
-        exceptionContext.addContextValue(label1, new ObjectToStringRuntimeException(label1));
-        exceptionContext.addContextValue(label2, new ObjectToStringRuntimeException(label2));
-        final String message = exceptionContext.getFormattedExceptionMessage(TEST_MESSAGE);
-        assertTrue(message.startsWith(TEST_MESSAGE));
-        assertTrue(message.contains(label1));
-        assertTrue(message.contains(label2));
+        final Object value1 = new ObjectToStringRuntimeException(label1);
+        final Object value2 = new ObjectToStringRuntimeException(label2);
+
+        // When
+        context.addContextValue(label1, value1);
+        context.addContextValue(label2, value2);
+        final String message = context.getFormattedExceptionMessage(TEST_MESSAGE);
+
+        // Then
+        assertTrue(message.startsWith(TEST_MESSAGE), 
+            "Message should start with base message");
+        assertTrue(message.contains(label1), 
+            () -> "Message should contain label: " + label1);
+        assertTrue(message.contains(label2), 
+            () -> "Message should contain label: " + label2);
     }
 
     @Test
-    void testFormattedExceptionMessageNull() {
-        exceptionContext = new DefaultExceptionContext();
-        assertEquals("", exceptionContext.getFormattedExceptionMessage(null));
+    void testGetFormattedExceptionMessage_WithNullBaseMessage() {
+        // Given
+        final DefaultExceptionContext context = new DefaultExceptionContext();
+
+        // When
+        final String message = context.getFormattedExceptionMessage(null);
+
+        // Then
+        assertEquals("", message, 
+            "Formatted message should be empty for null base message");
     }
 
     @Test
-    void testFormattedExceptionMessageNullValue() {
-        exceptionContext = new DefaultExceptionContext();
+    void testGetFormattedExceptionMessage_WithNullContextValues() {
+        // Given
+        final DefaultExceptionContext context = new DefaultExceptionContext();
         final String label1 = "throws 1";
         final String label2 = "throws 2";
-        exceptionContext.addContextValue(label1, null);
-        exceptionContext.addContextValue(label2, null);
-        final String message = exceptionContext.getFormattedExceptionMessage(TEST_MESSAGE);
-        assertTrue(message.startsWith(TEST_MESSAGE));
-        assertTrue(message.contains(label1));
-        assertTrue(message.contains(label2));
+
+        // When
+        context.addContextValue(label1, null);
+        context.addContextValue(label2, null);
+        final String message = context.getFormattedExceptionMessage(TEST_MESSAGE);
+
+        // Then
+        assertTrue(message.startsWith(TEST_MESSAGE), 
+            "Message should start with base message");
+        assertTrue(message.contains(label1), 
+            () -> "Message should contain label: " + label1);
+        assertTrue(message.contains(label2), 
+            () -> "Message should contain label: " + label2);
     }
 
 }
