@@ -20,243 +20,367 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class SeekableInMemoryByteChannel_ESTest extends SeekableInMemoryByteChannel_ESTest_scaffolding {
 
-    // ===== Constructor Tests =====
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void constructor_withNullArray_throwsNullPointerException() {
-        new SeekableInMemoryByteChannel((byte[]) null);
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      byte[] byteArray0 = new byte[5];
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(byteArray0);
+      ByteBuffer byteBuffer0 = ByteBuffer.allocate(0);
+      int int0 = seekableInMemoryByteChannel0.write(byteBuffer0);
+      assertEquals(0, int0);
+      assertEquals(0L, seekableInMemoryByteChannel0.position());
+      assertEquals(5L, seekableInMemoryByteChannel0.size());
+  }
 
-    @Test(timeout = 4000, expected = NegativeArraySizeException.class)
-    public void constructor_withNegativeSize_throwsNegativeArraySizeException() {
-        new SeekableInMemoryByteChannel(-1);
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(122);
+      SeekableByteChannel seekableByteChannel0 = seekableInMemoryByteChannel0.truncate(122);
+      assertEquals(0L, seekableByteChannel0.position());
+  }
 
-    @Test(timeout = 4000)
-    public void constructor_withEmptyArray_initializesCorrectly() {
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel();
-        assertArrayEquals(new byte[]{}, channel.array());
-        assertEquals(0L, channel.size());
-        assertEquals(0L, channel.position());
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      byte[] byteArray0 = new byte[3];
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(byteArray0);
+      SeekableByteChannel seekableByteChannel0 = seekableInMemoryByteChannel0.truncate(2147483647L);
+      assertEquals(3L, seekableByteChannel0.size());
+      assertEquals(0L, seekableByteChannel0.position());
+  }
 
-    @Test(timeout = 4000)
-    public void constructor_withInitialArray_setsSizeCorrectly() {
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel(122);
-        assertEquals(122L, channel.size());
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      byte[] byteArray0 = new byte[1];
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(byteArray0);
+      ByteBuffer byteBuffer0 = ByteBuffer.allocate((byte)86);
+      int int0 = seekableInMemoryByteChannel0.write(byteBuffer0);
+      assertEquals("java.nio.HeapByteBuffer[pos=86 lim=86 cap=86]", byteBuffer0.toString());
+      assertEquals(86, int0);
+  }
 
-    // ===== Close/Open State Tests =====
-    @Test(timeout = 4000)
-    public void isOpen_afterClose_returnsFalse() {
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel();
-        channel.close();
-        assertFalse(channel.isOpen());
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel();
+      ByteBuffer byteBuffer0 = ByteBuffer.allocate(1098);
+      SeekableByteChannel seekableByteChannel0 = seekableInMemoryByteChannel0.position(2147483647L);
+      int int0 = seekableByteChannel0.read(byteBuffer0);
+      assertEquals((-1), int0);
+  }
 
-    @Test(timeout = 4000)
-    public void isOpen_onNewChannel_returnsTrue() {
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel(1);
-        assertTrue(channel.isOpen());
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      byte[] byteArray0 = new byte[5];
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(byteArray0);
+      seekableInMemoryByteChannel0.position(1L);
+      ByteBuffer byteBuffer0 = ByteBuffer.allocate(0);
+      int int0 = seekableInMemoryByteChannel0.read(byteBuffer0);
+      assertEquals(1L, seekableInMemoryByteChannel0.position());
+      assertEquals(0, int0);
+  }
 
-    // ===== Read Operation Tests =====
-    @Test(timeout = 4000)
-    public void read_onEmptyChannel_returnsMinusOne() {
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel();
-        ByteBuffer buffer = ByteBuffer.allocate(1098);
-        assertEquals(-1, channel.read(buffer));
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel();
+      SeekableByteChannel seekableByteChannel0 = seekableInMemoryByteChannel0.position(0L);
+      assertEquals(0L, seekableByteChannel0.size());
+  }
 
-    @Test(timeout = 4000)
-    public void read_withEmptyBuffer_returnsZeroAndMaintainsPosition() throws IOException {
-        byte[] data = new byte[5];
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel(data);
-        channel.position(1L);
-        ByteBuffer buffer = ByteBuffer.allocate(0);
-        assertEquals(0, channel.read(buffer));
-        assertEquals(1L, channel.position());
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(1);
+      ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(1);
+      seekableInMemoryByteChannel0.read(byteBuffer0);
+      int int0 = seekableInMemoryByteChannel0.write(byteBuffer0);
+      assertEquals(1L, seekableInMemoryByteChannel0.position());
+      assertEquals(0, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void read_updatesPosition() throws IOException {
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel(1);
-        ByteBuffer buffer = ByteBuffer.allocate(3);
-        channel.read(buffer);
-        assertEquals(1L, channel.position());
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      byte[] byteArray0 = new byte[0];
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(byteArray0);
+      seekableInMemoryByteChannel0.close();
+      seekableInMemoryByteChannel0.truncate(6051L);
+      assertFalse(seekableInMemoryByteChannel0.isOpen());
+  }
 
-    @Test(timeout = 4000)
-    public void read_beyondSize_returnsMinusOne() throws IOException {
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel();
-        SeekableByteChannel positionedChannel = channel.position(Integer.MAX_VALUE);
-        ByteBuffer buffer = ByteBuffer.allocate(1098);
-        assertEquals(-1, positionedChannel.read(buffer));
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(1);
+      long long0 = seekableInMemoryByteChannel0.size();
+      assertEquals(1L, long0);
+  }
 
-    @Test(timeout = 4000, expected = ClosedChannelException.class)
-    public void read_afterClose_throwsException() throws IOException {
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel();
-        channel.close();
-        channel.read(ByteBuffer.allocate(1));
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(1);
+      byte[] byteArray0 = new byte[3];
+      ByteBuffer byteBuffer0 = ByteBuffer.wrap(byteArray0);
+      seekableInMemoryByteChannel0.read(byteBuffer0);
+      long long0 = seekableInMemoryByteChannel0.position();
+      assertEquals(1L, long0);
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void read_withNullBuffer_throwsNullPointerException() throws IOException {
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel();
-        channel.read(null);
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      byte[] byteArray0 = new byte[8];
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(byteArray0);
+      byte[] byteArray1 = seekableInMemoryByteChannel0.array();
+      assertArrayEquals(new byte[] {(byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0}, byteArray1);
+  }
 
-    // ===== Write Operation Tests =====
-    @Test(timeout = 4000)
-    public void write_withEmptyBuffer_returnsZeroAndMaintainsPosition() throws IOException {
-        byte[] data = new byte[5];
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel(data);
-        ByteBuffer buffer = ByteBuffer.allocate(0);
-        assertEquals(0, channel.write(buffer));
-        assertEquals(0L, channel.position());
-        assertEquals(5L, channel.size());
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(958);
+      // Undeclared exception!
+      try { 
+        seekableInMemoryByteChannel0.write((ByteBuffer) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.utils.SeekableInMemoryByteChannel", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void write_expandsChannelCapacity() throws IOException {
-        byte[] data = new byte[1];
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel(data);
-        ByteBuffer buffer = ByteBuffer.allocate(86);
-        assertEquals(86, channel.write(buffer));
-        assertEquals("java.nio.HeapByteBuffer[pos=86 lim=86 cap=86]", buffer.toString());
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel();
+      seekableInMemoryByteChannel0.close();
+      ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(1169);
+      try { 
+        seekableInMemoryByteChannel0.read(byteBuffer0);
+        fail("Expecting exception: ClosedChannelException");
+      
+      } catch(ClosedChannelException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.utils.SeekableInMemoryByteChannel", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void write_largeData_handlesCorrectly() throws IOException {
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel();
-        ByteBuffer buffer = ByteBuffer.allocate(1073741823);
-        int written = channel.write(buffer);
-        assertEquals(1073741823, written);
-        assertEquals(1073741823, buffer.position());
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel();
+      // Undeclared exception!
+      try { 
+        seekableInMemoryByteChannel0.read((ByteBuffer) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.utils.SeekableInMemoryByteChannel", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = ClosedChannelException.class)
-    public void write_afterClose_throwsException() throws IOException {
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel();
-        channel.close();
-        channel.write(ByteBuffer.allocate(1));
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel();
+      seekableInMemoryByteChannel0.close();
+      try { 
+        seekableInMemoryByteChannel0.position((long) 1073741828);
+        fail("Expecting exception: ClosedChannelException");
+      
+      } catch(ClosedChannelException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.utils.SeekableInMemoryByteChannel", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void write_withNullBuffer_throwsNullPointerException() throws IOException {
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel(958);
-        channel.write(null);
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = null;
+      try {
+        seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel((byte[]) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.utils.SeekableInMemoryByteChannel", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void write_withFullBuffer_returnsZero() throws IOException {
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel(1);
-        ByteBuffer buffer = ByteBuffer.allocateDirect(1);
-        channel.read(buffer); // Fill buffer, position advances to 1
-        int written = channel.write(buffer); // Buffer has no remaining space
-        assertEquals(0, written);
-        assertEquals(1L, channel.position());
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = null;
+      try {
+        seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel((-1));
+        fail("Expecting exception: NegativeArraySizeException");
+      
+      } catch(NegativeArraySizeException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.utils.SeekableInMemoryByteChannel", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void write_afterReadAndBufferClear_writesData() throws IOException {
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel(1);
-        ByteBuffer buffer = ByteBuffer.allocateDirect(1);
-        channel.read(buffer); // Position becomes 1
-        buffer.clear(); // Reset buffer for writing
-        int written = channel.write(buffer); // Write 1 byte at position 1
-        assertEquals(1, written);
-        assertEquals(0, buffer.remaining());
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      byte[] byteArray0 = new byte[1];
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(byteArray0);
+      seekableInMemoryByteChannel0.close();
+      boolean boolean0 = seekableInMemoryByteChannel0.isOpen();
+      assertFalse(boolean0);
+  }
 
-    // ===== Position Management Tests =====
-    @Test(timeout = 4000)
-    public void position_setToZero_worksCorrectly() {
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel();
-        SeekableByteChannel result = channel.position(0L);
-        assertEquals(0L, result.size());
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(1);
+      boolean boolean0 = seekableInMemoryByteChannel0.isOpen();
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000, expected = IOException.class)
-    public void position_setBeyondIntegerMax_throwsException() throws IOException {
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel();
-        channel.position(2147483669L);
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(1);
+      ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(1);
+      seekableInMemoryByteChannel0.read(byteBuffer0);
+      seekableInMemoryByteChannel0.truncate((byte)0);
+      assertEquals(0L, seekableInMemoryByteChannel0.size());
+  }
 
-    @Test(timeout = 4000, expected = IOException.class)
-    public void position_setNegative_throwsException() throws IOException {
-        byte[] data = new byte[2];
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel(data);
-        channel.position(-429L);
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel();
+      // Undeclared exception!
+      try { 
+        seekableInMemoryByteChannel0.truncate(2147483648L);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Size must be range [0..2147483647]
+         //
+         verifyException("org.apache.commons.compress.utils.SeekableInMemoryByteChannel", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = ClosedChannelException.class)
-    public void position_afterClose_throwsException() throws IOException {
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel();
-        channel.close();
-        channel.position(1073741828L);
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(1);
+      seekableInMemoryByteChannel0.truncate((byte)0);
+      assertEquals(0L, seekableInMemoryByteChannel0.size());
+  }
 
-    // ===== Truncation Tests =====
-    @Test(timeout = 4000)
-    public void truncate_toCurrentSize_maintainsState() {
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel(122);
-        SeekableByteChannel result = channel.truncate(122);
-        assertEquals(0L, result.position());
-    }
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel();
+      // Undeclared exception!
+      try { 
+        seekableInMemoryByteChannel0.truncate((-469L));
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Size must be range [0..2147483647]
+         //
+         verifyException("org.apache.commons.compress.utils.SeekableInMemoryByteChannel", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void truncate_largerThanSize_ignored() {
-        byte[] data = new byte[3];
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel(data);
-        SeekableByteChannel result = channel.truncate(Integer.MAX_VALUE);
-        assertEquals(3L, result.size());
-        assertEquals(0L, result.position());
-    }
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel();
+      ByteBuffer byteBuffer0 = ByteBuffer.allocate(1098);
+      int int0 = seekableInMemoryByteChannel0.read(byteBuffer0);
+      assertEquals((-1), int0);
+  }
 
-    @Test(timeout = 4000)
-    public void truncate_toZero_resetsSize() {
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel(1);
-        channel.truncate(0);
-        assertEquals(0L, channel.size());
-    }
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(1);
+      ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(1);
+      seekableInMemoryByteChannel0.read(byteBuffer0);
+      byteBuffer0.clear();
+      int int0 = seekableInMemoryByteChannel0.write(byteBuffer0);
+      assertEquals(0, byteBuffer0.remaining());
+      assertEquals(1, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void truncate_afterRead_resetsSizeAndPosition() throws IOException {
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel(1);
-        ByteBuffer buffer = ByteBuffer.allocateDirect(1);
-        channel.read(buffer); // Position becomes 1
-        channel.truncate(0); // Size becomes 0, position reset to 0
-        assertEquals(0L, channel.size());
-        assertEquals(0L, channel.position());
-    }
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel();
+      try { 
+        seekableInMemoryByteChannel0.position(2147483669L);
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // Position must be in range [0..2147483647]
+         //
+         verifyException("org.apache.commons.compress.utils.SeekableInMemoryByteChannel", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = IllegalArgumentException.class)
-    public void truncate_beyondIntegerMax_throwsException() {
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel();
-        channel.truncate(2147483648L);
-    }
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      byte[] byteArray0 = new byte[2];
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(byteArray0);
+      try { 
+        seekableInMemoryByteChannel0.position((-429L));
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // Position must be in range [0..2147483647]
+         //
+         verifyException("org.apache.commons.compress.utils.SeekableInMemoryByteChannel", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = IllegalArgumentException.class)
-    public void truncate_negativeSize_throwsException() {
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel();
-        channel.truncate(-469L);
-    }
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel();
+      ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(1073741823);
+      int int0 = seekableInMemoryByteChannel0.write(byteBuffer0);
+      assertEquals(1073741823, byteBuffer0.position());
+      assertEquals(1073741823, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void truncate_afterClose_maintainsClosedState() {
-        byte[] data = new byte[0];
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel(data);
-        channel.close();
-        channel.truncate(6051L); // Should not throw
-        assertFalse(channel.isOpen());
-    }
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel();
+      byte[] byteArray0 = seekableInMemoryByteChannel0.array();
+      assertArrayEquals(new byte[] {}, byteArray0);
+  }
 
-    // ===== Array Access Tests =====
-    @Test(timeout = 4000)
-    public void array_returnsBackingArray() {
-        byte[] expected = new byte[8];
-        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel(expected);
-        assertArrayEquals(expected, channel.array());
-    }
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel();
+      long long0 = seekableInMemoryByteChannel0.size();
+      assertEquals(0L, long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel();
+      seekableInMemoryByteChannel0.close();
+      ByteBuffer byteBuffer0 = ByteBuffer.allocate(1);
+      try { 
+        seekableInMemoryByteChannel0.write(byteBuffer0);
+        fail("Expecting exception: ClosedChannelException");
+      
+      } catch(ClosedChannelException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.compress.utils.SeekableInMemoryByteChannel", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test32()  throws Throwable  {
+      SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel();
+      long long0 = seekableInMemoryByteChannel0.position();
+      assertEquals(0L, long0);
+  }
 }
