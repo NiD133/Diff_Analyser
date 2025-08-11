@@ -1,11 +1,27 @@
+/*
+ *  Copyright 2001-2005 Stephen Colebourne
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package org.joda.time.convert;
-
-import static org.junit.Assert.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
@@ -13,182 +29,161 @@ import org.joda.time.ReadWritableDateTime;
 import org.joda.time.ReadWritableInstant;
 import org.joda.time.ReadableDateTime;
 import org.joda.time.ReadableInstant;
-import org.junit.Test;
 
 /**
- * Unit tests for ConverterSet.
- * 
- * Goals:
- * - Make test intent obvious with descriptive names and comments.
- * - Remove duplication by using helper methods and constants.
- * - Prefer clear assertions and explicit expectations.
+ * This class is a JUnit test for ConverterSet.
+ * Mostly for coverage.
+ *
+ * @author Stephen Colebourne
  */
-public class ConverterSetTest {
+public class TestConverterSet extends TestCase {
 
-    // Converter stubs for primitive wrapper types.
-    private static final Converter BOOLEAN_CONVERTER = stub(Boolean.class);
-    private static final Converter CHAR_CONVERTER = stub(Character.class);
-    private static final Converter BYTE_CONVERTER = stub(Byte.class);
-    private static final Converter SHORT_CONVERTER = stub(Short.class);
-
-    // Another instance supporting the same type as SHORT_CONVERTER.
-    private static final Converter SHORT_CONVERTER_DIFFERENT_INSTANCE = stub(Short.class);
-
-    private static final Converter INT_CONVERTER = stub(Integer.class);
-
-    private static Converter stub(final Class<?> type) {
-        return new Converter() {
-            @Override
-            public Class getSupportedType() { return type; }
-        };
+    private static final Converter c1 = new Converter() {
+        public Class getSupportedType() {return Boolean.class;}
+    };
+    private static final Converter c2 = new Converter() {
+        public Class getSupportedType() {return Character.class;}
+    };
+    private static final Converter c3 = new Converter() {
+        public Class getSupportedType() {return Byte.class;}
+    };
+    private static final Converter c4 = new Converter() {
+        public Class getSupportedType() {return Short.class;}
+    };
+    private static final Converter c4a = new Converter() {
+        public Class getSupportedType() {return Short.class;}
+    };
+    private static final Converter c5 = new Converter() {
+        public Class getSupportedType() {return Integer.class;}
+    };
+    
+    public static void main(String[] args) {
+        junit.textui.TestRunner.run(suite());
     }
 
-    private static ConverterSet newSetWithDefaultConverters() {
-        return new ConverterSet(new Converter[] {
-            BOOLEAN_CONVERTER, CHAR_CONVERTER, BYTE_CONVERTER, SHORT_CONVERTER
-        });
+    public static TestSuite suite() {
+        return new TestSuite(TestConverterSet.class);
     }
 
-    @Test
-    public void classAndConstructor_arePackagePrivate() throws Exception {
-        // Class should be package-private (no public/protected/private modifier).
-        Class<?> cls = ConverterSet.class;
-        assertPackagePrivate(cls.getModifiers());
+    public TestConverterSet(String name) {
+        super(name);
+    }
 
-        // There should be a single package-private constructor.
+    //-----------------------------------------------------------------------
+    public void testClass() throws Exception {
+        Class cls = ConverterSet.class;
+        assertEquals(false, Modifier.isPublic(cls.getModifiers()));
+        assertEquals(false, Modifier.isProtected(cls.getModifiers()));
+        assertEquals(false, Modifier.isPrivate(cls.getModifiers()));
+        
         assertEquals(1, cls.getDeclaredConstructors().length);
-        Constructor<?> ctor = cls.getDeclaredConstructors()[0];
-        assertPackagePrivate(ctor.getModifiers());
+        Constructor con = cls.getDeclaredConstructors()[0];
+        assertEquals(false, Modifier.isPublic(con.getModifiers()));
+        assertEquals(false, Modifier.isProtected(con.getModifiers()));
+        assertEquals(false, Modifier.isPrivate(con.getModifiers()));
     }
 
-    @Test
-    public void select_onVariousTypes_doesNotChangeSetSize() {
-        ConverterSet set = newSetWithDefaultConverters();
-
-        // Exercise selection for many different types (including unknowns and null)
-        // to populate and reuse the internal select cache (hashtable).
-        Class<?>[] typesToSelect = new Class<?>[] {
-            Boolean.class,
-            Character.class,
-            Byte.class,
-            Short.class,
-            Integer.class,
-            Long.class,
-            Float.class,
-            Double.class,
-            null,
-            Calendar.class,
-            GregorianCalendar.class,
-            DateTime.class,
-            DateMidnight.class,
-            ReadableInstant.class,
-            ReadableDateTime.class,
-            ReadWritableInstant.class,
-            ReadWritableDateTime.class,
-            DateTime.class, // repeat to ensure cache reuse
+    //-----------------------------------------------------------------------
+    public void testBigHashtable() {
+        Converter[] array = new Converter[] {
+            c1, c2, c3, c4,
         };
-
-        for (Class<?> type : typesToSelect) {
-            set.select(type);
-        }
-
-        // The set is immutable; select must not modify its contents.
+        ConverterSet set = new ConverterSet(array);
+        set.select(Boolean.class);
+        set.select(Character.class);
+        set.select(Byte.class);
+        set.select(Short.class);
+        set.select(Integer.class);
+        set.select(Long.class);
+        set.select(Float.class);
+        set.select(Double.class);
+        set.select(null);
+        set.select(Calendar.class);
+        set.select(GregorianCalendar.class);
+        set.select(DateTime.class);
+        set.select(DateMidnight.class);
+        set.select(ReadableInstant.class);
+        set.select(ReadableDateTime.class);
+        set.select(ReadWritableInstant.class);  // 16
+        set.select(ReadWritableDateTime.class);
+        set.select(DateTime.class);
         assertEquals(4, set.size());
     }
 
-    @Test
-    public void add_newConverter_returnsNewSet_andLeavesOriginalUnchanged() {
-        ConverterSet original = newSetWithDefaultConverters();
-
-        Converter[] removed = new Converter[1];
-        ConverterSet updated = original.add(INT_CONVERTER, removed);
-
-        assertEquals("original size unchanged", 4, original.size());
-        assertEquals("updated size increased", 5, updated.size());
-        assertNull("nothing removed when adding a new supported type", removed[0]);
+    //-----------------------------------------------------------------------
+    public void testAddNullRemoved1() {
+        Converter[] array = new Converter[] {
+            c1, c2, c3, c4,
+        };
+        ConverterSet set = new ConverterSet(array);
+        ConverterSet result = set.add(c5, null);
+        assertEquals(4, set.size());
+        assertEquals(5, result.size());
     }
 
-    @Test
-    public void add_sameInstanceAlreadyPresent_returnsSameSet() {
-        ConverterSet original = newSetWithDefaultConverters();
-
-        Converter[] removed = new Converter[1];
-        ConverterSet updated = original.add(SHORT_CONVERTER, removed);
-
-        assertSame("adding identical instance should return original set", original, updated);
-        assertNull("nothing removed when adding identical instance", removed[0]);
+    public void testAddNullRemoved2() {
+        Converter[] array = new Converter[] {
+            c1, c2, c3, c4,
+        };
+        ConverterSet set = new ConverterSet(array);
+        ConverterSet result = set.add(c4, null);
+        assertSame(set, result);
     }
 
-    @Test
-    public void add_differentInstanceWithSameSupportedType_replacesExisting_butSizeUnchanged() {
-        ConverterSet original = newSetWithDefaultConverters();
-
-        Converter[] removed = new Converter[1];
-        ConverterSet updated = original.add(SHORT_CONVERTER_DIFFERENT_INSTANCE, removed);
-
-        assertNotSame("adding different instance with same supported type returns a new set", original, updated);
-        assertEquals("original size unchanged", 4, original.size());
-        assertEquals("updated size unchanged (replacement)", 4, updated.size());
-        assertSame("removed should be the previously registered converter instance",
-                   SHORT_CONVERTER, removed[0]);
+    public void testAddNullRemoved3() {
+        Converter[] array = new Converter[] {
+            c1, c2, c3, c4,
+        };
+        ConverterSet set = new ConverterSet(array);
+        ConverterSet result = set.add(c4a, null);
+        assertTrue(set != result);
+        assertEquals(4, set.size());
+        assertEquals(4, result.size());
     }
 
-    @Test
-    public void remove_existingConverter_returnsNewSet_andLeavesOriginalUnchanged() {
-        ConverterSet original = newSetWithDefaultConverters();
-
-        Converter[] removed = new Converter[1];
-        ConverterSet updated = original.remove(BYTE_CONVERTER, removed);
-
-        assertEquals("original size unchanged", 4, original.size());
-        assertEquals("updated size decreased", 3, updated.size());
-        assertSame("removed should be the converter passed in", BYTE_CONVERTER, removed[0]);
+    //-----------------------------------------------------------------------
+    public void testRemoveNullRemoved1() {
+        Converter[] array = new Converter[] {
+            c1, c2, c3, c4,
+        };
+        ConverterSet set = new ConverterSet(array);
+        ConverterSet result = set.remove(c3, null);
+        assertEquals(4, set.size());
+        assertEquals(3, result.size());
     }
 
-    @Test
-    public void remove_converterNotInSet_returnsSameSet() {
-        ConverterSet original = newSetWithDefaultConverters();
-
-        Converter[] removed = new Converter[1];
-        ConverterSet updated = original.remove(INT_CONVERTER, removed);
-
-        assertSame("removing a non-existent converter returns original set", original, updated);
-        assertNull("removed should be null when nothing removed", removed[0]);
+    public void testRemoveNullRemoved2() {
+        Converter[] array = new Converter[] {
+            c1, c2, c3, c4,
+        };
+        ConverterSet set = new ConverterSet(array);
+        ConverterSet result = set.remove(c5, null);
+        assertSame(set, result);
     }
 
-    @Test
-    public void remove_byIndex_withTooLargeIndex_throws_andLeavesSetUnchanged() {
-        ConverterSet set = newSetWithDefaultConverters();
-
+    //-----------------------------------------------------------------------
+    public void testRemoveBadIndex1() {
+        Converter[] array = new Converter[] {
+            c1, c2, c3, c4,
+        };
+        ConverterSet set = new ConverterSet(array);
         try {
             set.remove(200, null);
-            fail("Expected IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException expected) {
-            // expected
-        }
-
+            fail();
+        } catch (IndexOutOfBoundsException ex) {}
         assertEquals(4, set.size());
     }
 
-    @Test
-    public void remove_byIndex_withNegativeIndex_throws_andLeavesSetUnchanged() {
-        ConverterSet set = newSetWithDefaultConverters();
-
+    public void testRemoveBadIndex2() {
+        Converter[] array = new Converter[] {
+            c1, c2, c3, c4,
+        };
+        ConverterSet set = new ConverterSet(array);
         try {
             set.remove(-1, null);
-            fail("Expected IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException expected) {
-            // expected
-        }
-
+            fail();
+        } catch (IndexOutOfBoundsException ex) {}
         assertEquals(4, set.size());
     }
 
-    // Helpers
-
-    private static void assertPackagePrivate(int modifiers) {
-        assertFalse(Modifier.isPublic(modifiers));
-        assertFalse(Modifier.isProtected(modifiers));
-        assertFalse(Modifier.isPrivate(modifiers));
-    }
 }
