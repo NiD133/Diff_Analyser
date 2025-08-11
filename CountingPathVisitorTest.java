@@ -26,64 +26,123 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * Tests {@link CountingPathVisitor}.
+ * Tests {@link CountingPathVisitor} functionality for counting directories, files, and total bytes
+ * when traversing file system hierarchies.
  */
 class CountingPathVisitorTest extends TestArguments {
 
-    private void checkZeroCounts(final CountingPathVisitor visitor) {
-        Assertions.assertEquals(CountingPathVisitor.withLongCounters(), visitor);
-        Assertions.assertEquals(CountingPathVisitor.withBigIntegerCounters(), visitor);
+    // Test data directory paths
+    private static final String TEST_RESOURCES_BASE = "src/test/resources/org/apache/commons/io/";
+    private static final String SINGLE_EMPTY_FILE_DIR = TEST_RESOURCES_BASE + "dirs-1-file-size-0";
+    private static final String SINGLE_ONE_BYTE_FILE_DIR = TEST_RESOURCES_BASE + "dirs-1-file-size-1";
+    private static final String TWO_DIRS_TWO_FILES_DIR = TEST_RESOURCES_BASE + "dirs-2-file-size-2";
+
+    /**
+     * Verifies that a fresh visitor has zero counts and equals other fresh visitors.
+     * This ensures proper initialization and equality implementation.
+     */
+    private void assertVisitorHasZeroCounts(final CountingPathVisitor visitor) {
+        Assertions.assertEquals(CountingPathVisitor.withLongCounters(), visitor,
+            "Fresh visitor should equal a new long counter visitor");
+        Assertions.assertEquals(CountingPathVisitor.withBigIntegerCounters(), visitor,
+            "Fresh visitor should equal a new BigInteger counter visitor");
     }
 
     /**
-     * Tests an empty folder.
+     * Tests counting an empty directory.
+     * Expected: 1 directory, 0 files, 0 bytes total
      */
     @ParameterizedTest
     @MethodSource("countingPathVisitors")
     void testCountEmptyFolder(final CountingPathVisitor visitor) throws IOException {
-        checkZeroCounts(visitor);
+        // Given: A fresh visitor with zero counts
+        assertVisitorHasZeroCounts(visitor);
+        
+        // When: Visiting an empty temporary directory
         try (TempDirectory tempDir = TempDirectory.create(getClass().getCanonicalName())) {
-            assertCounts(1, 0, 0, PathUtils.visitFileTree(visitor, tempDir.get()));
+            CountingPathVisitor result = PathUtils.visitFileTree(visitor, tempDir.get());
+            
+            // Then: Should count 1 directory, 0 files, 0 bytes
+            int expectedDirectories = 1;
+            int expectedFiles = 0;
+            long expectedBytes = 0;
+            assertCounts(expectedDirectories, expectedFiles, expectedBytes, result);
         }
     }
 
     /**
-     * Tests a directory with one file of size 0.
+     * Tests counting a directory containing one empty file (0 bytes).
+     * Expected: 1 directory, 1 file, 0 bytes total
      */
     @ParameterizedTest
     @MethodSource("countingPathVisitors")
     void testCountFolders1FileSize0(final CountingPathVisitor visitor) throws IOException {
-        checkZeroCounts(visitor);
-        assertCounts(1, 1, 0, PathUtils.visitFileTree(visitor,
-                "src/test/resources/org/apache/commons/io/dirs-1-file-size-0"));
+        // Given: A fresh visitor with zero counts
+        assertVisitorHasZeroCounts(visitor);
+        
+        // When: Visiting a directory with one empty file
+        CountingPathVisitor result = PathUtils.visitFileTree(visitor, SINGLE_EMPTY_FILE_DIR);
+        
+        // Then: Should count 1 directory, 1 file, 0 bytes
+        int expectedDirectories = 1;
+        int expectedFiles = 1;
+        long expectedBytes = 0;
+        assertCounts(expectedDirectories, expectedFiles, expectedBytes, result);
     }
 
     /**
-     * Tests a directory with one file of size 1.
+     * Tests counting a directory containing one file with 1 byte.
+     * Expected: 1 directory, 1 file, 1 byte total
      */
     @ParameterizedTest
     @MethodSource("countingPathVisitors")
     void testCountFolders1FileSize1(final CountingPathVisitor visitor) throws IOException {
-        checkZeroCounts(visitor);
-        assertCounts(1, 1, 1, PathUtils.visitFileTree(visitor,
-                "src/test/resources/org/apache/commons/io/dirs-1-file-size-1"));
+        // Given: A fresh visitor with zero counts
+        assertVisitorHasZeroCounts(visitor);
+        
+        // When: Visiting a directory with one 1-byte file
+        CountingPathVisitor result = PathUtils.visitFileTree(visitor, SINGLE_ONE_BYTE_FILE_DIR);
+        
+        // Then: Should count 1 directory, 1 file, 1 byte
+        int expectedDirectories = 1;
+        int expectedFiles = 1;
+        long expectedBytes = 1;
+        assertCounts(expectedDirectories, expectedFiles, expectedBytes, result);
     }
 
     /**
-     * Tests a directory with two subdirectories, each containing one file of size 1.
+     * Tests counting a directory structure with two subdirectories, each containing one 1-byte file.
+     * Structure: root/ -> subdir1/file1(1 byte), subdir2/file2(1 byte)
+     * Expected: 3 directories (root + 2 subdirs), 2 files, 2 bytes total
      */
     @ParameterizedTest
     @MethodSource("countingPathVisitors")
     void testCountFolders2FileSize2(final CountingPathVisitor visitor) throws IOException {
-        checkZeroCounts(visitor);
-        assertCounts(3, 2, 2, PathUtils.visitFileTree(visitor,
-                "src/test/resources/org/apache/commons/io/dirs-2-file-size-2"));
+        // Given: A fresh visitor with zero counts
+        assertVisitorHasZeroCounts(visitor);
+        
+        // When: Visiting a directory tree with 2 subdirectories and 2 files
+        CountingPathVisitor result = PathUtils.visitFileTree(visitor, TWO_DIRS_TWO_FILES_DIR);
+        
+        // Then: Should count 3 directories (root + 2 subdirs), 2 files, 2 bytes
+        int expectedDirectories = 3;
+        int expectedFiles = 2;
+        long expectedBytes = 2;
+        assertCounts(expectedDirectories, expectedFiles, expectedBytes, result);
     }
 
+    /**
+     * Tests that the toString() method doesn't throw exceptions.
+     * This is a defensive test to ensure string representation is always available for debugging.
+     */
     @ParameterizedTest
     @MethodSource("countingPathVisitors")
-    void testToString(final CountingPathVisitor visitor) {
-        // Make sure it does not blow up
-        visitor.toString();
+    void testToStringDoesNotThrowException(final CountingPathVisitor visitor) {
+        // When: Calling toString() on a visitor
+        // Then: Should not throw any exception
+        Assertions.assertDoesNotThrow(() -> {
+            String result = visitor.toString();
+            Assertions.assertNotNull(result, "toString() should never return null");
+        }, "toString() method should never throw an exception");
     }
 }
