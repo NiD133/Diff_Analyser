@@ -1,10 +1,31 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.commons.codec.binary;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Locale;
 import java.util.Random;
 
 import org.apache.commons.codec.CodecPolicy;
@@ -14,127 +35,113 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for Base16 (Hex) encoding/decoding.
- * These tests aim to be easier to read and maintain by:
- * - Centralizing constants for repeated values.
- * - Extracting helpers for UTF-8 and hex conversions.
- * - Reducing repetition with small loops where applicable.
- * - Using clear, intention-revealing test names.
+ * Tests {@link Base16}.
  */
 class Base16Test {
 
-    private static final Charset UTF8 = StandardCharsets.UTF_8;
-    private static final String HELLO_WORLD = "Hello World";
-    private static final String HELLO_WORLD_HEX_UPPER = "48656C6C6F20576F726C64";
-
-    private static final Base16 BASE16_UPPER = new Base16();
-    private static final Base16 BASE16_LOWER = new Base16(true);
+    private static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
 
     private final Random random = new Random();
 
-    private static byte[] utf8(final String s) {
-        return StringUtils.getBytesUtf8(s);
-    }
-
-    private static String strUtf8(final byte[] bytes) {
-        return StringUtils.newStringUtf8(bytes);
-    }
-
-    private static String encodeUpperToHex(final byte[] bytes) {
-        return strUtf8(BASE16_UPPER.encode(bytes));
-    }
-
-    private static byte[] decodeUpperHexToBytes(final String hex) {
-        return BASE16_UPPER.decode(utf8(hex));
-    }
-
-    private static String toUpperHex(final byte... bytes) {
-        final StringBuilder sb = new StringBuilder(bytes.length * 2);
-        for (final byte b : bytes) {
-            sb.append(String.format(Locale.ROOT, "%02X", b & 0xFF));
-        }
-        return sb.toString();
+    /**
+     * @return the random.
+     */
+    public Random getRandom() {
+        return this.random;
     }
 
     /**
-     * Basic round-trip: "Hello World" -> hex (upper-case) -> original.
+     * Test the Base16 implementation
      */
     @Test
-    void encodesAndDecodesHelloWorld() {
-        final String encoded = encodeUpperToHex(utf8(HELLO_WORLD));
-        assertEquals(HELLO_WORLD_HEX_UPPER, encoded);
+    void testBase16() {
+        final String content = "Hello World";
+        final byte[] encodedBytes = new Base16().encode(StringUtils.getBytesUtf8(content));
+        final String encodedContent = StringUtils.newStringUtf8(encodedBytes);
+        assertEquals("48656C6C6F20576F726C64", encodedContent, "encoding hello world");
 
-        final String decoded = strUtf8(BASE16_UPPER.decode(utf8(encoded)));
-        assertEquals(HELLO_WORLD, decoded);
+        final byte[] decodedBytes = new Base16().decode(encodedBytes);
+        final String decodedContent = StringUtils.newStringUtf8(decodedBytes);
+        assertEquals(content, decodedContent, "decoding hello world");
     }
 
     @Test
-    void encodesSubsetAtBufferStart() {
-        assertEncodesInPaddedBuffer(0, 100);
+    void testBase16AtBufferEnd() {
+        testBase16InBuffer(100, 0);
     }
 
     @Test
-    void encodesSubsetAtBufferMiddle() {
-        assertEncodesInPaddedBuffer(100, 100);
+    void testBase16AtBufferMiddle() {
+        testBase16InBuffer(100, 100);
     }
 
     @Test
-    void encodesSubsetAtBufferEnd() {
-        assertEncodesInPaddedBuffer(100, 0);
+    void testBase16AtBufferStart() {
+        testBase16InBuffer(0, 100);
     }
 
-    private void assertEncodesInPaddedBuffer(final int startPadSize, final int endPadSize) {
-        final byte[] payload = utf8(HELLO_WORLD);
-        byte[] buffer = ArrayUtils.addAll(payload, new byte[endPadSize]);
-        buffer = ArrayUtils.addAll(new byte[startPadSize], buffer);
-
-        final byte[] encoded = BASE16_UPPER.encode(buffer, startPadSize, payload.length);
-        assertEquals(HELLO_WORLD_HEX_UPPER, strUtf8(encoded));
-    }
-
-    @Test
-    void byteToStringVariations() {
-        final byte[] nonEmpty = utf8("Hello World");
-        final byte[] empty = {};
-        final byte[] nullBytes = null;
-
-        assertEquals(HELLO_WORLD_HEX_UPPER, BASE16_UPPER.encodeToString(nonEmpty));
-        assertEquals(HELLO_WORLD_HEX_UPPER, strUtf8(new Base16().encode(nonEmpty)));
-        assertEquals("", BASE16_UPPER.encodeToString(empty));
-        assertEquals("", strUtf8(new Base16().encode(empty)));
-        assertNull(BASE16_UPPER.encodeToString(nullBytes));
-        assertNull(strUtf8(new Base16().encode(nullBytes)));
+    private void testBase16InBuffer(final int startPasSize, final int endPadSize) {
+        final String content = "Hello World";
+        final String encodedContent;
+        final byte[] bytesUtf8 = StringUtils.getBytesUtf8(content);
+        byte[] buffer = ArrayUtils.addAll(bytesUtf8, new byte[endPadSize]);
+        buffer = ArrayUtils.addAll(new byte[startPasSize], buffer);
+        final byte[] encodedBytes = new Base16().encode(buffer, startPasSize, bytesUtf8.length);
+        encodedContent = StringUtils.newStringUtf8(encodedBytes);
+        assertEquals("48656C6C6F20576F726C64", encodedContent, "encoding hello world");
     }
 
     @Test
-    void checkEncodeLengthBounds() {
-        assertThrows(IllegalArgumentException.class, () -> BASE16_UPPER.encode(new byte[10], 0, 1 << 30));
+    void testByteToStringVariations() {
+        final Base16 base16 = new Base16();
+        final byte[] b1 = StringUtils.getBytesUtf8("Hello World");
+        final byte[] b2 = {};
+        final byte[] b3 = null;
+
+        assertEquals("48656C6C6F20576F726C64", base16.encodeToString(b1), "byteToString Hello World");
+        assertEquals("48656C6C6F20576F726C64", StringUtils.newStringUtf8(new Base16().encode(b1)), "byteToString static Hello World");
+        assertEquals("", base16.encodeToString(b2), "byteToString \"\"");
+        assertEquals("", StringUtils.newStringUtf8(new Base16().encode(b2)), "byteToString static \"\"");
+        assertNull(base16.encodeToString(b3), "byteToString null");
+        assertNull(StringUtils.newStringUtf8(new Base16().encode(b3)), "byteToString static null");
+    }
+
+    @Test
+    void testCheckEncodeLengthBounds() {
+        final Base16 base16 = new Base16();
+        assertThrows(IllegalArgumentException.class, () -> base16.encode(new byte[10], 0, 1 << 30));
     }
 
     /**
-     * isBase16 throws RuntimeException on some non-Base16 bytes (CODEC-68).
+     * isBase16 throws RuntimeException on some non-Base16 bytes
      */
     @Test
-    void codec68_nonBase16InputCausesRuntimeException() {
+    void testCodec68() {
         final byte[] x = { 'n', 'H', '=', '=', (byte) 0x9c };
-        assertThrows(RuntimeException.class, () -> BASE16_UPPER.decode(x));
+        final Base16 b16 = new Base16();
+        assertThrows(RuntimeException.class, () -> b16.decode(x));
     }
 
     @Test
-    void constructor_lowerCaseEncoding() {
-        final byte[] encoded = BASE16_LOWER.encode(BaseNTestData.DECODED);
-        assertEquals(Base16TestData.ENCODED_UTF8_LOWERCASE, strUtf8(encoded), "new Base16(true)");
+    void testConstructor_LowerCase() {
+        final Base16 base16 = new Base16(true);
+        final byte[] encoded = base16.encode(BaseNTestData.DECODED);
+        final String expectedResult = Base16TestData.ENCODED_UTF8_LOWERCASE;
+        final String result = StringUtils.newStringUtf8(encoded);
+        assertEquals(expectedResult, result, "new Base16(true)");
     }
 
     @Test
-    void constructor_upperCaseWithStrictPolicy() {
-        final Base16 b16 = new Base16(false, CodecPolicy.STRICT);
-        assertEquals(Base16TestData.ENCODED_UTF8_UPPERCASE, strUtf8(b16.encode(BaseNTestData.DECODED)),
-                "new Base16(false, CodecPolicy.STRICT)");
+    void testConstructor_LowerCase_DecodingPolicy() {
+        final Base16 base16 = new Base16(false, CodecPolicy.STRICT);
+        final byte[] encoded = base16.encode(BaseNTestData.DECODED);
+        final String expectedResult = Base16TestData.ENCODED_UTF8_UPPERCASE;
+        final String result = StringUtils.newStringUtf8(encoded);
+        assertEquals(result, expectedResult, "new base16(false, CodecPolicy.STRICT)");
     }
 
     @Test
-    void constructors_doNotThrow() {
+    void testConstructors() {
         new Base16();
         new Base16(false);
         new Base16(true);
@@ -143,112 +150,141 @@ class Base16Test {
     }
 
     @Test
-    void decodeSingleBytes_acrossChunkBoundaries() {
-        final String encoded = "556E74696C206E6578742074696D6521"; // "Until next time!"
-        final BaseNCodec.Context ctx = new BaseNCodec.Context();
-        final byte[] encodedBytes = utf8(encoded);
+    void testDecodeSingleBytes() {
+        final String encoded = "556E74696C206E6578742074696D6521";
 
-        // decode byte-by-byte (including split hex-pairs) to exercise streaming behavior
+        final BaseNCodec.Context context = new BaseNCodec.Context();
         final Base16 b16 = new Base16();
-        b16.decode(encodedBytes, 0, 1, ctx);
-        b16.decode(encodedBytes, 1, 1, ctx); // yields "U"
-        b16.decode(encodedBytes, 2, 1, ctx);
-        b16.decode(encodedBytes, 3, 1, ctx); // yields "n"
-        b16.decode(encodedBytes, 4, 3, ctx);  // yields "t"
-        b16.decode(encodedBytes, 7, 3, ctx);  // yields "il"
-        b16.decode(encodedBytes, 10, 3, ctx); // yields " "
-        b16.decode(encodedBytes, 13, 19, ctx);// yields "next time!"
 
-        final byte[] out = new byte[ctx.pos];
-        System.arraycopy(ctx.buffer, ctx.readPos, out, 0, out.length);
-        assertEquals("Until next time!", strUtf8(out));
+        final byte[] encocdedBytes = StringUtils.getBytesUtf8(encoded);
+
+        // decode byte-by-byte
+        b16.decode(encocdedBytes, 0, 1, context);
+        b16.decode(encocdedBytes, 1, 1, context); // yields "U"
+        b16.decode(encocdedBytes, 2, 1, context);
+        b16.decode(encocdedBytes, 3, 1, context); // yields "n"
+
+        // decode split hex-pairs
+        b16.decode(encocdedBytes, 4, 3, context); // yields "t"
+        b16.decode(encocdedBytes, 7, 3, context); // yields "il"
+        b16.decode(encocdedBytes, 10, 3, context); // yields " "
+
+        // decode remaining
+        b16.decode(encocdedBytes, 13, 19, context); // yields "next time!"
+
+        final byte[] decodedBytes = new byte[context.pos];
+        System.arraycopy(context.buffer, context.readPos, decodedBytes, 0, decodedBytes.length);
+        final String decoded = StringUtils.newStringUtf8(decodedBytes);
+
+        assertEquals("Until next time!", decoded);
     }
 
     @Test
-    void decodeSingleBytes_internalOptimization() {
-        final BaseNCodec.Context ctx = new BaseNCodec.Context();
-        assertEquals(0, ctx.ibitWorkArea);
-        assertNull(ctx.buffer);
+    void testDecodeSingleBytesOptimization() {
+        final BaseNCodec.Context context = new BaseNCodec.Context();
+        assertEquals(0, context.ibitWorkArea);
+        assertNull(context.buffer);
+
+        final byte[] data = new byte[1];
 
         final Base16 b16 = new Base16();
-        final byte[] oneByte = new byte[1];
 
-        oneByte[0] = (byte) 'E';
-        b16.decode(oneByte, 0, 1, ctx);
-        assertEquals(15, ctx.ibitWorkArea); // 'E' -> 0xE
-        assertNull(ctx.buffer);             // still no output
+        data[0] = (byte) 'E';
+        b16.decode(data, 0, 1, context);
+        assertEquals(15, context.ibitWorkArea);
+        assertNull(context.buffer);
 
-        oneByte[0] = (byte) 'F';
-        b16.decode(oneByte, 0, 1, ctx);
-        assertEquals(0, ctx.ibitWorkArea);  // completed a byte
+        data[0] = (byte) 'F';
+        b16.decode(data, 0, 1, context);
+        assertEquals(0, context.ibitWorkArea);
 
-        assertEquals((byte) 0xEF, ctx.buffer[0]);
+        assertEquals((byte) 0xEF, context.buffer[0]);
     }
 
+    /**
+     * Test encode and decode of empty byte array.
+     */
     @Test
-    void emptyInputs_encodeAndDecode() {
+    void testEmptyBase16() {
         byte[] empty = {};
-        byte[] result = BASE16_UPPER.encode(empty);
-        assertEquals(0, result.length);
-        assertNull(new Base16().encode(null));
-
+        byte[] result = new Base16().encode(empty);
+        assertEquals(0, result.length, "empty Base16 encode");
+        assertNull(new Base16().encode(null), "empty Base16 encode");
         result = new Base16().encode(empty, 0, 1);
-        assertEquals(0, result.length);
-        assertNull(new Base16().encode(null));
+        assertEquals(0, result.length, "empty Base16 encode with offset");
+        assertNull(new Base16().encode(null), "empty Base16 encode with offset");
 
         empty = new byte[0];
         result = new Base16().decode(empty);
-        assertEquals(0, result.length);
-        assertNull(new Base16().decode((byte[]) null));
+        assertEquals(0, result.length, "empty Base16 decode");
+        assertNull(new Base16().decode((byte[]) null), "empty Base16 encode");
     }
 
+    // encode/decode a large random array
     @Test
-    void encodeDecode_randomArrays() {
-        for (int i = 0; i < 4; i++) {
-            final int len = random.nextInt(10_000) + 1;
+    void testEncodeDecodeRandom() {
+        for (int i = 1; i < 5; i++) {
+            final int len = getRandom().nextInt(10000) + 1;
             final byte[] data = new byte[len];
-            random.nextBytes(data);
-
-            final byte[] roundTrip = new Base16().decode(new Base16().encode(data));
-            assertArrayEquals(data, roundTrip);
+            getRandom().nextBytes(data);
+            final byte[] enc = new Base16().encode(data);
+            final byte[] data2 = new Base16().decode(enc);
+            assertArrayEquals(data, data2);
         }
     }
 
+    // encode/decode random arrays from size 0 to size 11
     @Test
-    void encodeDecode_smallArrays() {
+    void testEncodeDecodeSmall() {
         for (int i = 0; i < 12; i++) {
             final byte[] data = new byte[i];
-            random.nextBytes(data);
-
-            final byte[] roundTrip = new Base16().decode(new Base16().encode(data));
-            assertArrayEquals(data, roundTrip, "Roundtrip mismatch for length " + i);
+            getRandom().nextBytes(data);
+            final byte[] enc = new Base16().encode(data);
+            final byte[] data2 = new Base16().decode(enc);
+            assertArrayEquals(data, data2, toString(data) + " equals " + toString(data2));
         }
     }
 
     @Test
-    void isInAlphabet_lowerAndUpperCasesAndBounds() {
+    void testIsInAlphabet() {
         // invalid bounds
         Base16 b16 = new Base16(true);
-        for (final int v : new int[] {0, 1, -1, -15, -16, 128, 255}) {
-            assertFalse(b16.isInAlphabet((byte) v));
-        }
+        assertFalse(b16.isInAlphabet((byte) 0));
+        assertFalse(b16.isInAlphabet((byte) 1));
+        assertFalse(b16.isInAlphabet((byte) -1));
+        assertFalse(b16.isInAlphabet((byte) -15));
+        assertFalse(b16.isInAlphabet((byte) -16));
+        assertFalse(b16.isInAlphabet((byte) 128));
+        assertFalse(b16.isInAlphabet((byte) 255));
 
-        // lower-case alphabet accepts 0-9 and a-f only
+        // lower-case
         b16 = new Base16(true);
-        for (char c = '0'; c <= '9'; c++) assertTrue(b16.isInAlphabet((byte) c));
-        for (char c = 'a'; c <= 'f'; c++) assertTrue(b16.isInAlphabet((byte) c));
-        for (char c = 'A'; c <= 'F'; c++) assertFalse(b16.isInAlphabet((byte) c));
+        for (char c = '0'; c <= '9'; c++) {
+            assertTrue(b16.isInAlphabet((byte) c));
+        }
+        for (char c = 'a'; c <= 'f'; c++) {
+            assertTrue(b16.isInAlphabet((byte) c));
+        }
+        for (char c = 'A'; c <= 'F'; c++) {
+            assertFalse(b16.isInAlphabet((byte) c));
+        }
         assertFalse(b16.isInAlphabet((byte) ('0' - 1)));
         assertFalse(b16.isInAlphabet((byte) ('9' + 1)));
         assertFalse(b16.isInAlphabet((byte) ('a' - 1)));
         assertFalse(b16.isInAlphabet((byte) ('f' + 1)));
         assertFalse(b16.isInAlphabet((byte) ('z' + 1)));
 
-        // upper-case alphabet accepts 0-9 and A-F only
+        // upper-case
         b16 = new Base16(false);
-        for (char c = '0'; c <= '9'; c++) assertTrue(b16.isInAlphabet((byte) c));
-        for (char c = 'a'; c <= 'f'; c++) assertFalse(b16.isInAlphabet((byte) c));
-        for (char c = 'A'; c <= 'F'; c++) assertTrue(b16.isInAlphabet((byte) c));
+        for (char c = '0'; c <= '9'; c++) {
+            assertTrue(b16.isInAlphabet((byte) c));
+        }
+        for (char c = 'a'; c <= 'f'; c++) {
+            assertFalse(b16.isInAlphabet((byte) c));
+        }
+        for (char c = 'A'; c <= 'F'; c++) {
+            assertTrue(b16.isInAlphabet((byte) c));
+        }
         assertFalse(b16.isInAlphabet((byte) ('0' - 1)));
         assertFalse(b16.isInAlphabet((byte) ('9' + 1)));
         assertFalse(b16.isInAlphabet((byte) ('A' - 1)));
@@ -257,161 +293,311 @@ class Base16Test {
     }
 
     @Test
-    void knownDecodings_lowerCaseInput() {
-        assertEquals("The quick brown fox jumped over the lazy dogs.",
-                strUtf8(new Base16(true).decode(utf8("54686520717569636b2062726f776e20666f78206a756d706564206f76657220746865206c617a7920646f67732e"))));
-        assertEquals("It was the best of times, it was the worst of times.",
-                strUtf8(new Base16(true).decode(utf8("497420776173207468652062657374206f662074696d65732c206974207761732074686520776f727374206f662074696d65732e"))));
+    void testKnownDecodings() {
+        assertEquals("The quick brown fox jumped over the lazy dogs.", new String(new Base16(true)
+                .decode("54686520717569636b2062726f776e20666f78206a756d706564206f76657220746865206c617a7920646f67732e".getBytes(CHARSET_UTF8))));
+        assertEquals("It was the best of times, it was the worst of times.", new String(new Base16(true)
+                .decode("497420776173207468652062657374206f662074696d65732c206974207761732074686520776f727374206f662074696d65732e".getBytes(CHARSET_UTF8))));
         assertEquals("http://jakarta.apache.org/commmons",
-                strUtf8(new Base16(true).decode(utf8("687474703a2f2f6a616b617274612e6170616368652e6f72672f636f6d6d6d6f6e73"))));
-        assertEquals("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz",
-                strUtf8(new Base16(true).decode(utf8("4161426243634464456546664767486849694a6a4b6b4c6c4d6d4e6e4f6f50705171527253735474557556765777587859795a7a"))));
+                new String(new Base16(true).decode("687474703a2f2f6a616b617274612e6170616368652e6f72672f636f6d6d6d6f6e73".getBytes(CHARSET_UTF8))));
+        assertEquals("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz", new String(new Base16(true)
+                .decode("4161426243634464456546664767486849694a6a4b6b4c6c4d6d4e6e4f6f50705171527253735474557556765777587859795a7a".getBytes(CHARSET_UTF8))));
         assertEquals("{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }",
-                strUtf8(new Base16(true).decode(utf8("7b20302c20312c20322c20332c20342c20352c20362c20372c20382c2039207d"))));
-        assertEquals("xyzzy!", strUtf8(new Base16(true).decode(utf8("78797a7a7921"))));
+                new String(new Base16(true).decode("7b20302c20312c20322c20332c20342c20352c20362c20372c20382c2039207d".getBytes(CHARSET_UTF8))));
+        assertEquals("xyzzy!", new String(new Base16(true).decode("78797a7a7921".getBytes(CHARSET_UTF8))));
     }
 
     @Test
-    void knownEncodings_lowerCaseOutput() {
+    void testKnownEncodings() {
         assertEquals("54686520717569636b2062726f776e20666f78206a756d706564206f76657220746865206c617a7920646f67732e",
-                strUtf8(new Base16(true).encode(utf8("The quick brown fox jumped over the lazy dogs."))));
+                new String(new Base16(true).encode("The quick brown fox jumped over the lazy dogs.".getBytes(CHARSET_UTF8))));
         assertEquals("497420776173207468652062657374206f662074696d65732c206974207761732074686520776f727374206f662074696d65732e",
-                strUtf8(new Base16(true).encode(utf8("It was the best of times, it was the worst of times."))));
+                new String(new Base16(true).encode("It was the best of times, it was the worst of times.".getBytes(CHARSET_UTF8))));
         assertEquals("687474703a2f2f6a616b617274612e6170616368652e6f72672f636f6d6d6d6f6e73",
-                strUtf8(new Base16(true).encode(utf8("http://jakarta.apache.org/commmons"))));
+                new String(new Base16(true).encode("http://jakarta.apache.org/commmons".getBytes(CHARSET_UTF8))));
         assertEquals("4161426243634464456546664767486849694a6a4b6b4c6c4d6d4e6e4f6f50705171527253735474557556765777587859795a7a",
-                strUtf8(new Base16(true).encode(utf8("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz"))));
+                new String(new Base16(true).encode("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz".getBytes(CHARSET_UTF8))));
         assertEquals("7b20302c20312c20322c20332c20342c20352c20362c20372c20382c2039207d",
-                strUtf8(new Base16(true).encode(utf8("{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }"))));
-        assertEquals("78797a7a7921", strUtf8(new Base16(true).encode(utf8("xyzzy!"))));
+                new String(new Base16(true).encode("{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }".getBytes(CHARSET_UTF8))));
+        assertEquals("78797a7a7921", new String(new Base16(true).encode("xyzzy!".getBytes(CHARSET_UTF8))));
     }
 
     @Test
-    void lenientDecoding_truncatesTrailingNibble() {
-        final String encoded = "aabbccdde"; // trailing 'e' is a half-byte
+    void testLenientDecoding() {
+        final String encoded = "aabbccdde"; // Note the trailing `e` which does not make up a hex-pair and so is only 1/2 byte
+
         final Base16 b16 = new Base16(true, CodecPolicy.LENIENT);
         assertEquals(CodecPolicy.LENIENT, b16.getCodecPolicy());
-        assertArrayEquals(new byte[] {(byte) 0xaa, (byte) 0xbb, (byte) 0xcc, (byte) 0xdd}, b16.decode(utf8(encoded)));
+
+        final byte[] decoded = b16.decode(StringUtils.getBytesUtf8(encoded));
+        assertArrayEquals(new byte[] { (byte) 0xaa, (byte) 0xbb, (byte) 0xcc, (byte) 0xdd }, decoded);
     }
 
     @Test
-    void strictDecoding_rejectsTrailingNibble() {
-        final String encoded = "aabbccdde"; // trailing 'e' is a half-byte
-        final Base16 b16 = new Base16(true, CodecPolicy.STRICT);
-        assertEquals(CodecPolicy.STRICT, b16.getCodecPolicy());
-        assertThrows(IllegalArgumentException.class, () -> b16.decode(utf8(encoded)));
-    }
+    void testNonBase16Test() {
+        final byte[] invalidEncodedChars = { '/', ':', '@', 'G', '%', '`', 'g' };
 
-    @Test
-    void nonBase16Chars_throwIllegalArgumentException() {
-        final byte[] invalids = {'/', ':', '@', 'G', '%', '`', 'g'};
-        final byte[] single = new byte[1];
-        for (final byte b : invalids) {
-            single[0] = b;
-            assertThrows(IllegalArgumentException.class, () -> BASE16_UPPER.decode(single),
-                    "Invalid Base16 char: " + (char) b);
+        final byte[] encoded = new byte[1];
+        for (final byte invalidEncodedChar : invalidEncodedChars) {
+            encoded[0] = invalidEncodedChar;
+            assertThrows(IllegalArgumentException.class, () -> new Base16().decode(encoded), "Invalid Base16 char: " + (char) invalidEncodedChar);
         }
     }
 
     @Test
-    void objectDecode_withInvalidParameter_throws() {
+    void testObjectDecodeWithInvalidParameter() {
         assertThrows(DecoderException.class, () -> new Base16().decode(Integer.valueOf(5)));
     }
 
     @Test
-    void objectDecode_withValidParameter_roundTrips() throws Exception {
+    void testObjectDecodeWithValidParameter() throws Exception {
         final String original = "Hello World!";
-        final Object encoded = new Base16().encode(original.getBytes(UTF8));
+        final Object o = new Base16().encode(original.getBytes(CHARSET_UTF8));
 
-        final byte[] decoded = (byte[]) new Base16().decode(encoded);
-        assertEquals(original, new String(decoded, UTF8));
-    }
-
-    @Test
-    void objectEncode_roundTrips() {
         final Base16 b16 = new Base16();
-        assertEquals(HELLO_WORLD_HEX_UPPER, new String(b16.encode(HELLO_WORLD.getBytes(UTF8)), UTF8));
+        final Object oDecoded = b16.decode(o);
+        final byte[] baDecoded = (byte[]) oDecoded;
+        final String dest = new String(baDecoded);
+
+        assertEquals(original, dest, "dest string does not equal original");
     }
 
     @Test
-    void objectEncode_withInvalidParameter_throws() {
+    void testObjectEncode() {
+        final Base16 b16 = new Base16();
+        assertEquals(new String(b16.encode("Hello World".getBytes(CHARSET_UTF8))), "48656C6C6F20576F726C64");
+    }
+
+    @Test
+    void testObjectEncodeWithInvalidParameter() {
         assertThrows(EncoderException.class, () -> new Base16().encode("Yadayadayada"));
     }
 
     @Test
-    void objectEncode_withValidParameter_roundTrips() throws Exception {
+    void testObjectEncodeWithValidParameter() throws Exception {
         final String original = "Hello World!";
-        final Object origObj = original.getBytes(UTF8);
+        final Object origObj = original.getBytes(CHARSET_UTF8);
 
-        final Object encoded = new Base16().encode(origObj);
-        final byte[] roundTrip = new Base16().decode((byte[]) encoded);
-        assertEquals(original, new String(roundTrip, UTF8));
+        final Object oEncoded = new Base16().encode(origObj);
+        final byte[] bArray = new Base16().decode((byte[]) oEncoded);
+        final String dest = new String(bArray);
+
+        assertEquals(original, dest, "dest string does not equal original");
     }
 
     @Test
-    void oddEvenDecoding_streamingAcrossOddEvenBoundaries() {
-        final String encoded = "4142434445"; // "ABCDE"
-        final BaseNCodec.Context ctx = new BaseNCodec.Context();
-        final Base16 b16 = new Base16();
-        final byte[] bytes = utf8(encoded);
+    void testOddEvenDecoding() {
+        final String encoded = "4142434445";
 
-        b16.decode(bytes, 0, 3, ctx);  // odd
-        b16.decode(bytes, 3, 4, ctx);  // even
-        b16.decode(bytes, 7, 3, ctx);  // odd
+        final BaseNCodec.Context context = new BaseNCodec.Context();
+        final Base16 base16 = new Base16();
 
-        final byte[] out = new byte[ctx.pos];
-        System.arraycopy(ctx.buffer, ctx.readPos, out, 0, out.length);
-        assertEquals("ABCDE", strUtf8(out));
+        final byte[] encodedBytes = StringUtils.getBytesUtf8(encoded);
+
+        // pass odd, then even, then odd amount of data
+        base16.decode(encodedBytes, 0, 3, context);
+        base16.decode(encodedBytes, 3, 4, context);
+        base16.decode(encodedBytes, 7, 3, context);
+
+        final byte[] decodedBytes = new byte[context.pos];
+        System.arraycopy(context.buffer, context.readPos, decodedBytes, 0, decodedBytes.length);
+        final String decoded = StringUtils.newStringUtf8(decodedBytes);
+
+        assertEquals("ABCDE", decoded);
     }
 
     @Test
-    void encodePairs_andAllEqualPairsRoundTrip() {
-        // Verify 0x00XX for a few initial values with expected upper-case hex.
-        for (int i = 0; i <= 17; i++) {
-            final byte[] pair = {(byte) 0x00, (byte) i};
-            assertEquals(toUpperHex(pair), encodeUpperToHex(pair));
-        }
-        // Round-trip for all equal pairs
+    void testPairs() {
+        assertEquals("0000", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0 })));
+        assertEquals("0001", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 1 })));
+        assertEquals("0002", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 2 })));
+        assertEquals("0003", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 3 })));
+        assertEquals("0004", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 4 })));
+        assertEquals("0005", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 5 })));
+        assertEquals("0006", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 6 })));
+        assertEquals("0007", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 7 })));
+        assertEquals("0008", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 8 })));
+        assertEquals("0009", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 9 })));
+        assertEquals("000A", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 10 })));
+        assertEquals("000B", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 11 })));
+        assertEquals("000C", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 12 })));
+        assertEquals("000D", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 13 })));
+        assertEquals("000E", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 14 })));
+        assertEquals("000F", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 15 })));
+        assertEquals("0010", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 16 })));
+        assertEquals("0011", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 17 })));
         for (int i = -128; i <= 127; i++) {
-            final byte[] test = {(byte) i, (byte) i};
+            final byte[] test = { (byte) i, (byte) i };
             assertArrayEquals(test, new Base16().decode(new Base16().encode(test)));
         }
     }
 
     @Test
-    void encodeSingletons_andAllSingletonsRoundTrip() {
-        // Verify 0x00..0x68 explicitly via computed expected hex
-        for (int i = 0; i <= 0x68; i++) {
-            final byte[] singleton = {(byte) i};
-            assertEquals(toUpperHex(singleton), encodeUpperToHex(singleton));
-        }
-        // Round-trip for all byte values
+    void testSingletons() {
+        assertEquals("00", new String(new Base16().encode(new byte[] { (byte) 0 })));
+        assertEquals("01", new String(new Base16().encode(new byte[] { (byte) 1 })));
+        assertEquals("02", new String(new Base16().encode(new byte[] { (byte) 2 })));
+        assertEquals("03", new String(new Base16().encode(new byte[] { (byte) 3 })));
+        assertEquals("04", new String(new Base16().encode(new byte[] { (byte) 4 })));
+        assertEquals("05", new String(new Base16().encode(new byte[] { (byte) 5 })));
+        assertEquals("06", new String(new Base16().encode(new byte[] { (byte) 6 })));
+        assertEquals("07", new String(new Base16().encode(new byte[] { (byte) 7 })));
+        assertEquals("08", new String(new Base16().encode(new byte[] { (byte) 8 })));
+        assertEquals("09", new String(new Base16().encode(new byte[] { (byte) 9 })));
+        assertEquals("0A", new String(new Base16().encode(new byte[] { (byte) 10 })));
+        assertEquals("0B", new String(new Base16().encode(new byte[] { (byte) 11 })));
+        assertEquals("0C", new String(new Base16().encode(new byte[] { (byte) 12 })));
+        assertEquals("0D", new String(new Base16().encode(new byte[] { (byte) 13 })));
+        assertEquals("0E", new String(new Base16().encode(new byte[] { (byte) 14 })));
+        assertEquals("0F", new String(new Base16().encode(new byte[] { (byte) 15 })));
+        assertEquals("10", new String(new Base16().encode(new byte[] { (byte) 16 })));
+        assertEquals("11", new String(new Base16().encode(new byte[] { (byte) 17 })));
+        assertEquals("12", new String(new Base16().encode(new byte[] { (byte) 18 })));
+        assertEquals("13", new String(new Base16().encode(new byte[] { (byte) 19 })));
+        assertEquals("14", new String(new Base16().encode(new byte[] { (byte) 20 })));
+        assertEquals("15", new String(new Base16().encode(new byte[] { (byte) 21 })));
+        assertEquals("16", new String(new Base16().encode(new byte[] { (byte) 22 })));
+        assertEquals("17", new String(new Base16().encode(new byte[] { (byte) 23 })));
+        assertEquals("18", new String(new Base16().encode(new byte[] { (byte) 24 })));
+        assertEquals("19", new String(new Base16().encode(new byte[] { (byte) 25 })));
+        assertEquals("1A", new String(new Base16().encode(new byte[] { (byte) 26 })));
+        assertEquals("1B", new String(new Base16().encode(new byte[] { (byte) 27 })));
+        assertEquals("1C", new String(new Base16().encode(new byte[] { (byte) 28 })));
+        assertEquals("1D", new String(new Base16().encode(new byte[] { (byte) 29 })));
+        assertEquals("1E", new String(new Base16().encode(new byte[] { (byte) 30 })));
+        assertEquals("1F", new String(new Base16().encode(new byte[] { (byte) 31 })));
+        assertEquals("20", new String(new Base16().encode(new byte[] { (byte) 32 })));
+        assertEquals("21", new String(new Base16().encode(new byte[] { (byte) 33 })));
+        assertEquals("22", new String(new Base16().encode(new byte[] { (byte) 34 })));
+        assertEquals("23", new String(new Base16().encode(new byte[] { (byte) 35 })));
+        assertEquals("24", new String(new Base16().encode(new byte[] { (byte) 36 })));
+        assertEquals("25", new String(new Base16().encode(new byte[] { (byte) 37 })));
+        assertEquals("26", new String(new Base16().encode(new byte[] { (byte) 38 })));
+        assertEquals("27", new String(new Base16().encode(new byte[] { (byte) 39 })));
+        assertEquals("28", new String(new Base16().encode(new byte[] { (byte) 40 })));
+        assertEquals("29", new String(new Base16().encode(new byte[] { (byte) 41 })));
+        assertEquals("2A", new String(new Base16().encode(new byte[] { (byte) 42 })));
+        assertEquals("2B", new String(new Base16().encode(new byte[] { (byte) 43 })));
+        assertEquals("2C", new String(new Base16().encode(new byte[] { (byte) 44 })));
+        assertEquals("2D", new String(new Base16().encode(new byte[] { (byte) 45 })));
+        assertEquals("2E", new String(new Base16().encode(new byte[] { (byte) 46 })));
+        assertEquals("2F", new String(new Base16().encode(new byte[] { (byte) 47 })));
+        assertEquals("30", new String(new Base16().encode(new byte[] { (byte) 48 })));
+        assertEquals("31", new String(new Base16().encode(new byte[] { (byte) 49 })));
+        assertEquals("32", new String(new Base16().encode(new byte[] { (byte) 50 })));
+        assertEquals("33", new String(new Base16().encode(new byte[] { (byte) 51 })));
+        assertEquals("34", new String(new Base16().encode(new byte[] { (byte) 52 })));
+        assertEquals("35", new String(new Base16().encode(new byte[] { (byte) 53 })));
+        assertEquals("36", new String(new Base16().encode(new byte[] { (byte) 54 })));
+        assertEquals("37", new String(new Base16().encode(new byte[] { (byte) 55 })));
+        assertEquals("38", new String(new Base16().encode(new byte[] { (byte) 56 })));
+        assertEquals("39", new String(new Base16().encode(new byte[] { (byte) 57 })));
+        assertEquals("3A", new String(new Base16().encode(new byte[] { (byte) 58 })));
+        assertEquals("3B", new String(new Base16().encode(new byte[] { (byte) 59 })));
+        assertEquals("3C", new String(new Base16().encode(new byte[] { (byte) 60 })));
+        assertEquals("3D", new String(new Base16().encode(new byte[] { (byte) 61 })));
+        assertEquals("3E", new String(new Base16().encode(new byte[] { (byte) 62 })));
+        assertEquals("3F", new String(new Base16().encode(new byte[] { (byte) 63 })));
+        assertEquals("40", new String(new Base16().encode(new byte[] { (byte) 64 })));
+        assertEquals("41", new String(new Base16().encode(new byte[] { (byte) 65 })));
+        assertEquals("42", new String(new Base16().encode(new byte[] { (byte) 66 })));
+        assertEquals("43", new String(new Base16().encode(new byte[] { (byte) 67 })));
+        assertEquals("44", new String(new Base16().encode(new byte[] { (byte) 68 })));
+        assertEquals("45", new String(new Base16().encode(new byte[] { (byte) 69 })));
+        assertEquals("46", new String(new Base16().encode(new byte[] { (byte) 70 })));
+        assertEquals("47", new String(new Base16().encode(new byte[] { (byte) 71 })));
+        assertEquals("48", new String(new Base16().encode(new byte[] { (byte) 72 })));
+        assertEquals("49", new String(new Base16().encode(new byte[] { (byte) 73 })));
+        assertEquals("4A", new String(new Base16().encode(new byte[] { (byte) 74 })));
+        assertEquals("4B", new String(new Base16().encode(new byte[] { (byte) 75 })));
+        assertEquals("4C", new String(new Base16().encode(new byte[] { (byte) 76 })));
+        assertEquals("4D", new String(new Base16().encode(new byte[] { (byte) 77 })));
+        assertEquals("4E", new String(new Base16().encode(new byte[] { (byte) 78 })));
+        assertEquals("4F", new String(new Base16().encode(new byte[] { (byte) 79 })));
+        assertEquals("50", new String(new Base16().encode(new byte[] { (byte) 80 })));
+        assertEquals("51", new String(new Base16().encode(new byte[] { (byte) 81 })));
+        assertEquals("52", new String(new Base16().encode(new byte[] { (byte) 82 })));
+        assertEquals("53", new String(new Base16().encode(new byte[] { (byte) 83 })));
+        assertEquals("54", new String(new Base16().encode(new byte[] { (byte) 84 })));
+        assertEquals("55", new String(new Base16().encode(new byte[] { (byte) 85 })));
+        assertEquals("56", new String(new Base16().encode(new byte[] { (byte) 86 })));
+        assertEquals("57", new String(new Base16().encode(new byte[] { (byte) 87 })));
+        assertEquals("58", new String(new Base16().encode(new byte[] { (byte) 88 })));
+        assertEquals("59", new String(new Base16().encode(new byte[] { (byte) 89 })));
+        assertEquals("5A", new String(new Base16().encode(new byte[] { (byte) 90 })));
+        assertEquals("5B", new String(new Base16().encode(new byte[] { (byte) 91 })));
+        assertEquals("5C", new String(new Base16().encode(new byte[] { (byte) 92 })));
+        assertEquals("5D", new String(new Base16().encode(new byte[] { (byte) 93 })));
+        assertEquals("5E", new String(new Base16().encode(new byte[] { (byte) 94 })));
+        assertEquals("5F", new String(new Base16().encode(new byte[] { (byte) 95 })));
+        assertEquals("60", new String(new Base16().encode(new byte[] { (byte) 96 })));
+        assertEquals("61", new String(new Base16().encode(new byte[] { (byte) 97 })));
+        assertEquals("62", new String(new Base16().encode(new byte[] { (byte) 98 })));
+        assertEquals("63", new String(new Base16().encode(new byte[] { (byte) 99 })));
+        assertEquals("64", new String(new Base16().encode(new byte[] { (byte) 100 })));
+        assertEquals("65", new String(new Base16().encode(new byte[] { (byte) 101 })));
+        assertEquals("66", new String(new Base16().encode(new byte[] { (byte) 102 })));
+        assertEquals("67", new String(new Base16().encode(new byte[] { (byte) 103 })));
+        assertEquals("68", new String(new Base16().encode(new byte[] { (byte) 104 })));
         for (int i = -128; i <= 127; i++) {
-            final byte[] singleton = {(byte) i};
-            assertArrayEquals(singleton, new Base16().decode(new Base16().encode(singleton)));
+            final byte[] test = { (byte) i };
+            assertArrayEquals(test, new Base16().decode(new Base16().encode(test)));
         }
     }
 
     @Test
-    void encodeTriplets_firstTwoZero_thirdInLowRange() {
-        for (int i = 0; i <= 0x0F; i++) {
-            final byte[] triplet = {(byte) 0x00, (byte) 0x00, (byte) i};
-            assertEquals(toUpperHex(triplet), encodeUpperToHex(triplet));
-        }
+    void testStrictDecoding() {
+        final String encoded = "aabbccdde"; // Note the trailing `e` which does not make up a hex-pair and so is only 1/2 byte
+
+        final Base16 b16 = new Base16(true, CodecPolicy.STRICT);
+        assertEquals(CodecPolicy.STRICT, b16.getCodecPolicy());
+        assertThrows(IllegalArgumentException.class, () -> b16.decode(StringUtils.getBytesUtf8(encoded)));
     }
 
     @Test
-    void stringToByteVariations() throws DecoderException {
-        final String s1 = HELLO_WORLD_HEX_UPPER;
+    void testStringToByteVariations() throws DecoderException {
+        final Base16 base16 = new Base16();
+        final String s1 = "48656C6C6F20576F726C64";
         final String s2 = "";
         final String s3 = null;
 
-        assertEquals(HELLO_WORLD, strUtf8(BASE16_UPPER.decode(s1)));
-        assertEquals(HELLO_WORLD, strUtf8((byte[]) new Base16().decode((Object) s1)));
-        assertEquals(HELLO_WORLD, strUtf8(new Base16().decode(s1)));
-        assertEquals("", strUtf8(new Base16().decode(s2)));
-        assertEquals("", strUtf8(new Base16().decode(s2)));
-        assertNull(strUtf8(new Base16().decode(s3)));
-        assertNull(strUtf8(new Base16().decode(s3)));
+        assertEquals("Hello World", StringUtils.newStringUtf8(base16.decode(s1)), "StringToByte Hello World");
+        assertEquals("Hello World", StringUtils.newStringUtf8((byte[]) new Base16().decode((Object) s1)), "StringToByte Hello World");
+        assertEquals("Hello World", StringUtils.newStringUtf8(new Base16().decode(s1)), "StringToByte static Hello World");
+        assertEquals("", StringUtils.newStringUtf8(new Base16().decode(s2)), "StringToByte \"\"");
+        assertEquals("", StringUtils.newStringUtf8(new Base16().decode(s2)), "StringToByte static \"\"");
+        assertNull(StringUtils.newStringUtf8(new Base16().decode(s3)), "StringToByte null");
+        assertNull(StringUtils.newStringUtf8(new Base16().decode(s3)), "StringToByte static null");
+    }
+
+    @Test
+    void testTriplets() {
+        assertEquals("000000", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 0 })));
+        assertEquals("000001", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 1 })));
+        assertEquals("000002", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 2 })));
+        assertEquals("000003", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 3 })));
+        assertEquals("000004", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 4 })));
+        assertEquals("000005", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 5 })));
+        assertEquals("000006", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 6 })));
+        assertEquals("000007", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 7 })));
+        assertEquals("000008", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 8 })));
+        assertEquals("000009", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 9 })));
+        assertEquals("00000A", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 10 })));
+        assertEquals("00000B", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 11 })));
+        assertEquals("00000C", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 12 })));
+        assertEquals("00000D", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 13 })));
+        assertEquals("00000E", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 14 })));
+        assertEquals("00000F", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 15 })));
+    }
+
+    private String toString(final byte[] data) {
+        final StringBuilder buf = new StringBuilder();
+        for (int i = 0; i < data.length; i++) {
+            buf.append(data[i]);
+            if (i != data.length - 1) {
+                buf.append(",");
+            }
+        }
+        return buf.toString();
     }
 }
