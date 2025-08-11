@@ -24,13 +24,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-/**
- * Base test class for {@link TypeHandler} implementations.
- * <p>
- * Provides common mock objects for testing JDBC interactions and defines the required test
- * methods that concrete subclasses must implement to validate specific type handlers.
- * </p>
- */
 @ExtendWith(MockitoExtension.class)
 abstract class BaseTypeHandlerTest {
 
@@ -43,80 +36,17 @@ abstract class BaseTypeHandlerTest {
   @Mock
   protected ResultSetMetaData rsmd;
 
-  /**
-   * Tests setting a non-null parameter on a {@link PreparedStatement}.
-   * <p>
-   * Concrete implementations should verify that the type handler correctly sets the parameter
-   * value at the specified position using the appropriate JDBC type.
-   * </p>
-   *
-   * @throws Exception if any error occurs during the test
-   */
   public abstract void shouldSetParameter() throws Exception;
 
-  /**
-   * Tests retrieving a non-null result from a {@link ResultSet} using a column name.
-   * <p>
-   * Concrete implementations should verify that the type handler correctly reads and converts
-   * a non-null value from the specified column.
-   * </p>
-   *
-   * @throws Exception if any error occurs during the test
-   */
   public abstract void shouldGetResultFromResultSetByName() throws Exception;
 
-  /**
-   * Tests retrieving a null result from a {@link ResultSet} using a column name.
-   * <p>
-   * Concrete implementations should verify that the type handler correctly handles SQL {@code NULL}
-   * values and returns a Java {@code null} or equivalent representation.
-   * </p>
-   *
-   * @throws Exception if any error occurs during the test
-   */
   public abstract void shouldGetResultNullFromResultSetByName() throws Exception;
 
-  /**
-   * Tests retrieving a non-null result from a {@link ResultSet} using a column index.
-   * <p>
-   * Concrete implementations should verify that the type handler correctly reads and converts
-   * a non-null value from the specified column position.
-   * </p>
-   *
-   * @throws Exception if any error occurs during the test
-   */
   public abstract void shouldGetResultFromResultSetByPosition() throws Exception;
 
-  /**
-   * Tests retrieving a null result from a {@link ResultSet} using a column index.
-   * <p>
-   * Concrete implementations should verify that the type handler correctly handles SQL {@code NULL}
-   * values and returns a Java {@code null} or equivalent representation.
-   * </p>
-   *
-   * @throws Exception if any error occurs during the test
-   */
   public abstract void shouldGetResultNullFromResultSetByPosition() throws Exception;
 
-  /**
-   * Tests retrieving a non-null result from a {@link CallableStatement} using a column index.
-   * <p>
-   * Concrete implementations should verify that the type handler correctly reads and converts
-   * a non-null value from the specified output parameter or result column.
-   * </p>
-   *
-   * @throws Exception if any error occurs during the test
-   */
   public abstract void shouldGetResultFromCallableStatement() throws Exception;
 
-  /**
-   * Tests retrieving a null result from a {@link CallableStatement} using a column index.
-   * <p>
-   * Concrete implementations should verify that the type handler correctly handles SQL {@code NULL}
-   * values and returns a Java {@code null} or equivalent representation.
-   * </p>
-   *
-   * @throws Exception if any error occurs during the test
-   */
   public abstract void shouldGetResultNullFromCallableStatement() throws Exception;
 }
