@@ -65,98 +65,141 @@ class CartesianProductIteratorTest extends AbstractIteratorTest<List<Character>>
     }
 
     @Test
-    void testHasNext_WhenOneCollectionIsEmpty_ShouldReturnFalse() {
-        CartesianProductIterator<Character> it = new CartesianProductIterator<>(letters, Collections.emptyList());
-        verifyNoResults(it);
+    void testEmptyCollection() {
+        final CartesianProductIterator<Character> it = new CartesianProductIterator<>(letters, Collections.emptyList());
+        assertFalse(it.hasNext());
+        assertThrows(NoSuchElementException.class, it::next);
     }
 
+    /**
+     * test checking that all the tuples are returned
+     */
     @Test
-    void testNext_ShouldReturnAllCombinations() {
-        List<Character[]> results = collectIteratorResults(makeObject());
-        verifyCartesianProduct(letters, numbers, symbols, results);
-    }
-
-    @Test
-    void testNext_WhenAllCollectionsAreEmpty_ShouldReturnNoCombinations() {
-        CartesianProductIterator<Character> it = new CartesianProductIterator<>(emptyList, emptyList, emptyList);
-        verifyNoResults(it);
-    }
-
-    @Test
-    void testNext_WhenFirstCollectionIsEmpty_ShouldReturnNoCombinations() {
-        CartesianProductIterator<Character> it = new CartesianProductIterator<>(emptyList, numbers, symbols);
-        verifyNoResults(it);
-    }
-
-    @Test
-    void testNext_WhenLastCollectionIsEmpty_ShouldReturnNoCombinations() {
-        CartesianProductIterator<Character> it = new CartesianProductIterator<>(letters, numbers, emptyList);
-        verifyNoResults(it);
-    }
-
-    @Test
-    void testNext_WhenMiddleCollectionIsEmpty_ShouldReturnNoCombinations() {
-        CartesianProductIterator<Character> it = new CartesianProductIterator<>(letters, emptyList, symbols);
-        verifyNoResults(it);
-    }
-
-    @Test
-    void testNext_WhenSameListUsedMultipleTimes_ShouldReturnAllCombinations() {
-        CartesianProductIterator<Character> it = new CartesianProductIterator<>(letters, letters, letters);
-        List<Character[]> results = collectIteratorResults(it);
-        verifyCartesianProduct(letters, letters, letters, results);
-    }
-
-    @Override
-    @Test
-    void testForEachRemaining() {
-        List<Character[]> results = new ArrayList<>();
-        makeObject().forEachRemaining(t -> results.add(t.toArray(new Character[0])));
-        verifyCartesianProduct(letters, numbers, symbols, results);
-    }
-
-    @Test
-    void testRemove_ShouldThrowUnsupportedOperationException() {
-        CartesianProductIterator<Character> it = makeObject();
-        assertThrows(UnsupportedOperationException.class, it::remove);
-    }
-
-    // Helper methods ==========================================================
-    
-    private List<Character[]> collectIteratorResults(CartesianProductIterator<Character> iterator) {
-        List<Character[]> results = new ArrayList<>();
-        while (iterator.hasNext()) {
-            results.add(iterator.next().toArray(new Character[0]));
+    void testExhaustivity() {
+        final List<Character[]> resultsList = new ArrayList<>();
+        final CartesianProductIterator<Character> it = makeObject();
+        while (it.hasNext()) {
+            final List<Character> tuple = it.next();
+            resultsList.add(tuple.toArray(new Character[0]));
         }
-        verifyNoResults(iterator); // Verify post-exhaustion state
-        return results;
-    }
-    
-    private void verifyNoResults(CartesianProductIterator<Character> iterator) {
-        assertFalse(iterator.hasNext(), "Iterator should report no more elements");
-        assertThrows(NoSuchElementException.class, iterator::next, 
-            "Calling next() should throw when exhausted");
-    }
-    
-    private void verifyCartesianProduct(
-        List<Character> list1, 
-        List<Character> list2, 
-        List<Character> list3, 
-        List<Character[]> actualResults
-    ) {
-        int expectedSize = list1.size() * list2.size() * list3.size();
-        assertEquals(expectedSize, actualResults.size(), 
-            "Incorrect number of cartesian product results");
-        
-        Iterator<Character[]> resultIterator = actualResults.iterator();
-        for (Character item1 : list1) {
-            for (Character item2 : list2) {
-                for (Character item3 : list3) {
-                    Character[] expectedTuple = {item1, item2, item3};
-                    assertArrayEquals(expectedTuple, resultIterator.next(), 
-                        "Incorrect cartesian product tuple");
+        assertThrows(NoSuchElementException.class, it::next);
+        assertEquals(18, resultsList.size());
+        final Iterator<Character[]> itResults = resultsList.iterator();
+        for (final Character a : letters) {
+            for (final Character b : numbers) {
+                for (final Character c : symbols) {
+                    assertArrayEquals(new Character[]{a, b, c}, itResults.next());
                 }
             }
         }
+    }
+
+    /**
+     * test checking that no tuples are returned when all the lists are empty
+     */
+    @Test
+    void testExhaustivityWithAllEmptyLists() {
+        final List<Character[]> resultsList = new ArrayList<>();
+        final CartesianProductIterator<Character> it = new CartesianProductIterator<>(emptyList, emptyList, emptyList);
+        while (it.hasNext()) {
+            final List<Character> tuple = it.next();
+            resultsList.add(tuple.toArray(new Character[0]));
+        }
+        assertThrows(NoSuchElementException.class, it::next);
+        assertEquals(0, resultsList.size());
+    }
+
+    /**
+     * test checking that no tuples are returned when first of the lists is empty
+     */
+    @Test
+    void testExhaustivityWithEmptyFirstList() {
+        final List<Character[]> resultsList = new ArrayList<>();
+        final CartesianProductIterator<Character> it = new CartesianProductIterator<>(emptyList, numbers, symbols);
+        while (it.hasNext()) {
+            final List<Character> tuple = it.next();
+            resultsList.add(tuple.toArray(new Character[0]));
+        }
+        assertThrows(NoSuchElementException.class, it::next);
+        assertEquals(0, resultsList.size());
+    }
+
+    /**
+     * test checking that no tuples are returned when last of the lists is empty
+     */
+    @Test
+    void testExhaustivityWithEmptyLastList() {
+        final List<Character[]> resultsList = new ArrayList<>();
+        final CartesianProductIterator<Character> it = new CartesianProductIterator<>(letters, numbers, emptyList);
+        while (it.hasNext()) {
+            final List<Character> tuple = it.next();
+            resultsList.add(tuple.toArray(new Character[0]));
+        }
+        assertThrows(NoSuchElementException.class, it::next);
+        assertEquals(0, resultsList.size());
+    }
+
+    /**
+     * test checking that no tuples are returned when at least one of the lists is empty
+     */
+    @Test
+    void testExhaustivityWithEmptyList() {
+        final List<Character[]> resultsList = new ArrayList<>();
+        final CartesianProductIterator<Character> it = new CartesianProductIterator<>(letters, emptyList, symbols);
+        while (it.hasNext()) {
+            final List<Character> tuple = it.next();
+            resultsList.add(tuple.toArray(new Character[0]));
+        }
+        assertThrows(NoSuchElementException.class, it::next);
+        assertEquals(0, resultsList.size());
+    }
+
+    /**
+     * test checking that all tuples are returned when same list is passed multiple times
+     */
+    @Test
+    void testExhaustivityWithSameList() {
+        final List<Character[]> resultsList = new ArrayList<>();
+        final CartesianProductIterator<Character> it = new CartesianProductIterator<>(letters, letters, letters);
+        while (it.hasNext()) {
+            final List<Character> tuple = it.next();
+            resultsList.add(tuple.toArray(new Character[0]));
+        }
+        assertThrows(NoSuchElementException.class, it::next);
+        assertEquals(27, resultsList.size());
+        final Iterator<Character[]> itResults = resultsList.iterator();
+        for (final Character a : letters) {
+            for (final Character b : letters) {
+                for (final Character c : letters) {
+                    assertArrayEquals(new Character[]{a, b, c}, itResults.next());
+                }
+            }
+        }
+    }
+
+    /**
+     * test that all tuples are provided to consumer
+     */
+    @Override
+    @Test
+    void testForEachRemaining() {
+        final List<Character[]> resultsList = new ArrayList<>();
+        final CartesianProductIterator<Character> it = makeObject();
+        it.forEachRemaining(tuple -> resultsList.add(tuple.toArray(new Character[0])));
+        assertEquals(18, resultsList.size());
+        final Iterator<Character[]> itResults = resultsList.iterator();
+        for (final Character a : letters) {
+            for (final Character b : numbers) {
+                for (final Character c : symbols) {
+                    assertArrayEquals(new Character[]{a, b, c}, itResults.next());
+                }
+            }
+        }
+    }
+
+    @Test
+    void testRemoveThrows() {
+        final CartesianProductIterator<Character> it = makeObject();
+        assertThrows(UnsupportedOperationException.class, it::remove);
     }
 }
