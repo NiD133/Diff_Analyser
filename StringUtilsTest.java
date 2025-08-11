@@ -1,85 +1,97 @@
+/*
+ *
+ * This file is part of the iText (R) project.
+    Copyright (c) 1998-2022 iText Group NV
+ * Authors: Bruno Lowagie, Paulo Soares, et al.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License version 3
+ * as published by the Free Software Foundation with the addition of the
+ * following permission added to Section 15 as permitted in Section 7(a):
+ * FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
+ * ITEXT GROUP. ITEXT GROUP DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
+ * OF THIRD PARTY RIGHTS
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, see http://www.gnu.org/licenses or write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA, 02110-1301 USA, or download the license from the following URL:
+ * http://itextpdf.com/terms-of-use/
+ *
+ * The interactive user interfaces in modified source and object code versions
+ * of this program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU Affero General Public License.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License,
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
+ *
+ * You can be released from the requirements of the license by purchasing
+ * a commercial license. Buying such a license is mandatory as soon as you
+ * develop commercial activities involving the iText software without
+ * disclosing the source code of your own applications.
+ * These activities include: offering paid services to customers as an ASP,
+ * serving PDFs on the fly in a web application, shipping iText with a closed
+ * source product.
+ *
+ * For more information, please contact iText Software Corp. at this
+ * address: sales@itextpdf.com
+ */
 package com.itextpdf.text.pdf;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * Parameterized tests for StringUtils.convertCharsToBytes(char[]).
+ * Parameterized unit tests for the method StringUtils::convertCharsToBytes
  *
- * Purpose:
- * - Verifies that each 16-bit Java char is converted to two bytes in big-endian order:
- *   result[0] = high byte (bits 15..8), result[1] = low byte (bits 7..0).
- * - Covers typical characters, Arabic sample, and boundaries around surrogate ranges.
+ * @author benoit
  */
 @RunWith(Parameterized.class)
-public class StringUtilsConvertCharsToBytesTest {
+public class StringUtilsTest {
 
-    @Parameterized.Parameters(name = "{0}")
+    @Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-            caseEntry("Null character", '\u0000', 0x00, 0x00),
-            caseEntry("Backspace", '\b', 0x00, 0x08),
-            caseEntry("Lowercase letter 'a'", 'a', 0x00, 0x61),
-            caseEntry("Arabic letter 'ة'", 'ة', 0x06, 0x29),
-            caseEntry("Just below surrogate range start", '\ud7ff', 0xD7, 0xFF),
-            caseEntry("Surrogate range start", '\ud800', 0xD8, 0x00),
-            caseEntry("Inside surrogate range", '\uda82', 0xDA, 0x82),
-            caseEntry("Inside surrogate range", '\udbb0', 0xDB, 0xB0),
-            caseEntry("Surrogate range end", '\udfff', 0xDF, 0xFF),
-            caseEntry("Just above surrogate range end", '\ue000', 0xE0, 0x00),
-            caseEntry("Replacement character", '\ufffd', 0xFF, 0xFD),
-            caseEntry("Maximum char value", '\uffff', 0xFF, 0xFF),
-        });
+            {'\u0000', (byte) 0x0, (byte) 0x0},
+            {'\b', (byte) 0x0, (byte) 0x08},
+            {'a', (byte) 0x0, (byte) 0x61},
+            {'ة', (byte) 0x06, (byte) 0x29}, // Arabic characters
+            {'\ud7ff', (byte) 0xd7, (byte) 0xff}, // just outside of a special Unicode range
+            {'\ud800', (byte) 0xd8, (byte) 0x0}, // in a special Unicode range
+            {'\uda82', (byte) 0xda, (byte) 0x82}, // in a special Unicode range
+            {'\udbb0', (byte) 0xdb, (byte) 0xb0}, // in a special Unicode range
+            {'\udfff', (byte) 0xdf, (byte) 0xff}, // in a special Unicode range
+            {'\ue000', (byte) 0xe0, (byte) 0x0}, // just outside of a special Unicode range
+            {'\ufffd', (byte) 0xff, (byte) 0xfd},
+            {'\uffff', (byte) 0xff, (byte) 0xff},});
     }
 
-    private final String description;
-    private final char inputChar;
-    private final byte expectedHigh;
-    private final byte expectedLow;
+    private final char input;
+    private final byte check1, check2;
 
-    public StringUtilsConvertCharsToBytesTest(String description, char inputChar, byte expectedHigh, byte expectedLow) {
-        this.description = description;
-        this.inputChar = inputChar;
-        this.expectedHigh = expectedHigh;
-        this.expectedLow = expectedLow;
+    public StringUtilsTest(char in, byte c1, byte c2) {
+        input = in;
+        check1 = c1;
+        check2 = c2;
     }
 
     @Test
-    public void convertSingleCharToBytes_returnsHighAndLowByteInBigEndianOrder() {
-        // Given
-        char[] chars = { inputChar };
+    public void convertCharsToBytesTest() {
+        byte[] check = {check1, check2};
+        char[] vals = {input};
+        byte[] result = StringUtils.convertCharsToBytes(vals);
 
-        // When
-        byte[] actual = StringUtils.convertCharsToBytes(chars);
-
-        // Then
-        String failMsg = String.format(
-            "%s. Input %s. Expected [%s, %s] but got [%s, %s].",
-            description, toHex(inputChar),
-            toHex(expectedHigh), toHex(expectedLow),
-            toHex(actual[0]), toHex(actual[1])
-        );
-        Assert.assertArrayEquals(failMsg, new byte[]{expectedHigh, expectedLow}, actual);
-    }
-
-    // ---- helpers ----
-
-    private static Object[] caseEntry(String desc, char ch, int high, int low) {
-        String name = String.format("%s (input=%s, expected=[0x%02X 0x%02X])",
-                desc, toHex(ch), high, low);
-        return new Object[]{ name, ch, (byte) high, (byte) low };
-    }
-
-    private static String toHex(char c) {
-        return String.format("U+%04X", (int) c);
-    }
-
-    private static String toHex(byte b) {
-        return String.format("0x%02X", b & 0xFF);
+        Assert.assertArrayEquals(check, result);
     }
 }
