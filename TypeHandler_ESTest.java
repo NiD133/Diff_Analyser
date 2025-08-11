@@ -18,246 +18,231 @@ import org.evosuite.runtime.EvoRunnerParameters;
 import org.evosuite.runtime.mock.java.lang.MockThrowable;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class TypeHandler_ESTest extends TypeHandler_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      Number number0 = TypeHandler.createNumber("6");
-      assertEquals(6L, number0);
-  }
+    // ========== Number Creation Tests ==========
+    
+    @Test(timeout = 4000)
+    public void testCreateNumber_ValidInteger_ReturnsLong()  throws Throwable  {
+        Number result = TypeHandler.createNumber("6");
+        assertEquals("Should create Long for integer string", 6L, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      Object object0 = TypeHandler.createValue("", (Object) null);
-      assertEquals("", object0);
-  }
+    @Test(timeout = 4000)
+    public void testCreateNumber_InvalidFormat_ThrowsException()  throws Throwable  {
+        try { 
+            TypeHandler.createNumber("I%5HIg?GFqZ!&");
+            fail("Should throw exception for invalid number format");
+        } catch(Exception e) {
+            verifyException("org.apache.commons.cli.ParseException", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      Class<MockThrowable> class0 = MockThrowable.class;
-      MockThrowable mockThrowable0 = TypeHandler.createValue((String) null, class0);
-      assertNull(mockThrowable0);
-  }
+    // ========== File Creation Tests ==========
+    
+    @Test(timeout = 4000)
+    public void testCreateFile_ValidPath_ReturnsFile()  throws Throwable  {
+        File result = TypeHandler.createFile(".7");
+        assertEquals("File should have zero length", 0L, result.length());
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      File file0 = TypeHandler.createFile(".7");
-      assertEquals(0L, file0.length());
-  }
+    @Test(timeout = 4000)
+    public void testCreateFile_AnotherValidPath_ReturnsFile()  throws Throwable  {
+        File result = TypeHandler.createFile("wnU<h1?h~G9CL");
+        assertFalse("File should not be a directory", result.isDirectory());
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      File file0 = TypeHandler.createFile("wnU<h1?h~G9CL");
-      assertFalse(file0.isDirectory());
-  }
+    @Test(timeout = 4000)
+    public void testCreateFile_RootPath_ReturnsRootFile()  throws Throwable  {
+        File result = TypeHandler.createFile("/");
+        assertNull("Root file should have no parent", result.getParent());
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      Map<Class<?>, Converter<?, ? extends Throwable>> map0 = TypeHandler.createDefaultMap();
-      TypeHandler typeHandler0 = new TypeHandler(map0);
-  }
+    @Test(timeout = 4000)
+    public void testCreateFile_NullPath_ThrowsException()  throws Throwable  {
+        try { 
+            TypeHandler.createFile((String) null);
+            fail("Should throw exception for null file path");
+        } catch(IllegalArgumentException e) {
+            verifyException("org.apache.commons.cli.TypeHandler", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      Class<?> class0 = TypeHandler.createClass("org.apache.commons.cli.ParseException");
-      assertFalse(class0.isArray());
-  }
+    // ========== Class Creation Tests ==========
+    
+    @Test(timeout = 4000)
+    public void testCreateClass_ValidClassName_ReturnsClass()  throws Throwable  {
+        Class<?> result = TypeHandler.createClass("org.apache.commons.cli.ParseException");
+        assertFalse("Class should not be an array", result.isArray());
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      Class<Date> class0 = Date.class;
-      try { 
-        TypeHandler.createValue("converterMap", (Object) class0);
-        fail("Expecting exception: Exception");
-      
-      } catch(Exception e) {
-         //
-         // java.text.ParseException: Unparseable date: \"converterMap\"
-         //
-         verifyException("org.apache.commons.cli.ParseException", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testCreateClass_AnotherValidClassName_ReturnsClass()  throws Throwable  {
+        Class<?> result = TypeHandler.createClass("org.apache.commons.cli.Converter");
+        assertEquals("Class should have expected modifiers", 1537, result.getModifiers());
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        TypeHandler.createValue("", (Object) "");
-        fail("Expecting exception: ClassCastException");
-      
-      } catch(ClassCastException e) {
-         //
-         // java.lang.String cannot be cast to java.lang.Class
-         //
-         verifyException("org.apache.commons.cli.TypeHandler", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testCreateClass_InvalidClassName_ThrowsException()  throws Throwable  {
+        try { 
+            TypeHandler.createClass("converterMap");
+            fail("Should throw exception for invalid class name");
+        } catch(Exception e) {
+            verifyException("org.apache.commons.cli.ParseException", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      try { 
-        TypeHandler.createObject("P");
-        fail("Expecting exception: Exception");
-      
-      } catch(Exception e) {
-         //
-         // java.lang.ClassNotFoundException: Class 'P.class' should be in target project, but could not be found!
-         //
-         verifyException("org.apache.commons.cli.ParseException", e);
-      }
-  }
+    // ========== Object Creation Tests ==========
+    
+    @Test(timeout = 4000)
+    public void testCreateObject_ValidClassName_ReturnsObject()  throws Throwable  {
+        Object result = TypeHandler.createObject("org.apache.commons.cli.TypeHandler");
+        assertNotNull("Should create object for valid class name", result);
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        TypeHandler.createFile((String) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // org.evosuite.runtime.mock.java.lang.MockThrowable: java.lang.NullPointerException
-         //
-         verifyException("org.apache.commons.cli.TypeHandler", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testCreateObject_InvalidClassName_ThrowsException()  throws Throwable  {
+        try { 
+            TypeHandler.createObject("P");
+            fail("Should throw exception for invalid class name");
+        } catch(Exception e) {
+            verifyException("org.apache.commons.cli.ParseException", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      try { 
-        TypeHandler.createClass("converterMap");
-        fail("Expecting exception: Exception");
-      
-      } catch(Exception e) {
-         //
-         // java.lang.ClassNotFoundException: Class 'converterMap.class' should be in target project, but could not be found!
-         //
-         verifyException("org.apache.commons.cli.ParseException", e);
-      }
-  }
+    // ========== Value Creation Tests ==========
+    
+    @Test(timeout = 4000)
+    public void testCreateValue_EmptyStringWithNullType_ReturnsEmptyString()  throws Throwable  {
+        Object result = TypeHandler.createValue("", (Object) null);
+        assertEquals("Should return empty string", "", result);
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      Class<Date> class0 = Date.class;
-      try { 
-        TypeHandler.createValue("", class0);
-        fail("Expecting exception: Exception");
-      
-      } catch(Exception e) {
-         //
-         // java.text.ParseException: Unparseable date: \"\"
-         //
-         verifyException("org.apache.commons.cli.ParseException", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testCreateValue_NullStringWithClass_ReturnsNull()  throws Throwable  {
+        Class<MockThrowable> clazz = MockThrowable.class;
+        MockThrowable result = TypeHandler.createValue((String) null, clazz);
+        assertNull("Should return null for null string", result);
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      TypeHandler typeHandler0 = TypeHandler.getDefault();
-      Class<Date> class0 = Date.class;
-      Converter<Date, ?> converter0 = typeHandler0.getConverter(class0);
-      assertNotNull(converter0);
-  }
+    @Test(timeout = 4000)
+    public void testCreateValue_BothNull_ReturnsNull()  throws Throwable  {
+        Object result = TypeHandler.createValue((String) null, (Object) null);
+        assertNull("Should return null when both parameters are null", result);
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        TypeHandler.createDate("w2E%~v5+#");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // org.evosuite.runtime.mock.java.lang.MockThrowable: java.text.ParseException: Unparseable date: \"w2E%~v5+#\"
-         //
-         verifyException("org.apache.commons.cli.TypeHandler", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testCreateValue_InvalidDateString_ThrowsException()  throws Throwable  {
+        Class<Date> dateClass = Date.class;
+        try { 
+            TypeHandler.createValue("converterMap", (Object) dateClass);
+            fail("Should throw exception for invalid date string");
+        } catch(Exception e) {
+            verifyException("org.apache.commons.cli.ParseException", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      try { 
-        TypeHandler.createURL("N)i");
-        fail("Expecting exception: Exception");
-      
-      } catch(Exception e) {
-         //
-         // java.net.MalformedURLException: no protocol: N)i
-         //
-         verifyException("org.apache.commons.cli.ParseException", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testCreateValue_EmptyDateString_ThrowsException()  throws Throwable  {
+        Class<Date> dateClass = Date.class;
+        try { 
+            TypeHandler.createValue("", dateClass);
+            fail("Should throw exception for empty date string");
+        } catch(Exception e) {
+            verifyException("org.apache.commons.cli.ParseException", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      try { 
-        TypeHandler.createNumber("I%5HIg?GFqZ!&");
-        fail("Expecting exception: Exception");
-      
-      } catch(Exception e) {
-         //
-         // java.lang.NumberFormatException: For input string: \"I%5HIg?GFqZ!&\"
-         //
-         verifyException("org.apache.commons.cli.ParseException", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testCreateValue_InvalidTypeObject_ThrowsClassCastException()  throws Throwable  {
+        try { 
+            TypeHandler.createValue("", (Object) "");
+            fail("Should throw ClassCastException when type object is not a Class");
+        } catch(ClassCastException e) {
+            verifyException("org.apache.commons.cli.TypeHandler", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        TypeHandler.createFiles("org.apache.commons.cli.Converter");
-        fail("Expecting exception: UnsupportedOperationException");
-      
-      } catch(UnsupportedOperationException e) {
-         //
-         // Not yet implemented
-         //
-         verifyException("org.apache.commons.cli.TypeHandler", e);
-      }
-  }
+    // ========== Date Creation Tests ==========
+    
+    @Test(timeout = 4000)
+    public void testCreateDate_InvalidDateString_ThrowsException()  throws Throwable  {
+        try { 
+            TypeHandler.createDate("w2E%~v5+#");
+            fail("Should throw exception for invalid date format");
+        } catch(IllegalArgumentException e) {
+            verifyException("org.apache.commons.cli.TypeHandler", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      try { 
-        TypeHandler.openFile("EEE MMM dd HH:mm:ss zzz yyyy");
-        fail("Expecting exception: Exception");
-      
-      } catch(Exception e) {
-         //
-         // java.io.FileNotFoundException: EEE MMM dd HH:mm:ss zzz yyyy (No such file or directory)
-         //
-         verifyException("org.apache.commons.cli.ParseException", e);
-      }
-  }
+    // ========== URL Creation Tests ==========
+    
+    @Test(timeout = 4000)
+    public void testCreateURL_InvalidURL_ThrowsException()  throws Throwable  {
+        try { 
+            TypeHandler.createURL("N)i");
+            fail("Should throw exception for malformed URL");
+        } catch(Exception e) {
+            verifyException("org.apache.commons.cli.ParseException", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      Object object0 = TypeHandler.createValue((String) null, (Object) null);
-      assertNull(object0);
-  }
+    // ========== File Operations Tests ==========
+    
+    @Test(timeout = 4000)
+    public void testOpenFile_NonExistentFile_ThrowsException()  throws Throwable  {
+        try { 
+            TypeHandler.openFile("EEE MMM dd HH:mm:ss zzz yyyy");
+            fail("Should throw exception for non-existent file");
+        } catch(Exception e) {
+            verifyException("org.apache.commons.cli.ParseException", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      Object object0 = TypeHandler.createObject("org.apache.commons.cli.TypeHandler");
-      assertNotNull(object0);
-  }
+    @Test(timeout = 4000)
+    public void testCreateFiles_NotImplemented_ThrowsUnsupportedOperationException()  throws Throwable  {
+        try { 
+            TypeHandler.createFiles("org.apache.commons.cli.Converter");
+            fail("Should throw UnsupportedOperationException as method is not implemented");
+        } catch(UnsupportedOperationException e) {
+            verifyException("org.apache.commons.cli.TypeHandler", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      TypeHandler typeHandler0 = new TypeHandler();
-  }
+    // ========== TypeHandler Instance Tests ==========
+    
+    @Test(timeout = 4000)
+    public void testTypeHandlerConstructor_DefaultConstructor_CreatesInstance()  throws Throwable  {
+        TypeHandler typeHandler = new TypeHandler();
+        assertNotNull("Should create TypeHandler instance", typeHandler);
+    }
 
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      Class<?> class0 = TypeHandler.createClass("org.apache.commons.cli.Converter");
-      assertEquals(1537, class0.getModifiers());
-  }
+    @Test(timeout = 4000)
+    public void testTypeHandlerConstructor_WithConverterMap_CreatesInstance()  throws Throwable  {
+        Map<Class<?>, Converter<?, ? extends Throwable>> converterMap = TypeHandler.createDefaultMap();
+        TypeHandler typeHandler = new TypeHandler(converterMap);
+        assertNotNull("Should create TypeHandler instance with converter map", typeHandler);
+    }
 
-  @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
-      File file0 = TypeHandler.createFile("/");
-      assertNull(file0.getParent());
-  }
+    @Test(timeout = 4000)
+    public void testGetDefault_ReturnsDefaultInstance()  throws Throwable  {
+        TypeHandler defaultHandler = TypeHandler.getDefault();
+        assertNotNull("Should return default TypeHandler instance", defaultHandler);
+    }
+
+    @Test(timeout = 4000)
+    public void testGetConverter_DateClass_ReturnsConverter()  throws Throwable  {
+        TypeHandler typeHandler = TypeHandler.getDefault();
+        Class<Date> dateClass = Date.class;
+        Converter<Date, ?> converter = typeHandler.getConverter(dateClass);
+        assertNotNull("Should return converter for Date class", converter);
+    }
+
+    @Test(timeout = 4000)
+    public void testCreateDefaultMap_ReturnsConverterMap()  throws Throwable  {
+        Map<Class<?>, Converter<?, ? extends Throwable>> result = TypeHandler.createDefaultMap();
+        assertNotNull("Should return default converter map", result);
+    }
 }
