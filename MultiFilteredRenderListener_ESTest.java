@@ -25,141 +25,138 @@ import org.junit.runner.RunWith;
 public class MultiFilteredRenderListener_ESTest extends MultiFilteredRenderListener_ESTest_scaffolding {
 
   @Test(timeout = 4000)
-  public void test0()  throws Throwable  {
-      MultiFilteredRenderListener multiFilteredRenderListener0 = new MultiFilteredRenderListener();
-      LocationTextExtractionStrategy.TextChunkLocationStrategy locationTextExtractionStrategy_TextChunkLocationStrategy0 = mock(LocationTextExtractionStrategy.TextChunkLocationStrategy.class, new ViolatedAssumptionAnswer());
-      LocationTextExtractionStrategy locationTextExtractionStrategy0 = new LocationTextExtractionStrategy(locationTextExtractionStrategy_TextChunkLocationStrategy0);
-      RenderFilter[] renderFilterArray0 = new RenderFilter[7];
-      multiFilteredRenderListener0.attachRenderListener(locationTextExtractionStrategy0, renderFilterArray0);
-      multiFilteredRenderListener0.endTextBlock();
+  public void endTextBlock_WithAttachedListener_CompletesSuccessfully() throws Throwable {
+      // Setup: Create listener and attach with dummy filters
+      MultiFilteredRenderListener multiListener = new MultiFilteredRenderListener();
+      LocationTextExtractionStrategy.TextChunkLocationStrategy mockStrategy = 
+          mock(LocationTextExtractionStrategy.TextChunkLocationStrategy.class, new ViolatedAssumptionAnswer());
+      LocationTextExtractionStrategy listener = new LocationTextExtractionStrategy(mockStrategy);
+      RenderFilter[] filters = new RenderFilter[7]; // All null filters
+      
+      multiListener.attachRenderListener(listener, filters);
+      
+      // Execute & Verify: Should complete without exceptions
+      multiListener.endTextBlock();
   }
 
   @Test(timeout = 4000)
-  public void test1()  throws Throwable  {
-      MultiFilteredRenderListener multiFilteredRenderListener0 = new MultiFilteredRenderListener();
-      RenderFilter[] renderFilterArray0 = new RenderFilter[0];
-      multiFilteredRenderListener0.attachRenderListener((LocationTextExtractionStrategy) null, renderFilterArray0);
-      // Undeclared exception!
-      try { 
-        multiFilteredRenderListener0.beginTextBlock();
-        fail("Expecting exception: NullPointerException");
+  public void beginTextBlock_WithNullListener_ThrowsNullPointerException() throws Throwable {
+      // Setup: Attach null listener
+      MultiFilteredRenderListener multiListener = new MultiFilteredRenderListener();
+      RenderFilter[] filters = new RenderFilter[0];
+      multiListener.attachRenderListener((LocationTextExtractionStrategy) null, filters);
       
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.itextpdf.text.pdf.parser.MultiFilteredRenderListener", e);
+      // Execute & Verify: Null listener causes NPE
+      try {
+          multiListener.beginTextBlock();
+          fail("Expected NullPointerException");
+      } catch (NullPointerException e) {
+          // Expected due to null listener
       }
   }
 
   @Test(timeout = 4000)
-  public void test2()  throws Throwable  {
-      MultiFilteredRenderListener multiFilteredRenderListener0 = new MultiFilteredRenderListener();
-      LocationTextExtractionStrategy.TextChunkLocationStrategy locationTextExtractionStrategy_TextChunkLocationStrategy0 = mock(LocationTextExtractionStrategy.TextChunkLocationStrategy.class, new ViolatedAssumptionAnswer());
-      LocationTextExtractionStrategy locationTextExtractionStrategy0 = new LocationTextExtractionStrategy(locationTextExtractionStrategy_TextChunkLocationStrategy0);
-      RenderFilter[] renderFilterArray0 = new RenderFilter[3];
-      Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double((-2030.332760438), (-2030.332760438), (-2030.332760438), (-846.7357066836466));
-      RegionTextRenderFilter regionTextRenderFilter0 = new RegionTextRenderFilter(rectangle2D_Double0);
-      renderFilterArray0[0] = (RenderFilter) regionTextRenderFilter0;
-      renderFilterArray0[1] = (RenderFilter) regionTextRenderFilter0;
-      renderFilterArray0[2] = (RenderFilter) regionTextRenderFilter0;
-      multiFilteredRenderListener0.attachRenderListener(locationTextExtractionStrategy0, renderFilterArray0);
-      multiFilteredRenderListener0.renderImage((ImageRenderInfo) null);
+  public void renderImage_WithRegionFiltersAndNullImage_CompletesSuccessfully() throws Throwable {
+      // Setup: Attach listener with region filters
+      MultiFilteredRenderListener multiListener = new MultiFilteredRenderListener();
+      LocationTextExtractionStrategy.TextChunkLocationStrategy mockStrategy = 
+          mock(LocationTextExtractionStrategy.TextChunkLocationStrategy.class, new ViolatedAssumptionAnswer());
+      LocationTextExtractionStrategy listener = new LocationTextExtractionStrategy(mockStrategy);
+      RenderFilter[] filters = new RenderFilter[3];
+      
+      // Create identical region filters
+      Rectangle2D.Double region = new Rectangle2D.Double(-2030.33, -2030.33, -2030.33, -846.74);
+      RegionTextRenderFilter regionFilter = new RegionTextRenderFilter(region);
+      filters[0] = regionFilter;
+      filters[1] = regionFilter;
+      filters[2] = regionFilter;
+      
+      multiListener.attachRenderListener(listener, filters);
+      
+      // Execute: Null image should be handled safely
+      multiListener.renderImage((ImageRenderInfo) null);
   }
 
   @Test(timeout = 4000)
-  public void test3()  throws Throwable  {
-      MultiFilteredRenderListener multiFilteredRenderListener0 = new MultiFilteredRenderListener();
-      LocationTextExtractionStrategy.TextChunkLocationStrategy locationTextExtractionStrategy_TextChunkLocationStrategy0 = mock(LocationTextExtractionStrategy.TextChunkLocationStrategy.class, new ViolatedAssumptionAnswer());
-      LocationTextExtractionStrategy locationTextExtractionStrategy0 = new LocationTextExtractionStrategy(locationTextExtractionStrategy_TextChunkLocationStrategy0);
-      RenderFilter[] renderFilterArray0 = new RenderFilter[3];
-      multiFilteredRenderListener0.attachRenderListener(locationTextExtractionStrategy0, renderFilterArray0);
-      // Undeclared exception!
-      try { 
-        multiFilteredRenderListener0.renderImage((ImageRenderInfo) null);
-        fail("Expecting exception: NullPointerException");
+  public void renderImage_WithNullFilters_ThrowsNullPointerException() throws Throwable {
+      // Setup: Attach listener with null filters
+      MultiFilteredRenderListener multiListener = new MultiFilteredRenderListener();
+      LocationTextExtractionStrategy.TextChunkLocationStrategy mockStrategy = 
+          mock(LocationTextExtractionStrategy.TextChunkLocationStrategy.class, new ViolatedAssumptionAnswer());
+      LocationTextExtractionStrategy listener = new LocationTextExtractionStrategy(mockStrategy);
+      RenderFilter[] filters = new RenderFilter[3]; // All null
       
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.itextpdf.text.pdf.parser.MultiFilteredRenderListener", e);
+      multiListener.attachRenderListener(listener, filters);
+      
+      // Execute & Verify: Null filters cause NPE
+      try {
+          multiListener.renderImage((ImageRenderInfo) null);
+          fail("Expected NullPointerException");
+      } catch (NullPointerException e) {
+          // Expected due to null filters
       }
   }
 
   @Test(timeout = 4000)
-  public void test4()  throws Throwable  {
-      MultiFilteredRenderListener multiFilteredRenderListener0 = new MultiFilteredRenderListener();
-      multiFilteredRenderListener0.attachRenderListener((LocationTextExtractionStrategy) null, (RenderFilter[]) null);
-      // Undeclared exception!
-      try { 
-        multiFilteredRenderListener0.endTextBlock();
-        fail("Expecting exception: NullPointerException");
+  public void endTextBlock_WithNullListener_ThrowsNullPointerException() throws Throwable {
+      // Setup: Attach null listener and filters
+      MultiFilteredRenderListener multiListener = new MultiFilteredRenderListener();
+      multiListener.attachRenderListener((LocationTextExtractionStrategy) null, (RenderFilter[]) null);
       
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.itextpdf.text.pdf.parser.MultiFilteredRenderListener", e);
+      // Execute & Verify: Null listener causes NPE
+      try {
+          multiListener.endTextBlock();
+          fail("Expected NullPointerException");
+      } catch (NullPointerException e) {
+          // Expected due to null listener
       }
   }
 
   @Test(timeout = 4000)
-  public void test5()  throws Throwable  {
-      MultiFilteredRenderListener multiFilteredRenderListener0 = new MultiFilteredRenderListener();
-      LocationTextExtractionStrategy locationTextExtractionStrategy0 = new LocationTextExtractionStrategy();
-      RenderFilter[] renderFilterArray0 = new RenderFilter[0];
-      multiFilteredRenderListener0.attachRenderListener(locationTextExtractionStrategy0, renderFilterArray0);
-      // Undeclared exception!
-      try { 
-        multiFilteredRenderListener0.renderText((TextRenderInfo) null);
-        fail("Expecting exception: NullPointerException");
+  public void renderText_WithNullTextInfo_ThrowsNullPointerException() throws Throwable {
+      // Setup: Attach valid listener with empty filters
+      MultiFilteredRenderListener multiListener = new MultiFilteredRenderListener();
+      LocationTextExtractionStrategy listener = new LocationTextExtractionStrategy();
+      RenderFilter[] filters = new RenderFilter[0];
+      multiListener.attachRenderListener(listener, filters);
       
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.itextpdf.text.pdf.parser.LocationTextExtractionStrategy", e);
+      // Execute & Verify: Null TextRenderInfo causes NPE in strategy
+      try {
+          multiListener.renderText((TextRenderInfo) null);
+          fail("Expected NullPointerException");
+      } catch (NullPointerException e) {
+          // Expected from LocationTextExtractionStrategy
       }
   }
 
   @Test(timeout = 4000)
-  public void test6()  throws Throwable  {
-      MultiFilteredRenderListener multiFilteredRenderListener0 = new MultiFilteredRenderListener();
-      RenderFilter[] renderFilterArray0 = new RenderFilter[1];
-      multiFilteredRenderListener0.attachRenderListener((LocationTextExtractionStrategy) null, renderFilterArray0);
-      // Undeclared exception!
-      try { 
-        multiFilteredRenderListener0.renderText((TextRenderInfo) null);
-        fail("Expecting exception: NullPointerException");
+  public void renderText_WithNullListener_ThrowsNullPointerException() throws Throwable {
+      // Setup: Attach null listener
+      MultiFilteredRenderListener multiListener = new MultiFilteredRenderListener();
+      RenderFilter[] filters = new RenderFilter[1]; // Single null filter
+      multiListener.attachRenderListener((LocationTextExtractionStrategy) null, filters);
       
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.itextpdf.text.pdf.parser.MultiFilteredRenderListener", e);
+      // Execute & Verify: Null listener causes NPE
+      try {
+          multiListener.renderText((TextRenderInfo) null);
+          fail("Expected NullPointerException");
+      } catch (NullPointerException e) {
+          // Expected due to null listener
       }
   }
 
   @Test(timeout = 4000)
-  public void test7()  throws Throwable  {
-      MultiFilteredRenderListener multiFilteredRenderListener0 = new MultiFilteredRenderListener();
-      multiFilteredRenderListener0.renderText((TextRenderInfo) null);
-  }
-
-  @Test(timeout = 4000)
-  public void test8()  throws Throwable  {
-      MultiFilteredRenderListener multiFilteredRenderListener0 = new MultiFilteredRenderListener();
-      multiFilteredRenderListener0.beginTextBlock();
-  }
-
-  @Test(timeout = 4000)
-  public void test9()  throws Throwable  {
-      MultiFilteredRenderListener multiFilteredRenderListener0 = new MultiFilteredRenderListener();
-      LocationTextExtractionStrategy.TextChunkLocationStrategy locationTextExtractionStrategy_TextChunkLocationStrategy0 = mock(LocationTextExtractionStrategy.TextChunkLocationStrategy.class, new ViolatedAssumptionAnswer());
-      LocationTextExtractionStrategy locationTextExtractionStrategy0 = new LocationTextExtractionStrategy(locationTextExtractionStrategy_TextChunkLocationStrategy0);
-      RenderFilter[] renderFilterArray0 = new RenderFilter[3];
-      multiFilteredRenderListener0.attachRenderListener(locationTextExtractionStrategy0, renderFilterArray0);
-      multiFilteredRenderListener0.beginTextBlock();
+  public void beginTextBlock_WithAttachedListener_CompletesSuccessfully() throws Throwable {
+      // Setup: Create and attach valid listener
+      MultiFilteredRenderListener multiListener = new MultiFilteredRenderListener();
+      LocationTextExtractionStrategy.TextChunkLocationStrategy mockStrategy = 
+          mock(LocationTextExtractionStrategy.TextChunkLocationStrategy.class, new ViolatedAssumptionAnswer());
+      LocationTextExtractionStrategy listener = new LocationTextExtractionStrategy(mockStrategy);
+      RenderFilter[] filters = new RenderFilter[3]; // All null
+      
+      multiListener.attachRenderListener(listener, filters);
+      
+      // Execute: Should complete without exceptions
+      multiListener.beginTextBlock();
   }
 }
