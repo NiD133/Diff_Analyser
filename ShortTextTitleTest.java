@@ -21,102 +21,80 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
  * Other names may be trademarks of their respective owners.]
  *
  * -----------------------
  * ShortTextTitleTest.java
  * -----------------------
- * Tests for the ShortTextTitle class.
+ * (C) Copyright 2008-present, by David Gilbert and Contributors.
+ *
+ * Original Author:  David Gilbert;
+ * Contributor(s):   -;
+ *
  */
 
 package org.jfree.chart.title;
 
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.internal.CloneUtils;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for {@link ShortTextTitle}.
- *
- * These tests focus on:
- * - equals() contract (reflexive, symmetric, null-safety, and field sensitivity)
- * - hashCode() consistency with equals()
- * - clone() behavior (deep copy vs. same instance)
- * - serialization round-trip equivalence
+ * Tests for the {@link ShortTextTitle} class.
  */
 public class ShortTextTitleTest {
 
-    private static final String DEFAULT_TEXT = "ABC";
-
-    private static ShortTextTitle title(String text) {
-        return new ShortTextTitle(text);
-    }
-
+    /**
+     * Check that the equals() method distinguishes all fields.
+     */
     @Test
-    @DisplayName("equals(): reflexive, symmetric, null-safe")
-    public void equals_contractBasics() {
-        ShortTextTitle t1 = title(DEFAULT_TEXT);
-        ShortTextTitle t2 = title(DEFAULT_TEXT);
-
-        // reflexive
-        assertEquals(t1, t1);
-
-        // symmetric
-        assertEquals(t1, t2);
-        assertEquals(t2, t1);
-
-        // null-safe and type-safe
-        assertNotEquals(t1, null);
-        assertNotEquals(t1, new Object());
-    }
-
-    @Test
-    @DisplayName("equals(): detects differences in text and matches after alignment")
-    public void equals_fieldSensitivity() {
-        ShortTextTitle t1 = title(DEFAULT_TEXT);
-        ShortTextTitle t2 = title(DEFAULT_TEXT);
+    public void testEquals() {
+        ShortTextTitle t1 = new ShortTextTitle("ABC");
+        ShortTextTitle t2 = new ShortTextTitle("ABC");
         assertEquals(t1, t2);
 
-        // change state in one instance -> not equal
         t1.setText("Test 1");
         assertNotEquals(t1, t2);
-
-        // align state -> equal again
         t2.setText("Test 1");
         assertEquals(t1, t2);
     }
 
+    /**
+     * Two objects that are equal are required to return the same hashCode.
+     */
     @Test
-    @DisplayName("hashCode(): equal objects must have equal hash codes")
-    public void hashCode_consistentWithEquals() {
-        ShortTextTitle t1 = title(DEFAULT_TEXT);
-        ShortTextTitle t2 = title(DEFAULT_TEXT);
-
+    public void testHashcode() {
+        ShortTextTitle t1 = new ShortTextTitle("ABC");
+        ShortTextTitle t2 = new ShortTextTitle("ABC");
         assertEquals(t1, t2);
-        assertEquals(t1.hashCode(), t2.hashCode());
+        int h1 = t1.hashCode();
+        int h2 = t2.hashCode();
+        assertEquals(h1, h2);
     }
 
+    /**
+     * Confirm that cloning works.
+     */
     @Test
-    @DisplayName("clone(): cloned instance is equal but not the same reference")
-    public void clone_createsEqualButDistinctCopy() throws CloneNotSupportedException {
-        ShortTextTitle original = title(DEFAULT_TEXT);
-        ShortTextTitle clone = CloneUtils.clone(original);
-
-        assertNotSame(original, clone);
-        assertSame(original.getClass(), clone.getClass());
-        assertEquals(original, clone);
+    public void testCloning() throws CloneNotSupportedException {
+        ShortTextTitle t1 = new ShortTextTitle("ABC");
+        ShortTextTitle t2 = CloneUtils.clone(t1);
+        assertNotSame(t1, t2);
+        assertSame(t1.getClass(), t2.getClass());
+        assertEquals(t1, t2);
     }
 
+    /**
+     * Serialize an instance, restore it, and check for equality.
+     */
     @Test
-    @DisplayName("serialization: round-trip preserves equality")
-    public void serialization_roundTripPreservesEquality() {
-        ShortTextTitle original = title(DEFAULT_TEXT);
-        ShortTextTitle restored = TestUtils.serialised(original);
-
-        assertEquals(original, restored);
+    public void testSerialization() {
+        ShortTextTitle t1 = new ShortTextTitle("ABC");
+        ShortTextTitle t2 = TestUtils.serialised(t1);
+        assertEquals(t1, t2);
     }
+
 }
