@@ -18,29 +18,20 @@ package org.apache.ibatis.parsing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Properties;
-import org.junit.jupiter.api.DisplayName;
+
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests for XNode#toString() formatting and placeholder substitution.
- * Notes:
- * - The first test uses a single-line XML source on purpose to avoid
- *   injecting extra whitespace text nodes that would affect the output.
- * - The mapper test verifies that toString() preserves meaningful
- *   whitespace inside elements as produced by the parser.
- */
 class XNodeTest {
 
-  // Single-line source to keep the DOM free from incidental whitespace nodes.
-  private static final String USERS_XML =
-      "<users><user><id>100</id><name>Tom</name><age>30</age><cars><car index=\"1\">BMW</car><car index=\"2\">Audi</car><car index=\"3\">Benz</car></cars></user></users>";
-
   @Test
-  @DisplayName("toString() renders entire tree and subtrees with consistent indentation")
-  void rendersUsersTreeAndSubtrees() {
-    XPathParser parser = new XPathParser(USERS_XML);
+  void formatXNodeToString() {
+    XPathParser parser = new XPathParser(
+        "<users><user><id>100</id><name>Tom</name><age>30</age><cars><car index=\"1\">BMW</car><car index=\"2\">Audi</car><car index=\"3\">Benz</car></cars></user></users>");
+    String usersNodeToString = parser.evalNode("/users").toString();
+    String userNodeToString = parser.evalNode("/users/user").toString();
+    String carsNodeToString = parser.evalNode("/users/user/cars").toString();
 
-    String expectedUsers = """
+    String usersNodeToStringExpect = """
         <users>
           <user>
             <id>
@@ -67,7 +58,7 @@ class XNodeTest {
         </users>
         """;
 
-    String expectedUser = """
+    String userNodeToStringExpect = """
         <user>
           <id>
             100
@@ -92,7 +83,7 @@ class XNodeTest {
         </user>
         """;
 
-    String expectedCars = """
+    String carsNodeToStringExpect = """
         <cars>
           <car index="1">
             BMW
@@ -106,14 +97,13 @@ class XNodeTest {
         </cars>
         """;
 
-    assertNodeToString(parser, "/users", expectedUsers);
-    assertNodeToString(parser, "/users/user", expectedUser);
-    assertNodeToString(parser, "/users/user/cars", expectedCars);
+    assertEquals(usersNodeToStringExpect, usersNodeToString);
+    assertEquals(userNodeToStringExpect, userNodeToString);
+    assertEquals(carsNodeToStringExpect, carsNodeToString);
   }
 
   @Test
-  @DisplayName("toString() renders dynamic SQL and control flow tags as XML with preserved whitespace")
-  void rendersMapperSelectNode() {
+  void xNodeToString() {
     String xml = """
         <mapper>
           <select id='select' resultType='map'>
@@ -139,7 +129,7 @@ class XNodeTest {
         </mapper>
         """;
 
-    // The line breaks/indentation inside the select body are preserved as-is.
+    // a little bit ugly with id/name break, but not a blocker
     String expected = """
         <select id="select" resultType="map">
           select
@@ -167,37 +157,19 @@ class XNodeTest {
 
     XPathParser parser = new XPathParser(xml);
     XNode selectNode = parser.evalNode("/mapper/select");
-    assertEquals(expected, selectNode.toString(), "Formatted XML for /mapper/select did not match");
+    assertEquals(expected, selectNode.toString());
   }
 
   @Test
-  @DisplayName("toString() substitutes ${...} placeholders using provided variables")
-  void rendersWithVariablesSubstituted() {
+  void xnodeToStringVariables() throws Exception {
     String src = "<root attr='${x}'>y = ${y}<sub attr='${y}'>x = ${x}</sub></root>";
-    String expected = """
-        <root attr="foo">
-          y = bar
-          <sub attr="bar">
-            x = foo
-          </sub>
-        </root>
-        """;
-
+    String expected = "<root attr=\"foo\">\n  y = bar\n  <sub attr=\"bar\">\n    x = foo\n  </sub>\n</root>\n";
     Properties vars = new Properties();
     vars.put("x", "foo");
     vars.put("y", "bar");
-
     XPathParser parser = new XPathParser(src, false, vars);
-    XNode root = parser.evalNode("/root");
-    assertEquals(expected, root.toString(), "Placeholder substitution did not produce expected XML");
+    XNode selectNode = parser.evalNode("/root");
+    assertEquals(expected, selectNode.toString());
   }
 
-  private static void assertNodeToString(XPathParser parser, String path, String expected) {
-    XNode node = parser.evalNode(path);
-    assertEquals(expected, node.toString(), () -> "Formatted XML for path " + path + " did not match");
-    // Sanity check: ensure the node under test is the one we intended.
-    // This does not affect formatting but helps future maintainers spot path mistakes quickly.
-    // Example: "/users/user/cars" should end with "cars".
-    // We read node.getName() via toString expectations, so no additional assertion is necessary here.
-  }
 }
