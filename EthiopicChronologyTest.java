@@ -32,41 +32,67 @@ import org.joda.time.DurationFieldType;
 import org.joda.time.DateTime.Property;
 
 /**
- * This class is a Junit unit test for EthiopicChronology.
+ * Comprehensive test suite for EthiopicChronology.
+ * 
+ * The Ethiopic calendar is similar to Julian calendar with:
+ * - 12 months of 30 days each
+ * - 13th month of 5 days (6 in leap years)
+ * - Every 4th year is a leap year (year % 4 == 3)
+ * - Year 1 EE began on August 29, 8 CE (Julian)
  *
  * @author Stephen Colebourne
  */
 public class TestEthiopicChronology extends TestCase {
 
+    // ========================================================================
+    // Test Constants and Setup
+    // ========================================================================
+    
     private static final int MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
-
-    private static long SKIP = 1 * MILLIS_PER_DAY;
-
+    private static final long TEST_SKIP_INTERVAL = 1 * MILLIS_PER_DAY;
+    
+    // Time zones for testing
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
     private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+    
+    // Chronologies for comparison and testing
     private static final Chronology ETHIOPIC_UTC = EthiopicChronology.getInstanceUTC();
     private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
     private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 
-                     366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 
-                     365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 +
-                     366 + 365;
-    // 2002-06-09
-    private long TEST_TIME_NOW =
-            (y2002days + 31L + 28L + 31L + 30L + 31L + 9L -1L) * MILLIS_PER_DAY;
-
+    // Fixed test time: June 9, 2002 (equivalent to Sene 2, 1994 in Ethiopic calendar)
+    private static final long TEST_TIME_NOW = calculateTestTime();
+    
+    // Test environment state preservation
     private DateTimeZone originalDateTimeZone = null;
     private TimeZone originalTimeZone = null;
     private Locale originalLocale = null;
+
+    /**
+     * Calculates the test time as milliseconds since epoch.
+     * This represents June 9, 2002 in the Gregorian calendar.
+     */
+    private static long calculateTestTime() {
+        // Days from year 1 to 2002
+        long totalDays = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 
+                        366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 
+                        365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 +
+                        366 + 365;
+        // Add days for January through June 9, 2002
+        long daysInYear2002 = 31L + 28L + 31L + 30L + 31L + 9L - 1L;
+        return (totalDays + daysInYear2002) * MILLIS_PER_DAY;
+    }
+
+    // ========================================================================
+    // Test Suite Infrastructure
+    // ========================================================================
 
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
 
     public static TestSuite suite() {
-        SKIP = 1 * MILLIS_PER_DAY;
         return new TestSuite(TestEthiopicChronology.class);
     }
 
@@ -76,10 +102,15 @@ public class TestEthiopicChronology extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
+        // Fix current time for consistent test results
         DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
+        
+        // Preserve original environment settings
         originalDateTimeZone = DateTimeZone.getDefault();
         originalTimeZone = TimeZone.getDefault();
         originalLocale = Locale.getDefault();
+        
+        // Set consistent test environment
         DateTimeZone.setDefault(LONDON);
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
         Locale.setDefault(Locale.UK);
@@ -87,68 +118,123 @@ public class TestEthiopicChronology extends TestCase {
 
     @Override
     protected void tearDown() throws Exception {
+        // Restore system time
         DateTimeUtils.setCurrentMillisSystem();
+        
+        // Restore original environment settings
         DateTimeZone.setDefault(originalDateTimeZone);
         TimeZone.setDefault(originalTimeZone);
         Locale.setDefault(originalLocale);
+        
+        // Clear references
         originalDateTimeZone = null;
         originalTimeZone = null;
         originalLocale = null;
     }
 
-    //-----------------------------------------------------------------------
-    public void testFactoryUTC() {
-        assertEquals(DateTimeZone.UTC, EthiopicChronology.getInstanceUTC().getZone());
-        assertSame(EthiopicChronology.class, EthiopicChronology.getInstanceUTC().getClass());
+    // ========================================================================
+    // Factory Method Tests
+    // ========================================================================
+
+    public void testFactoryUTC_ReturnsUTCChronologyInstance() {
+        EthiopicChronology chronology = EthiopicChronology.getInstanceUTC();
+        
+        assertEquals("Should use UTC timezone", DateTimeZone.UTC, chronology.getZone());
+        assertSame("Should return EthiopicChronology instance", 
+                  EthiopicChronology.class, chronology.getClass());
     }
 
-    public void testFactory() {
-        assertEquals(LONDON, EthiopicChronology.getInstance().getZone());
-        assertSame(EthiopicChronology.class, EthiopicChronology.getInstance().getClass());
+    public void testFactory_ReturnsDefaultTimezoneInstance() {
+        EthiopicChronology chronology = EthiopicChronology.getInstance();
+        
+        assertEquals("Should use default timezone", LONDON, chronology.getZone());
+        assertSame("Should return EthiopicChronology instance", 
+                  EthiopicChronology.class, chronology.getClass());
     }
 
-    public void testFactory_Zone() {
-        assertEquals(TOKYO, EthiopicChronology.getInstance(TOKYO).getZone());
-        assertEquals(PARIS, EthiopicChronology.getInstance(PARIS).getZone());
-        assertEquals(LONDON, EthiopicChronology.getInstance(null).getZone());
-        assertSame(EthiopicChronology.class, EthiopicChronology.getInstance(TOKYO).getClass());
+    public void testFactoryWithZone_ReturnsCorrectTimezoneInstance() {
+        assertEquals("Tokyo timezone should be preserved", 
+                    TOKYO, EthiopicChronology.getInstance(TOKYO).getZone());
+        assertEquals("Paris timezone should be preserved", 
+                    PARIS, EthiopicChronology.getInstance(PARIS).getZone());
+        assertEquals("Null timezone should default to London", 
+                    LONDON, EthiopicChronology.getInstance(null).getZone());
+        assertSame("Should return EthiopicChronology instance", 
+                  EthiopicChronology.class, EthiopicChronology.getInstance(TOKYO).getClass());
     }
 
-    //-----------------------------------------------------------------------
-    public void testEquality() {
-        assertSame(EthiopicChronology.getInstance(TOKYO), EthiopicChronology.getInstance(TOKYO));
-        assertSame(EthiopicChronology.getInstance(LONDON), EthiopicChronology.getInstance(LONDON));
-        assertSame(EthiopicChronology.getInstance(PARIS), EthiopicChronology.getInstance(PARIS));
-        assertSame(EthiopicChronology.getInstanceUTC(), EthiopicChronology.getInstanceUTC());
-        assertSame(EthiopicChronology.getInstance(), EthiopicChronology.getInstance(LONDON));
+    // ========================================================================
+    // Instance Management Tests
+    // ========================================================================
+
+    public void testEquality_SameTimezonesReturnSameInstance() {
+        assertSame("Tokyo instances should be identical", 
+                  EthiopicChronology.getInstance(TOKYO), EthiopicChronology.getInstance(TOKYO));
+        assertSame("London instances should be identical", 
+                  EthiopicChronology.getInstance(LONDON), EthiopicChronology.getInstance(LONDON));
+        assertSame("Paris instances should be identical", 
+                  EthiopicChronology.getInstance(PARIS), EthiopicChronology.getInstance(PARIS));
+        assertSame("UTC instances should be identical", 
+                  EthiopicChronology.getInstanceUTC(), EthiopicChronology.getInstanceUTC());
+        assertSame("Default should match London timezone", 
+                  EthiopicChronology.getInstance(), EthiopicChronology.getInstance(LONDON));
     }
 
-    public void testWithUTC() {
-        assertSame(EthiopicChronology.getInstanceUTC(), EthiopicChronology.getInstance(LONDON).withUTC());
-        assertSame(EthiopicChronology.getInstanceUTC(), EthiopicChronology.getInstance(TOKYO).withUTC());
-        assertSame(EthiopicChronology.getInstanceUTC(), EthiopicChronology.getInstanceUTC().withUTC());
-        assertSame(EthiopicChronology.getInstanceUTC(), EthiopicChronology.getInstance().withUTC());
+    public void testWithUTC_ConvertsToUTCChronology() {
+        EthiopicChronology utcExpected = EthiopicChronology.getInstanceUTC();
+        
+        assertSame("London chronology should convert to UTC", 
+                  utcExpected, EthiopicChronology.getInstance(LONDON).withUTC());
+        assertSame("Tokyo chronology should convert to UTC", 
+                  utcExpected, EthiopicChronology.getInstance(TOKYO).withUTC());
+        assertSame("UTC chronology should return itself", 
+                  utcExpected, EthiopicChronology.getInstanceUTC().withUTC());
+        assertSame("Default chronology should convert to UTC", 
+                  utcExpected, EthiopicChronology.getInstance().withUTC());
     }
 
-    public void testWithZone() {
-        assertSame(EthiopicChronology.getInstance(TOKYO), EthiopicChronology.getInstance(TOKYO).withZone(TOKYO));
-        assertSame(EthiopicChronology.getInstance(LONDON), EthiopicChronology.getInstance(TOKYO).withZone(LONDON));
-        assertSame(EthiopicChronology.getInstance(PARIS), EthiopicChronology.getInstance(TOKYO).withZone(PARIS));
-        assertSame(EthiopicChronology.getInstance(LONDON), EthiopicChronology.getInstance(TOKYO).withZone(null));
-        assertSame(EthiopicChronology.getInstance(PARIS), EthiopicChronology.getInstance().withZone(PARIS));
-        assertSame(EthiopicChronology.getInstance(PARIS), EthiopicChronology.getInstanceUTC().withZone(PARIS));
+    public void testWithZone_ConvertsToSpecifiedTimezone() {
+        EthiopicChronology baseChronology = EthiopicChronology.getInstance(TOKYO);
+        
+        assertSame("Same timezone should return same instance", 
+                  EthiopicChronology.getInstance(TOKYO), baseChronology.withZone(TOKYO));
+        assertSame("Should convert to London timezone", 
+                  EthiopicChronology.getInstance(LONDON), baseChronology.withZone(LONDON));
+        assertSame("Should convert to Paris timezone", 
+                  EthiopicChronology.getInstance(PARIS), baseChronology.withZone(PARIS));
+        assertSame("Null timezone should default to London", 
+                  EthiopicChronology.getInstance(LONDON), baseChronology.withZone(null));
+        assertSame("Default chronology should convert to Paris", 
+                  EthiopicChronology.getInstance(PARIS), 
+                  EthiopicChronology.getInstance().withZone(PARIS));
+        assertSame("UTC chronology should convert to Paris", 
+                  EthiopicChronology.getInstance(PARIS), 
+                  EthiopicChronology.getInstanceUTC().withZone(PARIS));
     }
 
-    public void testToString() {
-        assertEquals("EthiopicChronology[Europe/London]", EthiopicChronology.getInstance(LONDON).toString());
-        assertEquals("EthiopicChronology[Asia/Tokyo]", EthiopicChronology.getInstance(TOKYO).toString());
-        assertEquals("EthiopicChronology[Europe/London]", EthiopicChronology.getInstance().toString());
-        assertEquals("EthiopicChronology[UTC]", EthiopicChronology.getInstanceUTC().toString());
+    public void testToString_DisplaysCorrectFormat() {
+        assertEquals("London chronology toString", 
+                    "EthiopicChronology[Europe/London]", 
+                    EthiopicChronology.getInstance(LONDON).toString());
+        assertEquals("Tokyo chronology toString", 
+                    "EthiopicChronology[Asia/Tokyo]", 
+                    EthiopicChronology.getInstance(TOKYO).toString());
+        assertEquals("Default chronology toString", 
+                    "EthiopicChronology[Europe/London]", 
+                    EthiopicChronology.getInstance().toString());
+        assertEquals("UTC chronology toString", 
+                    "EthiopicChronology[UTC]", 
+                    EthiopicChronology.getInstanceUTC().toString());
     }
 
-    //-----------------------------------------------------------------------
-    public void testDurationFields() {
+    // ========================================================================
+    // Duration Field Tests
+    // ========================================================================
+
+    public void testDurationFields_NamesAndSupport() {
         final EthiopicChronology ethiopic = EthiopicChronology.getInstance();
+        
+        // Verify field names
         assertEquals("eras", ethiopic.eras().getName());
         assertEquals("centuries", ethiopic.centuries().getName());
         assertEquals("years", ethiopic.years().getName());
@@ -162,61 +248,87 @@ public class TestEthiopicChronology extends TestCase {
         assertEquals("seconds", ethiopic.seconds().getName());
         assertEquals("millis", ethiopic.millis().getName());
         
-        assertEquals(false, ethiopic.eras().isSupported());
-        assertEquals(true, ethiopic.centuries().isSupported());
-        assertEquals(true, ethiopic.years().isSupported());
-        assertEquals(true, ethiopic.weekyears().isSupported());
-        assertEquals(true, ethiopic.months().isSupported());
-        assertEquals(true, ethiopic.weeks().isSupported());
-        assertEquals(true, ethiopic.days().isSupported());
-        assertEquals(true, ethiopic.halfdays().isSupported());
-        assertEquals(true, ethiopic.hours().isSupported());
-        assertEquals(true, ethiopic.minutes().isSupported());
-        assertEquals(true, ethiopic.seconds().isSupported());
-        assertEquals(true, ethiopic.millis().isSupported());
-        
-        assertEquals(false, ethiopic.centuries().isPrecise());
-        assertEquals(false, ethiopic.years().isPrecise());
-        assertEquals(false, ethiopic.weekyears().isPrecise());
-        assertEquals(false, ethiopic.months().isPrecise());
-        assertEquals(false, ethiopic.weeks().isPrecise());
-        assertEquals(false, ethiopic.days().isPrecise());
-        assertEquals(false, ethiopic.halfdays().isPrecise());
-        assertEquals(true, ethiopic.hours().isPrecise());
-        assertEquals(true, ethiopic.minutes().isPrecise());
-        assertEquals(true, ethiopic.seconds().isPrecise());
-        assertEquals(true, ethiopic.millis().isPrecise());
-        
-        final EthiopicChronology ethiopicUTC = EthiopicChronology.getInstanceUTC();
-        assertEquals(false, ethiopicUTC.centuries().isPrecise());
-        assertEquals(false, ethiopicUTC.years().isPrecise());
-        assertEquals(false, ethiopicUTC.weekyears().isPrecise());
-        assertEquals(false, ethiopicUTC.months().isPrecise());
-        assertEquals(true, ethiopicUTC.weeks().isPrecise());
-        assertEquals(true, ethiopicUTC.days().isPrecise());
-        assertEquals(true, ethiopicUTC.halfdays().isPrecise());
-        assertEquals(true, ethiopicUTC.hours().isPrecise());
-        assertEquals(true, ethiopicUTC.minutes().isPrecise());
-        assertEquals(true, ethiopicUTC.seconds().isPrecise());
-        assertEquals(true, ethiopicUTC.millis().isPrecise());
-        
-        final DateTimeZone gmt = DateTimeZone.forID("Etc/GMT");
-        final EthiopicChronology ethiopicGMT = EthiopicChronology.getInstance(gmt);
-        assertEquals(false, ethiopicGMT.centuries().isPrecise());
-        assertEquals(false, ethiopicGMT.years().isPrecise());
-        assertEquals(false, ethiopicGMT.weekyears().isPrecise());
-        assertEquals(false, ethiopicGMT.months().isPrecise());
-        assertEquals(true, ethiopicGMT.weeks().isPrecise());
-        assertEquals(true, ethiopicGMT.days().isPrecise());
-        assertEquals(true, ethiopicGMT.halfdays().isPrecise());
-        assertEquals(true, ethiopicGMT.hours().isPrecise());
-        assertEquals(true, ethiopicGMT.minutes().isPrecise());
-        assertEquals(true, ethiopicGMT.seconds().isPrecise());
-        assertEquals(true, ethiopicGMT.millis().isPrecise());
+        // Verify support status
+        assertEquals("Eras should not be supported", false, ethiopic.eras().isSupported());
+        assertEquals("Centuries should be supported", true, ethiopic.centuries().isSupported());
+        assertEquals("Years should be supported", true, ethiopic.years().isSupported());
+        assertEquals("Weekyears should be supported", true, ethiopic.weekyears().isSupported());
+        assertEquals("Months should be supported", true, ethiopic.months().isSupported());
+        assertEquals("Weeks should be supported", true, ethiopic.weeks().isSupported());
+        assertEquals("Days should be supported", true, ethiopic.days().isSupported());
+        assertEquals("Halfdays should be supported", true, ethiopic.halfdays().isSupported());
+        assertEquals("Hours should be supported", true, ethiopic.hours().isSupported());
+        assertEquals("Minutes should be supported", true, ethiopic.minutes().isSupported());
+        assertEquals("Seconds should be supported", true, ethiopic.seconds().isSupported());
+        assertEquals("Millis should be supported", true, ethiopic.millis().isSupported());
     }
 
-    public void testDateFields() {
+    public void testDurationFields_PrecisionWithTimezone() {
         final EthiopicChronology ethiopic = EthiopicChronology.getInstance();
+        
+        // Time-zone dependent fields are imprecise due to DST
+        assertEquals("Centuries should be imprecise with timezone", false, ethiopic.centuries().isPrecise());
+        assertEquals("Years should be imprecise with timezone", false, ethiopic.years().isPrecise());
+        assertEquals("Weekyears should be imprecise with timezone", false, ethiopic.weekyears().isPrecise());
+        assertEquals("Months should be imprecise with timezone", false, ethiopic.months().isPrecise());
+        assertEquals("Weeks should be imprecise with timezone", false, ethiopic.weeks().isPrecise());
+        assertEquals("Days should be imprecise with timezone", false, ethiopic.days().isPrecise());
+        assertEquals("Halfdays should be imprecise with timezone", false, ethiopic.halfdays().isPrecise());
+        
+        // Sub-day fields are always precise
+        assertEquals("Hours should be precise", true, ethiopic.hours().isPrecise());
+        assertEquals("Minutes should be precise", true, ethiopic.minutes().isPrecise());
+        assertEquals("Seconds should be precise", true, ethiopic.seconds().isPrecise());
+        assertEquals("Millis should be precise", true, ethiopic.millis().isPrecise());
+    }
+
+    public void testDurationFields_PrecisionWithUTC() {
+        final EthiopicChronology ethiopicUTC = EthiopicChronology.getInstanceUTC();
+        
+        // Variable-length fields remain imprecise even in UTC
+        assertEquals("Centuries should be imprecise", false, ethiopicUTC.centuries().isPrecise());
+        assertEquals("Years should be imprecise", false, ethiopicUTC.years().isPrecise());
+        assertEquals("Weekyears should be imprecise", false, ethiopicUTC.weekyears().isPrecise());
+        assertEquals("Months should be imprecise", false, ethiopicUTC.months().isPrecise());
+        
+        // Fixed-length fields are precise in UTC
+        assertEquals("Weeks should be precise in UTC", true, ethiopicUTC.weeks().isPrecise());
+        assertEquals("Days should be precise in UTC", true, ethiopicUTC.days().isPrecise());
+        assertEquals("Halfdays should be precise in UTC", true, ethiopicUTC.halfdays().isPrecise());
+        assertEquals("Hours should be precise", true, ethiopicUTC.hours().isPrecise());
+        assertEquals("Minutes should be precise", true, ethiopicUTC.minutes().isPrecise());
+        assertEquals("Seconds should be precise", true, ethiopicUTC.seconds().isPrecise());
+        assertEquals("Millis should be precise", true, ethiopicUTC.millis().isPrecise());
+    }
+
+    public void testDurationFields_PrecisionWithFixedOffsetTimezone() {
+        final DateTimeZone fixedGMT = DateTimeZone.forID("Etc/GMT");
+        final EthiopicChronology ethiopicGMT = EthiopicChronology.getInstance(fixedGMT);
+        
+        // Variable-length fields remain imprecise
+        assertEquals("Centuries should be imprecise", false, ethiopicGMT.centuries().isPrecise());
+        assertEquals("Years should be imprecise", false, ethiopicGMT.years().isPrecise());
+        assertEquals("Weekyears should be imprecise", false, ethiopicGMT.weekyears().isPrecise());
+        assertEquals("Months should be imprecise", false, ethiopicGMT.months().isPrecise());
+        
+        // Fixed-length fields are precise with fixed offset
+        assertEquals("Weeks should be precise with fixed offset", true, ethiopicGMT.weeks().isPrecise());
+        assertEquals("Days should be precise with fixed offset", true, ethiopicGMT.days().isPrecise());
+        assertEquals("Halfdays should be precise with fixed offset", true, ethiopicGMT.halfdays().isPrecise());
+        assertEquals("Hours should be precise", true, ethiopicGMT.hours().isPrecise());
+        assertEquals("Minutes should be precise", true, ethiopicGMT.minutes().isPrecise());
+        assertEquals("Seconds should be precise", true, ethiopicGMT.seconds().isPrecise());
+        assertEquals("Millis should be precise", true, ethiopicGMT.millis().isPrecise());
+    }
+
+    // ========================================================================
+    // Date Field Tests
+    // ========================================================================
+
+    public void testDateFields_NamesAndSupport() {
+        final EthiopicChronology ethiopic = EthiopicChronology.getInstance();
+        
+        // Verify field names
         assertEquals("era", ethiopic.era().getName());
         assertEquals("centuryOfEra", ethiopic.centuryOfEra().getName());
         assertEquals("yearOfCentury", ethiopic.yearOfCentury().getName());
@@ -230,48 +342,65 @@ public class TestEthiopicChronology extends TestCase {
         assertEquals("dayOfMonth", ethiopic.dayOfMonth().getName());
         assertEquals("dayOfWeek", ethiopic.dayOfWeek().getName());
         
-        assertEquals(true, ethiopic.era().isSupported());
-        assertEquals(true, ethiopic.centuryOfEra().isSupported());
-        assertEquals(true, ethiopic.yearOfCentury().isSupported());
-        assertEquals(true, ethiopic.yearOfEra().isSupported());
-        assertEquals(true, ethiopic.year().isSupported());
-        assertEquals(true, ethiopic.monthOfYear().isSupported());
-        assertEquals(true, ethiopic.weekyearOfCentury().isSupported());
-        assertEquals(true, ethiopic.weekyear().isSupported());
-        assertEquals(true, ethiopic.weekOfWeekyear().isSupported());
-        assertEquals(true, ethiopic.dayOfYear().isSupported());
-        assertEquals(true, ethiopic.dayOfMonth().isSupported());
-        assertEquals(true, ethiopic.dayOfWeek().isSupported());
-        
-        assertEquals(ethiopic.eras(), ethiopic.era().getDurationField());
-        assertEquals(ethiopic.centuries(), ethiopic.centuryOfEra().getDurationField());
-        assertEquals(ethiopic.years(), ethiopic.yearOfCentury().getDurationField());
-        assertEquals(ethiopic.years(), ethiopic.yearOfEra().getDurationField());
-        assertEquals(ethiopic.years(), ethiopic.year().getDurationField());
-        assertEquals(ethiopic.months(), ethiopic.monthOfYear().getDurationField());
-        assertEquals(ethiopic.weekyears(), ethiopic.weekyearOfCentury().getDurationField());
-        assertEquals(ethiopic.weekyears(), ethiopic.weekyear().getDurationField());
-        assertEquals(ethiopic.weeks(), ethiopic.weekOfWeekyear().getDurationField());
-        assertEquals(ethiopic.days(), ethiopic.dayOfYear().getDurationField());
-        assertEquals(ethiopic.days(), ethiopic.dayOfMonth().getDurationField());
-        assertEquals(ethiopic.days(), ethiopic.dayOfWeek().getDurationField());
-        
-        assertEquals(null, ethiopic.era().getRangeDurationField());
-        assertEquals(ethiopic.eras(), ethiopic.centuryOfEra().getRangeDurationField());
-        assertEquals(ethiopic.centuries(), ethiopic.yearOfCentury().getRangeDurationField());
-        assertEquals(ethiopic.eras(), ethiopic.yearOfEra().getRangeDurationField());
-        assertEquals(null, ethiopic.year().getRangeDurationField());
-        assertEquals(ethiopic.years(), ethiopic.monthOfYear().getRangeDurationField());
-        assertEquals(ethiopic.centuries(), ethiopic.weekyearOfCentury().getRangeDurationField());
-        assertEquals(null, ethiopic.weekyear().getRangeDurationField());
-        assertEquals(ethiopic.weekyears(), ethiopic.weekOfWeekyear().getRangeDurationField());
-        assertEquals(ethiopic.years(), ethiopic.dayOfYear().getRangeDurationField());
-        assertEquals(ethiopic.months(), ethiopic.dayOfMonth().getRangeDurationField());
-        assertEquals(ethiopic.weeks(), ethiopic.dayOfWeek().getRangeDurationField());
+        // All date fields should be supported
+        assertEquals("Era should be supported", true, ethiopic.era().isSupported());
+        assertEquals("Century of era should be supported", true, ethiopic.centuryOfEra().isSupported());
+        assertEquals("Year of century should be supported", true, ethiopic.yearOfCentury().isSupported());
+        assertEquals("Year of era should be supported", true, ethiopic.yearOfEra().isSupported());
+        assertEquals("Year should be supported", true, ethiopic.year().isSupported());
+        assertEquals("Month of year should be supported", true, ethiopic.monthOfYear().isSupported());
+        assertEquals("Weekyear of century should be supported", true, ethiopic.weekyearOfCentury().isSupported());
+        assertEquals("Weekyear should be supported", true, ethiopic.weekyear().isSupported());
+        assertEquals("Week of weekyear should be supported", true, ethiopic.weekOfWeekyear().isSupported());
+        assertEquals("Day of year should be supported", true, ethiopic.dayOfYear().isSupported());
+        assertEquals("Day of month should be supported", true, ethiopic.dayOfMonth().isSupported());
+        assertEquals("Day of week should be supported", true, ethiopic.dayOfWeek().isSupported());
     }
 
-    public void testTimeFields() {
+    public void testDateFields_DurationFieldAssociations() {
         final EthiopicChronology ethiopic = EthiopicChronology.getInstance();
+        
+        // Verify each field uses the correct duration field
+        assertEquals("Era duration field", ethiopic.eras(), ethiopic.era().getDurationField());
+        assertEquals("Century duration field", ethiopic.centuries(), ethiopic.centuryOfEra().getDurationField());
+        assertEquals("Year of century duration field", ethiopic.years(), ethiopic.yearOfCentury().getDurationField());
+        assertEquals("Year of era duration field", ethiopic.years(), ethiopic.yearOfEra().getDurationField());
+        assertEquals("Year duration field", ethiopic.years(), ethiopic.year().getDurationField());
+        assertEquals("Month duration field", ethiopic.months(), ethiopic.monthOfYear().getDurationField());
+        assertEquals("Weekyear of century duration field", ethiopic.weekyears(), ethiopic.weekyearOfCentury().getDurationField());
+        assertEquals("Weekyear duration field", ethiopic.weekyears(), ethiopic.weekyear().getDurationField());
+        assertEquals("Week duration field", ethiopic.weeks(), ethiopic.weekOfWeekyear().getDurationField());
+        assertEquals("Day of year duration field", ethiopic.days(), ethiopic.dayOfYear().getDurationField());
+        assertEquals("Day of month duration field", ethiopic.days(), ethiopic.dayOfMonth().getDurationField());
+        assertEquals("Day of week duration field", ethiopic.days(), ethiopic.dayOfWeek().getDurationField());
+    }
+
+    public void testDateFields_RangeDurationFieldAssociations() {
+        final EthiopicChronology ethiopic = EthiopicChronology.getInstance();
+        
+        // Verify range duration field associations
+        assertEquals("Era range duration field", null, ethiopic.era().getRangeDurationField());
+        assertEquals("Century range duration field", ethiopic.eras(), ethiopic.centuryOfEra().getRangeDurationField());
+        assertEquals("Year of century range duration field", ethiopic.centuries(), ethiopic.yearOfCentury().getRangeDurationField());
+        assertEquals("Year of era range duration field", ethiopic.eras(), ethiopic.yearOfEra().getRangeDurationField());
+        assertEquals("Year range duration field", null, ethiopic.year().getRangeDurationField());
+        assertEquals("Month range duration field", ethiopic.years(), ethiopic.monthOfYear().getRangeDurationField());
+        assertEquals("Weekyear of century range duration field", ethiopic.centuries(), ethiopic.weekyearOfCentury().getRangeDurationField());
+        assertEquals("Weekyear range duration field", null, ethiopic.weekyear().getRangeDurationField());
+        assertEquals("Week range duration field", ethiopic.weekyears(), ethiopic.weekOfWeekyear().getRangeDurationField());
+        assertEquals("Day of year range duration field", ethiopic.years(), ethiopic.dayOfYear().getRangeDurationField());
+        assertEquals("Day of month range duration field", ethiopic.months(), ethiopic.dayOfMonth().getRangeDurationField());
+        assertEquals("Day of week range duration field", ethiopic.weeks(), ethiopic.dayOfWeek().getRangeDurationField());
+    }
+
+    // ========================================================================
+    // Time Field Tests
+    // ========================================================================
+
+    public void testTimeFields_NamesAndSupport() {
+        final EthiopicChronology ethiopic = EthiopicChronology.getInstance();
+        
+        // Verify field names
         assertEquals("halfdayOfDay", ethiopic.halfdayOfDay().getName());
         assertEquals("clockhourOfHalfday", ethiopic.clockhourOfHalfday().getName());
         assertEquals("hourOfHalfday", ethiopic.hourOfHalfday().getName());
@@ -284,45 +413,67 @@ public class TestEthiopicChronology extends TestCase {
         assertEquals("millisOfDay", ethiopic.millisOfDay().getName());
         assertEquals("millisOfSecond", ethiopic.millisOfSecond().getName());
         
-        assertEquals(true, ethiopic.halfdayOfDay().isSupported());
-        assertEquals(true, ethiopic.clockhourOfHalfday().isSupported());
-        assertEquals(true, ethiopic.hourOfHalfday().isSupported());
-        assertEquals(true, ethiopic.clockhourOfDay().isSupported());
-        assertEquals(true, ethiopic.hourOfDay().isSupported());
-        assertEquals(true, ethiopic.minuteOfDay().isSupported());
-        assertEquals(true, ethiopic.minuteOfHour().isSupported());
-        assertEquals(true, ethiopic.secondOfDay().isSupported());
-        assertEquals(true, ethiopic.secondOfMinute().isSupported());
-        assertEquals(true, ethiopic.millisOfDay().isSupported());
-        assertEquals(true, ethiopic.millisOfSecond().isSupported());
+        // All time fields should be supported
+        assertEquals("Halfday of day should be supported", true, ethiopic.halfdayOfDay().isSupported());
+        assertEquals("Clockhour of halfday should be supported", true, ethiopic.clockhourOfHalfday().isSupported());
+        assertEquals("Hour of halfday should be supported", true, ethiopic.hourOfHalfday().isSupported());
+        assertEquals("Clockhour of day should be supported", true, ethiopic.clockhourOfDay().isSupported());
+        assertEquals("Hour of day should be supported", true, ethiopic.hourOfDay().isSupported());
+        assertEquals("Minute of day should be supported", true, ethiopic.minuteOfDay().isSupported());
+        assertEquals("Minute of hour should be supported", true, ethiopic.minuteOfHour().isSupported());
+        assertEquals("Second of day should be supported", true, ethiopic.secondOfDay().isSupported());
+        assertEquals("Second of minute should be supported", true, ethiopic.secondOfMinute().isSupported());
+        assertEquals("Millis of day should be supported", true, ethiopic.millisOfDay().isSupported());
+        assertEquals("Millis of second should be supported", true, ethiopic.millisOfSecond().isSupported());
     }
 
-    //-----------------------------------------------------------------------
-    public void testEpoch() {
-        DateTime epoch = new DateTime(1, 1, 1, 0, 0, 0, 0, ETHIOPIC_UTC);
-        assertEquals(new DateTime(8, 8, 29, 0, 0, 0, 0, JULIAN_UTC), epoch.withChronology(JULIAN_UTC));
+    // ========================================================================
+    // Epoch and Era Tests
+    // ========================================================================
+
+    public void testEpoch_CorrespondsToJulianDate() {
+        // Ethiopic year 1, month 1, day 1 should correspond to Julian August 29, 8 CE
+        DateTime ethiopicEpoch = new DateTime(1, 1, 1, 0, 0, 0, 0, ETHIOPIC_UTC);
+        DateTime expectedJulianDate = new DateTime(8, 8, 29, 0, 0, 0, 0, JULIAN_UTC);
+        
+        assertEquals("Ethiopic epoch should match Julian date", 
+                    expectedJulianDate, ethiopicEpoch.withChronology(JULIAN_UTC));
     }
 
-    public void testEra() {
-        assertEquals(1, EthiopicChronology.EE);
+    public void testEra_OnlyPositiveEraSupported() {
+        assertEquals("EE era constant", 1, EthiopicChronology.EE);
+        
         try {
+            // Attempt to create date before era 1 (negative year)
             new DateTime(-1, 13, 5, 0, 0, 0, 0, ETHIOPIC_UTC);
-            fail();
-        } catch (IllegalArgumentException ex) {}
+            fail("Should not allow dates before era 1");
+        } catch (IllegalArgumentException expected) {
+            // This is expected behavior
+        }
     }
 
-    //-----------------------------------------------------------------------
+    // ========================================================================
+    // Comprehensive Calendar Tests
+    // ========================================================================
+
     /**
-     * Tests era, year, monthOfYear, dayOfMonth and dayOfWeek.
+     * Tests the complete calendar system including era, year, monthOfYear, 
+     * dayOfMonth and dayOfWeek calculations across a significant time range.
      */
-    public void testCalendar() {
+    public void testCalendar_ComprehensiveValidation() {
         if (TestAll.FAST) {
-            return;
+            return; // Skip intensive test in fast mode
         }
-        System.out.println("\nTestEthiopicChronology.testCalendar");
-        DateTime epoch = new DateTime(1, 1, 1, 0, 0, 0, 0, ETHIOPIC_UTC);
-        long millis = epoch.getMillis();
-        long end = new DateTime(3000, 1, 1, 0, 0, 0, 0, ISO_UTC).getMillis();
+        
+        System.out.println("\nTestEthiopicChronology.testCalendar - Running comprehensive validation");
+        
+        DateTime startDate = new DateTime(1, 1, 1, 0, 0, 0, 0, ETHIOPIC_UTC);
+        DateTime endDate = new DateTime(3000, 1, 1, 0, 0, 0, 0, ISO_UTC);
+        
+        long currentMillis = startDate.getMillis();
+        long endMillis = endDate.getMillis();
+        
+        // Get field references for performance
         DateTimeField dayOfWeek = ETHIOPIC_UTC.dayOfWeek();
         DateTimeField dayOfYear = ETHIOPIC_UTC.dayOfYear();
         DateTimeField dayOfMonth = ETHIOPIC_UTC.dayOfMonth();
@@ -330,270 +481,377 @@ public class TestEthiopicChronology extends TestCase {
         DateTimeField year = ETHIOPIC_UTC.year();
         DateTimeField yearOfEra = ETHIOPIC_UTC.yearOfEra();
         DateTimeField era = ETHIOPIC_UTC.era();
-        int expectedDOW = new DateTime(8, 8, 29, 0, 0, 0, 0, JULIAN_UTC).getDayOfWeek();
-        int expectedDOY = 1;
-        int expectedDay = 1;
-        int expectedMonth = 1;
+        
+        // Initialize expected values based on epoch correspondence
+        int expectedDayOfWeek = new DateTime(8, 8, 29, 0, 0, 0, 0, JULIAN_UTC).getDayOfWeek();
+        int expectedDayOfYear = 1;
+        int expectedDayOfMonth = 1;
+        int expectedMonthOfYear = 1;
         int expectedYear = 1;
-        while (millis < end) {
-            int dowValue = dayOfWeek.get(millis);
-            int doyValue = dayOfYear.get(millis);
-            int dayValue = dayOfMonth.get(millis);
-            int monthValue = monthOfYear.get(millis);
-            int yearValue = year.get(millis);
-            int yearOfEraValue = yearOfEra.get(millis);
-            int monthLen = dayOfMonth.getMaximumValue(millis);
-            if (monthValue < 1 || monthValue > 13) {
-                fail("Bad month: " + millis);
-            }
+        
+        while (currentMillis < endMillis) {
+            validateCalendarFieldsAtInstant(currentMillis, era, year, yearOfEra, monthOfYear, 
+                                          dayOfMonth, dayOfYear, dayOfWeek,
+                                          expectedYear, expectedMonthOfYear, expectedDayOfMonth, 
+                                          expectedDayOfYear, expectedDayOfWeek);
             
-            // test era
-            assertEquals(1, era.get(millis));
-            assertEquals("EE", era.getAsText(millis));
-            assertEquals("EE", era.getAsShortText(millis));
-            
-            // test date
-            assertEquals(expectedYear, yearValue);
-            assertEquals(expectedYear, yearOfEraValue);
-            assertEquals(expectedMonth, monthValue);
-            assertEquals(expectedDay, dayValue);
-            assertEquals(expectedDOW, dowValue);
-            assertEquals(expectedDOY, doyValue);
-            
-            // test leap year
-            assertEquals(yearValue % 4 == 3, year.isLeap(millis));
-            
-            // test month length
-            if (monthValue == 13) {
-                assertEquals(yearValue % 4 == 3, monthOfYear.isLeap(millis));
-                if (yearValue % 4 == 3) {
-                    assertEquals(6, monthLen);
-                } else {
-                    assertEquals(5, monthLen);
-                }
-            } else {
-                assertEquals(30, monthLen);
-            }
-            
-            // recalculate date
-            expectedDOW = (((expectedDOW + 1) - 1) % 7) + 1;
-            expectedDay++;
-            expectedDOY++;
-            if (expectedDay == 31 && expectedMonth < 13) {
-                expectedDay = 1;
-                expectedMonth++;
-            } else if (expectedMonth == 13) {
-                if (expectedYear % 4 == 3 && expectedDay == 7) {
-                    expectedDay = 1;
-                    expectedMonth = 1;
-                    expectedYear++;
-                    expectedDOY = 1;
-                } else if (expectedYear % 4 != 3 && expectedDay == 6) {
-                    expectedDay = 1;
-                    expectedMonth = 1;
-                    expectedYear++;
-                    expectedDOY = 1;
-                }
-            }
-            millis += SKIP;
+            // Advance to next day and update expected values
+            currentMillis += TEST_SKIP_INTERVAL;
+            updateExpectedCalendarValues(expectedYear, expectedMonthOfYear, expectedDayOfMonth,
+                                       expectedDayOfYear, expectedDayOfWeek);
         }
     }
 
-    public void testSampleDate() {
-        DateTime dt = new DateTime(2004, 6, 9, 0, 0, 0, 0, ISO_UTC).withChronology(ETHIOPIC_UTC);
-        assertEquals(EthiopicChronology.EE, dt.getEra());
-        assertEquals(20, dt.getCenturyOfEra());  // TODO confirm
-        assertEquals(96, dt.getYearOfCentury());
-        assertEquals(1996, dt.getYearOfEra());
+    private void validateCalendarFieldsAtInstant(long instant, DateTimeField era, DateTimeField year, 
+                                               DateTimeField yearOfEra, DateTimeField monthOfYear,
+                                               DateTimeField dayOfMonth, DateTimeField dayOfYear, 
+                                               DateTimeField dayOfWeek,
+                                               int expectedYear, int expectedMonth, int expectedDay,
+                                               int expectedDOY, int expectedDOW) {
         
-        assertEquals(1996, dt.getYear());
-        Property fld = dt.year();
-        assertEquals(false, fld.isLeap());
-        assertEquals(0, fld.getLeapAmount());
-        assertEquals(DurationFieldType.days(), fld.getLeapDurationField().getType());
-        assertEquals(new DateTime(1997, 10, 2, 0, 0, 0, 0, ETHIOPIC_UTC), fld.addToCopy(1));
+        int actualMonth = monthOfYear.get(instant);
         
-        assertEquals(10, dt.getMonthOfYear());
-        fld = dt.monthOfYear();
-        assertEquals(false, fld.isLeap());
-        assertEquals(0, fld.getLeapAmount());
-        assertEquals(DurationFieldType.days(), fld.getLeapDurationField().getType());
-        assertEquals(1, fld.getMinimumValue());
-        assertEquals(1, fld.getMinimumValueOverall());
-        assertEquals(13, fld.getMaximumValue());
-        assertEquals(13, fld.getMaximumValueOverall());
-        assertEquals(new DateTime(1997, 1, 2, 0, 0, 0, 0, ETHIOPIC_UTC), fld.addToCopy(4));
-        assertEquals(new DateTime(1996, 1, 2, 0, 0, 0, 0, ETHIOPIC_UTC), fld.addWrapFieldToCopy(4));
+        // Validate month range
+        if (actualMonth < 1 || actualMonth > 13) {
+            fail("Invalid month value: " + actualMonth + " at instant: " + instant);
+        }
         
-        assertEquals(2, dt.getDayOfMonth());
-        fld = dt.dayOfMonth();
-        assertEquals(false, fld.isLeap());
-        assertEquals(0, fld.getLeapAmount());
-        assertEquals(null, fld.getLeapDurationField());
-        assertEquals(1, fld.getMinimumValue());
-        assertEquals(1, fld.getMinimumValueOverall());
-        assertEquals(30, fld.getMaximumValue());
-        assertEquals(30, fld.getMaximumValueOverall());
-        assertEquals(new DateTime(1996, 10, 3, 0, 0, 0, 0, ETHIOPIC_UTC), fld.addToCopy(1));
+        // Test era
+        assertEquals("Era should be EE", 1, era.get(instant));
+        assertEquals("Era text should be EE", "EE", era.getAsText(instant));
+        assertEquals("Era short text should be EE", "EE", era.getAsShortText(instant));
         
-        assertEquals(DateTimeConstants.WEDNESDAY, dt.getDayOfWeek());
-        fld = dt.dayOfWeek();
-        assertEquals(false, fld.isLeap());
-        assertEquals(0, fld.getLeapAmount());
-        assertEquals(null, fld.getLeapDurationField());
-        assertEquals(1, fld.getMinimumValue());
-        assertEquals(1, fld.getMinimumValueOverall());
-        assertEquals(7, fld.getMaximumValue());
-        assertEquals(7, fld.getMaximumValueOverall());
-        assertEquals(new DateTime(1996, 10, 3, 0, 0, 0, 0, ETHIOPIC_UTC), fld.addToCopy(1));
+        // Test date field values
+        assertEquals("Year mismatch", expectedYear, year.get(instant));
+        assertEquals("Year of era mismatch", expectedYear, yearOfEra.get(instant));
+        assertEquals("Month mismatch", expectedMonth, actualMonth);
+        assertEquals("Day mismatch", expectedDay, dayOfMonth.get(instant));
+        assertEquals("Day of week mismatch", expectedDOW, dayOfWeek.get(instant));
+        assertEquals("Day of year mismatch", expectedDOY, dayOfYear.get(instant));
         
-        assertEquals(9 * 30 + 2, dt.getDayOfYear());
-        fld = dt.dayOfYear();
-        assertEquals(false, fld.isLeap());
-        assertEquals(0, fld.getLeapAmount());
-        assertEquals(null, fld.getLeapDurationField());
-        assertEquals(1, fld.getMinimumValue());
-        assertEquals(1, fld.getMinimumValueOverall());
-        assertEquals(365, fld.getMaximumValue());
-        assertEquals(366, fld.getMaximumValueOverall());
-        assertEquals(new DateTime(1996, 10, 3, 0, 0, 0, 0, ETHIOPIC_UTC), fld.addToCopy(1));
+        // Test leap year calculation (every 4th year when year % 4 == 3)
+        boolean expectedLeapYear = expectedYear % 4 == 3;
+        assertEquals("Leap year calculation", expectedLeapYear, year.isLeap(instant));
         
-        assertEquals(0, dt.getHourOfDay());
-        assertEquals(0, dt.getMinuteOfHour());
-        assertEquals(0, dt.getSecondOfMinute());
-        assertEquals(0, dt.getMillisOfSecond());
+        // Test month length
+        validateMonthLength(instant, actualMonth, expectedLeapYear, monthOfYear, dayOfMonth);
     }
 
-    public void testSampleDateWithZone() {
-        DateTime dt = new DateTime(2004, 6, 9, 12, 0, 0, 0, PARIS).withChronology(ETHIOPIC_UTC);
-        assertEquals(EthiopicChronology.EE, dt.getEra());
-        assertEquals(1996, dt.getYear());
-        assertEquals(1996, dt.getYearOfEra());
-        assertEquals(10, dt.getMonthOfYear());
-        assertEquals(2, dt.getDayOfMonth());
-        assertEquals(10, dt.getHourOfDay());  // PARIS is UTC+2 in summer (12-2=10)
-        assertEquals(0, dt.getMinuteOfHour());
-        assertEquals(0, dt.getSecondOfMinute());
-        assertEquals(0, dt.getMillisOfSecond());
+    private void validateMonthLength(long instant, int month, boolean isLeapYear, 
+                                   DateTimeField monthOfYear, DateTimeField dayOfMonth) {
+        int monthLength = dayOfMonth.getMaximumValue(instant);
+        
+        if (month == 13) {
+            // 13th month (Pagumē): 5 days normally, 6 in leap years
+            assertEquals("13th month leap status", isLeapYear, monthOfYear.isLeap(instant));
+            if (isLeapYear) {
+                assertEquals("13th month length in leap year", 6, monthLength);
+            } else {
+                assertEquals("13th month length in regular year", 5, monthLength);
+            }
+        } else {
+            // Regular months: always 30 days
+            assertEquals("Regular month length", 30, monthLength);
+        }
     }
 
-    public void testDurationYear() {
-        // Leap 1999, NotLeap 1996,97,98
-        DateTime dt96 = new DateTime(1996, 10, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
-        DateTime dt97 = new DateTime(1997, 10, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
-        DateTime dt98 = new DateTime(1998, 10, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
-        DateTime dt99 = new DateTime(1999, 10, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
-        DateTime dt00 = new DateTime(2000, 10, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
+    private int[] updateExpectedCalendarValues(int year, int month, int day, int dayOfYear, int dayOfWeek) {
+        // Advance day of week (1-7 cycle)
+        int newDayOfWeek = (dayOfWeek % 7) + 1;
         
-        DurationField fld = dt96.year().getDurationField();
-        assertEquals(ETHIOPIC_UTC.years(), fld);
-        assertEquals(1L * 365L * MILLIS_PER_DAY, fld.getMillis(1, dt96.getMillis()));
-        assertEquals(2L * 365L * MILLIS_PER_DAY, fld.getMillis(2, dt96.getMillis()));
-        assertEquals(3L * 365L * MILLIS_PER_DAY, fld.getMillis(3, dt96.getMillis()));
-        assertEquals((4L * 365L + 1L) * MILLIS_PER_DAY, fld.getMillis(4, dt96.getMillis()));
+        // Advance day and day of year
+        int newDay = day + 1;
+        int newDayOfYear = dayOfYear + 1;
+        int newMonth = month;
+        int newYear = year;
         
-        assertEquals(((4L * 365L + 1L) * MILLIS_PER_DAY) / 4, fld.getMillis(1));
-        assertEquals(((4L * 365L + 1L) * MILLIS_PER_DAY) / 2, fld.getMillis(2));
+        // Check if we need to advance month
+        if (newDay == 31 && month < 13) {
+            // Regular months have 30 days, advance to next month
+            newDay = 1;
+            newMonth++;
+        } else if (month == 13) {
+            // Handle 13th month transitions
+            boolean isLeapYear = year % 4 == 3;
+            int maxDaysInMonth13 = isLeapYear ? 6 : 5;
+            
+            if (newDay > maxDaysInMonth13) {
+                // Advance to next year
+                newDay = 1;
+                newMonth = 1;
+                newYear++;
+                newDayOfYear = 1;
+            }
+        }
         
-        assertEquals(1L * 365L * MILLIS_PER_DAY, fld.getMillis(1L, dt96.getMillis()));
-        assertEquals(2L * 365L * MILLIS_PER_DAY, fld.getMillis(2L, dt96.getMillis()));
-        assertEquals(3L * 365L * MILLIS_PER_DAY, fld.getMillis(3L, dt96.getMillis()));
-        assertEquals((4L * 365L + 1L) * MILLIS_PER_DAY, fld.getMillis(4L, dt96.getMillis()));
-        
-        assertEquals(((4L * 365L + 1L) * MILLIS_PER_DAY) / 4, fld.getMillis(1L));
-        assertEquals(((4L * 365L + 1L) * MILLIS_PER_DAY) / 2, fld.getMillis(2L));
-        
-        assertEquals(((4L * 365L + 1L) * MILLIS_PER_DAY) / 4, fld.getUnitMillis());
-        
-        assertEquals(0, fld.getValue(1L * 365L * MILLIS_PER_DAY - 1L, dt96.getMillis()));
-        assertEquals(1, fld.getValue(1L * 365L * MILLIS_PER_DAY, dt96.getMillis()));
-        assertEquals(1, fld.getValue(1L * 365L * MILLIS_PER_DAY + 1L, dt96.getMillis()));
-        assertEquals(1, fld.getValue(2L * 365L * MILLIS_PER_DAY - 1L, dt96.getMillis()));
-        assertEquals(2, fld.getValue(2L * 365L * MILLIS_PER_DAY, dt96.getMillis()));
-        assertEquals(2, fld.getValue(2L * 365L * MILLIS_PER_DAY + 1L, dt96.getMillis()));
-        assertEquals(2, fld.getValue(3L * 365L * MILLIS_PER_DAY - 1L, dt96.getMillis()));
-        assertEquals(3, fld.getValue(3L * 365L * MILLIS_PER_DAY, dt96.getMillis()));
-        assertEquals(3, fld.getValue(3L * 365L * MILLIS_PER_DAY + 1L, dt96.getMillis()));
-        assertEquals(3, fld.getValue((4L * 365L + 1L) * MILLIS_PER_DAY - 1L, dt96.getMillis()));
-        assertEquals(4, fld.getValue((4L * 365L + 1L) * MILLIS_PER_DAY, dt96.getMillis()));
-        assertEquals(4, fld.getValue((4L * 365L + 1L) * MILLIS_PER_DAY + 1L, dt96.getMillis()));
-        
-        assertEquals(dt97.getMillis(), fld.add(dt96.getMillis(), 1));
-        assertEquals(dt98.getMillis(), fld.add(dt96.getMillis(), 2));
-        assertEquals(dt99.getMillis(), fld.add(dt96.getMillis(), 3));
-        assertEquals(dt00.getMillis(), fld.add(dt96.getMillis(), 4));
-        
-        assertEquals(dt97.getMillis(), fld.add(dt96.getMillis(), 1L));
-        assertEquals(dt98.getMillis(), fld.add(dt96.getMillis(), 2L));
-        assertEquals(dt99.getMillis(), fld.add(dt96.getMillis(), 3L));
-        assertEquals(dt00.getMillis(), fld.add(dt96.getMillis(), 4L));
+        return new int[]{newYear, newMonth, newDay, newDayOfYear, newDayOfWeek};
     }
 
-    public void testDurationMonth() {
-        // Leap 1999, NotLeap 1996,97,98
-        DateTime dt11 = new DateTime(1999, 11, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
-        DateTime dt12 = new DateTime(1999, 12, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
-        DateTime dt13 = new DateTime(1999, 13, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
-        DateTime dt01 = new DateTime(2000, 1, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
+    // ========================================================================
+    // Specific Date Sample Tests
+    // ========================================================================
+
+    public void testSampleDate_June9_2004_Conversion() {
+        // Test conversion of June 9, 2004 (ISO) to Ethiopic calendar
+        DateTime gregorianDate = new DateTime(2004, 6, 9, 0, 0, 0, 0, ISO_UTC);
+        DateTime ethiopicDate = gregorianDate.withChronology(ETHIOPIC_UTC);
         
-        DurationField fld = dt11.monthOfYear().getDurationField();
-        assertEquals(ETHIOPIC_UTC.months(), fld);
-        assertEquals(1L * 30L * MILLIS_PER_DAY, fld.getMillis(1, dt11.getMillis()));
-        assertEquals(2L * 30L * MILLIS_PER_DAY, fld.getMillis(2, dt11.getMillis()));
-        assertEquals((2L * 30L + 6L) * MILLIS_PER_DAY, fld.getMillis(3, dt11.getMillis()));
-        assertEquals((3L * 30L + 6L) * MILLIS_PER_DAY, fld.getMillis(4, dt11.getMillis()));
+        // Verify basic date components
+        assertEquals("Era should be EE", EthiopicChronology.EE, ethiopicDate.getEra());
+        assertEquals("Century of era", 20, ethiopicDate.getCenturyOfEra());
+        assertEquals("Year of century", 96, ethiopicDate.getYearOfCentury());
+        assertEquals("Year of era", 1996, ethiopicDate.getYearOfEra());
+        assertEquals("Year", 1996, ethiopicDate.getYear());
+        assertEquals("Month of year", 10, ethiopicDate.getMonthOfYear());
+        assertEquals("Day of month", 2, ethiopicDate.getDayOfMonth());
+        assertEquals("Day of week", DateTimeConstants.WEDNESDAY, ethiopicDate.getDayOfWeek());
+        assertEquals("Day of year", 9 * 30 + 2, ethiopicDate.getDayOfYear()); // 272
         
-        assertEquals(1L * 30L * MILLIS_PER_DAY, fld.getMillis(1));
-        assertEquals(2L * 30L * MILLIS_PER_DAY, fld.getMillis(2));
-        assertEquals(13L * 30L * MILLIS_PER_DAY, fld.getMillis(13));
-        
-        assertEquals(1L * 30L * MILLIS_PER_DAY, fld.getMillis(1L, dt11.getMillis()));
-        assertEquals(2L * 30L * MILLIS_PER_DAY, fld.getMillis(2L, dt11.getMillis()));
-        assertEquals((2L * 30L + 6L) * MILLIS_PER_DAY, fld.getMillis(3L, dt11.getMillis()));
-        assertEquals((3L * 30L + 6L) * MILLIS_PER_DAY, fld.getMillis(4L, dt11.getMillis()));
-        
-        assertEquals(1L * 30L * MILLIS_PER_DAY, fld.getMillis(1L));
-        assertEquals(2L * 30L * MILLIS_PER_DAY, fld.getMillis(2L));
-        assertEquals(13L * 30L * MILLIS_PER_DAY, fld.getMillis(13L));
-        
-        assertEquals(0, fld.getValue(1L * 30L * MILLIS_PER_DAY - 1L, dt11.getMillis()));
-        assertEquals(1, fld.getValue(1L * 30L * MILLIS_PER_DAY, dt11.getMillis()));
-        assertEquals(1, fld.getValue(1L * 30L * MILLIS_PER_DAY + 1L, dt11.getMillis()));
-        assertEquals(1, fld.getValue(2L * 30L * MILLIS_PER_DAY - 1L, dt11.getMillis()));
-        assertEquals(2, fld.getValue(2L * 30L * MILLIS_PER_DAY, dt11.getMillis()));
-        assertEquals(2, fld.getValue(2L * 30L * MILLIS_PER_DAY + 1L, dt11.getMillis()));
-        assertEquals(2, fld.getValue((2L * 30L + 6L) * MILLIS_PER_DAY - 1L, dt11.getMillis()));
-        assertEquals(3, fld.getValue((2L * 30L + 6L) * MILLIS_PER_DAY, dt11.getMillis()));
-        assertEquals(3, fld.getValue((2L * 30L + 6L) * MILLIS_PER_DAY + 1L, dt11.getMillis()));
-        assertEquals(3, fld.getValue((3L * 30L + 6L) * MILLIS_PER_DAY - 1L, dt11.getMillis()));
-        assertEquals(4, fld.getValue((3L * 30L + 6L) * MILLIS_PER_DAY, dt11.getMillis()));
-        assertEquals(4, fld.getValue((3L * 30L + 6L) * MILLIS_PER_DAY + 1L, dt11.getMillis()));
-        
-        assertEquals(dt12.getMillis(), fld.add(dt11.getMillis(), 1));
-        assertEquals(dt13.getMillis(), fld.add(dt11.getMillis(), 2));
-        assertEquals(dt01.getMillis(), fld.add(dt11.getMillis(), 3));
-        
-        assertEquals(dt12.getMillis(), fld.add(dt11.getMillis(), 1L));
-        assertEquals(dt13.getMillis(), fld.add(dt11.getMillis(), 2L));
-        assertEquals(dt01.getMillis(), fld.add(dt11.getMillis(), 3L));
+        // Verify time components remain unchanged
+        assertEquals("Hour of day", 0, ethiopicDate.getHourOfDay());
+        assertEquals("Minute of hour", 0, ethiopicDate.getMinuteOfHour());
+        assertEquals("Second of minute", 0, ethiopicDate.getSecondOfMinute());
+        assertEquals("Millis of second", 0, ethiopicDate.getMillisOfSecond());
     }
 
-    public void testLeap_5_13() {
-        Chronology chrono = EthiopicChronology.getInstance();
-        DateTime dt = new DateTime(3, 13, 5, 0, 0, chrono);
-        assertEquals(true, dt.year().isLeap());
-        assertEquals(true, dt.monthOfYear().isLeap());
-        assertEquals(false, dt.dayOfMonth().isLeap());
-        assertEquals(false, dt.dayOfYear().isLeap());
+    public void testSampleDate_YearFieldProperties() {
+        DateTime ethiopicDate = new DateTime(2004, 6, 9, 0, 0, 0, 0, ISO_UTC).withChronology(ETHIOPIC_UTC);
+        Property yearField = ethiopicDate.year();
+        
+        // Year 1996 EE is not a leap year (1996 % 4 != 3)
+        assertEquals("Year should not be leap", false, yearField.isLeap());
+        assertEquals("Leap amount should be 0", 0, yearField.getLeapAmount());
+        assertEquals("Leap duration field type", DurationFieldType.days(), 
+                    yearField.getLeapDurationField().getType());
+        
+        // Test year arithmetic
+        DateTime nextYear = new DateTime(1997, 10, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
+        assertEquals("Adding 1 year", nextYear, yearField.addToCopy(1));
     }
 
-    public void testLeap_6_13() {
-        Chronology chrono = EthiopicChronology.getInstance();
-        DateTime dt = new DateTime(3, 13, 6, 0, 0, chrono);
-        assertEquals(true, dt.year().isLeap());
-        assertEquals(true, dt.monthOfYear().isLeap());
-        assertEquals(true, dt.dayOfMonth().isLeap());
-        assertEquals(true, dt.dayOfYear().isLeap());
+    public void testSampleDate_MonthFieldProperties() {
+        DateTime ethiopicDate = new DateTime(2004, 6, 9, 0, 0, 0, 0, ISO_UTC).withChronology(ETHIOPIC_UTC);
+        Property monthField = ethiopicDate.monthOfYear();
+        
+        assertEquals("Month should not be leap", false, monthField.isLeap());
+        assertEquals("Leap amount should be 0", 0, monthField.getLeapAmount());
+        assertEquals("Leap duration field type", DurationFieldType.days(), 
+                    monthField.getLeapDurationField().getType());
+        
+        // Test month range values
+        assertEquals("Month minimum value", 1, monthField.getMinimumValue());
+        assertEquals("Month minimum value overall", 1, monthField.getMinimumValueOverall());
+        assertEquals("Month maximum value", 13, monthField.getMaximumValue());
+        assertEquals("Month maximum value overall", 13, monthField.getMaximumValueOverall());
+        
+        // Test month arithmetic
+        DateTime fourMonthsLater = new DateTime(1997, 1, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
+        DateTime wrappedMonth = new DateTime(1996, 1, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
+        assertEquals("Adding 4 months", fourMonthsLater, monthField.addToCopy(4));
+        assertEquals("Wrapping 4 months", wrappedMonth, monthField.addWrapFieldToCopy(4));
     }
 
+    public void testSampleDate_DayFieldProperties() {
+        DateTime ethiopicDate = new DateTime(2004, 6, 9, 0, 0, 0, 0, ISO_UTC).withChronology(ETHIOPIC_UTC);
+        
+        // Test day of month properties
+        Property dayOfMonthField = ethiopicDate.dayOfMonth();
+        assertEquals("Day of month should not be leap", false, dayOfMonthField.isLeap());
+        assertEquals("Day leap amount should be 0", 0, dayOfMonthField.getLeapAmount());
+        assertEquals("Day leap duration field should be null", null, dayOfMonthField.getLeapDurationField());
+        assertEquals("Day minimum value", 1, dayOfMonthField.getMinimumValue());
+        assertEquals("Day minimum value overall", 1, dayOfMonthField.getMinimumValueOverall());
+        assertEquals("Day maximum value", 30, dayOfMonthField.getMaximumValue());
+        assertEquals("Day maximum value overall", 30, dayOfMonthField.getMaximumValueOverall());
+        
+        DateTime nextDay = new DateTime(1996, 10, 3, 0, 0, 0, 0, ETHIOPIC_UTC);
+        assertEquals("Adding 1 day", nextDay, dayOfMonthField.addToCopy(1));
+        
+        // Test day of week properties
+        Property dayOfWeekField = ethiopicDate.dayOfWeek();
+        assertEquals("Day of week minimum value", 1, dayOfWeekField.getMinimumValue());
+        assertEquals("Day of week maximum value", 7, dayOfWeekField.getMaximumValue());
+        assertEquals("Adding 1 day to day of week", nextDay, dayOfWeekField.addToCopy(1));
+        
+        // Test day of year properties
+        Property dayOfYearField = ethiopicDate.dayOfYear();
+        assertEquals("Day of year minimum value", 1, dayOfYearField.getMinimumValue());
+        assertEquals("Day of year maximum value", 365, dayOfYearField.getMaximumValue());
+        assertEquals("Day of year maximum value overall", 366, dayOfYearField.getMaximumValueOverall());
+        assertEquals("Adding 1 day to day of year", nextDay, dayOfYearField.addToCopy(1));
+    }
+
+    public void testSampleDateWithTimezone_HandlesOffsetCorrectly() {
+        // Test that timezone conversions work correctly
+        DateTime parisTime = new DateTime(2004, 6, 9, 12, 0, 0, 0, PARIS);
+        DateTime ethiopicDate = parisTime.withChronology(ETHIOPIC_UTC);
+        
+        assertEquals("Era should be EE", EthiopicChronology.EE, ethiopicDate.getEra());
+        assertEquals("Year should be 1996", 1996, ethiopicDate.getYear());
+        assertEquals("Year of era should be 1996", 1996, ethiopicDate.getYearOfEra());
+        assertEquals("Month should be 10", 10, ethiopicDate.getMonthOfYear());
+        assertEquals("Day should be 2", 2, ethiopicDate.getDayOfMonth());
+        
+        // PARIS is UTC+2 in summer, so 12:00 Paris time = 10:00 UTC
+        assertEquals("Hour should be adjusted for timezone", 10, ethiopicDate.getHourOfDay());
+        assertEquals("Minutes should be unchanged", 0, ethiopicDate.getMinuteOfHour());
+        assertEquals("Seconds should be unchanged", 0, ethiopicDate.getSecondOfMinute());
+        assertEquals("Milliseconds should be unchanged", 0, ethiopicDate.getMillisOfSecond());
+    }
+
+    // ========================================================================
+    // Duration Calculation Tests
+    // ========================================================================
+
+    public void testDurationYear_LeapYearCycles() {
+        // Test year duration calculations across leap year boundaries
+        // Leap year: 1999 EE (1999 % 4 == 3)
+        // Regular years: 1996, 1997, 1998 EE
+        DateTime year1996 = new DateTime(1996, 10, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
+        DateTime year1997 = new DateTime(1997, 10, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
+        DateTime year1998 = new DateTime(1998, 10, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
+        DateTime year1999 = new DateTime(1999, 10, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
+        DateTime year2000 = new DateTime(2000, 10, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
+        
+        DurationField yearField = year1996.year().getDurationField();
+        assertEquals("Duration field should be years", ETHIOPIC_UTC.years(), yearField);
+        
+        // Test duration calculations from a base year
+        long oneYearMillis = 365L * MILLIS_PER_DAY;
+        long fourYearCycleMillis = (4L * 365L + 1L) * MILLIS_PER_DAY; // 3 regular + 1 leap
+        
+        assertEquals("1 year duration", oneYearMillis, yearField.getMillis(1, year1996.getMillis()));
+        assertEquals("2 year duration", 2L * oneYearMillis, yearField.getMillis(2, year1996.getMillis()));
+        assertEquals("3 year duration", 3L * oneYearMillis, yearField.getMillis(3, year1996.getMillis()));
+        assertEquals("4 year duration with leap", fourYearCycleMillis, yearField.getMillis(4, year1996.getMillis()));
+        
+        // Test average year duration
+        long avgYearMillis = fourYearCycleMillis / 4;
+        assertEquals("Average 1 year duration", avgYearMillis, yearField.getMillis(1));
+        assertEquals("Average 2 year duration", avgYearMillis * 2, yearField.getMillis(2));
+        assertEquals("Unit milliseconds", avgYearMillis, yearField.getUnitMillis());
+        
+        // Test year value calculations
+        testYearValueCalculations(yearField, year1996.getMillis(), oneYearMillis);
+        
+        // Test year addition
+        assertEquals("Add 1 year", year1997.getMillis(), yearField.add(year1996.getMillis(), 1));
+        assertEquals("Add 2 years", year1998.getMillis(), yearField.add(year1996.getMillis(), 2));
+        assertEquals("Add 3 years", year1999.getMillis(), yearField.add(year1996.getMillis(), 3));
+        assertEquals("Add 4 years", year2000.getMillis(), yearField.add(year1996.getMillis(), 4));
+        
+        // Test with long values
+        assertEquals("Add 1 year (long)", year1997.getMillis(), yearField.add(year1996.getMillis(), 1L));
+        assertEquals("Add 4 years (long)", year2000.getMillis(), yearField.add(year1996.getMillis(), 4L));
+    }
+
+    private void testYearValueCalculations(DurationField yearField, long baseMillis, long oneYearMillis) {
+        // Test boundary conditions for year value calculations
+        assertEquals("Just before 1 year", 0, yearField.getValue(oneYearMillis - 1L, baseMillis));
+        assertEquals("Exactly 1 year", 1, yearField.getValue(oneYearMillis, baseMillis));
+        assertEquals("Just after 1 year", 1, yearField.getValue(oneYearMillis + 1L, baseMillis));
+        
+        assertEquals("Just before 2 years", 1, yearField.getValue(2L * oneYearMillis - 1L, baseMillis));
+        assertEquals("Exactly 2 years", 2, yearField.getValue(2L * oneYearMillis, baseMillis));
+        assertEquals("Just after 2 years", 2, yearField.getValue(2L * oneYearMillis + 1L, baseMillis));
+        
+        // Test 4-year cycle boundary (includes leap year)
+        long fourYearMillis = (4L * 365L + 1L) * MILLIS_PER_DAY;
+        assertEquals("Just before 4 years", 3, yearField.getValue(fourYearMillis - 1L, baseMillis));
+        assertEquals("Exactly 4 years", 4, yearField.getValue(fourYearMillis, baseMillis));
+        assertEquals("Just after 4 years", 4, yearField.getValue(fourYearMillis + 1L, baseMillis));
+    }
+
+    public void testDurationMonth_WithLeapYearMonth() {
+        // Test month duration across the 13th month in a leap year (1999 EE)
+        DateTime month11 = new DateTime(1999, 11, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
+        DateTime month12 = new DateTime(1999, 12, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
+        DateTime month13 = new DateTime(1999, 13, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
+        DateTime nextYearMonth1 = new DateTime(2000, 1, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
+        
+        DurationField monthField = month11.monthOfYear().getDurationField();
+        assertEquals("Duration field should be months", ETHIOPIC_UTC.months(), monthField);
+        
+        long regularMonthMillis = 30L * MILLIS_PER_DAY;
+        long leapMonth13Millis = 6L * MILLIS_PER_DAY; // 13th month in leap year
+        
+        // Test month duration calculations
+        assertEquals("Regular month duration", regularMonthMillis, monthField.getMillis(1, month11.getMillis()));
+        assertEquals("Two regular months", 2L * regularMonthMillis, monthField.getMillis(2, month11.getMillis()));
+        assertEquals("Two months + leap 13th", 2L * regularMonthMillis + leapMonth13Millis, 
+                    monthField.getMillis(3, month11.getMillis()));
+        assertEquals("Three months + leap 13th", 3L * regularMonthMillis + leapMonth13Millis, 
+                    monthField.getMillis(4, month11.getMillis()));
+        
+        // Test average month durations
+        assertEquals("Average month duration", regularMonthMillis, monthField.getMillis(1));
+        assertEquals("13 average months", 13L * regularMonthMillis, monthField.getMillis(13));
+        
+        // Test month value calculations
+        testMonthValueCalculations(monthField, month11.getMillis(), regularMonthMillis, leapMonth13Millis);
+        
+        // Test month addition
+        assertEquals("Add 1 month", month12.getMillis(), monthField.add(month11.getMillis(), 1));
+        assertEquals("Add 2 months", month13.getMillis(), monthField.add(month11.getMillis(), 2));
+        assertEquals("Add 3 months", nextYearMonth1.getMillis(), monthField.add(month11.getMillis(), 3));
+    }
+
+    private void testMonthValueCalculations(DurationField monthField, long baseMillis, 
+                                          long regularMonthMillis, long leapMonth13Millis) {
+        // Test month value calculations across regular and leap month boundaries
+        assertEquals("Just before 1 month", 0, monthField.getValue(regularMonthMillis - 1L, baseMillis));
+        assertEquals("Exactly 1 month", 1, monthField.getValue(regularMonthMillis, baseMillis));
+        assertEquals("Just after 1 month", 1, monthField.getValue(regularMonthMillis + 1L, baseMillis));
+        
+        // Test across the leap 13th month boundary
+        long twoMonthsPlusLeap = 2L * regularMonthMillis + leapMonth13Millis;
+        assertEquals("Just before leap month end", 2, monthField.getValue(twoMonthsPlusLeap - 1L, baseMillis));
+        assertEquals("Exactly at leap month end", 3, monthField.getValue(twoMonthsPlusLeap, baseMillis));
+        assertEquals("Just after leap month end", 3, monthField.getValue(twoMonthsPlusLeap + 1L, baseMillis));
+    }
+
+    // ========================================================================
+    // Leap Year/Month/Day Tests
+    // ========================================================================
+
+    public void testLeapYear_Day5Of13thMonth() {
+        // Test 5th day of 13th month in a leap year - should not be a leap day itself
+        Chronology ethiopic = EthiopicChronology.getInstance();
+        DateTime date = new DateTime(3, 13, 5, 0, 0, ethiopic); // Year 3 EE is leap (3 % 4 == 3)
+        
+        assertEquals("Year should be leap", true, date.year().isLeap());
+        assertEquals("13th month should be leap", true, date.monthOfYear().isLeap());
+        assertEquals("Day 5 should not be leap day", false, date.dayOfMonth().isLeap());
+        assertEquals("Day of year should not be leap", false, date.dayOfYear().isLeap());
+    }
+
+    public void testLeapYear_Day6Of13thMonth() {
+        // Test 6th day of 13th month in a leap year - this IS the leap day
+        Chronology ethiopic = EthiopicChronology.getInstance();
+        DateTime date = new DateTime(3, 13, 6, 0, 0, ethiopic); // Year 3 EE is leap (3 % 4 == 3)
+        
+        assertEquals("Year should be leap", true, date.year().isLeap());
+        assertEquals("13th month should be leap", true, date.monthOfYear().isLeap());
+        assertEquals("Day 6 should be leap day", true, date.dayOfMonth().isLeap());
+        assertEquals("Day of year should be leap", true, date.dayOfYear().isLeap());
+    }
+
+    public void testNonLeapYear_13thMonth() {
+        // Test that non-leap years only have 5 days in the 13th month
+        Chronology ethiopic = EthiopicChronology.getInstance();
+        DateTime date = new DateTime(4, 13, 5, 0, 0, ethiopic); // Year 4 EE is not leap (4 % 4 != 3)
+        
+        assertEquals("Year should not be leap", false, date.year().isLeap());
+        assertEquals("13th month should not be leap", false, date.monthOfYear().isLeap());
+        assertEquals("Day should not be leap", false, date.dayOfMonth().isLeap());
+        assertEquals("Day of year should not be leap", false, date.dayOfYear().isLeap());
+        
+        try {
+            // Attempting to create 6th day of 13th month in non-leap year should fail
+            new DateTime(4, 13, 6, 0, 0, ethiopic);
+            fail("Should not allow 6th day of 13th month in non-leap year");
+        } catch (IllegalArgumentException expected) {
+            // This is expected behavior
+        }
+    }
 }
