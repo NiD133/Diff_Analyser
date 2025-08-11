@@ -42,29 +42,78 @@
  */
 package com.itextpdf.text.io;
 
-import junit.framework.Assert;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * Tests for GetBufferedRandomAccessSource to ensure proper handling of edge cases
+ * and correct buffering behavior.
+ */
 public class GetBufferedRandomAccessSourceTest {
 
-	@Before
-	public void setUp() throws Exception {
-	}
+    private static final byte EXPECTED_BYTE_VALUE = 42;
+    private static final int FIRST_POSITION = 0;
 
-	@After
-	public void tearDown() throws Exception {
-	}
+    /**
+     * Tests that GetBufferedRandomAccessSource can handle very small data sources
+     * without throwing ArrayIndexOutOfBoundsException.
+     * 
+     * This is a regression test for a bug where sources with less than 4 bytes
+     * would cause array index out of bounds errors during get() operations.
+     */
+    @Test
+    public void testGetFromSingleByteSource_ShouldReturnCorrectValue() throws Exception {
+        // Given: A data source containing only one byte
+        byte[] singleByteData = createSingleByteArray(EXPECTED_BYTE_VALUE);
+        ArrayRandomAccessSource underlyingSource = new ArrayRandomAccessSource(singleByteData);
+        GetBufferedRandomAccessSource bufferedSource = new GetBufferedRandomAccessSource(underlyingSource);
+        
+        // When: Reading the byte at position 0
+        int actualValue = bufferedSource.get(FIRST_POSITION);
+        
+        // Then: The correct byte value should be returned
+        assertEquals("Should return the correct byte value from single-byte source", 
+                    EXPECTED_BYTE_VALUE, actualValue);
+    }
 
-	@Test
-	public void testSmallSizedFile() throws Exception { 
-		// we had a problem if source was less than 4 characters in length - would result in array index out of bounds problems on get()
-		byte[] data = new byte[]{42};
-		ArrayRandomAccessSource arrayRAS = new ArrayRandomAccessSource(data);
-		GetBufferedRandomAccessSource bufferedRAS = new GetBufferedRandomAccessSource(arrayRAS);
-		Assert.assertEquals(42, bufferedRAS.get(0));
-	}
+    /**
+     * Tests that GetBufferedRandomAccessSource works correctly with empty data sources.
+     */
+    @Test
+    public void testGetFromEmptySource_ShouldHandleGracefully() throws Exception {
+        // Given: An empty data source
+        byte[] emptyData = new byte[0];
+        ArrayRandomAccessSource underlyingSource = new ArrayRandomAccessSource(emptyData);
+        GetBufferedRandomAccessSource bufferedSource = new GetBufferedRandomAccessSource(underlyingSource);
+        
+        // When/Then: Attempting to read should not crash (specific behavior depends on implementation)
+        // This test ensures the buffered source can be created with empty data without exceptions
+        assertEquals("Empty source should have length 0", 0, bufferedSource.length());
+    }
 
+    /**
+     * Tests that GetBufferedRandomAccessSource works correctly with multi-byte sources.
+     */
+    @Test
+    public void testGetFromMultiByteSource_ShouldReturnCorrectValues() throws Exception {
+        // Given: A data source with multiple bytes
+        byte[] multiByteData = {10, 20, 30, 40, 50};
+        ArrayRandomAccessSource underlyingSource = new ArrayRandomAccessSource(multiByteData);
+        GetBufferedRandomAccessSource bufferedSource = new GetBufferedRandomAccessSource(underlyingSource);
+        
+        // When/Then: Reading different positions should return correct values
+        assertEquals("Should return correct value at position 0", 10, bufferedSource.get(0));
+        assertEquals("Should return correct value at position 2", 30, bufferedSource.get(2));
+        assertEquals("Should return correct value at position 4", 50, bufferedSource.get(4));
+    }
+
+    /**
+     * Helper method to create a single-byte array with the specified value.
+     * 
+     * @param value the byte value to store in the array
+     * @return a new byte array containing only the specified value
+     */
+    private byte[] createSingleByteArray(byte value) {
+        return new byte[]{value};
+    }
 }
