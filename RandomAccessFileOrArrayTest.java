@@ -1,95 +1,113 @@
+/*
+    This file is part of the iText (R) project.
+    Copyright (c) 1998-2022 iText Group NV
+    Authors: iText Software.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License version 3
+    as published by the Free Software Foundation with the addition of the
+    following permission added to Section 15 as permitted in Section 7(a):
+    FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
+    ITEXT GROUP. ITEXT GROUP DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
+    OF THIRD PARTY RIGHTS
+    
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Affero General Public License for more details.
+    You should have received a copy of the GNU Affero General Public License
+    along with this program; if not, see http://www.gnu.org/licenses or write to
+    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+    Boston, MA, 02110-1301 USA, or download the license from the following URL:
+    http://itextpdf.com/terms-of-use/
+    
+    The interactive user interfaces in modified source and object code versions
+    of this program must display Appropriate Legal Notices, as required under
+    Section 5 of the GNU Affero General Public License.
+    
+    In accordance with Section 7(b) of the GNU Affero General Public License,
+    a covered work must retain the producer line in every PDF that is created
+    or manipulated using iText.
+    
+    You can be released from the requirements of the license by purchasing
+    a commercial license. Buying such a license is mandatory as soon as you
+    develop commercial activities involving the iText software without
+    disclosing the source code of your own applications.
+    These activities include: offering paid services to customers as an ASP,
+    serving PDFs on the fly in a web application, shipping iText with a closed
+    source product.
+    
+    For more information, please contact iText Software Corp. at this
+    address: sales@itextpdf.com
+ */
 package com.itextpdf.text.pdf;
 
 import java.io.ByteArrayOutputStream;
 
+import junit.framework.Assert;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
 
 import com.itextpdf.text.io.RandomAccessSourceFactory;
 import com.itextpdf.text.pdf.RandomAccessFileOrArray;
 
-/**
- * Test suite for the RandomAccessFileOrArray class.
- */
 public class RandomAccessFileOrArrayTest {
+	byte[] data;
+	RandomAccessFileOrArray rafoa;
+	
+	@Before
+	public void setUp() throws Exception {
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		for (int i = 0; i < 10000; i++){
+			os.write(i);
+		}
+		data = os.toByteArray();
+		rafoa = new RandomAccessFileOrArray(new RandomAccessSourceFactory().createSource(data));
+	}
 
-    private static final int DATA_SIZE = 10000;
-    private byte[] testData;
-    private RandomAccessFileOrArray randomAccessFileOrArray;
+	@After
+	public void tearDown() throws Exception {
+	}
 
-    /**
-     * Sets up the test environment by initializing test data and the RandomAccessFileOrArray instance.
-     */
-    @Before
-    public void setUp() throws Exception {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        for (int i = 0; i < DATA_SIZE; i++) {
-            outputStream.write(i);
-        }
-        testData = outputStream.toByteArray();
-        randomAccessFileOrArray = new RandomAccessFileOrArray(new RandomAccessSourceFactory().createSource(testData));
-    }
+	@Test
+	public void testPushback_byteByByte() throws Exception {
+		
+		Assert.assertEquals(data[0], (byte)rafoa.read());
+		Assert.assertEquals(data[1], (byte)rafoa.read());
+		byte pushBackVal = (byte)(data[1] + 42);
+		rafoa.pushBack(pushBackVal);
+		Assert.assertEquals(pushBackVal, (byte)rafoa.read());
+		Assert.assertEquals(data[2], (byte)rafoa.read());
+		Assert.assertEquals(data[3], (byte)rafoa.read());
+		
+	}
 
-    /**
-     * Cleans up resources after each test.
-     */
-    @After
-    public void tearDown() throws Exception {
-        randomAccessFileOrArray.close();
-    }
+	@Test
+	public void testSimple() throws Exception {
+		for(int i = 0; i < data.length; i++){
+			Assert.assertEquals(data[i], (byte)rafoa.read());
+		}
+	}
 
-    /**
-     * Tests the pushBack functionality by reading bytes, pushing a byte back, and verifying the sequence.
-     */
-    @Test
-    public void testPushback_byteByByte() throws Exception {
-        assertEquals("First byte should match", testData[0], (byte) randomAccessFileOrArray.read());
-        assertEquals("Second byte should match", testData[1], (byte) randomAccessFileOrArray.read());
-
-        byte pushBackValue = (byte) (testData[1] + 42);
-        randomAccessFileOrArray.pushBack(pushBackValue);
-
-        assertEquals("Pushed back byte should be read next", pushBackValue, (byte) randomAccessFileOrArray.read());
-        assertEquals("Third byte should match", testData[2], (byte) randomAccessFileOrArray.read());
-        assertEquals("Fourth byte should match", testData[3], (byte) randomAccessFileOrArray.read());
-    }
-
-    /**
-     * Tests reading all bytes sequentially from the RandomAccessFileOrArray.
-     */
-    @Test
-    public void testReadSequentially() throws Exception {
-        for (int i = 0; i < testData.length; i++) {
-            assertEquals("Byte at position " + i + " should match", testData[i], (byte) randomAccessFileOrArray.read());
-        }
-    }
-
-    /**
-     * Tests seeking to a specific position and reading from there.
-     */
-    @Test
-    public void testSeekAndRead() throws Exception {
-        int seekPosition = 72;
-        randomAccessFileOrArray.seek(seekPosition);
-
-        for (int i = seekPosition; i < testData.length; i++) {
-            assertEquals("Byte at position " + i + " should match after seek", testData[i], (byte) randomAccessFileOrArray.read());
-        }
-    }
-
-    /**
-     * Tests the file pointer position after a pushback operation.
-     */
-    @Test
-    public void testFilePositionWithPushback() throws Exception {
-        int initialPosition = 72;
-        randomAccessFileOrArray.seek(initialPosition);
-        assertEquals("File pointer should be at initial position", initialPosition, randomAccessFileOrArray.getFilePointer());
-
-        byte pushBackValue = 42;
-        randomAccessFileOrArray.pushBack(pushBackValue);
-        assertEquals("File pointer should be decremented by one after pushback", initialPosition - 1, randomAccessFileOrArray.getFilePointer());
-    }
+	@Test
+	public void testSeek() throws Exception {
+		RandomAccessFileOrArray rafoa = new RandomAccessFileOrArray(new RandomAccessSourceFactory().createSource(data));
+		rafoa.seek(72);
+		for(int i = 72; i < data.length; i++){
+			Assert.assertEquals(data[i], (byte)rafoa.read());
+		}
+	}
+	
+	@Test
+	public void testFilePositionWithPushback() throws Exception {
+		RandomAccessFileOrArray rafoa = new RandomAccessFileOrArray(new RandomAccessSourceFactory().createSource(data));
+		long offset = 72;
+		rafoa.seek(offset);
+		Assert.assertEquals(offset, rafoa.getFilePointer());
+		byte pushbackVal = 42;
+		rafoa.pushBack(pushbackVal);
+		Assert.assertEquals(offset-1, rafoa.getFilePointer());
+	}
 }
