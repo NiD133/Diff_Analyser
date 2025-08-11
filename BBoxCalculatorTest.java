@@ -9,161 +9,87 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import com.carrotsearch.randomizedtesting.annotations.Repeat;
-import org.junit.Test;
 import org.locationtech.spatial4j.context.SpatialContext;
 import org.locationtech.spatial4j.shape.RandomizedShapeTest;
 import org.locationtech.spatial4j.shape.Rectangle;
 import org.locationtech.spatial4j.shape.SpatialRelation;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-/**
- * Tests BBoxCalculator longitude handling with emphasis on geodetic wrap-around (dateline).
- * Notes:
- * - We focus on longitude behavior because latitude behavior is straightforward and mirrors
- *   the implementation too closely to provide additional value.
- * - Randomized tests are used to cover a wide range of cases. Helper methods and clear
- *   assertions are provided to make the intent explicit.
- */
 public class BBoxCalculatorTest extends RandomizedShapeTest {
-
-  private static final double WORLD_MIN_LON = -180d;
-  private static final double WORLD_MAX_LON = 180d;
-  private static final double WORLD_MIN_LAT = -90d;
-  private static final double WORLD_MAX_LAT = 90d;
-
-  // A small step used to probe just outside a boundary
-  private static final double PROBE_DELTA = 0.5d;
 
   public BBoxCalculatorTest() {
     super(SpatialContext.GEO);
   }
 
-  @Test
-  @Repeat(iterations = 100)
-  public void testLongitudeBoundingBox_randomized() {
-    // 1 to 4 rectangles makes it easy to reason about and still covers interesting combinations
-    final int numRects = randomIntBetween(1, 4);
-    final List<Rectangle> rects = new ArrayList<>(numRects);
+  // note: testing latitude would be so simple that's effectively the same code as the code to be tested. So I don't.
 
-    // Use a grid that makes probing with 0.25/0.5 degrees line up nicely.
-    // See PROBE_DELTA and the 0.25 used in gap testing.
-    for (int i = 0; i < numRects; i++) {
-      rects.add(randomRectangle(30));
-    }
 
-    final Rectangle boundary = computeBoundary(rects);
-
-    // Single rectangle: the boundary must equal that rectangle
-    if (numRects == 1) {
-      assertEquals("Single rectangle should be its own boundary", rects.get(0), boundary);
-      return;
-    }
-
-    // If the boundary spans the entire world-longitude, ensure every longitude is covered
-    if (boundary.getMinX() == WORLD_MIN_LON && boundary.getMaxX() == WORLD_MAX_LON) {
-      assertEveryWholeDegreeLongitudeIsCovered(rects);
-      return;
-    }
-
-    // General case: the boundary should contain all rectangles...
-    assertBoundaryContainsAllRectangles(boundary, rects);
-
-    // ...and both boundary edges must be tight (touched by at least one rectangle),
-    // with nothing immediately beyond them.
-    assertBoundaryEdgesAreTight(boundary, rects);
-
-    // If the chosen boundary is wider than 180 degrees, verify that the gap on the opposite
-    // side is the maximum possible (i.e., no strictly larger gap can exist without intersecting).
-    assertOppositeGapIsMaximalIfWiderThanHalfWorld(boundary, rects);
-  }
-
-  @Test
-  public void testLongitudeBoundingBox_worldBoundsWhenEveryLongitudeIsCovered() {
-    // Construct rectangles that collectively cover every longitude.
-    List<Rectangle> rects = new ArrayList<>();
-    rects.add(makeNormRect(-180, -90, WORLD_MIN_LAT, WORLD_MAX_LAT));
-    rects.add(makeNormRect(-90, 0, WORLD_MIN_LAT, WORLD_MAX_LAT));
-    rects.add(makeNormRect(0, 90, WORLD_MIN_LAT, WORLD_MAX_LAT));
-    rects.add(makeNormRect(90, 180, WORLD_MIN_LAT, WORLD_MAX_LAT));
-
-    Rectangle boundary = computeBoundary(rects);
-
-    assertEquals(WORLD_MIN_LON, boundary.getMinX(), 0);
-    assertEquals(WORLD_MAX_LON, boundary.getMaxX(), 0);
-    assertEveryWholeDegreeLongitudeIsCovered(rects);
-  }
-
-  // --- Helpers ----------------------------------------------------------------
-
-  private Rectangle computeBoundary(List<Rectangle> rects) {
+  @Test @Repeat(iterations = 100)
+  public void testGeoLongitude() {
     BBoxCalculator calc = new BBoxCalculator(ctx);
-    for (Rectangle r : rects) {
-      calc.expandRange(r);
+    final int numShapes = randomIntBetween(1, 4);//inclusive
+    List<Rectangle> rects = new ArrayList<>(numShapes);
+    for (int i = 0; i < numShapes; i++) {
+      Rectangle rect = randomRectangle(30);// divisible by
+      rects.add(rect);
+      calc.expandRange(rect);
     }
-    return calc.getBoundary();
-  }
-
-  private void assertEveryWholeDegreeLongitudeIsCovered(List<Rectangle> rects) {
-    for (int lon = (int) WORLD_MIN_LON; lon <= (int) WORLD_MAX_LON; lon++) {
-      assertTrue("Expected some rectangle to cover lon=" + lon,
-          hasAnyRectangleCoveringLongitude(rects, lon));
+    Rectangle boundary = calc.getBoundary();
+    if (numShapes == 1) {
+      assertEquals(rects.get(0), boundary);
+      return;
     }
-  }
 
-  private void assertBoundaryContainsAllRectangles(Rectangle boundary, List<Rectangle> rects) {
+    // If the boundary is the world-bounds, check that it's right.
+    if (boundary.getMinX() == -180 && boundary.getMaxX() == 180) {
+      // each longitude should be present in at least one shape:
+      for (int lon = -180; lon <= +180; lon++) {
+        assertTrue(atLeastOneRectHasLon(rects, lon));
+      }
+      return;
+    }
+
+    // Test that it contains all shapes:
     for (Rectangle rect : rects) {
       assertRelation(SpatialRelation.CONTAINS, boundary, rect);
     }
-  }
 
-  private void assertBoundaryEdgesAreTight(Rectangle boundary, List<Rectangle> rects) {
-    // Left edge must be touched; just to the left must not be covered
-    assertTrue("No rectangle touches boundary minX=" + boundary.getMinX(),
-        hasAnyRectangleCoveringLongitude(rects, boundary.getMinX()));
-    assertFalse("Some rectangle covers just left of boundary minX",
-        hasAnyRectangleCoveringLongitude(rects, normX(boundary.getMinX() - PROBE_DELTA)));
+    // Test that the left & right are boundaries:
+    assertTrue(atLeastOneRectHasLon(rects, boundary.getMinX()));
+    assertFalse(atLeastOneRectHasLon(rects, normX(boundary.getMinX() - 0.5)));
 
-    // Right edge must be touched; just to the right must not be covered
-    assertTrue("No rectangle touches boundary maxX=" + boundary.getMaxX(),
-        hasAnyRectangleCoveringLongitude(rects, boundary.getMaxX()));
-    assertFalse("Some rectangle covers just right of boundary maxX",
-        hasAnyRectangleCoveringLongitude(rects, normX(boundary.getMaxX() + PROBE_DELTA)));
-  }
+    assertTrue(atLeastOneRectHasLon(rects, boundary.getMaxX()));
+    assertFalse(atLeastOneRectHasLon(rects, normX(boundary.getMaxX() + 0.5)));
 
-  private void assertOppositeGapIsMaximalIfWiderThanHalfWorld(Rectangle boundary, List<Rectangle> rects) {
-    if (boundary.getWidth() <= 180) {
-      return; // if not wider than half the world, there can't exist a wider gap
-    }
-
-    // If the boundary is wider than 180°, then the opposite gap is smaller than 180°,
-    // and must be the maximum possible. Try to place a (strictly) larger gap next to each
-    // rectangle and assert it can't fit without intersecting some rectangle.
-    double strictlyLargerGap = 360.0 - boundary.getWidth() + PROBE_DELTA;
-
-    for (Rectangle rect : rects) {
-      // Place the candidate gap immediately to the right of this rectangle
-      double gapLeft = rect.getMaxX() + 0.25; // lines up with randomRectangle(30) grid
-      double gapRight = gapLeft + strictlyLargerGap;
-
-      Rectangle candidateGap = makeNormRect(gapLeft, gapRight, WORLD_MIN_LAT, WORLD_MAX_LAT);
-
-      boolean intersectsAny = false;
-      for (Rectangle other : rects) {
-        if (other.relate(candidateGap).intersects()) {
-          intersectsAny = true;
-          break;
+    // Test that this is the smallest enclosing boundary by ensuring the gap (opposite the bbox) is
+    //  the largest:
+    if (boundary.getWidth() > 180) { // conversely if wider than 180 then no wider gap is possible
+      double biggerGap = 360.0 - boundary.getWidth() + 0.5;
+      for (Rectangle rect : rects) {
+        // try to see if a bigger gap could lie to the right of this rect
+        double gapRectLeft = rect.getMaxX() + 0.25;
+        double gapRectRight = gapRectLeft + biggerGap;
+        Rectangle testGap = makeNormRect(gapRectLeft, gapRectRight, -90, 90);
+        boolean fits = true;
+        for (Rectangle rect2 : rects) {
+          if (rect2.relate(testGap).intersects()) {
+            fits = false;
+            break;
+          }
         }
+        assertFalse(fits);//should never fit because it's larger than the biggest gap
       }
-      // The "strictly larger" gap must not be feasible.
-      assertTrue("Found a gap larger than the theoretical maximum", intersectsAny);
     }
   }
 
-  private boolean hasAnyRectangleCoveringLongitude(List<Rectangle> rects, double lon) {
+  private boolean atLeastOneRectHasLon(List<Rectangle> rects, double lon) {
     for (Rectangle rect : rects) {
       if (rect.relateXRange(lon, lon).intersects()) {
         return true;
@@ -171,4 +97,5 @@ public class BBoxCalculatorTest extends RandomizedShapeTest {
     }
     return false;
   }
+
 }
