@@ -47,18 +47,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-/**
- * Tests for TypeHandler class which handles conversion of string values to various Java types.
- */
 class TypeHandlerTest {
 
-    // Test helper classes
-    
-    /** Test class that can be instantiated using default constructor. */
-    public static class InstantiableTestClass {
+    /** Used for Class and Object creation tests. */
+    public static class Instantiable {
+
         @Override
-        public boolean equals(final Object other) {
-            return other instanceof InstantiableTestClass;
+        public boolean equals(final Object arg0) {
+            return arg0 instanceof Instantiable;
         }
 
         @Override
@@ -67,362 +63,199 @@ class TypeHandlerTest {
         }
     }
 
-    /** Test class that cannot be instantiated (private constructor). */
-    public static final class NonInstantiableTestClass {
-        private NonInstantiableTestClass() {
-            // Private constructor prevents instantiation
+    /** Used for Class and Object negative creation tests */
+    public static final class NotInstantiable {
+        private NotInstantiable() {
         }
+
     }
 
-    // Test constants and fixtures
-    
-    private static final String TEST_FILE_PATH = "src/test/resources/org/apache/commons/cli/existing-readable.file";
-    private static final String SAMPLE_URL = "https://commons.apache.org";
-    private static final Date FIXED_TEST_DATE = new Date(1023400137000L); // Fixed date for consistent testing
-    
-    /** Custom path converter that always returns the same path for testing. */
-    private static final Converter<Path, InvalidPathException> CUSTOM_PATH_CONVERTER = s -> Paths.get("foo");
+    /** Always returns the same Path. */
+    private static final Converter<Path, InvalidPathException> PATH_CONVERTER = s -> Paths.get("foo");
 
-    // Test data providers
-    
-    /**
-     * Provides various Date instances for testing date conversion.
-     */
-    private static Stream<Date> provideDateTestCases() {
-        return Stream.of(
-            Date.from(Instant.EPOCH),
-            Date.from(Instant.ofEpochSecond(0)),
-            Date.from(Instant.ofEpochSecond(40_000))
-        );
+    private static Stream<Date> createDateFixtures() {
+        return Stream.of(Date.from(Instant.EPOCH), Date.from(Instant.ofEpochSecond(0)), Date.from(Instant.ofEpochSecond(40_000)));
+
     }
 
-    /**
-     * Provides comprehensive test cases for value conversion testing.
-     * Each argument contains: input string, target type, expected result (or exception class).
-     */
-    private static Stream<Arguments> provideValueConversionTestCases() throws MalformedURLException {
-        // Initialize PatternOptionBuilder to ensure TypeHandler table is loaded
+    private static Stream<Arguments> createValueTestParameters() throws MalformedURLException {
+        // force the PatternOptionBuilder to load / modify the TypeHandler table.
         @SuppressWarnings("unused")
-        final Class<?> forceStaticLoad = PatternOptionBuilder.FILES_VALUE;
-        
-        final List<Arguments> testCases = new ArrayList<>();
-        
-        // Use consistent date formatting to avoid timezone issues
-        final DateFormat dateFormatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-        final String formattedTestDate = dateFormatter.format(FIXED_TEST_DATE);
+        final Class<?> loadStatic = PatternOptionBuilder.FILES_VALUE;
+        // reset the type handler table.
+        // TypeHandler.resetConverters();
+        final List<Arguments> list = new ArrayList<>();
 
-        // Class conversion test cases
-        addClassConversionTests(testCases);
-        
-        // Date conversion test cases
-        addDateConversionTests(testCases, formattedTestDate);
-        
-        // File conversion test cases
-        addFileConversionTests(testCases);
-        
-        // Numeric type conversion test cases
-        addNumericConversionTests(testCases);
-        
-        // Character conversion test cases
-        addCharacterConversionTests(testCases);
-        
-        // Big number conversion test cases
-        addBigNumberConversionTests(testCases);
-        
-        // Object instantiation test cases
-        addObjectInstantiationTests(testCases);
-        
-        // URL conversion test cases
-        addUrlConversionTests(testCases);
-        
-        // String conversion test cases
-        testCases.add(Arguments.of("String", PatternOptionBuilder.STRING_VALUE, "String"));
+        /*
+         * Dates calculated from strings are dependent upon configuration and environment settings for the machine on which the test is running. To avoid this
+         * problem, convert the time into a string and then unparse that using the converter. This produces strings that always match the correct time zone.
+         */
+        final Date date = new Date(1023400137000L);
+        final DateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
 
-        return testCases.stream();
+        list.add(Arguments.of(Instantiable.class.getName(), PatternOptionBuilder.CLASS_VALUE, Instantiable.class));
+        list.add(Arguments.of("what ever", PatternOptionBuilder.CLASS_VALUE, ParseException.class));
+
+        list.add(Arguments.of("what ever", PatternOptionBuilder.DATE_VALUE, ParseException.class));
+        list.add(Arguments.of(dateFormat.format(date), PatternOptionBuilder.DATE_VALUE, date));
+        list.add(Arguments.of("Jun 06 17:48:57 EDT 2002", PatternOptionBuilder.DATE_VALUE, ParseException.class));
+
+        list.add(Arguments.of("non-existing.file", PatternOptionBuilder.EXISTING_FILE_VALUE, ParseException.class));
+
+        list.add(Arguments.of("some-file.txt", PatternOptionBuilder.FILE_VALUE, new File("some-file.txt")));
+
+        list.add(Arguments.of("some-path.txt", Path.class, new File("some-path.txt").toPath()));
+
+        // the PatternOptionBuilder.FILES_VALUE is not registered so it should just return the string
+        list.add(Arguments.of("some.files", PatternOptionBuilder.FILES_VALUE, "some.files"));
+
+        list.add(Arguments.of("just-a-string", Integer.class, ParseException.class));
+        list.add(Arguments.of("5", Integer.class, 5));
+        list.add(Arguments.of("5.5", Integer.class, ParseException.class));
+        list.add(Arguments.of(Long.toString(Long.MAX_VALUE), Integer.class, ParseException.class));
+
+        list.add(Arguments.of("just-a-string", Long.class, ParseException.class));
+        list.add(Arguments.of("5", Long.class, 5L));
+        list.add(Arguments.of("5.5", Long.class, ParseException.class));
+
+        list.add(Arguments.of("just-a-string", Short.class, ParseException.class));
+        list.add(Arguments.of("5", Short.class, (short) 5));
+        list.add(Arguments.of("5.5", Short.class, ParseException.class));
+        list.add(Arguments.of(Integer.toString(Integer.MAX_VALUE), Short.class, ParseException.class));
+
+        list.add(Arguments.of("just-a-string", Byte.class, ParseException.class));
+        list.add(Arguments.of("5", Byte.class, (byte) 5));
+        list.add(Arguments.of("5.5", Byte.class, ParseException.class));
+        list.add(Arguments.of(Short.toString(Short.MAX_VALUE), Byte.class, ParseException.class));
+
+        list.add(Arguments.of("just-a-string", Character.class, 'j'));
+        list.add(Arguments.of("5", Character.class, '5'));
+        list.add(Arguments.of("5.5", Character.class, '5'));
+        list.add(Arguments.of("\\u0124", Character.class, Character.toChars(0x0124)[0]));
+
+        list.add(Arguments.of("just-a-string", Double.class, ParseException.class));
+        list.add(Arguments.of("5", Double.class, 5d));
+        list.add(Arguments.of("5.5", Double.class, 5.5));
+
+        list.add(Arguments.of("just-a-string", Float.class, ParseException.class));
+        list.add(Arguments.of("5", Float.class, 5f));
+        list.add(Arguments.of("5.5", Float.class, 5.5f));
+        list.add(Arguments.of(Double.toString(Double.MAX_VALUE), Float.class, Float.POSITIVE_INFINITY));
+
+        list.add(Arguments.of("just-a-string", BigInteger.class, ParseException.class));
+        list.add(Arguments.of("5", BigInteger.class, new BigInteger("5")));
+        list.add(Arguments.of("5.5", BigInteger.class, ParseException.class));
+
+        list.add(Arguments.of("just-a-string", BigDecimal.class, ParseException.class));
+        list.add(Arguments.of("5", BigDecimal.class, new BigDecimal("5")));
+        list.add(Arguments.of("5.5", BigDecimal.class, new BigDecimal(5.5)));
+
+        list.add(Arguments.of("1.5", PatternOptionBuilder.NUMBER_VALUE, Double.valueOf(1.5)));
+        list.add(Arguments.of("15", PatternOptionBuilder.NUMBER_VALUE, Long.valueOf(15)));
+        list.add(Arguments.of("not a number", PatternOptionBuilder.NUMBER_VALUE, ParseException.class));
+
+        list.add(Arguments.of(Instantiable.class.getName(), PatternOptionBuilder.OBJECT_VALUE, new Instantiable()));
+        list.add(Arguments.of(NotInstantiable.class.getName(), PatternOptionBuilder.OBJECT_VALUE, ParseException.class));
+        list.add(Arguments.of("unknown", PatternOptionBuilder.OBJECT_VALUE, ParseException.class));
+
+        list.add(Arguments.of("String", PatternOptionBuilder.STRING_VALUE, "String"));
+
+        final String urlString = "https://commons.apache.org";
+        list.add(Arguments.of(urlString, PatternOptionBuilder.URL_VALUE, new URL(urlString)));
+        list.add(Arguments.of("Malformed-url", PatternOptionBuilder.URL_VALUE, ParseException.class));
+
+        return list.stream();
+
     }
 
-    private static void addClassConversionTests(List<Arguments> testCases) {
-        testCases.add(Arguments.of(
-            InstantiableTestClass.class.getName(), 
-            PatternOptionBuilder.CLASS_VALUE, 
-            InstantiableTestClass.class
-        ));
-        testCases.add(Arguments.of(
-            "non.existent.Class", 
-            PatternOptionBuilder.CLASS_VALUE, 
-            ParseException.class
-        ));
-    }
-
-    private static void addDateConversionTests(List<Arguments> testCases, String formattedTestDate) {
-        testCases.add(Arguments.of(
-            "invalid date string", 
-            PatternOptionBuilder.DATE_VALUE, 
-            ParseException.class
-        ));
-        testCases.add(Arguments.of(
-            formattedTestDate, 
-            PatternOptionBuilder.DATE_VALUE, 
-            FIXED_TEST_DATE
-        ));
-        testCases.add(Arguments.of(
-            "Jun 06 17:48:57 EDT 2002", 
-            PatternOptionBuilder.DATE_VALUE, 
-            ParseException.class
-        ));
-    }
-
-    private static void addFileConversionTests(List<Arguments> testCases) {
-        testCases.add(Arguments.of(
-            "non-existing.file", 
-            PatternOptionBuilder.EXISTING_FILE_VALUE, 
-            ParseException.class
-        ));
-        testCases.add(Arguments.of(
-            "some-file.txt", 
-            PatternOptionBuilder.FILE_VALUE, 
-            new File("some-file.txt")
-        ));
-        testCases.add(Arguments.of(
-            "some-path.txt", 
-            Path.class, 
-            new File("some-path.txt").toPath()
-        ));
-        // FILES_VALUE is not registered, should return the string as-is
-        testCases.add(Arguments.of(
-            "some.files", 
-            PatternOptionBuilder.FILES_VALUE, 
-            "some.files"
-        ));
-    }
-
-    private static void addNumericConversionTests(List<Arguments> testCases) {
-        // Integer conversion tests
-        addIntegerConversionTests(testCases);
-        
-        // Long conversion tests
-        addLongConversionTests(testCases);
-        
-        // Short conversion tests
-        addShortConversionTests(testCases);
-        
-        // Byte conversion tests
-        addByteConversionTests(testCases);
-        
-        // Double conversion tests
-        addDoubleConversionTests(testCases);
-        
-        // Float conversion tests
-        addFloatConversionTests(testCases);
-        
-        // Number (generic) conversion tests
-        testCases.add(Arguments.of("1.5", PatternOptionBuilder.NUMBER_VALUE, Double.valueOf(1.5)));
-        testCases.add(Arguments.of("15", PatternOptionBuilder.NUMBER_VALUE, Long.valueOf(15)));
-        testCases.add(Arguments.of("not a number", PatternOptionBuilder.NUMBER_VALUE, ParseException.class));
-    }
-
-    private static void addIntegerConversionTests(List<Arguments> testCases) {
-        testCases.add(Arguments.of("invalid integer", Integer.class, ParseException.class));
-        testCases.add(Arguments.of("5", Integer.class, 5));
-        testCases.add(Arguments.of("5.5", Integer.class, ParseException.class));
-        testCases.add(Arguments.of(Long.toString(Long.MAX_VALUE), Integer.class, ParseException.class));
-    }
-
-    private static void addLongConversionTests(List<Arguments> testCases) {
-        testCases.add(Arguments.of("invalid long", Long.class, ParseException.class));
-        testCases.add(Arguments.of("5", Long.class, 5L));
-        testCases.add(Arguments.of("5.5", Long.class, ParseException.class));
-    }
-
-    private static void addShortConversionTests(List<Arguments> testCases) {
-        testCases.add(Arguments.of("invalid short", Short.class, ParseException.class));
-        testCases.add(Arguments.of("5", Short.class, (short) 5));
-        testCases.add(Arguments.of("5.5", Short.class, ParseException.class));
-        testCases.add(Arguments.of(Integer.toString(Integer.MAX_VALUE), Short.class, ParseException.class));
-    }
-
-    private static void addByteConversionTests(List<Arguments> testCases) {
-        testCases.add(Arguments.of("invalid byte", Byte.class, ParseException.class));
-        testCases.add(Arguments.of("5", Byte.class, (byte) 5));
-        testCases.add(Arguments.of("5.5", Byte.class, ParseException.class));
-        testCases.add(Arguments.of(Short.toString(Short.MAX_VALUE), Byte.class, ParseException.class));
-    }
-
-    private static void addDoubleConversionTests(List<Arguments> testCases) {
-        testCases.add(Arguments.of("invalid double", Double.class, ParseException.class));
-        testCases.add(Arguments.of("5", Double.class, 5d));
-        testCases.add(Arguments.of("5.5", Double.class, 5.5));
-    }
-
-    private static void addFloatConversionTests(List<Arguments> testCases) {
-        testCases.add(Arguments.of("invalid float", Float.class, ParseException.class));
-        testCases.add(Arguments.of("5", Float.class, 5f));
-        testCases.add(Arguments.of("5.5", Float.class, 5.5f));
-        testCases.add(Arguments.of(Double.toString(Double.MAX_VALUE), Float.class, Float.POSITIVE_INFINITY));
-    }
-
-    private static void addCharacterConversionTests(List<Arguments> testCases) {
-        testCases.add(Arguments.of("just-a-string", Character.class, 'j'));
-        testCases.add(Arguments.of("5", Character.class, '5'));
-        testCases.add(Arguments.of("5.5", Character.class, '5'));
-        testCases.add(Arguments.of("\\u0124", Character.class, Character.toChars(0x0124)[0]));
-    }
-
-    private static void addBigNumberConversionTests(List<Arguments> testCases) {
-        // BigInteger tests
-        testCases.add(Arguments.of("invalid big integer", BigInteger.class, ParseException.class));
-        testCases.add(Arguments.of("5", BigInteger.class, new BigInteger("5")));
-        testCases.add(Arguments.of("5.5", BigInteger.class, ParseException.class));
-
-        // BigDecimal tests
-        testCases.add(Arguments.of("invalid big decimal", BigDecimal.class, ParseException.class));
-        testCases.add(Arguments.of("5", BigDecimal.class, new BigDecimal("5")));
-        testCases.add(Arguments.of("5.5", BigDecimal.class, new BigDecimal(5.5)));
-    }
-
-    private static void addObjectInstantiationTests(List<Arguments> testCases) {
-        testCases.add(Arguments.of(
-            InstantiableTestClass.class.getName(), 
-            PatternOptionBuilder.OBJECT_VALUE, 
-            new InstantiableTestClass()
-        ));
-        testCases.add(Arguments.of(
-            NonInstantiableTestClass.class.getName(), 
-            PatternOptionBuilder.OBJECT_VALUE, 
-            ParseException.class
-        ));
-        testCases.add(Arguments.of(
-            "unknown.class.Name", 
-            PatternOptionBuilder.OBJECT_VALUE, 
-            ParseException.class
-        ));
-    }
-
-    private static void addUrlConversionTests(List<Arguments> testCases) throws MalformedURLException {
-        testCases.add(Arguments.of(SAMPLE_URL, PatternOptionBuilder.URL_VALUE, new URL(SAMPLE_URL)));
-        testCases.add(Arguments.of("malformed-url", PatternOptionBuilder.URL_VALUE, ParseException.class));
-    }
-
-    // Individual method tests
-    
     @Test
-    void testCreateClass_WithValidClassName_ReturnsCorrectClass() throws ParseException {
-        final Class<?> expectedClass = getClass();
-        final Class<?> actualClass = TypeHandler.createClass(expectedClass.getName());
-        
-        assertEquals(expectedClass, actualClass);
+    void testCreateClass() throws ParseException {
+        final Class<?> cls = getClass();
+        assertEquals(cls, TypeHandler.createClass(cls.getName()));
     }
 
     @ParameterizedTest
-    @MethodSource("provideDateTestCases")
-    void testCreateDate_WithValidDateString_ReturnsCorrectDate(final Date expectedDate) {
-        final Date actualDate = TypeHandler.createDate(expectedDate.toString());
-        
-        assertEquals(expectedDate, actualDate);
+    @MethodSource("createDateFixtures")
+    void testCreateDate(final Date date) {
+        assertEquals(date, TypeHandler.createDate(date.toString()));
     }
 
     @Test
-    void testCreateFile_WithValidPath_ReturnsCorrectFile() {
-        final File expectedFile = new File("").getAbsoluteFile();
-        final File actualFile = TypeHandler.createFile(expectedFile.toString());
-        
-        assertEquals(expectedFile, actualFile);
+    void testCreateFile() {
+        final File file = new File("").getAbsoluteFile();
+        assertEquals(file, TypeHandler.createFile(file.toString()));
     }
 
     @Test
-    void testCreateFiles_ThrowsUnsupportedOperationException() {
+    void testCreateFiles() {
         assertThrows(UnsupportedOperationException.class, () -> TypeHandler.createFiles(null));
     }
 
     @Test
-    void testCreateNumber_WithValidNumbers_ReturnsCorrectTypes() throws ParseException {
+    void testCreateNumber() throws ParseException {
         assertEquals(0L, TypeHandler.createNumber("0"));
         assertEquals(0d, TypeHandler.createNumber("0.0"));
     }
 
     @Test
-    void testCreateObject_WithValidClassName_ReturnsInstanceOfClass() throws ParseException {
-        final Object createdObject = TypeHandler.createObject(Date.class.getName());
-        
-        assertTrue(createdObject instanceof Date);
+    void testCreateObject() throws ParseException {
+        assertTrue(TypeHandler.createObject(Date.class.getName()) instanceof Date);
     }
 
     @Test
-    void testCreateURL_WithValidUrlString_ReturnsCorrectURL() throws ParseException, MalformedURLException {
-        final URL expectedUrl = Paths.get("").toAbsolutePath().toUri().toURL();
-        final URL actualUrl = TypeHandler.createURL(expectedUrl.toString());
-        
-        assertEquals(expectedUrl, actualUrl);
+    void testCreateURL() throws ParseException, MalformedURLException {
+        final URL file = Paths.get("").toAbsolutePath().toUri().toURL();
+        assertEquals(file, TypeHandler.createURL(file.toString()));
     }
 
     @SuppressWarnings("unchecked")
-    @ParameterizedTest(name = "Converting ''{0}'' to {1}")
-    @MethodSource("provideValueConversionTestCases")
-    void testCreateValue_WithVariousInputsAndTypes_ProducesExpectedResults(
-            final String inputString, 
-            final Class<?> targetType, 
-            final Object expectedResult) throws Exception {
-        
-        // Test both Class and Object API variants
-        final Object objectApiParameter = targetType;
-        
-        if (isExpectedToThrowException(expectedResult)) {
-            @SuppressWarnings("cast")
-            final Class<Throwable> expectedExceptionType = (Class<Throwable>) expectedResult;
-            
-            assertThrows(expectedExceptionType, () -> TypeHandler.createValue(inputString, targetType));
-            assertThrows(expectedExceptionType, () -> TypeHandler.createValue(inputString, objectApiParameter));
+    @ParameterizedTest(name = "{0} as {1}")
+    @MethodSource("createValueTestParameters")
+    void testCreateValue(final String str, final Class<?> type, final Object expected) throws Exception {
+        @SuppressWarnings("cast")
+        final Object objectApiTest = type; // KEEP this cast
+        if (expected instanceof Class<?> && Throwable.class.isAssignableFrom((Class<?>) expected)) {
+            assertThrows((Class<Throwable>) expected, () -> TypeHandler.createValue(str, type));
+            assertThrows((Class<Throwable>) expected, () -> TypeHandler.createValue(str, objectApiTest));
         } else {
-            assertEquals(expectedResult, TypeHandler.createValue(inputString, targetType));
-            assertEquals(expectedResult, TypeHandler.createValue(inputString, objectApiParameter));
+            assertEquals(expected, TypeHandler.createValue(str, type));
+            assertEquals(expected, TypeHandler.createValue(str, objectApiTest));
         }
     }
 
     @Test
-    void testCreateValue_WithExistingFile_ReturnsFileInputStream() throws Exception {
-        try (FileInputStream fileStream = TypeHandler.createValue(TEST_FILE_PATH, PatternOptionBuilder.EXISTING_FILE_VALUE)) {
-            assertNotNull(fileStream);
+    void testCreateValueExistingFile() throws Exception {
+        try (FileInputStream result = TypeHandler.createValue("src/test/resources/org/apache/commons/cli/existing-readable.file",
+                PatternOptionBuilder.EXISTING_FILE_VALUE)) {
+            assertNotNull(result);
+        }
+    }
+
+    /* proof of equality for later tests */
+    @Test
+    void testnstantiableEquals() {
+        assertEquals(new Instantiable(), new Instantiable());
+    }
+
+    @Test
+    void testOpenFile() throws ParseException, IOException {
+        try (FileInputStream fis = TypeHandler.openFile("src/test/resources/org/apache/commons/cli/existing-readable.file")) {
+            IOUtils.consume(fis);
         }
     }
 
     @Test
-    void testInstantiableTestClass_EqualsContract_WorksCorrectly() {
-        assertEquals(new InstantiableTestClass(), new InstantiableTestClass());
-    }
-
-    @Test
-    void testOpenFile_WithExistingFile_ReturnsValidFileInputStream() throws ParseException, IOException {
-        try (FileInputStream fileStream = TypeHandler.openFile(TEST_FILE_PATH)) {
-            IOUtils.consume(fileStream);
-        }
-    }
-
-    @Test
-    void testTypeHandlerConverterRegistration_WithCustomConverter_WorksCorrectly() {
-        final Map<Class<?>, Converter<?, ? extends Throwable>> converterMap = TypeHandler.createDefaultMap();
-        final TypeHandler typeHandler = new TypeHandler(converterMap);
-        
-        // Verify default converter
+    void testRegister() {
+        final Map<Class<?>, Converter<?, ? extends Throwable>> map = TypeHandler.createDefaultMap();
+        final TypeHandler typeHandler = new TypeHandler(map);
         assertEquals(Converter.PATH, typeHandler.getConverter(Path.class));
-        
         try {
-            // Register custom converter
-            converterMap.put(Path.class, CUSTOM_PATH_CONVERTER);
-            assertEquals(CUSTOM_PATH_CONVERTER, typeHandler.getConverter(Path.class));
+            map.put(Path.class, PATH_CONVERTER);
+            assertEquals(PATH_CONVERTER, typeHandler.getConverter(Path.class));
         } finally {
-            // Clean up - remove custom converter
-            converterMap.remove(Path.class);
+            map.remove(Path.class);
             assertEquals(Converter.DEFAULT, typeHandler.getConverter(Path.class));
         }
     }
 
-    // Helper methods
-    
-    /**
-     * Determines if the expected result represents an exception that should be thrown.
-     */
-    private boolean isExpectedToThrowException(Object expectedResult) {
-        return expectedResult instanceof Class<?> && 
-               Throwable.class.isAssignableFrom((Class<?>) expectedResult);
-    }
 }
