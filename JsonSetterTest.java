@@ -1,137 +1,106 @@
 package com.fasterxml.jackson.annotation;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static com.fasterxml.jackson.annotation.Nulls.DEFAULT;
-import static com.fasterxml.jackson.annotation.Nulls.FAIL;
-import static com.fasterxml.jackson.annotation.Nulls.SET;
-import static com.fasterxml.jackson.annotation.Nulls.SKIP;
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("JsonSetter.Value behavior")
-public class JsonSetterTest {
-
-    // Fixture: a field with explicit JsonSetter configuration for "from annotation" tests
-    private static final class AnnotatedTarget {
-        @JsonSetter(nulls = FAIL, contentNulls = SKIP)
-        public int configured;
+public class JsonSetterTest
+{
+    private final static class Bogus {
+        @JsonSetter(nulls=Nulls.FAIL, contentNulls=Nulls.SKIP)
+        public int field;
     }
 
-    private static final JsonSetter.Value EMPTY = JsonSetter.Value.empty();
+    private final JsonSetter.Value EMPTY = JsonSetter.Value.empty();
 
-    // ----- Small helpers to keep assertions concise and intention-revealing -----
+    @Test
+    public void testEmpty()
+    {
+        assertEquals(Nulls.DEFAULT, EMPTY.getValueNulls());
+        assertEquals(Nulls.DEFAULT, EMPTY.getContentNulls());
 
-    private static void assertDefaults(JsonSetter.Value v) {
-        assertAll(
-                () -> assertEquals(DEFAULT, v.getValueNulls(), "valueNulls should default"),
-                () -> assertEquals(DEFAULT, v.getContentNulls(), "contentNulls should default"),
-                () -> assertNull(v.nonDefaultValueNulls(), "nonDefaultValueNulls() must be null when DEFAULT"),
-                () -> assertNull(v.nonDefaultContentNulls(), "nonDefaultContentNulls() must be null when DEFAULT")
-        );
+        assertEquals(JsonSetter.class, EMPTY.valueFor());
+
+        assertNull(EMPTY.nonDefaultValueNulls());
+        assertNull(EMPTY.nonDefaultContentNulls());
     }
 
-    private static void assertSettings(JsonSetter.Value v, Nulls valueNulls, Nulls contentNulls) {
-        assertAll(
-                () -> assertEquals(valueNulls, v.getValueNulls(), "valueNulls"),
-                () -> assertEquals(contentNulls, v.getContentNulls(), "contentNulls")
-        );
-    }
-
-    private static JsonSetter getJsonSetterAnnotation() {
-        try {
-            return AnnotatedTarget.class.getField("configured").getAnnotation(JsonSetter.class);
-        } catch (NoSuchFieldException e) {
-            throw new AssertionError("Test fixture misconfigured: field not found", e);
+    @Test
+    public void testStdMethods() {
+        assertEquals("JsonSetter.Value(valueNulls=DEFAULT,contentNulls=DEFAULT)",
+                EMPTY.toString());
+        int x = EMPTY.hashCode();
+        if (x == 0) { // no fixed value, but should not evaluate to 0
+            fail();
         }
-    }
-
-    // ----- Tests -----
-
-    @Test
-    @DisplayName("Empty instance exposes defaults and annotation type")
-    void emptyValue_defaultsAndType() {
-        assertDefaults(EMPTY);
-        assertEquals(JsonSetter.class, EMPTY.valueFor(), "valueFor() should return annotation type");
-    }
-
-    @Test
-    @DisplayName("Std method overrides (toString/hashCode/equals) behave as expected")
-    void stdMethods() {
-        assertEquals("JsonSetter.Value(valueNulls=DEFAULT,contentNulls=DEFAULT)", EMPTY.toString());
-
-        int hash = EMPTY.hashCode();
-        assertNotEquals(0, hash, "hashCode should not be 0");
-
         assertEquals(EMPTY, EMPTY);
-        assertNotEquals(EMPTY, null);
-        assertNotEquals(EMPTY, "xyz");
+        assertFalse(EMPTY.equals(null));
+        assertFalse(EMPTY.equals("xyz"));
     }
 
     @Test
-    @DisplayName("Value.from(null) returns EMPTY; Value.from(annotation) reads both null-handling options")
-    void fromAnnotation() {
-        assertSame(EMPTY, JsonSetter.Value.from(null), "from(null) must return EMPTY");
+    public void testFromAnnotation() throws Exception
+    {
+        assertSame(EMPTY, JsonSetter.Value.from(null)); // legal
 
-        JsonSetter.Value fromAnn = JsonSetter.Value.from(getJsonSetterAnnotation());
-        assertSettings(fromAnn, FAIL, SKIP);
+        JsonSetter ann = Bogus.class.getField("field").getAnnotation(JsonSetter.class);
+        JsonSetter.Value v = JsonSetter.Value.from(ann);
+        assertEquals(Nulls.FAIL, v.getValueNulls());
+        assertEquals(Nulls.SKIP, v.getContentNulls());
     }
 
     @Test
-    @DisplayName("construct(null, null) returns EMPTY (preferred API is empty()/withXxx)")
-    void constructReturnsEmptyForNulls() {
-        assertSame(EMPTY, JsonSetter.Value.construct(null, null));
+    public void testConstruct() throws Exception
+    {
+        JsonSetter.Value v = JsonSetter.Value.construct(null, null);
+        assertSame(EMPTY, v);
     }
 
     @Test
-    @DisplayName("Factories affect only their respective dimension (value vs content)")
-    void factories() {
-        JsonSetter.Value contentOnly = JsonSetter.Value.forContentNulls(SET);
-        assertSettings(contentOnly, DEFAULT, SET);
-        assertEquals(SET, contentOnly.nonDefaultContentNulls());
+    public void testFactories() throws Exception
+    {
+        JsonSetter.Value v = JsonSetter.Value.forContentNulls(Nulls.SET);
+        assertEquals(Nulls.DEFAULT, v.getValueNulls());
+        assertEquals(Nulls.SET, v.getContentNulls());
+        assertEquals(Nulls.SET, v.nonDefaultContentNulls());
 
-        JsonSetter.Value valueOnly = JsonSetter.Value.forValueNulls(SKIP);
-        assertSettings(valueOnly, SKIP, DEFAULT);
-        assertEquals(SKIP, valueOnly.nonDefaultValueNulls());
+        JsonSetter.Value skip = JsonSetter.Value.forValueNulls(Nulls.SKIP);
+        assertEquals(Nulls.SKIP, skip.getValueNulls());
+        assertEquals(Nulls.DEFAULT, skip.getContentNulls());
+        assertEquals(Nulls.SKIP, skip.nonDefaultValueNulls());
     }
 
     @Test
-    @DisplayName("Simple withXxx merging: apply content first then value")
-    void simpleMerge() {
-        JsonSetter.Value withContentSkip = EMPTY.withContentNulls(SKIP);
-        assertEquals(SKIP, withContentSkip.getContentNulls());
-
-        JsonSetter.Value withValueFail = withContentSkip.withValueNulls(FAIL);
-        assertEquals(FAIL, withValueFail.getValueNulls());
+    public void testSimpleMerge()
+    {
+        JsonSetter.Value v = EMPTY.withContentNulls(Nulls.SKIP);
+        assertEquals(Nulls.SKIP, v.getContentNulls());
+        v = v.withValueNulls(Nulls.FAIL);
+        assertEquals(Nulls.FAIL, v.getValueNulls());
     }
 
     @Test
-    @DisplayName("withXxx methods: idempotency, null-as-default, and overrides merging")
-    void withMethodsAndOverrides() {
-        // withContentNulls(null) should act as "no change" and return same instance
+    public void testWithMethods()
+    {
         JsonSetter.Value v = EMPTY.withContentNulls(null);
-        assertSame(EMPTY, v, "withContentNulls(null) should return same instance");
+        assertSame(EMPTY, v);
+        v = v.withContentNulls(Nulls.FAIL);
+        assertEquals(Nulls.FAIL, v.getContentNulls());
+        assertSame(v, v.withContentNulls(Nulls.FAIL));
 
-        // Change content null policy and verify idempotency on same value
-        v = v.withContentNulls(FAIL);
-        assertEquals(FAIL, v.getContentNulls());
-        assertSame(v, v.withContentNulls(FAIL), "setting to same value should be idempotent");
+        JsonSetter.Value v2 = v.withValueNulls(Nulls.SKIP);
+        assertEquals(Nulls.SKIP, v2.getValueNulls());
+        assertFalse(v.equals(v2));
+        assertFalse(v2.equals(v));
 
-        // Change value null policy -> should produce a different instance
-        JsonSetter.Value vWithValueSkip = v.withValueNulls(SKIP);
-        assertEquals(SKIP, vWithValueSkip.getValueNulls());
-        assertNotEquals(v, vWithValueSkip);
+        JsonSetter.Value v3 = v2.withValueNulls(null, null);
+        assertEquals(Nulls.DEFAULT, v3.getContentNulls());
+        assertEquals(Nulls.DEFAULT, v3.getValueNulls());
+        assertSame(v3, v3.withValueNulls(null, null));
 
-        // Explicitly set both value+content nulls via two-arg withValueNulls; nulls mean DEFAULT
-        JsonSetter.Value resetToDefaults = vWithValueSkip.withValueNulls(null, null);
-        assertDefaults(resetToDefaults);
-        assertSame(resetToDefaults, resetToDefaults.withValueNulls(null, null),
-                "Two-arg withValueNulls(null, null) should be idempotent");
-
-        // Merge overrides: non-default settings from overrides should win
-        JsonSetter.Value merged = resetToDefaults.withOverrides(vWithValueSkip);
-        assertNotSame(vWithValueSkip, merged, "withOverrides should create a new instance when overrides exist");
-        assertEquals(vWithValueSkip, merged);
-        assertEquals(merged, vWithValueSkip);
+        JsonSetter.Value merged = v3.withOverrides(v2);
+        assertNotSame(v2, merged);
+        assertEquals(merged, v2);
+        assertEquals(v2, merged);
     }
 }
