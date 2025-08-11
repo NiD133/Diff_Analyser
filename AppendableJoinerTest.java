@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.commons.lang3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,13 +33,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * Unit tests for {@link AppendableJoiner}.
+ * Tests {@link AppendableJoiner}.
  */
 class AppendableJoinerTest {
 
-    /**
-     * A simple fixture class for testing.
-     */
     static class Fixture {
 
         private final String name;
@@ -32,97 +46,96 @@ class AppendableJoinerTest {
         }
 
         /**
-         * Appends the name to the given Appendable, followed by an exclamation mark.
+         * Renders myself onto an Appendable to avoid creating intermediary strings.
          */
         void render(final Appendable appendable) throws IOException {
-            appendable.append(name).append('!');
+            appendable.append(name);
+            appendable.append('!');
         }
     }
 
     @Test
-    void testJoinerWithPrefixSuffixAndDelimiterUsingStringBuilder() {
-        // Create a joiner with specific prefix, delimiter, and suffix
+    void testAllBuilderPropertiesStringBuilder() {
+        // @formatter:off
         final AppendableJoiner<Object> joiner = AppendableJoiner.builder()
                 .setPrefix("<")
                 .setDelimiter(".")
                 .setSuffix(">")
                 .setElementAppender((a, e) -> a.append(String.valueOf(e)))
                 .get();
-
+        // @formatter:on
         final StringBuilder sbuilder = new StringBuilder("A");
         assertEquals("A<B.C>", joiner.join(sbuilder, "B", "C").toString());
-
         sbuilder.append("1");
         assertEquals("A<B.C>1<D.E>", joiner.join(sbuilder, Arrays.asList("D", "E")).toString());
     }
 
     @Test
-    void testDefaultJoinerWithStringBuilder() {
+    void testBuildDefaultStringBuilder() {
         final Builder<Object> builder = AppendableJoiner.builder();
         assertNotSame(builder.get(), builder.get());
-
         final AppendableJoiner<Object> joiner = builder.get();
         final StringBuilder sbuilder = new StringBuilder("A");
         assertEquals("ABC", joiner.join(sbuilder, "B", "C").toString());
-
         sbuilder.append("1");
         assertEquals("ABC1DE", joiner.join(sbuilder, "D", "E").toString());
     }
 
     @Test
-    void testBuilderInstancesAreUnique() {
+    void testBuilder() {
         assertNotSame(AppendableJoiner.builder(), AppendableJoiner.builder());
     }
 
+    @SuppressWarnings("deprecation") // Test own StrBuilder
     @ParameterizedTest
     @ValueSource(classes = { StringBuilder.class, StringBuffer.class, StringWriter.class, StrBuilder.class, TextStringBuilder.class })
-    void testJoinerWithDelimiterUsingVariousAppendables(final Class<? extends Appendable> clazz) throws Exception {
+    void testDelimiterAppendable(final Class<? extends Appendable> clazz) throws Exception {
         final AppendableJoiner<Object> joiner = AppendableJoiner.builder().setDelimiter(".").get();
-        final Appendable appendable = clazz.getDeclaredConstructor().newInstance();
-        appendable.append("A");
-
-        assertEquals("AB.C", joiner.joinA(appendable, "B", "C").toString());
-
-        appendable.append("1");
-        assertEquals("AB.C1D.E", joiner.joinA(appendable, Arrays.asList("D", "E")).toString());
+        final Appendable sbuilder = clazz.newInstance();
+        sbuilder.append("A");
+        // throws IOException
+        assertEquals("AB.C", joiner.joinA(sbuilder, "B", "C").toString());
+        sbuilder.append("1");
+        // throws IOException
+        assertEquals("AB.C1D.E", joiner.joinA(sbuilder, Arrays.asList("D", "E")).toString());
     }
 
     @Test
-    void testJoinerWithDelimiterUsingStringBuilder() {
+    void testDelimiterStringBuilder() {
         final AppendableJoiner<Object> joiner = AppendableJoiner.builder().setDelimiter(".").get();
         final StringBuilder sbuilder = new StringBuilder("A");
-
+        // does not throw IOException
         assertEquals("AB.C", joiner.join(sbuilder, "B", "C").toString());
-
         sbuilder.append("1");
+        // does not throw IOException
         assertEquals("AB.C1D.E", joiner.join(sbuilder, Arrays.asList("D", "E")).toString());
     }
 
     @Test
-    void testJoinerWithCustomElementAppender() {
+    void testToCharSequenceStringBuilder1() {
+        // @formatter:off
         final AppendableJoiner<Object> joiner = AppendableJoiner.builder()
                 .setPrefix("<")
                 .setDelimiter(".")
                 .setSuffix(">")
                 .setElementAppender((a, e) -> a.append("|").append(Objects.toString(e)))
                 .get();
-
+        // @formatter:on
         final StringBuilder sbuilder = new StringBuilder("A");
         assertEquals("A<|B.|C>", joiner.join(sbuilder, "B", "C").toString());
-
         sbuilder.append("1");
         assertEquals("A<|B.|C>1<|D.|E>", joiner.join(sbuilder, Arrays.asList("D", "E")).toString());
     }
 
     @Test
-    void testJoinerWithFixtureElementAppender() {
+    void testToCharSequenceStringBuilder2() {
+        // @formatter:off
         final AppendableJoiner<Fixture> joiner = AppendableJoiner.<Fixture>builder()
                 .setElementAppender((a, e) -> e.render(a))
                 .get();
-
+        // @formatter:on
         final StringBuilder sbuilder = new StringBuilder("[");
         assertEquals("[B!C!", joiner.join(sbuilder, new Fixture("B"), new Fixture("C")).toString());
-
         sbuilder.append("]");
         assertEquals("[B!C!]D!E!", joiner.join(sbuilder, Arrays.asList(new Fixture("D"), new Fixture("E"))).toString());
     }
