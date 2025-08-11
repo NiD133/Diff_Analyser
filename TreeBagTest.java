@@ -24,14 +24,22 @@ import org.apache.commons.collections4.SortedBag;
 import org.junit.jupiter.api.Test;
 
 /**
- * Extension of {@link AbstractBagTest} for exercising the {@link TreeBag}
- * implementation.
+ * Test suite for {@link TreeBag} implementation.
+ * Extends {@link AbstractSortedBagTest} to inherit common sorted bag test cases.
  */
 public class TreeBagTest<T> extends AbstractSortedBagTest<T> {
 
+    private static final String COMPATIBILITY_VERSION = "4";
+    
+    // Test data constants for better maintainability
+    private static final String ELEMENT_A = "A";
+    private static final String ELEMENT_B = "B";
+    private static final String ELEMENT_C = "C";
+    private static final String ELEMENT_D = "D";
+
     @Override
     public String getCompatibilityVersion() {
-        return "4";
+        return COMPATIBILITY_VERSION;
     }
 
     @Override
@@ -39,52 +47,106 @@ public class TreeBagTest<T> extends AbstractSortedBagTest<T> {
         return new TreeBag<>();
     }
 
+    /**
+     * Creates a TreeBag with sample data for testing.
+     * Elements are added in non-sorted order: C, A, B, D
+     * Expected sorted order should be: A, B, C, D
+     */
     @SuppressWarnings("unchecked")
     public SortedBag<T> setupBag() {
         final SortedBag<T> bag = makeObject();
-        bag.add((T) "C");
-        bag.add((T) "A");
-        bag.add((T) "B");
-        bag.add((T) "D");
+        // Add elements in non-alphabetical order to test sorting
+        bag.add((T) ELEMENT_C);
+        bag.add((T) ELEMENT_A);
+        bag.add((T) ELEMENT_B);
+        bag.add((T) ELEMENT_D);
         return bag;
     }
 
+    /**
+     * Test for COLLECTIONS-265: TreeBag should reject non-Comparable objects
+     * when using natural ordering.
+     * 
+     * When adding an Object instance (which doesn't implement Comparable)
+     * to a TreeBag using natural ordering, it should throw IllegalArgumentException.
+     */
     @Test
-    void testCollections265() {
-        final Bag<Object> bag = new TreeBag<>();
+    void testRejectsNonComparableObjectsWithNaturalOrdering() {
+        final Bag<Object> bagWithNaturalOrdering = new TreeBag<>();
+        final Object nonComparableObject = new Object();
 
-        assertThrows(IllegalArgumentException.class, () -> bag.add(new Object()));
+        assertThrows(IllegalArgumentException.class, 
+            () -> bagWithNaturalOrdering.add(nonComparableObject),
+            "TreeBag should reject non-Comparable objects when using natural ordering");
     }
 
+    /**
+     * Test for COLLECTIONS-555: TreeBag should reject null values.
+     * 
+     * TreeBag should throw NullPointerException when attempting to add null,
+     * both with natural ordering and custom comparator.
+     */
     @Test
-    void testCollections555() {
-        final Bag<Object> bag = new TreeBag<>();
+    void testRejectsNullValues() {
+        // Test with natural ordering
+        final Bag<Object> bagWithNaturalOrdering = new TreeBag<>();
+        
+        assertThrows(NullPointerException.class, 
+            () -> bagWithNaturalOrdering.add(null),
+            "TreeBag with natural ordering should reject null values");
 
-        assertThrows(NullPointerException.class, () -> bag.add(null));
+        // Test with custom comparator
+        final Bag<String> bagWithCustomComparator = new TreeBag<>(String::compareTo);
+        
+        // Add a non-null element first to ensure bag is not empty
+        // (workaround for JDK bug where adding null to empty TreeMap works)
+        bagWithCustomComparator.add("sample");
 
-        final Bag<String> bag2 = new TreeBag<>(String::compareTo);
-        // jdk bug: adding null to an empty TreeMap works
-        // thus ensure that the bag is not empty before adding null
-        bag2.add("a");
-
-        assertThrows(NullPointerException.class, () -> bag2.add(null));
+        assertThrows(NullPointerException.class, 
+            () -> bagWithCustomComparator.add(null),
+            "TreeBag with custom comparator should reject null values");
     }
 
+    /**
+     * Test that TreeBag maintains sorted order of elements.
+     * 
+     * Verifies that:
+     * 1. Elements are returned in sorted order via toArray()
+     * 2. first() returns the smallest element
+     * 3. last() returns the largest element
+     */
     @Test
-    void testOrdering() {
-        final Bag<T> bag = setupBag();
-        assertEquals("A", bag.toArray()[0], "Should get elements in correct order");
-        assertEquals("B", bag.toArray()[1], "Should get elements in correct order");
-        assertEquals("C", bag.toArray()[2], "Should get elements in correct order");
-        assertEquals("A", ((SortedBag<T>) bag).first(), "Should get first key");
-        assertEquals("D", ((SortedBag<T>) bag).last(), "Should get last key");
+    void testMaintainsSortedOrder() {
+        final SortedBag<T> sortedBag = setupBag();
+        final Object[] sortedElements = sortedBag.toArray();
+        
+        // Verify elements are in alphabetical order
+        assertEquals(ELEMENT_A, sortedElements[0], 
+            "First element should be 'A' (alphabetically first)");
+        assertEquals(ELEMENT_B, sortedElements[1], 
+            "Second element should be 'B'");
+        assertEquals(ELEMENT_C, sortedElements[2], 
+            "Third element should be 'C'");
+        
+        // Verify first() and last() methods
+        assertEquals(ELEMENT_A, sortedBag.first(), 
+            "first() should return the smallest element");
+        assertEquals(ELEMENT_D, sortedBag.last(), 
+            "last() should return the largest element");
     }
 
-//    void testCreate() throws Exception {
-//        Bag<T> bag = makeObject();
-//        writeExternalFormToDisk((java.io.Serializable) bag, "src/test/resources/data/test/TreeBag.emptyCollection.version4.obj");
-//        bag = makeFullCollection();
-//        writeExternalFormToDisk((java.io.Serializable) bag, "src/test/resources/data/test/TreeBag.fullCollection.version4.obj");
-//    }
-
+    // Commented out utility method for generating test data files
+    // Uncomment and use when regenerating serialization test data
+    //
+    // void generateSerializationTestData() throws Exception {
+    //     // Generate empty collection test data
+    //     SortedBag<T> emptyBag = makeObject();
+    //     writeExternalFormToDisk((java.io.Serializable) emptyBag, 
+    //         "src/test/resources/data/test/TreeBag.emptyCollection.version4.obj");
+    //     
+    //     // Generate full collection test data
+    //     SortedBag<T> fullBag = makeFullCollection();
+    //     writeExternalFormToDisk((java.io.Serializable) fullBag, 
+    //         "src/test/resources/data/test/TreeBag.fullCollection.version4.obj");
+    // }
 }
