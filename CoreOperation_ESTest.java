@@ -44,280 +44,235 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class CoreOperation_ESTest extends CoreOperation_ESTest_scaffolding {
 
-    // Node type constant for better readability
-    private static final int COMMENT_NODE_TYPE = 8;
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      Expression[] expressionArray0 = new Expression[0];
+      CoreOperationUnion coreOperationUnion0 = new CoreOperationUnion(expressionArray0);
+      String string0 = coreOperationUnion0.toString();
+      assertEquals("", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testCoreOperationUnionToStringWithEmptyArray() throws Throwable {
-        // Test that CoreOperationUnion with empty expression array returns empty string
-        Expression[] emptyExpressions = new Expression[0];
-        CoreOperationUnion union = new CoreOperationUnion(emptyExpressions);
-        String result = union.toString();
-        assertEquals("", result);
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      CoreOperationGreaterThan coreOperationGreaterThan0 = new CoreOperationGreaterThan((Expression) null, (Expression) null);
+      CoreOperationLessThanOrEqual coreOperationLessThanOrEqual0 = new CoreOperationLessThanOrEqual(coreOperationGreaterThan0, (Expression) null);
+      String string0 = coreOperationLessThanOrEqual0.getSymbol();
+      assertEquals("<=", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testCoreOperationLessThanOrEqualSymbol() throws Throwable {
-        // Test that CoreOperationLessThanOrEqual returns correct operator symbol
-        CoreOperationLessThanOrEqual operation = 
-            new CoreOperationLessThanOrEqual(null, null);
-        String symbol = operation.getSymbol();
-        assertEquals("<=", symbol);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      Expression[] expressionArray0 = new Expression[0];
+      CoreOperationUnion coreOperationUnion0 = new CoreOperationUnion(expressionArray0);
+      JXPathContextReferenceImpl jXPathContextReferenceImpl0 = (JXPathContextReferenceImpl)JXPathContext.newContext((Object) coreOperationUnion0);
+      VariablePointer variablePointer0 = new VariablePointer((QName) null);
+      RootContext rootContext0 = new RootContext(jXPathContextReferenceImpl0, variablePointer0);
+      InitialContext initialContext0 = (InitialContext)rootContext0.getConstantContext((Object) null);
+      UnionContext unionContext0 = (UnionContext)coreOperationUnion0.computeValue(initialContext0);
+      assertFalse(unionContext0.isChildOrderingRequired());
+  }
 
-    @Test(timeout = 4000)
-    public void testCoreOperationUnionComputeValueWithEmptyArray() throws Throwable {
-        // Test computeValue for CoreOperationUnion with empty expression array
-        Expression[] emptyExpressions = new Expression[0];
-        CoreOperationUnion union = new CoreOperationUnion(emptyExpressions);
-        
-        JXPathContextReferenceImpl contextImpl = 
-            (JXPathContextReferenceImpl) JXPathContext.newContext(union);
-        VariablePointer variablePointer = new VariablePointer(null);
-        RootContext rootContext = new RootContext(contextImpl, variablePointer);
-        
-        InitialContext initialContext = (InitialContext) rootContext.getConstantContext(null);
-        UnionContext result = (UnionContext) union.computeValue(initialContext);
-        
-        assertFalse("Child ordering should not be required", 
-                   result.isChildOrderingRequired());
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      Expression[] expressionArray0 = new Expression[0];
+      CoreOperationUnion coreOperationUnion0 = new CoreOperationUnion(expressionArray0);
+      RootContext rootContext0 = new RootContext((JXPathContextReferenceImpl) null, (NodePointer) null);
+      NodeTypeTest nodeTypeTest0 = new NodeTypeTest(22);
+      PrecedingOrFollowingContext precedingOrFollowingContext0 = new PrecedingOrFollowingContext(rootContext0, nodeTypeTest0, false);
+      SelfContext selfContext0 = new SelfContext(precedingOrFollowingContext0, nodeTypeTest0);
+      QName qName0 = new QName("");
+      NodeNameTest nodeNameTest0 = new NodeNameTest(qName0);
+      ParentContext parentContext0 = new ParentContext(selfContext0, nodeNameTest0);
+      UnionContext unionContext0 = (UnionContext)coreOperationUnion0.compute(parentContext0);
+      assertFalse(unionContext0.isChildOrderingRequired());
+  }
 
-    @Test(timeout = 4000)
-    public void testCoreOperationUnionComputeInParentContext() throws Throwable {
-        // Test compute for CoreOperationUnion in complex context hierarchy
-        Expression[] emptyExpressions = new Expression[0];
-        CoreOperationUnion union = new CoreOperationUnion(emptyExpressions);
-        
-        RootContext rootContext = new RootContext(null, null);
-        NodeTypeTest nodeTypeTest = new NodeTypeTest(COMMENT_NODE_TYPE);
-        PrecedingOrFollowingContext precedingContext = 
-            new PrecedingOrFollowingContext(rootContext, nodeTypeTest, false);
-        SelfContext selfContext = new SelfContext(precedingContext, nodeTypeTest);
-        
-        QName emptyQName = new QName("");
-        NodeNameTest nameTest = new NodeNameTest(emptyQName);
-        ParentContext parentContext = new ParentContext(selfContext, nameTest);
-        
-        UnionContext result = (UnionContext) union.compute(parentContext);
-        assertFalse("Child ordering should not be required", 
-                   result.isChildOrderingRequired());
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      NameAttributeTest nameAttributeTest0 = new NameAttributeTest((Expression) null, (Expression) null);
+      // Undeclared exception!
+      try { 
+        nameAttributeTest0.toString();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.evosuite.runtime.System", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testNameAttributeTestToStringWithNullExpressions() throws Throwable {
-        // Test that NameAttributeTest with null expressions throws NPE in toString
-        NameAttributeTest test = new NameAttributeTest(null, null);
-        
-        try {
-            test.toString();
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected due to null expressions
-        }
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      Expression[] expressionArray0 = new Expression[2];
+      CoreOperationAnd coreOperationAnd0 = new CoreOperationAnd(expressionArray0);
+      expressionArray0[0] = (Expression) coreOperationAnd0;
+      CoreOperationSubtract coreOperationSubtract0 = new CoreOperationSubtract(coreOperationAnd0, expressionArray0[1]);
+      // Undeclared exception!
+      coreOperationSubtract0.computeValue((EvalContext) null);
+  }
 
-    @Test(timeout = 4000)
-    public void testCoreOperationSubtractComputeValueWithNullContext() throws Throwable {
-        // Test that CoreOperationSubtract with recursive expression throws exception
-        Expression[] expressions = new Expression[2];
-        CoreOperationAnd recursiveOp = new CoreOperationAnd(expressions);
-        expressions[0] = recursiveOp; // Create recursive dependency
-        
-        CoreOperationSubtract subtract = 
-            new CoreOperationSubtract(recursiveOp, expressions[1]);
-        
-        // Should fail due to recursive expression evaluation
-        try {
-            subtract.computeValue(null);
-            fail("Expected exception");
-        } catch (Exception e) {
-            // Expected during evaluation
-        }
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      Expression[] expressionArray0 = new Expression[9];
+      CoreFunction coreFunction0 = new CoreFunction(15, expressionArray0);
+      CoreOperationMultiply coreOperationMultiply0 = new CoreOperationMultiply(coreFunction0, coreFunction0);
+      expressionArray0[0] = (Expression) coreOperationMultiply0;
+      CoreOperationAdd coreOperationAdd0 = new CoreOperationAdd(expressionArray0);
+      // Undeclared exception!
+      try { 
+        coreOperationAdd0.compute((EvalContext) null);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // Incorrect number of arguments: string-length(org.apache.commons.jxpath.ri.compiler.CoreFunction@0000000001 * org.apache.commons.jxpath.ri.compiler.CoreFunction@0000000001, null, null, null, null, null, null, null, null)
+         //
+         verifyException("org.apache.commons.jxpath.ri.compiler.CoreFunction", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testCoreOperationAddWithIncorrectFunctionArguments() throws Throwable {
-        // Test CoreOperationAdd with function having incorrect argument count
-        Expression[] functionArgs = new Expression[9];
-        CoreFunction function = new CoreFunction(15, functionArgs); // string-length function
-        
-        // Create expression: function * function
-        CoreOperationMultiply multiply = 
-            new CoreOperationMultiply(function, function);
-        functionArgs[0] = multiply;
-        
-        CoreOperationAdd addOperation = new CoreOperationAdd(functionArgs);
-        
-        try {
-            addOperation.compute(null);
-            fail("Expected RuntimeException for incorrect arguments");
-        } catch (RuntimeException e) {
-            // Verify exception mentions incorrect argument count
-            assertTrue(e.getMessage().contains("Incorrect number of arguments"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      NameAttributeTest nameAttributeTest0 = new NameAttributeTest((Expression) null, (Expression) null);
+      NameAttributeTest nameAttributeTest1 = new NameAttributeTest(nameAttributeTest0, nameAttributeTest0);
+      Expression[] expressionArray0 = new Expression[0];
+      nameAttributeTest1.args = expressionArray0;
+      // Undeclared exception!
+      try { 
+        nameAttributeTest1.compute((EvalContext) null);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 0
+         //
+         verifyException("org.apache.commons.jxpath.ri.compiler.CoreOperationCompare", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testNameAttributeTestComputeWithEmptyArgsArray() throws Throwable {
-        // Test NameAttributeTest with empty arguments array
-        NameAttributeTest baseTest = new NameAttributeTest(null, null);
-        NameAttributeTest test = new NameAttributeTest(baseTest, baseTest);
-        
-        // Override arguments to empty array
-        test.args = new Expression[0];
-        
-        try {
-            test.compute(null);
-            fail("Expected ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            assertEquals("0", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      Expression[] expressionArray0 = new Expression[0];
+      CoreOperationAnd coreOperationAnd0 = new CoreOperationAnd(expressionArray0);
+      CoreOperationMod coreOperationMod0 = new CoreOperationMod(coreOperationAnd0, coreOperationAnd0);
+      // Undeclared exception!
+      try { 
+        coreOperationMod0.compute((EvalContext) null);
+        fail("Expecting exception: ArithmeticException");
+      
+      } catch(ArithmeticException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testCoreOperationModComputeThrowsArithmeticException() throws Throwable {
-        // Test that CoreOperationMod throws ArithmeticException for invalid operation
-        Expression[] emptyArray = new Expression[0];
-        CoreOperationAnd andOp = new CoreOperationAnd(emptyArray);
-        
-        // Create mod operation: andOp % andOp
-        CoreOperationMod modOp = new CoreOperationMod(andOp, andOp);
-        
-        try {
-            modOp.compute(null);
-            fail("Expected ArithmeticException");
-        } catch (ArithmeticException e) {
-            // Expected division by zero or similar
-        }
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      Expression[] expressionArray0 = new Expression[8];
+      CoreFunction coreFunction0 = new CoreFunction(16, expressionArray0);
+      CoreOperationLessThanOrEqual coreOperationLessThanOrEqual0 = new CoreOperationLessThanOrEqual(coreFunction0, coreFunction0);
+      CoreOperationNegate coreOperationNegate0 = new CoreOperationNegate(coreOperationLessThanOrEqual0);
+      Expression[] expressionArray1 = new Expression[6];
+      expressionArray1[0] = (Expression) coreFunction0;
+      CoreOperationUnion coreOperationUnion0 = new CoreOperationUnion(expressionArray1);
+      expressionArray0[5] = (Expression) coreOperationNegate0;
+      // Undeclared exception!
+      try { 
+        coreOperationUnion0.computeValue((EvalContext) null);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // Incorrect number of arguments: normalize-space(null, null, null, null, null, -(org.apache.commons.jxpath.ri.compiler.CoreOperationLessThanOrEqual@0000000002), null, null)
+         //
+         verifyException("org.apache.commons.jxpath.ri.compiler.CoreFunction", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testCoreOperationUnionWithFunctionHavingIncorrectArguments() throws Throwable {
-        // Test CoreOperationUnion containing function with incorrect arguments
-        Expression[] functionArgs = new Expression[8];
-        CoreFunction function = new CoreFunction(16, functionArgs); // normalize-space
-        
-        // Create comparison: function <= function
-        CoreOperationLessThanOrEqual comparison = 
-            new CoreOperationLessThanOrEqual(function, function);
-        CoreOperationNegate negate = new CoreOperationNegate(comparison);
-        
-        // Create union with function and negated expression
-        Expression[] unionArgs = new Expression[6];
-        unionArgs[0] = function;
-        unionArgs[1] = negate;
-        CoreOperationUnion union = new CoreOperationUnion(unionArgs);
-        
-        // Set one function argument to trigger error
-        functionArgs[5] = negate;
-        
-        try {
-            union.computeValue(null);
-            fail("Expected RuntimeException for incorrect arguments");
-        } catch (RuntimeException e) {
-            // Verify exception mentions incorrect argument count
-            assertTrue(e.getMessage().contains("Incorrect number of arguments"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      CoreFunction coreFunction0 = new CoreFunction((-716), (Expression[]) null);
+      CoreOperationGreaterThan coreOperationGreaterThan0 = new CoreOperationGreaterThan(coreFunction0, coreFunction0);
+      CoreOperationLessThan coreOperationLessThan0 = new CoreOperationLessThan(coreOperationGreaterThan0, coreFunction0);
+      CoreOperationGreaterThanOrEqual coreOperationGreaterThanOrEqual0 = new CoreOperationGreaterThanOrEqual(coreOperationLessThan0, coreOperationLessThan0);
+      String string0 = coreOperationGreaterThanOrEqual0.toString();
+      assertNotNull(string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testCoreOperationGreaterThanOrEqualToString() throws Throwable {
-        // Test that CoreOperationGreaterThanOrEqual returns non-null string representation
-        CoreFunction function = new CoreFunction(-716, null);
-        CoreOperationGreaterThan greaterThan = 
-            new CoreOperationGreaterThan(function, function);
-        CoreOperationLessThan lessThan = 
-            new CoreOperationLessThan(greaterThan, function);
-        CoreOperationGreaterThanOrEqual geOperation = 
-            new CoreOperationGreaterThanOrEqual(lessThan, lessThan);
-        
-        String result = geOperation.toString();
-        assertNotNull("String representation should not be null", result);
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      NameAttributeTest nameAttributeTest0 = new NameAttributeTest((Expression) null, (Expression) null);
+      NameAttributeTest nameAttributeTest1 = new NameAttributeTest(nameAttributeTest0, nameAttributeTest0);
+      String string0 = nameAttributeTest1.toString();
+      assertNotNull(string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testNameAttributeTestToString() throws Throwable {
-        // Test that NameAttributeTest returns non-null string representation
-        NameAttributeTest baseTest = new NameAttributeTest(null, null);
-        NameAttributeTest test = new NameAttributeTest(baseTest, baseTest);
-        
-        String result = test.toString();
-        assertNotNull("String representation should not be null", result);
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      Expression[] expressionArray0 = new Expression[8];
+      CoreFunction coreFunction0 = new CoreFunction(16, expressionArray0);
+      CoreOperationLessThanOrEqual coreOperationLessThanOrEqual0 = new CoreOperationLessThanOrEqual(coreFunction0, coreFunction0);
+      CoreOperationNegate coreOperationNegate0 = new CoreOperationNegate(coreOperationLessThanOrEqual0);
+      Expression[] expressionArray1 = new Expression[6];
+      expressionArray1[0] = (Expression) coreFunction0;
+      CoreOperationUnion coreOperationUnion0 = new CoreOperationUnion(expressionArray1);
+      QName qName0 = new QName("");
+      VariableReference variableReference0 = new VariableReference(qName0);
+      CoreOperationMultiply coreOperationMultiply0 = new CoreOperationMultiply(coreOperationNegate0, variableReference0);
+      expressionArray0[6] = (Expression) coreOperationMultiply0;
+      // Undeclared exception!
+      try { 
+        coreOperationUnion0.computeValue((EvalContext) null);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // Incorrect number of arguments: normalize-space(null, null, null, null, null, null, org.apache.commons.jxpath.ri.compiler.CoreOperationNegate@0000000003 * org.apache.commons.jxpath.ri.compiler.VariableReference@0000000006, null)
+         //
+         verifyException("org.apache.commons.jxpath.ri.compiler.CoreFunction", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testCoreOperationUnionWithMultiplyAndFunction() throws Throwable {
-        // Test CoreOperationUnion containing complex expression tree
-        Expression[] functionArgs = new Expression[8];
-        CoreFunction function = new CoreFunction(16, functionArgs); // normalize-space
-        
-        CoreOperationLessThanOrEqual comparison = 
-            new CoreOperationLessThanOrEqual(function, function);
-        CoreOperationNegate negate = new CoreOperationNegate(comparison);
-        
-        // Create variable reference and multiplication: negate * variable
-        QName qname = new QName("");
-        VariableReference variable = new VariableReference(qname);
-        CoreOperationMultiply multiply = new CoreOperationMultiply(negate, variable);
-        functionArgs[6] = multiply;
-        
-        // Create union containing the function
-        Expression[] unionArgs = new Expression[6];
-        unionArgs[0] = function;
-        CoreOperationUnion union = new CoreOperationUnion(unionArgs);
-        
-        try {
-            union.computeValue(null);
-            fail("Expected RuntimeException for incorrect arguments");
-        } catch (RuntimeException e) {
-            // Verify exception mentions incorrect argument count
-            assertTrue(e.getMessage().contains("Incorrect number of arguments"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      Expression[] expressionArray0 = new Expression[8];
+      CoreFunction coreFunction0 = new CoreFunction(16, expressionArray0);
+      CoreOperationLessThanOrEqual coreOperationLessThanOrEqual0 = new CoreOperationLessThanOrEqual(coreFunction0, coreFunction0);
+      CoreOperationNegate coreOperationNegate0 = new CoreOperationNegate(coreOperationLessThanOrEqual0);
+      Expression[] expressionArray1 = new Expression[6];
+      expressionArray1[0] = (Expression) coreFunction0;
+      expressionArray1[1] = (Expression) coreOperationNegate0;
+      CoreOperationUnion coreOperationUnion0 = new CoreOperationUnion(expressionArray1);
+      expressionArray0[1] = (Expression) coreOperationUnion0;
+      // Undeclared exception!
+      try { 
+        coreOperationUnion0.computeValue((EvalContext) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.evosuite.runtime.System", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testCoreOperationUnionComputeWithUnionArgument() throws Throwable {
-        // Test CoreOperationUnion containing another union in arguments
-        Expression[] functionArgs = new Expression[8];
-        CoreFunction function = new CoreFunction(16, functionArgs); // normalize-space
-        
-        CoreOperationLessThanOrEqual comparison = 
-            new CoreOperationLessThanOrEqual(function, function);
-        CoreOperationNegate negate = new CoreOperationNegate(comparison);
-        
-        // Create union with function and negate
-        Expression[] innerUnionArgs = new Expression[6];
-        innerUnionArgs[0] = function;
-        innerUnionArgs[1] = negate;
-        CoreOperationUnion innerUnion = new CoreOperationUnion(innerUnionArgs);
-        
-        // Set the function argument to the inner union
-        functionArgs[1] = innerUnion;
-        
-        // Create outer union containing the function
-        Expression[] outerUnionArgs = new Expression[6];
-        outerUnionArgs[0] = function;
-        CoreOperationUnion outerUnion = new CoreOperationUnion(outerUnionArgs);
-        
-        try {
-            outerUnion.computeValue(null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected during evaluation
-        }
-    }
-
-    @Test(timeout = 4000)
-    public void testNameAttributeTestComputeWithNullContext() throws Throwable {
-        // Test that NameAttributeTest throws NPE when compute is called with null context
-        NameAttributeTest test = new NameAttributeTest(null, null);
-        
-        try {
-            test.compute(null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected due to null expressions
-        }
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      NameAttributeTest nameAttributeTest0 = new NameAttributeTest((Expression) null, (Expression) null);
+      // Undeclared exception!
+      try { 
+        nameAttributeTest0.compute((EvalContext) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.jxpath.ri.compiler.CoreOperationCompare", e);
+      }
+  }
 }
