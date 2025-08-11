@@ -17,919 +17,304 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class)
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true,
+    useVFS = true,
+    useVNET = true,
+    resetStaticState = true,
+    separateClassLoader = true
+)
 public class SegmentConstantPool_ESTest extends SegmentConstantPool_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      String[] stringArray0 = new String[6];
-      int int0 = segmentConstantPool0.matchSpecificPoolEntryIndex(stringArray0, stringArray0[0], (-182));
-      assertEquals((-1), int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      String[] stringArray0 = new String[4];
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      int int0 = segmentConstantPool0.matchSpecificPoolEntryIndex(stringArray0, stringArray0[2], 5);
-      assertEquals((-1), int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getValue(9, 9);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getValue(8, 8);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getValue(7, 5);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getValue(6, 5L);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getValue(5, 4);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getValue(3, 1622L);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getValue(2, 10);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getValue(1, 5L);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getValue((-282), 4294967296L);
-        fail("Expecting exception: Error");
-      
-      } catch(Error e) {
-         //
-         // Tried to get a value I don't know about: -282
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      try { 
-        segmentConstantPool0.getInitMethodPoolEntry(3120, 3120, "Tried to get a value I don't know about: ");
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // Nothing but CP_METHOD can be an <init>
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      try { 
-        segmentConstantPool0.getConstantPoolEntry((-13), 1152L);
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // Type is not supported yet: -13
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getConstantPoolEntry(11, 11);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getConstantPoolEntry(7, 1152L);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getConstantPoolEntry(5, 11);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getConstantPoolEntry(4, 0L);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getConstantPoolEntry(3, 1152L);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      boolean boolean0 = SegmentConstantPool.regexMatches("^<init>.*", "v_g:,");
-      assertFalse(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      int int0 = SegmentConstantPool.toIntExact(0L);
-      assertEquals(0, int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      int int0 = SegmentConstantPool.toIntExact((-119L));
-      assertEquals((-119), int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      int int0 = SegmentConstantPool.toIndex(0L);
-      assertEquals(0, int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      int int0 = SegmentConstantPool.toIndex(1L);
-      assertEquals(1, int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
-      boolean boolean0 = SegmentConstantPool.regexMatches(".*", ".*");
-      assertTrue(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
-      boolean boolean0 = SegmentConstantPool.regexMatches("^<init>.*", "");
-      assertFalse(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
-      String[] stringArray0 = new String[8];
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      int int0 = segmentConstantPool0.matchSpecificPoolEntryIndex(stringArray0, stringArray0[2], 0);
-      assertEquals(0, int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test26()  throws Throwable  {
-      try { 
-        SegmentConstantPool.toIntExact(4294967294L);
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // index
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test27()  throws Throwable  {
-      try { 
-        SegmentConstantPool.toIndex((-1975L));
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // Cannot have a negative index.
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test28()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        SegmentConstantPool.regexMatches("^<init>.*", (String) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test29()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        SegmentConstantPool.regexMatches("gml`F", "6x,WAe3");
-        fail("Expecting exception: Error");
-      
-      } catch(Error e) {
-         //
-         // regex trying to match a pattern I don't know: gml`F
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test30()  throws Throwable  {
-      String[] stringArray0 = new String[0];
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      String[] stringArray1 = new String[2];
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.matchSpecificPoolEntryIndex(stringArray1, stringArray0, stringArray1[1], ":M", 2501);
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
-      
-      } catch(ArrayIndexOutOfBoundsException e) {
-         //
-         // 0
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test31()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.matchSpecificPoolEntryIndex((String[]) null, (String) null, 5);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPoolArrayCache$CachedArray", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test32()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getClassPoolEntry("f(`.fI");
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test33()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      String[] stringArray0 = new String[8];
-      stringArray0[1] = "^<init>.*";
-      int int0 = segmentConstantPool0.matchSpecificPoolEntryIndex(stringArray0, "^<init>.*", 0);
-      assertEquals(1, int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test34()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getValue(9, 7);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test35()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getValue(8, 2L);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test36()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getValue(7, 3);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test37()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getValue(6, 6);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test38()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getValue(5, 1L);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test39()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getValue(4, 1970L);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test40()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getValue(2, 2);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test41()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getValue(1, 1);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test42()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      ClassFileEntry classFileEntry0 = segmentConstantPool0.getValue(12, (-1L));
-      assertNull(classFileEntry0);
-  }
-
-  @Test(timeout = 4000)
-  public void test43()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      try { 
-        segmentConstantPool0.getValue(7, (-460L));
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // Cannot have a negative range
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test44()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      try { 
-        segmentConstantPool0.getInitMethodPoolEntry(8, 8, "4(");
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // Nothing but CP_METHOD can be an <init>
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test45()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getInitMethodPoolEntry(11, 11, "o");
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test46()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getConstantPoolEntry(12, 139L);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test47()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getConstantPoolEntry(11, 10);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test48()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getConstantPoolEntry(10, 139L);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test49()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      try { 
-        segmentConstantPool0.getConstantPoolEntry(9, 4);
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // Type CP_DESCR is not supported yet: 9
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test50()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      try { 
-        segmentConstantPool0.getConstantPoolEntry(8, 8);
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // Type SIGNATURE is not supported yet: 8
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test51()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getConstantPoolEntry(6, 2009L);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test52()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getConstantPoolEntry(5, 2L);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test53()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getConstantPoolEntry(4, 2);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test54()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getConstantPoolEntry(1, 2586L);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test55()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      ConstantPoolEntry constantPoolEntry0 = segmentConstantPool0.getConstantPoolEntry((-1), (-1));
-      assertNull(constantPoolEntry0);
-  }
-
-  @Test(timeout = 4000)
-  public void test56()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      try { 
-        segmentConstantPool0.getClassSpecificPoolEntry((-1734632697), (-1734632697), "^<init>.*");
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // Type is not supported yet: -1734632697
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test57()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getClassSpecificPoolEntry(12, 12, "8Wpe iwwl]U~FA>Z");
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test58()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getClassSpecificPoolEntry(11, 11, "org.apache.commons.compress.harmony.unpack200.SegmentConstantPool");
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test59()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getClassSpecificPoolEntry(10, 4, ":i&");
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test60()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      try { 
-        segmentConstantPool0.getConstantPoolEntry(0, (-1988L));
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // Cannot have a negative index.
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test61()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.getConstantPoolEntry(2, 1137L);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test62()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      String[] stringArray0 = new String[6];
-      segmentConstantPool0.matchSpecificPoolEntryIndex(stringArray0, stringArray0, "<init>", "^6]wcG1bBG#D", 2355);
-      stringArray0[0] = "((";
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.matchSpecificPoolEntryIndex(stringArray0, stringArray0, (String) null, "^<init>.*", 0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test63()  throws Throwable  {
-      String[] stringArray0 = new String[11];
-      stringArray0[2] = "^]LzTC)tW7*]J5tWdvD$";
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      int int0 = segmentConstantPool0.matchSpecificPoolEntryIndex(stringArray0, stringArray0, "^]LzTC)tW7*]J5tWdvD$", "^<init>.*", (-1311));
-      assertEquals((-1), int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test64()  throws Throwable  {
-      SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-      String[] stringArray0 = new String[1];
-      stringArray0[0] = "v^<iPit>.*";
-      // Undeclared exception!
-      try { 
-        segmentConstantPool0.matchSpecificPoolEntryIndex(stringArray0, stringArray0, "v^<iPit>.*", "v^<iPit>.*", (-1089));
-        fail("Expecting exception: Error");
-      
-      } catch(Error e) {
-         //
-         // regex trying to match a pattern I don't know: v^<iPit>.*
-         //
-         verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test65()  throws Throwable  {
-      int int0 = SegmentConstantPool.toIntExact(1);
-      assertEquals(1, int0);
-  }
+    private static final SegmentConstantPool POOL_WITH_NULL_BANDS = new SegmentConstantPool(null);
+
+    // Tests for index conversion utilities: toIntExact and toIndex
+    @Test(timeout = 4000)
+    public void testToIntExact_WithZero_ReturnsZero() {
+        assertEquals(0, SegmentConstantPool.toIntExact(0L));
+    }
+
+    @Test(timeout = 4000)
+    public void testToIntExact_WithNegative_ReturnsNegative() {
+        assertEquals(-119, SegmentConstantPool.toIntExact(-119L));
+    }
+
+    @Test(timeout = 4000)
+    public void testToIntExact_WithPositive_ReturnsPositive() {
+        assertEquals(1, SegmentConstantPool.toIntExact(1L));
+    }
+
+    @Test(timeout = 4000)
+    public void testToIntExact_WithLargeValue_ThrowsIOException() throws IOException {
+        try {
+            SegmentConstantPool.toIntExact(4294967294L);
+            fail("Expected IOException for overflow");
+        } catch (IOException e) {
+            assertEquals("index", e.getMessage());
+        }
+    }
+
+    @Test(timeout = 4000)
+    public void testToIndex_WithZero_ReturnsZero() {
+        assertEquals(0, SegmentConstantPool.toIndex(0L));
+    }
+
+    @Test(timeout = 4000)
+    public void testToIndex_WithPositive_ReturnsPositive() {
+        assertEquals(1, SegmentConstantPool.toIndex(1L));
+    }
+
+    @Test(timeout = 4000)
+    public void testToIndex_WithNegative_ThrowsIOException() {
+        try {
+            SegmentConstantPool.toIndex(-1975L);
+            fail("Expected IOException for negative index");
+        } catch (IOException e) {
+            assertEquals("Cannot have a negative index.", e.getMessage());
+        }
+    }
+
+    // Tests for regex matching utility
+    @Test(timeout = 4000)
+    public void testRegexMatches_WithAllPattern_MatchesAnyString() {
+        assertTrue(SegmentConstantPool.regexMatches(".*", "any string"));
+    }
+
+    @Test(timeout = 4000)
+    public void testRegexMatches_WithInitPattern_MatchesInitStrings() {
+        assertTrue(SegmentConstantPool.regexMatches("^<init>.*", "<init>abc"));
+    }
+
+    @Test(timeout = 4000)
+    public void testRegexMatches_WithInitPattern_DoesNotMatchNonInitStrings() {
+        assertFalse(SegmentConstantPool.regexMatches("^<init>.*", "non-init"));
+        assertFalse(SegmentConstantPool.regexMatches("^<init>.*", ""));
+    }
+
+    @Test(timeout = 4000)
+    public void testRegexMatches_WithNullString_ThrowsNullPointerException() {
+        try {
+            SegmentConstantPool.regexMatches("^<init>.*", null);
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected
+        }
+    }
+
+    @Test(timeout = 4000)
+    public void testRegexMatches_WithUnsupportedPattern_ThrowsError() {
+        try {
+            SegmentConstantPool.regexMatches("unsupported", "test");
+            fail("Expected Error for unsupported pattern");
+        } catch (Error e) {
+            assertEquals("regex trying to match a pattern I don't know: unsupported", e.getMessage());
+        }
+    }
+
+    // Tests for constant pool entry matching
+    @Test(timeout = 4000)
+    public void testMatchSpecificPoolEntryIndex_WithNullArray_ThrowsNullPointerException() {
+        try {
+            POOL_WITH_NULL_BANDS.matchSpecificPoolEntryIndex(null, null, 5);
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected
+        }
+    }
+
+    @Test(timeout = 4000)
+    public void testMatchSpecificPoolEntryIndex_WithEmptyArray_ReturnsNotFound() {
+        String[] array = new String[0];
+        assertEquals(-1, POOL_WITH_NULL_BANDS.matchSpecificPoolEntryIndex(array, "test", 0));
+    }
+
+    @Test(timeout = 4000)
+    public void testMatchSpecificPoolEntryIndex_WithMatchingElement_ReturnsIndex() {
+        String[] array = new String[]{"a", "b", "c"};
+        assertEquals(1, POOL_WITH_NULL_BANDS.matchSpecificPoolEntryIndex(array, "b", 0));
+    }
+
+    @Test(timeout = 4000)
+    public void testMatchSpecificPoolEntryIndex_WithDuplicateElements_ReturnsCorrectIndex() {
+        String[] array = new String[]{"a", "b", "b", "c"};
+        assertEquals(2, POOL_WITH_NULL_BANDS.matchSpecificPoolEntryIndex(array, "b", 1));
+    }
+
+    @Test(timeout = 4000)
+    public void testMatchSpecificPoolEntryIndex_WithNoMatch_ReturnsNotFound() {
+        String[] array = new String[4];
+        assertEquals(-1, POOL_WITH_NULL_BANDS.matchSpecificPoolEntryIndex(array, "missing", 0));
+    }
+
+    @Test(timeout = 4000)
+    public void testMatchSpecificPoolEntryIndex_WithInitPatternInArray_MatchesCorrectly() {
+        String[] array = new String[8];
+        array[1] = "^<init>.*";
+        assertEquals(1, POOL_WITH_NULL_BANDS.matchSpecificPoolEntryIndex(array, "^<init>.*", 0));
+    }
+
+    @Test(timeout = 4000)
+    public void testMatchSpecificPoolEntryIndex_WithMultipleCriteria_ReturnsMatchingIndex() {
+        String[] primary = new String[]{"classA", "classB", "classA"};
+        String[] secondary = new String[]{"methodX", "methodY", "methodZ"};
+        int index = POOL_WITH_NULL_BANDS.matchSpecificPoolEntryIndex(
+            primary, secondary, "classA", "methodZ", 1
+        );
+        assertEquals(2, index);
+    }
+
+    // Tests for getValue method
+    @Test(timeout = 4000)
+    public void testGetValue_WithUnsupportedType_ThrowsError() {
+        try {
+            POOL_WITH_NULL_BANDS.getValue(-282, 4294967296L);
+            fail("Expected Error for unsupported type");
+        } catch (Error e) {
+            assertEquals("Tried to get a value I don't know about: -282", e.getMessage());
+        }
+    }
+
+    @Test(timeout = 4000)
+    public void testGetValue_WithNegativeRange_ThrowsIOException() {
+        try {
+            POOL_WITH_NULL_BANDS.getValue(7, -460L);
+            fail("Expected IOException for negative range");
+        } catch (IOException e) {
+            assertEquals("Cannot have a negative range", e.getMessage());
+        }
+    }
+
+    @Test(timeout = 4000)
+    public void testGetValue_WithNullBands_ThrowsNullPointerException() {
+        int[] unsupportedTypes = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+        for (int type : unsupportedTypes) {
+            try {
+                POOL_WITH_NULL_BANDS.getValue(type, 1);
+                fail("Expected NullPointerException for type: " + type);
+            } catch (NullPointerException e) {
+                // Expected for all types when bands are null
+            }
+        }
+    }
+
+    @Test(timeout = 4000)
+    public void testGetValue_WithType12_ReturnsNull() {
+        assertNull(POOL_WITH_NULL_BANDS.getValue(12, -1L));
+    }
+
+    // Tests for constant pool entry retrieval
+    @Test(timeout = 4000)
+    public void testGetConstantPoolEntry_WithUnsupportedType_ThrowsIOException() {
+        try {
+            POOL_WITH_NULL_BANDS.getConstantPoolEntry(-13, 1152L);
+            fail("Expected IOException for unsupported type");
+        } catch (IOException e) {
+            assertEquals("Type is not supported yet: -13", e.getMessage());
+        }
+    }
+
+    @Test(timeout = 4000)
+    public void testGetConstantPoolEntry_WithNegativeIndex_ThrowsIOException() {
+        try {
+            POOL_WITH_NULL_BANDS.getConstantPoolEntry(0, -1988L);
+            fail("Expected IOException for negative index");
+        } catch (IOException e) {
+            assertEquals("Cannot have a negative index.", e.getMessage());
+        }
+    }
+
+    @Test(timeout = 4000)
+    public void testGetConstantPoolEntry_WithNullBands_ThrowsNullPointerException() {
+        int[] typesCausingNPE = {1, 2, 3, 4, 5, 6, 7, 10, 11, 12};
+        for (int type : typesCausingNPE) {
+            try {
+                POOL_WITH_NULL_BANDS.getConstantPoolEntry(type, 1L);
+                fail("Expected NullPointerException for type: " + type);
+            } catch (NullPointerException e) {
+                // Expected
+            }
+        }
+    }
+
+    @Test(timeout = 4000)
+    public void testGetConstantPoolEntry_WithType9_ThrowsIOException() {
+        try {
+            POOL_WITH_NULL_BANDS.getConstantPoolEntry(9, 4);
+            fail("Expected IOException for unsupported type 9");
+        } catch (IOException e) {
+            assertEquals("Type CP_DESCR is not supported yet: 9", e.getMessage());
+        }
+    }
+
+    @Test(timeout = 4000)
+    public void testGetConstantPoolEntry_WithType8_ThrowsIOException() {
+        try {
+            POOL_WITH_NULL_BANDS.getConstantPoolEntry(8, 8);
+            fail("Expected IOException for unsupported type 8");
+        } catch (IOException e) {
+            assertEquals("Type SIGNATURE is not supported yet: 8", e.getMessage());
+        }
+    }
+
+    // Tests for initialization method handling
+    @Test(timeout = 4000)
+    public void testGetInitMethodPoolEntry_WithNonMethodType_ThrowsIOException() {
+        try {
+            POOL_WITH_NULL_BANDS.getInitMethodPoolEntry(3120, 3120, "Tried to get a value I don't know about: ");
+            fail("Expected IOException for non-method type");
+        } catch (IOException e) {
+            assertEquals("Nothing but CP_METHOD can be an <init>", e.getMessage());
+        }
+    }
+
+    @Test(timeout = 4000)
+    public void testGetInitMethodPoolEntry_WithMethodTypeAndNullBands_ThrowsNullPointerException() {
+        try {
+            POOL_WITH_NULL_BANDS.getInitMethodPoolEntry(11, 11, "o");
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected
+        }
+    }
+
+    // Tests for class-specific entry retrieval
+    @Test(timeout = 4000)
+    public void testGetClassSpecificPoolEntry_WithUnsupportedType_ThrowsIOException() {
+        try {
+            POOL_WITH_NULL_BANDS.getClassSpecificPoolEntry(-1734632697, -1734632697, "^<init>.*");
+            fail("Expected IOException for unsupported type");
+        } catch (IOException e) {
+            assertEquals("Type is not supported yet: -1734632697", e.getMessage());
+        }
+    }
+
+    @Test(timeout = 4000)
+    public void testGetClassSpecificPoolEntry_WithNullBands_ThrowsNullPointerException() {
+        int[] typesCausingNPE = {10, 11, 12};
+        for (int type : typesCausingNPE) {
+            try {
+                POOL_WITH_NULL_BANDS.getClassSpecificPoolEntry(type, 1, "test");
+                fail("Expected NullPointerException for type: " + type);
+            } catch (NullPointerException e) {
+                // Expected
+            }
+        }
+    }
+
+    // Additional edge case tests
+    @Test(timeout = 4000)
+    public void testGetClassPoolEntry_WithNullBands_ThrowsNullPointerException() {
+        try {
+            POOL_WITH_NULL_BANDS.getClassPoolEntry("f(`.fI");
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected
+        }
+    }
+
+    @Test(timeout = 4000)
+    public void testGetConstantPoolEntry_WithNegativeType_ReturnsNull() {
+        assertNull(POOL_WITH_NULL_BANDS.getConstantPoolEntry(-1, -1));
+    }
 }
