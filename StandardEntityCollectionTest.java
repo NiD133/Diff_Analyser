@@ -36,13 +36,12 @@
 
 package org.jfree.chart.entity;
 
-import java.awt.geom.Rectangle2D;
-
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.internal.CloneUtils;
-
 import org.jfree.data.general.DefaultPieDataset;
 import org.junit.jupiter.api.Test;
+
+import java.awt.geom.Rectangle2D;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -52,61 +51,92 @@ import static org.junit.jupiter.api.Assertions.*;
 public class StandardEntityCollectionTest {
 
     /**
-     * Confirm that the equals method can distinguish all the required fields.
+     * Creates a standard chart entity for use in tests.
+     * @return A new {@link PieSectionEntity} instance.
      */
-    @Test
-    public void testEquals() {
-        StandardEntityCollection c1 = new StandardEntityCollection();
-        StandardEntityCollection c2 = new StandardEntityCollection();
-        assertEquals(c1, c2);
-
-        PieSectionEntity<String> e1 = new PieSectionEntity<>(
-                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0), 
-                new DefaultPieDataset<String>(), 0, 1, "Key", "ToolTip", "URL");
-        c1.add(e1);
-        assertNotEquals(c1, c2);
-        PieSectionEntity<String> e2 = new PieSectionEntity<>(
-                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0), 
-                new DefaultPieDataset<String>(), 0, 1, "Key",
-                "ToolTip", "URL");
-        c2.add(e2);
-        assertEquals(c1, c2);
+    private PieSectionEntity<String> createTestEntity() {
+        Rectangle2D area = new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0);
+        DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
+        return new PieSectionEntity<>(area, dataset, 0, 1, "Key", "ToolTip", "URL");
     }
 
     /**
-     * Confirm that cloning works.
+     * Tests that two newly created, empty collections are considered equal.
      */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
-        PieSectionEntity<String> e1 = new PieSectionEntity<>(
-                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0), 
-                new DefaultPieDataset<String>(), 0, 1, "Key", "ToolTip", "URL");
-        StandardEntityCollection c1 = new StandardEntityCollection();
-        c1.add(e1);
-        StandardEntityCollection c2 = CloneUtils.clone(c1);
-        assertNotSame(c1, c2);
-        assertSame(c1.getClass(), c2.getClass());
-        assertEquals(c1, c2);
+    public void equals_withTwoEmptyCollections_shouldReturnTrue() {
+        // Arrange
+        StandardEntityCollection collection1 = new StandardEntityCollection();
+        StandardEntityCollection collection2 = new StandardEntityCollection();
 
-        // check independence
-        c1.clear();
-        assertNotEquals(c1, c2);
-        c2.clear();
-        assertEquals(c1, c2);
+        // Act & Assert
+        assertEquals(collection1, collection2);
     }
 
     /**
-     * Serialize an instance, restore it, and check for equality.
+     * Tests that a collection with an entity is not equal to an empty collection.
      */
     @Test
-    public void testSerialization() {
-        PieSectionEntity<String> e1 = new PieSectionEntity<>(
-                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0), 
-                new DefaultPieDataset<String>(), 0, 1, "Key", "ToolTip", "URL");
-        StandardEntityCollection c1 = new StandardEntityCollection();
-        c1.add(e1);
-        StandardEntityCollection c2 = TestUtils.serialised(c1);
-        assertEquals(c1, c2);
+    public void equals_withOneEmptyAndOneNonEmptyCollection_shouldReturnFalse() {
+        // Arrange
+        StandardEntityCollection collection1 = new StandardEntityCollection();
+        collection1.add(createTestEntity());
+        StandardEntityCollection collection2 = new StandardEntityCollection();
+
+        // Act & Assert
+        assertNotEquals(collection1, collection2);
     }
 
+    /**
+     * Tests that two collections containing identical entities are considered equal.
+     */
+    @Test
+    public void equals_withTwoCollectionsContainingSameEntities_shouldReturnTrue() {
+        // Arrange
+        StandardEntityCollection collection1 = new StandardEntityCollection();
+        collection1.add(createTestEntity());
+
+        StandardEntityCollection collection2 = new StandardEntityCollection();
+        collection2.add(createTestEntity());
+
+        // Act & Assert
+        assertEquals(collection1, collection2);
+    }
+
+    /**
+     * Tests that cloning creates an independent copy of the collection.
+     */
+    @Test
+    public void clone_shouldCreateIndependentCopy() throws CloneNotSupportedException {
+        // Arrange
+        StandardEntityCollection original = new StandardEntityCollection();
+        original.add(createTestEntity());
+
+        // Act
+        StandardEntityCollection cloned = CloneUtils.clone(original);
+
+        // Assert basic clone properties
+        assertNotSame(original, cloned, "Clone should be a different object instance.");
+        assertEquals(original, cloned, "Clone should be equal to the original.");
+
+        // Assert independence by modifying the original and checking the clone
+        original.clear();
+        assertNotEquals(original, cloned, "Modifying the original collection should not affect the clone.");
+    }
+
+    /**
+     * Tests that serialization and deserialization preserves the collection's state.
+     */
+    @Test
+    public void serialization_shouldPreserveObjectState() {
+        // Arrange
+        StandardEntityCollection original = new StandardEntityCollection();
+        original.add(createTestEntity());
+
+        // Act
+        StandardEntityCollection deserialized = TestUtils.serialised(original);
+
+        // Assert
+        assertEquals(original, deserialized);
+    }
 }
