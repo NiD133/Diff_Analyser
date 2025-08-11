@@ -32,37 +32,18 @@ import org.junit.jupiter.params.provider.MethodSource;
 class ListerTest {
 
     /**
-     * Provides a stream of paths to test fixture files.
-     * Only includes files with specific extensions that do not end with "-fail".
+     * Creates a stream of paths of test fixtures with file names that don't end with {@code "-fail"} for specific file extensions.
      *
-     * @return a stream of paths to valid test fixture files.
-     * @throws IOException if an I/O error occurs while accessing the file system.
+     * @return a stream of paths.
+     * @throws IOException if an I/O error is thrown.
      */
-    public static Stream<Path> provideTestFixturePaths() throws IOException {
-        // Define the root directory for test resources
-        Path testResourcesDirectory = Paths.get("src/test/resources");
-
-        // Define a regex filter to match files with specific extensions that do not end with "-fail"
-        RegexFileFilter fileFilter = new RegexFileFilter("^(?!.*(-fail)).*\\.(tar|ar|arj|apk|dump)$");
-
-        // Walk the file tree up to a depth of 10 to find matching files
-        return PathUtils.walk(testResourcesDirectory, fileFilter, 10, false);
+    public static Stream<Path> getFixtures() throws IOException {
+        return PathUtils.walk(Paths.get("src/test/resources"), new RegexFileFilter("^(?!.*(-fail)).*\\.(tar|ar|arj|apk|dump)$"), 10, false);
     }
 
-    /**
-     * Tests the Lister class's ability to process archive files.
-     * 
-     * @param archivePath the path to the archive file to be tested.
-     * @throws ArchiveException if an error occurs while processing the archive.
-     * @throws IOException if an I/O error occurs.
-     */
     @ParameterizedTest
-    @MethodSource("provideTestFixturePaths")
-    void testListerWithValidArchives(final Path archivePath) throws ArchiveException, IOException {
-        // Create a Lister instance with quiet mode enabled and the archive path as an argument
-        Lister lister = new Lister(true, archivePath.toString());
-
-        // Execute the Lister's main functionality
-        lister.go();
+    @MethodSource("getFixtures")
+    void testMain(final Path path) throws ArchiveException, IOException {
+        new Lister(true, path.toString()).go();
     }
 }
