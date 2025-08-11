@@ -19,114 +19,95 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class ISOChronology_ESTest extends ISOChronology_ESTest_scaffolding {
 
-    // Tests for assemble() method
-    //-----------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void testAssembleWithValidFieldsObject() throws Throwable {
-        ISOChronology chrono = ISOChronology.getInstance();
-        AssembledChronology.Fields fields = new AssembledChronology.Fields();
-        chrono.assemble(fields); // Should execute without exceptions
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      ISOChronology iSOChronology0 = ISOChronology.getInstance();
+      AssembledChronology.Fields assembledChronology_Fields0 = new AssembledChronology.Fields();
+      iSOChronology0.assemble(assembledChronology_Fields0);
+  }
 
-    @Test(timeout = 4000)
-    public void testAssembleAfterChangingTimeZone() throws Throwable {
-        ISOChronology defaultChrono = ISOChronology.getInstance();
-        DateTimeZone customZone = DateTimeZone.forOffsetMillis(7593750);
-        ISOChronology customChrono = (ISOChronology) defaultChrono.withZone(customZone);
-        
-        AssembledChronology.Fields fields = new AssembledChronology.Fields();
-        customChrono.assemble(fields); // Should execute without exceptions
-        assertNotSame(customChrono, defaultChrono); // Verify new instance created
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      ISOChronology iSOChronology0 = ISOChronology.getInstance();
+      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis(7593750);
+      ISOChronology iSOChronology1 = (ISOChronology)iSOChronology0.withZone(dateTimeZone0);
+      AssembledChronology.Fields assembledChronology_Fields0 = new AssembledChronology.Fields();
+      iSOChronology1.assemble(assembledChronology_Fields0);
+      assertNotSame(iSOChronology1, iSOChronology0);
+  }
 
-    @Test(timeout = 4000)
-    public void testAssembleWithNullFieldsThrowsException() throws Throwable {
-        ISOChronology chrono = ISOChronology.getInstance();
-        try {
-            chrono.assemble(null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      ISOChronology iSOChronology0 = ISOChronology.getInstanceUTC();
+      boolean boolean0 = iSOChronology0.equals(iSOChronology0);
+      assertTrue(boolean0);
+  }
 
-    // Tests for equals() method
-    //-----------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void testEqualsSameInstance() throws Throwable {
-        ISOChronology chrono = ISOChronology.getInstanceUTC();
-        assertTrue(chrono.equals(chrono)); // Identity check
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      ISOChronology iSOChronology0 = ISOChronology.getInstanceUTC();
+      Object object0 = new Object();
+      boolean boolean0 = iSOChronology0.equals(object0);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualsDifferentType() throws Throwable {
-        ISOChronology chrono = ISOChronology.getInstanceUTC();
-        Object other = new Object();
-        assertFalse(chrono.equals(other)); // Different type
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      ISOChronology iSOChronology0 = ISOChronology.getInstance();
+      // Undeclared exception!
+      try { 
+        iSOChronology0.assemble((AssembledChronology.Fields) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.joda.time.chrono.ISOChronology", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualsDifferentTimeZone() throws Throwable {
-        ISOChronology utcChrono = ISOChronology.getInstanceUTC();
-        DateTimeZone customZone = DateTimeZone.forOffsetMillis(-1322);
-        Chronology customChrono = utcChrono.withZone(customZone);
-        assertFalse(utcChrono.equals(customChrono)); // Different time zones
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      ISOChronology iSOChronology0 = ISOChronology.getInstanceUTC();
+      String string0 = iSOChronology0.toString();
+      assertEquals("ISOChronology[UTC]", string0);
+  }
 
-    // Tests for toString() method
-    //-----------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void testToStringWithUTC() throws Throwable {
-        ISOChronology chrono = ISOChronology.getInstanceUTC();
-        assertEquals("ISOChronology[UTC]", chrono.toString());
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis(85);
+      ISOChronology iSOChronology0 = ISOChronology.getInstance(dateTimeZone0);
+      assertNotNull(iSOChronology0);
+  }
 
-    // Tests for getInstance() with time zones
-    //-----------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void testGetInstanceWithCustomTimeZone() throws Throwable {
-        DateTimeZone customZone = DateTimeZone.forOffsetMillis(85);
-        ISOChronology chrono = ISOChronology.getInstance(customZone);
-        assertNotNull(chrono);
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      ISOChronology iSOChronology0 = ISOChronology.getInstance((DateTimeZone) null);
+      Chronology chronology0 = iSOChronology0.withUTC();
+      assertSame(iSOChronology0, chronology0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetInstanceWithNullTimeZone() throws Throwable {
-        // Null time zone should use default time zone
-        ISOChronology chrono = ISOChronology.getInstance((DateTimeZone) null);
-        assertNotNull(chrono);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-84));
+      ISOChronology iSOChronology0 = ISOChronology.getInstance(dateTimeZone0);
+      iSOChronology0.hashCode();
+  }
 
-    // Tests for withZone() method
-    //-----------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void testWithZoneNullReturnsSameInstance() throws Throwable {
-        // Setting zone to null (default) should return same instance if already using default
-        ISOChronology chrono = ISOChronology.getInstance();
-        Chronology result = chrono.withZone(null);
-        assertSame(chrono, result);
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      ISOChronology iSOChronology0 = ISOChronology.getInstanceUTC();
+      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-1322));
+      Chronology chronology0 = iSOChronology0.withZone(dateTimeZone0);
+      boolean boolean0 = iSOChronology0.equals(chronology0);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testWithUTCWhenDefaultTimeZoneIsUTC() throws Throwable {
-        // This test assumes JVM's default time zone is UTC
-        ISOChronology chrono = ISOChronology.getInstance((DateTimeZone) null);
-        Chronology utcChrono = chrono.withUTC();
-        assertSame(chrono, utcChrono); // Only passes if default time zone is UTC
-    }
-
-    // Tests for hashCode() method
-    //-----------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void testHashCodeWithCustomTimeZone() throws Throwable {
-        DateTimeZone customZone = DateTimeZone.forOffsetMillis(-84);
-        ISOChronology chrono = ISOChronology.getInstance(customZone);
-        chrono.hashCode(); // Should execute without exceptions
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      ISOChronology iSOChronology0 = ISOChronology.getInstance();
+      Chronology chronology0 = iSOChronology0.withZone((DateTimeZone) null);
+      assertSame(chronology0, iSOChronology0);
+  }
 }
