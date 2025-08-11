@@ -1,161 +1,183 @@
 package com.fasterxml.jackson.core.io;
 
-import java.io.*;
-
+import com.fasterxml.jackson.core.JUnit5TestBase;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UTF8WriterTest
-        extends com.fasterxml.jackson.core.JUnit5TestBase
-{
+/**
+ * Unit tests for the {@link UTF8Writer} class.
+ */
+class UTF8WriterTest extends JUnit5TestBase {
+
+    // A string with a mix of 1, 2, and 3-byte UTF-8 characters.
+    private static final String MULTIBYTE_STRING = "AB\u00A0\u1AE9\uFFFC"; // A, B, NO-BREAK SPACE, KHMER VOWEL, FULLWIDTH TILDE
+
+    // A 4-byte UTF-8 character (smiling emoji) represented as a surrogate pair.
+    private static final String EMOJI_STRING = "\uD83D\uDE03";
+    private static final byte[] EMOJI_UTF8_BYTES = {(byte) 0xF0, (byte) 0x9F, (byte) 0x98, (byte) 0x83};
+
     @Test
-    void simple() throws Exception
-    {
+    @DisplayName("Should write string correctly using various write method overloads")
+    void writeUsingVariousMethodsShouldConcatenateCorrectly() throws Exception {
+        // Arrange
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        UTF8Writer w = new UTF8Writer(_ioContext(), out);
+        UTF8Writer writer = new UTF8Writer(_ioContext(), out);
+        char[] contentChars = MULTIBYTE_STRING.toCharArray();
+        byte[] expectedBytesPerWrite = MULTIBYTE_STRING.getBytes(StandardCharsets.UTF_8);
+        String expectedFinalString = MULTIBYTE_STRING + MULTIBYTE_STRING + MULTIBYTE_STRING;
 
-        String str = "AB\u00A0\u1AE9\uFFFC";
-        char[] ch = str.toCharArray();
+        // Act: Write the same content three times using different methods
+        // 1. Write the full string
+        writer.write(MULTIBYTE_STRING);
 
-        // Let's write 3 times, using different methods
-        w.write(str);
+        // 2. Write character by character and as a sub-array
+        writer.append(contentChars[0]);
+        writer.write(contentChars[1]);
+        writer.write(contentChars, 2, 3);
+        writer.flush(); // Flush in the middle of operations
 
-        w.append(ch[0]);
-        w.write(ch[1]);
-        w.write(ch, 2, 3);
-        w.flush();
+        // 3. Write the full string from a substring
+        writer.write(MULTIBYTE_STRING, 0, MULTIBYTE_STRING.length());
+        writer.close();
 
-        w.write(str, 0, str.length());
-        w.close();
+        // Assert
+        byte[] actualBytes = out.toByteArray();
+        String actualString = new String(actualBytes, StandardCharsets.UTF_8);
 
-        // and thus should have 3 times contents
-        byte[] data = out.toByteArray();
-        assertEquals(3*10, data.length);
-        String act = utf8String(out);
-        assertEquals(15, act.length());
-
-        assertEquals(3 * str.length(), act.length());
-        assertEquals(str+str+str, act);
+        assertEquals(3 * expectedBytesPerWrite.length, actualBytes.length);
+        assertEquals(expectedFinalString, actualString);
     }
 
     @Test
-    void simpleAscii() throws Exception
-    {
+    @DisplayName("Should write a mostly ASCII string correctly")
+    void writeMostlyAsciiStringShouldEncodeCorrectly() throws Exception {
+        // Arrange
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        UTF8Writer w = new UTF8Writer(_ioContext(), out);
+        UTF8Writer writer = new UTF8Writer(_ioContext(), out);
+        String content = "abcdefghijklmnopqrst\u00A0"; // Ends with a 2-byte char
+        byte[] expectedBytes = content.getBytes(StandardCharsets.UTF_8);
 
-        String str = "abcdefghijklmnopqrst\u00A0";
-        char[] ch = str.toCharArray();
+        // Act
+        writer.write(content);
+        writer.flush(); // Flush before close to exercise a different code path
+        writer.close();
 
-        w.write(ch, 0, ch.length);
-        w.flush(); // trigger different code path for close
-        w.close();
-
-        byte[] data = out.toByteArray();
-        // one 2-byte encoded char
-        assertEquals(ch.length+1, data.length);
-        String act = utf8String(out);
-        assertEquals(str, act);
+        // Assert
+        assertArrayEquals(expectedBytes, out.toByteArray());
+        assertEquals(content, utf8String(out));
     }
 
     @Test
-    void flushAfterClose() throws Exception
-    {
+    @DisplayName("Should not throw exceptions when flush() or close() are called multiple times")
+    void writerMethodsAfterCloseShouldBeIdempotent() throws IOException {
+        // Arrange
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        UTF8Writer w = new UTF8Writer(_ioContext(), out);
+        UTF8Writer writer = new UTF8Writer(_ioContext(), out);
+        writer.write("XY");
+        writer.close();
+        assertEquals(2, out.size(), "Initial write should be successful before extra calls");
 
-        w.write('X');
-        char[] ch = { 'Y' };
-        w.write(ch);
-
-        w.close();
-        assertEquals(2, out.size());
-
-        // and this ought to be fine...
-        w.flush();
-        // as well as some more...
-        w.close();
-        w.flush();
+        // Act & Assert: Subsequent calls should be ignored without error
+        assertDoesNotThrow(() -> {
+            writer.flush();
+            writer.close();
+            writer.flush();
+        }, "flush() and close() should be idempotent after the writer is closed");
     }
 
     @Test
-    void surrogatesOk() throws Exception
-    {
+    @DisplayName("Should correctly encode a valid surrogate pair written as individual chars")
+    void writeValidSurrogatePairAsCharsShouldEncodeCorrectly() throws IOException {
+        // Arrange
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        UTF8Writer w = new UTF8Writer(_ioContext(), out);
+        UTF8Writer writer = new UTF8Writer(_ioContext(), out);
+        char highSurrogate = EMOJI_STRING.charAt(0); // 0xD83D
+        char lowSurrogate = EMOJI_STRING.charAt(1);  // 0xDE03
 
-        // First, valid case, char by char
-        w.write(0xD83D);
-        w.write(0xDE03);
-        w.close();
-        assertEquals(4, out.size());
-        final byte[] EXP_SURROGATES = new byte[] { (byte) 0xF0, (byte) 0x9F,
-               (byte) 0x98, (byte) 0x83 };
-        assertArrayEquals(EXP_SURROGATES, out.toByteArray());
+        // Act
+        writer.write(highSurrogate);
+        writer.write(lowSurrogate);
+        writer.close();
 
-        // and then as String
-        out = new ByteArrayOutputStream();
-        w = new UTF8Writer(_ioContext(), out);
-        w.write("\uD83D\uDE03");
-        w.close();
-        assertEquals(4, out.size());
-        assertArrayEquals(EXP_SURROGATES, out.toByteArray());
+        // Assert
+        assertArrayEquals(EMOJI_UTF8_BYTES, out.toByteArray());
     }
 
-    @SuppressWarnings("resource")
     @Test
-    void surrogatesFail() throws Exception
-    {
-        ByteArrayOutputStream out;
+    @DisplayName("Should correctly encode a valid surrogate pair written as a String")
+    void writeValidSurrogatePairAsStringShouldEncodeCorrectly() throws IOException {
+        // Arrange
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        UTF8Writer writer = new UTF8Writer(_ioContext(), out);
 
-        out = new ByteArrayOutputStream();
-        try (UTF8Writer w = new UTF8Writer(_ioContext(), out)) {
-            w.write(0xDE03);
-            fail("should not pass");
-        } catch (IOException e) {
-            verifyException(e, "Unmatched second part");
-        }
+        // Act
+        writer.write(EMOJI_STRING);
+        writer.close();
 
-        out = new ByteArrayOutputStream();
-        try (UTF8Writer w = new UTF8Writer(_ioContext(), out)) {
-            w.write(0xD83D);
-            w.write('a');
-            fail("should not pass");
-        } catch (IOException e) {
-            verifyException(e, "Broken surrogate pair");
-        }
-
-        out = new ByteArrayOutputStream();
-        try (UTF8Writer w = new UTF8Writer(_ioContext(), out)) {
-            w.write("\uDE03");
-            fail("should not pass");
-        } catch (IOException e) {
-            verifyException(e, "Unmatched second part");
-        }
-
-        out = new ByteArrayOutputStream();
-        try (UTF8Writer w = new UTF8Writer(_ioContext(), out)) {
-            w.write("\uD83Da");
-            fail("should not pass");
-        } catch (IOException e) {
-            verifyException(e, "Broken surrogate pair");
-        }
+        // Assert
+        assertArrayEquals(EMOJI_UTF8_BYTES, out.toByteArray());
     }
 
-    // For [core#1218]
-    // @since 2.17
+    @ParameterizedTest(name = "[{index}] Writing {2} should fail with: {1}")
+    @MethodSource("invalidSurrogateProvider")
+    @DisplayName("Should throw IOException for invalid surrogate sequences")
+    void writeWithInvalidSurrogateSequenceShouldThrowIOException(
+            IOConsumer<UTF8Writer> writeAction, String expectedMessage, String description) {
+        // Arrange
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        UTF8Writer writer = new UTF8Writer(_ioContext(), out);
+
+        // Act & Assert
+        IOException e = assertThrows(IOException.class, () -> {
+            writeAction.accept(writer);
+            writer.close(); // Some errors are only thrown on close
+        });
+        verifyException(e, expectedMessage);
+    }
+
+    private static Stream<Arguments> invalidSurrogateProvider() {
+        return Stream.of(
+                Arguments.of(writer -> writer.write(0xDE03), "Unmatched second part", "a lone low surrogate char"),
+                Arguments.of(writer -> {
+                    writer.write(0xD83D);
+                    writer.write('a');
+                }, "Broken surrogate pair", "a high surrogate followed by a non-surrogate"),
+                Arguments.of(writer -> writer.write("\uDE03"), "Unmatched second part", "a string with a lone low surrogate"),
+                Arguments.of(writer -> writer.write("\uD83Da"), "Broken surrogate pair", "a string with a high surrogate followed by a non-surrogate")
+        );
+    }
+
+    // Functional interface to allow lambda expressions that throw IOException
+    @FunctionalInterface
+    private interface IOConsumer<T> {
+        void accept(T t) throws IOException;
+    }
+
     @Test
-    void surrogateConversion()
-    {
-        for (int first = UTF8Writer.SURR1_FIRST; first <= UTF8Writer.SURR1_LAST; first++) {
-            for (int second = UTF8Writer.SURR2_FIRST; second <= UTF8Writer.SURR2_LAST; second++) {
-                int expected = 0x10000 + ((first - UTF8Writer.SURR1_FIRST) << 10) + (second - UTF8Writer.SURR2_FIRST);
-                int actual = (first << 10) + second + UTF8Writer.SURROGATE_BASE;
-                if (expected != actual) {
-                    fail("Mismatch on: "+Integer.toHexString(first) + " " + Integer.toHexString(second)
-                        +"; expected: "+expected+", actual: "+actual);
-                }
+    @DisplayName("Internal: Surrogate pair to code point conversion formula should be correct")
+    void internalSurrogateConversionFormulaShouldBeCorrect() {
+        // This test verifies the correctness of the internal formula used to convert
+        // a UTF-16 surrogate pair into a single Unicode code point.
+        for (int high = UTF8Writer.SURR1_FIRST; high <= UTF8Writer.SURR1_LAST; high++) {
+            for (int low = UTF8Writer.SURR2_FIRST; low <= UTF8Writer.SURR2_LAST; low++) {
+                // Standard formula for converting a surrogate pair
+                int expectedCodePoint = 0x10000 + ((high - UTF8Writer.SURR1_FIRST) << 10) + (low - UTF8Writer.SURR2_FIRST);
+                // The formula used inside UTF8Writer
+                int actualCodePoint = (high << 10) + low + UTF8Writer.SURROGATE_BASE;
+
+                assertEquals(expectedCodePoint, actualCodePoint,
+                        () -> String.format("Mismatch for surrogate pair [U+%X, U+%X]", high, low));
             }
         }
     }
