@@ -43,30 +43,30 @@
  */
 package com.itextpdf.text.error_messages;
 
-import static org.junit.Assert.assertTrue;
 
+import junit.framework.Assert;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests for {@link MessageLocalization} that verify proper handling of special characters.
+ * @author kevin
  */
 public class MessageLocalizationTest {
 
-    private static final String MESSAGE_KEY = "1.not.found.as.file.or.resource";
+    @Before
+    public void setUp() throws Exception {
+    }
 
-    /**
-     * Tests that file paths containing backslashes are properly handled
-     * when inserted into localized messages.
-     * 
-     * Verifies that the backslash escape sequences in Windows-style paths
-     * are correctly preserved during message composition.
-     */
+    @After
+    public void tearDown() throws Exception {
+    }
+
     @Test
-    public void testComposedMessagePreservesBackslashesInFilePath() {
+    public void testBackslashes() throws Exception{
         String testPath = "C:\\test\\file.txt";
-        String result = MessageLocalization.getComposedMessage(MESSAGE_KEY, testPath);
-        
-        assertTrue("Composed message should contain original file path with backslashes", 
-                   result.contains(testPath));
+        String rslt = MessageLocalization.getComposedMessage("1.not.found.as.file.or.resource", testPath);
+        Assert.assertTrue("Result doesn't contain the test path", rslt.contains(testPath));
     }
 }
