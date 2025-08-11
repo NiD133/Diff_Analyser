@@ -32,240 +32,252 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) 
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true, 
-    useVFS = true, 
-    useVNET = true, 
-    resetStaticState = true, 
-    separateClassLoader = true
-) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class SimpleTextExtractionStrategy_ESTest extends SimpleTextExtractionStrategy_ESTest_scaffolding {
 
-    // Test basic text rendering functionality
-    @Test(timeout = 4000)
-    public void renderTextShouldAppendToResultantText()  {
-        SimpleTextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-        PdfDate pdfDate = new PdfDate();
-        GraphicsState graphicsState = new GraphicsState();
-        Matrix matrix = new Matrix();
-        LinkedHashSet<MarkedContentInfo> markedContentSet = new LinkedHashSet<>();
-        PdfAction pdfAction = new PdfAction();
-        CMapAwareDocumentFont font = new CMapAwareDocumentFont(pdfAction);
-        graphicsState.font = font;
-        
-        TextRenderInfo textInfo = new TextRenderInfo(pdfDate, graphicsState, matrix, markedContentSet);
-        
-        // First render call processes the text chunk
-        strategy.renderText(textInfo);
-        
-        // Manually append additional text
-        strategy.appendTextChunk("Cp1257");
-        
-        // Second render call should process another chunk
-        strategy.renderText(textInfo);
-        
-        assertEquals("Cp1257", strategy.getResultantText());
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      SimpleTextExtractionStrategy simpleTextExtractionStrategy0 = new SimpleTextExtractionStrategy();
+      PdfDate pdfDate0 = new PdfDate();
+      GraphicsState graphicsState0 = new GraphicsState();
+      Matrix matrix0 = new Matrix();
+      LinkedHashSet<MarkedContentInfo> linkedHashSet0 = new LinkedHashSet<MarkedContentInfo>();
+      PdfAction pdfAction0 = new PdfAction();
+      CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfAction0);
+      graphicsState0.font = cMapAwareDocumentFont0;
+      TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, linkedHashSet0);
+      simpleTextExtractionStrategy0.renderText(textRenderInfo0);
+      simpleTextExtractionStrategy0.appendTextChunk("Cp1257");
+      simpleTextExtractionStrategy0.renderText(textRenderInfo0);
+      assertEquals("Cp1257", simpleTextExtractionStrategy0.getResultantText());
+  }
 
-    // Test text appending with StringBuffer
-    @Test(timeout = 4000)
-    public void appendTextChunkWithStringBufferShouldUpdateResult()  {
-        SimpleTextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-        StringBuffer buffer = new StringBuffer(",.,u/K'~XTk8go");
-        
-        strategy.appendTextChunk(buffer);
-        String result = strategy.getResultantText();
-        
-        assertEquals(",.,u/K'~XTk8go", result);
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      SimpleTextExtractionStrategy simpleTextExtractionStrategy0 = new SimpleTextExtractionStrategy();
+      StringBuffer stringBuffer0 = new StringBuffer(",.,u/K'~XTk8go");
+      simpleTextExtractionStrategy0.appendTextChunk(stringBuffer0);
+      String string0 = simpleTextExtractionStrategy0.getResultantText();
+      assertEquals(",.,u/K'~XTk8go", string0);
+  }
 
-    // Test exception handling for unsupported charsets
-    @Test(timeout = 4000)
-    public void renderTextShouldThrowWhenFontHasUnsupportedCharset()  {
-        SimpleTextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-        GraphicsState graphicsState = new GraphicsState();
-        Matrix matrix = graphicsState.getCtm();
-        LinkedHashSet<MarkedContentInfo> markedContentSet = new LinkedHashSet<>();
-        PdfAction pdfAction = new PdfAction("UnicodeBig", "UnicodeBig", "", "PDF");
-        CMapAwareDocumentFont font = new CMapAwareDocumentFont(pdfAction);
-        graphicsState.font = font;
-        PdfString pdfString = new PdfString("MacRoman", "Times-BoldItalic");
-        TextRenderInfo textInfo = new TextRenderInfo(pdfString, graphicsState, matrix, markedContentSet);
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      SimpleTextExtractionStrategy simpleTextExtractionStrategy0 = new SimpleTextExtractionStrategy();
+      GraphicsState graphicsState0 = new GraphicsState();
+      Matrix matrix0 = graphicsState0.getCtm();
+      LinkedHashSet<MarkedContentInfo> linkedHashSet0 = new LinkedHashSet<MarkedContentInfo>();
+      PdfAction pdfAction0 = new PdfAction("UnicodeBig", "UnicodeBig", "", "PDF");
+      CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfAction0);
+      graphicsState0.font = cMapAwareDocumentFont0;
+      PdfString pdfString0 = new PdfString("MacRoman", "Times-BoldItalic");
+      TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfString0, graphicsState0, matrix0, linkedHashSet0);
+      // Undeclared exception!
+      try { 
+        simpleTextExtractionStrategy0.renderText(textRenderInfo0);
+        fail("Expecting exception: UnsupportedCharsetException");
+      
+      } catch(UnsupportedCharsetException e) {
+         //
+         // Times-BoldItalic
+         //
+         verifyException("java.nio.charset.Charset", e);
+      }
+  }
 
-        try { 
-            strategy.renderText(textInfo);
-            fail("Expected UnsupportedCharsetException for 'Times-BoldItalic'");
-        } catch(UnsupportedCharsetException e) {
-            assertEquals("Times-BoldItalic", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      SimpleTextExtractionStrategy simpleTextExtractionStrategy0 = new SimpleTextExtractionStrategy();
+      GraphicsState graphicsState0 = new GraphicsState();
+      Matrix matrix0 = new Matrix();
+      LinkedHashSet<MarkedContentInfo> linkedHashSet0 = new LinkedHashSet<MarkedContentInfo>();
+      PdfAction pdfAction0 = PdfAction.createLaunch("", "", "PDF", "");
+      CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfAction0);
+      graphicsState0.font = cMapAwareDocumentFont0;
+      PdfString pdfString0 = new PdfString("Identity-H", ">|");
+      TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfString0, graphicsState0, matrix0, linkedHashSet0);
+      // Undeclared exception!
+      try { 
+        simpleTextExtractionStrategy0.renderText(textRenderInfo0);
+        fail("Expecting exception: IllegalCharsetNameException");
+      
+      } catch(IllegalCharsetNameException e) {
+         //
+         // >|
+         //
+         verifyException("java.nio.charset.Charset", e);
+      }
+  }
 
-    // Test exception handling for illegal charset names
-    @Test(timeout = 4000)
-    public void renderTextShouldThrowWhenFontHasIllegalCharsetName()  {
-        SimpleTextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-        GraphicsState graphicsState = new GraphicsState();
-        Matrix matrix = new Matrix();
-        LinkedHashSet<MarkedContentInfo> markedContentSet = new LinkedHashSet<>();
-        PdfAction pdfAction = PdfAction.createLaunch("", "", "PDF", "");
-        CMapAwareDocumentFont font = new CMapAwareDocumentFont(pdfAction);
-        graphicsState.font = font;
-        PdfString pdfString = new PdfString("Identity-H", ">|");
-        TextRenderInfo textInfo = new TextRenderInfo(pdfString, graphicsState, matrix, markedContentSet);
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      GraphicsState graphicsState0 = new GraphicsState();
+      Matrix matrix0 = graphicsState0.getCtm();
+      LinkedHashSet<MarkedContentInfo> linkedHashSet0 = new LinkedHashSet<MarkedContentInfo>();
+      PdfAction pdfAction0 = new PdfAction("");
+      CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfAction0);
+      graphicsState0.font = cMapAwareDocumentFont0;
+      SimpleTextExtractionStrategy simpleTextExtractionStrategy0 = new SimpleTextExtractionStrategy();
+      PdfString pdfString0 = new PdfString("Cp1252", "Cp1250");
+      TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfString0, graphicsState0, matrix0, linkedHashSet0);
+      // Undeclared exception!
+      try { 
+        simpleTextExtractionStrategy0.renderText(textRenderInfo0);
+        fail("Expecting exception: NoSuchMethodError");
+      
+      } catch(NoSuchMethodError e) {
+         //
+         // java.nio.ByteBuffer.rewind()Ljava/nio/ByteBuffer;
+         //
+         verifyException("com.itextpdf.text.pdf.PdfEncodings", e);
+      }
+  }
 
-        try { 
-            strategy.renderText(textInfo);
-            fail("Expected IllegalCharsetNameException for '>|'");
-        } catch(IllegalCharsetNameException e) {
-            assertEquals(">|", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      SimpleTextExtractionStrategy simpleTextExtractionStrategy0 = new SimpleTextExtractionStrategy();
+      Segment segment0 = new Segment((char[]) null, 2087, 2087);
+      // Undeclared exception!
+      try { 
+        simpleTextExtractionStrategy0.appendTextChunk(segment0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("javax.swing.text.Segment", e);
+      }
+  }
 
-    // Test error handling in specific encoding scenarios
-    @Test(timeout = 4000)
-    public void renderTextShouldThrowErrorForSpecificEncoding()  {
-        GraphicsState graphicsState = new GraphicsState();
-        Matrix matrix = graphicsState.getCtm();
-        LinkedHashSet<MarkedContentInfo> markedContentSet = new LinkedHashSet<>();
-        PdfAction pdfAction = new PdfAction("");
-        CMapAwareDocumentFont font = new CMapAwareDocumentFont(pdfAction);
-        graphicsState.font = font;
-        SimpleTextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-        PdfString pdfString = new PdfString("Cp1252", "Cp1250");
-        TextRenderInfo textInfo = new TextRenderInfo(pdfString, graphicsState, matrix, markedContentSet);
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      SimpleTextExtractionStrategy simpleTextExtractionStrategy0 = new SimpleTextExtractionStrategy();
+      char[] charArray0 = new char[2];
+      Segment segment0 = new Segment(charArray0, (-26), (-26));
+      // Undeclared exception!
+      try { 
+        simpleTextExtractionStrategy0.appendTextChunk(segment0);
+        fail("Expecting exception: IndexOutOfBoundsException");
+      
+      } catch(IndexOutOfBoundsException e) {
+         //
+         // start 0, end -26, s.length() -26
+         //
+         verifyException("java.lang.AbstractStringBuilder", e);
+      }
+  }
 
-        try { 
-            strategy.renderText(textInfo);
-            fail("Expected NoSuchMethodError due to encoding issue");
-        } catch(NoSuchMethodError e) {
-            assertTrue(e.getMessage().contains("java.nio.ByteBuffer.rewind()"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      SimpleTextExtractionStrategy simpleTextExtractionStrategy0 = new SimpleTextExtractionStrategy();
+      char[] charArray0 = new char[0];
+      Segment segment0 = new Segment(charArray0, 1, 1);
+      // Undeclared exception!
+      try { 
+        simpleTextExtractionStrategy0.appendTextChunk(segment0);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 1
+         //
+         verifyException("javax.swing.text.Segment", e);
+      }
+  }
 
-    // Test Segment handling with invalid parameters
-    @Test(timeout = 4000)
-    public void appendTextChunkShouldThrowWhenSegmentArrayIsNull()  {
-        SimpleTextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-        Segment segment = new Segment((char[]) null, 2087, 2087);
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      PdfDate pdfDate0 = new PdfDate();
+      GraphicsState graphicsState0 = new GraphicsState();
+      Matrix matrix0 = graphicsState0.ctm;
+      LinkedHashSet<MarkedContentInfo> linkedHashSet0 = new LinkedHashSet<MarkedContentInfo>();
+      PdfAction pdfAction0 = new PdfAction();
+      CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfAction0);
+      graphicsState0.font = cMapAwareDocumentFont0;
+      TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, linkedHashSet0);
+      SimpleTextExtractionStrategy simpleTextExtractionStrategy0 = new SimpleTextExtractionStrategy();
+      simpleTextExtractionStrategy0.renderText(textRenderInfo0);
+      StringBuffer stringBuffer0 = new StringBuffer("Inserting row at position ");
+      simpleTextExtractionStrategy0.appendTextChunk(stringBuffer0);
+      simpleTextExtractionStrategy0.renderText(textRenderInfo0);
+      assertEquals("Inserting row at position ", simpleTextExtractionStrategy0.getResultantText());
+  }
 
-        try { 
-            strategy.appendTextChunk(segment);
-            fail("Expected NullPointerException for null char array");
-        } catch(NullPointerException e) {
-            // Expected due to null character array
-        }
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      PdfDate pdfDate0 = new PdfDate();
+      GraphicsState graphicsState0 = new GraphicsState();
+      Matrix matrix0 = graphicsState0.ctm;
+      LinkedHashSet<MarkedContentInfo> linkedHashSet0 = new LinkedHashSet<MarkedContentInfo>();
+      PdfAction pdfAction0 = PdfAction.createLaunch("", "", "PDF", "");
+      CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfAction0);
+      graphicsState0.font = cMapAwareDocumentFont0;
+      TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, linkedHashSet0);
+      SimpleTextExtractionStrategy simpleTextExtractionStrategy0 = new SimpleTextExtractionStrategy();
+      CharBuffer charBuffer0 = CharBuffer.allocate(1037);
+      simpleTextExtractionStrategy0.appendTextChunk(charBuffer0);
+      // Undeclared exception!
+      try { 
+        simpleTextExtractionStrategy0.renderText(textRenderInfo0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("com.itextpdf.text.pdf.parser.SimpleTextExtractionStrategy", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void appendTextChunkShouldThrowForNegativeSegmentCount()  {
-        SimpleTextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-        char[] charArray = new char[2];
-        Segment segment = new Segment(charArray, -26, -26);
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      SimpleTextExtractionStrategy simpleTextExtractionStrategy0 = new SimpleTextExtractionStrategy();
+      simpleTextExtractionStrategy0.beginTextBlock();
+      assertEquals("", simpleTextExtractionStrategy0.getResultantText());
+  }
 
-        try { 
-            strategy.appendTextChunk(segment);
-            fail("Expected IndexOutOfBoundsException for negative count");
-        } catch(IndexOutOfBoundsException e) {
-            assertTrue(e.getMessage().contains("start 0, end -26"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      PdfDate pdfDate0 = new PdfDate();
+      GraphicsState graphicsState0 = new GraphicsState();
+      Matrix matrix0 = graphicsState0.ctm;
+      LinkedHashSet<MarkedContentInfo> linkedHashSet0 = new LinkedHashSet<MarkedContentInfo>();
+      PdfAction pdfAction0 = PdfAction.createLaunch("", "", "PDF", "");
+      CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfAction0);
+      graphicsState0.font = cMapAwareDocumentFont0;
+      TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, linkedHashSet0);
+      SimpleTextExtractionStrategy simpleTextExtractionStrategy0 = new SimpleTextExtractionStrategy();
+      simpleTextExtractionStrategy0.renderText(textRenderInfo0);
+      CharBuffer charBuffer0 = CharBuffer.allocate(1037);
+      simpleTextExtractionStrategy0.appendTextChunk(charBuffer0);
+      simpleTextExtractionStrategy0.renderText(textRenderInfo0);
+      assertEquals(0, textRenderInfo0.getTextRenderMode());
+  }
 
-    @Test(timeout = 4000)
-    public void appendTextChunkShouldThrowWhenSegmentOffsetInvalid()  {
-        SimpleTextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-        char[] charArray = new char[0];
-        Segment segment = new Segment(charArray, 1, 1);
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      SimpleTextExtractionStrategy simpleTextExtractionStrategy0 = new SimpleTextExtractionStrategy();
+      String string0 = simpleTextExtractionStrategy0.getResultantText();
+      assertEquals("", string0);
+  }
 
-        try { 
-            strategy.appendTextChunk(segment);
-            fail("Expected ArrayIndexOutOfBoundsException for invalid offset");
-        } catch(ArrayIndexOutOfBoundsException e) {
-            assertEquals("1", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      SimpleTextExtractionStrategy simpleTextExtractionStrategy0 = new SimpleTextExtractionStrategy();
+      simpleTextExtractionStrategy0.endTextBlock();
+      assertEquals("", simpleTextExtractionStrategy0.getResultantText());
+  }
 
-    // Test text rendering after manual text appending
-    @Test(timeout = 4000)
-    public void renderTextAfterManualAppendShouldNotOverwrite()  {
-        PdfDate pdfDate = new PdfDate();
-        GraphicsState graphicsState = new GraphicsState();
-        Matrix matrix = graphicsState.ctm;
-        LinkedHashSet<MarkedContentInfo> markedContentSet = new LinkedHashSet<>();
-        PdfAction pdfAction = new PdfAction();
-        CMapAwareDocumentFont font = new CMapAwareDocumentFont(pdfAction);
-        graphicsState.font = font;
-        TextRenderInfo textInfo = new TextRenderInfo(pdfDate, graphicsState, matrix, markedContentSet);
-        SimpleTextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-        
-        strategy.renderText(textInfo);
-        strategy.appendTextChunk("Inserting row at position ");
-        strategy.renderText(textInfo);
-        
-        assertEquals("Inserting row at position ", strategy.getResultantText());
-    }
-
-    // Test exception when rendering after appending CharBuffer
-    @Test(timeout = 4000)
-    public void renderTextAfterAppendingCharBufferShouldThrow()  {
-        PdfDate pdfDate = new PdfDate();
-        GraphicsState graphicsState = new GraphicsState();
-        Matrix matrix = graphicsState.ctm;
-        LinkedHashSet<MarkedContentInfo> markedContentSet = new LinkedHashSet<>();
-        PdfAction pdfAction = PdfAction.createLaunch("", "", "PDF", "");
-        CMapAwareDocumentFont font = new CMapAwareDocumentFont(pdfAction);
-        graphicsState.font = font;
-        TextRenderInfo textInfo = new TextRenderInfo(pdfDate, graphicsState, matrix, markedContentSet);
-        SimpleTextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-        CharBuffer buffer = CharBuffer.allocate(1037);
-        
-        strategy.appendTextChunk(buffer);
-
-        try { 
-            strategy.renderText(textInfo);
-            fail("Expected NullPointerException when rendering after CharBuffer append");
-        } catch(NullPointerException e) {
-            // Expected due to internal state
-        }
-    }
-
-    // Test lifecycle methods
-    @Test(timeout = 4000)
-    public void beginTextBlockShouldNotChangeResult()  {
-        SimpleTextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-        strategy.beginTextBlock();
-        assertEquals("", strategy.getResultantText());
-    }
-
-    @Test(timeout = 4000)
-    public void endTextBlockShouldNotChangeResult()  {
-        SimpleTextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-        strategy.endTextBlock();
-        assertEquals("", strategy.getResultantText());
-    }
-
-    // Test initial state
-    @Test(timeout = 4000)
-    public void resultantTextShouldBeEmptyInitially()  {
-        SimpleTextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-        assertEquals("", strategy.getResultantText());
-    }
-
-    // Test image rendering has no effect
-    @Test(timeout = 4000)
-    public void renderImageShouldNotChangeResult()  {
-        SimpleTextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-        PdfSigLockDictionary.LockPermissions permissions = 
-            PdfSigLockDictionary.LockPermissions.FORM_FILLING_AND_ANNOTATION;
-        PdfSigLockDictionary lockDict = new PdfSigLockDictionary(permissions);
-        GraphicsState graphicsState = new GraphicsState();
-        HashSet<MarkedContentInfo> contentSet = new HashSet<>();
-        
-        ImageRenderInfo imageInfo = ImageRenderInfo.createForXObject(
-            graphicsState, null, lockDict, contentSet
-        );
-        
-        strategy.renderImage(imageInfo);
-        assertEquals("", strategy.getResultantText());
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      SimpleTextExtractionStrategy simpleTextExtractionStrategy0 = new SimpleTextExtractionStrategy();
+      PdfSigLockDictionary.LockPermissions pdfSigLockDictionary_LockPermissions0 = PdfSigLockDictionary.LockPermissions.FORM_FILLING_AND_ANNOTATION;
+      PdfSigLockDictionary pdfSigLockDictionary0 = new PdfSigLockDictionary(pdfSigLockDictionary_LockPermissions0);
+      GraphicsState graphicsState0 = new GraphicsState();
+      HashSet<MarkedContentInfo> hashSet0 = new HashSet<MarkedContentInfo>();
+      ImageRenderInfo imageRenderInfo0 = ImageRenderInfo.createForXObject(graphicsState0, (PdfIndirectReference) null, (PdfDictionary) pdfSigLockDictionary0, (Collection<MarkedContentInfo>) hashSet0);
+      simpleTextExtractionStrategy0.renderImage(imageRenderInfo0);
+      assertEquals("", simpleTextExtractionStrategy0.getResultantText());
+  }
 }
