@@ -26,454 +26,231 @@ import org.evosuite.runtime.testdata.EvoSuiteFile;
 import org.evosuite.runtime.testdata.FileSystemHandling;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class)
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true,
+    useVFS = true,
+    useVNET = true,
+    resetStaticState = true,
+    separateClassLoader = true
+)
 public class RandomAccessFileMode_ESTest extends RandomAccessFileMode_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT;
-      RandomAccessFileMode randomAccessFileMode1 = RandomAccessFileMode.READ_ONLY;
-      boolean boolean0 = randomAccessFileMode0.implies(randomAccessFileMode1);
-      assertTrue(boolean0);
-  }
+    // Enum value tests
+    @Test(timeout = 4000)
+    public void testEnumValues_ShouldReturnAllModes() {
+        RandomAccessFileMode[] modes = RandomAccessFileMode.values();
+        assertEquals(4, modes.length);
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      RandomAccessFileMode[] randomAccessFileModeArray0 = RandomAccessFileMode.values();
-      assertEquals(4, randomAccessFileModeArray0.length);
-  }
+    @Test(timeout = 4000)
+    public void testValueOf_READ_WRITE_ShouldReturnCorrectMode() {
+        RandomAccessFileMode mode = RandomAccessFileMode.valueOf("READ_WRITE");
+        assertEquals(RandomAccessFileMode.READ_WRITE, mode);
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.valueOf("READ_WRITE");
-      assertEquals(RandomAccessFileMode.READ_WRITE, randomAccessFileMode0);
-  }
+    // Mode validation tests
+    @Test(timeout = 4000)
+    public void testValueOfMode_r_ShouldReturnReadOnly() {
+        RandomAccessFileMode mode = RandomAccessFileMode.valueOfMode("r");
+        assertEquals(RandomAccessFileMode.READ_ONLY, mode);
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT;
-      IORandomAccessFile iORandomAccessFile0 = randomAccessFileMode0.io(".4");
-      assertEquals(0L, iORandomAccessFile0.length());
-  }
+    @Test(timeout = 4000)
+    public void testValueOfMode_rws_ShouldReturnSyncAll() {
+        RandomAccessFileMode mode = RandomAccessFileMode.valueOfMode("rws");
+        assertEquals(RandomAccessFileMode.READ_WRITE_SYNC_ALL, mode);
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.valueOfMode("r");
-      assertEquals(RandomAccessFileMode.READ_ONLY, randomAccessFileMode0);
-      
-      EvoSuiteFile evoSuiteFile0 = new EvoSuiteFile("r");
-      FileSystemHandling.appendStringToFile(evoSuiteFile0, "r");
-      randomAccessFileMode0.io("r");
-      assertEquals("r", randomAccessFileMode0.getMode());
-  }
+    @Test(timeout = 4000)
+    public void testValueOfMode_rwd_ShouldReturnSyncContent() {
+        RandomAccessFileMode mode = RandomAccessFileMode.valueOfMode("rwd");
+        assertEquals(RandomAccessFileMode.READ_WRITE_SYNC_CONTENT, mode);
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT;
-      boolean boolean0 = randomAccessFileMode0.implies(randomAccessFileMode0);
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testValueOfMode_NullMode_ShouldThrowNullPointerException() {
+        RandomAccessFileMode.valueOfMode(null);
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_ALL;
-      RandomAccessFileMode randomAccessFileMode1 = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT;
-      boolean boolean0 = randomAccessFileMode1.implies(randomAccessFileMode0);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testValueOfMode_InvalidMode_ShouldThrowIllegalArgumentException() {
+        try {
+            RandomAccessFileMode.valueOfMode("listener");
+            fail("Expected IllegalArgumentException for invalid mode");
+        } catch (IllegalArgumentException e) {
+            assertEquals("listener", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.valueOfMode("r");
-      assertEquals(RandomAccessFileMode.READ_ONLY, randomAccessFileMode0);
-      
-      EvoSuiteFile evoSuiteFile0 = new EvoSuiteFile("r");
-      FileSystemHandling.appendStringToFile(evoSuiteFile0, "r");
-      MockFile mockFile0 = new MockFile("r");
-      Path path0 = mockFile0.toPath();
-      randomAccessFileMode0.create(path0);
-      assertEquals("r", randomAccessFileMode0.getMode());
-  }
+    @Test(timeout = 4000)
+    public void testValueOf_WithWriteOption_ShouldReturnReadWrite() {
+        OpenOption[] options = {StandardOpenOption.WRITE};
+        RandomAccessFileMode mode = RandomAccessFileMode.valueOf(options);
+        assertEquals(RandomAccessFileMode.READ_WRITE, mode);
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT;
-      MockFile mockFile0 = new MockFile((String) null, ">V{;Ka");
-      Path path0 = mockFile0.toPath();
-      RandomAccessFile randomAccessFile0 = randomAccessFileMode0.create(path0);
-      assertEquals(0L, randomAccessFile0.getFilePointer());
-  }
+    @Test(timeout = 4000)
+    public void testValueOf_WithSyncOptions_ShouldReturnSyncAll() {
+        OpenOption[] options = new OpenOption[5];
+        options[1] = StandardOpenOption.SYNC;
+        options[2] = StandardOpenOption.SYNC;
+        RandomAccessFileMode mode = RandomAccessFileMode.valueOf(options);
+        assertEquals(RandomAccessFileMode.READ_WRITE_SYNC_ALL, mode);
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.valueOfMode("r");
-      assertEquals(RandomAccessFileMode.READ_ONLY, randomAccessFileMode0);
-      
-      EvoSuiteFile evoSuiteFile0 = new EvoSuiteFile("r");
-      FileSystemHandling.appendStringToFile(evoSuiteFile0, "r");
-      randomAccessFileMode0.create("r");
-      assertEquals("r", randomAccessFileMode0.getMode());
-  }
-
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_ALL;
-      IORandomAccessFile iORandomAccessFile0 = (IORandomAccessFile)randomAccessFileMode0.create("rws");
-      assertEquals("rws", iORandomAccessFile0.getMode());
-  }
-
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      MockFile mockFile0 = new MockFile("krLiZQCe");
-      EvoSuiteFile evoSuiteFile0 = new EvoSuiteFile("krLiZQCe");
-      FileSystemHandling.appendLineToFile(evoSuiteFile0, "krLiZQCe");
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT;
-      IORandomAccessFile iORandomAccessFile0 = (IORandomAccessFile)randomAccessFileMode0.create((File) mockFile0);
-      assertEquals("rwd", iORandomAccessFile0.getMode());
-  }
-
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        RandomAccessFileMode.valueOfMode((String) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.RandomAccessFileMode", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testValueOf_NullOptions_ShouldThrowNullPointerException() {
         RandomAccessFileMode.valueOf((OpenOption[]) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.RandomAccessFileMode", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_ALL;
-      // Undeclared exception!
-      try { 
-        randomAccessFileMode0.io((String) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.evosuite.runtime.mock.java.io.MockRandomAccessFile", e);
-      }
-  }
+    // Mode property tests
+    @Test(timeout = 4000)
+    public void testGetMode_READ_WRITE_SYNC_ALL_ShouldReturn_rws() {
+        assertEquals("rws", RandomAccessFileMode.READ_WRITE_SYNC_ALL.getMode());
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.valueOfMode("r");
-      MockFile mockFile0 = new MockFile("r");
-      Path path0 = mockFile0.toPath();
-      try { 
-        randomAccessFileMode0.create(path0);
-        fail("Expecting exception: FileNotFoundException");
-      
-      } catch(FileNotFoundException e) {
-         //
-         // File does not exist, and RandomAccessFile is not open in write mode
-         //
-         verifyException("org.evosuite.runtime.mock.java.io.MockRandomAccessFile", e);
-      }
-  }
+    // Implication logic tests
+    @Test(timeout = 4000)
+    public void testImplies_SameMode_ShouldReturnTrue() {
+        assertTrue(RandomAccessFileMode.READ_WRITE_SYNC_CONTENT.implies(
+            RandomAccessFileMode.READ_WRITE_SYNC_CONTENT
+        ));
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_ONLY;
-      // Undeclared exception!
-      try { 
-        randomAccessFileMode0.create((String) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.evosuite.runtime.mock.java.io.MockRandomAccessFile", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testImplies_HigherLevelMode_ShouldReturnTrue() {
+        assertTrue(RandomAccessFileMode.READ_WRITE_SYNC_CONTENT.implies(
+            RandomAccessFileMode.READ_ONLY
+        ));
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_ONLY;
-      // Undeclared exception!
-      try { 
-        randomAccessFileMode0.create((File) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.evosuite.runtime.mock.java.io.MockRandomAccessFile", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testImplies_LowerLevelMode_ShouldReturnFalse() {
+        assertFalse(RandomAccessFileMode.READ_WRITE_SYNC_CONTENT.implies(
+            RandomAccessFileMode.READ_WRITE_SYNC_ALL
+        ));
+    }
 
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE;
-      // Undeclared exception!
-      try { 
-        randomAccessFileMode0.apply((Path) null, (IOFunction<RandomAccessFile, RandomAccessFileMode>) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.RandomAccessFileMode", e);
-      }
-  }
+    // File creation tests
+    @Test(timeout = 4000)
+    public void testCreateFile_READ_WRITE_SYNC_CONTENT_ShouldSucceed() throws Exception {
+        // Setup file with content
+        MockFile file = new MockFile("testFile");
+        EvoSuiteFile evoFile = new EvoSuiteFile("testFile");
+        FileSystemHandling.appendLineToFile(evoFile, "content");
+        
+        RandomAccessFile raf = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT.create(file);
+        assertEquals(0L, raf.getFilePointer());
+        assertEquals("rwd", raf.getMode());
+    }
 
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      MockFile mockFile0 = new MockFile("chunkSize <= 0");
-      Path path0 = mockFile0.toPath();
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_ONLY;
-      try { 
-        randomAccessFileMode0.apply(path0, (IOFunction<RandomAccessFile, RandomAccessFileMode>) null);
-        fail("Expecting exception: FileNotFoundException");
-      
-      } catch(FileNotFoundException e) {
-         //
-         // File does not exist, and RandomAccessFile is not open in write mode
-         //
-         verifyException("org.evosuite.runtime.mock.java.io.MockRandomAccessFile", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testCreateString_READ_WRITE_SYNC_ALL_ShouldReturnCorrectMode() throws Exception {
+        IORandomAccessFile file = (IORandomAccessFile) RandomAccessFileMode.READ_WRITE_SYNC_ALL.create("rws");
+        assertEquals("rws", file.getMode());
+    }
 
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_ALL;
-      IOConsumer<RandomAccessFile> iOConsumer0 = IOConsumer.noop();
-      // Undeclared exception!
-      try { 
-        randomAccessFileMode0.accept((Path) null, iOConsumer0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.RandomAccessFileMode", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testCreatePath_READ_WRITE_SYNC_CONTENT_ShouldSucceed() throws Exception {
+        MockFile file = new MockFile("testPath");
+        Path path = file.toPath();
+        RandomAccessFile raf = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT.create(path);
+        assertEquals(0L, raf.getFilePointer());
+    }
 
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      MockFile mockFile0 = new MockFile("rw");
-      Path path0 = mockFile0.toPath();
-      FileSystemHandling.shouldAllThrowIOExceptions();
-      IOConsumer<RandomAccessFile> iOConsumer0 = IOConsumer.noop();
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT;
-      try { 
-        randomAccessFileMode0.accept(path0, iOConsumer0);
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // Simulated IOException
-         //
-         verifyException("org.evosuite.runtime.vfs.VirtualFileSystem", e);
-      }
-  }
+    // IO operation tests
+    @Test(timeout = 4000)
+    public void testIo_READ_WRITE_SYNC_CONTENT_ShouldCreateFile() throws Exception {
+        IORandomAccessFile file = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT.io(".4");
+        assertEquals(0L, file.length());
+    }
 
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_ONLY;
-      MockFile mockFile0 = new MockFile("U:QK#Sv^NT_2h");
-      Path path0 = mockFile0.toPath();
-      IOConsumer<RandomAccessFile> iOConsumer0 = IOConsumer.noop();
-      try { 
-        randomAccessFileMode0.accept(path0, iOConsumer0);
-        fail("Expecting exception: FileNotFoundException");
-      
-      } catch(FileNotFoundException e) {
-         //
-         // File does not exist, and RandomAccessFile is not open in write mode
-         //
-         verifyException("org.evosuite.runtime.mock.java.io.MockRandomAccessFile", e);
-      }
-  }
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testIo_NullPath_ShouldThrowNullPointerException() throws Exception {
+        RandomAccessFileMode.READ_WRITE_SYNC_ALL.io((String) null);
+    }
 
-  @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_ALL;
-      // Undeclared exception!
-      try { 
-        randomAccessFileMode0.create((Path) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.RandomAccessFileMode", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testIo_READ_ONLY_FileDoesNotExist_ShouldThrowException() {
+        try {
+            RandomAccessFileMode.READ_ONLY.io("nonexistent");
+            fail("Expected FileNotFoundException for missing file in read-only mode");
+        } catch (FileNotFoundException e) {
+            // Expected exception
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.valueOfMode("r");
-      MockFile mockFile0 = new MockFile("r");
-      try { 
-        randomAccessFileMode0.create((File) mockFile0);
-        fail("Expecting exception: FileNotFoundException");
-      
-      } catch(FileNotFoundException e) {
-         //
-         // File does not exist, and RandomAccessFile is not open in write mode
-         //
-         verifyException("org.evosuite.runtime.mock.java.io.MockRandomAccessFile", e);
-      }
-  }
+    // Exception handling tests
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testCreateString_READ_ONLY_NullPath_ShouldThrowNullPointerException() throws Exception {
+        RandomAccessFileMode.READ_ONLY.create((String) null);
+    }
 
-  @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
-      StandardOpenOption standardOpenOption0 = StandardOpenOption.SYNC;
-      OpenOption[] openOptionArray0 = new OpenOption[5];
-      openOptionArray0[1] = (OpenOption) standardOpenOption0;
-      openOptionArray0[2] = (OpenOption) standardOpenOption0;
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.valueOf(openOptionArray0);
-      assertEquals(RandomAccessFileMode.READ_WRITE_SYNC_ALL, randomAccessFileMode0);
-  }
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testCreateFile_READ_ONLY_NullFile_ShouldThrowNullPointerException() throws Exception {
+        RandomAccessFileMode.READ_ONLY.create((File) null);
+    }
 
-  @Test(timeout = 4000)
-  public void test26()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT;
-      MockFile mockFile0 = new MockFile("");
-      Path path0 = mockFile0.toPath();
-      // Undeclared exception!
-      try { 
-        randomAccessFileMode0.apply(path0, (IOFunction<RandomAccessFile, RandomAccessFileMode>) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.RandomAccessFileMode", e);
-      }
-  }
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testCreatePath_NullPath_ShouldThrowNullPointerException() throws Exception {
+        RandomAccessFileMode.READ_WRITE_SYNC_ALL.create((Path) null);
+    }
 
-  @Test(timeout = 4000)
-  public void test27()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_ALL;
-      MockFile mockFile0 = new MockFile("org.apa@he.com#ons.io.RandomAccessF\"leMode$1");
-      Path path0 = mockFile0.toPath();
-      IOConsumer<RandomAccessFile> iOConsumer0 = IOConsumer.noop();
-      randomAccessFileMode0.accept(path0, iOConsumer0);
-      assertEquals("rws", randomAccessFileMode0.getMode());
-  }
+    @Test(timeout = 4000)
+    public void testCreate_READ_ONLY_FileDoesNotExist_ShouldThrowFileNotFoundException() {
+        try {
+            RandomAccessFileMode.READ_ONLY.create("missing.txt");
+            fail("Expected FileNotFoundException for missing file in read-only mode");
+        } catch (FileNotFoundException e) {
+            // Expected exception
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test28()  throws Throwable  {
-      MockFile mockFile0 = new MockFile("VjDO;0I0)G");
-      Path path0 = mockFile0.toPath();
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT;
-      // Undeclared exception!
-      try { 
-        randomAccessFileMode0.accept(path0, (IOConsumer<RandomAccessFile>) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.RandomAccessFileMode", e);
-      }
-  }
+    // Functional operation tests
+    @Test(timeout = 4000)
+    public void testAccept_READ_WRITE_SYNC_ALL_WithExistingFile_ShouldSucceed() throws Exception {
+        MockFile file = new MockFile("testAccept");
+        Path path = file.toPath();
+        IOConsumer<RandomAccessFile> noop = IOConsumer.noop();
+        RandomAccessFileMode.READ_WRITE_SYNC_ALL.accept(path, noop);
+    }
 
-  @Test(timeout = 4000)
-  public void test29()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        RandomAccessFileMode.valueOfMode("listener");
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // listener
-         //
-         verifyException("org.apache.commons.io.RandomAccessFileMode", e);
-      }
-  }
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testAccept_READ_WRITE_SYNC_CONTENT_NullConsumer_ShouldThrowNullPointerException() throws Exception {
+        MockFile file = new MockFile("testFile");
+        Path path = file.toPath();
+        RandomAccessFileMode.READ_WRITE_SYNC_CONTENT.accept(path, null);
+    }
 
-  @Test(timeout = 4000)
-  public void test30()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.valueOfMode("rws");
-      assertEquals(RandomAccessFileMode.READ_WRITE_SYNC_ALL, randomAccessFileMode0);
-  }
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testAccept_READ_WRITE_SYNC_ALL_NullPath_ShouldThrowNullPointerException() throws Exception {
+        RandomAccessFileMode.READ_WRITE_SYNC_ALL.accept(null, IOConsumer.noop());
+    }
 
-  @Test(timeout = 4000)
-  public void test31()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.valueOfMode("rwd");
-      assertEquals(RandomAccessFileMode.READ_WRITE_SYNC_CONTENT, randomAccessFileMode0);
-  }
+    @Test(timeout = 4000)
+    public void testAccept_READ_WRITE_SYNC_CONTENT_IOException_ShouldPropagate() {
+        MockFile file = new MockFile("testIO");
+        Path path = file.toPath();
+        FileSystemHandling.shouldAllThrowIOExceptions();
+        
+        try {
+            RandomAccessFileMode.READ_WRITE_SYNC_CONTENT.accept(path, IOConsumer.noop());
+            fail("Expected IOException from simulated file system");
+        } catch (IOException e) {
+            assertEquals("Simulated IOException", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test32()  throws Throwable  {
-      OpenOption[] openOptionArray0 = new OpenOption[1];
-      StandardOpenOption standardOpenOption0 = StandardOpenOption.WRITE;
-      openOptionArray0[0] = (OpenOption) standardOpenOption0;
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.valueOf(openOptionArray0);
-      MockFile mockFile0 = new MockFile("6UOySR)&C(+0\"]F]DS");
-      IORandomAccessFile iORandomAccessFile0 = (IORandomAccessFile)randomAccessFileMode0.create((File) mockFile0);
-      assertEquals("rw", iORandomAccessFile0.getMode());
-  }
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testApply_READ_WRITE_SYNC_CONTENT_NullFunction_ShouldThrowNullPointerException() throws Exception {
+        MockFile file = new MockFile("testFile");
+        Path path = file.toPath();
+        RandomAccessFileMode.READ_WRITE_SYNC_CONTENT.apply(path, null);
+    }
 
-  @Test(timeout = 4000)
-  public void test33()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.valueOfMode("r");
-      try { 
-        randomAccessFileMode0.create("r");
-        fail("Expecting exception: FileNotFoundException");
-      
-      } catch(FileNotFoundException e) {
-         //
-         // File does not exist, and RandomAccessFile is not open in write mode
-         //
-         verifyException("org.evosuite.runtime.mock.java.io.MockRandomAccessFile", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test34()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_ALL;
-      String string0 = randomAccessFileMode0.getMode();
-      assertEquals("rws", string0);
-  }
-
-  @Test(timeout = 4000)
-  public void test35()  throws Throwable  {
-      RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.valueOfMode("r");
-      try { 
-        randomAccessFileMode0.io("r");
-        fail("Expecting exception: FileNotFoundException");
-      
-      } catch(FileNotFoundException e) {
-         //
-         // File does not exist, and RandomAccessFile is not open in write mode
-         //
-         verifyException("org.evosuite.runtime.mock.java.io.MockRandomAccessFile", e);
-      }
-  }
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testApply_READ_WRITE_NullArguments_ShouldThrowNullPointerException() throws Exception {
+        RandomAccessFileMode.READ_WRITE.apply(null, null);
+    }
 }
