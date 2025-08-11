@@ -13,104 +13,135 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class)
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true,
-    useVFS = true,
-    useVNET = true,
-    resetStaticState = true,
-    separateClassLoader = true
-)
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class ParameterExpression_ESTest extends ParameterExpression_ESTest_scaffolding {
 
-    // Tests for valid expressions
-    @Test(timeout = 4000)
-    public void validExpressionWithTwoEntries() throws Throwable {
-        ParameterExpression expr = new ParameterExpression("L\"r(,=BUu>r7|KV)X");
-        assertEquals(2, expr.size());
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      ParameterExpression parameterExpression0 = new ParameterExpression("L\"r(,=BUu>r7|KV)X");
+      assertEquals(2, parameterExpression0.size());
+  }
 
-    @Test(timeout = 4000)
-    public void validExpressionWithOneEntry() throws Throwable {
-        ParameterExpression expr = new ParameterExpression("%t~fZCvjt{");
-        assertEquals(1, expr.size());
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      ParameterExpression parameterExpression0 = null;
+      try {
+        parameterExpression0 = new ParameterExpression("(V5BD)wo7C47");
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // Parsing error in {(V5BD)wo7C47} in position 6
+         //
+         verifyException("org.apache.ibatis.builder.ParameterExpression", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void validExpressionWithCommaAndEquals() throws Throwable {
-        ParameterExpression expr = new ParameterExpression("wLz5Rg,g= +b1h^([5");
-        assertEquals(2, expr.size());
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      ParameterExpression parameterExpression0 = null;
+      try {
+        parameterExpression0 = new ParameterExpression(" ([}otejk;%91MIm8?:");
+        fail("Expecting exception: StringIndexOutOfBoundsException");
+      
+      } catch(StringIndexOutOfBoundsException e) {
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void validExpressionWithColonAndSemicolon() throws Throwable {
-        ParameterExpression expr = new ParameterExpression("mRl: ;vM;");
-        assertEquals(2, expr.size());
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      ParameterExpression parameterExpression0 = new ParameterExpression("%t~fZCvjt{");
+      assertEquals(1, parameterExpression0.size());
+  }
 
-    @Test(timeout = 4000)
-    public void validExpressionWithParentheses() throws Throwable {
-        ParameterExpression expr = new ParameterExpression("(Vx5:BD)");
-        assertEquals(1, expr.size());
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      ParameterExpression parameterExpression0 = null;
+      try {
+        parameterExpression0 = new ParameterExpression((String) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.ibatis.builder.ParameterExpression", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void validExpressionWithLeadingSpace() throws Throwable {
-        ParameterExpression expr = new ParameterExpression(" ;|l, =R=kNH");
-        assertEquals(2, expr.size());
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      ParameterExpression parameterExpression0 = null;
+      try {
+        parameterExpression0 = new ParameterExpression("], b");
+        fail("Expecting exception: StringIndexOutOfBoundsException");
+      
+      } catch(StringIndexOutOfBoundsException e) {
+      }
+  }
 
-    // Tests for invalid expressions that throw exceptions
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void nullExpressionThrowsNullPointerException() {
-        new ParameterExpression(null);
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      ParameterExpression parameterExpression0 = new ParameterExpression("wLz5Rg,g= +b1h^([5");
+      assertEquals(2, parameterExpression0.size());
+  }
 
-    @Test(timeout = 4000, expected = StringIndexOutOfBoundsException.class)
-    public void expressionWithInvalidBracketThrowsStringIndexException() {
-        new ParameterExpression(" ([}otejk;%91MIm8?:");
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      ParameterExpression parameterExpression0 = null;
+      try {
+        parameterExpression0 = new ParameterExpression("/;vUk0|B%J1\"7WA: ");
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // Parsing error in {/;vUk0|B%J1\"7WA: } in position 16
+         //
+         verifyException("org.apache.ibatis.builder.ParameterExpression", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = StringIndexOutOfBoundsException.class)
-    public void expressionWithTrailingCommaThrowsStringIndexException() {
-        new ParameterExpression("], b");
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      ParameterExpression parameterExpression0 = new ParameterExpression("mRl: ;vM;");
+      assertEquals(2, parameterExpression0.size());
+  }
 
-    @Test(timeout = 4000, expected = StringIndexOutOfBoundsException.class)
-    public void expressionWithInvalidColonPositionThrowsStringIndexException() {
-        new ParameterExpression("( :s>(R5C/J>,K1");
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      ParameterExpression parameterExpression0 = null;
+      try {
+        parameterExpression0 = new ParameterExpression("( :s>(R5C/J>,K1");
+        fail("Expecting exception: StringIndexOutOfBoundsException");
+      
+      } catch(StringIndexOutOfBoundsException e) {
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void malformedParenthesesThrowRuntimeException() {
-        // Test expression with mismatched parentheses
-        try {
-            new ParameterExpression("(V5BD)wo7C47");
-            fail("Expected RuntimeException");
-        } catch (RuntimeException e) {
-            verifyException("org.apache.ibatis.builder.ParameterExpression", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      ParameterExpression parameterExpression0 = new ParameterExpression("(Vx5:BD)");
+      assertEquals(1, parameterExpression0.size());
+  }
 
-    @Test(timeout = 4000)
-    public void expressionWithColonInInvalidPositionThrowsRuntimeException() {
-        // Test expression with colon in wrong position
-        try {
-            new ParameterExpression("/;vUk0|B%J1\"7WA: ");
-            fail("Expected RuntimeException");
-        } catch (RuntimeException e) {
-            verifyException("org.apache.ibatis.builder.ParameterExpression", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      ParameterExpression parameterExpression0 = null;
+      try {
+        parameterExpression0 = new ParameterExpression("(;)$");
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // Parsing error in {(;)$} in position 3
+         //
+         verifyException("org.apache.ibatis.builder.ParameterExpression", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void expressionWithInvalidSemicolonThrowsRuntimeException() {
-        // Test expression with invalid semicolon usage
-        try {
-            new ParameterExpression("(;)$");
-            fail("Expected RuntimeException");
-        } catch (RuntimeException e) {
-            verifyException("org.apache.ibatis.builder.ParameterExpression", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      ParameterExpression parameterExpression0 = new ParameterExpression(" ;|l, =R=kNH");
+      assertEquals(2, parameterExpression0.size());
+  }
 }
