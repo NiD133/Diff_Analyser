@@ -1,41 +1,45 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.commons.collections4.bloomfilter;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.LongPredicate;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-/**
- * Tests for IndexExtractor.
- *
- * Focus:
- * - asIndexArray: verifies it returns all provided indices in encounter order (including duplicates).
- * - fromBitMapExtractor: verifies conversion from 64-bit blocks to absolute bit indices.
- */
 class IndexExtractorTest {
 
-    /**
-     * Simple stub that feeds fixed bitmaps to a consumer.
-     */
-    private static final class StubBitMapExtractor implements BitMapExtractor {
-        private final long[] bitMaps;
+    private static final class TestingBitMapExtractor implements BitMapExtractor {
+        long[] values;
 
-        StubBitMapExtractor(final long... bitMaps) {
-            this.bitMaps = bitMaps;
+        TestingBitMapExtractor(final long[] values) {
+            this.values = values;
         }
 
         @Override
         public boolean processBitMaps(final LongPredicate consumer) {
-            for (final long bm : bitMaps) {
-                if (!consumer.test(bm)) {
+            for (final long l : values) {
+                if (!consumer.test(l)) {
                     return false;
                 }
             }
@@ -43,50 +47,41 @@ class IndexExtractorTest {
         }
     }
 
-    private static IndexExtractor extractorFromBitMaps(final long... bitMaps) {
-        return IndexExtractor.fromBitMapExtractor(new StubBitMapExtractor(bitMaps));
-    }
-
-    private static List<Integer> toIndexList(final IndexExtractor extractor) {
-        final List<Integer> out = new ArrayList<>();
-        extractor.processIndices(out::add);
-        return out;
-    }
-
     @ParameterizedTest
     @ValueSource(ints = {32, 33})
-    void asIndexArray_returnsAllProvidedIndices_inEncounterOrder(final int n) {
-        // Provide the index 0 exactly n times.
-        final IndexExtractor extractor = predicate -> {
-            for (int i = 0; i < n; i++) {
-                predicate.test(0);
+    void testAsIndexArray(final int n) {
+        final IndexExtractor ip = i -> {
+            for (int j = 0; j < n; j++) {
+                // Always test index zero
+                i.test(0);
             }
             return true;
         };
-
-        // Expect an array of length n, all zeros (duplicates preserved).
-        assertArrayEquals(new int[n], extractor.asIndexArray(),
-                "Expected n copies of 0 when extractor yields index 0 n times");
+        Assertions.assertArrayEquals(new int[n], ip.asIndexArray());
     }
 
     @Test
-    void fromBitMapExtractor_translatesSetBitsToAbsoluteIndices() {
-        // Bitmaps: [1, 2, 3]
-        // Explanation of expected indices:
-        //   1L  -> bit 0 in block 0        => 0
-        //   2L  -> bit 1 in block 1 (64)   => 64 + 1 = 65
-        //   3L  -> bits 0,1 in block 2 (128) => 128, 129
-        IndexExtractor extractor = extractorFromBitMaps(1L, 2L, 3L);
-        List<Integer> indices = toIndexList(extractor);
-        assertIterableEquals(Arrays.asList(0, 65, 128, 129), indices);
+    void testFromBitMapExtractor() {
+        TestingBitMapExtractor testingBitMapExtractor = new TestingBitMapExtractor(new long[] {1L, 2L, 3L});
+        IndexExtractor underTest = IndexExtractor.fromBitMapExtractor(testingBitMapExtractor);
+        List<Integer> lst = new ArrayList<>();
 
-        // All bits set in a single 64-bit block => indices 0..63
-        extractor = extractorFromBitMaps(0xFFFFFFFFFFFFFFFFL);
-        indices = toIndexList(extractor);
+        underTest.processIndices(lst::add);
+        assertEquals(4, lst.size());
+        assertEquals(Integer.valueOf(0), lst.get(0));
+        assertEquals(Integer.valueOf(1 + 64), lst.get(1));
+        assertEquals(Integer.valueOf(0 + 128), lst.get(2));
+        assertEquals(Integer.valueOf(1 + 128), lst.get(3));
 
-        assertEquals(Long.SIZE, indices.size());
-        for (int i = 0; i < Long.SIZE; i++) {
-            assertEquals(i, indices.get(i));
+        testingBitMapExtractor = new TestingBitMapExtractor(new long[] {0xFFFFFFFFFFFFFFFFL});
+        underTest = IndexExtractor.fromBitMapExtractor(testingBitMapExtractor);
+        lst = new ArrayList<>();
+
+        underTest.processIndices(lst::add);
+
+        assertEquals(64, lst.size());
+        for (int i = 0; i < 64; i++) {
+            assertEquals(Integer.valueOf(i), lst.get(i));
         }
     }
 }
