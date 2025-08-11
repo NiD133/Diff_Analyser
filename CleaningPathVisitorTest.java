@@ -20,7 +20,7 @@ package org.apache.commons.io.file;
 import static org.apache.commons.io.file.CounterAssertions.assertCounts;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,132 +28,161 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.file.Counters.PathCounters;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * Tests {@link DeletingPathVisitor}.
+ * Tests {@link CleaningPathVisitor}.
  */
+@DisplayName("CleaningPathVisitor tests")
 class CleaningPathVisitorTest extends TestArguments {
 
     @TempDir
     private Path tempDir;
+    private Path resourceDir;
 
-    private void applyCleanEmptyDirectory(final CleaningPathVisitor visitor) throws IOException {
-        Files.walkFileTree(tempDir, visitor);
-        assertCounts(1, 0, 0, visitor);
+    @BeforeEach
+    void setUp() {
+        resourceDir = Paths.get("src/test/resources/org/apache/commons/io/file");
     }
 
-    /**
-     * Tests an empty folder.
-     */
-    @ParameterizedTest
-    @MethodSource("cleaningPathVisitors")
-    void testCleanEmptyDirectory(final CleaningPathVisitor visitor) throws IOException {
-        applyCleanEmptyDirectory(visitor);
+    @Nested
+    @DisplayName("Cleaning functionality tests")
+    class CleaningFunctionalityTests {
+
+        @DisplayName("should visit an empty directory and delete nothing")
+        @ParameterizedTest(name = "with {0}")
+        @MethodSource("org.apache.commons.io.file.TestArguments#cleaningPathVisitors")
+        void whenCleaningEmptyDirectory_thenVisitsDirectoryButDeletesNothing(final CleaningPathVisitor visitor) throws IOException {
+            // Arrange: tempDir is already empty.
+
+            // Act
+            Files.walkFileTree(tempDir, visitor);
+
+            // Assert: The visitor should count 1 directory, 0 files, and 0 bytes.
+            assertCounts(1, 0, 0, visitor);
+        }
+
+        @DisplayName("should handle a null skip array when cleaning an empty directory")
+        @ParameterizedTest(name = "with {0}")
+        @MethodSource("org.apache.commons.io.file.TestArguments#pathCounters")
+        void whenCleaningWithNullSkipList_thenBehavesAsIfEmpty(final PathCounters pathCounters) throws IOException {
+            // Arrange
+            final CleaningPathVisitor visitor = new CleaningPathVisitor(pathCounters, (String[]) null);
+
+            // Act
+            Files.walkFileTree(tempDir, visitor);
+
+            // Assert: A null skip list is treated as empty; counts are for an empty directory.
+            assertCounts(1, 0, 0, visitor);
+        }
+
+        @DisplayName("should delete a zero-byte file and update counts")
+        @ParameterizedTest(name = "with {0}")
+        @MethodSource("org.apache.commons.io.file.TestArguments#cleaningPathVisitors")
+        void whenDirectoryHasZeroByteFile_thenFileIsDeletedAndCountsAreCorrect(final CleaningPathVisitor visitor) throws IOException {
+            // Arrange
+            PathUtils.copyDirectory(resourceDir.resolve("dirs-1-file-size-0"), tempDir);
+
+            // Act
+            PathUtils.visitFileTree(visitor, tempDir);
+
+            // Assert: Counts 1 directory, 1 file, and 0 bytes.
+            assertCounts(1, 1, 0, visitor);
+        }
+
+        @DisplayName("should delete a one-byte file and update counts")
+        @ParameterizedTest(name = "with {0}")
+        @MethodSource("org.apache.commons.io.file.TestArguments#cleaningPathVisitors")
+        void whenDirectoryHasOneByteFile_thenFileIsDeletedAndCountsAreCorrect(final CleaningPathVisitor visitor) throws IOException {
+            // Arrange
+            PathUtils.copyDirectory(resourceDir.resolve("dirs-1-file-size-1"), tempDir);
+
+            // Act
+            PathUtils.visitFileTree(visitor, tempDir);
+
+            // Assert: Counts 1 directory, 1 file, and 1 byte.
+            assertCounts(1, 1, 1, visitor);
+        }
+
+        @DisplayName("should not delete a file that is in the skip list")
+        @ParameterizedTest(name = "with {0}")
+        @MethodSource("org.apache.commons.io.file.TestArguments#pathCounters")
+        void whenFileIsSkipped_thenItIsNotDeleted(final PathCounters pathCounters) throws IOException {
+            // Arrange
+            PathUtils.copyDirectory(resourceDir.resolve("dirs-1-file-size-1"), tempDir);
+            final String fileToSkip = "file-size-1.bin";
+            final Path skippedFilePath = tempDir.resolve(fileToSkip);
+            final CleaningPathVisitor visitor = new CleaningPathVisitor(pathCounters, fileToSkip);
+
+            // Act
+            PathUtils.visitFileTree(visitor, tempDir);
+
+            // Assert
+            // The visitor still counts everything it visits.
+            assertCounts(1, 1, 1, visitor);
+            // Verify the skipped file was not deleted.
+            assertTrue(Files.exists(skippedFilePath), "Skipped file should not have been deleted.");
+
+            // Clean up the skipped file manually since the visitor did not delete it.
+            Files.delete(skippedFilePath);
+        }
+
+        @DisplayName("should delete all files in a complex directory structure")
+        @ParameterizedTest(name = "with {0}")
+        @MethodSource("org.apache.commons.io.file.TestArguments#cleaningPathVisitors")
+        void whenDirectoryHasSubdirectories_thenAllFilesAreDeleted(final CleaningPathVisitor visitor) throws IOException {
+            // Arrange
+            PathUtils.copyDirectory(resourceDir.resolve("dirs-2-file-size-2"), tempDir);
+
+            // Act
+            PathUtils.visitFileTree(visitor, tempDir);
+
+            // Assert: Counts 3 directories, 2 files, and 2 bytes.
+            assertCounts(3, 2, 2, visitor);
+        }
     }
 
-    /**
-     * Tests an empty folder.
-     */
-    @ParameterizedTest
-    @MethodSource("pathCounters")
-    void testCleanEmptyDirectoryNullCtorArg(final PathCounters pathCounters) throws IOException {
-        applyCleanEmptyDirectory(new CleaningPathVisitor(pathCounters, (String[]) null));
-    }
+    @Nested
+    @DisplayName("equals() and hashCode() contract tests")
+    class EqualsAndHashCodeTest {
 
-    /**
-     * Tests a directory with one file of size 0.
-     */
-    @ParameterizedTest
-    @MethodSource("cleaningPathVisitors")
-    void testCleanFolders1FileSize0(final CleaningPathVisitor visitor) throws IOException {
-        PathUtils.copyDirectory(Paths.get("src/test/resources/org/apache/commons/io/dirs-1-file-size-0"), tempDir);
-        final CleaningPathVisitor visitFileTree = PathUtils.visitFileTree(visitor, tempDir);
-        assertCounts(1, 1, 0, visitFileTree);
-        assertSame(visitor, visitFileTree);
-        //
-        assertNotEquals(visitFileTree, CleaningPathVisitor.withLongCounters());
-        assertNotEquals(visitFileTree.hashCode(), CleaningPathVisitor.withLongCounters().hashCode());
-        assertEquals(visitFileTree, visitFileTree);
-        assertEquals(visitFileTree.hashCode(), visitFileTree.hashCode());
-    }
+        @Test
+        @DisplayName("should be equal for two new instances")
+        void testEqualsAndHashCodeForNewInstances() {
+            final CleaningPathVisitor visitor1 = CleaningPathVisitor.withLongCounters();
+            final CleaningPathVisitor visitor2 = CleaningPathVisitor.withLongCounters();
 
-    /**
-     * Tests a directory with one file of size 1.
-     */
-    @ParameterizedTest
-    @MethodSource("cleaningPathVisitors")
-    void testCleanFolders1FileSize1(final CleaningPathVisitor visitor) throws IOException {
-        PathUtils.copyDirectory(Paths.get("src/test/resources/org/apache/commons/io/dirs-1-file-size-1"), tempDir);
-        final CleaningPathVisitor visitFileTree = PathUtils.visitFileTree(visitor, tempDir);
-        assertCounts(1, 1, 1, visitFileTree);
-        assertSame(visitor, visitFileTree);
-        //
-        assertNotEquals(visitFileTree, CleaningPathVisitor.withLongCounters());
-        assertNotEquals(visitFileTree.hashCode(), CleaningPathVisitor.withLongCounters().hashCode());
-        assertEquals(visitFileTree, visitFileTree);
-        assertEquals(visitFileTree.hashCode(), visitFileTree.hashCode());
-    }
+            assertEquals(visitor1, visitor2);
+            assertEquals(visitor1.hashCode(), visitor2.hashCode());
+        }
 
-    /**
-     * Tests a directory with one file of size 1 but skip that file.
-     */
-    @ParameterizedTest
-    @MethodSource("pathCounters")
-    void testCleanFolders1FileSize1Skip(final PathCounters pathCounters) throws IOException {
-        PathUtils.copyDirectory(Paths.get("src/test/resources/org/apache/commons/io/dirs-1-file-size-1"), tempDir);
-        final String skipFileName = "file-size-1.bin";
-        final CountingPathVisitor visitor = new CleaningPathVisitor(pathCounters, skipFileName);
-        final CountingPathVisitor visitFileTree = PathUtils.visitFileTree(visitor, tempDir);
-        assertCounts(1, 1, 1, visitFileTree);
-        assertSame(visitor, visitFileTree);
-        final Path skippedFile = tempDir.resolve(skipFileName);
-        Assertions.assertTrue(Files.exists(skippedFile));
-        Files.delete(skippedFile);
-        //
-        assertNotEquals(visitFileTree, CleaningPathVisitor.withLongCounters());
-        assertNotEquals(visitFileTree.hashCode(), CleaningPathVisitor.withLongCounters().hashCode());
-        assertEquals(visitFileTree, visitFileTree);
-        assertEquals(visitFileTree.hashCode(), visitFileTree.hashCode());
-    }
+        @Test
+        @DisplayName("should be equal to itself")
+        void testEqualsAndHashCodeForSameInstance() {
+            final CleaningPathVisitor visitor = CleaningPathVisitor.withLongCounters();
+            assertEquals(visitor, visitor);
+            assertEquals(visitor.hashCode(), visitor.hashCode());
+        }
 
-    /**
-     * Tests a directory with two subdirectories, each containing one file of size 1.
-     */
-    @ParameterizedTest
-    @MethodSource("cleaningPathVisitors")
-    void testCleanFolders2FileSize2(final CleaningPathVisitor visitor) throws IOException {
-        PathUtils.copyDirectory(Paths.get("src/test/resources/org/apache/commons/io/dirs-2-file-size-2"), tempDir);
-        final CleaningPathVisitor visitFileTree = PathUtils.visitFileTree(visitor, tempDir);
-        assertCounts(3, 2, 2, visitFileTree);
-        assertSame(visitor, visitFileTree);
-        //
-        assertNotEquals(visitFileTree, CleaningPathVisitor.withLongCounters());
-        assertNotEquals(visitFileTree.hashCode(), CleaningPathVisitor.withLongCounters().hashCode());
-        assertEquals(visitFileTree, visitFileTree);
-        assertEquals(visitFileTree.hashCode(), visitFileTree.hashCode());
-    }
+        @Test
+        @DisplayName("should not be equal after state changes")
+        void testEqualsAndHashCodeAfterStateChange() {
+            // Arrange
+            final CleaningPathVisitor visitor1 = CleaningPathVisitor.withLongCounters();
+            final CleaningPathVisitor visitor2 = CleaningPathVisitor.withLongCounters();
 
-    @Test
-    void testEqualsHashCode() {
-        final CountingPathVisitor visitor0 = CleaningPathVisitor.withLongCounters();
-        final CountingPathVisitor visitor1 = CleaningPathVisitor.withLongCounters();
-        assertEquals(visitor0, visitor0);
-        assertEquals(visitor0, visitor1);
-        assertEquals(visitor1, visitor0);
-        assertEquals(visitor0.hashCode(), visitor0.hashCode());
-        assertEquals(visitor0.hashCode(), visitor1.hashCode());
-        assertEquals(visitor1.hashCode(), visitor0.hashCode());
-        visitor0.getPathCounters().getByteCounter().increment();
-        assertEquals(visitor0, visitor0);
-        assertNotEquals(visitor0, visitor1);
-        assertNotEquals(visitor1, visitor0);
-        assertEquals(visitor0.hashCode(), visitor0.hashCode());
-        assertNotEquals(visitor0.hashCode(), visitor1.hashCode());
-        assertNotEquals(visitor1.hashCode(), visitor0.hashCode());
+            // Act: Modify the state of one visitor
+            visitor1.getPathCounters().getByteCounter().increment();
+
+            // Assert
+            assertNotEquals(visitor1, visitor2);
+            assertNotEquals(visitor1.hashCode(), visitor2.hashCode());
+        }
     }
 }
