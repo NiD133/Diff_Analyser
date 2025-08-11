@@ -25,142 +25,89 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit tests for the {@link ArraySorter} class.
+ * Tests {@link ArraySorter}.
  */
 class ArraySorterTest extends AbstractLangTest {
 
-    /**
-     * Tests sorting of a byte array.
-     */
     @Test
     void testSortByteArray() {
-        final byte[] unsortedArray = {2, 1};
-        final byte[] expectedSortedArray = {1, 2};
-
-        // Test sorting functionality
-        assertArrayEquals(expectedSortedArray, ArraySorter.sort(unsortedArray.clone()));
-
-        // Test sorting of null array
+        final byte[] array1 = {2, 1};
+        final byte[] array2 = array1.clone();
+        Arrays.sort(array1);
+        assertArrayEquals(array1, ArraySorter.sort(array2));
         assertNull(ArraySorter.sort((byte[]) null));
     }
 
-    /**
-     * Tests sorting of a char array.
-     */
     @Test
     void testSortCharArray() {
-        final char[] unsortedArray = {2, 1};
-        final char[] expectedSortedArray = {1, 2};
-
-        // Test sorting functionality
-        assertArrayEquals(expectedSortedArray, ArraySorter.sort(unsortedArray.clone()));
-
-        // Test sorting of null array
+        final char[] array1 = {2, 1};
+        final char[] array2 = array1.clone();
+        Arrays.sort(array1);
+        assertArrayEquals(array1, ArraySorter.sort(array2));
         assertNull(ArraySorter.sort((char[]) null));
     }
 
-    /**
-     * Tests sorting of a String array using natural ordering.
-     */
     @Test
     void testSortComparable() {
-        final String[] unsortedArray = {"foo", "bar"};
-        final String[] expectedSortedArray = {"bar", "foo"};
-
-        // Test sorting functionality
-        assertArrayEquals(expectedSortedArray, ArraySorter.sort(unsortedArray.clone(), String::compareTo));
-
-        // Test sorting of null array
+        final String[] array1 = ArrayUtils.toArray("foo", "bar");
+        final String[] array2 = array1.clone();
+        Arrays.sort(array1);
+        assertArrayEquals(array1, ArraySorter.sort(array2, String::compareTo));
         assertNull(ArraySorter.sort((String[]) null));
     }
 
-    /**
-     * Tests sorting of a double array.
-     */
     @Test
     void testSortDoubleArray() {
-        final double[] unsortedArray = {2.0, 1.0};
-        final double[] expectedSortedArray = {1.0, 2.0};
-
-        // Test sorting functionality
-        assertArrayEquals(expectedSortedArray, ArraySorter.sort(unsortedArray.clone()));
-
-        // Test sorting of null array
+        final double[] array1 = {2, 1};
+        final double[] array2 = array1.clone();
+        Arrays.sort(array1);
+        assertArrayEquals(array1, ArraySorter.sort(array2));
         assertNull(ArraySorter.sort((double[]) null));
     }
 
-    /**
-     * Tests sorting of a float array.
-     */
     @Test
     void testSortFloatArray() {
-        final float[] unsortedArray = {2.0f, 1.0f};
-        final float[] expectedSortedArray = {1.0f, 2.0f};
-
-        // Test sorting functionality
-        assertArrayEquals(expectedSortedArray, ArraySorter.sort(unsortedArray.clone()));
-
-        // Test sorting of null array
+        final float[] array1 = {2, 1};
+        final float[] array2 = array1.clone();
+        Arrays.sort(array1);
+        assertArrayEquals(array1, ArraySorter.sort(array2));
         assertNull(ArraySorter.sort((float[]) null));
     }
 
-    /**
-     * Tests sorting of an int array.
-     */
     @Test
     void testSortIntArray() {
-        final int[] unsortedArray = {2, 1};
-        final int[] expectedSortedArray = {1, 2};
-
-        // Test sorting functionality
-        assertArrayEquals(expectedSortedArray, ArraySorter.sort(unsortedArray.clone()));
-
-        // Test sorting of null array
+        final int[] array1 = {2, 1};
+        final int[] array2 = array1.clone();
+        Arrays.sort(array1);
+        assertArrayEquals(array1, ArraySorter.sort(array2));
         assertNull(ArraySorter.sort((int[]) null));
     }
 
-    /**
-     * Tests sorting of a long array.
-     */
     @Test
     void testSortLongArray() {
-        final long[] unsortedArray = {2L, 1L};
-        final long[] expectedSortedArray = {1L, 2L};
-
-        // Test sorting functionality
-        assertArrayEquals(expectedSortedArray, ArraySorter.sort(unsortedArray.clone()));
-
-        // Test sorting of null array
+        final long[] array1 = {2, 1};
+        final long[] array2 = array1.clone();
+        Arrays.sort(array1);
+        assertArrayEquals(array1, ArraySorter.sort(array2));
         assertNull(ArraySorter.sort((long[]) null));
     }
 
-    /**
-     * Tests sorting of an Object array using natural ordering.
-     */
     @Test
     void testSortObjects() {
-        final String[] unsortedArray = {"foo", "bar"};
-        final String[] expectedSortedArray = {"bar", "foo"};
-
-        // Test sorting functionality
-        assertArrayEquals(expectedSortedArray, ArraySorter.sort(unsortedArray.clone()));
-
-        // Test sorting of null array
+        final String[] array1 = ArrayUtils.toArray("foo", "bar");
+        final String[] array2 = array1.clone();
+        Arrays.sort(array1);
+        assertArrayEquals(array1, ArraySorter.sort(array2));
         assertNull(ArraySorter.sort((String[]) null));
     }
 
-    /**
-     * Tests sorting of a short array.
-     */
     @Test
     void testSortShortArray() {
-        final short[] unsortedArray = {2, 1};
-        final short[] expectedSortedArray = {1, 2};
-
-        // Test sorting functionality
-        assertArrayEquals(expectedSortedArray, ArraySorter.sort(unsortedArray.clone()));
-
-        // Test sorting of null array
+        final short[] array1 = {2, 1};
+        final short[] array2 = array1.clone();
+        Arrays.sort(array1);
+        assertArrayEquals(array1, ArraySorter.sort(array2));
         assertNull(ArraySorter.sort((short[]) null));
     }
+
 }
