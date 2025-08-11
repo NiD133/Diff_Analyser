@@ -44,147 +44,70 @@ package com.itextpdf.text.pdf;
 
 import java.io.ByteArrayOutputStream;
 
+import junit.framework.Assert;
+
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.itextpdf.text.io.RandomAccessSourceFactory;
 import com.itextpdf.text.pdf.RandomAccessFileOrArray;
 
-/**
- * Test suite for RandomAccessFileOrArray functionality.
- * Tests core operations: sequential reading, seeking, and pushback functionality.
- */
 public class RandomAccessFileOrArrayTest {
-    
-    // Test data constants
-    private static final int TEST_DATA_SIZE = 10000;
-    private static final int SEEK_POSITION = 72;
-    private static final byte PUSHBACK_OFFSET = 42;
-    
-    // Test fixtures
-    private byte[] testData;
-    private RandomAccessFileOrArray randomAccessArray;
-    
-    @Before
-    public void setUp() throws Exception {
-        testData = createTestData();
-        randomAccessArray = createRandomAccessArray(testData);
-    }
+	byte[] data;
+	RandomAccessFileOrArray rafoa;
+	
+	@Before
+	public void setUp() throws Exception {
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		for (int i = 0; i < 10000; i++){
+			os.write(i);
+		}
+		data = os.toByteArray();
+		rafoa = new RandomAccessFileOrArray(new RandomAccessSourceFactory().createSource(data));
+	}
 
-    @After
-    public void tearDown() throws Exception {
-        // No cleanup needed - objects will be garbage collected
-    }
+	@After
+	public void tearDown() throws Exception {
+	}
 
-    /**
-     * Test that pushBack() correctly inserts a byte that will be read next,
-     * without affecting subsequent reads from the original data.
-     */
-    @Test
-    public void testPushbackInsertsCorrectByteInReadSequence() throws Exception {
-        // Read first two bytes normally
-        byte firstByte = (byte) randomAccessArray.read();
-        byte secondByte = (byte) randomAccessArray.read();
-        
-        Assert.assertEquals("First byte should match test data", testData[0], firstByte);
-        Assert.assertEquals("Second byte should match test data", testData[1], secondByte);
-        
-        // Push back a different value
-        byte pushedBackValue = (byte) (testData[1] + PUSHBACK_OFFSET);
-        randomAccessArray.pushBack(pushedBackValue);
-        
-        // Verify pushback value is read next, then normal sequence continues
-        Assert.assertEquals("Next read should return pushed back value", 
-                           pushedBackValue, (byte) randomAccessArray.read());
-        Assert.assertEquals("Following read should continue from original position", 
-                           testData[2], (byte) randomAccessArray.read());
-        Assert.assertEquals("Subsequent read should follow original sequence", 
-                           testData[3], (byte) randomAccessArray.read());
-    }
+	@Test
+	public void testPushback_byteByByte() throws Exception {
+		
+		Assert.assertEquals(data[0], (byte)rafoa.read());
+		Assert.assertEquals(data[1], (byte)rafoa.read());
+		byte pushBackVal = (byte)(data[1] + 42);
+		rafoa.pushBack(pushBackVal);
+		Assert.assertEquals(pushBackVal, (byte)rafoa.read());
+		Assert.assertEquals(data[2], (byte)rafoa.read());
+		Assert.assertEquals(data[3], (byte)rafoa.read());
+		
+	}
 
-    /**
-     * Test that sequential reading returns all bytes in correct order.
-     */
-    @Test
-    public void testSequentialReadingReturnsAllBytesInOrder() throws Exception {
-        for (int position = 0; position < testData.length; position++) {
-            byte expectedByte = testData[position];
-            byte actualByte = (byte) randomAccessArray.read();
-            
-            Assert.assertEquals(
-                String.format("Byte at position %d should match test data", position),
-                expectedByte, 
-                actualByte
-            );
-        }
-    }
+	@Test
+	public void testSimple() throws Exception {
+		for(int i = 0; i < data.length; i++){
+			Assert.assertEquals(data[i], (byte)rafoa.read());
+		}
+	}
 
-    /**
-     * Test that seek() correctly positions the file pointer and subsequent reads
-     * start from the new position.
-     */
-    @Test
-    public void testSeekPositionsFilePointerCorrectly() throws Exception {
-        RandomAccessFileOrArray seekTestArray = createRandomAccessArray(testData);
-        
-        seekTestArray.seek(SEEK_POSITION);
-        
-        // Verify all reads after seek start from the correct position
-        for (int position = SEEK_POSITION; position < testData.length; position++) {
-            byte expectedByte = testData[position];
-            byte actualByte = (byte) seekTestArray.read();
-            
-            Assert.assertEquals(
-                String.format("After seeking to %d, byte at position %d should match", 
-                             SEEK_POSITION, position),
-                expectedByte, 
-                actualByte
-            );
-        }
-    }
-    
-    /**
-     * Test that getFilePointer() correctly reports position changes after seek() and pushBack().
-     */
-    @Test
-    public void testFilePointerReflectsPositionChangesCorrectly() throws Exception {
-        RandomAccessFileOrArray positionTestArray = createRandomAccessArray(testData);
-        
-        // Test position after seek
-        positionTestArray.seek(SEEK_POSITION);
-        Assert.assertEquals("File pointer should reflect seek position", 
-                           SEEK_POSITION, positionTestArray.getFilePointer());
-        
-        // Test position after pushback (should move back by 1)
-        byte pushbackValue = PUSHBACK_OFFSET;
-        positionTestArray.pushBack(pushbackValue);
-        long expectedPositionAfterPushback = SEEK_POSITION - 1;
-        
-        Assert.assertEquals("File pointer should move back by 1 after pushback", 
-                           expectedPositionAfterPushback, positionTestArray.getFilePointer());
-    }
-    
-    // Helper methods
-    
-    /**
-     * Creates test data array with predictable byte values for testing.
-     * Each byte value is the lower 8 bits of its index position.
-     */
-    private byte[] createTestData() {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        for (int i = 0; i < TEST_DATA_SIZE; i++) {
-            outputStream.write(i); // Automatically truncates to byte
-        }
-        return outputStream.toByteArray();
-    }
-    
-    /**
-     * Creates a RandomAccessFileOrArray instance from the given byte array.
-     */
-    private RandomAccessFileOrArray createRandomAccessArray(byte[] data) {
-        RandomAccessSourceFactory sourceFactory = new RandomAccessSourceFactory();
-        return new RandomAccessFileOrArray(sourceFactory.createSource(data));
-    }
+	@Test
+	public void testSeek() throws Exception {
+		RandomAccessFileOrArray rafoa = new RandomAccessFileOrArray(new RandomAccessSourceFactory().createSource(data));
+		rafoa.seek(72);
+		for(int i = 72; i < data.length; i++){
+			Assert.assertEquals(data[i], (byte)rafoa.read());
+		}
+	}
+	
+	@Test
+	public void testFilePositionWithPushback() throws Exception {
+		RandomAccessFileOrArray rafoa = new RandomAccessFileOrArray(new RandomAccessSourceFactory().createSource(data));
+		long offset = 72;
+		rafoa.seek(offset);
+		Assert.assertEquals(offset, rafoa.getFilePointer());
+		byte pushbackVal = 42;
+		rafoa.pushBack(pushbackVal);
+		Assert.assertEquals(offset-1, rafoa.getFilePointer());
+	}
 }
