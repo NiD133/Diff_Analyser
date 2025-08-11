@@ -43,33 +43,50 @@
  */
 package com.itextpdf.text.pdf.parser;
 
-import junit.framework.Assert;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 /**
- * @author kevin
+ * Tests for the {@link Vector} class, focusing on its mathematical operations.
  */
 public class VectorTest {
 
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
+    /**
+     * The 'cross' method in iText's Vector class performs a vector-matrix multiplication,
+     * which is a standard way to apply an affine transformation to a point. This test
+     * verifies that a Vector multiplied by a Matrix produces the correct transformed Vector.
+     *
+     * <p>The transformation is calculated as follows: v' = v * M</p>
+     * <p>Where v = [x, y, z] and M is the 3x3 transformation matrix.</p>
+     *
+     * <p>Given Vector v = [2, 3, 4]</p>
+     * <p>And Matrix M from {@code new Matrix(5, 6, 7, 8, 9, 10)} which corresponds to:</p>
+     * <pre>
+     * [ 5  6  0 ]
+     * [ 7  8  0 ]
+     * [ 9 10  1 ]
+     * </pre>
+     *
+     * <p>The resulting vector's components are calculated as:</p>
+     * <ul>
+     *   <li>x' = (2 * 5) + (3 * 7) + (4 * 9) = 10 + 21 + 36 = 67</li>
+     *   <li>y' = (2 * 6) + (3 * 8) + (4 * 10) = 12 + 24 + 40 = 76</li>
+     *   <li>z' = (2 * 0) + (3 * 0) + (4 * 1) = 4</li>
+     * </ul>
+     * <p>Thus, the expected result is the vector [67, 76, 4].</p>
+     */
     @Test
-    public void testCrossVector() {
-        Vector v = new Vector(2, 3, 4);
-        Matrix m = new Matrix(5, 6, 7, 8, 9, 10);
-        Vector shouldBe = new Vector(67, 76, 4);
-        
-        Vector rslt = v.cross(m);
-        Assert.assertEquals(shouldBe, rslt);
-    }
+    public void crossWithMatrix_shouldCorrectlyTransformVector() {
+        // Arrange: Define the initial vector, the transformation matrix, and the expected result.
+        // The Arrange-Act-Assert pattern separates the test logic into distinct sections.
+        Vector initialVector = new Vector(2, 3, 4);
+        Matrix transformationMatrix = new Matrix(5, 6, 7, 8, 9, 10);
+        Vector expectedVector = new Vector(67, 76, 4);
 
+        // Act: Apply the transformation by calling the 'cross' method.
+        Vector actualVector = initialVector.cross(transformationMatrix);
+
+        // Assert: Verify that the resulting vector matches the expected vector.
+        assertEquals(expectedVector, actualVector);
+    }
 }
