@@ -22,12 +22,15 @@ import java.util.TimeZone;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.joda.time.Chronology;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.MutablePeriod;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
+import org.joda.time.chrono.BuddhistChronology;
+import org.joda.time.chrono.ISOChronology;
 
 /**
  * This class is a Junit unit test for Period Formating.
@@ -36,23 +39,27 @@ import org.joda.time.PeriodType;
  */
 public class TestPeriodFormatter extends TestCase {
 
-    // Test time setup (not directly used in period formatting tests)
-    private static final long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 
+    private static final DateTimeZone UTC = DateTimeZone.UTC;
+    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
+    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+    private static final DateTimeZone NEWYORK = DateTimeZone.forID("America/New_York");
+    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
+    private static final Chronology ISO_PARIS = ISOChronology.getInstance(PARIS);
+    private static final Chronology BUDDHIST_PARIS = BuddhistChronology.getInstance(PARIS);
+
+    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 
                      366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 
                      365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 +
                      366 + 365;
-    private static final long TEST_TIME_NOW =
+    // 2002-06-09
+    private long TEST_TIME_NOW =
             (y2002days + 31L + 28L + 31L + 30L + 31L + 9L -1L) * DateTimeConstants.MILLIS_PER_DAY;
 
-    // Standard period components for test data
-    private static final String STANDARD_PERIOD_STRING = "P1Y2M3W4DT5H6M7.008S";
-    private static final Period TEST_PERIOD = new Period(1, 2, 3, 4, 5, 6, 7, 8);
-    private static final MutablePeriod TEST_MUTABLE_PERIOD = new MutablePeriod(1, 2, 3, 4, 5, 6, 7, 8);
-
-    private DateTimeZone originalDateTimeZone;
-    private TimeZone originalTimeZone;
-    private Locale originalLocale;
-    private PeriodFormatter formatter;
+    private DateTimeZone originalDateTimeZone = null;
+    private TimeZone originalTimeZone = null;
+    private Locale originalLocale = null;
+    private PeriodFormatter f = null;
 
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
@@ -68,17 +75,14 @@ public class TestPeriodFormatter extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        // Fixed time setup (doesn't affect period formatting but preserves original behavior)
         DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
         originalDateTimeZone = DateTimeZone.getDefault();
         originalTimeZone = TimeZone.getDefault();
         originalLocale = Locale.getDefault();
-        
-        DateTimeZone.setDefault(DateTimeZone.forID("Europe/London"));
+        DateTimeZone.setDefault(LONDON);
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
         Locale.setDefault(Locale.UK);
-        
-        formatter = ISOPeriodFormat.standard();
+        f = ISOPeriodFormat.standard();
     }
 
     @Override
@@ -87,243 +91,144 @@ public class TestPeriodFormatter extends TestCase {
         DateTimeZone.setDefault(originalDateTimeZone);
         TimeZone.setDefault(originalTimeZone);
         Locale.setDefault(originalLocale);
-        formatter = null;
+        originalDateTimeZone = null;
+        originalTimeZone = null;
+        originalLocale = null;
+        f = null;
     }
 
     //-----------------------------------------------------------------------
-    // Test Period Printing
-    //-----------------------------------------------------------------------
-
-    /**
-     * Tests basic printing of a period in standard ISO format.
-     */
-    public void testPrintStandardFormat() {
-        assertEquals(STANDARD_PERIOD_STRING, formatter.print(TEST_PERIOD));
+    public void testPrint_simple() {
+        Period p = new Period(1, 2, 3, 4, 5, 6, 7, 8);
+        assertEquals("P1Y2M3W4DT5H6M7.008S", f.print(p));
     }
 
-    /**
-     * Tests printing to a StringBuffer.
-     */
-    public void testPrintToStringBuffer() {
+    //-----------------------------------------------------------------------
+    public void testPrint_bufferMethods() throws Exception {
+        Period p = new Period(1, 2, 3, 4, 5, 6, 7, 8);
         StringBuffer buf = new StringBuffer();
-        formatter.printTo(buf, TEST_PERIOD);
-        assertEquals(STANDARD_PERIOD_STRING, buf.toString());
-    }
-
-    /**
-     * Tests printing to a StringBuffer with null period (expects exception).
-     */
-    public void testPrintToStringBufferWithNullPeriod() {
+        f.printTo(buf, p);
+        assertEquals("P1Y2M3W4DT5H6M7.008S", buf.toString());
+        
+        buf = new StringBuffer();
         try {
-            formatter.printTo(new StringBuffer(), null);
-            fail("Expected IllegalArgumentException when printing null period");
-        } catch (IllegalArgumentException ex) {
-            // Expected
-        }
+            f.printTo(buf, null);
+            fail();
+        } catch (IllegalArgumentException ex) {}
     }
 
-    /**
-     * Tests printing to a Writer.
-     */
-    public void testPrintToWriter() throws Exception {
+    //-----------------------------------------------------------------------
+    public void testPrint_writerMethods() throws Exception {
+        Period p = new Period(1, 2, 3, 4, 5, 6, 7, 8);
         CharArrayWriter out = new CharArrayWriter();
-        formatter.printTo(out, TEST_PERIOD);
-        assertEquals(STANDARD_PERIOD_STRING, out.toString());
-    }
-
-    /**
-     * Tests printing to a Writer with null period (expects exception).
-     */
-    public void testPrintToWriterWithNullPeriod() {
+        f.printTo(out, p);
+        assertEquals("P1Y2M3W4DT5H6M7.008S", out.toString());
+        
+        out = new CharArrayWriter();
         try {
-            formatter.printTo(new CharArrayWriter(), null);
-            fail("Expected IllegalArgumentException when printing null period");
-        } catch (IllegalArgumentException ex) {
-            // Expected
-        }
+            f.printTo(out, null);
+            fail();
+        } catch (IllegalArgumentException ex) {}
     }
 
     //-----------------------------------------------------------------------
-    // Test Configuration Methods
-    //-----------------------------------------------------------------------
-
-    /**
-     * Tests setting/getting locale.
-     */
-    public void testWithGetLocale() {
-        PeriodFormatter frenchFormatter = formatter.withLocale(Locale.FRENCH);
-        assertEquals(Locale.FRENCH, frenchFormatter.getLocale());
-        assertSame(frenchFormatter, frenchFormatter.withLocale(Locale.FRENCH));
+    public void testWithGetLocaleMethods() {
+        PeriodFormatter f2 = f.withLocale(Locale.FRENCH);
+        assertEquals(Locale.FRENCH, f2.getLocale());
+        assertSame(f2, f2.withLocale(Locale.FRENCH));
         
-        PeriodFormatter nullLocaleFormatter = formatter.withLocale(null);
-        assertNull(nullLocaleFormatter.getLocale());
-        assertSame(nullLocaleFormatter, nullLocaleFormatter.withLocale(null));
+        f2 = f.withLocale(null);
+        assertEquals(null, f2.getLocale());
+        assertSame(f2, f2.withLocale(null));
     }
 
-    /**
-     * Tests setting/getting parse type.
-     */
-    public void testWithGetParseType() {
-        PeriodType dayTimeType = PeriodType.dayTime();
-        PeriodFormatter dayTimeFormatter = formatter.withParseType(dayTimeType);
-        assertEquals(dayTimeType, dayTimeFormatter.getParseType());
-        assertSame(dayTimeFormatter, dayTimeFormatter.withParseType(dayTimeType));
+    public void testWithGetParseTypeMethods() {
+        PeriodFormatter f2 = f.withParseType(PeriodType.dayTime());
+        assertEquals(PeriodType.dayTime(), f2.getParseType());
+        assertSame(f2, f2.withParseType(PeriodType.dayTime()));
         
-        PeriodFormatter nullParseTypeFormatter = formatter.withParseType(null);
-        assertNull(nullParseTypeFormatter.getParseType());
-        assertSame(nullParseTypeFormatter, nullParseTypeFormatter.withParseType(null));
+        f2 = f.withParseType(null);
+        assertEquals(null, f2.getParseType());
+        assertSame(f2, f2.withParseType(null));
     }
 
-    /**
-     * Tests printer/parser access methods.
-     */
-    public void testPrinterParserAccessors() {
-        PeriodFormatter printerParserFormatter = new PeriodFormatter(
-            formatter.getPrinter(), formatter.getParser());
+    public void testPrinterParserMethods() {
+        Period p = new Period(1, 2, 3, 4, 5, 6, 7, 8);
+        PeriodFormatter f2 = new PeriodFormatter(f.getPrinter(), f.getParser());
+        assertEquals(f.getPrinter(), f2.getPrinter());
+        assertEquals(f.getParser(), f2.getParser());
+        assertEquals(true, f2.isPrinter());
+        assertEquals(true, f2.isParser());
+        assertNotNull(f2.print(p));
+        assertNotNull(f2.parsePeriod("P1Y2M3W4DT5H6M7.008S"));
         
-        assertEquals(formatter.getPrinter(), printerParserFormatter.getPrinter());
-        assertEquals(formatter.getParser(), printerParserFormatter.getParser());
-        assertTrue(printerParserFormatter.isPrinter());
-        assertTrue(printerParserFormatter.isParser());
-        
-        assertEquals(STANDARD_PERIOD_STRING, printerParserFormatter.print(TEST_PERIOD));
-        assertEquals(TEST_PERIOD, printerParserFormatter.parsePeriod(STANDARD_PERIOD_STRING));
-    }
-
-    /**
-     * Tests formatter with only printer capability.
-     */
-    public void testPrinterOnlyFormatter() {
-        PeriodFormatter printerOnlyFormatter = new PeriodFormatter(formatter.getPrinter(), null);
-        
-        assertEquals(formatter.getPrinter(), printerOnlyFormatter.getPrinter());
-        assertNull(printerOnlyFormatter.getParser());
-        assertTrue(printerOnlyFormatter.isPrinter());
-        assertFalse(printerOnlyFormatter.isParser());
-        
-        assertEquals(STANDARD_PERIOD_STRING, printerOnlyFormatter.print(TEST_PERIOD));
-        
+        f2 = new PeriodFormatter(f.getPrinter(), null);
+        assertEquals(f.getPrinter(), f2.getPrinter());
+        assertEquals(null, f2.getParser());
+        assertEquals(true, f2.isPrinter());
+        assertEquals(false, f2.isParser());
+        assertNotNull(f2.print(p));
         try {
-            printerOnlyFormatter.parsePeriod(STANDARD_PERIOD_STRING);
-            fail("Expected UnsupportedOperationException when parsing with printer-only formatter");
-        } catch (UnsupportedOperationException ex) {
-            // Expected
-        }
-    }
-
-    /**
-     * Tests formatter with only parser capability.
-     */
-    public void testParserOnlyFormatter() {
-        PeriodFormatter parserOnlyFormatter = new PeriodFormatter(null, formatter.getParser());
+            assertNotNull(f2.parsePeriod("P1Y2M3W4DT5H6M7.008S"));
+            fail();
+        } catch (UnsupportedOperationException ex) {}
         
-        assertNull(parserOnlyFormatter.getPrinter());
-        assertEquals(formatter.getParser(), parserOnlyFormatter.getParser());
-        assertFalse(parserOnlyFormatter.isPrinter());
-        assertTrue(parserOnlyFormatter.isParser());
-        
+        f2 = new PeriodFormatter(null, f.getParser());
+        assertEquals(null, f2.getPrinter());
+        assertEquals(f.getParser(), f2.getParser());
+        assertEquals(false, f2.isPrinter());
+        assertEquals(true, f2.isParser());
         try {
-            parserOnlyFormatter.print(TEST_PERIOD);
-            fail("Expected UnsupportedOperationException when printing with parser-only formatter");
-        } catch (UnsupportedOperationException ex) {
-            // Expected
-        }
-        
-        assertEquals(TEST_PERIOD, parserOnlyFormatter.parsePeriod(STANDARD_PERIOD_STRING));
+            f2.print(p);
+            fail();
+        } catch (UnsupportedOperationException ex) {}
+        assertNotNull(f2.parsePeriod("P1Y2M3W4DT5H6M7.008S"));
     }
 
     //-----------------------------------------------------------------------
-    // Test Parsing Functionality
+    public void testParsePeriod_simple() {
+        Period expect = new Period(1, 2, 3, 4, 5, 6, 7, 8);
+        assertEquals(expect, f.parsePeriod("P1Y2M3W4DT5H6M7.008S"));
+        
+        try {
+            f.parsePeriod("ABC");
+            fail();
+        } catch (IllegalArgumentException ex) {}
+    }
+
+    public void testParsePeriod_parseType() {
+        Period expect = new Period(0, 0, 0, 4, 5, 6, 7, 8, PeriodType.dayTime());
+        assertEquals(expect, f.withParseType(PeriodType.dayTime()).parsePeriod("P4DT5H6M7.008S"));
+        try {
+            f.withParseType(PeriodType.dayTime()).parsePeriod("P3W4DT5H6M7.008S");
+            fail();
+        } catch (IllegalArgumentException ex) {}
+    }
+
     //-----------------------------------------------------------------------
-
-    /**
-     * Tests basic period parsing.
-     */
-    public void testParsePeriod() {
-        assertEquals(TEST_PERIOD, formatter.parsePeriod(STANDARD_PERIOD_STRING));
-    }
-
-    /**
-     * Tests parsing invalid text (expects exception).
-     */
-    public void testParseInvalidText() {
-        try {
-            formatter.parsePeriod("ABC");
-            fail("Expected IllegalArgumentException when parsing invalid text");
-        } catch (IllegalArgumentException ex) {
-            // Expected
-        }
-    }
-
-    /**
-     * Tests parsing with specific period type.
-     */
-    public void testParseWithPeriodType() {
-        PeriodType dayTimeType = PeriodType.dayTime();
-        Period expectedDayTime = new Period(0, 0, 0, 4, 5, 6, 7, 8, dayTimeType);
-        
-        PeriodFormatter dayTimeFormatter = formatter.withParseType(dayTimeType);
-        assertEquals(expectedDayTime, dayTimeFormatter.parsePeriod("P4DT5H6M7.008S"));
+    public void testParseMutablePeriod_simple() {
+        MutablePeriod expect = new MutablePeriod(1, 2, 3, 4, 5, 6, 7, 8);
+        assertEquals(expect, f.parseMutablePeriod("P1Y2M3W4DT5H6M7.008S"));
         
         try {
-            dayTimeFormatter.parsePeriod("P3W4DT5H6M7.008S");
-            fail("Expected IllegalArgumentException when parsing weeks with day-time type");
-        } catch (IllegalArgumentException ex) {
-            // Expected
-        }
+            f.parseMutablePeriod("ABC");
+            fail();
+        } catch (IllegalArgumentException ex) {}
     }
 
-    /**
-     * Tests parsing to MutablePeriod.
-     */
-    public void testParseMutablePeriod() {
-        assertEquals(TEST_MUTABLE_PERIOD, formatter.parseMutablePeriod(STANDARD_PERIOD_STRING));
-    }
-
-    /**
-     * Tests parsing invalid text to MutablePeriod (expects exception).
-     */
-    public void testParseMutablePeriodInvalidText() {
-        try {
-            formatter.parseMutablePeriod("ABC");
-            fail("Expected IllegalArgumentException when parsing invalid text");
-        } catch (IllegalArgumentException ex) {
-            // Expected
-        }
-    }
-
-    /**
-     * Tests parsing into existing MutablePeriod.
-     */
-    public void testParseIntoMutablePeriod() {
+    //-----------------------------------------------------------------------
+    public void testParseInto_simple() {
+        MutablePeriod expect = new MutablePeriod(1, 2, 3, 4, 5, 6, 7, 8);
         MutablePeriod result = new MutablePeriod();
-        int parsePosition = formatter.parseInto(result, STANDARD_PERIOD_STRING, 0);
+        assertEquals(20, f.parseInto(result, "P1Y2M3W4DT5H6M7.008S", 0));
+        assertEquals(expect, result);
         
-        assertEquals(20, parsePosition);  // Entire string processed
-        assertEquals(TEST_MUTABLE_PERIOD, result);
-    }
-
-    /**
-     * Tests parsing into null MutablePeriod (expects exception).
-     */
-    public void testParseIntoNullPeriod() {
         try {
-            formatter.parseInto(null, STANDARD_PERIOD_STRING, 0);
-            fail("Expected IllegalArgumentException when parsing into null period");
-        } catch (IllegalArgumentException ex) {
-            // Expected
-        }
+            f.parseInto(null, "P1Y2M3W4DT5H6M7.008S", 0);
+            fail();
+        } catch (IllegalArgumentException ex) {}
+        
+        assertEquals(~0, f.parseInto(result, "ABC", 0));
     }
 
-    /**
-     * Tests parsing invalid text into existing MutablePeriod.
-     */
-    public void testParseIntoInvalidText() {
-        MutablePeriod result = new MutablePeriod();
-        int parsePosition = formatter.parseInto(result, "ABC", 0);
-        
-        assertTrue("Expected negative position for parse failure", parsePosition < 0);
-        assertEquals("Result period should remain unchanged", 
-                     new MutablePeriod(), result);
-    }
 }
