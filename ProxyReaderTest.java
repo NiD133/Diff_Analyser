@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.CharBuffer;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -52,17 +53,26 @@ class ProxyReaderTest {
     }
 
     @Test
-    void testNullCharArray() throws Exception {
+    void read_WithNullCharArray_ReturnsZero() throws Exception {
         try (ProxyReader proxy = new ProxyReaderImpl(new CustomNullReader(0))) {
-            proxy.read((char[]) null);
-            proxy.read(null, 0, 0);
+            int result = proxy.read((char[]) null);
+            assertEquals(0, result);
         }
     }
 
     @Test
-    void testNullCharBuffer() throws Exception {
+    void read_WithNullCharArrayWithOffset_ReturnsZero() throws Exception {
         try (ProxyReader proxy = new ProxyReaderImpl(new CustomNullReader(0))) {
-            proxy.read((CharBuffer) null);
+            int result = proxy.read(null, 0, 0);
+            assertEquals(0, result);
+        }
+    }
+
+    @Test
+    void read_WithNullCharBuffer_ReturnsZero() throws Exception {
+        try (ProxyReader proxy = new ProxyReaderImpl(new CustomNullReader(0))) {
+            int result = proxy.read((CharBuffer) null);
+            assertEquals(0, result);
         }
     }
 }
