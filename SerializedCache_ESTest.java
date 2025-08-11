@@ -32,185 +32,440 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class SerializedCache_ESTest extends SerializedCache_ESTest_scaffolding {
 
-  // Test exception when serializing non-serializable objects
   @Test(timeout = 4000)
-  public void testPutObjectNonSerializableThrowsException() throws Throwable {
-    PerpetualCache perpetualCache = new PerpetualCache("org.apache.ibatis.cache.decorators.SerializedCache$CustomObjectInputStream");
-    Cache syncCache = new SynchronizedCache(perpetualCache);
-    SerializedCache serializedCache = new SerializedCache(syncCache);
-    Object nonSerializable = new PerpetualCache("non-serializable");
-    
-    try {
-      serializedCache.putObject("key", nonSerializable);
-      fail("Expecting exception: RuntimeException");
-    } catch(RuntimeException e) {
-      // Verify exception details
-      assertEquals("SharedCache failed to make a copy of a non-serializable object: org.apache.ibatis.cache.impl.PerpetualCache@e1348a2c", e.getMessage());
-      verifyException("org.apache.ibatis.cache.decorators.SerializedCache", e);
-    }
+  public void test00()  throws Throwable  {
+      PerpetualCache perpetualCache0 = new PerpetualCache("org.apache.ibatis.cache.decorators.SerializedCache$CustomObjectInputStream");
+      SynchronizedCache synchronizedCache0 = new SynchronizedCache(perpetualCache0);
+      SerializedCache serializedCache0 = new SerializedCache(synchronizedCache0);
+      // Undeclared exception!
+      try { 
+        serializedCache0.putObject("org.apache.ibatis.cache.decorators.SerializedCache$CustomObjectInputStream", perpetualCache0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // SharedCache failed to make a copy of a non-serializable object: org.apache.ibatis.cache.impl.PerpetualCache@e1348a2c
+         //
+         verifyException("org.apache.ibatis.cache.decorators.SerializedCache", e);
+      }
   }
 
-  // Test successful serialization path
   @Test(timeout = 4000)
-  public void testPutAndGetSerializableObject() throws Throwable {
-    PerpetualCache baseCache = new PerpetualCache("");
-    SerializedCache serializedCache = new SerializedCache(baseCache);
-    Serializable value = "serializable_value";
-    
-    serializedCache.putObject("key", value);
-    Object retrieved = serializedCache.getObject("key");
-    
-    assertEquals(value, retrieved);
+  public void test01()  throws Throwable  {
+      PerpetualCache perpetualCache0 = new PerpetualCache("");
+      SerializedCache serializedCache0 = new SerializedCache(perpetualCache0);
+      serializedCache0.hashCode();
   }
 
-  // Test reading from empty stream
   @Test(timeout = 4000)
-  public void testCustomObjectInputStreamEmptyStreamThrowsEOF() throws Throwable {
-    Enumeration<MockFileInputStream> emptyEnum = mock(Enumeration.class, new ViolatedAssumptionAnswer());
-    doReturn(false).when(emptyEnum).hasMoreElements();
-    SequenceInputStream emptyStream = new SequenceInputStream(emptyEnum);
-
-    try {
-      new SerializedCache.CustomObjectInputStream(emptyStream);
-      fail("Expecting exception: EOFException");
-    } catch(EOFException e) {
-      // Expected when reading from empty stream
-    }
+  public void test02()  throws Throwable  {
+      Enumeration<MockFileInputStream> enumeration0 = (Enumeration<MockFileInputStream>) mock(Enumeration.class, new ViolatedAssumptionAnswer());
+      doReturn(false).when(enumeration0).hasMoreElements();
+      SequenceInputStream sequenceInputStream0 = new SequenceInputStream(enumeration0);
+      SerializedCache.CustomObjectInputStream serializedCache_CustomObjectInputStream0 = null;
+      try {
+        serializedCache_CustomObjectInputStream0 = new SerializedCache.CustomObjectInputStream(sequenceInputStream0);
+        fail("Expecting exception: EOFException");
+      
+      } catch(Throwable e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.io.ObjectInputStream$PeekInputStream", e);
+      }
   }
 
-  // Test cache clearance
   @Test(timeout = 4000)
-  public void testClearCache() throws Throwable {
-    PerpetualCache baseCache = new PerpetualCache("");
-    SerializedCache serializedCache = new SerializedCache(baseCache);
-    baseCache.putObject("key", "value");
-    
-    serializedCache.clear();
-    int size = serializedCache.getSize();
-    
-    assertEquals(0, size);
+  public void test03()  throws Throwable  {
+      PerpetualCache perpetualCache0 = new PerpetualCache("");
+      SerializedCache serializedCache0 = new SerializedCache(perpetualCache0);
+      serializedCache0.clear();
+      assertEquals("", serializedCache0.getId());
   }
 
-  // Test object removal
   @Test(timeout = 4000)
-  public void testRemoveObject() throws Throwable {
-    PerpetualCache baseCache = new PerpetualCache("");
-    SerializedCache serializedCache = new SerializedCache(baseCache);
-    baseCache.putObject("key", "value");
-    
-    Object removed = serializedCache.removeObject("key");
-    int size = serializedCache.getSize();
-    
-    assertEquals("value", removed);
-    assertEquals(0, size);
+  public void test04()  throws Throwable  {
+      PerpetualCache perpetualCache0 = new PerpetualCache("");
+      SerializedCache serializedCache0 = new SerializedCache(perpetualCache0);
+      perpetualCache0.putObject((Object) null, "");
+      Object object0 = serializedCache0.removeObject((Object) null);
+      assertEquals("", object0);
   }
 
-  // Test initial cache size
   @Test(timeout = 4000)
-  public void testInitialSizeIsZero() throws Throwable {
-    PerpetualCache baseCache = new PerpetualCache("");
-    SerializedCache serializedCache = new SerializedCache(baseCache);
-    assertEquals(0, serializedCache.getSize());
+  public void test05()  throws Throwable  {
+      PerpetualCache perpetualCache0 = new PerpetualCache("");
+      SerializedCache serializedCache0 = new SerializedCache(perpetualCache0);
+      int int0 = serializedCache0.getSize();
+      assertEquals(0, int0);
   }
 
-  // Test size after adding an item
   @Test(timeout = 4000)
-  public void testSizeAfterPut() throws Throwable {
-    PerpetualCache baseCache = new PerpetualCache("");
-    SerializedCache serializedCache = new SerializedCache(baseCache);
-    serializedCache.putObject("key", "value");
-    assertEquals(1, serializedCache.getSize());
+  public void test06()  throws Throwable  {
+      PerpetualCache perpetualCache0 = new PerpetualCache("");
+      SerializedCache serializedCache0 = new SerializedCache(perpetualCache0);
+      serializedCache0.putObject(perpetualCache0, (Object) null);
+      int int0 = serializedCache0.getSize();
+      assertEquals(1, int0);
   }
 
-  // Test ID retrieval (null case)
   @Test(timeout = 4000)
-  public void testGetIdNull() throws Throwable {
-    PerpetualCache baseCache = new PerpetualCache(null);
-    SerializedCache serializedCache = new SerializedCache(baseCache);
-    assertNull(serializedCache.getId());
+  public void test07()  throws Throwable  {
+      PerpetualCache perpetualCache0 = new PerpetualCache((String) null);
+      SerializedCache serializedCache0 = new SerializedCache(perpetualCache0);
+      String string0 = serializedCache0.getId();
+      assertNull(string0);
   }
 
-  // Test ID retrieval
   @Test(timeout = 4000)
-  public void testGetId() throws Throwable {
-    PerpetualCache baseCache = new PerpetualCache("test_id");
-    SerializedCache serializedCache = new SerializedCache(baseCache);
-    assertEquals("test_id", serializedCache.getId());
+  public void test08()  throws Throwable  {
+      PerpetualCache perpetualCache0 = new PerpetualCache("org.apache.ibatis.cache.decorators.SerializedCache$CustomObjectInputStream");
+      SynchronizedCache synchronizedCache0 = new SynchronizedCache(perpetualCache0);
+      SerializedCache serializedCache0 = new SerializedCache(synchronizedCache0);
+      String string0 = serializedCache0.getId();
+      assertEquals("org.apache.ibatis.cache.decorators.SerializedCache$CustomObjectInputStream", string0);
   }
 
-  // Test cache equality
   @Test(timeout = 4000)
-  public void testCacheEquality() throws Throwable {
-    Cache cache1 = new SerializedCache(new PerpetualCache("id"));
-    Cache cache2 = new SerializedCache(new PerpetualCache("id"));
-    assertTrue(cache1.equals(cache2));
+  public void test09()  throws Throwable  {
+      PerpetualCache perpetualCache0 = new PerpetualCache("");
+      SerializedCache serializedCache0 = new SerializedCache(perpetualCache0);
+      String string0 = serializedCache0.getId();
+      assertEquals("", string0);
   }
 
-  // Test cache inequality
   @Test(timeout = 4000)
-  public void testCacheInequality() throws Throwable {
-    Cache cache1 = new SerializedCache(new PerpetualCache("id1"));
-    Cache cache2 = new PerpetualCache("id2");
-    assertFalse(cache1.equals(cache2));
+  public void test10()  throws Throwable  {
+      FifoCache fifoCache0 = new FifoCache((Cache) null);
+      TransactionalCache transactionalCache0 = new TransactionalCache(fifoCache0);
+      SerializedCache serializedCache0 = new SerializedCache(transactionalCache0);
+      boolean boolean0 = serializedCache0.equals(transactionalCache0);
+      assertTrue(boolean0);
   }
 
-  // Test NPE in removeObject with null delegate
   @Test(timeout = 4000)
-  public void testRemoveObjectWithNullDelegateThrowsNPE() throws Throwable {
-    SerializedCache serializedCache = new SerializedCache(null);
-    try {
-      serializedCache.removeObject("key");
-      fail("Expecting exception: NullPointerException");
-    } catch(NullPointerException e) {
-      // Expected due to null delegate
-    }
+  public void test11()  throws Throwable  {
+      PerpetualCache perpetualCache0 = new PerpetualCache("org.apache.ibatis.exceptions.PersistenceException");
+      LruCache lruCache0 = new LruCache(perpetualCache0);
+      ScheduledCache scheduledCache0 = new ScheduledCache(lruCache0);
+      WeakCache weakCache0 = new WeakCache(scheduledCache0);
+      SerializedCache serializedCache0 = new SerializedCache(weakCache0);
+      boolean boolean0 = serializedCache0.equals(perpetualCache0);
+      assertFalse(boolean0);
   }
 
-  // Test NPE in putObject with null delegate
   @Test(timeout = 4000)
-  public void testPutObjectWithNullDelegateThrowsNPE() throws Throwable {
-    SerializedCache serializedCache = new SerializedCache(null);
-    try {
-      serializedCache.putObject("key", "value");
-      fail("Expecting exception: NullPointerException");
-    } catch(NullPointerException e) {
-      // Expected due to null delegate
-    }
+  public void test12()  throws Throwable  {
+      SerializedCache serializedCache0 = new SerializedCache((Cache) null);
+      // Undeclared exception!
+      try { 
+        serializedCache0.removeObject((Object) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.ibatis.cache.decorators.SerializedCache", e);
+      }
   }
 
-  // Test error when cache ID is missing
   @Test(timeout = 4000)
-  public void testMissingCacheIdThrowsException() throws Throwable {
-    PerpetualCache baseCache = new PerpetualCache(null);
-    SerializedCache serializedCache = new SerializedCache(baseCache);
-    try {
-      serializedCache.hashCode();
-      fail("Expecting exception: RuntimeException");
-    } catch(RuntimeException e) {
-      assertEquals("Cache instances require an ID.", e.getMessage());
-    }
+  public void test13()  throws Throwable  {
+      SynchronizedCache synchronizedCache0 = new SynchronizedCache((Cache) null);
+      SerializedCache serializedCache0 = new SerializedCache(synchronizedCache0);
+      // Undeclared exception!
+      try { 
+        serializedCache0.removeObject(synchronizedCache0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.ibatis.cache.decorators.SynchronizedCache", e);
+      }
   }
 
-  // Test deserialization failure with wrong data type
   @Test(timeout = 4000)
-  public void testDeserializeNonByteArrayThrowsClassCast() throws Throwable {
-    PerpetualCache baseCache = new PerpetualCache("");
-    SerializedCache serializedCache = new SerializedCache(baseCache);
-    baseCache.putObject("key", "non_byte_array"); // Wrong type stored
-    
-    try {
-      serializedCache.getObject("key");
-      fail("Expecting exception: ClassCastException");
-    } catch(ClassCastException e) {
-      // Expected when deserializing non-byte array
-    }
+  public void test14()  throws Throwable  {
+      PerpetualCache perpetualCache0 = new PerpetualCache("org.apache.ibatis.cache.decorators.SerializedCache$CustomObjectInputStream");
+      BlockingCache blockingCache0 = new BlockingCache(perpetualCache0);
+      TransactionalCache transactionalCache0 = new TransactionalCache(blockingCache0);
+      SerializedCache serializedCache0 = new SerializedCache(blockingCache0);
+      // Undeclared exception!
+      try { 
+        serializedCache0.removeObject(transactionalCache0);
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // Detected an attempt at releasing unacquired lock. This should never happen.
+         //
+         verifyException("org.apache.ibatis.cache.decorators.BlockingCache", e);
+      }
   }
 
-  // Test getObject returns null for missing keys
   @Test(timeout = 4000)
-  public void testGetObjectMissingKeyReturnsNull() throws Throwable {
-    PerpetualCache baseCache = new PerpetualCache("");
-    SerializedCache serializedCache = new SerializedCache(baseCache);
-    assertNull(serializedCache.getObject("missing_key"));
+  public void test15()  throws Throwable  {
+      SynchronizedCache synchronizedCache0 = new SynchronizedCache((Cache) null);
+      SerializedCache serializedCache0 = new SerializedCache(synchronizedCache0);
+      // Undeclared exception!
+      try { 
+        serializedCache0.putObject((Object) null, (Object) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.ibatis.cache.decorators.SynchronizedCache", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      PerpetualCache perpetualCache0 = new PerpetualCache("zzCCvt");
+      BlockingCache blockingCache0 = new BlockingCache(perpetualCache0);
+      SerializedCache serializedCache0 = new SerializedCache(blockingCache0);
+      // Undeclared exception!
+      try { 
+        serializedCache0.putObject(blockingCache0, "zzCCvt");
+        fail("Expecting exception: IllegalStateException");
+      
+      } catch(IllegalStateException e) {
+         //
+         // Detected an attempt at releasing unacquired lock. This should never happen.
+         //
+         verifyException("org.apache.ibatis.cache.decorators.BlockingCache", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      PerpetualCache perpetualCache0 = new PerpetualCache((String) null);
+      SerializedCache serializedCache0 = new SerializedCache(perpetualCache0);
+      // Undeclared exception!
+      try { 
+        serializedCache0.hashCode();
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // Cache instances require an ID.
+         //
+         verifyException("org.apache.ibatis.cache.impl.PerpetualCache", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      SoftCache softCache0 = new SoftCache((Cache) null);
+      SynchronizedCache synchronizedCache0 = new SynchronizedCache(softCache0);
+      SerializedCache serializedCache0 = new SerializedCache(synchronizedCache0);
+      // Undeclared exception!
+      try { 
+        serializedCache0.getSize();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.ibatis.cache.decorators.SoftCache", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      PerpetualCache perpetualCache0 = new PerpetualCache((String) null);
+      SerializedCache serializedCache0 = new SerializedCache(perpetualCache0);
+      // Undeclared exception!
+      try { 
+        serializedCache0.getObject(serializedCache0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // Cache instances require an ID.
+         //
+         verifyException("org.apache.ibatis.cache.impl.PerpetualCache", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      TransactionalCache transactionalCache0 = new TransactionalCache((Cache) null);
+      SoftCache softCache0 = new SoftCache(transactionalCache0);
+      SerializedCache serializedCache0 = new SerializedCache(softCache0);
+      // Undeclared exception!
+      try { 
+        serializedCache0.getObject(softCache0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.ibatis.cache.decorators.TransactionalCache", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      SynchronizedCache synchronizedCache0 = new SynchronizedCache((Cache) null);
+      SoftCache softCache0 = new SoftCache(synchronizedCache0);
+      SerializedCache serializedCache0 = new SerializedCache(softCache0);
+      // Undeclared exception!
+      try { 
+        serializedCache0.getObject((Object) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.ibatis.cache.decorators.SynchronizedCache", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      PerpetualCache perpetualCache0 = new PerpetualCache("");
+      perpetualCache0.putObject("", "");
+      SerializedCache serializedCache0 = new SerializedCache(perpetualCache0);
+      // Undeclared exception!
+      try { 
+        serializedCache0.getObject("");
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // class java.lang.String cannot be cast to class [B (java.lang.String and [B are in module java.base of loader 'bootstrap')
+         //
+         verifyException("org.apache.ibatis.cache.decorators.SerializedCache", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      SerializedCache serializedCache0 = new SerializedCache((Cache) null);
+      // Undeclared exception!
+      try { 
+        serializedCache0.hashCode();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.ibatis.cache.decorators.SerializedCache", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      PerpetualCache perpetualCache0 = new PerpetualCache("");
+      SerializedCache serializedCache0 = new SerializedCache(perpetualCache0);
+      Object object0 = serializedCache0.getObject("");
+      assertNull(object0);
+  }
+
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      PerpetualCache perpetualCache0 = new PerpetualCache("");
+      SerializedCache serializedCache0 = new SerializedCache(perpetualCache0);
+      SerializedCache serializedCache1 = new SerializedCache(serializedCache0);
+      serializedCache1.putObject((Object) null, (Object) null);
+      Object object0 = serializedCache0.getObject((Object) null);
+      assertNotNull(object0);
+  }
+
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      SerializedCache serializedCache0 = new SerializedCache((Cache) null);
+      // Undeclared exception!
+      try { 
+        serializedCache0.getSize();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.ibatis.cache.decorators.SerializedCache", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      SerializedCache serializedCache0 = new SerializedCache((Cache) null);
+      // Undeclared exception!
+      try { 
+        serializedCache0.putObject((Object) null, (Object) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.ibatis.cache.decorators.SerializedCache", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      PerpetualCache perpetualCache0 = new PerpetualCache("org.apache.ibatis.exceptions.PersistenceException");
+      SerializedCache serializedCache0 = new SerializedCache(perpetualCache0);
+      Object object0 = serializedCache0.removeObject("org.apache.ibatis.exceptions.PersistenceException");
+      assertNull(object0);
+  }
+
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      SerializedCache serializedCache0 = new SerializedCache((Cache) null);
+      // Undeclared exception!
+      try { 
+        serializedCache0.equals((Object) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.ibatis.cache.decorators.SerializedCache", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      SerializedCache serializedCache0 = new SerializedCache((Cache) null);
+      // Undeclared exception!
+      try { 
+        serializedCache0.getId();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.ibatis.cache.decorators.SerializedCache", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      SerializedCache serializedCache0 = new SerializedCache((Cache) null);
+      // Undeclared exception!
+      try { 
+        serializedCache0.clear();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.ibatis.cache.decorators.SerializedCache", e);
+      }
   }
 }
