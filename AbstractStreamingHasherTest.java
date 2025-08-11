@@ -17,14 +17,10 @@
 package com.google.common.hash;
 
 import static java.nio.charset.StandardCharsets.UTF_16LE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Iterables;
 import com.google.common.hash.HashTestUtils.RandomHasherAction;
-import com.google.common.testing.AndroidIncompatible;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -33,198 +29,152 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import junit.framework.TestCase;
 import org.jspecify.annotations.NullUnmarked;
-import org.junit.Test;
 
 /**
- * Unit tests for AbstractStreamingHasher.
+ * Tests for AbstractStreamingHasher.
  *
- * These tests verify:
- * - Little-endian ordering for primitive types
- * - Correct chunking behavior and zero-padding for tails
- * - Consistency between different input methods (e.g. putUnencodedChars vs putString/putBytes)
- * - Exception behavior for invalid putBytes ranges
- * - Cross-check against a simple "control" hash that just returns the concatenated input bytes
+ * @author Dimitris Andreou
  */
 @NullUnmarked
-public class AbstractStreamingHasherTest {
-
-  @Test
-  public void bytes_areConcatenatedInOrder() {
-    Sink sink = new Sink(4); // Little-endian order is enforced inside Sink
+public class AbstractStreamingHasherTest extends TestCase {
+  public void testBytes() {
+    Sink sink = new Sink(4); // byte order insignificant here
     byte[] expected = {1, 2, 3, 4, 5, 6, 7, 8};
-
     sink.putByte((byte) 1);
     sink.putBytes(new byte[] {2, 3, 4, 5, 6});
     sink.putByte((byte) 7);
     sink.putBytes(new byte[] {});
     sink.putBytes(new byte[] {8});
-    sink.hash();
-
-    sink.assertChunkingInvariants(8);
-    sink.assertOutputPrefixEquals(expected);
+    HashCode unused = sink.hash();
+    sink.assertInvariants(8);
+    sink.assertBytes(expected);
   }
 
-  @Test
-  public void short_isLittleEndianAndTailIsZeroPaddedToChunk() {
+  public void testShort() {
     Sink sink = new Sink(4);
-
     sink.putShort((short) 0x0201);
-    sink.hash();
-
-    sink.assertChunkingInvariants(2);
-    sink.assertOutputPrefixEquals(new byte[] {1, 2, 0, 0}); // zero padding up to chunk size
+    HashCode unused = sink.hash();
+    sink.assertInvariants(2);
+    sink.assertBytes(new byte[] {1, 2, 0, 0}); // padded with zeros
   }
 
-  @Test
-  public void int_isLittleEndian() {
+  public void testInt() {
     Sink sink = new Sink(4);
-
     sink.putInt(0x04030201);
-    sink.hash();
-
-    sink.assertChunkingInvariants(4);
-    sink.assertOutputPrefixEquals(new byte[] {1, 2, 3, 4});
+    HashCode unused = sink.hash();
+    sink.assertInvariants(4);
+    sink.assertBytes(new byte[] {1, 2, 3, 4});
   }
 
-  @Test
-  public void long_isLittleEndian() {
+  public void testLong() {
     Sink sink = new Sink(8);
-
     sink.putLong(0x0807060504030201L);
-    sink.hash();
-
-    sink.assertChunkingInvariants(8);
-    sink.assertOutputPrefixEquals(new byte[] {1, 2, 3, 4, 5, 6, 7, 8});
+    HashCode unused = sink.hash();
+    sink.assertInvariants(8);
+    sink.assertBytes(new byte[] {1, 2, 3, 4, 5, 6, 7, 8});
   }
 
-  @Test
-  public void char_isLittleEndianAndTailIsZeroPaddedToChunk() {
+  public void testChar() {
     Sink sink = new Sink(4);
-
     sink.putChar((char) 0x0201);
-    sink.hash();
-
-    sink.assertChunkingInvariants(2);
-    sink.assertOutputPrefixEquals(new byte[] {1, 2, 0, 0}); // zero padding up to chunk size
+    HashCode unused = sink.hash();
+    sink.assertInvariants(2);
+    sink.assertBytes(new byte[] {1, 2, 0, 0}); // padded with zeros
   }
 
-  @Test
-  public void string_putUnencodedChars_matches_putBytes_and_putString_forUtf16Le() {
-    Random random = new Random(0); // fixed seed for deterministic failures
+  public void testString() {
+    Random random = new Random();
     for (int i = 0; i < 100; i++) {
-      byte[] randomBytes = new byte[64];
-      random.nextBytes(randomBytes);
-
-      // UTF-16LE ensures every random byte sequence decodes to valid chars.
-      String s = new String(randomBytes, UTF_16LE);
-
+      byte[] bytes = new byte[64];
+      random.nextBytes(bytes);
+      String s = new String(bytes, UTF_16LE); // so all random strings are valid
       assertEquals(
           new Sink(4).putUnencodedChars(s).hash(),
           new Sink(4).putBytes(s.getBytes(UTF_16LE)).hash());
-
       assertEquals(
-          new Sink(4).putUnencodedChars(s).hash(),
-          new Sink(4).putString(s, UTF_16LE).hash());
+          new Sink(4).putUnencodedChars(s).hash(), new Sink(4).putString(s, UTF_16LE).hash());
     }
   }
 
-  @Test
-  public void float_isLittleEndian() {
+  public void testFloat() {
     Sink sink = new Sink(4);
-
     sink.putFloat(Float.intBitsToFloat(0x04030201));
-    sink.hash();
-
-    sink.assertChunkingInvariants(4);
-    sink.assertOutputPrefixEquals(new byte[] {1, 2, 3, 4});
+    HashCode unused = sink.hash();
+    sink.assertInvariants(4);
+    sink.assertBytes(new byte[] {1, 2, 3, 4});
   }
 
-  @Test
-  public void double_isLittleEndian() {
+  public void testDouble() {
     Sink sink = new Sink(8);
-
     sink.putDouble(Double.longBitsToDouble(0x0807060504030201L));
-    sink.hash();
-
-    sink.assertChunkingInvariants(8);
-    sink.assertOutputPrefixEquals(new byte[] {1, 2, 3, 4, 5, 6, 7, 8});
+    HashCode unused = sink.hash();
+    sink.assertInvariants(8);
+    sink.assertBytes(new byte[] {1, 2, 3, 4, 5, 6, 7, 8});
   }
 
-  @Test
-  public void putBytes_throwsForInvalidRanges() {
+  public void testCorrectExceptions() {
     Sink sink = new Sink(4);
-
     assertThrows(IndexOutOfBoundsException.class, () -> sink.putBytes(new byte[8], -1, 4));
     assertThrows(IndexOutOfBoundsException.class, () -> sink.putBytes(new byte[8], 0, 16));
     assertThrows(IndexOutOfBoundsException.class, () -> sink.putBytes(new byte[8], 0, -1));
   }
 
   /**
-   * Creates a long random sequence of inputs, then feeds it to many differently configured sinks.
-   * All sinks must produce the exact same output as the control hasher (which returns the raw bytes
-   * it saw). The only difference among sinks should be how many times process()/processRemaining()
-   * are called (due to chunk and buffer alignment).
+   * This test creates a long random sequence of inputs, then a lot of differently configured sinks
+   * process it; all should produce the same answer, the only difference should be the number of
+   * process()/processRemaining() invocations, due to alignment.
    */
-  @Test
-  @AndroidIncompatible // slow. Consider reducing iterations on Android.
-  public void randomized_streamingConsistency_acrossChunkAndBufferSizes() throws Exception {
-    Random random = new Random(0); // deterministic for easier debugging
-
+  @AndroidIncompatible // slow. TODO(cpovirk): Maybe just reduce iterations under Android.
+  public void testExhaustive() throws Exception {
+    Random random = new Random(0); // will iteratively make more debuggable, each time it breaks
     for (int totalInsertions = 0; totalInsertions < 200; totalInsertions++) {
-      // Build a wide variety of sink configurations.
+
       List<Sink> sinks = new ArrayList<>();
       for (int chunkSize = 4; chunkSize <= 32; chunkSize++) {
         for (int bufferSize = chunkSize; bufferSize <= chunkSize * 4; bufferSize += chunkSize) {
+          // yes, that's a lot of sinks!
           sinks.add(new Sink(chunkSize, bufferSize));
-          // We keep little-endian only here for simplicity (DataOutputStream compatibility).
+          // For convenience, testing only with big endianness, to match DataOutputStream.
+          // I regard highly unlikely that both the little endianness tests above and this one
+          // passes, and there is still a little endianness bug lurking around.
         }
       }
 
-      // Control hasher echoes input bytes back as the "hash" for easy comparison.
       Control control = new Control();
-      Hasher controlHasher = control.newHasher(1024);
+      Hasher controlSink = control.newHasher(1024);
 
-      Iterable<Hasher> allHashers = Iterables.concat(sinks, Collections.singleton(controlHasher));
-
-      // Perform a random sequence of hasher operations.
+      Iterable<Hasher> sinksAndControl =
+          Iterables.concat(sinks, Collections.singleton(controlSink));
       for (int insertion = 0; insertion < totalInsertions; insertion++) {
-        RandomHasherAction.pickAtRandom(random).performAction(random, allHashers);
+        RandomHasherAction.pickAtRandom(random).performAction(random, sinksAndControl);
       }
-
-      // Ensure at least 4 bytes were added so that Hasher#hash won't throw.
-      int extraInt = random.nextInt();
-      for (Hasher h : allHashers) {
-        h.putInt(extraInt);
+      // We need to ensure that at least 4 bytes have been put into the hasher or else
+      // Hasher#hash will throw an ISE.
+      int intToPut = random.nextInt();
+      for (Hasher hasher : sinksAndControl) {
+        hasher.putInt(intToPut);
       }
-
-      // Finalize sinks first, then capture the control output.
       for (Sink sink : sinks) {
-        sink.hash();
+        HashCode unused = sink.hash();
       }
-      byte[] expected = controlHasher.hash().asBytes();
 
-      // Each sink should have captured the same bytes as the control.
+      byte[] expected = controlSink.hash().asBytes();
       for (Sink sink : sinks) {
-        sink.assertChunkingInvariants(expected.length);
-        sink.assertOutputPrefixEquals(expected);
+        sink.assertInvariants(expected.length);
+        sink.assertBytes(expected);
       }
     }
   }
 
-  /**
-   * A concrete AbstractStreamingHasher used only for testing. It:
-   * - Forces LITTLE_ENDIAN byte order
-   * - Captures bytes passed through process()/processRemaining()
-   * - Verifies that tail handling zero-pads up to chunk size and then delegates to process()
-   */
-  private static final class Sink extends AbstractStreamingHasher {
+  private static class Sink extends AbstractStreamingHasher {
     final int chunkSize;
     final int bufferSize;
-    final ByteArrayOutputStream captured = new ByteArrayOutputStream();
+    final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-    int processChunkCalls = 0;
-    boolean processedTail = false;
+    int processCalled = 0;
+    boolean remainingCalled = false;
 
     Sink(int chunkSize, int bufferSize) {
       super(chunkSize, bufferSize);
@@ -240,66 +190,57 @@ public class AbstractStreamingHasherTest {
 
     @Override
     protected HashCode makeHash() {
-      return HashCode.fromBytes(captured.toByteArray());
+      return HashCode.fromBytes(out.toByteArray());
     }
 
     @Override
     protected void process(ByteBuffer bb) {
-      processChunkCalls++;
+      processCalled++;
       assertEquals(ByteOrder.LITTLE_ENDIAN, bb.order());
       assertTrue(bb.remaining() >= chunkSize);
       for (int i = 0; i < chunkSize; i++) {
-        captured.write(bb.get());
+        out.write(bb.get());
       }
     }
 
     @Override
     protected void processRemaining(ByteBuffer bb) {
-      assertFalse(processedTail);
-      processedTail = true;
-
+      assertFalse(remainingCalled);
+      remainingCalled = true;
       assertEquals(ByteOrder.LITTLE_ENDIAN, bb.order());
       assertTrue(bb.remaining() > 0);
       assertTrue(bb.remaining() < bufferSize);
-
-      // The default implementation pads with zeros and calls process().
-      int before = processChunkCalls;
+      int before = processCalled;
       super.processRemaining(bb);
-      int after = processChunkCalls;
-      assertEquals(before + 1, after);
-
-      // Do not count the synthesized tail chunk in processChunkCalls to make expectations clearer.
-      processChunkCalls--;
+      int after = processCalled;
+      assertEquals(before + 1, after); // default implementation pads and calls process()
+      processCalled--; // don't count the tail invocation (makes tests a bit more understandable)
     }
 
-    void assertChunkingInvariants(int expectedUnpaddedBytes) {
-      // Total captured length should be ceil(expected, chunkSize).
-      assertEquals(captured.size(), ceilToMultiple(expectedUnpaddedBytes, chunkSize));
-      // Number of full process() calls equals the number of whole chunks observed.
-      assertEquals(expectedUnpaddedBytes / chunkSize, processChunkCalls);
-      // Tail should be processed if and only if there was a non-zero remainder.
-      assertEquals(expectedUnpaddedBytes % chunkSize != 0, processedTail);
+    // ensures that the number of invocations looks sane
+    void assertInvariants(int expectedBytes) {
+      // we should have seen as many bytes as the next multiple of chunk after expectedBytes - 1
+      assertEquals(out.toByteArray().length, ceilToMultiple(expectedBytes, chunkSize));
+      assertEquals(expectedBytes / chunkSize, processCalled);
+      assertEquals(expectedBytes % chunkSize != 0, remainingCalled);
     }
 
-    void assertOutputPrefixEquals(byte[] expectedPrefix) {
-      byte[] got = captured.toByteArray();
-      for (int i = 0; i < expectedPrefix.length; i++) {
-        assertEquals("byte[" + i + "]", expectedPrefix[i], got[i]);
-      }
-    }
-
+    // returns the minimum x such as x >= a && (x % b) == 0
     private static int ceilToMultiple(int a, int b) {
       int remainder = a % b;
       return remainder == 0 ? a : a + b - remainder;
     }
+
+    void assertBytes(byte[] expected) {
+      byte[] got = out.toByteArray();
+      for (int i = 0; i < expected.length; i++) {
+        assertEquals(expected[i], got[i]);
+      }
+    }
   }
 
-  /**
-   * A control hash function for verification:
-   * - Simply returns all input bytes (from off to off + len) as the "hash" value.
-   * - Relies on AbstractNonStreamingHashFunction to accumulate provided bytes.
-   */
-  private static final class Control extends AbstractNonStreamingHashFunction {
+  // Assumes that AbstractNonStreamingHashFunction works properly (must be tested elsewhere!)
+  private static class Control extends AbstractNonStreamingHashFunction {
     @Override
     public HashCode hashBytes(byte[] input, int off, int len) {
       return HashCode.fromBytes(Arrays.copyOfRange(input, off, off + len));
