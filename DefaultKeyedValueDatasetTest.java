@@ -38,7 +38,6 @@ package org.jfree.data.general;
 
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.internal.CloneUtils;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,64 +47,72 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class DefaultKeyedValueDatasetTest {
 
-    /**
-     * Confirm that the equals method can distinguish all the required fields.
-     */
+    // ===========================================================
+    // Tests for Object Equality
+    // ===========================================================
+
     @Test
-    public void testEquals() {
-
-        DefaultKeyedValueDataset d1 = new DefaultKeyedValueDataset("Test", 45.5);
-        DefaultKeyedValueDataset d2 = new DefaultKeyedValueDataset("Test", 45.5);
-        assertEquals(d1, d2);
-        assertEquals(d2, d1);
-
-        d1 = new DefaultKeyedValueDataset("Test 1", 45.5);
-        d2 = new DefaultKeyedValueDataset("Test 2", 45.5);
-        assertNotEquals(d1, d2);
-
-        d1 = new DefaultKeyedValueDataset("Test", 45.5);
-        d2 = new DefaultKeyedValueDataset("Test", 45.6);
-        assertNotEquals(d1, d2);
-
+    public void identicalKeyValuePairs_ShouldBeEqual() {
+        DefaultKeyedValueDataset dataset1 = new DefaultKeyedValueDataset("Test", 45.5);
+        DefaultKeyedValueDataset dataset2 = new DefaultKeyedValueDataset("Test", 45.5);
+        assertEquals(dataset1, dataset2, "Datasets with same key and value should be equal");
     }
 
-    /**
-     * Confirm that cloning works.
-     * @throws java.lang.CloneNotSupportedException
-     */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
-        DefaultKeyedValueDataset d1 = new DefaultKeyedValueDataset("Test", 45.5);
-        DefaultKeyedValueDataset d2 = (DefaultKeyedValueDataset) d1.clone();
-        assertNotSame(d1, d2);
-        assertSame(d1.getClass(), d2.getClass());
-        assertEquals(d1, d2);
+    public void differentKeys_ShouldNotBeEqual() {
+        DefaultKeyedValueDataset dataset1 = new DefaultKeyedValueDataset("Key1", 45.5);
+        DefaultKeyedValueDataset dataset2 = new DefaultKeyedValueDataset("Key2", 45.5);
+        assertNotEquals(dataset1, dataset2, "Datasets with different keys should not be equal");
     }
 
-    /**
-     * Confirm that the clone is independent of the original.
-     * @throws java.lang.CloneNotSupportedException
-     */
     @Test
-    public void testCloneIndependence() throws CloneNotSupportedException {
-        DefaultKeyedValueDataset d1
-            = new DefaultKeyedValueDataset("Key", 10.0);
-        DefaultKeyedValueDataset d2 = CloneUtils.clone(d1);
-        assertEquals(d1, d2);
-        d2.updateValue(99.9);
-        assertNotEquals(d1, d2);
-        d2.updateValue(10.0);
-        assertEquals(d1, d2);
+    public void differentValues_ShouldNotBeEqual() {
+        DefaultKeyedValueDataset dataset1 = new DefaultKeyedValueDataset("Test", 45.5);
+        DefaultKeyedValueDataset dataset2 = new DefaultKeyedValueDataset("Test", 45.6);
+        assertNotEquals(dataset1, dataset2, "Datasets with different values should not be equal");
     }
 
-    /**
-     * Serialize an instance, restore it, and check for equality.
-     */
+    // ===========================================================
+    // Tests for Cloning Functionality
+    // ===========================================================
+
     @Test
-    public void testSerialization() {
-        DefaultKeyedValueDataset d1 = new DefaultKeyedValueDataset("Test", 25.3);
-        DefaultKeyedValueDataset d2 = TestUtils.serialised(d1);
-        assertEquals(d1, d2);
+    public void cloning_ShouldCreateDistinctButEqualInstance() throws CloneNotSupportedException {
+        DefaultKeyedValueDataset original = new DefaultKeyedValueDataset("Test", 45.5);
+        DefaultKeyedValueDataset clone = CloneUtils.clone(original);
+
+        // Verify clone is a separate instance with identical state
+        assertNotSame(original, clone, "Clone should be a distinct object");
+        assertEquals(original, clone, "Clone should be equal to the original");
+        assertEquals(original.getClass(), clone.getClass(), "Clone should have the same class");
     }
 
+    // ===========================================================
+    // Tests for Clone Independence
+    // ===========================================================
+
+    @Test
+    public void cloneModification_ShouldNotAffectOriginal() throws CloneNotSupportedException {
+        DefaultKeyedValueDataset original = new DefaultKeyedValueDataset("Key", 10.0);
+        DefaultKeyedValueDataset clone = CloneUtils.clone(original);
+
+        // Modify clone and verify it diverges from original
+        clone.updateValue(99.9);
+        assertNotEquals(original, clone, "Clone should not equal original after modification");
+
+        // Restore clone's value and verify equality is reestablished
+        clone.updateValue(10.0);
+        assertEquals(original, clone, "Equality should be restored after reverting clone");
+    }
+
+    // ===========================================================
+    // Tests for Serialization
+    // ===========================================================
+
+    @Test
+    public void serialization_ShouldPreserveObjectState() {
+        DefaultKeyedValueDataset original = new DefaultKeyedValueDataset("Test", 25.3);
+        DefaultKeyedValueDataset deserialized = TestUtils.serialised(original);
+        assertEquals(original, deserialized, "Deserialized object should match original");
+    }
 }
