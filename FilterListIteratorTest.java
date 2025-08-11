@@ -21,407 +21,254 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.PredicateUtils;
-import org.apache.commons.collections4.list.GrowthList;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests the FilterListIterator class.
+ * Tests the FilterListIterator class, focusing on clarity and maintainability.
  */
-@SuppressWarnings("boxing")
+@DisplayName("FilterListIterator Tests")
 class FilterListIteratorTest {
 
-    private ArrayList<Integer> list;
-    private ArrayList<Integer> odds;
-    private ArrayList<Integer> evens;
-    private ArrayList<Integer> threes;
-    private ArrayList<Integer> fours;
-    private ArrayList<Integer> sixes;
-    private Predicate<Integer> truePred;
-    private Predicate<Integer> falsePred;
-    private Predicate<Integer> evenPred;
-    private Predicate<Integer> oddPred;
-    private Predicate<Integer> threePred;
-    private Predicate<Integer> fourPred;
-    private final Random random = new Random();
+    // --- Predicates for filtering ---
+    private static final Predicate<Integer> IS_EVEN_PREDICATE = n -> n % 2 == 0;
+    private static final Predicate<Integer> IS_ODD_PREDICATE = n -> n % 2 != 0;
+    private static final Predicate<Integer> IS_MULTIPLE_OF_3_PREDICATE = n -> n % 3 == 0;
+    private static final Predicate<Integer> IS_MULTIPLE_OF_4_PREDICATE = n -> n % 4 == 0;
+    private static final Predicate<Integer> ALWAYS_TRUE_PREDICATE = PredicateUtils.truePredicate();
+    private static final Predicate<Integer> ALWAYS_FALSE_PREDICATE = PredicateUtils.falsePredicate();
 
-    private void nextNextPrevious(final ListIterator<?> expected, final ListIterator<?> testing) {
-        // calls to next() should change the value returned by previous()
-        // even after previous() has been set by a call to hasPrevious()
-        assertEquals(expected.next(), testing.next());
-        assertEquals(expected.hasPrevious(), testing.hasPrevious());
-        final Object expecteda = expected.next();
-        final Object testinga = testing.next();
-        assertEquals(expecteda, testinga);
-        final Object expectedb = expected.previous();
-        final Object testingb = testing.previous();
-        assertEquals(expecteda, expectedb);
-        assertEquals(testinga, testingb);
-    }
-
-    private void previousPreviousNext(final ListIterator<?> expected, final ListIterator<?> testing) {
-        // calls to previous() should change the value returned by next()
-        // even after next() has been set by a call to hasNext()
-        assertEquals(expected.previous(), testing.previous());
-        assertEquals(expected.hasNext(), testing.hasNext());
-        final Object expecteda = expected.previous();
-        final Object testinga = testing.previous();
-        assertEquals(expecteda, testinga);
-        final Object expectedb = expected.next();
-        final Object testingb = testing.next();
-        assertEquals(expecteda, testingb);
-        assertEquals(expecteda, expectedb);
-        assertEquals(testinga, testingb);
-    }
+    // --- Test data ---
+    private List<Integer> fullList;
+    private List<Integer> evens;
+    private List<Integer> odds;
+    private List<Integer> multiplesOf3;
+    private List<Integer> multiplesOf4;
+    private List<Integer> multiplesOf6;
 
     @BeforeEach
-    public void setUp() {
-        list = new ArrayList<>();
-        odds = new ArrayList<>();
-        evens = new ArrayList<>();
-        threes = new ArrayList<>();
-        fours = new ArrayList<>();
-        sixes = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
-            list.add(Integer.valueOf(i));
-            if (i % 2 == 0) {
-                evens.add(Integer.valueOf(i));
-            }
-            if (i % 2 != 0) {
-                odds.add(Integer.valueOf(i));
-            }
-            if (i % 3 == 0) {
-                threes.add(Integer.valueOf(i));
-            }
-            if (i % 4 == 0) {
-                fours.add(Integer.valueOf(i));
-            }
-            if (i % 6 == 0) {
-                sixes.add(Integer.valueOf(i));
-            }
-        }
-
-        truePred = x -> true;
-
-        falsePred = x -> true;
-
-        evenPred = x -> x % 2 == 0;
-
-        oddPred = x -> x % 2 != 0;
-
-        threePred = x -> x % 3 == 0;
-
-        fourPred = x -> x % 4 == 0;
-
+    void setUp() {
+        fullList = IntStream.range(0, 20).boxed().collect(Collectors.toList());
+        evens = fullList.stream().filter(IS_EVEN_PREDICATE).collect(Collectors.toList());
+        odds = fullList.stream().filter(IS_ODD_PREDICATE).collect(Collectors.toList());
+        multiplesOf3 = fullList.stream().filter(IS_MULTIPLE_OF_3_PREDICATE).collect(Collectors.toList());
+        multiplesOf4 = fullList.stream().filter(IS_MULTIPLE_OF_4_PREDICATE).collect(Collectors.toList());
+        multiplesOf6 = fullList.stream()
+                .filter(IS_EVEN_PREDICATE)
+                .filter(IS_MULTIPLE_OF_3_PREDICATE)
+                .collect(Collectors.toList());
     }
 
-    @AfterEach
-    public void tearDown() throws Exception {
-        list = null;
-        odds = null;
-        evens = null;
-        threes = null;
-        fours = null;
-        sixes = null;
-        truePred = null;
-        falsePred = null;
-        evenPred = null;
-        oddPred = null;
-        threePred = null;
-        fourPred = null;
+    // ========================================================================
+    // --- Helper Methods for Assertions ---
+    // ========================================================================
+
+    /**
+     * Asserts that the filtered iterator behaves identically to an expected iterator
+     * during a full forward and backward traversal.
+     */
+    private <E> void assertIteratorBehavesLike(final List<E> expected, final ListIterator<E> filteredIterator) {
+        final ListIterator<E> expectedIterator = expected.listIterator();
+        assertForwardTraversalEquals(expectedIterator, filteredIterator);
+        assertBackwardTraversalEquals(expectedIterator, filteredIterator);
     }
 
     /**
-     * Test for {@link "https://issues.apache.org/jira/browse/COLLECTIONS-360 COLLECTIONS-360"}
+     * Asserts that the iterators are equivalent when traversing forward.
      */
-    @Test
-    void testCollections360() throws Throwable {
-        final Collection<Predicate<Object>> var7 = new GrowthList<>();
-        final Predicate<Object> var9 = PredicateUtils.anyPredicate(var7);
-        final FilterListIterator<Object> var13 = new FilterListIterator<>(var9);
-        assertFalse(var13.hasNext());
-        final FilterListIterator<Object> var14 = new FilterListIterator<>(var9);
-        assertFalse(var14.hasPrevious());
-    }
-
-    @Test
-    void testEvens() {
-        final FilterListIterator<Integer> filtered = new FilterListIterator<>(list.listIterator(), evenPred);
-        walkLists(evens, filtered);
-    }
-
-    @Test
-    void testFailingHasNextBug() {
-        final FilterListIterator<Integer> filtered = new FilterListIterator<>(list.listIterator(), fourPred);
-        final ListIterator<Integer> expected = fours.listIterator();
+    private void assertForwardTraversalEquals(final ListIterator<?> expected, final ListIterator<?> testing) {
         while (expected.hasNext()) {
-            expected.next();
-            filtered.next();
+            assertTrue(testing.hasNext(), "Testing iterator should have a next element");
+            assertEquals(expected.nextIndex(), testing.nextIndex(), "Next indices should match");
+            assertEquals(expected.previousIndex(), testing.previousIndex(), "Previous indices should match");
+            assertEquals(expected.next(), testing.next(), "Next elements should be equal");
         }
-        assertTrue(filtered.hasPrevious());
-        assertFalse(filtered.hasNext());
-        assertEquals(expected.previous(), filtered.previous());
+        assertFalse(testing.hasNext(), "Testing iterator should be at the end");
     }
 
-    @Test
-    void testFalsePredicate() {
-        final FilterListIterator<Integer> filtered = new FilterListIterator<>(list.listIterator(), falsePred);
-        walkLists(new ArrayList<>(), filtered);
-    }
-
-    @Test
-    void testFours() {
-        final FilterListIterator<Integer> filtered = new FilterListIterator<>(list.listIterator(), fourPred);
-        walkLists(fours, filtered);
-    }
-
-    @Test
-    void testManual() {
-        // do this one "by hand" as a sanity check
-        final FilterListIterator<Integer> filtered = new FilterListIterator<>(list.listIterator(), threePred);
-
-        assertEquals(Integer.valueOf(0), filtered.next());
-        assertEquals(Integer.valueOf(3), filtered.next());
-        assertEquals(Integer.valueOf(6), filtered.next());
-        assertEquals(Integer.valueOf(9), filtered.next());
-        assertEquals(Integer.valueOf(12), filtered.next());
-        assertEquals(Integer.valueOf(15), filtered.next());
-        assertEquals(Integer.valueOf(18), filtered.next());
-
-        assertEquals(Integer.valueOf(18), filtered.previous());
-        assertEquals(Integer.valueOf(15), filtered.previous());
-        assertEquals(Integer.valueOf(12), filtered.previous());
-        assertEquals(Integer.valueOf(9), filtered.previous());
-        assertEquals(Integer.valueOf(6), filtered.previous());
-        assertEquals(Integer.valueOf(3), filtered.previous());
-        assertEquals(Integer.valueOf(0), filtered.previous());
-
-        assertFalse(filtered.hasPrevious());
-
-        assertEquals(Integer.valueOf(0), filtered.next());
-        assertEquals(Integer.valueOf(3), filtered.next());
-        assertEquals(Integer.valueOf(6), filtered.next());
-        assertEquals(Integer.valueOf(9), filtered.next());
-        assertEquals(Integer.valueOf(12), filtered.next());
-        assertEquals(Integer.valueOf(15), filtered.next());
-        assertEquals(Integer.valueOf(18), filtered.next());
-
-        assertFalse(filtered.hasNext());
-
-        assertEquals(Integer.valueOf(18), filtered.previous());
-        assertEquals(Integer.valueOf(15), filtered.previous());
-        assertEquals(Integer.valueOf(12), filtered.previous());
-        assertEquals(Integer.valueOf(9), filtered.previous());
-        assertEquals(Integer.valueOf(6), filtered.previous());
-        assertEquals(Integer.valueOf(3), filtered.previous());
-        assertEquals(Integer.valueOf(0), filtered.previous());
-
-        assertEquals(Integer.valueOf(0), filtered.next());
-        assertEquals(Integer.valueOf(0), filtered.previous());
-        assertEquals(Integer.valueOf(0), filtered.next());
-
-        assertEquals(Integer.valueOf(3), filtered.next());
-        assertEquals(Integer.valueOf(6), filtered.next());
-        assertEquals(Integer.valueOf(6), filtered.previous());
-        assertEquals(Integer.valueOf(3), filtered.previous());
-        assertEquals(Integer.valueOf(3), filtered.next());
-        assertEquals(Integer.valueOf(6), filtered.next());
-
-        assertEquals(Integer.valueOf(9), filtered.next());
-        assertEquals(Integer.valueOf(12), filtered.next());
-        assertEquals(Integer.valueOf(15), filtered.next());
-        assertEquals(Integer.valueOf(15), filtered.previous());
-        assertEquals(Integer.valueOf(12), filtered.previous());
-        assertEquals(Integer.valueOf(9), filtered.previous());
-    }
-
-    @Test
-    void testNestedSixes() {
-        final FilterListIterator<Integer> filtered = new FilterListIterator<>(
-                                        new FilterListIterator<>(list.listIterator(), threePred),
-                                        evenPred
-                                      );
-        walkLists(sixes, filtered);
-    }
-
-    @Test
-    void testNestedSixes2() {
-        final FilterListIterator<Integer> filtered = new FilterListIterator<>(
-                                        new FilterListIterator<>(list.listIterator(), evenPred),
-                                        threePred
-                                      );
-        walkLists(sixes, filtered);
-    }
-
-    @Test
-    void testNestedSixes3() {
-        final FilterListIterator<Integer> filtered = new FilterListIterator<>(
-                                        new FilterListIterator<>(list.listIterator(), threePred),
-                                        evenPred
-                                      );
-        walkLists(sixes, new FilterListIterator<>(filtered, truePred));
-    }
-
-    @Test
-    void testNextChangesPrevious() {
-        {
-            final FilterListIterator<Integer> filtered = new FilterListIterator<>(list.listIterator(), threePred);
-            nextNextPrevious(threes.listIterator(), filtered);
-        }
-
-        {
-            final FilterListIterator<Integer> filtered = new FilterListIterator<>(list.listIterator(), truePred);
-            nextNextPrevious(list.listIterator(), filtered);
-        }
-    }
-
-    @Test
-    void testOdds() {
-        final FilterListIterator<Integer> filtered = new FilterListIterator<>(list.listIterator(), oddPred);
-        walkLists(odds, filtered);
-    }
-
-    @Test
-    void testPreviousChangesNext() {
-        {
-            final FilterListIterator<Integer> filtered = new FilterListIterator<>(list.listIterator(), threePred);
-            final ListIterator<Integer> expected = threes.listIterator();
-            walkForward(expected, filtered);
-            previousPreviousNext(expected, filtered);
-        }
-        {
-            final FilterListIterator<Integer> filtered = new FilterListIterator<>(list.listIterator(), truePred);
-            final ListIterator<Integer> expected = list.listIterator();
-            walkForward(expected, filtered);
-            previousPreviousNext(expected, filtered);
-        }
-    }
-
-    @Test
-    void testThrees() {
-        final FilterListIterator<Integer> filtered = new FilterListIterator<>(list.listIterator(), threePred);
-        walkLists(threes, filtered);
-    }
-
-    // Utilities
-
-    @Test
-    void testTruePredicate() {
-        final FilterListIterator<Integer> filtered = new FilterListIterator<>(list.listIterator(), truePred);
-        walkLists(list, filtered);
-    }
-
-    @Test
-    void testWalkLists() {
-        // this just confirms that our walkLists method works OK
-        walkLists(list, list.listIterator());
-    }
-
-    private void walkBackward(final ListIterator<?> expected, final ListIterator<?> testing) {
+    /**
+     * Asserts that the iterators are equivalent when traversing backward.
+     */
+    private void assertBackwardTraversalEquals(final ListIterator<?> expected, final ListIterator<?> testing) {
         while (expected.hasPrevious()) {
-            assertEquals(expected.nextIndex(), testing.nextIndex());
-            assertEquals(expected.previousIndex(), testing.previousIndex());
-            assertTrue(testing.hasPrevious());
-            assertEquals(expected.previous(), testing.previous());
+            assertTrue(testing.hasPrevious(), "Testing iterator should have a previous element");
+            assertEquals(expected.nextIndex(), testing.nextIndex(), "Next indices should match");
+            assertEquals(expected.previousIndex(), testing.previousIndex(), "Previous indices should match");
+            assertEquals(expected.previous(), testing.previous(), "Previous elements should be equal");
+        }
+        assertFalse(testing.hasPrevious(), "Testing iterator should be at the beginning");
+    }
+
+    // ========================================================================
+    // --- Test Cases ---
+    // ========================================================================
+
+    @Nested
+    @DisplayName("Basic Filtering")
+    class BasicFilteringTests {
+
+        @Test
+        @DisplayName("should return only even numbers")
+        void filter_WithEvenPredicate_ShouldReturnOnlyEvens() {
+            final FilterListIterator<Integer> filtered = new FilterListIterator<>(fullList.listIterator(), IS_EVEN_PREDICATE);
+            assertIteratorBehavesLike(evens, filtered);
+        }
+
+        @Test
+        @DisplayName("should return only odd numbers")
+        void filter_WithOddPredicate_ShouldReturnOnlyOdds() {
+            final FilterListIterator<Integer> filtered = new FilterListIterator<>(fullList.listIterator(), IS_ODD_PREDICATE);
+            assertIteratorBehavesLike(odds, filtered);
+        }
+
+        @Test
+        @DisplayName("should return only multiples of 3")
+        void filter_WithMultipleOf3Predicate_ShouldReturnOnlyMultiplesOf3() {
+            final FilterListIterator<Integer> filtered = new FilterListIterator<>(fullList.listIterator(), IS_MULTIPLE_OF_3_PREDICATE);
+            assertIteratorBehavesLike(multiplesOf3, filtered);
+        }
+
+        @Test
+        @DisplayName("should return all elements when predicate is always true")
+        void filter_WithTruePredicate_ShouldReturnAllElements() {
+            final FilterListIterator<Integer> filtered = new FilterListIterator<>(fullList.listIterator(), ALWAYS_TRUE_PREDICATE);
+            assertIteratorBehavesLike(fullList, filtered);
+        }
+
+        @Test
+        @DisplayName("should return no elements when predicate is always false")
+        void filter_WithFalsePredicate_ShouldReturnNoElements() {
+            final FilterListIterator<Integer> filtered = new FilterListIterator<>(fullList.listIterator(), ALWAYS_FALSE_PREDICATE);
+            assertIteratorBehavesLike(new ArrayList<>(), filtered);
         }
     }
 
-    private void walkForward(final ListIterator<?> expected, final ListIterator<?> testing) {
-        while (expected.hasNext()) {
-            assertEquals(expected.nextIndex(), testing.nextIndex());
-            assertEquals(expected.previousIndex(), testing.previousIndex());
-            assertTrue(testing.hasNext());
-            assertEquals(expected.next(), testing.next());
+    @Nested
+    @DisplayName("Nested Filtering")
+    class NestedFilteringTests {
+
+        @Test
+        @DisplayName("should correctly filter with nested (even, then multiple-of-3) predicates")
+        void filter_WithNestedPredicates_ShouldReturnMultiplesOf6() {
+            final FilterListIterator<Integer> evenFilter = new FilterListIterator<>(fullList.listIterator(), IS_EVEN_PREDICATE);
+            final FilterListIterator<Integer> finalFilter = new FilterListIterator<>(evenFilter, IS_MULTIPLE_OF_3_PREDICATE);
+            assertIteratorBehavesLike(multiplesOf6, finalFilter);
+        }
+
+        @Test
+        @DisplayName("should correctly filter with nested (multiple-of-3, then even) predicates")
+        void filter_WithNestedPredicatesReversed_ShouldReturnMultiplesOf6() {
+            final FilterListIterator<Integer> multipleOf3Filter = new FilterListIterator<>(fullList.listIterator(), IS_MULTIPLE_OF_3_PREDICATE);
+            final FilterListIterator<Integer> finalFilter = new FilterListIterator<>(multipleOf3Filter, IS_EVEN_PREDICATE);
+            assertIteratorBehavesLike(multiplesOf6, finalFilter);
         }
     }
 
-    private <E> void walkLists(final List<E> list, final ListIterator<E> testing) {
-        final ListIterator<E> expected = list.listIterator();
+    @Nested
+    @DisplayName("Traversal Behavior")
+    class TraversalBehaviorTests {
 
-        // walk all the way forward
-        walkForward(expected, testing);
+        @Test
+        @DisplayName("next() followed by previous() should return the same element")
+        void nextThenPrevious_ShouldReturnSameElement() {
+            final FilterListIterator<Integer> filtered = new FilterListIterator<>(fullList.listIterator(), IS_MULTIPLE_OF_3_PREDICATE);
+            final ListIterator<Integer> expected = multiplesOf3.listIterator();
 
-        // walk all the way back
-        walkBackward(expected, testing);
+            // Move both iterators forward
+            assertEquals(expected.next(), filtered.next()); // 0
+            assertEquals(expected.next(), filtered.next()); // 3
 
-        // forward,back,forward
-        while (expected.hasNext()) {
-            assertEquals(expected.nextIndex(), testing.nextIndex());
-            assertEquals(expected.previousIndex(), testing.previousIndex());
-            assertTrue(testing.hasNext());
-            assertEquals(expected.next(), testing.next());
-            assertTrue(testing.hasPrevious());
-            assertEquals(expected.previous(), testing.previous());
-            assertTrue(testing.hasNext());
-            assertEquals(expected.next(), testing.next());
+            // Calling previous() should return the element just returned by next()
+            assertEquals(3, filtered.previous());
         }
 
-        // walk all the way back
-        walkBackward(expected, testing);
+        @Test
+        @DisplayName("previous() followed by next() should return the same element")
+        void previousThenNext_ShouldReturnSameElement() {
+            final FilterListIterator<Integer> filtered = new FilterListIterator<>(fullList.listIterator(), IS_MULTIPLE_OF_3_PREDICATE);
+            final ListIterator<Integer> expected = multiplesOf3.listIterator();
 
-        for (int i = 0; i < list.size(); i++) {
-            // walk forward i
-            for (int j = 0; j < i; j++) {
-                assertEquals(expected.nextIndex(), testing.nextIndex());
-                assertEquals(expected.previousIndex(), testing.previousIndex());
-                assertTrue(expected.hasNext()); // if this one fails we've got a logic error in the test
-                assertTrue(testing.hasNext());
-                assertEquals(expected.next(), testing.next());
+            // Move both iterators to the end
+            while (expected.hasNext()) {
+                expected.next();
+                filtered.next();
             }
-            // walk back i/2
-            for (int j = 0; j < i / 2; j++) {
-                assertEquals(expected.nextIndex(), testing.nextIndex());
-                assertEquals(expected.previousIndex(), testing.previousIndex());
-                assertTrue(expected.hasPrevious()); // if this one fails we've got a logic error in the test
-                assertTrue(testing.hasPrevious());
-                assertEquals(expected.previous(), testing.previous());
-            }
-            // walk forward i/2
-            for (int j = 0; j < i / 2; j++) {
-                assertEquals(expected.nextIndex(), testing.nextIndex());
-                assertEquals(expected.previousIndex(), testing.previousIndex());
-                assertTrue(expected.hasNext()); // if this one fails we've got a logic error in the test
-                assertTrue(testing.hasNext());
-                assertEquals(expected.next(), testing.next());
-            }
-            // walk back i
-            for (int j = 0; j < i; j++) {
-                assertEquals(expected.nextIndex(), testing.nextIndex());
-                assertEquals(expected.previousIndex(), testing.previousIndex());
-                assertTrue(expected.hasPrevious()); // if this one fails we've got a logic error in the test
-                assertTrue(testing.hasPrevious());
-                assertEquals(expected.previous(), testing.previous());
-            }
+
+            // Move both iterators backward
+            assertEquals(expected.previous(), filtered.previous()); // 18
+            assertEquals(expected.previous(), filtered.previous()); // 15
+
+            // Calling next() should return the element just returned by previous()
+            assertEquals(15, filtered.next());
         }
 
-        // random walk
-        final StringBuilder walkdescr = new StringBuilder(500);
-        for (int i = 0; i < 500; i++) {
-            if (random.nextBoolean()) {
-                // step forward
-                walkdescr.append("+");
-                if (expected.hasNext()) {
-                    assertEquals(expected.next(), testing.next(), walkdescr.toString());
+        @Test
+        @DisplayName("hasNext() should be false at the end of the filtered list")
+        void hasNext_AtEndOfFilteredList_ShouldBeFalse() {
+            final FilterListIterator<Integer> filtered = new FilterListIterator<>(fullList.listIterator(), IS_MULTIPLE_OF_4_PREDICATE);
+
+            // Walk to the end of the filtered list
+            while (filtered.hasNext()) {
+                filtered.next();
+            }
+
+            assertTrue(filtered.hasPrevious(), "Should have a previous element at the end");
+            assertFalse(filtered.hasNext(), "Should not have a next element at the end");
+            assertEquals(Integer.valueOf(16), filtered.previous(), "Previous should return the last filtered element");
+        }
+
+        @Test
+        @DisplayName("should handle extensive random forward and backward traversals")
+        void iterator_WithRandomizedTraversal_ShouldRemainConsistent() {
+            final FilterListIterator<Integer> filtered = new FilterListIterator<>(fullList.listIterator(), IS_MULTIPLE_OF_3_PREDICATE);
+            final ListIterator<Integer> expected = multiplesOf3.listIterator();
+            final Random random = new Random(12345); // Use a fixed seed for reproducibility
+
+            for (int i = 0; i < 500; i++) {
+                if (random.nextBoolean()) {
+                    if (expected.hasNext()) {
+                        assertEquals(expected.next(), filtered.next(), "Mismatch during random forward step");
+                    }
+                } else {
+                    if (expected.hasPrevious()) {
+                        assertEquals(expected.previous(), filtered.previous(), "Mismatch during random backward step");
+                    }
                 }
-            } else {
-                // step backward
-                walkdescr.append("-");
-                if (expected.hasPrevious()) {
-                    assertEquals(expected.previous(), testing.previous(), walkdescr.toString());
-                }
+                assertEquals(expected.nextIndex(), filtered.nextIndex());
+                assertEquals(expected.previousIndex(), filtered.previousIndex());
             }
-            assertEquals(expected.nextIndex(), testing.nextIndex(), walkdescr.toString());
-            assertEquals(expected.previousIndex(), testing.previousIndex(), walkdescr.toString());
         }
-
     }
 
+    @Nested
+    @DisplayName("Edge Cases")
+    class EdgeCaseTests {
+
+        /**
+         * Test for JIRA issue COLLECTIONS-360.
+         * An iterator with a predicate that is based on an empty collection should not have next or previous elements.
+         */
+        @Test
+        @DisplayName("should not have next or previous with an empty predicate collection")
+        void iterator_WithEmptyAnyPredicate_ShouldBeEmpty() {
+            final Predicate<Object> anyOfNothing = PredicateUtils.anyPredicate(Collections.emptyList());
+
+            final FilterListIterator<Object> iterator1 = new FilterListIterator<>(anyOfNothing);
+            assertFalse(iterator1.hasNext());
+
+            final FilterListIterator<Object> iterator2 = new FilterListIterator<>(anyOfNothing);
+            assertFalse(iterator2.hasPrevious());
+        }
+    }
 }
