@@ -19,356 +19,224 @@ package org.apache.commons.codec.language;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
-import java.util.stream.Stream;
 import org.apache.commons.codec.AbstractStringEncoderTest;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for {@link Metaphone}.
  */
 class MetaphoneTest extends AbstractStringEncoderTest<Metaphone> {
+
+    public void assertIsMetaphoneEqual(final String source, final String[] matches) {
+        // match source to all matches
+        for (final String matche : matches) {
+            assertTrue(getStringEncoder().isMetaphoneEqual(source, matche), "Source: " + source + ", should have same Metaphone as: " + matche);
+        }
+        // match to each other
+        for (final String matche : matches) {
+            for (final String matche2 : matches) {
+                assertTrue(getStringEncoder().isMetaphoneEqual(matche, matche2));
+            }
+        }
+    }
+
+    public void assertMetaphoneEqual(final String[][] pairs) {
+        validateFixture(pairs);
+        for (final String[] pair : pairs) {
+            final String name0 = pair[0];
+            final String name1 = pair[1];
+            final String failMsg = "Expected match between " + name0 + " and " + name1;
+            assertTrue(getStringEncoder().isMetaphoneEqual(name0, name1), failMsg);
+            assertTrue(getStringEncoder().isMetaphoneEqual(name1, name0), failMsg);
+        }
+    }
 
     @Override
     protected Metaphone createStringEncoder() {
         return new Metaphone();
     }
 
-    // ==================== TEST METAPHONE EQUALITY FOR WORD PAIRS ====================
-
-    @ParameterizedTest
-    @MethodSource("provideBasicEqualityPairs")
-    void testMetaphoneEquality_BasicPairs(String word1, String word2) {
-        assertTrue(getStringEncoder().isMetaphoneEqual(word1, word2),
-            () -> String.format("Words should be metaphone-equal: '%s' and '%s'", word1, word2));
+    @Test
+    void testDiscardOfSCEOrSCIOrSCY() {
+        assertEquals("SNS", getStringEncoder().metaphone("SCIENCE"));
+        assertEquals("SN", getStringEncoder().metaphone("SCENE"));
+        assertEquals("S", getStringEncoder().metaphone("SCY"));
     }
 
-    private static Stream<Arguments> provideBasicEqualityPairs() {
-        return Stream.of(
-            Arguments.of("Case", "case"),
-            Arguments.of("CASE", "Case"),
-            Arguments.of("caSe", "cAsE"),
-            Arguments.of("quick", "cookie")
-        );
+    @Test
+    void testDiscardOfSilentGN() {
+        // NOTE: This does not test for silent GN, but for starting with GN
+        assertEquals("N", getStringEncoder().metaphone("GNU"));
+
+        // NOTE: Trying to test for GNED, but expected code does not appear to execute
+        assertEquals("SNT", getStringEncoder().metaphone("SIGNED"));
     }
 
-    @ParameterizedTest
-    @MethodSource("provideNameEqualityPairs")
-    void testMetaphoneEquality_NamePairs(String word1, String word2) {
-        assertTrue(getStringEncoder().isMetaphoneEqual(word1, word2),
-            () -> String.format("Names should be metaphone-equal: '%s' and '%s'", word1, word2));
-    }
-
-    private static Stream<Arguments> provideNameEqualityPairs() {
-        return Stream.of(
-            Arguments.of("Lawrence", "Lorenza"),
-            Arguments.of("Gary", "Cahra")
-        );
-    }
-
-    // ==================== TEST METAPHONE EQUALITY FOR WORD GROUPS ====================
-
-    @ParameterizedTest
-    @ValueSource(strings = {"Eure"})
-    void testMetaphoneEquality_Aero(String match) {
-        assertTrue(getStringEncoder().isMetaphoneEqual("Aero", match),
-            () -> String.format("'Aero' should match '%s'", match));
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideAlbertMatches")
-    void testMetaphoneEquality_Albert(String match) {
-        assertTrue(getStringEncoder().isMetaphoneEqual("Albert", match),
-            () -> String.format("'Albert' should match '%s'", match));
-    }
-
-    private static Stream<String> provideAlbertMatches() {
-        return Stream.of("Ailbert", "Alberik", "Albert", "Alberto", "Albrecht");
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideGaryMatches")
-    void testMetaphoneEquality_Gary(String match) {
-        assertTrue(getStringEncoder().isMetaphoneEqual("Gary", match),
-            () -> String.format("'Gary' should match '%s'", match));
-    }
-
-    private static Stream<String> provideGaryMatches() {
-        return Stream.of(
-            "Cahra", "Cara", "Carey", "Cari", "Caria", "Carie", "Caro", "Carree", "Carri", "Carrie", "Carry", "Cary", 
-            "Cora", "Corey", "Cori", "Corie", "Correy", "Corri", "Corrie", "Corry", "Cory", "Gray", "Kara", "Kare", 
-            "Karee", "Kari", "Karia", "Karie", "Karrah", "Karrie", "Karry", "Kary", "Keri", "Kerri", "Kerrie", "Kerry", 
-            "Kira", "Kiri", "Kora", "Kore", "Kori", "Korie", "Korrie", "Korry"
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideJohnMatches")
-    void testMetaphoneEquality_John(String match) {
-        assertTrue(getStringEncoder().isMetaphoneEqual("John", match),
-            () -> String.format("'John' should match '%s'", match));
-    }
-
-    private static Stream<String> provideJohnMatches() {
-        return Stream.of(
-            "Gena", "Gene", "Genia", "Genna", "Genni", "Gennie", "Genny", "Giana", "Gianna", "Gina", "Ginni", "Ginnie", 
-            "Ginny", "Jaine", "Jan", "Jana", "Jane", "Janey", "Jania", "Janie", "Janna", "Jany", "Jayne", "Jean", 
-            "Jeana", "Jeane", "Jeanie", "Jeanna", "Jeanne", "Jeannie", "Jen", "Jena", "Jeni", "Jenn", "Jenna", "Jennee", 
-            "Jenni", "Jennie", "Jenny", "Jinny", "Jo Ann", "Jo-Ann", "Jo-Anne", "Joan", "Joana", "Joane", "Joanie", 
-            "Joann", "Joanna", "Joanne", "Joeann", "Johna", "Johnna", "Joni", "Jonie", "Juana", "June", "Junia", "Junie"
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideKnightMatches")
-    void testMetaphoneEquality_Knight(String match) {
-        assertTrue(getStringEncoder().isMetaphoneEqual("Knight", match),
-            () -> String.format("'Knight' should match '%s'", match));
-    }
-
-    private static Stream<String> provideKnightMatches() {
-        return Stream.of(
-            "Hynda", "Nada", "Nadia", "Nady", "Nat", "Nata", "Natty", "Neda", "Nedda", "Nedi", "Netta", "Netti", 
-            "Nettie", "Netty", "Nita", "Nydia"
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideMaryMatches")
-    void testMetaphoneEquality_Mary(String match) {
-        assertTrue(getStringEncoder().isMetaphoneEqual("Mary", match),
-            () -> String.format("'Mary' should match '%s'", match));
-    }
-
-    private static Stream<String> provideMaryMatches() {
-        return Stream.of(
-            "Mair", "Maire", "Mara", "Mareah", "Mari", "Maria", "Marie", "Mary", "Maura", "Maure", "Meara", "Merrie", 
-            "Merry", "Mira", "Moira", "Mora", "Moria", "Moyra", "Muire", "Myra", "Myrah"
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideParisMatches")
-    void testMetaphoneEquality_Paris(String match) {
-        assertTrue(getStringEncoder().isMetaphoneEqual("Paris", match),
-            () -> String.format("'Paris' should match '%s'", match));
-    }
-
-    private static Stream<String> provideParisMatches() {
-        return Stream.of("Pearcy", "Perris", "Piercy", "Pierz", "Pryse");
-    }
-
-    @ParameterizedTest
-    @MethodSource("providePeterMatches")
-    void testMetaphoneEquality_Peter(String match) {
-        assertTrue(getStringEncoder().isMetaphoneEqual("Peter", match),
-            () -> String.format("'Peter' should match '%s'", match));
-    }
-
-    private static Stream<String> providePeterMatches() {
-        return Stream.of("Peadar", "Peder", "Pedro", "Peter", "Petr", "Peyter", "Pieter", "Pietro", "Piotr");
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideRayMatches")
-    void testMetaphoneEquality_Ray(String match) {
-        assertTrue(getStringEncoder().isMetaphoneEqual("Ray", match),
-            () -> String.format("'Ray' should match '%s'", match));
-    }
-
-    private static Stream<String> provideRayMatches() {
-        return Stream.of("Ray", "Rey", "Roi", "Roy", "Ruy");
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideSusanMatches")
-    void testMetaphoneEquality_Susan(String match) {
-        assertTrue(getStringEncoder().isMetaphoneEqual("Susan", match),
-            () -> String.format("'Susan' should match '%s'", match));
-    }
-
-    private static Stream<String> provideSusanMatches() {
-        return Stream.of(
-            "Siusan", "Sosanna", "Susan", "Susana", "Susann", "Susanna", "Susannah", "Susanne", "Suzann", "Suzanna", 
-            "Suzanne", "Zuzana"
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideWhiteMatches")
-    void testMetaphoneEquality_White(String match) {
-        assertTrue(getStringEncoder().isMetaphoneEqual("White", match),
-            () -> String.format("'White' should match '%s'", match));
-    }
-
-    private static Stream<String> provideWhiteMatches() {
-        return Stream.of(
-            "Wade", "Wait", "Waite", "Wat", "Whit", "Wiatt", "Wit", "Wittie", "Witty", "Wood", "Woodie", "Woody"
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideWrightMatches")
-    void testMetaphoneEquality_Wright(String match) {
-        assertTrue(getStringEncoder().isMetaphoneEqual("Wright", match),
-            () -> String.format("'Wright' should match '%s'", match));
-    }
-
-    private static Stream<String> provideWrightMatches() {
-        return Stream.of("Rota", "Rudd", "Ryde");
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideXalanMatches")
-    void testMetaphoneEquality_Xalan(String match) {
-        assertTrue(getStringEncoder().isMetaphoneEqual("Xalan", match),
-            () -> String.format("'Xalan' should match '%s'", match));
-    }
-
-    private static Stream<String> provideXalanMatches() {
-        return Stream.of(
-            "Celene", "Celina", "Celine", "Selena", "Selene", "Selina", "Seline", "Suellen", "Xylina"
-        );
-    }
-
-    // ==================== TEST SPECIFIC METAPHONE RULES ====================
-
-    @ParameterizedTest
-    @MethodSource
-    void testDiscardOfSCEOrSCIOrSCY(String word, String expected) {
-        assertEquals(expected, getStringEncoder().metaphone(word));
-    }
-
-    private static Stream<Arguments> testDiscardOfSCEOrSCIOrSCY() {
-        return Stream.of(
-            Arguments.of("SCIENCE", "SNS"),
-            Arguments.of("SCENE", "SN"),
-            Arguments.of("SCY", "S")
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource
-    void testDiscardOfSilentGN(String word, String expected) {
-        assertEquals(expected, getStringEncoder().metaphone(word));
-    }
-
-    private static Stream<Arguments> testDiscardOfSilentGN() {
-        return Stream.of(
-            Arguments.of("GNU", "N"),        // GN at start
-            Arguments.of("SIGNED", "SNT")    // GN in middle
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource
-    void testDiscardOfSilentHAfterG(String word, String expected) {
-        assertEquals(expected, getStringEncoder().metaphone(word));
-    }
-
-    private static Stream<Arguments> testDiscardOfSilentHAfterG() {
-        return Stream.of(
-            Arguments.of("GHENT", "KNT"),
-            Arguments.of("BAUGH", "B")
-        );
+    @Test
+    void testDiscardOfSilentHAfterG() {
+        assertEquals("KNT", getStringEncoder().metaphone("GHENT"));
+        assertEquals("B", getStringEncoder().metaphone("BAUGH"));
     }
 
     @Test
     void testExceedLength() {
-        // Should be AKSKS but gets truncated by max code length (default=4)
+        // should be AKSKS, but is truncated by Max Code Length
         assertEquals("AKSK", getStringEncoder().metaphone("AXEAXE"));
     }
 
-    @ParameterizedTest
-    @MethodSource
-    void testSHAndSIOAndSIAToX(String word, String expected) {
-        assertEquals(expected, getStringEncoder().metaphone(word));
+    @Test
+    void testIsMetaphoneEqual1() {
+        assertMetaphoneEqual(new String[][] { { "Case", "case" }, { "CASE", "Case" }, { "caSe", "cAsE" }, { "quick", "cookie" } });
     }
 
-    private static Stream<Arguments> testSHAndSIOAndSIAToX() {
-        return Stream.of(
-            Arguments.of("SHOT", "XT"),
-            Arguments.of("ODSIAN", "OTXN"),
-            Arguments.of("PULSION", "PLXN")
-        );
+    /**
+     * Matches computed from http://www.lanw.com/java/phonetic/default.htm
+     */
+    @Test
+    void testIsMetaphoneEqual2() {
+        assertMetaphoneEqual(new String[][] { { "Lawrence", "Lorenza" }, { "Gary", "Cahra" }, });
     }
 
-    @ParameterizedTest
-    @MethodSource
-    void testTCH(String word, String expected) {
-        assertEquals(expected, getStringEncoder().metaphone(word));
+    /**
+     * Initial AE case.
+     *
+     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
+     */
+    @Test
+    void testIsMetaphoneEqualAero() {
+        assertIsMetaphoneEqual("Aero", new String[] { "Eure" });
     }
 
-    private static Stream<Arguments> testTCH() {
-        return Stream.of(
-            Arguments.of("RETCH", "RX"),
-            Arguments.of("WATCH", "WX")
-        );
+    /**
+     * Initial A, not followed by an E case.
+     *
+     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
+     */
+    @Test
+    void testIsMetaphoneEqualAlbert() {
+        assertIsMetaphoneEqual("Albert", new String[] { "Ailbert", "Alberik", "Albert", "Alberto", "Albrecht" });
     }
 
-    @ParameterizedTest
-    @MethodSource
-    void testTIOAndTIAToX(String word, String expected) {
-        assertEquals(expected, getStringEncoder().metaphone(word));
+    /**
+     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
+     */
+    @Test
+    void testIsMetaphoneEqualGary() {
+        assertIsMetaphoneEqual("Gary",
+                new String[] { "Cahra", "Cara", "Carey", "Cari", "Caria", "Carie", "Caro", "Carree", "Carri", "Carrie", "Carry", "Cary", "Cora", "Corey",
+                        "Cori", "Corie", "Correy", "Corri", "Corrie", "Corry", "Cory", "Gray", "Kara", "Kare", "Karee", "Kari", "Karia", "Karie", "Karrah",
+                        "Karrie", "Karry", "Kary", "Keri", "Kerri", "Kerrie", "Kerry", "Kira", "Kiri", "Kora", "Kore", "Kori", "Korie", "Korrie", "Korry" });
     }
 
-    private static Stream<Arguments> testTIOAndTIAToX() {
-        return Stream.of(
-            Arguments.of("OTIA", "OX"),
-            Arguments.of("PORTION", "PRXN")
-        );
+    /**
+     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
+     */
+    @Test
+    void testIsMetaphoneEqualJohn() {
+        assertIsMetaphoneEqual("John",
+                new String[] { "Gena", "Gene", "Genia", "Genna", "Genni", "Gennie", "Genny", "Giana", "Gianna", "Gina", "Ginni", "Ginnie", "Ginny", "Jaine",
+                        "Jan", "Jana", "Jane", "Janey", "Jania", "Janie", "Janna", "Jany", "Jayne", "Jean", "Jeana", "Jeane", "Jeanie", "Jeanna", "Jeanne",
+                        "Jeannie", "Jen", "Jena", "Jeni", "Jenn", "Jenna", "Jennee", "Jenni", "Jennie", "Jenny", "Jinny", "Jo Ann", "Jo-Ann", "Jo-Anne", "Joan",
+                        "Joana", "Joane", "Joanie", "Joann", "Joanna", "Joanne", "Joeann", "Johna", "Johnna", "Joni", "Jonie", "Juana", "June", "Junia",
+                        "Junie" });
     }
 
-    @ParameterizedTest
-    @MethodSource
-    void testTranslateOfSCHAndCH(String word, String expected) {
-        assertEquals(expected, getStringEncoder().metaphone(word));
+    /**
+     * Initial KN case.
+     *
+     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
+     */
+    @Test
+    void testIsMetaphoneEqualKnight() {
+        assertIsMetaphoneEqual("Knight", new String[] { "Hynda", "Nada", "Nadia", "Nady", "Nat", "Nata", "Natty", "Neda", "Nedda", "Nedi", "Netta",
+                "Netti", "Nettie", "Netty", "Nita", "Nydia" });
     }
 
-    private static Stream<Arguments> testTranslateOfSCHAndCH() {
-        return Stream.of(
-            Arguments.of("SCHEDULE", "SKTL"),
-            Arguments.of("SCHEMATIC", "SKMT"),
-            Arguments.of("CHARACTER", "KRKT"),
-            Arguments.of("TEACH", "TX")
-        );
+    /**
+     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
+     */
+    @Test
+    void testIsMetaphoneEqualMary() {
+        assertIsMetaphoneEqual("Mary", new String[] { "Mair", "Maire", "Mara", "Mareah", "Mari", "Maria", "Marie", "Mary", "Maura", "Maure", "Meara",
+                "Merrie", "Merry", "Mira", "Moira", "Mora", "Moria", "Moyra", "Muire", "Myra", "Myrah" });
     }
 
-    @ParameterizedTest
-    @MethodSource
-    void testTranslateToJOfDGEOrDGIOrDGY(String word, String expected) {
-        assertEquals(expected, getStringEncoder().metaphone(word));
+    /**
+     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
+     */
+    @Test
+    void testIsMetaphoneEqualParis() {
+        assertIsMetaphoneEqual("Paris", new String[] { "Pearcy", "Perris", "Piercy", "Pierz", "Pryse" });
     }
 
-    private static Stream<Arguments> testTranslateToJOfDGEOrDGIOrDGY() {
-        return Stream.of(
-            Arguments.of("DODGY", "TJ"),
-            Arguments.of("DODGE", "TJ"),
-            Arguments.of("ADGIEMTI", "AJMT")
-        );
+    /**
+     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
+     */
+    @Test
+    void testIsMetaphoneEqualPeter() {
+        assertIsMetaphoneEqual("Peter", new String[] { "Peadar", "Peder", "Pedro", "Peter", "Petr", "Peyter", "Pieter", "Pietro", "Piotr" });
     }
 
-    @ParameterizedTest
-    @MethodSource
-    void testWordEndingInMB(String word, String expected) {
-        assertEquals(expected, getStringEncoder().metaphone(word));
+    /**
+     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
+     */
+    @Test
+    void testIsMetaphoneEqualRay() {
+        assertIsMetaphoneEqual("Ray", new String[] { "Ray", "Rey", "Roi", "Roy", "Ruy" });
     }
 
-    private static Stream<Arguments> testWordEndingInMB() {
-        return Stream.of(
-            Arguments.of("COMB", "KM"),
-            Arguments.of("TOMB", "TM"),
-            Arguments.of("WOMB", "WM")
-        );
+    /**
+     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
+     */
+    @Test
+    void testIsMetaphoneEqualSusan() {
+        assertIsMetaphoneEqual("Susan",
+                new String[] { "Siusan", "Sosanna", "Susan", "Susana", "Susann", "Susanna", "Susannah", "Susanne", "Suzann", "Suzanna", "Suzanne", "Zuzana" });
+    }
+
+    /**
+     * Initial WH case.
+     *
+     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
+     */
+    @Test
+    void testIsMetaphoneEqualWhite() {
+        assertIsMetaphoneEqual("White",
+                new String[] { "Wade", "Wait", "Waite", "Wat", "Whit", "Wiatt", "Wit", "Wittie", "Witty", "Wood", "Woodie", "Woody" });
+    }
+
+    /**
+     * Initial WR case.
+     *
+     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
+     */
+    @Test
+    void testIsMetaphoneEqualWright() {
+        assertIsMetaphoneEqual("Wright", new String[] { "Rota", "Rudd", "Ryde" });
+    }
+
+    /**
+     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
+     */
+    @Test
+    void testIsMetaphoneEqualXalan() {
+        assertIsMetaphoneEqual("Xalan", new String[] { "Celene", "Celina", "Celine", "Selena", "Selene", "Selina", "Seline", "Suellen", "Xylina" });
     }
 
     @Test
-    void testWordsWithCIA() {
-        assertEquals("XP", getStringEncoder().metaphone("CIAPO"));
+    void testMetaphone() {
+        assertEquals("HL", getStringEncoder().metaphone("howl"));
+        assertEquals("TSTN", getStringEncoder().metaphone("testing"));
+        assertEquals("0", getStringEncoder().metaphone("The"));
+        assertEquals("KK", getStringEncoder().metaphone("quick"));
+        assertEquals("BRN", getStringEncoder().metaphone("brown"));
+        assertEquals("FKS", getStringEncoder().metaphone("fox"));
+        assertEquals("JMPT", getStringEncoder().metaphone("jumped"));
+        assertEquals("OFR", getStringEncoder().metaphone("over"));
+        assertEquals("0", getStringEncoder().metaphone("the"));
+        assertEquals("LS", getStringEncoder().metaphone("lazy"));
+        assertEquals("TKS", getStringEncoder().metaphone("dogs"));
     }
 
     @Test
@@ -378,39 +246,76 @@ class MetaphoneTest extends AbstractStringEncoderTest<Metaphone> {
 
     @Test
     void testSetMaxLengthWithTruncation() {
+        // should be AKSKS, but istruncated by Max Code Length
         getStringEncoder().setMaxCodeLen(6);
-        // Should be AKSKSK but gets truncated to max length (6)
         assertEquals("AKSKSK", getStringEncoder().metaphone("AXEAXEAXE"));
     }
 
-    @ParameterizedTest
-    @MethodSource
-    void testMetaphoneBasicWords(String word, String expected) {
-        assertEquals(expected, getStringEncoder().metaphone(word));
-    }
-
-    private static Stream<Arguments> testMetaphoneBasicWords() {
-        return Stream.of(
-            Arguments.of("howl", "HL"),
-            Arguments.of("testing", "TSTN"),
-            Arguments.of("The", "0"),
-            Arguments.of("quick", "KK"),
-            Arguments.of("brown", "BRN"),
-            Arguments.of("fox", "FKS"),
-            Arguments.of("jumped", "JMPT"),
-            Arguments.of("over", "OFR"),
-            Arguments.of("the", "0"),
-            Arguments.of("lazy", "LS"),
-            Arguments.of("dogs", "TKS")
-        );
+    @Test
+    void testSHAndSIOAndSIAToX() {
+        assertEquals("XT", getStringEncoder().metaphone("SHOT"));
+        assertEquals("OTXN", getStringEncoder().metaphone("ODSIAN"));
+        assertEquals("PLXN", getStringEncoder().metaphone("PULSION"));
     }
 
     @Test
+    void testTCH() {
+        assertEquals("RX", getStringEncoder().metaphone("RETCH"));
+        assertEquals("WX", getStringEncoder().metaphone("WATCH"));
+    }
+
+    @Test
+    void testTIOAndTIAToX() {
+        assertEquals("OX", getStringEncoder().metaphone("OTIA"));
+        assertEquals("PRXN", getStringEncoder().metaphone("PORTION"));
+    }
+
+    @Test
+    void testTranslateOfSCHAndCH() {
+        assertEquals("SKTL", getStringEncoder().metaphone("SCHEDULE"));
+        assertEquals("SKMT", getStringEncoder().metaphone("SCHEMATIC"));
+
+        assertEquals("KRKT", getStringEncoder().metaphone("CHARACTER"));
+        assertEquals("TX", getStringEncoder().metaphone("TEACH"));
+    }
+
+    @Test
+    void testTranslateToJOfDGEOrDGIOrDGY() {
+        assertEquals("TJ", getStringEncoder().metaphone("DODGY"));
+        assertEquals("TJ", getStringEncoder().metaphone("DODGE"));
+        assertEquals("AJMT", getStringEncoder().metaphone("ADGIEMTI"));
+    }
+
+    /**
+     * Tests (CODEC-57) Metaphone.Metaphone(String) returns an empty string when passed the word "why"
+     */
+    @Test
     void testWhy() {
-        /*
-         * Original Metaphone returns empty string for WHY.
-         * Note: PHP version returns "H" but that's a different implementation.
-         */
+        // PHP returns "H". The original Metaphone returns an empty string.
         assertEquals("", getStringEncoder().metaphone("WHY"));
     }
+
+    @Test
+    void testWordEndingInMB() {
+        assertEquals("KM", getStringEncoder().metaphone("COMB"));
+        assertEquals("TM", getStringEncoder().metaphone("TOMB"));
+        assertEquals("WM", getStringEncoder().metaphone("WOMB"));
+    }
+
+    @Test
+    void testWordsWithCIA() {
+        assertEquals("XP", getStringEncoder().metaphone("CIAPO"));
+    }
+
+    public void validateFixture(final String[][] pairs) {
+        if (pairs.length == 0) {
+            fail("Test fixture is empty");
+        }
+        for (int i = 0; i < pairs.length; i++) {
+            if (pairs[i].length != 2) {
+                fail("Error in test fixture in the data array at index " + i);
+            }
+        }
+    }
+
 }
