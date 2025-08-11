@@ -1,14 +1,48 @@
+/*
+ * Copyright (C) 2008 The Guava Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 package com.google.common.util.concurrent;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.util.concurrent.ClassPathUtil.parseJavaClassPath;
 import static com.google.common.util.concurrent.Futures.getChecked;
 import static com.google.common.util.concurrent.Futures.immediateFuture;
-import static com.google.common.util.concurrent.FuturesGetCheckedInputs.*;
+import static com.google.common.util.concurrent.FuturesGetCheckedInputs.CHECKED_EXCEPTION;
+import static com.google.common.util.concurrent.FuturesGetCheckedInputs.ERROR;
+import static com.google.common.util.concurrent.FuturesGetCheckedInputs.ERROR_FUTURE;
+import static com.google.common.util.concurrent.FuturesGetCheckedInputs.FAILED_FUTURE_CHECKED_EXCEPTION;
+import static com.google.common.util.concurrent.FuturesGetCheckedInputs.FAILED_FUTURE_ERROR;
+import static com.google.common.util.concurrent.FuturesGetCheckedInputs.FAILED_FUTURE_OTHER_THROWABLE;
+import static com.google.common.util.concurrent.FuturesGetCheckedInputs.FAILED_FUTURE_UNCHECKED_EXCEPTION;
+import static com.google.common.util.concurrent.FuturesGetCheckedInputs.OTHER_THROWABLE;
+import static com.google.common.util.concurrent.FuturesGetCheckedInputs.RUNTIME_EXCEPTION;
+import static com.google.common.util.concurrent.FuturesGetCheckedInputs.RUNTIME_EXCEPTION_FUTURE;
+import static com.google.common.util.concurrent.FuturesGetCheckedInputs.UNCHECKED_EXCEPTION;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertThrows;
 
 import com.google.common.testing.GcFinalization;
+import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithBadConstructor;
+import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithGoodAndBadConstructor;
+import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithManyConstructors;
+import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithManyConstructorsButOnlyOneThrowable;
+import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithPrivateConstructor;
+import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithSomePrivateConstructors;
+import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithWrongTypesConstructor;
+import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithoutThrowableConstructor;
+import com.google.common.util.concurrent.FuturesGetCheckedInputs.TwoArgConstructorException;
+import com.google.common.util.concurrent.FuturesGetCheckedInputs.TwoArgConstructorRuntimeException;
 import java.lang.ref.WeakReference;
 import java.net.URLClassLoader;
 import java.util.concurrent.CancellationException;
@@ -20,8 +54,7 @@ import org.jspecify.annotations.NullUnmarked;
 /** Unit tests for {@link Futures#getChecked(Future, Class)}. */
 @NullUnmarked
 public class FuturesGetCheckedTest extends TestCase {
-
-  // Untimed get() tests
+  // Boring untimed-get tests:
 
   public void testGetCheckedUntimed_success() throws TwoArgConstructorException {
     assertEquals("foo", getChecked(immediateFuture("foo"), TwoArgConstructorException.class));
@@ -123,7 +156,7 @@ public class FuturesGetCheckedTest extends TestCase {
     assertThat(expected).hasCauseThat().isSameInstanceAs(CHECKED_EXCEPTION);
   }
 
-  // Timed get() tests
+  // Boring timed-get tests:
 
   public void testGetCheckedTimed_success() throws TwoArgConstructorException {
     assertEquals(
@@ -340,4 +373,14 @@ public class FuturesGetCheckedTest extends TestCase {
     getChecked(immediateFuture("foo"), shadowClass);
     return new WeakReference<>(shadowLoader);
   }
+
+  /*
+   * TODO(cpovirk): It would be great to run all these tests (including class unloading) in an
+   * environment that forces Futures.getChecked to its fallback WeakSetValidator. One awful way of
+   * doing so would be to derive a separate test library by using remove_from_jar to strip out
+   * ClassValueValidator.
+   *
+   * Fortunately, we get pretty good coverage "by accident": We run all these tests against the
+   * *backport*, where ClassValueValidator is not present.
+   */
 }
