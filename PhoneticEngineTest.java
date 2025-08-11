@@ -27,165 +27,69 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * Tests for PhoneticEngine - verifies phonetic encoding of names using Beider-Morse algorithm.
- * 
- * The PhoneticEngine converts names into phonetic representations that can be compared
- * across different languages and name origins (Generic, Ashkenazi, Sephardic).
+ * Tests PhoneticEngine.
  */
 class PhoneticEngineTest {
 
-    private static final int DEFAULT_MAX_PHONEMES = 10;
-    private static final int SINGLE_PHONEME = 1;
+    private static final Integer TEN = Integer.valueOf(10);
 
-    /**
-     * Test data for valid phonetic encoding scenarios.
-     * Each test case includes:
-     * - Input name
-     * - Expected phonetic output (pipe-separated alternatives)
-     * - Name type (Generic, Ashkenazi, Sephardic)
-     * - Rule type (Exact or Approximate matching)
-     * - Whether to concatenate multiple word encodings
-     * - Maximum number of phonemes to generate
-     */
-    public static Stream<Arguments> validEncodingTestCases() {
+    public static Stream<Arguments> data() {
+        // @formatter:off
         return Stream.of(
-                // French surname "Renault" with different name type interpretations
-                Arguments.of("Renault", "rinD|rinDlt|rina|rinalt|rino|rinolt|rinu|rinult", 
-                           NameType.GENERIC, RuleType.APPROX, true, DEFAULT_MAX_PHONEMES),
-                           
-                Arguments.of("Renault", "rYnDlt|rYnalt|rYnult|rinDlt|rinalt|rinolt|rinult", 
-                           NameType.ASHKENAZI, RuleType.APPROX, true, DEFAULT_MAX_PHONEMES),
-                           
-                // Test limiting phonemes to single result
-                Arguments.of("Renault", "rinDlt", 
-                           NameType.ASHKENAZI, RuleType.APPROX, true, SINGLE_PHONEME),
-                           
-                Arguments.of("Renault", "rinDlt", 
-                           NameType.SEPHARDIC, RuleType.APPROX, true, DEFAULT_MAX_PHONEMES),
-
-                // Hyphenated surname with exact matching
-                Arguments.of("SntJohn-Smith", "sntjonsmit", 
-                           NameType.GENERIC, RuleType.EXACT, true, DEFAULT_MAX_PHONEMES),
-
-                // Name with apostrophe prefix
-                Arguments.of("d'ortley", "(ortlaj|ortlej)-(dortlaj|dortlej)", 
-                           NameType.GENERIC, RuleType.EXACT, true, DEFAULT_MAX_PHONEMES),
-
-                // Multi-word name without concatenation (separate word encoding)
-                Arguments.of("van helsing", "(elSink|elsink|helSink|helsink|helzink|xelsink)-(banhelsink|fanhelsink|fanhelzink|vanhelsink|vanhelzink|vanjelsink)", 
-                           NameType.GENERIC, RuleType.EXACT, false, DEFAULT_MAX_PHONEMES),
-
-                // German place name with approximate matching
-                Arguments.of("Judenburg", "iudnbYrk|iudnbirk|iudnburk|xudnbirk|xudnburk|zudnbirk|zudnburk", 
-                           NameType.GENERIC, RuleType.APPROX, true, DEFAULT_MAX_PHONEMES),
-                           
-                // Same test with unlimited phonemes
-                Arguments.of("Judenburg", "iudnbYrk|iudnbirk|iudnburk|xudnbirk|xudnburk|zudnbirk|zudnburk", 
-                           NameType.GENERIC, RuleType.APPROX, true, Integer.MAX_VALUE)
-        );
+                Arguments.of("Renault", "rinD|rinDlt|rina|rinalt|rino|rinolt|rinu|rinult", NameType.GENERIC, RuleType.APPROX, Boolean.TRUE, TEN),
+                Arguments.of("Renault", "rYnDlt|rYnalt|rYnult|rinDlt|rinalt|rinolt|rinult", NameType.ASHKENAZI, RuleType.APPROX, Boolean.TRUE, TEN),
+                Arguments.of("Renault", "rinDlt", NameType.ASHKENAZI, RuleType.APPROX, Boolean.TRUE, Integer.valueOf(1)),
+                Arguments.of("Renault", "rinDlt", NameType.SEPHARDIC, RuleType.APPROX, Boolean.TRUE, TEN),
+                Arguments.of("SntJohn-Smith", "sntjonsmit", NameType.GENERIC, RuleType.EXACT, Boolean.TRUE, TEN),
+                Arguments.of("d'ortley", "(ortlaj|ortlej)-(dortlaj|dortlej)", NameType.GENERIC, RuleType.EXACT, Boolean.TRUE, TEN),
+                Arguments.of("van helsing", "(elSink|elsink|helSink|helsink|helzink|xelsink)-(banhelsink|fanhelsink|fanhelzink|vanhelsink|vanhelzink|vanjelsink)", NameType.GENERIC, RuleType.EXACT, Boolean.FALSE, TEN),
+                Arguments.of("Judenburg", "iudnbYrk|iudnbirk|iudnburk|xudnbirk|xudnburk|zudnbirk|zudnburk", NameType.GENERIC, RuleType.APPROX, Boolean.TRUE, TEN),
+                Arguments.of("Judenburg", "iudnbYrk|iudnbirk|iudnburk|xudnbirk|xudnburk|zudnbirk|zudnburk", NameType.GENERIC, RuleType.APPROX, Boolean.TRUE, Integer.MAX_VALUE)
+                );
+        // @formatter:on
     }
 
-    /**
-     * Test data for edge cases and special input scenarios.
-     * These test cases verify proper handling of:
-     * - Short names
-     * - Names with prefixes
-     * - Special characters
-     * - Empty results
-     */
-    public static Stream<Arguments> edgeCaseTestData() {
+    public static Stream<Arguments> invalidData() {
+        // @formatter:off
         return Stream.of(
-                // Short name with multiple phonetic possibilities
-                Arguments.of("bar", "bar|bor|var|vor", 
-                           NameType.ASHKENAZI, RuleType.APPROX, false, DEFAULT_MAX_PHONEMES),
-                           
-                // Name prefix that can be empty or preserved
-                Arguments.of("al", "|al", 
-                           NameType.SEPHARDIC, RuleType.APPROX, false, DEFAULT_MAX_PHONEMES),
-                           
-                // Short name with exact matching
-                Arguments.of("da", "da|di", 
-                           NameType.GENERIC, RuleType.EXACT, false, DEFAULT_MAX_PHONEMES),
-                           
-                // Special characters that result in empty encoding
-                Arguments.of("'''", "", 
-                           NameType.SEPHARDIC, RuleType.APPROX, false, DEFAULT_MAX_PHONEMES),
-                           
-                Arguments.of("'''", "", 
-                           NameType.SEPHARDIC, RuleType.APPROX, false, Integer.MAX_VALUE)
-        );
+                Arguments.of("bar", "bar|bor|var|vor", NameType.ASHKENAZI, RuleType.APPROX, Boolean.FALSE, TEN),
+                Arguments.of("al", "|al", NameType.SEPHARDIC, RuleType.APPROX, Boolean.FALSE, TEN),
+                Arguments.of("da", "da|di", NameType.GENERIC, RuleType.EXACT, Boolean.FALSE, TEN),
+                Arguments.of("'''", "", NameType.SEPHARDIC, RuleType.APPROX, Boolean.FALSE, TEN),
+                Arguments.of("'''", "", NameType.SEPHARDIC, RuleType.APPROX, Boolean.FALSE, Integer.MAX_VALUE)
+                );
+        // @formatter:on
     }
 
-    /**
-     * Tests phonetic encoding with valid input names.
-     * Verifies that:
-     * 1. The encoded result matches the expected phonetic representation
-     * 2. The number of phonemes doesn't exceed the specified maximum
-     * 3. Concatenation behavior works correctly for multi-word names
-     */
+    // TODO Identify if there is a need to an assertTimeout(Duration.ofMillis(10000L) in some point, since this method was marked as @Test(timeout = 10000L)
     @ParameterizedTest
-    @MethodSource("validEncodingTestCases")
-    void shouldEncodeNamesCorrectly(String inputName, String expectedPhoneticResult, 
-                                   NameType nameType, RuleType ruleType, 
-                                   boolean shouldConcatenateWords, int maxPhonemes) {
-        // Given: A phonetic engine configured with specific parameters
-        PhoneticEngine engine = new PhoneticEngine(nameType, ruleType, shouldConcatenateWords, maxPhonemes);
+    @MethodSource("data")
+    void testEncode(final String name, final String phoneticExpected, final NameType nameType,
+                           final RuleType ruleType, final boolean concat, final int maxPhonemes) {
+        final PhoneticEngine engine = new PhoneticEngine(nameType, ruleType, concat, maxPhonemes);
 
-        // When: Encoding the input name
-        String actualPhoneticResult = engine.encode(inputName);
+        final String phoneticActual = engine.encode(name);
 
-        // Then: The result should match expected phonetic representation
-        assertEquals(expectedPhoneticResult, actualPhoneticResult, 
-                    String.format("Phonetic encoding failed for name '%s' with %s/%s rules", 
-                                inputName, nameType, ruleType));
+        assertEquals(phoneticExpected, phoneticActual, "phoneme incorrect");
 
-        // And: The number of phonemes should not exceed the maximum limit
-        verifyPhonemeCountLimit(actualPhoneticResult, shouldConcatenateWords, maxPhonemes);
-    }
-
-    /**
-     * Tests phonetic encoding with edge cases and special inputs.
-     * Verifies proper handling of short names, prefixes, and special characters.
-     */
-    @ParameterizedTest
-    @MethodSource("edgeCaseTestData")
-    void shouldHandleEdgeCasesCorrectly(String inputName, String expectedPhoneticResult, 
-                                       NameType nameType, RuleType ruleType, 
-                                       boolean shouldConcatenateWords, int maxPhonemes) {
-        // Given: A phonetic engine configured for edge case testing
-        PhoneticEngine engine = new PhoneticEngine(nameType, ruleType, shouldConcatenateWords, maxPhonemes);
-
-        // When: Encoding the edge case input
-        String actualResult = engine.encode(inputName);
-
-        // Then: The result should match the expected output
-        assertEquals(expectedPhoneticResult, actualResult,
-                    String.format("Edge case encoding failed for input '%s'", inputName));
-    }
-
-    /**
-     * Verifies that the phonetic result doesn't exceed the maximum phoneme limit.
-     * 
-     * @param phoneticResult The encoded phonetic string
-     * @param isConcatenated Whether words are concatenated or separated
-     * @param maxPhonemes Maximum allowed phonemes per word
-     */
-    private void verifyPhonemeCountLimit(String phoneticResult, boolean isConcatenated, int maxPhonemes) {
-        if (isConcatenated) {
-            // For concatenated results, check total phoneme count
-            String[] phonemes = phoneticResult.split("\\|");
-            assertTrue(phonemes.length <= maxPhonemes, 
-                      String.format("Total phonemes (%d) exceeded limit (%d) in concatenated result: %s", 
-                                  phonemes.length, maxPhonemes, phoneticResult));
+        if (concat) {
+            final String[] split = phoneticActual.split("\\|");
+            assertTrue(split.length <= maxPhonemes);
         } else {
-            // For non-concatenated results, check each word separately
-            String[] words = phoneticResult.split("-");
-            for (String word : words) {
-                String[] phonemes = word.split("\\|");
-                assertTrue(phonemes.length <= maxPhonemes,
-                          String.format("Phonemes (%d) exceeded limit (%d) in word '%s'", 
-                                      phonemes.length, maxPhonemes, word));
+            final String[] words = phoneticActual.split("-");
+            for (final String word : words) {
+                final String[] split = word.split("\\|");
+                assertTrue(split.length <= maxPhonemes);
             }
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidData")
+    void testInvalidEncode(final String input, final String phoneticExpected, final NameType nameType,
+                                  final RuleType ruleType, final boolean concat, final int maxPhonemes) {
+        final PhoneticEngine engine = new PhoneticEngine(nameType, ruleType, concat, maxPhonemes);
+
+        assertEquals(engine.encode(input), phoneticExpected);
     }
 }
