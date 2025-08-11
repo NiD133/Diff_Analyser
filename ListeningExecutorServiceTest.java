@@ -34,53 +34,119 @@ import java.util.concurrent.TimeoutException;
 import junit.framework.TestCase;
 import org.jspecify.annotations.NullUnmarked;
 
+/**
+ * Tests for the Duration-based overloads in ListeningExecutorService.
+ * 
+ * This test verifies that the new Duration-based methods properly convert
+ * Duration objects to nanoseconds when calling the underlying TimeUnit-based methods.
+ */
 @NullUnmarked
 public final class ListeningExecutorServiceTest extends TestCase {
 
-  private Collection<? extends Callable<?>> recordedTasks;
-  private long recordedTimeout;
-  private TimeUnit recordedTimeUnit;
+  private static final String INVOKE_ANY_RESULT = "invokeAny";
+  private static final String INVOKE_ALL_RESULT = "invokeAll";
+  private static final Duration SEVEN_SECONDS = Duration.ofSeconds(7);
+  private static final Duration ONE_YEAR = Duration.ofDays(365);
+  private static final Duration LONG_TIMEOUT = Duration.ofMinutes(144);
 
-  private final ListeningExecutorService executorService = new FakeExecutorService();
+  private TestableListeningExecutorService executorService;
 
-  public void testInvokeAny() throws Exception {
-    Set<Callable<String>> tasks = Collections.singleton(() -> "invokeAny");
-
-    String result = executorService.invokeAny(tasks, Duration.ofSeconds(7));
-
-    assertThat(result).isEqualTo("invokeAny");
-    assertThat(recordedTasks).isSameInstanceAs(tasks);
-    assertThat(recordedTimeUnit).isEqualTo(NANOSECONDS);
-    assertThat(Duration.ofNanos(recordedTimeout)).isEqualTo(Duration.ofSeconds(7));
+  @Override
+  protected void setUp() {
+    executorService = new TestableListeningExecutorService();
   }
 
-  public void testInvokeAll() throws Exception {
-    Set<Callable<String>> tasks = Collections.singleton(() -> "invokeAll");
+  public void testInvokeAny_withDuration_convertsToNanoseconds() throws Exception {
+    // Given: A task that returns a known value
+    Set<Callable<String>> tasks = Collections.singleton(() -> INVOKE_ANY_RESULT);
 
-    List<Future<String>> result = executorService.invokeAll(tasks, Duration.ofDays(365));
+    // When: Calling invokeAny with a Duration
+    String actualResult = executorService.invokeAny(tasks, SEVEN_SECONDS);
 
-    assertThat(result).hasSize(1);
-    assertThat(Futures.getDone(result.get(0))).isEqualTo("invokeAll");
-    assertThat(recordedTasks).isSameInstanceAs(tasks);
-    assertThat(recordedTimeUnit).isEqualTo(NANOSECONDS);
-    assertThat(Duration.ofNanos(recordedTimeout)).isEqualTo(Duration.ofDays(365));
+    // Then: The result should be correct and Duration should be converted to nanoseconds
+    assertThat(actualResult).isEqualTo(INVOKE_ANY_RESULT);
+    assertTasksWereRecorded(tasks);
+    assertDurationWasConvertedToNanoseconds(SEVEN_SECONDS);
   }
 
-  public void testAwaitTermination() throws Exception {
-    boolean result = executorService.awaitTermination(Duration.ofMinutes(144));
+  public void testInvokeAll_withDuration_convertsToNanoseconds() throws Exception {
+    // Given: A task that returns a known value
+    Set<Callable<String>> tasks = Collections.singleton(() -> INVOKE_ALL_RESULT);
 
-    assertThat(result).isTrue();
-    assertThat(recordedTimeUnit).isEqualTo(NANOSECONDS);
-    assertThat(Duration.ofNanos(recordedTimeout)).isEqualTo(Duration.ofMinutes(144));
+    // When: Calling invokeAll with a Duration
+    List<Future<String>> results = executorService.invokeAll(tasks, ONE_YEAR);
+
+    // Then: The results should be correct and Duration should be converted to nanoseconds
+    assertThat(results).hasSize(1);
+    assertThat(Futures.getDone(results.get(0))).isEqualTo(INVOKE_ALL_RESULT);
+    assertTasksWereRecorded(tasks);
+    assertDurationWasConvertedToNanoseconds(ONE_YEAR);
   }
 
-  private class FakeExecutorService extends AbstractListeningExecutorService {
+  public void testAwaitTermination_withDuration_convertsToNanoseconds() throws Exception {
+    // When: Calling awaitTermination with a Duration
+    boolean terminationResult = executorService.awaitTermination(LONG_TIMEOUT);
+
+    // Then: The result should be true and Duration should be converted to nanoseconds
+    assertThat(terminationResult).isTrue();
+    assertDurationWasConvertedToNanoseconds(LONG_TIMEOUT);
+  }
+
+  private void assertTasksWereRecorded(Collection<? extends Callable<?>> expectedTasks) {
+    assertThat(executorService.getRecordedTasks()).isSameInstanceAs(expectedTasks);
+  }
+
+  private void assertDurationWasConvertedToNanoseconds(Duration expectedDuration) {
+    assertThat(executorService.getRecordedTimeUnit()).isEqualTo(NANOSECONDS);
+    Duration actualDuration = Duration.ofNanos(executorService.getRecordedTimeout());
+    assertThat(actualDuration).isEqualTo(expectedDuration);
+  }
+
+  /**
+   * A test double that records method calls and provides predictable responses.
+   * This allows us to verify that Duration-based methods properly delegate to
+   * the underlying TimeUnit-based methods with correct conversions.
+   */
+  private static class TestableListeningExecutorService extends AbstractListeningExecutorService {
+    private Collection<? extends Callable<?>> recordedTasks;
+    private long recordedTimeout;
+    private TimeUnit recordedTimeUnit;
+
     @Override
     public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
         throws InterruptedException, ExecutionException, TimeoutException {
-      recordedTasks = tasks;
-      recordedTimeout = timeout;
-      recordedTimeUnit = unit;
+      recordMethodCall(tasks, timeout, unit);
+      return executeFirstTask(tasks);
+    }
+
+    @Override
+    public <T> List<Future<T>> invokeAll(
+        Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
+        throws InterruptedException {
+      recordMethodCall(tasks, timeout, unit);
+      return createFutureListFromTasks(tasks);
+    }
+
+    @Override
+    public boolean awaitTermination(long timeout, TimeUnit unit) {
+      recordTimeoutCall(timeout, unit);
+      return true; // Always return true for testing
+    }
+
+    // Helper methods for recording method calls
+    private void recordMethodCall(Collection<? extends Callable<?>> tasks, long timeout, TimeUnit unit) {
+      this.recordedTasks = tasks;
+      recordTimeoutCall(timeout, unit);
+    }
+
+    private void recordTimeoutCall(long timeout, TimeUnit unit) {
+      this.recordedTimeout = timeout;
+      this.recordedTimeUnit = unit;
+    }
+
+    // Helper methods for creating responses
+    private <T> T executeFirstTask(Collection<? extends Callable<T>> tasks) 
+        throws ExecutionException {
       try {
         return tasks.iterator().next().call();
       } catch (Exception e) {
@@ -88,50 +154,52 @@ public final class ListeningExecutorServiceTest extends TestCase {
       }
     }
 
-    @Override
-    public <T> List<Future<T>> invokeAll(
-        Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
-        throws InterruptedException {
-      recordedTasks = tasks;
-      recordedTimeout = timeout;
-      recordedTimeUnit = unit;
+    private <T> List<Future<T>> createFutureListFromTasks(Collection<? extends Callable<T>> tasks) {
       try {
-        return Collections.singletonList(immediateFuture(tasks.iterator().next().call()));
+        T result = tasks.iterator().next().call();
+        return Collections.singletonList(immediateFuture(result));
       } catch (Exception e) {
         return Collections.singletonList(immediateFailedFuture(e));
       }
     }
 
-    @Override
-    public boolean awaitTermination(long timeout, TimeUnit unit) {
-      recordedTimeout = timeout;
-      recordedTimeUnit = unit;
-      return true;
+    // Getters for test verification
+    public Collection<? extends Callable<?>> getRecordedTasks() {
+      return recordedTasks;
     }
 
+    public long getRecordedTimeout() {
+      return recordedTimeout;
+    }
+
+    public TimeUnit getRecordedTimeUnit() {
+      return recordedTimeUnit;
+    }
+
+    // Unsupported operations (not needed for these tests)
     @Override
     public void execute(Runnable runnable) {
-      throw new UnsupportedOperationException();
+      throw new UnsupportedOperationException("Not needed for Duration conversion tests");
     }
 
     @Override
     public void shutdown() {
-      throw new UnsupportedOperationException();
+      throw new UnsupportedOperationException("Not needed for Duration conversion tests");
     }
 
     @Override
     public List<Runnable> shutdownNow() {
-      throw new UnsupportedOperationException();
+      throw new UnsupportedOperationException("Not needed for Duration conversion tests");
     }
 
     @Override
     public boolean isShutdown() {
-      throw new UnsupportedOperationException();
+      throw new UnsupportedOperationException("Not needed for Duration conversion tests");
     }
 
     @Override
     public boolean isTerminated() {
-      throw new UnsupportedOperationException();
+      throw new UnsupportedOperationException("Not needed for Duration conversion tests");
     }
   }
 }
