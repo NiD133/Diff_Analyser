@@ -16,289 +16,232 @@
  */
 package org.apache.commons.lang3;
 
-import static org.apache.commons.lang3.CharSetUtils.containsAny;
-import static org.apache.commons.lang3.CharSetUtils.count;
-import static org.apache.commons.lang3.CharSetUtils.delete;
-import static org.apache.commons.lang3.CharSetUtils.keep;
-import static org.apache.commons.lang3.CharSetUtils.squeeze;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for CharSetUtils.
- *
- * Notes on argument forms:
- * - Passing (String) null means a single null pattern element (varargs array of length 1, with null inside).
- * - Passing (String[]) null means the entire varargs array itself is null (no patterns provided).
- * - Passing no patterns at all means an empty varargs array.
- *
- * Char set syntax examples:
- * - "a-e" denotes a range a..e.
- * - "el" denotes the set {e, l}.
- * - "^l" denotes any character except 'l'.
+ * Tests {@link CharSetUtils}.
  */
 class CharSetUtilsTest extends AbstractLangTest {
 
-    private static final String HELLO = "hello";
-    private static final String EMPTY = "";
-    private static final String RANGE_A_E = "a-e";
-    private static final String RANGE_L_P = "l-p";
-    private static final String EL = "el";
+    @Test
+    void testConstructor() {
+        assertNotNull(new CharSetUtils());
+        final Constructor<?>[] cons = CharSetUtils.class.getDeclaredConstructors();
+        assertEquals(1, cons.length);
+        assertTrue(Modifier.isPublic(cons[0].getModifiers()));
+        assertTrue(Modifier.isPublic(CharSetUtils.class.getModifiers()));
+        assertFalse(Modifier.isFinal(CharSetUtils.class.getModifiers()));
+    }
 
     @Test
-    void constructorCharacteristics() {
-        assertNotNull(new CharSetUtils(), "Public no-arg constructor should exist for tools");
-        final Constructor<?>[] constructors = CharSetUtils.class.getDeclaredConstructors();
-        assertEquals(1, constructors.length, "Utility class should have a single constructor");
-        assertTrue(Modifier.isPublic(constructors[0].getModifiers()), "Constructor should be public (deprecated, for tools)");
-        assertTrue(Modifier.isPublic(CharSetUtils.class.getModifiers()), "Class should be public");
-        assertFalse(Modifier.isFinal(CharSetUtils.class.getModifiers()), "Class should not be final");
+    void testContainsAny_StringString() {
+        assertFalse(CharSetUtils.containsAny(null, (String) null));
+        assertFalse(CharSetUtils.containsAny(null, ""));
+
+        assertFalse(CharSetUtils.containsAny("", (String) null));
+        assertFalse(CharSetUtils.containsAny("", ""));
+        assertFalse(CharSetUtils.containsAny("", "a-e"));
+
+        assertFalse(CharSetUtils.containsAny("hello", (String) null));
+        assertFalse(CharSetUtils.containsAny("hello", ""));
+        assertTrue(CharSetUtils.containsAny("hello", "a-e"));
+        assertTrue(CharSetUtils.containsAny("hello", "l-p"));
     }
 
-    @Nested
-    class ContainsAny {
+    @Test
+    void testContainsAny_StringStringarray() {
+        assertFalse(CharSetUtils.containsAny(null, (String[]) null));
+        assertFalse(CharSetUtils.containsAny(null));
+        assertFalse(CharSetUtils.containsAny(null, (String) null));
+        assertFalse(CharSetUtils.containsAny(null, "a-e"));
 
-        @Test
-        void singlePatternArgument() {
-            // null/empty inputs
-            assertFalse(containsAny(null, (String) null));
-            assertFalse(containsAny(null, EMPTY));
+        assertFalse(CharSetUtils.containsAny("", (String[]) null));
+        assertFalse(CharSetUtils.containsAny(""));
+        assertFalse(CharSetUtils.containsAny("", (String) null));
+        assertFalse(CharSetUtils.containsAny("", "a-e"));
 
-            assertFalse(containsAny(EMPTY, (String) null));
-            assertFalse(containsAny(EMPTY, EMPTY));
-            assertFalse(containsAny(EMPTY, RANGE_A_E));
+        assertFalse(CharSetUtils.containsAny("hello", (String[]) null));
+        assertFalse(CharSetUtils.containsAny("hello"));
+        assertFalse(CharSetUtils.containsAny("hello", (String) null));
+        assertTrue(CharSetUtils.containsAny("hello", "a-e"));
 
-            // regular inputs
-            assertFalse(containsAny(HELLO, (String) null));
-            assertFalse(containsAny(HELLO, EMPTY));
-            assertTrue(containsAny(HELLO, RANGE_A_E));
-            assertTrue(containsAny(HELLO, RANGE_L_P));
-        }
-
-        @Test
-        void arrayArgumentAndVarargsBehaviors() {
-            // Entire pattern array is null or empty
-            assertFalse(containsAny(null, (String[]) null));
-            assertFalse(containsAny(null)); // no patterns
-            assertFalse(containsAny(null, (String) null));
-            assertFalse(containsAny(null, RANGE_A_E));
-
-            assertFalse(containsAny(EMPTY, (String[]) null));
-            assertFalse(containsAny(EMPTY)); // no patterns
-            assertFalse(containsAny(EMPTY, (String) null));
-            assertFalse(containsAny(EMPTY, RANGE_A_E));
-
-            assertFalse(containsAny(HELLO, (String[]) null));
-            assertFalse(containsAny(HELLO)); // no patterns
-            assertFalse(containsAny(HELLO, (String) null));
-            assertTrue(containsAny(HELLO, RANGE_A_E));
-
-            // multiple/typical cases
-            assertTrue(containsAny(HELLO, EL));
-            assertFalse(containsAny(HELLO, "x"));
-            assertTrue(containsAny(HELLO, "e-i"));
-            assertTrue(containsAny(HELLO, "a-z"));
-            assertFalse(containsAny(HELLO, EMPTY));
-        }
+        assertTrue(CharSetUtils.containsAny("hello", "el"));
+        assertFalse(CharSetUtils.containsAny("hello", "x"));
+        assertTrue(CharSetUtils.containsAny("hello", "e-i"));
+        assertTrue(CharSetUtils.containsAny("hello", "a-z"));
+        assertFalse(CharSetUtils.containsAny("hello", ""));
     }
 
-    @Nested
-    class Count {
+    @Test
+    void testCount_StringString() {
+        assertEquals(0, CharSetUtils.count(null, (String) null));
+        assertEquals(0, CharSetUtils.count(null, ""));
 
-        @Test
-        void singlePatternArgument() {
-            // null/empty inputs
-            assertEquals(0, count(null, (String) null));
-            assertEquals(0, count(null, EMPTY));
+        assertEquals(0, CharSetUtils.count("", (String) null));
+        assertEquals(0, CharSetUtils.count("", ""));
+        assertEquals(0, CharSetUtils.count("", "a-e"));
 
-            assertEquals(0, count(EMPTY, (String) null));
-            assertEquals(0, count(EMPTY, EMPTY));
-            assertEquals(0, count(EMPTY, RANGE_A_E));
-
-            // regular inputs
-            assertEquals(0, count(HELLO, (String) null));
-            assertEquals(0, count(HELLO, EMPTY));
-            assertEquals(1, count(HELLO, RANGE_A_E));
-            assertEquals(3, count(HELLO, RANGE_L_P));
-        }
-
-        @Test
-        void arrayArgumentAndVarargsBehaviors() {
-            // Entire pattern array is null or empty
-            assertEquals(0, count(null, (String[]) null));
-            assertEquals(0, count(null)); // no patterns
-            assertEquals(0, count(null, (String) null));
-            assertEquals(0, count(null, RANGE_A_E));
-
-            assertEquals(0, count(EMPTY, (String[]) null));
-            assertEquals(0, count(EMPTY)); // no patterns
-            assertEquals(0, count(EMPTY, (String) null));
-            assertEquals(0, count(EMPTY, RANGE_A_E));
-
-            assertEquals(0, count(HELLO, (String[]) null));
-            assertEquals(0, count(HELLO)); // no patterns
-            assertEquals(0, count(HELLO, (String) null));
-            assertEquals(1, count(HELLO, RANGE_A_E));
-
-            // multiple/typical cases
-            assertEquals(3, count(HELLO, EL));
-            assertEquals(0, count(HELLO, "x"));
-            assertEquals(2, count(HELLO, "e-i"));
-            assertEquals(5, count(HELLO, "a-z"));
-            assertEquals(0, count(HELLO, EMPTY));
-        }
+        assertEquals(0, CharSetUtils.count("hello", (String) null));
+        assertEquals(0, CharSetUtils.count("hello", ""));
+        assertEquals(1, CharSetUtils.count("hello", "a-e"));
+        assertEquals(3, CharSetUtils.count("hello", "l-p"));
     }
 
-    @Nested
-    class Delete {
+    @Test
+    void testCount_StringStringarray() {
+        assertEquals(0, CharSetUtils.count(null, (String[]) null));
+        assertEquals(0, CharSetUtils.count(null));
+        assertEquals(0, CharSetUtils.count(null, (String) null));
+        assertEquals(0, CharSetUtils.count(null, "a-e"));
 
-        @Test
-        void singlePatternArgument() {
-            // null/empty inputs
-            assertNull(delete(null, (String) null));
-            assertNull(delete(null, EMPTY));
+        assertEquals(0, CharSetUtils.count("", (String[]) null));
+        assertEquals(0, CharSetUtils.count(""));
+        assertEquals(0, CharSetUtils.count("", (String) null));
+        assertEquals(0, CharSetUtils.count("", "a-e"));
 
-            assertEquals(EMPTY, delete(EMPTY, (String) null));
-            assertEquals(EMPTY, delete(EMPTY, EMPTY));
-            assertEquals(EMPTY, delete(EMPTY, RANGE_A_E));
+        assertEquals(0, CharSetUtils.count("hello", (String[]) null));
+        assertEquals(0, CharSetUtils.count("hello"));
+        assertEquals(0, CharSetUtils.count("hello", (String) null));
+        assertEquals(1, CharSetUtils.count("hello", "a-e"));
 
-            // regular inputs
-            assertEquals(HELLO, delete(HELLO, (String) null));
-            assertEquals(HELLO, delete(HELLO, EMPTY));
-            assertEquals("hllo", delete(HELLO, RANGE_A_E));
-            assertEquals("he", delete(HELLO, RANGE_L_P));
-            assertEquals(HELLO, delete(HELLO, "z"));
-        }
-
-        @Test
-        void arrayArgumentAndVarargsBehaviors() {
-            // Entire pattern array is null or empty
-            assertNull(delete(null, (String[]) null));
-            assertNull(delete(null)); // no patterns
-            assertNull(delete(null, (String) null));
-            assertNull(delete(null, EL));
-
-            assertEquals(EMPTY, delete(EMPTY, (String[]) null));
-            assertEquals(EMPTY, delete(EMPTY)); // no patterns
-            assertEquals(EMPTY, delete(EMPTY, (String) null));
-            assertEquals(EMPTY, delete(EMPTY, RANGE_A_E));
-
-            assertEquals(HELLO, delete(HELLO, (String[]) null));
-            assertEquals(HELLO, delete(HELLO)); // no patterns
-            assertEquals(HELLO, delete(HELLO, (String) null));
-            assertEquals(HELLO, delete(HELLO, "xyz"));
-
-            // multiple/typical cases
-            assertEquals("ho", delete(HELLO, EL));
-            assertEquals(EMPTY, delete(HELLO, "elho"));
-            assertEquals(HELLO, delete(HELLO, EMPTY));
-            assertEquals(HELLO, delete(HELLO, EMPTY)); // repeat to mirror original test
-            assertEquals(EMPTY, delete(HELLO, "a-z"));
-            assertEquals(EMPTY, delete("----", "-"));
-            assertEquals("heo", delete(HELLO, "l"));
-        }
+        assertEquals(3, CharSetUtils.count("hello", "el"));
+        assertEquals(0, CharSetUtils.count("hello", "x"));
+        assertEquals(2, CharSetUtils.count("hello", "e-i"));
+        assertEquals(5, CharSetUtils.count("hello", "a-z"));
+        assertEquals(0, CharSetUtils.count("hello", ""));
     }
 
-    @Nested
-    class Keep {
+    @Test
+    void testDelete_StringString() {
+        assertNull(CharSetUtils.delete(null, (String) null));
+        assertNull(CharSetUtils.delete(null, ""));
 
-        @Test
-        void singlePatternArgument() {
-            // null/empty inputs
-            assertNull(keep(null, (String) null));
-            assertNull(keep(null, EMPTY));
+        assertEquals("", CharSetUtils.delete("", (String) null));
+        assertEquals("", CharSetUtils.delete("", ""));
+        assertEquals("", CharSetUtils.delete("", "a-e"));
 
-            assertEquals(EMPTY, keep(EMPTY, (String) null));
-            assertEquals(EMPTY, keep(EMPTY, EMPTY));
-            assertEquals(EMPTY, keep(EMPTY, RANGE_A_E));
-
-            // regular inputs
-            assertEquals(EMPTY, keep(HELLO, (String) null));
-            assertEquals(EMPTY, keep(HELLO, EMPTY));
-            assertEquals(EMPTY, keep(HELLO, "xyz"));
-            assertEquals(HELLO, keep(HELLO, "a-z"));
-            assertEquals(HELLO, keep(HELLO, "oleh"));
-            assertEquals("ell", keep(HELLO, EL));
-        }
-
-        @Test
-        void arrayArgumentAndVarargsBehaviors() {
-            // Entire pattern array is null or empty
-            assertNull(keep(null, (String[]) null));
-            assertNull(keep(null)); // no patterns
-            assertNull(keep(null, (String) null));
-            assertNull(keep(null, RANGE_A_E));
-
-            assertEquals(EMPTY, keep(EMPTY, (String[]) null));
-            assertEquals(EMPTY, keep(EMPTY)); // no patterns
-            assertEquals(EMPTY, keep(EMPTY, (String) null));
-            assertEquals(EMPTY, keep(EMPTY, RANGE_A_E));
-
-            assertEquals(EMPTY, keep(HELLO, (String[]) null));
-            assertEquals(EMPTY, keep(HELLO)); // no patterns
-            assertEquals(EMPTY, keep(HELLO, (String) null));
-            assertEquals("e", keep(HELLO, RANGE_A_E));
-
-            // multiple/typical cases
-            assertEquals("e", keep(HELLO, RANGE_A_E)); // duplicate to mirror original test
-            assertEquals("ell", keep(HELLO, EL));
-            assertEquals(HELLO, keep(HELLO, "elho"));
-            assertEquals(HELLO, keep(HELLO, "a-z"));
-            assertEquals("----", keep("----", "-"));
-            assertEquals("ll", keep(HELLO, "l"));
-        }
+        assertEquals("hello", CharSetUtils.delete("hello", (String) null));
+        assertEquals("hello", CharSetUtils.delete("hello", ""));
+        assertEquals("hllo", CharSetUtils.delete("hello", "a-e"));
+        assertEquals("he", CharSetUtils.delete("hello", "l-p"));
+        assertEquals("hello", CharSetUtils.delete("hello", "z"));
     }
 
-    @Nested
-    class Squeeze {
+    @Test
+    void testDelete_StringStringarray() {
+        assertNull(CharSetUtils.delete(null, (String[]) null));
+        assertNull(CharSetUtils.delete(null));
+        assertNull(CharSetUtils.delete(null, (String) null));
+        assertNull(CharSetUtils.delete(null, "el"));
 
-        @Test
-        void singlePatternArgument() {
-            // null/empty inputs
-            assertNull(squeeze(null, (String) null));
-            assertNull(squeeze(null, EMPTY));
+        assertEquals("", CharSetUtils.delete("", (String[]) null));
+        assertEquals("", CharSetUtils.delete(""));
+        assertEquals("", CharSetUtils.delete("", (String) null));
+        assertEquals("", CharSetUtils.delete("", "a-e"));
 
-            assertEquals(EMPTY, squeeze(EMPTY, (String) null));
-            assertEquals(EMPTY, squeeze(EMPTY, EMPTY));
-            assertEquals(EMPTY, squeeze(EMPTY, RANGE_A_E));
+        assertEquals("hello", CharSetUtils.delete("hello", (String[]) null));
+        assertEquals("hello", CharSetUtils.delete("hello"));
+        assertEquals("hello", CharSetUtils.delete("hello", (String) null));
+        assertEquals("hello", CharSetUtils.delete("hello", "xyz"));
 
-            // regular inputs
-            assertEquals(HELLO, squeeze(HELLO, (String) null));
-            assertEquals(HELLO, squeeze(HELLO, EMPTY));
-            assertEquals(HELLO, squeeze(HELLO, RANGE_A_E));
-            assertEquals("helo", squeeze(HELLO, RANGE_L_P));
-            assertEquals("heloo", squeeze("helloo", "l"));
-            assertEquals(HELLO, squeeze("helloo", "^l"));
-        }
-
-        @Test
-        void arrayArgumentAndVarargsBehaviors() {
-            // Entire pattern array is null or empty
-            assertNull(squeeze(null, (String[]) null));
-            assertNull(squeeze(null)); // no patterns
-            assertNull(squeeze(null, (String) null));
-            assertNull(squeeze(null, EL));
-
-            assertEquals(EMPTY, squeeze(EMPTY, (String[]) null));
-            assertEquals(EMPTY, squeeze(EMPTY)); // no patterns
-            assertEquals(EMPTY, squeeze(EMPTY, (String) null));
-            assertEquals(EMPTY, squeeze(EMPTY, RANGE_A_E));
-
-            assertEquals(HELLO, squeeze(HELLO, (String[]) null));
-            assertEquals(HELLO, squeeze(HELLO)); // no patterns
-            assertEquals(HELLO, squeeze(HELLO, (String) null));
-            assertEquals(HELLO, squeeze(HELLO, RANGE_A_E));
-
-            // multiple/typical cases
-            assertEquals("helo", squeeze(HELLO, EL));
-            assertEquals(HELLO, squeeze(HELLO, "e"));
-            assertEquals("fofof", squeeze("fooffooff", "of"));
-            assertEquals("fof", squeeze("fooooff", "fo"));
-        }
+        assertEquals("ho", CharSetUtils.delete("hello", "el"));
+        assertEquals("", CharSetUtils.delete("hello", "elho"));
+        assertEquals("hello", CharSetUtils.delete("hello", ""));
+        assertEquals("hello", CharSetUtils.delete("hello", ""));
+        assertEquals("", CharSetUtils.delete("hello", "a-z"));
+        assertEquals("", CharSetUtils.delete("----", "-"));
+        assertEquals("heo", CharSetUtils.delete("hello", "l"));
     }
+
+    @Test
+    void testKeep_StringString() {
+        assertNull(CharSetUtils.keep(null, (String) null));
+        assertNull(CharSetUtils.keep(null, ""));
+
+        assertEquals("", CharSetUtils.keep("", (String) null));
+        assertEquals("", CharSetUtils.keep("", ""));
+        assertEquals("", CharSetUtils.keep("", "a-e"));
+
+        assertEquals("", CharSetUtils.keep("hello", (String) null));
+        assertEquals("", CharSetUtils.keep("hello", ""));
+        assertEquals("", CharSetUtils.keep("hello", "xyz"));
+        assertEquals("hello", CharSetUtils.keep("hello", "a-z"));
+        assertEquals("hello", CharSetUtils.keep("hello", "oleh"));
+        assertEquals("ell", CharSetUtils.keep("hello", "el"));
+    }
+
+    @Test
+    void testKeep_StringStringarray() {
+        assertNull(CharSetUtils.keep(null, (String[]) null));
+        assertNull(CharSetUtils.keep(null));
+        assertNull(CharSetUtils.keep(null, (String) null));
+        assertNull(CharSetUtils.keep(null, "a-e"));
+
+        assertEquals("", CharSetUtils.keep("", (String[]) null));
+        assertEquals("", CharSetUtils.keep(""));
+        assertEquals("", CharSetUtils.keep("", (String) null));
+        assertEquals("", CharSetUtils.keep("", "a-e"));
+
+        assertEquals("", CharSetUtils.keep("hello", (String[]) null));
+        assertEquals("", CharSetUtils.keep("hello"));
+        assertEquals("", CharSetUtils.keep("hello", (String) null));
+        assertEquals("e", CharSetUtils.keep("hello", "a-e"));
+
+        assertEquals("e", CharSetUtils.keep("hello", "a-e"));
+        assertEquals("ell", CharSetUtils.keep("hello", "el"));
+        assertEquals("hello", CharSetUtils.keep("hello", "elho"));
+        assertEquals("hello", CharSetUtils.keep("hello", "a-z"));
+        assertEquals("----", CharSetUtils.keep("----", "-"));
+        assertEquals("ll", CharSetUtils.keep("hello", "l"));
+    }
+
+    @Test
+    void testSqueeze_StringString() {
+        assertNull(CharSetUtils.squeeze(null, (String) null));
+        assertNull(CharSetUtils.squeeze(null, ""));
+
+        assertEquals("", CharSetUtils.squeeze("", (String) null));
+        assertEquals("", CharSetUtils.squeeze("", ""));
+        assertEquals("", CharSetUtils.squeeze("", "a-e"));
+
+        assertEquals("hello", CharSetUtils.squeeze("hello", (String) null));
+        assertEquals("hello", CharSetUtils.squeeze("hello", ""));
+        assertEquals("hello", CharSetUtils.squeeze("hello", "a-e"));
+        assertEquals("helo", CharSetUtils.squeeze("hello", "l-p"));
+        assertEquals("heloo", CharSetUtils.squeeze("helloo", "l"));
+        assertEquals("hello", CharSetUtils.squeeze("helloo", "^l"));
+    }
+
+    @Test
+    void testSqueeze_StringStringarray() {
+        assertNull(CharSetUtils.squeeze(null, (String[]) null));
+        assertNull(CharSetUtils.squeeze(null));
+        assertNull(CharSetUtils.squeeze(null, (String) null));
+        assertNull(CharSetUtils.squeeze(null, "el"));
+
+        assertEquals("", CharSetUtils.squeeze("", (String[]) null));
+        assertEquals("", CharSetUtils.squeeze(""));
+        assertEquals("", CharSetUtils.squeeze("", (String) null));
+        assertEquals("", CharSetUtils.squeeze("", "a-e"));
+
+        assertEquals("hello", CharSetUtils.squeeze("hello", (String[]) null));
+        assertEquals("hello", CharSetUtils.squeeze("hello"));
+        assertEquals("hello", CharSetUtils.squeeze("hello", (String) null));
+        assertEquals("hello", CharSetUtils.squeeze("hello", "a-e"));
+
+        assertEquals("helo", CharSetUtils.squeeze("hello", "el"));
+        assertEquals("hello", CharSetUtils.squeeze("hello", "e"));
+        assertEquals("fofof", CharSetUtils.squeeze("fooffooff", "of"));
+        assertEquals("fof", CharSetUtils.squeeze("fooooff", "fo"));
+    }
+
 }
