@@ -24,175 +24,173 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.convert.CalendarConverter;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true, 
+    useVFS = true, 
+    useVNET = true, 
+    resetStaticState = true, 
+    separateClassLoader = true
+) 
 public class CalendarConverter_ESTest extends CalendarConverter_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      CalendarConverter calendarConverter0 = new CalendarConverter();
-      ZoneOffset zoneOffset0 = ZoneOffset.MIN;
-      TimeZone timeZone0 = TimeZone.getTimeZone((ZoneId) zoneOffset0);
-      MockGregorianCalendar mockGregorianCalendar0 = new MockGregorianCalendar(timeZone0);
-      Chronology chronology0 = calendarConverter0.getChronology((Object) mockGregorianCalendar0, (Chronology) null);
-      assertNotNull(chronology0);
-  }
+    // Tests for getChronology() method
+    @Test(timeout = 4000)
+    public void testGetChronology_WithTimeZoneAndMockGregorianCalendar_ReturnsNotNull() throws Throwable {
+        CalendarConverter converter = new CalendarConverter();
+        ZoneOffset zoneOffset = ZoneOffset.MIN;
+        TimeZone timeZone = TimeZone.getTimeZone((ZoneId) zoneOffset);
+        MockGregorianCalendar calendar = new MockGregorianCalendar(timeZone);
+        
+        Chronology result = converter.getChronology(calendar, (Chronology) null);
+        assertNotNull(result);
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      CalendarConverter calendarConverter0 = new CalendarConverter();
-      MockGregorianCalendar mockGregorianCalendar0 = new MockGregorianCalendar(741, 206, 741, 741, 741, 206);
-      long long0 = calendarConverter0.getInstantMillis(mockGregorianCalendar0, (Chronology) null);
-      assertEquals(0L, long0);
-  }
+    @Test(timeout = 4000)
+    public void testGetChronology_WithMockGregorianCalendarAndNullDateTimeZone_ReturnsNotNull() throws Throwable {
+        CalendarConverter converter = CalendarConverter.INSTANCE;
+        MockGregorianCalendar calendar = new MockGregorianCalendar(-3785, -2040, 0, -1127, -2040);
+        
+        Chronology result = converter.getChronology(calendar, (DateTimeZone) null);
+        assertNotNull(result);
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      MockGregorianCalendar mockGregorianCalendar0 = new MockGregorianCalendar();
-      CalendarConverter calendarConverter0 = CalendarConverter.INSTANCE;
-      long long0 = calendarConverter0.getInstantMillis(mockGregorianCalendar0, (Chronology) null);
-      assertEquals(1392409281320L, long0);
-  }
+    @Test(timeout = 4000)
+    public void testGetChronology_WithGregorianCalendarFromZonedDateTime_ReturnsNotNull() throws Throwable {
+        CalendarConverter converter = new CalendarConverter();
+        ZonedDateTime zonedDateTime = MockZonedDateTime.now();
+        GregorianCalendar calendar = MockGregorianCalendar.from(zonedDateTime);
+        
+        Chronology result = converter.getChronology(calendar, (Chronology) null);
+        assertNotNull(result);
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      System.setCurrentTimeMillis((-1870L));
-      CalendarConverter calendarConverter0 = CalendarConverter.INSTANCE;
-      TimeZone timeZone0 = TimeZone.getDefault();
-      MockGregorianCalendar mockGregorianCalendar0 = new MockGregorianCalendar(timeZone0);
-      long long0 = calendarConverter0.getInstantMillis(mockGregorianCalendar0, (Chronology) null);
-      assertEquals((-1870L), long0);
-  }
+    @Test(timeout = 4000)
+    public void testGetChronology_WithGregorianChangeDateSet_ReturnsNotNull() throws Throwable {
+        CalendarConverter converter = new CalendarConverter();
+        MockDate changeDate = new MockDate(9223372036854775785L);
+        MockGregorianCalendar calendar = new MockGregorianCalendar();
+        calendar.setGregorianChange(changeDate);
+        
+        Chronology result = converter.getChronology(calendar, (DateTimeZone) null);
+        assertNotNull(result);
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      CalendarConverter calendarConverter0 = CalendarConverter.INSTANCE;
-      // Undeclared exception!
-      try { 
-        calendarConverter0.getInstantMillis((Object) null, (Chronology) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.joda.time.convert.CalendarConverter", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testGetChronology_WithGregorianCalendarFromZonedDateTimeAndSpecificTimeZone_ReturnsNotNull() throws Throwable {
+        CalendarConverter converter = new CalendarConverter();
+        DateTimeZone timeZone = DateTimeZone.forOffsetMillis(1963);
+        MockGregorianCalendar mockCalendar = new MockGregorianCalendar(0, 1963, 0, -247581896, -21, 3826);
+        ZonedDateTime zonedDateTime = mockCalendar.toZonedDateTime();
+        GregorianCalendar calendar = MockGregorianCalendar.from(zonedDateTime);
+        
+        Chronology result = converter.getChronology(calendar, timeZone);
+        assertNotNull(result);
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      CalendarConverter calendarConverter0 = CalendarConverter.INSTANCE;
-      // Undeclared exception!
-      try { 
-        calendarConverter0.getChronology((Object) null, (DateTimeZone) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.joda.time.convert.CalendarConverter", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testGetChronology_WithUnsupportedTypeAndDateTimeZone_ReturnsISOChronology() throws Throwable {
+        CalendarConverter converter = new CalendarConverter();
+        // Passing converter instance (unsupported type) should return ISO chronology
+        Chronology result = converter.getChronology(converter, (DateTimeZone) null);
+        assertNotNull(result);
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      CalendarConverter calendarConverter0 = new CalendarConverter();
-      // Undeclared exception!
-      try { 
-        calendarConverter0.getChronology((Object) null, (Chronology) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.joda.time.convert.CalendarConverter", e);
-      }
-  }
+    // Tests for exception cases in getChronology()
+    @Test(timeout = 4000)
+    public void testGetChronology_WithNullObjectAndDateTimeZone_ThrowsNullPointerException() throws Throwable {
+        CalendarConverter converter = CalendarConverter.INSTANCE;
+        try {
+            converter.getChronology(null, (DateTimeZone) null);
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected exception
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      CalendarConverter calendarConverter0 = new CalendarConverter();
-      // Undeclared exception!
-      try { 
-        calendarConverter0.getChronology((Object) calendarConverter0, (Chronology) null);
-        fail("Expecting exception: ClassCastException");
-      
-      } catch(ClassCastException e) {
-         //
-         // org.joda.time.convert.CalendarConverter cannot be cast to java.util.Calendar
-         //
-         verifyException("org.joda.time.convert.CalendarConverter", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testGetChronology_WithNullObjectAndChronology_ThrowsNullPointerException() throws Throwable {
+        CalendarConverter converter = new CalendarConverter();
+        try {
+            converter.getChronology(null, (Chronology) null);
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected exception
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      CalendarConverter calendarConverter0 = CalendarConverter.INSTANCE;
-      MockGregorianCalendar mockGregorianCalendar0 = new MockGregorianCalendar((-3785), (-2040), 0, (-1127), (-2040));
-      Chronology chronology0 = calendarConverter0.getChronology((Object) mockGregorianCalendar0, (DateTimeZone) null);
-      assertNotNull(chronology0);
-  }
+    @Test(timeout = 4000)
+    public void testGetChronology_WithUnsupportedTypeAndChronology_ThrowsClassCastException() throws Throwable {
+        CalendarConverter converter = new CalendarConverter();
+        try {
+            converter.getChronology(converter, (Chronology) null);
+            fail("Expected ClassCastException");
+        } catch (ClassCastException e) {
+            // Verify exception message
+            assertTrue(e.getMessage().contains("org.joda.time.convert.CalendarConverter cannot be cast to java.util.Calendar"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      CalendarConverter calendarConverter0 = new CalendarConverter();
-      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis(1963);
-      MockGregorianCalendar mockGregorianCalendar0 = new MockGregorianCalendar(0, 1963, 0, (-247581896), (-21), 3826);
-      ZonedDateTime zonedDateTime0 = mockGregorianCalendar0.toZonedDateTime();
-      GregorianCalendar gregorianCalendar0 = MockGregorianCalendar.from(zonedDateTime0);
-      Chronology chronology0 = calendarConverter0.getChronology((Object) gregorianCalendar0, dateTimeZone0);
-      assertNotNull(chronology0);
-  }
+    // Tests for getInstantMillis() method
+    @Test(timeout = 4000)
+    public void testGetInstantMillis_WithMockGregorianCalendar_ReturnsZero() throws Throwable {
+        CalendarConverter converter = new CalendarConverter();
+        MockGregorianCalendar calendar = new MockGregorianCalendar(741, 206, 741, 741, 741, 206);
+        
+        long result = converter.getInstantMillis(calendar, (Chronology) null);
+        assertEquals(0L, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      CalendarConverter calendarConverter0 = new CalendarConverter();
-      MockDate mockDate0 = new MockDate(9223372036854775785L);
-      MockGregorianCalendar mockGregorianCalendar0 = new MockGregorianCalendar();
-      mockGregorianCalendar0.setGregorianChange(mockDate0);
-      Chronology chronology0 = calendarConverter0.getChronology((Object) mockGregorianCalendar0, (DateTimeZone) null);
-      assertNotNull(chronology0);
-  }
+    @Test(timeout = 4000)
+    public void testGetInstantMillis_WithDefaultMockGregorianCalendar_ReturnsFixedTime() throws Throwable {
+        CalendarConverter converter = CalendarConverter.INSTANCE;
+        MockGregorianCalendar calendar = new MockGregorianCalendar();
+        
+        // Expected value corresponds to mock's fixed time setting
+        long result = converter.getInstantMillis(calendar, (Chronology) null);
+        assertEquals(1392409281320L, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      CalendarConverter calendarConverter0 = new CalendarConverter();
-      ZonedDateTime zonedDateTime0 = MockZonedDateTime.now();
-      GregorianCalendar gregorianCalendar0 = MockGregorianCalendar.from(zonedDateTime0);
-      Chronology chronology0 = calendarConverter0.getChronology((Object) gregorianCalendar0, (Chronology) null);
-      assertNotNull(chronology0);
-  }
+    @Test(timeout = 4000)
+    public void testGetInstantMillis_WithSystemTimeSet_ReturnsSetTime() throws Throwable {
+        System.setCurrentTimeMillis(-1870L);
+        CalendarConverter converter = CalendarConverter.INSTANCE;
+        TimeZone timeZone = TimeZone.getDefault();
+        MockGregorianCalendar calendar = new MockGregorianCalendar(timeZone);
+        
+        long result = converter.getInstantMillis(calendar, (Chronology) null);
+        assertEquals(-1870L, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      CalendarConverter calendarConverter0 = new CalendarConverter();
-      Chronology chronology0 = calendarConverter0.getChronology((Object) calendarConverter0, (DateTimeZone) null);
-      assertNotNull(chronology0);
-  }
+    // Tests for exception cases in getInstantMillis()
+    @Test(timeout = 4000)
+    public void testGetInstantMillis_WithNullObject_ThrowsNullPointerException() throws Throwable {
+        CalendarConverter converter = CalendarConverter.INSTANCE;
+        try {
+            converter.getInstantMillis(null, (Chronology) null);
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected exception
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      CalendarConverter calendarConverter0 = new CalendarConverter();
-      Class<?> class0 = calendarConverter0.getSupportedType();
-      assertFalse(class0.isSynthetic());
-  }
+    @Test(timeout = 4000)
+    public void testGetInstantMillis_WithUnsupportedObjectType_ThrowsClassCastException() throws Throwable {
+        CalendarConverter converter = new CalendarConverter();
+        try {
+            converter.getInstantMillis(new Object(), (Chronology) null);
+            fail("Expected ClassCastException");
+        } catch (ClassCastException e) {
+            // Verify exception message
+            assertTrue(e.getMessage().contains("java.lang.Object cannot be cast to java.util.Calendar"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      CalendarConverter calendarConverter0 = new CalendarConverter();
-      Object object0 = new Object();
-      // Undeclared exception!
-      try { 
-        calendarConverter0.getInstantMillis(object0, (Chronology) null);
-        fail("Expecting exception: ClassCastException");
-      
-      } catch(ClassCastException e) {
-         //
-         // java.lang.Object cannot be cast to java.util.Calendar
-         //
-         verifyException("org.joda.time.convert.CalendarConverter", e);
-      }
-  }
+    // Test for getSupportedType()
+    @Test(timeout = 4000)
+    public void testGetSupportedType_ReturnsCalendarClass() throws Throwable {
+        CalendarConverter converter = new CalendarConverter();
+        Class<?> result = converter.getSupportedType();
+        assertFalse("Returned class should not be synthetic", result.isSynthetic());
+    }
 }
