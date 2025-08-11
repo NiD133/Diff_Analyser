@@ -24,7 +24,7 @@
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
- * Section 5 of the GNU Affero General Public License.
+ * Section 5 of the GNU Affero General Notice.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
  * a covered work must retain the producer line in every PDF that is created
@@ -43,30 +43,45 @@
  */
 package com.itextpdf.text.error_messages;
 
-
-import junit.framework.Assert;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
 /**
- * @author kevin
+ * Tests for MessageLocalization class functionality.
+ * 
+ * This test suite verifies that the MessageLocalization class correctly handles
+ * message composition with various parameter types, particularly focusing on
+ * edge cases like file paths with special characters.
  */
 public class MessageLocalizationTest {
 
-    @Before
-    public void setUp() throws Exception {
-    }
+    private static final String FILE_NOT_FOUND_MESSAGE_KEY = "1.not.found.as.file.or.resource";
+    private static final String WINDOWS_FILE_PATH_WITH_BACKSLASHES = "C:\\test\\file.txt";
 
-    @After
-    public void tearDown() throws Exception {
-    }
-
+    /**
+     * Tests that MessageLocalization.getComposedMessage() correctly preserves backslashes
+     * in Windows file paths when composing error messages.
+     * 
+     * This test addresses a potential issue where backslashes in file paths might be
+     * interpreted as escape characters during message composition, which would result
+     * in malformed file paths in error messages.
+     * 
+     * Expected behavior: The composed message should contain the original file path
+     * with all backslashes intact.
+     */
     @Test
-    public void testBackslashes() throws Exception{
-        String testPath = "C:\\test\\file.txt";
-        String rslt = MessageLocalization.getComposedMessage("1.not.found.as.file.or.resource", testPath);
-        Assert.assertTrue("Result doesn't contain the test path", rslt.contains(testPath));
+    public void testGetComposedMessage_PreservesBackslashesInFilePaths() throws Exception {
+        // Act: Compose an error message with a Windows file path containing backslashes
+        String composedMessage = MessageLocalization.getComposedMessage(
+            FILE_NOT_FOUND_MESSAGE_KEY, 
+            WINDOWS_FILE_PATH_WITH_BACKSLASHES
+        );
+        
+        // Assert: Verify the original file path (including backslashes) is preserved in the message
+        assertTrue(
+            "The composed error message should contain the original file path with backslashes intact. " +
+            "Actual message: " + composedMessage, 
+            composedMessage.contains(WINDOWS_FILE_PATH_WITH_BACKSLASHES)
+        );
     }
 }
