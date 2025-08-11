@@ -24,86 +24,151 @@ import java.util.Objects;
 
 import org.apache.ibatis.cache.decorators.SerializedCache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for SerializedCache to verify serialization and deserialization behavior.
+ * SerializedCache is a decorator that serializes objects before storing them in cache
+ * and deserializes them when retrieving from cache.
+ */
 class SerializedCacheTest {
 
-  @Test
-  void shouldDemonstrateSerializedObjectAreEqual() {
-    SerializedCache cache = new SerializedCache(new PerpetualCache("default"));
-    for (int i = 0; i < 5; i++) {
-      cache.putObject(i, new CachingObject(i));
-    }
-    for (int i = 0; i < 5; i++) {
-      assertEquals(new CachingObject(i), cache.getObject(i));
-    }
+  private static final String CACHE_ID = "test-cache";
+  private static final int TEST_OBJECT_COUNT = 5;
+  
+  private SerializedCache serializedCache;
+
+  @BeforeEach
+  void setUp() {
+    Cache underlyingCache = new PerpetualCache(CACHE_ID);
+    serializedCache = new SerializedCache(underlyingCache);
   }
 
   @Test
-  void shouldDemonstrateNullsAreSerializable() {
-    SerializedCache cache = new SerializedCache(new PerpetualCache("default"));
-    for (int i = 0; i < 5; i++) {
-      cache.putObject(i, null);
-    }
-    for (int i = 0; i < 5; i++) {
-      assertNull(cache.getObject(i));
-    }
+  void shouldSerializeAndDeserializeObjectsCorrectly() {
+    // Given: Multiple serializable objects to cache
+    storeSerializableObjectsInCache();
+    
+    // When & Then: Retrieved objects should equal the original objects
+    verifyStoredObjectsCanBeRetrievedCorrectly();
   }
 
   @Test
-  void throwExceptionWhenTryingToCacheNonSerializableObject() {
-    SerializedCache cache = new SerializedCache(new PerpetualCache("default"));
-    assertThrows(CacheException.class, () -> cache.putObject(0, new CachingObjectWithoutSerializable(0)));
+  void shouldHandleNullValuesCorrectly() {
+    // Given: Null values stored in cache
+    storeNullValuesInCache();
+    
+    // When & Then: Retrieved values should be null
+    verifyStoredNullValuesAreRetrievedAsNull();
   }
 
-  static class CachingObject implements Serializable {
+  @Test
+  void shouldThrowExceptionWhenCachingNonSerializableObject() {
+    // Given: A non-serializable object
+    NonSerializableTestObject nonSerializableObject = new NonSerializableTestObject(42);
+    
+    // When & Then: Attempting to cache it should throw CacheException
+    assertThrows(CacheException.class, 
+        () -> serializedCache.putObject("key", nonSerializableObject),
+        "SerializedCache should throw CacheException when trying to cache non-serializable objects");
+  }
+
+  private void storeSerializableObjectsInCache() {
+    for (int i = 0; i < TEST_OBJECT_COUNT; i++) {
+      SerializableTestObject testObject = new SerializableTestObject(i);
+      serializedCache.putObject(i, testObject);
+    }
+  }
+
+  private void verifyStoredObjectsCanBeRetrievedCorrectly() {
+    for (int i = 0; i < TEST_OBJECT_COUNT; i++) {
+      SerializableTestObject expectedObject = new SerializableTestObject(i);
+      SerializableTestObject actualObject = (SerializableTestObject) serializedCache.getObject(i);
+      
+      assertEquals(expectedObject, actualObject, 
+          "Deserialized object should equal the original object for key: " + i);
+    }
+  }
+
+  private void storeNullValuesInCache() {
+    for (int i = 0; i < TEST_OBJECT_COUNT; i++) {
+      serializedCache.putObject(i, null);
+    }
+  }
+
+  private void verifyStoredNullValuesAreRetrievedAsNull() {
+    for (int i = 0; i < TEST_OBJECT_COUNT; i++) {
+      Object retrievedValue = serializedCache.getObject(i);
+      assertNull(retrievedValue, "Retrieved value should be null for key: " + i);
+    }
+  }
+
+  /**
+   * Test object that implements Serializable for testing successful serialization.
+   */
+  static class SerializableTestObject implements Serializable {
     private static final long serialVersionUID = 1L;
-    int x;
+    
+    private final int value;
 
-    public CachingObject(int x) {
-      this.x = x;
+    public SerializableTestObject(int value) {
+      this.value = value;
     }
 
     @Override
-    public boolean equals(Object o) {
-      if (this == o) {
+    public boolean equals(Object other) {
+      if (this == other) {
         return true;
       }
-      if (o == null || getClass() != o.getClass()) {
+      if (other == null || getClass() != other.getClass()) {
         return false;
       }
-      CachingObject obj = (CachingObject) o;
-      return x == obj.x;
+      SerializableTestObject that = (SerializableTestObject) other;
+      return value == that.value;
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(x);
+      return Objects.hash(value);
+    }
+
+    @Override
+    public String toString() {
+      return "SerializableTestObject{value=" + value + "}";
     }
   }
 
-  static class CachingObjectWithoutSerializable {
-    int x;
+  /**
+   * Test object that does NOT implement Serializable for testing serialization failures.
+   */
+  static class NonSerializableTestObject {
+    private final int value;
 
-    public CachingObjectWithoutSerializable(int x) {
-      this.x = x;
+    public NonSerializableTestObject(int value) {
+      this.value = value;
     }
 
     @Override
-    public boolean equals(Object o) {
-      if (this == o) {
+    public boolean equals(Object other) {
+      if (this == other) {
         return true;
       }
-      if (o == null || getClass() != o.getClass()) {
+      if (other == null || getClass() != other.getClass()) {
         return false;
       }
-      CachingObjectWithoutSerializable obj = (CachingObjectWithoutSerializable) o;
-      return x == obj.x;
+      NonSerializableTestObject that = (NonSerializableTestObject) other;
+      return value == that.value;
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(x);
+      return Objects.hash(value);
+    }
+
+    @Override
+    public String toString() {
+      return "NonSerializableTestObject{value=" + value + "}";
     }
   }
 }
