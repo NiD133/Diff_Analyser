@@ -68,12 +68,23 @@ public class MappedRandomAccessFileTest {
         TestResourceUtils.purgeTempFiles();
     }
 
+    /**
+     * Tests that reading from a zero-sized file returns EOF (-1) immediately.
+     * 
+     * @throws Exception if any I/O error occurs during test execution
+     */
     @Test
-    public void testZeroSize() throws Exception {
-        File pdf = TestResourceUtils.getResourceAsTempFile(getClass(), "zerosizedfile.pdf");
-        MappedRandomAccessFile f = new MappedRandomAccessFile(pdf.getCanonicalPath(), "rw");
-        Assert.assertEquals(-1, f.read());
-        f.close();
+    public void readFromZeroSizedFile_ReturnsEOF() throws Exception {
+        // Arrange: Load a zero-byte file resource
+        File zeroSizedFile = TestResourceUtils.getResourceAsTempFile(getClass(), "zerosizedfile.pdf");
+        
+        // Act: Attempt to read from the empty file
+        try (MappedRandomAccessFile file = new MappedRandomAccessFile(zeroSizedFile.getCanonicalPath(), "rw")) {
+            int result = file.read();
+            
+            // Assert: Verify read operation returns EOF indicator
+            Assert.assertEquals("Reading from empty file should return -1 (EOF)", -1, result);
+        }
     }
 
 }
