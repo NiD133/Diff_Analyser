@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2011 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.gson.internal.bind;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -9,17 +25,15 @@ import com.google.gson.Strictness;
 import com.google.gson.common.MoreAsserts;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
 
-/**
- * Unit tests for the {@link JsonTreeWriter} class.
- */
+@SuppressWarnings("resource")
 public final class JsonTreeWriterTest {
-
   @Test
-  public void testSimpleArraySerialization() throws IOException {
+  public void testArray() throws IOException {
     JsonTreeWriter writer = new JsonTreeWriter();
     writer.beginArray();
     writer.value(1);
@@ -30,7 +44,7 @@ public final class JsonTreeWriterTest {
   }
 
   @Test
-  public void testNestedArraySerialization() throws IOException {
+  public void testNestedArray() throws IOException {
     JsonTreeWriter writer = new JsonTreeWriter();
     writer.beginArray();
     writer.beginArray();
@@ -44,7 +58,7 @@ public final class JsonTreeWriterTest {
   }
 
   @Test
-  public void testSimpleObjectSerialization() throws IOException {
+  public void testObject() throws IOException {
     JsonTreeWriter writer = new JsonTreeWriter();
     writer.beginObject();
     writer.name("A").value(1);
@@ -54,7 +68,7 @@ public final class JsonTreeWriterTest {
   }
 
   @Test
-  public void testNestedObjectSerialization() throws IOException {
+  public void testNestedObject() throws IOException {
     JsonTreeWriter writer = new JsonTreeWriter();
     writer.beginObject();
     writer.name("A");
@@ -71,7 +85,7 @@ public final class JsonTreeWriterTest {
   }
 
   @Test
-  public void testWriteAfterCloseThrowsException() throws Exception {
+  public void testWriteAfterClose() throws Exception {
     JsonTreeWriter writer = new JsonTreeWriter();
     writer.setStrictness(Strictness.LENIENT);
     writer.beginArray();
@@ -82,38 +96,38 @@ public final class JsonTreeWriterTest {
   }
 
   @Test
-  public void testPrematureCloseThrowsException() throws Exception {
+  public void testPrematureClose() throws Exception {
     JsonTreeWriter writer = new JsonTreeWriter();
     writer.setStrictness(Strictness.LENIENT);
     writer.beginArray();
-    IOException exception = assertThrows(IOException.class, () -> writer.close());
-    assertThat(exception).hasMessageThat().isEqualTo("Incomplete document");
+    var e = assertThrows(IOException.class, () -> writer.close());
+    assertThat(e).hasMessageThat().isEqualTo("Incomplete document");
   }
 
   @Test
-  public void testNameAsTopLevelValueThrowsException() throws IOException {
+  public void testNameAsTopLevelValue() throws IOException {
     JsonTreeWriter writer = new JsonTreeWriter();
-    IllegalStateException exception = assertThrows(IllegalStateException.class, () -> writer.name("hello"));
-    assertThat(exception).hasMessageThat().isEqualTo("Did not expect a name");
+    IllegalStateException e = assertThrows(IllegalStateException.class, () -> writer.name("hello"));
+    assertThat(e).hasMessageThat().isEqualTo("Did not expect a name");
 
     writer.value(12);
     writer.close();
 
-    exception = assertThrows(IllegalStateException.class, () -> writer.name("hello"));
-    assertThat(exception).hasMessageThat().isEqualTo("Please begin an object before writing a name.");
+    e = assertThrows(IllegalStateException.class, () -> writer.name("hello"));
+    assertThat(e).hasMessageThat().isEqualTo("Please begin an object before writing a name.");
   }
 
   @Test
-  public void testNameInArrayThrowsException() throws IOException {
+  public void testNameInArray() throws IOException {
     JsonTreeWriter writer = new JsonTreeWriter();
 
     writer.beginArray();
-    IllegalStateException exception = assertThrows(IllegalStateException.class, () -> writer.name("hello"));
-    assertThat(exception).hasMessageThat().isEqualTo("Please begin an object before writing a name.");
+    IllegalStateException e = assertThrows(IllegalStateException.class, () -> writer.name("hello"));
+    assertThat(e).hasMessageThat().isEqualTo("Please begin an object before writing a name.");
 
     writer.value(12);
-    exception = assertThrows(IllegalStateException.class, () -> writer.name("hello"));
-    assertThat(exception).hasMessageThat().isEqualTo("Please begin an object before writing a name.");
+    e = assertThrows(IllegalStateException.class, () -> writer.name("hello"));
+    assertThat(e).hasMessageThat().isEqualTo("Please begin an object before writing a name.");
 
     writer.endArray();
 
@@ -121,12 +135,12 @@ public final class JsonTreeWriterTest {
   }
 
   @Test
-  public void testDuplicateNameThrowsException() throws IOException {
+  public void testTwoNames() throws IOException {
     JsonTreeWriter writer = new JsonTreeWriter();
     writer.beginObject();
     writer.name("a");
-    IllegalStateException exception = assertThrows(IllegalStateException.class, () -> writer.name("a"));
-    assertThat(exception).hasMessageThat().isEqualTo("Did not expect a name");
+    IllegalStateException e = assertThrows(IllegalStateException.class, () -> writer.name("a"));
+    assertThat(e).hasMessageThat().isEqualTo("Did not expect a name");
   }
 
   @Test
@@ -152,42 +166,42 @@ public final class JsonTreeWriterTest {
   }
 
   @Test
-  public void testEmptyWriterReturnsJsonNull() {
+  public void testEmptyWriter() {
     JsonTreeWriter writer = new JsonTreeWriter();
     assertThat(writer.get()).isEqualTo(JsonNull.INSTANCE);
   }
 
   @Test
-  public void testBeginArrayReturnsWriter() throws Exception {
+  public void testBeginArray() throws Exception {
     JsonTreeWriter writer = new JsonTreeWriter();
     assertThat(writer.beginArray()).isEqualTo(writer);
   }
 
   @Test
-  public void testBeginObjectReturnsWriter() throws Exception {
+  public void testBeginObject() throws Exception {
     JsonTreeWriter writer = new JsonTreeWriter();
     assertThat(writer.beginObject()).isEqualTo(writer);
   }
 
   @Test
-  public void testValueStringReturnsWriter() throws Exception {
+  public void testValueString() throws Exception {
     JsonTreeWriter writer = new JsonTreeWriter();
-    String value = "as";
-    assertThat(writer.value(value)).isEqualTo(writer);
+    String n = "as";
+    assertThat(writer.value(n)).isEqualTo(writer);
   }
 
   @Test
-  public void testValueBooleanReturnsWriter() throws Exception {
+  public void testBoolValue() throws Exception {
     JsonTreeWriter writer = new JsonTreeWriter();
-    boolean value = true;
-    assertThat(writer.value(value)).isEqualTo(writer);
+    boolean bool = true;
+    assertThat(writer.value(bool)).isEqualTo(writer);
   }
 
   @Test
-  public void testValueBoxedBooleanReturnsWriter() throws Exception {
+  public void testBoolMaisValue() throws Exception {
     JsonTreeWriter writer = new JsonTreeWriter();
-    Boolean value = true;
-    assertThat(writer.value(value)).isEqualTo(writer);
+    Boolean bool = true;
+    assertThat(writer.value(bool)).isEqualTo(writer);
   }
 
   @Test
@@ -207,7 +221,7 @@ public final class JsonTreeWriterTest {
   }
 
   @Test
-  public void testStrictNansAndInfinitiesThrowsException() throws IOException {
+  public void testStrictNansAndInfinities() throws IOException {
     JsonTreeWriter writer = new JsonTreeWriter();
     writer.setStrictness(Strictness.LEGACY_STRICT);
     writer.beginArray();
@@ -220,43 +234,51 @@ public final class JsonTreeWriterTest {
   }
 
   @Test
-  public void testStrictBoxedNansAndInfinitiesThrowsException() throws IOException {
+  public void testStrictBoxedNansAndInfinities() throws IOException {
     JsonTreeWriter writer = new JsonTreeWriter();
     writer.setStrictness(Strictness.LEGACY_STRICT);
     writer.beginArray();
     assertThrows(IllegalArgumentException.class, () -> writer.value(Float.valueOf(Float.NaN)));
-    assertThrows(IllegalArgumentException.class, () -> writer.value(Float.valueOf(Float.NEGATIVE_INFINITY)));
-    assertThrows(IllegalArgumentException.class, () -> writer.value(Float.valueOf(Float.POSITIVE_INFINITY)));
+    assertThrows(
+        IllegalArgumentException.class, () -> writer.value(Float.valueOf(Float.NEGATIVE_INFINITY)));
+    assertThrows(
+        IllegalArgumentException.class, () -> writer.value(Float.valueOf(Float.POSITIVE_INFINITY)));
     assertThrows(IllegalArgumentException.class, () -> writer.value(Double.valueOf(Double.NaN)));
-    assertThrows(IllegalArgumentException.class, () -> writer.value(Double.valueOf(Double.NEGATIVE_INFINITY)));
-    assertThrows(IllegalArgumentException.class, () -> writer.value(Double.valueOf(Double.POSITIVE_INFINITY)));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> writer.value(Double.valueOf(Double.NEGATIVE_INFINITY)));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> writer.value(Double.valueOf(Double.POSITIVE_INFINITY)));
   }
 
   @Test
-  public void testJsonValueThrowsUnsupportedOperationException() throws IOException {
+  public void testJsonValue() throws IOException {
     JsonTreeWriter writer = new JsonTreeWriter();
     writer.beginArray();
     assertThrows(UnsupportedOperationException.class, () -> writer.jsonValue("test"));
   }
 
   /**
-   * Tests that all relevant methods of {@link JsonWriter} are overridden in {@link JsonTreeWriter}.
+   * {@link JsonTreeWriter} effectively replaces the complete writing logic of {@link JsonWriter} to
+   * create a {@link JsonElement} tree instead of writing to a {@link Writer}. Therefore all
+   * relevant methods of {@code JsonWriter} must be overridden.
    */
   @Test
-  public void testOverridesAllRelevantMethods() {
-    List<String> ignoredMethods = Arrays.asList(
-        "setLenient(boolean)",
-        "isLenient()",
-        "setStrictness(com.google.gson.Strictness)",
-        "getStrictness()",
-        "setIndent(java.lang.String)",
-        "setHtmlSafe(boolean)",
-        "isHtmlSafe()",
-        "setFormattingStyle(com.google.gson.FormattingStyle)",
-        "getFormattingStyle()",
-        "setSerializeNulls(boolean)",
-        "getSerializeNulls()"
-    );
+  public void testOverrides() {
+    List<String> ignoredMethods =
+        Arrays.asList(
+            "setLenient(boolean)",
+            "isLenient()",
+            "setStrictness(com.google.gson.Strictness)",
+            "getStrictness()",
+            "setIndent(java.lang.String)",
+            "setHtmlSafe(boolean)",
+            "isHtmlSafe()",
+            "setFormattingStyle(com.google.gson.FormattingStyle)",
+            "getFormattingStyle()",
+            "setSerializeNulls(boolean)",
+            "getSerializeNulls()");
     MoreAsserts.assertOverridesMethods(JsonWriter.class, JsonTreeWriter.class, ignoredMethods);
   }
 }
