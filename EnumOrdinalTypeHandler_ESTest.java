@@ -5,15 +5,264 @@
 
 package org.apache.ibatis.type;
 
-// ... (imports and annotations)
+import org.junit.Test;
+import static org.junit.Assert.*;
+import static org.evosuite.shaded.org.mockito.Mockito.*;
+import static org.evosuite.runtime.EvoAssertions.*;
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import org.apache.ibatis.type.EnumOrdinalTypeHandler;
+import org.apache.ibatis.type.JdbcType;
+import org.evosuite.runtime.EvoRunner;
+import org.evosuite.runtime.EvoRunnerParameters;
+import org.evosuite.runtime.ViolatedAssumptionAnswer;
+import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(/*...*/) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class EnumOrdinalTypeHandler_ESTest extends EnumOrdinalTypeHandler_ESTest_scaffolding {
 
   @Test(timeout = 4000)
   public void test00()  throws Throwable  {
-      // ...
+      Class<JdbcType> class0 = JdbcType.class;
+      EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
+      ResultSet resultSet0 = mock(ResultSet.class, new ViolatedAssumptionAnswer());
+      doReturn((-1824)).when(resultSet0).getInt(anyInt());
+      // Undeclared exception!
+      try { 
+        enumOrdinalTypeHandler0.getNullableResult(resultSet0, 0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Cannot convert -1824 to JdbcType by ordinal value.
+         //
+         verifyException("org.apache.ibatis.type.EnumOrdinalTypeHandler", e);
+      }
   }
 
-  // ... 16 more cryptic, auto-generated tests
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      Class<JdbcType> class0 = JdbcType.class;
+      EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
+      CallableStatement callableStatement0 = mock(CallableStatement.class, new ViolatedAssumptionAnswer());
+      doReturn(15).when(callableStatement0).getInt(anyInt());
+      JdbcType jdbcType0 = enumOrdinalTypeHandler0.getNullableResult(callableStatement0, 0);
+      PreparedStatement preparedStatement0 = mock(PreparedStatement.class, new ViolatedAssumptionAnswer());
+      enumOrdinalTypeHandler0.setNonNullParameter(preparedStatement0, 1996, jdbcType0, jdbcType0);
+  }
+
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      Class<JdbcType> class0 = JdbcType.class;
+      EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
+      // Undeclared exception!
+      try { 
+        enumOrdinalTypeHandler0.getNullableResult((ResultSet) null, "");
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.ibatis.type.EnumOrdinalTypeHandler", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      Class<JdbcType> class0 = JdbcType.class;
+      EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
+      ResultSet resultSet0 = mock(ResultSet.class, new ViolatedAssumptionAnswer());
+      doReturn((-874)).when(resultSet0).getInt(anyString());
+      // Undeclared exception!
+      try { 
+        enumOrdinalTypeHandler0.getNullableResult(resultSet0, "");
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Cannot convert -874 to JdbcType by ordinal value.
+         //
+         verifyException("org.apache.ibatis.type.EnumOrdinalTypeHandler", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      Class<JdbcType> class0 = JdbcType.class;
+      EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
+      // Undeclared exception!
+      try { 
+        enumOrdinalTypeHandler0.getNullableResult((ResultSet) null, (-2905));
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.ibatis.type.EnumOrdinalTypeHandler", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      Class<JdbcType> class0 = JdbcType.class;
+      EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
+      // Undeclared exception!
+      try { 
+        enumOrdinalTypeHandler0.getNullableResult((CallableStatement) null, (-3556));
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.ibatis.type.EnumOrdinalTypeHandler", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      Class<JdbcType> class0 = JdbcType.class;
+      EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
+      CallableStatement callableStatement0 = mock(CallableStatement.class, new ViolatedAssumptionAnswer());
+      doReturn((-1824)).when(callableStatement0).getInt(anyInt());
+      // Undeclared exception!
+      try { 
+        enumOrdinalTypeHandler0.getNullableResult(callableStatement0, (-1824));
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Cannot convert -1824 to JdbcType by ordinal value.
+         //
+         verifyException("org.apache.ibatis.type.EnumOrdinalTypeHandler", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      Class<JdbcType> class0 = JdbcType.class;
+      EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
+      CallableStatement callableStatement0 = mock(CallableStatement.class, new ViolatedAssumptionAnswer());
+      doReturn(0).when(callableStatement0).getInt(anyInt());
+      doReturn(true).when(callableStatement0).wasNull();
+      enumOrdinalTypeHandler0.getNullableResult(callableStatement0, 0);
+  }
+
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      Class<JdbcType> class0 = JdbcType.class;
+      EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
+      CallableStatement callableStatement0 = mock(CallableStatement.class, new ViolatedAssumptionAnswer());
+      doReturn(0).when(callableStatement0).getInt(anyInt());
+      doReturn(false).when(callableStatement0).wasNull();
+      JdbcType jdbcType0 = enumOrdinalTypeHandler0.getNullableResult(callableStatement0, (-1));
+      assertEquals(JdbcType.ARRAY, jdbcType0);
+  }
+
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      Class<JdbcType> class0 = JdbcType.class;
+      EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
+      ResultSet resultSet0 = mock(ResultSet.class, new ViolatedAssumptionAnswer());
+      doReturn(0).when(resultSet0).getInt(anyInt());
+      doReturn(false).when(resultSet0).wasNull();
+      JdbcType jdbcType0 = enumOrdinalTypeHandler0.getNullableResult(resultSet0, 2778);
+      assertEquals(JdbcType.ARRAY, jdbcType0);
+  }
+
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      Class<JdbcType> class0 = JdbcType.class;
+      EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
+      ResultSet resultSet0 = mock(ResultSet.class, new ViolatedAssumptionAnswer());
+      doReturn(0).when(resultSet0).getInt(anyInt());
+      doReturn(false).when(resultSet0).wasNull();
+      enumOrdinalTypeHandler0.getNullableResult(resultSet0, (-1));
+  }
+
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      Class<JdbcType> class0 = JdbcType.class;
+      EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
+      ResultSet resultSet0 = mock(ResultSet.class, new ViolatedAssumptionAnswer());
+      doReturn(538).when(resultSet0).getInt(anyInt());
+      // Undeclared exception!
+      try { 
+        enumOrdinalTypeHandler0.getNullableResult(resultSet0, 538);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Cannot convert 538 to JdbcType by ordinal value.
+         //
+         verifyException("org.apache.ibatis.type.EnumOrdinalTypeHandler", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      Class<JdbcType> class0 = JdbcType.class;
+      EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
+      ResultSet resultSet0 = mock(ResultSet.class, new ViolatedAssumptionAnswer());
+      doReturn((-1)).when(resultSet0).getInt(anyString());
+      doReturn(false).when(resultSet0).wasNull();
+      enumOrdinalTypeHandler0.getNullableResult(resultSet0, (String) null);
+  }
+
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      Class<JdbcType> class0 = JdbcType.class;
+      EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
+      ResultSet resultSet0 = mock(ResultSet.class, new ViolatedAssumptionAnswer());
+      doReturn(0).when(resultSet0).getInt(anyString());
+      doReturn(false).when(resultSet0).wasNull();
+      JdbcType jdbcType0 = enumOrdinalTypeHandler0.getNullableResult(resultSet0, "+%+\"nk/Mp#S]");
+      assertEquals(JdbcType.ARRAY, jdbcType0);
+  }
+
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = null;
+      try {
+        enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>((Class<JdbcType>) null);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Type argument cannot be null
+         //
+         verifyException("org.apache.ibatis.type.EnumOrdinalTypeHandler", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      Class<JdbcType> class0 = JdbcType.class;
+      EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
+      JdbcType jdbcType0 = JdbcType.LONGVARBINARY;
+      // Undeclared exception!
+      try { 
+        enumOrdinalTypeHandler0.setNonNullParameter((PreparedStatement) null, (-2025), jdbcType0, jdbcType0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.ibatis.type.EnumOrdinalTypeHandler", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      Class<JdbcType> class0 = JdbcType.class;
+      EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
+      ResultSet resultSet0 = mock(ResultSet.class, new ViolatedAssumptionAnswer());
+      doReturn(1).when(resultSet0).getInt(anyString());
+      JdbcType jdbcType0 = enumOrdinalTypeHandler0.getNullableResult(resultSet0, "Nv<W]59B0_y%8#{]L");
+      assertEquals(JdbcType.BIT, jdbcType0);
+  }
 }
