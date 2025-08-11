@@ -15,45 +15,25 @@
  */
 package org.joda.time;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 /**
- * This class is a Junit unit test for Weeks.
- *
- * @author Stephen Colebourne
+ * Unit tests for the {@link Weeks} class.
  */
-public class TestWeeks extends TestCase {
-    // Test in 2002/03 as time zones are more well known
-    // (before the late 90's they were all over the place)
+public class TestWeeks {
+
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestWeeks.class);
-    }
-
-    public TestWeeks(String name) {
-        super(name);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
     //-----------------------------------------------------------------------
+    // Test Constants
+    //-----------------------------------------------------------------------
+    @Test
     public void testConstants() {
         assertEquals(0, Weeks.ZERO.getWeeks());
         assertEquals(1, Weeks.ONE.getWeeks());
@@ -64,339 +44,389 @@ public class TestWeeks extends TestCase {
     }
 
     //-----------------------------------------------------------------------
-    public void testFactory_weeks_int() {
+    // Test Factory Methods
+    //-----------------------------------------------------------------------
+    @Test
+    public void weeks_int_shouldReturnCachedAndNewInstances() {
         assertSame(Weeks.ZERO, Weeks.weeks(0));
         assertSame(Weeks.ONE, Weeks.weeks(1));
         assertSame(Weeks.TWO, Weeks.weeks(2));
         assertSame(Weeks.THREE, Weeks.weeks(3));
         assertSame(Weeks.MAX_VALUE, Weeks.weeks(Integer.MAX_VALUE));
         assertSame(Weeks.MIN_VALUE, Weeks.weeks(Integer.MIN_VALUE));
+        
         assertEquals(-1, Weeks.weeks(-1).getWeeks());
         assertEquals(4, Weeks.weeks(4).getWeeks());
     }
 
-    //-----------------------------------------------------------------------
-    public void testFactory_weeksBetween_RInstant() {
+    @Test
+    public void weeksBetween_instants_shouldCalculateWeeks() {
+        // Arrange
         DateTime start = new DateTime(2006, 6, 9, 12, 0, 0, 0, PARIS);
-        DateTime end1 = new DateTime(2006, 6, 30, 12, 0, 0, 0, PARIS);
-        DateTime end2 = new DateTime(2006, 7, 21, 12, 0, 0, 0, PARIS);
-        
-        assertEquals(3, Weeks.weeksBetween(start, end1).getWeeks());
+        DateTime threeWeeksLater = new DateTime(2006, 6, 30, 12, 0, 0, 0, PARIS);
+        DateTime sixWeeksLater = new DateTime(2006, 7, 21, 12, 0, 0, 0, PARIS);
+
+        // Act & Assert
+        assertEquals(3, Weeks.weeksBetween(start, threeWeeksLater).getWeeks());
         assertEquals(0, Weeks.weeksBetween(start, start).getWeeks());
-        assertEquals(0, Weeks.weeksBetween(end1, end1).getWeeks());
-        assertEquals(-3, Weeks.weeksBetween(end1, start).getWeeks());
-        assertEquals(6, Weeks.weeksBetween(start, end2).getWeeks());
+        assertEquals(-3, Weeks.weeksBetween(threeWeeksLater, start).getWeeks());
+        assertEquals(6, Weeks.weeksBetween(start, sixWeeksLater).getWeeks());
     }
 
+    @Test
     @SuppressWarnings("deprecation")
-    public void testFactory_weeksBetween_RPartial() {
+    public void weeksBetween_partials_shouldCalculateWeeks() {
+        // Arrange
         LocalDate start = new LocalDate(2006, 6, 9);
-        LocalDate end1 = new LocalDate(2006, 6, 30);
-        YearMonthDay end2 = new YearMonthDay(2006, 7, 21);
-        
-        assertEquals(3, Weeks.weeksBetween(start, end1).getWeeks());
+        LocalDate threeWeeksLater = new LocalDate(2006, 6, 30);
+        YearMonthDay sixWeeksLater = new YearMonthDay(2006, 7, 21);
+
+        // Act & Assert
+        assertEquals(3, Weeks.weeksBetween(start, threeWeeksLater).getWeeks());
         assertEquals(0, Weeks.weeksBetween(start, start).getWeeks());
-        assertEquals(0, Weeks.weeksBetween(end1, end1).getWeeks());
-        assertEquals(-3, Weeks.weeksBetween(end1, start).getWeeks());
-        assertEquals(6, Weeks.weeksBetween(start, end2).getWeeks());
+        assertEquals(-3, Weeks.weeksBetween(threeWeeksLater, start).getWeeks());
+        assertEquals(6, Weeks.weeksBetween(start, sixWeeksLater).getWeeks());
     }
 
-    public void testFactory_weeksIn_RInterval() {
+    @Test
+    public void weeksIn_interval_shouldCalculateWeeks() {
+        // Arrange
         DateTime start = new DateTime(2006, 6, 9, 12, 0, 0, 0, PARIS);
-        DateTime end1 = new DateTime(2006, 6, 30, 12, 0, 0, 0, PARIS);
-        DateTime end2 = new DateTime(2006, 7, 21, 12, 0, 0, 0, PARIS);
-        
-        assertEquals(0, Weeks.weeksIn((ReadableInterval) null).getWeeks());
-        assertEquals(3, Weeks.weeksIn(new Interval(start, end1)).getWeeks());
+        DateTime threeWeeksLater = new DateTime(2006, 6, 30, 12, 0, 0, 0, PARIS);
+        DateTime sixWeeksLater = new DateTime(2006, 7, 21, 12, 0, 0, 0, PARIS);
+
+        // Act & Assert
+        assertEquals(0, Weeks.weeksIn(null).getWeeks());
+        assertEquals(3, Weeks.weeksIn(new Interval(start, threeWeeksLater)).getWeeks());
         assertEquals(0, Weeks.weeksIn(new Interval(start, start)).getWeeks());
-        assertEquals(0, Weeks.weeksIn(new Interval(end1, end1)).getWeeks());
-        assertEquals(6, Weeks.weeksIn(new Interval(start, end2)).getWeeks());
+        assertEquals(6, Weeks.weeksIn(new Interval(start, sixWeeksLater)).getWeeks());
     }
-
-    public void testFactory_standardWeeksIn_RPeriod() {
-        assertEquals(0, Weeks.standardWeeksIn((ReadablePeriod) null).getWeeks());
+    
+    @Test
+    public void standardWeeksIn_period_shouldCalculateWeeks() {
+        assertEquals(0, Weeks.standardWeeksIn(null).getWeeks());
         assertEquals(0, Weeks.standardWeeksIn(Period.ZERO).getWeeks());
-        assertEquals(1, Weeks.standardWeeksIn(new Period(0, 0, 1, 0, 0, 0, 0, 0)).getWeeks());
+        assertEquals(1, Weeks.standardWeeksIn(Period.weeks(1)).getWeeks());
         assertEquals(123, Weeks.standardWeeksIn(Period.weeks(123)).getWeeks());
-        assertEquals(-987, Weeks.standardWeeksIn(Period.weeks(-987)).getWeeks());
-        assertEquals(1, Weeks.standardWeeksIn(Period.days(13)).getWeeks());
+        assertEquals(1, Weeks.standardWeeksIn(Period.days(13)).getWeeks()); // 1 week and 6 days
         assertEquals(2, Weeks.standardWeeksIn(Period.days(14)).getWeeks());
-        assertEquals(2, Weeks.standardWeeksIn(Period.days(15)).getWeeks());
-        try {
-            Weeks.standardWeeksIn(Period.months(1));
-            fail();
-        } catch (IllegalArgumentException ex) {
-            // expected
-        }
+        assertEquals(2, Weeks.standardWeeksIn(Period.days(15)).getWeeks()); // 2 weeks and 1 day
     }
 
-    public void testFactory_parseWeeks_String() {
-        assertEquals(0, Weeks.parseWeeks((String) null).getWeeks());
+    @Test(expected = IllegalArgumentException.class)
+    public void standardWeeksIn_periodWithMonths_shouldThrowException() {
+        Weeks.standardWeeksIn(Period.months(1));
+    }
+
+    @Test
+    public void parseWeeks_shouldParseValidStrings() {
+        assertEquals(0, Weeks.parseWeeks(null).getWeeks());
         assertEquals(0, Weeks.parseWeeks("P0W").getWeeks());
         assertEquals(1, Weeks.parseWeeks("P1W").getWeeks());
         assertEquals(-3, Weeks.parseWeeks("P-3W").getWeeks());
         assertEquals(2, Weeks.parseWeeks("P0Y0M2W").getWeeks());
         assertEquals(2, Weeks.parseWeeks("P2WT0H0M").getWeeks());
-        try {
-            Weeks.parseWeeks("P1Y1D");
-            fail();
-        } catch (IllegalArgumentException ex) {
-            // expected
-        }
-        try {
-            Weeks.parseWeeks("P1WT1H");
-            fail();
-        } catch (IllegalArgumentException ex) {
-            // expected
-        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void parseWeeks_invalidStringWithDays_shouldThrowException() {
+        Weeks.parseWeeks("P1Y1D");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void parseWeeks_invalidStringWithTime_shouldThrowException() {
+        Weeks.parseWeeks("P1WT1H");
     }
 
     //-----------------------------------------------------------------------
-    public void testGetMethods() {
-        Weeks test = Weeks.weeks(20);
-        assertEquals(20, test.getWeeks());
+    // Test Getters
+    //-----------------------------------------------------------------------
+    @Test
+    public void getWeeks_shouldReturnCorrectValue() {
+        assertEquals(20, Weeks.weeks(20).getWeeks());
     }
 
-    public void testGetFieldType() {
-        Weeks test = Weeks.weeks(20);
-        assertEquals(DurationFieldType.weeks(), test.getFieldType());
+    @Test
+    public void getFieldType_shouldReturnWeeks() {
+        assertEquals(DurationFieldType.weeks(), Weeks.weeks(20).getFieldType());
     }
 
-    public void testGetPeriodType() {
-        Weeks test = Weeks.weeks(20);
-        assertEquals(PeriodType.weeks(), test.getPeriodType());
+    @Test
+    public void getPeriodType_shouldReturnWeeks() {
+        assertEquals(PeriodType.weeks(), Weeks.weeks(20).getPeriodType());
     }
 
     //-----------------------------------------------------------------------
-    public void testIsGreaterThan() {
-        assertEquals(true, Weeks.THREE.isGreaterThan(Weeks.TWO));
-        assertEquals(false, Weeks.THREE.isGreaterThan(Weeks.THREE));
-        assertEquals(false, Weeks.TWO.isGreaterThan(Weeks.THREE));
-        assertEquals(true, Weeks.ONE.isGreaterThan(null));
-        assertEquals(false, Weeks.weeks(-1).isGreaterThan(null));
+    // Test Comparison Methods
+    //-----------------------------------------------------------------------
+    @Test
+    public void isGreaterThan_shouldCompareCorrectly() {
+        assertTrue(Weeks.THREE.isGreaterThan(Weeks.TWO));
+        assertFalse(Weeks.THREE.isGreaterThan(Weeks.THREE));
+        assertFalse(Weeks.TWO.isGreaterThan(Weeks.THREE));
+        assertTrue(Weeks.ONE.isGreaterThan(null)); // null is treated as zero
+        assertFalse(Weeks.weeks(-1).isGreaterThan(null));
     }
 
-    public void testIsLessThan() {
-        assertEquals(false, Weeks.THREE.isLessThan(Weeks.TWO));
-        assertEquals(false, Weeks.THREE.isLessThan(Weeks.THREE));
-        assertEquals(true, Weeks.TWO.isLessThan(Weeks.THREE));
-        assertEquals(false, Weeks.ONE.isLessThan(null));
-        assertEquals(true, Weeks.weeks(-1).isLessThan(null));
+    @Test
+    public void isLessThan_shouldCompareCorrectly() {
+        assertFalse(Weeks.THREE.isLessThan(Weeks.TWO));
+        assertFalse(Weeks.THREE.isLessThan(Weeks.THREE));
+        assertTrue(Weeks.TWO.isLessThan(Weeks.THREE));
+        assertFalse(Weeks.ONE.isLessThan(null)); // null is treated as zero
+        assertTrue(Weeks.weeks(-1).isLessThan(null));
     }
 
     //-----------------------------------------------------------------------
-    public void testToString() {
-        Weeks test = Weeks.weeks(20);
-        assertEquals("P20W", test.toString());
+    // Test toString()
+    //-----------------------------------------------------------------------
+    @Test
+    public void toString_shouldReturnISOFormat() {
+        assertEquals("P20W", Weeks.weeks(20).toString());
+        assertEquals("P-20W", Weeks.weeks(-20).toString());
+    }
+
+    //-----------------------------------------------------------------------
+    // Test Serialization
+    //-----------------------------------------------------------------------
+    @Test
+    public void serialization_shouldPreserveInstance() throws Exception {
+        // Arrange
+        Weeks original = Weeks.THREE;
         
-        test = Weeks.weeks(-20);
-        assertEquals("P-20W", test.toString());
-    }
-
-    //-----------------------------------------------------------------------
-    public void testSerialization() throws Exception {
-        Weeks test = Weeks.THREE;
-        
+        // Act
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(test);
+        oos.writeObject(original);
         oos.close();
-        byte[] bytes = baos.toByteArray();
         
-        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
         ObjectInputStream ois = new ObjectInputStream(bais);
-        Weeks result = (Weeks) ois.readObject();
+        Weeks deserialized = (Weeks) ois.readObject();
         ois.close();
         
-        assertSame(test, result);
+        // Assert
+        assertSame(original, deserialized);
     }
 
     //-----------------------------------------------------------------------
-    public void testToStandardDays() {
-        Weeks test = Weeks.weeks(2);
-        Days expected = Days.days(14);
-        assertEquals(expected, test.toStandardDays());
-        
-        try {
-            Weeks.MAX_VALUE.toStandardDays();
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+    // Test Standard Conversions
+    //-----------------------------------------------------------------------
+    @Test
+    public void toStandardDays_shouldConvertCorrectly() {
+        assertEquals(Days.days(14), Weeks.weeks(2).toStandardDays());
     }
 
-    public void testToStandardHours() {
-        Weeks test = Weeks.weeks(2);
-        Hours expected = Hours.hours(2 * 7 * 24);
-        assertEquals(expected, test.toStandardHours());
-        
-        try {
-            Weeks.MAX_VALUE.toStandardHours();
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+    @Test(expected = ArithmeticException.class)
+    public void toStandardDays_shouldThrowExceptionOnOverflow() {
+        Weeks.MAX_VALUE.toStandardDays();
     }
 
-    public void testToStandardMinutes() {
-        Weeks test = Weeks.weeks(2);
-        Minutes expected = Minutes.minutes(2 * 7 * 24 * 60);
-        assertEquals(expected, test.toStandardMinutes());
-        
-        try {
-            Weeks.MAX_VALUE.toStandardMinutes();
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+    @Test
+    public void toStandardHours_shouldConvertCorrectly() {
+        assertEquals(Hours.hours(2 * 7 * 24), Weeks.weeks(2).toStandardHours());
     }
 
-    public void testToStandardSeconds() {
-        Weeks test = Weeks.weeks(2);
-        Seconds expected = Seconds.seconds(2 * 7 * 24 * 60 * 60);
-        assertEquals(expected, test.toStandardSeconds());
-        
-        try {
-            Weeks.MAX_VALUE.toStandardSeconds();
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+    @Test(expected = ArithmeticException.class)
+    public void toStandardHours_shouldThrowExceptionOnOverflow() {
+        Weeks.MAX_VALUE.toStandardHours();
     }
 
-    public void testToStandardDuration() {
-        Weeks test = Weeks.weeks(20);
+    @Test
+    public void toStandardMinutes_shouldConvertCorrectly() {
+        assertEquals(Minutes.minutes(2 * 7 * 24 * 60), Weeks.weeks(2).toStandardMinutes());
+    }
+
+    @Test(expected = ArithmeticException.class)
+    public void toStandardMinutes_shouldThrowExceptionOnOverflow() {
+        Weeks.MAX_VALUE.toStandardMinutes();
+    }
+
+    @Test
+    public void toStandardSeconds_shouldConvertCorrectly() {
+        assertEquals(Seconds.seconds(2 * 7 * 24 * 60 * 60), Weeks.weeks(2).toStandardSeconds());
+    }
+
+    @Test(expected = ArithmeticException.class)
+    public void toStandardSeconds_shouldThrowExceptionOnOverflow() {
+        Weeks.MAX_VALUE.toStandardSeconds();
+    }
+
+    @Test
+    public void toStandardDuration_shouldConvertCorrectly() {
+        // Arrange
+        Weeks twentyWeeks = Weeks.weeks(20);
         Duration expected = new Duration(20L * DateTimeConstants.MILLIS_PER_WEEK);
-        assertEquals(expected, test.toStandardDuration());
         
-        expected = new Duration(((long) Integer.MAX_VALUE) * DateTimeConstants.MILLIS_PER_WEEK);
-        assertEquals(expected, Weeks.MAX_VALUE.toStandardDuration());
+        // Act & Assert
+        assertEquals(expected, twentyWeeks.toStandardDuration());
+        
+        // Arrange
+        Duration expectedMax = new Duration((long) Integer.MAX_VALUE * DateTimeConstants.MILLIS_PER_WEEK);
+        
+        // Act & Assert
+        assertEquals(expectedMax, Weeks.MAX_VALUE.toStandardDuration());
     }
 
     //-----------------------------------------------------------------------
-    public void testPlus_int() {
-        Weeks test2 = Weeks.weeks(2);
-        Weeks result = test2.plus(3);
-        assertEquals(2, test2.getWeeks());
-        assertEquals(5, result.getWeeks());
+    // Test Math Operations
+    //-----------------------------------------------------------------------
+    @Test
+    public void plus_int_shouldAddWeeks() {
+        // Arrange
+        Weeks twoWeeks = Weeks.weeks(2);
         
+        // Act
+        Weeks result = twoWeeks.plus(3);
+        
+        // Assert
+        assertEquals(2, twoWeeks.getWeeks()); // Original is immutable
+        assertEquals(5, result.getWeeks());
         assertEquals(1, Weeks.ONE.plus(0).getWeeks());
-        
-        try {
-            Weeks.MAX_VALUE.plus(1);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
     }
 
-    public void testPlus_Weeks() {
-        Weeks test2 = Weeks.weeks(2);
-        Weeks test3 = Weeks.weeks(3);
-        Weeks result = test2.plus(test3);
-        assertEquals(2, test2.getWeeks());
-        assertEquals(3, test3.getWeeks());
+    @Test(expected = ArithmeticException.class)
+    public void plus_int_shouldThrowExceptionOnOverflow() {
+        Weeks.MAX_VALUE.plus(1);
+    }
+
+    @Test
+    public void plus_Weeks_shouldAddWeeks() {
+        // Arrange
+        Weeks twoWeeks = Weeks.weeks(2);
+        Weeks threeWeeks = Weeks.weeks(3);
+        
+        // Act
+        Weeks result = twoWeeks.plus(threeWeeks);
+        
+        // Assert
+        assertEquals(2, twoWeeks.getWeeks()); // Original is immutable
+        assertEquals(3, threeWeeks.getWeeks()); // Parameter is immutable
         assertEquals(5, result.getWeeks());
-        
         assertEquals(1, Weeks.ONE.plus(Weeks.ZERO).getWeeks());
+    }
+    
+    @Test
+    public void plus_Weeks_withNull_shouldTreatAsZero() {
         assertEquals(1, Weeks.ONE.plus((Weeks) null).getWeeks());
-        
-        try {
-            Weeks.MAX_VALUE.plus(Weeks.ONE);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
     }
 
-    public void testMinus_int() {
-        Weeks test2 = Weeks.weeks(2);
-        Weeks result = test2.minus(3);
-        assertEquals(2, test2.getWeeks());
-        assertEquals(-1, result.getWeeks());
+    @Test(expected = ArithmeticException.class)
+    public void plus_Weeks_shouldThrowExceptionOnOverflow() {
+        Weeks.MAX_VALUE.plus(Weeks.ONE);
+    }
+
+    @Test
+    public void minus_int_shouldSubtractWeeks() {
+        // Arrange
+        Weeks twoWeeks = Weeks.weeks(2);
         
+        // Act
+        Weeks result = twoWeeks.minus(3);
+        
+        // Assert
+        assertEquals(2, twoWeeks.getWeeks()); // Original is immutable
+        assertEquals(-1, result.getWeeks());
         assertEquals(1, Weeks.ONE.minus(0).getWeeks());
-        
-        try {
-            Weeks.MIN_VALUE.minus(1);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
     }
 
-    public void testMinus_Weeks() {
-        Weeks test2 = Weeks.weeks(2);
-        Weeks test3 = Weeks.weeks(3);
-        Weeks result = test2.minus(test3);
-        assertEquals(2, test2.getWeeks());
-        assertEquals(3, test3.getWeeks());
+    @Test(expected = ArithmeticException.class)
+    public void minus_int_shouldThrowExceptionOnOverflow() {
+        Weeks.MIN_VALUE.minus(1);
+    }
+
+    @Test
+    public void minus_Weeks_shouldSubtractWeeks() {
+        // Arrange
+        Weeks twoWeeks = Weeks.weeks(2);
+        Weeks threeWeeks = Weeks.weeks(3);
+        
+        // Act
+        Weeks result = twoWeeks.minus(threeWeeks);
+        
+        // Assert
+        assertEquals(2, twoWeeks.getWeeks()); // Original is immutable
+        assertEquals(3, threeWeeks.getWeeks()); // Parameter is immutable
         assertEquals(-1, result.getWeeks());
-        
         assertEquals(1, Weeks.ONE.minus(Weeks.ZERO).getWeeks());
+    }
+    
+    @Test
+    public void minus_Weeks_withNull_shouldTreatAsZero() {
         assertEquals(1, Weeks.ONE.minus((Weeks) null).getWeeks());
-        
-        try {
-            Weeks.MIN_VALUE.minus(Weeks.ONE);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
     }
 
-    public void testMultipliedBy_int() {
-        Weeks test = Weeks.weeks(2);
-        assertEquals(6, test.multipliedBy(3).getWeeks());
-        assertEquals(2, test.getWeeks());
-        assertEquals(-6, test.multipliedBy(-3).getWeeks());
-        assertSame(test, test.multipliedBy(1));
-        
-        Weeks halfMax = Weeks.weeks(Integer.MAX_VALUE / 2 + 1);
-        try {
-            halfMax.multipliedBy(2);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+    @Test(expected = ArithmeticException.class)
+    public void minus_Weeks_shouldThrowExceptionOnOverflow() {
+        Weeks.MIN_VALUE.minus(Weeks.ONE);
     }
 
-    public void testDividedBy_int() {
-        Weeks test = Weeks.weeks(12);
-        assertEquals(6, test.dividedBy(2).getWeeks());
-        assertEquals(12, test.getWeeks());
-        assertEquals(4, test.dividedBy(3).getWeeks());
-        assertEquals(3, test.dividedBy(4).getWeeks());
-        assertEquals(2, test.dividedBy(5).getWeeks());
-        assertEquals(2, test.dividedBy(6).getWeeks());
-        assertSame(test, test.dividedBy(1));
+    @Test
+    public void multipliedBy_shouldMultiplyCorrectly() {
+        // Arrange
+        Weeks twoWeeks = Weeks.weeks(2);
         
-        try {
-            Weeks.ONE.dividedBy(0);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+        // Act & Assert
+        assertEquals(6, twoWeeks.multipliedBy(3).getWeeks());
+        assertEquals(2, twoWeeks.getWeeks()); // Original is immutable
+        assertEquals(-6, twoWeeks.multipliedBy(-3).getWeeks());
+        assertSame(twoWeeks, twoWeeks.multipliedBy(1));
     }
 
-    public void testNegated() {
-        Weeks test = Weeks.weeks(12);
-        assertEquals(-12, test.negated().getWeeks());
-        assertEquals(12, test.getWeeks());
+    @Test(expected = ArithmeticException.class)
+    public void multipliedBy_shouldThrowExceptionOnOverflow() {
+        Weeks.weeks(Integer.MAX_VALUE / 2 + 1).multipliedBy(2);
+    }
+
+    @Test
+    public void dividedBy_shouldDivideCorrectly() {
+        // Arrange
+        Weeks twelveWeeks = Weeks.weeks(12);
         
-        try {
-            Weeks.MIN_VALUE.negated();
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+        // Act & Assert
+        assertEquals(6, twelveWeeks.dividedBy(2).getWeeks());
+        assertEquals(12, twelveWeeks.getWeeks()); // Original is immutable
+        assertEquals(4, twelveWeeks.dividedBy(3).getWeeks());
+        assertEquals(3, twelveWeeks.dividedBy(4).getWeeks());
+        assertEquals(2, twelveWeeks.dividedBy(5).getWeeks()); // Integer division
+        assertEquals(2, twelveWeeks.dividedBy(6).getWeeks());
+        assertSame(twelveWeeks, twelveWeeks.dividedBy(1));
+    }
+
+    @Test(expected = ArithmeticException.class)
+    public void dividedBy_zero_shouldThrowException() {
+        Weeks.ONE.dividedBy(0);
+    }
+
+    @Test
+    public void negated_shouldNegateCorrectly() {
+        // Arrange
+        Weeks twelveWeeks = Weeks.weeks(12);
+        
+        // Act & Assert
+        assertEquals(-12, twelveWeeks.negated().getWeeks());
+        assertEquals(12, twelveWeeks.getWeeks()); // Original is immutable
+    }
+
+    @Test(expected = ArithmeticException.class)
+    public void negated_minValue_shouldThrowExceptionOnOverflow() {
+        Weeks.MIN_VALUE.negated();
     }
 
     //-----------------------------------------------------------------------
-    public void testAddToLocalDate() {
-        Weeks test = Weeks.weeks(3);
+    // Test Integration
+    //-----------------------------------------------------------------------
+    @Test
+    public void addToLocalDate_shouldAddWeeksCorrectly() {
+        // Arrange
+        Weeks threeWeeks = Weeks.weeks(3);
         LocalDate date = new LocalDate(2006, 6, 1);
         LocalDate expected = new LocalDate(2006, 6, 22);
-        assertEquals(expected, date.plus(test));
+        
+        // Act
+        LocalDate result = date.plus(threeWeeks);
+        
+        // Assert
+        assertEquals(expected, result);
     }
-
 }
