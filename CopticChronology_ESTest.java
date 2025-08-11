@@ -16,169 +16,164 @@ import org.joda.time.chrono.AssembledChronology;
 import org.joda.time.chrono.CopticChronology;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, 
+useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class CopticChronology_ESTest extends CopticChronology_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      CopticChronology copticChronology0 = CopticChronology.getInstanceUTC();
-      long long0 = copticChronology0.calculateFirstDayOfYearMillis(292272708);
-      assertEquals(9223371994233600000L, long0);
-  }
+    // Constants for repeated values
+    private static final int MIN_DAYS_IN_FIRST_WEEK = 1;
+    private static final int VALID_MIN_DAYS = 7;
+    private static final int INVALID_MIN_DAYS = 634;
+    private static final int NEGATIVE_MIN_DAYS = -1686;
+    private static final long TEST_INSTANT = 16965676800000L;
+    private static final long MAX_YEAR_INSTANT = 9223371994233600000L;
+    private static final int MAX_YEAR = 292272708;
+    private static final int MIN_YEAR = -292269337;
+    private static final int ERA_AM = 1;
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
-      CopticChronology copticChronology0 = CopticChronology.getInstance(dateTimeZone0);
-      AssembledChronology.Fields assembledChronology_Fields0 = new AssembledChronology.Fields();
-      copticChronology0.assemble(assembledChronology_Fields0);
-      assertEquals(1, CopticChronology.AM);
-  }
+    @Test(timeout = 4000)
+    public void testCalculateFirstDayOfYearForMaxYear() throws Throwable {
+        CopticChronology chronology = CopticChronology.getInstanceUTC();
+        long result = chronology.calculateFirstDayOfYearMillis(MAX_YEAR);
+        assertEquals(MAX_YEAR_INSTANT, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      CopticChronology copticChronology0 = CopticChronology.getInstance();
-      long long0 = copticChronology0.getApproxMillisAtEpochDividedByTwo();
-      assertEquals(26607895200000L, long0);
-  }
+    @Test(timeout = 4000)
+    public void testAssembleChronology() throws Throwable {
+        CopticChronology chronology = CopticChronology.getInstance(DateTimeZone.getDefault());
+        chronology.assemble(new AssembledChronology.Fields());
+        assertEquals(ERA_AM, CopticChronology.AM);
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      CopticChronology copticChronology0 = CopticChronology.getInstance();
-      // Undeclared exception!
-      try { 
-        copticChronology0.isLeapDay((-9223372036854775768L));
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // The instant is below the supported minimum of 0001-01-01T00:00:00.000Z (CopticChronology[UTC])
-         //
-         verifyException("org.joda.time.chrono.LimitChronology", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testGetApproxMillisAtEpochDividedByTwo() throws Throwable {
+        CopticChronology chronology = CopticChronology.getInstance();
+        long result = chronology.getApproxMillisAtEpochDividedByTwo();
+        assertEquals(26607895200000L, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      CopticChronology copticChronology0 = CopticChronology.getInstanceUTC();
-      CopticChronology copticChronology1 = null;
-      try {
-        copticChronology1 = new CopticChronology(copticChronology0, copticChronology0, 634);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid min days in first week: 634
-         //
-         verifyException("org.joda.time.chrono.BasicChronology", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testIsLeapDayWithExtremeNegativeInstantThrowsException() throws Throwable {
+        CopticChronology chronology = CopticChronology.getInstance();
+        try {
+            chronology.isLeapDay(Long.MIN_VALUE);
+            fail("Expected IllegalArgumentException for instant below minimum");
+        } catch (IllegalArgumentException e) {
+            verifyException("org.joda.time.chrono.LimitChronology", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      CopticChronology copticChronology0 = CopticChronology.getInstance();
-      CopticChronology copticChronology1 = new CopticChronology(copticChronology0, copticChronology0, 1);
-      assertFalse(copticChronology1.equals((Object)copticChronology0));
-  }
+    @Test(timeout = 4000)
+    public void testCreateWithInvalidMinDaysThrowsException() throws Throwable {
+        CopticChronology base = CopticChronology.getInstanceUTC();
+        try {
+            new CopticChronology(base, base, INVALID_MIN_DAYS);
+            fail("Expected IllegalArgumentException for invalid min days");
+        } catch (IllegalArgumentException e) {
+            verifyException("org.joda.time.chrono.BasicChronology", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      CopticChronology copticChronology0 = CopticChronology.getInstanceUTC();
-      long long0 = copticChronology0.calculateFirstDayOfYearMillis(3571);
-      assertEquals(59476377600000L, long0);
-  }
+    @Test(timeout = 4000)
+    public void testCreateWithValidMinDaysSucceeds() throws Throwable {
+        CopticChronology base = CopticChronology.getInstance();
+        CopticChronology newChronology = new CopticChronology(base, base, MIN_DAYS_IN_FIRST_WEEK);
+        assertNotSame(newChronology, base);
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      CopticChronology copticChronology0 = CopticChronology.getInstanceUTC();
-      long long0 = copticChronology0.calculateFirstDayOfYearMillis(1);
-      assertEquals((-53184211200000L), long0);
-  }
+    @Test(timeout = 4000)
+    public void testCalculateFirstDayOfYearForYear3571() throws Throwable {
+        CopticChronology chronology = CopticChronology.getInstanceUTC();
+        long result = chronology.calculateFirstDayOfYearMillis(3571);
+        assertEquals(59476377600000L, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-1686));
-      // Undeclared exception!
-      try { 
-        CopticChronology.getInstance(dateTimeZone0, (-1686));
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Invalid min days in first week: -1686
-         //
-         verifyException("org.joda.time.chrono.CopticChronology", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testCalculateFirstDayOfYearForYear1() throws Throwable {
+        CopticChronology chronology = CopticChronology.getInstanceUTC();
+        long result = chronology.calculateFirstDayOfYearMillis(1);
+        assertEquals(-53184211200000L, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      CopticChronology copticChronology0 = CopticChronology.getInstance((DateTimeZone) null, 1);
-      assertEquals(1, CopticChronology.AM);
-  }
+    @Test(timeout = 4000)
+    public void testGetInstanceWithNegativeMinDaysThrowsException() throws Throwable {
+        DateTimeZone zone = DateTimeZone.forOffsetMillis(NEGATIVE_MIN_DAYS);
+        try {
+            CopticChronology.getInstance(zone, NEGATIVE_MIN_DAYS);
+            fail("Expected IllegalArgumentException for negative min days");
+        } catch (IllegalArgumentException e) {
+            verifyException("org.joda.time.chrono.CopticChronology", e);
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      CopticChronology copticChronology0 = CopticChronology.getInstance();
-      CopticChronology copticChronology1 = new CopticChronology((Chronology) null, copticChronology0, 1);
-      assertFalse(copticChronology1.equals((Object)copticChronology0));
-  }
+    @Test(timeout = 4000)
+    public void testGetInstanceWithNullZoneAndValidMinDays() throws Throwable {
+        CopticChronology chronology = CopticChronology.getInstance(null, MIN_DAYS_IN_FIRST_WEEK);
+        assertEquals(ERA_AM, CopticChronology.AM);
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      CopticChronology copticChronology0 = CopticChronology.getInstanceUTC();
-      int int0 = copticChronology0.getMinYear();
-      assertEquals((-292269337), int0);
-  }
+    @Test(timeout = 4000)
+    public void testCreateWithNullBaseChronology() throws Throwable {
+        CopticChronology base = CopticChronology.getInstance();
+        CopticChronology newChronology = new CopticChronology(null, base, MIN_DAYS_IN_FIRST_WEEK);
+        assertNotSame(newChronology, base);
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-1686));
-      CopticChronology copticChronology0 = CopticChronology.getInstance(dateTimeZone0, 7);
-      CopticChronology copticChronology1 = (CopticChronology)copticChronology0.withUTC();
-      assertEquals(1, CopticChronology.AM);
-  }
+    @Test(timeout = 4000)
+    public void testGetMinYear() throws Throwable {
+        CopticChronology chronology = CopticChronology.getInstanceUTC();
+        int result = chronology.getMinYear();
+        assertEquals(MIN_YEAR, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      CopticChronology copticChronology0 = CopticChronology.getInstance();
-      boolean boolean0 = copticChronology0.isLeapDay(16965676800000L);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testWithUTC() throws Throwable {
+        DateTimeZone zone = DateTimeZone.forOffsetMillis(NEGATIVE_MIN_DAYS);
+        CopticChronology chronology = CopticChronology.getInstance(zone, VALID_MIN_DAYS);
+        Chronology utcChronology = chronology.withUTC();
+        assertEquals(ERA_AM, CopticChronology.AM);
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      CopticChronology copticChronology0 = CopticChronology.getInstance();
-      boolean boolean0 = copticChronology0.isLeapDay(9223371994233600000L);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testIsLeapDayForRegularInstant() throws Throwable {
+        CopticChronology chronology = CopticChronology.getInstance();
+        boolean result = chronology.isLeapDay(TEST_INSTANT);
+        assertFalse(result);
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      CopticChronology copticChronology0 = CopticChronology.getInstance();
-      int int0 = copticChronology0.getMaxYear();
-      assertEquals(292272708, int0);
-  }
+    @Test(timeout = 4000)
+    public void testIsLeapDayForMaxYearInstant() throws Throwable {
+        CopticChronology chronology = CopticChronology.getInstance();
+        boolean result = chronology.isLeapDay(MAX_YEAR_INSTANT);
+        assertFalse(result);
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-1686));
-      CopticChronology copticChronology0 = CopticChronology.getInstance(dateTimeZone0, 7);
-      Chronology chronology0 = copticChronology0.withZone(dateTimeZone0);
-      assertSame(chronology0, copticChronology0);
-  }
+    @Test(timeout = 4000)
+    public void testGetMaxYear() throws Throwable {
+        CopticChronology chronology = CopticChronology.getInstance();
+        int result = chronology.getMaxYear();
+        assertEquals(MAX_YEAR, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      CopticChronology copticChronology0 = CopticChronology.getInstance();
-      boolean boolean0 = copticChronology0.isLeapDay(1);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testWithZoneSameAsOriginal() throws Throwable {
+        DateTimeZone zone = DateTimeZone.forOffsetMillis(NEGATIVE_MIN_DAYS);
+        CopticChronology chronology = CopticChronology.getInstance(zone, VALID_MIN_DAYS);
+        Chronology result = chronology.withZone(zone);
+        assertSame(chronology, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      CopticChronology copticChronology0 = CopticChronology.getInstanceUTC();
-      Chronology chronology0 = copticChronology0.withZone((DateTimeZone) null);
-      assertSame(copticChronology0, chronology0);
-  }
+    @Test(timeout = 4000)
+    public void testIsLeapDayForSmallInstant() throws Throwable {
+        CopticChronology chronology = CopticChronology.getInstance();
+        boolean result = chronology.isLeapDay(1);
+        assertFalse(result);
+    }
+
+    @Test(timeout = 4000)
+    public void testWithNullZoneReturnsSameWhenUTC() throws Throwable {
+        CopticChronology chronology = CopticChronology.getInstanceUTC();
+        Chronology result = chronology.withZone(null);
+        assertSame(chronology, result);
+    }
 }
