@@ -121,7 +121,7 @@ public class RFC1522Codec_ESTest extends RFC1522Codec_ESTest_scaffolding {
       BCodec bCodec0 = new BCodec();
       // Undeclared exception!
       try { 
-        bCodec0.encodeText("0T5`BTkU* |f-hr", (String) null);
+        bCodec0.encodeText("0T5`BTkU*|f-hr", (String) null);
         fail("Expecting exception: IllegalArgumentException");
       
       } catch(IllegalArgumentException e) {
