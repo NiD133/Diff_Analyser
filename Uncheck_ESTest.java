@@ -43,570 +43,327 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class Uncheck_ESTest extends Uncheck_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      IOTriConsumer<String, String, String> iOTriConsumer0 = IOTriConsumer.noop();
-      Uncheck.accept(iOTriConsumer0, "", "09zT^3GkFTSgG3", "09zT^3GkFTSgG3");
-  }
+    // Tests for accept() methods
+    @Test(timeout = 4000)
+    public void testAcceptTriConsumer_NoOp() throws Throwable {
+        IOTriConsumer<String, String, String> noop = IOTriConsumer.noop();
+        Uncheck.accept(noop, "", "09zT^3GkFTSgG3", "09zT^3GkFTSgG3");
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      IOBiConsumer<String, String> iOBiConsumer0 = IOBiConsumer.noop();
-      Uncheck.accept(iOBiConsumer0, "I8ucG1|7Y@", ">jR><;J|_0");
-  }
+    @Test(timeout = 4000)
+    public void testAcceptBiConsumer_NoOp() throws Throwable {
+        IOBiConsumer<String, String> noop = IOBiConsumer.noop();
+        Uncheck.accept(noop, "I8ucG1|7Y@", ">jR><;J|_0");
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      IOConsumer<String> iOConsumer0 = IOConsumer.noop();
-      Uncheck.accept(iOConsumer0, "");
-  }
+    @Test(timeout = 4000)
+    public void testAcceptConsumer_NoOp() throws Throwable {
+        IOConsumer<String> noop = IOConsumer.noop();
+        Uncheck.accept(noop, "");
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      IOPredicate<String> iOPredicate0 = IOPredicate.alwaysTrue();
-      boolean boolean0 = Uncheck.test(iOPredicate0, "after");
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testAcceptIntConsumer() throws Throwable {
+        IOIntConsumer mockConsumer = mock(IOIntConsumer.class);
+        Uncheck.accept(mockConsumer, 111);
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      IOLongSupplier iOLongSupplier0 = mock(IOLongSupplier.class, new ViolatedAssumptionAnswer());
-      doReturn(0L).when(iOLongSupplier0).getAsLong();
-      long long0 = Uncheck.getAsLong(iOLongSupplier0, (Supplier<String>) null);
-      assertEquals(0L, long0);
-  }
+    // Tests for test() method with IOPredicate
+    @Test(timeout = 4000)
+    public void testTestPredicate_AlwaysTrue() throws Throwable {
+        IOPredicate<String> alwaysTrue = IOPredicate.alwaysTrue();
+        assertTrue(Uncheck.test(alwaysTrue, "after"));
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      IOLongSupplier iOLongSupplier0 = mock(IOLongSupplier.class, new ViolatedAssumptionAnswer());
-      doReturn(1139L).when(iOLongSupplier0).getAsLong();
-      long long0 = Uncheck.getAsLong(iOLongSupplier0, (Supplier<String>) null);
-      assertEquals(1139L, long0);
-  }
+    @Test(timeout = 4000)
+    public void testTestPredicate_AlwaysFalse() throws Throwable {
+        IOPredicate<String> alwaysFalse = IOPredicate.alwaysFalse();
+        assertFalse(Uncheck.test(alwaysFalse, "6 P)'Sdhh"));
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      IOLongSupplier iOLongSupplier0 = mock(IOLongSupplier.class, new ViolatedAssumptionAnswer());
-      doReturn((-890L)).when(iOLongSupplier0).getAsLong();
-      long long0 = Uncheck.getAsLong(iOLongSupplier0, (Supplier<String>) null);
-      assertEquals((-890L), long0);
-  }
+    // Tests for getAsLong() with IOLongSupplier
+    @Test(timeout = 4000)
+    public void testGetAsLong_WithExceptionMessage() throws Throwable {
+        IOLongSupplier mockSupplier = mock(IOLongSupplier.class, new ViolatedAssumptionAnswer());
+        doReturn(0L).when(mockSupplier).getAsLong();
+        assertEquals(0L, Uncheck.getAsLong(mockSupplier, (Supplier<String>) null));
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      IOLongSupplier iOLongSupplier0 = mock(IOLongSupplier.class, new ViolatedAssumptionAnswer());
-      doReturn(0L).when(iOLongSupplier0).getAsLong();
-      long long0 = Uncheck.getAsLong(iOLongSupplier0);
-      assertEquals(0L, long0);
-  }
+        doReturn(1139L).when(mockSupplier).getAsLong();
+        assertEquals(1139L, Uncheck.getAsLong(mockSupplier, (Supplier<String>) null));
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      IOLongSupplier iOLongSupplier0 = mock(IOLongSupplier.class, new ViolatedAssumptionAnswer());
-      doReturn(2444L).when(iOLongSupplier0).getAsLong();
-      long long0 = Uncheck.getAsLong(iOLongSupplier0);
-      assertEquals(2444L, long0);
-  }
+        doReturn(-890L).when(mockSupplier).getAsLong();
+        assertEquals(-890L, Uncheck.getAsLong(mockSupplier, (Supplier<String>) null));
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      IOIntSupplier iOIntSupplier0 = mock(IOIntSupplier.class, new ViolatedAssumptionAnswer());
-      doReturn(0).when(iOIntSupplier0).getAsInt();
-      int int0 = Uncheck.getAsInt(iOIntSupplier0, (Supplier<String>) null);
-      assertEquals(0, int0);
-  }
+    @Test(timeout = 4000)
+    public void testGetAsLong_WithoutExceptionMessage() throws Throwable {
+        IOLongSupplier mockSupplier = mock(IOLongSupplier.class, new ViolatedAssumptionAnswer());
+        doReturn(0L).when(mockSupplier).getAsLong();
+        assertEquals(0L, Uncheck.getAsLong(mockSupplier));
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      IOIntSupplier iOIntSupplier0 = mock(IOIntSupplier.class, new ViolatedAssumptionAnswer());
-      doReturn(2726).when(iOIntSupplier0).getAsInt();
-      int int0 = Uncheck.getAsInt(iOIntSupplier0, (Supplier<String>) null);
-      assertEquals(2726, int0);
-  }
+        doReturn(2444L).when(mockSupplier).getAsLong();
+        assertEquals(2444L, Uncheck.getAsLong(mockSupplier));
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      IOIntSupplier iOIntSupplier0 = mock(IOIntSupplier.class, new ViolatedAssumptionAnswer());
-      doReturn(0).when(iOIntSupplier0).getAsInt();
-      int int0 = Uncheck.getAsInt(iOIntSupplier0);
-      assertEquals(0, int0);
-  }
+        doReturn(-2307L).when(mockSupplier).getAsLong();
+        assertEquals(-2307L, Uncheck.getAsLong(mockSupplier));
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      IOIntSupplier iOIntSupplier0 = mock(IOIntSupplier.class, new ViolatedAssumptionAnswer());
-      doReturn(1165).when(iOIntSupplier0).getAsInt();
-      int int0 = Uncheck.getAsInt(iOIntSupplier0);
-      assertEquals(1165, int0);
-  }
+    // Tests for getAsInt() with IOIntSupplier
+    @Test(timeout = 4000)
+    public void testGetAsInt_WithExceptionMessage() throws Throwable {
+        IOIntSupplier mockSupplier = mock(IOIntSupplier.class, new ViolatedAssumptionAnswer());
+        doReturn(0).when(mockSupplier).getAsInt();
+        assertEquals(0, Uncheck.getAsInt(mockSupplier, (Supplier<String>) null));
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      IOIntSupplier iOIntSupplier0 = mock(IOIntSupplier.class, new ViolatedAssumptionAnswer());
-      doReturn((-1830)).when(iOIntSupplier0).getAsInt();
-      int int0 = Uncheck.getAsInt(iOIntSupplier0);
-      assertEquals((-1830), int0);
-  }
+        doReturn(2726).when(mockSupplier).getAsInt();
+        assertEquals(2726, Uncheck.getAsInt(mockSupplier, (Supplier<String>) null));
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      IOBooleanSupplier iOBooleanSupplier0 = mock(IOBooleanSupplier.class, new ViolatedAssumptionAnswer());
-      doReturn(true).when(iOBooleanSupplier0).getAsBoolean();
-      boolean boolean0 = Uncheck.getAsBoolean(iOBooleanSupplier0);
-      assertTrue(boolean0);
-  }
+        doReturn(-1214).when(mockSupplier).getAsInt();
+        assertEquals(-1214, Uncheck.getAsInt(mockSupplier, (Supplier<String>) null));
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      IOComparator<String> iOComparator0 = (IOComparator<String>) mock(IOComparator.class, new ViolatedAssumptionAnswer());
-      doReturn((-2057)).when(iOComparator0).compare(anyString() , anyString());
-      int int0 = Uncheck.compare(iOComparator0, (String) null, "");
-      assertEquals(0, int0);
-  }
+    @Test(timeout = 4000)
+    public void testGetAsInt_WithoutExceptionMessage() throws Throwable {
+        IOIntSupplier mockSupplier = mock(IOIntSupplier.class, new ViolatedAssumptionAnswer());
+        doReturn(0).when(mockSupplier).getAsInt();
+        assertEquals(0, Uncheck.getAsInt(mockSupplier));
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      IOComparator<String> iOComparator0 = (IOComparator<String>) mock(IOComparator.class, new ViolatedAssumptionAnswer());
-      doReturn(553).when(iOComparator0).compare(anyString() , anyString());
-      int int0 = Uncheck.compare(iOComparator0, "I8ucG1|7Y@", "I8ucG1|7Y@");
-      assertEquals(553, int0);
-  }
+        doReturn(1165).when(mockSupplier).getAsInt();
+        assertEquals(1165, Uncheck.getAsInt(mockSupplier));
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      IOComparator<String> iOComparator0 = (IOComparator<String>) mock(IOComparator.class, new ViolatedAssumptionAnswer());
-      doReturn((-502)).when(iOComparator0).compare(anyString() , anyString());
-      int int0 = Uncheck.compare(iOComparator0, "I8ucG1|7Y@", "I8ucG1|7Y@");
-      assertEquals((-502), int0);
-  }
+        doReturn(-1830).when(mockSupplier).getAsInt();
+        assertEquals(-1830, Uncheck.getAsInt(mockSupplier));
+    }
 
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      IOTriFunction<String, String, String, String> iOTriFunction0 = (IOTriFunction<String, String, String, String>) mock(IOTriFunction.class, new ViolatedAssumptionAnswer());
-      doReturn((Object) null).when(iOTriFunction0).apply(anyString() , anyString() , anyString());
-      String string0 = Uncheck.apply(iOTriFunction0, (String) null, (String) null, "}S<aaJ[%:eX");
-      assertNull(string0);
-  }
+    // Tests for getAsBoolean() with IOBooleanSupplier
+    @Test(timeout = 4000)
+    public void testGetAsBoolean_True() throws Throwable {
+        IOBooleanSupplier mockSupplier = mock(IOBooleanSupplier.class, new ViolatedAssumptionAnswer());
+        doReturn(true).when(mockSupplier).getAsBoolean();
+        assertTrue(Uncheck.getAsBoolean(mockSupplier));
+    }
 
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      IOQuadFunction<String, String, String, String, String> iOQuadFunction0 = (IOQuadFunction<String, String, String, String, String>) mock(IOQuadFunction.class, new ViolatedAssumptionAnswer());
-      doReturn((Object) null).when(iOQuadFunction0).apply(anyString() , anyString() , anyString() , anyString());
-      String string0 = Uncheck.apply(iOQuadFunction0, "Thread aborted", "&;", "lI1~&fKWs}?,L*$", "lI1~&fKWs}?,L*$");
-      assertNull(string0);
-  }
+    @Test(timeout = 4000)
+    public void testGetAsBoolean_False() throws Throwable {
+        IOBooleanSupplier mockSupplier = mock(IOBooleanSupplier.class, new ViolatedAssumptionAnswer());
+        doReturn(false).when(mockSupplier).getAsBoolean();
+        assertFalse(Uncheck.getAsBoolean(mockSupplier));
+    }
 
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      IOQuadFunction<String, String, String, String, String> iOQuadFunction0 = (IOQuadFunction<String, String, String, String, String>) mock(IOQuadFunction.class, new ViolatedAssumptionAnswer());
-      doReturn("JVT0j").when(iOQuadFunction0).apply(anyString() , anyString() , anyString() , anyString());
-      String string0 = Uncheck.apply(iOQuadFunction0, "Thread aborted", "&;", "lI1~&fKWs}?,L*$", "lI1~&fKWs}?,L*$");
-      assertEquals("JVT0j", string0);
-  }
+    // Tests for compare() with IOComparator
+    @Test(timeout = 4000)
+    public void testCompare_ZeroResult() throws Throwable {
+        IOComparator<String> mockComparator = mock(IOComparator.class, new ViolatedAssumptionAnswer());
+        doReturn(0).when(mockComparator).compare(anyString(), anyString());
+        assertEquals(0, Uncheck.compare(mockComparator, null, ""));
+    }
 
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      IOFunction<String, String> iOFunction0 = IOFunction.identity();
-      String string0 = Uncheck.apply(iOFunction0, (String) null);
-      assertNull(string0);
-  }
+    @Test(timeout = 4000)
+    public void testCompare_PositiveResult() throws Throwable {
+        IOComparator<String> mockComparator = mock(IOComparator.class, new ViolatedAssumptionAnswer());
+        doReturn(553).when(mockComparator).compare(anyString(), anyString());
+        assertEquals(553, Uncheck.compare(mockComparator, "I8ucG1|7Y@", "I8ucG1|7Y@"));
+    }
 
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      IOBiFunction<String, String, String> iOBiFunction0 = (IOBiFunction<String, String, String>) mock(IOBiFunction.class, new ViolatedAssumptionAnswer());
-      doReturn((Object) null).when(iOBiFunction0).apply(anyString() , anyString());
-      String string0 = Uncheck.apply(iOBiFunction0, "T;ot>5MR", "");
-      assertNull(string0);
-  }
+    @Test(timeout = 4000)
+    public void testCompare_NegativeResult() throws Throwable {
+        IOComparator<String> mockComparator = mock(IOComparator.class, new ViolatedAssumptionAnswer());
+        doReturn(-502).when(mockComparator).compare(anyString(), anyString());
+        assertEquals(-502, Uncheck.compare(mockComparator, "I8ucG1|7Y@", "I8ucG1|7Y@"));
+    }
 
-  @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    // Tests for apply() with IOTriFunction
+    @Test(timeout = 4000)
+    public void testApplyTriFunction_ReturnsNull() throws Throwable {
+        IOTriFunction<String, String, String, String> mockFunction = 
+            mock(IOTriFunction.class, new ViolatedAssumptionAnswer());
+        doReturn(null).when(mockFunction).apply(anyString(), anyString(), anyString());
+        assertNull(Uncheck.apply(mockFunction, null, null, "}S<aaJ[%:eX"));
+    }
+
+    @Test(timeout = 4000)
+    public void testApplyTriFunction_ReturnsString() throws Throwable {
+        IOTriFunction<String, String, String, String> mockFunction = 
+            mock(IOTriFunction.class, new ViolatedAssumptionAnswer());
+        doReturn("%s #%,d: %s").when(mockFunction).apply(anyString(), anyString(), anyString());
+        assertEquals("%s #%,d: %s", Uncheck.apply(mockFunction, "http", "", ""));
+    }
+
+    // Tests for apply() with IOQuadFunction
+    @Test(timeout = 4000)
+    public void testApplyQuadFunction_ReturnsNull() throws Throwable {
+        IOQuadFunction<String, String, String, String, String> mockFunction = 
+            mock(IOQuadFunction.class, new ViolatedAssumptionAnswer());
+        doReturn(null).when(mockFunction).apply(anyString(), anyString(), anyString(), anyString());
+        assertNull(Uncheck.apply(mockFunction, "Thread aborted", "&;", "lI1~&fKWs}?,L*$", "lI1~&fKWs}?,L*$"));
+    }
+
+    @Test(timeout = 4000)
+    public void testApplyQuadFunction_ReturnsString() throws Throwable {
+        IOQuadFunction<String, String, String, String, String> mockFunction = 
+            mock(IOQuadFunction.class, new ViolatedAssumptionAnswer());
+        doReturn("JVT0j").when(mockFunction).apply(anyString(), anyString(), anyString(), anyString());
+        assertEquals("JVT0j", Uncheck.apply(mockFunction, "Thread aborted", "&;", "lI1~&fKWs}?,L*$", "lI1~&fKWs}?,L*$"));
+    }
+
+    // Tests for apply() with IOFunction
+    @Test(timeout = 4000)
+    public void testApplyFunction_IdentityReturnsNull() throws Throwable {
+        IOFunction<String, String> identity = IOFunction.identity();
+        assertNull(Uncheck.apply(identity, (String) null));
+    }
+
+    @Test(timeout = 4000)
+    public void testApplyFunction_IdentityReturnsSameValue() throws Throwable {
+        IOFunction<String, String> identity = IOFunction.identity();
+        assertEquals("http", Uncheck.apply(identity, "http"));
+    }
+
+    // Tests for apply() with IOBiFunction
+    @Test(timeout = 4000)
+    public void testApplyBiFunction_ReturnsNull() throws Throwable {
+        IOBiFunction<String, String, String> mockFunction = 
+            mock(IOBiFunction.class, new ViolatedAssumptionAnswer());
+        doReturn(null).when(mockFunction).apply(anyString(), anyString());
+        assertNull(Uncheck.apply(mockFunction, "T;ot>5MR", ""));
+    }
+
+    @Test(timeout = 4000)
+    public void testApplyBiFunction_ReturnsString() throws Throwable {
+        IOBiFunction<String, String, String> mockFunction = 
+            mock(IOBiFunction.class, new ViolatedAssumptionAnswer());
+        doReturn("|M8Y<4e").when(mockFunction).apply(anyString(), anyString());
+        assertEquals("|M8Y<4e", Uncheck.apply(mockFunction, "I8ucG1|7Y@", "I8ucG1|7Y@"));
+    }
+
+    // Tests for run() with IORunnable
+    @Test(timeout = 4000)
+    public void testRun_NoOpWithoutExceptionMessage() throws Throwable {
+        IORunnable noop = IORunnable.noop();
+        Uncheck.run(noop);
+    }
+
+    @Test(timeout = 4000)
+    public void testRun_NoOpWithExceptionMessage() throws Throwable {
+        IORunnable noop = IORunnable.noop();
+        Uncheck.run(noop, (Supplier<String>) null);
+    }
+
+    // Tests for get() with IOSupplier
+    @Test(timeout = 4000)
+    public void testGet_ReturnsNullWithoutExceptionMessage() throws Throwable {
+        IOSupplier<ForkJoinTask<String>> mockSupplier = 
+            mock(IOSupplier.class, new ViolatedAssumptionAnswer());
+        doReturn(null).when(mockSupplier).get();
+        assertNull(Uncheck.get(mockSupplier));
+    }
+
+    @Test(timeout = 4000)
+    public void testGet_ReturnsNullWithExceptionMessage() throws Throwable {
+        IOSupplier<LongStream> mockSupplier = 
+            mock(IOSupplier.class, new ViolatedAssumptionAnswer());
+        doReturn(null).when(mockSupplier).get();
+        assertNull(Uncheck.get(mockSupplier, (Supplier<String>) null));
+    }
+
+    // Tests for null argument validation
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testTestPredicate_NullPredicateThrowsNPE() throws Throwable {
         Uncheck.test((IOPredicate<String>) null, "exists");
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.function.Uncheck", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
-      Supplier<String> supplier0 = (Supplier<String>) mock(Supplier.class, new ViolatedAssumptionAnswer());
-      IOBiConsumer<String, String> iOBiConsumer0 = IOBiConsumer.noop();
-      BiConsumer<String, String> biConsumer0 = iOBiConsumer0.asBiConsumer();
-      Comparator<String> comparator0 = (Comparator<String>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-      BinaryOperator<String> binaryOperator0 = BinaryOperator.minBy((Comparator<? super String>) comparator0);
-      Collector.Characteristics[] collector_CharacteristicsArray0 = (Collector.Characteristics[]) Array.newInstance(Collector.Characteristics.class, 0);
-      Collector<String, String, String> collector0 = Collector.of(supplier0, biConsumer0, binaryOperator0, (Collector.Characteristics[]) collector_CharacteristicsArray0);
-      Supplier<String> supplier1 = collector0.supplier();
-      // Undeclared exception!
-      try { 
-        Uncheck.run((IORunnable) null, supplier1);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.function.Uncheck", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testRun_NullRunnableThrowsNPE() throws Throwable {
         Uncheck.run((IORunnable) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.function.Uncheck", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test26()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testRun_NullRunnableWithMessageThrowsNPE() throws Throwable {
+        // Setup collector to provide exception message
+        Supplier<String> messageSupplier = mock(Supplier.class);
+        Uncheck.run((IORunnable) null, messageSupplier);
+    }
+
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testGetAsLong_NullSupplierThrowsNPE() throws Throwable {
         Uncheck.getAsLong((IOLongSupplier) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.function.Uncheck", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test27()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        Uncheck.getAsInt((IOIntSupplier) null, (Supplier<String>) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.function.Uncheck", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test28()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        Uncheck.getAsBoolean((IOBooleanSupplier) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.function.Uncheck", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test29()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        Uncheck.get((IOSupplier<String>) null, (Supplier<String>) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.function.Uncheck", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test30()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        Uncheck.get((IOSupplier<String>) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.function.Uncheck", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test31()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        Uncheck.apply((IOTriFunction<String, String, String, HijrahEra>) null, "org.apache.commons.io.output.FileWriterWithEncoding", "*T~4q!]3", "*T~4q!]3");
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.function.Uncheck", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test32()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        Uncheck.apply((IOFunction<String, String>) null, "7j}&A}pmS^");
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.function.Uncheck", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test33()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        Uncheck.apply((IOBiFunction<String, String, String>) null, "", "");
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.function.Uncheck", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test34()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        Uncheck.accept((IOIntConsumer) null, Integer.MAX_VALUE);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.function.Uncheck", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test35()  throws Throwable  {
-      IOTriFunction<String, String, String, String> iOTriFunction0 = (IOTriFunction<String, String, String, String>) mock(IOTriFunction.class, new ViolatedAssumptionAnswer());
-      doReturn("%s #%,d: %s").when(iOTriFunction0).apply(anyString() , anyString() , anyString());
-      String string0 = Uncheck.apply(iOTriFunction0, "http", "", "");
-      assertEquals("%s #%,d: %s", string0);
-  }
-
-  @Test(timeout = 4000)
-  public void test36()  throws Throwable  {
-      IOLongSupplier iOLongSupplier0 = mock(IOLongSupplier.class, new ViolatedAssumptionAnswer());
-      doReturn((-2307L)).when(iOLongSupplier0).getAsLong();
-      long long0 = Uncheck.getAsLong(iOLongSupplier0);
-      assertEquals((-2307L), long0);
-  }
-
-  @Test(timeout = 4000)
-  public void test37()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        Uncheck.compare((IOComparator<String>) null, "%0E@O`5Sj", "%0E@O`5Sj");
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.function.Uncheck", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test38()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        Uncheck.getAsInt((IOIntSupplier) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.function.Uncheck", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test39()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        Uncheck.apply((IOQuadFunction<String, String, String, String, String>) null, "Array size=", "Array size=", "", (String) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.function.Uncheck", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test40()  throws Throwable  {
-      IOBooleanSupplier iOBooleanSupplier0 = mock(IOBooleanSupplier.class, new ViolatedAssumptionAnswer());
-      doReturn(false).when(iOBooleanSupplier0).getAsBoolean();
-      boolean boolean0 = Uncheck.getAsBoolean(iOBooleanSupplier0);
-      assertFalse(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test41()  throws Throwable  {
-      IOFunction<String, String> iOFunction0 = IOFunction.identity();
-      String string0 = Uncheck.apply(iOFunction0, "http");
-      assertEquals("http", string0);
-  }
-
-  @Test(timeout = 4000)
-  public void test42()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        Uncheck.accept((IOTriConsumer<String, String, String>) null, "P!ebq\"v'`L[1fuAO5S", "P!ebq\"v'`L[1fuAO5S", "");
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.function.Uncheck", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test43()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        Uncheck.accept((IOBiConsumer<String, String>) null, " exists", " exists");
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.function.Uncheck", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test44()  throws Throwable  {
-      IOIntSupplier iOIntSupplier0 = mock(IOIntSupplier.class, new ViolatedAssumptionAnswer());
-      doReturn((-1214)).when(iOIntSupplier0).getAsInt();
-      Supplier<String> supplier0 = (Supplier<String>) mock(Supplier.class, new ViolatedAssumptionAnswer());
-      IOBiConsumer<String, String> iOBiConsumer0 = IOBiConsumer.noop();
-      BiConsumer<String, String> biConsumer0 = iOBiConsumer0.asBiConsumer();
-      Comparator<String> comparator0 = (Comparator<String>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-      BinaryOperator<String> binaryOperator0 = BinaryOperator.minBy((Comparator<? super String>) comparator0);
-      IOFunction<String, String> iOFunction0 = IOFunction.identity();
-      Function<String, String> function0 = iOFunction0.asFunction();
-      Collector.Characteristics[] collector_CharacteristicsArray0 = (Collector.Characteristics[]) Array.newInstance(Collector.Characteristics.class, 0);
-      Collector<String, String, String> collector0 = Collector.of(supplier0, biConsumer0, binaryOperator0, function0, (Collector.Characteristics[]) collector_CharacteristicsArray0);
-      Supplier<String> supplier1 = collector0.supplier();
-      int int0 = Uncheck.getAsInt(iOIntSupplier0, supplier1);
-      assertEquals((-1214), int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test45()  throws Throwable  {
-      IOSupplier<LongStream> iOSupplier0 = (IOSupplier<LongStream>) mock(IOSupplier.class, new ViolatedAssumptionAnswer());
-      doReturn((Object) null).when(iOSupplier0).get();
-      LongStream longStream0 = Uncheck.get(iOSupplier0, (Supplier<String>) null);
-      assertNull(longStream0);
-  }
-
-  @Test(timeout = 4000)
-  public void test46()  throws Throwable  {
-      IOBiFunction<String, String, String> iOBiFunction0 = (IOBiFunction<String, String, String>) mock(IOBiFunction.class, new ViolatedAssumptionAnswer());
-      doReturn("|M8Y<4e").when(iOBiFunction0).apply(anyString() , anyString());
-      String string0 = Uncheck.apply(iOBiFunction0, "I8ucG1|7Y@", "I8ucG1|7Y@");
-      assertEquals("|M8Y<4e", string0);
-  }
-
-  @Test(timeout = 4000)
-  public void test47()  throws Throwable  {
-      IORunnable iORunnable0 = IORunnable.noop();
-      Uncheck.run(iORunnable0);
-  }
-
-  @Test(timeout = 4000)
-  public void test48()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        Uncheck.accept((IOConsumer<String>) null, (String) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.function.Uncheck", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test49()  throws Throwable  {
-      IOIntConsumer iOIntConsumer0 = mock(IOIntConsumer.class, new ViolatedAssumptionAnswer());
-      Uncheck.accept(iOIntConsumer0, 111);
-  }
-
-  @Test(timeout = 4000)
-  public void test50()  throws Throwable  {
-      // Undeclared exception!
-      try { 
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testGetAsLong_NullSupplierWithMessageThrowsNPE() throws Throwable {
         Uncheck.getAsLong((IOLongSupplier) null, (Supplier<String>) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.function.Uncheck", e);
-      }
-  }
+    }
 
-  @Test(timeout = 4000)
-  public void test51()  throws Throwable  {
-      IOSupplier<ForkJoinTask<String>> iOSupplier0 = (IOSupplier<ForkJoinTask<String>>) mock(IOSupplier.class, new ViolatedAssumptionAnswer());
-      doReturn((Object) null).when(iOSupplier0).get();
-      ForkJoinTask<String> forkJoinTask0 = Uncheck.get(iOSupplier0);
-      assertNull(forkJoinTask0);
-  }
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testGetAsInt_NullSupplierThrowsNPE() throws Throwable {
+        Uncheck.getAsInt((IOIntSupplier) null);
+    }
 
-  @Test(timeout = 4000)
-  public void test52()  throws Throwable  {
-      IOPredicate<String> iOPredicate0 = IOPredicate.alwaysFalse();
-      boolean boolean0 = Uncheck.test(iOPredicate0, "6 P)'Sdhh");
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testGetAsInt_NullSupplierWithMessageThrowsNPE() throws Throwable {
+        Uncheck.getAsInt((IOIntSupplier) null, (Supplier<String>) null);
+    }
 
-  @Test(timeout = 4000)
-  public void test53()  throws Throwable  {
-      IORunnable iORunnable0 = IORunnable.noop();
-      Uncheck.run(iORunnable0, (Supplier<String>) null);
-  }
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testGetAsBoolean_NullSupplierThrowsNPE() throws Throwable {
+        Uncheck.getAsBoolean((IOBooleanSupplier) null);
+    }
+
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testGet_NullSupplierThrowsNPE() throws Throwable {
+        Uncheck.get((IOSupplier<String>) null);
+    }
+
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testGet_NullSupplierWithMessageThrowsNPE() throws Throwable {
+        Uncheck.get((IOSupplier<String>) null, (Supplier<String>) null);
+    }
+
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testApplyTriFunction_NullFunctionThrowsNPE() throws Throwable {
+        Uncheck.apply((IOTriFunction<String, String, String, HijrahEra>) null, 
+            "org.apache.commons.io.output.FileWriterWithEncoding", "*T~4q!]3", "*T~4q!]3");
+    }
+
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testApplyFunction_NullFunctionThrowsNPE() throws Throwable {
+        Uncheck.apply((IOFunction<String, String>) null, "7j}&A}pmS^");
+    }
+
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testApplyBiFunction_NullFunctionThrowsNPE() throws Throwable {
+        Uncheck.apply((IOBiFunction<String, String, String>) null, "", "");
+    }
+
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testApplyQuadFunction_NullFunctionThrowsNPE() throws Throwable {
+        Uncheck.apply((IOQuadFunction<String, String, String, String, String>) null, 
+            "Array size=", "Array size=", "", null);
+    }
+
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testAcceptIntConsumer_NullConsumerThrowsNPE() throws Throwable {
+        Uncheck.accept((IOIntConsumer) null, Integer.MAX_VALUE);
+    }
+
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testAcceptTriConsumer_NullConsumerThrowsNPE() throws Throwable {
+        Uncheck.accept((IOTriConsumer<String, String, String>) null, 
+            "P!ebq\"v'`L[1fuAO5S", "P!ebq\"v'`L[1fuAO5S", "");
+    }
+
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testAcceptBiConsumer_NullConsumerThrowsNPE() throws Throwable {
+        Uncheck.accept((IOBiConsumer<String, String>) null, " exists", " exists");
+    }
+
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testAcceptConsumer_NullConsumerThrowsNPE() throws Throwable {
+        Uncheck.accept((IOConsumer<String>) null, (String) null);
+    }
+
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void testCompare_NullComparatorThrowsNPE() throws Throwable {
+        Uncheck.compare((IOComparator<String>) null, "%0E@O`5Sj", "%0E@O`5Sj");
+    }
 }
