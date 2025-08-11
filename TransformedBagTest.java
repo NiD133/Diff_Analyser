@@ -44,54 +44,95 @@ public class TransformedBagTest<T> extends AbstractBagTest<T> {
     @Override
     @SuppressWarnings("unchecked")
     public Bag<T> makeObject() {
-        return TransformedBag.transformingBag(new HashBag<>(),
-                (Transformer<T, T>) TransformedCollectionTest.NOOP_TRANSFORMER);
+        return TransformedBag.transformingBag(
+            new HashBag<>(),
+            (Transformer<T, T>) TransformedCollectionTest.NOOP_TRANSFORMER
+        );
     }
 
+    // Test data for transformation scenarios
+    private static final String[] STRING_ELEMENTS = {"1", "3", "5", "7", "2", "4", "6"};
+    private static final Transformer<Object, Integer> STRING_TO_INTEGER = 
+        TransformedCollectionTest.STRING_TO_INTEGER_TRANSFORMER;
+
+    /**
+     * Tests behavior when using transformingBag() factory method:
+     * 1. New elements should be transformed on addition
+     * 2. Existing contents should NOT be transformed
+     */
     @Test
-    @SuppressWarnings("unchecked")
-    void testTransformedBag() {
-        //T had better be Object!
-        final Bag<T> bag = TransformedBag.transformingBag(new HashBag<>(),
-                (Transformer<T, T>) TransformedCollectionTest.STRING_TO_INTEGER_TRANSFORMER);
-        assertTrue(bag.isEmpty());
-        final Object[] els = {"1", "3", "5", "7", "2", "4", "6"};
-        for (int i = 0; i < els.length; i++) {
-            bag.add((T) els[i]);
-            assertEquals(i + 1, bag.size());
-            assertTrue(bag.contains(Integer.valueOf((String) els[i])));
-            assertFalse(bag.contains(els[i]));
+    void testTransformingBag_TransformsNewElements() {
+        // Create empty bag with transformation
+        Bag<Object> bag = TransformedBag.transformingBag(
+            new HashBag<>(),
+            STRING_TO_INTEGER
+        );
+        
+        assertTrue(bag.isEmpty(), "Newly created bag should be empty");
+        
+        // Verify transformation during element addition
+        for (int i = 0; i < STRING_ELEMENTS.length; i++) {
+            String element = STRING_ELEMENTS[i];
+            Integer transformed = Integer.valueOf(element);
+            
+            bag.add(element);
+            int currentSize = i + 1;
+            
+            assertEquals(currentSize, bag.size(), "Bag size should increment after add");
+            assertTrue(bag.contains(transformed), 
+                "Bag should contain transformed element: " + transformed);
+            assertFalse(bag.contains(element), 
+                "Bag should not contain original element: " + element);
         }
-
-        assertFalse(bag.remove(els[0]));
-        assertTrue(bag.remove(Integer.valueOf((String) els[0])));
+        
+        // Verify removal requires transformed element
+        String firstElement = STRING_ELEMENTS[0];
+        Integer firstTransformed = Integer.valueOf(firstElement);
+        
+        assertFalse(bag.remove(firstElement), 
+            "Should not remove using untransformed element");
+        assertTrue(bag.remove(firstTransformed), 
+            "Should remove using transformed element");
     }
 
+    /**
+     * Tests behavior when using transformedBag() factory method:
+     * 1. Existing elements should be transformed during decoration
+     * 2. New elements should be transformed on addition
+     */
     @Test
-    @SuppressWarnings("unchecked")
-    void testTransformedBag_decorateTransform() {
-        final Bag<T> originalBag = new HashBag<>();
-        final Object[] els = {"1", "3", "5", "7", "2", "4", "6"};
-        for (final Object el : els) {
-            originalBag.add((T) el);
+    void testTransformedBag_TransformsExistingAndNewElements() {
+        // Create bag with existing string elements
+        Bag<Object> original = new HashBag<>();
+        for (String element : STRING_ELEMENTS) {
+            original.add(element);
         }
-        final Bag<T> bag = TransformedBag.transformedBag(originalBag,
-                (Transformer<T, T>) TransformedCollectionTest.STRING_TO_INTEGER_TRANSFORMER);
-        assertEquals(els.length, bag.size());
-        for (final Object el : els) {
-            assertTrue(bag.contains(Integer.valueOf((String) el)));
-            assertFalse(bag.contains(el));
+        
+        // Apply transformation to existing contents
+        Bag<Object> bag = TransformedBag.transformedBag(
+            original, 
+            STRING_TO_INTEGER
+        );
+        
+        assertEquals(STRING_ELEMENTS.length, bag.size(), 
+            "Bag size should match number of elements added");
+        
+        // Verify all elements were transformed
+        for (String element : STRING_ELEMENTS) {
+            Integer transformed = Integer.valueOf(element);
+            assertTrue(bag.contains(transformed), 
+                "Bag should contain transformed element: " + transformed);
+            assertFalse(bag.contains(element), 
+                "Bag should not contain original element: " + element);
         }
-
-        assertFalse(bag.remove(els[0]));
-        assertTrue(bag.remove(Integer.valueOf((String) els[0])));
+        
+        // Verify removal requires transformed element
+        String firstElement = STRING_ELEMENTS[0];
+        Integer firstTransformed = Integer.valueOf(firstElement);
+        
+        assertFalse(bag.remove(firstElement), 
+            "Should not remove using untransformed element");
+        assertTrue(bag.remove(firstTransformed), 
+            "Should remove using transformed element");
     }
-
-//    void testCreate() throws Exception {
-//        Bag<T> bag = makeObject();
-//        writeExternalFormToDisk((java.io.Serializable) bag, "src/test/resources/data/test/TransformedBag.emptyCollection.version4.obj");
-//        bag = makeFullCollection();
-//        writeExternalFormToDisk((java.io.Serializable) bag, "src/test/resources/data/test/TransformedBag.fullCollection.version4.obj");
-//    }
-
 }
