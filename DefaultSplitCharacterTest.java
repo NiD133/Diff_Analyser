@@ -45,33 +45,77 @@ package com.itextpdf.text.pdf;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Tests for DefaultSplitCharacter to verify hyphen splitting behavior.
+ * The class should split on hyphens in regular text but preserve date formats.
+ */
 public class DefaultSplitCharacterTest {
-    private final String[] INPUT_TEXT =
-            new String[]{"tha111-is one that should-be-splitted-right-herel-2018-12-18", "anddate format2 01-01-1920"};
-
+    
+    // Test data with various hyphen scenarios
+    private static final String TEXT_WITH_HYPHENS_AND_DATE = "tha111-is one that should-be-splitted-right-herel-2018-12-18";
+    private static final String TEXT_WITH_DATE_FORMAT = "anddate format2 01-01-1920";
+    
+    // Character positions for testing (0-based indexing)
+    private static final int HYPHEN_IN_DATE_POSITION = 21; // Position of first hyphen in "01-01-1920"
+    private static final int HYPHEN_BEFORE_DATE_POSITION = 49; // Position of hyphen before "2018-12-18"
+    private static final int HYPHEN_IN_REGULAR_TEXT_POSITION = 6; // Position of hyphen in "tha111-is"
+    
     @Test
-    public void splitCharacterDateFormatTest() {
-        Assert.assertFalse(isPsplitCharacter(21, INPUT_TEXT[1]));
+    public void shouldNotSplitOnHyphenInDateFormat() {
+        // Given: A text containing a date in format "01-01-1920"
+        // When: Checking if hyphen within the date should be a split character
+        // Then: It should NOT be splittable to preserve date integrity
+        boolean canSplit = isSplitCharacter(HYPHEN_IN_DATE_POSITION, TEXT_WITH_DATE_FORMAT);
+        
+        Assert.assertFalse("Hyphen within date format should not be splittable", canSplit);
     }
 
     @Test
-    public void hypenInsideDateTest() {
-        Assert.assertFalse(isPsplitCharacter(21, INPUT_TEXT[1]));
+    public void shouldNotSplitOnHyphenInsideDate() {
+        // Given: A text containing a date format
+        // When: Checking if hyphen inside the date should be a split character  
+        // Then: It should NOT be splittable to keep date format intact
+        boolean canSplit = isSplitCharacter(HYPHEN_IN_DATE_POSITION, TEXT_WITH_DATE_FORMAT);
+        
+        Assert.assertFalse("Hyphen inside date should not be splittable", canSplit);
     }
 
     @Test
-    public void hypenBeforeDateTest() {
-        //check HyphenBeforeAdate ex. '-2019-01-01'
-        Assert.assertTrue(isPsplitCharacter(49, INPUT_TEXT[0]));
+    public void shouldSplitOnHyphenBeforeDate() {
+        // Given: A text with hyphen immediately before a date (e.g., "text-2019-01-01")
+        // When: Checking if hyphen before the date should be a split character
+        // Then: It should be splittable as it separates text from date
+        boolean canSplit = isSplitCharacter(HYPHEN_BEFORE_DATE_POSITION, TEXT_WITH_HYPHENS_AND_DATE);
+        
+        Assert.assertTrue("Hyphen before date should be splittable", canSplit);
     }
 
     @Test
-    public void hypenInsideTextTest() {
-        //checHyphenInsideText ex. 'some-text-here'
-        Assert.assertTrue(isPsplitCharacter(6, INPUT_TEXT[0]));
+    public void shouldSplitOnHyphenInRegularText() {
+        // Given: A text with hyphens in regular words (e.g., "some-text-here")
+        // When: Checking if hyphen in regular text should be a split character
+        // Then: It should be splittable for normal text wrapping
+        boolean canSplit = isSplitCharacter(HYPHEN_IN_REGULAR_TEXT_POSITION, TEXT_WITH_HYPHENS_AND_DATE);
+        
+        Assert.assertTrue("Hyphen in regular text should be splittable", canSplit);
     }
 
-    private boolean isPsplitCharacter(int current, String text) {
-        return new DefaultSplitCharacter().isSplitCharacter(75, current, text.length() + 1, text.toCharArray(), null);
+    /**
+     * Helper method to test if a character at a specific position is a split character.
+     * 
+     * @param characterPosition The position of the character to test (0-based)
+     * @param text The text containing the character
+     * @return true if the character can be used for splitting, false otherwise
+     */
+    private boolean isSplitCharacter(int characterPosition, String text) {
+        DefaultSplitCharacter splitCharacter = new DefaultSplitCharacter();
+        
+        return splitCharacter.isSplitCharacter(
+            75,                          // start position (arbitrary for this test)
+            characterPosition,           // current position to test
+            text.length() + 1,          // end position
+            text.toCharArray(),         // character array
+            null                        // PdfChunk array (not needed for this test)
+        );
     }
 }
