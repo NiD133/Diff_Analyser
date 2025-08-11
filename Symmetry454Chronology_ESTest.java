@@ -41,562 +41,699 @@ import org.threeten.extra.chrono.PaxDate;
 import org.threeten.extra.chrono.Symmetry454Chronology;
 import org.threeten.extra.chrono.Symmetry454Date;
 
-@RunWith(EvoRunner.class)
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true,
-    useVFS = true,
-    useVNET = true,
-    resetStaticState = true,
-    separateClassLoader = true
-)
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class Symmetry454Chronology_ESTest extends Symmetry454Chronology_ESTest_scaffolding {
 
-    private final Symmetry454Chronology chronology = new Symmetry454Chronology();
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      IsoEra isoEra0 = IsoEra.BCE;
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.date((Era) isoEra0, 3322, (-2136356788), 8);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value for MonthOfYear (valid values 1 - 12): -2136356788
+         //
+         verifyException("java.time.temporal.ValueRange", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testDateWithInvalidMonthThrowsException() throws Throwable {
-        // Test that creating a date with an invalid month throws DateTimeException
-        IsoEra era = IsoEra.BCE;
-        try {
-            chronology.date(era, 3322, -2136356788, 8);
-            fail("Expected DateTimeException for invalid month");
-        } catch (DateTimeException e) {
-            assertEquals(
-                "Invalid value for MonthOfYear (valid values 1 - 12): -2136356788",
-                e.getMessage()
-            );
-        }
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      ZoneOffset zoneOffset0 = ZoneOffset.UTC;
+      Instant instant0 = MockInstant.ofEpochSecond((long) 3, 0L);
+      ChronoZonedDateTime<Symmetry454Date> chronoZonedDateTime0 = symmetry454Chronology0.zonedDateTime(instant0, (ZoneId) zoneOffset0);
+      assertNotNull(chronoZonedDateTime0);
+  }
 
-    @Test(timeout = 4000)
-    public void testZonedDateTimeFromInstant() throws Throwable {
-        // Test creating a zoned date-time from an Instant
-        ZoneOffset zone = ZoneOffset.UTC;
-        Instant instant = MockInstant.ofEpochSecond(3L, 0L);
-        ChronoZonedDateTime<Symmetry454Date> zdt = chronology.zonedDateTime(instant, zone);
-        assertNotNull("ZonedDateTime should not be null", zdt);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      IsoEra isoEra0 = IsoEra.BCE;
+      int int0 = symmetry454Chronology0.prolepticYear(isoEra0, 1996);
+      assertEquals(1996, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void testProlepticYearForBceEra() throws Throwable {
-        // Test proleptic year calculation for BCE era
-        int year = chronology.prolepticYear(IsoEra.BCE, 1996);
-        assertEquals("Proleptic year should match BCE input", 1996, year);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      IsoEra isoEra0 = IsoEra.CE;
+      int int0 = symmetry454Chronology0.prolepticYear(isoEra0, (-1390));
+      assertEquals((-1390), int0);
+  }
 
-    @Test(timeout = 4000)
-    public void testProlepticYearForCeEra() throws Throwable {
-        // Test proleptic year calculation for CE era
-        int year = chronology.prolepticYear(IsoEra.CE, -1390);
-        assertEquals("Proleptic year should match CE input", -1390, year);
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = Symmetry454Chronology.INSTANCE;
+      LocalDateTime localDateTime0 = MockLocalDateTime.now();
+      ChronoLocalDateTime<Symmetry454Date> chronoLocalDateTime0 = symmetry454Chronology0.localDateTime(localDateTime0);
+      assertNotNull(chronoLocalDateTime0);
+  }
 
-    @Test(timeout = 4000)
-    public void testLocalDateTimeFromLocalDateTime() throws Throwable {
-        // Test conversion from LocalDateTime to ChronoLocalDateTime
-        LocalDateTime ldt = MockLocalDateTime.now();
-        ChronoLocalDateTime<Symmetry454Date> chronoLdt = chronology.localDateTime(ldt);
-        assertNotNull("ChronoLocalDateTime should not be null", chronoLdt);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      boolean boolean0 = symmetry454Chronology0.isLeapYear(3L);
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testIsLeapYearForYear3() throws Throwable {
-        // Test that year 3 is identified as a leap year
-        assertTrue("Year 3 should be a leap year", chronology.isLeapYear(3L));
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      long long0 = Symmetry454Chronology.getLeapYearsBefore(719162L);
+      assertEquals(127633L, long0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetLeapYearsBefore719162() throws Throwable {
-        // Test leap years calculation for a specific epoch day
-        long leapYears = Symmetry454Chronology.getLeapYearsBefore(719162L);
-        assertEquals(127633L, leapYears);
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      long long0 = Symmetry454Chronology.getLeapYearsBefore((-60L));
+      assertEquals((-11L), long0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetLeapYearsBeforeNegative() throws Throwable {
-        // Test leap years calculation for a negative value
-        long leapYears = Symmetry454Chronology.getLeapYearsBefore(-60L);
-        assertEquals(-11L, leapYears);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      IsoEra isoEra0 = symmetry454Chronology0.eraOf(0);
+      assertEquals(IsoEra.BCE, isoEra0);
+  }
 
-    @Test(timeout = 4000)
-    public void testEraOfValue0() throws Throwable {
-        // Test getting BCE era from value 0
-        Era era = chronology.eraOf(0);
-        assertEquals(IsoEra.BCE, era);
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      Clock clock0 = MockClock.systemDefaultZone();
+      Symmetry454Date symmetry454Date0 = Symmetry454Date.now(clock0);
+      IsoEra isoEra0 = symmetry454Date0.getEra();
+      Symmetry454Date symmetry454Date1 = symmetry454Chronology0.dateYearDay((Era) isoEra0, 29, 11);
+      assertEquals(IsoEra.CE, symmetry454Date1.getEra());
+  }
 
-    @Test(timeout = 4000)
-    public void testDateYearDayWithCeEra() throws Throwable {
-        // Test creating date from CE era, year, and day of year
-        Clock clock = MockClock.systemDefaultZone();
-        Symmetry454Date date = Symmetry454Date.now(clock);
-        Era era = date.getEra();
-        Symmetry454Date result = chronology.dateYearDay(era, 29, 11);
-        assertEquals(IsoEra.CE, result.getEra());
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      Symmetry454Date symmetry454Date0 = symmetry454Chronology0.dateYearDay(19, 19);
+      assertEquals(IsoEra.CE, symmetry454Date0.getEra());
+  }
 
-    @Test(timeout = 4000)
-    public void testDateYearDay() throws Throwable {
-        // Test creating date from year and day of year
-        Symmetry454Date date = chronology.dateYearDay(19, 19);
-        assertEquals(IsoEra.CE, date.getEra());
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      ZoneOffset zoneOffset0 = ZoneOffset.MIN;
+      Symmetry454Date symmetry454Date0 = symmetry454Chronology0.dateNow((ZoneId) zoneOffset0);
+      assertEquals(IsoEra.CE, symmetry454Date0.getEra());
+  }
 
-    @Test(timeout = 4000)
-    public void testDateNowWithZoneOffset() throws Throwable {
-        // Test getting current date with specific time zone
-        ZoneOffset zone = ZoneOffset.MIN;
-        Symmetry454Date date = chronology.dateNow(zone);
-        assertEquals(IsoEra.CE, date.getEra());
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      Symmetry454Date symmetry454Date0 = symmetry454Chronology0.dateEpochDay(132L);
+      assertEquals(IsoEra.CE, symmetry454Date0.getEra());
+  }
 
-    @Test(timeout = 4000)
-    public void testDateEpochDay() throws Throwable {
-        // Test creating date from epoch day
-        Symmetry454Date date = chronology.dateEpochDay(132L);
-        assertEquals(IsoEra.CE, date.getEra());
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      ZoneId zoneId0 = ZoneId.systemDefault();
+      Symmetry454Date symmetry454Date0 = Symmetry454Date.now(zoneId0);
+      Symmetry454Date symmetry454Date1 = symmetry454Chronology0.date((TemporalAccessor) symmetry454Date0);
+      assertEquals(IsoEra.CE, symmetry454Date1.getEra());
+  }
 
-    @Test(timeout = 4000)
-    public void testDateFromTemporalAccessor() throws Throwable {
-        // Test creating date from TemporalAccessor
-        ZoneId zone = ZoneId.systemDefault();
-        Symmetry454Date inputDate = Symmetry454Date.now(zone);
-        Symmetry454Date date = chronology.date(inputDate);
-        assertEquals(IsoEra.CE, date.getEra());
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = Symmetry454Chronology.INSTANCE;
+      IsoEra isoEra0 = IsoEra.CE;
+      Symmetry454Date symmetry454Date0 = symmetry454Chronology0.date((Era) isoEra0, 4, 4, 4);
+      assertEquals(IsoEra.CE, symmetry454Date0.getEra());
+  }
 
-    @Test(timeout = 4000)
-    public void testDateWithCeEra() throws Throwable {
-        // Test creating date from CE era, year, month, and day
-        Symmetry454Date date = chronology.date(IsoEra.CE, 4, 4, 4);
-        assertEquals(IsoEra.CE, date.getEra());
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      Symmetry454Date symmetry454Date0 = symmetry454Chronology0.date(3, 2, 3);
+      assertEquals(IsoEra.CE, symmetry454Date0.getEra());
+  }
 
-    @Test(timeout = 4000)
-    public void testDate() throws Throwable {
-        // Test creating date from year, month, and day
-        Symmetry454Date date = chronology.date(3, 2, 3);
-        assertEquals(IsoEra.CE, date.getEra());
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      JapaneseEra japaneseEra0 = JapaneseEra.TAISHO;
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.zonedDateTime((TemporalAccessor) japaneseEra0);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Unable to obtain ChronoZonedDateTime from TemporalAccessor: class java.time.chrono.JapaneseEra
+         //
+         verifyException("java.time.chrono.Chronology", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testZonedDateTimeFromInvalidTemporalThrowsException() throws Throwable {
-        // Test that zonedDateTime fails with unsupported TemporalAccessor
-        try {
-            chronology.zonedDateTime(JapaneseEra.TAISHO);
-            fail("Expected DateTimeException for unsupported TemporalAccessor");
-        } catch (DateTimeException e) {
-            assertTrue(e.getMessage().contains("Unable to obtain ChronoZonedDateTime"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.zonedDateTime((TemporalAccessor) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.time.ZoneId", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testZonedDateTimeFromNullThrowsException() throws Throwable {
-        // Test that zonedDateTime fails with null input
-        try {
-            chronology.zonedDateTime((TemporalAccessor) null);
-            fail("Expected NullPointerException for null input");
-        } catch (NullPointerException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.range((ChronoField) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.threeten.extra.chrono.Symmetry454Chronology", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testRangeWithNullFieldThrowsException() throws Throwable {
-        // Test that range fails with null ChronoField
-        try {
-            chronology.range(null);
-            fail("Expected NullPointerException for null field");
-        } catch (NullPointerException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      IsoEra isoEra0 = IsoEra.BCE;
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.prolepticYear(isoEra0, (-2133538947));
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value for YearOfEra (valid values -1000000 - 1000000): -2133538947
+         //
+         verifyException("java.time.temporal.ValueRange", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testProlepticYearWithInvalidYearThrowsException() throws Throwable {
-        // Test that proleptic year fails with invalid year
-        try {
-            chronology.prolepticYear(IsoEra.BCE, -2133538947);
-            fail("Expected DateTimeException for invalid year");
-        } catch (DateTimeException e) {
-            assertTrue(e.getMessage().contains("Invalid value for YearOfEra"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      EthiopicDate ethiopicDate0 = EthiopicDate.ofEpochDay(719162L);
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.localDateTime(ethiopicDate0);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Unable to obtain ChronoLocalDateTime from TemporalAccessor: class org.threeten.extra.chrono.EthiopicDate
+         //
+         verifyException("java.time.chrono.Chronology", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testLocalDateTimeFromInvalidTemporalThrowsException() throws Throwable {
-        // Test that localDateTime fails with unsupported TemporalAccessor
-        EthiopicDate ethiopicDate = EthiopicDate.ofEpochDay(719162L);
-        try {
-            chronology.localDateTime(ethiopicDate);
-            fail("Expected DateTimeException for unsupported TemporalAccessor");
-        } catch (DateTimeException e) {
-            assertTrue(e.getMessage().contains("Unable to obtain ChronoLocalDateTime"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.eraOf((-334));
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid era: -334
+         //
+         verifyException("java.time.chrono.IsoEra", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testEraOfInvalidValueThrowsException() throws Throwable {
-        // Test that eraOf fails with invalid era value
-        try {
-            chronology.eraOf(-334);
-            fail("Expected DateTimeException for invalid era");
-        } catch (DateTimeException e) {
-            assertEquals("Invalid era: -334", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      IsoEra isoEra0 = IsoEra.BCE;
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.dateYearDay((Era) isoEra0, (-313), (-313));
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value for DayOfYear (valid values 1 - 364/371): -313
+         //
+         verifyException("java.time.temporal.ValueRange", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testDateYearDayWithInvalidDayThrowsException() throws Throwable {
-        // Test that dateYearDay fails with invalid day of year
-        try {
-            chronology.dateYearDay(IsoEra.BCE, -313, -313);
-            fail("Expected DateTimeException for invalid day of year");
-        } catch (DateTimeException e) {
-            assertTrue(e.getMessage().contains("Invalid value for DayOfYear"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      JapaneseEra japaneseEra0 = JapaneseEra.SHOWA;
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.dateYearDay((Era) japaneseEra0, (-2315), (-2315));
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // Invalid era: Showa
+         //
+         verifyException("org.threeten.extra.chrono.Symmetry454Chronology", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testDateYearDayWithUnsupportedEraThrowsException() throws Throwable {
-        // Test that dateYearDay fails with unsupported era
-        try {
-            chronology.dateYearDay(JapaneseEra.SHOWA, -2315, -2315);
-            fail("Expected ClassCastException for unsupported era");
-        } catch (ClassCastException e) {
-            assertEquals("Invalid era: Showa", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.dateYearDay(371, 371);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid date 'DayOfYear 371' as '371' is not a leap year
+         //
+         verifyException("org.threeten.extra.chrono.Symmetry454Date", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testDateYearDayWithInvalidLeapYearDayThrowsException() throws Throwable {
-        // Test that dateYearDay fails with invalid day in non-leap year
-        try {
-            chronology.dateYearDay(371, 371);
-            fail("Expected DateTimeException for invalid leap year day");
-        } catch (DateTimeException e) {
-            assertTrue(e.getMessage().contains("is not a leap year"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.dateNow((Clock) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // clock
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testDateNowWithNullClockThrowsException() throws Throwable {
-        // Test that dateNow fails with null clock
-        try {
-            chronology.dateNow((Clock) null);
-            fail("Expected NullPointerException for null clock");
-        } catch (NullPointerException e) {
-            assertEquals("clock", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      IsoEra isoEra0 = IsoEra.CE;
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.date((TemporalAccessor) isoEra0);
+        fail("Expecting exception: UnsupportedTemporalTypeException");
+      
+      } catch(UnsupportedTemporalTypeException e) {
+         //
+         // Unsupported field: EpochDay
+         //
+         verifyException("java.time.chrono.Era", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testDateFromUnsupportedTemporalThrowsException() throws Throwable {
-        // Test that date fails with unsupported TemporalAccessor
-        try {
-            chronology.date((TemporalAccessor) IsoEra.CE);
-            fail("Expected UnsupportedTemporalTypeException");
-        } catch (UnsupportedTemporalTypeException e) {
-            assertTrue(e.getMessage().contains("Unsupported field: EpochDay"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      PaxDate paxDate0 = PaxDate.ofEpochDay(719162L);
+      ChronoUnit chronoUnit0 = ChronoUnit.CENTURIES;
+      PaxDate paxDate1 = paxDate0.minus(719162L, (TemporalUnit) chronoUnit0);
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.date((TemporalAccessor) paxDate1);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value for EpochDay (valid values -365961480 - 364523156): -26266133510
+         //
+         verifyException("java.time.temporal.ValueRange", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testDateFromInvalidTemporalThrowsException() throws Throwable {
-        // Test that date fails with TemporalAccessor having invalid epoch day
-        PaxDate paxDate = PaxDate.ofEpochDay(719162L);
-        PaxDate adjustedDate = paxDate.minus(719162L, ChronoUnit.CENTURIES);
-        try {
-            chronology.date(adjustedDate);
-            fail("Expected DateTimeException for invalid epoch day");
-        } catch (DateTimeException e) {
-            assertTrue(e.getMessage().contains("Invalid value for EpochDay"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.date(1363, 1363, 1363);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value for MonthOfYear (valid values 1 - 12): 1363
+         //
+         verifyException("java.time.temporal.ValueRange", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testDateWithInvalidMonthThrowsException() throws Throwable {
-        // Test that date fails with invalid month
-        try {
-            chronology.date(1363, 1363, 1363);
-            fail("Expected DateTimeException for invalid month");
-        } catch (DateTimeException e) {
-            assertTrue(e.getMessage().contains("Invalid value for MonthOfYear"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      JapaneseEra japaneseEra0 = JapaneseEra.SHOWA;
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.prolepticYear(japaneseEra0, 29);
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // Invalid era: Showa
+         //
+         verifyException("org.threeten.extra.chrono.Symmetry454Chronology", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testProlepticYearWithUnsupportedEraThrowsException() throws Throwable {
-        // Test that prolepticYear fails with unsupported era
-        try {
-            chronology.prolepticYear(JapaneseEra.SHOWA, 29);
-            fail("Expected ClassCastException for unsupported era");
-        } catch (ClassCastException e) {
-            assertEquals("Invalid era: Showa", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      boolean boolean0 = symmetry454Chronology0.isLeapYear(32L);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testIsLeapYearForYear32() throws Throwable {
-        // Test that year 32 is not a leap year
-        assertFalse("Year 32 should not be a leap year", chronology.isLeapYear(32L));
-    }
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.dateYearDay((-2501), (-2501));
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value for DayOfYear (valid values 1 - 364/371): -2501
+         //
+         verifyException("java.time.temporal.ValueRange", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testDateYearDayWithInvalidDayThrowsException() throws Throwable {
-        // Test that dateYearDay fails with invalid day of year
-        try {
-            chronology.dateYearDay(-2501, -2501);
-            fail("Expected DateTimeException for invalid day of year");
-        } catch (DateTimeException e) {
-            assertTrue(e.getMessage().contains("Invalid value for DayOfYear"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test32()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = Symmetry454Chronology.INSTANCE;
+      Instant instant0 = MockInstant.ofEpochSecond(719162L);
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.zonedDateTime(instant0, (ZoneId) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.time.chrono.ChronoZonedDateTimeImpl", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testZonedDateTimeWithNullZoneThrowsException() throws Throwable {
-        // Test that zonedDateTime fails with null zone
-        Instant instant = MockInstant.ofEpochSecond(719162L);
-        try {
-            chronology.zonedDateTime(instant, null);
-            fail("Expected NullPointerException for null zone");
-        } catch (NullPointerException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test33()  throws Throwable  {
+      long long0 = Symmetry454Chronology.getLeapYearsBefore(0L);
+      assertEquals(0L, long0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetLeapYearsBeforeZero() throws Throwable {
-        // Test leap years calculation for year 0
-        long leapYears = Symmetry454Chronology.getLeapYearsBefore(0L);
-        assertEquals(0L, leapYears);
-    }
+  @Test(timeout = 4000)
+  public void test34()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.localDateTime((TemporalAccessor) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.threeten.extra.chrono.Symmetry454Date", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testLocalDateTimeWithNullThrowsException() throws Throwable {
-        // Test that localDateTime fails with null input
-        try {
-            chronology.localDateTime((TemporalAccessor) null);
-            fail("Expected NullPointerException for null input");
-        } catch (NullPointerException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test35()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.date((TemporalAccessor) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.threeten.extra.chrono.Symmetry454Date", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testDateWithNullThrowsException() throws Throwable {
-        // Test that date fails with null input
-        try {
-            chronology.date((TemporalAccessor) null);
-            fail("Expected NullPointerException for null input");
-        } catch (NullPointerException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test36()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      HijrahEra hijrahEra0 = HijrahEra.AH;
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.date((Era) hijrahEra0, (-2164), (-2164), (-2164));
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // Invalid era: AH
+         //
+         verifyException("org.threeten.extra.chrono.Symmetry454Chronology", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testDateWithUnsupportedEraThrowsException() throws Throwable {
-        // Test that date fails with unsupported era
-        try {
-            chronology.date(HijrahEra.AH, -2164, -2164, -2164);
-            fail("Expected ClassCastException for unsupported era");
-        } catch (ClassCastException e) {
-            assertEquals("Invalid era: AH", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test37()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      ChronoField chronoField0 = ChronoField.SECOND_OF_MINUTE;
+      ValueRange valueRange0 = symmetry454Chronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
 
-    @Test(timeout = 4000)
-    public void testRangeForSecondField() throws Throwable {
-        // Test value range for SECOND_OF_MINUTE field
-        ValueRange range = chronology.range(ChronoField.SECOND_OF_MINUTE);
-        assertNotNull(range);
-    }
+  @Test(timeout = 4000)
+  public void test38()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      ChronoField chronoField0 = ChronoField.YEAR;
+      ValueRange valueRange0 = symmetry454Chronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
 
-    @Test(timeout = 4000)
-    public void testRangeForYearField() throws Throwable {
-        // Test value range for YEAR field
-        ValueRange range = chronology.range(ChronoField.YEAR);
-        assertNotNull(range);
-    }
+  @Test(timeout = 4000)
+  public void test39()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      ChronoField chronoField0 = ChronoField.YEAR_OF_ERA;
+      ValueRange valueRange0 = symmetry454Chronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
 
-    @Test(timeout = 4000)
-    public void testRangeForYearOfEraField() throws Throwable {
-        // Test value range for YEAR_OF_ERA field
-        ValueRange range = chronology.range(ChronoField.YEAR_OF_ERA);
-        assertNotNull(range);
-    }
+  @Test(timeout = 4000)
+  public void test40()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      ChronoField chronoField0 = ChronoField.PROLEPTIC_MONTH;
+      ValueRange valueRange0 = symmetry454Chronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
 
-    @Test(timeout = 4000)
-    public void testRangeForProlepticMonthField() throws Throwable {
-        // Test value range for PROLEPTIC_MONTH field
-        ValueRange range = chronology.range(ChronoField.PROLEPTIC_MONTH);
-        assertNotNull(range);
-    }
+  @Test(timeout = 4000)
+  public void test41()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      ChronoField chronoField0 = ChronoField.ERA;
+      ValueRange valueRange0 = symmetry454Chronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
 
-    @Test(timeout = 4000)
-    public void testRangeForEraField() throws Throwable {
-        // Test value range for ERA field
-        ValueRange range = chronology.range(ChronoField.ERA);
-        assertNotNull(range);
-    }
+  @Test(timeout = 4000)
+  public void test42()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      ChronoField chronoField0 = ChronoField.EPOCH_DAY;
+      ValueRange valueRange0 = symmetry454Chronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
 
-    @Test(timeout = 4000)
-    public void testRangeForEpochDayField() throws Throwable {
-        // Test value range for EPOCH_DAY field
-        ValueRange range = chronology.range(ChronoField.EPOCH_DAY);
-        assertNotNull(range);
-    }
+  @Test(timeout = 4000)
+  public void test43()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      ChronoField chronoField0 = ChronoField.DAY_OF_YEAR;
+      ValueRange valueRange0 = symmetry454Chronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
 
-    @Test(timeout = 4000)
-    public void testRangeForDayOfYearField() throws Throwable {
-        // Test value range for DAY_OF_YEAR field
-        ValueRange range = chronology.range(ChronoField.DAY_OF_YEAR);
-        assertNotNull(range);
-    }
+  @Test(timeout = 4000)
+  public void test44()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      ChronoField chronoField0 = ChronoField.DAY_OF_MONTH;
+      ValueRange valueRange0 = symmetry454Chronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
 
-    @Test(timeout = 4000)
-    public void testRangeForDayOfMonthField() throws Throwable {
-        // Test value range for DAY_OF_MONTH field
-        ValueRange range = chronology.range(ChronoField.DAY_OF_MONTH);
-        assertNotNull(range);
-    }
+  @Test(timeout = 4000)
+  public void test45()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      ChronoField chronoField0 = ChronoField.ALIGNED_WEEK_OF_YEAR;
+      ValueRange valueRange0 = symmetry454Chronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
 
-    @Test(timeout = 4000)
-    public void testRangeForAlignedWeekOfYearField() throws Throwable {
-        // Test value range for ALIGNED_WEEK_OF_YEAR field
-        ValueRange range = chronology.range(ChronoField.ALIGNED_WEEK_OF_YEAR);
-        assertNotNull(range);
-    }
+  @Test(timeout = 4000)
+  public void test46()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      ChronoField chronoField0 = ChronoField.ALIGNED_WEEK_OF_MONTH;
+      ValueRange valueRange0 = symmetry454Chronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
 
-    @Test(timeout = 4000)
-    public void testRangeForAlignedWeekOfMonthField() throws Throwable {
-        // Test value range for ALIGNED_WEEK_OF_MONTH field
-        ValueRange range = chronology.range(ChronoField.ALIGNED_WEEK_OF_MONTH);
-        assertNotNull(range);
-    }
+  @Test(timeout = 4000)
+  public void test47()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      ChronoField chronoField0 = ChronoField.DAY_OF_WEEK;
+      ValueRange valueRange0 = symmetry454Chronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
 
-    @Test(timeout = 4000)
-    public void testRangeForDayOfWeekField() throws Throwable {
-        // Test value range for DAY_OF_WEEK field
-        ValueRange range = chronology.range(ChronoField.DAY_OF_WEEK);
-        assertNotNull(range);
-    }
+  @Test(timeout = 4000)
+  public void test48()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = Symmetry454Chronology.INSTANCE;
+      ChronoField chronoField0 = ChronoField.ALIGNED_DAY_OF_WEEK_IN_MONTH;
+      ValueRange valueRange0 = symmetry454Chronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
 
-    @Test(timeout = 4000)
-    public void testRangeForAlignedDayOfWeekInMonthField() throws Throwable {
-        // Test value range for ALIGNED_DAY_OF_WEEK_IN_MONTH field
-        ValueRange range = chronology.range(ChronoField.ALIGNED_DAY_OF_WEEK_IN_MONTH);
-        assertNotNull(range);
-    }
+  @Test(timeout = 4000)
+  public void test49()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      ChronoField chronoField0 = ChronoField.MONTH_OF_YEAR;
+      ValueRange valueRange0 = symmetry454Chronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
 
-    @Test(timeout = 4000)
-    public void testRangeForMonthOfYearField() throws Throwable {
-        // Test value range for MONTH_OF_YEAR field
-        ValueRange range = chronology.range(ChronoField.MONTH_OF_YEAR);
-        assertNotNull(range);
-    }
+  @Test(timeout = 4000)
+  public void test50()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      ChronoField chronoField0 = ChronoField.ALIGNED_DAY_OF_WEEK_IN_YEAR;
+      ValueRange valueRange0 = symmetry454Chronology0.range(chronoField0);
+      assertNotNull(valueRange0);
+  }
 
-    @Test(timeout = 4000)
-    public void testRangeForAlignedDayOfWeekInYearField() throws Throwable {
-        // Test value range for ALIGNED_DAY_OF_WEEK_IN_YEAR field
-        ValueRange range = chronology.range(ChronoField.ALIGNED_DAY_OF_WEEK_IN_YEAR);
-        assertNotNull(range);
-    }
+  @Test(timeout = 4000)
+  public void test51()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      System.setCurrentTimeMillis((-1343L));
+      OffsetDateTime offsetDateTime0 = MockOffsetDateTime.now();
+      ChronoZonedDateTime<Symmetry454Date> chronoZonedDateTime0 = symmetry454Chronology0.zonedDateTime((TemporalAccessor) offsetDateTime0);
+      assertNotNull(chronoZonedDateTime0);
+  }
 
-    @Test(timeout = 4000)
-    public void testZonedDateTimeFromOffsetDateTime() throws Throwable {
-        // Test creating zoned date-time from OffsetDateTime
-        System.setCurrentTimeMillis(-1343L);
-        OffsetDateTime odt = MockOffsetDateTime.now();
-        ChronoZonedDateTime<Symmetry454Date> zdt = chronology.zonedDateTime(odt);
-        assertNotNull(zdt);
-    }
+  @Test(timeout = 4000)
+  public void test52()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = Symmetry454Chronology.INSTANCE;
+      Era era0 = symmetry454Chronology0.eraOf(0);
+      assertEquals(IsoEra.BCE, era0);
+      
+      int int0 = symmetry454Chronology0.prolepticYear(era0, 0);
+      assertEquals(0, int0);
+  }
 
-    @Test(timeout = 4000)
-    public void testProlepticYearForBceEraYear0() throws Throwable {
-        // Test proleptic year for BCE era with year 0
-        Era era = chronology.eraOf(0);
-        int year = chronology.prolepticYear(era, 0);
-        assertEquals(0, year);
-    }
+  @Test(timeout = 4000)
+  public void test53()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = Symmetry454Chronology.INSTANCE;
+      String string0 = symmetry454Chronology0.getId();
+      assertEquals("Sym454", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetId() throws Throwable {
-        // Test chronology ID
-        assertEquals("Sym454", chronology.getId());
-    }
+  @Test(timeout = 4000)
+  public void test54()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = Symmetry454Chronology.INSTANCE;
+      Clock clock0 = MockClock.systemDefaultZone();
+      Symmetry454Date symmetry454Date0 = symmetry454Chronology0.dateNow(clock0);
+      assertEquals(IsoEra.CE, symmetry454Date0.getEra());
+  }
 
-    @Test(timeout = 4000)
-    public void testDateNowWithClock() throws Throwable {
-        // Test getting current date with clock
-        Clock clock = MockClock.systemDefaultZone();
-        Symmetry454Date date = chronology.dateNow(clock);
-        assertEquals(IsoEra.CE, date.getEra());
-    }
+  @Test(timeout = 4000)
+  public void test55()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      IsoEra isoEra0 = IsoEra.BCE;
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.dateYearDay((Era) isoEra0, 1145, 371);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid date 'DayOfYear 371' as '1145' is not a leap year
+         //
+         verifyException("org.threeten.extra.chrono.Symmetry454Date", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testDateYearDayWithInvalidLeapDayThrowsException() throws Throwable {
-        // Test that dateYearDay fails with leap day in non-leap year
-        try {
-            chronology.dateYearDay(IsoEra.BCE, 1145, 371);
-            fail("Expected DateTimeException for leap day in non-leap year");
-        } catch (DateTimeException e) {
-            assertTrue(e.getMessage().contains("is not a leap year"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test56()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      List<Era> list0 = symmetry454Chronology0.eras();
+      assertFalse(list0.isEmpty());
+  }
 
-    @Test(timeout = 4000)
-    public void testEras() throws Throwable {
-        // Test getting list of eras
-        List<Era> eras = chronology.eras();
-        assertFalse(eras.isEmpty());
-    }
+  @Test(timeout = 4000)
+  public void test57()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      Symmetry454Date symmetry454Date0 = symmetry454Chronology0.dateNow();
+      assertEquals(IsoEra.CE, symmetry454Date0.getEra());
+  }
 
-    @Test(timeout = 4000)
-    public void testDateNow() throws Throwable {
-        // Test getting current date
-        Symmetry454Date date = chronology.dateNow();
-        assertEquals(IsoEra.CE, date.getEra());
-    }
+  @Test(timeout = 4000)
+  public void test58()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.dateEpochDay(365242134L);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid value for EpochDay (valid values -365961480 - 364523156): 365242137
+         //
+         verifyException("java.time.temporal.ValueRange", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testDateEpochDayWithLargeValueThrowsException() throws Throwable {
-        // Test that dateEpochDay fails with large epoch day
-        try {
-            chronology.dateEpochDay(365242134L);
-            fail("Expected DateTimeException for invalid epoch day");
-        } catch (DateTimeException e) {
-            assertTrue(e.getMessage().contains("Invalid value for EpochDay"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test59()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      String string0 = symmetry454Chronology0.getCalendarType();
+      assertNull(string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetCalendarType() throws Throwable {
-        // Test getting calendar type (should be null)
-        assertNull(chronology.getCalendarType());
-    }
+  @Test(timeout = 4000)
+  public void test60()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.date(1, 1, 35);
+        fail("Expecting exception: DateTimeException");
+      
+      } catch(DateTimeException e) {
+         //
+         // Invalid date: 1/1/35
+         //
+         verifyException("org.threeten.extra.chrono.Symmetry454Date", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testDateWithInvalidDayThrowsException() throws Throwable {
-        // Test that date fails with invalid day of month
-        try {
-            chronology.date(1, 1, 35);
-            fail("Expected DateTimeException for invalid day of month");
-        } catch (DateTimeException e) {
-            assertTrue(e.getMessage().contains("Invalid date"));
-        }
-    }
-
-    @Test(timeout = 4000)
-    public void testDateNowWithNullZoneThrowsException() throws Throwable {
-        // Test that dateNow fails with null zone
-        try {
-            chronology.dateNow((ZoneId) null);
-            fail("Expected NullPointerException for null zone");
-        } catch (NullPointerException e) {
-            assertEquals("zone", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test61()  throws Throwable  {
+      Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
+      // Undeclared exception!
+      try { 
+        symmetry454Chronology0.dateNow((ZoneId) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // zone
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 }
