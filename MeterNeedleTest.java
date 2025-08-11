@@ -44,114 +44,56 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
 /**
  * Tests for the {@link MeterNeedle} class.
  */
 public class MeterNeedleTest {
 
-    // Test data constants for better maintainability
-    private static final GradientPaint FILL_GRADIENT = 
-        new GradientPaint(1.0f, 2.0f, Color.RED, 3.0f, 4.0f, Color.BLUE);
-    
-    private static final GradientPaint OUTLINE_GRADIENT = 
-        new GradientPaint(5.0f, 6.0f, Color.RED, 7.0f, 8.0f, Color.BLUE);
-    
-    private static final GradientPaint HIGHLIGHT_GRADIENT = 
-        new GradientPaint(9.0f, 0.0f, Color.RED, 1.0f, 2.0f, Color.BLUE);
-    
-    private static final Stroke TEST_STROKE = new BasicStroke(1.23f);
-    
-    private static final double ROTATE_X_VALUE = 1.23;
-    private static final double ROTATE_Y_VALUE = 4.56;
-    private static final int SIZE_VALUE = 11;
-
     /**
-     * Verifies that the equals() method correctly distinguishes between all MeterNeedle fields.
-     * This test ensures that two MeterNeedle objects are equal only when all their properties match.
+     * Check that the equals() method can distinguish all fields.
      */
     @Test
-    public void testEquals_AllFieldsAreComparedCorrectly() {
-        // Given: Two identical MeterNeedle instances
-        MeterNeedle firstNeedle = new LineNeedle();
-        MeterNeedle secondNeedle = new LineNeedle();
-        
-        // Then: They should be equal initially
-        assertEquals(firstNeedle, secondNeedle, "Two default MeterNeedle instances should be equal");
+    public void testEquals() {
+        MeterNeedle n1 = new LineNeedle();
+        MeterNeedle n2 = new LineNeedle();
+        assertEquals(n1, n2);
 
-        // Test fillPaint property
-        testFieldEquality(
-            firstNeedle, secondNeedle,
-            needle -> needle.setFillPaint(FILL_GRADIENT),
-            "MeterNeedle instances should differ when fillPaint is different"
-        );
+        n1.setFillPaint(new GradientPaint(1.0f, 2.0f, Color.RED, 3.0f, 4.0f, Color.BLUE));
+        assertNotEquals(n1, n2);
+        n2.setFillPaint(new GradientPaint(1.0f, 2.0f, Color.RED, 3.0f, 4.0f, Color.BLUE));
+        assertEquals(n1, n2);
 
-        // Test outlinePaint property
-        testFieldEquality(
-            firstNeedle, secondNeedle,
-            needle -> needle.setOutlinePaint(OUTLINE_GRADIENT),
-            "MeterNeedle instances should differ when outlinePaint is different"
-        );
+        n1.setOutlinePaint(new GradientPaint(5.0f, 6.0f, Color.RED, 7.0f, 8.0f, Color.BLUE));
+        assertNotEquals(n1, n2);
+        n2.setOutlinePaint(new GradientPaint(5.0f, 6.0f, Color.RED, 7.0f, 8.0f, Color.BLUE));
+        assertEquals(n1, n2);
 
-        // Test highlightPaint property
-        testFieldEquality(
-            firstNeedle, secondNeedle,
-            needle -> needle.setHighlightPaint(HIGHLIGHT_GRADIENT),
-            "MeterNeedle instances should differ when highlightPaint is different"
-        );
+        n1.setHighlightPaint(new GradientPaint(9.0f, 0.0f, Color.RED, 1.0f, 2.0f, Color.BLUE));
+        assertNotEquals(n1, n2);
+        n2.setHighlightPaint(new GradientPaint(9.0f, 0.0f, Color.RED, 1.0f, 2.0f, Color.BLUE));
+        assertEquals(n1, n2);
 
-        // Test outlineStroke property
-        testFieldEquality(
-            firstNeedle, secondNeedle,
-            needle -> needle.setOutlineStroke(TEST_STROKE),
-            "MeterNeedle instances should differ when outlineStroke is different"
-        );
+        Stroke s = new BasicStroke(1.23f);
+        n1.setOutlineStroke(s);
+        assertNotEquals(n1, n2);
+        n2.setOutlineStroke(s);
+        assertEquals(n1, n2);
 
-        // Test rotateX property
-        testFieldEquality(
-            firstNeedle, secondNeedle,
-            needle -> needle.setRotateX(ROTATE_X_VALUE),
-            "MeterNeedle instances should differ when rotateX is different"
-        );
+        n1.setRotateX(1.23);
+        assertNotEquals(n1, n2);
+        n2.setRotateX(1.23);
+        assertEquals(n1, n2);
 
-        // Test rotateY property
-        testFieldEquality(
-            firstNeedle, secondNeedle,
-            needle -> needle.setRotateY(ROTATE_Y_VALUE),
-            "MeterNeedle instances should differ when rotateY is different"
-        );
+        n1.setRotateY(4.56);
+        assertNotEquals(n1, n2);
+        n2.setRotateY(4.56);
+        assertEquals(n1, n2);
 
-        // Test size property
-        testFieldEquality(
-            firstNeedle, secondNeedle,
-            needle -> needle.setSize(SIZE_VALUE),
-            "MeterNeedle instances should differ when size is different"
-        );
+        n1.setSize(11);
+        assertNotEquals(n1, n2);
+        n2.setSize(11);
+        assertEquals(n1, n2);
     }
 
-    /**
-     * Helper method to test equality behavior for a specific field.
-     * This reduces code duplication and makes the test pattern more explicit.
-     * 
-     * @param firstNeedle the first needle to compare
-     * @param secondNeedle the second needle to compare
-     * @param fieldSetter a function that sets a specific field on a needle
-     * @param inequalityMessage error message when needles should not be equal
-     */
-    private void testFieldEquality(MeterNeedle firstNeedle, 
-                                 MeterNeedle secondNeedle,
-                                 java.util.function.Consumer<MeterNeedle> fieldSetter,
-                                 String inequalityMessage) {
-        // When: Only the first needle's field is modified
-        fieldSetter.accept(firstNeedle);
-        
-        // Then: The needles should not be equal
-        assertNotEquals(firstNeedle, secondNeedle, inequalityMessage);
-        
-        // When: The second needle's field is set to the same value
-        fieldSetter.accept(secondNeedle);
-        
-        // Then: The needles should be equal again
-        assertEquals(firstNeedle, secondNeedle, 
-            "MeterNeedle instances should be equal when all fields match");
-    }
 }
