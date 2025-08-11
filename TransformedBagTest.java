@@ -21,21 +21,15 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.apache.commons.collections4.Bag;
+import org.apache.commons.collections4.Transformer;
 import org.apache.commons.collections4.collection.TransformedCollectionTest;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for {@link TransformedBag}.
- * <p>
- * This suite intentionally uses Object as the element type to avoid unsafe casts
- * and to clearly demonstrate that:
- * - transformingBag(...) transforms elements only when they are added after decoration.
- * - transformedBag(...) transforms any existing elements in the decorated bag.
- * </p>
+ * Extension of {@link AbstractBagTest} for exercising the {@link TransformedBag}
+ * implementation.
  */
-public class TransformedBagTest extends AbstractBagTest<Object> {
-
-    private static final String[] NUMERIC_STRINGS = {"1", "3", "5", "7", "2", "4", "6"};
+public class TransformedBagTest<T> extends AbstractBagTest<T> {
 
     @Override
     public String getCompatibilityVersion() {
@@ -48,72 +42,56 @@ public class TransformedBagTest extends AbstractBagTest<Object> {
     }
 
     @Override
-    public Bag<Object> makeObject() {
-        // A no-op transformer preserves added elements unchanged.
+    @SuppressWarnings("unchecked")
+    public Bag<T> makeObject() {
         return TransformedBag.transformingBag(new HashBag<>(),
-                TransformedCollectionTest.NOOP_TRANSFORMER);
-    }
-
-    /**
-     * Helper to create a bag that transforms added String values to Integer values.
-     */
-    private Bag<Object> newTransformingIntegerBag() {
-        return TransformedBag.transformingBag(new HashBag<>(),
-                TransformedCollectionTest.STRING_TO_INTEGER_TRANSFORMER);
+                (Transformer<T, T>) TransformedCollectionTest.NOOP_TRANSFORMER);
     }
 
     @Test
-    void transformingBag_transformsNewlyAddedElementsOnly() {
-        final Bag<Object> bag = newTransformingIntegerBag();
-
-        assertTrue(bag.isEmpty(), "Newly created bag should be empty");
-
-        for (int i = 0; i < NUMERIC_STRINGS.length; i++) {
-            final String value = NUMERIC_STRINGS[i];
-
-            // Add a String; the bag should store the transformed Integer.
-            bag.add(value);
-
-            assertEquals(i + 1, bag.size(), "Size should reflect number of additions");
-            assertTrue(bag.contains(Integer.valueOf(value)), "Bag should contain transformed Integer");
-            assertFalse(bag.contains(value), "Bag should not contain the original String");
+    @SuppressWarnings("unchecked")
+    void testTransformedBag() {
+        //T had better be Object!
+        final Bag<T> bag = TransformedBag.transformingBag(new HashBag<>(),
+                (Transformer<T, T>) TransformedCollectionTest.STRING_TO_INTEGER_TRANSFORMER);
+        assertTrue(bag.isEmpty());
+        final Object[] els = {"1", "3", "5", "7", "2", "4", "6"};
+        for (int i = 0; i < els.length; i++) {
+            bag.add((T) els[i]);
+            assertEquals(i + 1, bag.size());
+            assertTrue(bag.contains(Integer.valueOf((String) els[i])));
+            assertFalse(bag.contains(els[i]));
         }
 
-        // Removing the original String should fail; removing the transformed Integer should succeed.
-        assertFalse(bag.remove(NUMERIC_STRINGS[0]));
-        assertTrue(bag.remove(Integer.valueOf(NUMERIC_STRINGS[0])));
+        assertFalse(bag.remove(els[0]));
+        assertTrue(bag.remove(Integer.valueOf((String) els[0])));
     }
 
     @Test
-    void transformedBag_transformsExistingContents() {
-        // Populate a plain bag with Strings first.
-        final Bag<Object> original = new HashBag<>();
-        for (final String s : NUMERIC_STRINGS) {
-            original.add(s);
+    @SuppressWarnings("unchecked")
+    void testTransformedBag_decorateTransform() {
+        final Bag<T> originalBag = new HashBag<>();
+        final Object[] els = {"1", "3", "5", "7", "2", "4", "6"};
+        for (final Object el : els) {
+            originalBag.add((T) el);
+        }
+        final Bag<T> bag = TransformedBag.transformedBag(originalBag,
+                (Transformer<T, T>) TransformedCollectionTest.STRING_TO_INTEGER_TRANSFORMER);
+        assertEquals(els.length, bag.size());
+        for (final Object el : els) {
+            assertTrue(bag.contains(Integer.valueOf((String) el)));
+            assertFalse(bag.contains(el));
         }
 
-        // Decorating with transformedBag(...) should transform existing contents immediately.
-        final Bag<Object> bag = TransformedBag.transformedBag(original,
-                TransformedCollectionTest.STRING_TO_INTEGER_TRANSFORMER);
-
-        assertEquals(NUMERIC_STRINGS.length, bag.size(), "All original elements should remain after transformation");
-
-        for (final String s : NUMERIC_STRINGS) {
-            assertTrue(bag.contains(Integer.valueOf(s)), "Bag should contain transformed Integer");
-            assertFalse(bag.contains(s), "Bag should not contain the original String after transformation");
-        }
-
-        // Removing the original String should fail; removing the transformed Integer should succeed.
-        assertFalse(bag.remove(NUMERIC_STRINGS[0]));
-        assertTrue(bag.remove(Integer.valueOf(NUMERIC_STRINGS[0])));
+        assertFalse(bag.remove(els[0]));
+        assertTrue(bag.remove(Integer.valueOf((String) els[0])));
     }
 
-//    // Utility to regenerate serialized compatibility resources, if needed.
-//    // Disabled by default to avoid accidental file writes in CI.
 //    void testCreate() throws Exception {
-//        Bag<Object> bag = makeObject();
+//        Bag<T> bag = makeObject();
 //        writeExternalFormToDisk((java.io.Serializable) bag, "src/test/resources/data/test/TransformedBag.emptyCollection.version4.obj");
 //        bag = makeFullCollection();
 //        writeExternalFormToDisk((java.io.Serializable) bag, "src/test/resources/data/test/TransformedBag.fullCollection.version4.obj");
 //    }
+
 }
