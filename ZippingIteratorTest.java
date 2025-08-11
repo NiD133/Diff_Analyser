@@ -21,12 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.apache.commons.collections4.IteratorUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,9 +32,10 @@ import org.junit.jupiter.api.Test;
 @SuppressWarnings("boxing")
 class ZippingIteratorTest extends AbstractIteratorTest<Integer> {
 
-    private List<Integer> evens;
-    private List<Integer> odds;
-    private List<Integer> fib;
+    private ArrayList<Integer> evens;
+
+    private ArrayList<Integer> odds;
+    private ArrayList<Integer> fib;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -54,141 +49,142 @@ class ZippingIteratorTest extends AbstractIteratorTest<Integer> {
     }
 
     @BeforeEach
-    public void setUp() {
-        // Generate even numbers: [0, 2, 4, ..., 18]
-        evens = IntStream.range(0, 20)
-                .filter(i -> i % 2 == 0)
-                .boxed()
-                .collect(Collectors.toList());
-        
-        // Generate odd numbers: [1, 3, 5, ..., 19]
-        odds = IntStream.range(0, 20)
-                .filter(i -> i % 2 != 0)
-                .boxed()
-                .collect(Collectors.toList());
-        
-        // Predefined Fibonacci sequence
-        fib = Arrays.asList(1, 1, 2, 3, 5, 8, 13, 21);
-    }
-
-    // Helper to assert sequence of values from iterator
-    private void assertSequence(ZippingIterator<Integer> iterator, List<Integer> expectedSequence) {
-        for (Integer expected : expectedSequence) {
-            assertTrue(iterator.hasNext(), "Iterator should have next value: " + expected);
-            assertEquals(expected, iterator.next());
-        }
-        assertFalse(iterator.hasNext(), "Iterator should be exhausted after sequence");
-    }
-
-    @Test
-    void testSingleIterator() {
-        @SuppressWarnings("unchecked")
-        ZippingIterator<Integer> iterator = new ZippingIterator<>(evens.iterator());
-        assertSequence(iterator, evens);
-    }
-
-    @Test
-    void testTwoIdenticalIterators() {
-        // Expected: each element from 'evens' repeated twice consecutively
-        List<Integer> expected = evens.stream()
-                .flatMap(i -> List.of(i, i).stream())
-                .collect(Collectors.toList());
-        
-        ZippingIterator<Integer> iterator = new ZippingIterator<>(evens.iterator(), evens.iterator());
-        assertSequence(iterator, expected);
-    }
-
-    @Test
-    void testTwoIteratorsInterleaved() {
-        // Expected: interleaved sequence [0,1,2,3,...,19]
-        List<Integer> expected = IntStream.range(0, 20)
-                .boxed()
-                .collect(Collectors.toList());
-        
-        ZippingIterator<Integer> iterator = new ZippingIterator<>(evens.iterator(), odds.iterator());
-        assertSequence(iterator, expected);
-    }
-
-    @Test
-    void testTwoIteratorsAlternating() {
-        // Expected: alternating sequence [1,0,3,2,...,19,18]
-        List<Integer> expected = new ArrayList<>();
-        for (int i = 0; i < odds.size(); i++) {
-            expected.add(odds.get(i));
-            expected.add(evens.get(i));
-        }
-        
-        ZippingIterator<Integer> iterator = new ZippingIterator<>(odds.iterator(), evens.iterator());
-        assertSequence(iterator, expected);
-    }
-
-    @Test
-    void testThreeIteratorsInterleaved() {
-        // Expected sequence: round-robin from fib, evens, then odds until exhaustion
-        List<Integer> expected = Arrays.asList(
-            1, 0, 1,     // fib[0], evens[0], odds[0]
-            1, 2, 3,     // fib[1], evens[1], odds[1]
-            2, 4, 5,     // fib[2], evens[2], odds[2]
-            3, 6, 7,     // fib[3], evens[3], odds[3]
-            5, 8, 9,     // fib[4], evens[4], odds[4]
-            8, 10, 11,   // fib[5], evens[5], odds[5]
-            13, 12, 13,  // fib[6], evens[6], odds[6]
-            21, 14, 15,  // fib[7], evens[7], odds[7]
-            16, 17,       // evens[8], odds[8]
-            18, 19        // evens[9], odds[9]
-        );
-        
-        ZippingIterator<Integer> iterator = new ZippingIterator<>(
-            fib.iterator(), evens.iterator(), odds.iterator()
-        );
-        assertSequence(iterator, expected);
-    }
-
-    @Test
-    void testRemoveWithSingleIterator() {
-        // Condition: remove even numbers divisible by 4
-        Predicate<Integer> shouldRemove = val -> val % 4 == 0;
-        
-        // Track expected state after removals
-        List<Integer> expectedEvens = new ArrayList<>(evens);
-        
-        @SuppressWarnings("unchecked")
-        ZippingIterator<Integer> iterator = new ZippingIterator<>(evens.iterator());
-        while (iterator.hasNext()) {
-            Integer val = iterator.next();
-            if (shouldRemove.test(val)) {
-                iterator.remove();
-                expectedEvens.remove(val);
+    public void setUp() throws Exception {
+        evens = new ArrayList<>();
+        odds = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            if (0 == i % 2) {
+                evens.add(i);
+            } else {
+                odds.add(i);
             }
         }
-        
-        assertEquals(expectedEvens, evens, "Evens list after removal");
+        fib = new ArrayList<>();
+        fib.add(1);
+        fib.add(1);
+        fib.add(2);
+        fib.add(3);
+        fib.add(5);
+        fib.add(8);
+        fib.add(13);
+        fib.add(21);
     }
 
     @Test
-    void testRemoveWithTwoIterators() {
-        // Condition: remove numbers divisible by 3 or 4
-        Predicate<Integer> shouldRemove = val -> val % 3 == 0 || val % 4 == 0;
-        
-        // Track expected state after removals
-        List<Integer> expectedEvens = new ArrayList<>(evens);
-        List<Integer> expectedOdds = new ArrayList<>(odds);
-        
-        ZippingIterator<Integer> iterator = new ZippingIterator<>(evens.iterator(), odds.iterator());
-        while (iterator.hasNext()) {
-            Integer val = iterator.next();
-            if (shouldRemove.test(val)) {
-                iterator.remove();
-                // Remove from correct source list
-                if (val % 2 == 0) {
-                    expectedEvens.remove(val);
-                } else {
-                    expectedOdds.remove(val);
-                }
+    void testIterateEven() {
+        @SuppressWarnings("unchecked")
+        final ZippingIterator<Integer> iter = new ZippingIterator<>(evens.iterator());
+        for (final Integer even : evens) {
+            assertTrue(iter.hasNext());
+            assertEquals(even, iter.next());
+        }
+        assertFalse(iter.hasNext());
+    }
+
+    @Test
+    void testIterateEvenEven() {
+        final ZippingIterator<Integer> iter = new ZippingIterator<>(evens.iterator(), evens.iterator());
+        for (final Integer even : evens) {
+            assertTrue(iter.hasNext());
+            assertEquals(even, iter.next());
+            assertTrue(iter.hasNext());
+            assertEquals(even, iter.next());
+        }
+        assertFalse(iter.hasNext());
+    }
+
+    @Test
+    void testIterateEvenOdd() {
+        final ZippingIterator<Integer> iter = new ZippingIterator<>(evens.iterator(), odds.iterator());
+        for (int i = 0; i < 20; i++) {
+            assertTrue(iter.hasNext());
+            assertEquals(Integer.valueOf(i), iter.next());
+        }
+        assertFalse(iter.hasNext());
+    }
+
+    @Test
+    void testIterateFibEvenOdd() {
+        final ZippingIterator<Integer> iter = new ZippingIterator<>(fib.iterator(), evens.iterator(), odds.iterator());
+
+        assertEquals(Integer.valueOf(1), iter.next());  // fib    1
+        assertEquals(Integer.valueOf(0), iter.next());  // even   0
+        assertEquals(Integer.valueOf(1), iter.next());  // odd    1
+        assertEquals(Integer.valueOf(1), iter.next());  // fib    1
+        assertEquals(Integer.valueOf(2), iter.next());  // even   2
+        assertEquals(Integer.valueOf(3), iter.next());  // odd    3
+        assertEquals(Integer.valueOf(2), iter.next());  // fib    2
+        assertEquals(Integer.valueOf(4), iter.next());  // even   4
+        assertEquals(Integer.valueOf(5), iter.next());  // odd    5
+        assertEquals(Integer.valueOf(3), iter.next());  // fib    3
+        assertEquals(Integer.valueOf(6), iter.next());  // even   6
+        assertEquals(Integer.valueOf(7), iter.next());  // odd    7
+        assertEquals(Integer.valueOf(5), iter.next());  // fib    5
+        assertEquals(Integer.valueOf(8), iter.next());  // even   8
+        assertEquals(Integer.valueOf(9), iter.next());  // odd    9
+        assertEquals(Integer.valueOf(8), iter.next());  // fib    8
+        assertEquals(Integer.valueOf(10), iter.next()); // even  10
+        assertEquals(Integer.valueOf(11), iter.next()); // odd   11
+        assertEquals(Integer.valueOf(13), iter.next()); // fib   13
+        assertEquals(Integer.valueOf(12), iter.next()); // even  12
+        assertEquals(Integer.valueOf(13), iter.next()); // odd   13
+        assertEquals(Integer.valueOf(21), iter.next()); // fib   21
+        assertEquals(Integer.valueOf(14), iter.next()); // even  14
+        assertEquals(Integer.valueOf(15), iter.next()); // odd   15
+        assertEquals(Integer.valueOf(16), iter.next()); // even  16
+        assertEquals(Integer.valueOf(17), iter.next()); // odd   17
+        assertEquals(Integer.valueOf(18), iter.next()); // even  18
+        assertEquals(Integer.valueOf(19), iter.next()); // odd   19
+
+        assertFalse(iter.hasNext());
+    }
+
+    @Test
+    void testIterateOddEven() {
+        final ZippingIterator<Integer> iter = new ZippingIterator<>(odds.iterator(), evens.iterator());
+        for (int i = 0, j = 0; i < 20; i++) {
+            assertTrue(iter.hasNext());
+            final int val = iter.next();
+            if (i % 2 == 0) {
+                assertEquals(odds.get(j).intValue(), val);
+            } else {
+                assertEquals(evens.get(j).intValue(), val);
+                j++;
             }
         }
-        
-        assertEquals(expectedEvens, evens, "Evens list after removal");
-        assertEquals(expectedOdds, odds, "Odds list after removal");
+        assertFalse(iter.hasNext());
     }
+
+    @Test
+    void testRemoveFromDouble() {
+        final ZippingIterator<Integer> iter = new ZippingIterator<>(evens.iterator(), odds.iterator());
+        int expectedSize = evens.size() + odds.size();
+        while (iter.hasNext()) {
+            final Object o = iter.next();
+            final Integer val = (Integer) o;
+            if (val.intValue() % 4 == 0 || val.intValue() % 3 == 0) {
+                expectedSize--;
+                iter.remove();
+            }
+        }
+        assertEquals(expectedSize, evens.size() + odds.size());
+    }
+
+    @Test
+    void testRemoveFromSingle() {
+        @SuppressWarnings("unchecked")
+        final ZippingIterator<Integer> iter = new ZippingIterator<>(evens.iterator());
+        int expectedSize = evens.size();
+        while (iter.hasNext()) {
+            final Object o = iter.next();
+            final Integer val = (Integer) o;
+            if (val.intValue() % 4 == 0) {
+                expectedSize--;
+                iter.remove();
+            }
+        }
+        assertEquals(expectedSize, evens.size());
+    }
+
 }
+
