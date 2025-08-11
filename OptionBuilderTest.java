@@ -24,216 +24,129 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 @SuppressWarnings("deprecation") // OptionBuilder is marked deprecated
 class OptionBuilderTest {
-
-    private static final String SAMPLE_DESCRIPTION = "option description";
-    private static final char SAMPLE_CHAR_OPTION = 'o';
-    private static final String SAMPLE_STRING_OPTION = "o";
-
     @Test
-    void shouldCreateBasicOptionWithCharacterIdentifier() {
-        // Given: An OptionBuilder with a description
-        // When: Creating an option with a character identifier
-        final Option option = OptionBuilder
-                .withDescription(SAMPLE_DESCRIPTION)
-                .create(SAMPLE_CHAR_OPTION);
+    void testBaseOptionCharOpt() {
+        final Option base = OptionBuilder.withDescription("option description").create('o');
 
-        // Then: The option should have the correct properties
-        assertEquals("o", option.getOpt());
-        assertEquals(SAMPLE_DESCRIPTION, option.getDescription());
-        assertFalse(option.hasArg(), "Basic option should not require arguments");
+        assertEquals("o", base.getOpt());
+        assertEquals("option description", base.getDescription());
+        assertFalse(base.hasArg());
     }
 
     @Test
-    void shouldCreateBasicOptionWithStringIdentifier() {
-        // Given: An OptionBuilder with a description
-        // When: Creating an option with a string identifier
-        final Option option = OptionBuilder
-                .withDescription(SAMPLE_DESCRIPTION)
-                .create(SAMPLE_STRING_OPTION);
+    void testBaseOptionStringOpt() {
+        final Option base = OptionBuilder.withDescription("option description").create("o");
 
-        // Then: The option should have the correct properties
-        assertEquals("o", option.getOpt());
-        assertEquals(SAMPLE_DESCRIPTION, option.getDescription());
-        assertFalse(option.hasArg(), "Basic option should not require arguments");
+        assertEquals("o", base.getOpt());
+        assertEquals("option description", base.getDescription());
+        assertFalse(base.hasArg());
     }
 
     @Test
-    void shouldResetBuilderStateAfterEachOperation() {
-        // Given: An invalid option creation that should fail
-        // When: Attempting to create an option with invalid character
-        assertThrows(IllegalArgumentException.class, 
-                () -> OptionBuilder.withDescription("JUnit").create('"'),
-                "Should reject invalid option character");
-
-        // Then: Builder state should be reset - next option should not inherit description
-        Option cleanOption = OptionBuilder.create('x');
-        assertNull(cleanOption.getDescription(), 
-                "Builder should be reset - no description should be inherited");
-
-        // When: Attempting to create option without identifier
-        assertThrows(IllegalStateException.class, 
-                OptionBuilder::create,
-                "Should require option identifier");
-
-        // Then: Builder should still be reset for subsequent operations
-        Option anotherCleanOption = OptionBuilder.create('x');
-        assertNull(anotherCleanOption.getDescription(), 
-                "Builder should remain reset after exception");
+    void testBuilderIsResettedAlways() {
+        assertThrows(IllegalArgumentException.class, () -> OptionBuilder.withDescription("JUnit").create('"'));
+        assertNull(OptionBuilder.create('x').getDescription(), "we inherited a description");
+        assertThrows(IllegalStateException.class, (Executable) OptionBuilder::create);
+        assertNull(OptionBuilder.create('x').getDescription(), "we inherited a description");
     }
 
     @Test
-    void shouldCreateComplexOptionWithAllFeatures() {
-        // Given: An OptionBuilder with all possible configurations
-        // When: Creating a complex option with multiple features
-        final Option complexOption = OptionBuilder
-                .withLongOpt("simple option")
-                .hasArg()
-                .isRequired()
-                .hasArgs()
-                .withType(Float.class)
-                .withDescription("this is a simple option")
-                .create('s');
+    void testCompleteOption() {
+        //@formatter:off
+        final Option simple = OptionBuilder.withLongOpt("simple option")
+                                     .hasArg()
+                                     .isRequired()
+                                     .hasArgs()
+                                     .withType(Float.class)
+                                     .withDescription("this is a simple option")
+                                     .create('s');
+        //@formatter:on
 
-        // Then: All configured properties should be correctly set
-        assertEquals("s", complexOption.getOpt());
-        assertEquals("simple option", complexOption.getLongOpt());
-        assertEquals("this is a simple option", complexOption.getDescription());
-        assertEquals(Float.class, complexOption.getType());
-        assertTrue(complexOption.hasArg(), "Option should accept arguments");
-        assertTrue(complexOption.isRequired(), "Option should be required");
-        assertTrue(complexOption.hasArgs(), "Option should accept multiple arguments");
+        assertEquals("s", simple.getOpt());
+        assertEquals("simple option", simple.getLongOpt());
+        assertEquals("this is a simple option", simple.getDescription());
+        assertEquals(simple.getType(), Float.class);
+        assertTrue(simple.hasArg());
+        assertTrue(simple.isRequired());
+        assertTrue(simple.hasArgs());
     }
 
     @Test
-    void shouldRejectIncompleteOptionCreation() {
-        // When: Attempting to create an option without any configuration
-        // Then: Should throw IllegalStateException
-        assertThrows(IllegalStateException.class, 
-                OptionBuilder::create,
-                "Should require at least an option identifier");
-
-        // Note: Builder is implicitly reset after the exception
-        // This should work without issues
+    void testCreateIncompleteOption() {
+        assertThrows(IllegalStateException.class, (Executable) OptionBuilder::create);
+        // implicitly reset the builder
         OptionBuilder.create("opt");
     }
 
     @Test
-    void shouldValidateOptionCharacters() {
-        // When: Using invalid single character option (quote character)
-        // Then: Should reject with IllegalArgumentException
-        assertThrows(IllegalArgumentException.class, 
-                () -> OptionBuilder.withDescription(SAMPLE_DESCRIPTION).create('"'),
-                "Should reject quote character as option");
-
-        // When: Using invalid character in option string (backtick)
-        // Then: Should reject with IllegalArgumentException
-        assertThrows(IllegalArgumentException.class, 
-                () -> OptionBuilder.create("opt`"),
-                "Should reject backtick in option string");
-
-        // When: Using valid option string
-        // Then: Should create successfully
-        OptionBuilder.create("opt"); // Should not throw
+    void testIllegalOptions() {
+        // bad single character option
+        assertThrows(IllegalArgumentException.class, () -> OptionBuilder.withDescription("option description").create('"'));
+        // bad character in option string
+        assertThrows(IllegalArgumentException.class, () -> OptionBuilder.create("opt`"));
+        // valid option
+        OptionBuilder.create("opt");
     }
 
     @Test
-    void shouldSetCorrectArgumentCount() {
-        // Given: An OptionBuilder configured for specific argument count
-        // When: Creating an option that accepts exactly 2 arguments
-        final Option optionWithTwoArgs = OptionBuilder
-                .withDescription(SAMPLE_DESCRIPTION)
-                .hasArgs(2)
-                .create('o');
-
-        // Then: The argument count should be correctly set
-        assertEquals(2, optionWithTwoArgs.getArgs());
+    void testOptionArgNumbers() {
+        //@formatter:off
+        final Option opt = OptionBuilder.withDescription("option description")
+                                  .hasArgs(2)
+                                  .create('o');
+        //@formatter:on
+        assertEquals(2, opt.getArgs());
     }
 
     @Test
-    void shouldHandleSpecialOptionCharacters() throws Exception {
-        // When: Creating option with '?' character
-        final Option helpOption = OptionBuilder
-                .withDescription("help options")
-                .create('?');
-        // Then: Should accept '?' as valid option character
-        assertEquals("?", helpOption.getOpt());
-
-        // When: Creating option with '@' character
-        final Option stdinOption = OptionBuilder
-                .withDescription("read from stdin")
-                .create('@');
-        // Then: Should accept '@' as valid option character
-        assertEquals("@", stdinOption.getOpt());
-
-        // When: Attempting to use space character as option
-        // Then: Should reject space character
-        assertThrows(IllegalArgumentException.class, 
-                () -> OptionBuilder.create(' '),
-                "Should reject space character as option");
+    void testSpecialOptChars() throws Exception {
+        // '?'
+        final Option opt1 = OptionBuilder.withDescription("help options").create('?');
+        assertEquals("?", opt1.getOpt());
+        // '@'
+        final Option opt2 = OptionBuilder.withDescription("read from stdin").create('@');
+        assertEquals("@", opt2.getOpt());
+        // ' '
+        assertThrows(IllegalArgumentException.class, () -> OptionBuilder.create(' '));
     }
 
     @Test
-    void shouldCreateMultipleIndependentOptions() {
-        // Given: First complex option configuration
-        // When: Creating first option with full configuration
-        Option firstOption = OptionBuilder
-                .withLongOpt("simple option")
-                .hasArg()
-                .isRequired()
-                .hasArgs()
-                .withType(Float.class)
-                .withDescription("this is a simple option")
-                .create('s');
+    void testTwoCompleteOptions() {
+        //@formatter:off
+        Option simple = OptionBuilder.withLongOpt("simple option")
+                                     .hasArg()
+                                     .isRequired()
+                                     .hasArgs()
+                                     .withType(Float.class)
+                                     .withDescription("this is a simple option")
+                                     .create('s');
+        //@formatter:on
 
-        // Then: First option should have all specified properties
-        assertComplexOptionProperties(firstOption, 's', "simple option", 
-                "this is a simple option", Float.class, true, true, true);
+        assertEquals("s", simple.getOpt());
+        assertEquals("simple option", simple.getLongOpt());
+        assertEquals("this is a simple option", simple.getDescription());
+        assertEquals(simple.getType(), Float.class);
+        assertTrue(simple.hasArg());
+        assertTrue(simple.isRequired());
+        assertTrue(simple.hasArgs());
 
-        // Given: Second option with different configuration (builder should be reset)
-        // When: Creating second option with simpler configuration
-        Option secondOption = OptionBuilder
-                .withLongOpt("dimple option")
-                .hasArg()
-                .withDescription("this is a dimple option")
-                .create('d');
+        //@formatter:off
+        simple = OptionBuilder.withLongOpt("dimple option")
+                              .hasArg()
+                              .withDescription("this is a dimple option")
+                              .create('d');
+        //@formatter:on
 
-        // Then: Second option should have only its specified properties
-        assertSimpleOptionProperties(secondOption, 'd', "dimple option", 
-                "this is a dimple option", String.class, true, false, false);
-    }
-
-    /**
-     * Helper method to assert properties of a complex option
-     */
-    private void assertComplexOptionProperties(Option option, char expectedOpt, 
-            String expectedLongOpt, String expectedDescription, Class<?> expectedType,
-            boolean shouldHaveArg, boolean shouldBeRequired, boolean shouldHaveArgs) {
-        
-        assertEquals(String.valueOf(expectedOpt), option.getOpt());
-        assertEquals(expectedLongOpt, option.getLongOpt());
-        assertEquals(expectedDescription, option.getDescription());
-        assertEquals(expectedType, option.getType());
-        assertEquals(shouldHaveArg, option.hasArg(), "hasArg() mismatch");
-        assertEquals(shouldBeRequired, option.isRequired(), "isRequired() mismatch");
-        assertEquals(shouldHaveArgs, option.hasArgs(), "hasArgs() mismatch");
-    }
-
-    /**
-     * Helper method to assert properties of a simple option
-     */
-    private void assertSimpleOptionProperties(Option option, char expectedOpt, 
-            String expectedLongOpt, String expectedDescription, Class<?> expectedType,
-            boolean shouldHaveArg, boolean shouldBeRequired, boolean shouldHaveArgs) {
-        
-        assertEquals(String.valueOf(expectedOpt), option.getOpt());
-        assertEquals(expectedLongOpt, option.getLongOpt());
-        assertEquals(expectedDescription, option.getDescription());
-        assertEquals(expectedType, option.getType());
-        assertEquals(shouldHaveArg, option.hasArg(), "hasArg() mismatch");
-        assertEquals(shouldBeRequired, option.isRequired(), "isRequired() mismatch");
-        assertEquals(shouldHaveArgs, option.hasArgs(), "hasArgs() mismatch");
+        assertEquals("d", simple.getOpt());
+        assertEquals("dimple option", simple.getLongOpt());
+        assertEquals("this is a dimple option", simple.getDescription());
+        assertEquals(String.class, simple.getType());
+        assertTrue(simple.hasArg());
+        assertFalse(simple.isRequired());
+        assertFalse(simple.hasArgs());
     }
 }
