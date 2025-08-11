@@ -1,19 +1,3 @@
-/*
-  Licensed to the Apache Software Foundation (ASF) under one or more
-  contributor license agreements.  See the NOTICE file distributed with
-  this work for additional information regarding copyright ownership.
-  The ASF licenses this file to You under the Apache License, Version 2.0
-  (the "License"); you may not use this file except in compliance with
-  the License.  You may obtain a copy of the License at
-
-      https://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
- */
 package org.apache.commons.cli.help;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,281 +20,317 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests {@link TextHelpAppendable}.
+ * 
+ * The tests favor readability by:
+ * - Using expressive test names.
+ * - Extracting helpers for repeated patterns (reset, read output lines, expected builders).
+ * - Using clear Arrange-Act-Assert structure.
  */
 public final class TextHelpAppendableTest {
+
+    private static final String HELLO_WORLD = "Hello World";
 
     private StringBuilder sb;
     private TextHelpAppendable underTest;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         sb = new StringBuilder();
         underTest = new TextHelpAppendable(sb);
     }
 
+    // Helpers
+
+    private void resetOutput() {
+        sb.setLength(0);
+    }
+
+    private List<String> readOutputLines() throws IOException {
+        return IOUtils.readLines(new StringReader(sb.toString()));
+    }
+
+    private static List<String> expectedParagraph(String text) {
+        final List<String> expected = new ArrayList<>(2);
+        expected.add(" " + text);
+        expected.add("");
+        return expected;
+    }
+
+    private static List<String> expectedHeader(String text, char underlineChar) {
+        final char[] underline = new char[text.length()];
+        Arrays.fill(underline, underlineChar);
+        final List<String> expected = new ArrayList<>(3);
+        expected.add(" " + text);
+        expected.add(" " + new String(underline));
+        expected.add("");
+        return expected;
+    }
+
+    private static Queue<String> queueOf(String... lines) {
+        final Queue<String> q = new LinkedList<>();
+        q.addAll(Arrays.asList(lines));
+        return q;
+    }
+
+    // Tests
+
     @Test
-    void tesstMakeColumnQueue() {
+    void testMakeColumnQueue() {
         final String text = "The quick brown fox jumps over the lazy dog";
-        final TextStyle.Builder styleBuilder = TextStyle.builder().setMaxWidth(10).setIndent(0).setLeftPad(0);
+        final TextStyle.Builder style = TextStyle.builder().setMaxWidth(10).setIndent(0).setLeftPad(0);
 
-        Queue<String> expected = new LinkedList<>();
-        expected.add("The quick ");
-        expected.add("brown fox ");
-        expected.add("jumps over");
-        expected.add("the lazy  ");
-        expected.add("dog       ");
+        // Left aligned
+        Queue<String> expected = queueOf(
+                "The quick ",
+                "brown fox ",
+                "jumps over",
+                "the lazy  ",
+                "dog       ");
+        assertEquals(expected, underTest.makeColumnQueue(text, style.get()), "left aligned failed");
 
-        Queue<String> result = underTest.makeColumnQueue(text, styleBuilder.get());
-        assertEquals(expected, result, "left aligned failed");
+        // Right aligned
+        expected = queueOf(
+                " The quick",
+                " brown fox",
+                "jumps over",
+                "  the lazy",
+                "       dog");
+        style.setAlignment(TextStyle.Alignment.RIGHT);
+        assertEquals(expected, underTest.makeColumnQueue(text, style.get()), "right aligned failed");
 
-        expected.clear();
-        expected.add(" The quick");
-        expected.add(" brown fox");
-        expected.add("jumps over");
-        expected.add("  the lazy");
-        expected.add("       dog");
-        styleBuilder.setAlignment(TextStyle.Alignment.RIGHT);
+        // Center aligned
+        expected = queueOf(
+                "The quick ",
+                "brown fox ",
+                "jumps over",
+                " the lazy ",
+                "   dog    ");
+        style.setAlignment(TextStyle.Alignment.CENTER);
+        assertEquals(expected, underTest.makeColumnQueue(text, style.get()), "center aligned failed");
 
-        result = underTest.makeColumnQueue(text, styleBuilder.get());
-        assertEquals(expected, result, "right aligned failed");
-
-        expected.clear();
-        expected.add("The quick ");
-        expected.add("brown fox ");
-        expected.add("jumps over");
-        expected.add(" the lazy ");
-        expected.add("   dog    ");
-        styleBuilder.setAlignment(TextStyle.Alignment.CENTER);
-
-        result = underTest.makeColumnQueue(text, styleBuilder.get());
-        assertEquals(expected, result, "center aligned failed");
-
-        expected = new LinkedList<>();
-        expected.add("      The quick");
-        expected.add("          brown");
-        expected.add("            fox");
-        expected.add("          jumps");
-        expected.add("       over the");
-        expected.add("       lazy dog");
-        styleBuilder.setAlignment(TextStyle.Alignment.RIGHT).setLeftPad(5).setIndent(2);
-
-        result = underTest.makeColumnQueue(text, styleBuilder.get());
-        assertEquals(expected, result, "right aligned failed");
+        // Right aligned with left pad and indent
+        expected = queueOf(
+                "      The quick",
+                "          brown",
+                "            fox",
+                "          jumps",
+                "       over the",
+                "       lazy dog");
+        style.setAlignment(TextStyle.Alignment.RIGHT).setLeftPad(5).setIndent(2);
+        assertEquals(expected, underTest.makeColumnQueue(text, style.get()), "right aligned with pad/indent failed");
     }
 
     @Test
-    void testAdjustTableFormat() {
-        // test width smaller than header
-        // @formatter:off
-        final TableDefinition tableDefinition = TableDefinition.from("Testing",
+    void testAdjustTableFormatResizesToHeaderLength() {
+        // Given: header longer than requested width
+        final TableDefinition tableDefinition = TableDefinition.from(
+                "Testing",
                 Collections.singletonList(TextStyle.builder().setMaxWidth(3).get()),
                 Collections.singletonList("header"),
-                // "data" shorter than "header"
-                Collections.singletonList(Collections.singletonList("data"))
-        );
-        // @formatter:on
+                Collections.singletonList(Collections.singletonList("data"))); // "data" shorter than "header"
+
+        // When
         final TableDefinition actual = underTest.adjustTableFormat(tableDefinition);
+
+        // Then: min/max are at least header length
         assertEquals("header".length(), actual.columnTextStyles().get(0).getMaxWidth());
         assertEquals("header".length(), actual.columnTextStyles().get(0).getMinWidth());
     }
 
     @Test
-    void testAppend() throws IOException {
-        final char c = (char) 0x1F44D;
+    void testAppendCharAndString() throws IOException {
+        // Append a single char
+        final char c = (char) 0x1F44D; // 👍
         underTest.append(c);
         assertEquals(1, sb.length());
         assertEquals(String.valueOf(c), sb.toString());
 
-        sb.setLength(0);
+        // Append a string
+        resetOutput();
         underTest.append("Hello");
         assertEquals("Hello", sb.toString());
     }
 
     @Test
-    void testAppendHeader() throws IOException {
-        final String[] expected = { " Hello World", " ===========", "" };
+    void testAppendHeaderLevels() throws IOException {
+        // Level 1 uses '='
+        resetOutput();
+        underTest.appendHeader(1, HELLO_WORLD);
+        assertEquals(expectedHeader(HELLO_WORLD, '='), readOutputLines(), "header 1 failed");
 
-        sb.setLength(0);
-        underTest.appendHeader(1, "Hello World");
-        List<String> actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(Arrays.asList(expected), actual, "header 1 failed");
+        // Level 2 uses '%'
+        resetOutput();
+        underTest.appendHeader(2, HELLO_WORLD);
+        assertEquals(expectedHeader(HELLO_WORLD, '%'), readOutputLines(), "header 2 failed");
 
-        sb.setLength(0);
-        underTest.appendHeader(2, "Hello World");
-        actual = IOUtils.readLines(new StringReader(sb.toString()));
-        expected[1] = " %%%%%%%%%%%";
-        assertEquals(Arrays.asList(expected), actual, "header 2 failed");
+        // Level 3 uses '+'
+        resetOutput();
+        underTest.appendHeader(3, HELLO_WORLD);
+        assertEquals(expectedHeader(HELLO_WORLD, '+'), readOutputLines(), "header 3 failed");
 
-        sb.setLength(0);
-        underTest.appendHeader(3, "Hello World");
-        actual = IOUtils.readLines(new StringReader(sb.toString()));
-        expected[1] = " +++++++++++";
-        assertEquals(Arrays.asList(expected), actual, "header 3 failed");
+        // Level 4 uses '_'
+        resetOutput();
+        underTest.appendHeader(4, HELLO_WORLD);
+        assertEquals(expectedHeader(HELLO_WORLD, '_'), readOutputLines(), "header 4 failed");
 
-        sb.setLength(0);
-        underTest.appendHeader(4, "Hello World");
-        actual = IOUtils.readLines(new StringReader(sb.toString()));
-        expected[1] = " ___________";
-        assertEquals(Arrays.asList(expected), actual, "header 4 failed");
+        // Level 5 also uses '_'
+        resetOutput();
+        underTest.appendHeader(5, HELLO_WORLD);
+        assertEquals(expectedHeader(HELLO_WORLD, '_'), readOutputLines(), "header 5 failed");
 
-        sb.setLength(0);
-        underTest.appendHeader(5, "Hello World");
-        actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(Arrays.asList(expected), actual, "header 5 failed");
+        // Invalid level
+        resetOutput();
+        assertThrows(IllegalArgumentException.class, () -> underTest.appendHeader(0, HELLO_WORLD));
 
-        sb.setLength(0);
-        assertThrows(IllegalArgumentException.class, () -> underTest.appendHeader(0, "Hello World"));
-
-        sb.setLength(0);
+        // Empty text is a no-op
+        resetOutput();
         underTest.appendHeader(5, "");
-        assertEquals(0, sb.length(), "empty string test failed");
+        assertEquals(0, sb.length(), "empty string should not produce output");
 
-        sb.setLength(0);
+        // Null is a no-op
+        resetOutput();
         underTest.appendHeader(5, null);
-        assertEquals(0, sb.length(), "null test failed");
+        assertEquals(0, sb.length(), "null should not produce output");
     }
 
     @Test
-    void testAppendList() throws IOException {
-        final List<String> expected = new ArrayList<>();
-        final String[] entries = { "one", "two", "three" };
-        for (int i = 0; i < entries.length; i++) {
-            expected.add(String.format("  %s. %s", i + 1, entries[i]));
+    void testAppendListOrderedAndUnordered() throws IOException {
+        final String[] items = { "one", "two", "three" };
+
+        // Ordered
+        resetOutput();
+        underTest.appendList(true, Arrays.asList(items));
+        final List<String> expectedOrdered = new ArrayList<>();
+        for (int i = 0; i < items.length; i++) {
+            expectedOrdered.add(String.format("  %d. %s", i + 1, items[i]));
         }
-        expected.add("");
+        expectedOrdered.add("");
+        assertEquals(expectedOrdered, readOutputLines(), "ordered list failed");
 
-        sb.setLength(0);
-        underTest.appendList(true, Arrays.asList(entries));
-        List<String> actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(expected, actual, "ordered list failed");
-
-        sb.setLength(0);
-        expected.clear();
-        for (final String entry : entries) {
-            expected.add(String.format("  * %s", entry));
+        // Unordered
+        resetOutput();
+        underTest.appendList(false, Arrays.asList(items));
+        final List<String> expectedUnordered = new ArrayList<>();
+        for (final String s : items) {
+            expectedUnordered.add("  * " + s);
         }
-        expected.add("");
-        underTest.appendList(false, Arrays.asList(entries));
-        actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(expected, actual, "unordered list failed");
+        expectedUnordered.add("");
+        assertEquals(expectedUnordered, readOutputLines(), "unordered list failed");
 
-        sb.setLength(0);
-        expected.clear();
+        // Empty list is a no-op (no trailing empty line)
+        resetOutput();
         underTest.appendList(false, Collections.emptyList());
-        actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(expected, actual, "empty list failed");
+        assertEquals(Collections.emptyList(), readOutputLines(), "empty list failed");
 
-        sb.setLength(0);
-        expected.clear();
+        // Null list is a no-op
+        resetOutput();
         underTest.appendList(false, null);
-        actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(expected, actual, "null list failed");
+        assertEquals(Collections.emptyList(), readOutputLines(), "null list failed");
     }
 
     @Test
     void testAppendParagraph() throws IOException {
-        final String[] expected = { " Hello World", "" };
+        // Non-empty
+        resetOutput();
+        underTest.appendParagraph(HELLO_WORLD);
+        assertEquals(expectedParagraph(HELLO_WORLD), readOutputLines());
 
-        sb.setLength(0);
-        underTest.appendParagraph("Hello World");
-        final List<String> actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(Arrays.asList(expected), actual);
-
-        sb.setLength(0);
+        // Empty is a no-op
+        resetOutput();
         underTest.appendParagraph("");
-        assertEquals(0, sb.length(), "empty string test failed");
+        assertEquals(0, sb.length(), "empty string should not produce output");
 
-        sb.setLength(0);
+        // Null is a no-op
+        resetOutput();
         underTest.appendParagraph(null);
-        assertEquals(0, sb.length(), "null test failed");
+        assertEquals(0, sb.length(), "null should not produce output");
     }
 
     @Test
     void testAppendParagraphFormat() throws IOException {
-        final String[] expected = { " Hello Joe World 309", "" };
-
-        sb.setLength(0);
+        // Non-empty format
+        resetOutput();
         underTest.appendParagraphFormat("Hello %s World %,d", "Joe", 309);
-        final List<String> actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(Arrays.asList(expected), actual);
+        assertEquals(expectedParagraph("Hello Joe World 309"), readOutputLines());
 
-        sb.setLength(0);
+        // Empty format is a no-op
+        resetOutput();
         underTest.appendParagraphFormat("");
-        assertEquals(0, sb.length(), "empty string test failed");
+        assertEquals(0, sb.length(), "empty format should not produce output");
     }
 
     @Test
     void testAppendTable() throws IOException {
+        // Column styles: first column indented; second right-aligned with left pad
         final TextStyle.Builder styleBuilder = TextStyle.builder();
         final List<TextStyle> styles = new ArrayList<>();
         styles.add(styleBuilder.setIndent(2).get());
         styles.add(styleBuilder.setIndent(0).setLeftPad(5).setAlignment(TextStyle.Alignment.RIGHT).get());
         final String[] headers = { "fox", "time" };
-        // @formatter:off
+
+        // Rows contain ASCII and non-ASCII content to test wrapping behavior
         final List<List<String>> rows = Arrays.asList(
-                Arrays.asList("The quick brown fox jumps over the lazy dog",
+                Arrays.asList(
+                        "The quick brown fox jumps over the lazy dog",
                         "Now is the time for all good people to come to the aid of their country"),
-                Arrays.asList("Léimeann an sionnach donn gasta thar an madra leisciúil",
+                Arrays.asList(
+                        "Léimeann an sionnach donn gasta thar an madra leisciúil",
                         "Anois an t-am do na daoine maithe go léir teacht i gcabhair ar a dtír")
         );
-        // @formatter:on
 
-        List<String> expected = new ArrayList<>();
-        expected.add(" Common Phrases");
-        expected.add("");
-        expected.add("               fox                                       time                   ");
-        expected.add(" The quick brown fox jumps over           Now is the time for all good people to");
-        expected.add("   the lazy dog                                 come to the aid of their country");
-        expected.add(" Léimeann an sionnach donn gasta       Anois an t-am do na daoine maithe go léir");
-        expected.add("   thar an madra leisciúil                           teacht i gcabhair ar a dtír");
-        expected.add("");
+        // With caption and width 80
+        final List<String> expectedWithCaption = Arrays.asList(
+                " Common Phrases",
+                "",
+                "               fox                                       time                   ",
+                " The quick brown fox jumps over           Now is the time for all good people to",
+                "   the lazy dog                                 come to the aid of their country",
+                " Léimeann an sionnach donn gasta       Anois an t-am do na daoine maithe go léir",
+                "   thar an madra leisciúil                           teacht i gcabhair ar a dtír",
+                ""
+        );
 
         TableDefinition table = TableDefinition.from("Common Phrases", styles, Arrays.asList(headers), rows);
-        sb.setLength(0);
+        resetOutput();
         underTest.setMaxWidth(80);
         underTest.appendTable(table);
-        List<String> actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(expected, actual, "full table failed");
+        assertEquals(expectedWithCaption, readOutputLines(), "full table failed");
 
+        // Without caption
+        final List<String> expectedWithoutCaption = expectedWithCaption.subList(2, expectedWithCaption.size());
         table = TableDefinition.from(null, styles, Arrays.asList(headers), rows);
-        expected.remove(1);
-        expected.remove(0);
-        sb.setLength(0);
+        resetOutput();
         underTest.appendTable(table);
-        actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(expected, actual);
+        assertEquals(expectedWithoutCaption, readOutputLines());
 
+        // No rows: print only header and an empty line
+        final List<String> expectedNoRows = Arrays.asList(
+                " fox     time",
+                ""
+        );
         table = TableDefinition.from(null, styles, Arrays.asList(headers), Collections.emptyList());
-        expected = new ArrayList<>();
-        expected.add(" fox     time");
-        expected.add("");
-        sb.setLength(0);
+        resetOutput();
         underTest.appendTable(table);
-        actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(expected, actual, "no rows test failed");
+        assertEquals(expectedNoRows, readOutputLines(), "no rows test failed");
     }
 
     @Test
     void testAppendTitle() throws IOException {
-        final String[] expected = { " Hello World", " ###########", "" };
+        resetOutput();
+        underTest.appendTitle(HELLO_WORLD);
+        assertEquals(expectedHeader(HELLO_WORLD, '#'), readOutputLines());
 
-        sb.setLength(0);
-        underTest.appendTitle("Hello World");
-        final List<String> actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(Arrays.asList(expected), actual);
-
-        sb.setLength(0);
+        resetOutput();
         underTest.appendTitle("");
-        assertEquals(0, sb.length(), "empty string test failed");
+        assertEquals(0, sb.length(), "empty string should not produce output");
 
-        sb.setLength(0);
+        resetOutput();
         underTest.appendTitle(null);
-        assertEquals(0, sb.length(), "null test failed");
-
+        assertEquals(0, sb.length(), "null should not produce output");
     }
 
     @Test
-    void testGetStyleBuilder() {
+    void testGetTextStyleBuilderDefaults() {
         final TextStyle.Builder builder = underTest.getTextStyleBuilder();
         assertEquals(TextHelpAppendable.DEFAULT_INDENT, builder.getIndent(), "Default indent value was changed, some tests may fail");
         assertEquals(TextHelpAppendable.DEFAULT_LEFT_PAD, builder.getLeftPad(), "Default left pad value was changed, some tests may fail");
@@ -318,15 +338,15 @@ public final class TextHelpAppendableTest {
     }
 
     @Test
-    void testindexOfWrapPos() {
-        final String testString = "The quick brown fox jumps over\tthe lazy dog";
+    void testIndexOfWrap() {
+        final String text = "The quick brown fox jumps over\tthe lazy dog";
 
-        assertEquals(9, TextHelpAppendable.indexOfWrap(testString, 10, 0), "did not find end of word");
-        assertEquals(9, TextHelpAppendable.indexOfWrap(testString, 14, 0), "did not backup to end of word");
-        assertEquals(15, TextHelpAppendable.indexOfWrap(testString, 15, 0), "did not find word at 15");
-        assertEquals(15, TextHelpAppendable.indexOfWrap(testString, 16, 0));
-        assertEquals(30, TextHelpAppendable.indexOfWrap(testString, 15, 20), "did not find break character");
-        assertEquals(30, TextHelpAppendable.indexOfWrap(testString, 150, 0), "did not handle text shorter than width");
+        assertEquals(9, TextHelpAppendable.indexOfWrap(text, 10, 0), "did not find end of word");
+        assertEquals(9, TextHelpAppendable.indexOfWrap(text, 14, 0), "did not backup to end of word");
+        assertEquals(15, TextHelpAppendable.indexOfWrap(text, 15, 0), "did not find word at 15");
+        assertEquals(15, TextHelpAppendable.indexOfWrap(text, 16, 0));
+        assertEquals(30, TextHelpAppendable.indexOfWrap(text, 15, 20), "did not find break character");
+        assertEquals(30, TextHelpAppendable.indexOfWrap(text, 150, 0), "did not handle text shorter than width");
 
         assertThrows(IllegalArgumentException.class, () -> TextHelpAppendable.indexOfWrap("", 0, 0));
         assertEquals(3, TextHelpAppendable.indexOfWrap("Hello", 4, 0));
@@ -334,90 +354,73 @@ public final class TextHelpAppendableTest {
 
     @ParameterizedTest
     @MethodSource("org.apache.commons.cli.help.UtilTest#charArgs")
-    void testindexOfWrapPosWithWhitespace(final Character c, final boolean isWhitespace) {
+    void testIndexOfWrapWithWhitespace(final Character c, final boolean isWhitespace) {
         final String text = String.format("Hello%cWorld", c);
         assertEquals(isWhitespace ? 5 : 6, TextHelpAppendable.indexOfWrap(text, 7, 0));
     }
 
     @Test
-    void testPrintWrapped() throws IOException {
+    void testPrintWrappedWithCustomStyleAndDefaults() throws IOException {
         String text = "The quick brown fox jumps over the lazy dog";
-        final TextStyle.Builder styleBuilder = TextStyle.builder().setMaxWidth(10).setIndent(0).setLeftPad(0);
+        final TextStyle.Builder style = TextStyle.builder().setMaxWidth(10).setIndent(0).setLeftPad(0);
 
-        final List<String> expected = new ArrayList<>();
-        expected.add("The quick");
-        expected.add("brown fox");
-        expected.add("jumps over");
-        expected.add("the lazy");
-        expected.add("dog");
-        underTest.printWrapped(text, styleBuilder.get());
-        List<String> actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(expected, actual, "left aligned failed");
+        // Left aligned
+        resetOutput();
+        underTest.printWrapped(text, style.get());
+        assertEquals(Arrays.asList("The quick", "brown fox", "jumps over", "the lazy", "dog"), readOutputLines(), "left aligned failed");
 
-        sb.setLength(0);
-        expected.clear();
-        expected.add(" The quick");
-        expected.add(" brown fox");
-        expected.add("jumps over");
-        expected.add("  the lazy");
-        expected.add("       dog");
-        styleBuilder.setAlignment(TextStyle.Alignment.RIGHT);
+        // Right aligned
+        resetOutput();
+        style.setAlignment(TextStyle.Alignment.RIGHT);
+        underTest.printWrapped(text, style.get());
+        assertEquals(Arrays.asList(" The quick", " brown fox", "jumps over", "  the lazy", "       dog"), readOutputLines(), "right aligned failed");
 
-        underTest.printWrapped(text, styleBuilder.get());
-        actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(expected, actual, "right aligned failed");
+        // Center aligned
+        resetOutput();
+        style.setAlignment(TextStyle.Alignment.CENTER);
+        underTest.printWrapped(text, style.get());
+        assertEquals(Arrays.asList("The quick", "brown fox", "jumps over", " the lazy", "   dog"), readOutputLines(), "center aligned failed");
 
-        sb.setLength(0);
-        expected.clear();
-        expected.add("The quick");
-        expected.add("brown fox");
-        expected.add("jumps over");
-        expected.add(" the lazy");
-        expected.add("   dog");
-        styleBuilder.setAlignment(TextStyle.Alignment.CENTER);
-
-        underTest.printWrapped(text, styleBuilder.get());
-        actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(expected, actual, "center aligned failed");
-
-        sb.setLength(0);
-        expected.clear();
-        expected.add(" The quick brown fox jumps over the lazy dog");
-
+        // Defaults from underTest (pad=1, indent=3, width=74)
+        resetOutput();
         assertEquals(1, underTest.getLeftPad(), "unexpected page left pad");
         assertEquals(3, underTest.getIndent(), "unexpected page indent");
         assertEquals(74, underTest.getMaxWidth(), "unexpected page width");
         underTest.printWrapped(text);
-        actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(expected, actual, "default format aligned failed");
+        assertEquals(Arrays.asList(" The quick brown fox jumps over the lazy dog"), readOutputLines(), "default format failed");
 
-        sb.setLength(0);
+        // Defaults with multiple paragraphs
+        resetOutput();
         text += ".\nNow is the time for all good people to come to the aid of their country.";
-        expected.clear();
-        expected.add(" The quick brown fox jumps over the lazy dog.");
-        expected.add("    Now is the time for all good people to come to the aid of their");
-        expected.add("    country.");
         underTest.printWrapped(text);
-        actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(expected, actual, "default format aligned failed");
+        assertEquals(
+                Arrays.asList(
+                        " The quick brown fox jumps over the lazy dog.",
+                        "    Now is the time for all good people to come to the aid of their",
+                        "    country."
+                ),
+                readOutputLines(),
+                "default multi-paragraph format failed");
     }
 
     @Test
-    void testResize() {
-        TextStyle.Builder tsBuilder = TextStyle.builder().setIndent(2).setMaxWidth(3);
-        underTest.resize(tsBuilder, 0.5);
-        assertEquals(0, tsBuilder.getIndent());
+    void testResizeIndentBasedOnFraction() {
+        TextStyle.Builder ts = TextStyle.builder().setIndent(2).setMaxWidth(3);
+        underTest.resize(ts, 0.5);
+        assertEquals(0, ts.getIndent(), "indent should be resized down");
 
-        tsBuilder = TextStyle.builder().setIndent(4).setMaxWidth(6);
-        underTest.resize(tsBuilder, 0.5);
-        assertEquals(1, tsBuilder.getIndent());
+        ts = TextStyle.builder().setIndent(4).setMaxWidth(6);
+        underTest.resize(ts, 0.5);
+        assertEquals(1, ts.getIndent(), "indent should be resized and rounded");
     }
 
     @Test
-    void testResizeTableFormat() {
+    void testAdjustTableFormatDoesNotOverrideExplicitMinMax() {
         underTest.setMaxWidth(150);
-        final TableDefinition tableDefinition = TableDefinition.from("Caption",
-                Collections.singletonList(TextStyle.builder().setMinWidth(20).setMaxWidth(100).get()), Collections.singletonList("header"),
+        final TableDefinition tableDefinition = TableDefinition.from(
+                "Caption",
+                Collections.singletonList(TextStyle.builder().setMinWidth(20).setMaxWidth(100).get()),
+                Collections.singletonList("header"),
                 Collections.singletonList(Collections.singletonList("one")));
         final TableDefinition result = underTest.adjustTableFormat(tableDefinition);
         assertEquals(20, result.columnTextStyles().get(0).getMinWidth(), "Minimum width should not be reset");
@@ -425,56 +428,49 @@ public final class TextHelpAppendableTest {
     }
 
     @Test
-    void testSetIndent() {
+    void testSetAndGetIndent() {
         assertEquals(TextHelpAppendable.DEFAULT_INDENT, underTest.getIndent(), "Default indent value was changed, some tests may fail");
         underTest.setIndent(TextHelpAppendable.DEFAULT_INDENT + 2);
-        assertEquals(underTest.getIndent(), TextHelpAppendable.DEFAULT_INDENT + 2);
+        assertEquals(TextHelpAppendable.DEFAULT_INDENT + 2, underTest.getIndent());
     }
 
     @Test
     void testWriteColumnQueues() throws IOException {
+        // Two columns of equal width (10), second column has left pad of 5
         final List<Queue<String>> queues = new ArrayList<>();
+        queues.add(queueOf(
+                "The quick ",
+                "brown fox ",
+                "jumps over",
+                "the lazy  ",
+                "dog       "));
+        queues.add(queueOf(
+                "     Now is the",
+                "     time for  ",
+                "     all good  ",
+                "     people to ",
+                "     come to   ",
+                "     the aid of",
+                "     their     ",
+                "     country   "));
 
-        Queue<String> queue = new LinkedList<>();
-        queue.add("The quick ");
-        queue.add("brown fox ");
-        queue.add("jumps over");
-        queue.add("the lazy  ");
-        queue.add("dog       ");
-
-        queues.add(queue);
-
-        queue = new LinkedList<>();
-        queue.add("     Now is the");
-        queue.add("     time for  ");
-        queue.add("     all good  ");
-        queue.add("     people to ");
-        queue.add("     come to   ");
-        queue.add("     the aid of");
-        queue.add("     their     ");
-        queue.add("     country   ");
-
-        queues.add(queue);
-
-        final TextStyle.Builder styleBuilder = TextStyle.builder().setMaxWidth(10).setIndent(0).setLeftPad(0);
-
+        final TextStyle.Builder style = TextStyle.builder().setMaxWidth(10).setIndent(0).setLeftPad(0);
         final List<TextStyle> columns = new ArrayList<>();
-        columns.add(styleBuilder.get());
-        columns.add(styleBuilder.setLeftPad(5).get());
+        columns.add(style.get());
+        columns.add(style.setLeftPad(5).get());
 
-        final List<String> expected = new ArrayList<>();
-        expected.add(" The quick      Now is the");
-        expected.add(" brown fox      time for  ");
-        expected.add(" jumps over     all good  ");
-        expected.add(" the lazy       people to ");
-        expected.add(" dog            come to   ");
-        expected.add("                the aid of");
-        expected.add("                their     ");
-        expected.add("                country   ");
-
-        sb.setLength(0);
+        resetOutput();
         underTest.writeColumnQueues(queues, columns);
-        final List<String> actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(expected, actual);
+
+        final List<String> expected = Arrays.asList(
+                " The quick      Now is the",
+                " brown fox      time for  ",
+                " jumps over     all good  ",
+                " the lazy       people to ",
+                " dog            come to   ",
+                "                the aid of",
+                "                their     ",
+                "                country   ");
+        assertEquals(expected, readOutputLines());
     }
 }
