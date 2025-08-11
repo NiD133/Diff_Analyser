@@ -24,14 +24,19 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * This class is a Junit unit test for Minutes.
+ * Test suite for the Minutes class in Joda Time library.
+ * Tests all factory methods, arithmetic operations, conversions, and edge cases.
  *
  * @author Stephen Colebourne
  */
 public class TestMinutes extends TestCase {
-    // Test in 2002/03 as time zones are more well known
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    
+    // Using Paris timezone for consistent test results (well-defined DST rules post-2000)
+    private static final DateTimeZone PARIS_TIMEZONE = DateTimeZone.forID("Europe/Paris");
+    
+    // Test data constants
+    private static final int SAMPLE_MINUTES = 20;
+    private static final int NEGATIVE_MINUTES = -20;
 
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
@@ -47,336 +52,415 @@ public class TestMinutes extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
+        // No setup required
     }
 
     @Override
     protected void tearDown() throws Exception {
+        // No cleanup required
     }
 
-    //-----------------------------------------------------------------------
-    public void testConstants() {
-        assertEquals(0, Minutes.ZERO.getMinutes());
-        assertEquals(1, Minutes.ONE.getMinutes());
-        assertEquals(2, Minutes.TWO.getMinutes());
-        assertEquals(3, Minutes.THREE.getMinutes());
-        assertEquals(Integer.MAX_VALUE, Minutes.MAX_VALUE.getMinutes());
-        assertEquals(Integer.MIN_VALUE, Minutes.MIN_VALUE.getMinutes());
+    // ========================================================================
+    // CONSTANT TESTS
+    // ========================================================================
+    
+    public void testPredefinedConstants_ShouldHaveCorrectValues() {
+        assertEquals("ZERO constant should be 0", 0, Minutes.ZERO.getMinutes());
+        assertEquals("ONE constant should be 1", 1, Minutes.ONE.getMinutes());
+        assertEquals("TWO constant should be 2", 2, Minutes.TWO.getMinutes());
+        assertEquals("THREE constant should be 3", 3, Minutes.THREE.getMinutes());
+        assertEquals("MAX_VALUE should be Integer.MAX_VALUE", Integer.MAX_VALUE, Minutes.MAX_VALUE.getMinutes());
+        assertEquals("MIN_VALUE should be Integer.MIN_VALUE", Integer.MIN_VALUE, Minutes.MIN_VALUE.getMinutes());
     }
 
-    //-----------------------------------------------------------------------
-    public void testFactory_minutes_int() {
-        assertSame(Minutes.ZERO, Minutes.minutes(0));
-        assertSame(Minutes.ONE, Minutes.minutes(1));
-        assertSame(Minutes.TWO, Minutes.minutes(2));
-        assertSame(Minutes.THREE, Minutes.minutes(3));
-        assertSame(Minutes.MAX_VALUE, Minutes.minutes(Integer.MAX_VALUE));
-        assertSame(Minutes.MIN_VALUE, Minutes.minutes(Integer.MIN_VALUE));
-        assertEquals(-1, Minutes.minutes(-1).getMinutes());
-        assertEquals(4, Minutes.minutes(4).getMinutes());
-    }
-
-    //-----------------------------------------------------------------------
-    public void testFactory_minutesBetween_RInstant() {
-        DateTime start = new DateTime(2006, 6, 9, 12, 3, 0, 0, PARIS);
-        DateTime end1 = new DateTime(2006, 6, 9, 12, 6, 0, 0, PARIS);
-        DateTime end2 = new DateTime(2006, 6, 9, 12, 9, 0, 0, PARIS);
+    // ========================================================================
+    // FACTORY METHOD TESTS
+    // ========================================================================
+    
+    public void testFactoryMethod_minutes_ShouldReturnCachedInstancesForCommonValues() {
+        // Test that factory method returns singleton instances for common values
+        assertSame("Should return cached ZERO instance", Minutes.ZERO, Minutes.minutes(0));
+        assertSame("Should return cached ONE instance", Minutes.ONE, Minutes.minutes(1));
+        assertSame("Should return cached TWO instance", Minutes.TWO, Minutes.minutes(2));
+        assertSame("Should return cached THREE instance", Minutes.THREE, Minutes.minutes(3));
+        assertSame("Should return cached MAX_VALUE instance", Minutes.MAX_VALUE, Minutes.minutes(Integer.MAX_VALUE));
+        assertSame("Should return cached MIN_VALUE instance", Minutes.MIN_VALUE, Minutes.minutes(Integer.MIN_VALUE));
         
-        assertEquals(3, Minutes.minutesBetween(start, end1).getMinutes());
-        assertEquals(0, Minutes.minutesBetween(start, start).getMinutes());
-        assertEquals(0, Minutes.minutesBetween(end1, end1).getMinutes());
-        assertEquals(-3, Minutes.minutesBetween(end1, start).getMinutes());
-        assertEquals(6, Minutes.minutesBetween(start, end2).getMinutes());
+        // Test non-cached values
+        assertEquals("Should create instance for -1", -1, Minutes.minutes(-1).getMinutes());
+        assertEquals("Should create instance for 4", 4, Minutes.minutes(4).getMinutes());
     }
 
-    public void testFactory_minutesBetween_RPartial() {
-        LocalTime start = new LocalTime(12, 3);
-        LocalTime end1 = new LocalTime(12, 6);
+    public void testFactoryMethod_minutesBetween_WithInstants_ShouldCalculateCorrectDifference() {
+        DateTime startTime = new DateTime(2006, 6, 9, 12, 3, 0, 0, PARIS_TIMEZONE);
+        DateTime threeMinutesLater = new DateTime(2006, 6, 9, 12, 6, 0, 0, PARIS_TIMEZONE);
+        DateTime sixMinutesLater = new DateTime(2006, 6, 9, 12, 9, 0, 0, PARIS_TIMEZONE);
+        
+        assertEquals("Should calculate 3 minutes difference", 3, 
+            Minutes.minutesBetween(startTime, threeMinutesLater).getMinutes());
+        assertEquals("Same time should give 0 minutes", 0, 
+            Minutes.minutesBetween(startTime, startTime).getMinutes());
+        assertEquals("Same end time should give 0 minutes", 0, 
+            Minutes.minutesBetween(threeMinutesLater, threeMinutesLater).getMinutes());
+        assertEquals("Reversed order should give negative result", -3, 
+            Minutes.minutesBetween(threeMinutesLater, startTime).getMinutes());
+        assertEquals("Should calculate 6 minutes difference", 6, 
+            Minutes.minutesBetween(startTime, sixMinutesLater).getMinutes());
+    }
+
+    public void testFactoryMethod_minutesBetween_WithPartials_ShouldCalculateCorrectDifference() {
+        LocalTime startTime = new LocalTime(12, 3);
+        LocalTime threeMinutesLater = new LocalTime(12, 6);
         @SuppressWarnings("deprecation")
-        TimeOfDay end2 = new TimeOfDay(12, 9);
+        TimeOfDay sixMinutesLater = new TimeOfDay(12, 9);
         
-        assertEquals(3, Minutes.minutesBetween(start, end1).getMinutes());
-        assertEquals(0, Minutes.minutesBetween(start, start).getMinutes());
-        assertEquals(0, Minutes.minutesBetween(end1, end1).getMinutes());
-        assertEquals(-3, Minutes.minutesBetween(end1, start).getMinutes());
-        assertEquals(6, Minutes.minutesBetween(start, end2).getMinutes());
+        assertEquals("Should calculate 3 minutes between LocalTime objects", 3, 
+            Minutes.minutesBetween(startTime, threeMinutesLater).getMinutes());
+        assertEquals("Same time should give 0 minutes", 0, 
+            Minutes.minutesBetween(startTime, startTime).getMinutes());
+        assertEquals("Same end time should give 0 minutes", 0, 
+            Minutes.minutesBetween(threeMinutesLater, threeMinutesLater).getMinutes());
+        assertEquals("Reversed order should give negative result", -3, 
+            Minutes.minutesBetween(threeMinutesLater, startTime).getMinutes());
+        assertEquals("Should work with different partial types", 6, 
+            Minutes.minutesBetween(startTime, sixMinutesLater).getMinutes());
     }
 
-    public void testFactory_minutesIn_RInterval() {
-        DateTime start = new DateTime(2006, 6, 9, 12, 3, 0, 0, PARIS);
-        DateTime end1 = new DateTime(2006, 6, 9, 12, 6, 0, 0, PARIS);
-        DateTime end2 = new DateTime(2006, 6, 9, 12, 9, 0, 0, PARIS);
+    public void testFactoryMethod_minutesIn_WithInterval_ShouldCalculateIntervalDuration() {
+        DateTime startTime = new DateTime(2006, 6, 9, 12, 3, 0, 0, PARIS_TIMEZONE);
+        DateTime threeMinutesLater = new DateTime(2006, 6, 9, 12, 6, 0, 0, PARIS_TIMEZONE);
+        DateTime sixMinutesLater = new DateTime(2006, 6, 9, 12, 9, 0, 0, PARIS_TIMEZONE);
         
-        assertEquals(0, Minutes.minutesIn((ReadableInterval) null).getMinutes());
-        assertEquals(3, Minutes.minutesIn(new Interval(start, end1)).getMinutes());
-        assertEquals(0, Minutes.minutesIn(new Interval(start, start)).getMinutes());
-        assertEquals(0, Minutes.minutesIn(new Interval(end1, end1)).getMinutes());
-        assertEquals(6, Minutes.minutesIn(new Interval(start, end2)).getMinutes());
+        assertEquals("Null interval should return 0", 0, 
+            Minutes.minutesIn((ReadableInterval) null).getMinutes());
+        assertEquals("3-minute interval should return 3", 3, 
+            Minutes.minutesIn(new Interval(startTime, threeMinutesLater)).getMinutes());
+        assertEquals("Zero-length interval should return 0", 0, 
+            Minutes.minutesIn(new Interval(startTime, startTime)).getMinutes());
+        assertEquals("Zero-length interval at end should return 0", 0, 
+            Minutes.minutesIn(new Interval(threeMinutesLater, threeMinutesLater)).getMinutes());
+        assertEquals("6-minute interval should return 6", 6, 
+            Minutes.minutesIn(new Interval(startTime, sixMinutesLater)).getMinutes());
     }
 
-    public void testFactory_standardMinutesIn_RPeriod() {
-        assertEquals(0, Minutes.standardMinutesIn((ReadablePeriod) null).getMinutes());
-        assertEquals(0, Minutes.standardMinutesIn(Period.ZERO).getMinutes());
-        assertEquals(1, Minutes.standardMinutesIn(new Period(0, 0, 0, 0, 0, 1, 0, 0)).getMinutes());
-        assertEquals(123, Minutes.standardMinutesIn(Period.minutes(123)).getMinutes());
-        assertEquals(-987, Minutes.standardMinutesIn(Period.minutes(-987)).getMinutes());
-        assertEquals(1, Minutes.standardMinutesIn(Period.seconds(119)).getMinutes());
-        assertEquals(2, Minutes.standardMinutesIn(Period.seconds(120)).getMinutes());
-        assertEquals(2, Minutes.standardMinutesIn(Period.seconds(121)).getMinutes());
-        assertEquals(120, Minutes.standardMinutesIn(Period.hours(2)).getMinutes());
+    public void testFactoryMethod_standardMinutesIn_WithPeriod_ShouldConvertToMinutes() {
+        assertEquals("Null period should return 0", 0, 
+            Minutes.standardMinutesIn((ReadablePeriod) null).getMinutes());
+        assertEquals("Zero period should return 0", 0, 
+            Minutes.standardMinutesIn(Period.ZERO).getMinutes());
+        assertEquals("1-minute period should return 1", 1, 
+            Minutes.standardMinutesIn(new Period(0, 0, 0, 0, 0, 1, 0, 0)).getMinutes());
+        assertEquals("123-minute period should return 123", 123, 
+            Minutes.standardMinutesIn(Period.minutes(123)).getMinutes());
+        assertEquals("Negative minutes should work", -987, 
+            Minutes.standardMinutesIn(Period.minutes(-987)).getMinutes());
+        
+        // Test seconds conversion (119 seconds = 1 minute, 59 seconds)
+        assertEquals("119 seconds should convert to 1 minute", 1, 
+            Minutes.standardMinutesIn(Period.seconds(119)).getMinutes());
+        assertEquals("120 seconds should convert to 2 minutes", 2, 
+            Minutes.standardMinutesIn(Period.seconds(120)).getMinutes());
+        assertEquals("121 seconds should convert to 2 minutes", 2, 
+            Minutes.standardMinutesIn(Period.seconds(121)).getMinutes());
+        
+        // Test hours conversion (2 hours = 120 minutes)
+        assertEquals("2 hours should convert to 120 minutes", 120, 
+            Minutes.standardMinutesIn(Period.hours(2)).getMinutes());
+        
+        // Test that imprecise periods throw exception
         try {
             Minutes.standardMinutesIn(Period.months(1));
-            fail();
-        } catch (IllegalArgumentException ex) {
-            // expected
+            fail("Should throw IllegalArgumentException for imprecise period (months)");
+        } catch (IllegalArgumentException expected) {
+            // Expected behavior
         }
     }
 
-    public void testFactory_parseMinutes_String() {
-        assertEquals(0, Minutes.parseMinutes((String) null).getMinutes());
-        assertEquals(0, Minutes.parseMinutes("PT0M").getMinutes());
-        assertEquals(1, Minutes.parseMinutes("PT1M").getMinutes());
-        assertEquals(-3, Minutes.parseMinutes("PT-3M").getMinutes());
-        assertEquals(2, Minutes.parseMinutes("P0Y0M0DT2M").getMinutes());
-        assertEquals(2, Minutes.parseMinutes("PT0H2M").getMinutes());
+    public void testFactoryMethod_parseMinutes_WithISOString_ShouldParseCorrectly() {
+        assertEquals("Null string should return 0", 0, 
+            Minutes.parseMinutes((String) null).getMinutes());
+        assertEquals("PT0M should parse to 0", 0, 
+            Minutes.parseMinutes("PT0M").getMinutes());
+        assertEquals("PT1M should parse to 1", 1, 
+            Minutes.parseMinutes("PT1M").getMinutes());
+        assertEquals("PT-3M should parse to -3", -3, 
+            Minutes.parseMinutes("PT-3M").getMinutes());
+        assertEquals("Full ISO format should work", 2, 
+            Minutes.parseMinutes("P0Y0M0DT2M").getMinutes());
+        assertEquals("Hours and minutes format should work", 2, 
+            Minutes.parseMinutes("PT0H2M").getMinutes());
+        
+        // Test invalid formats
         try {
             Minutes.parseMinutes("P1Y1D");
-            fail();
-        } catch (IllegalArgumentException ex) {
-            // expected
+            fail("Should reject period with years and days");
+        } catch (IllegalArgumentException expected) {
+            // Expected behavior
         }
+        
         try {
             Minutes.parseMinutes("P1DT1M");
-            fail();
-        } catch (IllegalArgumentException ex) {
-            // expected
+            fail("Should reject period with days and minutes");
+        } catch (IllegalArgumentException expected) {
+            // Expected behavior
         }
     }
 
-    //-----------------------------------------------------------------------
-    public void testGetMethods() {
-        Minutes test = Minutes.minutes(20);
-        assertEquals(20, test.getMinutes());
+    // ========================================================================
+    // GETTER METHOD TESTS
+    // ========================================================================
+    
+    public void testGetMinutes_ShouldReturnStoredValue() {
+        Minutes testMinutes = Minutes.minutes(SAMPLE_MINUTES);
+        assertEquals("Should return the stored minutes value", SAMPLE_MINUTES, testMinutes.getMinutes());
     }
 
-    public void testGetFieldType() {
-        Minutes test = Minutes.minutes(20);
-        assertEquals(DurationFieldType.minutes(), test.getFieldType());
+    public void testGetFieldType_ShouldReturnMinutesFieldType() {
+        Minutes testMinutes = Minutes.minutes(SAMPLE_MINUTES);
+        assertEquals("Should return minutes field type", DurationFieldType.minutes(), testMinutes.getFieldType());
     }
 
-    public void testGetPeriodType() {
-        Minutes test = Minutes.minutes(20);
-        assertEquals(PeriodType.minutes(), test.getPeriodType());
+    public void testGetPeriodType_ShouldReturnMinutesPeriodType() {
+        Minutes testMinutes = Minutes.minutes(SAMPLE_MINUTES);
+        assertEquals("Should return minutes period type", PeriodType.minutes(), testMinutes.getPeriodType());
     }
 
-    //-----------------------------------------------------------------------
-    public void testIsGreaterThan() {
-        assertEquals(true, Minutes.THREE.isGreaterThan(Minutes.TWO));
-        assertEquals(false, Minutes.THREE.isGreaterThan(Minutes.THREE));
-        assertEquals(false, Minutes.TWO.isGreaterThan(Minutes.THREE));
-        assertEquals(true, Minutes.ONE.isGreaterThan(null));
-        assertEquals(false, Minutes.minutes(-1).isGreaterThan(null));
+    // ========================================================================
+    // COMPARISON METHOD TESTS
+    // ========================================================================
+    
+    public void testIsGreaterThan_ShouldCompareCorrectly() {
+        assertTrue("THREE should be greater than TWO", Minutes.THREE.isGreaterThan(Minutes.TWO));
+        assertFalse("THREE should not be greater than THREE", Minutes.THREE.isGreaterThan(Minutes.THREE));
+        assertFalse("TWO should not be greater than THREE", Minutes.TWO.isGreaterThan(Minutes.THREE));
+        assertTrue("Positive value should be greater than null", Minutes.ONE.isGreaterThan(null));
+        assertFalse("Negative value should not be greater than null", Minutes.minutes(-1).isGreaterThan(null));
     }
 
-    public void testIsLessThan() {
-        assertEquals(false, Minutes.THREE.isLessThan(Minutes.TWO));
-        assertEquals(false, Minutes.THREE.isLessThan(Minutes.THREE));
-        assertEquals(true, Minutes.TWO.isLessThan(Minutes.THREE));
-        assertEquals(false, Minutes.ONE.isLessThan(null));
-        assertEquals(true, Minutes.minutes(-1).isLessThan(null));
+    public void testIsLessThan_ShouldCompareCorrectly() {
+        assertFalse("THREE should not be less than TWO", Minutes.THREE.isLessThan(Minutes.TWO));
+        assertFalse("THREE should not be less than THREE", Minutes.THREE.isLessThan(Minutes.THREE));
+        assertTrue("TWO should be less than THREE", Minutes.TWO.isLessThan(Minutes.THREE));
+        assertFalse("Positive value should not be less than null", Minutes.ONE.isLessThan(null));
+        assertTrue("Negative value should be less than null", Minutes.minutes(-1).isLessThan(null));
     }
 
-    //-----------------------------------------------------------------------
-    public void testToString() {
-        Minutes test = Minutes.minutes(20);
-        assertEquals("PT20M", test.toString());
+    // ========================================================================
+    // STRING REPRESENTATION TESTS
+    // ========================================================================
+    
+    public void testToString_ShouldReturnISOFormat() {
+        Minutes positiveMinutes = Minutes.minutes(SAMPLE_MINUTES);
+        assertEquals("Positive minutes should format correctly", "PT20M", positiveMinutes.toString());
         
-        test = Minutes.minutes(-20);
-        assertEquals("PT-20M", test.toString());
+        Minutes negativeMinutes = Minutes.minutes(NEGATIVE_MINUTES);
+        assertEquals("Negative minutes should format correctly", "PT-20M", negativeMinutes.toString());
     }
 
-    //-----------------------------------------------------------------------
-    public void testSerialization() throws Exception {
-        Minutes test = Minutes.THREE;
+    // ========================================================================
+    // SERIALIZATION TESTS
+    // ========================================================================
+    
+    public void testSerialization_ShouldPreserveSingletonInstances() throws Exception {
+        Minutes originalMinutes = Minutes.THREE;
         
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(test);
-        oos.close();
-        byte[] bytes = baos.toByteArray();
+        // Serialize the object
+        ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutput = new ObjectOutputStream(byteOutput);
+        objectOutput.writeObject(originalMinutes);
+        objectOutput.close();
+        byte[] serializedData = byteOutput.toByteArray();
         
-        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-        ObjectInputStream ois = new ObjectInputStream(bais);
-        Minutes result = (Minutes) ois.readObject();
-        ois.close();
+        // Deserialize the object
+        ByteArrayInputStream byteInput = new ByteArrayInputStream(serializedData);
+        ObjectInputStream objectInput = new ObjectInputStream(byteInput);
+        Minutes deserializedMinutes = (Minutes) objectInput.readObject();
+        objectInput.close();
         
-        assertSame(test, result);
+        assertSame("Deserialized instance should be same singleton", originalMinutes, deserializedMinutes);
     }
 
-    //-----------------------------------------------------------------------
-    public void testToStandardWeeks() {
-        Minutes test = Minutes.minutes(60 * 24 * 7 * 2);
-        Weeks expected = Weeks.weeks(2);
-        assertEquals(expected, test.toStandardWeeks());
+    // ========================================================================
+    // CONVERSION METHOD TESTS
+    // ========================================================================
+    
+    public void testToStandardWeeks_ShouldConvertCorrectly() {
+        int minutesInTwoWeeks = 60 * 24 * 7 * 2; // 2 weeks in minutes
+        Minutes testMinutes = Minutes.minutes(minutesInTwoWeeks);
+        Weeks expectedWeeks = Weeks.weeks(2);
+        assertEquals("Should convert to 2 weeks", expectedWeeks, testMinutes.toStandardWeeks());
     }
 
-    public void testToStandardDays() {
-        Minutes test = Minutes.minutes(60 * 24 * 2);
-        Days expected = Days.days(2);
-        assertEquals(expected, test.toStandardDays());
+    public void testToStandardDays_ShouldConvertCorrectly() {
+        int minutesInTwoDays = 60 * 24 * 2; // 2 days in minutes
+        Minutes testMinutes = Minutes.minutes(minutesInTwoDays);
+        Days expectedDays = Days.days(2);
+        assertEquals("Should convert to 2 days", expectedDays, testMinutes.toStandardDays());
     }
 
-    public void testToStandardHours() {
-        Minutes test = Minutes.minutes(3 * 60);
-        Hours expected = Hours.hours(3);
-        assertEquals(expected, test.toStandardHours());
+    public void testToStandardHours_ShouldConvertCorrectly() {
+        int minutesInThreeHours = 3 * 60; // 3 hours in minutes
+        Minutes testMinutes = Minutes.minutes(minutesInThreeHours);
+        Hours expectedHours = Hours.hours(3);
+        assertEquals("Should convert to 3 hours", expectedHours, testMinutes.toStandardHours());
     }
 
-    public void testToStandardSeconds() {
-        Minutes test = Minutes.minutes(3);
-        Seconds expected = Seconds.seconds(3 * 60);
-        assertEquals(expected, test.toStandardSeconds());
+    public void testToStandardSeconds_ShouldConvertCorrectly() {
+        Minutes testMinutes = Minutes.minutes(3);
+        Seconds expectedSeconds = Seconds.seconds(3 * 60);
+        assertEquals("Should convert to 180 seconds", expectedSeconds, testMinutes.toStandardSeconds());
         
         try {
             Minutes.MAX_VALUE.toStandardSeconds();
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
+            fail("Should throw ArithmeticException for overflow");
+        } catch (ArithmeticException expected) {
+            // Expected behavior
         }
     }
 
-    public void testToStandardDuration() {
-        Minutes test = Minutes.minutes(20);
-        Duration expected = new Duration(20L * DateTimeConstants.MILLIS_PER_MINUTE);
-        assertEquals(expected, test.toStandardDuration());
+    public void testToStandardDuration_ShouldConvertCorrectly() {
+        Minutes testMinutes = Minutes.minutes(SAMPLE_MINUTES);
+        Duration expectedDuration = new Duration(SAMPLE_MINUTES * DateTimeConstants.MILLIS_PER_MINUTE);
+        assertEquals("Should convert to correct duration", expectedDuration, testMinutes.toStandardDuration());
         
-        expected = new Duration(((long) Integer.MAX_VALUE) * DateTimeConstants.MILLIS_PER_MINUTE);
-        assertEquals(expected, Minutes.MAX_VALUE.toStandardDuration());
+        Duration maxExpectedDuration = new Duration(((long) Integer.MAX_VALUE) * DateTimeConstants.MILLIS_PER_MINUTE);
+        assertEquals("Should handle MAX_VALUE conversion", maxExpectedDuration, Minutes.MAX_VALUE.toStandardDuration());
     }
 
-    //-----------------------------------------------------------------------
-    public void testPlus_int() {
-        Minutes test2 = Minutes.minutes(2);
-        Minutes result = test2.plus(3);
-        assertEquals(2, test2.getMinutes());
-        assertEquals(5, result.getMinutes());
+    // ========================================================================
+    // ARITHMETIC OPERATION TESTS
+    // ========================================================================
+    
+    public void testPlus_WithInt_ShouldAddCorrectly() {
+        Minutes originalMinutes = Minutes.minutes(2);
+        Minutes result = originalMinutes.plus(3);
         
-        assertEquals(1, Minutes.ONE.plus(0).getMinutes());
+        assertEquals("Original should be unchanged", 2, originalMinutes.getMinutes());
+        assertEquals("Result should be sum", 5, result.getMinutes());
+        assertEquals("Adding zero should work", 1, Minutes.ONE.plus(0).getMinutes());
         
         try {
             Minutes.MAX_VALUE.plus(1);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
+            fail("Should throw ArithmeticException for overflow");
+        } catch (ArithmeticException expected) {
+            // Expected behavior
         }
     }
 
-    public void testPlus_Minutes() {
-        Minutes test2 = Minutes.minutes(2);
-        Minutes test3 = Minutes.minutes(3);
-        Minutes result = test2.plus(test3);
-        assertEquals(2, test2.getMinutes());
-        assertEquals(3, test3.getMinutes());
-        assertEquals(5, result.getMinutes());
+    public void testPlus_WithMinutes_ShouldAddCorrectly() {
+        Minutes firstMinutes = Minutes.minutes(2);
+        Minutes secondMinutes = Minutes.minutes(3);
+        Minutes result = firstMinutes.plus(secondMinutes);
         
-        assertEquals(1, Minutes.ONE.plus(Minutes.ZERO).getMinutes());
-        assertEquals(1, Minutes.ONE.plus((Minutes) null).getMinutes());
+        assertEquals("First operand should be unchanged", 2, firstMinutes.getMinutes());
+        assertEquals("Second operand should be unchanged", 3, secondMinutes.getMinutes());
+        assertEquals("Result should be sum", 5, result.getMinutes());
+        assertEquals("Adding ZERO should work", 1, Minutes.ONE.plus(Minutes.ZERO).getMinutes());
+        assertEquals("Adding null should work like zero", 1, Minutes.ONE.plus((Minutes) null).getMinutes());
         
         try {
             Minutes.MAX_VALUE.plus(Minutes.ONE);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
+            fail("Should throw ArithmeticException for overflow");
+        } catch (ArithmeticException expected) {
+            // Expected behavior
         }
     }
 
-    public void testMinus_int() {
-        Minutes test2 = Minutes.minutes(2);
-        Minutes result = test2.minus(3);
-        assertEquals(2, test2.getMinutes());
-        assertEquals(-1, result.getMinutes());
+    public void testMinus_WithInt_ShouldSubtractCorrectly() {
+        Minutes originalMinutes = Minutes.minutes(2);
+        Minutes result = originalMinutes.minus(3);
         
-        assertEquals(1, Minutes.ONE.minus(0).getMinutes());
+        assertEquals("Original should be unchanged", 2, originalMinutes.getMinutes());
+        assertEquals("Result should be difference", -1, result.getMinutes());
+        assertEquals("Subtracting zero should work", 1, Minutes.ONE.minus(0).getMinutes());
         
         try {
             Minutes.MIN_VALUE.minus(1);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
+            fail("Should throw ArithmeticException for underflow");
+        } catch (ArithmeticException expected) {
+            // Expected behavior
         }
     }
 
-    public void testMinus_Minutes() {
-        Minutes test2 = Minutes.minutes(2);
-        Minutes test3 = Minutes.minutes(3);
-        Minutes result = test2.minus(test3);
-        assertEquals(2, test2.getMinutes());
-        assertEquals(3, test3.getMinutes());
-        assertEquals(-1, result.getMinutes());
+    public void testMinus_WithMinutes_ShouldSubtractCorrectly() {
+        Minutes firstMinutes = Minutes.minutes(2);
+        Minutes secondMinutes = Minutes.minutes(3);
+        Minutes result = firstMinutes.minus(secondMinutes);
         
-        assertEquals(1, Minutes.ONE.minus(Minutes.ZERO).getMinutes());
-        assertEquals(1, Minutes.ONE.minus((Minutes) null).getMinutes());
+        assertEquals("First operand should be unchanged", 2, firstMinutes.getMinutes());
+        assertEquals("Second operand should be unchanged", 3, secondMinutes.getMinutes());
+        assertEquals("Result should be difference", -1, result.getMinutes());
+        assertEquals("Subtracting ZERO should work", 1, Minutes.ONE.minus(Minutes.ZERO).getMinutes());
+        assertEquals("Subtracting null should work like zero", 1, Minutes.ONE.minus((Minutes) null).getMinutes());
         
         try {
             Minutes.MIN_VALUE.minus(Minutes.ONE);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
+            fail("Should throw ArithmeticException for underflow");
+        } catch (ArithmeticException expected) {
+            // Expected behavior
         }
     }
 
-    public void testMultipliedBy_int() {
-        Minutes test = Minutes.minutes(2);
-        assertEquals(6, test.multipliedBy(3).getMinutes());
-        assertEquals(2, test.getMinutes());
-        assertEquals(-6, test.multipliedBy(-3).getMinutes());
-        assertSame(test, test.multipliedBy(1));
+    public void testMultipliedBy_ShouldMultiplyCorrectly() {
+        Minutes originalMinutes = Minutes.minutes(2);
         
-        Minutes halfMax = Minutes.minutes(Integer.MAX_VALUE / 2 + 1);
+        assertEquals("Should multiply correctly", 6, originalMinutes.multipliedBy(3).getMinutes());
+        assertEquals("Original should be unchanged", 2, originalMinutes.getMinutes());
+        assertEquals("Should handle negative multiplier", -6, originalMinutes.multipliedBy(-3).getMinutes());
+        assertSame("Multiplying by 1 should return same instance", originalMinutes, originalMinutes.multipliedBy(1));
+        
+        Minutes halfMaxValue = Minutes.minutes(Integer.MAX_VALUE / 2 + 1);
         try {
-            halfMax.multipliedBy(2);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
+            halfMaxValue.multipliedBy(2);
+            fail("Should throw ArithmeticException for overflow");
+        } catch (ArithmeticException expected) {
+            // Expected behavior
         }
     }
 
-    public void testDividedBy_int() {
-        Minutes test = Minutes.minutes(12);
-        assertEquals(6, test.dividedBy(2).getMinutes());
-        assertEquals(12, test.getMinutes());
-        assertEquals(4, test.dividedBy(3).getMinutes());
-        assertEquals(3, test.dividedBy(4).getMinutes());
-        assertEquals(2, test.dividedBy(5).getMinutes());
-        assertEquals(2, test.dividedBy(6).getMinutes());
-        assertSame(test, test.dividedBy(1));
+    public void testDividedBy_ShouldDivideCorrectly() {
+        Minutes originalMinutes = Minutes.minutes(12);
+        
+        assertEquals("12 / 2 should equal 6", 6, originalMinutes.dividedBy(2).getMinutes());
+        assertEquals("Original should be unchanged", 12, originalMinutes.getMinutes());
+        assertEquals("12 / 3 should equal 4", 4, originalMinutes.dividedBy(3).getMinutes());
+        assertEquals("12 / 4 should equal 3", 3, originalMinutes.dividedBy(4).getMinutes());
+        assertEquals("12 / 5 should equal 2 (integer division)", 2, originalMinutes.dividedBy(5).getMinutes());
+        assertEquals("12 / 6 should equal 2", 2, originalMinutes.dividedBy(6).getMinutes());
+        assertSame("Dividing by 1 should return same instance", originalMinutes, originalMinutes.dividedBy(1));
         
         try {
             Minutes.ONE.dividedBy(0);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
+            fail("Should throw ArithmeticException for division by zero");
+        } catch (ArithmeticException expected) {
+            // Expected behavior
         }
     }
 
-    public void testNegated() {
-        Minutes test = Minutes.minutes(12);
-        assertEquals(-12, test.negated().getMinutes());
-        assertEquals(12, test.getMinutes());
+    public void testNegated_ShouldNegateCorrectly() {
+        Minutes originalMinutes = Minutes.minutes(12);
+        Minutes negatedMinutes = originalMinutes.negated();
+        
+        assertEquals("Should negate correctly", -12, negatedMinutes.getMinutes());
+        assertEquals("Original should be unchanged", 12, originalMinutes.getMinutes());
         
         try {
             Minutes.MIN_VALUE.negated();
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
+            fail("Should throw ArithmeticException when negating MIN_VALUE");
+        } catch (ArithmeticException expected) {
+            // Expected behavior
         }
     }
 
-    //-----------------------------------------------------------------------
-    public void testAddToLocalDate() {
-        Minutes test = Minutes.minutes(26);
-        LocalDateTime date = new LocalDateTime(2006, 6, 1, 0, 0, 0, 0);
-        LocalDateTime expected = new LocalDateTime(2006, 6, 1, 0, 26, 0, 0);
-        assertEquals(expected, date.plus(test));
+    // ========================================================================
+    // INTEGRATION TESTS
+    // ========================================================================
+    
+    public void testAddToLocalDate_ShouldAddMinutesCorrectly() {
+        Minutes minutesToAdd = Minutes.minutes(26);
+        LocalDateTime originalDateTime = new LocalDateTime(2006, 6, 1, 0, 0, 0, 0);
+        LocalDateTime expectedDateTime = new LocalDateTime(2006, 6, 1, 0, 26, 0, 0);
+        
+        assertEquals("Should add 26 minutes to LocalDateTime", expectedDateTime, originalDateTime.plus(minutesToAdd));
     }
-
 }
