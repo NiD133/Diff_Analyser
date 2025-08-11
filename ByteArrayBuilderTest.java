@@ -11,96 +11,65 @@ import com.fasterxml.jackson.core.io.IOContext;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ByteArrayBuilderTest extends com.fasterxml.jackson.core.JUnit5TestBase {
+class ByteArrayBuilderTest extends com.fasterxml.jackson.core.JUnit5TestBase
+{
+    @Test
+    void simple() throws Exception
+    {
+        ByteArrayBuilder b = new ByteArrayBuilder(null, 20);
+        assertArrayEquals(new byte[0], b.toByteArray());
 
-    private static final int FIRST_BLOCK_SIZE = 20;
-    private static final int TOTAL_EXPECTED_BYTES = 100;
+        b.write((byte) 0);
+        b.append(1);
 
-    private static byte[] sequentialBytes(int startInclusive, int count) {
-        byte[] out = new byte[count];
-        for (int i = 0; i < count; i++) {
-            out[i] = (byte) (startInclusive + i);
+        byte[] foo = new byte[98];
+        for (int i = 0; i < foo.length; ++i) {
+            foo[i] = (byte) (2 + i);
         }
-        return out;
+        b.write(foo);
+
+        byte[] result = b.toByteArray();
+        assertEquals(100, result.length);
+        for (int i = 0; i < 100; ++i) {
+            assertEquals(i, result[i]);
+        }
+
+        b.release();
+        b.close();
     }
 
+    // [core#1195]: Try to verify that BufferRecycler instance is indeed reused
     @Test
-    void toByteArray_isEmptyWhenNoWrites() {
-        ByteArrayBuilder builder = new ByteArrayBuilder(null, FIRST_BLOCK_SIZE);
-        try {
-            // When no content has been written
-            byte[] actual = builder.toByteArray();
-
-            // Then result is an empty array
-            assertArrayEquals(new byte[0], actual, "Empty builder should return empty array");
-        } finally {
-            // Ensure resources are released in case recycler is used
-            builder.release();
-            builder.close();
-        }
-    }
-
-    @Test
-    void write_singleBytesAndArray_yieldsContiguousSequence() {
-        ByteArrayBuilder builder = new ByteArrayBuilder(null, FIRST_BLOCK_SIZE);
-        try {
-            // Arrange: write 0 and 1 using two different APIs
-            builder.write((byte) 0);
-            builder.append(1);
-
-            // ...then write bytes 2..99 as a block
-            builder.write(sequentialBytes(2, 98));
-
-            // Act
-            byte[] actual = builder.toByteArray();
-
-            // Assert
-            assertEquals(TOTAL_EXPECTED_BYTES, actual.length, "Unexpected total number of bytes");
-            assertArrayEquals(sequentialBytes(0, TOTAL_EXPECTED_BYTES), actual,
-                    "Should contain bytes 0..99 in order");
-        } finally {
-            builder.release();
-            builder.close();
-        }
-    }
-
-    // [core#1195]: Verify that BufferRecycler instance is reused and requires explicit release
-    @Test
-    void bufferRecycler_isReusedAndOnlyExplicitlyReleased() throws Exception {
-        // Given a JsonFactory and a recycler linked to a bounded pool
-        JsonFactory factory = new JsonFactory();
-        BufferRecycler recycler = new BufferRecycler()
+    void bufferRecyclerReuse() throws Exception
+    {
+        JsonFactory f = new JsonFactory();
+        BufferRecycler br = new BufferRecycler()
+                // need to link with some pool
                 .withPool(JsonRecyclerPools.newBoundedPool(3));
 
-        try (ByteArrayBuilder builder = new ByteArrayBuilder(recycler, FIRST_BLOCK_SIZE)) {
-            assertSame(recycler, builder.bufferRecycler(), "Builder must expose the provided recycler");
+        try (ByteArrayBuilder bab = new ByteArrayBuilder(br, 20)) {
+            assertSame(br, bab.bufferRecycler());
 
-            // When a JsonGenerator writes into the builder
-            try (JsonGenerator gen = factory.createGenerator(builder)) {
-                IOContext ioCtxt = ((GeneratorBase) gen).ioContext();
+            try (JsonGenerator g = f.createGenerator(bab)) {
+                IOContext ioCtxt = ((GeneratorBase) g).ioContext();
+                assertSame(br, ioCtxt.bufferRecycler());
+                assertTrue(ioCtxt.bufferRecycler().isLinkedWithPool());
 
-                assertSame(recycler, ioCtxt.bufferRecycler(), "Generator should share the same recycler");
-                assertTrue(ioCtxt.bufferRecycler().isLinkedWithPool(),
-                        "Recycler should be linked to the pool while generator is open");
-
-                gen.writeStartArray();
-                gen.writeEndArray();
+                g.writeStartArray();
+                g.writeEndArray();
             }
 
-            // Then closing the generator should NOT release the recycler
-            assertTrue(recycler.isLinkedWithPool(), "Closing generator must NOT release the recycler");
+            // Generator.close() should NOT release buffer recycler
+            assertTrue(br.isLinkedWithPool());
 
-            // And accessing/clearing the builder's content should NOT release it either
-            byte[] json = builder.getClearAndRelease();
-            assertEquals("[]", new String(json, StandardCharsets.UTF_8), "Unexpected JSON payload");
+            byte[] result = bab.getClearAndRelease();
+            assertEquals("[]", new String(result, StandardCharsets.UTF_8));
         }
+        // Nor accessing contents
+        assertTrue(br.isLinkedWithPool());
 
-        // Closing the builder must still NOT release the recycler
-        assertTrue(recycler.isLinkedWithPool(),
-                "Closing builder or accessing its contents must not release the recycler");
-
-        // Only an explicit release detaches it from the pool
-        recycler.releaseToPool();
-        assertFalse(recycler.isLinkedWithPool(), "Explicit release must detach recycler from the pool");
+        // only explicit release does
+        br.releaseToPool();
+        assertFalse(br.isLinkedWithPool());
     }
 }
