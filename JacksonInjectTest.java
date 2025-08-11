@@ -4,144 +4,117 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class JacksonInjectTest {
-    private static final JacksonInject.Value EMPTY = JacksonInject.Value.empty();
-
-    // Helper class for annotation examples
-    private static final class AnnotationExamples {
-        @JacksonInject(value = "inject", useInput = OptBoolean.FALSE, optional = OptBoolean.FALSE)
-        public int explicitValues;
+public class JacksonInjectTest
+{
+    private final static class Bogus {
+        @JacksonInject(value="inject", useInput=OptBoolean.FALSE,
+                optional=OptBoolean.FALSE)
+        public int field;
 
         @JacksonInject
-        public int defaultValues;
+        public int vanilla;
 
         @JacksonInject(optional = OptBoolean.TRUE)
         public int optionalField;
     }
 
+    private final JacksonInject.Value EMPTY = JacksonInject.Value.empty();
+
     @Test
-    public void emptyValue_hasExpectedDefaults() {
+    public void testEmpty()
+    {
         assertNull(EMPTY.getId());
         assertNull(EMPTY.getUseInput());
         assertTrue(EMPTY.willUseInput(true));
         assertFalse(EMPTY.willUseInput(false));
-    }
 
-    @Test
-    public void emptyValue_constructsSingletonInstance() {
         assertSame(EMPTY, JacksonInject.Value.construct(null, null, null));
-        assertSame(EMPTY, JacksonInject.Value.construct("", null, null)); // Empty string coerced to null
+        // also, "" gets coerced to null so
+        assertSame(EMPTY, JacksonInject.Value.construct("", null, null));
     }
 
     @Test
-    public void fromAnnotation_withNull_returnsEmpty() {
-        assertSame(EMPTY, JacksonInject.Value.from(null));
+    public void testFromAnnotation() throws Exception
+    {
+        assertSame(EMPTY, JacksonInject.Value.from(null)); // legal
+
+        JacksonInject ann = Bogus.class.getField("field").getAnnotation(JacksonInject.class);
+        JacksonInject.Value v = JacksonInject.Value.from(ann);
+        assertEquals("inject", v.getId());
+        assertEquals(Boolean.FALSE, v.getUseInput());
+
+        assertEquals("JacksonInject.Value(id=inject,useInput=false,optional=false)", v.toString());
+        assertFalse(v.equals(EMPTY));
+        assertFalse(EMPTY.equals(v));
+
+        JacksonInject ann2 = Bogus.class.getField("vanilla").getAnnotation(JacksonInject.class);
+        v = JacksonInject.Value.from(ann2);
+        assertEquals(JacksonInject.Value.construct(null, null, null), v,
+                "optional should be `null` by default");
+
+        JacksonInject optionalField = Bogus.class.getField("optionalField")
+                .getAnnotation(JacksonInject.class);
+        v = JacksonInject.Value.from(optionalField);
+        assertEquals(JacksonInject.Value.construct(null, null, true), v);
     }
 
+    @SuppressWarnings("unlikely-arg-type")
     @Test
-    public void fromAnnotation_withExplicitValues() throws Exception {
-        JacksonInject ann = AnnotationExamples.class
-            .getField("explicitValues")
-            .getAnnotation(JacksonInject.class);
-        JacksonInject.Value value = JacksonInject.Value.from(ann);
-
-        assertEquals("inject", value.getId());
-        assertEquals(Boolean.FALSE, value.getUseInput());
-        assertEquals(Boolean.FALSE, value.getOptional());
-        assertEquals(
-            "JacksonInject.Value(id=inject,useInput=false,optional=false)",
-            value.toString()
-        );
-        assertNotEquals(EMPTY, value);
-    }
-
-    @Test
-    public void fromAnnotation_withDefaultValues() throws Exception {
-        JacksonInject ann = AnnotationExamples.class
-            .getField("defaultValues")
-            .getAnnotation(JacksonInject.class);
-        JacksonInject.Value value = JacksonInject.Value.from(ann);
-
-        assertEquals(JacksonInject.Value.construct(null, null, null), value);
-    }
-
-    @Test
-    public void fromAnnotation_withOptionalField() throws Exception {
-        JacksonInject ann = AnnotationExamples.class
-            .getField("optionalField")
-            .getAnnotation(JacksonInject.class);
-        JacksonInject.Value value = JacksonInject.Value.from(ann);
-
-        assertEquals(JacksonInject.Value.construct(null, null, true), value);
-    }
-
-    @Test
-    public void emptyValue_toString() {
-        assertEquals(
-            "JacksonInject.Value(id=null,useInput=null,optional=null)",
-            EMPTY.toString()
-        );
-    }
-
-    @Test
-    public void emptyValue_hashCodeNonZero() {
-        assertNotEquals(0, EMPTY.hashCode());
-    }
-
-    @Test
-    public void emptyValue_equals() {
+    public void testStdMethods() {
+        assertEquals("JacksonInject.Value(id=null,useInput=null,optional=null)",
+                EMPTY.toString());
+        int x = EMPTY.hashCode();
+        if (x == 0) { // no fixed value, but should not evaluate to 0
+            fail();
+        }
         assertEquals(EMPTY, EMPTY);
-        assertNotEquals(EMPTY, null);
-        assertNotEquals(EMPTY, "differentType");
+        assertFalse(EMPTY.equals(null));
+        assertFalse(EMPTY.equals("xyz"));
+
+        JacksonInject.Value equals1 = JacksonInject.Value.construct("value", true, true);
+        JacksonInject.Value equals2 = JacksonInject.Value.construct("value", true, true);
+        JacksonInject.Value valueNull = JacksonInject.Value.construct(null, true, true);
+        JacksonInject.Value useInputNull = JacksonInject.Value.construct("value", null, true);
+        JacksonInject.Value optionalNull = JacksonInject.Value.construct("value", true, null);
+        JacksonInject.Value valueNotEqual = JacksonInject.Value.construct("not equal", true, true);
+        JacksonInject.Value useInputNotEqual = JacksonInject.Value.construct("value", false, true);
+        JacksonInject.Value optionalNotEqual = JacksonInject.Value.construct("value", true, false);
+        String string = "string";
+
+        assertEquals(equals1, equals2);
+        assertNotEquals(equals1, valueNull);
+        assertNotEquals(equals1, useInputNull);
+        assertNotEquals(equals1, optionalNull);
+        assertNotEquals(equals1, valueNotEqual);
+        assertNotEquals(equals1, useInputNotEqual);
+        assertNotEquals(equals1, optionalNotEqual);
+        assertNotEquals(equals1, string);
     }
 
     @Test
-    public void valueEquality() {
-        JacksonInject.Value base = JacksonInject.Value.construct("id", true, true);
-        JacksonInject.Value same = JacksonInject.Value.construct("id", true, true);
-        JacksonInject.Value differentId = JacksonInject.Value.construct("other", true, true);
-        JacksonInject.Value differentUseInput = JacksonInject.Value.construct("id", false, true);
-        JacksonInject.Value differentOptional = JacksonInject.Value.construct("id", true, false);
-        JacksonInject.Value nullId = JacksonInject.Value.construct(null, true, true);
-        JacksonInject.Value nullUseInput = JacksonInject.Value.construct("id", null, true);
-        JacksonInject.Value nullOptional = JacksonInject.Value.construct("id", true, null);
+    public void testFactories() throws Exception
+    {
+        JacksonInject.Value v = EMPTY.withId("name");
+        assertNotSame(EMPTY, v);
+        assertEquals("name", v.getId());
+        assertSame(v, v.withId("name"));
 
-        assertEquals(base, same);
-        assertNotEquals(base, differentId);
-        assertNotEquals(base, differentUseInput);
-        assertNotEquals(base, differentOptional);
-        assertNotEquals(base, nullId);
-        assertNotEquals(base, nullUseInput);
-        assertNotEquals(base, nullOptional);
-        assertNotEquals(base, "string");
-    }
+        JacksonInject.Value v2 = v.withUseInput(Boolean.TRUE);
+        assertNotSame(v, v2);
+        assertFalse(v.equals(v2));
+        assertFalse(v2.equals(v));
+        assertSame(v2, v2.withUseInput(Boolean.TRUE));
 
-    @Test
-    public void withMethods_createNewInstances() {
-        JacksonInject.Value withId = EMPTY.withId("name");
-        assertNotSame(EMPTY, withId);
-        assertEquals("name", withId.getId());
+        JacksonInject.Value v3 = v.withOptional(Boolean.TRUE);
+        assertNotSame(v, v3);
+        assertFalse(v.equals(v3));
+        assertFalse(v3.equals(v));
+        assertSame(v3, v3.withOptional(Boolean.TRUE));
+        assertTrue(v3.getOptional());
 
-        JacksonInject.Value withUseInput = withId.withUseInput(Boolean.TRUE);
-        assertNotSame(withId, withUseInput);
-        assertEquals(Boolean.TRUE, withUseInput.getUseInput());
-
-        JacksonInject.Value withOptional = withId.withOptional(Boolean.TRUE);
-        assertNotSame(withId, withOptional);
-        assertEquals(Boolean.TRUE, withOptional.getOptional());
-    }
-
-    @Test
-    public void withMethods_idempotent() {
-        JacksonInject.Value value = JacksonInject.Value.forId("name");
-        assertSame(value, value.withId("name"));
-        assertSame(value, value.withUseInput(null));
-        assertSame(value, value.withOptional(null));
-    }
-
-    @Test
-    public void nonEmptyValue_hashCodeNonZero() {
-        JacksonInject.Value value = EMPTY.withId("name").withUseInput(Boolean.TRUE);
-        assertNotEquals(0, value.hashCode());
+        int x = v2.hashCode();
+        if (x == 0) { // no fixed value, but should not evaluate to 0
+            fail();
+        }
     }
 }
