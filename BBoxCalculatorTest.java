@@ -28,99 +28,74 @@ public class BBoxCalculatorTest extends RandomizedShapeTest {
     super(SpatialContext.GEO);
   }
 
-  /**
-   * Test the calculation of the bounding box for random rectangles on the geodetic longitude.
-   * This test is repeated 100 times to ensure robustness.
-   */
-  @Test
-  @Repeat(iterations = 100)
+  // note: testing latitude would be so simple that's effectively the same code as the code to be tested. So I don't.
+
+
+  @Test @Repeat(iterations = 100)
   public void testGeoLongitude() {
-    BBoxCalculator bboxCalculator = new BBoxCalculator(ctx);
-    final int numberOfRectangles = randomIntBetween(1, 4);
-    List<Rectangle> rectangles = new ArrayList<>(numberOfRectangles);
-
-    // Create random rectangles and expand the bounding box to include them
-    for (int i = 0; i < numberOfRectangles; i++) {
-      Rectangle rectangle = randomRectangle(30);
-      rectangles.add(rectangle);
-      bboxCalculator.expandRange(rectangle);
+    BBoxCalculator calc = new BBoxCalculator(ctx);
+    final int numShapes = randomIntBetween(1, 4);//inclusive
+    List<Rectangle> rects = new ArrayList<>(numShapes);
+    for (int i = 0; i < numShapes; i++) {
+      Rectangle rect = randomRectangle(30);// divisible by
+      rects.add(rect);
+      calc.expandRange(rect);
     }
-
-    Rectangle calculatedBoundary = bboxCalculator.getBoundary();
-
-    // If only one rectangle, the boundary should be the rectangle itself
-    if (numberOfRectangles == 1) {
-      assertEquals(rectangles.get(0), calculatedBoundary);
+    Rectangle boundary = calc.getBoundary();
+    if (numShapes == 1) {
+      assertEquals(rects.get(0), boundary);
       return;
     }
 
-    // Check if the boundary covers the entire world longitude range
-    if (isWorldLongitudeBoundary(calculatedBoundary)) {
-      assertWorldLongitudeCoverage(rectangles);
+    // If the boundary is the world-bounds, check that it's right.
+    if (boundary.getMinX() == -180 && boundary.getMaxX() == 180) {
+      // each longitude should be present in at least one shape:
+      for (int lon = -180; lon <= +180; lon++) {
+        assertTrue(atLeastOneRectHasLon(rects, lon));
+      }
       return;
     }
 
-    // Verify that the boundary contains all rectangles
-    assertBoundaryContainsAllRectangles(calculatedBoundary, rectangles);
-
-    // Verify that the boundary edges are correct
-    assertBoundaryEdges(calculatedBoundary, rectangles);
-
-    // Verify that the boundary is the smallest possible enclosing boundary
-    assertSmallestEnclosingBoundary(calculatedBoundary, rectangles);
-  }
-
-  private boolean isWorldLongitudeBoundary(Rectangle boundary) {
-    return boundary.getMinX() == -180 && boundary.getMaxX() == 180;
-  }
-
-  private void assertWorldLongitudeCoverage(List<Rectangle> rectangles) {
-    for (int lon = -180; lon <= 180; lon++) {
-      assertTrue(atLeastOneRectangleCoversLongitude(rectangles, lon));
+    // Test that it contains all shapes:
+    for (Rectangle rect : rects) {
+      assertRelation(SpatialRelation.CONTAINS, boundary, rect);
     }
-  }
 
-  private void assertBoundaryContainsAllRectangles(Rectangle boundary, List<Rectangle> rectangles) {
-    for (Rectangle rectangle : rectangles) {
-      assertRelation(SpatialRelation.CONTAINS, boundary, rectangle);
-    }
-  }
+    // Test that the left & right are boundaries:
+    assertTrue(atLeastOneRectHasLon(rects, boundary.getMinX()));
+    assertFalse(atLeastOneRectHasLon(rects, normX(boundary.getMinX() - 0.5)));
 
-  private void assertBoundaryEdges(Rectangle boundary, List<Rectangle> rectangles) {
-    assertTrue(atLeastOneRectangleCoversLongitude(rectangles, boundary.getMinX()));
-    assertFalse(atLeastOneRectangleCoversLongitude(rectangles, normX(boundary.getMinX() - 0.5)));
+    assertTrue(atLeastOneRectHasLon(rects, boundary.getMaxX()));
+    assertFalse(atLeastOneRectHasLon(rects, normX(boundary.getMaxX() + 0.5)));
 
-    assertTrue(atLeastOneRectangleCoversLongitude(rectangles, boundary.getMaxX()));
-    assertFalse(atLeastOneRectangleCoversLongitude(rectangles, normX(boundary.getMaxX() + 0.5)));
-  }
-
-  private void assertSmallestEnclosingBoundary(Rectangle boundary, List<Rectangle> rectangles) {
-    if (boundary.getWidth() > 180) {
-      double largerGap = 360.0 - boundary.getWidth() + 0.5;
-      for (Rectangle rectangle : rectangles) {
-        double gapStart = rectangle.getMaxX() + 0.25;
-        double gapEnd = gapStart + largerGap;
-        Rectangle testGap = makeNormRect(gapStart, gapEnd, -90, 90);
-        assertFalse(isGapFittingInAnyRectangle(testGap, rectangles));
+    // Test that this is the smallest enclosing boundary by ensuring the gap (opposite the bbox) is
+    //  the largest:
+    if (boundary.getWidth() > 180) { // conversely if wider than 180 then no wider gap is possible
+      double biggerGap = 360.0 - boundary.getWidth() + 0.5;
+      for (Rectangle rect : rects) {
+        // try to see if a bigger gap could lie to the right of this rect
+        double gapRectLeft = rect.getMaxX() + 0.25;
+        double gapRectRight = gapRectLeft + biggerGap;
+        Rectangle testGap = makeNormRect(gapRectLeft, gapRectRight, -90, 90);
+        boolean fits = true;
+        for (Rectangle rect2 : rects) {
+          if (rect2.relate(testGap).intersects()) {
+            fits = false;
+            break;
+          }
+        }
+        assertFalse(fits);//should never fit because it's larger than the biggest gap
       }
     }
   }
 
-  private boolean atLeastOneRectangleCoversLongitude(List<Rectangle> rectangles, double longitude) {
-    for (Rectangle rectangle : rectangles) {
-      if (rectangle.relateXRange(longitude, longitude).intersects()) {
+  private boolean atLeastOneRectHasLon(List<Rectangle> rects, double lon) {
+    for (Rectangle rect : rects) {
+      if (rect.relateXRange(lon, lon).intersects()) {
         return true;
       }
     }
     return false;
   }
 
-  private boolean isGapFittingInAnyRectangle(Rectangle gap, List<Rectangle> rectangles) {
-    for (Rectangle rectangle : rectangles) {
-      if (rectangle.relate(gap).intersects()) {
-        return true;
-      }
-    }
-    return false;
-  }
 }
