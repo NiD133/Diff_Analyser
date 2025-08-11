@@ -1,28 +1,12 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.apache.commons.codec.net;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -32,127 +16,146 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
- * Percent codec test cases.
+ * Unit tests for PercentCodec focused on clarity and maintainability.
  */
 class PercentCodecTest {
 
+    private static final Charset UTF_8 = StandardCharsets.UTF_8;
+
+    private static byte[] bytes(final String s) {
+        return s.getBytes(UTF_8);
+    }
+
+    private static String str(final byte[] bytes) {
+        return new String(bytes, UTF_8);
+    }
+
     @Test
-    void testBasicEncodeDecode() throws Exception {
-        final PercentCodec percentCodec = new PercentCodec();
+    void encodesAndDecodesBasicAsciiUnchanged() throws Exception {
+        final PercentCodec codec = new PercentCodec();
         final String input = "abcdABCD";
-        final byte[] encoded = percentCodec.encode(input.getBytes(StandardCharsets.UTF_8));
-        final String encodedS = new String(encoded, StandardCharsets.UTF_8);
-        final byte[] decoded = percentCodec.decode(encoded);
-        final String decodedS = new String(decoded, StandardCharsets.UTF_8);
-        assertEquals(input, encodedS, "Basic PercentCodec encoding test");
-        assertEquals(input, decodedS, "Basic PercentCodec decoding test");
+
+        final byte[] encoded = codec.encode(bytes(input));
+        final byte[] decoded = codec.decode(encoded);
+
+        assertEquals(input, str(encoded), "ASCII should be unchanged when encoding");
+        assertEquals(input, str(decoded), "Round-trip decode should match original");
     }
 
     @Test
-    @Disabled // TODO Should be removed?
-    void testBasicSpace() throws Exception {
-        final PercentCodec percentCodec = new PercentCodec();
+    @Disabled("Spaces are not encoded to %20 by default; enable if behavior/spec changes")
+    void encodesSpaceAsPercent20_whenRequired() throws Exception {
+        final PercentCodec codec = new PercentCodec();
         final String input = " ";
-        final byte[] encoded = percentCodec.encode(input.getBytes(StandardCharsets.UTF_8));
-        assertArrayEquals("%20".getBytes(StandardCharsets.UTF_8), encoded);
+
+        final byte[] encoded = codec.encode(bytes(input));
+
+        assertArrayEquals(bytes("%20"), encoded);
     }
 
     @Test
-    void testConfigurablePercentEncoder() throws Exception {
-        final String input = "abc123_-.*\u03B1\u03B2";
-        final PercentCodec percentCodec = new PercentCodec("abcdef".getBytes(StandardCharsets.UTF_8), false);
-        final byte[] encoded = percentCodec.encode(input.getBytes(StandardCharsets.UTF_8));
-        final String encodedS = new String(encoded, StandardCharsets.UTF_8);
-        assertEquals("%61%62%63123_-.*%CE%B1%CE%B2", encodedS, "Configurable PercentCodec encoding test");
-        final byte[] decoded = percentCodec.decode(encoded);
-        assertEquals(new String(decoded, StandardCharsets.UTF_8), input, "Configurable PercentCodec decoding test");
+    void configurableAlwaysEncodeChars_arePercentEncoded_andRoundTripDecodes() throws Exception {
+        final String input = "abc123_-.*\u03B1\u03B2"; // includes Greek alpha, beta
+        final PercentCodec codec = new PercentCodec(bytes("abcdef"), false);
+
+        final byte[] encoded = codec.encode(bytes(input));
+        final byte[] decoded = codec.decode(encoded);
+
+        assertEquals("%61%62%63123_-.*%CE%B1%CE%B2", str(encoded));
+        assertEquals(input, str(decoded));
     }
 
     @Test
-    void testDecodeInvalidEncodedResultDecoding() throws Exception {
-        final String inputS = "\u03B1\u03B2";
-        final PercentCodec percentCodec = new PercentCodec();
-        final byte[] encoded = percentCodec.encode(inputS.getBytes(StandardCharsets.UTF_8));
-        try {
-            percentCodec.decode(Arrays.copyOf(encoded, encoded.length - 1)); // exclude one byte
-        } catch (final Exception e) {
-            assertTrue(DecoderException.class.isInstance(e) && ArrayIndexOutOfBoundsException.class.isInstance(e.getCause()));
-        }
+    void decodingTruncatedPercentSequence_throwsDecoderExceptionWithCause() throws Exception {
+        final PercentCodec codec = new PercentCodec();
+        final String input = "\u03B1\u03B2";
+
+        final byte[] properlyEncoded = codec.encode(bytes(input));
+        final byte[] truncated = Arrays.copyOf(properlyEncoded, properlyEncoded.length - 1); // drop last byte
+
+        final DecoderException ex = assertThrows(DecoderException.class, () -> codec.decode(truncated));
+        // Implementation detail: root cause is ArrayIndexOutOfBoundsException for truncated byte sequence.
+        assertSame(ArrayIndexOutOfBoundsException.class, ex.getCause().getClass());
     }
 
     @Test
-    void testDecodeNullObject() throws Exception {
-        final PercentCodec percentCodec = new PercentCodec();
-        assertNull(percentCodec.decode((Object) null));
+    void decodeObject_null_returnsNull() throws Exception {
+        final PercentCodec codec = new PercentCodec();
+        assertNull(codec.decode((Object) null));
     }
 
     @Test
-    void testDecodeUnsupportedObject() {
-        final PercentCodec percentCodec = new PercentCodec();
-        assertThrows(DecoderException.class, () -> percentCodec.decode("test"));
+    void decodeObject_unsupportedType_throwsDecoderException() {
+        final PercentCodec codec = new PercentCodec();
+        assertThrows(DecoderException.class, () -> codec.decode("test"));
     }
 
     @Test
-    void testEncodeNullObject() throws Exception {
-        final PercentCodec percentCodec = new PercentCodec();
-        assertNull(percentCodec.encode((Object) null));
+    void encodeObject_null_returnsNull() throws Exception {
+        final PercentCodec codec = new PercentCodec();
+        assertNull(codec.encode((Object) null));
     }
 
     @Test
-    void testEncodeUnsupportedObject() {
-        final PercentCodec percentCodec = new PercentCodec();
-        assertThrows(EncoderException.class, () -> percentCodec.encode("test"));
+    void encodeObject_unsupportedType_throwsEncoderException() {
+        final PercentCodec codec = new PercentCodec();
+        assertThrows(EncoderException.class, () -> codec.encode("test"));
     }
 
     @Test
-    void testInvalidByte() throws Exception {
+    void constructingWithNonAsciiAlwaysEncodeChars_throwsIllegalArgumentException() {
         final byte[] invalid = { (byte) -1, (byte) 'A' };
         assertThrows(IllegalArgumentException.class, () -> new PercentCodec(invalid, true));
     }
 
     @Test
-    void testPercentEncoderDecoderWithNullOrEmptyInput() throws Exception {
-        final PercentCodec percentCodec = new PercentCodec(null, true);
-        assertNull(percentCodec.encode(null), "Null input value encoding test");
-        assertNull(percentCodec.decode(null), "Null input value decoding test");
-        final byte[] emptyInput = "".getBytes(StandardCharsets.UTF_8);
-        assertEquals(percentCodec.encode(emptyInput), emptyInput, "Empty input value encoding test");
-        assertArrayEquals(percentCodec.decode(emptyInput), emptyInput, "Empty input value decoding test");
+    void nullAndEmptyInput_areHandledGracefully() throws Exception {
+        final PercentCodec codec = new PercentCodec(null, true);
+
+        // Nulls
+        assertNull(codec.encode((byte[]) null), "Encoding null should return null");
+        assertNull(codec.decode((byte[]) null), "Decoding null should return null");
+
+        // Empty array
+        final byte[] empty = bytes("");
+        // Historically this test asserts reference equality (not just content) for encode(empty)
+        assertSame(empty, codec.encode(empty), "Encoding empty array should return the same instance");
+        assertArrayEquals(empty, codec.decode(empty), "Decoding empty array should return an empty array");
     }
 
     @Test
-    void testPercentEncoderDecoderWithPlusForSpace() throws Exception {
+    void plusForSpace_encodesSpacesAsPlus_andDecodesBack() throws Exception {
+        final PercentCodec codec = new PercentCodec(null, true);
         final String input = "a b c d";
-        final PercentCodec percentCodec = new PercentCodec(null, true);
-        final byte[] encoded = percentCodec.encode(input.getBytes(StandardCharsets.UTF_8));
-        final String encodedS = new String(encoded, StandardCharsets.UTF_8);
-        assertEquals("a+b+c+d", encodedS, "PercentCodec plus for space encoding test");
-        final byte[] decode = percentCodec.decode(encoded);
-        assertEquals(new String(decode, StandardCharsets.UTF_8), input, "PercentCodec plus for space decoding test");
+
+        final byte[] encoded = codec.encode(bytes(input));
+        final byte[] decoded = codec.decode(encoded);
+
+        assertEquals("a+b+c+d", str(encoded), "Spaces should be encoded as '+' when plusForSpace is true");
+        assertEquals(input, str(decoded), "Round-trip decode should match original");
     }
 
     @Test
-    void testSafeCharEncodeDecodeObject() throws Exception {
-        final PercentCodec percentCodec = new PercentCodec(null, true);
+    void safeAsciiChars_encodeDecodeViaObject_apiRoundTrips() throws Exception {
+        final PercentCodec codec = new PercentCodec(null, true);
         final String input = "abc123_-.*";
-        final Object encoded = percentCodec.encode((Object) input.getBytes(StandardCharsets.UTF_8));
-        final String encodedS = new String((byte[]) encoded, StandardCharsets.UTF_8);
-        final Object decoded = percentCodec.decode(encoded);
-        final String decodedS = new String((byte[]) decoded, StandardCharsets.UTF_8);
-        assertEquals(input, encodedS, "Basic PercentCodec safe char encoding test");
-        assertEquals(input, decodedS, "Basic PercentCodec safe char decoding test");
+
+        final Object encoded = codec.encode((Object) bytes(input));
+        final Object decoded = codec.decode(encoded);
+
+        assertEquals(input, str((byte[]) encoded), "Safe ASCII should be unchanged when encoding");
+        assertEquals(input, str((byte[]) decoded), "Round-trip decode should match original");
     }
 
     @Test
-    void testUnsafeCharEncodeDecode() throws Exception {
-        final PercentCodec percentCodec = new PercentCodec();
+    void unsafeChars_arePercentEncoded_andRoundTripDecodes() throws Exception {
+        final PercentCodec codec = new PercentCodec();
         final String input = "\u03B1\u03B2\u03B3\u03B4\u03B5\u03B6% ";
-        final byte[] encoded = percentCodec.encode(input.getBytes(StandardCharsets.UTF_8));
-        final String encodedS = new String(encoded, StandardCharsets.UTF_8);
-        final byte[] decoded = percentCodec.decode(encoded);
-        final String decodedS = new String(decoded, StandardCharsets.UTF_8);
-        assertEquals("%CE%B1%CE%B2%CE%B3%CE%B4%CE%B5%CE%B6%25 ", encodedS, "Basic PercentCodec unsafe char encoding test");
-        assertEquals(input, decodedS, "Basic PercentCodec unsafe char decoding test");
-    }
 
+        final byte[] encoded = codec.encode(bytes(input));
+        final byte[] decoded = codec.decode(encoded);
+
+        assertEquals("%CE%B1%CE%B2%CE%B3%CE%B4%CE%B5%CE%B6%25 ", str(encoded));
+        assertEquals(input, str(decoded));
+    }
 }
