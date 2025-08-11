@@ -24,152 +24,128 @@ import java.util.Locale;
 import org.junit.Test;
 
 /**
- * Unit tests for FieldNamingPolicy helper methods and the built-in policies.
- * For end-to-end tests with Gson see FieldNamingTest.
+ * Performs tests directly against {@link FieldNamingPolicy}; for integration tests see {@code
+ * FieldNamingTest}.
  */
 public class FieldNamingPolicyTest {
+  @Test
+  public void testSeparateCamelCase() {
+    // Map from original -> expected
+    String[][] argumentPairs = {
+      {"a", "a"},
+      {"ab", "ab"},
+      {"Ab", "Ab"},
+      {"aB", "a_B"},
+      {"AB", "A_B"},
+      {"A_B", "A__B"},
+      {"firstSecondThird", "first_Second_Third"},
+      {"__", "__"},
+      {"_123", "_123"}
+    };
 
-  private static final char UNDERSCORE = '_';
-  // U+2170: SMALL ROMAN NUMERAL ONE; has an uppercase variant but is not a letter in Java sense
-  private static final String ROMAN_NUMERAL_ONE = "\u2170";
-
-  private static void assertSeparatesCamelCase(String input, String expected) {
-    assertThat(FieldNamingPolicy.separateCamelCase(input, UNDERSCORE)).isEqualTo(expected);
-  }
-
-  private static void assertUpperCaseFirstLetter(String input, String expected) {
-    assertThat(FieldNamingPolicy.upperCaseFirstLetter(input)).isEqualTo(expected);
+    for (String[] pair : argumentPairs) {
+      assertThat(FieldNamingPolicy.separateCamelCase(pair[0], '_')).isEqualTo(pair[1]);
+    }
   }
 
   @Test
-  public void separateCamelCase_leavesNonCamelCaseStringsUnchanged() {
-    assertSeparatesCamelCase("a", "a");
-    assertSeparatesCamelCase("ab", "ab");
-    assertSeparatesCamelCase("Ab", "Ab");   // already starts with upper-case
-    assertSeparatesCamelCase("__", "__");   // only separators
-    assertSeparatesCamelCase("_123", "_123"); // leading underscore + digits
-  }
+  public void testUpperCaseFirstLetter() {
+    // Map from original -> expected
+    String[][] argumentPairs = {
+      {"a", "A"},
+      {"ab", "Ab"},
+      {"AB", "AB"},
+      {"_a", "_A"},
+      {"_ab", "_Ab"},
+      {"__", "__"},
+      {"_1", "_1"},
+      // Not a letter, but has uppercase variant (should not be uppercased)
+      // See https://github.com/google/gson/issues/1965
+      {"\u2170", "\u2170"},
+      {"_\u2170", "_\u2170"},
+      {"\u2170a", "\u2170A"},
+    };
 
-  @Test
-  public void separateCamelCase_insertsSeparatorBetweenLowerToUpperTransition() {
-    assertSeparatesCamelCase("aB", "a_B");
-  }
-
-  @Test
-  public void separateCamelCase_splitsConsecutiveUppercaseLetters() {
-    assertSeparatesCamelCase("AB", "A_B");
-  }
-
-  @Test
-  public void separateCamelCase_preservesExistingSeparators() {
-    assertSeparatesCamelCase("A_B", "A__B");
-  }
-
-  @Test
-  public void separateCamelCase_splitsMultipleWords() {
-    assertSeparatesCamelCase("firstSecondThird", "first_Second_Third");
-  }
-
-  @Test
-  public void upperCaseFirstLetter_basicAsciiCases() {
-    assertUpperCaseFirstLetter("a", "A");
-    assertUpperCaseFirstLetter("ab", "Ab");
-    assertUpperCaseFirstLetter("AB", "AB"); // already capitalized
-  }
-
-  @Test
-  public void upperCaseFirstLetter_preservesLeadingUnderscoresAndNonLetters() {
-    assertUpperCaseFirstLetter("_a", "_A");
-    assertUpperCaseFirstLetter("_ab", "_Ab");
-    assertUpperCaseFirstLetter("__", "__");
-    assertUpperCaseFirstLetter("_1", "_1");
-  }
-
-  @Test
-  public void upperCaseFirstLetter_nonLetterWithUppercaseVariant_isNotUppercased() {
-    // See https://github.com/google/gson/issues/1965
-    assertUpperCaseFirstLetter(ROMAN_NUMERAL_ONE, ROMAN_NUMERAL_ONE);
-    assertUpperCaseFirstLetter("_" + ROMAN_NUMERAL_ONE, "_" + ROMAN_NUMERAL_ONE);
-    assertUpperCaseFirstLetter(ROMAN_NUMERAL_ONE + "a", ROMAN_NUMERAL_ONE + "A");
+    for (String[] pair : argumentPairs) {
+      assertThat(FieldNamingPolicy.upperCaseFirstLetter(pair[0])).isEqualTo(pair[1]);
+    }
   }
 
   /** Upper-casing policies should be unaffected by default Locale. */
   @Test
-  public void upperCasingPolicies_ignoreDefaultLocale() throws Exception {
+  public void testUpperCasingLocaleIndependent() throws Exception {
     class Dummy {
       @SuppressWarnings("unused")
       int i;
     }
 
-    Field field = Dummy.class.getDeclaredField("i");
-    String name = field.getName();
-
     FieldNamingPolicy[] policies = {
-        FieldNamingPolicy.UPPER_CAMEL_CASE,
-        FieldNamingPolicy.UPPER_CAMEL_CASE_WITH_SPACES,
-        FieldNamingPolicy.UPPER_CASE_WITH_UNDERSCORES
+      FieldNamingPolicy.UPPER_CAMEL_CASE,
+      FieldNamingPolicy.UPPER_CAMEL_CASE_WITH_SPACES,
+      FieldNamingPolicy.UPPER_CASE_WITH_UNDERSCORES,
     };
 
-    // Expected transformation must use a fixed, locale-independent reference
+    Field field = Dummy.class.getDeclaredField("i");
+    String name = field.getName();
     String expected = name.toUpperCase(Locale.ROOT);
 
-    Locale original = Locale.getDefault();
-    // Turkish has special case conversion rules (e.g., dotted/dotless i)
-    Locale.setDefault(Locale.forLanguageTag("tr"));
+    Locale oldLocale = Locale.getDefault();
+    // Set Turkish as Locale which has special case conversion rules
+    Locale.setDefault(new Locale("tr"));
 
     try {
-      // Sanity-check that our test environment differs from ROOT for this name
+      // Verify that default Locale has different case conversion rules
       assertWithMessage("Test setup is broken")
           .that(name.toUpperCase(Locale.getDefault()))
-          .isNotEqualTo(expected);
+          .doesNotMatch(expected);
 
       for (FieldNamingPolicy policy : policies) {
+        // Should ignore default Locale
         assertWithMessage("Unexpected conversion for %s", policy)
             .that(policy.translateName(field))
-            .isEqualTo(expected);
+            .matches(expected);
       }
     } finally {
-      Locale.setDefault(original);
+      Locale.setDefault(oldLocale);
     }
   }
 
-  /** Lower-casing policies should be unaffected by default Locale. */
+  /** Lower casing policies should be unaffected by default Locale. */
   @Test
-  public void lowerCasingPolicies_ignoreDefaultLocale() throws Exception {
+  public void testLowerCasingLocaleIndependent() throws Exception {
     class Dummy {
       @SuppressWarnings({"unused", "ConstantField"})
       int I;
     }
 
-    Field field = Dummy.class.getDeclaredField("I");
-    String name = field.getName();
-
     FieldNamingPolicy[] policies = {
-        FieldNamingPolicy.LOWER_CASE_WITH_DASHES,
-        FieldNamingPolicy.LOWER_CASE_WITH_DOTS,
-        FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES
+      FieldNamingPolicy.LOWER_CASE_WITH_DASHES,
+      FieldNamingPolicy.LOWER_CASE_WITH_DOTS,
+      FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES,
     };
 
-    // Expected transformation must use a fixed, locale-independent reference
+    Field field = Dummy.class.getDeclaredField("I");
+    String name = field.getName();
     String expected = name.toLowerCase(Locale.ROOT);
 
-    Locale original = Locale.getDefault();
-    // Turkish has special case conversion rules (e.g., dotted/dotless i)
-    Locale.setDefault(Locale.forLanguageTag("tr"));
+    Locale oldLocale = Locale.getDefault();
+    // Set Turkish as Locale which has special case conversion rules
+    Locale.setDefault(new Locale("tr"));
 
     try {
-      // Sanity-check that our test environment differs from ROOT for this name
+      // Verify that default Locale has different case conversion rules
       assertWithMessage("Test setup is broken")
           .that(name.toLowerCase(Locale.getDefault()))
-          .isNotEqualTo(expected);
+          .doesNotMatch(expected);
 
       for (FieldNamingPolicy policy : policies) {
+        // Should ignore default Locale
         assertWithMessage("Unexpected conversion for %s", policy)
             .that(policy.translateName(field))
-            .isEqualTo(expected);
+            .matches(expected);
       }
     } finally {
-      Locale.setDefault(original);
+      Locale.setDefault(oldLocale);
     }
   }
 }
