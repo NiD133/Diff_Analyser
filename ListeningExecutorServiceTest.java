@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 The Guava Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.common.util.concurrent;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -21,38 +37,28 @@ import org.jspecify.annotations.NullUnmarked;
 @NullUnmarked
 public final class ListeningExecutorServiceTest extends TestCase {
 
-  // Variables to record task details for verification
   private Collection<? extends Callable<?>> recordedTasks;
   private long recordedTimeout;
   private TimeUnit recordedTimeUnit;
 
-  // Fake executor service to simulate task execution
   private final ListeningExecutorService executorService = new FakeExecutorService();
 
-  // Test for the invokeAny method with a single task
   public void testInvokeAny() throws Exception {
-    // Arrange: Create a set with a single task
     Set<Callable<String>> tasks = Collections.singleton(() -> "invokeAny");
 
-    // Act: Invoke any task with a timeout
     String result = executorService.invokeAny(tasks, Duration.ofSeconds(7));
 
-    // Assert: Verify the result and recorded task details
     assertThat(result).isEqualTo("invokeAny");
     assertThat(recordedTasks).isSameInstanceAs(tasks);
     assertThat(recordedTimeUnit).isEqualTo(NANOSECONDS);
     assertThat(Duration.ofNanos(recordedTimeout)).isEqualTo(Duration.ofSeconds(7));
   }
 
-  // Test for the invokeAll method with a single task
   public void testInvokeAll() throws Exception {
-    // Arrange: Create a set with a single task
     Set<Callable<String>> tasks = Collections.singleton(() -> "invokeAll");
 
-    // Act: Invoke all tasks with a timeout
     List<Future<String>> result = executorService.invokeAll(tasks, Duration.ofDays(365));
 
-    // Assert: Verify the result and recorded task details
     assertThat(result).hasSize(1);
     assertThat(Futures.getDone(result.get(0))).isEqualTo("invokeAll");
     assertThat(recordedTasks).isSameInstanceAs(tasks);
@@ -60,18 +66,14 @@ public final class ListeningExecutorServiceTest extends TestCase {
     assertThat(Duration.ofNanos(recordedTimeout)).isEqualTo(Duration.ofDays(365));
   }
 
-  // Test for the awaitTermination method
   public void testAwaitTermination() throws Exception {
-    // Act: Await termination with a timeout
     boolean result = executorService.awaitTermination(Duration.ofMinutes(144));
 
-    // Assert: Verify the result and recorded timeout details
     assertThat(result).isTrue();
     assertThat(recordedTimeUnit).isEqualTo(NANOSECONDS);
     assertThat(Duration.ofNanos(recordedTimeout)).isEqualTo(Duration.ofMinutes(144));
   }
 
-  // Fake executor service to simulate task execution and record details
   private class FakeExecutorService extends AbstractListeningExecutorService {
     @Override
     public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
