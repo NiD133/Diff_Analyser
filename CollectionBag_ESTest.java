@@ -46,532 +46,788 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class)
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true, 
-    useVFS = true, 
-    useVNET = true, 
-    resetStaticState = true, 
-    separateClassLoader = true
-) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class CollectionBag_ESTest extends CollectionBag_ESTest_scaffolding {
 
-    // Constants for commonly used values
-    private static final Integer VALUE_389 = 389;
-    private static final Integer VALUE_5810 = 5810;
-    private static final Integer VALUE_105 = 105;
-    private static final Integer VALUE_NEG_300 = -300;
-    private static final Integer VALUE_10 = 10;
-    private static final Integer VALUE_1 = 1;
-    private static final Integer VALUE_273 = 273;
-    private static final Integer VALUE_512 = 512;
-    private static final Integer VALUE_NEG_926 = -926;
-    private static final Integer VALUE_977 = 977;
-    private static final Integer VALUE_2616 = 2616;
-    private static final Integer VALUE_4 = 4;
-    private static final Integer VALUE_0 = 0;
-    private static final Integer VALUE_2358 = 2358;
-    private static final Integer VALUE_2221 = 2221;
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      HashBag<Integer> hashBag0 = new HashBag<Integer>();
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(hashBag0);
+      Integer integer0 = new Integer(389);
+      hashBag0.add(integer0);
+      boolean boolean0 = collectionBag0.remove((Object) integer0);
+      assertTrue(boolean0);
+  }
 
-    // Test Cases Grouped by Functionality
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      HashBag<Object> hashBag0 = new HashBag<Object>((Collection<?>) treeBag0);
+      Integer integer0 = new Integer(5810);
+      boolean boolean0 = treeBag0.add(integer0);
+      CollectionBag<Object> collectionBag0 = new CollectionBag<Object>(hashBag0);
+      boolean boolean1 = collectionBag0.containsAll(treeBag0);
+      assertFalse(boolean1 == boolean0);
+  }
 
-    /*------------------------------*
-     * Tests for remove() method   *
-     *------------------------------*/
-    
-    @Test(timeout = 4000)
-    public void testRemoveElement_ShouldReturnTrue() throws Throwable {
-        // Setup
-        HashBag<Integer> bag = new HashBag<>();
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(bag);
-        bag.add(VALUE_389);
-        
-        // Execute
-        boolean result = collectionBag.remove((Object) VALUE_389);
-        
-        // Verify
-        assertTrue(result);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
+      Integer integer0 = new Integer(105);
+      collectionBag0.add(integer0, 105);
+      // Undeclared exception!
+      collectionBag0.retainAll(treeBag0);
+  }
 
-    @Test(timeout = 4000)
-    public void testRemoveFromUnmodifiableBag_ShouldThrowException() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        treeBag.add(VALUE_NEG_300);
-        SortedBag<Integer> unmodifiableBag = UnmodifiableSortedBag.unmodifiableSortedBag(treeBag);
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(unmodifiableBag);
-        
-        // Execute & Verify
-        try {
-            collectionBag.remove(new Object());
-            fail("Expected UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      Integer integer0 = new Integer((-300));
+      treeBag0.add(integer0);
+      SortedBag<Integer> sortedBag0 = UnmodifiableSortedBag.unmodifiableSortedBag((SortedBag<Integer>) treeBag0);
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(sortedBag0);
+      TreeSet<Integer> treeSet0 = new TreeSet<Integer>();
+      // Undeclared exception!
+      try { 
+        collectionBag0.retainAll(treeSet0);
+        fail("Expecting exception: UnsupportedOperationException");
+      
+      } catch(UnsupportedOperationException e) {
+         //
+         // remove() is not supported
+         //
+         verifyException("org.apache.commons.collections4.iterators.UnmodifiableIterator", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testRemoveNull_ShouldThrowNullPointer() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(treeBag);
-        
-        // Execute & Verify
-        try {
-            collectionBag.remove(null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
+      // Undeclared exception!
+      try { 
+        collectionBag0.retainAll((Collection<?>) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.collections4.bag.AbstractMapBag", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testRemoveWrongType_ShouldThrowClassCast() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(treeBag);
-        
-        // Execute & Verify
-        try {
-            collectionBag.remove((Object) treeBag);
-            fail("Expected ClassCastException");
-        } catch (ClassCastException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
+      Integer integer0 = new Integer(10);
+      collectionBag0.add(integer0, 10);
+      // Undeclared exception!
+      try { 
+        collectionBag0.removeAll(treeBag0);
+        fail("Expecting exception: ConcurrentModificationException");
+      
+      } catch(ConcurrentModificationException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.collections4.bag.AbstractMapBag$BagIterator", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testRemoveAbsentElement_ShouldReturnFalse() throws Throwable {
-        // Setup
-        LinkedList<Integer> list = new LinkedList<>();
-        HashBag<Integer> bag = new HashBag<>(list);
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(bag);
-        SynchronizedBag<Integer> syncBag = new SynchronizedBag<>(bag, list);
-        
-        // Execute
-        boolean result = collectionBag.remove(syncBag);
-        
-        // Verify
-        assertFalse(result);
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
+      Integer integer0 = new Integer(1);
+      HashBag<Integer> hashBag0 = new HashBag<Integer>((Collection<? extends Integer>) collectionBag0);
+      hashBag0.add(integer0);
+      collectionBag0.addAll(hashBag0);
+      HashBag<ComparatorPredicate.Criterion> hashBag1 = new HashBag<ComparatorPredicate.Criterion>();
+      Bag<ComparatorPredicate.Criterion> bag0 = UnmodifiableBag.unmodifiableBag((Bag<? extends ComparatorPredicate.Criterion>) hashBag1);
+      CollectionBag<ComparatorPredicate.Criterion> collectionBag1 = new CollectionBag<ComparatorPredicate.Criterion>(bag0);
+      // Undeclared exception!
+      try { 
+        collectionBag1.removeAll(collectionBag0);
+        fail("Expecting exception: UnsupportedOperationException");
+      
+      } catch(UnsupportedOperationException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.collections4.bag.UnmodifiableBag", e);
+      }
+  }
 
-    /*--------------------------------*
-     * Tests for containsAll() method *
-     *--------------------------------*/
-    
-    @Test(timeout = 4000)
-    public void testContainsAll_ShouldReturnFalseWhenMissingElements() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        HashBag<Object> hashBag = new HashBag<>(treeBag);
-        CollectionBag<Object> collectionBag = new CollectionBag<>(hashBag);
-        treeBag.add(VALUE_5810);
-        
-        // Execute
-        boolean result = collectionBag.containsAll(treeBag);
-        
-        // Verify
-        assertFalse(result);
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      HashBag<Integer> hashBag0 = new HashBag<Integer>((Iterable<? extends Integer>) treeBag0);
+      hashBag0.add((Integer) null);
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(hashBag0);
+      TreeBag<Object> treeBag1 = new TreeBag<Object>();
+      CollectionBag<Object> collectionBag1 = new CollectionBag<Object>(treeBag1);
+      // Undeclared exception!
+      try { 
+        collectionBag1.removeAll(collectionBag0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.util.TreeMap", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testContainsAll_ShouldReturnTrueWhenAllPresent() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        HashBag<Object> hashBag = new HashBag<>(treeBag);
-        CollectionBag<Object> collectionBag = new CollectionBag<>(hashBag);
-        
-        // Execute
-        boolean result = collectionBag.containsAll(treeBag);
-        
-        // Verify
-        assertTrue(result);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      Bag<Object> bag0 = UnmodifiableBag.unmodifiableBag((Bag<?>) treeBag0);
+      CollectionBag<Object> collectionBag0 = new CollectionBag<Object>(bag0);
+      Object object0 = new Object();
+      // Undeclared exception!
+      try { 
+        collectionBag0.remove(object0);
+        fail("Expecting exception: UnsupportedOperationException");
+      
+      } catch(UnsupportedOperationException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.collections4.bag.UnmodifiableBag", e);
+      }
+  }
 
-    /*-------------------------------*
-     * Tests for retainAll() method  *
-     *-------------------------------*/
-    
-    @Test(timeout = 4000)
-    public void testRetainAllWithModification_ShouldThrowConcurrentModification() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(treeBag);
-        collectionBag.add(VALUE_105, VALUE_105);
-        
-        // Execute & Verify
-        try {
-            collectionBag.retainAll(treeBag);
-            fail("Expected ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
+      // Undeclared exception!
+      try { 
+        collectionBag0.remove((Object) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.util.TreeMap", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testRetainAllOnUnmodifiableBag_ShouldThrowException() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        treeBag.add(VALUE_NEG_300);
-        SortedBag<Integer> unmodifiableBag = UnmodifiableSortedBag.unmodifiableSortedBag(treeBag);
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(unmodifiableBag);
-        TreeSet<Integer> set = new TreeSet<>();
-        
-        // Execute & Verify
-        try {
-            collectionBag.retainAll(set);
-            fail("Expected UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
+      // Undeclared exception!
+      try { 
+        collectionBag0.remove((Object) treeBag0);
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testRetainAllWithNullCollection_ShouldThrowNullPointer() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(treeBag);
-        
-        // Execute & Verify
-        try {
-            collectionBag.retainAll(null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      Stack<LinkedList<Integer>> stack0 = new Stack<LinkedList<Integer>>();
+      TreeBag<LinkedList<Integer>> treeBag0 = new TreeBag<LinkedList<Integer>>((Iterable<? extends LinkedList<Integer>>) stack0);
+      SynchronizedSortedBag<LinkedList<Integer>> synchronizedSortedBag0 = SynchronizedSortedBag.synchronizedSortedBag((SortedBag<LinkedList<Integer>>) treeBag0);
+      Transformer<LinkedList<Integer>, LinkedList<Integer>> transformer0 = InvokerTransformer.invokerTransformer("org.apache.commons.collections4.bag.CollectionBag");
+      CollectionBag<LinkedList<Integer>> collectionBag0 = new CollectionBag<LinkedList<Integer>>(synchronizedSortedBag0);
+      // Undeclared exception!
+      try { 
+        collectionBag0.remove((Object) transformer0);
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testRetainAll_ShouldRemoveNonMatchingElements() throws Throwable {
-        // Setup
-        LinkedList<Integer> list = new LinkedList<>();
-        HashBag<Integer> bag = new HashBag<>(list);
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(bag);
-        Integer value = VALUE_2221;
-        bag.add(value);
-        
-        // Execute
-        boolean result = collectionBag.retainAll(list);
-        
-        // Verify
-        assertTrue(result);
-        assertFalse(bag.contains(value));
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        CollectionBag.collectionBag((Bag<Object>) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // collection
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testRetainAll_ShouldReturnFalseWhenNoChanges() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        HashBag<Integer> hashBag = new HashBag<>(treeBag);
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(hashBag);
-        treeBag.add(VALUE_1);
-        collectionBag.addAll(treeBag);
-        
-        // Execute
-        boolean result = collectionBag.retainAll(treeBag);
-        
-        // Verify
-        assertFalse(result);
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      Integer integer0 = new Integer((-1));
+      treeBag0.add(integer0);
+      TreeBag<Object> treeBag1 = new TreeBag<Object>();
+      SynchronizedSortedBag<Object> synchronizedSortedBag0 = SynchronizedSortedBag.synchronizedSortedBag((SortedBag<Object>) treeBag1);
+      Class<Object>[] classArray0 = (Class<Object>[]) Array.newInstance(Class.class, 0);
+      InvokerTransformer<Object, Object> invokerTransformer0 = new InvokerTransformer<Object, Object>("LESS", classArray0, classArray0);
+      TransformedBag<Object> transformedBag0 = new TransformedBag<Object>(synchronizedSortedBag0, invokerTransformer0);
+      CollectionBag<Object> collectionBag0 = new CollectionBag<Object>(transformedBag0);
+      // Undeclared exception!
+      try { 
+        collectionBag0.addAll(treeBag0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // InvokerTransformer: The method 'LESS' on 'class java.lang.Integer' does not exist
+         //
+         verifyException("org.apache.commons.collections4.functors.InvokerTransformer", e);
+      }
+  }
 
-    /*-------------------------------*
-     * Tests for removeAll() method  *
-     *-------------------------------*/
-    
-    @Test(timeout = 4000)
-    public void testRemoveAllWithModification_ShouldThrowConcurrentModification() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(treeBag);
-        collectionBag.add(VALUE_10, VALUE_10);
-        
-        // Execute & Verify
-        try {
-            collectionBag.removeAll(treeBag);
-            fail("Expected ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      Integer integer0 = new Integer(273);
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
+      collectionBag0.add(integer0, 273);
+      // Undeclared exception!
+      try { 
+        collectionBag0.addAll(treeBag0);
+        fail("Expecting exception: ConcurrentModificationException");
+      
+      } catch(ConcurrentModificationException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.collections4.bag.AbstractMapBag$BagIterator", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testRemoveAllOnUnmodifiableBag_ShouldThrowException() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(treeBag);
-        treeBag.add(VALUE_1);
-        HashBag<ComparatorPredicate.Criterion> emptyBag = new HashBag<>();
-        Bag<ComparatorPredicate.Criterion> unmodifiableBag = UnmodifiableBag.unmodifiableBag(emptyBag);
-        CollectionBag<ComparatorPredicate.Criterion> targetBag = new CollectionBag<>(unmodifiableBag);
-        
-        // Execute & Verify
-        try {
-            targetBag.removeAll(collectionBag);
-            fail("Expected UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      Integer integer0 = new Integer(512);
+      treeBag0.add(integer0);
+      SortedBag<Integer> sortedBag0 = UnmodifiableSortedBag.unmodifiableSortedBag((SortedBag<Integer>) treeBag0);
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(sortedBag0);
+      // Undeclared exception!
+      try { 
+        collectionBag0.addAll(sortedBag0);
+        fail("Expecting exception: UnsupportedOperationException");
+      
+      } catch(UnsupportedOperationException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.collections4.bag.UnmodifiableSortedBag", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testRemoveAllNullCollection_ShouldReturnFalse() throws Throwable {
-        // Setup
-        LinkedList<Integer> list = new LinkedList<>();
-        HashBag<Integer> bag = new HashBag<>(list);
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(bag);
-        
-        // Execute
-        boolean result = collectionBag.removeAll(null);
-        
-        // Verify
-        assertFalse(result);
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
+      // Undeclared exception!
+      try { 
+        collectionBag0.addAll((Collection<? extends Integer>) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.collections4.bag.CollectionBag", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testRemoveAll_ShouldRemoveAllMatchingElements() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        treeBag.add(VALUE_2616);
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(treeBag);
-        collectionBag.addAll(treeBag);
-        HashBag<Object> targetBag = new HashBag<>(treeBag);
-        CollectionBag<Object> targetCollectionBag = new CollectionBag<>(targetBag);
-        
-        // Execute
-        boolean result = targetCollectionBag.removeAll(treeBag);
-        
-        // Verify
-        assertTrue(result);
-        assertEquals(2, treeBag.size());
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      Integer integer0 = new Integer((-926));
+      treeBag0.add(integer0);
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
+      TreeBag<Object> treeBag1 = new TreeBag<Object>((Iterable<?>) collectionBag0);
+      HashMap<Object, Object> hashMap0 = new HashMap<Object, Object>();
+      Transformer<Object, Object> transformer0 = MapTransformer.mapTransformer((Map<? super Object, ?>) hashMap0);
+      Bag<Object> bag0 = TransformedBag.transformingBag((Bag<Object>) treeBag1, (Transformer<? super Object, ?>) transformer0);
+      SynchronizedBag<Object> synchronizedBag0 = new SynchronizedBag<Object>(bag0, collectionBag0);
+      CollectionBag<Object> collectionBag1 = new CollectionBag<Object>(synchronizedBag0);
+      // Undeclared exception!
+      try { 
+        collectionBag1.addAll(treeBag1);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.util.TreeMap", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testRemoveAll_ShouldReturnFalseWhenNoElementsRemoved() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(treeBag);
-        HashBag<ComparatorPredicate.Criterion> emptyBag = new HashBag<>();
-        CollectionBag<ComparatorPredicate.Criterion> targetBag = new CollectionBag<>(emptyBag);
-        
-        // Execute
-        boolean result = targetBag.removeAll(collectionBag);
-        
-        // Verify
-        assertFalse(result);
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      Integer integer0 = new Integer(977);
+      treeBag0.add(integer0);
+      UniquePredicate<Integer> uniquePredicate0 = new UniquePredicate<Integer>();
+      NullIsExceptionPredicate<Integer> nullIsExceptionPredicate0 = new NullIsExceptionPredicate<Integer>(uniquePredicate0);
+      PredicatedSortedBag<Integer> predicatedSortedBag0 = PredicatedSortedBag.predicatedSortedBag((SortedBag<Integer>) treeBag0, (Predicate<? super Integer>) nullIsExceptionPredicate0);
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(predicatedSortedBag0);
+      // Undeclared exception!
+      try { 
+        collectionBag0.addAll(predicatedSortedBag0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Cannot add Object '977' - Predicate 'org.apache.commons.collections4.functors.NullIsExceptionPredicate@4' rejected it
+         //
+         verifyException("org.apache.commons.collections4.collection.PredicatedCollection", e);
+      }
+  }
 
-    /*----------------------------*
-     * Tests for addAll() method  *
-     *----------------------------*/
-    
-    @Test(timeout = 4000)
-    public void testAddAllWithTransformer_ShouldThrowRuntimeException() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        treeBag.add(VALUE_NEG_926);
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(treeBag);
-        TreeBag<Object> targetTreeBag = new TreeBag<>(collectionBag);
-        HashMap<Object, Object> map = new HashMap<>();
-        Transformer<Object, Object> transformer = MapTransformer.mapTransformer(map);
-        Bag<Object> transformedBag = TransformedBag.transformingBag(targetTreeBag, transformer);
-        SynchronizedBag<Object> syncBag = new SynchronizedBag<>(transformedBag, collectionBag);
-        CollectionBag<Object> targetCollectionBag = new CollectionBag<>(syncBag);
-        
-        // Execute & Verify
-        try {
-            targetCollectionBag.addAll(targetTreeBag);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      TreeBag<Object> treeBag1 = new TreeBag<Object>((Collection<?>) treeBag0);
+      Transformer<Object, Boolean> transformer0 = InvokerTransformer.invokerTransformer("");
+      TransformerPredicate<Object> transformerPredicate0 = new TransformerPredicate<Object>(transformer0);
+      NullIsExceptionPredicate<Object> nullIsExceptionPredicate0 = new NullIsExceptionPredicate<Object>(transformerPredicate0);
+      PredicatedBag<Object> predicatedBag0 = new PredicatedBag<Object>(treeBag1, nullIsExceptionPredicate0);
+      CollectionBag<Object> collectionBag0 = new CollectionBag<Object>(predicatedBag0);
+      // Undeclared exception!
+      try { 
+        collectionBag0.add((Object) treeBag1, (-3484));
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // InvokerTransformer: The method '' on 'class org.apache.commons.collections4.bag.TreeBag' does not exist
+         //
+         verifyException("org.apache.commons.collections4.functors.InvokerTransformer", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testAddAllWithPredicate_ShouldThrowIllegalArgument() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        treeBag.add(VALUE_977);
-        UniquePredicate<Integer> uniquePredicate = new UniquePredicate<>();
-        NullIsExceptionPredicate<Integer> predicate = new NullIsExceptionPredicate<>(uniquePredicate);
-        PredicatedSortedBag<Integer> predicatedBag = PredicatedSortedBag.predicatedSortedBag(treeBag, predicate);
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(predicatedBag);
-        
-        // Execute & Verify
-        try {
-            collectionBag.addAll(predicatedBag);
-            fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
+      TreeBag<Object> treeBag1 = new TreeBag<Object>((Collection<?>) collectionBag0);
+      SortedBag<Object> sortedBag0 = UnmodifiableSortedBag.unmodifiableSortedBag((SortedBag<Object>) treeBag1);
+      CollectionBag<Object> collectionBag1 = new CollectionBag<Object>(sortedBag0);
+      // Undeclared exception!
+      try { 
+        collectionBag1.add((Object) treeBag1, 512);
+        fail("Expecting exception: UnsupportedOperationException");
+      
+      } catch(UnsupportedOperationException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.collections4.bag.UnmodifiableSortedBag", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testAddAllNullCollection_ShouldThrowNullPointer() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(treeBag);
-        
-        // Execute & Verify
-        try {
-            collectionBag.addAll(null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      TreeBag<Predicate<Object>> treeBag0 = new TreeBag<Predicate<Object>>();
+      Predicate<Object> predicate0 = FalsePredicate.falsePredicate();
+      IfTransformer<Object, Predicate<Object>> ifTransformer0 = new IfTransformer<Object, Predicate<Object>>(predicate0, (Transformer<? super Object, ? extends Predicate<Object>>) null, (Transformer<? super Object, ? extends Predicate<Object>>) null);
+      Bag<Predicate<Object>> bag0 = TransformedBag.transformedBag((Bag<Predicate<Object>>) treeBag0, (Transformer<? super Predicate<Object>, ? extends Predicate<Object>>) ifTransformer0);
+      SynchronizedBag<Predicate<Object>> synchronizedBag0 = new SynchronizedBag<Predicate<Object>>(bag0, predicate0);
+      CollectionBag<Predicate<Object>> collectionBag0 = new CollectionBag<Predicate<Object>>(synchronizedBag0);
+      // Undeclared exception!
+      try { 
+        collectionBag0.add(predicate0, 0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.collections4.functors.IfTransformer", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testAddAll_ShouldReturnTrueWhenElementsAdded() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        treeBag.add(VALUE_2358);
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(treeBag);
-        HashBag<Object> targetBag = new HashBag<>(treeBag);
-        CollectionBag<Object> targetCollectionBag = new CollectionBag<>(targetBag);
-        
-        // Execute
-        boolean result = targetCollectionBag.addAll(treeBag);
-        
-        // Verify
-        assertTrue(result);
-        assertEquals(4, targetBag.size());
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      Predicate<Integer> predicate0 = FalsePredicate.falsePredicate();
+      PredicatedSortedBag<Integer> predicatedSortedBag0 = PredicatedSortedBag.predicatedSortedBag((SortedBag<Integer>) treeBag0, (Predicate<? super Integer>) predicate0);
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(predicatedSortedBag0);
+      // Undeclared exception!
+      try { 
+        collectionBag0.add((Integer) null, (-3735));
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Cannot add Object 'null' - Predicate 'org.apache.commons.collections4.functors.FalsePredicate@5' rejected it
+         //
+         verifyException("org.apache.commons.collections4.collection.PredicatedCollection", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testAddAll_ShouldReturnFalseWhenNoElementsAdded() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(treeBag);
-        HashBag<Integer> emptyBag = new HashBag<>(collectionBag);
-        
-        // Execute
-        boolean result = collectionBag.addAll(emptyBag);
-        
-        // Verify
-        assertFalse(result);
-    }
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      TreeBag<LinkedList<Object>> treeBag0 = new TreeBag<LinkedList<Object>>();
+      CollectionBag<LinkedList<Object>> collectionBag0 = new CollectionBag<LinkedList<Object>>(treeBag0);
+      LinkedList<Object> linkedList0 = new LinkedList<Object>();
+      // Undeclared exception!
+      try { 
+        collectionBag0.add(linkedList0, 3280);
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+      }
+  }
 
-    /*----------------------------*
-     * Tests for add() method     *
-     *----------------------------*/
-    
-    @Test(timeout = 4000)
-    public void testAddElement_ShouldReturnTrue() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        HashBag<Integer> bag = new HashBag<>(treeBag);
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(bag);
-        
-        // Execute
-        boolean result = collectionBag.add(VALUE_0);
-        
-        // Verify
-        assertTrue(result);
-        assertTrue(collectionBag.contains(VALUE_0));
-    }
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      TreeBag<LinkedList<Integer>> treeBag0 = new TreeBag<LinkedList<Integer>>();
+      SynchronizedBag<LinkedList<Integer>> synchronizedBag0 = SynchronizedBag.synchronizedBag((Bag<LinkedList<Integer>>) treeBag0);
+      CollectionBag<LinkedList<Integer>> collectionBag0 = new CollectionBag<LinkedList<Integer>>(synchronizedBag0);
+      LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
+      // Undeclared exception!
+      try { 
+        collectionBag0.add(linkedList0, 2864);
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testAddToUnmodifiableBag_ShouldThrowException() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        SortedBag<Integer> unmodifiableBag = UnmodifiableSortedBag.unmodifiableSortedBag(treeBag);
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(unmodifiableBag);
-        
-        // Execute & Verify
-        try {
-            collectionBag.add(VALUE_NEG_300);
-            fail("Expected UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      TreeBag<Object> treeBag0 = new TreeBag<Object>();
+      Class<Object>[] classArray0 = (Class<Object>[]) Array.newInstance(Class.class, 0);
+      InvokerTransformer<Object, Object> invokerTransformer0 = new InvokerTransformer<Object, Object>("R5.G^N;x-<AR<<c", classArray0, classArray0);
+      TransformedSortedBag<Object> transformedSortedBag0 = TransformedSortedBag.transformingSortedBag((SortedBag<Object>) treeBag0, (Transformer<? super Object, ?>) invokerTransformer0);
+      CollectionBag<Object> collectionBag0 = new CollectionBag<Object>(transformedSortedBag0);
+      Object object0 = new Object();
+      // Undeclared exception!
+      try { 
+        collectionBag0.add(object0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // InvokerTransformer: The method 'R5.G^N;x-<AR<<c' on 'class java.lang.Object' does not exist
+         //
+         verifyException("org.apache.commons.collections4.functors.InvokerTransformer", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testAddNull_ShouldThrowNullPointer() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(treeBag);
-        
-        // Execute & Verify
-        try {
-            collectionBag.add(null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      Integer integer0 = new Integer((-300));
+      SortedBag<Integer> sortedBag0 = UnmodifiableSortedBag.unmodifiableSortedBag((SortedBag<Integer>) treeBag0);
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(sortedBag0);
+      // Undeclared exception!
+      try { 
+        collectionBag0.add(integer0);
+        fail("Expecting exception: UnsupportedOperationException");
+      
+      } catch(UnsupportedOperationException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.collections4.bag.UnmodifiableSortedBag", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testAddWithPredicate_ShouldThrowIllegalArgument() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        Integer value = VALUE_4;
-        IdentityPredicate<Integer> predicate = new IdentityPredicate<>(value);
-        PredicatedSortedBag<Integer> predicatedBag = new PredicatedSortedBag<>(treeBag, predicate);
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(predicatedBag);
-        
-        // Execute & Verify
-        try {
-            collectionBag.add(value);
-            fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
+      // Undeclared exception!
+      try { 
+        collectionBag0.add((Integer) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.util.TreeMap", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testAddMultipleCopies_ShouldSucceed() throws Throwable {
-        // Setup
-        TreeBag<Integer> treeBag = new TreeBag<>();
-        CollectionBag<Integer> collectionBag = new CollectionBag<>(treeBag);
-        
-        // Execute
-        boolean result = collectionBag.add(VALUE_1, 5);
-        
-        // Verify
-        assertTrue(result);
-        assertEquals(5, collectionBag.getCount(VALUE_1));
-    }
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
+      TreeBag<Object> treeBag1 = new TreeBag<Object>((Collection<?>) collectionBag0);
+      SynchronizedSortedBag<Object> synchronizedSortedBag0 = SynchronizedSortedBag.synchronizedSortedBag((SortedBag<Object>) treeBag1);
+      Transformer<Object, Integer> transformer0 = ConstantTransformer.nullTransformer();
+      TransformedSortedBag<Object> transformedSortedBag0 = TransformedSortedBag.transformingSortedBag((SortedBag<Object>) synchronizedSortedBag0, (Transformer<? super Object, ?>) transformer0);
+      SortedBag<Object> sortedBag0 = CollectionSortedBag.collectionSortedBag((SortedBag<Object>) transformedSortedBag0);
+      CollectionBag<Object> collectionBag1 = new CollectionBag<Object>(sortedBag0);
+      // Undeclared exception!
+      try { 
+        collectionBag1.add((Object) collectionBag0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.util.TreeMap", e);
+      }
+  }
 
-    /*--------------------------------*
-     * Tests for factory method       *
-     *--------------------------------*/
-    
-    @Test(timeout = 4000)
-    public void testCollectionBagFactory_ShouldCreateEmptyBag() throws Throwable {
-        // Setup
-        HashBag<ComparatorPredicate.Criterion> bag = new HashBag<>();
-        
-        // Execute
-        Bag<ComparatorPredicate.Criterion> result = CollectionBag.collectionBag(bag);
-        
-        // Verify
-        assertEquals(0, result.size());
-    }
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      Integer integer0 = new Integer(4);
+      IdentityPredicate<Integer> identityPredicate0 = new IdentityPredicate<Integer>(integer0);
+      PredicatedSortedBag<Integer> predicatedSortedBag0 = new PredicatedSortedBag<Integer>(treeBag0, identityPredicate0);
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(predicatedSortedBag0);
+      Integer integer1 = new Integer(4);
+      // Undeclared exception!
+      try { 
+        collectionBag0.add(integer1);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Cannot add Object '4' - Predicate 'org.apache.commons.collections4.functors.IdentityPredicate@2' rejected it
+         //
+         verifyException("org.apache.commons.collections4.collection.PredicatedCollection", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testCollectionBagFactoryWithNull_ShouldThrowNullPointer() throws Throwable {
-        // Execute & Verify
-        try {
-            CollectionBag.collectionBag(null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      TreeBag<LinkedList<Object>> treeBag0 = new TreeBag<LinkedList<Object>>();
+      CollectionBag<LinkedList<Object>> collectionBag0 = new CollectionBag<LinkedList<Object>>(treeBag0);
+      LinkedList<Object> linkedList0 = new LinkedList<Object>();
+      // Undeclared exception!
+      try { 
+        collectionBag0.add(linkedList0);
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+      }
+  }
 
-    /*--------------------------------*
-     * Tests for constructor          *
-     *--------------------------------*/
-    
-    @Test(timeout = 4000)
-    public void testConstructorWithNull_ShouldThrowNullPointer() throws Throwable {
-        // Execute & Verify
-        try {
-            new CollectionBag<>(null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected behavior
-        }
-    }
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      TreeBag<LinkedList<Object>> treeBag0 = new TreeBag<LinkedList<Object>>();
+      TreeBag<Object> treeBag1 = new TreeBag<Object>((Iterable<?>) treeBag0);
+      SynchronizedSortedBag<Object> synchronizedSortedBag0 = SynchronizedSortedBag.synchronizedSortedBag((SortedBag<Object>) treeBag1);
+      CollectionBag<Object> collectionBag0 = new CollectionBag<Object>(synchronizedSortedBag0);
+      // Undeclared exception!
+      try { 
+        collectionBag0.add((Object) treeBag1);
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test32()  throws Throwable  {
+      CollectionBag<Object> collectionBag0 = null;
+      try {
+        collectionBag0 = new CollectionBag<Object>((Bag<Object>) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // collection
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test33()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
+      // Undeclared exception!
+      try { 
+        collectionBag0.add((Integer) null, 2412);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.util.TreeMap", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test34()  throws Throwable  {
+      LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
+      HashBag<Integer> hashBag0 = new HashBag<Integer>((Iterable<? extends Integer>) linkedList0);
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(hashBag0);
+      Integer integer0 = new Integer(2221);
+      hashBag0.add(integer0);
+      boolean boolean0 = collectionBag0.retainAll(linkedList0);
+      assertFalse(hashBag0.contains(2221));
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test35()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
+      Integer integer0 = new Integer(1);
+      HashBag<Integer> hashBag0 = new HashBag<Integer>((Collection<? extends Integer>) collectionBag0);
+      hashBag0.add(integer0);
+      collectionBag0.addAll(hashBag0);
+      boolean boolean0 = collectionBag0.retainAll(treeBag0);
+      assertTrue(collectionBag0.contains(1));
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test36()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      SynchronizedBag<Integer> synchronizedBag0 = new SynchronizedBag<Integer>(treeBag0);
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(synchronizedBag0);
+      // Undeclared exception!
+      try { 
+        collectionBag0.retainAll((Collection<?>) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.collections4.bag.AbstractMapBag", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test37()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      Integer integer0 = new Integer(2616);
+      treeBag0.add(integer0);
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
+      collectionBag0.addAll(treeBag0);
+      HashBag<Object> hashBag0 = new HashBag<Object>((Collection<?>) treeBag0);
+      CollectionBag<Object> collectionBag1 = new CollectionBag<Object>(hashBag0);
+      boolean boolean0 = collectionBag1.removeAll(treeBag0);
+      assertEquals(2, treeBag0.size());
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test38()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
+      HashBag<ComparatorPredicate.Criterion> hashBag0 = new HashBag<ComparatorPredicate.Criterion>();
+      CollectionBag<ComparatorPredicate.Criterion> collectionBag1 = new CollectionBag<ComparatorPredicate.Criterion>(hashBag0);
+      boolean boolean0 = collectionBag1.removeAll(collectionBag0);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test39()  throws Throwable  {
+      LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
+      HashBag<Integer> hashBag0 = new HashBag<Integer>((Collection<? extends Integer>) linkedList0);
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(hashBag0);
+      boolean boolean0 = collectionBag0.removeAll((Collection<?>) null);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test40()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
+      Integer integer0 = new Integer(2358);
+      treeBag0.add(integer0);
+      collectionBag0.addAll(treeBag0);
+      HashBag<Object> hashBag0 = new HashBag<Object>((Collection<?>) treeBag0);
+      CollectionBag<Object> collectionBag1 = new CollectionBag<Object>(hashBag0);
+      boolean boolean0 = collectionBag1.addAll(treeBag0);
+      assertEquals(4, hashBag0.size());
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test41()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
+      Integer integer0 = new Integer(1);
+      HashBag<Integer> hashBag0 = new HashBag<Integer>((Collection<? extends Integer>) collectionBag0);
+      hashBag0.add(integer0);
+      collectionBag0.addAll(hashBag0);
+      HashBag<ComparatorPredicate.Criterion> hashBag1 = new HashBag<ComparatorPredicate.Criterion>();
+      CollectionBag<ComparatorPredicate.Criterion> collectionBag1 = new CollectionBag<ComparatorPredicate.Criterion>(hashBag1);
+      boolean boolean0 = collectionBag1.removeAll(collectionBag0);
+      assertTrue(collectionBag0.contains(1));
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test42()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
+      HashBag<Integer> hashBag0 = new HashBag<Integer>((Collection<? extends Integer>) collectionBag0);
+      boolean boolean0 = collectionBag0.addAll(hashBag0);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test43()  throws Throwable  {
+      HashBag<ComparatorPredicate.Criterion> hashBag0 = new HashBag<ComparatorPredicate.Criterion>();
+      Bag<ComparatorPredicate.Criterion> bag0 = CollectionBag.collectionBag((Bag<ComparatorPredicate.Criterion>) hashBag0);
+      assertEquals(0, bag0.size());
+  }
+
+  @Test(timeout = 4000)
+  public void test44()  throws Throwable  {
+      LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
+      HashBag<Integer> hashBag0 = new HashBag<Integer>((Iterable<? extends Integer>) linkedList0);
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(hashBag0);
+      SynchronizedBag<Integer> synchronizedBag0 = new SynchronizedBag<Integer>(hashBag0, linkedList0);
+      boolean boolean0 = collectionBag0.remove((Object) synchronizedBag0);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test45()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      Integer integer0 = new Integer(0);
+      HashBag<Integer> hashBag0 = new HashBag<Integer>((Iterable<? extends Integer>) treeBag0);
+      CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(hashBag0);
+      boolean boolean0 = collectionBag0.add(integer0);
+      assertTrue(collectionBag0.contains(0));
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test46()  throws Throwable  {
+      TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
+      HashBag<Object> hashBag0 = new HashBag<Object>((Collection<?>) treeBag0);
+      CollectionBag<Object> collectionBag0 = new CollectionBag<Object>(hashBag0);
+      boolean boolean0 = collectionBag0.containsAll(treeBag0);
+      assertTrue(boolean0);
+  }
 }
