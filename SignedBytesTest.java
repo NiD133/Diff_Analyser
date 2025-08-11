@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2008 The Guava Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.google.common.primitives;
 
 import static com.google.common.primitives.ReflectionFreeAssertThrows.assertThrows;
@@ -35,92 +19,106 @@ import junit.framework.TestCase;
 import org.jspecify.annotations.NullMarked;
 
 /**
- * Unit test for {@link SignedBytes}.
- *
- * @author Kevin Bourrillion
+ * Tests for SignedBytes.
+ * 
+ * The tests are organized by API surface area and favor small, intention-revealing helpers and
+ * messages. Where appropriate, we assert only on the sign of comparisons (to match the contract).
  */
 @NullMarked
 @GwtCompatible(emulated = true)
 public class SignedBytesTest extends TestCase {
+
   private static final byte[] EMPTY = {};
   private static final byte[] ARRAY1 = {(byte) 1};
 
   private static final byte LEAST = Byte.MIN_VALUE;
   private static final byte GREATEST = Byte.MAX_VALUE;
 
-  private static final byte[] VALUES = {LEAST, -1, 0, 1, GREATEST};
+  private static final byte[] VALUES = {LEAST, (byte) -1, (byte) 0, (byte) 1, GREATEST};
 
-  public void testCheckedCast() {
+  // ----------------------------------------------------------------------------------------------
+  // Casting
+  // ----------------------------------------------------------------------------------------------
+
+  public void testCheckedCast_withinRange_returnsSameValue() {
     for (byte value : VALUES) {
       assertThat(SignedBytes.checkedCast((long) value)).isEqualTo(value);
     }
-    assertCastFails(GREATEST + 1L);
-    assertCastFails(LEAST - 1L);
-    assertCastFails(Long.MAX_VALUE);
-    assertCastFails(Long.MIN_VALUE);
   }
 
-  public void testSaturatedCast() {
+  public void testCheckedCast_outOfRange_throwsWithValueInMessage() {
+    assertCastFailsWithValueInMessage(GREATEST + 1L);
+    assertCastFailsWithValueInMessage(LEAST - 1L);
+    assertCastFailsWithValueInMessage(Long.MAX_VALUE);
+    assertCastFailsWithValueInMessage(Long.MIN_VALUE);
+  }
+
+  public void testSaturatedCast_withinRange_returnsSameValue() {
     for (byte value : VALUES) {
       assertThat(SignedBytes.saturatedCast((long) value)).isEqualTo(value);
     }
+  }
+
+  public void testSaturatedCast_outOfRange_clampsToBounds() {
     assertThat(SignedBytes.saturatedCast(GREATEST + 1L)).isEqualTo(GREATEST);
     assertThat(SignedBytes.saturatedCast(LEAST - 1L)).isEqualTo(LEAST);
     assertThat(SignedBytes.saturatedCast(Long.MAX_VALUE)).isEqualTo(GREATEST);
     assertThat(SignedBytes.saturatedCast(Long.MIN_VALUE)).isEqualTo(LEAST);
   }
 
-  private static void assertCastFails(long value) {
-    try {
-      SignedBytes.checkedCast(value);
-      fail("Cast to byte should have failed: " + value);
-    } catch (IllegalArgumentException ex) {
-      assertWithMessage(value + " not found in exception text: " + ex.getMessage())
-          .that(ex.getMessage().contains(String.valueOf(value)))
-          .isTrue();
-    }
+  private static void assertCastFailsWithValueInMessage(long value) {
+    IllegalArgumentException ex =
+        assertThrows(IllegalArgumentException.class, () -> SignedBytes.checkedCast(value));
+    assertWithMessage("Exception message should contain the offending value")
+        .that(ex.getMessage().contains(String.valueOf(value)))
+        .isTrue();
   }
 
-  public void testCompare() {
+  // ----------------------------------------------------------------------------------------------
+  // Comparison
+  // ----------------------------------------------------------------------------------------------
+
+  public void testCompare_matchesByteCompareSign() {
     for (byte x : VALUES) {
       for (byte y : VALUES) {
-        // Only compare the sign of the result of compare().
         int expected = Byte.compare(x, y);
         int actual = SignedBytes.compare(x, y);
-        if (expected == 0) {
-          assertWithMessage(x + ", " + y).that(actual).isEqualTo(expected);
-        } else if (expected < 0) {
-          assertWithMessage(x + ", " + y + " (expected: " + expected + ", actual" + actual + ")")
-              .that(actual < 0)
-              .isTrue();
-        } else {
-          assertWithMessage(x + ", " + y + " (expected: " + expected + ", actual" + actual + ")")
-              .that(actual > 0)
-              .isTrue();
-        }
+
+        // We assert on sign only (contract); magnitude may differ.
+        assertWithMessage("compare(%s, %s)", x, y)
+            .that(Integer.signum(actual))
+            .isEqualTo(Integer.signum(expected));
       }
     }
   }
 
-  public void testMax_noArgs() {
+  // ----------------------------------------------------------------------------------------------
+  // Min/Max
+  // ----------------------------------------------------------------------------------------------
+
+  public void testMax_noArgs_throws() {
     assertThrows(IllegalArgumentException.class, () -> max());
   }
 
-  public void testMax() {
+  public void testMax_varargs() {
     assertThat(max(LEAST)).isEqualTo(LEAST);
     assertThat(max(GREATEST)).isEqualTo(GREATEST);
     assertThat(max((byte) 0, (byte) -128, (byte) -1, (byte) 127, (byte) 1)).isEqualTo((byte) 127);
   }
 
-  public void testMin_noArgs() {
+  public void testMin_noArgs_throws() {
     assertThrows(IllegalArgumentException.class, () -> min());
   }
 
-  public void testMin() {
+  public void testMin_varargs() {
     assertThat(min(LEAST)).isEqualTo(LEAST);
     assertThat(min(GREATEST)).isEqualTo(GREATEST);
     assertThat(min((byte) 0, (byte) -128, (byte) -1, (byte) 127, (byte) 1)).isEqualTo((byte) -128);
   }
+
+  // ----------------------------------------------------------------------------------------------
+  // Join
+  // ----------------------------------------------------------------------------------------------
 
   public void testJoin() {
     assertThat(SignedBytes.join(",", EMPTY)).isEmpty();
@@ -130,8 +128,13 @@ public class SignedBytesTest extends TestCase {
     assertThat(SignedBytes.join(",", (byte) -128, (byte) -1)).isEqualTo("-128,-1");
   }
 
+  // ----------------------------------------------------------------------------------------------
+  // Lexicographical comparator
+  // ----------------------------------------------------------------------------------------------
+
   @J2ktIncompatible // b/285319375
-  public void testLexicographicalComparator() {
+  public void testLexicographicalComparator_ordersCorrectly() {
+    // Ordered ascending by lexicographic comparison of signed bytes.
     List<byte[]> ordered =
         Arrays.asList(
             new byte[] {},
@@ -140,7 +143,7 @@ public class SignedBytesTest extends TestCase {
             new byte[] {LEAST, (byte) 1},
             new byte[] {(byte) 1},
             new byte[] {(byte) 1, LEAST},
-            new byte[] {GREATEST, GREATEST - (byte) 1},
+            new byte[] {GREATEST, (byte) (GREATEST - 1)},
             new byte[] {GREATEST, GREATEST},
             new byte[] {GREATEST, GREATEST, GREATEST});
 
@@ -150,44 +153,58 @@ public class SignedBytesTest extends TestCase {
 
   @J2ktIncompatible
   @GwtIncompatible // SerializableTester
-  public void testLexicographicalComparatorSerializable() {
+  public void testLexicographicalComparator_isSerializableSingleton() {
     Comparator<byte[]> comparator = SignedBytes.lexicographicalComparator();
     assertThat(SerializableTester.reserialize(comparator)).isSameInstanceAs(comparator);
   }
 
-  public void testSortDescending() {
-    testSortDescending(new byte[] {}, new byte[] {});
-    testSortDescending(new byte[] {1}, new byte[] {1});
-    testSortDescending(new byte[] {1, 2}, new byte[] {2, 1});
-    testSortDescending(new byte[] {1, 3, 1}, new byte[] {3, 1, 1});
-    testSortDescending(new byte[] {-1, 1, -2, 2}, new byte[] {2, 1, -1, -2});
+  // ----------------------------------------------------------------------------------------------
+  // Sorting (descending)
+  // ----------------------------------------------------------------------------------------------
+
+  public void testSortDescending_wholeArray() {
+    assertSortDescending(new byte[] {}, new byte[] {});
+    assertSortDescending(new byte[] {1}, new byte[] {1});
+    assertSortDescending(new byte[] {1, 2}, new byte[] {2, 1});
+    assertSortDescending(new byte[] {1, 3, 1}, new byte[] {3, 1, 1});
+    assertSortDescending(new byte[] {-1, 1, -2, 2}, new byte[] {2, 1, -1, -2});
   }
 
-  private static void testSortDescending(byte[] input, byte[] expectedOutput) {
-    input = Arrays.copyOf(input, input.length);
-    SignedBytes.sortDescending(input);
-    assertThat(input).isEqualTo(expectedOutput);
+  public void testSortDescending_subrangeOnly() {
+    // Empty slice
+    assertSortDescending(new byte[] {}, 0, 0, new byte[] {});
+    // Single element slice
+    assertSortDescending(new byte[] {1}, 0, 1, new byte[] {1});
+    // Full array
+    assertSortDescending(new byte[] {1, 2}, 0, 2, new byte[] {2, 1});
+    // Prefix only
+    assertSortDescending(new byte[] {1, 3, 1}, 0, 2, new byte[] {3, 1, 1});
+    // No-op (slice of length 1)
+    assertSortDescending(new byte[] {1, 3, 1}, 0, 1, new byte[] {1, 3, 1});
+    // Middle slice sorted; ends unchanged
+    assertSortDescending(new byte[] {-1, -2, 1, 2}, 1, 3, new byte[] {-1, 1, -2, 2});
   }
 
-  private static void testSortDescending(
+  private static void assertSortDescending(byte[] input, byte[] expectedOutput) {
+    byte[] actual = Arrays.copyOf(input, input.length);
+    SignedBytes.sortDescending(actual);
+    assertThat(actual).isEqualTo(expectedOutput);
+  }
+
+  private static void assertSortDescending(
       byte[] input, int fromIndex, int toIndex, byte[] expectedOutput) {
-    input = Arrays.copyOf(input, input.length);
-    SignedBytes.sortDescending(input, fromIndex, toIndex);
-    assertThat(input).isEqualTo(expectedOutput);
+    byte[] actual = Arrays.copyOf(input, input.length);
+    SignedBytes.sortDescending(actual, fromIndex, toIndex);
+    assertThat(actual).isEqualTo(expectedOutput);
   }
 
-  public void testSortDescendingIndexed() {
-    testSortDescending(new byte[] {}, 0, 0, new byte[] {});
-    testSortDescending(new byte[] {1}, 0, 1, new byte[] {1});
-    testSortDescending(new byte[] {1, 2}, 0, 2, new byte[] {2, 1});
-    testSortDescending(new byte[] {1, 3, 1}, 0, 2, new byte[] {3, 1, 1});
-    testSortDescending(new byte[] {1, 3, 1}, 0, 1, new byte[] {1, 3, 1});
-    testSortDescending(new byte[] {-1, -2, 1, 2}, 1, 3, new byte[] {-1, 1, -2, 2});
-  }
+  // ----------------------------------------------------------------------------------------------
+  // Nulls
+  // ----------------------------------------------------------------------------------------------
 
   @J2ktIncompatible
   @GwtIncompatible // NullPointerTester
-  public void testNulls() {
+  public void testAllPublicStaticMethods_rejectNullsWhereRequired() {
     new NullPointerTester().testAllPublicStaticMethods(SignedBytes.class);
   }
 }
