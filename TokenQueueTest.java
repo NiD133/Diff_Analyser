@@ -13,132 +13,72 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for TokenQueue - a character reader with helpers for parsing CSS selectors.
+ * Token queue tests.
  */
 public class TokenQueueTest {
+    @Test public void chompBalanced() {
+        TokenQueue tq = new TokenQueue(":contains(one (two) three) four");
+        String pre = tq.consumeTo("(");
+        String guts = tq.chompBalanced('(', ')');
+        String remainder = tq.remainder();
 
-    // ========== Balanced Chomping Tests ==========
-    
-    @Test 
-    public void chompBalanced_shouldExtractContentBetweenMatchingParentheses() {
-        // Given: A token queue with nested parentheses
-        TokenQueue tokenQueue = new TokenQueue(":contains(one (two) three) four");
-        
-        // When: We consume parts step by step
-        String beforeParentheses = tokenQueue.consumeTo("(");
-        String contentInsideParentheses = tokenQueue.chompBalanced('(', ')');
-        String remainingContent = tokenQueue.remainder();
-
-        // Then: Each part should be correctly extracted
-        assertEquals(":contains", beforeParentheses);
-        assertEquals("one (two) three", contentInsideParentheses);
-        assertEquals(" four", remainingContent);
+        assertEquals(":contains", pre);
+        assertEquals("one (two) three", guts);
+        assertEquals(" four", remainder);
     }
 
-    @Test 
-    public void chompBalanced_shouldHandleEscapedCharacters() {
-        // Given: A token queue with escaped parentheses
-        TokenQueue tokenQueue = new TokenQueue(":contains(one (two) \\( \\) \\) three) four");
-        
-        // When: We consume and process the content
-        String beforeParentheses = tokenQueue.consumeTo("(");
-        String escapedContent = tokenQueue.chompBalanced('(', ')');
-        String unescapedContent = TokenQueue.unescape(escapedContent);
-        String remainingContent = tokenQueue.remainder();
+    @Test public void chompEscapedBalanced() {
+        TokenQueue tq = new TokenQueue(":contains(one (two) \\( \\) \\) three) four");
+        String pre = tq.consumeTo("(");
+        String guts = tq.chompBalanced('(', ')');
+        String remainder = tq.remainder();
 
-        // Then: Escaped characters should be preserved and unescapable
-        assertEquals(":contains", beforeParentheses);
-        assertEquals("one (two) \\( \\) \\) three", escapedContent);
-        assertEquals("one (two) ( ) ) three", unescapedContent);
-        assertEquals(" four", remainingContent);
+        assertEquals(":contains", pre);
+        assertEquals("one (two) \\( \\) \\) three", guts);
+        assertEquals("one (two) ( ) ) three", TokenQueue.unescape(guts));
+        assertEquals(" four", remainder);
     }
 
-    @Test 
-    public void chompBalanced_shouldMatchAsMuchAsPossible() {
-        // Given: An unbalanced string with nested parentheses
-        TokenQueue tokenQueue = new TokenQueue("unbalanced(something(or another)) else");
-        
-        // When: We try to chomp balanced content
-        tokenQueue.consumeTo("(");
-        String matchedContent = tokenQueue.chompBalanced('(', ')');
-        
-        // Then: It should match the longest balanced sequence
-        assertEquals("something(or another)", matchedContent);
+    @Test public void chompBalancedMatchesAsMuchAsPossible() {
+        TokenQueue tq = new TokenQueue("unbalanced(something(or another)) else");
+        tq.consumeTo("(");
+        String match = tq.chompBalanced('(', ')');
+        assertEquals("something(or another)", match);
     }
 
-    @Test
-    public void chompBalanced_shouldThrowExceptionForUnbalancedMarkers() {
-        // Given: A token queue with mismatched brackets
-        TokenQueue tokenQueue = new TokenQueue("unbalanced(something(or another)) else");
-        tokenQueue.consumeTo("(");
-        
-        // When & Then: Attempting to balance with wrong closing character should throw exception
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, 
-            () -> tokenQueue.chompBalanced('(', '+'));
-        
-        assertEquals("Did not find balanced marker at 'something(or another)) else'", 
-            exception.getMessage());
+    @Test public void unescape() {
+        assertEquals("one ( ) \\", TokenQueue.unescape("one \\( \\) \\\\"));
     }
 
-    // ========== Unescaping Tests ==========
-    
-    @Test 
-    public void unescape_shouldConvertEscapedCharacters() {
-        // Given: A string with escaped characters
-        String escapedString = "one \\( \\) \\\\";
-        
-        // When: We unescape it
-        String result = TokenQueue.unescape(escapedString);
-        
-        // Then: Escaped characters should be converted to their literal form
-        assertEquals("one ( ) \\", result);
+    @Test public void unescape_2() {
+        assertEquals("\\&", TokenQueue.unescape("\\\\\\&"));
     }
 
-    @Test 
-    public void unescape_shouldHandleComplexEscapeSequences() {
-        // Given: A string with multiple escape sequences
-        String complexEscapedString = "\\\\\\&";
-        
-        // When: We unescape it
-        String result = TokenQueue.unescape(complexEscapedString);
-        
-        // Then: The result should be properly unescaped
-        assertEquals("\\&", result);
-    }
-
-    // ========== CSS Identifier Escaping Tests ==========
-    
     @ParameterizedTest
-    @MethodSource("getWebPlatformTestCases")
-    @MethodSource("getAdditionalTestCases")
-    public void escapeCssIdentifier_shouldEscapeAccordingToWebStandards(String expectedOutput, String input) {
-        // When: We escape a CSS identifier
-        String result = TokenQueue.escapeCssIdentifier(input);
-        
-        // Then: It should match the expected web platform standard output
-        assertEquals(expectedOutput, result);
+    @MethodSource("escapeCssIdentifier_WebPlatformTestParameters")
+    @MethodSource("escapeCssIdentifier_additionalParameters")
+    public void escapeCssIdentifier(String expected, String input) {
+        assertEquals(expected, TokenQueue.escapeCssIdentifier(input));
     }
 
-    /**
-     * Test cases from Web Platform Tests for CSS identifier escaping.
-     * Source: https://github.com/web-platform-tests/wpt/blob/328fa1c67bf5dfa6f24571d4c41dd10224b6d247/css/cssom/escape.html
-     */
-    private static Stream<Arguments> getWebPlatformTestCases() {
+    // https://github.com/web-platform-tests/wpt/blob/328fa1c67bf5dfa6f24571d4c41dd10224b6d247/css/cssom/escape.html
+    private static Stream<Arguments> escapeCssIdentifier_WebPlatformTestParameters() {
         return Stream.of(
-            // Empty string
             Arguments.of("", ""),
 
-            // Null byte handling - should be replaced with replacement character
+            // Null bytes
             Arguments.of("\uFFFD", "\0"),
             Arguments.of("a\uFFFD", "a\0"),
             Arguments.of("\uFFFDb", "\0b"),
             Arguments.of("a\uFFFDb", "a\0b"),
 
-            // Replacement character handling
+            // Replacement character
             Arguments.of("\uFFFD", "\uFFFD"),
             Arguments.of("a\uFFFD", "a\uFFFD"),
+            Arguments.of("\uFFFDb", "\uFFFDb"),
+            Arguments.of("a\uFFFDb", "a\uFFFDb"),
 
-            // Numbers at start need escaping (CSS identifiers can't start with digits)
+            // Number prefix
             Arguments.of("\\30 a", "0a"),
             Arguments.of("\\31 a", "1a"),
             Arguments.of("\\32 a", "2a"),
@@ -150,251 +90,244 @@ public class TokenQueueTest {
             Arguments.of("\\38 a", "8a"),
             Arguments.of("\\39 a", "9a"),
 
-            // Numbers in middle don't need escaping
+            // Letter number prefix
             Arguments.of("a0b", "a0b"),
             Arguments.of("a1b", "a1b"),
             Arguments.of("a2b", "a2b"),
+            Arguments.of("a3b", "a3b"),
+            Arguments.of("a4b", "a4b"),
+            Arguments.of("a5b", "a5b"),
+            Arguments.of("a6b", "a6b"),
+            Arguments.of("a7b", "a7b"),
+            Arguments.of("a8b", "a8b"),
+            Arguments.of("a9b", "a9b"),
 
-            // Dash followed by number needs escaping
+            // Dash number prefix
             Arguments.of("-\\30 a", "-0a"),
             Arguments.of("-\\31 a", "-1a"),
             Arguments.of("-\\32 a", "-2a"),
+            Arguments.of("-\\33 a", "-3a"),
+            Arguments.of("-\\34 a", "-4a"),
+            Arguments.of("-\\35 a", "-5a"),
+            Arguments.of("-\\36 a", "-6a"),
+            Arguments.of("-\\37 a", "-7a"),
+            Arguments.of("-\\38 a", "-8a"),
+            Arguments.of("-\\39 a", "-9a"),
 
-            // Double dash is valid
+            // Double dash prefix
             Arguments.of("--a", "--a"),
 
-            // Control characters need escaping
+            // Various tests
             Arguments.of("\\1 \\2 \\1e \\1f ", "\u0001\u0002\u001E\u001F"),
-            
-            // High Unicode characters are preserved
             Arguments.of("\u0080\u002D\u005F\u00A9", "\u0080\u002D\u005F\u00A9"),
-            
-            // Backslashes need escaping
-            Arguments.of("hello\\\\world", "hello\\world"),
-            
-            // Special CSS characters need escaping
-            Arguments.of("\\-", "-"),
+            Arguments.of("\\7f \u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008A\u008B\u008C\u008D\u008E\u008F\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u0098\u0099\u009A\u009B\u009C\u009D\u009E\u009F", "\u007F\u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008A\u008B\u008C\u008D\u008E\u008F\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u0098\u0099\u009A\u009B\u009C\u009D\u009E\u009F"),
+            Arguments.of("\u00A0\u00A1\u00A2", "\u00A0\u00A1\u00A2"),
+            Arguments.of("a0123456789b", "a0123456789b"),
+            Arguments.of("abcdefghijklmnopqrstuvwxyz", "abcdefghijklmnopqrstuvwxyz"),
+            Arguments.of("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
+
+            Arguments.of("hello\\\\world", "hello\\world"), // Backslashes get backslash-escaped
+            Arguments.of("hello\u1234world", "hello\u1234world"), // Code points greater than U+0080 are preserved
+            Arguments.of("\\-", "-"), // CSS.escape: Single dash escaped
+
             Arguments.of("\\ \\!xy", "\u0020\u0021\u0078\u0079"),
 
-            // Astral symbols (surrogate pairs) are preserved
+            // astral symbol (U+1D306 TETRAGRAM FOR CENTRE)
             Arguments.of("\uD834\uDF06", "\uD834\uDF06"),
-            
-            // Lone surrogates are preserved
+
+            // lone surrogates
             Arguments.of("\uDF06", "\uDF06"),
             Arguments.of("\uD834", "\uD834")
         );
     }
 
-    private static Stream<Arguments> getAdditionalTestCases() {
+    private static Stream<Arguments> escapeCssIdentifier_additionalParameters() {
         return Stream.of(
-            // CSS special characters that need escaping
             Arguments.of("one\\#two\\.three\\/four\\\\five", "one#two.three/four\\five"),
             Arguments.of("-a", "-a"),
             Arguments.of("--", "--")
         );
     }
 
-    // ========== Nested Quotes in HTML Tests ==========
-    
-    @Test 
-    public void testNestedQuotes_shouldHandleQuotesInAttributes() {
-        // Test various combinations of nested quotes in HTML attributes
-        validateHtmlWithNestedQuotes(
-            "<html><body><a id=\"identifier\" onclick=\"func('arg')\" /></body></html>", 
-            "a[onclick*=\"('arg\"]"
-        );
-        
-        validateHtmlWithNestedQuotes(
-            "<html><body><a id=\"identifier\" onclick=func('arg') /></body></html>", 
-            "a[onclick*=\"('arg\"]"
-        );
-        
-        validateHtmlWithNestedQuotes(
-            "<html><body><a id=\"identifier\" onclick='func(\"arg\")' /></body></html>", 
-            "a[onclick*='(\"arg']"
-        );
-        
-        validateHtmlWithNestedQuotes(
-            "<html><body><a id=\"identifier\" onclick=func(\"arg\") /></body></html>", 
-            "a[onclick*='(\"arg']"
-        );
+    @Test public void testNestedQuotes() {
+        validateNestedQuotes("<html><body><a id=\"identifier\" onclick=\"func('arg')\" /></body></html>", "a[onclick*=\"('arg\"]");
+        validateNestedQuotes("<html><body><a id=\"identifier\" onclick=func('arg') /></body></html>", "a[onclick*=\"('arg\"]");
+        validateNestedQuotes("<html><body><a id=\"identifier\" onclick='func(\"arg\")' /></body></html>", "a[onclick*='(\"arg']");
+        validateNestedQuotes("<html><body><a id=\"identifier\" onclick=func(\"arg\") /></body></html>", "a[onclick*='(\"arg']");
     }
 
-    private static void validateHtmlWithNestedQuotes(String html, String selector) {
-        // When: We parse HTML and select with the given selector
-        String result = Jsoup.parse(html).select(selector).first().cssSelector();
-        
-        // Then: It should correctly identify the element
-        assertEquals("#identifier", result);
+    private static void validateNestedQuotes(String html, String selector) {
+        assertEquals("#identifier", Jsoup.parse(html).select(selector).first().cssSelector());
     }
 
-    // ========== Pattern Matching Tests ==========
-    
     @Test
-    public void testQuotedPattern_shouldHandleSpecialCharactersInRegex() {
-        // Given: HTML with special regex characters in text content
-        Document document = Jsoup.parse(
-            "<div>\\) foo1</div><div>( foo2</div><div>1) foo3</div>"
-        );
-        
-        // When & Then: We should be able to match these special characters using Pattern.quote
-        assertEquals("\\) foo1", 
-            document.select("div:matches(" + Pattern.quote("\\)") + ")")
-                    .get(0).childNode(0).toString());
-                    
-        assertEquals("( foo2", 
-            document.select("div:matches(" + Pattern.quote("(") + ")")
-                    .get(0).childNode(0).toString());
-                    
-        assertEquals("1) foo3", 
-            document.select("div:matches(" + Pattern.quote("1)") + ")")
-                    .get(0).childNode(0).toString());
+    public void chompBalancedThrowIllegalArgumentException() {
+        try {
+            TokenQueue tq = new TokenQueue("unbalanced(something(or another)) else");
+            tq.consumeTo("(");
+            tq.chompBalanced('(', '+');
+            fail("should have thrown IllegalArgumentException");
+        } catch (IllegalArgumentException expected) {
+            assertEquals("Did not find balanced marker at 'something(or another)) else'", expected.getMessage());
+        }
     }
 
-    // ========== Element Selector Consumption Tests ==========
-    
-    @Test 
-    public void consumeElementSelector_shouldHandleEscapedCharacters() {
-        // Given: A token queue with escaped element selectors
-        TokenQueue queue = new TokenQueue("p\\\\p p\\.p p\\:p p\\!p");
-
-        // When & Then: Each escaped selector should be properly consumed
-        assertEquals("p\\p", queue.consumeElementSelector());
-        assertTrue(queue.consumeWhitespace());
-
-        assertEquals("p.p", queue.consumeElementSelector());
-        assertTrue(queue.consumeWhitespace());
-
-        assertEquals("p:p", queue.consumeElementSelector());
-        assertTrue(queue.consumeWhitespace());
-
-        assertEquals("p!p", queue.consumeElementSelector());
-        assertTrue(queue.isEmpty());
+    @Test
+    public void testQuotedPattern() {
+        final Document doc = Jsoup.parse("<div>\\) foo1</div><div>( foo2</div><div>1) foo3</div>");
+        assertEquals("\\) foo1",doc.select("div:matches(" + Pattern.quote("\\)") + ")").get(0).childNode(0).toString());
+        assertEquals("( foo2",doc.select("div:matches(" + Pattern.quote("(") + ")").get(0).childNode(0).toString());
+        assertEquals("1) foo3",doc.select("div:matches(" + Pattern.quote("1)") + ")").get(0).childNode(0).toString());
     }
 
-    // ========== CSS Identifier Consumption Tests ==========
-    
-    @Test 
-    public void consumeCssIdentifier_shouldHandleEscapedIdentifiers() {
-        // Given: A token queue with escaped CSS identifiers
-        TokenQueue queue = new TokenQueue("i\\.d i\\\\d");
+    @Test public void consumeEscapedTag() {
+        TokenQueue q = new TokenQueue("p\\\\p p\\.p p\\:p p\\!p");
 
-        // When & Then: Escaped identifiers should be properly unescaped
-        assertEquals("i.d", queue.consumeCssIdentifier());
-        assertTrue(queue.consumeWhitespace());
+        assertEquals("p\\p", q.consumeElementSelector());
+        assertTrue(q.consumeWhitespace());
 
-        assertEquals("i\\d", queue.consumeCssIdentifier());
-        assertTrue(queue.isEmpty());
+        assertEquals("p.p", q.consumeElementSelector());
+        assertTrue(q.consumeWhitespace());
+
+        assertEquals("p:p", q.consumeElementSelector());
+        assertTrue(q.consumeWhitespace());
+
+        assertEquals("p!p", q.consumeElementSelector());
+        assertTrue(q.isEmpty());
     }
 
-    @Test 
-    public void consumeCssIdentifier_shouldHandleEscapeAtEndOfInput() {
-        // Given: A token queue ending with an escape character
-        TokenQueue queue = new TokenQueue("Foo\\");
-        
-        // When: We consume the element selector
-        String result = queue.consumeElementSelector();
-        
-        // Then: The trailing escape should be ignored
-        assertEquals("Foo", result);
+    @Test public void consumeEscapedId() {
+        TokenQueue q = new TokenQueue("i\\.d i\\\\d");
+
+        assertEquals("i.d", q.consumeCssIdentifier());
+        assertTrue(q.consumeWhitespace());
+
+        assertEquals("i\\d", q.consumeCssIdentifier());
+        assertTrue(q.isEmpty());
+    }
+
+    @Test void escapeAtEof() {
+        TokenQueue q = new TokenQueue("Foo\\");
+        String s = q.consumeElementSelector();
+        assertEquals("Foo", s); // no escape, no eof. Just straight up Foo.
     }
 
     @ParameterizedTest
-    @MethodSource("getWebPlatformCssIdentifierTestCases")
-    @MethodSource("getAdditionalCssIdentifierTestCases")
-    public void consumeCssIdentifier_shouldParseAccordingToWebStandards(
-            String expectedOutput, String cssIdentifier) {
-        // When: We parse a CSS identifier
-        String result = parseCssIdentifier(cssIdentifier);
-        
-        // Then: It should match the expected web platform standard output
-        assertEquals(expectedOutput, result);
+    @MethodSource("cssIdentifiers")
+    @MethodSource("cssAdditionalIdentifiers")
+    void consumeCssIdentifier_WebPlatformTests(String expected, String cssIdentifier) {
+        assertParsedCssIdentifierEquals(expected, cssIdentifier);
     }
 
-    /**
-     * Test cases from Web Platform Tests for CSS identifier parsing.
-     * Source: https://github.com/web-platform-tests/wpt/blob/36036fb5212a3fc15fc5750cecb1923ba4071668/dom/nodes/ParentNode-querySelector-escapes.html
-     */
-    private static Stream<Arguments> getWebPlatformCssIdentifierTestCases() {
+    private static Stream<Arguments> cssIdentifiers() {
         return Stream.of(
-            // Hex digit escaping with whitespace
+            // https://github.com/web-platform-tests/wpt/blob/36036fb5212a3fc15fc5750cecb1923ba4071668/dom/nodes/ParentNode-querySelector-escapes.html
+            // - escape hex digit
             Arguments.of("0nextIsWhiteSpace", "\\30 nextIsWhiteSpace"),
             Arguments.of("0nextIsNotHexLetters", "\\30nextIsNotHexLetters"),
             Arguments.of("0connectHexMoreThan6Hex", "\\000030connectHexMoreThan6Hex"),
             Arguments.of("0spaceMoreThan6Hex", "\\000030 spaceMoreThan6Hex"),
 
-            // Special character replacement for invalid code points
+            // - hex digit special replacement
+            // 1. zero points
             Arguments.of("zero\uFFFD", "zero\\0"),
             Arguments.of("zero\uFFFD", "zero\\000000"),
+            // 2. surrogate points
             Arguments.of("\uFFFDsurrogateFirst", "\\d83d surrogateFirst"),
             Arguments.of("surrogateSecond\uFFFd", "surrogateSecond\\dd11"),
+            Arguments.of("surrogatePair\uFFFD\uFFFD", "surrogatePair\\d83d\\dd11"),
+            // 3. out of range points
             Arguments.of("outOfRange\uFFFD", "outOfRange\\110000"),
+            Arguments.of("outOfRange\uFFFD", "outOfRange\\110030"),
+            Arguments.of("outOfRange\uFFFD", "outOfRange\\555555"),
+            Arguments.of("outOfRange\uFFFD", "outOfRange\\ffffff"),
 
-            // Basic character escaping
+            // - escape anything else
             Arguments.of(".comma", "\\.comma"),
             Arguments.of("-minus", "\\-minus"),
             Arguments.of("g", "\\g"),
 
-            // Unicode handling
+            // non edge cases
             Arguments.of("aBMPRegular", "\\61 BMPRegular"),
             Arguments.of("\uD83D\uDD11nonBMP", "\\1f511 nonBMP"),
-            
-            // Complex escape sequences
+            Arguments.of("00continueEscapes", "\\30\\30 continueEscapes"),
+            Arguments.of("00continueEscapes", "\\30 \\30 continueEscapes"),
+            Arguments.of("continueEscapes00", "continueEscapes\\30 \\30 "),
+            Arguments.of("continueEscapes00", "continueEscapes\\30 \\30"),
+            Arguments.of("continueEscapes00", "continueEscapes\\30\\30 "),
+            Arguments.of("continueEscapes00", "continueEscapes\\30\\30"),
+
+            // ident tests case from CSS tests of chromium source: https://goo.gl/3Cxdov
             Arguments.of("hello", "hel\\6Co"),
             Arguments.of("&B", "\\26 B"),
             Arguments.of("hello", "hel\\6C o"),
             Arguments.of("spaces", "spac\\65\r\ns"),
             Arguments.of("spaces", "sp\\61\tc\\65\fs"),
-            
-            // Edge cases
+            Arguments.of("test\uD799", "test\\D799"),
+            Arguments.of("\uE000", "\\E000"),
+            Arguments.of("test", "te\\s\\t"),
+            Arguments.of("spaces in\tident", "spaces\\ in\\\tident"),
+            Arguments.of(".,:!", "\\.\\,\\:\\!"),
+            Arguments.of("null\uFFFD", "null\\0"),
+            Arguments.of("null\uFFFD", "null\\0000"),
+            Arguments.of("large\uFFFD", "large\\110000"),
+            Arguments.of("large\uFFFD", "large\\23456a"),
+            Arguments.of("surrogate\uFFFD", "surrogate\\D800"),
+            Arguments.of("surrogate\uFFFD", "surrogate\\0DBAC"),
+            Arguments.of("\uFFFDsurrogate", "\\00DFFFsurrogate"),
+            Arguments.of("\uDBFF\uDFFF", "\\10fFfF"),
+            Arguments.of("\uDBFF\uDFFF0", "\\10fFfF0"),
+            Arguments.of("\uDBC0\uDC0000", "\\10000000"),
+            Arguments.of("eof\uFFFD", "eof\\"),
+
             Arguments.of("simple-ident", "simple-ident"),
             Arguments.of("testing123", "testing123"),
             Arguments.of("_underscore", "_underscore"),
             Arguments.of("-text", "-text"),
+            Arguments.of("-m", "-\\6d"),
             Arguments.of("--abc", "--abc"),
             Arguments.of("--", "--"),
-            Arguments.of("---", "---")
+            Arguments.of("--11", "--11"),
+            Arguments.of("---", "---"),
+            Arguments.of("\u2003", "\u2003"),
+            Arguments.of("\u00A0", "\u00A0"),
+            Arguments.of("\u1234", "\u1234"),
+            Arguments.of("\uD808\uDF45", "\uD808\uDF45"),
+            Arguments.of("\uFFFD", "\u0000"),
+            Arguments.of("ab\uFFFDc", "ab\u0000c")
         );
     }
 
-    private static Stream<Arguments> getAdditionalCssIdentifierTestCases() {
+    private static Stream<Arguments> cssAdditionalIdentifiers() {
         return Stream.of(
             Arguments.of("1st", "\\31\r\nst"),
             Arguments.of("1", "\\31\r"),
             Arguments.of("1a", "\\31\ra"),
             Arguments.of("1", "\\031"),
             Arguments.of("1", "\\0031"),
+            Arguments.of("1", "\\00031"),
+            Arguments.of("1", "\\000031"),
+            Arguments.of("1", "\\000031"),
             Arguments.of("a", "a\\\nb")
         );
     }
 
-    @Test 
-    public void consumeCssIdentifier_shouldThrowExceptionForEmptyInput() {
-        // Given: An empty token queue
+    @Test void consumeCssIdentifierWithEmptyInput() {
         TokenQueue emptyQueue = new TokenQueue("");
-        
-        // When & Then: Attempting to consume CSS identifier should throw exception
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class, 
-            emptyQueue::consumeCssIdentifier
-        );
-        
+        Exception exception = assertThrows(IllegalArgumentException.class, emptyQueue::consumeCssIdentifier);
         assertEquals("CSS identifier expected, but end of input found", exception.getMessage());
     }
 
-    @Test 
-    public void consumeCssIdentifier_shouldSupportBackwardsCompatibility() {
-        // Note: These are technically invalid CSS identifiers but supported for backwards compatibility
+    // Some of jsoup's tests depend on this behavior
+    @Test public void consumeCssIdentifier_invalidButSupportedForBackwardsCompatibility() {
         assertParsedCssIdentifierEquals("1", "1");
         assertParsedCssIdentifierEquals("-", "-");
         assertParsedCssIdentifierEquals("-1", "-1");
     }
 
-    // ========== Helper Methods ==========
-    
     private static String parseCssIdentifier(String text) {
-        TokenQueue queue = new TokenQueue(text);
-        return queue.consumeCssIdentifier();
+        TokenQueue q = new TokenQueue(text);
+        return q.consumeCssIdentifier();
     }
 
     private void assertParsedCssIdentifierEquals(String expected, String cssIdentifier) {
