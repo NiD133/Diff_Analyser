@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Arrays;
 import org.apache.commons.collections4.Bag;
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.collections4.collection.TransformedCollectionTest;
@@ -41,6 +42,10 @@ public class TransformedBagTest<T> extends AbstractBagTest<T> {
         return UNORDERED;
     }
 
+    /**
+     * Creates a new {@link TransformedBag} with a no-op transformer.
+     * This method is used by the superclass tests.
+     */
     @Override
     @SuppressWarnings("unchecked")
     public Bag<T> makeObject() {
@@ -48,50 +53,85 @@ public class TransformedBagTest<T> extends AbstractBagTest<T> {
                 (Transformer<T, T>) TransformedCollectionTest.NOOP_TRANSFORMER);
     }
 
+    /**
+     * Tests that elements added to a bag created with {@code transformingBag}
+     * are transformed on insertion.
+     */
     @Test
-    @SuppressWarnings("unchecked")
-    void testTransformedBag() {
-        //T had better be Object!
-        final Bag<T> bag = TransformedBag.transformingBag(new HashBag<>(),
-                (Transformer<T, T>) TransformedCollectionTest.STRING_TO_INTEGER_TRANSFORMER);
-        assertTrue(bag.isEmpty());
-        final Object[] els = {"1", "3", "5", "7", "2", "4", "6"};
-        for (int i = 0; i < els.length; i++) {
-            bag.add((T) els[i]);
-            assertEquals(i + 1, bag.size());
-            assertTrue(bag.contains(Integer.valueOf((String) els[i])));
-            assertFalse(bag.contains(els[i]));
+    void testTransformingBag_add() {
+        // Arrange
+        final Transformer<Object, Object> transformer = TransformedCollectionTest.STRING_TO_INTEGER_TRANSFORMER;
+        final Bag<Object> bag = TransformedBag.transformingBag(new HashBag<>(), transformer);
+        final String[] elementsToAdd = {"1", "2", "3", "3"};
+
+        // Act
+        for (final String element : elementsToAdd) {
+            bag.add(element);
         }
 
-        assertFalse(bag.remove(els[0]));
-        assertTrue(bag.remove(Integer.valueOf((String) els[0])));
+        // Assert
+        assertEquals(elementsToAdd.length, bag.size(), "Bag size should match the number of added elements");
+
+        // Verify that only transformed elements (Integers) are present
+        assertTrue(bag.contains(1));
+        assertTrue(bag.contains(2));
+        assertEquals(2, bag.getCount(3));
+
+        // Verify that original elements (Strings) are not present
+        assertFalse(bag.contains("1"));
+        assertFalse(bag.contains("2"));
+        assertFalse(bag.contains("3"));
     }
 
+    /**
+     * Tests that removing elements from a {@code transformingBag} must be done
+     * using the transformed object.
+     */
     @Test
-    @SuppressWarnings("unchecked")
-    void testTransformedBag_decorateTransform() {
-        final Bag<T> originalBag = new HashBag<>();
-        final Object[] els = {"1", "3", "5", "7", "2", "4", "6"};
-        for (final Object el : els) {
-            originalBag.add((T) el);
-        }
-        final Bag<T> bag = TransformedBag.transformedBag(originalBag,
-                (Transformer<T, T>) TransformedCollectionTest.STRING_TO_INTEGER_TRANSFORMER);
-        assertEquals(els.length, bag.size());
-        for (final Object el : els) {
-            assertTrue(bag.contains(Integer.valueOf((String) el)));
-            assertFalse(bag.contains(el));
-        }
+    void testTransformingBag_remove() {
+        // Arrange
+        final Transformer<Object, Object> transformer = TransformedCollectionTest.STRING_TO_INTEGER_TRANSFORMER;
+        final Bag<Object> bag = TransformedBag.transformingBag(new HashBag<>(), transformer);
+        bag.add("1");
 
-        assertFalse(bag.remove(els[0]));
-        assertTrue(bag.remove(Integer.valueOf((String) els[0])));
+        // Act & Assert
+        assertFalse(bag.remove("1"), "Removing the original object should fail");
+        assertTrue(bag.remove(1), "Removing the transformed object should succeed");
+        assertTrue(bag.isEmpty(), "Bag should be empty after removal");
     }
 
-//    void testCreate() throws Exception {
-//        Bag<T> bag = makeObject();
-//        writeExternalFormToDisk((java.io.Serializable) bag, "src/test/resources/data/test/TransformedBag.emptyCollection.version4.obj");
-//        bag = makeFullCollection();
-//        writeExternalFormToDisk((java.io.Serializable) bag, "src/test/resources/data/test/TransformedBag.fullCollection.version4.obj");
-//    }
+    /**
+     * Tests that {@code transformedBag} factory method correctly transforms
+     * the elements of a pre-populated bag.
+     */
+    @Test
+    void testTransformedBag_withPreexistingElements() {
+        // Arrange
+        final Bag<Object> originalBag = new HashBag<>();
+        final String[] initialElements = {"1", "2", "3", "3"};
+        originalBag.addAll(Arrays.asList(initialElements));
+
+        final Transformer<Object, Object> transformer = TransformedCollectionTest.STRING_TO_INTEGER_TRANSFORMER;
+
+        // Act
+        final Bag<Object> transformedBag = TransformedBag.transformedBag(originalBag, transformer);
+
+        // Assert
+        assertEquals(initialElements.length, transformedBag.size(), "Bag size should be unchanged");
+
+        // Verify that only transformed elements (Integers) are present
+        assertTrue(transformedBag.contains(1));
+        assertTrue(transformedBag.contains(2));
+        assertEquals(2, transformedBag.getCount(3));
+
+        // Verify that original elements (Strings) are not present
+        assertFalse(transformedBag.contains("1"));
+        assertFalse(transformedBag.contains("2"));
+        assertFalse(transformedBag.contains("3"));
+
+        // Verify removal behavior
+        assertFalse(transformedBag.remove("1"), "Removing the original object should fail");
+        assertTrue(transformedBag.remove(1), "Removing the transformed object should succeed");
+    }
 
 }
