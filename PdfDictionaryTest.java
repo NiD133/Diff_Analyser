@@ -43,109 +43,55 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-/**
- * Test suite for PdfDictionary null key handling behavior.
- * 
- * This test class verifies that PdfDictionary properly handles null keys
- * across all its key-based operations, ensuring consistent behavior
- * throughout the API.
- */
 public class PdfDictionaryTest {
-    
-    private PdfDictionary dictionary;
-    private PdfObject testValue;
-    
-    @Before
-    public void setUp() {
-        dictionary = new PdfDictionary();
-        testValue = new PdfName("testValue");
+    @Test
+    public void pdfDictionaryGetReturnsNullIfKeyIsNull() {
+        PdfDictionary dictionary = new PdfDictionary();
+
+        PdfObject value = dictionary.get(null);
+
+        Assert.assertNull(value);
     }
 
-    /**
-     * Test that get() method returns null when called with a null key.
-     * 
-     * This verifies defensive programming - the method should handle
-     * null input gracefully rather than throwing an exception.
-     */
     @Test
-    public void get_WithNullKey_ReturnsNull() {
-        // When: attempting to get a value with null key
-        PdfObject result = dictionary.get(null);
+    public void pdfDictionaryContainsReturnsFalseIfKeyIsNull() {
+        PdfDictionary dictionary = new PdfDictionary();
 
-        // Then: should return null (not throw exception)
-        Assert.assertNull("get() should return null when key is null", result);
+        boolean contained = dictionary.contains(null);
+
+        Assert.assertFalse(contained);
     }
 
-    /**
-     * Test that contains() method returns false when called with a null key.
-     * 
-     * Since null keys are not valid, the dictionary should never
-     * contain a null key, so this should always return false.
-     */
     @Test
-    public void contains_WithNullKey_ReturnsFalse() {
-        // When: checking if dictionary contains null key
-        boolean result = dictionary.contains(null);
+    public void pdfDictionaryRemoveDoesNothingIfKeyIsNull() {
+        PdfDictionary dictionary = new PdfDictionary();
 
-        // Then: should return false
-        Assert.assertFalse("contains() should return false when key is null", result);
-    }
-
-    /**
-     * Test that remove() method handles null keys gracefully.
-     * 
-     * The remove operation should not fail when given a null key,
-     * it should simply do nothing (no-op behavior).
-     */
-    @Test
-    public void remove_WithNullKey_DoesNotThrowException() {
-        // When: attempting to remove with null key
-        // Then: should not throw any exception
         dictionary.remove(null);
-        
-        // Test passes if no exception is thrown
     }
 
-    /**
-     * Test that put() method throws IllegalArgumentException when key is null.
-     * 
-     * Since PDF dictionaries require valid PdfName keys, attempting to
-     * put a null key should result in a clear error message.
-     */
     @Test
-    public void put_WithNullKey_ThrowsIllegalArgumentException() {
-        // When: attempting to put with null key
+    public void pdfDictionaryPutThrowsExceptionIfKeyIsNull() {
+        PdfDictionary dictionary = new PdfDictionary();
+
         try {
-            dictionary.put(null, testValue);
-            Assert.fail("Expected IllegalArgumentException when putting null key");
-        } catch (IllegalArgumentException exception) {
-            // Then: should throw exception with specific message
-            Assert.assertEquals("Exception should have correct error message", 
-                              "key is null.", 
-                              exception.getMessage());
+            dictionary.put(null, new PdfName("null"));
+            Assert.fail("IllegalArgumentException expected");
+        } catch (IllegalArgumentException e) {
+            Assert.assertEquals(e.getMessage(), "key is null.");
         }
     }
 
-    /**
-     * Test that putEx() method throws IllegalArgumentException when key is null.
-     * 
-     * Like put(), the putEx() method should also reject null keys
-     * with the same error handling behavior.
-     */
     @Test
-    public void putEx_WithNullKey_ThrowsIllegalArgumentException() {
-        // When: attempting to putEx with null key
+    public void pdfDictionaryPutExThrowsExceptionIfKeyIsNull() {
+        PdfDictionary dictionary = new PdfDictionary();
+
         try {
-            dictionary.putEx(null, testValue);
-            Assert.fail("Expected IllegalArgumentException when putting null key with putEx");
-        } catch (IllegalArgumentException exception) {
-            // Then: should throw exception with specific message
-            Assert.assertEquals("Exception should have correct error message", 
-                              "key is null.", 
-                              exception.getMessage());
+            dictionary.putEx(null, new PdfName("null"));
+            Assert.fail("IllegalArgumentException expected");
+        } catch (IllegalArgumentException e) {
+            Assert.assertEquals(e.getMessage(), "key is null.");
         }
     }
 }
