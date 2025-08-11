@@ -49,99 +49,150 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests for the {@link CategoryLabelPosition} class.
  */
 public class CategoryLabelPositionTest {
-    
+
     /**
-     * Check that the equals() method can distinguish all fields.
+     * Creates a default position instance for testing.
+     * 
+     * @return A default CategoryLabelPosition instance.
      */
+    private static CategoryLabelPosition createDefaultPosition() {
+        return new CategoryLabelPosition(
+            RectangleAnchor.BOTTOM_LEFT,
+            TextBlockAnchor.CENTER_RIGHT,
+            TextAnchor.BASELINE_LEFT,
+            Math.PI / 4.0,
+            CategoryLabelWidthType.RANGE,
+            0.44f
+        );
+    }
+
+    // EQUALITY TESTS =========================================================
+
     @Test
-    public void testEquals() {
-        CategoryLabelPosition p1 = new CategoryLabelPosition(
-                RectangleAnchor.BOTTOM_LEFT, TextBlockAnchor.CENTER_RIGHT,
-                TextAnchor.BASELINE_LEFT, Math.PI / 4.0,
-                CategoryLabelWidthType.RANGE, 0.44f);
+    public void equalsShouldReturnTrueForSameInstance() {
+        CategoryLabelPosition position = createDefaultPosition();
+        assertEquals(position, position);
+    }
+
+    @Test
+    public void equalsShouldReturnTrueForEqualObjects() {
+        CategoryLabelPosition p1 = createDefaultPosition();
+        CategoryLabelPosition p2 = createDefaultPosition();
+        assertEquals(p1, p2);
+        assertEquals(p2, p1); // Test symmetry
+    }
+
+    @Test
+    public void equalsShouldReturnFalseForNull() {
+        CategoryLabelPosition position = createDefaultPosition();
+        assertNotEquals(null, position);
+    }
+
+    @Test
+    public void equalsShouldReturnFalseForDifferentClass() {
+        CategoryLabelPosition position = createDefaultPosition();
+        assertNotEquals(position, new Object());
+    }
+
+    @Test
+    public void equalsShouldReturnFalseWhenCategoryAnchorDiffers() {
+        CategoryLabelPosition p1 = createDefaultPosition();
         CategoryLabelPosition p2 = new CategoryLabelPosition(
-                RectangleAnchor.BOTTOM_LEFT, TextBlockAnchor.CENTER_RIGHT,
-                TextAnchor.BASELINE_LEFT, Math.PI / 4.0,
-                CategoryLabelWidthType.RANGE, 0.44f);
-        assertEquals(p1, p2);
-        assertEquals(p2, p1);
-
-        p1 = new CategoryLabelPosition(RectangleAnchor.TOP,
-                TextBlockAnchor.CENTER_RIGHT, TextAnchor.BASELINE_LEFT,
-                Math.PI / 4.0, CategoryLabelWidthType.RANGE, 0.44f);
+            RectangleAnchor.TOP, // Different anchor
+            p1.getLabelAnchor(),
+            p1.getRotationAnchor(),
+            p1.getAngle(),
+            p1.getWidthType(),
+            p1.getWidthRatio()
+        );
         assertNotEquals(p1, p2);
-        p2 = new CategoryLabelPosition(RectangleAnchor.TOP,
-                TextBlockAnchor.CENTER_RIGHT, TextAnchor.BASELINE_LEFT,
-                Math.PI / 4.0, CategoryLabelWidthType.RANGE, 0.44f);
-        assertEquals(p1, p2);
-
-        p1 = new CategoryLabelPosition(RectangleAnchor.TOP,
-                TextBlockAnchor.CENTER, TextAnchor.BASELINE_LEFT, Math.PI / 4.0,
-                CategoryLabelWidthType.RANGE, 0.44f);
-        assertNotEquals(p1, p2);
-        p2 = new CategoryLabelPosition(RectangleAnchor.TOP,
-                TextBlockAnchor.CENTER, TextAnchor.BASELINE_LEFT, Math.PI / 4.0,
-                CategoryLabelWidthType.RANGE, 0.44f);
-        assertEquals(p1, p2);
-
-        p1 = new CategoryLabelPosition(RectangleAnchor.TOP,
-                TextBlockAnchor.CENTER, TextAnchor.CENTER, Math.PI / 4.0,
-                CategoryLabelWidthType.RANGE, 0.44f);
-        assertNotEquals(p1, p2);
-        p2 = new CategoryLabelPosition(RectangleAnchor.TOP,
-                TextBlockAnchor.CENTER, TextAnchor.CENTER, Math.PI / 4.0,
-                CategoryLabelWidthType.RANGE, 0.44f);
-        assertEquals(p1, p2);
-
-        p1 = new CategoryLabelPosition(RectangleAnchor.TOP,
-                TextBlockAnchor.CENTER, TextAnchor.CENTER, Math.PI / 6.0,
-                CategoryLabelWidthType.RANGE, 0.44f);
-        assertNotEquals(p1, p2);
-        p2 = new CategoryLabelPosition(RectangleAnchor.TOP,
-                TextBlockAnchor.CENTER, TextAnchor.CENTER, Math.PI / 6.0,
-                CategoryLabelWidthType.RANGE, 0.44f);
-        assertEquals(p1, p2);
-
-        p1 = new CategoryLabelPosition(RectangleAnchor.TOP,
-                TextBlockAnchor.CENTER, TextAnchor.CENTER, Math.PI / 6.0,
-                CategoryLabelWidthType.CATEGORY, 0.44f);
-        assertNotEquals(p1, p2);
-        p2 = new CategoryLabelPosition(RectangleAnchor.TOP,
-                TextBlockAnchor.CENTER, TextAnchor.CENTER, Math.PI / 6.0,
-                CategoryLabelWidthType.CATEGORY, 0.44f);
-        assertEquals(p1, p2);
-
-        p1 = new CategoryLabelPosition(RectangleAnchor.TOP,
-                TextBlockAnchor.CENTER, TextAnchor.CENTER,  Math.PI / 6.0,
-                CategoryLabelWidthType.CATEGORY, 0.55f);
-        assertNotEquals(p1, p2);
-        p2 = new CategoryLabelPosition(RectangleAnchor.TOP,
-                TextBlockAnchor.CENTER, TextAnchor.CENTER, Math.PI / 6.0,
-                CategoryLabelWidthType.CATEGORY, 0.55f);
-        assertEquals(p1, p2);
     }
 
-    /**
-     * Two objects that are equal are required to return the same hashCode.
-     */
     @Test
-    public void testHashCode() {
-        CategoryLabelPosition a1 = new CategoryLabelPosition();
-        CategoryLabelPosition a2 = new CategoryLabelPosition();
-        assertEquals(a1, a2);
-        int h1 = a1.hashCode();
-        int h2 = a2.hashCode();
-        assertEquals(h1, h2);
+    public void equalsShouldReturnFalseWhenLabelAnchorDiffers() {
+        CategoryLabelPosition p1 = createDefaultPosition();
+        CategoryLabelPosition p2 = new CategoryLabelPosition(
+            p1.getCategoryAnchor(),
+            TextBlockAnchor.CENTER, // Different anchor
+            p1.getRotationAnchor(),
+            p1.getAngle(),
+            p1.getWidthType(),
+            p1.getWidthRatio()
+        );
+        assertNotEquals(p1, p2);
     }
 
-    /**
-     * Serialize an instance, restore it, and check for equality.
-     */
     @Test
-    public void testSerialization() {
+    public void equalsShouldReturnFalseWhenRotationAnchorDiffers() {
+        CategoryLabelPosition p1 = createDefaultPosition();
+        CategoryLabelPosition p2 = new CategoryLabelPosition(
+            p1.getCategoryAnchor(),
+            p1.getLabelAnchor(),
+            TextAnchor.CENTER, // Different anchor
+            p1.getAngle(),
+            p1.getWidthType(),
+            p1.getWidthRatio()
+        );
+        assertNotEquals(p1, p2);
+    }
+
+    @Test
+    public void equalsShouldReturnFalseWhenAngleDiffers() {
+        CategoryLabelPosition p1 = createDefaultPosition();
+        CategoryLabelPosition p2 = new CategoryLabelPosition(
+            p1.getCategoryAnchor(),
+            p1.getLabelAnchor(),
+            p1.getRotationAnchor(),
+            Math.PI / 6.0, // Different angle
+            p1.getWidthType(),
+            p1.getWidthRatio()
+        );
+        assertNotEquals(p1, p2);
+    }
+
+    @Test
+    public void equalsShouldReturnFalseWhenWidthTypeDiffers() {
+        CategoryLabelPosition p1 = createDefaultPosition();
+        CategoryLabelPosition p2 = new CategoryLabelPosition(
+            p1.getCategoryAnchor(),
+            p1.getLabelAnchor(),
+            p1.getRotationAnchor(),
+            p1.getAngle(),
+            CategoryLabelWidthType.CATEGORY, // Different width type
+            p1.getWidthRatio()
+        );
+        assertNotEquals(p1, p2);
+    }
+
+    @Test
+    public void equalsShouldReturnFalseWhenWidthRatioDiffers() {
+        CategoryLabelPosition p1 = createDefaultPosition();
+        CategoryLabelPosition p2 = new CategoryLabelPosition(
+            p1.getCategoryAnchor(),
+            p1.getLabelAnchor(),
+            p1.getRotationAnchor(),
+            p1.getAngle(),
+            p1.getWidthType(),
+            0.55f // Different ratio
+        );
+        assertNotEquals(p1, p2);
+    }
+
+    // HASHCODE TESTS =========================================================
+
+    @Test
+    public void hashCodeShouldBeEqualForEqualObjects() {
+        CategoryLabelPosition p1 = createDefaultPosition();
+        CategoryLabelPosition p2 = createDefaultPosition();
+        assertEquals(p1.hashCode(), p2.hashCode());
+    }
+
+    // SERIALIZATION TESTS ====================================================
+
+    @Test
+    public void serializationShouldPreserveEquality() {
         CategoryLabelPosition p1 = new CategoryLabelPosition();
         CategoryLabelPosition p2 = TestUtils.serialised(p1);
         assertEquals(p1, p2);
     }
-
 }
