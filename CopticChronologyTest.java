@@ -1,18 +1,3 @@
-/*
- *  Copyright 2001-2014 Stephen Colebourne
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
 package org.joda.time.chrono;
 
 import java.util.Locale;
@@ -32,41 +17,38 @@ import org.joda.time.DurationField;
 import org.joda.time.DurationFieldType;
 
 /**
- * This class is a Junit unit test for CopticChronology.
- *
- * @author Stephen Colebourne
+ * Unit tests for CopticChronology.
+ * The tests cover factory methods, timezone/UTC handling, supported fields, precision,
+ * epoch alignment with Julian calendar, leap-year/month logic, and duration field behavior.
  */
 public class TestCopticChronology extends TestCase {
 
-    private static final int MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
+    // Common constants and helpers -------------------------------------------------------------
 
-    private static long SKIP = 1 * MILLIS_PER_DAY;
+    private static final int MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
+    private static final long ONE_DAY = MILLIS_PER_DAY;
 
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
     private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+
     private static final Chronology COPTIC_UTC = CopticChronology.getInstanceUTC();
     private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
     private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 
-                     366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 
-                     365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 +
-                     366 + 365;
-    // 2002-06-09
-    private long TEST_TIME_NOW =
-            (y2002days + 31L + 28L + 31L + 30L + 31L + 9L -1L) * MILLIS_PER_DAY;
+    // Fixed "now" for deterministic tests: 2002-06-09T00:00:00.000Z
+    private static final long FIXED_TEST_TIME_NOW_UTC =
+            new DateTime(2002, 6, 9, 0, 0, 0, 0, ISO_UTC).getMillis();
 
-    private DateTimeZone originalDateTimeZone = null;
-    private TimeZone originalTimeZone = null;
-    private Locale originalLocale = null;
+    private DateTimeZone originalDateTimeZone;
+    private TimeZone originalTimeZone;
+    private Locale originalLocale;
 
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
 
     public static TestSuite suite() {
-        SKIP = 1 * MILLIS_PER_DAY;
         return new TestSuite(TestCopticChronology.class);
     }
 
@@ -76,10 +58,11 @@ public class TestCopticChronology extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
+        DateTimeUtils.setCurrentMillisFixed(FIXED_TEST_TIME_NOW_UTC);
         originalDateTimeZone = DateTimeZone.getDefault();
         originalTimeZone = TimeZone.getDefault();
         originalLocale = Locale.getDefault();
+
         DateTimeZone.setDefault(LONDON);
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
         Locale.setDefault(Locale.UK);
@@ -96,7 +79,19 @@ public class TestCopticChronology extends TestCase {
         originalLocale = null;
     }
 
-    //-----------------------------------------------------------------------
+    // Helpers ---------------------------------------------------------------------------------
+
+    private static DateTime copticUTC(int year, int month, int day) {
+        return new DateTime(year, month, day, 0, 0, 0, 0, COPTIC_UTC);
+    }
+
+    private static boolean isCopticLeapYear(int year) {
+        // In Coptic, every 4th year is leap, with year % 4 == 3
+        return year % 4 == 3;
+    }
+
+    // Factory and zone behavior ----------------------------------------------------------------
+
     public void testFactoryUTC() {
         assertEquals(DateTimeZone.UTC, CopticChronology.getInstanceUTC().getZone());
         assertSame(CopticChronology.class, CopticChronology.getInstanceUTC().getClass());
@@ -114,7 +109,6 @@ public class TestCopticChronology extends TestCase {
         assertSame(CopticChronology.class, CopticChronology.getInstance(TOKYO).getClass());
     }
 
-    //-----------------------------------------------------------------------
     public void testEquality() {
         assertSame(CopticChronology.getInstance(TOKYO), CopticChronology.getInstance(TOKYO));
         assertSame(CopticChronology.getInstance(LONDON), CopticChronology.getInstance(LONDON));
@@ -146,9 +140,11 @@ public class TestCopticChronology extends TestCase {
         assertEquals("CopticChronology[UTC]", CopticChronology.getInstanceUTC().toString());
     }
 
-    //-----------------------------------------------------------------------
+    // Fields: Duration and Date/Time -----------------------------------------------------------
+
     public void testDurationFields() {
         final CopticChronology coptic = CopticChronology.getInstance();
+
         assertEquals("eras", coptic.eras().getName());
         assertEquals("centuries", coptic.centuries().getName());
         assertEquals("years", coptic.years().getName());
@@ -161,62 +157,63 @@ public class TestCopticChronology extends TestCase {
         assertEquals("minutes", coptic.minutes().getName());
         assertEquals("seconds", coptic.seconds().getName());
         assertEquals("millis", coptic.millis().getName());
-        
-        assertEquals(false, coptic.eras().isSupported());
-        assertEquals(true, coptic.centuries().isSupported());
-        assertEquals(true, coptic.years().isSupported());
-        assertEquals(true, coptic.weekyears().isSupported());
-        assertEquals(true, coptic.months().isSupported());
-        assertEquals(true, coptic.weeks().isSupported());
-        assertEquals(true, coptic.days().isSupported());
-        assertEquals(true, coptic.halfdays().isSupported());
-        assertEquals(true, coptic.hours().isSupported());
-        assertEquals(true, coptic.minutes().isSupported());
-        assertEquals(true, coptic.seconds().isSupported());
-        assertEquals(true, coptic.millis().isSupported());
-        
-        assertEquals(false, coptic.centuries().isPrecise());
-        assertEquals(false, coptic.years().isPrecise());
-        assertEquals(false, coptic.weekyears().isPrecise());
-        assertEquals(false, coptic.months().isPrecise());
-        assertEquals(false, coptic.weeks().isPrecise());
-        assertEquals(false, coptic.days().isPrecise());
-        assertEquals(false, coptic.halfdays().isPrecise());
-        assertEquals(true, coptic.hours().isPrecise());
-        assertEquals(true, coptic.minutes().isPrecise());
-        assertEquals(true, coptic.seconds().isPrecise());
-        assertEquals(true, coptic.millis().isPrecise());
-        
+
+        assertFalse(coptic.eras().isSupported());
+        assertTrue(coptic.centuries().isSupported());
+        assertTrue(coptic.years().isSupported());
+        assertTrue(coptic.weekyears().isSupported());
+        assertTrue(coptic.months().isSupported());
+        assertTrue(coptic.weeks().isSupported());
+        assertTrue(coptic.days().isSupported());
+        assertTrue(coptic.halfdays().isSupported());
+        assertTrue(coptic.hours().isSupported());
+        assertTrue(coptic.minutes().isSupported());
+        assertTrue(coptic.seconds().isSupported());
+        assertTrue(coptic.millis().isSupported());
+
+        assertFalse(coptic.centuries().isPrecise());
+        assertFalse(coptic.years().isPrecise());
+        assertFalse(coptic.weekyears().isPrecise());
+        assertFalse(coptic.months().isPrecise());
+        assertFalse(coptic.weeks().isPrecise());
+        assertFalse(coptic.days().isPrecise());
+        assertFalse(coptic.halfdays().isPrecise());
+        assertTrue(coptic.hours().isPrecise());
+        assertTrue(coptic.minutes().isPrecise());
+        assertTrue(coptic.seconds().isPrecise());
+        assertTrue(coptic.millis().isPrecise());
+
         final CopticChronology copticUTC = CopticChronology.getInstanceUTC();
-        assertEquals(false, copticUTC.centuries().isPrecise());
-        assertEquals(false, copticUTC.years().isPrecise());
-        assertEquals(false, copticUTC.weekyears().isPrecise());
-        assertEquals(false, copticUTC.months().isPrecise());
-        assertEquals(true, copticUTC.weeks().isPrecise());
-        assertEquals(true, copticUTC.days().isPrecise());
-        assertEquals(true, copticUTC.halfdays().isPrecise());
-        assertEquals(true, copticUTC.hours().isPrecise());
-        assertEquals(true, copticUTC.minutes().isPrecise());
-        assertEquals(true, copticUTC.seconds().isPrecise());
-        assertEquals(true, copticUTC.millis().isPrecise());
-        
+        assertFalse(copticUTC.centuries().isPrecise());
+        assertFalse(copticUTC.years().isPrecise());
+        assertFalse(copticUTC.weekyears().isPrecise());
+        assertFalse(copticUTC.months().isPrecise());
+        assertTrue(copticUTC.weeks().isPrecise());
+        assertTrue(copticUTC.days().isPrecise());
+        assertTrue(copticUTC.halfdays().isPrecise());
+        assertTrue(copticUTC.hours().isPrecise());
+        assertTrue(copticUTC.minutes().isPrecise());
+        assertTrue(copticUTC.seconds().isPrecise());
+        assertTrue(copticUTC.millis().isPrecise());
+
         final DateTimeZone gmt = DateTimeZone.forID("Etc/GMT");
         final CopticChronology copticGMT = CopticChronology.getInstance(gmt);
-        assertEquals(false, copticGMT.centuries().isPrecise());
-        assertEquals(false, copticGMT.years().isPrecise());
-        assertEquals(false, copticGMT.weekyears().isPrecise());
-        assertEquals(false, copticGMT.months().isPrecise());
-        assertEquals(true, copticGMT.weeks().isPrecise());
-        assertEquals(true, copticGMT.days().isPrecise());
-        assertEquals(true, copticGMT.halfdays().isPrecise());
-        assertEquals(true, copticGMT.hours().isPrecise());
-        assertEquals(true, copticGMT.minutes().isPrecise());
-        assertEquals(true, copticGMT.seconds().isPrecise());
-        assertEquals(true, copticGMT.millis().isPrecise());
+        assertFalse(copticGMT.centuries().isPrecise());
+        assertFalse(copticGMT.years().isPrecise());
+        assertFalse(copticGMT.weekyears().isPrecise());
+        assertFalse(copticGMT.months().isPrecise());
+        assertTrue(copticGMT.weeks().isPrecise());
+        assertTrue(copticGMT.days().isPrecise());
+        assertTrue(copticGMT.halfdays().isPrecise());
+        assertTrue(copticGMT.hours().isPrecise());
+        assertTrue(copticGMT.minutes().isPrecise());
+        assertTrue(copticGMT.seconds().isPrecise());
+        assertTrue(copticGMT.millis().isPrecise());
     }
 
     public void testDateFields() {
         final CopticChronology coptic = CopticChronology.getInstance();
+
         assertEquals("era", coptic.era().getName());
         assertEquals("centuryOfEra", coptic.centuryOfEra().getName());
         assertEquals("yearOfCentury", coptic.yearOfCentury().getName());
@@ -229,20 +226,20 @@ public class TestCopticChronology extends TestCase {
         assertEquals("dayOfYear", coptic.dayOfYear().getName());
         assertEquals("dayOfMonth", coptic.dayOfMonth().getName());
         assertEquals("dayOfWeek", coptic.dayOfWeek().getName());
-        
-        assertEquals(true, coptic.era().isSupported());
-        assertEquals(true, coptic.centuryOfEra().isSupported());
-        assertEquals(true, coptic.yearOfCentury().isSupported());
-        assertEquals(true, coptic.yearOfEra().isSupported());
-        assertEquals(true, coptic.year().isSupported());
-        assertEquals(true, coptic.monthOfYear().isSupported());
-        assertEquals(true, coptic.weekyearOfCentury().isSupported());
-        assertEquals(true, coptic.weekyear().isSupported());
-        assertEquals(true, coptic.weekOfWeekyear().isSupported());
-        assertEquals(true, coptic.dayOfYear().isSupported());
-        assertEquals(true, coptic.dayOfMonth().isSupported());
-        assertEquals(true, coptic.dayOfWeek().isSupported());
-        
+
+        assertTrue(coptic.era().isSupported());
+        assertTrue(coptic.centuryOfEra().isSupported());
+        assertTrue(coptic.yearOfCentury().isSupported());
+        assertTrue(coptic.yearOfEra().isSupported());
+        assertTrue(coptic.year().isSupported());
+        assertTrue(coptic.monthOfYear().isSupported());
+        assertTrue(coptic.weekyearOfCentury().isSupported());
+        assertTrue(coptic.weekyear().isSupported());
+        assertTrue(coptic.weekOfWeekyear().isSupported());
+        assertTrue(coptic.dayOfYear().isSupported());
+        assertTrue(coptic.dayOfMonth().isSupported());
+        assertTrue(coptic.dayOfWeek().isSupported());
+
         assertEquals(coptic.eras(), coptic.era().getDurationField());
         assertEquals(coptic.centuries(), coptic.centuryOfEra().getDurationField());
         assertEquals(coptic.years(), coptic.yearOfCentury().getDurationField());
@@ -255,15 +252,15 @@ public class TestCopticChronology extends TestCase {
         assertEquals(coptic.days(), coptic.dayOfYear().getDurationField());
         assertEquals(coptic.days(), coptic.dayOfMonth().getDurationField());
         assertEquals(coptic.days(), coptic.dayOfWeek().getDurationField());
-        
-        assertEquals(null, coptic.era().getRangeDurationField());
+
+        assertNull(coptic.era().getRangeDurationField());
         assertEquals(coptic.eras(), coptic.centuryOfEra().getRangeDurationField());
         assertEquals(coptic.centuries(), coptic.yearOfCentury().getRangeDurationField());
         assertEquals(coptic.eras(), coptic.yearOfEra().getRangeDurationField());
-        assertEquals(null, coptic.year().getRangeDurationField());
+        assertNull(coptic.year().getRangeDurationField());
         assertEquals(coptic.years(), coptic.monthOfYear().getRangeDurationField());
         assertEquals(coptic.centuries(), coptic.weekyearOfCentury().getRangeDurationField());
-        assertEquals(null, coptic.weekyear().getRangeDurationField());
+        assertNull(coptic.weekyear().getRangeDurationField());
         assertEquals(coptic.weekyears(), coptic.weekOfWeekyear().getRangeDurationField());
         assertEquals(coptic.years(), coptic.dayOfYear().getRangeDurationField());
         assertEquals(coptic.months(), coptic.dayOfMonth().getRangeDurationField());
@@ -272,6 +269,7 @@ public class TestCopticChronology extends TestCase {
 
     public void testTimeFields() {
         final CopticChronology coptic = CopticChronology.getInstance();
+
         assertEquals("halfdayOfDay", coptic.halfdayOfDay().getName());
         assertEquals("clockhourOfHalfday", coptic.clockhourOfHalfday().getName());
         assertEquals("hourOfHalfday", coptic.hourOfHalfday().getName());
@@ -283,181 +281,196 @@ public class TestCopticChronology extends TestCase {
         assertEquals("secondOfMinute", coptic.secondOfMinute().getName());
         assertEquals("millisOfDay", coptic.millisOfDay().getName());
         assertEquals("millisOfSecond", coptic.millisOfSecond().getName());
-        
-        assertEquals(true, coptic.halfdayOfDay().isSupported());
-        assertEquals(true, coptic.clockhourOfHalfday().isSupported());
-        assertEquals(true, coptic.hourOfHalfday().isSupported());
-        assertEquals(true, coptic.clockhourOfDay().isSupported());
-        assertEquals(true, coptic.hourOfDay().isSupported());
-        assertEquals(true, coptic.minuteOfDay().isSupported());
-        assertEquals(true, coptic.minuteOfHour().isSupported());
-        assertEquals(true, coptic.secondOfDay().isSupported());
-        assertEquals(true, coptic.secondOfMinute().isSupported());
-        assertEquals(true, coptic.millisOfDay().isSupported());
-        assertEquals(true, coptic.millisOfSecond().isSupported());
+
+        assertTrue(coptic.halfdayOfDay().isSupported());
+        assertTrue(coptic.clockhourOfHalfday().isSupported());
+        assertTrue(coptic.hourOfHalfday().isSupported());
+        assertTrue(coptic.clockhourOfDay().isSupported());
+        assertTrue(coptic.hourOfDay().isSupported());
+        assertTrue(coptic.minuteOfDay().isSupported());
+        assertTrue(coptic.minuteOfHour().isSupported());
+        assertTrue(coptic.secondOfDay().isSupported());
+        assertTrue(coptic.secondOfMinute().isSupported());
+        assertTrue(coptic.millisOfDay().isSupported());
+        assertTrue(coptic.millisOfSecond().isSupported());
     }
 
-    //-----------------------------------------------------------------------
+    // Epoch and era ----------------------------------------------------------------------------
+
     public void testEpoch() {
-        DateTime epoch = new DateTime(1, 1, 1, 0, 0, 0, 0, COPTIC_UTC);
-        assertEquals(new DateTime(284, 8, 29, 0, 0, 0, 0, JULIAN_UTC), epoch.withChronology(JULIAN_UTC));
+        // Coptic 0001-01-01 (UTC) aligns to Julian 0284-08-29 (UTC)
+        DateTime copticEpoch = copticUTC(1, 1, 1);
+        assertEquals(new DateTime(284, 8, 29, 0, 0, 0, 0, JULIAN_UTC), copticEpoch.withChronology(JULIAN_UTC));
     }
 
     public void testEra() {
         assertEquals(1, CopticChronology.AM);
         try {
+            // Negative year not allowed by CopticChronology (not proleptic)
             new DateTime(-1, 13, 5, 0, 0, 0, 0, COPTIC_UTC);
-            fail();
-        } catch (IllegalArgumentException ex) {}
+            fail("Expected IllegalArgumentException for proleptic negative year");
+        } catch (IllegalArgumentException ex) {
+            // expected
+        }
     }
 
-    //-----------------------------------------------------------------------
+    // Long-running calendar sweep ---------------------------------------------------------------
+
     /**
-     * Tests era, year, monthOfYear, dayOfMonth and dayOfWeek.
+     * Sweeps from Coptic epoch to ISO year 3000 (UTC) one day at a time,
+     * validating:
+     * - era is always AM
+     * - date components match the expected rolling counters
+     * - dayOfWeek increments correctly
+     * - leap year rule: year % 4 == 3
+     * - month lengths: months 1-12 have 30 days; month 13 has 5 or 6 days
      */
     public void testCalendar() {
         if (TestAll.FAST) {
             return;
         }
-        System.out.println("\nTestCopticChronology.testCalendar");
-        DateTime epoch = new DateTime(1, 1, 1, 0, 0, 0, 0, COPTIC_UTC);
-        long millis = epoch.getMillis();
-        long end = new DateTime(3000, 1, 1, 0, 0, 0, 0, ISO_UTC).getMillis();
-        DateTimeField dayOfWeek = COPTIC_UTC.dayOfWeek();
-        DateTimeField dayOfYear = COPTIC_UTC.dayOfYear();
-        DateTimeField dayOfMonth = COPTIC_UTC.dayOfMonth();
-        DateTimeField monthOfYear = COPTIC_UTC.monthOfYear();
-        DateTimeField year = COPTIC_UTC.year();
-        DateTimeField yearOfEra = COPTIC_UTC.yearOfEra();
-        DateTimeField era = COPTIC_UTC.era();
+
+        final DateTime copticEpoch = copticUTC(1, 1, 1);
+        long millis = copticEpoch.getMillis();
+        final long endExclusive = new DateTime(3000, 1, 1, 0, 0, 0, 0, ISO_UTC).getMillis();
+
+        final DateTimeField dayOfWeek = COPTIC_UTC.dayOfWeek();
+        final DateTimeField dayOfYear = COPTIC_UTC.dayOfYear();
+        final DateTimeField dayOfMonth = COPTIC_UTC.dayOfMonth();
+        final DateTimeField monthOfYear = COPTIC_UTC.monthOfYear();
+        final DateTimeField year = COPTIC_UTC.year();
+        final DateTimeField yearOfEra = COPTIC_UTC.yearOfEra();
+        final DateTimeField era = COPTIC_UTC.era();
+
         int expectedDOW = new DateTime(284, 8, 29, 0, 0, 0, 0, JULIAN_UTC).getDayOfWeek();
         int expectedDOY = 1;
         int expectedDay = 1;
         int expectedMonth = 1;
         int expectedYear = 1;
-        while (millis < end) {
-            int dowValue = dayOfWeek.get(millis);
-            int doyValue = dayOfYear.get(millis);
-            int dayValue = dayOfMonth.get(millis);
-            int monthValue = monthOfYear.get(millis);
-            int yearValue = year.get(millis);
-            int yearOfEraValue = yearOfEra.get(millis);
-            int monthLen = dayOfMonth.getMaximumValue(millis);
-            if (monthValue < 1 || monthValue > 13) {
-                fail("Bad month: " + millis);
-            }
-            
-            // test era
+
+        while (millis < endExclusive) {
+            final int dow = dayOfWeek.get(millis);
+            final int doy = dayOfYear.get(millis);
+            final int dom = dayOfMonth.get(millis);
+            final int moy = monthOfYear.get(millis);
+            final int yr = year.get(millis);
+            final int yoe = yearOfEra.get(millis);
+            final int currentMonthLength = dayOfMonth.getMaximumValue(millis);
+
+            assertTrue("Month out of range: " + moy, moy >= 1 && moy <= 13);
+
+            // Era
             assertEquals(1, era.get(millis));
             assertEquals("AM", era.getAsText(millis));
             assertEquals("AM", era.getAsShortText(millis));
-            
-            // test date
-            assertEquals(expectedYear, yearValue);
-            assertEquals(expectedYear, yearOfEraValue);
-            assertEquals(expectedMonth, monthValue);
-            assertEquals(expectedDay, dayValue);
-            assertEquals(expectedDOW, dowValue);
-            assertEquals(expectedDOY, doyValue);
-            
-            // test leap year
-            assertEquals(yearValue % 4 == 3, year.isLeap(millis));
-            
-            // test month length
-            if (monthValue == 13) {
-                assertEquals(yearValue % 4 == 3, monthOfYear.isLeap(millis));
-                if (yearValue % 4 == 3) {
-                    assertEquals(6, monthLen);
-                } else {
-                    assertEquals(5, monthLen);
-                }
+
+            // Date components
+            assertEquals(expectedYear, yr);
+            assertEquals(expectedYear, yoe);
+            assertEquals(expectedMonth, moy);
+            assertEquals(expectedDay, dom);
+            assertEquals(expectedDOW, dow);
+            assertEquals(expectedDOY, doy);
+
+            // Leap year rule
+            assertEquals(isCopticLeapYear(yr), year.isLeap(millis));
+
+            // Month lengths
+            if (moy == 13) {
+                assertEquals(isCopticLeapYear(yr), monthOfYear.isLeap(millis));
+                assertEquals(isCopticLeapYear(yr) ? 6 : 5, currentMonthLength);
             } else {
-                assertEquals(30, monthLen);
+                assertEquals(30, currentMonthLength);
             }
-            
-            // recalculate date
-            expectedDOW = (((expectedDOW + 1) - 1) % 7) + 1;
+
+            // Advance expected counters one day
+            expectedDOW = ((expectedDOW) % 7) + 1;
             expectedDay++;
             expectedDOY++;
+
+            // Month/Year rollovers
             if (expectedDay == 31 && expectedMonth < 13) {
+                // next month (months 1-12 are 30 days)
                 expectedDay = 1;
                 expectedMonth++;
             } else if (expectedMonth == 13) {
-                if (expectedYear % 4 == 3 && expectedDay == 7) {
-                    expectedDay = 1;
-                    expectedMonth = 1;
-                    expectedYear++;
-                    expectedDOY = 1;
-                } else if (expectedYear % 4 != 3 && expectedDay == 6) {
+                // intercalary period at year end (5 or 6 days)
+                final int maxIntercalary = isCopticLeapYear(expectedYear) ? 6 : 5;
+                if (expectedDay == maxIntercalary + 1) {
                     expectedDay = 1;
                     expectedMonth = 1;
                     expectedYear++;
                     expectedDOY = 1;
                 }
             }
-            millis += SKIP;
+
+            millis += ONE_DAY;
         }
     }
 
+    // Sample dates -----------------------------------------------------------------------------
+
     public void testSampleDate() {
+        // ISO: 2004-06-09T00:00Z -> Coptic
         DateTime dt = new DateTime(2004, 6, 9, 0, 0, 0, 0, ISO_UTC).withChronology(COPTIC_UTC);
+
         assertEquals(CopticChronology.AM, dt.getEra());
-        assertEquals(18, dt.getCenturyOfEra());  // TODO confirm
+        assertEquals(18, dt.getCenturyOfEra());   // TODO confirm
         assertEquals(20, dt.getYearOfCentury());
         assertEquals(1720, dt.getYearOfEra());
-        
+
         assertEquals(1720, dt.getYear());
         Property fld = dt.year();
-        assertEquals(false, fld.isLeap());
+        assertFalse(fld.isLeap());
         assertEquals(0, fld.getLeapAmount());
         assertEquals(DurationFieldType.days(), fld.getLeapDurationField().getType());
-        assertEquals(new DateTime(1721, 10, 2, 0, 0, 0, 0, COPTIC_UTC), fld.addToCopy(1));
-        
+        assertEquals(copticUTC(1721, 10, 2), fld.addToCopy(1));
+
         assertEquals(10, dt.getMonthOfYear());
         fld = dt.monthOfYear();
-        assertEquals(false, fld.isLeap());
+        assertFalse(fld.isLeap());
         assertEquals(0, fld.getLeapAmount());
         assertEquals(DurationFieldType.days(), fld.getLeapDurationField().getType());
         assertEquals(1, fld.getMinimumValue());
         assertEquals(1, fld.getMinimumValueOverall());
         assertEquals(13, fld.getMaximumValue());
         assertEquals(13, fld.getMaximumValueOverall());
-        assertEquals(new DateTime(1721, 1, 2, 0, 0, 0, 0, COPTIC_UTC), fld.addToCopy(4));
-        assertEquals(new DateTime(1720, 1, 2, 0, 0, 0, 0, COPTIC_UTC), fld.addWrapFieldToCopy(4));
-        
+        assertEquals(copticUTC(1721, 1, 2), fld.addToCopy(4));
+        assertEquals(copticUTC(1720, 1, 2), fld.addWrapFieldToCopy(4));
+
         assertEquals(2, dt.getDayOfMonth());
         fld = dt.dayOfMonth();
-        assertEquals(false, fld.isLeap());
+        assertFalse(fld.isLeap());
         assertEquals(0, fld.getLeapAmount());
-        assertEquals(null, fld.getLeapDurationField());
+        assertNull(fld.getLeapDurationField());
         assertEquals(1, fld.getMinimumValue());
         assertEquals(1, fld.getMinimumValueOverall());
         assertEquals(30, fld.getMaximumValue());
         assertEquals(30, fld.getMaximumValueOverall());
-        assertEquals(new DateTime(1720, 10, 3, 0, 0, 0, 0, COPTIC_UTC), fld.addToCopy(1));
-        
+        assertEquals(copticUTC(1720, 10, 3), fld.addToCopy(1));
+
         assertEquals(DateTimeConstants.WEDNESDAY, dt.getDayOfWeek());
         fld = dt.dayOfWeek();
-        assertEquals(false, fld.isLeap());
+        assertFalse(fld.isLeap());
         assertEquals(0, fld.getLeapAmount());
-        assertEquals(null, fld.getLeapDurationField());
+        assertNull(fld.getLeapDurationField());
         assertEquals(1, fld.getMinimumValue());
         assertEquals(1, fld.getMinimumValueOverall());
         assertEquals(7, fld.getMaximumValue());
         assertEquals(7, fld.getMaximumValueOverall());
-        assertEquals(new DateTime(1720, 10, 3, 0, 0, 0, 0, COPTIC_UTC), fld.addToCopy(1));
-        
+        assertEquals(copticUTC(1720, 10, 3), fld.addToCopy(1));
+
         assertEquals(9 * 30 + 2, dt.getDayOfYear());
         fld = dt.dayOfYear();
-        assertEquals(false, fld.isLeap());
+        assertFalse(fld.isLeap());
         assertEquals(0, fld.getLeapAmount());
-        assertEquals(null, fld.getLeapDurationField());
+        assertNull(fld.getLeapDurationField());
         assertEquals(1, fld.getMinimumValue());
         assertEquals(1, fld.getMinimumValueOverall());
         assertEquals(365, fld.getMaximumValue());
         assertEquals(366, fld.getMaximumValueOverall());
-        assertEquals(new DateTime(1720, 10, 3, 0, 0, 0, 0, COPTIC_UTC), fld.addToCopy(1));
-        
+        assertEquals(copticUTC(1720, 10, 3), fld.addToCopy(1));
+
         assertEquals(0, dt.getHourOfDay());
         assertEquals(0, dt.getMinuteOfHour());
         assertEquals(0, dt.getSecondOfMinute());
@@ -465,46 +478,50 @@ public class TestCopticChronology extends TestCase {
     }
 
     public void testSampleDateWithZone() {
+        // Noon in Paris (UTC+2 in summer) corresponds to 10:00 UTC
         DateTime dt = new DateTime(2004, 6, 9, 12, 0, 0, 0, PARIS).withChronology(COPTIC_UTC);
         assertEquals(CopticChronology.AM, dt.getEra());
         assertEquals(1720, dt.getYear());
         assertEquals(1720, dt.getYearOfEra());
         assertEquals(10, dt.getMonthOfYear());
         assertEquals(2, dt.getDayOfMonth());
-        assertEquals(10, dt.getHourOfDay());  // PARIS is UTC+2 in summer (12-2=10)
+        assertEquals(10, dt.getHourOfDay());  // 12:00 in Paris is 10:00 UTC in summer
         assertEquals(0, dt.getMinuteOfHour());
         assertEquals(0, dt.getSecondOfMinute());
         assertEquals(0, dt.getMillisOfSecond());
     }
 
+    // Duration fields: Year and Month -----------------------------------------------------------
+
     public void testDurationYear() {
-        // Leap 1723
-        DateTime dt20 = new DateTime(1720, 10, 2, 0, 0, 0, 0, COPTIC_UTC);
-        DateTime dt21 = new DateTime(1721, 10, 2, 0, 0, 0, 0, COPTIC_UTC);
-        DateTime dt22 = new DateTime(1722, 10, 2, 0, 0, 0, 0, COPTIC_UTC);
-        DateTime dt23 = new DateTime(1723, 10, 2, 0, 0, 0, 0, COPTIC_UTC);
-        DateTime dt24 = new DateTime(1724, 10, 2, 0, 0, 0, 0, COPTIC_UTC);
-        
+        // Leap year sequence around 1723 (leap)
+        DateTime dt20 = copticUTC(1720, 10, 2);
+        DateTime dt21 = copticUTC(1721, 10, 2);
+        DateTime dt22 = copticUTC(1722, 10, 2);
+        DateTime dt23 = copticUTC(1723, 10, 2);
+        DateTime dt24 = copticUTC(1724, 10, 2);
+
         DurationField fld = dt20.year().getDurationField();
         assertEquals(COPTIC_UTC.years(), fld);
+
         assertEquals(1L * 365L * MILLIS_PER_DAY, fld.getMillis(1, dt20.getMillis()));
         assertEquals(2L * 365L * MILLIS_PER_DAY, fld.getMillis(2, dt20.getMillis()));
         assertEquals(3L * 365L * MILLIS_PER_DAY, fld.getMillis(3, dt20.getMillis()));
         assertEquals((4L * 365L + 1L) * MILLIS_PER_DAY, fld.getMillis(4, dt20.getMillis()));
-        
+
         assertEquals(((4L * 365L + 1L) * MILLIS_PER_DAY) / 4, fld.getMillis(1));
         assertEquals(((4L * 365L + 1L) * MILLIS_PER_DAY) / 2, fld.getMillis(2));
-        
+
         assertEquals(1L * 365L * MILLIS_PER_DAY, fld.getMillis(1L, dt20.getMillis()));
         assertEquals(2L * 365L * MILLIS_PER_DAY, fld.getMillis(2L, dt20.getMillis()));
         assertEquals(3L * 365L * MILLIS_PER_DAY, fld.getMillis(3L, dt20.getMillis()));
         assertEquals((4L * 365L + 1L) * MILLIS_PER_DAY, fld.getMillis(4L, dt20.getMillis()));
-        
+
         assertEquals(((4L * 365L + 1L) * MILLIS_PER_DAY) / 4, fld.getMillis(1L));
         assertEquals(((4L * 365L + 1L) * MILLIS_PER_DAY) / 2, fld.getMillis(2L));
-        
+
         assertEquals(((4L * 365L + 1L) * MILLIS_PER_DAY) / 4, fld.getUnitMillis());
-        
+
         assertEquals(0, fld.getValue(1L * 365L * MILLIS_PER_DAY - 1L, dt20.getMillis()));
         assertEquals(1, fld.getValue(1L * 365L * MILLIS_PER_DAY, dt20.getMillis()));
         assertEquals(1, fld.getValue(1L * 365L * MILLIS_PER_DAY + 1L, dt20.getMillis()));
@@ -517,12 +534,12 @@ public class TestCopticChronology extends TestCase {
         assertEquals(3, fld.getValue((4L * 365L + 1L) * MILLIS_PER_DAY - 1L, dt20.getMillis()));
         assertEquals(4, fld.getValue((4L * 365L + 1L) * MILLIS_PER_DAY, dt20.getMillis()));
         assertEquals(4, fld.getValue((4L * 365L + 1L) * MILLIS_PER_DAY + 1L, dt20.getMillis()));
-        
+
         assertEquals(dt21.getMillis(), fld.add(dt20.getMillis(), 1));
         assertEquals(dt22.getMillis(), fld.add(dt20.getMillis(), 2));
         assertEquals(dt23.getMillis(), fld.add(dt20.getMillis(), 3));
         assertEquals(dt24.getMillis(), fld.add(dt20.getMillis(), 4));
-        
+
         assertEquals(dt21.getMillis(), fld.add(dt20.getMillis(), 1L));
         assertEquals(dt22.getMillis(), fld.add(dt20.getMillis(), 2L));
         assertEquals(dt23.getMillis(), fld.add(dt20.getMillis(), 3L));
@@ -530,32 +547,33 @@ public class TestCopticChronology extends TestCase {
     }
 
     public void testDurationMonth() {
-        // Leap 1723
-        DateTime dt11 = new DateTime(1723, 11, 2, 0, 0, 0, 0, COPTIC_UTC);
-        DateTime dt12 = new DateTime(1723, 12, 2, 0, 0, 0, 0, COPTIC_UTC);
-        DateTime dt13 = new DateTime(1723, 13, 2, 0, 0, 0, 0, COPTIC_UTC);
-        DateTime dt01 = new DateTime(1724, 1, 2, 0, 0, 0, 0, COPTIC_UTC);
-        
+        // Leap 1723 -> Month 13 has 6 days
+        DateTime dt11 = copticUTC(1723, 11, 2);
+        DateTime dt12 = copticUTC(1723, 12, 2);
+        DateTime dt13 = copticUTC(1723, 13, 2);
+        DateTime dt01 = copticUTC(1724, 1, 2);
+
         DurationField fld = dt11.monthOfYear().getDurationField();
         assertEquals(COPTIC_UTC.months(), fld);
+
         assertEquals(1L * 30L * MILLIS_PER_DAY, fld.getMillis(1, dt11.getMillis()));
         assertEquals(2L * 30L * MILLIS_PER_DAY, fld.getMillis(2, dt11.getMillis()));
         assertEquals((2L * 30L + 6L) * MILLIS_PER_DAY, fld.getMillis(3, dt11.getMillis()));
         assertEquals((3L * 30L + 6L) * MILLIS_PER_DAY, fld.getMillis(4, dt11.getMillis()));
-        
+
         assertEquals(1L * 30L * MILLIS_PER_DAY, fld.getMillis(1));
         assertEquals(2L * 30L * MILLIS_PER_DAY, fld.getMillis(2));
         assertEquals(13L * 30L * MILLIS_PER_DAY, fld.getMillis(13));
-        
+
         assertEquals(1L * 30L * MILLIS_PER_DAY, fld.getMillis(1L, dt11.getMillis()));
         assertEquals(2L * 30L * MILLIS_PER_DAY, fld.getMillis(2L, dt11.getMillis()));
         assertEquals((2L * 30L + 6L) * MILLIS_PER_DAY, fld.getMillis(3L, dt11.getMillis()));
         assertEquals((3L * 30L + 6L) * MILLIS_PER_DAY, fld.getMillis(4L, dt11.getMillis()));
-        
+
         assertEquals(1L * 30L * MILLIS_PER_DAY, fld.getMillis(1L));
         assertEquals(2L * 30L * MILLIS_PER_DAY, fld.getMillis(2L));
         assertEquals(13L * 30L * MILLIS_PER_DAY, fld.getMillis(13L));
-        
+
         assertEquals(0, fld.getValue(1L * 30L * MILLIS_PER_DAY - 1L, dt11.getMillis()));
         assertEquals(1, fld.getValue(1L * 30L * MILLIS_PER_DAY, dt11.getMillis()));
         assertEquals(1, fld.getValue(1L * 30L * MILLIS_PER_DAY + 1L, dt11.getMillis()));
@@ -568,32 +586,33 @@ public class TestCopticChronology extends TestCase {
         assertEquals(3, fld.getValue((3L * 30L + 6L) * MILLIS_PER_DAY - 1L, dt11.getMillis()));
         assertEquals(4, fld.getValue((3L * 30L + 6L) * MILLIS_PER_DAY, dt11.getMillis()));
         assertEquals(4, fld.getValue((3L * 30L + 6L) * MILLIS_PER_DAY + 1L, dt11.getMillis()));
-        
+
         assertEquals(dt12.getMillis(), fld.add(dt11.getMillis(), 1));
         assertEquals(dt13.getMillis(), fld.add(dt11.getMillis(), 2));
         assertEquals(dt01.getMillis(), fld.add(dt11.getMillis(), 3));
-        
+
         assertEquals(dt12.getMillis(), fld.add(dt11.getMillis(), 1L));
         assertEquals(dt13.getMillis(), fld.add(dt11.getMillis(), 2L));
         assertEquals(dt01.getMillis(), fld.add(dt11.getMillis(), 3L));
     }
 
+    // Leap specifics on month 13 ---------------------------------------------------------------
+
     public void testLeap_5_13() {
         Chronology chrono = CopticChronology.getInstance();
         DateTime dt = new DateTime(3, 13, 5, 0, 0, chrono);
-        assertEquals(true, dt.year().isLeap());
-        assertEquals(true, dt.monthOfYear().isLeap());
-        assertEquals(false, dt.dayOfMonth().isLeap());
-        assertEquals(false, dt.dayOfYear().isLeap());
+        assertTrue(dt.year().isLeap());
+        assertTrue(dt.monthOfYear().isLeap());
+        assertFalse(dt.dayOfMonth().isLeap());
+        assertFalse(dt.dayOfYear().isLeap());
     }
 
     public void testLeap_6_13() {
         Chronology chrono = CopticChronology.getInstance();
         DateTime dt = new DateTime(3, 13, 6, 0, 0, chrono);
-        assertEquals(true, dt.year().isLeap());
-        assertEquals(true, dt.monthOfYear().isLeap());
-        assertEquals(true, dt.dayOfMonth().isLeap());
-        assertEquals(true, dt.dayOfYear().isLeap());
+        assertTrue(dt.year().isLeap());
+        assertTrue(dt.monthOfYear().isLeap());
+        assertTrue(dt.dayOfMonth().isLeap());
+        assertTrue(dt.dayOfYear().isLeap());
     }
-
 }
