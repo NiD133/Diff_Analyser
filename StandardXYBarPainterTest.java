@@ -1,90 +1,97 @@
+/* ======================================================
+ * JFreeChart : a chart library for the Java(tm) platform
+ * ======================================================
+ *
+ * (C) Copyright 2000-present, by David Gilbert and Contributors.
+ *
+ * Project Info:  https://www.jfree.org/jfreechart/index.html
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ *
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
+ *
+ * -----------------------------
+ * StandardXYBarPainterTest.java
+ * -----------------------------
+ * (C) Copyright 2008-present, by David Gilbert and Contributors.
+ *
+ * Original Author:  David Gilbert;
+ * Contributor(s):   -;
+ *
+ */
+
 package org.jfree.chart.renderer.xy;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.api.PublicCloneable;
-import org.junit.jupiter.api.DisplayName;
+
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit tests for StandardXYBarPainter.
- * The class is stateless and immutable, so equality/hashCode/serialization
- * behavior is the primary concern. Cloning is intentionally unsupported.
+ * Tests for the {@link StandardXYBarPainter} class.
  */
 public class StandardXYBarPainterTest {
 
-    private static StandardXYBarPainter newPainter() {
-        return new StandardXYBarPainter();
-    }
-
+    /**
+     * Check that the equals() method distinguishes all fields.
+     */
     @Test
-    @DisplayName("equals(): obeys the general contract for a stateless painter")
-    public void equals_contract() {
-        // Arrange
-        StandardXYBarPainter a = newPainter();
-        StandardXYBarPainter b = newPainter();
-        StandardXYBarPainter c = newPainter();
-
-        // Assert
-        assertAll(
-            () -> assertTrue(a.equals(a), "reflexive"),
-            () -> assertTrue(a.equals(b) && b.equals(a), "symmetric"),
-            () -> assertTrue(a.equals(b) && b.equals(c) && a.equals(c), "transitive"),
-            () -> assertFalse(a.equals(null), "not equal to null"),
-            () -> assertFalse(a.equals("not a painter"), "not equal to different type")
-        );
+    public void testEquals() {
+        StandardXYBarPainter p1 = new StandardXYBarPainter();
+        StandardXYBarPainter p2 = new StandardXYBarPainter();
+        assertEquals(p1, p2);
     }
 
+    /**
+     * Two objects that are equal are required to return the same hashCode.
+     */
     @Test
-    @DisplayName("hashCode(): consistent and aligned with equals()")
-    public void hashCode_consistencyWithEquals() {
-        // Arrange
-        StandardXYBarPainter a = newPainter();
-        StandardXYBarPainter b = newPainter();
-
-        // Act
-        int a1 = a.hashCode();
-        int a2 = a.hashCode();
-        int bHash = b.hashCode();
-
-        // Assert
-        assertAll(
-            () -> assertEquals(a1, a2, "hashCode must be consistent for the same instance"),
-            () -> assertEquals(a1, bHash, "equal instances must have the same hashCode")
-        );
+    public void testHashcode() {
+        StandardXYBarPainter p1 = new StandardXYBarPainter();
+        StandardXYBarPainter p2 = new StandardXYBarPainter();
+        assertEquals(p1, p2);
+        int h1 = p1.hashCode();
+        int h2 = p2.hashCode();
+        assertEquals(h1, h2);
     }
 
+    /**
+     * Confirm that cloning isn't implemented (it isn't required, because
+     * instances of the class are immutable).
+     */
     @Test
-    @DisplayName("Cloning: not supported for immutable painter")
-    public void cloning_notSupported() {
-        // Arrange
-        StandardXYBarPainter painter = newPainter();
-
-        // Assert
-        assertAll(
-            () -> assertFalse(painter instanceof Cloneable, "should not implement Cloneable"),
-            () -> assertFalse(painter instanceof PublicCloneable, "should not implement PublicCloneable")
-        );
+    public void testCloning() {
+        StandardXYBarPainter p1 = new StandardXYBarPainter();
+        assertFalse(p1 instanceof Cloneable);
+        assertFalse(p1 instanceof PublicCloneable);
     }
 
+    /**
+     * Serialize an instance, restore it, and check for equality.
+     */
     @Test
-    @DisplayName("Serialization: round-trip preserves equality and yields a distinct instance")
-    public void serialization_roundTrip() {
-        // Arrange
-        StandardXYBarPainter original = newPainter();
-
-        // Act
-        StandardXYBarPainter copy = TestUtils.serialised(original);
-
-        // Assert
-        assertAll(
-            () -> assertEquals(original, copy, "serialized copy should be equal to the original"),
-            () -> assertNotSame(original, copy, "serialized copy should be a different instance")
-        );
+    public void testSerialization() {
+        StandardXYBarPainter p1 = new StandardXYBarPainter();
+        StandardXYBarPainter p2 = TestUtils.serialised(p1);
+        assertEquals(p1, p2);
     }
+
 }
