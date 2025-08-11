@@ -1,107 +1,73 @@
-/* ======================================================
- * JFreeChart : a chart library for the Java(tm) platform
- * ======================================================
- *
- * (C) Copyright 2000-present, by David Gilbert and Contributors.
- *
- * Project Info:  https://www.jfree.org/jfreechart/index.html
- *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2.1 of the License, or
- * (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- * License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
- * USA.
- *
- * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
- * Other names may be trademarks of their respective owners.]
- *
- * -------------------------------------
- * SymbolicXYItemLabelGeneratorTest.java
- * -------------------------------------
- * (C) Copyright 2003-present, by David Gilbert and Contributors.
- *
- * Original Author:  David Gilbert;
- * Contributor(s):   -;
- *
- */
-
 package org.jfree.chart.labels;
 
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.internal.CloneUtils;
 import org.jfree.chart.api.PublicCloneable;
-
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for the {@link SymbolicXYItemLabelGenerator} class.
+ * Unit tests for {@link SymbolicXYItemLabelGenerator}.
+ * 
+ * Focus: object semantics (equals, hashCode), cloning, and serialization.
  */
+@DisplayName("SymbolicXYItemLabelGenerator")
 public class SymbolicXYItemLabelGeneratorTest {
 
-    /**
-     * Tests the equals method.
-     */
-    @Test
-    public void testEquals() {
-        SymbolicXYItemLabelGenerator g1 = new SymbolicXYItemLabelGenerator();
-        SymbolicXYItemLabelGenerator g2 = new SymbolicXYItemLabelGenerator();
-        assertEquals(g1, g2);
-        assertEquals(g2, g1);
+    // Factory method to emphasize "default instance" intent and reduce duplication.
+    private static SymbolicXYItemLabelGenerator newDefaultGenerator() {
+        return new SymbolicXYItemLabelGenerator();
     }
 
-    /**
-     * Simple check that hashCode is implemented.
-     */
     @Test
-    public void testHashCode() {
-        SymbolicXYItemLabelGenerator g1
-                = new SymbolicXYItemLabelGenerator();
-        SymbolicXYItemLabelGenerator g2
-                = new SymbolicXYItemLabelGenerator();
-        assertEquals(g1, g2);
-        assertEquals(g1.hashCode(), g2.hashCode());
+    @DisplayName("equals(): two default instances are equal (symmetry)")
+    public void equals_twoDefaultInstances_areEqualAndSymmetric() {
+        SymbolicXYItemLabelGenerator g1 = newDefaultGenerator();
+        SymbolicXYItemLabelGenerator g2 = newDefaultGenerator();
+
+        assertEquals(g1, g2, "Two default generators should be equal");
+        assertEquals(g2, g1, "Equals should be symmetric");
     }
 
-    /**
-     * Confirm that cloning works.
-     */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
-        SymbolicXYItemLabelGenerator g1 = new SymbolicXYItemLabelGenerator();
-        SymbolicXYItemLabelGenerator g2 = CloneUtils.clone(g1);
-        assertNotSame(g1, g2);
-        assertSame(g1.getClass(), g2.getClass());
-        assertEquals(g1, g2);
+    @DisplayName("hashCode(): equal instances produce the same hash")
+    public void hashCode_equalInstances_produceSameHash() {
+        SymbolicXYItemLabelGenerator g1 = newDefaultGenerator();
+        SymbolicXYItemLabelGenerator g2 = newDefaultGenerator();
+
+        assertEquals(g1, g2, "Precondition: instances must be equal");
+        assertEquals(g1.hashCode(), g2.hashCode(),
+                "Equal instances must have the same hashCode");
     }
 
-    /**
-     * Check to ensure that this class implements PublicCloneable.
-     */
     @Test
-    public void testPublicCloneable() {
-        SymbolicXYItemLabelGenerator g1 = new SymbolicXYItemLabelGenerator();
-        assertTrue(g1 instanceof PublicCloneable);
+    @DisplayName("clone(): cloned instance is distinct but equal")
+    public void clone_createsDistinctButEqualInstance() throws CloneNotSupportedException {
+        SymbolicXYItemLabelGenerator original = newDefaultGenerator();
+        SymbolicXYItemLabelGenerator clone = CloneUtils.clone(original);
+
+        assertNotSame(original, clone, "Clone should be a different object reference");
+        assertSame(original.getClass(), clone.getClass(), "Clone should have the same runtime type");
+        assertEquals(original, clone, "Clone should be equal to the original");
     }
 
-    /**
-     * Serialize an instance, restore it, and check for equality.
-     */
     @Test
-    public void testSerialization() {
-        SymbolicXYItemLabelGenerator g1 = new SymbolicXYItemLabelGenerator();
-        SymbolicXYItemLabelGenerator g2 = TestUtils.serialised(g1);
-        assertEquals(g1, g2);
+    @DisplayName("Implements PublicCloneable")
+    public void implementsPublicCloneable() {
+        SymbolicXYItemLabelGenerator generator = newDefaultGenerator();
+        assertTrue(generator instanceof PublicCloneable,
+                "Default generator should implement PublicCloneable");
     }
 
+    @Test
+    @DisplayName("Serialization round-trip preserves equality")
+    public void serialization_roundTrip_preservesEquality() {
+        SymbolicXYItemLabelGenerator original = newDefaultGenerator();
+        SymbolicXYItemLabelGenerator restored = TestUtils.serialised(original);
+
+        assertEquals(original, restored,
+                "Serialized-then-deserialized instance should be equal to the original");
+    }
 }
