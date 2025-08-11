@@ -26,191 +26,215 @@ import org.evosuite.runtime.mock.java.io.MockFileInputStream;
 import org.evosuite.runtime.mock.java.io.MockPrintStream;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) 
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true, 
-    useVFS = true, 
-    useVNET = true, 
-    resetStaticState = true, 
-    separateClassLoader = true
-) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class SerializationUtils_ESTest extends SerializationUtils_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void serialize_nullObject_shouldSucceed() throws Throwable {
-        // Test serializing null to an OutputStream should not throw
-        OutputStream outputStream = new MockPrintStream("objectData");
-        SerializationUtils.serialize(null, outputStream);
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      MockPrintStream mockPrintStream0 = new MockPrintStream("objectData");
+      SerializationUtils.serialize((Serializable) null, (OutputStream) mockPrintStream0);
+  }
 
-    @Test(timeout = 4000)
-    public void classLoaderAwareInputStream_constructorWithNullInputStream_throwsNullPointerException() throws Throwable {
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        try {
-            // Attempt to create stream with null input stream
-            new SerializationUtils.ClassLoaderAwareObjectInputStream(null, classLoader);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            verifyException("org.apache.commons.lang3.SerializationUtils", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      SerializationUtils.ClassLoaderAwareObjectInputStream serializationUtils_ClassLoaderAwareObjectInputStream0 = null;
+      try {
+        serializationUtils_ClassLoaderAwareObjectInputStream0 = new SerializationUtils.ClassLoaderAwareObjectInputStream((InputStream) null, classLoader0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void roundtrip_nullObject_returnsNull() throws Throwable {
-        Integer result = SerializationUtils.roundtrip(null);
-        assertNull(result);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      Integer integer0 = SerializationUtils.roundtrip((Integer) null);
+      assertNull(integer0);
+  }
 
-    @Test(timeout = 4000)
-    public void serializeAndDeserialize_nullObject_returnsNull() throws Throwable {
-        byte[] serialized = SerializationUtils.serialize(null);
-        Object deserialized = SerializationUtils.deserialize(serialized);
-        assertNull(deserialized);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      byte[] byteArray0 = SerializationUtils.serialize((Serializable) null);
+      Object object0 = SerializationUtils.deserialize(byteArray0);
+      assertNull(object0);
+  }
 
-    @Test(timeout = 4000)
-    public void serializeAndDeserialize_LocalePRC_retainsState() throws Throwable {
-        Locale original = Locale.PRC;
-        byte[] serialized = SerializationUtils.serialize(original);
-        Locale deserialized = (Locale) SerializationUtils.deserialize(serialized);
-        assertEquals("Variant should be empty", "", deserialized.getVariant());
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      Locale locale0 = Locale.PRC;
+      byte[] byteArray0 = SerializationUtils.serialize((Serializable) locale0);
+      Locale locale1 = (Locale)SerializationUtils.deserialize(byteArray0);
+      assertEquals("", locale1.getVariant());
+  }
 
-    @Test(timeout = 4000)
-    public void deserialize_sequenceInputStreamOfNull_returnsNull() throws Throwable {
-        byte[] serializedNull = SerializationUtils.serialize(null);
-        ByteArrayInputStream stream1 = new ByteArrayInputStream(serializedNull);
-        ByteArrayInputStream stream2 = new ByteArrayInputStream(serializedNull);
-        SequenceInputStream combinedStream = new SequenceInputStream(stream1, stream2);
-        
-        Object result = SerializationUtils.deserialize(combinedStream);
-        assertNull(result);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      byte[] byteArray0 = SerializationUtils.serialize((Serializable) null);
+      ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
+      SequenceInputStream sequenceInputStream0 = new SequenceInputStream(byteArrayInputStream0, byteArrayInputStream0);
+      Object object0 = SerializationUtils.deserialize((InputStream) sequenceInputStream0);
+      assertNull(object0);
+  }
 
-    @Test(timeout = 4000)
-    public void deserialize_validLocaleJapaneseStream_returnsEqualObject() throws Throwable {
-        Locale original = Locale.JAPANESE;
-        byte[] serialized = SerializationUtils.serialize(original);
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(serialized);
-        
-        Object deserialized = SerializationUtils.deserialize(inputStream);
-        assertSame(deserialized, original); // Locale uses flyweight pattern
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      Locale locale0 = Locale.JAPANESE;
+      byte[] byteArray0 = SerializationUtils.serialize((Serializable) locale0);
+      ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
+      Object object0 = SerializationUtils.deserialize((InputStream) byteArrayInputStream0);
+      assertSame(object0, locale0);
+  }
 
-    @Test(timeout = 4000)
-    public void serialize_toUnconnectedPipedOutputStream_throwsRuntimeException() throws Throwable {
-        PipedOutputStream outputStream = new PipedOutputStream();
-        Class<Object> clazz = Object.class;
-        try {
-            // Attempt serialization to unconnected pipe
-            SerializationUtils.serialize(clazz, outputStream);
-            fail("Expected RuntimeException due to unconnected pipe");
-        } catch (RuntimeException e) {
-            verifyException("org.apache.commons.lang3.SerializationUtils", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
+      Class<Object> class0 = Object.class;
+      // Undeclared exception!
+      try { 
+        SerializationUtils.serialize((Serializable) class0, (OutputStream) pipedOutputStream0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // java.io.IOException: Pipe not connected
+         //
+         verifyException("org.apache.commons.lang3.SerializationUtils", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void serialize_nonSerializableObjectInMap_throwsRuntimeException() throws Throwable {
-        HashMap<MockFileInputStream, Object> map = new HashMap<>();
-        File tempFile = MockFile.createTempFile("4*54", "4*54");
-        MockFileInputStream fileInputStream = new MockFileInputStream(tempFile);
-        map.put(fileInputStream, tempFile);
-        
-        try {
-            // Map contains non-serializable MockFileInputStream
-            SerializationUtils.serialize(map);
-            fail("Expected RuntimeException (NotSerializableException)");
-        } catch (RuntimeException e) {
-            verifyException("org.apache.commons.lang3.SerializationUtils", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      HashMap<MockFileInputStream, Object> hashMap0 = new HashMap<MockFileInputStream, Object>();
+      File file0 = MockFile.createTempFile("4*54", "4*54");
+      MockFileInputStream mockFileInputStream0 = new MockFileInputStream(file0);
+      hashMap0.put(mockFileInputStream0, file0);
+      // Undeclared exception!
+      try { 
+        SerializationUtils.serialize((Serializable) hashMap0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // java.io.NotSerializableException: org.evosuite.runtime.mock.java.io.MockFileInputStream
+         //
+         verifyException("org.apache.commons.lang3.SerializationUtils", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void deserialize_invalidByteArray_throwsEOFException() throws Throwable {
-        byte[] invalidData = new byte[1]; // Incomplete serialized data
-        try {
-            SerializationUtils.deserialize(invalidData);
-            fail("Expected RuntimeException (EOFException)");
-        } catch (RuntimeException e) {
-            verifyException("org.apache.commons.lang3.SerializationUtils", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      byte[] byteArray0 = new byte[1];
+      // Undeclared exception!
+      try { 
+        SerializationUtils.deserialize(byteArray0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // java.io.EOFException
+         //
+         verifyException("org.apache.commons.lang3.SerializationUtils", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void deserialize_nullByteArray_throwsNullPointerException() throws Throwable {
-        try {
-            SerializationUtils.deserialize(null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            verifyException("java.util.Objects", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        SerializationUtils.deserialize((byte[]) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // objectData
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void deserialize_unconnectedPipedInputStream_throwsRuntimeException() throws Throwable {
-        PipedInputStream inputStream = new PipedInputStream();
-        try {
-            // Attempt deserialization from unconnected pipe
-            SerializationUtils.deserialize(inputStream);
-            fail("Expected RuntimeException due to unconnected pipe");
-        } catch (RuntimeException e) {
-            verifyException("org.apache.commons.lang3.SerializationUtils", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      PipedInputStream pipedInputStream0 = new PipedInputStream();
+      // Undeclared exception!
+      try { 
+        SerializationUtils.deserialize((InputStream) pipedInputStream0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // java.io.IOException: Pipe not connected
+         //
+         verifyException("org.apache.commons.lang3.SerializationUtils", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void deserialize_nullInputStream_throwsNullPointerException() throws Throwable {
-        try {
-            SerializationUtils.deserialize((InputStream) null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            verifyException("java.util.Objects", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        SerializationUtils.deserialize((InputStream) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // inputStream
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void deserialize_byteArrayInputStreamWithInvalidOffset_throwsArrayIndexOutOfBoundsException() throws Throwable {
-        byte value = 114;
-        byte[] serialized = SerializationUtils.serialize(value);
-        try {
-            // Create stream with invalid negative offset
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(serialized, -1, 163);
-            SerializationUtils.deserialize(inputStream);
-            fail("Expected ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            // Expected during stream creation
-        }
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      byte[] byteArray0 = SerializationUtils.serialize((Serializable) (byte)114);
+      ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0, (-1), 163);
+      // Undeclared exception!
+      try { 
+        SerializationUtils.deserialize((InputStream) byteArrayInputStream0);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.io.ByteArrayInputStream", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void serialize_nonNullObjectToNullOutputStream_throwsNullPointerException() throws Throwable {
-        Integer value = new Integer(-106);
-        try {
-            SerializationUtils.serialize(value, null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            verifyException("java.util.Objects", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      Integer integer0 = new Integer((-106));
+      // Undeclared exception!
+      try { 
+        SerializationUtils.serialize((Serializable) integer0, (OutputStream) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // outputStream
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void clone_nullObject_returnsNull() throws Throwable {
-        Integer result = SerializationUtils.clone(null);
-        assertNull(result);
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      Integer integer0 = SerializationUtils.clone((Integer) null);
+      assertNull(integer0);
+  }
 
-    @Test(timeout = 4000)
-    public void clone_integer_returnsEqualValue() throws Throwable {
-        Integer original = new Integer(114);
-        Integer cloned = SerializationUtils.clone(original);
-        assertEquals(original, cloned);
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      Integer integer0 = new Integer((byte)114);
+      Integer integer1 = SerializationUtils.clone(integer0);
+      assertTrue(integer1.equals((Object)integer0));
+  }
 
-    @Test(timeout = 4000)
-    public void constructor_instantiation_success() throws Throwable {
-        // Verify utility class constructor can be instantiated
-        SerializationUtils utils = new SerializationUtils();
-        assertNotNull(utils);
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      SerializationUtils serializationUtils0 = new SerializationUtils();
+  }
 }
