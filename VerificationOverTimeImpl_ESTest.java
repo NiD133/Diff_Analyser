@@ -25,229 +25,218 @@ import org.mockito.verification.After;
 import org.mockito.verification.Timeout;
 import org.mockito.verification.VerificationMode;
 
-@RunWith(EvoRunner.class) 
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true, 
-    useVFS = true, 
-    useVNET = true, 
-    resetStaticState = true, 
-    separateClassLoader = true
-) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class VerificationOverTimeImpl_ESTest extends VerificationOverTimeImpl_ESTest_scaffolding {
 
-    // Tests for getTimer()
-    @Test(timeout = 4000)
-    public void getTimer_ReturnsNull_WhenInitializedWithNullTimer() throws Throwable {
-        After after0 = new After(10L, (VerificationMode) null);
-        VerificationOverTimeImpl verificationOverTimeImpl0 = 
-            new VerificationOverTimeImpl(0L, after0, false, (Timer) null);
-        Timer timer0 = verificationOverTimeImpl0.getTimer();
-        assertNull(timer0);
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      After after0 = new After(10L, (VerificationMode) null);
+      VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(0L, after0, false, (Timer) null);
+      Timer timer0 = verificationOverTimeImpl0.getTimer();
+      assertNull(timer0);
+  }
 
-    // Tests for isReturnOnSuccess() and getPollingPeriodMillis()
-    @Test(timeout = 4000)
-    public void isReturnOnSuccess_AndGetPollingPeriod_ReturnCorrectValues() throws Throwable {
-        NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
-        After after0 = new After(2416L, noMoreInteractions0);
-        VerificationOverTimeImpl verificationOverTimeImpl0 = 
-            new VerificationOverTimeImpl(5157L, 1L, after0, false);
-        Timer timer0 = verificationOverTimeImpl0.getTimer();
-        VerificationOverTimeImpl verificationOverTimeImpl1 = 
-            new VerificationOverTimeImpl(5157L, noMoreInteractions0, true, timer0);
-        
-        // Verify returnOnSuccess is true and polling period is 5157L
-        assertTrue(verificationOverTimeImpl1.isReturnOnSuccess());
-        assertEquals(5157L, verificationOverTimeImpl1.getPollingPeriodMillis());
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
+      After after0 = new After(2416L, noMoreInteractions0);
+      VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(5157L, 1L, after0, false);
+      Timer timer0 = verificationOverTimeImpl0.getTimer();
+      VerificationOverTimeImpl verificationOverTimeImpl1 = new VerificationOverTimeImpl(5157L, noMoreInteractions0, true, timer0);
+      verificationOverTimeImpl1.isReturnOnSuccess();
+      assertEquals(5157L, verificationOverTimeImpl1.getPollingPeriodMillis());
+  }
 
-    // Tests for getPollingPeriodMillis()
-    @Test(timeout = 4000)
-    public void getPollingPeriodMillis_ReturnsZero_WhenSetToZero() throws Throwable {
-        AtMost atMost0 = new AtMost(3199);
-        Timeout timeout0 = new Timeout(0L, atMost0);
-        Timer timer0 = new Timer(0L);
-        VerificationOverTimeImpl verificationOverTimeImpl0 = 
-            new VerificationOverTimeImpl(0L, timeout0, false, timer0);
-        long actualPollingPeriod = verificationOverTimeImpl0.getPollingPeriodMillis();
-        assertEquals(0L, actualPollingPeriod);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      AtMost atMost0 = new AtMost(3199);
+      Timeout timeout0 = new Timeout(0L, atMost0);
+      Timer timer0 = new Timer(0L);
+      VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(0L, timeout0, false, timer0);
+      long long0 = verificationOverTimeImpl0.getPollingPeriodMillis();
+      assertEquals(0L, long0);
+  }
 
-    @Test(timeout = 4000)
-    public void getPollingPeriodMillis_ReturnsValueSetInConstructor() throws Throwable {
-        NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
-        After after0 = new After(2416L, noMoreInteractions0);
-        VerificationOverTimeImpl verificationOverTimeImpl0 = 
-            new VerificationOverTimeImpl(5157L, 1L, after0, false);
-        long actualPollingPeriod = verificationOverTimeImpl0.getPollingPeriodMillis();
-        assertEquals(5157L, actualPollingPeriod);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
+      After after0 = new After(2416L, noMoreInteractions0);
+      VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(5157L, 1L, after0, false);
+      long long0 = verificationOverTimeImpl0.getPollingPeriodMillis();
+      assertEquals(5157L, long0);
+  }
 
-    @Test(timeout = 4000)
-    public void getPollingPeriodMillis_ReturnsNegativeValue_WhenSetInConstructor() throws Throwable {
-        After after0 = new After(0L, (VerificationMode) null);
-        Timer timer0 = new Timer(488L);
-        VerificationOverTimeImpl verificationOverTimeImpl0 = 
-            new VerificationOverTimeImpl((-288L), after0, true, timer0);
-        long actualPollingPeriod = verificationOverTimeImpl0.getPollingPeriodMillis();
-        assertEquals(-288L, actualPollingPeriod);
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      AtMost atMost0 = new AtMost(3199);
+      Timeout timeout0 = new Timeout(0L, atMost0);
+      Timer timer0 = new Timer(3199);
+      VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(0L, timeout0, false, timer0);
+      VerificationMode verificationMode0 = verificationOverTimeImpl0.getDelegate();
+      assertSame(verificationMode0, timeout0);
+  }
 
-    // Tests for getDelegate()
-    @Test(timeout = 4000)
-    public void getDelegate_ReturnsSameInstance_AsProvidedInConstructor() throws Throwable {
-        AtMost atMost0 = new AtMost(3199);
-        Timeout timeout0 = new Timeout(0L, atMost0);
-        Timer timer0 = new Timer(3199);
-        VerificationOverTimeImpl verificationOverTimeImpl0 = 
-            new VerificationOverTimeImpl(0L, timeout0, false, timer0);
-        VerificationMode actualDelegate = verificationOverTimeImpl0.getDelegate();
-        assertSame(timeout0, actualDelegate);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(0L, 0L, (VerificationMode) null, false);
+      VerificationOverTimeImpl verificationOverTimeImpl1 = verificationOverTimeImpl0.copyWithVerificationMode((VerificationMode) null);
+      assertFalse(verificationOverTimeImpl1.equals((Object)verificationOverTimeImpl0));
+  }
 
-    @Test(timeout = 4000)
-    public void getDelegate_ReturnsDelegate_WhenSetInConstructor() throws Throwable {
-        Timer timer0 = new Timer(1418L);
-        VerificationOverTimeImpl verificationOverTimeImpl0 = 
-            new VerificationOverTimeImpl(1418L, (VerificationMode) null, true, timer0);
-        // Should return the delegate set in constructor (null)
-        assertNull(verificationOverTimeImpl0.getDelegate());
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
+      VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl((-102L), 0L, noMoreInteractions0, false);
+      VerificationOverTimeImpl verificationOverTimeImpl1 = verificationOverTimeImpl0.copyWithVerificationMode(noMoreInteractions0);
+      assertEquals((-102L), verificationOverTimeImpl1.getPollingPeriodMillis());
+      assertEquals((-102L), verificationOverTimeImpl0.getPollingPeriodMillis());
+  }
 
-    // Tests for copyWithVerificationMode()
-    @Test(timeout = 4000)
-    public void copyWithVerificationMode_ReturnsNewInstance_NotEqualToOriginal() throws Throwable {
-        VerificationOverTimeImpl original = 
-            new VerificationOverTimeImpl(0L, 0L, (VerificationMode) null, false);
-        VerificationOverTimeImpl copy = original.copyWithVerificationMode((VerificationMode) null);
-        assertNotSame(original, copy);
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(0L, 0L, (VerificationMode) null, false);
+      // Undeclared exception!
+      try { 
+        verificationOverTimeImpl0.verify((VerificationData) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.mockito.internal.verification.VerificationOverTimeImpl", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void copyWithVerificationMode_CopiesPollingPeriod_FromOriginal() throws Throwable {
-        NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
-        VerificationOverTimeImpl original = 
-            new VerificationOverTimeImpl((-102L), 0L, noMoreInteractions0, false);
-        VerificationOverTimeImpl copy = original.copyWithVerificationMode(noMoreInteractions0);
-        assertEquals(-102L, copy.getPollingPeriodMillis());
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(3L, 3L, (VerificationMode) null, true);
+      VerificationOverTimeImpl verificationOverTimeImpl1 = verificationOverTimeImpl0.copyWithVerificationMode((VerificationMode) null);
+      // Undeclared exception!
+      try { 
+        verificationOverTimeImpl1.copyWithVerificationMode(verificationOverTimeImpl0);
+       //  fail("Expecting exception: NoSuchElementException");
+       // Unstable assertion
+      } catch(NoSuchElementException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.util.LinkedList", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void copyWithVerificationMode_ThrowsException_WhenDelegateIsNull() throws Throwable {
-        VerificationOverTimeImpl original = 
-            new VerificationOverTimeImpl(3L, 3L, (VerificationMode) null, true);
-        VerificationOverTimeImpl copy = original.copyWithVerificationMode((VerificationMode) null);
-        try {
-            copy.copyWithVerificationMode(original);
-            fail("Expected NoSuchElementException");
-        } catch (NoSuchElementException e) {
-            // Expected from LinkedList
-        }
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(0L, 0L, (VerificationMode) null, false);
+      VerificationOverTimeImpl verificationOverTimeImpl1 = null;
+      try {
+        verificationOverTimeImpl1 = new VerificationOverTimeImpl((-720L), (-720L), verificationOverTimeImpl0, false);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void copyWithVerificationMode_ThrowsNPE_WhenTimerIsNull() throws Throwable {
-        NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
-        VerificationOverTimeImpl original = 
-            new VerificationOverTimeImpl(3058L, noMoreInteractions0, true, (Timer) null);
-        try {
-            original.copyWithVerificationMode(noMoreInteractions0);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected due to null timer
-        }
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
+      Timeout timeout0 = new Timeout(318L, noMoreInteractions0);
+      Timer timer0 = new Timer(5157L);
+      VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(1L, timeout0, true, timer0);
+      boolean boolean0 = verificationOverTimeImpl0.canRecoverFromFailure(noMoreInteractions0);
+      assertEquals(1L, verificationOverTimeImpl0.getPollingPeriodMillis());
+      assertFalse(boolean0);
+  }
 
-    // Tests for constructor exceptions
-    @Test(timeout = 4000)
-    public void constructor_ThrowsRuntimeException_WhenNegativePollingPeriodUsed() throws Throwable {
-        VerificationOverTimeImpl original = 
-            new VerificationOverTimeImpl(0L, 0L, (VerificationMode) null, false);
-        try {
-            new VerificationOverTimeImpl((-720L), (-720L), original, false);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
+      After after0 = new After(2416L, noMoreInteractions0);
+      VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(5157L, 1L, after0, false);
+      boolean boolean0 = verificationOverTimeImpl0.canRecoverFromFailure(after0);
+      assertEquals(5157L, verificationOverTimeImpl0.getPollingPeriodMillis());
+      assertTrue(boolean0);
+  }
 
-    // Tests for canRecoverFromFailure()
-    @Test(timeout = 4000)
-    public void canRecoverFromFailure_ReturnsFalse_ForNoMoreInteractions() throws Throwable {
-        NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
-        Timeout timeout0 = new Timeout(318L, noMoreInteractions0);
-        Timer timer0 = new Timer(5157L);
-        VerificationOverTimeImpl impl = 
-            new VerificationOverTimeImpl(1L, timeout0, true, timer0);
-        boolean canRecover = impl.canRecoverFromFailure(noMoreInteractions0);
-        assertFalse(canRecover);
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      AtMost atMost0 = new AtMost(0);
+      Timer timer0 = new Timer(0);
+      VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(1444L, atMost0, true, timer0);
+      boolean boolean0 = verificationOverTimeImpl0.canRecoverFromFailure(atMost0);
+      assertEquals(1444L, verificationOverTimeImpl0.getPollingPeriodMillis());
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void canRecoverFromFailure_ReturnsTrue_ForAfterMode() throws Throwable {
-        NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
-        After after0 = new After(2416L, noMoreInteractions0);
-        VerificationOverTimeImpl impl = 
-            new VerificationOverTimeImpl(5157L, 1L, after0, false);
-        boolean canRecover = impl.canRecoverFromFailure(after0);
-        assertTrue(canRecover);
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
+      VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(0L, 0L, noMoreInteractions0, true);
+      MockSettingsImpl<Object> mockSettingsImpl0 = new MockSettingsImpl<Object>();
+      InvocationContainerImpl invocationContainerImpl0 = new InvocationContainerImpl(mockSettingsImpl0);
+      VerificationDataImpl verificationDataImpl0 = new VerificationDataImpl(invocationContainerImpl0, (InvocationMatcher) null);
+      verificationOverTimeImpl0.verify(verificationDataImpl0);
+      assertTrue(verificationOverTimeImpl0.isReturnOnSuccess());
+  }
 
-    @Test(timeout = 4000)
-    public void canRecoverFromFailure_ReturnsFalse_ForAtMostMode() throws Throwable {
-        AtMost atMost0 = new AtMost(0);
-        Timer timer0 = new Timer(0);
-        VerificationOverTimeImpl impl = 
-            new VerificationOverTimeImpl(1444L, atMost0, true, timer0);
-        boolean canRecover = impl.canRecoverFromFailure(atMost0);
-        assertFalse(canRecover);
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
+      VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(2161L, 2161L, noMoreInteractions0, false);
+      MockSettingsImpl<Object> mockSettingsImpl0 = new MockSettingsImpl<Object>();
+      InvocationContainerImpl invocationContainerImpl0 = new InvocationContainerImpl(mockSettingsImpl0);
+      VerificationDataImpl verificationDataImpl0 = new VerificationDataImpl(invocationContainerImpl0, (InvocationMatcher) null);
+      // Undeclared exception!
+      verificationOverTimeImpl0.verify(verificationDataImpl0);
+  }
 
-    // Tests for verify()
-    @Test(timeout = 4000)
-    public void verify_ThrowsNPE_WhenDataIsNull() throws Throwable {
-        VerificationOverTimeImpl impl = 
-            new VerificationOverTimeImpl(0L, 0L, (VerificationMode) null, false);
-        try {
-            impl.verify((VerificationData) null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      Timer timer0 = new Timer(1418L);
+      VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(1418L, (VerificationMode) null, true, timer0);
+      verificationOverTimeImpl0.getDelegate();
+      assertTrue(verificationOverTimeImpl0.isReturnOnSuccess());
+      assertEquals(1418L, verificationOverTimeImpl0.getPollingPeriodMillis());
+  }
 
-    @Test(timeout = 4000)
-    public void verify_DoesNotThrow_WithNoMoreInteractionsAndNullInvocationMatcher() throws Throwable {
-        NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
-        VerificationOverTimeImpl impl = 
-            new VerificationOverTimeImpl(0L, 0L, noMoreInteractions0, true);
-        MockSettingsImpl<Object> mockSettings = new MockSettingsImpl<>();
-        InvocationContainerImpl container = new InvocationContainerImpl(mockSettings);
-        VerificationDataImpl data = new VerificationDataImpl(container, (InvocationMatcher) null);
-        impl.verify(data); // Should not throw
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      After after0 = new After(0L, (VerificationMode) null);
+      Timer timer0 = new Timer(488L);
+      VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl((-288L), after0, true, timer0);
+      long long0 = verificationOverTimeImpl0.getPollingPeriodMillis();
+      assertTrue(verificationOverTimeImpl0.isReturnOnSuccess());
+      assertEquals((-288L), long0);
+  }
 
-    @Test(timeout = 4000)
-    public void verify_ThrowsException_WithNoMoreInteractionsAndInvalidData() throws Throwable {
-        NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
-        VerificationOverTimeImpl impl = 
-            new VerificationOverTimeImpl(2161L, 2161L, noMoreInteractions0, false);
-        MockSettingsImpl<Object> mockSettings = new MockSettingsImpl<>();
-        InvocationContainerImpl container = new InvocationContainerImpl(mockSettings);
-        VerificationDataImpl data = new VerificationDataImpl(container, (InvocationMatcher) null);
-        try {
-            impl.verify(data);
-            fail("Expected exception");
-        } catch (Throwable e) {
-            // Expected from verification logic
-        }
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(0L, 0L, (VerificationMode) null, false);
+      verificationOverTimeImpl0.getTimer();
+      assertFalse(verificationOverTimeImpl0.isReturnOnSuccess());
+  }
 
-    // Tests for isReturnOnSuccess()
-    @Test(timeout = 4000)
-    public void isReturnOnSuccess_ReturnsFalse_WhenSetInConstructor() throws Throwable {
-        VerificationOverTimeImpl impl = 
-            new VerificationOverTimeImpl(0L, 0L, (VerificationMode) null, false);
-        assertFalse(impl.isReturnOnSuccess());
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(0L, 0L, (VerificationMode) null, false);
+      boolean boolean0 = verificationOverTimeImpl0.isReturnOnSuccess();
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
+      VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(3058L, noMoreInteractions0, true, (Timer) null);
+      // Undeclared exception!
+      try { 
+        verificationOverTimeImpl0.copyWithVerificationMode(noMoreInteractions0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.mockito.internal.verification.VerificationOverTimeImpl", e);
+      }
+  }
 }
