@@ -34,334 +34,526 @@ import java.util.function.Supplier;
 import org.apache.commons.io.input.BrokenInputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Nested;
 
 /**
- * Tests {@link Uncheck}.
+ * Tests {@link Uncheck} utility class that converts checked IOExceptions to unchecked UncheckedIOExceptions.
  */
 class UncheckTest {
 
-    private static final byte[] BYTES = { 'a', 'b' };
-    private static final String CAUSE_MESSAGE = "CauseMessage";
-    private static final String CUSTOM_MESSAGE = "Custom message";
+    private static final byte[] TEST_BYTES = { 'a', 'b' };
+    private static final String EXPECTED_CAUSE_MESSAGE = "CauseMessage";
+    private static final String CUSTOM_ERROR_MESSAGE = "Custom message";
 
-    private AtomicInteger atomicInt;
-    private AtomicLong atomicLong;
-    private AtomicBoolean atomicBoolean;
-    private AtomicReference<String> ref1;
-    private AtomicReference<String> ref2;
-    private AtomicReference<String> ref3;
-    private AtomicReference<String> ref4;
-
-    private void assertUncheckedIOException(final IOException expected, final UncheckedIOException e) {
-        assertEquals(CUSTOM_MESSAGE, e.getMessage());
-        final IOException cause = e.getCause();
-        assertEquals(expected.getClass(), cause.getClass());
-        assertEquals(CAUSE_MESSAGE, cause.getMessage());
-    }
+    // Test state holders for verifying side effects
+    private AtomicInteger intHolder;
+    private AtomicLong longHolder;
+    private AtomicBoolean booleanHolder;
+    private AtomicReference<String> stringHolder1;
+    private AtomicReference<String> stringHolder2;
+    private AtomicReference<String> stringHolder3;
+    private AtomicReference<String> stringHolder4;
 
     @BeforeEach
-    public void beforeEach() {
-        ref1 = new AtomicReference<>();
-        ref2 = new AtomicReference<>();
-        ref3 = new AtomicReference<>();
-        ref4 = new AtomicReference<>();
-        atomicInt = new AtomicInteger();
-        atomicLong = new AtomicLong();
-        atomicBoolean = new AtomicBoolean();
+    void setUp() {
+        stringHolder1 = new AtomicReference<>();
+        stringHolder2 = new AtomicReference<>();
+        stringHolder3 = new AtomicReference<>();
+        stringHolder4 = new AtomicReference<>();
+        intHolder = new AtomicInteger();
+        longHolder = new AtomicLong();
+        booleanHolder = new AtomicBoolean();
     }
 
-    private ByteArrayInputStream newInputStream() {
-        return new ByteArrayInputStream(BYTES);
+    private ByteArrayInputStream createTestInputStream() {
+        return new ByteArrayInputStream(TEST_BYTES);
     }
 
-    /**
-     * Tests {@link Uncheck#accept(IOConsumer, Object)}.
-     */
-    @Test
-    void testAccept() {
-        final ByteArrayInputStream stream = newInputStream();
-        Uncheck.accept(n -> stream.skip(n), 1);
-        assertEquals('b', Uncheck.get(stream::read).intValue());
+    private void assertUncheckedIOExceptionWithCustomMessage(IOException originalException, UncheckedIOException actualException) {
+        assertEquals(CUSTOM_ERROR_MESSAGE, actualException.getMessage());
+        
+        IOException cause = actualException.getCause();
+        assertEquals(originalException.getClass(), cause.getClass());
+        assertEquals(EXPECTED_CAUSE_MESSAGE, cause.getMessage());
     }
 
-    @Test
-    void testAcceptIOBiConsumerOfTUTU() {
-        assertThrows(UncheckedIOException.class, () -> Uncheck.accept((t, u) -> {
-            throw new IOException();
-        }, null, null));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.accept(TestConstants.THROWING_IO_BI_CONSUMER, null, null));
-        Uncheck.accept((t, u) -> {
-            TestUtils.compareAndSetThrowsIO(ref1, t);
-            TestUtils.compareAndSetThrowsIO(ref2, u);
-        }, "new1", "new2");
-        assertEquals("new1", ref1.get());
-        assertEquals("new2", ref2.get());
+    private void assertIOExceptionIsWrappedAsUnchecked(Runnable operation) {
+        assertThrows(UncheckedIOException.class, operation::run);
     }
 
-    @Test
-    void testAcceptIOConsumerOfTT() {
-        assertThrows(UncheckedIOException.class, () -> Uncheck.accept(t -> {
-            throw new IOException();
-        }, null));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.accept(TestUtils.throwingIOConsumer(), null));
-        Uncheck.accept(t -> TestUtils.compareAndSetThrowsIO(ref1, t), "new1");
-        assertEquals("new1", ref1.get());
-    }
+    @Nested
+    class AcceptTests {
+        
+        @Test
+        void shouldAcceptSingleParameterConsumerSuccessfully() {
+            ByteArrayInputStream stream = createTestInputStream();
+            
+            // Skip 1 byte using Uncheck.accept
+            Uncheck.accept(n -> stream.skip(n), 1);
+            
+            // Verify the skip operation worked by reading next byte
+            assertEquals('b', Uncheck.get(stream::read).intValue());
+        }
 
-    @Test
-    void testAcceptIOTriConsumerOfTUVTUV() {
-        assertThrows(UncheckedIOException.class, () -> Uncheck.accept((t, u, v) -> {
-            throw new IOException();
-        }, null, null, null));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.accept(TestConstants.THROWING_IO_TRI_CONSUMER, null, null, null));
-        Uncheck.accept((t, u, v) -> {
-            TestUtils.compareAndSetThrowsIO(ref1, t);
-            TestUtils.compareAndSetThrowsIO(ref2, u);
-            TestUtils.compareAndSetThrowsIO(ref3, v);
-        }, "new1", "new2", "new3");
-        assertEquals("new1", ref1.get());
-        assertEquals("new2", ref2.get());
-        assertEquals("new3", ref3.get());
-    }
+        @Test
+        void shouldWrapIOExceptionFromSingleParameterConsumer() {
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.accept(t -> { throw new IOException(); }, null));
+            
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.accept(TestUtils.throwingIOConsumer(), null));
+        }
 
-    /**
-     * Tests {@link Uncheck#apply(IOFunction, Object)}.
-     */
-    @Test
-    void testApply1() {
-        final ByteArrayInputStream stream = newInputStream();
-        assertEquals(1, Uncheck.apply(n -> stream.skip(n), 1).intValue());
-        assertEquals('b', Uncheck.get(stream::read).intValue());
-    }
+        @Test
+        void shouldExecuteSingleParameterConsumerWithSideEffects() {
+            String testValue = "testValue";
+            
+            Uncheck.accept(value -> TestUtils.compareAndSetThrowsIO(stringHolder1, value), testValue);
+            
+            assertEquals(testValue, stringHolder1.get());
+        }
 
-    /**
-     * Tests {@link Uncheck#apply(IOBiFunction, Object, Object)}.
-     */
-    @Test
-    void testApply2() {
-        final ByteArrayInputStream stream = newInputStream();
-        final byte[] buf = new byte[BYTES.length];
-        assertEquals(1, Uncheck.apply((o, l) -> stream.read(buf, o, l), 0, 1).intValue());
-        assertEquals('a', buf[0]);
-    }
+        @Test
+        void shouldWrapIOExceptionFromBiConsumer() {
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.accept((t, u) -> { throw new IOException(); }, null, null));
+            
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.accept(TestConstants.THROWING_IO_BI_CONSUMER, null, null));
+        }
 
-    /**
-     * Tests {@link Uncheck#apply(IOTriFunction, Object, Object, Object)}.
-     */
-    @Test
-    void testApply3() {
-        final ByteArrayInputStream stream = newInputStream();
-        final byte[] buf = new byte[BYTES.length];
-        assertEquals(1, Uncheck.apply((b, o, l) -> stream.read(b, o, l), buf, 0, 1).intValue());
-        assertEquals('a', buf[0]);
-    }
+        @Test
+        void shouldExecuteBiConsumerWithSideEffects() {
+            String value1 = "value1";
+            String value2 = "value2";
+            
+            Uncheck.accept((t, u) -> {
+                TestUtils.compareAndSetThrowsIO(stringHolder1, t);
+                TestUtils.compareAndSetThrowsIO(stringHolder2, u);
+            }, value1, value2);
+            
+            assertEquals(value1, stringHolder1.get());
+            assertEquals(value2, stringHolder2.get());
+        }
 
-    @Test
-    void testApplyIOBiFunctionOfTURTU() {
-        assertThrows(UncheckedIOException.class, () -> Uncheck.apply((t, u) -> {
-            throw new IOException();
-        }, null, null));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.apply(TestConstants.THROWING_IO_BI_FUNCTION, null, null));
-        assertEquals("new0", Uncheck.apply((t, u) -> {
-            TestUtils.compareAndSetThrowsIO(ref1, t);
-            TestUtils.compareAndSetThrowsIO(ref2, u);
-            return "new0";
-        }, "new1", "new2"));
-        assertEquals("new1", ref1.get());
-        assertEquals("new2", ref2.get());
-    }
+        @Test
+        void shouldWrapIOExceptionFromTriConsumer() {
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.accept((t, u, v) -> { throw new IOException(); }, null, null, null));
+            
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.accept(TestConstants.THROWING_IO_TRI_CONSUMER, null, null, null));
+        }
 
-    @Test
-    void testApplyIOFunctionOfTRT() {
-        assertThrows(UncheckedIOException.class, () -> Uncheck.apply(t -> {
-            throw new IOException();
-        }, null));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.apply(TestConstants.THROWING_IO_FUNCTION, null));
-        Uncheck.apply(t -> TestUtils.compareAndSetThrowsIO(ref1, t), "new1");
-        assertEquals("new1", ref1.get());
-    }
-
-    @Test
-    void testApplyIOQuadFunctionOfTUVWRTUVW() {
-        assertThrows(UncheckedIOException.class, () -> Uncheck.apply((t, u, v, w) -> {
-            throw new IOException();
-        }, null, null, null, null));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.apply(TestConstants.THROWING_IO_QUAD_FUNCTION, null, null, null, null));
-        assertEquals("new0", Uncheck.apply((t, u, v, w) -> {
-            TestUtils.compareAndSetThrowsIO(ref1, t);
-            TestUtils.compareAndSetThrowsIO(ref2, u);
-            TestUtils.compareAndSetThrowsIO(ref3, v);
-            TestUtils.compareAndSetThrowsIO(ref4, w);
-            return "new0";
-        }, "new1", "new2", "new3", "new4"));
-        assertEquals("new1", ref1.get());
-        assertEquals("new2", ref2.get());
-        assertEquals("new3", ref3.get());
-        assertEquals("new4", ref4.get());
-    }
-
-    @Test
-    void testApplyIOTriFunctionOfTUVRTUV() {
-        assertThrows(UncheckedIOException.class, () -> Uncheck.apply((t, u, v) -> {
-            throw new IOException();
-        }, null, null, null));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.apply(TestConstants.THROWING_IO_TRI_FUNCTION, null, null, null));
-        assertEquals("new0", Uncheck.apply((t, u, v) -> {
-            TestUtils.compareAndSetThrowsIO(ref1, t);
-            TestUtils.compareAndSetThrowsIO(ref2, u);
-            TestUtils.compareAndSetThrowsIO(ref3, v);
-            return "new0";
-        }, "new1", "new2", "new3"));
-        assertEquals("new1", ref1.get());
-        assertEquals("new2", ref2.get());
-        assertEquals("new3", ref3.get());
-    }
-
-    /**
-     * Tests {@link Uncheck#get(IOSupplier)}.
-     */
-    @Test
-    void testGet() {
-        assertEquals('a', Uncheck.get(() -> newInputStream().read()).intValue());
-        assertThrows(UncheckedIOException.class, () -> Uncheck.get(() -> {
-            throw new IOException();
-        }));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.get(TestConstants.THROWING_IO_SUPPLIER));
-        assertEquals("new1", Uncheck.get(() -> TestUtils.compareAndSetThrowsIO(ref1, "new1")));
-        assertEquals("new1", ref1.get());
-    }
-
-    @Test
-    void testGetAsBoolean() {
-        assertThrows(UncheckedIOException.class, () -> Uncheck.getAsBoolean(() -> {
-            throw new IOException();
-        }));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.getAsBoolean(TestConstants.THROWING_IO_BOOLEAN_SUPPLIER));
-        assertTrue(Uncheck.getAsBoolean(() -> TestUtils.compareAndSetThrowsIO(atomicBoolean, true)));
-        assertTrue(atomicBoolean.get());
-    }
-
-    @Test
-    void testGetAsInt() {
-        assertThrows(UncheckedIOException.class, () -> Uncheck.getAsInt(() -> {
-            throw new IOException();
-        }));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.getAsInt(TestConstants.THROWING_IO_INT_SUPPLIER));
-        assertEquals(1, Uncheck.getAsInt(() -> TestUtils.compareAndSetThrowsIO(atomicInt, 1)));
-        assertEquals(1, atomicInt.get());
-    }
-
-    @Test
-    void testGetAsIntMessage() {
-        // No exception
-        assertThrows(UncheckedIOException.class, () -> Uncheck.getAsInt(() -> {
-            throw new IOException();
-        }, () -> CUSTOM_MESSAGE));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.getAsInt(TestConstants.THROWING_IO_INT_SUPPLIER, () -> CUSTOM_MESSAGE));
-        assertEquals(1, Uncheck.getAsInt(() -> TestUtils.compareAndSetThrowsIO(atomicInt, 1), () -> CUSTOM_MESSAGE));
-        assertEquals(1, atomicInt.get());
-        // exception
-        final IOException expected = new IOException(CAUSE_MESSAGE);
-        try {
-            Uncheck.getAsInt(() -> new BrokenInputStream(expected).read(), () -> CUSTOM_MESSAGE);
-            fail();
-        } catch (final UncheckedIOException e) {
-            assertUncheckedIOException(expected, e);
+        @Test
+        void shouldExecuteTriConsumerWithSideEffects() {
+            String value1 = "value1";
+            String value2 = "value2";
+            String value3 = "value3";
+            
+            Uncheck.accept((t, u, v) -> {
+                TestUtils.compareAndSetThrowsIO(stringHolder1, t);
+                TestUtils.compareAndSetThrowsIO(stringHolder2, u);
+                TestUtils.compareAndSetThrowsIO(stringHolder3, v);
+            }, value1, value2, value3);
+            
+            assertEquals(value1, stringHolder1.get());
+            assertEquals(value2, stringHolder2.get());
+            assertEquals(value3, stringHolder3.get());
         }
     }
 
-    @Test
-    void testGetAsLong() {
-        assertThrows(UncheckedIOException.class, () -> Uncheck.getAsLong(() -> {
-            throw new IOException();
-        }));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.getAsLong(TestConstants.THROWING_IO_LONG_SUPPLIER));
-        assertEquals(1L, Uncheck.getAsLong(() -> TestUtils.compareAndSetThrowsIO(atomicLong, 1L)));
-        assertEquals(1L, atomicLong.get());
-    }
+    @Nested
+    class ApplyTests {
 
-    @Test
-    void testGetAsLongMessage() {
-        // No exception
-        assertThrows(UncheckedIOException.class, () -> Uncheck.getAsLong(() -> {
-            throw new IOException();
-        }, () -> CUSTOM_MESSAGE));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.getAsLong(TestConstants.THROWING_IO_LONG_SUPPLIER, () -> CUSTOM_MESSAGE));
-        assertEquals(1L, Uncheck.getAsLong(() -> TestUtils.compareAndSetThrowsIO(atomicLong, 1L), () -> CUSTOM_MESSAGE));
-        assertEquals(1L, atomicLong.get());
-        // exception
-        final IOException expected = new IOException(CAUSE_MESSAGE);
-        try {
-            Uncheck.getAsLong(() -> new BrokenInputStream(expected).read(), () -> CUSTOM_MESSAGE);
-            fail();
-        } catch (final UncheckedIOException e) {
-            assertUncheckedIOException(expected, e);
+        @Test
+        void shouldApplySingleParameterFunctionSuccessfully() {
+            ByteArrayInputStream stream = createTestInputStream();
+            
+            long bytesSkipped = Uncheck.apply(n -> stream.skip(n), 1);
+            
+            assertEquals(1, bytesSkipped);
+            assertEquals('b', Uncheck.get(stream::read).intValue());
+        }
+
+        @Test
+        void shouldApplyBiFunctionSuccessfully() {
+            ByteArrayInputStream stream = createTestInputStream();
+            byte[] buffer = new byte[TEST_BYTES.length];
+            
+            int bytesRead = Uncheck.apply((offset, length) -> stream.read(buffer, offset, length), 0, 1);
+            
+            assertEquals(1, bytesRead);
+            assertEquals('a', buffer[0]);
+        }
+
+        @Test
+        void shouldApplyTriFunctionSuccessfully() {
+            ByteArrayInputStream stream = createTestInputStream();
+            byte[] buffer = new byte[TEST_BYTES.length];
+            
+            int bytesRead = Uncheck.apply((buf, offset, length) -> stream.read(buf, offset, length), buffer, 0, 1);
+            
+            assertEquals(1, bytesRead);
+            assertEquals('a', buffer[0]);
+        }
+
+        @Test
+        void shouldWrapIOExceptionFromSingleParameterFunction() {
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.apply(t -> { throw new IOException(); }, null));
+            
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.apply(TestConstants.THROWING_IO_FUNCTION, null));
+        }
+
+        @Test
+        void shouldExecuteSingleParameterFunctionWithSideEffects() {
+            String testValue = "testValue";
+            
+            Uncheck.apply(value -> TestUtils.compareAndSetThrowsIO(stringHolder1, value), testValue);
+            
+            assertEquals(testValue, stringHolder1.get());
+        }
+
+        @Test
+        void shouldWrapIOExceptionFromBiFunction() {
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.apply((t, u) -> { throw new IOException(); }, null, null));
+            
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.apply(TestConstants.THROWING_IO_BI_FUNCTION, null, null));
+        }
+
+        @Test
+        void shouldExecuteBiFunctionWithSideEffectsAndReturnValue() {
+            String value1 = "value1";
+            String value2 = "value2";
+            String expectedResult = "result";
+            
+            String actualResult = Uncheck.apply((t, u) -> {
+                TestUtils.compareAndSetThrowsIO(stringHolder1, t);
+                TestUtils.compareAndSetThrowsIO(stringHolder2, u);
+                return expectedResult;
+            }, value1, value2);
+            
+            assertEquals(expectedResult, actualResult);
+            assertEquals(value1, stringHolder1.get());
+            assertEquals(value2, stringHolder2.get());
+        }
+
+        @Test
+        void shouldWrapIOExceptionFromTriFunction() {
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.apply((t, u, v) -> { throw new IOException(); }, null, null, null));
+            
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.apply(TestConstants.THROWING_IO_TRI_FUNCTION, null, null, null));
+        }
+
+        @Test
+        void shouldExecuteTriFunctionWithSideEffectsAndReturnValue() {
+            String value1 = "value1";
+            String value2 = "value2";
+            String value3 = "value3";
+            String expectedResult = "result";
+            
+            String actualResult = Uncheck.apply((t, u, v) -> {
+                TestUtils.compareAndSetThrowsIO(stringHolder1, t);
+                TestUtils.compareAndSetThrowsIO(stringHolder2, u);
+                TestUtils.compareAndSetThrowsIO(stringHolder3, v);
+                return expectedResult;
+            }, value1, value2, value3);
+            
+            assertEquals(expectedResult, actualResult);
+            assertEquals(value1, stringHolder1.get());
+            assertEquals(value2, stringHolder2.get());
+            assertEquals(value3, stringHolder3.get());
+        }
+
+        @Test
+        void shouldWrapIOExceptionFromQuadFunction() {
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.apply((t, u, v, w) -> { throw new IOException(); }, null, null, null, null));
+            
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.apply(TestConstants.THROWING_IO_QUAD_FUNCTION, null, null, null, null));
+        }
+
+        @Test
+        void shouldExecuteQuadFunctionWithSideEffectsAndReturnValue() {
+            String value1 = "value1";
+            String value2 = "value2";
+            String value3 = "value3";
+            String value4 = "value4";
+            String expectedResult = "result";
+            
+            String actualResult = Uncheck.apply((t, u, v, w) -> {
+                TestUtils.compareAndSetThrowsIO(stringHolder1, t);
+                TestUtils.compareAndSetThrowsIO(stringHolder2, u);
+                TestUtils.compareAndSetThrowsIO(stringHolder3, v);
+                TestUtils.compareAndSetThrowsIO(stringHolder4, w);
+                return expectedResult;
+            }, value1, value2, value3, value4);
+            
+            assertEquals(expectedResult, actualResult);
+            assertEquals(value1, stringHolder1.get());
+            assertEquals(value2, stringHolder2.get());
+            assertEquals(value3, stringHolder3.get());
+            assertEquals(value4, stringHolder4.get());
         }
     }
 
-    /**
-     * Tests {@link Uncheck#get(IOSupplier, Supplier)}.
-     */
-    @Test
-    void testGetMessage() {
-        // No exception
-        assertEquals('a', Uncheck.get(() -> newInputStream().read()).intValue(), () -> CUSTOM_MESSAGE);
-        // Exception
-        final IOException expected = new IOException(CAUSE_MESSAGE);
-        try {
-            Uncheck.get(() -> new BrokenInputStream(expected).read(), () -> CUSTOM_MESSAGE);
-            fail();
-        } catch (final UncheckedIOException e) {
-            assertUncheckedIOException(expected, e);
+    @Nested
+    class GetTests {
+
+        @Test
+        void shouldGetValueFromSupplierSuccessfully() {
+            int expectedValue = Uncheck.get(() -> createTestInputStream().read());
+            
+            assertEquals('a', expectedValue);
+        }
+
+        @Test
+        void shouldWrapIOExceptionFromSupplier() {
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.get(() -> { throw new IOException(); }));
+            
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.get(TestConstants.THROWING_IO_SUPPLIER));
+        }
+
+        @Test
+        void shouldExecuteSupplierWithSideEffects() {
+            String testValue = "testValue";
+            
+            String result = Uncheck.get(() -> TestUtils.compareAndSetThrowsIO(stringHolder1, testValue));
+            
+            assertEquals(testValue, result);
+            assertEquals(testValue, stringHolder1.get());
+        }
+
+        @Test
+        void shouldGetValueFromSupplierWithCustomMessageWhenNoException() {
+            int expectedValue = Uncheck.get(() -> createTestInputStream().read(), () -> CUSTOM_ERROR_MESSAGE);
+            
+            assertEquals('a', expectedValue);
+        }
+
+        @Test
+        void shouldWrapIOExceptionFromSupplierWithCustomMessage() {
+            IOException originalException = new IOException(EXPECTED_CAUSE_MESSAGE);
+            
+            try {
+                Uncheck.get(() -> new BrokenInputStream(originalException).read(), () -> CUSTOM_ERROR_MESSAGE);
+                fail("Expected UncheckedIOException to be thrown");
+            } catch (UncheckedIOException e) {
+                assertUncheckedIOExceptionWithCustomMessage(originalException, e);
+            }
         }
     }
 
-    /**
-     * Tests {@link Uncheck#run(IORunnable)}.
-     */
-    @Test
-    void testRun() {
-        final ByteArrayInputStream stream = newInputStream();
-        Uncheck.run(() -> stream.skip(1));
-        assertEquals('b', Uncheck.get(stream::read).intValue());
-        //
-        assertThrows(UncheckedIOException.class, () -> Uncheck.run(() -> {
-            throw new IOException();
-        }));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.run(TestConstants.THROWING_IO_RUNNABLE));
-        Uncheck.run(() -> TestUtils.compareAndSetThrowsIO(ref1, "new1"));
-        assertEquals("new1", ref1.get());
-    }
+    @Nested
+    class GetAsBooleanTests {
 
-    /**
-     * Tests {@link Uncheck#run(IORunnable, Supplier))}.
-     *
-     * @throws IOException
-     */
-    @Test
-    void testRunMessage() throws IOException {
-        // No exception
-        final ByteArrayInputStream stream = newInputStream();
-        Uncheck.run(() -> stream.skip(1), () -> CUSTOM_MESSAGE);
-        assertEquals('b', Uncheck.get(stream::read).intValue());
-        final IOException expected = new IOException(CAUSE_MESSAGE);
-        // Exception
-        try {
-            Uncheck.run(() -> new BrokenInputStream(expected).read(), () -> CUSTOM_MESSAGE);
-            fail();
-        } catch (final UncheckedIOException e) {
-            assertUncheckedIOException(expected, e);
+        @Test
+        void shouldWrapIOExceptionFromBooleanSupplier() {
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.getAsBoolean(() -> { throw new IOException(); }));
+            
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.getAsBoolean(TestConstants.THROWING_IO_BOOLEAN_SUPPLIER));
+        }
+
+        @Test
+        void shouldExecuteBooleanSupplierWithSideEffects() {
+            boolean result = Uncheck.getAsBoolean(() -> TestUtils.compareAndSetThrowsIO(booleanHolder, true));
+            
+            assertTrue(result);
+            assertTrue(booleanHolder.get());
         }
     }
 
-    @Test
-    void testTest() {
-        assertThrows(UncheckedIOException.class, () -> Uncheck.test(t -> {
-            throw new IOException();
-        }, null));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.test(TestConstants.THROWING_IO_PREDICATE, null));
-        assertTrue(Uncheck.test(t -> TestUtils.compareAndSetThrowsIO(ref1, t).equals(t), "new1"));
-        assertEquals("new1", ref1.get());
+    @Nested
+    class GetAsIntTests {
+
+        @Test
+        void shouldWrapIOExceptionFromIntSupplier() {
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.getAsInt(() -> { throw new IOException(); }));
+            
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.getAsInt(TestConstants.THROWING_IO_INT_SUPPLIER));
+        }
+
+        @Test
+        void shouldExecuteIntSupplierWithSideEffects() {
+            int expectedValue = 42;
+            
+            int result = Uncheck.getAsInt(() -> TestUtils.compareAndSetThrowsIO(intHolder, expectedValue));
+            
+            assertEquals(expectedValue, result);
+            assertEquals(expectedValue, intHolder.get());
+        }
+
+        @Test
+        void shouldGetIntValueWithCustomMessageWhenNoException() {
+            int expectedValue = 42;
+            
+            int result = Uncheck.getAsInt(() -> TestUtils.compareAndSetThrowsIO(intHolder, expectedValue), () -> CUSTOM_ERROR_MESSAGE);
+            
+            assertEquals(expectedValue, result);
+            assertEquals(expectedValue, intHolder.get());
+        }
+
+        @Test
+        void shouldWrapIOExceptionFromIntSupplierWithCustomMessage() {
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.getAsInt(() -> { throw new IOException(); }, () -> CUSTOM_ERROR_MESSAGE));
+            
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.getAsInt(TestConstants.THROWING_IO_INT_SUPPLIER, () -> CUSTOM_ERROR_MESSAGE));
+        }
+
+        @Test
+        void shouldWrapIOExceptionWithCustomMessageFromBrokenInputStream() {
+            IOException originalException = new IOException(EXPECTED_CAUSE_MESSAGE);
+            
+            try {
+                Uncheck.getAsInt(() -> new BrokenInputStream(originalException).read(), () -> CUSTOM_ERROR_MESSAGE);
+                fail("Expected UncheckedIOException to be thrown");
+            } catch (UncheckedIOException e) {
+                assertUncheckedIOExceptionWithCustomMessage(originalException, e);
+            }
+        }
     }
 
+    @Nested
+    class GetAsLongTests {
+
+        @Test
+        void shouldWrapIOExceptionFromLongSupplier() {
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.getAsLong(() -> { throw new IOException(); }));
+            
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.getAsLong(TestConstants.THROWING_IO_LONG_SUPPLIER));
+        }
+
+        @Test
+        void shouldExecuteLongSupplierWithSideEffects() {
+            long expectedValue = 42L;
+            
+            long result = Uncheck.getAsLong(() -> TestUtils.compareAndSetThrowsIO(longHolder, expectedValue));
+            
+            assertEquals(expectedValue, result);
+            assertEquals(expectedValue, longHolder.get());
+        }
+
+        @Test
+        void shouldGetLongValueWithCustomMessageWhenNoException() {
+            long expectedValue = 42L;
+            
+            long result = Uncheck.getAsLong(() -> TestUtils.compareAndSetThrowsIO(longHolder, expectedValue), () -> CUSTOM_ERROR_MESSAGE);
+            
+            assertEquals(expectedValue, result);
+            assertEquals(expectedValue, longHolder.get());
+        }
+
+        @Test
+        void shouldWrapIOExceptionFromLongSupplierWithCustomMessage() {
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.getAsLong(() -> { throw new IOException(); }, () -> CUSTOM_ERROR_MESSAGE));
+            
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.getAsLong(TestConstants.THROWING_IO_LONG_SUPPLIER, () -> CUSTOM_ERROR_MESSAGE));
+        }
+
+        @Test
+        void shouldWrapIOExceptionWithCustomMessageFromBrokenInputStream() {
+            IOException originalException = new IOException(EXPECTED_CAUSE_MESSAGE);
+            
+            try {
+                Uncheck.getAsLong(() -> new BrokenInputStream(originalException).read(), () -> CUSTOM_ERROR_MESSAGE);
+                fail("Expected UncheckedIOException to be thrown");
+            } catch (UncheckedIOException e) {
+                assertUncheckedIOExceptionWithCustomMessage(originalException, e);
+            }
+        }
+    }
+
+    @Nested
+    class RunTests {
+
+        @Test
+        void shouldRunRunnableSuccessfully() {
+            ByteArrayInputStream stream = createTestInputStream();
+            
+            Uncheck.run(() -> stream.skip(1));
+            
+            assertEquals('b', Uncheck.get(stream::read).intValue());
+        }
+
+        @Test
+        void shouldWrapIOExceptionFromRunnable() {
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.run(() -> { throw new IOException(); }));
+            
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.run(TestConstants.THROWING_IO_RUNNABLE));
+        }
+
+        @Test
+        void shouldExecuteRunnableWithSideEffects() {
+            String testValue = "testValue";
+            
+            Uncheck.run(() -> TestUtils.compareAndSetThrowsIO(stringHolder1, testValue));
+            
+            assertEquals(testValue, stringHolder1.get());
+        }
+
+        @Test
+        void shouldRunRunnableWithCustomMessageWhenNoException() {
+            ByteArrayInputStream stream = createTestInputStream();
+            
+            Uncheck.run(() -> stream.skip(1), () -> CUSTOM_ERROR_MESSAGE);
+            
+            assertEquals('b', Uncheck.get(stream::read).intValue());
+        }
+
+        @Test
+        void shouldWrapIOExceptionFromRunnableWithCustomMessage() {
+            IOException originalException = new IOException(EXPECTED_CAUSE_MESSAGE);
+            
+            try {
+                Uncheck.run(() -> new BrokenInputStream(originalException).read(), () -> CUSTOM_ERROR_MESSAGE);
+                fail("Expected UncheckedIOException to be thrown");
+            } catch (UncheckedIOException e) {
+                assertUncheckedIOExceptionWithCustomMessage(originalException, e);
+            }
+        }
+    }
+
+    @Nested
+    class TestTests {
+
+        @Test
+        void shouldWrapIOExceptionFromPredicate() {
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.test(t -> { throw new IOException(); }, null));
+            
+            assertIOExceptionIsWrappedAsUnchecked(() -> 
+                Uncheck.test(TestConstants.THROWING_IO_PREDICATE, null));
+        }
+
+        @Test
+        void shouldExecutePredicateWithSideEffectsAndReturnResult() {
+            String testValue = "testValue";
+            
+            boolean result = Uncheck.test(value -> TestUtils.compareAndSetThrowsIO(stringHolder1, value).equals(value), testValue);
+            
+            assertTrue(result);
+            assertEquals(testValue, stringHolder1.get());
+        }
+    }
 }
