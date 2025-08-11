@@ -37,7 +37,6 @@
 package org.jfree.chart.axis;
 
 import org.jfree.chart.TestUtils;
-
 import org.jfree.data.Range;
 import org.junit.jupiter.api.Test;
 
@@ -48,54 +47,113 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class ModuloAxisTest {
 
+    // Test data constants for better maintainability
+    private static final String TEST_AXIS_LABEL = "Test";
+    private static final Range STANDARD_FIXED_RANGE = new Range(0.0, 1.0);
+    private static final double DISPLAY_START = 0.1;
+    private static final double DISPLAY_END = 1.1;
+
     /**
-     * Confirm that cloning works.
+     * Verifies that cloning creates a proper deep copy of ModuloAxis.
+     * Tests that:
+     * - Clone is a different object instance
+     * - Clone has the same class type
+     * - Clone is equal to the original
      */
     @Test
     public void testCloning() throws CloneNotSupportedException {
-        ModuloAxis a1 = new ModuloAxis("Test", new Range(0.0, 1.0));
-        ModuloAxis a2 = (ModuloAxis) a1.clone();
-        assertNotSame(a1, a2);
-        assertSame(a1.getClass(), a2.getClass());
-        assertEquals(a1, a2);
+        // Given: A ModuloAxis with standard configuration
+        ModuloAxis originalAxis = createStandardModuloAxis();
+        
+        // When: Cloning the axis
+        ModuloAxis clonedAxis = (ModuloAxis) originalAxis.clone();
+        
+        // Then: Clone should be a separate but equal instance
+        assertNotSame(originalAxis, clonedAxis, 
+            "Cloned axis should be a different object instance");
+        assertSame(originalAxis.getClass(), clonedAxis.getClass(), 
+            "Cloned axis should have the same class as original");
+        assertEquals(originalAxis, clonedAxis, 
+            "Cloned axis should be equal to the original");
     }
 
     /**
-     * Confirm that the equals method can distinguish all the required fields.
+     * Verifies that the equals method correctly identifies equal and unequal ModuloAxis instances.
+     * Tests equality based on:
+     * - Initial configuration (label and fixed range)
+     * - Display range settings
      */
     @Test
     public void testEquals() {
-        ModuloAxis a1 = new ModuloAxis("Test", new Range(0.0, 1.0));
-        ModuloAxis a2 = new ModuloAxis("Test", new Range(0.0, 1.0));
-        assertEquals(a1, a2);
+        // Given: Two ModuloAxis instances with identical initial configuration
+        ModuloAxis firstAxis = createStandardModuloAxis();
+        ModuloAxis secondAxis = createStandardModuloAxis();
+        
+        // Then: They should be equal initially
+        assertEquals(firstAxis, secondAxis, 
+            "Axes with identical configuration should be equal");
 
-        a1.setDisplayRange(0.1, 1.1);
-        assertNotEquals(a1, a2);
-        a2.setDisplayRange(0.1, 1.1);
-        assertEquals(a1, a2);
+        // When: Changing display range on first axis only
+        firstAxis.setDisplayRange(DISPLAY_START, DISPLAY_END);
+        
+        // Then: They should no longer be equal
+        assertNotEquals(firstAxis, secondAxis, 
+            "Axes with different display ranges should not be equal");
+        
+        // When: Setting the same display range on second axis
+        secondAxis.setDisplayRange(DISPLAY_START, DISPLAY_END);
+        
+        // Then: They should be equal again
+        assertEquals(firstAxis, secondAxis, 
+            "Axes with matching display ranges should be equal");
     }
 
     /**
-     * Two objects that are equal are required to return the same hashCode.
+     * Verifies that equal ModuloAxis instances produce the same hash code.
+     * This is required by the Java contract for hashCode() and equals().
      */
     @Test
     public void testHashCode() {
-        ModuloAxis a1 = new ModuloAxis("Test", new Range(0.0, 1.0));
-        ModuloAxis a2 = new ModuloAxis("Test", new Range(0.0, 1.0));
-        assertEquals(a1, a2);
-        int h1 = a1.hashCode();
-        int h2 = a2.hashCode();
-        assertEquals(h1, h2);
+        // Given: Two equal ModuloAxis instances
+        ModuloAxis firstAxis = createStandardModuloAxis();
+        ModuloAxis secondAxis = createStandardModuloAxis();
+        
+        assertEquals(firstAxis, secondAxis, 
+            "Precondition: axes should be equal for hash code test");
+        
+        // When: Getting hash codes
+        int firstHashCode = firstAxis.hashCode();
+        int secondHashCode = secondAxis.hashCode();
+        
+        // Then: Hash codes should be identical
+        assertEquals(firstHashCode, secondHashCode, 
+            "Equal objects must have equal hash codes");
     }
 
     /**
-     * Serialize an instance, restore it, and check for equality.
+     * Verifies that ModuloAxis can be serialized and deserialized correctly.
+     * Tests that the deserialized instance is equal to the original.
      */
     @Test
     public void testSerialization() {
-        ModuloAxis a1 = new ModuloAxis("Test", new Range(0.0, 1.0));
-        ModuloAxis a2 = TestUtils.serialised(a1);
-        assertEquals(a1, a2);
+        // Given: A ModuloAxis instance
+        ModuloAxis originalAxis = createStandardModuloAxis();
+        
+        // When: Serializing and deserializing the axis
+        ModuloAxis deserializedAxis = TestUtils.serialised(originalAxis);
+        
+        // Then: Deserialized axis should equal the original
+        assertEquals(originalAxis, deserializedAxis, 
+            "Deserialized axis should be equal to the original");
     }
 
+    /**
+     * Helper method to create a standard ModuloAxis for testing.
+     * Centralizes test data creation for consistency and maintainability.
+     * 
+     * @return A new ModuloAxis with standard test configuration
+     */
+    private ModuloAxis createStandardModuloAxis() {
+        return new ModuloAxis(TEST_AXIS_LABEL, STANDARD_FIXED_RANGE);
+    }
 }
