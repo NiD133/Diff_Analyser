@@ -19,286 +19,235 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class BoundedReader_ESTest extends BoundedReader_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      StringReader stringReader0 = new StringReader("org.apache.commons.io.input.BoundedReader");
-      BoundedReader boundedReader0 = new BoundedReader(stringReader0, 3);
-      char[] charArray0 = new char[7];
-      int int0 = boundedReader0.read(charArray0);
-      assertEquals(3, int0);
-      assertArrayEquals(new char[] {'o', 'r', 'g', '\u0000', '\u0000', '\u0000', '\u0000'}, charArray0);
-  }
+    // Tests for read() method
+    @Test(timeout = 4000)
+    public void testReadSingleCharWithinLimit() throws Throwable {
+        StringReader stringReader = new StringReader("v4]>?/Q;dj|.O1#4");
+        BoundedReader reader = new BoundedReader(stringReader, 1);
+        assertEquals('v', reader.read());
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      StringReader stringReader0 = new StringReader("");
-      BoundedReader boundedReader0 = new BoundedReader(stringReader0, 1805);
-      boundedReader0.read();
-      boundedReader0.mark(0);
-      int int0 = boundedReader0.read();
-      assertEquals((-1), int0);
-  }
+    @Test(timeout = 4000)
+    public void testReadOnEmptyReader() throws Throwable {
+        StringReader stringReader = new StringReader("");
+        BoundedReader reader = new BoundedReader(stringReader, 1805);
+        assertEquals(-1, reader.read());
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      BoundedReader boundedReader0 = new BoundedReader((Reader) null, (-1));
-      int int0 = boundedReader0.read();
-      assertEquals((-1), int0);
-  }
+    @Test(timeout = 4000)
+    public void testReadOnNullReader() throws Throwable {
+        BoundedReader reader = new BoundedReader(null, -1);
+        assertEquals(-1, reader.read());
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      StringReader stringReader0 = new StringReader("");
-      BoundedReader boundedReader0 = new BoundedReader(stringReader0, 1805);
-      int int0 = boundedReader0.read();
-      boundedReader0.mark(1268);
-      int int1 = boundedReader0.read();
-      assertTrue(int1 == int0);
-  }
+    @Test(timeout = 4000)
+    public void testReadAfterClosingReader() throws Throwable {
+        StringReader stringReader = new StringReader("");
+        stringReader.close();
+        BoundedReader reader = new BoundedReader(stringReader, 202);
+        try {
+            reader.read();
+            fail("Expected IOException: Stream closed");
+        } catch (IOException e) {
+            assertEquals("Stream closed", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      StringReader stringReader0 = new StringReader("");
-      BoundedReader boundedReader0 = new BoundedReader(stringReader0, 1);
-      char[] charArray0 = new char[3];
-      int int0 = boundedReader0.read(charArray0, (-743), 0);
-      assertEquals(0, int0);
-  }
+    // Tests for read(char[]) method
+    @Test(timeout = 4000)
+    public void testReadCharBufferWithLimit() throws Throwable {
+        StringReader stringReader = new StringReader("org.apache.commons.io.input.BoundedReader");
+        BoundedReader reader = new BoundedReader(stringReader, 3);
+        char[] buffer = new char[7];
+        int readCount = reader.read(buffer);
+        
+        assertEquals(3, readCount);
+        assertArrayEquals(new char[] {'o', 'r', 'g', '\u0000', '\u0000', '\u0000', '\u0000'}, buffer);
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      StringReader stringReader0 = new StringReader(".''L5DuTEy{jV3");
-      BoundedReader boundedReader0 = new BoundedReader(stringReader0, 1729);
-      char[] charArray0 = new char[8];
-      int int0 = boundedReader0.read(charArray0, 1, 1);
-      assertEquals(1, int0);
-      assertArrayEquals(new char[] {'\u0000', '.', '\u0000', '\u0000', '\u0000', '\u0000', '\u0000', '\u0000'}, charArray0);
-  }
+    @Test(timeout = 4000)
+    public void testReadCharBufferWithOffset() throws Throwable {
+        StringReader stringReader = new StringReader(".''L5DuTEy{jV3");
+        BoundedReader reader = new BoundedReader(stringReader, 1729);
+        char[] buffer = new char[8];
+        int readCount = reader.read(buffer, 1, 1);
+        
+        assertEquals(1, readCount);
+        assertArrayEquals(new char[] {'\u0000', '.', '\u0000', '\u0000', '\u0000', '\u0000', '\u0000', '\u0000'}, buffer);
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      StringReader stringReader0 = new StringReader("v4]>?/Q;dj|.O1#4");
-      BoundedReader boundedReader0 = new BoundedReader(stringReader0, 1);
-      int int0 = boundedReader0.read();
-      assertEquals(118, int0);
-  }
+    @Test(timeout = 4000)
+    public void testReadWithInvalidParameters() throws Throwable {
+        StringReader stringReader = new StringReader("");
+        BoundedReader reader = new BoundedReader(stringReader, 1);
+        char[] buffer = new char[3];
+        // Negative offset with zero length should return 0
+        assertEquals(0, reader.read(buffer, -743, 0));
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      BoundedReader boundedReader0 = new BoundedReader((Reader) null, 1);
-      // Undeclared exception!
-      try { 
-        boundedReader0.reset();
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.input.BoundedReader", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testReadWithNullBuffer() throws Throwable {
+        StringReader stringReader = new StringReader("");
+        BoundedReader reader = new BoundedReader(stringReader, 1805);
+        assertEquals(-1, reader.read(null, 1805, -1));
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      StringReader stringReader0 = new StringReader("org.apache.commons.io.input.BoundedReader");
-      BoundedReader boundedReader0 = new BoundedReader(stringReader0, 0);
-      boundedReader0.close();
-      try { 
-        boundedReader0.reset();
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // Stream closed
-         //
-         verifyException("java.io.StringReader", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testReadWithInvalidOffset() throws Throwable {
+        StringReader stringReader = new StringReader("4s");
+        BoundedReader reader = new BoundedReader(stringReader, 179);
+        char[] buffer = new char[0];
+        try {
+            reader.read(buffer, 179, 179);
+            fail("Expected ArrayIndexOutOfBoundsException");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // Expected exception when accessing invalid array index
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      BoundedReader boundedReader0 = new BoundedReader((Reader) null, 1);
-      char[] charArray0 = new char[1];
-      // Undeclared exception!
-      try { 
-        boundedReader0.read(charArray0, 1, 1);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.input.BoundedReader", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testReadAfterClosingReaderWithBuffer() throws Throwable {
+        StringReader stringReader = new StringReader("");
+        stringReader.close();
+        BoundedReader reader = new BoundedReader(stringReader, 214);
+        try {
+            char[] buffer = new char[0];
+            reader.read(buffer, 214, 214);
+            fail("Expected IOException: Stream closed");
+        } catch (IOException e) {
+            assertEquals("Stream closed", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      StringReader stringReader0 = new StringReader("4s");
-      BoundedReader boundedReader0 = new BoundedReader(stringReader0, 179);
-      char[] charArray0 = new char[0];
-      // Undeclared exception!
-      try { 
-        boundedReader0.read(charArray0, 179, 179);
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
-      
-      } catch(ArrayIndexOutOfBoundsException e) {
-         //
-         // 179
-         //
-         verifyException("org.apache.commons.io.input.BoundedReader", e);
-      }
-  }
+    // Tests for mark() and reset() methods
+    @Test(timeout = 4000)
+    public void testMarkAndResetBehavior() throws Throwable {
+        StringReader stringReader = new StringReader("");
+        BoundedReader reader = new BoundedReader(stringReader, 1805);
+        reader.mark(1268);
+        assertEquals(-1, reader.read());
+        reader.reset();
+        assertEquals(-1, reader.read());
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      StringReader stringReader0 = new StringReader("");
-      stringReader0.close();
-      BoundedReader boundedReader0 = new BoundedReader(stringReader0, 214);
-      char[] charArray0 = new char[0];
-      try { 
-        boundedReader0.read(charArray0, 214, 214);
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // Stream closed
-         //
-         verifyException("java.io.StringReader", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testMarkWithEmptyReader() throws Throwable {
+        StringReader stringReader = new StringReader("");
+        BoundedReader reader = new BoundedReader(stringReader, 1805);
+        reader.read();
+        reader.mark(0);
+        assertEquals(-1, reader.read());
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      BoundedReader boundedReader0 = new BoundedReader((Reader) null, 1);
-      // Undeclared exception!
-      try { 
-        boundedReader0.read();
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.input.BoundedReader", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testResetWithoutMark() throws Throwable {
+        StringReader stringReader = new StringReader("");
+        BoundedReader reader = new BoundedReader(stringReader, 1);
+        // Should succeed without exception
+        reader.reset();
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      StringReader stringReader0 = new StringReader("");
-      stringReader0.close();
-      BoundedReader boundedReader0 = new BoundedReader(stringReader0, 202);
-      try { 
-        boundedReader0.read();
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // Stream closed
-         //
-         verifyException("java.io.StringReader", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testResetAfterClose() throws Throwable {
+        StringReader stringReader = new StringReader("test");
+        BoundedReader reader = new BoundedReader(stringReader, 0);
+        reader.close();
+        try {
+            reader.reset();
+            fail("Expected IOException: Stream closed");
+        } catch (IOException e) {
+            assertEquals("Stream closed", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      BoundedReader boundedReader0 = new BoundedReader((Reader) null, 4168);
-      // Undeclared exception!
-      try { 
-        boundedReader0.mark(4168);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.input.BoundedReader", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testMarkWithNegativeReadAhead() throws Throwable {
+        StringReader stringReader = new StringReader("");
+        BoundedReader reader = new BoundedReader(stringReader, -431);
+        try {
+            reader.mark(-431);
+            fail("Expected IllegalArgumentException: Read-ahead limit < 0");
+        } catch (IllegalArgumentException e) {
+            // Expected exception for negative read-ahead
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      StringReader stringReader0 = new StringReader("");
-      BoundedReader boundedReader0 = new BoundedReader(stringReader0, (-431));
-      // Undeclared exception!
-      try { 
-        boundedReader0.mark((-431));
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Read-ahead limit < 0
-         //
-         verifyException("java.io.StringReader", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testMarkAfterClosingReader() throws Throwable {
+        StringReader stringReader = new StringReader("");
+        stringReader.close();
+        BoundedReader reader = new BoundedReader(stringReader, 198);
+        try {
+            reader.mark(198);
+            fail("Expected IOException: Stream closed");
+        } catch (IOException e) {
+            assertEquals("Stream closed", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      StringReader stringReader0 = new StringReader("");
-      stringReader0.close();
-      BoundedReader boundedReader0 = new BoundedReader(stringReader0, 198);
-      try { 
-        boundedReader0.mark(198);
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // Stream closed
-         //
-         verifyException("java.io.StringReader", e);
-      }
-  }
+    // Tests for skip() method
+    @Test(timeout = 4000)
+    public void testMarkAndSkip() throws Throwable {
+        StringReader stringReader = new StringReader("wa");
+        BoundedReader reader = new BoundedReader(stringReader, 10);
+        reader.mark(1);
+        assertEquals(1, reader.skip(10));
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      BoundedReader boundedReader0 = new BoundedReader((Reader) null, (-1235));
-      // Undeclared exception!
-      try { 
-        boundedReader0.close();
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.input.BoundedReader", e);
-      }
-  }
+    // Tests for null reader scenarios
+    @Test(timeout = 4000)
+    public void testReadOnNullReaderWithBuffer() throws Throwable {
+        BoundedReader reader = new BoundedReader(null, 1);
+        try {
+            char[] buffer = new char[1];
+            reader.read(buffer, 1, 1);
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected for null reader
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      StringReader stringReader0 = new StringReader("");
-      BoundedReader boundedReader0 = new BoundedReader(stringReader0, 1805);
-      boundedReader0.mark(1);
-      boundedReader0.read();
-      int int0 = boundedReader0.read();
-      assertEquals((-1), int0);
-  }
+    @Test(timeout = 4000)
+    public void testReadSingleCharOnNullReader() throws Throwable {
+        BoundedReader reader = new BoundedReader(null, 1);
+        try {
+            reader.read();
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected for null reader
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      StringReader stringReader0 = new StringReader("");
-      BoundedReader boundedReader0 = new BoundedReader(stringReader0, 1805);
-      int int0 = boundedReader0.read((char[]) null, 1805, (-1));
-      assertEquals((-1), int0);
-  }
+    @Test(timeout = 4000)
+    public void testMarkOnNullReader() throws Throwable {
+        BoundedReader reader = new BoundedReader(null, 4168);
+        try {
+            reader.mark(4168);
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected for null reader
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      StringReader stringReader0 = new StringReader("wa");
-      BoundedReader boundedReader0 = new BoundedReader(stringReader0, 10);
-      boundedReader0.mark(1);
-      long long0 = boundedReader0.skip(10);
-      assertEquals(1L, long0);
-  }
+    @Test(timeout = 4000)
+    public void testResetOnNullReader() throws Throwable {
+        BoundedReader reader = new BoundedReader(null, 1);
+        try {
+            reader.reset();
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected for null reader
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      StringReader stringReader0 = new StringReader("");
-      BoundedReader boundedReader0 = new BoundedReader(stringReader0, 1);
-      boundedReader0.reset();
-  }
+    @Test(timeout = 4000)
+    public void testCloseOnNullReader() throws Throwable {
+        BoundedReader reader = new BoundedReader(null, -1235);
+        try {
+            reader.close();
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected for null reader
+        }
+    }
 }
