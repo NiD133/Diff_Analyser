@@ -22,128 +22,233 @@ import org.junit.jupiter.api.Test;
 
 class ParameterExpressionTest {
 
-  @Test
-  void simpleProperty() {
-    Map<String, String> result = new ParameterExpression("id");
-    Assertions.assertEquals(1, result.size());
-    Assertions.assertEquals("id", result.get("property"));
-  }
+    @Test
+    void shouldParseSimpleProperty() {
+        // Given
+        String input = "id";
 
-  @Test
-  void propertyWithSpacesInside() {
-    Map<String, String> result = new ParameterExpression(" with spaces ");
-    Assertions.assertEquals(1, result.size());
-    Assertions.assertEquals("with spaces", result.get("property"));
-  }
+        // When
+        Map<String, String> result = new ParameterExpression(input);
 
-  @Test
-  void simplePropertyWithOldStyleJdbcType() {
-    Map<String, String> result = new ParameterExpression("id:VARCHAR");
-    Assertions.assertEquals(2, result.size());
-    Assertions.assertEquals("id", result.get("property"));
-    Assertions.assertEquals("VARCHAR", result.get("jdbcType"));
-  }
-
-  @Test
-  void oldStyleJdbcTypeWithExtraWhitespaces() {
-    Map<String, String> result = new ParameterExpression(" id :  VARCHAR ");
-    Assertions.assertEquals(2, result.size());
-    Assertions.assertEquals("id", result.get("property"));
-    Assertions.assertEquals("VARCHAR", result.get("jdbcType"));
-  }
-
-  @Test
-  void expressionWithOldStyleJdbcType() {
-    Map<String, String> result = new ParameterExpression("(id.toString()):VARCHAR");
-    Assertions.assertEquals(2, result.size());
-    Assertions.assertEquals("id.toString()", result.get("expression"));
-    Assertions.assertEquals("VARCHAR", result.get("jdbcType"));
-  }
-
-  @Test
-  void simplePropertyWithOneAttribute() {
-    Map<String, String> result = new ParameterExpression("id,name=value");
-    Assertions.assertEquals(2, result.size());
-    Assertions.assertEquals("id", result.get("property"));
-    Assertions.assertEquals("value", result.get("name"));
-  }
-
-  @Test
-  void expressionWithOneAttribute() {
-    Map<String, String> result = new ParameterExpression("(id.toString()),name=value");
-    Assertions.assertEquals(2, result.size());
-    Assertions.assertEquals("id.toString()", result.get("expression"));
-    Assertions.assertEquals("value", result.get("name"));
-  }
-
-  @Test
-  void simplePropertyWithManyAttributes() {
-    Map<String, String> result = new ParameterExpression("id, attr1=val1, attr2=val2, attr3=val3");
-    Assertions.assertEquals(4, result.size());
-    Assertions.assertEquals("id", result.get("property"));
-    Assertions.assertEquals("val1", result.get("attr1"));
-    Assertions.assertEquals("val2", result.get("attr2"));
-    Assertions.assertEquals("val3", result.get("attr3"));
-  }
-
-  @Test
-  void expressionWithManyAttributes() {
-    Map<String, String> result = new ParameterExpression("(id.toString()), attr1=val1, attr2=val2, attr3=val3");
-    Assertions.assertEquals(4, result.size());
-    Assertions.assertEquals("id.toString()", result.get("expression"));
-    Assertions.assertEquals("val1", result.get("attr1"));
-    Assertions.assertEquals("val2", result.get("attr2"));
-    Assertions.assertEquals("val3", result.get("attr3"));
-  }
-
-  @Test
-  void simplePropertyWithOldStyleJdbcTypeAndAttributes() {
-    Map<String, String> result = new ParameterExpression("id:VARCHAR, attr1=val1, attr2=val2");
-    Assertions.assertEquals(4, result.size());
-    Assertions.assertEquals("id", result.get("property"));
-    Assertions.assertEquals("VARCHAR", result.get("jdbcType"));
-    Assertions.assertEquals("val1", result.get("attr1"));
-    Assertions.assertEquals("val2", result.get("attr2"));
-  }
-
-  @Test
-  void simplePropertyWithSpaceAndManyAttributes() {
-    Map<String, String> result = new ParameterExpression("user name, attr1=val1, attr2=val2, attr3=val3");
-    Assertions.assertEquals(4, result.size());
-    Assertions.assertEquals("user name", result.get("property"));
-    Assertions.assertEquals("val1", result.get("attr1"));
-    Assertions.assertEquals("val2", result.get("attr2"));
-    Assertions.assertEquals("val3", result.get("attr3"));
-  }
-
-  @Test
-  void shouldIgnoreLeadingAndTrailingSpaces() {
-    Map<String, String> result = new ParameterExpression(" id , jdbcType =  VARCHAR,  attr1 = val1 ,  attr2 = val2 ");
-    Assertions.assertEquals(4, result.size());
-    Assertions.assertEquals("id", result.get("property"));
-    Assertions.assertEquals("VARCHAR", result.get("jdbcType"));
-    Assertions.assertEquals("val1", result.get("attr1"));
-    Assertions.assertEquals("val2", result.get("attr2"));
-  }
-
-  @Test
-  void invalidOldJdbcTypeFormat() {
-    try {
-      new ParameterExpression("id:");
-      Assertions.fail();
-    } catch (BuilderException e) {
-      Assertions.assertTrue(e.getMessage().contains("Parsing error in {id:} in position 3"));
+        // Then
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(1, result.size(), "Should have exactly one entry"),
+            () -> Assertions.assertEquals("id", result.get("property"), "Should parse property correctly")
+        );
     }
-  }
 
-  @Test
-  void invalidJdbcTypeOptUsingExpression() {
-    try {
-      new ParameterExpression("(expression)+");
-      Assertions.fail();
-    } catch (BuilderException e) {
-      Assertions.assertTrue(e.getMessage().contains("Parsing error in {(expression)+} in position 12"));
+    @Test
+    void shouldParsePropertyWithInternalSpaces() {
+        // Given
+        String input = " with spaces ";
+
+        // When
+        Map<String, String> result = new ParameterExpression(input);
+
+        // Then
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(1, result.size(), "Should have exactly one entry"),
+            () -> Assertions.assertEquals("with spaces", result.get("property"), "Should preserve internal spaces")
+        );
     }
-  }
 
+    @Test
+    void shouldParsePropertyWithJdbcType() {
+        // Given
+        String input = "id:VARCHAR";
+
+        // When
+        Map<String, String> result = new ParameterExpression(input);
+
+        // Then
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(2, result.size(), "Should have two entries"),
+            () -> Assertions.assertEquals("id", result.get("property"), "Should parse property correctly"),
+            () -> Assertions.assertEquals("VARCHAR", result.get("jdbcType"), "Should parse JDBC type correctly")
+        );
+    }
+
+    @Test
+    void shouldParsePropertyWithJdbcTypeAndWhitespace() {
+        // Given
+        String input = " id :  VARCHAR ";
+
+        // When
+        Map<String, String> result = new ParameterExpression(input);
+
+        // Then
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(2, result.size(), "Should have two entries"),
+            () -> Assertions.assertEquals("id", result.get("property"), "Should trim property"),
+            () -> Assertions.assertEquals("VARCHAR", result.get("jdbcType"), "Should trim JDBC type")
+        );
+    }
+
+    @Test
+    void shouldParseExpressionWithJdbcType() {
+        // Given
+        String input = "(id.toString()):VARCHAR";
+
+        // When
+        Map<String, String> result = new ParameterExpression(input);
+
+        // Then
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(2, result.size(), "Should have two entries"),
+            () -> Assertions.assertEquals("id.toString()", result.get("expression"), "Should parse expression correctly"),
+            () -> Assertions.assertEquals("VARCHAR", result.get("jdbcType"), "Should parse JDBC type correctly")
+        );
+    }
+
+    @Test
+    void shouldParsePropertyWithSingleAttribute() {
+        // Given
+        String input = "id,name=value";
+
+        // When
+        Map<String, String> result = new ParameterExpression(input);
+
+        // Then
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(2, result.size(), "Should have two entries"),
+            () -> Assertions.assertEquals("id", result.get("property"), "Should parse property correctly"),
+            () -> Assertions.assertEquals("value", result.get("name"), "Should parse attribute correctly")
+        );
+    }
+
+    @Test
+    void shouldParseExpressionWithSingleAttribute() {
+        // Given
+        String input = "(id.toString()),name=value";
+
+        // When
+        Map<String, String> result = new ParameterExpression(input);
+
+        // Then
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(2, result.size(), "Should have two entries"),
+            () -> Assertions.assertEquals("id.toString()", result.get("expression"), "Should parse expression correctly"),
+            () -> Assertions.assertEquals("value", result.get("name"), "Should parse attribute correctly")
+        );
+    }
+
+    @Test
+    void shouldParsePropertyWithMultipleAttributes() {
+        // Given
+        String input = "id, attr1=val1, attr2=val2, attr3=val3";
+
+        // When
+        Map<String, String> result = new ParameterExpression(input);
+
+        // Then
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(4, result.size(), "Should have four entries"),
+            () -> Assertions.assertEquals("id", result.get("property"), "Should parse property correctly"),
+            () -> Assertions.assertEquals("val1", result.get("attr1"), "Should parse attr1 correctly"),
+            () -> Assertions.assertEquals("val2", result.get("attr2"), "Should parse attr2 correctly"),
+            () -> Assertions.assertEquals("val3", result.get("attr3"), "Should parse attr3 correctly")
+        );
+    }
+
+    @Test
+    void shouldParseExpressionWithMultipleAttributes() {
+        // Given
+        String input = "(id.toString()), attr1=val1, attr2=val2, attr3=val3";
+
+        // When
+        Map<String, String> result = new ParameterExpression(input);
+
+        // Then
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(4, result.size(), "Should have four entries"),
+            () -> Assertions.assertEquals("id.toString()", result.get("expression"), "Should parse expression correctly"),
+            () -> Assertions.assertEquals("val1", result.get("attr1"), "Should parse attr1 correctly"),
+            () -> Assertions.assertEquals("val2", result.get("attr2"), "Should parse attr2 correctly"),
+            () -> Assertions.assertEquals("val3", result.get("attr3"), "Should parse attr3 correctly")
+        );
+    }
+
+    @Test
+    void shouldParsePropertyWithJdbcTypeAndAttributes() {
+        // Given
+        String input = "id:VARCHAR, attr1=val1, attr2=val2";
+
+        // When
+        Map<String, String> result = new ParameterExpression(input);
+
+        // Then
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(4, result.size(), "Should have four entries"),
+            () -> Assertions.assertEquals("id", result.get("property"), "Should parse property correctly"),
+            () -> Assertions.assertEquals("VARCHAR", result.get("jdbcType"), "Should parse JDBC type correctly"),
+            () -> Assertions.assertEquals("val1", result.get("attr1"), "Should parse attr1 correctly"),
+            () -> Assertions.assertEquals("val2", result.get("attr2"), "Should parse attr2 correctly")
+        );
+    }
+
+    @Test
+    void shouldParsePropertyWithSpacesAndAttributes() {
+        // Given
+        String input = "user name, attr1=val1, attr2=val2, attr3=val3";
+
+        // When
+        Map<String, String> result = new ParameterExpression(input);
+
+        // Then
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(4, result.size(), "Should have four entries"),
+            () -> Assertions.assertEquals("user name", result.get("property"), "Should preserve spaces in property"),
+            () -> Assertions.assertEquals("val1", result.get("attr1"), "Should parse attr1 correctly"),
+            () -> Assertions.assertEquals("val2", result.get("attr2"), "Should parse attr2 correctly"),
+            () -> Assertions.assertEquals("val3", result.get("attr3"), "Should parse attr3 correctly")
+        );
+    }
+
+    @Test
+    void shouldIgnoreWhitespaceAroundEntries() {
+        // Given
+        String input = " id , jdbcType =  VARCHAR,  attr1 = val1 ,  attr2 = val2 ";
+
+        // When
+        Map<String, String> result = new ParameterExpression(input);
+
+        // Then
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(4, result.size(), "Should have four entries"),
+            () -> Assertions.assertEquals("id", result.get("property"), "Should trim property"),
+            () -> Assertions.assertEquals("VARCHAR", result.get("jdbcType"), "Should trim JDBC type"),
+            () -> Assertions.assertEquals("val1", result.get("attr1"), "Should trim attribute value"),
+            () -> Assertions.assertEquals("val2", result.get("attr2"), "Should trim attribute value")
+        );
+    }
+
+    @Test
+    void shouldThrowExceptionForInvalidJdbcTypeFormat() {
+        // Given
+        String input = "id:";
+        String expectedError = "Parsing error in {id:} in position 3";
+
+        // When & Then
+        BuilderException exception = Assertions.assertThrows(BuilderException.class,
+            () -> new ParameterExpression(input),
+            "Should throw BuilderException for invalid format"
+        );
+        Assertions.assertTrue(exception.getMessage().contains(expectedError),
+            "Exception message should contain parsing details");
+    }
+
+    @Test
+    void shouldThrowExceptionForInvalidExpressionFormat() {
+        // Given
+        String input = "(expression)+";
+        String expectedError = "Parsing error in {(expression)+} in position 12";
+
+        // When & Then
+        BuilderException exception = Assertions.assertThrows(BuilderException.class,
+            () -> new ParameterExpression(input),
+            "Should throw BuilderException for invalid expression"
+        );
+        Assertions.assertTrue(exception.getMessage().contains(expectedError),
+            "Exception message should contain parsing details");
+    }
 }
