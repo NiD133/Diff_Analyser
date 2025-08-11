@@ -42,29 +42,31 @@
  */
 package com.itextpdf.text.io;
 
-import junit.framework.Assert;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class GetBufferedRandomAccessSourceTest {
 
-	@Before
-	public void setUp() throws Exception {
-	}
+    /**
+     * Verifies that getting a byte from a very small source (e.g., a single byte) works correctly.
+     * <p>
+     * This is a regression test for a bug where sources shorter than 4 bytes caused an
+     * {@link ArrayIndexOutOfBoundsException} due to an issue in the internal buffer sizing logic.
+     * This test ensures that edge case is handled properly.
+     * </p>
+     */
+    @Test
+    public void get_fromSingleByteSource_shouldReturnValue() throws Exception {
+        // Arrange: Create a source with a single byte of data.
+        byte[] data = {42};
+        RandomAccessSource source = new ArrayRandomAccessSource(data);
+        GetBufferedRandomAccessSource bufferedSource = new GetBufferedRandomAccessSource(source);
 
-	@After
-	public void tearDown() throws Exception {
-	}
+        // Act: Attempt to read the first byte from the buffered source.
+        int result = bufferedSource.get(0);
 
-	@Test
-	public void testSmallSizedFile() throws Exception { 
-		// we had a problem if source was less than 4 characters in length - would result in array index out of bounds problems on get()
-		byte[] data = new byte[]{42};
-		ArrayRandomAccessSource arrayRAS = new ArrayRandomAccessSource(data);
-		GetBufferedRandomAccessSource bufferedRAS = new GetBufferedRandomAccessSource(arrayRAS);
-		Assert.assertEquals(42, bufferedRAS.get(0));
-	}
-
+        // Assert: The correct byte value should be returned.
+        assertEquals("The byte read from the source should match the original value.", 42, result);
+    }
 }
