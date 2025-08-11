@@ -16,7 +16,11 @@
  */
 package org.apache.commons.lang3;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
@@ -24,57 +28,42 @@ import java.lang.reflect.Modifier;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit tests for {@link CharSetUtils}.
+ * Tests {@link CharSetUtils}.
  */
 class CharSetUtilsTest extends AbstractLangTest {
 
-    /**
-     * Test the constructor of CharSetUtils.
-     */
     @Test
     void testConstructor() {
-        // Ensure the constructor is not null
         assertNotNull(new CharSetUtils());
-
-        // Verify the constructor properties
-        final Constructor<?>[] constructors = CharSetUtils.class.getDeclaredConstructors();
-        assertEquals(1, constructors.length, "CharSetUtils should have one constructor");
-        assertTrue(Modifier.isPublic(constructors[0].getModifiers()), "Constructor should be public");
-        assertTrue(Modifier.isPublic(CharSetUtils.class.getModifiers()), "Class should be public");
-        assertFalse(Modifier.isFinal(CharSetUtils.class.getModifiers()), "Class should not be final");
+        final Constructor<?>[] cons = CharSetUtils.class.getDeclaredConstructors();
+        assertEquals(1, cons.length);
+        assertTrue(Modifier.isPublic(cons[0].getModifiers()));
+        assertTrue(Modifier.isPublic(CharSetUtils.class.getModifiers()));
+        assertFalse(Modifier.isFinal(CharSetUtils.class.getModifiers()));
     }
 
-    /**
-     * Test containsAny method with String and String parameters.
-     */
     @Test
     void testContainsAny_StringString() {
-        // Test cases with null or empty inputs
         assertFalse(CharSetUtils.containsAny(null, (String) null));
         assertFalse(CharSetUtils.containsAny(null, ""));
+
         assertFalse(CharSetUtils.containsAny("", (String) null));
         assertFalse(CharSetUtils.containsAny("", ""));
         assertFalse(CharSetUtils.containsAny("", "a-e"));
 
-        // Test cases with non-empty inputs
         assertFalse(CharSetUtils.containsAny("hello", (String) null));
         assertFalse(CharSetUtils.containsAny("hello", ""));
         assertTrue(CharSetUtils.containsAny("hello", "a-e"));
         assertTrue(CharSetUtils.containsAny("hello", "l-p"));
     }
 
-    /**
-     * Test containsAny method with String and String array parameters.
-     */
     @Test
-    void testContainsAny_StringStringArray() {
-        // Test cases with null or empty inputs
+    void testContainsAny_StringStringarray() {
         assertFalse(CharSetUtils.containsAny(null, (String[]) null));
         assertFalse(CharSetUtils.containsAny(null));
         assertFalse(CharSetUtils.containsAny(null, (String) null));
         assertFalse(CharSetUtils.containsAny(null, "a-e"));
 
-        // Test cases with non-empty inputs
         assertFalse(CharSetUtils.containsAny("", (String[]) null));
         assertFalse(CharSetUtils.containsAny(""));
         assertFalse(CharSetUtils.containsAny("", (String) null));
@@ -84,6 +73,7 @@ class CharSetUtilsTest extends AbstractLangTest {
         assertFalse(CharSetUtils.containsAny("hello"));
         assertFalse(CharSetUtils.containsAny("hello", (String) null));
         assertTrue(CharSetUtils.containsAny("hello", "a-e"));
+
         assertTrue(CharSetUtils.containsAny("hello", "el"));
         assertFalse(CharSetUtils.containsAny("hello", "x"));
         assertTrue(CharSetUtils.containsAny("hello", "e-i"));
@@ -91,37 +81,28 @@ class CharSetUtilsTest extends AbstractLangTest {
         assertFalse(CharSetUtils.containsAny("hello", ""));
     }
 
-    /**
-     * Test count method with String and String parameters.
-     */
     @Test
     void testCount_StringString() {
-        // Test cases with null or empty inputs
         assertEquals(0, CharSetUtils.count(null, (String) null));
         assertEquals(0, CharSetUtils.count(null, ""));
+
         assertEquals(0, CharSetUtils.count("", (String) null));
         assertEquals(0, CharSetUtils.count("", ""));
         assertEquals(0, CharSetUtils.count("", "a-e"));
 
-        // Test cases with non-empty inputs
         assertEquals(0, CharSetUtils.count("hello", (String) null));
         assertEquals(0, CharSetUtils.count("hello", ""));
         assertEquals(1, CharSetUtils.count("hello", "a-e"));
         assertEquals(3, CharSetUtils.count("hello", "l-p"));
     }
 
-    /**
-     * Test count method with String and String array parameters.
-     */
     @Test
-    void testCount_StringStringArray() {
-        // Test cases with null or empty inputs
+    void testCount_StringStringarray() {
         assertEquals(0, CharSetUtils.count(null, (String[]) null));
         assertEquals(0, CharSetUtils.count(null));
         assertEquals(0, CharSetUtils.count(null, (String) null));
         assertEquals(0, CharSetUtils.count(null, "a-e"));
 
-        // Test cases with non-empty inputs
         assertEquals(0, CharSetUtils.count("", (String[]) null));
         assertEquals(0, CharSetUtils.count(""));
         assertEquals(0, CharSetUtils.count("", (String) null));
@@ -131,6 +112,7 @@ class CharSetUtilsTest extends AbstractLangTest {
         assertEquals(0, CharSetUtils.count("hello"));
         assertEquals(0, CharSetUtils.count("hello", (String) null));
         assertEquals(1, CharSetUtils.count("hello", "a-e"));
+
         assertEquals(3, CharSetUtils.count("hello", "el"));
         assertEquals(0, CharSetUtils.count("hello", "x"));
         assertEquals(2, CharSetUtils.count("hello", "e-i"));
@@ -138,19 +120,15 @@ class CharSetUtilsTest extends AbstractLangTest {
         assertEquals(0, CharSetUtils.count("hello", ""));
     }
 
-    /**
-     * Test delete method with String and String parameters.
-     */
     @Test
     void testDelete_StringString() {
-        // Test cases with null or empty inputs
         assertNull(CharSetUtils.delete(null, (String) null));
         assertNull(CharSetUtils.delete(null, ""));
+
         assertEquals("", CharSetUtils.delete("", (String) null));
         assertEquals("", CharSetUtils.delete("", ""));
         assertEquals("", CharSetUtils.delete("", "a-e"));
 
-        // Test cases with non-empty inputs
         assertEquals("hello", CharSetUtils.delete("hello", (String) null));
         assertEquals("hello", CharSetUtils.delete("hello", ""));
         assertEquals("hllo", CharSetUtils.delete("hello", "a-e"));
@@ -158,18 +136,13 @@ class CharSetUtilsTest extends AbstractLangTest {
         assertEquals("hello", CharSetUtils.delete("hello", "z"));
     }
 
-    /**
-     * Test delete method with String and String array parameters.
-     */
     @Test
-    void testDelete_StringStringArray() {
-        // Test cases with null or empty inputs
+    void testDelete_StringStringarray() {
         assertNull(CharSetUtils.delete(null, (String[]) null));
         assertNull(CharSetUtils.delete(null));
         assertNull(CharSetUtils.delete(null, (String) null));
         assertNull(CharSetUtils.delete(null, "el"));
 
-        // Test cases with non-empty inputs
         assertEquals("", CharSetUtils.delete("", (String[]) null));
         assertEquals("", CharSetUtils.delete(""));
         assertEquals("", CharSetUtils.delete("", (String) null));
@@ -179,27 +152,25 @@ class CharSetUtilsTest extends AbstractLangTest {
         assertEquals("hello", CharSetUtils.delete("hello"));
         assertEquals("hello", CharSetUtils.delete("hello", (String) null));
         assertEquals("hello", CharSetUtils.delete("hello", "xyz"));
+
         assertEquals("ho", CharSetUtils.delete("hello", "el"));
         assertEquals("", CharSetUtils.delete("hello", "elho"));
+        assertEquals("hello", CharSetUtils.delete("hello", ""));
         assertEquals("hello", CharSetUtils.delete("hello", ""));
         assertEquals("", CharSetUtils.delete("hello", "a-z"));
         assertEquals("", CharSetUtils.delete("----", "-"));
         assertEquals("heo", CharSetUtils.delete("hello", "l"));
     }
 
-    /**
-     * Test keep method with String and String parameters.
-     */
     @Test
     void testKeep_StringString() {
-        // Test cases with null or empty inputs
         assertNull(CharSetUtils.keep(null, (String) null));
         assertNull(CharSetUtils.keep(null, ""));
+
         assertEquals("", CharSetUtils.keep("", (String) null));
         assertEquals("", CharSetUtils.keep("", ""));
         assertEquals("", CharSetUtils.keep("", "a-e"));
 
-        // Test cases with non-empty inputs
         assertEquals("", CharSetUtils.keep("hello", (String) null));
         assertEquals("", CharSetUtils.keep("hello", ""));
         assertEquals("", CharSetUtils.keep("hello", "xyz"));
@@ -208,18 +179,13 @@ class CharSetUtilsTest extends AbstractLangTest {
         assertEquals("ell", CharSetUtils.keep("hello", "el"));
     }
 
-    /**
-     * Test keep method with String and String array parameters.
-     */
     @Test
-    void testKeep_StringStringArray() {
-        // Test cases with null or empty inputs
+    void testKeep_StringStringarray() {
         assertNull(CharSetUtils.keep(null, (String[]) null));
         assertNull(CharSetUtils.keep(null));
         assertNull(CharSetUtils.keep(null, (String) null));
         assertNull(CharSetUtils.keep(null, "a-e"));
 
-        // Test cases with non-empty inputs
         assertEquals("", CharSetUtils.keep("", (String[]) null));
         assertEquals("", CharSetUtils.keep(""));
         assertEquals("", CharSetUtils.keep("", (String) null));
@@ -229,6 +195,8 @@ class CharSetUtilsTest extends AbstractLangTest {
         assertEquals("", CharSetUtils.keep("hello"));
         assertEquals("", CharSetUtils.keep("hello", (String) null));
         assertEquals("e", CharSetUtils.keep("hello", "a-e"));
+
+        assertEquals("e", CharSetUtils.keep("hello", "a-e"));
         assertEquals("ell", CharSetUtils.keep("hello", "el"));
         assertEquals("hello", CharSetUtils.keep("hello", "elho"));
         assertEquals("hello", CharSetUtils.keep("hello", "a-z"));
@@ -236,19 +204,15 @@ class CharSetUtilsTest extends AbstractLangTest {
         assertEquals("ll", CharSetUtils.keep("hello", "l"));
     }
 
-    /**
-     * Test squeeze method with String and String parameters.
-     */
     @Test
     void testSqueeze_StringString() {
-        // Test cases with null or empty inputs
         assertNull(CharSetUtils.squeeze(null, (String) null));
         assertNull(CharSetUtils.squeeze(null, ""));
+
         assertEquals("", CharSetUtils.squeeze("", (String) null));
         assertEquals("", CharSetUtils.squeeze("", ""));
         assertEquals("", CharSetUtils.squeeze("", "a-e"));
 
-        // Test cases with non-empty inputs
         assertEquals("hello", CharSetUtils.squeeze("hello", (String) null));
         assertEquals("hello", CharSetUtils.squeeze("hello", ""));
         assertEquals("hello", CharSetUtils.squeeze("hello", "a-e"));
@@ -257,18 +221,13 @@ class CharSetUtilsTest extends AbstractLangTest {
         assertEquals("hello", CharSetUtils.squeeze("helloo", "^l"));
     }
 
-    /**
-     * Test squeeze method with String and String array parameters.
-     */
     @Test
-    void testSqueeze_StringStringArray() {
-        // Test cases with null or empty inputs
+    void testSqueeze_StringStringarray() {
         assertNull(CharSetUtils.squeeze(null, (String[]) null));
         assertNull(CharSetUtils.squeeze(null));
         assertNull(CharSetUtils.squeeze(null, (String) null));
         assertNull(CharSetUtils.squeeze(null, "el"));
 
-        // Test cases with non-empty inputs
         assertEquals("", CharSetUtils.squeeze("", (String[]) null));
         assertEquals("", CharSetUtils.squeeze(""));
         assertEquals("", CharSetUtils.squeeze("", (String) null));
@@ -278,9 +237,11 @@ class CharSetUtilsTest extends AbstractLangTest {
         assertEquals("hello", CharSetUtils.squeeze("hello"));
         assertEquals("hello", CharSetUtils.squeeze("hello", (String) null));
         assertEquals("hello", CharSetUtils.squeeze("hello", "a-e"));
+
         assertEquals("helo", CharSetUtils.squeeze("hello", "el"));
         assertEquals("hello", CharSetUtils.squeeze("hello", "e"));
         assertEquals("fofof", CharSetUtils.squeeze("fooffooff", "of"));
         assertEquals("fof", CharSetUtils.squeeze("fooooff", "fo"));
     }
+
 }
