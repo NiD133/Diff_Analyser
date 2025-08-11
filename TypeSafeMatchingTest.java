@@ -23,74 +23,67 @@ import org.mockitousage.IMethods;
 
 public class TypeSafeMatchingTest {
 
-    private static final Object NON_COMPARABLE_OBJECT = new Object();
+    private static final Object NOT_A_COMPARABLE = new Object();
 
-    @Rule 
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
+    @Rule public MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    @Mock 
-    public IMethods mock;
+    @Mock public IMethods mock;
 
     /**
-     * Test to ensure that a null argument does not throw a NullPointerException.
-     * Related issue: https://github.com/mockito/mockito/issues/457
+     * Should not throw an {@link NullPointerException}
+     *
+     * @see <a href="https://github.com/mockito/mockito/issues/457">Bug 457</a>
      */
     @Test
-    public void shouldNotThrowExceptionForNullArgument() {
-        boolean isMatch = matchesTypeSafe().apply(new LessOrEqual<Integer>(5), null);
-        assertThat(isMatch).isFalse();
+    public void compareNullArgument() {
+        boolean match = matchesTypeSafe().apply(new LessOrEqual<Integer>(5), null);
+        assertThat(match).isFalse();
     }
 
     /**
-     * Test to ensure that a non-comparable object does not throw a ClassCastException.
+     * Should not throw an {@link ClassCastException}
      */
     @Test
-    public void shouldNotThrowExceptionForNonComparableObject() {
-        boolean isMatch = matchesTypeSafe().apply(new LessOrEqual<Integer>(5), NON_COMPARABLE_OBJECT);
-        assertThat(isMatch).isFalse();
+    public void compareToNonCompareable() {
+        boolean match = matchesTypeSafe().apply(new LessOrEqual<Integer>(5), NOT_A_COMPARABLE);
+        assertThat(match).isFalse();
     }
 
     /**
-     * Test to ensure that comparing null values does not throw a ClassCastException.
+     * Should not throw an {@link ClassCastException}
      */
     @Test
-    public void shouldNotThrowExceptionForNullComparison() {
-        boolean isMatch = matchesTypeSafe().apply(new LessOrEqual<Integer>(null), null);
-        assertThat(isMatch).isFalse();
+    public void compareToNull() {
+        boolean match = matchesTypeSafe().apply(new LessOrEqual<Integer>(null), null);
+        assertThat(match).isFalse();
     }
 
     /**
-     * Test to ensure that comparing null with a Null matcher returns true.
+     * Should not throw an {@link ClassCastException}
      */
     @Test
-    public void shouldMatchNullWithNullMatcher() {
-        boolean isMatch = matchesTypeSafe().apply(Null.NULL, null);
-        assertThat(isMatch).isTrue();
+    public void compareToNull2() {
+        boolean match = matchesTypeSafe().apply(Null.NULL, null);
+        assertThat(match).isTrue();
     }
 
     /**
-     * Test to ensure that comparing a string matcher with an integer does not throw a ClassCastException.
+     * Should not throw an {@link ClassCastException}
      */
     @Test
-    public void shouldNotMatchStringMatcherWithInteger() {
-        boolean isMatch = matchesTypeSafe().apply(new StartsWith("Hello"), 123);
-        assertThat(isMatch).isFalse();
+    public void compareToStringVsInt() {
+        boolean match = matchesTypeSafe().apply(new StartsWith("Hello"), 123);
+        assertThat(match).isFalse();
     }
 
-    /**
-     * Test to ensure that comparing an integer matcher with a string does not throw a ClassCastException.
-     */
     @Test
-    public void shouldNotMatchIntegerMatcherWithString() {
-        boolean isMatch = matchesTypeSafe().apply(new LessOrEqual<Integer>(5), "Hello");
-        assertThat(isMatch).isFalse();
+    public void compareToIntVsString() throws Exception {
+        boolean match = matchesTypeSafe().apply(new LessOrEqual<Integer>(5), "Hello");
+        assertThat(match).isFalse();
     }
 
-    /**
-     * Test to ensure that overloaded matches methods are ignored.
-     */
     @Test
-    public void shouldIgnoreOverloadedMatchesMethods() {
+    public void matchesOverloadsMustBeIgnored() {
         class TestMatcher implements ArgumentMatcher<Integer> {
             @Override
             public boolean matches(Integer arg) {
@@ -108,15 +101,12 @@ public class TypeSafeMatchingTest {
             }
         }
 
-        boolean isMatch = matchesTypeSafe().apply(new TestMatcher(), 123);
-        assertThat(isMatch).isFalse();
+        boolean match = matchesTypeSafe().apply(new TestMatcher(), 123);
+        assertThat(match).isFalse();
     }
 
-    /**
-     * Test to ensure that a matcher with a subtype extending a generic class matches correctly.
-     */
     @Test
-    public void shouldMatchWithSubtypeExtendingGenericClass() {
+    public void matchesWithSubTypeExtendingGenericClass() {
         abstract class GenericMatcher<T> implements ArgumentMatcher<T> {}
         class TestMatcher extends GenericMatcher<Integer> {
             @Override
@@ -124,15 +114,12 @@ public class TypeSafeMatchingTest {
                 return true;
             }
         }
-        boolean isMatch = matchesTypeSafe().apply(new TestMatcher(), 123);
-        assertThat(isMatch).isTrue();
+        boolean match = matchesTypeSafe().apply(new TestMatcher(), 123);
+        assertThat(match).isTrue();
     }
 
-    /**
-     * Test to ensure that a matcher with a subtype extending a generic class does not match incompatible types.
-     */
     @Test
-    public void shouldNotMatchWithSubtypeExtendingGenericClassForIncompatibleTypes() {
+    public void dontMatchesWithSubTypeExtendingGenericClass() {
         final AtomicBoolean wasCalled = new AtomicBoolean();
 
         abstract class GenericMatcher<T> implements ArgumentMatcher<T> {}
@@ -143,7 +130,6 @@ public class TypeSafeMatchingTest {
                 return true;
             }
         }
-
         wasCalled.set(false);
         matchesTypeSafe().apply(new TestMatcher(), 123);
         assertThat(wasCalled.get()).isTrue();
@@ -153,11 +139,8 @@ public class TypeSafeMatchingTest {
         assertThat(wasCalled.get()).isFalse();
     }
 
-    /**
-     * Test to ensure that every argument type is passed if no bridge method was generated.
-     */
     @Test
-    public void shouldPassEveryArgumentTypeIfNoBridgeMethodGenerated() {
+    public void passEveryArgumentTypeIfNoBridgeMethodWasGenerated() {
         final AtomicBoolean wasCalled = new AtomicBoolean();
         class GenericMatcher<T> implements ArgumentMatcher<T> {
             @Override
