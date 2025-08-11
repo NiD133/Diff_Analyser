@@ -53,99 +53,45 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * Parameterized unit tests for StringUtils.convertCharsToBytes() method.
- * 
- * This test verifies that 16-bit Unicode characters are correctly converted
- * to their 2-byte representation (high byte + low byte).
+ * Parameterized unit tests for the method StringUtils::convertCharsToBytes
  *
  * @author benoit
  */
 @RunWith(Parameterized.class)
 public class StringUtilsTest {
 
-    // Unicode surrogate pair range: U+D800 to U+DFFF
-    private static final char SURROGATE_RANGE_START = '\ud800';
-    private static final char SURROGATE_RANGE_END = '\udfff';
-
-    @Parameters(name = "char={0} (U+{1}) -> bytes=[0x{2}, 0x{3}]")
-    public static Collection<Object[]> testData() {
+    @Parameters
+    public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-            // Test case format: {inputChar, expectedHighByte, expectedLowByte}
-            
-            // Basic ASCII and control characters
-            createTestCase('\u0000', "NULL character"),
-            createTestCase('\b', "backspace character"),
-            createTestCase('a', "lowercase 'a'"),
-            
-            // Non-ASCII Unicode characters
-            createTestCase('ة', "Arabic letter Teh Marbuta"),
-            
-            // Unicode boundary testing - just outside surrogate range
-            createTestCase('\ud7ff', "last character before surrogate range"),
-            createTestCase('\ue000', "first character after surrogate range"),
-            
-            // Unicode surrogate range (U+D800 to U+DFFF)
-            // These are typically used for UTF-16 encoding of characters beyond Basic Multilingual Plane
-            createTestCase('\ud800', "start of surrogate range"),
-            createTestCase('\uda82', "middle of surrogate range"),
-            createTestCase('\udbb0', "middle of surrogate range"),
-            createTestCase('\udfff', "end of surrogate range"),
-            
-            // High Unicode values
-            createTestCase('\ufffd', "Unicode replacement character"),
-            createTestCase('\uffff', "maximum Unicode value in Basic Multilingual Plane")
-        });
+            {'\u0000', (byte) 0x0, (byte) 0x0},
+            {'\b', (byte) 0x0, (byte) 0x08},
+            {'a', (byte) 0x0, (byte) 0x61},
+            {'ة', (byte) 0x06, (byte) 0x29}, // Arabic characters
+            {'\ud7ff', (byte) 0xd7, (byte) 0xff}, // just outside of a special Unicode range
+            {'\ud800', (byte) 0xd8, (byte) 0x0}, // in a special Unicode range
+            {'\uda82', (byte) 0xda, (byte) 0x82}, // in a special Unicode range
+            {'\udbb0', (byte) 0xdb, (byte) 0xb0}, // in a special Unicode range
+            {'\udfff', (byte) 0xdf, (byte) 0xff}, // in a special Unicode range
+            {'\ue000', (byte) 0xe0, (byte) 0x0}, // just outside of a special Unicode range
+            {'\ufffd', (byte) 0xff, (byte) 0xfd},
+            {'\uffff', (byte) 0xff, (byte) 0xff},});
     }
 
-    /**
-     * Helper method to create test cases with clearer byte calculation
-     */
-    private static Object[] createTestCase(char inputChar, String description) {
-        int charValue = (int) inputChar;
-        byte highByte = (byte) ((charValue >> 8) & 0xFF);  // Extract high 8 bits
-        byte lowByte = (byte) (charValue & 0xFF);          // Extract low 8 bits
-        return new Object[]{inputChar, highByte, lowByte};
-    }
+    private final char input;
+    private final byte check1, check2;
 
-    // Test parameters
-    private final char inputCharacter;
-    private final byte expectedHighByte;
-    private final byte expectedLowByte;
-
-    public StringUtilsTest(char inputCharacter, byte expectedHighByte, byte expectedLowByte) {
-        this.inputCharacter = inputCharacter;
-        this.expectedHighByte = expectedHighByte;
-        this.expectedLowByte = expectedLowByte;
+    public StringUtilsTest(char in, byte c1, byte c2) {
+        input = in;
+        check1 = c1;
+        check2 = c2;
     }
 
     @Test
-    public void shouldConvertSingleCharacterToTwoByteArray() {
-        // Given: a single character input
-        char[] inputChars = {inputCharacter};
-        byte[] expectedBytes = {expectedHighByte, expectedLowByte};
+    public void convertCharsToBytesTest() {
+        byte[] check = {check1, check2};
+        char[] vals = {input};
+        byte[] result = StringUtils.convertCharsToBytes(vals);
 
-        // When: converting chars to bytes
-        byte[] actualBytes = StringUtils.convertCharsToBytes(inputChars);
-
-        // Then: should produce correct 2-byte representation
-        Assert.assertArrayEquals(
-            String.format("Character '%c' (U+%04X) should convert to bytes [0x%02X, 0x%02X]",
-                inputCharacter, (int) inputCharacter, expectedHighByte, expectedLowByte),
-            expectedBytes, 
-            actualBytes
-        );
-    }
-
-    @Test
-    public void shouldProduceArrayTwiceTheInputSize() {
-        // Given: a single character input
-        char[] inputChars = {inputCharacter};
-
-        // When: converting chars to bytes
-        byte[] result = StringUtils.convertCharsToBytes(inputChars);
-
-        // Then: output array should be twice the size of input array
-        Assert.assertEquals("Output byte array should be twice the size of input char array",
-            inputChars.length * 2, result.length);
+        Assert.assertArrayEquals(check, result);
     }
 }
