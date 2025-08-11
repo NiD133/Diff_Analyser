@@ -15,166 +15,191 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests for verifying internal working of {@link JsonLocation} class itself,
  * as opposed to accuracy of reported location information by parsers.
  */
-class JsonLocationTest extends JUnit5TestBase {
-
+class JsonLocationTest
+        extends JUnit5TestBase
+{
     static class Foobar { }
 
     @Test
-    void testJsonLocationEqualityAndHashCode() {
-        JsonLocation location1 = new JsonLocation(createSourceReference("src"), 10L, 10L, 1, 2);
-        JsonLocation location2 = new JsonLocation(null, 10L, 10L, 3, 2);
+    void basics()
+    {
+        JsonLocation loc1 = new JsonLocation(_sourceRef("src"),
+                10L, 10L, 1, 2);
+        JsonLocation loc2 = new JsonLocation(null, 10L, 10L, 3, 2);
+        assertEquals(loc1, loc1);
+        assertNotEquals(null, loc1);
+        assertNotEquals(loc1, loc2);
+        assertNotEquals(loc2, loc1);
 
-        assertEquals(location1, location1, "A JsonLocation should be equal to itself");
-        assertNotEquals(null, location1, "A JsonLocation should not be equal to null");
-        assertNotEquals(location1, location2, "Different JsonLocations should not be equal");
-        assertNotEquals(location2, location1, "Equality should be symmetric");
-
-        assertTrue(location1.hashCode() != 0, "Hash code should not be zero");
-        assertTrue(location2.hashCode() != 0, "Hash code should not be zero");
+        // don't care about what it is; should not compute to 0 with data above
+        assertTrue(loc1.hashCode() != 0);
+        assertTrue(loc2.hashCode() != 0);
     }
 
     @Test
-    void testJsonLocationToString() throws Exception {
+    void basicToString() throws Exception
+    {
+        // no location; presumed to be Binary due to defaulting
         assertEquals("[Source: UNKNOWN; line: 3, column: 2]",
-                new JsonLocation(null, 10L, 10L, 3, 2).toString(),
-                "Default source should be UNKNOWN");
+                new JsonLocation(null, 10L, 10L, 3, 2).toString());
 
+        // Short String
         assertEquals("[Source: (String)\"string-source\"; line: 1, column: 2]",
-                new JsonLocation(createSourceReference("string-source"), 10L, 10L, 1, 2).toString(),
-                "Source should be correctly represented for String");
+                new JsonLocation(_sourceRef("string-source"), 10L, 10L, 1, 2).toString());
 
+        // Short char[]
         assertEquals("[Source: (char[])\"chars-source\"; line: 1, column: 2]",
-                new JsonLocation(createSourceReference("chars-source".toCharArray()), 10L, 10L, 1, 2).toString(),
-                "Source should be correctly represented for char[]");
+                new JsonLocation(_sourceRef("chars-source".toCharArray()), 10L, 10L, 1, 2).toString());
 
+        // Short byte[]
         assertEquals("[Source: (byte[])\"bytes-source\"; line: 1, column: 2]",
-                new JsonLocation(createSourceReference("bytes-source".getBytes("UTF-8")), 10L, 10L, 1, 2).toString(),
-                "Source should be correctly represented for byte[]");
+                new JsonLocation(_sourceRef("bytes-source".getBytes("UTF-8")),
+                        10L, 10L, 1, 2).toString());
 
+        // InputStream
         assertEquals("[Source: (ByteArrayInputStream); line: 1, column: 2]",
-                new JsonLocation(createSourceReference(new ByteArrayInputStream(new byte[0])), 10L, 10L, 1, 2).toString(),
-                "Source should be correctly represented for InputStream");
+                new JsonLocation(_sourceRef(new ByteArrayInputStream(new byte[0])),
+                        10L, 10L, 1, 2).toString());
 
+        // Class<?> that specifies source type
         assertEquals("[Source: (InputStream); line: 1, column: 2]",
-                new JsonLocation(createRawSourceReference(true, InputStream.class), 10L, 10L, 1, 2).toString(),
-                "Source should be correctly represented for InputStream class");
+                new JsonLocation(_rawSourceRef(true, InputStream.class), 10L, 10L, 1, 2).toString());
 
-        Foobar sourceReference = new Foobar();
-        assertEquals("[Source: (" + sourceReference.getClass().getName() + "); line: 1, column: 2]",
-                new JsonLocation(createRawSourceReference(true, sourceReference), 10L, 10L, 1, 2).toString(),
-                "Source should be correctly represented for custom object");
+        // misc other
+        Foobar srcRef = new Foobar();
+        assertEquals("[Source: ("+srcRef.getClass().getName()+"); line: 1, column: 2]",
+                new JsonLocation(_rawSourceRef(true, srcRef), 10L, 10L, 1, 2).toString());
     }
 
     @Test
-    void testTruncatedSourceDescription() throws Exception {
-        StringBuilder builder = new StringBuilder();
+    void truncatedSource() throws Exception
+    {
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < ErrorReportConfiguration.DEFAULT_MAX_RAW_CONTENT_LENGTH; ++i) {
-            builder.append("x");
+            sb.append("x");
         }
-        String mainContent = builder.toString();
-        String extendedContent = mainContent + "yyy";
+        String main = sb.toString();
+        String json = main + "yyy";
+        JsonLocation loc = new JsonLocation(_sourceRef(json), 0L, 0L, 1, 1);
+        String desc = loc.sourceDescription();
+        assertEquals(String.format("(String)\"%s\"[truncated 3 chars]", main), desc);
 
-        JsonLocation location = new JsonLocation(createSourceReference(extendedContent), 0L, 0L, 1, 1);
-        String description = location.sourceDescription();
-        assertEquals(String.format("(String)\"%s\"[truncated 3 chars]", mainContent), description,
-                "Source description should indicate truncation for String");
-
-        location = new JsonLocation(createSourceReference(extendedContent.getBytes("UTF-8")), 0L, 0L, 1, 1);
-        description = location.sourceDescription();
-        assertEquals(String.format("(byte[])\"%s\"[truncated 3 bytes]", mainContent), description,
-                "Source description should indicate truncation for byte[]");
+        // and same with bytes
+        loc = new JsonLocation(_sourceRef(json.getBytes("UTF-8")), 0L, 0L, 1, 1);
+        desc = loc.sourceDescription();
+        assertEquals(String.format("(byte[])\"%s\"[truncated 3 bytes]", main), desc);
     }
 
+    // for [jackson-core#658]
     @Test
-    void testEscapeNonPrintableCharacters() throws Exception {
-        final String document = "[ \"tab:[\t]/null:[\0]\" ]";
-        JsonLocation location = new JsonLocation(createSourceReference(document), 0L, 0L, -1, -1);
-        final String sourceDescription = location.sourceDescription();
-        assertEquals(String.format("(String)\"[ \"tab:[%s]/null:[%s]\" ]\"", "\\u0009", "\\u0000"), sourceDescription,
-                "Non-printable characters should be escaped");
+    void escapeNonPrintable() throws Exception
+    {
+        final String DOC = "[ \"tab:[\t]/null:[\0]\" ]";
+        JsonLocation loc = new JsonLocation(_sourceRef(DOC), 0L, 0L, -1, -1);
+        final String sourceDesc = loc.sourceDescription();
+        assertEquals(String.format("(String)\"[ \"tab:[%s]/null:[%s]\" ]\"",
+                "\\u0009", "\\u0000"), sourceDesc);
     }
 
+    // for [jackson-core#356]
     @Test
-    void testDisableSourceInclusion() throws Exception {
-        JsonFactory factory = JsonFactory.builder()
+    void disableSourceInclusion() throws Exception
+    {
+        JsonFactory f = JsonFactory.builder()
                 .disable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
                 .build();
 
-        try (JsonParser parser = factory.createParser("[ foobar ]")) {
-            assertToken(JsonToken.START_ARRAY, parser.nextToken());
+        try (JsonParser p = f.createParser("[ foobar ]")) {
+            assertToken(JsonToken.START_ARRAY, p.nextToken());
             try {
-                parser.nextToken();
-                fail("Parser should throw exception for unrecognized token");
+                p.nextToken();
+                fail("Shouldn't have passed");
             } catch (JsonParseException e) {
-                verifyContentDisabled(e);
+                _verifyContentDisabled(e);
             }
         }
 
-        try (JsonParser parser = factory.createParser("[ foobar ]".getBytes("UTF-8"))) {
-            assertToken(JsonToken.START_ARRAY, parser.nextToken());
+        // and verify same works for byte-based too
+        try (JsonParser p = f.createParser("[ foobar ]".getBytes("UTF-8"))) {
+            assertToken(JsonToken.START_ARRAY, p.nextToken());
             try {
-                parser.nextToken();
-                fail("Parser should throw exception for unrecognized token");
+                p.nextToken();
+                fail("Shouldn't have passed");
             } catch (JsonParseException e) {
-                verifyContentDisabled(e);
+                _verifyContentDisabled(e);
             }
         }
     }
 
-    private void verifyContentDisabled(JsonParseException exception) {
-        verifyException(exception, "unrecognized token");
-        JsonLocation location = exception.getLocation();
-        assertNull(location.contentReference().getRawContent(), "Raw content should be null when source inclusion is disabled");
-        assertThat(location.sourceDescription()).startsWith("REDACTED", "Source description should be redacted");
+    private void _verifyContentDisabled(JsonParseException e) {
+        verifyException(e, "unrecognized token");
+        JsonLocation loc = e.getLocation();
+        assertNull(loc.contentReference().getRawContent());
+        assertThat(loc.sourceDescription()).startsWith("REDACTED");
     }
 
+    // for [jackson-core#739]: try to support equality
     @Test
-    void testJsonLocationEquality() throws Exception {
-        File sourceFile1 = new File("/tmp/foo");
-        File sourceFile2 = new File("/tmp/foo");
-        assertEquals(sourceFile1, sourceFile2, "Files with the same path should be equal");
+    void locationEquality() throws Exception
+    {
+        // important: create separate but equal instances
+        File src1 = new File("/tmp/foo");
+        File src2 = new File("/tmp/foo");
+        assertEquals(src1, src2);
 
-        JsonLocation location1 = new JsonLocation(createSourceReference(sourceFile1), 10L, 10L, 1, 2);
-        JsonLocation location2 = new JsonLocation(createSourceReference(sourceFile2), 10L, 10L, 1, 2);
-        assertEquals(location1, location2, "JsonLocations with the same source and offsets should be equal");
+        JsonLocation loc1 = new JsonLocation(_sourceRef(src1),
+                10L, 10L, 1, 2);
+        JsonLocation loc2 = new JsonLocation(_sourceRef(src2),
+                10L, 10L, 1, 2);
+        assertEquals(loc1, loc2);
 
-        final byte[] bogusData = "BOGUS".getBytes();
+        // Also make sure to consider offset/length
+        final byte[] bogus = "BOGUS".getBytes();
 
-        assertEquals(new JsonLocation(createSourceReference(bogusData, 0, 5), 5L, 0L, 1, 2),
-                new JsonLocation(createSourceReference(bogusData, 0, 5), 5L, 0L, 1, 2),
-                "JsonLocations with the same byte source and offsets should be equal");
+        // If same, equals:
+        assertEquals(new JsonLocation(_sourceRef(bogus, 0, 5), 5L, 0L, 1, 2),
+                new JsonLocation(_sourceRef(bogus, 0, 5), 5L, 0L, 1, 2));
 
-        location1 = new JsonLocation(createSourceReference(bogusData, 0, 5), 5L, 0L, 1, 2);
-        location2 = new JsonLocation(createSourceReference(bogusData, 1, 4), 5L, 0L, 1, 2);
-        assertNotEquals(location1, location2, "JsonLocations with different byte offsets should not be equal");
-        assertNotEquals(location2, location1, "Equality should be symmetric");
+        // If different, not equals
+        loc1 = new JsonLocation(_sourceRef(bogus, 0, 5),
+                5L, 0L, 1, 2);
+        loc2 = new JsonLocation(_sourceRef(bogus, 1, 4),
+                5L, 0L, 1, 2);
+        assertNotEquals(loc1, loc2);
+        assertNotEquals(loc2, loc1);
     }
 
-    private ContentReference createSourceReference(String rawSource) {
-        return ContentReference.construct(true, rawSource, 0, rawSource.length(), ErrorReportConfiguration.defaults());
+    private ContentReference _sourceRef(String rawSrc) {
+        return ContentReference.construct(true, rawSrc, 0, rawSrc.length(),
+                ErrorReportConfiguration.defaults());
     }
 
-    private ContentReference createSourceReference(char[] rawSource) {
-        return ContentReference.construct(true, rawSource, 0, rawSource.length, ErrorReportConfiguration.defaults());
+    private ContentReference _sourceRef(char[] rawSrc) {
+        return ContentReference.construct(true, rawSrc, 0, rawSrc.length,
+                ErrorReportConfiguration.defaults());
     }
 
-    private ContentReference createSourceReference(byte[] rawSource) {
-        return ContentReference.construct(true, rawSource, 0, rawSource.length, ErrorReportConfiguration.defaults());
+    private ContentReference _sourceRef(byte[] rawSrc) {
+        return ContentReference.construct(true, rawSrc, 0, rawSrc.length,
+                ErrorReportConfiguration.defaults());
     }
 
-    private ContentReference createSourceReference(byte[] rawSource, int offset, int length) {
-        return ContentReference.construct(true, rawSource, offset, length, ErrorReportConfiguration.defaults());
+    private ContentReference _sourceRef(byte[] rawSrc, int offset, int length) {
+        return ContentReference.construct(true, rawSrc, offset, length,
+                ErrorReportConfiguration.defaults());
     }
 
-    private ContentReference createSourceReference(InputStream rawSource) {
-        return ContentReference.construct(true, rawSource, -1, -1, ErrorReportConfiguration.defaults());
+    private ContentReference _sourceRef(InputStream rawSrc) {
+        return ContentReference.construct(true, rawSrc, -1, -1,
+                ErrorReportConfiguration.defaults());
     }
 
-    private ContentReference createSourceReference(File rawSource) {
-        return ContentReference.construct(true, rawSource, -1, -1, ErrorReportConfiguration.defaults());
+    private ContentReference _sourceRef(File rawSrc) {
+        return ContentReference.construct(true, rawSrc, -1, -1,
+                ErrorReportConfiguration.defaults());
     }
 
-    private ContentReference createRawSourceReference(boolean textual, Object rawSource) {
-        return ContentReference.rawReference(textual, rawSource);
+    private ContentReference _rawSourceRef(boolean textual, Object rawSrc) {
+        return ContentReference.rawReference(textual, rawSrc);
     }
 }
