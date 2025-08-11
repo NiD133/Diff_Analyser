@@ -39,652 +39,442 @@ import org.junit.jupiter.params.provider.MethodSource;
  */
 public final class TextHelpAppendableTest {
 
-    private static final String SAMPLE_TEXT = "The quick brown fox jumps over the lazy dog";
-    private static final int COLUMN_WIDTH_10 = 10;
-    private static final int NO_INDENT = 0;
-    private static final int NO_LEFT_PAD = 0;
-    private static final int SMALL_INDENT = 2;
-    private static final int MEDIUM_LEFT_PAD = 5;
-    private static final int PAGE_WIDTH_80 = 80;
-    private static final int PAGE_WIDTH_150 = 150;
-
-    private StringBuilder outputBuffer;
-    private TextHelpAppendable textAppendable;
+    private StringBuilder sb;
+    private TextHelpAppendable underTest;
 
     @BeforeEach
     public void setUp() {
-        outputBuffer = new StringBuilder();
-        textAppendable = new TextHelpAppendable(outputBuffer);
-    }
-
-    // ========== Column Queue Tests ==========
-
-    @Test
-    void testMakeColumnQueue_LeftAlignment() {
-        // Given
-        TextStyle leftAlignedStyle = createTextStyle(COLUMN_WIDTH_10, NO_INDENT, NO_LEFT_PAD, TextStyle.Alignment.LEFT);
-        Queue<String> expectedLeftAligned = createQueue("The quick ", "brown fox ", "jumps over", "the lazy  ", "dog       ");
-
-        // When
-        Queue<String> actualResult = textAppendable.makeColumnQueue(SAMPLE_TEXT, leftAlignedStyle);
-
-        // Then
-        assertEquals(expectedLeftAligned, actualResult, "Left alignment should wrap text correctly");
+        sb = new StringBuilder();
+        underTest = new TextHelpAppendable(sb);
     }
 
     @Test
-    void testMakeColumnQueue_RightAlignment() {
-        // Given
-        TextStyle rightAlignedStyle = createTextStyle(COLUMN_WIDTH_10, NO_INDENT, NO_LEFT_PAD, TextStyle.Alignment.RIGHT);
-        Queue<String> expectedRightAligned = createQueue(" The quick", " brown fox", "jumps over", "  the lazy", "       dog");
+    void tesstMakeColumnQueue() {
+        final String text = "The quick brown fox jumps over the lazy dog";
+        final TextStyle.Builder styleBuilder = TextStyle.builder().setMaxWidth(10).setIndent(0).setLeftPad(0);
 
-        // When
-        Queue<String> actualResult = textAppendable.makeColumnQueue(SAMPLE_TEXT, rightAlignedStyle);
+        Queue<String> expected = new LinkedList<>();
+        expected.add("The quick ");
+        expected.add("brown fox ");
+        expected.add("jumps over");
+        expected.add("the lazy  ");
+        expected.add("dog       ");
 
-        // Then
-        assertEquals(expectedRightAligned, actualResult, "Right alignment should wrap text correctly");
+        Queue<String> result = underTest.makeColumnQueue(text, styleBuilder.get());
+        assertEquals(expected, result, "left aligned failed");
+
+        expected.clear();
+        expected.add(" The quick");
+        expected.add(" brown fox");
+        expected.add("jumps over");
+        expected.add("  the lazy");
+        expected.add("       dog");
+        styleBuilder.setAlignment(TextStyle.Alignment.RIGHT);
+
+        result = underTest.makeColumnQueue(text, styleBuilder.get());
+        assertEquals(expected, result, "right aligned failed");
+
+        expected.clear();
+        expected.add("The quick ");
+        expected.add("brown fox ");
+        expected.add("jumps over");
+        expected.add(" the lazy ");
+        expected.add("   dog    ");
+        styleBuilder.setAlignment(TextStyle.Alignment.CENTER);
+
+        result = underTest.makeColumnQueue(text, styleBuilder.get());
+        assertEquals(expected, result, "center aligned failed");
+
+        expected = new LinkedList<>();
+        expected.add("      The quick");
+        expected.add("          brown");
+        expected.add("            fox");
+        expected.add("          jumps");
+        expected.add("       over the");
+        expected.add("       lazy dog");
+        styleBuilder.setAlignment(TextStyle.Alignment.RIGHT).setLeftPad(5).setIndent(2);
+
+        result = underTest.makeColumnQueue(text, styleBuilder.get());
+        assertEquals(expected, result, "right aligned failed");
     }
 
     @Test
-    void testMakeColumnQueue_CenterAlignment() {
-        // Given
-        TextStyle centerAlignedStyle = createTextStyle(COLUMN_WIDTH_10, NO_INDENT, NO_LEFT_PAD, TextStyle.Alignment.CENTER);
-        Queue<String> expectedCenterAligned = createQueue("The quick ", "brown fox ", "jumps over", " the lazy ", "   dog    ");
-
-        // When
-        Queue<String> actualResult = textAppendable.makeColumnQueue(SAMPLE_TEXT, centerAlignedStyle);
-
-        // Then
-        assertEquals(expectedCenterAligned, actualResult, "Center alignment should wrap text correctly");
-    }
-
-    @Test
-    void testMakeColumnQueue_WithPaddingAndIndent() {
-        // Given
-        TextStyle styledText = createTextStyle(COLUMN_WIDTH_10, SMALL_INDENT, MEDIUM_LEFT_PAD, TextStyle.Alignment.RIGHT);
-        Queue<String> expectedWithPadding = createQueue(
-            "      The quick", "          brown", "            fox", "          jumps", 
-            "       over the", "       lazy dog"
+    void testAdjustTableFormat() {
+        // test width smaller than header
+        // @formatter:off
+        final TableDefinition tableDefinition = TableDefinition.from("Testing",
+                Collections.singletonList(TextStyle.builder().setMaxWidth(3).get()),
+                Collections.singletonList("header"),
+                // "data" shorter than "header"
+                Collections.singletonList(Collections.singletonList("data"))
         );
-
-        // When
-        Queue<String> actualResult = textAppendable.makeColumnQueue(SAMPLE_TEXT, styledText);
-
-        // Then
-        assertEquals(expectedWithPadding, actualResult, "Right alignment with padding and indent should format correctly");
-    }
-
-    // ========== Table Format Adjustment Tests ==========
-
-    @Test
-    void testAdjustTableFormat_ExpandsColumnToFitHeader() {
-        // Given: Column width smaller than header text
-        String headerText = "header";
-        String dataText = "data"; // shorter than header
-        TableDefinition originalTable = TableDefinition.from(
-            "Testing",
-            Collections.singletonList(TextStyle.builder().setMaxWidth(3).get()),
-            Collections.singletonList(headerText),
-            Collections.singletonList(Collections.singletonList(dataText))
-        );
-
-        // When
-        TableDefinition adjustedTable = textAppendable.adjustTableFormat(originalTable);
-
-        // Then
-        int expectedWidth = headerText.length();
-        assertEquals(expectedWidth, adjustedTable.columnTextStyles().get(0).getMaxWidth(),
-            "Column width should expand to fit header");
-        assertEquals(expectedWidth, adjustedTable.columnTextStyles().get(0).getMinWidth(),
-            "Column min width should match header length");
+        // @formatter:on
+        final TableDefinition actual = underTest.adjustTableFormat(tableDefinition);
+        assertEquals("header".length(), actual.columnTextStyles().get(0).getMaxWidth());
+        assertEquals("header".length(), actual.columnTextStyles().get(0).getMinWidth());
     }
 
     @Test
-    void testAdjustTableFormat_PreservesExistingDimensions() {
-        // Given
-        int minWidth = 20;
-        int maxWidth = 100;
-        textAppendable.setMaxWidth(PAGE_WIDTH_150);
-        
-        TableDefinition originalTable = TableDefinition.from(
-            "Caption",
-            Collections.singletonList(TextStyle.builder().setMinWidth(minWidth).setMaxWidth(maxWidth).get()),
-            Collections.singletonList("header"),
-            Collections.singletonList(Collections.singletonList("one"))
-        );
+    void testAppend() throws IOException {
+        final char c = (char) 0x1F44D;
+        underTest.append(c);
+        assertEquals(1, sb.length());
+        assertEquals(String.valueOf(c), sb.toString());
 
-        // When
-        TableDefinition adjustedTable = textAppendable.adjustTableFormat(originalTable);
-
-        // Then
-        assertEquals(minWidth, adjustedTable.columnTextStyles().get(0).getMinWidth(),
-            "Minimum width should be preserved");
-        assertEquals(maxWidth, adjustedTable.columnTextStyles().get(0).getMaxWidth(),
-            "Maximum width should be preserved");
-    }
-
-    // ========== Basic Append Tests ==========
-
-    @Test
-    void testAppend_Character() throws IOException {
-        // Given
-        char testChar = (char) 0x1F44D;
-
-        // When
-        textAppendable.append(testChar);
-
-        // Then
-        assertEquals(1, outputBuffer.length(), "Should append single character");
-        assertEquals(String.valueOf(testChar), outputBuffer.toString(), "Character should match");
+        sb.setLength(0);
+        underTest.append("Hello");
+        assertEquals("Hello", sb.toString());
     }
 
     @Test
-    void testAppend_String() throws IOException {
-        // Given
-        String testString = "Hello";
+    void testAppendHeader() throws IOException {
+        final String[] expected = { " Hello World", " ===========", "" };
 
-        // When
-        textAppendable.append(testString);
+        sb.setLength(0);
+        underTest.appendHeader(1, "Hello World");
+        List<String> actual = IOUtils.readLines(new StringReader(sb.toString()));
+        assertEquals(Arrays.asList(expected), actual, "header 1 failed");
 
-        // Then
-        assertEquals(testString, outputBuffer.toString(), "String should be appended correctly");
-    }
+        sb.setLength(0);
+        underTest.appendHeader(2, "Hello World");
+        actual = IOUtils.readLines(new StringReader(sb.toString()));
+        expected[1] = " %%%%%%%%%%%";
+        assertEquals(Arrays.asList(expected), actual, "header 2 failed");
 
-    // ========== Header Tests ==========
+        sb.setLength(0);
+        underTest.appendHeader(3, "Hello World");
+        actual = IOUtils.readLines(new StringReader(sb.toString()));
+        expected[1] = " +++++++++++";
+        assertEquals(Arrays.asList(expected), actual, "header 3 failed");
 
-    @Test
-    void testAppendHeader_Level1() throws IOException {
-        testHeaderLevel(1, "Hello World", "===========");
-    }
+        sb.setLength(0);
+        underTest.appendHeader(4, "Hello World");
+        actual = IOUtils.readLines(new StringReader(sb.toString()));
+        expected[1] = " ___________";
+        assertEquals(Arrays.asList(expected), actual, "header 4 failed");
 
-    @Test
-    void testAppendHeader_Level2() throws IOException {
-        testHeaderLevel(2, "Hello World", "%%%%%%%%%%%");
-    }
+        sb.setLength(0);
+        underTest.appendHeader(5, "Hello World");
+        actual = IOUtils.readLines(new StringReader(sb.toString()));
+        assertEquals(Arrays.asList(expected), actual, "header 5 failed");
 
-    @Test
-    void testAppendHeader_Level3() throws IOException {
-        testHeaderLevel(3, "Hello World", "+++++++++++");
-    }
+        sb.setLength(0);
+        assertThrows(IllegalArgumentException.class, () -> underTest.appendHeader(0, "Hello World"));
 
-    @Test
-    void testAppendHeader_Level4And5() throws IOException {
-        testHeaderLevel(4, "Hello World", "___________");
-        
-        outputBuffer.setLength(0);
-        testHeaderLevel(5, "Hello World", "___________");
-    }
+        sb.setLength(0);
+        underTest.appendHeader(5, "");
+        assertEquals(0, sb.length(), "empty string test failed");
 
-    @Test
-    void testAppendHeader_InvalidLevel() {
-        assertThrows(IllegalArgumentException.class, 
-            () -> textAppendable.appendHeader(0, "Hello World"),
-            "Should throw exception for invalid header level");
-    }
-
-    @Test
-    void testAppendHeader_EmptyAndNullText() throws IOException {
-        // Empty string
-        textAppendable.appendHeader(1, "");
-        assertEquals(0, outputBuffer.length(), "Empty header should produce no output");
-
-        // Null string
-        outputBuffer.setLength(0);
-        textAppendable.appendHeader(1, null);
-        assertEquals(0, outputBuffer.length(), "Null header should produce no output");
-    }
-
-    // ========== List Tests ==========
-
-    @Test
-    void testAppendList_Ordered() throws IOException {
-        // Given
-        List<String> items = Arrays.asList("one", "two", "three");
-        List<String> expectedOutput = Arrays.asList(
-            "  1. one", "  2. two", "  3. three", ""
-        );
-
-        // When
-        textAppendable.appendList(true, items);
-
-        // Then
-        List<String> actualOutput = readOutputLines();
-        assertEquals(expectedOutput, actualOutput, "Ordered list should be numbered correctly");
+        sb.setLength(0);
+        underTest.appendHeader(5, null);
+        assertEquals(0, sb.length(), "null test failed");
     }
 
     @Test
-    void testAppendList_Unordered() throws IOException {
-        // Given
-        List<String> items = Arrays.asList("one", "two", "three");
-        List<String> expectedOutput = Arrays.asList(
-            "  * one", "  * two", "  * three", ""
-        );
+    void testAppendList() throws IOException {
+        final List<String> expected = new ArrayList<>();
+        final String[] entries = { "one", "two", "three" };
+        for (int i = 0; i < entries.length; i++) {
+            expected.add(String.format("  %s. %s", i + 1, entries[i]));
+        }
+        expected.add("");
 
-        // When
-        textAppendable.appendList(false, items);
+        sb.setLength(0);
+        underTest.appendList(true, Arrays.asList(entries));
+        List<String> actual = IOUtils.readLines(new StringReader(sb.toString()));
+        assertEquals(expected, actual, "ordered list failed");
 
-        // Then
-        List<String> actualOutput = readOutputLines();
-        assertEquals(expectedOutput, actualOutput, "Unordered list should use bullet points");
+        sb.setLength(0);
+        expected.clear();
+        for (final String entry : entries) {
+            expected.add(String.format("  * %s", entry));
+        }
+        expected.add("");
+        underTest.appendList(false, Arrays.asList(entries));
+        actual = IOUtils.readLines(new StringReader(sb.toString()));
+        assertEquals(expected, actual, "unordered list failed");
+
+        sb.setLength(0);
+        expected.clear();
+        underTest.appendList(false, Collections.emptyList());
+        actual = IOUtils.readLines(new StringReader(sb.toString()));
+        assertEquals(expected, actual, "empty list failed");
+
+        sb.setLength(0);
+        expected.clear();
+        underTest.appendList(false, null);
+        actual = IOUtils.readLines(new StringReader(sb.toString()));
+        assertEquals(expected, actual, "null list failed");
     }
 
     @Test
-    void testAppendList_EmptyAndNull() throws IOException {
-        // Empty list
-        textAppendable.appendList(false, Collections.emptyList());
-        assertEquals(Collections.emptyList(), readOutputLines(), "Empty list should produce no output");
+    void testAppendParagraph() throws IOException {
+        final String[] expected = { " Hello World", "" };
 
-        // Null list
-        outputBuffer.setLength(0);
-        textAppendable.appendList(false, null);
-        assertEquals(Collections.emptyList(), readOutputLines(), "Null list should produce no output");
-    }
+        sb.setLength(0);
+        underTest.appendParagraph("Hello World");
+        final List<String> actual = IOUtils.readLines(new StringReader(sb.toString()));
+        assertEquals(Arrays.asList(expected), actual);
 
-    // ========== Paragraph Tests ==========
+        sb.setLength(0);
+        underTest.appendParagraph("");
+        assertEquals(0, sb.length(), "empty string test failed");
 
-    @Test
-    void testAppendParagraph_Normal() throws IOException {
-        // Given
-        String paragraphText = "Hello World";
-        List<String> expectedOutput = Arrays.asList(" Hello World", "");
-
-        // When
-        textAppendable.appendParagraph(paragraphText);
-
-        // Then
-        List<String> actualOutput = readOutputLines();
-        assertEquals(expectedOutput, actualOutput, "Paragraph should be formatted with padding");
-    }
-
-    @Test
-    void testAppendParagraph_EmptyAndNull() throws IOException {
-        // Empty string
-        textAppendable.appendParagraph("");
-        assertEquals(0, outputBuffer.length(), "Empty paragraph should produce no output");
-
-        // Null string
-        outputBuffer.setLength(0);
-        textAppendable.appendParagraph(null);
-        assertEquals(0, outputBuffer.length(), "Null paragraph should produce no output");
+        sb.setLength(0);
+        underTest.appendParagraph(null);
+        assertEquals(0, sb.length(), "null test failed");
     }
 
     @Test
     void testAppendParagraphFormat() throws IOException {
-        // Given
-        String template = "Hello %s World %,d";
-        String name = "Joe";
-        int number = 309;
-        List<String> expectedOutput = Arrays.asList(" Hello Joe World 309", "");
+        final String[] expected = { " Hello Joe World 309", "" };
 
-        // When
-        textAppendable.appendParagraphFormat(template, name, number);
+        sb.setLength(0);
+        underTest.appendParagraphFormat("Hello %s World %,d", "Joe", 309);
+        final List<String> actual = IOUtils.readLines(new StringReader(sb.toString()));
+        assertEquals(Arrays.asList(expected), actual);
 
-        // Then
-        List<String> actualOutput = readOutputLines();
-        assertEquals(expectedOutput, actualOutput, "Formatted paragraph should substitute parameters");
+        sb.setLength(0);
+        underTest.appendParagraphFormat("");
+        assertEquals(0, sb.length(), "empty string test failed");
     }
 
     @Test
-    void testAppendParagraphFormat_EmptyTemplate() throws IOException {
-        textAppendable.appendParagraphFormat("");
-        assertEquals(0, outputBuffer.length(), "Empty format template should produce no output");
-    }
-
-    // ========== Table Tests ==========
-
-    @Test
-    void testAppendTable_CompleteTable() throws IOException {
-        // Given
-        TableDefinition completeTable = createSampleTable("Common Phrases");
-        List<String> expectedOutput = Arrays.asList(
-            " Common Phrases", "",
-            "               fox                                       time                   ",
-            " The quick brown fox jumps over           Now is the time for all good people to",
-            "   the lazy dog                                 come to the aid of their country",
-            " Léimeann an sionnach donn gasta       Anois an t-am do na daoine maithe go léir",
-            "   thar an madra leisciúil                           teacht i gcabhair ar a dtír",
-            ""
+    void testAppendTable() throws IOException {
+        final TextStyle.Builder styleBuilder = TextStyle.builder();
+        final List<TextStyle> styles = new ArrayList<>();
+        styles.add(styleBuilder.setIndent(2).get());
+        styles.add(styleBuilder.setIndent(0).setLeftPad(5).setAlignment(TextStyle.Alignment.RIGHT).get());
+        final String[] headers = { "fox", "time" };
+        // @formatter:off
+        final List<List<String>> rows = Arrays.asList(
+                Arrays.asList("The quick brown fox jumps over the lazy dog",
+                        "Now is the time for all good people to come to the aid of their country"),
+                Arrays.asList("Léimeann an sionnach donn gasta thar an madra leisciúil",
+                        "Anois an t-am do na daoine maithe go léir teacht i gcabhair ar a dtír")
         );
+        // @formatter:on
 
-        // When
-        textAppendable.setMaxWidth(PAGE_WIDTH_80);
-        textAppendable.appendTable(completeTable);
+        List<String> expected = new ArrayList<>();
+        expected.add(" Common Phrases");
+        expected.add("");
+        expected.add("               fox                                       time                   ");
+        expected.add(" The quick brown fox jumps over           Now is the time for all good people to");
+        expected.add("   the lazy dog                                 come to the aid of their country");
+        expected.add(" Léimeann an sionnach donn gasta       Anois an t-am do na daoine maithe go léir");
+        expected.add("   thar an madra leisciúil                           teacht i gcabhair ar a dtír");
+        expected.add("");
 
-        // Then
-        List<String> actualOutput = readOutputLines();
-        assertEquals(expectedOutput, actualOutput, "Complete table should include title and formatted data");
+        TableDefinition table = TableDefinition.from("Common Phrases", styles, Arrays.asList(headers), rows);
+        sb.setLength(0);
+        underTest.setMaxWidth(80);
+        underTest.appendTable(table);
+        List<String> actual = IOUtils.readLines(new StringReader(sb.toString()));
+        assertEquals(expected, actual, "full table failed");
+
+        table = TableDefinition.from(null, styles, Arrays.asList(headers), rows);
+        expected.remove(1);
+        expected.remove(0);
+        sb.setLength(0);
+        underTest.appendTable(table);
+        actual = IOUtils.readLines(new StringReader(sb.toString()));
+        assertEquals(expected, actual);
+
+        table = TableDefinition.from(null, styles, Arrays.asList(headers), Collections.emptyList());
+        expected = new ArrayList<>();
+        expected.add(" fox     time");
+        expected.add("");
+        sb.setLength(0);
+        underTest.appendTable(table);
+        actual = IOUtils.readLines(new StringReader(sb.toString()));
+        assertEquals(expected, actual, "no rows test failed");
     }
-
-    @Test
-    void testAppendTable_NoTitle() throws IOException {
-        // Given
-        TableDefinition tableWithoutTitle = createSampleTable(null);
-        List<String> expectedOutput = Arrays.asList(
-            "               fox                                       time                   ",
-            " The quick brown fox jumps over           Now is the time for all good people to",
-            "   the lazy dog                                 come to the aid of their country",
-            " Léimeann an sionnach donn gasta       Anois an t-am do na daoine maithe go léir",
-            "   thar an madra leisciúil                           teacht i gcabhair ar a dtír",
-            ""
-        );
-
-        // When
-        textAppendable.setMaxWidth(PAGE_WIDTH_80);
-        textAppendable.appendTable(tableWithoutTitle);
-
-        // Then
-        List<String> actualOutput = readOutputLines();
-        assertEquals(expectedOutput, actualOutput, "Table without title should only show headers and data");
-    }
-
-    @Test
-    void testAppendTable_HeadersOnly() throws IOException {
-        // Given
-        List<TextStyle> columnStyles = createSampleColumnStyles();
-        String[] headers = {"fox", "time"};
-        TableDefinition headersOnlyTable = TableDefinition.from(
-            null, columnStyles, Arrays.asList(headers), Collections.emptyList()
-        );
-        List<String> expectedOutput = Arrays.asList(" fox     time", "");
-
-        // When
-        textAppendable.appendTable(headersOnlyTable);
-
-        // Then
-        List<String> actualOutput = readOutputLines();
-        assertEquals(expectedOutput, actualOutput, "Table with no data should show only headers");
-    }
-
-    // ========== Title Tests ==========
 
     @Test
     void testAppendTitle() throws IOException {
-        // Given
-        String titleText = "Hello World";
-        List<String> expectedOutput = Arrays.asList(" Hello World", " ###########", "");
+        final String[] expected = { " Hello World", " ###########", "" };
 
-        // When
-        textAppendable.appendTitle(titleText);
+        sb.setLength(0);
+        underTest.appendTitle("Hello World");
+        final List<String> actual = IOUtils.readLines(new StringReader(sb.toString()));
+        assertEquals(Arrays.asList(expected), actual);
 
-        // Then
-        List<String> actualOutput = readOutputLines();
-        assertEquals(expectedOutput, actualOutput, "Title should be underlined with hash marks");
+        sb.setLength(0);
+        underTest.appendTitle("");
+        assertEquals(0, sb.length(), "empty string test failed");
+
+        sb.setLength(0);
+        underTest.appendTitle(null);
+        assertEquals(0, sb.length(), "null test failed");
+
     }
 
     @Test
-    void testAppendTitle_EmptyAndNull() throws IOException {
-        // Empty string
-        textAppendable.appendTitle("");
-        assertEquals(0, outputBuffer.length(), "Empty title should produce no output");
-
-        // Null string
-        outputBuffer.setLength(0);
-        textAppendable.appendTitle(null);
-        assertEquals(0, outputBuffer.length(), "Null title should produce no output");
-    }
-
-    // ========== Style Builder Tests ==========
-
-    @Test
-    void testGetTextStyleBuilder_DefaultValues() {
-        TextStyle.Builder builder = textAppendable.getTextStyleBuilder();
-        
-        assertEquals(TextHelpAppendable.DEFAULT_INDENT, builder.getIndent(),
-            "Default indent should match constant");
-        assertEquals(TextHelpAppendable.DEFAULT_LEFT_PAD, builder.getLeftPad(),
-            "Default left pad should match constant");
-        assertEquals(TextHelpAppendable.DEFAULT_WIDTH, builder.getMaxWidth(),
-            "Default width should match constant");
-    }
-
-    // ========== Text Wrapping Tests ==========
-
-    @Test
-    void testIndexOfWrap_FindEndOfWord() {
-        String testText = "The quick brown fox jumps over\tthe lazy dog";
-        
-        assertEquals(9, TextHelpAppendable.indexOfWrap(testText, 10, 0),
-            "Should find end of word within width");
-        assertEquals(9, TextHelpAppendable.indexOfWrap(testText, 14, 0),
-            "Should backup to end of word when exceeding width");
-        assertEquals(15, TextHelpAppendable.indexOfWrap(testText, 15, 0),
-            "Should find exact word boundary");
-        assertEquals(30, TextHelpAppendable.indexOfWrap(testText, 15, 20),
-            "Should find tab character as break point");
-        assertEquals(30, TextHelpAppendable.indexOfWrap(testText, 150, 0),
-            "Should handle text shorter than width");
+    void testGetStyleBuilder() {
+        final TextStyle.Builder builder = underTest.getTextStyleBuilder();
+        assertEquals(TextHelpAppendable.DEFAULT_INDENT, builder.getIndent(), "Default indent value was changed, some tests may fail");
+        assertEquals(TextHelpAppendable.DEFAULT_LEFT_PAD, builder.getLeftPad(), "Default left pad value was changed, some tests may fail");
+        assertEquals(TextHelpAppendable.DEFAULT_WIDTH, builder.getMaxWidth(), "Default width value was changed, some tests may fail");
     }
 
     @Test
-    void testIndexOfWrap_EdgeCases() {
-        assertThrows(IllegalArgumentException.class, 
-            () -> TextHelpAppendable.indexOfWrap("", 0, 0),
-            "Should throw exception for empty string with zero width");
-        
-        assertEquals(3, TextHelpAppendable.indexOfWrap("Hello", 4, 0),
-            "Should handle text longer than width");
+    void testindexOfWrapPos() {
+        final String testString = "The quick brown fox jumps over\tthe lazy dog";
+
+        assertEquals(9, TextHelpAppendable.indexOfWrap(testString, 10, 0), "did not find end of word");
+        assertEquals(9, TextHelpAppendable.indexOfWrap(testString, 14, 0), "did not backup to end of word");
+        assertEquals(15, TextHelpAppendable.indexOfWrap(testString, 15, 0), "did not find word at 15");
+        assertEquals(15, TextHelpAppendable.indexOfWrap(testString, 16, 0));
+        assertEquals(30, TextHelpAppendable.indexOfWrap(testString, 15, 20), "did not find break character");
+        assertEquals(30, TextHelpAppendable.indexOfWrap(testString, 150, 0), "did not handle text shorter than width");
+
+        assertThrows(IllegalArgumentException.class, () -> TextHelpAppendable.indexOfWrap("", 0, 0));
+        assertEquals(3, TextHelpAppendable.indexOfWrap("Hello", 4, 0));
     }
 
     @ParameterizedTest
     @MethodSource("org.apache.commons.cli.help.UtilTest#charArgs")
-    void testIndexOfWrap_WhitespaceHandling(final Character character, final boolean isWhitespace) {
-        String testText = String.format("Hello%cWorld", character);
-        int expectedPosition = isWhitespace ? 5 : 6;
-        
-        assertEquals(expectedPosition, TextHelpAppendable.indexOfWrap(testText, 7, 0),
-            "Whitespace handling should depend on character type");
-    }
-
-    // ========== Print Wrapped Tests ==========
-
-    @Test
-    void testPrintWrapped_LeftAlignment() throws IOException {
-        testWrappedAlignment(TextStyle.Alignment.LEFT, 
-            Arrays.asList("The quick", "brown fox", "jumps over", "the lazy", "dog"));
+    void testindexOfWrapPosWithWhitespace(final Character c, final boolean isWhitespace) {
+        final String text = String.format("Hello%cWorld", c);
+        assertEquals(isWhitespace ? 5 : 6, TextHelpAppendable.indexOfWrap(text, 7, 0));
     }
 
     @Test
-    void testPrintWrapped_RightAlignment() throws IOException {
-        testWrappedAlignment(TextStyle.Alignment.RIGHT,
-            Arrays.asList(" The quick", " brown fox", "jumps over", "  the lazy", "       dog"));
+    void testPrintWrapped() throws IOException {
+        String text = "The quick brown fox jumps over the lazy dog";
+        final TextStyle.Builder styleBuilder = TextStyle.builder().setMaxWidth(10).setIndent(0).setLeftPad(0);
+
+        final List<String> expected = new ArrayList<>();
+        expected.add("The quick");
+        expected.add("brown fox");
+        expected.add("jumps over");
+        expected.add("the lazy");
+        expected.add("dog");
+        underTest.printWrapped(text, styleBuilder.get());
+        List<String> actual = IOUtils.readLines(new StringReader(sb.toString()));
+        assertEquals(expected, actual, "left aligned failed");
+
+        sb.setLength(0);
+        expected.clear();
+        expected.add(" The quick");
+        expected.add(" brown fox");
+        expected.add("jumps over");
+        expected.add("  the lazy");
+        expected.add("       dog");
+        styleBuilder.setAlignment(TextStyle.Alignment.RIGHT);
+
+        underTest.printWrapped(text, styleBuilder.get());
+        actual = IOUtils.readLines(new StringReader(sb.toString()));
+        assertEquals(expected, actual, "right aligned failed");
+
+        sb.setLength(0);
+        expected.clear();
+        expected.add("The quick");
+        expected.add("brown fox");
+        expected.add("jumps over");
+        expected.add(" the lazy");
+        expected.add("   dog");
+        styleBuilder.setAlignment(TextStyle.Alignment.CENTER);
+
+        underTest.printWrapped(text, styleBuilder.get());
+        actual = IOUtils.readLines(new StringReader(sb.toString()));
+        assertEquals(expected, actual, "center aligned failed");
+
+        sb.setLength(0);
+        expected.clear();
+        expected.add(" The quick brown fox jumps over the lazy dog");
+
+        assertEquals(1, underTest.getLeftPad(), "unexpected page left pad");
+        assertEquals(3, underTest.getIndent(), "unexpected page indent");
+        assertEquals(74, underTest.getMaxWidth(), "unexpected page width");
+        underTest.printWrapped(text);
+        actual = IOUtils.readLines(new StringReader(sb.toString()));
+        assertEquals(expected, actual, "default format aligned failed");
+
+        sb.setLength(0);
+        text += ".\nNow is the time for all good people to come to the aid of their country.";
+        expected.clear();
+        expected.add(" The quick brown fox jumps over the lazy dog.");
+        expected.add("    Now is the time for all good people to come to the aid of their");
+        expected.add("    country.");
+        underTest.printWrapped(text);
+        actual = IOUtils.readLines(new StringReader(sb.toString()));
+        assertEquals(expected, actual, "default format aligned failed");
     }
 
     @Test
-    void testPrintWrapped_CenterAlignment() throws IOException {
-        testWrappedAlignment(TextStyle.Alignment.CENTER,
-            Arrays.asList("The quick", "brown fox", "jumps over", " the lazy", "   dog"));
+    void testResize() {
+        TextStyle.Builder tsBuilder = TextStyle.builder().setIndent(2).setMaxWidth(3);
+        underTest.resize(tsBuilder, 0.5);
+        assertEquals(0, tsBuilder.getIndent());
+
+        tsBuilder = TextStyle.builder().setIndent(4).setMaxWidth(6);
+        underTest.resize(tsBuilder, 0.5);
+        assertEquals(1, tsBuilder.getIndent());
     }
 
     @Test
-    void testPrintWrapped_DefaultFormat() throws IOException {
-        // Given
-        List<String> expectedOutput = Arrays.asList(" The quick brown fox jumps over the lazy dog");
-
-        // When
-        textAppendable.printWrapped(SAMPLE_TEXT);
-
-        // Then
-        List<String> actualOutput = readOutputLines();
-        assertEquals(expectedOutput, actualOutput, "Default format should use page settings");
-        
-        // Verify default settings
-        assertEquals(1, textAppendable.getLeftPad(), "Default left pad should be 1");
-        assertEquals(3, textAppendable.getIndent(), "Default indent should be 3");
-        assertEquals(74, textAppendable.getMaxWidth(), "Default width should be 74");
+    void testResizeTableFormat() {
+        underTest.setMaxWidth(150);
+        final TableDefinition tableDefinition = TableDefinition.from("Caption",
+                Collections.singletonList(TextStyle.builder().setMinWidth(20).setMaxWidth(100).get()), Collections.singletonList("header"),
+                Collections.singletonList(Collections.singletonList("one")));
+        final TableDefinition result = underTest.adjustTableFormat(tableDefinition);
+        assertEquals(20, result.columnTextStyles().get(0).getMinWidth(), "Minimum width should not be reset");
+        assertEquals(100, result.columnTextStyles().get(0).getMaxWidth(), "Maximum width should not be reset");
     }
-
-    @Test
-    void testPrintWrapped_MultipleLines() throws IOException {
-        // Given
-        String multiLineText = SAMPLE_TEXT + ".\nNow is the time for all good people to come to the aid of their country.";
-        List<String> expectedOutput = Arrays.asList(
-            " The quick brown fox jumps over the lazy dog.",
-            "    Now is the time for all good people to come to the aid of their",
-            "    country."
-        );
-
-        // When
-        textAppendable.printWrapped(multiLineText);
-
-        // Then
-        List<String> actualOutput = readOutputLines();
-        assertEquals(expectedOutput, actualOutput, "Multiple lines should handle indentation correctly");
-    }
-
-    // ========== Resize Tests ==========
-
-    @Test
-    void testResize_HalvesValues() {
-        TextStyle.Builder builder = TextStyle.builder().setIndent(2).setMaxWidth(3);
-        
-        textAppendable.resize(builder, 0.5);
-        
-        assertEquals(0, builder.getIndent(), "Indent should be halved and rounded down");
-    }
-
-    @Test
-    void testResize_RoundsDown() {
-        TextStyle.Builder builder = TextStyle.builder().setIndent(4).setMaxWidth(6);
-        
-        textAppendable.resize(builder, 0.5);
-        
-        assertEquals(1, builder.getIndent(), "Odd numbers should round down when halved");
-    }
-
-    // ========== Setter Tests ==========
 
     @Test
     void testSetIndent() {
-        int newIndent = TextHelpAppendable.DEFAULT_INDENT + 2;
-        
-        textAppendable.setIndent(newIndent);
-        
-        assertEquals(newIndent, textAppendable.getIndent(), "Indent should be updated");
+        assertEquals(TextHelpAppendable.DEFAULT_INDENT, underTest.getIndent(), "Default indent value was changed, some tests may fail");
+        underTest.setIndent(TextHelpAppendable.DEFAULT_INDENT + 2);
+        assertEquals(underTest.getIndent(), TextHelpAppendable.DEFAULT_INDENT + 2);
     }
-
-    // ========== Column Queue Writing Tests ==========
 
     @Test
     void testWriteColumnQueues() throws IOException {
-        // Given
-        List<Queue<String>> columnQueues = createSampleColumnQueues();
-        List<TextStyle> columnStyles = createColumnQueueStyles();
-        List<String> expectedOutput = Arrays.asList(
-            " The quick      Now is the",
-            " brown fox      time for  ",
-            " jumps over     all good  ",
-            " the lazy       people to ",
-            " dog            come to   ",
-            "                the aid of",
-            "                their     ",
-            "                country   "
-        );
+        final List<Queue<String>> queues = new ArrayList<>();
 
-        // When
-        textAppendable.writeColumnQueues(columnQueues, columnStyles);
-
-        // Then
-        List<String> actualOutput = readOutputLines();
-        assertEquals(expectedOutput, actualOutput, "Column queues should be written side by side");
-    }
-
-    // ========== Helper Methods ==========
-
-    private TextStyle createTextStyle(int maxWidth, int indent, int leftPad, TextStyle.Alignment alignment) {
-        return TextStyle.builder()
-            .setMaxWidth(maxWidth)
-            .setIndent(indent)
-            .setLeftPad(leftPad)
-            .setAlignment(alignment)
-            .get();
-    }
-
-    private Queue<String> createQueue(String... items) {
         Queue<String> queue = new LinkedList<>();
-        Collections.addAll(queue, items);
-        return queue;
-    }
+        queue.add("The quick ");
+        queue.add("brown fox ");
+        queue.add("jumps over");
+        queue.add("the lazy  ");
+        queue.add("dog       ");
 
-    private void testHeaderLevel(int level, String headerText, String underlineChar) throws IOException {
-        List<String> expectedOutput = Arrays.asList(
-            " " + headerText,
-            " " + underlineChar,
-            ""
-        );
+        queues.add(queue);
 
-        outputBuffer.setLength(0);
-        textAppendable.appendHeader(level, headerText);
-        List<String> actualOutput = readOutputLines();
-        
-        assertEquals(expectedOutput, actualOutput, "Header level " + level + " should format correctly");
-    }
+        queue = new LinkedList<>();
+        queue.add("     Now is the");
+        queue.add("     time for  ");
+        queue.add("     all good  ");
+        queue.add("     people to ");
+        queue.add("     come to   ");
+        queue.add("     the aid of");
+        queue.add("     their     ");
+        queue.add("     country   ");
 
-    private void testWrappedAlignment(TextStyle.Alignment alignment, List<String> expectedLines) throws IOException {
-        TextStyle style = createTextStyle(COLUMN_WIDTH_10, NO_INDENT, NO_LEFT_PAD, alignment);
-        
-        outputBuffer.setLength(0);
-        textAppendable.printWrapped(SAMPLE_TEXT, style);
-        List<String> actualOutput = readOutputLines();
-        
-        assertEquals(expectedLines, actualOutput, alignment + " alignment should wrap correctly");
-    }
+        queues.add(queue);
 
-    private TableDefinition createSampleTable(String title) {
-        List<TextStyle> columnStyles = createSampleColumnStyles();
-        String[] headers = {"fox", "time"};
-        List<List<String>> rows = Arrays.asList(
-            Arrays.asList(
-                "The quick brown fox jumps over the lazy dog",
-                "Now is the time for all good people to come to the aid of their country"
-            ),
-            Arrays.asList(
-                "Léimeann an sionnach donn gasta thar an madra leisciúil",
-                "Anois an t-am do na daoine maithe go léir teacht i gcabhair ar a dtír"
-            )
-        );
-        
-        return TableDefinition.from(title, columnStyles, Arrays.asList(headers), rows);
-    }
+        final TextStyle.Builder styleBuilder = TextStyle.builder().setMaxWidth(10).setIndent(0).setLeftPad(0);
 
-    private List<TextStyle> createSampleColumnStyles() {
-        TextStyle.Builder styleBuilder = TextStyle.builder();
-        List<TextStyle> styles = new ArrayList<>();
-        styles.add(styleBuilder.setIndent(SMALL_INDENT).get());
-        styles.add(styleBuilder.setIndent(NO_INDENT).setLeftPad(MEDIUM_LEFT_PAD)
-            .setAlignment(TextStyle.Alignment.RIGHT).get());
-        return styles;
-    }
-
-    private List<Queue<String>> createSampleColumnQueues() {
-        List<Queue<String>> queues = new ArrayList<>();
-        
-        // First column
-        Queue<String> firstColumn = createQueue(
-            "The quick ", "brown fox ", "jumps over", "the lazy  ", "dog       "
-        );
-        queues.add(firstColumn);
-        
-        // Second column
-        Queue<String> secondColumn = createQueue(
-            "     Now is the", "     time for  ", "     all good  ", "     people to ",
-            "     come to   ", "     the aid of", "     their     ", "     country   "
-        );
-        queues.add(secondColumn);
-        
-        return queues;
-    }
-
-    private List<TextStyle> createColumnQueueStyles() {
-        TextStyle.Builder styleBuilder = TextStyle.builder().setMaxWidth(COLUMN_WIDTH_10)
-            .setIndent(NO_INDENT).setLeftPad(NO_LEFT_PAD);
-        
-        List<TextStyle> columns = new ArrayList<>();
+        final List<TextStyle> columns = new ArrayList<>();
         columns.add(styleBuilder.get());
-        columns.add(styleBuilder.setLeftPad(MEDIUM_LEFT_PAD).get());
-        return columns;
-    }
+        columns.add(styleBuilder.setLeftPad(5).get());
 
-    private List<String> readOutputLines() throws IOException {
-        return IOUtils.readLines(new StringReader(outputBuffer.toString()));
+        final List<String> expected = new ArrayList<>();
+        expected.add(" The quick      Now is the");
+        expected.add(" brown fox      time for  ");
+        expected.add(" jumps over     all good  ");
+        expected.add(" the lazy       people to ");
+        expected.add(" dog            come to   ");
+        expected.add("                the aid of");
+        expected.add("                their     ");
+        expected.add("                country   ");
+
+        sb.setLength(0);
+        underTest.writeColumnQueues(queues, columns);
+        final List<String> actual = IOUtils.readLines(new StringReader(sb.toString()));
+        assertEquals(expected, actual);
     }
 }
