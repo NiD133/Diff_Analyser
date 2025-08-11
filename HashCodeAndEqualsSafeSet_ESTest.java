@@ -23,482 +23,357 @@ import org.junit.runner.RunWith;
 import org.mockito.internal.util.collections.HashCodeAndEqualsMockWrapper;
 import org.mockito.internal.util.collections.HashCodeAndEqualsSafeSet;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class)
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true,
+    useVFS = true,
+    useVNET = true,
+    resetStaticState = true,
+    separateClassLoader = true
+)
 public class HashCodeAndEqualsSafeSet_ESTest extends HashCodeAndEqualsSafeSet_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = HashCodeAndEqualsSafeSet.of((Iterable<Object>) null);
-      LinkedHashSet<Object> linkedHashSet0 = new LinkedHashSet<Object>();
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet1 = HashCodeAndEqualsSafeSet.of((Iterable<Object>) linkedHashSet0);
-      boolean boolean0 = hashCodeAndEqualsSafeSet1.equals(hashCodeAndEqualsSafeSet0);
-      assertTrue(boolean0);
-  }
+    // Tests for basic set operations
+    @Test(timeout = 4000)
+    public void setsCreatedFromNullIterableAndEmptyCollectionShouldBeEqual() {
+        HashCodeAndEqualsSafeSet setFromNull = HashCodeAndEqualsSafeSet.of((Iterable<Object>) null);
+        LinkedHashSet<Object> emptySet = new LinkedHashSet<>();
+        HashCodeAndEqualsSafeSet setFromEmpty = HashCodeAndEqualsSafeSet.of((Iterable<Object>) emptySet);
+        
+        assertTrue(setFromEmpty.equals(setFromNull));
+    }
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      Object[] objectArray0 = new Object[0];
-      Object[] objectArray1 = hashCodeAndEqualsSafeSet0.toArray(objectArray0);
-      assertSame(objectArray1, objectArray0);
-  }
+    @Test(timeout = 4000)
+    public void toArrayShouldReturnSameEmptyArrayWhenPassedEmptyArray() {
+        HashCodeAndEqualsSafeSet set = new HashCodeAndEqualsSafeSet();
+        Object[] emptyArray = new Object[0];
+        
+        Object[] result = set.toArray(emptyArray);
+        assertSame(emptyArray, result);
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      Object object0 = new Object();
-      hashCodeAndEqualsSafeSet0.add(object0);
-      Object[] objectArray0 = hashCodeAndEqualsSafeSet0.toArray();
-      assertEquals(1, objectArray0.length);
-  }
+    @Test(timeout = 4000)
+    public void toArrayShouldReturnArrayOfCorrectSizeAfterAddingElement() {
+        HashCodeAndEqualsSafeSet set = new HashCodeAndEqualsSafeSet();
+        set.add(new Object());
+        
+        Object[] array = set.toArray();
+        assertEquals(1, array.length);
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      Object object0 = new Object();
-      hashCodeAndEqualsSafeSet0.add(object0);
-      int int0 = hashCodeAndEqualsSafeSet0.size();
-      assertEquals(1, int0);
-  }
+    @Test(timeout = 4000)
+    public void sizeShouldReflectNumberOfElementsAfterAddition() {
+        HashCodeAndEqualsSafeSet set = new HashCodeAndEqualsSafeSet();
+        set.add(new Object());
+        
+        assertEquals(1, set.size());
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      Object object0 = new Object();
-      hashCodeAndEqualsSafeSet0.add(object0);
-      ArrayDeque<HashCodeAndEqualsMockWrapper> arrayDeque0 = new ArrayDeque<HashCodeAndEqualsMockWrapper>();
-      boolean boolean0 = hashCodeAndEqualsSafeSet0.retainAll(arrayDeque0);
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void retainAllShouldRemoveElementsWhenPassedEmptyCollection() {
+        HashCodeAndEqualsSafeSet set = new HashCodeAndEqualsSafeSet();
+        Object element = new Object();
+        set.add(element);
+        Collection<HashCodeAndEqualsMockWrapper> emptyCollection = new ArrayDeque<>();
+        
+        assertTrue(set.retainAll(emptyCollection));
+        assertTrue(set.isEmpty());
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      Vector<Object> vector0 = new Vector<Object>();
-      boolean boolean0 = vector0.add((Object) null);
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = HashCodeAndEqualsSafeSet.of((Iterable<Object>) vector0);
-      boolean boolean1 = hashCodeAndEqualsSafeSet0.removeAll(vector0);
-      assertTrue(boolean1 == boolean0);
-  }
+    @Test(timeout = 4000)
+    public void removeAllShouldSucceedWhenRemovingExistingElements() {
+        Vector<Object> vector = new Vector<>();
+        vector.add(null);
+        HashCodeAndEqualsSafeSet set = HashCodeAndEqualsSafeSet.of((Iterable<Object>) vector);
+        
+        assertTrue(set.removeAll(vector));
+        assertTrue(set.isEmpty());
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      boolean boolean0 = hashCodeAndEqualsSafeSet0.removeAll(hashCodeAndEqualsSafeSet0);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void removeAllShouldReturnFalseWhenSetIsEmpty() {
+        HashCodeAndEqualsSafeSet set = new HashCodeAndEqualsSafeSet();
+        assertFalse(set.removeAll(set));
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      Object[] objectArray0 = new Object[3];
-      Object object0 = new Object();
-      objectArray0[0] = object0;
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = HashCodeAndEqualsSafeSet.of(objectArray0);
-      boolean boolean0 = hashCodeAndEqualsSafeSet0.remove(object0);
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void removeShouldReturnTrueForExistingElement() {
+        Object element = new Object();
+        Object[] elements = { element };
+        HashCodeAndEqualsSafeSet set = HashCodeAndEqualsSafeSet.of(elements);
+        
+        assertTrue(set.remove(element));
+        assertFalse(set.contains(element));
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      Object[] objectArray0 = new Object[0];
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = HashCodeAndEqualsSafeSet.of(objectArray0);
-      assertEquals(0, hashCodeAndEqualsSafeSet0.size());
-  }
+    @Test(timeout = 4000)
+    public void setCreatedFromEmptyArrayShouldBeEmpty() {
+        Object[] emptyArray = new Object[0];
+        HashCodeAndEqualsSafeSet set = HashCodeAndEqualsSafeSet.of(emptyArray);
+        
+        assertEquals(0, set.size());
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = HashCodeAndEqualsSafeSet.of((Iterable<Object>) null);
-      Iterator<Object> iterator0 = hashCodeAndEqualsSafeSet0.iterator();
-      assertNotNull(iterator0);
-  }
+    @Test(timeout = 4000)
+    public void iteratorShouldBeNonNullForSetCreatedFromNullIterable() {
+        HashCodeAndEqualsSafeSet set = HashCodeAndEqualsSafeSet.of((Iterable<Object>) null);
+        assertNotNull(set.iterator());
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      Object object0 = new Object();
-      hashCodeAndEqualsSafeSet0.add(object0);
-      boolean boolean0 = hashCodeAndEqualsSafeSet0.isEmpty();
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void isEmptyShouldReturnFalseAfterAddingElement() {
+        HashCodeAndEqualsSafeSet set = new HashCodeAndEqualsSafeSet();
+        set.add(new Object());
+        
+        assertFalse(set.isEmpty());
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      ArrayList<HashCodeAndEqualsMockWrapper> arrayList0 = new ArrayList<HashCodeAndEqualsMockWrapper>();
-      boolean boolean0 = hashCodeAndEqualsSafeSet0.containsAll(arrayList0);
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void containsAllShouldReturnTrueForEmptyCollection() {
+        HashCodeAndEqualsSafeSet set = new HashCodeAndEqualsSafeSet();
+        Collection<HashCodeAndEqualsMockWrapper> emptyCollection = new ArrayList<>();
+        
+        assertTrue(set.containsAll(emptyCollection));
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = HashCodeAndEqualsSafeSet.of((Iterable<Object>) null);
-      Object[] objectArray0 = new Object[6];
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet1 = HashCodeAndEqualsSafeSet.of(objectArray0);
-      boolean boolean0 = hashCodeAndEqualsSafeSet0.containsAll(hashCodeAndEqualsSafeSet1);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void containsAllShouldReturnFalseForNonEmptyCollectionWhenSetIsEmpty() {
+        HashCodeAndEqualsSafeSet emptySet = HashCodeAndEqualsSafeSet.of((Iterable<Object>) null);
+        Object[] nonEmptyArray = new Object[6];
+        HashCodeAndEqualsSafeSet nonEmptySet = HashCodeAndEqualsSafeSet.of(nonEmptyArray);
+        
+        assertFalse(emptySet.containsAll(nonEmptySet));
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      Object object0 = new Object();
-      List<Object> list0 = List.of(object0);
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = HashCodeAndEqualsSafeSet.of((Iterable<Object>) list0);
-      boolean boolean0 = hashCodeAndEqualsSafeSet0.contains(object0);
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void containsShouldReturnTrueForExistingElement() {
+        Object element = new Object();
+        List<Object> list = List.of(element);
+        HashCodeAndEqualsSafeSet set = HashCodeAndEqualsSafeSet.of((Iterable<Object>) list);
+        
+        assertTrue(set.contains(element));
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = HashCodeAndEqualsSafeSet.of((Iterable<Object>) null);
-      Vector<Object> vector0 = new Vector<Object>();
-      vector0.add((Object) null);
-      boolean boolean0 = hashCodeAndEqualsSafeSet0.addAll(vector0);
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void addAllShouldSucceedWhenAddingNullElement() {
+        HashCodeAndEqualsSafeSet set = HashCodeAndEqualsSafeSet.of((Iterable<Object>) null);
+        Vector<Object> vectorWithNull = new Vector<>();
+        vectorWithNull.add(null);
+        
+        assertTrue(set.addAll(vectorWithNull));
+        assertTrue(set.contains(null));
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      LinkedList<HashCodeAndEqualsMockWrapper> linkedList0 = new LinkedList<HashCodeAndEqualsMockWrapper>();
-      boolean boolean0 = hashCodeAndEqualsSafeSet0.addAll(linkedList0);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void addAllShouldReturnFalseWhenAddingEmptyCollection() {
+        HashCodeAndEqualsSafeSet set = new HashCodeAndEqualsSafeSet();
+        Collection<HashCodeAndEqualsMockWrapper> emptyCollection = new LinkedList<>();
+        
+        assertFalse(set.addAll(emptyCollection));
+    }
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      Object object0 = new Object();
-      boolean boolean0 = hashCodeAndEqualsSafeSet0.add(object0);
-      boolean boolean1 = hashCodeAndEqualsSafeSet0.add(object0);
-      assertFalse(boolean1 == boolean0);
-  }
+    @Test(timeout = 4000)
+    public void addShouldReturnFalseWhenAddingDuplicateElement() {
+        HashCodeAndEqualsSafeSet set = new HashCodeAndEqualsSafeSet();
+        Object element = new Object();
+        
+        assertTrue(set.add(element));
+        assertFalse(set.add(element));
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      HashCodeAndEqualsMockWrapper hashCodeAndEqualsMockWrapper0 = new HashCodeAndEqualsMockWrapper(hashCodeAndEqualsSafeSet0);
-      hashCodeAndEqualsSafeSet0.add(hashCodeAndEqualsMockWrapper0);
-      // Undeclared exception!
-      try { 
-        hashCodeAndEqualsSafeSet0.toString();
-        fail("Expecting exception: IllegalStateException");
-      
-      } catch(IllegalStateException e) {
-         //
-         // Could not initialize plugin: interface org.mockito.plugins.MockMaker (alternate: null)
-         //
-         verifyException("org.mockito.internal.configuration.plugins.PluginLoader$1", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void sizeOfEmptySetShouldBeZero() {
+        assertEquals(0, new HashCodeAndEqualsSafeSet().size());
+    }
 
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      // Undeclared exception!
-      try { 
-        hashCodeAndEqualsSafeSet0.toArray((HashCodeAndEqualsMockWrapper[]) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.mockito.internal.util.collections.HashCodeAndEqualsSafeSet", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void retainAllShouldReturnFalseWhenNoElementsRemoved() {
+        HashCodeAndEqualsSafeSet set = new HashCodeAndEqualsSafeSet();
+        Vector<Object> vectorWithNull = new Vector<>();
+        vectorWithNull.add(null);
+        
+        assertFalse(set.retainAll(vectorWithNull));
+    }
 
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      // Undeclared exception!
-      try { 
-        hashCodeAndEqualsSafeSet0.retainAll((Collection<?>) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Passed collection should notify() be null should not be null
-         //
-         verifyException("org.mockito.internal.util.Checks", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void equalsShouldReturnFalseWhenComparedToNull() {
+        assertFalse(new HashCodeAndEqualsSafeSet().equals(null));
+    }
 
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      HashCodeAndEqualsMockWrapper hashCodeAndEqualsMockWrapper0 = new HashCodeAndEqualsMockWrapper(hashCodeAndEqualsSafeSet0);
-      List<HashCodeAndEqualsMockWrapper> list0 = List.of(hashCodeAndEqualsMockWrapper0, hashCodeAndEqualsMockWrapper0, hashCodeAndEqualsMockWrapper0, hashCodeAndEqualsMockWrapper0, hashCodeAndEqualsMockWrapper0, hashCodeAndEqualsMockWrapper0, hashCodeAndEqualsMockWrapper0);
-      // Undeclared exception!
-      try { 
-        hashCodeAndEqualsSafeSet0.retainAll(list0);
-        fail("Expecting exception: AssertionError");
-      
-      } catch(AssertionError e) {
-         //
-         // WRONG
-         //
-      }
-  }
+    @Test(timeout = 4000)
+    public void clearShouldRemoveAllElements() {
+        HashCodeAndEqualsSafeSet set = new HashCodeAndEqualsSafeSet();
+        set.add(new Object());
+        set.clear();
+        
+        assertEquals(0, set.size());
+    }
 
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      // Undeclared exception!
-      try { 
-        hashCodeAndEqualsSafeSet0.removeAll((Collection<?>) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Passed collection should notify() be null should not be null
-         //
-         verifyException("org.mockito.internal.util.Checks", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void isEmptyShouldReturnTrueForSetCreatedFromNullIterable() {
+        assertTrue(HashCodeAndEqualsSafeSet.of((Iterable<Object>) null).isEmpty());
+    }
 
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      // Undeclared exception!
-      try { 
-        HashCodeAndEqualsSafeSet.of((Object[]) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.util.Objects", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void toStringOfEmptySetShouldReturnEmptyBrackets() {
+        assertEquals("[]", new HashCodeAndEqualsSafeSet().toString());
+    }
 
-  @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      // Undeclared exception!
-      try { 
-        hashCodeAndEqualsSafeSet0.containsAll((Collection<?>) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Passed collection should notify() be null should not be null
-         //
-         verifyException("org.mockito.internal.util.Checks", e);
-      }
-  }
+    // Tests for special case handling
+    @Test(timeout = 4000)
+    public void removeIfShouldRemoveElementsMatchingPredicate() {
+        Object[] elements = new Object[14]; // Contains nulls
+        HashCodeAndEqualsSafeSet set = HashCodeAndEqualsSafeSet.of(elements);
+        Predicate<Object> isNullPredicate = Predicate.isEqual(null);
+        
+        assertTrue(set.removeIf(isNullPredicate));
+        assertFalse(set.contains(null));
+    }
 
-  @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      LinkedList<HashCodeAndEqualsMockWrapper> linkedList0 = new LinkedList<HashCodeAndEqualsMockWrapper>();
-      HashCodeAndEqualsMockWrapper hashCodeAndEqualsMockWrapper0 = HashCodeAndEqualsMockWrapper.of(linkedList0);
-      linkedList0.add(hashCodeAndEqualsMockWrapper0);
-      // Undeclared exception!
-      try { 
-        hashCodeAndEqualsSafeSet0.addAll(linkedList0);
-        fail("Expecting exception: AssertionError");
-      
-      } catch(AssertionError e) {
-         //
-         // WRONG
-         //
-      }
-  }
+    @Test(timeout = 4000)
+    public void toArrayShouldHandleInsufficientCapacityByCreatingNewArray() {
+        HashCodeAndEqualsSafeSet emptySet = new HashCodeAndEqualsSafeSet();
+        Object[] smallArray = new Object[0];
+        
+        Vector<Object> vectorWithNull = new Vector<>();
+        vectorWithNull.add(null);
+        HashCodeAndEqualsSafeSet setWithNull = HashCodeAndEqualsSafeSet.of((Iterable<Object>) vectorWithNull);
+        
+        Object[] result = setWithNull.toArray(smallArray);
+        assertEquals(1, result.length);
+    }
 
-  @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      int int0 = hashCodeAndEqualsSafeSet0.size();
-      assertEquals(0, int0);
-  }
+    @Test(timeout = 4000)
+    public void removeShouldReturnFalseForNonExistentWrapper() {
+        HashCodeAndEqualsSafeSet set = new HashCodeAndEqualsSafeSet();
+        Predicate<Object> predicate = Predicate.isEqual(set);
+        HashCodeAndEqualsMockWrapper wrapper = HashCodeAndEqualsMockWrapper.of(predicate);
+        
+        assertFalse(set.remove(wrapper));
+    }
 
-  @Test(timeout = 4000)
-  public void test26()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      Object object0 = new Object();
-      hashCodeAndEqualsSafeSet0.add(object0);
-      HashCodeAndEqualsMockWrapper[] hashCodeAndEqualsMockWrapperArray0 = new HashCodeAndEqualsMockWrapper[4];
-      // Undeclared exception!
-      try { 
-        hashCodeAndEqualsSafeSet0.toArray(hashCodeAndEqualsMockWrapperArray0);
-        fail("Expecting exception: ArrayStoreException");
-      
-      } catch(ArrayStoreException e) {
-         //
-         // java.lang.Object
-         //
-         verifyException("org.mockito.internal.util.collections.HashCodeAndEqualsSafeSet", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void containsShouldReturnFalseForNonExistentElement() {
+        assertFalse(new HashCodeAndEqualsSafeSet().contains("non-existent"));
+    }
 
-  @Test(timeout = 4000)
-  public void test27()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      Vector<Object> vector0 = new Vector<Object>();
-      vector0.add((Object) null);
-      boolean boolean0 = hashCodeAndEqualsSafeSet0.retainAll(vector0);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void hashCodeShouldNotThrowForSetCreatedFromNullIterable() {
+        HashCodeAndEqualsSafeSet set = HashCodeAndEqualsSafeSet.of((Iterable<Object>) null);
+        set.hashCode(); // Should not throw
+    }
 
-  @Test(timeout = 4000)
-  public void test28()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      HashCodeAndEqualsMockWrapper[] hashCodeAndEqualsMockWrapperArray0 = new HashCodeAndEqualsMockWrapper[6];
-      HashCodeAndEqualsMockWrapper[] hashCodeAndEqualsMockWrapperArray1 = hashCodeAndEqualsSafeSet0.toArray(hashCodeAndEqualsMockWrapperArray0);
-      assertEquals(6, hashCodeAndEqualsMockWrapperArray1.length);
-  }
+    // Tests for exception scenarios
+    @Test(timeout = 4000)
+    public void toStringShouldThrowWhenSetContainsSelfWrapper() {
+        HashCodeAndEqualsSafeSet set = new HashCodeAndEqualsSafeSet();
+        set.add(new HashCodeAndEqualsMockWrapper(set));
+        
+        try {
+            set.toString();
+            fail("Expected IllegalStateException due to plugin initialization failure");
+        } catch (IllegalStateException e) {
+            assertTrue(e.getMessage().contains("Could not initialize plugin"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test29()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      boolean boolean0 = hashCodeAndEqualsSafeSet0.equals((Object) null);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void toArrayShouldThrowNPEWhenPassedNullArray() {
+        try {
+            new HashCodeAndEqualsSafeSet().toArray((HashCodeAndEqualsMockWrapper[]) null);
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test30()  throws Throwable  {
-      Object[] objectArray0 = new Object[14];
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = HashCodeAndEqualsSafeSet.of(objectArray0);
-      Predicate<Object> predicate0 = Predicate.isEqual((Object) null);
-      boolean boolean0 = hashCodeAndEqualsSafeSet0.removeIf(predicate0);
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void retainAllShouldThrowIAEWhenPassedNullCollection() {
+        try {
+            new HashCodeAndEqualsSafeSet().retainAll(null);
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            assertTrue(e.getMessage().contains("should not be null"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test31()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      Vector<Object> vector0 = new Vector<Object>();
-      vector0.add((Object) null);
-      Object[] objectArray0 = hashCodeAndEqualsSafeSet0.toArray();
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet1 = HashCodeAndEqualsSafeSet.of((Iterable<Object>) vector0);
-      Object[] objectArray1 = hashCodeAndEqualsSafeSet1.toArray(objectArray0);
-      assertEquals(1, objectArray1.length);
-  }
+    @Test(timeout = 4000)
+    public void removeAllShouldThrowIAEWhenPassedNullCollection() {
+        try {
+            new HashCodeAndEqualsSafeSet().removeAll(null);
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            assertTrue(e.getMessage().contains("should not be null"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test32()  throws Throwable  {
-      Object[] objectArray0 = new Object[1];
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = HashCodeAndEqualsSafeSet.of(objectArray0);
-      try { 
-        hashCodeAndEqualsSafeSet0.clone();
-        fail("Expecting exception: CloneNotSupportedException");
-      
-      } catch(CloneNotSupportedException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.mockito.internal.util.collections.HashCodeAndEqualsSafeSet", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void ofShouldThrowNPEWhenPassedNullArray() {
+        try {
+            HashCodeAndEqualsSafeSet.of((Object[]) null);
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test33()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      Predicate<Object> predicate0 = Predicate.isEqual((Object) hashCodeAndEqualsSafeSet0);
-      HashCodeAndEqualsMockWrapper hashCodeAndEqualsMockWrapper0 = HashCodeAndEqualsMockWrapper.of(predicate0);
-      boolean boolean0 = hashCodeAndEqualsSafeSet0.remove(hashCodeAndEqualsMockWrapper0);
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void containsAllShouldThrowIAEWhenPassedNullCollection() {
+        try {
+            new HashCodeAndEqualsSafeSet().containsAll(null);
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            assertTrue(e.getMessage().contains("should not be null"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test34()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      boolean boolean0 = hashCodeAndEqualsSafeSet0.contains("[]");
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void addAllShouldThrowIAEWhenPassedNullCollection() {
+        try {
+            new HashCodeAndEqualsSafeSet().addAll(null);
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            assertTrue(e.getMessage().contains("should not be null"));
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test35()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      String string0 = hashCodeAndEqualsSafeSet0.toString();
-      assertEquals("[]", string0);
-  }
+    @Test(timeout = 4000)
+    public void toArrayShouldThrowArrayStoreWhenPassedIncompatibleType() {
+        HashCodeAndEqualsSafeSet set = new HashCodeAndEqualsSafeSet();
+        set.add(new Object());
+        HashCodeAndEqualsMockWrapper[] wrongTypeArray = new HashCodeAndEqualsMockWrapper[4];
+        
+        try {
+            set.toArray(wrongTypeArray);
+            fail("Expected ArrayStoreException");
+        } catch (ArrayStoreException e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test36()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = HashCodeAndEqualsSafeSet.of((Iterable<Object>) null);
-      hashCodeAndEqualsSafeSet0.hashCode();
-  }
+    @Test(timeout = 4000)
+    public void cloneShouldThrowCloneNotSupportedException() {
+        Object[] elements = new Object[1];
+        HashCodeAndEqualsSafeSet set = HashCodeAndEqualsSafeSet.of(elements);
+        
+        try {
+            set.clone();
+            fail("Expected CloneNotSupportedException");
+        } catch (CloneNotSupportedException e) {
+            // Expected behavior
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test37()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      Object object0 = new Object();
-      HashCodeAndEqualsMockWrapper hashCodeAndEqualsMockWrapper0 = HashCodeAndEqualsMockWrapper.of(object0);
-      List<HashCodeAndEqualsMockWrapper> list0 = List.of(hashCodeAndEqualsMockWrapper0, hashCodeAndEqualsMockWrapper0, hashCodeAndEqualsMockWrapper0, hashCodeAndEqualsMockWrapper0);
-      // Undeclared exception!
-      try { 
-        hashCodeAndEqualsSafeSet0.removeAll(list0);
-        fail("Expecting exception: AssertionError");
-      
-      } catch(AssertionError e) {
-         //
-         // WRONG
-         //
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test38()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = HashCodeAndEqualsSafeSet.of((Iterable<Object>) null);
-      boolean boolean0 = hashCodeAndEqualsSafeSet0.isEmpty();
-      assertTrue(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test39()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      // Undeclared exception!
-      try { 
-        hashCodeAndEqualsSafeSet0.addAll((Collection<?>) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Passed collection should notify() be null should not be null
-         //
-         verifyException("org.mockito.internal.util.Checks", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test40()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      Object object0 = new Object();
-      HashCodeAndEqualsMockWrapper hashCodeAndEqualsMockWrapper0 = HashCodeAndEqualsMockWrapper.of(object0);
-      List<HashCodeAndEqualsMockWrapper> list0 = List.of(hashCodeAndEqualsMockWrapper0, hashCodeAndEqualsMockWrapper0, hashCodeAndEqualsMockWrapper0, hashCodeAndEqualsMockWrapper0, hashCodeAndEqualsMockWrapper0, hashCodeAndEqualsMockWrapper0, hashCodeAndEqualsMockWrapper0, hashCodeAndEqualsMockWrapper0, hashCodeAndEqualsMockWrapper0);
-      // Undeclared exception!
-      try { 
-        hashCodeAndEqualsSafeSet0.containsAll(list0);
-        fail("Expecting exception: AssertionError");
-      
-      } catch(AssertionError e) {
-         //
-         // WRONG
-         //
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test41()  throws Throwable  {
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-      hashCodeAndEqualsSafeSet0.clear();
-      assertEquals(0, hashCodeAndEqualsSafeSet0.size());
-  }
-
-  @Test(timeout = 4000)
-  public void test42()  throws Throwable  {
-      Object[] objectArray0 = new Object[2];
-      HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = HashCodeAndEqualsSafeSet.of(objectArray0);
-      // Undeclared exception!
-      try { 
-        hashCodeAndEqualsSafeSet0.toString();
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.mockito.internal.util.collections.HashCodeAndEqualsMockWrapper", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void toStringShouldThrowNPEWhenContainingUninitializedElement() {
+        Object[] elements = new Object[2]; // Contains nulls
+        HashCodeAndEqualsSafeSet set = HashCodeAndEqualsSafeSet.of(elements);
+        
+        try {
+            set.toString();
+            fail("Expected NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected behavior
+        }
+    }
 }
