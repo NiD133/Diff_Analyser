@@ -25,53 +25,83 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests for {@link org.apache.commons.lang3.text.translate.NumericEntityUnescaper}.
+ * 
+ * NumericEntityUnescaper translates XML numeric entities (like &#65; or &#x41;) 
+ * back to their corresponding characters.
  */
 @Deprecated
 class NumericEntityUnescaperTest extends AbstractLangTest {
 
-    @Test
-    void testOutOfBounds() {
-        final NumericEntityUnescaper neu = new NumericEntityUnescaper();
+    // Test data constants for better maintainability
+    private static final String SAMPLE_TEXT_PREFIX = "Test ";
+    private static final String HEX_ENTITY_48_INCOMPLETE = "&#x30";
+    private static final String EXPECTED_CHAR_48 = "\u0030"; // Character '0'
+    private static final String SUPPLEMENTARY_ENTITY = "&#68642;";
+    private static final String SUPPLEMENTARY_CHAR = "\uD803\uDC22"; // Unicode supplementary character
 
-        assertEquals("Test &", neu.translate("Test &"), "Failed to ignore when last character is &");
-        assertEquals("Test &#", neu.translate("Test &#"), "Failed to ignore when last character is &");
-        assertEquals("Test &#x", neu.translate("Test &#x"), "Failed to ignore when last character is &");
-        assertEquals("Test &#X", neu.translate("Test &#X"), "Failed to ignore when last character is &");
+    @Test
+    void testIgnoresIncompleteEntitiesAtEndOfString() {
+        final NumericEntityUnescaper unescaper = new NumericEntityUnescaper();
+
+        // Test various incomplete entity patterns at string end
+        assertEntityIgnored(unescaper, "Test &", "single ampersand at end");
+        assertEntityIgnored(unescaper, "Test &#", "incomplete decimal entity at end");
+        assertEntityIgnored(unescaper, "Test &#x", "incomplete hex entity (lowercase) at end");
+        assertEntityIgnored(unescaper, "Test &#X", "incomplete hex entity (uppercase) at end");
     }
 
     @Test
-    void testSupplementaryUnescaping() {
-        final NumericEntityUnescaper neu = new NumericEntityUnescaper();
-        final String input = "&#68642;";
-        final String expected = "\uD803\uDC22";
-
-        final String result = neu.translate(input);
-        assertEquals(expected, result, "Failed to unescape numeric entities supplementary characters");
+    void testUnescapesSupplementaryUnicodeCharacters() {
+        final NumericEntityUnescaper unescaper = new NumericEntityUnescaper();
+        
+        String actualResult = unescaper.translate(SUPPLEMENTARY_ENTITY);
+        
+        assertEquals(SUPPLEMENTARY_CHAR, actualResult, 
+            "Should correctly unescape numeric entities representing supplementary Unicode characters");
     }
 
     @Test
-    void testUnfinishedEntity() {
-        // parse it
-        NumericEntityUnescaper neu = new NumericEntityUnescaper(NumericEntityUnescaper.OPTION.semiColonOptional);
-        String input = "Test &#x30 not test";
-        String expected = "Test \u0030 not test";
+    void testHandlesEntitiesMissingSemicolon() {
+        String inputWithMissingSemicolon = SAMPLE_TEXT_PREFIX + HEX_ENTITY_48_INCOMPLETE + " not test";
+        String expectedWhenParsed = SAMPLE_TEXT_PREFIX + EXPECTED_CHAR_48 + " not test";
 
-        String result = neu.translate(input);
-        assertEquals(expected, result, "Failed to support unfinished entities (i.e. missing semicolon)");
-
-        // ignore it
-        neu = new NumericEntityUnescaper();
-        input = "Test &#x30 not test";
-        expected = input;
-
-        result = neu.translate(input);
-        assertEquals(expected, result, "Failed to ignore unfinished entities (i.e. missing semicolon)");
-
-        // fail it
-        final NumericEntityUnescaper failingNeu =
-                new NumericEntityUnescaper(NumericEntityUnescaper.OPTION.errorIfNoSemiColon);
-        final String failingInput = "Test &#x30 not test";
-        assertIllegalArgumentException(() -> failingNeu.translate(failingInput));
+        testSemicolonOptionalBehavior(inputWithMissingSemicolon, expectedWhenParsed);
+        testDefaultIgnoreBehavior(inputWithMissingSemicolon);
+        testErrorOnMissingSemicolonBehavior(inputWithMissingSemicolon);
     }
 
+    private void testSemicolonOptionalBehavior(String input, String expected) {
+        NumericEntityUnescaper unescaper = new NumericEntityUnescaper(
+            NumericEntityUnescaper.OPTION.semiColonOptional);
+        
+        String result = unescaper.translate(input);
+        
+        assertEquals(expected, result, 
+            "With semiColonOptional, should parse entities even when semicolon is missing");
+    }
+
+    private void testDefaultIgnoreBehavior(String input) {
+        NumericEntityUnescaper unescaper = new NumericEntityUnescaper();
+        
+        String result = unescaper.translate(input);
+        
+        assertEquals(input, result, 
+            "By default, should ignore entities with missing semicolons (leave unchanged)");
+    }
+
+    private void testErrorOnMissingSemicolonBehavior(String input) {
+        final NumericEntityUnescaper strictUnescaper = new NumericEntityUnescaper(
+            NumericEntityUnescaper.OPTION.errorIfNoSemiColon);
+        
+        assertIllegalArgumentException(() -> strictUnescaper.translate(input),
+            "With errorIfNoSemiColon option, should throw exception when semicolon is missing");
+    }
+
+    /**
+     * Helper method to assert that an entity pattern is ignored (left unchanged).
+     */
+    private void assertEntityIgnored(NumericEntityUnescaper unescaper, String input, String scenario) {
+        String result = unescaper.translate(input);
+        assertEquals(input, result, "Should ignore " + scenario);
+    }
 }
