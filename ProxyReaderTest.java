@@ -16,8 +16,6 @@
  */
 package org.apache.commons.io.input;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.CharBuffer;
@@ -25,89 +23,46 @@ import java.nio.CharBuffer;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests {@link ProxyReader} to ensure it properly delegates method calls
- * to the underlying Reader and handles null parameters correctly.
+ * Tests {@link ProxyReader}.
  */
 class ProxyReaderTest {
 
-    /**
-     * A custom NullReader that handles null parameters gracefully.
-     * This is used to test ProxyReader's delegation behavior with null inputs.
-     */
-    private static final class NullParameterHandlingReader extends NullReader {
-        
-        NullParameterHandlingReader(final int length) {
-            super(length);
+    /** Custom NullReader implementation. */
+    private static final class CustomNullReader extends NullReader {
+        CustomNullReader(final int len) {
+            super(len);
         }
 
-        /**
-         * Returns 0 when char array is null, otherwise delegates to parent.
-         */
         @Override
         public int read(final char[] chars) throws IOException {
             return chars == null ? 0 : super.read(chars);
         }
 
-        /**
-         * Returns 0 when CharBuffer is null, otherwise delegates to parent.
-         */
         @Override
         public int read(final CharBuffer target) throws IOException {
             return target == null ? 0 : super.read(target);
         }
     }
 
-    /**
-     * Concrete implementation of ProxyReader for testing purposes.
-     * Simply delegates all calls to the underlying Reader without modification.
-     */
-    private static final class TestableProxyReader extends ProxyReader {
-        
-        TestableProxyReader(final Reader underlyingReader) {
-            super(underlyingReader);
+    /** ProxyReader implementation. */
+    private static final class ProxyReaderImpl extends ProxyReader {
+        ProxyReaderImpl(final Reader proxy) {
+            super(proxy);
         }
     }
 
-    /**
-     * Tests that ProxyReader correctly delegates read operations with null char arrays
-     * to the underlying Reader. This verifies that the proxy doesn't interfere with
-     * null parameter handling.
-     */
     @Test
-    void shouldDelegateReadOperationsWithNullCharArrayToUnderlyingReader() throws Exception {
-        // Given: A ProxyReader wrapping a reader that handles null char arrays
-        final Reader underlyingReader = new NullParameterHandlingReader(0);
-        
-        try (ProxyReader proxyReader = new TestableProxyReader(underlyingReader)) {
-            // When: Reading with null char array parameters
-            int resultFromNullArray = proxyReader.read((char[]) null);
-            int resultFromNullArrayWithOffsets = proxyReader.read(null, 0, 0);
-            
-            // Then: The underlying reader's behavior is preserved (returns 0 for null)
-            assertEquals(0, resultFromNullArray, 
-                "ProxyReader should delegate null char array handling to underlying reader");
-            assertEquals(0, resultFromNullArrayWithOffsets, 
-                "ProxyReader should delegate null char array with offsets handling to underlying reader");
+    void testNullCharArray() throws Exception {
+        try (ProxyReader proxy = new ProxyReaderImpl(new CustomNullReader(0))) {
+            proxy.read((char[]) null);
+            proxy.read(null, 0, 0);
         }
     }
 
-    /**
-     * Tests that ProxyReader correctly delegates read operations with null CharBuffer
-     * to the underlying Reader. This ensures the proxy pattern works correctly
-     * for all read method variants.
-     */
     @Test
-    void shouldDelegateReadOperationsWithNullCharBufferToUnderlyingReader() throws Exception {
-        // Given: A ProxyReader wrapping a reader that handles null CharBuffers
-        final Reader underlyingReader = new NullParameterHandlingReader(0);
-        
-        try (ProxyReader proxyReader = new TestableProxyReader(underlyingReader)) {
-            // When: Reading with null CharBuffer
-            int result = proxyReader.read((CharBuffer) null);
-            
-            // Then: The underlying reader's behavior is preserved (returns 0 for null)
-            assertEquals(0, result, 
-                "ProxyReader should delegate null CharBuffer handling to underlying reader");
+    void testNullCharBuffer() throws Exception {
+        try (ProxyReader proxy = new ProxyReaderImpl(new CustomNullReader(0))) {
+            proxy.read((CharBuffer) null);
         }
     }
 }
