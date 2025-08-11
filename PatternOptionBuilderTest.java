@@ -38,135 +38,279 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test case for the PatternOptionBuilder class.
+ * 
+ * Pattern syntax reference:
+ * - Plain letter (e.g., 'a') = boolean flag
+ * - Letter + ':' (e.g., 'a:') = string value
+ * - Letter + '@' (e.g., 'b@') = object instance
+ * - Letter + '+' (e.g., 'c+') = class type
+ * - Letter + '%' (e.g., 'd%') = number value
+ * - Letter + '/' (e.g., 'e/') = URL value
+ * - Letter + '>' (e.g., 'f>') = file value
+ * - Letter + '<' (e.g., 'g<') = existing file input stream
+ * - Letter + '#' (e.g., 'h#') = date value
+ * - Letter + '*' (e.g., 'i*') = file array (unsupported)
+ * - '!' prefix = required option
  */
 @SuppressWarnings("deprecation") // tests some deprecated classes
 class PatternOptionBuilderTest {
 
+    private static final String EXISTING_TEST_FILE = "src/test/resources/org/apache/commons/cli/existing-readable.file";
+    private static final String NON_EXISTING_FILE = "non-existing.file";
+    private static final String VALID_URL = "https://commons.apache.org";
+    private static final String INVALID_URL = "foo://commons.apache.org";
+    private static final String VALID_CLASS_NAME = "java.util.Calendar";
+    private static final String INVALID_CLASS_NAME = "System.DateTime";
+
     @Test
-    void testClassPattern() throws Exception {
-        final Options options = PatternOptionBuilder.parsePattern("c+d+");
+    void testEmptyPattern_ShouldCreateEmptyOptions() {
+        // Given: An empty pattern string
+        final String emptyPattern = "";
+        
+        // When: Parsing the empty pattern
+        final Options optionsFromEmptyPattern = PatternOptionBuilder.parsePattern(emptyPattern);
+        
+        // Then: Should create options with no defined options
+        assertTrue(optionsFromEmptyPattern.getOptions().isEmpty());
+    }
+
+    @Test
+    void testUntypedPattern_ShouldCreateBooleanFlags() throws Exception {
+        // Given: A pattern with plain letters (boolean flags)
+        final String booleanFlagsPattern = "abc";
+        final String[] commandLineArgs = {"-abc"};
+        
+        // When: Parsing options and command line
+        final Options optionsWithBooleanFlags = PatternOptionBuilder.parsePattern(booleanFlagsPattern);
         final CommandLineParser parser = new PosixParser();
-        final CommandLine line = parser.parse(options, new String[] {"-c", "java.util.Calendar", "-d", "System.DateTime"});
-        assertEquals(Calendar.class, line.getOptionObject("c"), "c value");
-        assertNull(line.getOptionObject("d"), "d value");
+        final CommandLine parsedCommandLine = parser.parse(optionsWithBooleanFlags, commandLineArgs);
+        
+        // Then: All flags should be present but have no values
+        assertTrue(parsedCommandLine.hasOption('a'));
+        assertNull(parsedCommandLine.getOptionObject('a'), "Boolean flag 'a' should have no value");
+        
+        assertTrue(parsedCommandLine.hasOption('b'));
+        assertNull(parsedCommandLine.getOptionObject('b'), "Boolean flag 'b' should have no value");
+        
+        assertTrue(parsedCommandLine.hasOption('c'));
+        assertNull(parsedCommandLine.getOptionObject('c'), "Boolean flag 'c' should have no value");
     }
 
     @Test
-    void testEmptyPattern() {
-        final Options options = PatternOptionBuilder.parsePattern("");
-        assertTrue(options.getOptions().isEmpty());
-    }
-
-    @Test
-    void testExistingFilePattern() throws Exception {
-        final Options options = PatternOptionBuilder.parsePattern("g<");
+    void testClassPattern_WithValidAndInvalidClassNames() throws Exception {
+        // Given: A pattern expecting class types (+ suffix)
+        final String classTypePattern = "c+d+";
+        final String[] argsWithValidAndInvalidClasses = {
+            "-c", VALID_CLASS_NAME,     // java.util.Calendar - valid class
+            "-d", INVALID_CLASS_NAME    // System.DateTime - invalid class
+        };
+        
+        // When: Parsing the command line
+        final Options optionsExpectingClasses = PatternOptionBuilder.parsePattern(classTypePattern);
         final CommandLineParser parser = new PosixParser();
-        final CommandLine line = parser.parse(options, new String[] {"-g", "src/test/resources/org/apache/commons/cli/existing-readable.file"});
-        final Object parsedReadableFileStream = line.getOptionObject("g");
-        assertNotNull(parsedReadableFileStream, "option g not parsed");
-        assertInstanceOf(FileInputStream.class, parsedReadableFileStream, "option g not FileInputStream");
+        final CommandLine parsedLine = parser.parse(optionsExpectingClasses, argsWithValidAndInvalidClasses);
+        
+        // Then: Valid class should be parsed, invalid should be null
+        assertEquals(Calendar.class, parsedLine.getOptionObject("c"), "Valid class name should be parsed to Class object");
+        assertNull(parsedLine.getOptionObject("d"), "Invalid class name should result in null");
     }
 
     @Test
-    void testExistingFilePatternFileNotExist() throws Exception {
-        final Options options = PatternOptionBuilder.parsePattern("f<");
+    void testNumberPattern_WithValidAndInvalidNumbers() throws Exception {
+        // Given: A pattern expecting number values (% suffix)
+        final String numberValuesPattern = "n%d%x%";
+        final String[] argsWithMixedNumbers = {
+            "-n", "1",      // Valid integer
+            "-d", "2.1",    // Valid decimal
+            "-x", "3,5"     // Invalid number format (comma instead of dot)
+        };
+        
+        // When: Parsing the command line
+        final Options optionsExpectingNumbers = PatternOptionBuilder.parsePattern(numberValuesPattern);
         final CommandLineParser parser = new PosixParser();
-        final CommandLine line = parser.parse(options, new String[] {"-f", "non-existing.file"});
-        assertNull(line.getOptionObject("f"), "option f parsed");
+        final CommandLine parsedNumbers = parser.parse(optionsExpectingNumbers, argsWithMixedNumbers);
+        
+        // Then: Valid numbers should be parsed with correct types, invalid should be null
+        assertEquals(Long.class, parsedNumbers.getOptionObject("n").getClass(), "Integer should be parsed as Long");
+        assertEquals(Long.valueOf(1), parsedNumbers.getOptionObject("n"), "Integer value should be correct");
+        
+        assertEquals(Double.class, parsedNumbers.getOptionObject("d").getClass(), "Decimal should be parsed as Double");
+        assertEquals(Double.valueOf(2.1), parsedNumbers.getOptionObject("d"), "Decimal value should be correct");
+        
+        assertNull(parsedNumbers.getOptionObject("x"), "Invalid number format should result in null");
     }
 
     @Test
-    void testNumberPattern() throws Exception {
-        final Options options = PatternOptionBuilder.parsePattern("n%d%x%");
+    void testObjectPattern_WithClassInstantiation() throws Exception {
+        // Given: A pattern expecting object instances (@ suffix)
+        final String objectInstancePattern = "o@i@n@";
+        final String[] argsWithClassNames = {
+            "-o", "java.lang.String",   // Should create empty String instance
+            "-i", VALID_CLASS_NAME,     // Should fail to create Calendar instance (no empty constructor)
+            "-n", INVALID_CLASS_NAME    // Should fail with invalid class name
+        };
+        
+        // When: Parsing the command line
+        final Options optionsExpectingObjects = PatternOptionBuilder.parsePattern(objectInstancePattern);
         final CommandLineParser parser = new PosixParser();
-        // 3,5 fails validation.
-        //assertThrows(ParseException.class, () -> parser.parse(options, new String[] {"-n", "1", "-d", "2.1", "-x", "3,5"}));
-        final CommandLine line = parser.parse(options, new String[] {"-n", "1", "-d", "2.1", "-x", "3,5"});
-        assertEquals(Long.class, line.getOptionObject("n").getClass(), "n object class");
-        assertEquals(Long.valueOf(1), line.getOptionObject("n"), "n value");
-        assertEquals(Double.class, line.getOptionObject("d").getClass(), "d object class");
-        assertEquals(Double.valueOf(2.1), line.getOptionObject("d"), "d value");
-        assertNull(line.getOptionObject("x"), "x object");
+        final CommandLine parsedObjects = parser.parse(optionsExpectingObjects, argsWithClassNames);
+        
+        // Then: Only classes with empty constructors should be instantiated
+        assertEquals("", parsedObjects.getOptionObject("o"), "String should be instantiated as empty string");
+        assertNull(parsedObjects.getOptionObject("i"), "Calendar cannot be instantiated via empty constructor");
+        assertNull(parsedObjects.getOptionObject("n"), "Invalid class name should result in null");
     }
 
     @Test
-    void testObjectPattern() throws Exception {
-        final Options options = PatternOptionBuilder.parsePattern("o@i@n@");
+    void testURLPattern_WithValidAndInvalidURLs() throws Exception {
+        // Given: A pattern expecting URL values (/ suffix)
+        final String urlValuesPattern = "u/v/";
+        final String[] argsWithMixedUrls = {
+            "-u", VALID_URL,    // Valid HTTPS URL
+            "-v", INVALID_URL   // Invalid protocol
+        };
+        
+        // When: Parsing the command line
+        final Options optionsExpectingUrls = PatternOptionBuilder.parsePattern(urlValuesPattern);
         final CommandLineParser parser = new PosixParser();
-        final CommandLine line = parser.parse(options, new String[] {"-o", "java.lang.String", "-i", "java.util.Calendar", "-n", "System.DateTime"});
-        assertEquals("", line.getOptionObject("o"), "o value");
-        assertNull(line.getOptionObject("i"), "i value");
-        assertNull(line.getOptionObject("n"), "n value");
+        final CommandLine parsedUrls = parser.parse(optionsExpectingUrls, argsWithMixedUrls);
+        
+        // Then: Valid URL should be parsed, invalid should be null
+        assertEquals(new URL(VALID_URL), parsedUrls.getOptionObject("u"), "Valid URL should be parsed correctly");
+        assertNull(parsedUrls.getOptionObject("v"), "Invalid URL should result in null");
     }
 
     @Test
-    void testRequiredOption() throws Exception {
-        final Options options = PatternOptionBuilder.parsePattern("!n%m%");
+    void testExistingFilePattern_WithExistingFile() throws Exception {
+        // Given: A pattern expecting existing file input streams (< suffix)
+        final String existingFilePattern = "g<";
+        final String[] argsWithExistingFile = {"-g", EXISTING_TEST_FILE};
+        
+        // When: Parsing the command line
+        final Options optionsExpectingExistingFile = PatternOptionBuilder.parsePattern(existingFilePattern);
         final CommandLineParser parser = new PosixParser();
-        final MissingOptionException e = assertThrows(MissingOptionException.class, () -> parser.parse(options, new String[] { "" }));
-        assertEquals(1, e.getMissingOptions().size());
-        assertTrue(e.getMissingOptions().contains("n"));
+        final CommandLine parsedExistingFile = parser.parse(optionsExpectingExistingFile, argsWithExistingFile);
+        
+        // Then: Should create FileInputStream for existing file
+        final Object parsedFileStream = parsedExistingFile.getOptionObject("g");
+        assertNotNull(parsedFileStream, "Existing file should be parsed");
+        assertInstanceOf(FileInputStream.class, parsedFileStream, "Should create FileInputStream for existing file");
     }
 
     @Test
-    void testSimplePattern() throws Exception {
+    void testExistingFilePattern_WithNonExistentFile() throws Exception {
+        // Given: A pattern expecting existing file but file doesn't exist
+        final String existingFilePattern = "f<";
+        final String[] argsWithNonExistentFile = {"-f", NON_EXISTING_FILE};
+        
+        // When: Parsing the command line
+        final Options optionsExpectingExistingFile = PatternOptionBuilder.parsePattern(existingFilePattern);
+        final CommandLineParser parser = new PosixParser();
+        final CommandLine parsedNonExistentFile = parser.parse(optionsExpectingExistingFile, argsWithNonExistentFile);
+        
+        // Then: Should return null for non-existent file
+        assertNull(parsedNonExistentFile.getOptionObject("f"), "Non-existent file should result in null");
+    }
+
+    @Test
+    void testRequiredOption_ShouldThrowExceptionWhenMissing() throws Exception {
+        // Given: A pattern with required options (! prefix)
+        final String requiredOptionsPattern = "!n%m%";  // 'n' is required, 'm' is optional
+        final String[] argsWithoutRequiredOption = {""};
+        
+        // When: Parsing without providing required option
+        final Options optionsWithRequiredOption = PatternOptionBuilder.parsePattern(requiredOptionsPattern);
+        final CommandLineParser parser = new PosixParser();
+        
+        // Then: Should throw MissingOptionException
+        final MissingOptionException exception = assertThrows(MissingOptionException.class, 
+            () -> parser.parse(optionsWithRequiredOption, argsWithoutRequiredOption));
+        
+        assertEquals(1, exception.getMissingOptions().size());
+        assertTrue(exception.getMissingOptions().contains("n"), "Should report 'n' as missing required option");
+    }
+
+    @Test
+    void testComplexPattern_WithAllOptionTypes() throws Exception {
+        // Given: A complex pattern with multiple option types
         /*
-         * Dates calculated from strings are dependent upon configuration and environment settings for the
-         * machine on which the test is running.  To avoid this problem, convert the time into a string
-         * and then unparse that using the converter.  This produces strings that always match the correct
-         * time zone.
+         * Pattern breakdown:
+         * a: = string value
+         * b@ = object instance  
+         * c = boolean flag
+         * d = boolean flag
+         * e> = file value
+         * f+ = class type
+         * n% = number value
+         * t/ = URL value
+         * m* = file array (unsupported)
+         * z# = date value
          */
-        final Options options = PatternOptionBuilder.parsePattern("a:b@cde>f+n%t/m*z#");
+        final String complexPattern = "a:b@cde>f+n%t/m*z#";
+        
+        // Prepare date for testing (avoid timezone issues by formatting and parsing)
         final Date expectedDate = new Date(1023400137000L);
         final DateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-        final String[] args = {"-c", "-a", "foo", "-b", "java.util.Vector", "-e", "build.xml", "-f", "java.util.Calendar", "-n", "4.5", "-t",
-            "https://commons.apache.org", "-z", dateFormat.format(expectedDate), "-m", "test*"};
+        
+        final String[] complexArgs = {
+            "-c",                                           // Boolean flag
+            "-a", "foo",                                    // String value
+            "-b", "java.util.Vector",                       // Object instance
+            "-e", "build.xml",                              // File value
+            "-f", VALID_CLASS_NAME,                         // Class type
+            "-n", "4.5",                                    // Number value
+            "-t", VALID_URL,                                // URL value
+            "-z", dateFormat.format(expectedDate),         // Date value
+            "-m", "test*"                                   // File array (unsupported)
+        };
+        
+        // When: Parsing the complex command line
+        final Options complexOptions = PatternOptionBuilder.parsePattern(complexPattern);
         final CommandLineParser parser = new PosixParser();
-        final CommandLine line = parser.parse(options, args);
-        assertEquals("foo", line.getOptionValue("a"), "flag a");
-        assertEquals("foo", line.getOptionObject("a"), "string flag a");
-        assertEquals(new Vector<>(), line.getOptionObject("b"), "object flag b");
-        assertTrue(line.hasOption("c"), "boolean true flag c");
-        assertFalse(line.hasOption("d"), "boolean false flag d");
-        assertEquals(new File("build.xml"), line.getOptionObject("e"), "file flag e");
-        assertEquals(Calendar.class, line.getOptionObject("f"), "class flag f");
-        assertEquals(Double.valueOf(4.5), line.getOptionObject("n"), "number flag n");
-        assertEquals(new URL("https://commons.apache.org"), line.getOptionObject("t"), "url flag t");
-        // tests the char methods of CommandLine that delegate to the String methods
-        assertEquals("foo", line.getOptionValue('a'), "flag a");
-        assertEquals("foo", line.getOptionObject('a'), "string flag a");
-        assertEquals(new Vector<>(), line.getOptionObject('b'), "object flag b");
-        assertTrue(line.hasOption('c'), "boolean true flag c");
-        assertFalse(line.hasOption('d'), "boolean false flag d");
-        assertEquals(new File("build.xml"), line.getOptionObject('e'), "file flag e");
-        assertEquals(Calendar.class, line.getOptionObject('f'), "class flag f");
-        assertEquals(Double.valueOf(4.5), line.getOptionObject('n'), "number flag n");
-        assertEquals(new URL("https://commons.apache.org"), line.getOptionObject('t'), "url flag t");
-        // FILES NOT SUPPORTED YET
-        assertThrows(UnsupportedOperationException.class, () -> line.getOptionObject('m'));
-        assertEquals(expectedDate, line.getOptionObject('z'), "date flag z");
-
-    }
-
-    @Test
-    void testUntypedPattern() throws Exception {
-        final Options options = PatternOptionBuilder.parsePattern("abc");
-        final CommandLineParser parser = new PosixParser();
-        final CommandLine line = parser.parse(options, new String[] {"-abc"});
-        assertTrue(line.hasOption('a'));
-        assertNull(line.getOptionObject('a'), "value a");
-        assertTrue(line.hasOption('b'));
-        assertNull(line.getOptionObject('b'), "value b");
-        assertTrue(line.hasOption('c'));
-        assertNull(line.getOptionObject('c'), "value c");
-    }
-
-    @Test
-    void testURLPattern() throws Exception {
-        final Options options = PatternOptionBuilder.parsePattern("u/v/");
-        final CommandLineParser parser = new PosixParser();
-        final CommandLine line = parser.parse(options, new String[] {"-u", "https://commons.apache.org", "-v", "foo://commons.apache.org"});
-        assertEquals(new URL("https://commons.apache.org"), line.getOptionObject("u"), "u value");
-        assertNull(line.getOptionObject("v"), "v value");
+        final CommandLine parsedComplexLine = parser.parse(complexOptions, complexArgs);
+        
+        // Then: Verify all option types are parsed correctly
+        
+        // String option
+        assertEquals("foo", parsedComplexLine.getOptionValue("a"), "String option value");
+        assertEquals("foo", parsedComplexLine.getOptionObject("a"), "String option object");
+        
+        // Object instance option
+        assertEquals(new Vector<>(), parsedComplexLine.getOptionObject("b"), "Object instance should be empty Vector");
+        
+        // Boolean flags
+        assertTrue(parsedComplexLine.hasOption("c"), "Boolean flag 'c' should be present");
+        assertFalse(parsedComplexLine.hasOption("d"), "Boolean flag 'd' should be absent");
+        
+        // File option
+        assertEquals(new File("build.xml"), parsedComplexLine.getOptionObject("e"), "File option value");
+        
+        // Class type option
+        assertEquals(Calendar.class, parsedComplexLine.getOptionObject("f"), "Class type option value");
+        
+        // Number option
+        assertEquals(Double.valueOf(4.5), parsedComplexLine.getOptionObject("n"), "Number option value");
+        
+        // URL option
+        assertEquals(new URL(VALID_URL), parsedComplexLine.getOptionObject("t"), "URL option value");
+        
+        // Date option
+        assertEquals(expectedDate, parsedComplexLine.getOptionObject('z'), "Date option value");
+        
+        // Test char-based access methods (should delegate to String methods)
+        assertEquals("foo", parsedComplexLine.getOptionValue('a'), "Char-based string access");
+        assertEquals("foo", parsedComplexLine.getOptionObject('a'), "Char-based string object access");
+        assertEquals(new Vector<>(), parsedComplexLine.getOptionObject('b'), "Char-based object access");
+        assertTrue(parsedComplexLine.hasOption('c'), "Char-based boolean flag access");
+        assertFalse(parsedComplexLine.hasOption('d'), "Char-based boolean flag access (false)");
+        assertEquals(new File("build.xml"), parsedComplexLine.getOptionObject('e'), "Char-based file access");
+        assertEquals(Calendar.class, parsedComplexLine.getOptionObject('f'), "Char-based class access");
+        assertEquals(Double.valueOf(4.5), parsedComplexLine.getOptionObject('n'), "Char-based number access");
+        assertEquals(new URL(VALID_URL), parsedComplexLine.getOptionObject('t'), "Char-based URL access");
+        
+        // File array option (unsupported - should throw exception)
+        assertThrows(UnsupportedOperationException.class, 
+            () -> parsedComplexLine.getOptionObject('m'), 
+            "File array option should throw UnsupportedOperationException");
     }
 }
