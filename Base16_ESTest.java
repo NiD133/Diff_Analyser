@@ -15,235 +15,336 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) 
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true, 
-    useVFS = true, 
-    useVNET = true, 
-    resetStaticState = true, 
-    separateClassLoader = true
-) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class Base16_ESTest extends Base16_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void testIsInAlphabet_NonAlphabetByte_ReturnsFalse() throws Throwable {
-        Base16 base16 = new Base16();
-        boolean result = base16.isInAlphabet((byte) 71);
-        assertFalse(result);
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      Base16 base16_0 = new Base16();
+      boolean boolean0 = base16_0.isInAlphabet((byte)71);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testEncode_WithNegativeByte_StrictPolicy() throws Throwable {
-        CodecPolicy strictPolicy = CodecPolicy.STRICT;
-        Base16 base16 = new Base16(false, strictPolicy);
-        byte[] input = {0, -23, 0};  // Middle byte is negative
-        byte[] encoded = base16.encode(input);
-        byte[] expected = {48, 48, 69, 57, 48, 48}; // "00E900" in ASCII
-        assertArrayEquals(expected, encoded);
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      CodecPolicy codecPolicy0 = CodecPolicy.STRICT;
+      Base16 base16_0 = new Base16(false, codecPolicy0);
+      byte[] byteArray0 = new byte[3];
+      byteArray0[1] = (byte) (-23);
+      byte[] byteArray1 = base16_0.encode(byteArray0);
+      assertArrayEquals(new byte[] {(byte)48, (byte)48, (byte)69, (byte)57, (byte)48, (byte)48}, byteArray1);
+  }
 
-    @Test(timeout = 4000)
-    public void testEncode_InputLengthExceedsMaximum_ThrowsIllegalArgumentException() throws Throwable {
-        Base16 base16 = new Base16();
-        BaseNCodec.Context context = new BaseNCodec.Context();
-        byte[] input = new byte[6];
-        try {
-            base16.encode(input, 2131, Integer.MAX_VALUE - 8, context);
-            fail("Expected IllegalArgumentException for excessive input length");
-        } catch (IllegalArgumentException e) {
-            assertEquals("Input length exceeds maximum size for encoded data: 2147483639", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      byte[] byteArray0 = new byte[6];
+      Base16 base16_0 = new Base16();
+      BaseNCodec.Context baseNCodec_Context0 = new BaseNCodec.Context();
+      // Undeclared exception!
+      try { 
+        base16_0.encode(byteArray0, 2131, 2147483639, baseNCodec_Context0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Input length exceeds maximum size for encoded data: 2147483639
+         //
+         verifyException("org.apache.commons.codec.binary.Base16", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testEncode_EmptyArray_NoChange() throws Throwable {
-        Base16 base16 = new Base16();
-        byte[] input = new byte[4];
-        BaseNCodec.Context context = new BaseNCodec.Context();
-        // Should handle zero-length encode without issues
-        base16.encode(input, 0, 0, context);
-        assertArrayEquals(new byte[]{0, 0, 0, 0}, input);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      Base16 base16_0 = new Base16();
+      byte[] byteArray0 = new byte[4];
+      BaseNCodec.Context baseNCodec_Context0 = new BaseNCodec.Context();
+      base16_0.encode(byteArray0, 0, (int) (byte)0, baseNCodec_Context0);
+      assertArrayEquals(new byte[] {(byte)0, (byte)0, (byte)0, (byte)0}, byteArray0);
+  }
 
-    @Test(timeout = 4000)
-    public void testDecode_InvalidCharacter_ThrowsIllegalArgumentException() throws Throwable {
-        Base16 base16 = new Base16();
-        try {
-            base16.decode("Gw");  // 'G' is invalid in strict mode
-            fail("Expected IllegalArgumentException for invalid character");
-        } catch (IllegalArgumentException e) {
-            assertEquals("Invalid octet in encoded value: 71", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      Base16 base16_0 = new Base16();
+      // Undeclared exception!
+      try { 
+        base16_0.decode("Gw");
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid octet in encoded value: 71
+         //
+         verifyException("org.apache.commons.codec.binary.Base16", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testDecode_ValidString_ReturnsCorrectByteArray() throws Throwable {
-        Base16 base16 = new Base16();
-        byte[] decoded = base16.decode("21");  // '21' hex = 33 decimal
-        assertArrayEquals(new byte[]{33}, decoded);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      Base16 base16_0 = new Base16();
+      byte[] byteArray0 = base16_0.decode("21");
+      assertArrayEquals(new byte[] {(byte)33}, byteArray0);
+  }
 
-    @Test(timeout = 4000)
-    public void testDecode_ByteArrayWithInvalidOctet_ThrowsException() throws Throwable {
-        Base16 base16 = new Base16();
-        BaseNCodec.Context context = new BaseNCodec.Context();
-        byte[] input = new byte[7];
-        try {
-            base16.decode(input, 6, 6, context);
-            fail("Expected IllegalArgumentException for invalid octet");
-        } catch (IllegalArgumentException e) {
-            assertEquals("Invalid octet in encoded value: 0", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      Base16 base16_0 = new Base16();
+      byte[] byteArray0 = new byte[7];
+      BaseNCodec.Context baseNCodec_Context0 = new BaseNCodec.Context();
+      // Undeclared exception!
+      try { 
+        base16_0.decode(byteArray0, (int) (byte)6, (int) (byte)6, baseNCodec_Context0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid octet in encoded value: 0
+         //
+         verifyException("org.apache.commons.codec.binary.Base16", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testDecode_WithInvalidContextState_ThrowsArrayIndexOutOfBounds() throws Throwable {
-        CodecPolicy strictPolicy = CodecPolicy.STRICT;
-        Base16 base16 = new Base16(false, strictPolicy);
-        BaseNCodec.Context context = new BaseNCodec.Context();
-        context.ibitWorkArea = -23;  // Invalid state
-        byte[] input = new byte[3];
-        try {
-            base16.decode(input, 4, 64, context);
-            fail("Expected ArrayIndexOutOfBoundsException due to invalid context");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            // Expected due to invalid index
-        }
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      CodecPolicy codecPolicy0 = CodecPolicy.STRICT;
+      Base16 base16_0 = new Base16(false, codecPolicy0);
+      byte[] byteArray0 = new byte[3];
+      BaseNCodec.Context baseNCodec_Context0 = new BaseNCodec.Context();
+      baseNCodec_Context0.ibitWorkArea = (int) (byte) (-23);
+      // Undeclared exception!
+      try { 
+        base16_0.decode(byteArray0, 4, 64, baseNCodec_Context0);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 4
+         //
+         verifyException("org.apache.commons.codec.binary.Base16", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testDecode_NegativeOffsetAndLength_NoException() throws Throwable {
-        Base16 base16 = new Base16();
-        BaseNCodec.Context context = new BaseNCodec.Context();
-        context.ibitWorkArea = -4039;  // Arbitrary invalid state
-        byte[] input = new byte[10];
-        // Should handle negative offset/length without exceptions
-        base16.decode(input, -1800, -1800, context);
-        assertArrayEquals(new byte[10], input);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      Base16 base16_0 = new Base16();
+      byte[] byteArray0 = new byte[3];
+      BaseNCodec.Context baseNCodec_Context0 = new BaseNCodec.Context();
+      baseNCodec_Context0.ibitWorkArea = (-4039);
+      base16_0.decode(byteArray0, (-3424), (-3424), baseNCodec_Context0);
+      assertArrayEquals(new byte[] {(byte)0, (byte)0, (byte)0}, byteArray0);
+  }
 
-    @Test(timeout = 4000)
-    public void testConstructor_WithFalse_InitializesConstant() throws Throwable {
-        Base16 base16 = new Base16(false);
-        // Verify class constant initialization
-        assertEquals(64, BaseNCodec.PEM_CHUNK_SIZE);
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      Base16 base16_0 = new Base16();
+      byte[] byteArray0 = new byte[5];
+      BaseNCodec.Context baseNCodec_Context0 = new BaseNCodec.Context();
+      base16_0.encode(byteArray0, 2147483639, 484, baseNCodec_Context0);
+      assertEquals(76, BaseNCodec.MIME_CHUNK_SIZE);
+  }
 
-    @Test(timeout = 4000)
-    public void testIsInAlphabet_NonAlphabetByte92_ReturnsFalse() throws Throwable {
-        Base16 base16 = new Base16();
-        boolean result = base16.isInAlphabet((byte) 92);  // Backslash character
-        assertFalse(result);
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      Base16 base16_0 = new Base16(false);
+      assertEquals(64, BaseNCodec.PEM_CHUNK_SIZE);
+  }
 
-    @Test(timeout = 4000)
-    public void testEncode_NullContext_ThrowsNullPointerException() throws Throwable {
-        Base16 base16 = new Base16();
-        byte[] input = new byte[3];
-        try {
-            base16.encode(input, 76, 0, null);  // Null context
-            fail("Expected NullPointerException for null context");
-        } catch (NullPointerException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      Base16 base16_0 = new Base16();
+      BaseNCodec.Context baseNCodec_Context0 = new BaseNCodec.Context();
+      baseNCodec_Context0.ibitWorkArea = 64;
+      byte[] byteArray0 = new byte[7];
+      byteArray0[5] = (byte)69;
+      // Undeclared exception!
+      try { 
+        base16_0.decode(byteArray0, (int) (byte)5, 513, baseNCodec_Context0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid octet in encoded value: 0
+         //
+         verifyException("org.apache.commons.codec.binary.Base16", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testEncode_OffsetAndLengthExceedArray_ThrowsArrayIndexOutOfBoundsException() throws Throwable {
-        Base16 base16 = new Base16();
-        BaseNCodec.Context context = new BaseNCodec.Context();
-        byte[] input = new byte[6];
-        try {
-            base16.encode(input, 76, 76, context);  // Offset beyond array
-            fail("Expected ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      Base16 base16_0 = new Base16();
+      boolean boolean0 = base16_0.isInAlphabet((byte)92);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testDecode_NullByteArray_ThrowsNullPointerException() throws Throwable {
-        Base16 base16 = new Base16();
-        BaseNCodec.Context context = new BaseNCodec.Context();
-        try {
-            base16.decode(null, 64, 64, context);  // Null input array
-            fail("Expected NullPointerException for null input");
-        } catch (NullPointerException e) {
-            // Expected
-        }
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      Base16 base16_0 = new Base16();
+      byte[] byteArray0 = new byte[3];
+      // Undeclared exception!
+      try { 
+        base16_0.encode(byteArray0, 76, (int) (byte)0, (BaseNCodec.Context) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.codec.binary.Base16", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testConstructor_WithTrueAndNullPolicy_ThrowsNullPointerException() throws Throwable {
-        try {
-            new Base16(true, null);  // Null policy
-            fail("Expected NullPointerException for null policy");
-        } catch (NullPointerException e) {
-            assertEquals("codecPolicy", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      byte[] byteArray0 = new byte[6];
+      Base16 base16_0 = new Base16();
+      BaseNCodec.Context baseNCodec_Context0 = new BaseNCodec.Context();
+      // Undeclared exception!
+      try { 
+        base16_0.encode(byteArray0, 76, 76, baseNCodec_Context0);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 76
+         //
+         verifyException("org.apache.commons.codec.binary.Base16", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testDecode_StrictPolicyWithSingleCharacter_ThrowsIllegalArgumentException() throws Throwable {
-        CodecPolicy strictPolicy = CodecPolicy.STRICT;
-        Base16 base16 = new Base16(false, strictPolicy);
-        try {
-            base16.decode("F");  // Incomplete byte representation
-            fail("Expected IllegalArgumentException for incomplete encoding");
-        } catch (IllegalArgumentException e) {
-            assertTrue(e.getMessage().contains("Strict decoding: Last encoded character"));
-        }
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      Base16 base16_0 = new Base16();
+      BaseNCodec.Context baseNCodec_Context0 = new BaseNCodec.Context();
+      // Undeclared exception!
+      try { 
+        base16_0.decode((byte[]) null, 64, 64, baseNCodec_Context0);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.codec.binary.Base16", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testIsInAlphabet_AlphabetByte48_ReturnsTrue() throws Throwable {
-        Base16 base16 = new Base16();
-        boolean result = base16.isInAlphabet((byte) 48);  // '0' character
-        assertTrue(result);
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      CodecPolicy codecPolicy0 = CodecPolicy.LENIENT;
+      Base16 base16_0 = new Base16(true, codecPolicy0);
+      byte[] byteArray0 = new byte[1];
+      BaseNCodec.Context baseNCodec_Context0 = new BaseNCodec.Context();
+      baseNCodec_Context0.ibitWorkArea = 76;
+      // Undeclared exception!
+      try { 
+        base16_0.decode(byteArray0, (int) (byte)1, (int) (byte)1, baseNCodec_Context0);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 1
+         //
+         verifyException("org.apache.commons.codec.binary.Base16", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testContainsAlphabetOrPad_WithChunkSeparator_ReturnsFalse() throws Throwable {
-        Base16 base16 = new Base16();
-        byte[] chunkSeparator = BaseNCodec.CHUNK_SEPARATOR;
-        boolean result = base16.containsAlphabetOrPad(chunkSeparator);
-        assertFalse(result);
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      Base16 base16_0 = null;
+      try {
+        base16_0 = new Base16(true, (CodecPolicy) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // codecPolicy
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testDecode_StringWithInvalidCharacter_ThrowsIllegalArgumentException() throws Throwable {
-        Base16 base16 = new Base16();
-        try {
-            base16.decode("BDT");  // 'T' is invalid
-            fail("Expected IllegalArgumentException for invalid character");
-        } catch (IllegalArgumentException e) {
-            assertEquals("Invalid octet in encoded value: 84", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      CodecPolicy codecPolicy0 = CodecPolicy.STRICT;
+      Base16 base16_0 = new Base16(false, codecPolicy0);
+      // Undeclared exception!
+      try { 
+        base16_0.decode("F");
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Strict decoding: Last encoded character is a valid base 16 alphabet character but not a possible encoding. Decoding requires at least two characters to create one byte.
+         //
+         verifyException("org.apache.commons.codec.binary.Base16", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testDecode_WithContextState76AndInvalidOctet_ThrowsIllegalArgumentException() throws Throwable {
-        CodecPolicy lenientPolicy = CodecPolicy.LENIENT;
-        Base16 base16 = new Base16(true, lenientPolicy);
-        BaseNCodec.Context context = new BaseNCodec.Context();
-        context.ibitWorkArea = 76;  // Arbitrary state
-        byte[] input = new byte[19];
-        try {
-            base16.decode(input, 0, 0, context);
-            fail("Expected IllegalArgumentException for invalid octet");
-        } catch (IllegalArgumentException e) {
-            assertEquals("Invalid octet in encoded value: 0", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      Base16 base16_0 = new Base16();
+      boolean boolean0 = base16_0.isInAlphabet((byte)48);
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testDecode_NegativeOffsetAndLengthTwice_NoException() throws Throwable {
-        Base16 base16 = new Base16();
-        BaseNCodec.Context context = new BaseNCodec.Context();
-        byte[] input = new byte[10];
-        // Multiple calls with invalid parameters should not throw
-        base16.decode(input, -1800, -1800, context);
-        base16.decode(input, -1800, -1800, context);
-        assertArrayEquals(new byte[10], input);
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      Base16 base16_0 = new Base16();
+      byte[] byteArray0 = BaseNCodec.CHUNK_SEPARATOR;
+      boolean boolean0 = base16_0.containsAlphabetOrPad(byteArray0);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      byte[] byteArray0 = new byte[5];
+      Base16 base16_0 = new Base16();
+      byte[] byteArray1 = base16_0.encode(byteArray0, (-1832), (-1832));
+      assertNotSame(byteArray0, byteArray1);
+  }
+
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      Base16 base16_0 = new Base16();
+      // Undeclared exception!
+      try { 
+        base16_0.decode("BDT");
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid octet in encoded value: 84
+         //
+         verifyException("org.apache.commons.codec.binary.Base16", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      CodecPolicy codecPolicy0 = CodecPolicy.LENIENT;
+      Base16 base16_0 = new Base16(true, codecPolicy0);
+      byte[] byteArray0 = new byte[19];
+      BaseNCodec.Context baseNCodec_Context0 = new BaseNCodec.Context();
+      baseNCodec_Context0.ibitWorkArea = 76;
+      // Undeclared exception!
+      try { 
+        base16_0.decode(byteArray0, (int) (byte)0, (int) (byte)0, baseNCodec_Context0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Invalid octet in encoded value: 0
+         //
+         verifyException("org.apache.commons.codec.binary.Base16", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      Base16 base16_0 = new Base16();
+      byte[] byteArray0 = new byte[10];
+      BaseNCodec.Context baseNCodec_Context0 = new BaseNCodec.Context();
+      base16_0.decode(byteArray0, (-1800), (-1800), baseNCodec_Context0);
+      base16_0.decode(byteArray0, (-1800), (-1800), baseNCodec_Context0);
+      assertArrayEquals(new byte[] {(byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0}, byteArray0);
+  }
 }
