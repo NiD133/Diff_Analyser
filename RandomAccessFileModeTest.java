@@ -20,70 +20,54 @@ package org.apache.commons.io;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests {@link RandomAccessFileMode}.
  */
+@DisplayName("Tests for RandomAccessFileMode")
 class RandomAccessFileModeTest {
 
-    private static final byte[] BYTES_FIXTURE = "Foo".getBytes(StandardCharsets.US_ASCII);
-
-    private static final String FIXTURE = "test.txt";
+    private static final byte[] FILE_CONTENT_BYTES = "Foo".getBytes(StandardCharsets.US_ASCII);
+    private static final String FILE_NAME = "test.txt";
 
     /**
-     * Temporary directory.
+     * Temporary directory managed by JUnit.
      */
     @TempDir
     public Path tempDir;
 
-    private byte[] read(final RandomAccessFile randomAccessFile) throws IOException {
+    private byte[] readAllBytes(final RandomAccessFile randomAccessFile) throws IOException {
         return RandomAccessFiles.read(randomAccessFile, 0, (int) randomAccessFile.length());
     }
 
-    @ParameterizedTest
-    @EnumSource(RandomAccessFileMode.class)
-    void testCreateFile(final RandomAccessFileMode randomAccessFileMode) throws IOException {
-        final byte[] expected = BYTES_FIXTURE;
-        final Path fixture = writeFixture(expected);
-        try (RandomAccessFile randomAccessFile = randomAccessFileMode.create(fixture.toFile())) {
-            assertArrayEquals(expected, read(randomAccessFile));
-        }
-    }
-
-    @ParameterizedTest
-    @EnumSource(RandomAccessFileMode.class)
-    void testCreatePath(final RandomAccessFileMode randomAccessFileMode) throws IOException {
-        final byte[] expected = BYTES_FIXTURE;
-        final Path fixture = writeFixture(expected);
-        randomAccessFileMode.accept(fixture, raf -> assertArrayEquals(expected, read(raf)));
-    }
-
-    @ParameterizedTest
-    @EnumSource(RandomAccessFileMode.class)
-    void testCreateString(final RandomAccessFileMode randomAccessFileMode) throws IOException {
-        final byte[] expected = BYTES_FIXTURE;
-        final Path fixture = writeFixture(expected);
-        try (RandomAccessFile randomAccessFile = randomAccessFileMode.create(fixture.toString())) {
-            assertArrayEquals(expected, read(randomAccessFile));
-        }
+    private Path createTestFile() throws IOException {
+        return Files.write(tempDir.resolve(FILE_NAME), FILE_CONTENT_BYTES, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     @Test
-    void testGetMode() {
+    void getMode_should_returnCorrectStringIdentifier() {
         assertEquals("r", RandomAccessFileMode.READ_ONLY.getMode());
         assertEquals("rw", RandomAccessFileMode.READ_WRITE.getMode());
         assertEquals("rwd", RandomAccessFileMode.READ_WRITE_SYNC_CONTENT.getMode());
@@ -91,74 +75,132 @@ class RandomAccessFileModeTest {
     }
 
     @Test
-    void testImplies() {
-        assertTrue(RandomAccessFileMode.READ_WRITE_SYNC_ALL.implies(RandomAccessFileMode.READ_WRITE_SYNC_CONTENT));
-        assertTrue(RandomAccessFileMode.READ_WRITE_SYNC_CONTENT.implies(RandomAccessFileMode.READ_WRITE));
-        assertTrue(RandomAccessFileMode.READ_WRITE.implies(RandomAccessFileMode.READ_ONLY));
-        assertFalse(RandomAccessFileMode.READ_ONLY.implies(RandomAccessFileMode.READ_WRITE_SYNC_ALL));
+    void implies_should_correctlyReflectAccessLevelHierarchy() {
+        // Aliases for readability
+        final RandomAccessFileMode r = RandomAccessFileMode.READ_ONLY;
+        final RandomAccessFileMode rw = RandomAccessFileMode.READ_WRITE;
+        final RandomAccessFileMode rwd = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT;
+        final RandomAccessFileMode rws = RandomAccessFileMode.READ_WRITE_SYNC_ALL;
+
+        // A mode always implies itself
+        assertTrue(r.implies(r));
+        assertTrue(rw.implies(rw));
+        assertTrue(rwd.implies(rwd));
+        assertTrue(rws.implies(rws));
+
+        // Test hierarchy
+        assertTrue(rws.implies(rwd));
+        assertTrue(rwd.implies(rw));
+        assertTrue(rw.implies(r));
+
+        // Test non-implication
+        assertFalse(r.implies(rw));
+        assertFalse(rw.implies(rwd));
+        assertFalse(rwd.implies(rws));
     }
 
-    @ParameterizedTest
-    @EnumSource(RandomAccessFileMode.class)
-    void testIoString(final RandomAccessFileMode randomAccessFileMode) throws IOException {
-        final byte[] expected = BYTES_FIXTURE;
-        final Path fixture = writeFixture(expected);
-        try (IORandomAccessFile randomAccessFile = randomAccessFileMode.io(fixture.toString())) {
-            assertArrayEquals(expected, read(randomAccessFile));
-        }
-    }
-
-    /**
-     * Tests the standard {@link Enum#toString()} behavior.
-     */
     @Test
-    void testToString() {
+    void toString_should_returnEnumConstantName() {
         assertEquals("READ_ONLY", RandomAccessFileMode.READ_ONLY.toString());
         assertEquals("READ_WRITE", RandomAccessFileMode.READ_WRITE.toString());
         assertEquals("READ_WRITE_SYNC_ALL", RandomAccessFileMode.READ_WRITE_SYNC_ALL.toString());
         assertEquals("READ_WRITE_SYNC_CONTENT", RandomAccessFileMode.READ_WRITE_SYNC_CONTENT.toString());
     }
 
-    @ParameterizedTest
-    @EnumSource(LinkOption.class)
-    void testValueOf(final LinkOption option) {
-        assertTrue(RandomAccessFileMode.valueOf(option).implies(RandomAccessFileMode.READ_ONLY));
+    @Nested
+    @DisplayName("Factory method: valueOfMode(String)")
+    class ValueOfModeTests {
+        @ParameterizedTest
+        @CsvSource({
+            "r,   READ_ONLY",
+            "rw,  READ_WRITE",
+            "rwd, READ_WRITE_SYNC_CONTENT",
+            "rws, READ_WRITE_SYNC_ALL"
+        })
+        void valueOfMode_should_returnCorrectEnum_forValidModeString(final String mode, final RandomAccessFileMode expected) {
+            assertEquals(expected, RandomAccessFileMode.valueOfMode(mode));
+        }
+
+        @Test
+        void valueOfMode_should_throwException_forInvalidMode() {
+            assertThrows(IllegalArgumentException.class, () -> RandomAccessFileMode.valueOfMode("invalid"));
+        }
     }
 
-    @ParameterizedTest
-    @EnumSource(StandardOpenOption.class)
-    void testValueOf(final StandardOpenOption option) {
-        assertTrue(RandomAccessFileMode.valueOf(option).implies(RandomAccessFileMode.READ_ONLY));
+    @Nested
+    @DisplayName("Factory method: valueOf(OpenOption...)")
+    class ValueOfOpenOptionTests {
+        static Stream<Arguments> valueOfOpenOptionProvider() {
+            return Stream.of(
+                // READ_ONLY cases
+                Arguments.of(RandomAccessFileMode.READ_ONLY, new OpenOption[]{StandardOpenOption.READ}),
+                // READ_WRITE cases
+                Arguments.of(RandomAccessFileMode.READ_WRITE, new OpenOption[]{StandardOpenOption.WRITE}),
+                Arguments.of(RandomAccessFileMode.READ_WRITE, new OpenOption[]{StandardOpenOption.READ, StandardOpenOption.WRITE}),
+                // READ_WRITE_SYNC_CONTENT cases
+                Arguments.of(RandomAccessFileMode.READ_WRITE_SYNC_CONTENT, new OpenOption[]{StandardOpenOption.DSYNC}),
+                Arguments.of(RandomAccessFileMode.READ_WRITE_SYNC_CONTENT, new OpenOption[]{StandardOpenOption.WRITE, StandardOpenOption.DSYNC}),
+                Arguments.of(RandomAccessFileMode.READ_WRITE_SYNC_CONTENT, new OpenOption[]{StandardOpenOption.READ, StandardOpenOption.WRITE, StandardOpenOption.DSYNC}),
+                // READ_WRITE_SYNC_ALL cases
+                Arguments.of(RandomAccessFileMode.READ_WRITE_SYNC_ALL, new OpenOption[]{StandardOpenOption.SYNC}),
+                Arguments.of(RandomAccessFileMode.READ_WRITE_SYNC_ALL, new OpenOption[]{StandardOpenOption.READ, StandardOpenOption.SYNC}),
+                Arguments.of(RandomAccessFileMode.READ_WRITE_SYNC_ALL, new OpenOption[]{StandardOpenOption.READ, StandardOpenOption.WRITE, StandardOpenOption.SYNC})
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource("valueOfOpenOptionProvider")
+        void valueOf_should_returnCorrectMode_forGivenOpenOptions(final RandomAccessFileMode expected, final OpenOption... options) {
+            assertEquals(expected, RandomAccessFileMode.valueOf(options));
+        }
     }
 
-    @Test
-    void testValueOfMode() {
-        assertEquals(RandomAccessFileMode.READ_ONLY, RandomAccessFileMode.valueOfMode("r"));
-        assertEquals(RandomAccessFileMode.READ_WRITE, RandomAccessFileMode.valueOfMode("rw"));
-        assertEquals(RandomAccessFileMode.READ_WRITE_SYNC_CONTENT, RandomAccessFileMode.valueOfMode("rwd"));
-        assertEquals(RandomAccessFileMode.READ_WRITE_SYNC_ALL, RandomAccessFileMode.valueOfMode("rws"));
-    }
+    @Nested
+    @DisplayName("File creation and access methods")
+    class FileAccessTests {
+        private Path testFilePath;
 
-    @Test
-    void testValueOfOpenOptions() {
-        // READ_ONLY
-        assertEquals(RandomAccessFileMode.READ_ONLY, RandomAccessFileMode.valueOf(StandardOpenOption.READ));
-        // READ_WRITE
-        assertEquals(RandomAccessFileMode.READ_WRITE, RandomAccessFileMode.valueOf(StandardOpenOption.WRITE));
-        assertEquals(RandomAccessFileMode.READ_WRITE, RandomAccessFileMode.valueOf(StandardOpenOption.READ, StandardOpenOption.WRITE));
-        // READ_WRITE_SYNC_CONTENT
-        assertEquals(RandomAccessFileMode.READ_WRITE_SYNC_CONTENT, RandomAccessFileMode.valueOf(StandardOpenOption.DSYNC));
-        assertEquals(RandomAccessFileMode.READ_WRITE_SYNC_CONTENT, RandomAccessFileMode.valueOf(StandardOpenOption.WRITE, StandardOpenOption.DSYNC));
-        assertEquals(RandomAccessFileMode.READ_WRITE_SYNC_CONTENT,
-                RandomAccessFileMode.valueOf(StandardOpenOption.READ, StandardOpenOption.WRITE, StandardOpenOption.DSYNC));
-        // READ_WRITE_SYNC_ALL
-        assertEquals(RandomAccessFileMode.READ_WRITE_SYNC_ALL, RandomAccessFileMode.valueOf(StandardOpenOption.SYNC));
-        assertEquals(RandomAccessFileMode.READ_WRITE_SYNC_ALL, RandomAccessFileMode.valueOf(StandardOpenOption.READ, StandardOpenOption.SYNC));
-        assertEquals(RandomAccessFileMode.READ_WRITE_SYNC_ALL,
-                RandomAccessFileMode.valueOf(StandardOpenOption.READ, StandardOpenOption.WRITE, StandardOpenOption.SYNC));
-    }
+        @BeforeEach
+        void setUp() throws IOException {
+            testFilePath = createTestFile();
+        }
 
-    private Path writeFixture(final byte[] bytes) throws IOException {
-        return Files.write(tempDir.resolve(FIXTURE), bytes, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        @ParameterizedTest
+        @EnumSource(RandomAccessFileMode.class)
+        void create_fromFile_should_openFileAndAllowReading(final RandomAccessFileMode mode) throws IOException {
+            try (RandomAccessFile raf = mode.create(testFilePath.toFile())) {
+                assertArrayEquals(FILE_CONTENT_BYTES, readAllBytes(raf));
+            }
+        }
+
+        @ParameterizedTest
+        @EnumSource(RandomAccessFileMode.class)
+        void create_fromPath_should_openFileAndAllowReading(final RandomAccessFileMode mode) throws IOException {
+            try (RandomAccessFile raf = mode.create(testFilePath)) {
+                assertArrayEquals(FILE_CONTENT_BYTES, readAllBytes(raf));
+            }
+        }
+
+        @ParameterizedTest
+        @EnumSource(RandomAccessFileMode.class)
+        void create_fromString_should_openFileAndAllowReading(final RandomAccessFileMode mode) throws IOException {
+            try (RandomAccessFile raf = mode.create(testFilePath.toString())) {
+                assertArrayEquals(FILE_CONTENT_BYTES, readAllBytes(raf));
+            }
+        }
+
+        @ParameterizedTest
+        @EnumSource(RandomAccessFileMode.class)
+        void accept_should_provideReadableRandomAccessFile(final RandomAccessFileMode mode) throws IOException {
+            mode.accept(testFilePath, raf -> assertArrayEquals(FILE_CONTENT_BYTES, readAllBytes(raf)));
+        }
+
+        @ParameterizedTest
+        @EnumSource(RandomAccessFileMode.class)
+        void io_fromString_should_openFileAndAllowReading(final RandomAccessFileMode mode) throws IOException {
+            try (IORandomAccessFile ioraf = mode.io(testFilePath.toString())) {
+                assertArrayEquals(FILE_CONTENT_BYTES, readAllBytes(ioraf));
+            }
+        }
     }
 }
