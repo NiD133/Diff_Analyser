@@ -19,183 +19,179 @@ package org.apache.commons.io.input;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Named.named;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.stream.Stream;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
+/**
+ * Tests for {@link WindowsLineEndingInputStream}.
+ */
+@DisplayName("Tests for WindowsLineEndingInputStream")
 class WindowsLineEndingInputStreamTest {
 
-    private String roundtripReadByte(final String msg) throws IOException {
-        return roundtripReadByte(msg, true);
+    private static final int BUFFER_SIZE = 100;
+
+    /**
+     * A functional interface to represent different ways of reading from an InputStream.
+     */
+    @FunctionalInterface
+    private interface TestReader {
+        String readAll(InputStream in) throws IOException;
     }
 
-    private String roundtripReadByte(final String msg, final boolean ensure) throws IOException {
-        // read(byte[])
-        try (WindowsLineEndingInputStream lf = new WindowsLineEndingInputStream(
-                CharSequenceInputStream.builder().setCharSequence(msg).setCharset(StandardCharsets.UTF_8).get(), ensure)) {
-            final byte[] buf = new byte[100];
-            int i = 0;
-            while (i < buf.length) {
-                final int read = lf.read();
-                if (read < 0) {
-                    break;
-                }
-                buf[i++] = (byte) read;
+    /**
+     * Reads the entire stream byte by byte using read().
+     */
+    private static String readByteByByte(final InputStream in) throws IOException {
+        final byte[] buf = new byte[BUFFER_SIZE];
+        int i = 0;
+        while (i < buf.length) {
+            final int b = in.read();
+            if (b == -1) {
+                break;
             }
-            return new String(buf, 0, i, StandardCharsets.UTF_8);
+            buf[i++] = (byte) b;
+        }
+        return new String(buf, 0, i, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Reads the stream into a buffer using read(byte[]).
+     */
+    private static String readIntoBuffer(final InputStream in) throws IOException {
+        final byte[] buf = new byte[BUFFER_SIZE];
+        final int bytesRead = in.read(buf);
+        return bytesRead == -1 ? "" : new String(buf, 0, bytesRead, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Reads the stream into a buffer using read(byte[], int, int).
+     */
+    private static String readIntoBufferWithOffset(final InputStream in) throws IOException {
+        final byte[] buf = new byte[BUFFER_SIZE];
+        final int bytesRead = in.read(buf, 0, BUFFER_SIZE);
+        return bytesRead == -1 ? "" : new String(buf, 0, bytesRead, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Provides the different read strategies as arguments for parameterized tests.
+     */
+    private static Stream<Arguments> readStrategies() {
+        return Stream.of(
+            Arguments.of(named("read()", (TestReader) WindowsLineEndingInputStreamTest::readByteByByte)),
+            Arguments.of(named("read(byte[])", (TestReader) WindowsLineEndingInputStreamTest::readIntoBuffer)),
+            Arguments.of(named("read(byte[], int, int)", (TestReader) WindowsLineEndingInputStreamTest::readIntoBufferWithOffset))
+        );
+    }
+
+    /**
+     * Helper method to process an input string through WindowsLineEndingInputStream
+     * using a specific reader.
+     */
+    private String process(final String input, final boolean ensureLineFeedAtEos, final TestReader reader) throws IOException {
+        try (WindowsLineEndingInputStream stream = new WindowsLineEndingInputStream(
+                CharSequenceInputStream.builder()
+                    .setCharSequence(input)
+                    .setCharset(StandardCharsets.UTF_8)
+                    .get(),
+                ensureLineFeedAtEos)) {
+            return reader.readAll(stream);
         }
     }
 
-    private String roundtripReadByteArray(final String msg) throws IOException {
-        return roundtripReadByteArray(msg, true);
-    }
+    @Nested
+    @DisplayName("When ensuring a line ending at the end of the stream")
+    class WhenEnsuringEosLineEnding {
+        private static final boolean ENSURE_EOS_LINE_ENDING = true;
 
-    private String roundtripReadByteArray(final String msg, final boolean ensure) throws IOException {
-        // read(byte[])
-        try (WindowsLineEndingInputStream lf = new WindowsLineEndingInputStream(
-                CharSequenceInputStream.builder().setCharSequence(msg).setCharset(StandardCharsets.UTF_8).get(), ensure)) {
-            final byte[] buf = new byte[100];
-            final int read = lf.read(buf);
-            return new String(buf, 0, read, StandardCharsets.UTF_8);
+        @DisplayName("should add CRLF to a simple string")
+        @ParameterizedTest(name = "using {0}")
+        @MethodSource("org.apache.commons.io.input.WindowsLineEndingInputStreamTest#readStrategies")
+        void shouldAddCrlfToSimpleString(final TestReader reader) throws IOException {
+            assertEquals("abc\r\n", process("abc", ENSURE_EOS_LINE_ENDING, reader));
+        }
+
+        @DisplayName("should add CRLF when a CRLF is not at the end")
+        @ParameterizedTest(name = "using {0}")
+        @MethodSource("org.apache.commons.io.input.WindowsLineEndingInputStreamTest#readStrategies")
+        void shouldAddCrlfWhenCrlfIsNotAtEnd(final TestReader reader) throws IOException {
+            assertEquals("a\r\nbc\r\n", process("a\r\nbc", ENSURE_EOS_LINE_ENDING, reader));
+        }
+
+        @DisplayName("should add CRLF after multiple blank lines")
+        @ParameterizedTest(name = "using {0}")
+        @MethodSource("org.apache.commons.io.input.WindowsLineEndingInputStreamTest#readStrategies")
+        void shouldAddCrlfAfterMultipleBlankLines(final TestReader reader) throws IOException {
+            assertEquals("a\r\n\r\nbc\r\n", process("a\r\n\r\nbc", ENSURE_EOS_LINE_ENDING, reader));
+        }
+
+        @DisplayName("should not add extra CRLF if stream already ends with it")
+        @ParameterizedTest(name = "using {0}")
+        @MethodSource("org.apache.commons.io.input.WindowsLineEndingInputStreamTest#readStrategies")
+        void shouldNotAddExtraCrlfIfPresent(final TestReader reader) throws IOException {
+            assertEquals("a\r\n\r\n", process("a\r\n\r\n", ENSURE_EOS_LINE_ENDING, reader));
         }
     }
 
-    private String roundtripReadByteArrayIndex(final String msg) throws IOException {
-        return roundtripReadByteArrayIndex(msg, true);
-    }
+    @Nested
+    @DisplayName("When not ensuring a line ending at the end of the stream")
+    class WhenNotEnsuringEosLineEnding {
+        private static final boolean ENSURE_EOS_LINE_ENDING = false;
 
-    private String roundtripReadByteArrayIndex(final String msg, final boolean ensure) throws IOException {
-        // read(byte[])
-        try (WindowsLineEndingInputStream lf = new WindowsLineEndingInputStream(
-                CharSequenceInputStream.builder().setCharSequence(msg).setCharset(StandardCharsets.UTF_8).get(), ensure)) {
-            final byte[] buf = new byte[100];
-            final int read = lf.read(buf, 0, 100);
-            return new String(buf, 0, read, StandardCharsets.UTF_8);
+        @DisplayName("should convert standalone LF to CRLF")
+        @ParameterizedTest(name = "using {0}")
+        @MethodSource("org.apache.commons.io.input.WindowsLineEndingInputStreamTest#readStrategies")
+        void shouldConvertLfToCrlf(final TestReader reader) throws IOException {
+            assertEquals("ab\r\nc", process("ab\nc", ENSURE_EOS_LINE_ENDING, reader));
+        }
+
+        @DisplayName("should leave a standalone CR unchanged")
+        @ParameterizedTest(name = "using {0}")
+        @MethodSource("org.apache.commons.io.input.WindowsLineEndingInputStreamTest#readStrategies")
+        void shouldLeaveLoneCrUnchanged(final TestReader reader) throws IOException {
+            assertEquals("a\rbc", process("a\rbc", ENSURE_EOS_LINE_ENDING, reader));
+        }
+
+        @DisplayName("should not add CRLF to a simple string")
+        @ParameterizedTest(name = "using {0}")
+        @MethodSource("org.apache.commons.io.input.WindowsLineEndingInputStreamTest#readStrategies")
+        void shouldNotAddCrlfToSimpleString(final TestReader reader) throws IOException {
+            assertEquals("a", process("a", ENSURE_EOS_LINE_ENDING, reader));
+        }
+
+        @DisplayName("should preserve existing CRLF sequences")
+        @ParameterizedTest(name = "using {0}")
+        @MethodSource("org.apache.commons.io.input.WindowsLineEndingInputStreamTest#readStrategies")
+        void shouldPreserveExistingCrlf(final TestReader reader) throws IOException {
+            assertEquals("a\r\n\r\n", process("a\r\n\r\n", ENSURE_EOS_LINE_ENDING, reader));
         }
     }
 
-    @Test
-    void testInTheMiddleOfTheLine_Byte() throws Exception {
-        assertEquals("a\r\nbc\r\n", roundtripReadByte("a\r\nbc"));
-    }
+    @Nested
+    @DisplayName("Unsupported Operations")
+    class UnsupportedOperations {
+        @Test
+        @DisplayName("markSupported() should always return false")
+        void markSupportedShouldReturnFalse() {
+            assertFalse(new WindowsLineEndingInputStream(new NullInputStream(), true).markSupported());
+            assertFalse(new WindowsLineEndingInputStream(new NullInputStream(), false).markSupported());
+        }
 
-    @Test
-    void testInTheMiddleOfTheLine_ByteArray() throws Exception {
-        assertEquals("a\r\nbc\r\n", roundtripReadByteArray("a\r\nbc"));
-    }
-
-    @Test
-    void testInTheMiddleOfTheLine_ByteArrayIndex() throws Exception {
-        assertEquals("a\r\nbc\r\n", roundtripReadByteArrayIndex("a\r\nbc"));
-    }
-
-    @Test
-    void testLinuxLineFeeds_Byte() throws Exception {
-        assertEquals("ab\r\nc", roundtripReadByte("ab\nc", false));
-    }
-
-    @Test
-    void testLinuxLineFeeds_ByteArray() throws Exception {
-        assertEquals("ab\r\nc", roundtripReadByteArray("ab\nc", false));
-    }
-
-    @Test
-    void testLinuxLineFeeds_ByteArrayIndex() throws Exception {
-        assertEquals("ab\r\nc", roundtripReadByteArrayIndex("ab\nc", false));
-    }
-
-    @Test
-    void testMalformed_Byte() throws Exception {
-        assertEquals("a\rbc", roundtripReadByte("a\rbc", false));
-    }
-
-    @Test
-    void testMalformed_ByteArray() throws Exception {
-        assertEquals("a\rbc", roundtripReadByteArray("a\rbc", false));
-    }
-
-    @Test
-    void testMalformed_ByteArrayIndex() throws Exception {
-        assertEquals("a\rbc", roundtripReadByteArrayIndex("a\rbc", false));
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = { false, true })
-    void testMark(final boolean ensureLineFeedAtEndOfFile) {
-        assertThrows(UnsupportedOperationException.class, () -> new WindowsLineEndingInputStream(new NullInputStream(), true).mark(1));
-    }
-
-    @SuppressWarnings("resource")
-    @ParameterizedTest
-    @ValueSource(booleans = { false, true })
-    void testMarkSupported(final boolean ensureLineFeedAtEndOfFile) {
-        assertFalse(new WindowsLineEndingInputStream(new NullInputStream(), true).markSupported());
-    }
-
-    @Test
-    void testMultipleBlankLines_Byte() throws Exception {
-        assertEquals("a\r\n\r\nbc\r\n", roundtripReadByte("a\r\n\r\nbc"));
-    }
-
-    @Test
-    void testMultipleBlankLines_ByteArray() throws Exception {
-        assertEquals("a\r\n\r\nbc\r\n", roundtripReadByteArray("a\r\n\r\nbc"));
-    }
-
-    @Test
-    void testMultipleBlankLines_ByteArrayIndex() throws Exception {
-        assertEquals("a\r\n\r\nbc\r\n", roundtripReadByteArrayIndex("a\r\n\r\nbc"));
-    }
-
-    @Test
-    void testRetainLineFeed_Byte() throws Exception {
-        assertEquals("a\r\n\r\n", roundtripReadByte("a\r\n\r\n", false));
-        assertEquals("a", roundtripReadByte("a", false));
-    }
-
-    @Test
-    void testRetainLineFeed_ByteArray() throws Exception {
-        assertEquals("a\r\n\r\n", roundtripReadByteArray("a\r\n\r\n", false));
-        assertEquals("a", roundtripReadByteArray("a", false));
-    }
-
-    @Test
-    void testRetainLineFeed_ByteArrayIndex() throws Exception {
-        assertEquals("a\r\n\r\n", roundtripReadByteArray("a\r\n\r\n", false));
-        assertEquals("a", roundtripReadByteArrayIndex("a", false));
-    }
-
-    @Test
-    void testSimpleString_Byte() throws Exception {
-        assertEquals("abc\r\n", roundtripReadByte("abc"));
-    }
-
-    @Test
-    void testSimpleString_ByteArray() throws Exception {
-        assertEquals("abc\r\n", roundtripReadByteArray("abc"));
-    }
-
-    @Test
-    void testSimpleString_ByteArrayIndex() throws Exception {
-        assertEquals("abc\r\n", roundtripReadByteArrayIndex("abc"));
-    }
-
-    @Test
-    void testTwoLinesAtEnd_Byte() throws Exception {
-        assertEquals("a\r\n\r\n", roundtripReadByte("a\r\n\r\n"));
-    }
-
-    @Test
-    void testTwoLinesAtEnd_ByteArray() throws Exception {
-        assertEquals("a\r\n\r\n", roundtripReadByteArray("a\r\n\r\n"));
-    }
-
-    @Test
-    void testTwoLinesAtEnd_ByteArrayIndex() throws Exception {
-        assertEquals("a\r\n\r\n", roundtripReadByteArrayIndex("a\r\n\r\n"));
+        @Test
+        @DisplayName("mark() should throw UnsupportedOperationException")
+        void markShouldThrowException() {
+            assertThrows(UnsupportedOperationException.class, () -> new WindowsLineEndingInputStream(new NullInputStream(), true).mark(1));
+            assertThrows(UnsupportedOperationException.class, () -> new WindowsLineEndingInputStream(new NullInputStream(), false).mark(1));
+        }
     }
 }
