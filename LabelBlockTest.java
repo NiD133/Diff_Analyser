@@ -36,102 +36,160 @@
 
 package org.jfree.chart.block;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GradientPaint;
-
 import org.jfree.chart.TestUtils;
-import org.jfree.chart.text.TextBlockAnchor;
 import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.internal.CloneUtils;
-
+import org.jfree.chart.text.TextBlockAnchor;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import java.awt.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Some tests for the {@link LabelBlock} class.
+ * Tests for the {@link LabelBlock} class, focusing on correctness and contract adherence.
  */
-public class LabelBlockTest {
+@DisplayName("LabelBlock")
+class LabelBlockTest {
+
+    private static final Font TEST_FONT = new Font("Dialog", Font.PLAIN, 12);
+    private static final Paint TEST_PAINT = Color.RED;
+    private static final String TEST_TEXT = "ABC";
 
     /**
-     * Confirm that the equals() method can distinguish all the required fields.
+     * Tests for the equals() method.
      */
-    @Test
-    public void testEquals() {
-        LabelBlock b1 = new LabelBlock("ABC", new Font("Dialog",
-                Font.PLAIN, 12), Color.RED);
-        LabelBlock b2 = new LabelBlock("ABC", new Font("Dialog",
-                Font.PLAIN, 12), Color.RED);
-        assertEquals(b1, b2);
-        assertEquals(b2, b2);
+    @Nested
+    @DisplayName("equals() contract")
+    class EqualsContract {
 
-        b1 = new LabelBlock("XYZ", new Font("Dialog", Font.PLAIN, 12),
-                Color.RED);
-        assertNotEquals(b1, b2);
-        b2 = new LabelBlock("XYZ", new Font("Dialog", Font.PLAIN, 12),
-                Color.RED);
-        assertEquals(b1, b2);
+        private LabelBlock block1;
+        private LabelBlock block2;
 
-        b1 = new LabelBlock("XYZ", new Font("Dialog", Font.BOLD, 12),
-                Color.RED);
-        assertNotEquals(b1, b2);
-        b2 = new LabelBlock("XYZ", new Font("Dialog", Font.BOLD, 12),
-                Color.RED);
-        assertEquals(b1, b2);
+        @BeforeEach
+        void setUp() {
+            block1 = new LabelBlock(TEST_TEXT, TEST_FONT, TEST_PAINT);
+            block2 = new LabelBlock(TEST_TEXT, TEST_FONT, TEST_PAINT);
+        }
 
-        b1 = new LabelBlock("XYZ", new Font("Dialog", Font.BOLD, 12),
-                Color.BLUE);
-        assertNotEquals(b1, b2);
-        b2 = new LabelBlock("XYZ", new Font("Dialog", Font.BOLD, 12),
-                Color.BLUE);
-        assertEquals(b1, b2);
+        @Test
+        @DisplayName("should be true for two blocks with identical properties")
+        void equals_isTrueForIdenticalProperties() {
+            assertEquals(block1, block2);
+        }
 
-        b1.setToolTipText("Tooltip");
-        assertNotEquals(b1, b2);
-        b2.setToolTipText("Tooltip");
-        assertEquals(b1, b2);
+        @Test
+        @DisplayName("should be false when text differs")
+        void equals_isFalseWhenTextDiffers() {
+            // Arrange
+            LabelBlock differentBlock = new LabelBlock("XYZ", TEST_FONT, TEST_PAINT);
 
-        b1.setURLText("URL");
-        assertNotEquals(b1, b2);
-        b2.setURLText("URL");
-        assertEquals(b1, b2);
+            // Act & Assert
+            assertNotEquals(block1, differentBlock);
+        }
 
-        b1.setContentAlignmentPoint(TextBlockAnchor.CENTER_RIGHT);
-        assertNotEquals(b1, b2);
-        b2.setContentAlignmentPoint(TextBlockAnchor.CENTER_RIGHT);
-        assertEquals(b1, b2);
+        @Test
+        @DisplayName("should be false when font differs")
+        void equals_isFalseWhenFontDiffers() {
+            // Arrange
+            Font differentFont = new Font("Dialog", Font.BOLD, 14);
+            LabelBlock differentBlock = new LabelBlock(TEST_TEXT, differentFont, TEST_PAINT);
 
-        b1.setTextAnchor(RectangleAnchor.BOTTOM_RIGHT);
-        assertNotEquals(b1, b2);
-        b2.setTextAnchor(RectangleAnchor.BOTTOM_RIGHT);
-        assertEquals(b1, b2);
+            // Act & Assert
+            assertNotEquals(block1, differentBlock);
+        }
+
+        @Test
+        @DisplayName("should be false when paint differs")
+        void equals_isFalseWhenPaintDiffers() {
+            // Arrange
+            LabelBlock differentBlock = new LabelBlock(TEST_TEXT, TEST_FONT, Color.BLUE);
+
+            // Act & Assert
+            assertNotEquals(block1, differentBlock);
+        }
+
+        @Test
+        @DisplayName("should be false when tool tip text differs")
+        void equals_isFalseWhenToolTipTextDiffers() {
+            // Arrange
+            block2.setToolTipText("A tooltip");
+
+            // Act & Assert
+            assertNotEquals(block1, block2);
+        }
+
+        @Test
+        @DisplayName("should be false when URL text differs")
+        void equals_isFalseWhenURLTextDiffers() {
+            // Arrange
+            block2.setURLText("A URL");
+
+            // Act & Assert
+            assertNotEquals(block1, block2);
+        }
+
+        @Test
+        @DisplayName("should be false when content alignment point differs")
+        void equals_isFalseWhenContentAlignmentPointDiffers() {
+            // Arrange
+            block2.setContentAlignmentPoint(TextBlockAnchor.CENTER_RIGHT);
+
+            // Act & Assert
+            assertNotEquals(block1, block2);
+        }
+
+        @Test
+        @DisplayName("should be false when text anchor differs")
+        void equals_isFalseWhenTextAnchorDiffers() {
+            // Arrange
+            block2.setTextAnchor(RectangleAnchor.BOTTOM_RIGHT);
+
+            // Act & Assert
+            assertNotEquals(block1, block2);
+        }
     }
 
     /**
-     * Confirm that cloning works.
+     * Verifies that cloning produces an independent and equal copy of the object.
      */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
-        LabelBlock b1 = new LabelBlock("ABC", new Font("Dialog",
-                Font.PLAIN, 12), Color.RED);
-        LabelBlock b2 = CloneUtils.clone(b1);
-        assertNotSame(b1, b2);
-        assertSame(b1.getClass(), b2.getClass());
-        assertEquals(b1, b2);
+    @DisplayName("cloning should produce an independent copy")
+    void clone_shouldProduceIndependentCopy() throws CloneNotSupportedException {
+        // Arrange
+        LabelBlock original = new LabelBlock(TEST_TEXT, TEST_FONT, TEST_PAINT);
+        original.setToolTipText("Original Tooltip");
+
+        // Act
+        LabelBlock clone = (LabelBlock) original.clone();
+
+        // Assert
+        assertNotSame(original, clone, "Clone must be a new object instance.");
+        assertEquals(original, clone, "Clone must be equal to the original object.");
+
+        // Verify independence by modifying the clone
+        clone.setToolTipText("Modified Tooltip");
+        assertNotEquals(original.getToolTipText(), clone.getToolTipText(),
+                "Modifying the clone's tooltip should not affect the original.");
     }
 
     /**
-     * Serialize an instance, restore it, and check for equality.
+     * Verifies that a LabelBlock instance can be serialized and deserialized
+     * without losing its state.
      */
     @Test
-    public void testSerialization() {
-        GradientPaint gp = new GradientPaint(1.0f, 2.0f, Color.RED, 3.0f, 4.0f,
-                Color.BLUE);
-        LabelBlock b1 = new LabelBlock("ABC", new Font("Dialog",
-                Font.PLAIN, 12), gp);
-        LabelBlock b2 = TestUtils.serialised(b1);
-        assertEquals(b1, b2);
-    }
+    @DisplayName("serialization should preserve object state")
+    void serialization_shouldPreserveObjectState() {
+        // Arrange
+        GradientPaint gradientPaint = new GradientPaint(1.0f, 2.0f, Color.RED, 3.0f, 4.0f, Color.BLUE);
+        LabelBlock originalBlock = new LabelBlock("Serializable", TEST_FONT, gradientPaint);
 
+        // Act
+        LabelBlock deserializedBlock = TestUtils.serialised(originalBlock);
+
+        // Assert
+        assertEquals(originalBlock, deserializedBlock);
+    }
 }
