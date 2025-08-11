@@ -42,29 +42,21 @@
  */
 package com.itextpdf.text.io;
 
-import junit.framework.Assert;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 public class GetBufferedRandomAccessSourceTest {
 
-	@Before
-	public void setUp() throws Exception {
-	}
+    @Test
+    public void get_WithSingleByteSource_ShouldReturnCorrectByte() throws Exception {
+        // This test verifies that the buffer handles sources smaller than the buffer size (4 bytes)
+        // without throwing ArrayIndexOutOfBoundsException. The source contains a single byte: 42.
+        byte[] sourceData = new byte[]{42};
+        ArrayRandomAccessSource underlyingSource = new ArrayRandomAccessSource(sourceData);
+        GetBufferedRandomAccessSource bufferedSource = new GetBufferedRandomAccessSource(underlyingSource);
 
-	@After
-	public void tearDown() throws Exception {
-	}
-
-	@Test
-	public void testSmallSizedFile() throws Exception { 
-		// we had a problem if source was less than 4 characters in length - would result in array index out of bounds problems on get()
-		byte[] data = new byte[]{42};
-		ArrayRandomAccessSource arrayRAS = new ArrayRandomAccessSource(data);
-		GetBufferedRandomAccessSource bufferedRAS = new GetBufferedRandomAccessSource(arrayRAS);
-		Assert.assertEquals(42, bufferedRAS.get(0));
-	}
-
+        // Retrieve the byte at position 0 and verify it matches the source data
+        int result = bufferedSource.get(0);
+        assertEquals("Byte read from position 0 must match source data", 42, result);
+    }
 }
