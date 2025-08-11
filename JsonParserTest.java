@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2009 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.gson;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -13,22 +29,19 @@ import java.io.StringReader;
 import org.junit.Test;
 
 /**
- * Unit tests for {@link JsonParser}
+ * Unit test for {@link JsonParser}
  *
- * This test suite verifies the behavior of the JsonParser class, ensuring it correctly parses
- * various JSON inputs and handles errors appropriately.
+ * @author Inderjeet Singh
  */
 public class JsonParserTest {
 
   @Test
   public void testParseInvalidJson() {
-    // Test that parsing an invalid JSON string throws a JsonSyntaxException
     assertThrows(JsonSyntaxException.class, () -> JsonParser.parseString("[[]"));
   }
 
   @Test
   public void testParseUnquotedStringArrayFails() {
-    // Test parsing a JSON array with unquoted strings
     JsonElement element = JsonParser.parseString("[a,b,c]");
     assertThat(element.getAsJsonArray().get(0).getAsString()).isEqualTo("a");
     assertThat(element.getAsJsonArray().get(1).getAsString()).isEqualTo("b");
@@ -38,49 +51,44 @@ public class JsonParserTest {
 
   @Test
   public void testParseString() {
-    // Test parsing a JSON object with mixed types
     String json = "{a:10,b:'c'}";
-    JsonElement element = JsonParser.parseString(json);
-    assertThat(element.isJsonObject()).isTrue();
-    assertThat(element.getAsJsonObject().get("a").getAsInt()).isEqualTo(10);
-    assertThat(element.getAsJsonObject().get("b").getAsString()).isEqualTo("c");
+    JsonElement e = JsonParser.parseString(json);
+    assertThat(e.isJsonObject()).isTrue();
+    assertThat(e.getAsJsonObject().get("a").getAsInt()).isEqualTo(10);
+    assertThat(e.getAsJsonObject().get("b").getAsString()).isEqualTo("c");
   }
 
   @Test
   public void testParseEmptyString() {
-    // Test parsing a JSON string with spaces
-    JsonElement element = JsonParser.parseString("\"   \"");
-    assertThat(element.isJsonPrimitive()).isTrue();
-    assertThat(element.getAsString()).isEqualTo("   ");
+    JsonElement e = JsonParser.parseString("\"   \"");
+    assertThat(e.isJsonPrimitive()).isTrue();
+    assertThat(e.getAsString()).isEqualTo("   ");
   }
 
   @Test
   public void testParseEmptyWhitespaceInput() {
-    // Test parsing a JSON input with only whitespace
-    JsonElement element = JsonParser.parseString("     ");
-    assertThat(element.isJsonNull()).isTrue();
+    JsonElement e = JsonParser.parseString("     ");
+    assertThat(e.isJsonNull()).isTrue();
   }
 
   @Test
   public void testParseUnquotedSingleWordStringFails() {
-    // Test parsing an unquoted single word string
     assertThat(JsonParser.parseString("Test").getAsString()).isEqualTo("Test");
   }
 
   @Test
   public void testParseUnquotedMultiWordStringFails() {
-    // Test that parsing an unquoted multi-word string throws a JsonSyntaxException
-    assertThrows(JsonSyntaxException.class, () -> JsonParser.parseString("Test is a test..blah blah"));
+    assertThrows(
+        JsonSyntaxException.class, () -> JsonParser.parseString("Test is a test..blah blah"));
   }
 
   @Test
   public void testParseMixedArray() {
-    // Test parsing a JSON array with mixed types
     String json = "[{},13,\"stringValue\"]";
-    JsonElement element = JsonParser.parseString(json);
-    assertThat(element.isJsonArray()).isTrue();
+    JsonElement e = JsonParser.parseString(json);
+    assertThat(e.isJsonArray()).isTrue();
 
-    JsonArray array = element.getAsJsonArray();
+    JsonArray array = e.getAsJsonArray();
     assertThat(array.get(0).toString()).isEqualTo("{}");
     assertThat(array.get(1).getAsInt()).isEqualTo(13);
     assertThat(array.get(2).getAsString()).isEqualTo("stringValue");
@@ -89,103 +97,102 @@ public class JsonParserTest {
   /** Deeply nested JSON arrays should not cause {@link StackOverflowError} */
   @Test
   public void testParseDeeplyNestedArrays() throws IOException {
-    // Test parsing deeply nested JSON arrays
-    int nestingLevel = 10000;
-    String json = "[".repeat(nestingLevel) + "]".repeat(nestingLevel);
+    int times = 10000;
+    // [[[ ... ]]]
+    String json = "[".repeat(times) + "]".repeat(times);
     JsonReader jsonReader = new JsonReader(new StringReader(json));
     jsonReader.setNestingLimit(Integer.MAX_VALUE);
 
-    int actualNestingLevel = 0;
-    JsonArray currentArray = JsonParser.parseReader(jsonReader).getAsJsonArray();
+    int actualTimes = 0;
+    JsonArray current = JsonParser.parseReader(jsonReader).getAsJsonArray();
     while (true) {
-      actualNestingLevel++;
-      if (currentArray.isEmpty()) {
+      actualTimes++;
+      if (current.isEmpty()) {
         break;
       }
-      assertThat(currentArray.size()).isEqualTo(1);
-      currentArray = currentArray.get(0).getAsJsonArray();
+      assertThat(current.size()).isEqualTo(1);
+      current = current.get(0).getAsJsonArray();
     }
-    assertThat(actualNestingLevel).isEqualTo(nestingLevel);
+    assertThat(actualTimes).isEqualTo(times);
   }
 
   /** Deeply nested JSON objects should not cause {@link StackOverflowError} */
   @Test
   public void testParseDeeplyNestedObjects() throws IOException {
-    // Test parsing deeply nested JSON objects
-    int nestingLevel = 10000;
-    String json = "{\"a\":".repeat(nestingLevel) + "null" + "}".repeat(nestingLevel);
+    int times = 10000;
+    // {"a":{"a": ... {"a":null} ... }}
+    String json = "{\"a\":".repeat(times) + "null" + "}".repeat(times);
     JsonReader jsonReader = new JsonReader(new StringReader(json));
     jsonReader.setNestingLimit(Integer.MAX_VALUE);
 
-    int actualNestingLevel = 0;
-    JsonObject currentObject = JsonParser.parseReader(jsonReader).getAsJsonObject();
+    int actualTimes = 0;
+    JsonObject current = JsonParser.parseReader(jsonReader).getAsJsonObject();
     while (true) {
-      assertThat(currentObject.size()).isEqualTo(1);
-      actualNestingLevel++;
-      JsonElement nextElement = currentObject.get("a");
-      if (nextElement.isJsonNull()) {
+      assertThat(current.size()).isEqualTo(1);
+      actualTimes++;
+      JsonElement next = current.get("a");
+      if (next.isJsonNull()) {
         break;
       } else {
-        currentObject = nextElement.getAsJsonObject();
+        current = next.getAsJsonObject();
       }
     }
-    assertThat(actualNestingLevel).isEqualTo(nestingLevel);
+    assertThat(actualTimes).isEqualTo(times);
   }
 
   @Test
   public void testParseReader() {
-    // Test parsing JSON from a StringReader
     StringReader reader = new StringReader("{a:10,b:'c'}");
-    JsonElement element = JsonParser.parseReader(reader);
-    assertThat(element.isJsonObject()).isTrue();
-    assertThat(element.getAsJsonObject().get("a").getAsInt()).isEqualTo(10);
-    assertThat(element.getAsJsonObject().get("b").getAsString()).isEqualTo("c");
+    JsonElement e = JsonParser.parseReader(reader);
+    assertThat(e.isJsonObject()).isTrue();
+    assertThat(e.getAsJsonObject().get("a").getAsInt()).isEqualTo(10);
+    assertThat(e.getAsJsonObject().get("b").getAsString()).isEqualTo("c");
   }
 
   @Test
   public void testReadWriteTwoObjects() throws Exception {
-    // Test reading and writing two JSON objects
     Gson gson = new Gson();
     CharArrayWriter writer = new CharArrayWriter();
-    BagOfPrimitives firstObject = new BagOfPrimitives(1, 1, true, "one");
-    writer.write(gson.toJson(firstObject).toCharArray());
-    BagOfPrimitives secondObject = new BagOfPrimitives(2, 2, false, "two");
-    writer.write(gson.toJson(secondObject).toCharArray());
+    BagOfPrimitives expectedOne = new BagOfPrimitives(1, 1, true, "one");
+    writer.write(gson.toJson(expectedOne).toCharArray());
+    BagOfPrimitives expectedTwo = new BagOfPrimitives(2, 2, false, "two");
+    writer.write(gson.toJson(expectedTwo).toCharArray());
     CharArrayReader reader = new CharArrayReader(writer.toCharArray());
 
-    JsonReader jsonReader = new JsonReader(reader);
-    jsonReader.setStrictness(Strictness.LENIENT);
-    JsonElement element1 = Streams.parse(jsonReader);
-    JsonElement element2 = Streams.parse(jsonReader);
-    BagOfPrimitives actualFirstObject = gson.fromJson(element1, BagOfPrimitives.class);
-    assertThat(actualFirstObject.stringValue).isEqualTo("one");
-    BagOfPrimitives actualSecondObject = gson.fromJson(element2, BagOfPrimitives.class);
-    assertThat(actualSecondObject.stringValue).isEqualTo("two");
+    JsonReader parser = new JsonReader(reader);
+    parser.setStrictness(Strictness.LENIENT);
+    JsonElement element1 = Streams.parse(parser);
+    JsonElement element2 = Streams.parse(parser);
+    BagOfPrimitives actualOne = gson.fromJson(element1, BagOfPrimitives.class);
+    assertThat(actualOne.stringValue).isEqualTo("one");
+    BagOfPrimitives actualTwo = gson.fromJson(element2, BagOfPrimitives.class);
+    assertThat(actualTwo.stringValue).isEqualTo("two");
   }
 
   @Test
   public void testLegacyStrict() {
-    // Test parsing with LEGACY_STRICT mode
     JsonReader reader = new JsonReader(new StringReader("unquoted"));
     Strictness strictness = Strictness.LEGACY_STRICT;
+    // LEGACY_STRICT is ignored by JsonParser later; parses in lenient mode instead
     reader.setStrictness(strictness);
 
     assertThat(JsonParser.parseReader(reader)).isEqualTo(new JsonPrimitive("unquoted"));
+    // Original strictness was restored
     assertThat(reader.getStrictness()).isEqualTo(strictness);
   }
 
   @Test
   public void testStrict() {
-    // Test parsing with STRICT mode, expecting a JsonSyntaxException
     JsonReader reader = new JsonReader(new StringReader("faLsE"));
     Strictness strictness = Strictness.STRICT;
     reader.setStrictness(strictness);
 
-    var exception = assertThrows(JsonSyntaxException.class, () -> JsonParser.parseReader(reader));
-    assertThat(exception)
+    var e = assertThrows(JsonSyntaxException.class, () -> JsonParser.parseReader(reader));
+    assertThat(e)
         .hasCauseThat()
         .hasMessageThat()
         .startsWith("Use JsonReader.setStrictness(Strictness.LENIENT) to accept malformed JSON");
+    // Original strictness was kept
     assertThat(reader.getStrictness()).isEqualTo(strictness);
   }
 }
