@@ -13,142 +13,136 @@ import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.data.flow.NodeKey;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true,
+    useVFS = true,
+    useVNET = true,
+    resetStaticState = true,
+    separateClassLoader = true
+) 
 public class NodeKey_ESTest extends NodeKey_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      Integer integer0 = new Integer(0);
-      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>((-1934), integer0);
-      NodeKey<Integer> nodeKey1 = new NodeKey<Integer>((-3799), integer0);
-      NodeKey nodeKey2 = (NodeKey)nodeKey1.clone();
-      boolean boolean0 = nodeKey0.equals(nodeKey2);
-      assertFalse(boolean0);
-      assertEquals((-3799), nodeKey2.getStage());
-      assertFalse(nodeKey1.equals((Object)nodeKey0));
-  }
+    @Test(timeout = 4000)
+    public void testEquals_DifferentStages_ReturnsFalse() throws Throwable {
+        // Setup: Create two NodeKeys with different stages but same node
+        Integer node = Integer.valueOf(0);
+        NodeKey<Integer> key1 = new NodeKey<>(-1934, node);
+        NodeKey<Integer> key2 = new NodeKey<>(-3799, node);
+        NodeKey<Integer> key2Clone = (NodeKey<Integer>) key2.clone();
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      Integer integer0 = new Integer(0);
-      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(0, integer0);
-      int int0 = nodeKey0.getStage();
-      assertEquals(0, int0);
-  }
+        // Verify keys with different stages are not equal
+        assertFalse(key1.equals(key2Clone));
+        assertEquals(-3799, key2Clone.getStage());
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      Integer integer0 = new Integer(0);
-      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>((-1934), integer0);
-      int int0 = nodeKey0.getStage();
-      assertEquals((-1934), int0);
-  }
+    @Test(timeout = 4000)
+    public void testGetStage_ZeroStage_ReturnsZero() throws Throwable {
+        // Setup: NodeKey with stage 0
+        NodeKey<Integer> key = new NodeKey<>(0, Integer.valueOf(0));
+        // Verify stage retrieval
+        assertEquals(0, key.getStage());
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      NodeKey<Integer> nodeKey0 = null;
-      try {
-        nodeKey0 = new NodeKey<Integer>(617, (Integer) null);
-        fail("Expecting exception: IllegalArgumentException");
-      
-      } catch(IllegalArgumentException e) {
-         //
-         // Null 'node' argument.
-         //
-         verifyException("org.jfree.chart.internal.Args", e);
-      }
-  }
+    @Test(timeout = 4000)
+    public void testGetStage_NegativeStage_ReturnsValue() throws Throwable {
+        // Setup: NodeKey with negative stage
+        NodeKey<Integer> key = new NodeKey<>(-1934, Integer.valueOf(0));
+        // Verify stage retrieval
+        assertEquals(-1934, key.getStage());
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      Integer integer0 = new Integer(3);
-      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(2281, integer0);
-      Integer integer1 = new Integer(2281);
-      NodeKey<Integer> nodeKey1 = new NodeKey<Integer>(2281, integer1);
-      NodeKey nodeKey2 = (NodeKey)nodeKey1.clone();
-      boolean boolean0 = nodeKey0.equals(nodeKey2);
-      assertFalse(boolean0);
-      assertEquals(2281, nodeKey2.getStage());
-  }
+    @Test(timeout = 4000)
+    public void testConstructor_NullNode_ThrowsException() throws Throwable {
+        // Verify that null node argument throws IllegalArgumentException
+        try {
+            new NodeKey<>(617, null);
+            fail("Expected IllegalArgumentException for null node");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Null 'node' argument.", e.getMessage());
+        }
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      Integer integer0 = new Integer(3);
-      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(2281, integer0);
-      Object object0 = new Object();
-      boolean boolean0 = nodeKey0.equals(object0);
-      assertEquals(2281, nodeKey0.getStage());
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testEquals_SameStageDifferentNodes_ReturnsFalse() throws Throwable {
+        // Setup: Create two NodeKeys with same stage but different nodes
+        NodeKey<Integer> key1 = new NodeKey<>(2281, Integer.valueOf(3));
+        NodeKey<Integer> key2 = new NodeKey<>(2281, Integer.valueOf(2281));
+        NodeKey<Integer> key2Clone = (NodeKey<Integer>) key2.clone();
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      Integer integer0 = new Integer(504);
-      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(504, integer0);
-      boolean boolean0 = nodeKey0.equals((Object) null);
-      assertEquals(504, nodeKey0.getStage());
-      assertFalse(boolean0);
-  }
+        // Verify keys with different nodes are not equal
+        assertFalse(key1.equals(key2Clone));
+        assertEquals(2281, key2Clone.getStage());
+    }
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      Integer integer0 = new Integer(5721);
-      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(5721, integer0);
-      boolean boolean0 = nodeKey0.equals(nodeKey0);
-      assertEquals(5721, nodeKey0.getStage());
-      assertTrue(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testEquals_NonNodeKeyObject_ReturnsFalse() throws Throwable {
+        // Setup: NodeKey compared to a non-NodeKey object
+        NodeKey<Integer> key = new NodeKey<>(2281, Integer.valueOf(3));
+        Object otherObject = new Object();
+        // Verify non-equality
+        assertFalse(key.equals(otherObject));
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      Integer integer0 = new Integer(3);
-      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(2281, integer0);
-      NodeKey<Integer> nodeKey1 = new NodeKey<Integer>(2725, integer0);
-      boolean boolean0 = nodeKey0.equals(nodeKey1);
-      assertEquals(2725, nodeKey1.getStage());
-      assertFalse(nodeKey1.equals((Object)nodeKey0));
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testEquals_Null_ReturnsFalse() throws Throwable {
+        // Verify NodeKey is not equal to null
+        NodeKey<Integer> key = new NodeKey<>(504, Integer.valueOf(504));
+        assertFalse(key.equals(null));
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      Integer integer0 = new Integer(3);
-      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(2281, integer0);
-      String string0 = nodeKey0.toString();
-      assertEquals("[NodeKey: 2281, 3]", string0);
-  }
+    @Test(timeout = 4000)
+    public void testEquals_Reflexive_ReturnsTrue() throws Throwable {
+        // Verify NodeKey equals itself
+        NodeKey<Integer> key = new NodeKey<>(5721, Integer.valueOf(5721));
+        assertTrue(key.equals(key));
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      Integer integer0 = new Integer(3);
-      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(2281, integer0);
-      NodeKey nodeKey1 = (NodeKey)nodeKey0.clone();
-      boolean boolean0 = nodeKey0.equals(nodeKey1);
-      assertTrue(boolean0);
-      assertEquals(2281, nodeKey1.getStage());
-  }
+    @Test(timeout = 4000)
+    public void testEquals_DifferentStagesSameNode_ReturnsFalse() throws Throwable {
+        // Setup: Create two NodeKeys with different stages but same node
+        Integer node = Integer.valueOf(3);
+        NodeKey<Integer> key1 = new NodeKey<>(2281, node);
+        NodeKey<Integer> key2 = new NodeKey<>(2725, node);
+        // Verify non-equality
+        assertFalse(key1.equals(key2));
+        assertEquals(2725, key2.getStage());
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      Integer integer0 = new Integer(504);
-      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(504, integer0);
-      nodeKey0.getNode();
-      assertEquals(504, nodeKey0.getStage());
-  }
+    @Test(timeout = 4000)
+    public void testToString_ReturnsExpectedFormat() throws Throwable {
+        // Verify toString format
+        NodeKey<Integer> key = new NodeKey<>(2281, Integer.valueOf(3));
+        assertEquals("[NodeKey: 2281, 3]", key.toString());
+    }
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      Integer integer0 = new Integer(9);
-      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(9, integer0);
-      nodeKey0.hashCode();
-      assertEquals(9, nodeKey0.getStage());
-  }
+    @Test(timeout = 4000)
+    public void testEquals_WithClone_ReturnsTrue() throws Throwable {
+        // Verify NodeKey equals its clone
+        NodeKey<Integer> original = new NodeKey<>(2281, Integer.valueOf(3));
+        NodeKey<Integer> clone = (NodeKey<Integer>) original.clone();
+        assertTrue(original.equals(clone));
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      Integer integer0 = new Integer(3);
-      NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(2281, integer0);
-      int int0 = nodeKey0.getStage();
-      assertEquals(2281, int0);
-  }
+    @Test(timeout = 4000)
+    public void testGetNode_ReturnsNode() throws Throwable {
+        // Verify node retrieval
+        Integer node = Integer.valueOf(504);
+        NodeKey<Integer> key = new NodeKey<>(504, node);
+        assertSame(node, key.getNode());
+    }
+
+    @Test(timeout = 4000)
+    public void testHashCode_DoesNotThrowException() throws Throwable {
+        // Verify hashCode doesn't throw exceptions
+        NodeKey<Integer> key = new NodeKey<>(9, Integer.valueOf(9));
+        key.hashCode(); // Should not throw
+    }
+
+    @Test(timeout = 4000)
+    public void testGetStage_PositiveStage_ReturnsValue() throws Throwable {
+        // Verify positive stage retrieval
+        NodeKey<Integer> key = new NodeKey<>(2281, Integer.valueOf(3));
+        assertEquals(2281, key.getStage());
+    }
 }
