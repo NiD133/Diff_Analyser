@@ -23,7 +23,6 @@
     
     The interactive user interfaces in modified source and object code versions
     of this program must display Appropriate Legal Notices, as required under
-    Section 5 of the GNU Affero General Notices, as required under
     Section 5 of the GNU Affero General Public License.
     
     In accordance with Section 7(b) of the GNU Affero General Public License,
@@ -59,224 +58,134 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
-/**
- * Test suite for XmpWriter functionality.
- * Tests various scenarios of creating and manipulating XMP metadata in PDF documents.
- */
 public class XmpWriterTest {
-    
-    private static final String OUTPUT_FOLDER = "./target/com/itextpdf/text/xml/xmp/";
-    private static final String EXPECTED_FOLDER = "./src/test/resources/com/itextpdf/text/xml/xmp/";
-    
-    // Test data constants
-    private static final String SAMPLE_TEXT = "Hello World";
-    private static final String[] TEST_SUBJECTS = {"Hello World", "XMP & Metadata", "Metadata"};
-    private static final String TEST_KEYWORDS = "Hello World, XMP & Metadata, Metadata";
-    private static final String PDF_VERSION = "1.4";
+    public static final String OUT_FOLDER = "./target/com/itextpdf/text/xml/xmp/";
+    public static final String CMP_FOLDER = "./src/test/resources/com/itextpdf/text/xml/xmp/";
 
     @Before
-    public void setupOutputDirectory() {
-        new File(OUTPUT_FOLDER).mkdirs();
+    public void init() {
+        new File(OUT_FOLDER).mkdirs();
     }
 
     @Test
-    public void shouldCreatePdfWithManualXmpMetadata() throws IOException, DocumentException, XMPException {
-        // Given
-        String outputFileName = "xmp_metadata.pdf";
-        
-        // When
-        createPdfWithManualXmpMetadata(outputFileName);
-        
-        // Then
-        assertXmpMetadataMatches(outputFileName, "xmp_metadata.pdf");
-    }
-
-    @Test
-    public void shouldCreatePdfWithAutomaticXmpMetadata() throws IOException, DocumentException {
-        // Given
-        String outputFileName = "xmp_metadata_automatic.pdf";
-        
-        // When
-        createPdfWithAutomaticXmpMetadata(outputFileName);
-        
-        // Then
-        assertXmpMetadataMatches(outputFileName, outputFileName);
-    }
-
-    @Test
-    public void shouldAddXmpMetadataToExistingPdf() throws IOException, DocumentException {
-        // Given
-        String inputFileName = "pdf_metadata.pdf";
-        String outputFileName = "xmp_metadata_added.pdf";
-        
-        // When
-        addXmpMetadataToExistingPdf(inputFileName, outputFileName);
-        
-        // Then
-        assertXmpMetadataMatches(outputFileName, outputFileName);
-    }
-
-    @Test
-    public void shouldEnhanceExistingPdfWithAdditionalXmpMetadata() throws IOException, DocumentException, XMPException {
-        // Given
-        String inputFileName = "pdf_metadata.pdf";
-        String outputFileName = "xmp_metadata_added2.pdf";
-        
-        // When
-        enhanceExistingPdfWithXmpMetadata(inputFileName, outputFileName);
-        
-        // Then
-        assertXmpMetadataMatches(outputFileName, outputFileName);
-    }
-
-    @Test
-    public void shouldCreatePdfUsingDeprecatedXmpApi() throws IOException, DocumentException {
-        // Given
-        String outputFileName = "xmp_metadata_deprecated.pdf";
-        String expectedFileName = "xmp_metadata.pdf";
-        
-        // When
-        createPdfUsingDeprecatedXmpApi(outputFileName);
-        
-        // Then
-        assertXmpMetadataMatches(outputFileName, expectedFileName);
-    }
-
-    // Helper methods for better test organization and readability
-
-    private void createPdfWithManualXmpMetadata(String fileName) throws IOException, DocumentException, XMPException {
+    public void createPdfTest() throws IOException, DocumentException, XMPException {
+        String fileName = "xmp_metadata.pdf";
+        // step 1
         Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(OUTPUT_FOLDER + fileName));
-        
-        // Create XMP metadata manually
-        ByteArrayOutputStream xmpOutputStream = new ByteArrayOutputStream();
-        XmpWriter xmpWriter = new XmpWriter(xmpOutputStream);
-        
-        addTestSubjectsToXmp(xmpWriter);
-        addTestPropertiesToXmp(xmpWriter);
-        
-        xmpWriter.close();
-        writer.setXmpMetadata(xmpOutputStream.toByteArray());
-        
-        writeDocumentContent(document);
+        // step 2
+        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(OUT_FOLDER + fileName));
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        XmpWriter xmp = new XmpWriter(os);
+
+        DublinCoreProperties.addSubject(xmp.getXmpMeta(), "Hello World");
+        DublinCoreProperties.addSubject(xmp.getXmpMeta(), "XMP & Metadata");
+        DublinCoreProperties.addSubject(xmp.getXmpMeta(), "Metadata");
+
+        PdfProperties.setKeywords(xmp.getXmpMeta(), "Hello World, XMP & Metadata, Metadata");
+        PdfProperties.setVersion(xmp.getXmpMeta(), "1.4");
+
+        xmp.close();
+
+        writer.setXmpMetadata(os.toByteArray());
+        // step 3
+        document.open();
+        // step 4
+        document.add(new Paragraph("Hello World"));
+        // step 5
+        document.close();
+
+        CompareTool ct = new CompareTool();
+        Assert.assertNull(ct.compareXmp(OUT_FOLDER + fileName, CMP_FOLDER + fileName, true));
     }
 
-    private void createPdfWithAutomaticXmpMetadata(String fileName) throws IOException, DocumentException {
+    @Test
+    public void createPdfAutomaticTest() throws IOException, DocumentException {
+        String fileName = "xmp_metadata_automatic.pdf";
+        // step 1
         Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(OUTPUT_FOLDER + fileName));
-        
-        // Add metadata using Document methods (automatic XMP generation)
-        addDocumentMetadata(document);
-        writer.createXmpMetadata();
-        
-        writeDocumentContent(document);
-    }
-
-    private void addXmpMetadataToExistingPdf(String inputFileName, String outputFileName) throws IOException, DocumentException {
-        PdfReader reader = new PdfReader(EXPECTED_FOLDER + inputFileName);
-        PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(OUTPUT_FOLDER + outputFileName));
-        
-        // Extract existing metadata and create XMP from it
-        HashMap<String, String> existingMetadata = reader.getInfo();
-        ByteArrayOutputStream xmpOutputStream = new ByteArrayOutputStream();
-        XmpWriter xmpWriter = new XmpWriter(xmpOutputStream, existingMetadata);
-        
-        xmpWriter.close();
-        stamper.setXmpMetadata(xmpOutputStream.toByteArray());
-        
-        closeResources(stamper, reader);
-    }
-
-    private void enhanceExistingPdfWithXmpMetadata(String inputFileName, String outputFileName) 
-            throws IOException, DocumentException, XMPException {
-        PdfReader reader = new PdfReader(EXPECTED_FOLDER + inputFileName);
-        PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(OUTPUT_FOLDER + outputFileName));
-        
-        // Create XMP metadata and enhance it with additional properties
-        stamper.createXmpMetadata();
-        XmpWriter xmpWriter = stamper.getXmpWriter();
-        
-        addTestSubjectsToXmp(xmpWriter);
-        PdfProperties.setVersion(xmpWriter.getXmpMeta(), PDF_VERSION);
-        
-        closeResources(stamper, reader);
-    }
-
-    private void createPdfUsingDeprecatedXmpApi(String fileName) throws IOException, DocumentException {
-        Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(OUTPUT_FOLDER + fileName));
-        
-        // Create XMP metadata using deprecated API
-        ByteArrayOutputStream xmpOutputStream = new ByteArrayOutputStream();
-        XmpWriter xmpWriter = new XmpWriter(xmpOutputStream);
-        
-        addDeprecatedDublinCoreSchema(xmpWriter);
-        addDeprecatedPdfSchema(xmpWriter);
-        
-        xmpWriter.close();
-        writer.setXmpMetadata(xmpOutputStream.toByteArray());
-        
-        writeDocumentContent(document);
-    }
-
-    // Utility methods for common operations
-
-    private void addTestSubjectsToXmp(XmpWriter xmpWriter) throws XMPException {
-        for (String subject : TEST_SUBJECTS) {
-            DublinCoreProperties.addSubject(xmpWriter.getXmpMeta(), subject);
-        }
-    }
-
-    private void addTestPropertiesToXmp(XmpWriter xmpWriter) throws XMPException {
-        PdfProperties.setKeywords(xmpWriter.getXmpMeta(), TEST_KEYWORDS);
-        PdfProperties.setVersion(xmpWriter.getXmpMeta(), PDF_VERSION);
-    }
-
-    private void addDocumentMetadata(Document document) {
+        // step 2
+        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(OUT_FOLDER + fileName));
         document.addTitle("Hello World example");
         document.addSubject("This example shows how to add metadata & XMP");
         document.addKeywords("Metadata, iText, step 3");
         document.addCreator("My program using 'iText'");
         document.addAuthor("Bruno Lowagie & Paulo Soares");
-    }
-
-    private void writeDocumentContent(Document document) throws DocumentException {
+        writer.createXmpMetadata();
+        // step 3
         document.open();
-        document.add(new Paragraph(SAMPLE_TEXT));
+        // step 4
+        document.add(new Paragraph("Hello World"));
+        // step 5
         document.close();
+        CompareTool ct = new CompareTool();
+        Assert.assertNull(ct.compareXmp(OUT_FOLDER + fileName, CMP_FOLDER + fileName, true));
     }
 
-    private void addDeprecatedDublinCoreSchema(XmpWriter xmpWriter) throws IOException {
-        XmpSchema dublinCoreSchema = new com.itextpdf.text.xml.xmp.DublinCoreSchema();
-        XmpArray subjectArray = new XmpArray(XmpArray.UNORDERED);
-        
-        for (String subject : TEST_SUBJECTS) {
-            subjectArray.add(subject);
-        }
-        
-        dublinCoreSchema.setProperty(DublinCoreSchema.SUBJECT, subjectArray);
-        xmpWriter.addRdfDescription(dublinCoreSchema.getXmlns(), dublinCoreSchema.toString());
-    }
-
-    private void addDeprecatedPdfSchema(XmpWriter xmpWriter) throws IOException {
-        PdfSchema pdfSchema = new PdfSchema();
-        pdfSchema.setProperty(PdfSchema.KEYWORDS, TEST_KEYWORDS);
-        pdfSchema.setProperty(PdfSchema.VERSION, PDF_VERSION);
-        xmpWriter.addRdfDescription(pdfSchema);
-    }
-
-    private void closeResources(PdfStamper stamper, PdfReader reader) throws DocumentException, IOException {
+    @Test
+    public void manipulatePdfTest() throws IOException, DocumentException {
+        String fileName = "xmp_metadata_added.pdf";
+        PdfReader reader = new PdfReader(CMP_FOLDER + "pdf_metadata.pdf");
+        PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(OUT_FOLDER + fileName));
+        HashMap<String, String> info = reader.getInfo();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        XmpWriter xmp = new XmpWriter(baos, info);
+        xmp.close();
+        stamper.setXmpMetadata(baos.toByteArray());
         stamper.close();
         reader.close();
+
+        CompareTool ct = new CompareTool();
+        Assert.assertNull(ct.compareXmp(OUT_FOLDER + fileName, CMP_FOLDER + fileName, true));
     }
 
-    private void assertXmpMetadataMatches(String actualFileName, String expectedFileName) throws IOException, DocumentException {
-        CompareTool compareTool = new CompareTool();
-        String comparisonResult = compareTool.compareXmp(
-            OUTPUT_FOLDER + actualFileName, 
-            EXPECTED_FOLDER + expectedFileName, 
-            true
-        );
-        Assert.assertNull("XMP metadata should match expected output", comparisonResult);
+    @Test
+    public void manipulatePdf2Test() throws IOException, DocumentException, XMPException {
+        String fileName = "xmp_metadata_added2.pdf";
+        PdfReader reader = new PdfReader(CMP_FOLDER + "pdf_metadata.pdf");
+        PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(OUT_FOLDER + fileName));
+        stamper.createXmpMetadata();
+        XmpWriter xmp = stamper.getXmpWriter();
+        DublinCoreProperties.addSubject(xmp.getXmpMeta(), "Hello World");
+        DublinCoreProperties.addSubject(xmp.getXmpMeta(), "XMP & Metadata");
+        DublinCoreProperties.addSubject(xmp.getXmpMeta(), "Metadata");
+
+        PdfProperties.setVersion(xmp.getXmpMeta(), "1.4");
+        stamper.close();
+        reader.close();
+
+        CompareTool ct = new CompareTool();
+        Assert.assertNull(ct.compareXmp(OUT_FOLDER + fileName, CMP_FOLDER + fileName, true));
+    }
+
+    @Test
+    public void deprecatedLogicTest() throws IOException, DocumentException {
+        String fileName = "xmp_metadata_deprecated.pdf";
+        // step 1
+        Document document = new Document();
+        // step 2
+        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(OUT_FOLDER + fileName));
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        XmpWriter xmp = new XmpWriter(os);
+        XmpSchema dc = new com.itextpdf.text.xml.xmp.DublinCoreSchema();
+        XmpArray subject = new XmpArray(XmpArray.UNORDERED);
+        subject.add("Hello World");
+        subject.add("XMP & Metadata");
+        subject.add("Metadata");
+        dc.setProperty(DublinCoreSchema.SUBJECT, subject);
+        xmp.addRdfDescription(dc.getXmlns(), dc.toString());
+        PdfSchema pdf = new PdfSchema();
+        pdf.setProperty(PdfSchema.KEYWORDS, "Hello World, XMP & Metadata, Metadata");
+        pdf.setProperty(PdfSchema.VERSION, "1.4");
+        xmp.addRdfDescription(pdf);
+        xmp.close();
+        writer.setXmpMetadata(os.toByteArray());
+        // step 3
+        document.open();
+        // step 4
+        document.add(new Paragraph("Hello World"));
+        // step 5
+        document.close();
+        CompareTool ct = new CompareTool();
+        Assert.assertNull(ct.compareXmp(OUT_FOLDER + fileName, CMP_FOLDER + "xmp_metadata.pdf", true));
     }
 }
