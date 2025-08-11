@@ -1,6 +1,21 @@
+/*
+ *    Copyright 2009-2024 the original author or authors.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package org.apache.ibatis.type;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -13,144 +28,96 @@ import java.sql.Array;
 import java.sql.Connection;
 import java.sql.Types;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
-@DisplayName("ArrayTypeHandler")
 class ArrayTypeHandlerTest extends BaseTypeHandlerTest {
 
-  private static final TypeHandler<Object> handler = new ArrayTypeHandler();
-
-  private static final String COLUMN = "column";
-  private static final int INDEX = 1;
-  private static final String[] SAMPLE_VALUES = { "a", "b" };
+  private static final TypeHandler<Object> TYPE_HANDLER = new ArrayTypeHandler();
 
   @Mock
-  Array sqlArray;
-
-  // ---------------------------------------------------------------------------
-  // setParameter
-  // ---------------------------------------------------------------------------
+  Array mockArray;
 
   @Override
   @Test
-  @DisplayName("setParameter: passes Array directly to PreparedStatement")
   public void shouldSetParameter() throws Exception {
-    handler.setParameter(ps, INDEX, sqlArray, null);
-
-    verify(ps).setArray(INDEX, sqlArray);
+    TYPE_HANDLER.setParameter(ps, 1, mockArray, null);
+    verify(ps).setArray(1, mockArray);
   }
 
   @Test
-  @DisplayName("setParameter: creates SQL Array for String[] and frees it")
   void shouldSetStringArrayParameter() throws Exception {
-    // given
     Connection connection = mock(Connection.class);
     when(ps.getConnection()).thenReturn(connection);
 
-    Array createdArray = mock(Array.class);
-    // Note: using anyString() to avoid coupling to internal JDBC type mapping
-    when(connection.createArrayOf(anyString(), any(String[].class))).thenReturn(createdArray);
+    Array array = mock(Array.class);
+    when(connection.createArrayOf(anyString(), any(String[].class))).thenReturn(array);
 
-    // when
-    handler.setParameter(ps, INDEX, new String[] { "Hello World" }, JdbcType.ARRAY);
-
-    // then
-    verify(ps).setArray(INDEX, createdArray);
-    verify(createdArray).free();
+    TYPE_HANDLER.setParameter(ps, 1, new String[] { "Hello World" }, JdbcType.ARRAY);
+    verify(ps).setArray(1, array);
+    verify(array).free();
   }
 
   @Test
-  @DisplayName("setParameter: sets SQL NULL for null parameter")
   void shouldSetNullParameter() throws Exception {
-    handler.setParameter(ps, INDEX, null, JdbcType.ARRAY);
-
-    verify(ps).setNull(INDEX, Types.ARRAY);
+    TYPE_HANDLER.setParameter(ps, 1, null, JdbcType.ARRAY);
+    verify(ps).setNull(1, Types.ARRAY);
   }
 
   @Test
-  @DisplayName("setParameter: throws TypeException for non-array parameter")
   void shouldFailForNonArrayParameter() {
-    assertThrows(TypeException.class, () ->
-        handler.setParameter(ps, INDEX, "unsupported parameter type", null));
+    assertThrows(TypeException.class, () -> TYPE_HANDLER.setParameter(ps, 1, "unsupported parameter type", null));
   }
-
-  // ---------------------------------------------------------------------------
-  // getResult (ResultSet by name)
-  // ---------------------------------------------------------------------------
 
   @Override
   @Test
-  @DisplayName("getResult (ResultSet by name): returns extracted array and frees SQL Array")
   public void shouldGetResultFromResultSetByName() throws Exception {
-    when(rs.getArray(COLUMN)).thenReturn(sqlArray);
-    when(sqlArray.getArray()).thenReturn(SAMPLE_VALUES);
-
-    Object result = handler.getResult(rs, COLUMN);
-
-    assertArrayEquals(SAMPLE_VALUES, (String[]) result);
-    verify(sqlArray).free();
+    when(rs.getArray("column")).thenReturn(mockArray);
+    String[] stringArray = { "a", "b" };
+    when(mockArray.getArray()).thenReturn(stringArray);
+    assertEquals(stringArray, TYPE_HANDLER.getResult(rs, "column"));
+    verify(mockArray).free();
   }
 
   @Override
   @Test
-  @DisplayName("getResult (ResultSet by name): returns null when SQL Array is null")
   public void shouldGetResultNullFromResultSetByName() throws Exception {
-    when(rs.getArray(COLUMN)).thenReturn(null);
-
-    assertNull(handler.getResult(rs, COLUMN));
+    when(rs.getArray("column")).thenReturn(null);
+    assertNull(TYPE_HANDLER.getResult(rs, "column"));
   }
-
-  // ---------------------------------------------------------------------------
-  // getResult (ResultSet by position)
-  // ---------------------------------------------------------------------------
 
   @Override
   @Test
-  @DisplayName("getResult (ResultSet by position): returns extracted array and frees SQL Array")
   public void shouldGetResultFromResultSetByPosition() throws Exception {
-    when(rs.getArray(INDEX)).thenReturn(sqlArray);
-    when(sqlArray.getArray()).thenReturn(SAMPLE_VALUES);
-
-    Object result = handler.getResult(rs, INDEX);
-
-    assertArrayEquals(SAMPLE_VALUES, (String[]) result);
-    verify(sqlArray).free();
+    when(rs.getArray(1)).thenReturn(mockArray);
+    String[] stringArray = { "a", "b" };
+    when(mockArray.getArray()).thenReturn(stringArray);
+    assertEquals(stringArray, TYPE_HANDLER.getResult(rs, 1));
+    verify(mockArray).free();
   }
 
   @Override
   @Test
-  @DisplayName("getResult (ResultSet by position): returns null when SQL Array is null")
   public void shouldGetResultNullFromResultSetByPosition() throws Exception {
-    when(rs.getArray(INDEX)).thenReturn(null);
-
-    assertNull(handler.getResult(rs, INDEX));
+    when(rs.getArray(1)).thenReturn(null);
+    assertNull(TYPE_HANDLER.getResult(rs, 1));
   }
-
-  // ---------------------------------------------------------------------------
-  // getResult (CallableStatement)
-  // ---------------------------------------------------------------------------
 
   @Override
   @Test
-  @DisplayName("getResult (CallableStatement): returns extracted array and frees SQL Array")
   public void shouldGetResultFromCallableStatement() throws Exception {
-    when(cs.getArray(INDEX)).thenReturn(sqlArray);
-    when(sqlArray.getArray()).thenReturn(SAMPLE_VALUES);
-
-    Object result = handler.getResult(cs, INDEX);
-
-    assertArrayEquals(SAMPLE_VALUES, (String[]) result);
-    verify(sqlArray).free();
+    when(cs.getArray(1)).thenReturn(mockArray);
+    String[] stringArray = { "a", "b" };
+    when(mockArray.getArray()).thenReturn(stringArray);
+    assertEquals(stringArray, TYPE_HANDLER.getResult(cs, 1));
+    verify(mockArray).free();
   }
 
   @Override
   @Test
-  @DisplayName("getResult (CallableStatement): returns null when SQL Array is null")
   public void shouldGetResultNullFromCallableStatement() throws Exception {
-    when(cs.getArray(INDEX)).thenReturn(null);
-
-    assertNull(handler.getResult(cs, INDEX));
+    when(cs.getArray(1)).thenReturn(null);
+    assertNull(TYPE_HANDLER.getResult(cs, 1));
   }
+
 }
