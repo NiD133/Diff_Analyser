@@ -27,58 +27,99 @@ import org.apache.commons.codec.DecoderException;
 import org.junit.jupiter.api.Test;
 
 /**
- * RFC 1522 compliant codec test cases
+ * Test cases for RFC1522Codec - verifies proper handling of invalid input and null values.
+ * 
+ * RFC 1522 defines the format for encoded words in email headers as:
+ * =?charset?encoding?encoded-text?=
  */
 class RFC1522CodecTest {
 
-    static class RFC1522TestCodec extends RFC1522Codec {
+    /**
+     * Test implementation of RFC1522Codec that performs no actual encoding/decoding.
+     * This allows us to test the base RFC1522Codec functionality without the complexity
+     * of specific encoding algorithms like Base64 or Quoted-Printable.
+     */
+    static class TestableRFC1522Codec extends RFC1522Codec {
 
-        RFC1522TestCodec() {
+        TestableRFC1522Codec() {
             super(StandardCharsets.UTF_8);
         }
 
         @Override
         protected byte[] doDecoding(final byte[] bytes) {
+            // Pass-through implementation for testing base class behavior
             return bytes;
         }
 
         @Override
         protected byte[] doEncoding(final byte[] bytes) {
+            // Pass-through implementation for testing base class behavior
             return bytes;
         }
 
         @Override
         protected String getEncoding() {
+            // Return "T" as a test encoding identifier
             return "T";
         }
-
     }
 
-    private void assertExpectedDecoderException(final String s) {
-        assertThrows(DecoderException.class, () -> new RFC1522TestCodec().decodeText(s));
+    private final TestableRFC1522Codec codec = new TestableRFC1522Codec();
+
+    /**
+     * Helper method to verify that decoding the given string throws a DecoderException.
+     * This reduces code duplication in the invalid input tests.
+     */
+    private void assertDecodingThrowsException(final String invalidInput) {
+        assertThrows(DecoderException.class, 
+                    () -> codec.decodeText(invalidInput),
+                    "Expected DecoderException for invalid input: " + invalidInput);
     }
 
+    /**
+     * Tests that various malformed RFC1522 encoded strings are properly rejected.
+     * 
+     * Valid RFC1522 format is: =?charset?encoding?encoded-text?=
+     * These tests verify that incomplete, malformed, or invalid formats throw DecoderException.
+     */
     @Test
-    void testDecodeInvalid() throws Exception {
-        assertExpectedDecoderException("whatever");
-        assertExpectedDecoderException("=?");
-        assertExpectedDecoderException("?=");
-        assertExpectedDecoderException("==");
-        assertExpectedDecoderException("=??=");
-        assertExpectedDecoderException("=?stuff?=");
-        assertExpectedDecoderException("=?UTF-8??=");
-        assertExpectedDecoderException("=?UTF-8?stuff?=");
-        assertExpectedDecoderException("=?UTF-8?T?stuff");
-        assertExpectedDecoderException("=??T?stuff?=");
-        assertExpectedDecoderException("=?UTF-8??stuff?=");
-        assertExpectedDecoderException("=?UTF-8?W?stuff?=");
+    void testDecodeInvalidFormats() throws Exception {
+        // Test completely invalid strings
+        assertDecodingThrowsException("whatever");  // No RFC1522 markers at all
+        
+        // Test incomplete RFC1522 markers
+        assertDecodingThrowsException("=?");        // Only start marker
+        assertDecodingThrowsException("?=");        // Only end marker
+        assertDecodingThrowsException("==");        // Wrong markers
+        
+        // Test malformed RFC1522 structure
+        assertDecodingThrowsException("=??=");      // Missing required fields
+        assertDecodingThrowsException("=?stuff?="); // Only one field instead of three
+        
+        // Test missing required components
+        assertDecodingThrowsException("=?UTF-8??=");        // Missing encoding and text
+        assertDecodingThrowsException("=?UTF-8?stuff?=");   // Invalid structure
+        assertDecodingThrowsException("=?UTF-8?T?stuff");   // Missing end marker
+        
+        // Test empty required fields
+        assertDecodingThrowsException("=??T?stuff?=");      // Empty charset
+        assertDecodingThrowsException("=?UTF-8??stuff?=");  // Empty encoding
+        
+        // Test unsupported encoding
+        assertDecodingThrowsException("=?UTF-8?W?stuff?="); // 'W' is not a valid encoding (should be B, Q, or T for test)
     }
 
+    /**
+     * Tests that null inputs are handled gracefully by returning null rather than throwing exceptions.
+     * This follows the common pattern in Apache Commons Codec of treating null as a no-op.
+     */
     @Test
-    void testNullInput() throws Exception {
-        final RFC1522TestCodec testCodec = new RFC1522TestCodec();
-        assertNull(testCodec.decodeText(null));
-        assertNull(testCodec.encodeText(null, CharEncoding.UTF_8));
+    void testNullInputHandling() throws Exception {
+        // Verify that null inputs return null rather than throwing exceptions
+        assertNull(codec.decodeText(null), 
+                  "decodeText should return null for null input");
+        
+        assertNull(codec.encodeText(null, CharEncoding.UTF_8), 
+                  "encodeText should return null for null input");
     }
-
 }
