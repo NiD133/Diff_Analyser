@@ -21,131 +21,92 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
  * Other names may be trademarks of their respective owners.]
  *
  * --------------------------
  * DeviationRendererTest.java
  * --------------------------
- * Tests for the DeviationRenderer class.
+ * (C) Copyright 2007-present, by David Gilbert and Contributors.
+ *
+ * Original Author:  David Gilbert;
+ * Contributor(s):   -;
+ *
  */
 
 package org.jfree.chart.renderer.xy;
 
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.api.PublicCloneable;
-import org.junit.jupiter.api.DisplayName;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for {@link DeviationRenderer}.
- *
- * The tests focus on:
- * - equals/hashCode contract
- * - cloning semantics
- * - PublicCloneable implementation
- * - Java serialization round-trip
+ * Tests for the {@link DeviationRenderer} class.
  */
-@DisplayName("DeviationRenderer")
 public class DeviationRendererTest {
 
-    // -------- Helper methods to keep individual tests concise --------
-
-    private static DeviationRenderer newRenderer() {
-        return new DeviationRenderer();
-    }
-
-    private static DeviationRenderer rendererWithAlpha(float alpha) {
-        DeviationRenderer r = newRenderer();
-        r.setAlpha(alpha);
-        return r;
-    }
-
-    // ------------------------------ equals ------------------------------
-
+    /**
+     * Test that the equals() method distinguishes all fields.
+     */
     @Test
-    @DisplayName("equals: default instances are equal and symmetric")
-    public void equals_defaultInstancesAreEqual() {
-        DeviationRenderer r1 = newRenderer();
-        DeviationRenderer r2 = newRenderer();
+    public void testEquals() {
+        // default instances
+        DeviationRenderer r1 = new DeviationRenderer();
+        DeviationRenderer r2 = new DeviationRenderer();
+        assertEquals(r1, r2);
+        assertEquals(r2, r1);
 
-        assertAll(
-                "Default instances should be equal and symmetric",
-                () -> assertEquals(r1, r2, "r1 should equal r2"),
-                () -> assertEquals(r2, r1, "r2 should equal r1")
-        );
-    }
-
-    @Test
-    @DisplayName("equals: differs when alpha differs, equal again when aligned")
-    public void equals_detectsDifferenceInAlpha() {
-        // Given two equal renderers
-        DeviationRenderer r1 = newRenderer();
-        DeviationRenderer r2 = newRenderer();
-        assertEquals(r1, r2, "Precondition: default instances must be equal");
-
-        // When alpha is changed on one
         r1.setAlpha(0.1f);
-
-        // Then they are no longer equal
-        assertNotEquals(r1, r2, "Different alpha should break equality");
-
-        // When alpha is aligned
+        assertNotEquals(r1, r2);
         r2.setAlpha(0.1f);
-
-        // Then equality is restored
-        assertEquals(r1, r2, "Setting the same alpha should restore equality");
+        assertEquals(r1, r2);
     }
 
-    // ---------------------------- hashCode -----------------------------
-
+    /**
+     * Two objects that are equal are required to return the same hashCode.
+     */
     @Test
-    @DisplayName("hashCode: equal objects produce equal hash codes")
-    public void hashCode_equalObjectsHaveSameHash() {
-        DeviationRenderer r1 = newRenderer();
-        DeviationRenderer r2 = newRenderer();
-
-        assertEquals(r1, r2, "Precondition: instances must be equal");
-        assertEquals(r1.hashCode(), r2.hashCode(), "Equal objects must have equal hash codes");
+    public void testHashcode() {
+        DeviationRenderer r1 = new DeviationRenderer();
+        DeviationRenderer r2 = new DeviationRenderer();
+        assertEquals(r1, r2);
+        int h1 = r1.hashCode();
+        int h2 = r2.hashCode();
+        assertEquals(h1, h2);
     }
 
-    // ----------------------------- cloning -----------------------------
-
+    /**
+     * Confirm that cloning works.
+     */
     @Test
-    @DisplayName("clone: creates a distinct but equal copy")
-    public void cloning_createsEqualButDistinctInstance() throws CloneNotSupportedException {
-        DeviationRenderer original = rendererWithAlpha(0.3f);
-
-        DeviationRenderer clone = (DeviationRenderer) original.clone();
-
-        assertAll(
-                "Clone should be a distinct but equal instance",
-                () -> assertNotSame(original, clone, "Clone must be a different instance"),
-                () -> assertSame(original.getClass(), clone.getClass(), "Clone must be of the same type"),
-                () -> assertEquals(original, clone, "Clone must be equal to the original")
-        );
+    public void testCloning() throws CloneNotSupportedException {
+        DeviationRenderer r1 = new DeviationRenderer();
+        DeviationRenderer r2 = (DeviationRenderer) r1.clone();
+        assertNotSame(r1, r2);
+        assertSame(r1.getClass(), r2.getClass());
+        assertEquals(r1, r2);
     }
 
-    // ------------------------ PublicCloneable --------------------------
-
+    /**
+     * Verify that this class implements {@link PublicCloneable}.
+     */
     @Test
-    @DisplayName("Implements PublicCloneable")
-    public void implementsPublicCloneable() {
-        assertTrue(newRenderer() instanceof PublicCloneable,
-                "DeviationRenderer should implement PublicCloneable");
+    public void testPublicCloneable() {
+        DeviationRenderer r1 = new DeviationRenderer();
+        assertTrue(r1 instanceof PublicCloneable);
     }
 
-    // -------------------------- serialization --------------------------
-
+    /**
+     * Serialize an instance, restore it, and check for equality.
+     */
     @Test
-    @DisplayName("Serialization: round-trip preserves equality")
-    public void serialization_roundTripYieldsEqualObject() {
-        DeviationRenderer original = rendererWithAlpha(0.25f);
-
-        DeviationRenderer restored = TestUtils.serialised(original);
-
-        assertEquals(original, restored, "Deserialized instance should equal the original");
+    public void testSerialization() {
+        DeviationRenderer r1 = new DeviationRenderer();
+        DeviationRenderer r2 = TestUtils.serialised(r1);
+        assertEquals(r1, r2);
     }
+
 }
