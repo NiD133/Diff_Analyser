@@ -30,5 +30,244 @@ public class MappedRandomAccessFile_ESTest extends MappedRandomAccessFile_ESTest
       assertEquals((-1), int0);
   }
 
-  // ... (and 22 other cryptic tests)
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      byte[] byteArray0 = new byte[9];
+      MappedRandomAccessFile mappedRandomAccessFile0 = new MappedRandomAccessFile("rw", "rw");
+      assertEquals(0L, mappedRandomAccessFile0.getFilePointer());
+      
+      mappedRandomAccessFile0.seek(1073741824L);
+      int int0 = mappedRandomAccessFile0.read(byteArray0, (-1458), 642);
+      assertEquals((-1), int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      MappedRandomAccessFile mappedRandomAccessFile0 = new MappedRandomAccessFile("rw", "rw");
+      mappedRandomAccessFile0.seek(1073741824L);
+      assertEquals(1073741824L, mappedRandomAccessFile0.getFilePointer());
+      
+      int int0 = mappedRandomAccessFile0.read();
+      assertEquals((-1), int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      MappedRandomAccessFile mappedRandomAccessFile0 = null;
+      try {
+        mappedRandomAccessFile0 = new MappedRandomAccessFile((String) null, "rw");
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.evosuite.runtime.mock.java.io.MockRandomAccessFile", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      MappedRandomAccessFile mappedRandomAccessFile0 = new MappedRandomAccessFile("rw", "rw");
+      mappedRandomAccessFile0.seek(686);
+      long long0 = mappedRandomAccessFile0.getFilePointer();
+      assertEquals(686L, long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      MappedRandomAccessFile mappedRandomAccessFile0 = new MappedRandomAccessFile("rw", "rw");
+      mappedRandomAccessFile0.seek((-2756L));
+      long long0 = mappedRandomAccessFile0.getFilePointer();
+      assertEquals((-2756L), long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      MappedRandomAccessFile mappedRandomAccessFile0 = new MappedRandomAccessFile("rw", "rw");
+      mappedRandomAccessFile0.close();
+      mappedRandomAccessFile0.getChannel();
+      assertEquals(0L, mappedRandomAccessFile0.getFilePointer());
+  }
+
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      FileSystemHandling.shouldAllThrowIOExceptions();
+      MappedRandomAccessFile mappedRandomAccessFile0 = new MappedRandomAccessFile("rw", "rw");
+      try { 
+        mappedRandomAccessFile0.finalize();
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // Simulated IOException
+         //
+         verifyException("org.evosuite.runtime.vfs.VirtualFileSystem", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      FileSystemHandling.shouldAllThrowIOExceptions();
+      MappedRandomAccessFile mappedRandomAccessFile0 = new MappedRandomAccessFile("rw", "rw");
+      try { 
+        mappedRandomAccessFile0.close();
+        fail("Expecting exception: IOException");
+      
+      } catch(IOException e) {
+         //
+         // Simulated IOException
+         //
+         verifyException("org.evosuite.runtime.vfs.VirtualFileSystem", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      java.nio.ByteBuffer byteBuffer0 = java.nio.ByteBuffer.allocate(2089);
+      boolean boolean0 = MappedRandomAccessFile.clean(byteBuffer0);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      boolean boolean0 = MappedRandomAccessFile.clean((java.nio.ByteBuffer) null);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      MappedRandomAccessFile mappedRandomAccessFile0 = new MappedRandomAccessFile("rw", "rw");
+      mappedRandomAccessFile0.close();
+      mappedRandomAccessFile0.close();
+      assertEquals(0L, mappedRandomAccessFile0.getFilePointer());
+  }
+
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      MappedRandomAccessFile mappedRandomAccessFile0 = new MappedRandomAccessFile("rw", "rw");
+      mappedRandomAccessFile0.seek((-1934028347));
+      byte[] byteArray0 = new byte[0];
+      // Undeclared exception!
+      try { 
+        mappedRandomAccessFile0.read(byteArray0, (-1934028347), 841);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // -1
+         //
+         verifyException("com.itextpdf.text.pdf.MappedRandomAccessFile", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      MappedRandomAccessFile mappedRandomAccessFile0 = new MappedRandomAccessFile("rw", "rw");
+      byte[] byteArray0 = new byte[9];
+      int int0 = mappedRandomAccessFile0.read(byteArray0, (int) (byte)0, 105);
+      assertEquals((-1), int0);
+      assertEquals(0L, mappedRandomAccessFile0.getFilePointer());
+  }
+
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      byte[] byteArray0 = new byte[9];
+      MappedRandomAccessFile mappedRandomAccessFile0 = new MappedRandomAccessFile("rw", "rw");
+      int int0 = mappedRandomAccessFile0.read(byteArray0, (int) (byte) (-56), (int) (byte)0);
+      assertEquals(0L, mappedRandomAccessFile0.getFilePointer());
+      assertEquals((-1), int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      MappedRandomAccessFile mappedRandomAccessFile0 = new MappedRandomAccessFile("rw", "rw");
+      int int0 = mappedRandomAccessFile0.read();
+      assertEquals(0L, mappedRandomAccessFile0.getFilePointer());
+      assertEquals((-1), int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      MappedRandomAccessFile mappedRandomAccessFile0 = new MappedRandomAccessFile("rw", "rw");
+      mappedRandomAccessFile0.seek((-1934028355));
+      // Undeclared exception!
+      try { 
+        mappedRandomAccessFile0.read();
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // -1
+         //
+         verifyException("com.itextpdf.text.pdf.MappedRandomAccessFile", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      EvoSuiteFile evoSuiteFile0 = new EvoSuiteFile("qw");
+      FileSystemHandling.appendStringToFile(evoSuiteFile0, "qw");
+      MappedRandomAccessFile mappedRandomAccessFile0 = null;
+      try {
+        mappedRandomAccessFile0 = new MappedRandomAccessFile("qw", "qw");
+        fail("Expecting exception: IOException");
+      
+      } catch(Throwable e) {
+         //
+         // MappedByteBuffer mocks are not supported yet
+         //
+         verifyException("org.evosuite.runtime.mock.java.io.EvoFileChannel", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      MappedRandomAccessFile mappedRandomAccessFile0 = null;
+      try {
+        mappedRandomAccessFile0 = new MappedRandomAccessFile("rw", "PmF8^@U[W<vM7");
+        fail("Expecting exception: FileNotFoundException");
+      
+      } catch(Throwable e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.evosuite.runtime.mock.java.io.MockFileInputStream", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      java.nio.ByteBuffer byteBuffer0 = java.nio.ByteBuffer.allocateDirect((byte)0);
+      boolean boolean0 = MappedRandomAccessFile.clean(byteBuffer0);
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      MappedRandomAccessFile mappedRandomAccessFile0 = new MappedRandomAccessFile("rw", "rw");
+      mappedRandomAccessFile0.getChannel();
+      assertEquals(0L, mappedRandomAccessFile0.getFilePointer());
+  }
+
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      MappedRandomAccessFile mappedRandomAccessFile0 = new MappedRandomAccessFile("rw", "rw");
+      long long0 = mappedRandomAccessFile0.getFilePointer();
+      assertEquals(0L, long0);
+  }
+
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      MappedRandomAccessFile mappedRandomAccessFile0 = new MappedRandomAccessFile("rw", "rw");
+      mappedRandomAccessFile0.length();
+      assertEquals(0L, mappedRandomAccessFile0.getFilePointer());
+  }
+
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      MappedRandomAccessFile mappedRandomAccessFile0 = new MappedRandomAccessFile("rw", "rw");
+      mappedRandomAccessFile0.finalize();
+      assertEquals(0L, mappedRandomAccessFile0.getFilePointer());
+  }
 }
