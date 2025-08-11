@@ -20,277 +20,331 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class CategoryLabelPosition_ESTest extends CategoryLabelPosition_ESTest_scaffolding {
 
-    // ========================= Constructor Validation Tests ========================
-    @Test(timeout = 4000)
-    public void testConstructorThrowsWhenLabelAnchorNull1() {
-        try {
-            new CategoryLabelPosition(RectangleAnchor.TOP_RIGHT, null, TextAnchor.CENTER, 
-                                      1000.4695532, CategoryLabelWidthType.CATEGORY, -1517.6609F);
-            fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            assertEquals("Null 'labelAnchor' argument.", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      RectangleAnchor rectangleAnchor0 = RectangleAnchor.TOP_LEFT;
+      TextBlockAnchor textBlockAnchor0 = TextBlockAnchor.BOTTOM_LEFT;
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0);
+      CategoryLabelWidthType categoryLabelWidthType0 = CategoryLabelWidthType.CATEGORY;
+      CategoryLabelPosition categoryLabelPosition1 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0, categoryLabelWidthType0, 0.0F);
+      boolean boolean0 = categoryLabelPosition0.equals(categoryLabelPosition1);
+      assertEquals(0.0F, categoryLabelPosition1.getWidthRatio(), 0.01F);
+      assertFalse(categoryLabelPosition1.equals((Object)categoryLabelPosition0));
+      assertFalse(boolean0);
+      assertEquals(0.0, categoryLabelPosition1.getAngle(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testConstructorThrowsWhenLabelAnchorNull2() {
-        try {
-            new CategoryLabelPosition(RectangleAnchor.BOTTOM_LEFT, null, 
-                                      CategoryLabelWidthType.RANGE, 2093.0F);
-            fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            assertEquals("Null 'labelAnchor' argument.", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      RectangleAnchor rectangleAnchor0 = RectangleAnchor.CENTER;
+      TextBlockAnchor textBlockAnchor0 = TextBlockAnchor.TOP_CENTER;
+      CategoryLabelWidthType categoryLabelWidthType0 = CategoryLabelWidthType.RANGE;
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0, categoryLabelWidthType0, 0.0F);
+      float float0 = categoryLabelPosition0.getWidthRatio();
+      assertEquals(0.0F, float0, 0.01F);
+      assertEquals(0.0, categoryLabelPosition0.getAngle(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testConstructorThrowsWhenLabelAnchorNull3() {
-        try {
-            new CategoryLabelPosition(RectangleAnchor.BOTTOM_LEFT, null);
-            fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            assertEquals("Null 'labelAnchor' argument.", e.getMessage());
-        }
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      RectangleAnchor rectangleAnchor0 = RectangleAnchor.BOTTOM;
+      TextBlockAnchor textBlockAnchor0 = TextBlockAnchor.TOP_LEFT;
+      TextAnchor textAnchor0 = TextAnchor.BASELINE_RIGHT;
+      CategoryLabelWidthType categoryLabelWidthType0 = CategoryLabelWidthType.CATEGORY;
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0, textAnchor0, (-1.0), categoryLabelWidthType0, (-1989.5195F));
+      float float0 = categoryLabelPosition0.getWidthRatio();
+      assertEquals((-1989.5195F), float0, 0.01F);
+      assertEquals((-1.0), categoryLabelPosition0.getAngle(), 0.01);
+  }
 
-    // ========================= Property Accessor Tests ========================
-    @Test(timeout = 4000)
-    public void testGetWidthRatio() {
-        CategoryLabelPosition position = new CategoryLabelPosition(
-            RectangleAnchor.CENTER, 
-            TextBlockAnchor.TOP_CENTER, 
-            CategoryLabelWidthType.RANGE, 
-            0.0F
-        );
-        assertEquals(0.0F, position.getWidthRatio(), 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      RectangleAnchor rectangleAnchor0 = RectangleAnchor.CENTER;
+      TextBlockAnchor textBlockAnchor0 = TextBlockAnchor.CENTER;
+      TextAnchor textAnchor0 = TextAnchor.TOP_CENTER;
+      CategoryLabelWidthType categoryLabelWidthType0 = CategoryLabelWidthType.RANGE;
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0, textAnchor0, 1.0, categoryLabelWidthType0, 0.0F);
+      categoryLabelPosition0.getRotationAnchor();
+      assertEquals(0.0F, categoryLabelPosition0.getWidthRatio(), 0.01F);
+      assertEquals(1.0, categoryLabelPosition0.getAngle(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetWidthRatioWithNegativeValue() {
-        CategoryLabelPosition position = new CategoryLabelPosition(
-            RectangleAnchor.BOTTOM, 
-            TextBlockAnchor.TOP_LEFT, 
-            TextAnchor.BASELINE_RIGHT, 
-            -1.0, 
-            CategoryLabelWidthType.CATEGORY, 
-            -1989.5195F
-        );
-        assertEquals(-1989.5195F, position.getWidthRatio(), 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      RectangleAnchor rectangleAnchor0 = RectangleAnchor.TOP_RIGHT;
+      TextBlockAnchor textBlockAnchor0 = TextBlockAnchor.CENTER_RIGHT;
+      CategoryLabelWidthType categoryLabelWidthType0 = CategoryLabelWidthType.CATEGORY;
+      TextAnchor textAnchor0 = TextAnchor.HALF_ASCENT_RIGHT;
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0, textAnchor0, 986.267245817, categoryLabelWidthType0, 0.95F);
+      categoryLabelPosition0.getRotationAnchor();
+      assertEquals(986.267245817, categoryLabelPosition0.getAngle(), 0.01);
+      assertEquals(0.95F, categoryLabelPosition0.getWidthRatio(), 0.01F);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetAngle() {
-        CategoryLabelPosition position = new CategoryLabelPosition(
-            RectangleAnchor.CENTER, 
-            TextBlockAnchor.CENTER, 
-            TextAnchor.TOP_CENTER, 
-            1.0, 
-            CategoryLabelWidthType.RANGE, 
-            0.0F
-        );
-        assertEquals(1.0, position.getAngle(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      RectangleAnchor rectangleAnchor0 = RectangleAnchor.TOP_RIGHT;
+      TextBlockAnchor textBlockAnchor0 = TextBlockAnchor.BOTTOM_RIGHT;
+      CategoryLabelWidthType categoryLabelWidthType0 = CategoryLabelWidthType.CATEGORY;
+      TextAnchor textAnchor0 = TextAnchor.BOTTOM_LEFT;
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0, textAnchor0, 0.0, categoryLabelWidthType0, (-234.34F));
+      categoryLabelPosition0.getRotationAnchor();
+      assertEquals((-234.34F), categoryLabelPosition0.getWidthRatio(), 0.01F);
+      assertEquals(0.0, categoryLabelPosition0.getAngle(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetAngleWithNegativeValue() {
-        CategoryLabelPosition position = new CategoryLabelPosition(
-            RectangleAnchor.TOP_RIGHT, 
-            TextBlockAnchor.CENTER_RIGHT, 
-            TextAnchor.TOP_RIGHT, 
-            -1.0, 
-            CategoryLabelWidthType.RANGE, 
-            3650.8F
-        );
-        assertEquals(-1.0, position.getAngle(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      RectangleAnchor rectangleAnchor0 = RectangleAnchor.RIGHT;
+      TextBlockAnchor textBlockAnchor0 = TextBlockAnchor.BOTTOM_CENTER;
+      TextAnchor textAnchor0 = TextAnchor.BASELINE_CENTER;
+      CategoryLabelWidthType categoryLabelWidthType0 = CategoryLabelWidthType.RANGE;
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0, textAnchor0, 0.0, categoryLabelWidthType0, (-985.5677F));
+      TextAnchor textAnchor1 = categoryLabelPosition0.getRotationAnchor();
+      CategoryLabelPosition categoryLabelPosition1 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0, textAnchor1, 986.267245817, categoryLabelWidthType0, (-985.5677F));
+      boolean boolean0 = categoryLabelPosition0.equals(categoryLabelPosition1);
+      assertFalse(categoryLabelPosition1.equals((Object)categoryLabelPosition0));
+      assertFalse(boolean0);
+      assertEquals((-985.5677F), categoryLabelPosition1.getWidthRatio(), 0.01F);
+      assertEquals(986.267245817, categoryLabelPosition1.getAngle(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetRotationAnchor() {
-        CategoryLabelPosition position = new CategoryLabelPosition(
-            RectangleAnchor.CENTER, 
-            TextBlockAnchor.CENTER, 
-            TextAnchor.TOP_CENTER, 
-            1.0, 
-            CategoryLabelWidthType.RANGE, 
-            0.0F
-        );
-        assertNotNull(position.getRotationAnchor());
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      RectangleAnchor rectangleAnchor0 = RectangleAnchor.CENTER;
+      TextBlockAnchor textBlockAnchor0 = TextBlockAnchor.CENTER;
+      TextAnchor textAnchor0 = TextAnchor.TOP_CENTER;
+      CategoryLabelWidthType categoryLabelWidthType0 = CategoryLabelWidthType.RANGE;
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0, textAnchor0, 1.0, categoryLabelWidthType0, 0.0F);
+      double double0 = categoryLabelPosition0.getAngle();
+      assertEquals(1.0, double0, 0.01);
+      assertEquals(0.0F, categoryLabelPosition0.getWidthRatio(), 0.01F);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetDefaultWidthRatio() {
-        CategoryLabelPosition position = new CategoryLabelPosition();
-        assertEquals(0.95F, position.getWidthRatio(), 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      RectangleAnchor rectangleAnchor0 = RectangleAnchor.TOP_RIGHT;
+      TextBlockAnchor textBlockAnchor0 = TextBlockAnchor.CENTER_RIGHT;
+      TextAnchor textAnchor0 = TextAnchor.TOP_RIGHT;
+      CategoryLabelWidthType categoryLabelWidthType0 = CategoryLabelWidthType.RANGE;
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0, textAnchor0, (-1.0), categoryLabelWidthType0, 3650.8F);
+      double double0 = categoryLabelPosition0.getAngle();
+      assertEquals((-1.0), double0, 0.01);
+      assertEquals(3650.8F, categoryLabelPosition0.getWidthRatio(), 0.01F);
+  }
 
-    @Test(timeout = 4000)
-    public void testGetDefaultAngle() {
-        CategoryLabelPosition position = new CategoryLabelPosition();
-        assertEquals(0.0, position.getAngle(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      RectangleAnchor rectangleAnchor0 = RectangleAnchor.TOP_RIGHT;
+      TextAnchor textAnchor0 = TextAnchor.CENTER;
+      CategoryLabelWidthType categoryLabelWidthType0 = CategoryLabelWidthType.CATEGORY;
+      CategoryLabelPosition categoryLabelPosition0 = null;
+      try {
+        categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, (TextBlockAnchor) null, textAnchor0, 1000.4695532, categoryLabelWidthType0, (-1517.6609F));
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Null 'labelAnchor' argument.
+         //
+         verifyException("org.jfree.chart.internal.Args", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetLabelAnchor() {
-        CategoryLabelPosition position = new CategoryLabelPosition();
-        assertNotNull(position.getLabelAnchor());
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      RectangleAnchor rectangleAnchor0 = RectangleAnchor.BOTTOM_LEFT;
+      CategoryLabelWidthType categoryLabelWidthType0 = CategoryLabelWidthType.RANGE;
+      CategoryLabelPosition categoryLabelPosition0 = null;
+      try {
+        categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, (TextBlockAnchor) null, categoryLabelWidthType0, 2093.0F);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Null 'labelAnchor' argument.
+         //
+         verifyException("org.jfree.chart.internal.Args", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testGetWidthType() {
-        CategoryLabelPosition position = new CategoryLabelPosition();
-        assertNotNull(position.getWidthType());
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      RectangleAnchor rectangleAnchor0 = RectangleAnchor.BOTTOM_LEFT;
+      CategoryLabelPosition categoryLabelPosition0 = null;
+      try {
+        categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, (TextBlockAnchor) null);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Null 'labelAnchor' argument.
+         //
+         verifyException("org.jfree.chart.internal.Args", e);
+      }
+  }
 
-    // ========================= Equality Tests ========================
-    @Test(timeout = 4000)
-    public void testEqualsSameObject() {
-        CategoryLabelPosition position = new CategoryLabelPosition();
-        assertTrue(position.equals(position));
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      RectangleAnchor rectangleAnchor0 = RectangleAnchor.TOP;
+      TextBlockAnchor textBlockAnchor0 = TextBlockAnchor.CENTER_RIGHT;
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0);
+      TextAnchor textAnchor0 = TextAnchor.CENTER;
+      CategoryLabelWidthType categoryLabelWidthType0 = CategoryLabelWidthType.CATEGORY;
+      CategoryLabelPosition categoryLabelPosition1 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0, textAnchor0, (-447.68625781958866), categoryLabelWidthType0, (-1488.0F));
+      boolean boolean0 = categoryLabelPosition0.equals(categoryLabelPosition1);
+      assertFalse(boolean0);
+      assertEquals((-1488.0F), categoryLabelPosition1.getWidthRatio(), 0.01F);
+      assertEquals((-447.68625781958866), categoryLabelPosition1.getAngle(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualsEqualObjects() {
-        CategoryLabelPosition position1 = new CategoryLabelPosition();
-        CategoryLabelPosition position2 = new CategoryLabelPosition();
-        assertTrue(position1.equals(position2));
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      RectangleAnchor rectangleAnchor0 = RectangleAnchor.BOTTOM_RIGHT;
+      TextBlockAnchor textBlockAnchor0 = TextBlockAnchor.CENTER_LEFT;
+      CategoryLabelWidthType categoryLabelWidthType0 = CategoryLabelWidthType.RANGE;
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0, categoryLabelWidthType0, (-641.25F));
+      TextAnchor textAnchor0 = TextAnchor.CENTER_RIGHT;
+      CategoryLabelPosition categoryLabelPosition1 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0, textAnchor0, (-641.25F), categoryLabelWidthType0, (-641.25F));
+      boolean boolean0 = categoryLabelPosition0.equals(categoryLabelPosition1);
+      assertEquals((-641.25F), categoryLabelPosition1.getWidthRatio(), 0.01F);
+      assertEquals((-641.25), categoryLabelPosition1.getAngle(), 0.01);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualsDifferentWidthRatio() {
-        CategoryLabelPosition position1 = new CategoryLabelPosition(
-            RectangleAnchor.TOP_LEFT, 
-            TextBlockAnchor.BOTTOM_LEFT
-        );
-        CategoryLabelPosition position2 = new CategoryLabelPosition(
-            RectangleAnchor.TOP_LEFT, 
-            TextBlockAnchor.BOTTOM_LEFT, 
-            CategoryLabelWidthType.CATEGORY, 
-            0.0F
-        );
-        assertFalse(position1.equals(position2));
-        assertEquals(0.0F, position2.getWidthRatio(), 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      RectangleAnchor rectangleAnchor0 = RectangleAnchor.CENTER;
+      TextBlockAnchor textBlockAnchor0 = TextBlockAnchor.CENTER;
+      TextAnchor textAnchor0 = TextAnchor.TOP_CENTER;
+      CategoryLabelWidthType categoryLabelWidthType0 = CategoryLabelWidthType.RANGE;
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0, textAnchor0, 1.0, categoryLabelWidthType0, 0.0F);
+      CategoryLabelPosition categoryLabelPosition1 = new CategoryLabelPosition();
+      boolean boolean0 = categoryLabelPosition0.equals(categoryLabelPosition1);
+      assertFalse(boolean0);
+      assertEquals(0.95F, categoryLabelPosition1.getWidthRatio(), 0.01F);
+      assertEquals(0.0, categoryLabelPosition1.getAngle(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualsDifferentAngle() {
-        CategoryLabelPosition position1 = new CategoryLabelPosition(
-            RectangleAnchor.TOP, 
-            TextBlockAnchor.CENTER_RIGHT
-        );
-        CategoryLabelPosition position2 = new CategoryLabelPosition(
-            RectangleAnchor.TOP, 
-            TextBlockAnchor.CENTER_RIGHT, 
-            TextAnchor.CENTER, 
-            -447.68625781958866, 
-            CategoryLabelWidthType.CATEGORY, 
-            -1488.0F
-        );
-        assertFalse(position1.equals(position2));
-        assertEquals(-447.68625781958866, position2.getAngle(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition();
+      CategoryLabelPosition categoryLabelPosition1 = new CategoryLabelPosition();
+      boolean boolean0 = categoryLabelPosition0.equals(categoryLabelPosition1);
+      assertEquals(0.95F, categoryLabelPosition1.getWidthRatio(), 0.01F);
+      assertTrue(boolean0);
+      assertEquals(0.0, categoryLabelPosition1.getAngle(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualsDifferentRotationAnchor() {
-        RectangleAnchor rectAnchor = RectangleAnchor.RIGHT;
-        TextBlockAnchor blockAnchor = TextBlockAnchor.BOTTOM_CENTER;
-        CategoryLabelWidthType widthType = CategoryLabelWidthType.RANGE;
-        
-        CategoryLabelPosition position1 = new CategoryLabelPosition(
-            rectAnchor, 
-            blockAnchor, 
-            TextAnchor.BASELINE_CENTER, 
-            0.0, 
-            widthType, 
-            -985.5677F
-        );
-        CategoryLabelPosition position2 = new CategoryLabelPosition(
-            rectAnchor, 
-            blockAnchor, 
-            position1.getRotationAnchor(), 
-            986.267245817, 
-            widthType, 
-            -985.5677F
-        );
-        assertFalse(position1.equals(position2));
-        assertEquals(986.267245817, position2.getAngle(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition();
+      Object object0 = new Object();
+      boolean boolean0 = categoryLabelPosition0.equals(object0);
+      assertFalse(boolean0);
+      assertEquals(0.95F, categoryLabelPosition0.getWidthRatio(), 0.01F);
+      assertEquals(0.0, categoryLabelPosition0.getAngle(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualsDifferentCategoryAnchor() {
-        RectangleAnchor rectAnchor = RectangleAnchor.CENTER;
-        TextBlockAnchor blockAnchor = TextBlockAnchor.CENTER;
-        CategoryLabelWidthType widthType = CategoryLabelWidthType.RANGE;
-        
-        CategoryLabelPosition position1 = new CategoryLabelPosition(
-            rectAnchor, 
-            blockAnchor, 
-            TextAnchor.TOP_CENTER, 
-            1.0, 
-            widthType, 
-            0.0F
-        );
-        CategoryLabelPosition position2 = new CategoryLabelPosition(
-            position1.getCategoryAnchor(), 
-            blockAnchor, 
-            widthType, 
-            428.78F
-        );
-        CategoryLabelPosition position3 = new CategoryLabelPosition(
-            rectAnchor, 
-            blockAnchor
-        );
-        assertFalse(position2.equals(position3));
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition();
+      boolean boolean0 = categoryLabelPosition0.equals(categoryLabelPosition0);
+      assertEquals(0.95F, categoryLabelPosition0.getWidthRatio(), 0.01F);
+      assertTrue(boolean0);
+      assertEquals(0.0, categoryLabelPosition0.getAngle(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualsDifferentWidthType() {
-        RectangleAnchor rectAnchor = RectangleAnchor.TOP_RIGHT;
-        TextBlockAnchor blockAnchor = TextBlockAnchor.CENTER_RIGHT;
-        
-        CategoryLabelPosition position1 = new CategoryLabelPosition(
-            rectAnchor, 
-            blockAnchor
-        );
-        CategoryLabelPosition position2 = new CategoryLabelPosition(
-            rectAnchor, 
-            blockAnchor, 
-            CategoryLabelWidthType.CATEGORY, 
-            -2714.5823F
-        );
-        assertFalse(position2.equals(position1));
-        assertEquals(-2714.5823F, position2.getWidthRatio(), 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition();
+      RectangleAnchor rectangleAnchor0 = RectangleAnchor.TOP_RIGHT;
+      TextBlockAnchor textBlockAnchor0 = TextBlockAnchor.CENTER_RIGHT;
+      CategoryLabelPosition categoryLabelPosition1 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0);
+      boolean boolean0 = categoryLabelPosition1.equals(categoryLabelPosition0);
+      assertEquals(0.95F, categoryLabelPosition1.getWidthRatio(), 0.01F);
+      assertFalse(boolean0);
+      assertEquals(0.0, categoryLabelPosition1.getAngle(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void testEqualsDifferentClass() {
-        CategoryLabelPosition position = new CategoryLabelPosition();
-        assertFalse(position.equals(new Object()));
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition();
+      categoryLabelPosition0.getLabelAnchor();
+      assertEquals(0.0, categoryLabelPosition0.getAngle(), 0.01);
+      assertEquals(0.95F, categoryLabelPosition0.getWidthRatio(), 0.01F);
+  }
 
-    // ========================= Hash Code Tests ========================
-    @Test(timeout = 4000)
-    public void testHashCodeConsistency() {
-        CategoryLabelPosition position = new CategoryLabelPosition();
-        assertEquals(position.hashCode(), position.hashCode());
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition();
+      categoryLabelPosition0.getWidthType();
+      assertEquals(0.0, categoryLabelPosition0.getAngle(), 0.01);
+      assertEquals(0.95F, categoryLabelPosition0.getWidthRatio(), 0.01F);
+  }
 
-    @Test(timeout = 4000)
-    public void testHashCodeEqualObjects() {
-        CategoryLabelPosition position1 = new CategoryLabelPosition();
-        CategoryLabelPosition position2 = new CategoryLabelPosition();
-        assertEquals(position1.hashCode(), position2.hashCode());
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition();
+      categoryLabelPosition0.hashCode();
+      assertEquals(0.0, categoryLabelPosition0.getAngle(), 0.01);
+      assertEquals(0.95F, categoryLabelPosition0.getWidthRatio(), 0.01F);
+  }
 
-    // ========================= Edge Case Tests ========================
-    @Test(timeout = 4000)
-    public void testRotationAnchorWithNegativeWidthRatio() {
-        CategoryLabelPosition position = new CategoryLabelPosition(
-            RectangleAnchor.BOTTOM_RIGHT, 
-            TextBlockAnchor.CENTER_LEFT, 
-            CategoryLabelWidthType.RANGE, 
-            -641.25F
-        );
-        assertNotNull(position.getRotationAnchor());
-        assertEquals(-641.25F, position.getWidthRatio(), 0.01F);
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      RectangleAnchor rectangleAnchor0 = RectangleAnchor.CENTER;
+      TextBlockAnchor textBlockAnchor0 = TextBlockAnchor.CENTER;
+      TextAnchor textAnchor0 = TextAnchor.TOP_CENTER;
+      CategoryLabelWidthType categoryLabelWidthType0 = CategoryLabelWidthType.RANGE;
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0, textAnchor0, 1.0, categoryLabelWidthType0, 0.0F);
+      RectangleAnchor rectangleAnchor1 = categoryLabelPosition0.getCategoryAnchor();
+      CategoryLabelPosition categoryLabelPosition1 = new CategoryLabelPosition(rectangleAnchor1, textBlockAnchor0, categoryLabelWidthType0, 428.78F);
+      CategoryLabelPosition categoryLabelPosition2 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0);
+      boolean boolean0 = categoryLabelPosition1.equals(categoryLabelPosition2);
+      assertEquals(0.0, categoryLabelPosition2.getAngle(), 0.01);
+      assertEquals(0.95F, categoryLabelPosition2.getWidthRatio(), 0.01F);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      RectangleAnchor rectangleAnchor0 = RectangleAnchor.TOP_RIGHT;
+      TextBlockAnchor textBlockAnchor0 = TextBlockAnchor.CENTER_RIGHT;
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0);
+      CategoryLabelWidthType categoryLabelWidthType0 = CategoryLabelWidthType.CATEGORY;
+      CategoryLabelPosition categoryLabelPosition1 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0, categoryLabelWidthType0, (-2714.5823F));
+      boolean boolean0 = categoryLabelPosition1.equals(categoryLabelPosition0);
+      assertEquals((-2714.5823F), categoryLabelPosition1.getWidthRatio(), 0.01F);
+      assertFalse(categoryLabelPosition0.equals((Object)categoryLabelPosition1));
+      assertEquals(0.0, categoryLabelPosition1.getAngle(), 0.01);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition();
+      float float0 = categoryLabelPosition0.getWidthRatio();
+      assertEquals(0.95F, float0, 0.01F);
+      assertEquals(0.0, categoryLabelPosition0.getAngle(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition();
+      double double0 = categoryLabelPosition0.getAngle();
+      assertEquals(0.95F, categoryLabelPosition0.getWidthRatio(), 0.01F);
+      assertEquals(0.0, double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      RectangleAnchor rectangleAnchor0 = RectangleAnchor.BOTTOM_RIGHT;
+      TextBlockAnchor textBlockAnchor0 = TextBlockAnchor.CENTER_LEFT;
+      CategoryLabelWidthType categoryLabelWidthType0 = CategoryLabelWidthType.RANGE;
+      CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0, categoryLabelWidthType0, (-641.25F));
+      categoryLabelPosition0.getRotationAnchor();
+      assertEquals((-641.25F), categoryLabelPosition0.getWidthRatio(), 0.01F);
+      assertEquals(0.0, categoryLabelPosition0.getAngle(), 0.01);
+  }
 }
