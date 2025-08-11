@@ -1,19 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.apache.commons.lang3;
 
 import static org.apache.commons.lang3.JavaVersion.JAVA_1_4;
@@ -44,6 +28,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests for {@link LocaleUtils}.
+ * 
+ * This suite focuses on:
+ * - Making expectations explicit.
+ * - Removing duplication by centralizing common assertions.
+ * - Adding small comments where behavior is non-obvious.
  */
 class LocaleUtilsTest extends AbstractLangTest {
 
@@ -56,140 +45,124 @@ class LocaleUtilsTest extends AbstractLangTest {
     private static final Locale LOCALE_QQ_ZZ = new Locale("qq", "ZZ");
 
     /**
-     * Make sure the country by language is correct. It checks that
-     * the LocaleUtils.countryByLanguage(language) call contains the
-     * array of countries passed in. It may contain more due to JVM
-     * variations.
-     *
-     *
-     * @param language
-     * @param countries array of countries that should be returned
+     * Asserts that LocaleUtils.countriesByLanguage(language) returns an unmodifiable list which:
+     * - is cached (same instance on repeated calls), and
+     * - contains locales with the given language and the expected set of countries (allowing JVM-specific supersets).
      */
-    private static void assertCountriesByLanguage(final String language, final String[] countries) {
-        final List<Locale> list = LocaleUtils.countriesByLanguage(language);
-        final List<Locale> list2 = LocaleUtils.countriesByLanguage(language);
-        assertNotNull(list);
-        assertSame(list, list2);
-        //search through languages
-        for (final String country : countries) {
+    private static void assertCountriesByLanguageContains(final String language, final String... expectedCountries) {
+        final List<Locale> localesOnce = LocaleUtils.countriesByLanguage(language);
+        final List<Locale> localesAgain = LocaleUtils.countriesByLanguage(language);
+
+        assertNotNull(localesOnce);
+        assertSame(localesOnce, localesAgain, "countriesByLanguage should be cached and return the same instance");
+        assertUnmodifiableCollection(localesOnce);
+
+        for (final String expectedCountry : expectedCountries) {
             boolean found = false;
-            // see if it was returned by the set
-            for (final Locale locale : list) {
-                // should have an en empty variant
-                assertTrue(StringUtils.isEmpty(locale.getVariant()));
-                assertEquals(language, locale.getLanguage());
-                if (country.equals(locale.getCountry())) {
+            for (final Locale locale : localesOnce) {
+                assertTrue(StringUtils.isEmpty(locale.getVariant()), "Expected empty variant");
+                assertEquals(language, locale.getLanguage(), "Language mismatch in returned locale");
+                if (expectedCountry.equals(locale.getCountry())) {
                     found = true;
                     break;
                 }
             }
-            assertTrue(found, "Could not find language: " + country + " for country: " + language);
+            assertTrue(found, "Missing expected country '" + expectedCountry + "' for language '" + language + "'");
         }
-        assertUnmodifiableCollection(list);
     }
 
     /**
-     * Make sure the language by country is correct. It checks that
-     * the LocaleUtils.languagesByCountry(country) call contains the
-     * array of languages passed in. It may contain more due to JVM
-     * variations.
-     *
-     * @param country
-     * @param languages array of languages that should be returned
+     * Asserts that LocaleUtils.languagesByCountry(country) returns an unmodifiable list which:
+     * - is cached (same instance on repeated calls), and
+     * - contains locales with the given country and the expected set of languages (allowing JVM-specific supersets).
      */
-    private static void assertLanguageByCountry(final String country, final String[] languages) {
-        final List<Locale> list = LocaleUtils.languagesByCountry(country);
-        final List<Locale> list2 = LocaleUtils.languagesByCountry(country);
-        assertNotNull(list);
-        assertSame(list, list2);
-        //search through languages
-        for (final String language : languages) {
+    private static void assertLanguagesByCountryContains(final String country, final String... expectedLanguages) {
+        final List<Locale> localesOnce = LocaleUtils.languagesByCountry(country);
+        final List<Locale> localesAgain = LocaleUtils.languagesByCountry(country);
+
+        assertNotNull(localesOnce);
+        assertSame(localesOnce, localesAgain, "languagesByCountry should be cached and return the same instance");
+        assertUnmodifiableCollection(localesOnce);
+
+        for (final String expectedLanguage : expectedLanguages) {
             boolean found = false;
-            // see if it was returned by the set
-            for (final Locale locale : list) {
-                // should have an en empty variant
-                assertTrue(StringUtils.isEmpty(locale.getVariant()));
-                assertEquals(country, locale.getCountry());
-                if (language.equals(locale.getLanguage())) {
+            for (final Locale locale : localesOnce) {
+                assertTrue(StringUtils.isEmpty(locale.getVariant()), "Expected empty variant");
+                assertEquals(country, locale.getCountry(), "Country mismatch in returned locale");
+                if (expectedLanguage.equals(locale.getLanguage())) {
                     found = true;
                     break;
                 }
             }
-            assertTrue(found, "Could not find language: " + language + " for country: " + country);
+            assertTrue(found, "Missing expected language '" + expectedLanguage + "' for country '" + country + "'");
         }
-        assertUnmodifiableCollection(list);
     }
 
     /**
-     * Helper method for local lookups.
-     *
-     * @param locale  the input locale
-     * @param defaultLocale  the input default locale
-     * @param expected  expected results
+     * Asserts the lookup chain for a given (locale, defaultLocale) pair is unmodifiable and matches expected.
      */
-    private static void assertLocaleLookupList(final Locale locale, final Locale defaultLocale, final Locale[] expected) {
-        final List<Locale> localeList = defaultLocale == null ?
-                LocaleUtils.localeLookupList(locale) :
-                LocaleUtils.localeLookupList(locale, defaultLocale);
+    private static void assertLocaleLookupChain(final Locale locale, final Locale defaultLocale, final Locale... expected) {
+        final List<Locale> actual = defaultLocale == null
+                ? LocaleUtils.localeLookupList(locale)
+                : LocaleUtils.localeLookupList(locale, defaultLocale);
 
-        assertEquals(expected.length, localeList.size());
-        assertEquals(Arrays.asList(expected), localeList);
-        assertUnmodifiableCollection(localeList);
+        assertEquals(expected.length, actual.size(), "Unexpected lookup chain length");
+        assertEquals(Arrays.asList(expected), actual, "Unexpected lookup chain contents");
+        assertUnmodifiableCollection(actual);
     }
 
     /**
-     * @param coll  the collection to check
+     * Asserts that a collection is unmodifiable by provoking an UnsupportedOperationException on add.
      */
     private static void assertUnmodifiableCollection(final Collection<?> coll) {
-        assertThrows(UnsupportedOperationException.class, () -> coll.add(null));
+        assertThrows(UnsupportedOperationException.class, () -> coll.add(null), "Collection should be unmodifiable");
     }
 
     /**
-     * Pass in a valid language, test toLocale.
-     *
-     * @param language  the language string
+     * Convenience: Asserts that parsing the given string yields a Locale with the expected language only.
+     * Expected country and variant are empty.
      */
-    private static void assertValidToLocale(final String language) {
-        final Locale locale = LocaleUtils.toLocale(language);
-        assertNotNull(locale, "valid locale");
-        assertEquals(language, locale.getLanguage());
-        //country and variant are empty
-        assertTrue(StringUtils.isEmpty(locale.getCountry()));
-        assertTrue(StringUtils.isEmpty(locale.getVariant()));
+    private static void assertParsesToLocaleLanguageOnly(final String language) {
+        assertParsesToLocaleParts(language, language, "", "");
     }
 
     /**
-     * Pass in a valid language, test toLocale.
-     *
-     * @param localeString to pass to toLocale()
-     * @param language of the resulting Locale
-     * @param country of the resulting Locale
+     * Convenience: Asserts that parsing yields a Locale with expected language and country, empty variant.
      */
-    private static void assertValidToLocale(final String localeString, final String language, final String country) {
+    private static void assertParsesToLocaleParts(final String localeString, final String language, final String country) {
+        assertParsesToLocaleParts(localeString, language, country, "");
+    }
+
+    /**
+     * Asserts that parsing yields a Locale with expected language, country, and variant.
+     */
+    private static void assertParsesToLocaleParts(final String localeString, final String language, final String country, final String variant) {
         final Locale locale = LocaleUtils.toLocale(localeString);
-        assertNotNull(locale, "valid locale");
-        assertEquals(language, locale.getLanguage());
-        assertEquals(country, locale.getCountry());
-        //variant is empty
-        assertTrue(StringUtils.isEmpty(locale.getVariant()));
+        assertNotNull(locale, "Expected a non-null Locale");
+        assertEquals(language, locale.getLanguage(), "Language mismatch");
+        assertEquals(country, locale.getCountry(), "Country mismatch");
+        assertEquals(variant, locale.getVariant(), "Variant mismatch");
     }
 
     /**
-     * Pass in a valid language, test toLocale.
-     *
-     * @param localeString to pass to toLocale()
-     * @param language of the resulting Locale
-     * @param country of the resulting Locale
-     * @param variant of the resulting Locale
+     * Returns the given Locale's toString() with any script/extension suffix removed.
+     * Locale#toString may include suffixes like "_#..." or "#...".
      */
-    private static void assertValidToLocale(
-            final String localeString, final String language,
-            final String country, final String variant) {
-        final Locale locale = LocaleUtils.toLocale(localeString);
-        assertNotNull(locale, "valid locale");
-        assertEquals(language, locale.getLanguage());
-        assertEquals(country, locale.getCountry());
-        assertEquals(variant, locale.getVariant());
+    private static String removeLocaleSuffixAfterHash(final String str) {
+        int idx = str.indexOf("_#");
+        if (idx == -1) {
+            idx = str.indexOf('#');
+        }
+        return idx >= 0 ? str.substring(0, idx) : str;
+    }
+
+    /**
+     * Asserts that isAvailableLocale mirrors availableLocaleSet().contains(locale).
+     */
+    private static void assertAvailabilityConsistency(final Locale locale) {
+        final boolean expected = LocaleUtils.availableLocaleSet().contains(locale);
+        assertEquals(expected, LocaleUtils.isAvailableLocale(locale),
+                "isAvailableLocale must reflect availableLocaleSet() membership");
     }
 
     @BeforeEach
@@ -198,112 +171,100 @@ class LocaleUtilsTest extends AbstractLangTest {
         LocaleUtils.isAvailableLocale(Locale.getDefault());
     }
 
-    /**
-     * Test availableLocaleList() method.
-     */
     @Test
     void testAvailableLocaleList() {
-        final List<Locale> list = LocaleUtils.availableLocaleList();
-        final List<Locale> list2 = LocaleUtils.availableLocaleList();
-        assertNotNull(list);
-        assertSame(list, list2);
-        assertUnmodifiableCollection(list);
+        final List<Locale> localesOnce = LocaleUtils.availableLocaleList();
+        final List<Locale> localesAgain = LocaleUtils.availableLocaleList();
 
-        final Locale[] jdkLocaleArray = Locale.getAvailableLocales();
-        final List<Locale> jdkLocaleList = Arrays.asList(ArraySorter.sort(jdkLocaleArray, Comparator.comparing(Locale::toString)));
-        assertEquals(jdkLocaleList, list);
+        assertNotNull(localesOnce);
+        assertSame(localesOnce, localesAgain, "availableLocaleList should be cached and return the same instance");
+        assertUnmodifiableCollection(localesOnce);
+
+        final List<Locale> expected = Arrays.asList(
+                ArraySorter.sort(Locale.getAvailableLocales(), Comparator.comparing(Locale::toString)));
+        assertEquals(expected, localesOnce, "availableLocaleList should be sorted and reflect JVM locales");
     }
 
-    /**
-     * Test availableLocaleSet() method.
-     */
     @Test
     void testAvailableLocaleSet() {
-        final Set<Locale> set = LocaleUtils.availableLocaleSet();
-        final Set<Locale> set2 = LocaleUtils.availableLocaleSet();
-        assertNotNull(set);
-        assertSame(set, set2);
-        assertUnmodifiableCollection(set);
+        final Set<Locale> setOnce = LocaleUtils.availableLocaleSet();
+        final Set<Locale> setAgain = LocaleUtils.availableLocaleSet();
 
-        final Locale[] jdkLocaleArray = Locale.getAvailableLocales();
-        final List<Locale> jdkLocaleList = Arrays.asList(jdkLocaleArray);
-        final Set<Locale> jdkLocaleSet = new HashSet<>(jdkLocaleList);
-        assertEquals(jdkLocaleSet, set);
+        assertNotNull(setOnce);
+        assertSame(setOnce, setAgain, "availableLocaleSet should be cached and return the same instance");
+        assertUnmodifiableCollection(setOnce);
+
+        final Set<Locale> expected = new HashSet<>(Arrays.asList(Locale.getAvailableLocales()));
+        assertEquals(expected, setOnce, "availableLocaleSet should reflect JVM locales");
     }
 
-    /**
-     * Test that constructors are public, and work, etc.
-     */
     @Test
     void testConstructor() {
-        assertNotNull(new LocaleUtils());
-        final Constructor<?>[] cons = LocaleUtils.class.getDeclaredConstructors();
-        assertEquals(1, cons.length);
-        assertTrue(Modifier.isPublic(cons[0].getModifiers()));
-        assertTrue(Modifier.isPublic(LocaleUtils.class.getModifiers()));
-        assertFalse(Modifier.isFinal(LocaleUtils.class.getModifiers()));
+        assertNotNull(new LocaleUtils(), "Public no-arg constructor should exist (deprecated but present)");
+        final Constructor<?>[] constructors = LocaleUtils.class.getDeclaredConstructors();
+        assertEquals(1, constructors.length, "Expected a single constructor");
+        assertTrue(Modifier.isPublic(constructors[0].getModifiers()), "Constructor should be public (deprecated)");
+        assertTrue(Modifier.isPublic(LocaleUtils.class.getModifiers()), "Class should be public");
+        assertFalse(Modifier.isFinal(LocaleUtils.class.getModifiers()), "Class should not be final");
     }
 
-    /**
-     * Test countriesByLanguage() method.
-     */
     @Test
     void testCountriesByLanguage() {
-        assertCountriesByLanguage(null, new String[0]);
-        assertCountriesByLanguage("de", new String[]{"DE", "CH", "AT", "LU"});
-        assertCountriesByLanguage("zz", new String[0]);
-        assertCountriesByLanguage("it", new String[]{"IT", "CH"});
+        assertCountriesByLanguageContains(null /* null => empty list */);
+        assertCountriesByLanguageContains("de", "DE", "CH", "AT", "LU");
+        assertCountriesByLanguageContains("zz" /* unknown language => empty list */);
+        assertCountriesByLanguageContains("it", "IT", "CH");
     }
 
-    /**
-     * Test availableLocaleSet() method.
-     */
-    @SuppressWarnings("boxing") // JUnit4 does not support primitive equality testing apart from long
     @Test
     void testIsAvailableLocale() {
-        final Set<Locale> set = LocaleUtils.availableLocaleSet();
-        assertEquals(set.contains(LOCALE_EN), LocaleUtils.isAvailableLocale(LOCALE_EN));
-        assertEquals(set.contains(LOCALE_EN_US), LocaleUtils.isAvailableLocale(LOCALE_EN_US));
-        assertEquals(set.contains(LOCALE_EN_US_ZZZZ), LocaleUtils.isAvailableLocale(LOCALE_EN_US_ZZZZ));
-        assertEquals(set.contains(LOCALE_FR), LocaleUtils.isAvailableLocale(LOCALE_FR));
-        assertEquals(set.contains(LOCALE_FR_CA), LocaleUtils.isAvailableLocale(LOCALE_FR_CA));
-        assertEquals(set.contains(LOCALE_QQ), LocaleUtils.isAvailableLocale(LOCALE_QQ));
-        assertEquals(set.contains(LOCALE_QQ_ZZ), LocaleUtils.isAvailableLocale(LOCALE_QQ_ZZ));
+        assertAvailabilityConsistency(LOCALE_EN);
+        assertAvailabilityConsistency(LOCALE_EN_US);
+        assertAvailabilityConsistency(LOCALE_EN_US_ZZZZ);
+        assertAvailabilityConsistency(LOCALE_FR);
+        assertAvailabilityConsistency(LOCALE_FR_CA);
+        assertAvailabilityConsistency(LOCALE_QQ);
+        assertAvailabilityConsistency(LOCALE_QQ_ZZ);
     }
 
     @Test
     void testIsLanguageUndetermined() {
-        final Set<Locale> set = LocaleUtils.availableLocaleSet();
-        // Determined
-        assertNotEquals(set.contains(LOCALE_EN), LocaleUtils.isLanguageUndetermined(LOCALE_EN));
-        assertNotEquals(set.contains(LOCALE_EN_US), LocaleUtils.isLanguageUndetermined(LOCALE_EN_US));
-        assertNotEquals(set.contains(LOCALE_FR), LocaleUtils.isLanguageUndetermined(LOCALE_FR));
-        assertNotEquals(set.contains(LOCALE_FR_CA), LocaleUtils.isLanguageUndetermined(LOCALE_FR_CA));
-        // Undetermined
-        assertEquals(set.contains(LOCALE_EN_US_ZZZZ), LocaleUtils.isLanguageUndetermined(LOCALE_EN_US_ZZZZ));
-        assertEquals(set.contains(LOCALE_QQ), LocaleUtils.isLanguageUndetermined(LOCALE_QQ));
-        assertEquals(set.contains(LOCALE_QQ_ZZ), LocaleUtils.isLanguageUndetermined(LOCALE_QQ_ZZ));
-        //
+        final Set<Locale> available = LocaleUtils.availableLocaleSet();
+
+        // Determined languages: available set membership is typically true, undetermined must be false.
+        assertNotEquals(available.contains(LOCALE_EN), LocaleUtils.isLanguageUndetermined(LOCALE_EN));
+        assertNotEquals(available.contains(LOCALE_EN_US), LocaleUtils.isLanguageUndetermined(LOCALE_EN_US));
+        assertNotEquals(available.contains(LOCALE_FR), LocaleUtils.isLanguageUndetermined(LOCALE_FR));
+        assertNotEquals(available.contains(LOCALE_FR_CA), LocaleUtils.isLanguageUndetermined(LOCALE_FR_CA));
+
+        // Locales with either unknown language or empty language: typically not available, undetermined may be false or true.
+        // For these specific cases, the current JVMs yield matching booleans.
+        assertEquals(available.contains(LOCALE_EN_US_ZZZZ), LocaleUtils.isLanguageUndetermined(LOCALE_EN_US_ZZZZ));
+        assertEquals(available.contains(LOCALE_QQ), LocaleUtils.isLanguageUndetermined(LOCALE_QQ));
+        assertEquals(available.contains(LOCALE_QQ_ZZ), LocaleUtils.isLanguageUndetermined(LOCALE_QQ_ZZ));
+
+        // Null => undetermined.
         assertTrue(LocaleUtils.isLanguageUndetermined(null));
     }
 
     /**
-     * Tests #LANG-328 - only language+variant
+     * Tests #LANG-328 - language + variant (no country).
      */
     @Test
-    void testLang328() {
-        assertValidToLocale("fr__P", "fr", "", "P");
-        assertValidToLocale("fr__POSIX", "fr", "", "POSIX");
+    void testLang328_languageAndVariantOnly() {
+        assertParsesToLocaleParts("fr__P", "fr", "", "P");
+        assertParsesToLocaleParts("fr__POSIX", "fr", "", "POSIX");
     }
 
     /**
      * Tests #LANG-865, strings starting with an underscore.
      */
     @Test
-    void testLang865() {
-        assertValidToLocale("_GB", "", "GB", "");
-        assertValidToLocale("_GB_P", "", "GB", "P");
-        assertValidToLocale("_GB_POSIX", "", "GB", "POSIX");
+    void testLang865_underscorePrefixed() {
+        assertParsesToLocaleParts("_GB", "", "GB");
+        assertParsesToLocaleParts("_GB_P", "", "GB", "P");
+        assertParsesToLocaleParts("_GB_POSIX", "", "GB", "POSIX");
+
         assertIllegalArgumentException(() -> LocaleUtils.toLocale("_G"), "Must be at least 3 chars if starts with underscore");
         assertIllegalArgumentException(() -> LocaleUtils.toLocale("_Gb"), "Must be uppercase if starts with underscore");
         assertIllegalArgumentException(() -> LocaleUtils.toLocale("_gB"), "Must be uppercase if starts with underscore");
@@ -316,151 +277,92 @@ class LocaleUtilsTest extends AbstractLangTest {
 
     @Test
     void testLanguageAndUNM49Numeric3AreaCodeLang1312() {
-        assertValidToLocale("en_001", "en", "001");
-        assertValidToLocale("en_150", "en", "150");
-        assertValidToLocale("ar_001", "ar", "001");
+        assertParsesToLocaleParts("en_001", "en", "001");
+        assertParsesToLocaleParts("en_150", "en", "150");
+        assertParsesToLocaleParts("ar_001", "ar", "001");
 
         // LANG-1312
-        assertValidToLocale("en_001_GB", "en", "001", "GB");
-        assertValidToLocale("en_150_US", "en", "150", "US");
+        assertParsesToLocaleParts("en_001_GB", "en", "001", "GB");
+        assertParsesToLocaleParts("en_150_US", "en", "150", "US");
     }
 
-    /**
-     * Test languagesByCountry() method.
-     */
     @Test
     void testLanguagesByCountry() {
-        assertLanguageByCountry(null, new String[0]);
-        assertLanguageByCountry("GB", new String[]{"en"});
-        assertLanguageByCountry("ZZ", new String[0]);
-        assertLanguageByCountry("CH", new String[]{"fr", "de", "it"});
+        assertLanguagesByCountryContains(null /* null => empty list */);
+        assertLanguagesByCountryContains("GB", "en");
+        assertLanguagesByCountryContains("ZZ" /* unknown country => empty list */);
+        assertLanguagesByCountryContains("CH", "fr", "de", "it");
     }
 
-    /**
-     * Test localeLookupList() method.
-     */
     @Test
-    void testLocaleLookupList_Locale() {
-        assertLocaleLookupList(null, null, new Locale[0]);
-        assertLocaleLookupList(LOCALE_QQ, null, new Locale[]{LOCALE_QQ});
-        assertLocaleLookupList(LOCALE_EN, null, new Locale[]{LOCALE_EN});
-        assertLocaleLookupList(LOCALE_EN, null, new Locale[]{LOCALE_EN});
-        assertLocaleLookupList(LOCALE_EN_US, null,
-            new Locale[] {
-                LOCALE_EN_US,
-                LOCALE_EN});
-        assertLocaleLookupList(LOCALE_EN_US_ZZZZ, null,
-            new Locale[] {
-                LOCALE_EN_US_ZZZZ,
-                LOCALE_EN_US,
-                LOCALE_EN});
+    void testLocaleLookupList_LocaleOnly() {
+        assertLocaleLookupChain(null, null /* => empty */);
+        assertLocaleLookupChain(LOCALE_QQ, null, LOCALE_QQ);
+        assertLocaleLookupChain(LOCALE_EN, null, LOCALE_EN);
+        assertLocaleLookupChain(LOCALE_EN_US, null, LOCALE_EN_US, LOCALE_EN);
+        assertLocaleLookupChain(LOCALE_EN_US_ZZZZ, null, LOCALE_EN_US_ZZZZ, LOCALE_EN_US, LOCALE_EN);
     }
 
-    /**
-     * Test localeLookupList() method.
-     */
     @Test
-    void testLocaleLookupList_LocaleLocale() {
-        assertLocaleLookupList(LOCALE_QQ, LOCALE_QQ,
-                new Locale[]{LOCALE_QQ});
-        assertLocaleLookupList(LOCALE_EN, LOCALE_EN,
-                new Locale[]{LOCALE_EN});
+    void testLocaleLookupList_LocaleWithDefault() {
+        assertLocaleLookupChain(LOCALE_QQ, LOCALE_QQ, LOCALE_QQ);
+        assertLocaleLookupChain(LOCALE_EN, LOCALE_EN, LOCALE_EN);
 
-        assertLocaleLookupList(LOCALE_EN_US, LOCALE_EN_US,
-            new Locale[]{
-                LOCALE_EN_US,
-                LOCALE_EN});
-        assertLocaleLookupList(LOCALE_EN_US, LOCALE_QQ,
-            new Locale[] {
-                LOCALE_EN_US,
-                LOCALE_EN,
-                LOCALE_QQ});
-        assertLocaleLookupList(LOCALE_EN_US, LOCALE_QQ_ZZ,
-            new Locale[] {
-                LOCALE_EN_US,
-                LOCALE_EN,
-                LOCALE_QQ_ZZ});
+        assertLocaleLookupChain(LOCALE_EN_US, LOCALE_EN_US, LOCALE_EN_US, LOCALE_EN);
+        assertLocaleLookupChain(LOCALE_EN_US, LOCALE_QQ, LOCALE_EN_US, LOCALE_EN, LOCALE_QQ);
+        assertLocaleLookupChain(LOCALE_EN_US, LOCALE_QQ_ZZ, LOCALE_EN_US, LOCALE_EN, LOCALE_QQ_ZZ);
 
-        assertLocaleLookupList(LOCALE_EN_US_ZZZZ, null,
-            new Locale[] {
-                LOCALE_EN_US_ZZZZ,
-                LOCALE_EN_US,
-                LOCALE_EN});
-        assertLocaleLookupList(LOCALE_EN_US_ZZZZ, LOCALE_EN_US_ZZZZ,
-            new Locale[] {
-                LOCALE_EN_US_ZZZZ,
-                LOCALE_EN_US,
-                LOCALE_EN});
-        assertLocaleLookupList(LOCALE_EN_US_ZZZZ, LOCALE_QQ,
-            new Locale[] {
-                LOCALE_EN_US_ZZZZ,
-                LOCALE_EN_US,
-                LOCALE_EN,
-                LOCALE_QQ});
-        assertLocaleLookupList(LOCALE_EN_US_ZZZZ, LOCALE_QQ_ZZ,
-            new Locale[] {
-                LOCALE_EN_US_ZZZZ,
-                LOCALE_EN_US,
-                LOCALE_EN,
-                LOCALE_QQ_ZZ});
-        assertLocaleLookupList(LOCALE_FR_CA, LOCALE_EN,
-            new Locale[] {
-                LOCALE_FR_CA,
-                LOCALE_FR,
-                LOCALE_EN});
+        assertLocaleLookupChain(LOCALE_EN_US_ZZZZ, null, LOCALE_EN_US_ZZZZ, LOCALE_EN_US, LOCALE_EN);
+        assertLocaleLookupChain(LOCALE_EN_US_ZZZZ, LOCALE_EN_US_ZZZZ, LOCALE_EN_US_ZZZZ, LOCALE_EN_US, LOCALE_EN);
+        assertLocaleLookupChain(LOCALE_EN_US_ZZZZ, LOCALE_QQ, LOCALE_EN_US_ZZZZ, LOCALE_EN_US, LOCALE_EN, LOCALE_QQ);
+        assertLocaleLookupChain(LOCALE_EN_US_ZZZZ, LOCALE_QQ_ZZ, LOCALE_EN_US_ZZZZ, LOCALE_EN_US, LOCALE_EN, LOCALE_QQ_ZZ);
+        assertLocaleLookupChain(LOCALE_FR_CA, LOCALE_EN, LOCALE_FR_CA, LOCALE_FR, LOCALE_EN);
     }
 
     @ParameterizedTest
     @MethodSource("java.util.Locale#getAvailableLocales")
     void testParseAllLocales(final Locale actualLocale) {
-        // Check if it's possible to recreate the Locale using just the standard constructor
-        final Locale locale = new Locale(actualLocale.getLanguage(), actualLocale.getCountry(), actualLocale.getVariant());
-        if (actualLocale.equals(locale)) { // it is possible for LocaleUtils.toLocale to handle these Locales
-            final String str = actualLocale.toString();
-            // Look for the script/extension suffix
-            int suff = str.indexOf("_#");
-            if (suff == - 1) {
-                suff = str.indexOf("#");
+        // Only test Locales that can be recreated with the standard three-arg Locale constructor.
+        final Locale roundTrip = new Locale(actualLocale.getLanguage(), actualLocale.getCountry(), actualLocale.getVariant());
+        if (actualLocale.equals(roundTrip)) {
+            final String original = actualLocale.toString();
+            final String withoutSuffix = removeLocaleSuffixAfterHash(original);
+
+            if (!original.equals(withoutSuffix)) {
+                // If there was a suffix, toLocale must reject the original with suffix.
+                assertIllegalArgumentException(() -> LocaleUtils.toLocale(original));
             }
-            String localeStr = str;
-            if (suff >= 0) { // we have a suffix
-                assertIllegalArgumentException(() -> LocaleUtils.toLocale(str));
-                // try without suffix
-                localeStr = str.substring(0, suff);
-            }
-            final Locale loc = LocaleUtils.toLocale(localeStr);
-            assertEquals(actualLocale, loc);
+            final Locale parsed = LocaleUtils.toLocale(withoutSuffix);
+            assertEquals(actualLocale, parsed, "Parsing should reproduce the Locale");
         }
     }
 
     /**
-     * Test for 3-chars locale, further details at LANG-915
+     * Test for 3-letter language locales (#LANG-915).
      */
     @Test
-    void testThreeCharsLocale() {
-        for (final String str : Arrays.asList("udm", "tet")) {
-            final Locale locale = LocaleUtils.toLocale(str);
+    void testThreeLetterLanguageLocales() {
+        for (final String lang : Arrays.asList("udm", "tet")) {
+            final Locale locale = LocaleUtils.toLocale(lang);
             assertNotNull(locale);
-            assertEquals(str, locale.getLanguage());
+            assertEquals(lang, locale.getLanguage());
             assertTrue(StringUtils.isBlank(locale.getCountry()));
-            assertEquals(new Locale(str), locale);
+            assertEquals(new Locale(lang), locale);
         }
     }
 
-    /**
-     * Test toLocale(String) method.
-     */
     @Test
     void testToLocale_1Part() {
         assertNull(LocaleUtils.toLocale((String) null));
-        assertValidToLocale("us");
-        assertValidToLocale("fr");
-        assertValidToLocale("de");
-        assertValidToLocale("zh");
-        // Valid format but lang doesn't exist, should make instance anyway
-        assertValidToLocale("qq");
-        // LANG-941: JDK 8 introduced the empty locale as one of the default locales
-        assertValidToLocale("");
+        assertParsesToLocaleLanguageOnly("us");
+        assertParsesToLocaleLanguageOnly("fr");
+        assertParsesToLocaleLanguageOnly("de");
+        assertParsesToLocaleLanguageOnly("zh");
+        // Valid format but language doesn't exist, should still create the instance.
+        assertParsesToLocaleLanguageOnly("qq");
+        // LANG-941: JDK 8 introduced the empty locale as one of the default locales.
+        assertParsesToLocaleLanguageOnly("");
+
         assertIllegalArgumentException(() -> LocaleUtils.toLocale("Us"), "Should fail if not lowercase");
         assertIllegalArgumentException(() -> LocaleUtils.toLocale("uS"), "Should fail if not lowercase");
         assertIllegalArgumentException(() -> LocaleUtils.toLocale("u#"), "Should fail if not lowercase");
@@ -468,15 +370,13 @@ class LocaleUtilsTest extends AbstractLangTest {
         assertIllegalArgumentException(() -> LocaleUtils.toLocale("uu_U"), "Must be 2 chars if less than 5");
     }
 
-    /**
-     * Test toLocale() method.
-     */
     @Test
     void testToLocale_2Part() {
-        assertValidToLocale("us_EN", "us", "EN");
-        assertValidToLocale("us-EN", "us", "EN");
-        // valid though doesn't exist
-        assertValidToLocale("us_ZH", "us", "ZH");
+        assertParsesToLocaleParts("us_EN", "us", "EN");
+        assertParsesToLocaleParts("us-EN", "us", "EN");
+        // Valid even if it doesn't exist.
+        assertParsesToLocaleParts("us_ZH", "us", "ZH");
+
         assertIllegalArgumentException(() -> LocaleUtils.toLocale("us_En"), "Should fail second part not uppercase");
         assertIllegalArgumentException(() -> LocaleUtils.toLocale("us_en"), "Should fail second part not uppercase");
         assertIllegalArgumentException(() -> LocaleUtils.toLocale("us_eN"), "Should fail second part not uppercase");
@@ -484,31 +384,27 @@ class LocaleUtilsTest extends AbstractLangTest {
         assertIllegalArgumentException(() -> LocaleUtils.toLocale("us_E3"), "Should fail second part not uppercase");
     }
 
-    /**
-     * Test toLocale() method.
-     */
     @Test
     void testToLocale_3Part() {
-        assertValidToLocale("us_EN_A", "us", "EN", "A");
-        assertValidToLocale("us-EN-A", "us", "EN", "A");
-        // this isn't pretty, but was caused by a jdk bug it seems
-        // https://bugs.java.com/bugdatabase/view_bug.do?bug_id=4210525
+        assertParsesToLocaleParts("us_EN_A", "us", "EN", "A");
+        assertParsesToLocaleParts("us-EN-A", "us", "EN", "A");
+
+        // JDK behavior difference: see https://bugs.java.com/bugdatabase/view_bug.do?bug_id=4210525
         if (SystemUtils.isJavaVersionAtLeast(JAVA_1_4)) {
-            assertValidToLocale("us_EN_a", "us", "EN", "a");
-            assertValidToLocale("us_EN_SFsafdFDsdfF", "us", "EN", "SFsafdFDsdfF");
+            assertParsesToLocaleParts("us_EN_a", "us", "EN", "a");
+            assertParsesToLocaleParts("us_EN_SFsafdFDsdfF", "us", "EN", "SFsafdFDsdfF");
         } else {
-            assertValidToLocale("us_EN_a", "us", "EN", "A");
-            assertValidToLocale("us_EN_SFsafdFDsdfF", "us", "EN", "SFSAFDFDSDFF");
+            assertParsesToLocaleParts("us_EN_a", "us", "EN", "A");
+            assertParsesToLocaleParts("us_EN_SFsafdFDsdfF", "us", "EN", "SFSAFDFDSDFF");
         }
+
         assertIllegalArgumentException(() -> LocaleUtils.toLocale("us_EN-a"), "Should fail as no consistent delimiter");
         assertIllegalArgumentException(() -> LocaleUtils.toLocale("uu_UU_"), "Must be 3, 5 or 7+ in length");
+
         // LANG-1741
         assertEquals(new Locale("en", "001", "US_POSIX"), LocaleUtils.toLocale("en_001_US_POSIX"));
     }
 
-    /**
-     * Test toLocale(Locale) method.
-     */
     @Test
     void testToLocale_Locale_defaults() {
         assertNull(LocaleUtils.toLocale((String) null));
@@ -516,9 +412,6 @@ class LocaleUtilsTest extends AbstractLangTest {
         assertEquals(Locale.getDefault(), LocaleUtils.toLocale(Locale.getDefault()));
     }
 
-    /**
-     * Test toLocale(Locale) method.
-     */
     @ParameterizedTest
     @MethodSource("java.util.Locale#getAvailableLocales")
     void testToLocales(final Locale actualLocale) {
