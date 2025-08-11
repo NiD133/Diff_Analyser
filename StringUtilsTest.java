@@ -1,6 +1,7 @@
 /*
+ *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2022 iText Group NV
+    Copyright (c) 1998-2022 iText Group NV
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -52,62 +53,45 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * Parameterized unit tests for the method StringUtils::convertCharsToBytes.
- * This test suite verifies that characters are correctly converted to their byte representations.
+ * Parameterized unit tests for the method StringUtils::convertCharsToBytes
+ *
+ * @author benoit
  */
 @RunWith(Parameterized.class)
 public class StringUtilsTest {
 
-    // Parameters for the test: each entry contains a character and its expected byte representation.
     @Parameters
-    public static Collection<Object[]> testData() {
+    public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-            {'\u0000', (byte) 0x0, (byte) 0x0},   // Null character
-            {'\b', (byte) 0x0, (byte) 0x08},      // Backspace
-            {'a', (byte) 0x0, (byte) 0x61},       // Lowercase 'a'
-            {'ة', (byte) 0x06, (byte) 0x29},      // Arabic character
-            {'\ud7ff', (byte) 0xd7, (byte) 0xff}, // Just outside a special Unicode range
-            {'\ud800', (byte) 0xd8, (byte) 0x0},  // Start of a special Unicode range
-            {'\uda82', (byte) 0xda, (byte) 0x82}, // Within a special Unicode range
-            {'\udbb0', (byte) 0xdb, (byte) 0xb0}, // Within a special Unicode range
-            {'\udfff', (byte) 0xdf, (byte) 0xff}, // End of a special Unicode range
-            {'\ue000', (byte) 0xe0, (byte) 0x0},  // Just outside a special Unicode range
-            {'\ufffd', (byte) 0xff, (byte) 0xfd}, // Replacement character
-            {'\uffff', (byte) 0xff, (byte) 0xff}, // Maximum Unicode value
-        });
+            {'\u0000', (byte) 0x0, (byte) 0x0},
+            {'\b', (byte) 0x0, (byte) 0x08},
+            {'a', (byte) 0x0, (byte) 0x61},
+            {'ة', (byte) 0x06, (byte) 0x29}, // Arabic characters
+            {'\ud7ff', (byte) 0xd7, (byte) 0xff}, // just outside of a special Unicode range
+            {'\ud800', (byte) 0xd8, (byte) 0x0}, // in a special Unicode range
+            {'\uda82', (byte) 0xda, (byte) 0x82}, // in a special Unicode range
+            {'\udbb0', (byte) 0xdb, (byte) 0xb0}, // in a special Unicode range
+            {'\udfff', (byte) 0xdf, (byte) 0xff}, // in a special Unicode range
+            {'\ue000', (byte) 0xe0, (byte) 0x0}, // just outside of a special Unicode range
+            {'\ufffd', (byte) 0xff, (byte) 0xfd},
+            {'\uffff', (byte) 0xff, (byte) 0xff},});
     }
 
-    private final char inputChar;
-    private final byte expectedByte1;
-    private final byte expectedByte2;
+    private final char input;
+    private final byte check1, check2;
 
-    /**
-     * Constructor for parameterized test, initializes input character and expected byte values.
-     *
-     * @param inputChar     the character to convert
-     * @param expectedByte1 the first byte of the expected result
-     * @param expectedByte2 the second byte of the expected result
-     */
-    public StringUtilsTest(char inputChar, byte expectedByte1, byte expectedByte2) {
-        this.inputChar = inputChar;
-        this.expectedByte1 = expectedByte1;
-        this.expectedByte2 = expectedByte2;
+    public StringUtilsTest(char in, byte c1, byte c2) {
+        input = in;
+        check1 = c1;
+        check2 = c2;
     }
 
-    /**
-     * Test method for StringUtils::convertCharsToBytes.
-     * Verifies that the conversion from a character to a byte array is correct.
-     */
     @Test
-    public void testConvertCharsToBytes() {
-        // Expected byte array result
-        byte[] expectedBytes = {expectedByte1, expectedByte2};
+    public void convertCharsToBytesTest() {
+        byte[] check = {check1, check2};
+        char[] vals = {input};
+        byte[] result = StringUtils.convertCharsToBytes(vals);
 
-        // Convert the input character to a byte array using the method under test
-        char[] inputChars = {inputChar};
-        byte[] actualBytes = StringUtils.convertCharsToBytes(inputChars);
-
-        // Assert that the actual byte array matches the expected byte array
-        Assert.assertArrayEquals("Byte conversion failed for character: " + inputChar, expectedBytes, actualBytes);
+        Assert.assertArrayEquals(check, result);
     }
 }
