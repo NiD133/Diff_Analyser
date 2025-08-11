@@ -33,727 +33,655 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class SimpleBloomFilter_ESTest extends SimpleBloomFilter_ESTest_scaffolding {
 
-    private static final int MAX_VALUE = Integer.MAX_VALUE;
-
-    @Test(timeout = 4000)
-    public void testMergeIndexExtractorWithIndexOutOfRangeThrowsException() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromKM(1, 1540);
-        int[] indices = {5023, 0, 0, 0, 0, 0, 0, 0};
-        IndexExtractor indexExtractor = IndexExtractor.fromIndexArray(indices);
-        
-        LayerManager<SparseBloomFilter> layerManager = mock(LayerManager.class);
-        doReturn(false).when(layerManager).processBloomFilters(any());
-        LayeredBloomFilter<SparseBloomFilter> layeredFilter = new LayeredBloomFilter<>(shape, layerManager);
-        SimpleBloomFilter filter = layeredFilter.flatten();
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, 
-            () -> filter.merge(indexExtractor));
-        assertEquals("IndexExtractor should only send values in the range[0,1540)", exception.getMessage());
-    }
-
-    @Test(timeout = 4000)
-    public void testMergeHasherThenMergeSparseBloomFilter() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromKM(19, 19);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-        SparseBloomFilter sparseFilter = new SparseBloomFilter(shape);
-        EnhancedDoubleHasher hasher = new EnhancedDoubleHasher(19, 2654L);
-
-        // Act
-        boolean mergedHasher = filter.merge(hasher);
-        boolean mergedSparse = filter.merge(sparseFilter);
-
-        // Assert
-        assertTrue(mergedHasher);
-        assertTrue(mergedSparse);
-    }
-
-    @Test(timeout = 4000)
-    public void testMergeHasherThenMergeSelfAsBitMapExtractor() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromNMK(78, 78, 2);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-        EnhancedDoubleHasher hasher = new EnhancedDoubleHasher(1L, Long.MIN_VALUE);
-
-        // Act
-        boolean mergedHasher = filter.merge(hasher);
-        boolean mergedSelf = filter.merge((BitMapExtractor) filter);
-
-        // Assert
-        assertTrue(mergedHasher);
-        assertTrue(mergedSelf);
-    }
-
-    @Test(timeout = 4000)
-    public void testMergeHasherOnEmptyFilterThenCheckNotEmpty() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromNM(64, 64);
-        LayerManager<SparseBloomFilter> layerManager = mock(LayerManager.class);
-        doReturn(false).when(layerManager).processBloomFilters(any());
-        LayeredBloomFilter<SparseBloomFilter> layeredFilter = new LayeredBloomFilter<>(shape, layerManager);
-        SimpleBloomFilter filter = layeredFilter.flatten();
-        EnhancedDoubleHasher hasher = new EnhancedDoubleHasher(Integer.MAX_VALUE, 0L);
-
-        // Act
-        boolean mergeResult = filter.merge(hasher);
-        boolean isEmpty = filter.isEmpty();
-
-        // Assert
-        assertTrue(mergeResult);
-        assertFalse(isEmpty);
-    }
-
-    @Test(timeout = 4000)
-    public void testMergeHasherThenCheckCardinalityAndFullness() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromNMK(115, 115, 2);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-        EnhancedDoubleHasher hasher = new EnhancedDoubleHasher(1L, Long.MIN_VALUE);
-
-        // Act
-        filter.merge(hasher);
-        boolean isFull = filter.isFull();
-        int cardinality = filter.cardinality();
-
-        // Assert
-        assertFalse(isFull);
-        assertEquals(2, cardinality);
-    }
-
-    @Test(timeout = 4000)
-    public void testProcessIndicesWithArrayTracker() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromNMK(78, 78, 2);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-        IndexFilter.ArrayTracker tracker = new IndexFilter.ArrayTracker(shape);
-
-        // Act
-        boolean result = filter.processIndices(tracker);
-
-        // Assert
-        assertTrue(result);
-    }
-
-    @Test(timeout = 4000)
-    public void testProcessBitMapsWithNegatedCountingLongPredicate() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromNMK(3419, 3419, 1);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-        long[] bitMapArray = new long[3];
-        LongBiPredicate biPredicate = mock(LongBiPredicate.class);
-        doReturn(false).when(biPredicate).test(anyLong(), anyLong());
-        CountingLongPredicate countingPredicate = new CountingLongPredicate(bitMapArray, biPredicate);
-        LongPredicate negatedPredicate = countingPredicate.negate();
-
-        // Act
-        boolean result = filter.processBitMaps(negatedPredicate);
-
-        // Assert
-        assertTrue(result);
-    }
-
-    @Test(timeout = 4000)
-    public void testProcessBitMapsWithEmptyFilter() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromNM(10, 10);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-        long[] bitMapArray = new long[1];
-        LongBiPredicate biPredicate = mock(LongBiPredicate.class);
-        doReturn(false).when(biPredicate).test(anyLong(), anyLong());
-        CountingLongPredicate countingPredicate = new CountingLongPredicate(bitMapArray, biPredicate);
-
-        // Act
-        boolean result = filter.processBitMaps(countingPredicate);
-
-        // Assert
-        assertFalse(result);
-    }
-
-    @Test(timeout = 4000)
-    public void testProcessBitMapPairsWithLayeredFilter() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromNM(51, 51);
-        LayerManager<SparseBloomFilter> layerManager = mock(LayerManager.class);
-        doReturn(true, false).when(layerManager).processBloomFilters(any());
-        LayeredBloomFilter<SparseBloomFilter> layeredFilter = new LayeredBloomFilter<>(shape, layerManager);
-        SimpleBloomFilter filter = layeredFilter.flatten();
-        LongBiPredicate biPredicate = mock(LongBiPredicate.class);
-        doReturn(true).when(biPredicate).test(anyLong(), anyLong());
-
-        // Act
-        boolean result = filter.processBitMapPairs(layeredFilter, biPredicate);
-
-        // Assert
-        assertTrue(result);
-    }
-
-    @Test(timeout = 4000)
-    public void testMergeSelfAsIndexExtractor() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromKM(22, 22);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-
-        // Act
-        boolean result = filter.merge((IndexExtractor) filter);
-
-        // Assert
-        assertTrue(result);
-    }
-
-    @Test(timeout = 4000)
-    public void testGetShapeFromLayeredFilter() throws Throwable {
-        // Arrange
-        Shape expectedShape = Shape.fromNM(294, 294);
-        LayerManager<SparseBloomFilter> layerManager = mock(LayerManager.class);
-        doReturn(false).when(layerManager).processBloomFilters(any());
-        LayeredBloomFilter<SparseBloomFilter> layeredFilter = new LayeredBloomFilter<>(expectedShape, layerManager);
-        SimpleBloomFilter filter = layeredFilter.flatten();
-
-        // Act
-        Shape actualShape = filter.getShape();
-
-        // Assert
-        assertEquals(expectedShape.estimateMaxN(), actualShape.estimateMaxN(), 0.01);
-    }
-
-    @Test(timeout = 4000)
-    public void testContainsWithEmptyLayeredFilter() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromNMK(64, 64, 1);
-        LayerManager<SparseBloomFilter> layerManager = mock(LayerManager.class);
-        doReturn(false).when(layerManager).processBloomFilters(any());
-        LayeredBloomFilter<SparseBloomFilter> layeredFilter = new LayeredBloomFilter<>(shape, layerManager);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-
-        // Act
-        boolean contains = filter.contains((IndexExtractor) layeredFilter);
-
-        // Assert
-        assertFalse(contains);
-    }
-
-    @Test(timeout = 4000)
-    public void testCharacteristics() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromKM(4, 4);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-
-        // Act
-        int characteristics = filter.characteristics();
-
-        // Assert
-        assertEquals(0, characteristics);
-    }
-
-    @Test(timeout = 4000)
-    public void testMergeHasherThenCheckCardinalityAndEmptiness() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromNM(38, 38);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-        EnhancedDoubleHasher hasher = new EnhancedDoubleHasher(38, 38);
-
-        // Act
-        boolean mergeResult = filter.merge(hasher);
-        int cardinality = filter.cardinality();
-        boolean isEmpty = filter.isEmpty();
-
-        // Assert
-        assertTrue(mergeResult);
-        assertEquals(1, cardinality);
-        assertFalse(isEmpty);
-    }
-
-    @Test(timeout = 4000)
-    public void testProcessIndicesThrowsOnLargeShape() {
-        // Arrange
-        Shape largeShape = Shape.fromNM(MAX_VALUE, MAX_VALUE);
-        SimpleBloomFilter filter = new SimpleBloomFilter(largeShape);
-        IndexFilter.ArrayTracker tracker = new IndexFilter.ArrayTracker(largeShape);
-
-        // Act & Assert
-        assertThrows(ArrayIndexOutOfBoundsException.class, () -> filter.processIndices(tracker));
-    }
-
-    @Test(timeout = 4000)
-    public void testProcessIndicesThrowsOnNullConsumer() {
-        // Arrange
-        Shape shape = Shape.fromNM(38, 38);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-
-        // Act & Assert
-        NullPointerException exception = assertThrows(NullPointerException.class, 
-            () -> filter.processIndices(null));
-        assertEquals("consumer", exception.getMessage());
-    }
-
-    @Test(timeout = 4000)
-    public void testProcessBitMapsThrowsOnLargeShape() {
-        // Arrange
-        Shape largeShape = Shape.fromNM(MAX_VALUE, MAX_VALUE);
-        SimpleBloomFilter filter = new SimpleBloomFilter(largeShape);
-        long[] bitMapArray = new long[0];
-        LongBiPredicate biPredicate = mock(LongBiPredicate.class);
-        doReturn(false).when(biPredicate).test(anyLong(), anyLong());
-        CountingLongPredicate countingPredicate = new CountingLongPredicate(bitMapArray, biPredicate);
-        LongPredicate negatedPredicate = countingPredicate.negate();
-
-        // Act & Assert
-        assertThrows(ArrayIndexOutOfBoundsException.class, () -> filter.processBitMaps(negatedPredicate));
-    }
-
-    @Test(timeout = 4000)
-    public void testProcessBitMapsThrowsOnNullConsumer() {
-        // Arrange
-        Shape shape = Shape.fromKM(1, 1);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-
-        // Act & Assert
-        NullPointerException exception = assertThrows(NullPointerException.class, 
-            () -> filter.processBitMaps(null));
-        assertEquals("consumer", exception.getMessage());
-    }
-
-    @Test(timeout = 4000)
-    public void testProcessBitMapPairsThrowsOnNullPredicate() {
-        // Arrange
-        Shape shape = Shape.fromNMK(15, 15, 15);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-
-        // Act & Assert
-        assertThrows(NullPointerException.class, 
-            () -> filter.processBitMapPairs(filter, null));
-    }
-
-    @Test(timeout = 4000)
-    public void testMergeSelfAsIndexExtractorThrowsOnLargeShape() {
-        // Arrange
-        Shape largeShape = Shape.fromNM(MAX_VALUE, MAX_VALUE);
-        SimpleBloomFilter filter = new SimpleBloomFilter(largeShape);
-
-        // Act & Assert
-        assertThrows(ArrayIndexOutOfBoundsException.class, 
-            () -> filter.merge((IndexExtractor) filter));
-    }
-
-    @Test(timeout = 4000)
-    public void testMergeIndexExtractorThrowsOnNull() {
-        // Arrange
-        Shape shape = Shape.fromKM(668, 668);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-
-        // Act & Assert
-        NullPointerException exception = assertThrows(NullPointerException.class, 
-            () -> filter.merge((IndexExtractor) null));
-        assertEquals("indexExtractor", exception.getMessage());
-    }
-
-    @Test(timeout = 4000)
-    public void testMergeHasherThrowsOnLargeShape() {
-        // Arrange
-        Shape largeShape = Shape.fromKM(MAX_VALUE, MAX_VALUE);
-        SimpleBloomFilter filter = new SimpleBloomFilter(largeShape);
-        EnhancedDoubleHasher hasher = new EnhancedDoubleHasher(MAX_VALUE, MAX_VALUE);
-
-        // Act & Assert
-        assertThrows(ArrayIndexOutOfBoundsException.class, () -> filter.merge(hasher));
-    }
-
-    @Test(timeout = 4000)
-    public void testMergeHasherThrowsOnNull() {
-        // Arrange
-        Shape shape = Shape.fromKM(56, 56);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-
-        // Act & Assert
-        NullPointerException exception = assertThrows(NullPointerException.class, 
-            () -> filter.merge((Hasher) null));
-        assertEquals("hasher", exception.getMessage());
-    }
-
-    @Test(timeout = 4000)
-    public void testMergeBloomFilterThrowsOnLargeShape() {
-        // Arrange
-        Shape largeShape = Shape.fromNM(MAX_VALUE, MAX_VALUE);
-        SimpleBloomFilter filter = new SimpleBloomFilter(largeShape);
-
-        // Act & Assert
-        assertThrows(ArrayIndexOutOfBoundsException.class, 
-            () -> filter.merge((BloomFilter<?>) filter));
-    }
-
-    @Test(timeout = 4000)
-    public void testMergeBloomFilterThrowsOnNull() {
-        // Arrange
-        Shape shape = Shape.fromNM(38, 38);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-
-        // Act & Assert
-        NullPointerException exception = assertThrows(NullPointerException.class, 
-            () -> filter.merge((BloomFilter<?>) null));
-        assertEquals("other", exception.getMessage());
-    }
-
-    @Test(timeout = 4000)
-    public void testMergeBloomFilterWithIncompatibleShape() {
-        // Arrange
-        Shape shape1 = Shape.fromKM(49, 5906);
-        Shape shape2 = Shape.fromKM(49, 49);
-        SimpleBloomFilter filter1 = new SimpleBloomFilter(shape1);
-        SimpleBloomFilter filter2 = new SimpleBloomFilter(shape2);
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, 
-            () -> filter2.merge(filter1));
-        assertEquals("BitMapExtractor should send at most 1 maps", exception.getMessage());
-    }
-
-    @Test(timeout = 4000)
-    public void testMergeBitMapExtractorThrowsOnLargeShape() {
-        // Arrange
-        Shape largeShape = Shape.fromNM(MAX_VALUE, MAX_VALUE);
-        SimpleBloomFilter filter = new SimpleBloomFilter(largeShape);
-        SparseBloomFilter sparseFilter = new SparseBloomFilter(largeShape);
-
-        // Act & Assert
-        assertThrows(ArrayIndexOutOfBoundsException.class, 
-            () -> filter.merge((BitMapExtractor) sparseFilter));
-    }
-
-    @Test(timeout = 4000)
-    public void testMergeBitMapExtractorThrowsOnNull() {
-        // Arrange
-        Shape shape = Shape.fromKM(1, 1);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-
-        // Act & Assert
-        NullPointerException exception = assertThrows(NullPointerException.class, 
-            () -> filter.merge((BitMapExtractor) null));
-        assertEquals("bitMapExtractor", exception.getMessage());
-    }
-
-    @Test(timeout = 4000)
-    public void testMergeBitMapExtractorWithInvalidMapCount() {
-        // Arrange
-        Shape shape = Shape.fromKM(20, 20);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-        BitMapExtractor bitMapExtractor = BitMapExtractor.fromIndexExtractor(filter, 283);
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, 
-            () -> filter.merge(bitMapExtractor));
-        assertEquals("BitMapExtractor should send at most 1 maps", exception.getMessage());
-    }
-
-    @Test(timeout = 4000)
-    public void testIsEmptyThrowsAfterMergeOnLargeShape() {
-        // Arrange
-        Shape largeShape = Shape.fromNM(MAX_VALUE, MAX_VALUE);
-        SimpleBloomFilter filter = new SimpleBloomFilter(largeShape);
-        EnhancedDoubleHasher hasher = new EnhancedDoubleHasher(-154L, MAX_VALUE);
-        filter.merge(hasher);
-
-        // Act & Assert
-        assertThrows(ArrayIndexOutOfBoundsException.class, filter::isEmpty);
-    }
-
-    @Test(timeout = 4000)
-    public void testCopy() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromNM(MAX_VALUE, MAX_VALUE);
-        SimpleBloomFilter original = new SimpleBloomFilter(shape);
-        EnhancedDoubleHasher hasher = new EnhancedDoubleHasher(MAX_VALUE, 1047039L);
-
-        // Act
-        SimpleBloomFilter copy = original.copy();
-
-        // Assert
-        assertNotSame(original, copy);
-    }
-
-    @Test(timeout = 4000)
-    public void testContainsThrowsOnLargeShape() {
-        // Arrange
-        Shape largeShape = Shape.fromNM(MAX_VALUE, MAX_VALUE);
-        SimpleBloomFilter filter = new SimpleBloomFilter(largeShape);
-        CellExtractor cellExtractor = CellExtractor.from(filter);
-
-        // Act & Assert
-        assertThrows(ArrayIndexOutOfBoundsException.class, 
-            () -> filter.contains((IndexExtractor) cellExtractor));
-    }
-
-    @Test(timeout = 4000)
-    public void testContainsThrowsOnNull() {
-        // Arrange
-        Shape shape = Shape.fromKM(668, 668);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-
-        // Act & Assert
-        assertThrows(NullPointerException.class, 
-            () -> filter.contains((IndexExtractor) null));
-    }
-
-    @Test(timeout = 4000)
-    public void testContainsThrowsOnInvalidIndex() {
-        // Arrange
-        Shape shape = Shape.fromNM(10, 10);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-        int[] indices = {977, 0, 0, 0, 0, 0, 0, 0};
-        IndexExtractor indexExtractor = IndexExtractor.fromIndexArray(indices);
-
-        // Act & Assert
-        assertThrows(ArrayIndexOutOfBoundsException.class, 
-            () -> filter.contains(indexExtractor));
-    }
-
-    @Test(timeout = 4000)
-    public void testCardinalityThrowsAfterMergeOnLargeShape() {
-        // Arrange
-        Shape largeShape = Shape.fromNM(MAX_VALUE, MAX_VALUE);
-        SimpleBloomFilter filter = new SimpleBloomFilter(largeShape);
-        EnhancedDoubleHasher hasher = new EnhancedDoubleHasher(MAX_VALUE, MAX_VALUE);
-        filter.merge(hasher);
-
-        // Act & Assert
-        assertThrows(ArrayIndexOutOfBoundsException.class, filter::cardinality);
-    }
-
-    @Test(timeout = 4000)
-    public void testConstructorThrowsOnNullShape() {
-        // Act & Assert
-        NullPointerException exception = assertThrows(NullPointerException.class, 
-            () -> new SimpleBloomFilter(null));
-        assertEquals("shape", exception.getMessage());
-    }
-
-    @Test(timeout = 4000)
-    public void testMergeSelfAsBitMapExtractor() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromNM(64, 64);
-        LayerManager<SparseBloomFilter> layerManager = mock(LayerManager.class);
-        doReturn(false).when(layerManager).processBloomFilters(any());
-        LayeredBloomFilter<SparseBloomFilter> layeredFilter = new LayeredBloomFilter<>(shape, layerManager);
-        SimpleBloomFilter filter = layeredFilter.flatten();
-
-        // Act
-        boolean result = filter.merge((BitMapExtractor) filter);
-
-        // Assert
-        assertTrue(result);
-    }
-
-    @Test(timeout = 4000)
-    public void testProcessBitMapPairsWithNegatedPredicate() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromKM(28, 28);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-        BitMapExtractor bitMapExtractor = BitMapExtractor.fromIndexExtractor(filter, -1);
-        LongBiPredicate biPredicate = mock(LongBiPredicate.class);
-        doReturn(false).when(biPredicate).test(anyLong(), anyLong());
-
-        // Act
-        boolean result = filter.processBitMapPairs(bitMapExtractor, biPredicate);
-
-        // Assert
-        assertFalse(result);
-    }
-
-    @Test(timeout = 4000)
-    public void testProcessBitMapPairsWithEmptyFilter() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromNM(294, 294);
-        LayerManager<SparseBloomFilter> layerManager = mock(LayerManager.class);
-        doReturn(false).when(layerManager).processBloomFilters(any());
-        LayeredBloomFilter<SparseBloomFilter> layeredFilter = new LayeredBloomFilter<>(shape, layerManager);
-        SimpleBloomFilter filter = layeredFilter.flatten();
-        LongBiPredicate biPredicate = mock(LongBiPredicate.class);
-        doReturn(false).when(biPredicate).test(anyLong(), anyLong());
-
-        // Act
-        boolean result = filter.processBitMapPairs(filter, biPredicate);
-
-        // Assert
-        assertFalse(result);
-    }
-
-    @Test(timeout = 4000)
-    public void testMergeHasherWithIndexOutOfRangeThrowsException() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromKM(655, 1);
-        EnhancedDoubleHasher hasher = new EnhancedDoubleHasher(655, 655);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, 
-            () -> filter.merge(hasher));
-        assertEquals("IndexExtractor should only send values in the range[0,1)", exception.getMessage());
-    }
-
-    @Test(timeout = 4000)
-    public void testMergeIndexExtractorWithNegativeIndexThrowsException() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromNM(10, 10);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-        int[] indices = {0, 0, -89, 0, 0};
-        IndexExtractor indexExtractor = IndexExtractor.fromIndexArray(indices);
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, 
-            () -> filter.merge(indexExtractor));
-        assertEquals("IndexExtractor should only send values in the range[0,10)", exception.getMessage());
-    }
-
-    @Test(timeout = 4000)
-    public void testMergeSparseBloomFilter() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromNM(2, 2);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-        SparseBloomFilter sparseFilter = new SparseBloomFilter(shape);
-
-        // Act
-        boolean result = filter.merge(sparseFilter);
-
-        // Assert
-        assertTrue(result);
-    }
-
-    @Test(timeout = 4000)
-    public void testMergeEmptyBloomFilter() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromNMK(19, 19, 19);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-
-        // Act
-        boolean result = filter.merge(filter);
-        boolean isEmpty = filter.isEmpty();
-        int characteristics = filter.characteristics();
-
-        // Assert
-        assertTrue(result);
-        assertTrue(isEmpty);
-        assertEquals(0, characteristics);
-    }
-
-    @Test(timeout = 4000)
-    public void testIsEmptyOnEmptyFilter() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromNM(294, 294);
-        LayerManager<SparseBloomFilter> layerManager = mock(LayerManager.class);
-        doReturn(false).when(layerManager).processBloomFilters(any());
-        LayeredBloomFilter<SparseBloomFilter> layeredFilter = new LayeredBloomFilter<>(shape, layerManager);
-        SimpleBloomFilter filter = layeredFilter.flatten();
-
-        // Act
-        boolean isEmpty = filter.isEmpty();
-
-        // Assert
-        assertTrue(isEmpty);
-    }
-
-    @Test(timeout = 4000)
-    public void testMergeSelfThenCheckCardinality() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromNMK(15, 15, 15);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-
-        // Act
-        boolean result = filter.merge(filter);
-        int cardinality = filter.cardinality();
-        int characteristics = filter.characteristics();
-
-        // Assert
-        assertTrue(result);
-        assertEquals(0, cardinality);
-        assertEquals(0, characteristics);
-    }
-
-    @Test(timeout = 4000)
-    public void testAsBitMapArrayOnLargeShape() {
-        // Arrange
-        Shape largeShape = Shape.fromNM(MAX_VALUE, MAX_VALUE);
-        SimpleBloomFilter filter = new SimpleBloomFilter(largeShape);
-
-        // Act
-        long[] bitMapArray = filter.asBitMapArray();
-
-        // Assert
-        assertEquals(33554432, bitMapArray.length);
-    }
-
-    @Test(timeout = 4000)
-    public void testIsFullOnEmptyFilter() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromNM(294, 294);
-        LayerManager<SparseBloomFilter> layerManager = mock(LayerManager.class);
-        doReturn(false).when(layerManager).processBloomFilters(any());
-        LayeredBloomFilter<SparseBloomFilter> layeredFilter = new LayeredBloomFilter<>(shape, layerManager);
-        SimpleBloomFilter filter = layeredFilter.flatten();
-
-        // Act
-        boolean isFull = filter.isFull();
-
-        // Assert
-        assertFalse(isFull);
-    }
-
-    @Test(timeout = 4000)
-    public void testClear() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromKM(23, 23);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-
-        // Act
-        filter.clear();
-
-        // Assert
-        assertEquals(0, filter.characteristics());
-    }
-
-    @Test(timeout = 4000)
-    public void testProcessIndicesAfterMerge() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromKM(19, 19);
-        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
-        EnhancedDoubleHasher hasher = new EnhancedDoubleHasher(1956L, -2388L);
-        filter.merge(hasher);
-        IndexFilter.ArrayTracker tracker = new IndexFilter.ArrayTracker(shape);
-        IntPredicate negatedPredicate = tracker.negate();
-
-        // Act
-        boolean result = filter.processIndices(negatedPredicate);
-
-        // Assert
-        assertFalse(result);
-    }
-
-    @Test(timeout = 4000)
-    public void testContainsSelfOnEmptyFilter() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromNM(294, 294);
-        LayerManager<SparseBloomFilter> layerManager = mock(LayerManager.class);
-        doReturn(false).when(layerManager).processBloomFilters(any());
-        LayeredBloomFilter<SparseBloomFilter> layeredFilter = new LayeredBloomFilter<>(shape, layerManager);
-        SimpleBloomFilter filter = layeredFilter.flatten();
-
-        // Act
-        boolean contains = filter.contains((IndexExtractor) filter);
-
-        // Assert
-        assertTrue(contains);
-    }
-
-    @Test(timeout = 4000)
-    public void testCopyCreatesNewInstance() throws Throwable {
-        // Arrange
-        Shape shape = Shape.fromNMK(78, 78, 2);
-        SimpleBloomFilter original = new SimpleBloomFilter(shape);
-
-        // Act
-        SimpleBloomFilter copy = original.copy();
-
-        // Assert
-        assertNotSame(original, copy);
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      Shape shape0 = Shape.fromKM(1, 1540);
+      int[] intArray0 = new int[8];
+      intArray0[0] = 5023;
+      IndexExtractor indexExtractor0 = IndexExtractor.fromIndexArray(intArray0);
+      LayerManager<SparseBloomFilter> layerManager0 = (LayerManager<SparseBloomFilter>) mock(LayerManager.class, new ViolatedAssumptionAnswer());
+      doReturn(false).when(layerManager0).processBloomFilters(any(java.util.function.Predicate.class));
+      LayeredBloomFilter<SparseBloomFilter> layeredBloomFilter0 = new LayeredBloomFilter<SparseBloomFilter>(shape0, layerManager0);
+      SimpleBloomFilter simpleBloomFilter0 = layeredBloomFilter0.flatten();
+      // Undeclared exception!
+      try { 
+        simpleBloomFilter0.merge(indexExtractor0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // IndexExtractor should only send values in the range[0,1540)
+         //
+         verifyException("org.apache.commons.collections4.bloomfilter.SimpleBloomFilter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      Shape shape0 = Shape.fromKM(19, 19);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      SparseBloomFilter sparseBloomFilter0 = new SparseBloomFilter(shape0);
+      EnhancedDoubleHasher enhancedDoubleHasher0 = new EnhancedDoubleHasher(19, 2654L);
+      boolean boolean0 = simpleBloomFilter0.merge((Hasher) enhancedDoubleHasher0);
+      assertTrue(boolean0);
+      
+      boolean boolean1 = simpleBloomFilter0.merge((BitMapExtractor) sparseBloomFilter0);
+      assertTrue(boolean1 == boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      Shape shape0 = Shape.fromNMK(78, 78, 2);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      EnhancedDoubleHasher enhancedDoubleHasher0 = new EnhancedDoubleHasher(1L, (-9223372036854775808L));
+      boolean boolean0 = simpleBloomFilter0.merge((Hasher) enhancedDoubleHasher0);
+      assertTrue(boolean0);
+      
+      boolean boolean1 = simpleBloomFilter0.merge((BitMapExtractor) simpleBloomFilter0);
+      assertTrue(boolean1 == boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(64, 64);
+      LayerManager<SparseBloomFilter> layerManager0 = (LayerManager<SparseBloomFilter>) mock(LayerManager.class, new ViolatedAssumptionAnswer());
+      doReturn(false).when(layerManager0).processBloomFilters(any(java.util.function.Predicate.class));
+      LayeredBloomFilter<SparseBloomFilter> layeredBloomFilter0 = new LayeredBloomFilter<SparseBloomFilter>(shape0, layerManager0);
+      SimpleBloomFilter simpleBloomFilter0 = layeredBloomFilter0.flatten();
+      EnhancedDoubleHasher enhancedDoubleHasher0 = new EnhancedDoubleHasher(2147483647L, 0L);
+      boolean boolean0 = simpleBloomFilter0.merge((Hasher) enhancedDoubleHasher0);
+      boolean boolean1 = simpleBloomFilter0.isEmpty();
+      assertFalse(boolean1 == boolean0);
+      assertFalse(boolean1);
+  }
+
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      Shape shape0 = Shape.fromNMK(115, 115, 2);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      EnhancedDoubleHasher enhancedDoubleHasher0 = new EnhancedDoubleHasher(1L, (-9223372036854775808L));
+      boolean boolean0 = simpleBloomFilter0.merge((Hasher) enhancedDoubleHasher0);
+      assertTrue(boolean0);
+      
+      simpleBloomFilter0.isFull();
+      int int0 = simpleBloomFilter0.cardinality();
+      assertEquals(2, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      Shape shape0 = Shape.fromNMK(78, 78, 2);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      IndexFilter.ArrayTracker indexFilter_ArrayTracker0 = new IndexFilter.ArrayTracker(shape0);
+      boolean boolean0 = simpleBloomFilter0.processIndices(indexFilter_ArrayTracker0);
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      Shape shape0 = Shape.fromNMK(3419, 3419, 1);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      long[] longArray0 = new long[3];
+      LongBiPredicate longBiPredicate0 = mock(LongBiPredicate.class, new ViolatedAssumptionAnswer());
+      doReturn(false, false, false, false, false).when(longBiPredicate0).test(anyLong() , anyLong());
+      CountingLongPredicate countingLongPredicate0 = new CountingLongPredicate(longArray0, longBiPredicate0);
+      LongPredicate longPredicate0 = countingLongPredicate0.negate();
+      boolean boolean0 = simpleBloomFilter0.processBitMaps(longPredicate0);
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(10, 10);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      long[] longArray0 = new long[1];
+      LongBiPredicate longBiPredicate0 = mock(LongBiPredicate.class, new ViolatedAssumptionAnswer());
+      doReturn(false).when(longBiPredicate0).test(anyLong() , anyLong());
+      CountingLongPredicate countingLongPredicate0 = new CountingLongPredicate(longArray0, longBiPredicate0);
+      boolean boolean0 = simpleBloomFilter0.processBitMaps(countingLongPredicate0);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(51, 51);
+      LayerManager<SparseBloomFilter> layerManager0 = (LayerManager<SparseBloomFilter>) mock(LayerManager.class, new ViolatedAssumptionAnswer());
+      doReturn(true, false).when(layerManager0).processBloomFilters(any(java.util.function.Predicate.class));
+      LayeredBloomFilter<SparseBloomFilter> layeredBloomFilter0 = new LayeredBloomFilter<SparseBloomFilter>(shape0, layerManager0);
+      SimpleBloomFilter simpleBloomFilter0 = layeredBloomFilter0.flatten();
+      LongBiPredicate longBiPredicate0 = mock(LongBiPredicate.class, new ViolatedAssumptionAnswer());
+      doReturn(true).when(longBiPredicate0).test(anyLong() , anyLong());
+      boolean boolean0 = simpleBloomFilter0.processBitMapPairs(layeredBloomFilter0, longBiPredicate0);
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      Shape shape0 = Shape.fromKM(22, 22);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      boolean boolean0 = simpleBloomFilter0.merge((IndexExtractor) simpleBloomFilter0);
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(294, 294);
+      LayerManager<SparseBloomFilter> layerManager0 = (LayerManager<SparseBloomFilter>) mock(LayerManager.class, new ViolatedAssumptionAnswer());
+      doReturn(false).when(layerManager0).processBloomFilters(any(java.util.function.Predicate.class));
+      LayeredBloomFilter<SparseBloomFilter> layeredBloomFilter0 = new LayeredBloomFilter<SparseBloomFilter>(shape0, layerManager0);
+      SimpleBloomFilter simpleBloomFilter0 = layeredBloomFilter0.flatten();
+      Shape shape1 = simpleBloomFilter0.getShape();
+      assertEquals(203.7852710846239, shape1.estimateMaxN(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      Shape shape0 = Shape.fromNMK(64, 64, 1);
+      LayerManager<SparseBloomFilter> layerManager0 = (LayerManager<SparseBloomFilter>) mock(LayerManager.class, new ViolatedAssumptionAnswer());
+      doReturn(false).when(layerManager0).processBloomFilters(any(java.util.function.Predicate.class));
+      LayeredBloomFilter<SparseBloomFilter> layeredBloomFilter0 = new LayeredBloomFilter<SparseBloomFilter>(shape0, layerManager0);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      boolean boolean0 = simpleBloomFilter0.contains((IndexExtractor) layeredBloomFilter0);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      Shape shape0 = Shape.fromKM(4, 4);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      int int0 = simpleBloomFilter0.characteristics();
+      assertEquals(0, int0);
+  }
+
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(38, 38);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      EnhancedDoubleHasher enhancedDoubleHasher0 = new EnhancedDoubleHasher(38, 38);
+      boolean boolean0 = simpleBloomFilter0.merge((Hasher) enhancedDoubleHasher0);
+      int int0 = simpleBloomFilter0.cardinality();
+      assertEquals(1, int0);
+      
+      boolean boolean1 = simpleBloomFilter0.isEmpty();
+      assertFalse(boolean1 == boolean0);
+      assertFalse(boolean1);
+  }
+
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      int int0 = 2147483605;
+      Shape shape0 = Shape.fromNM(2147483605, 2147483605);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      IndexFilter.ArrayTracker indexFilter_ArrayTracker0 = new IndexFilter.ArrayTracker(shape0);
+      // Undeclared exception!
+      simpleBloomFilter0.processIndices(indexFilter_ArrayTracker0);
+  }
+
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(38, 38);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      // Undeclared exception!
+      try { 
+        simpleBloomFilter0.processIndices((IntPredicate) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // consumer
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(2147483639, 2147483639);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      long[] longArray0 = new long[0];
+      LongBiPredicate longBiPredicate0 = mock(LongBiPredicate.class, new ViolatedAssumptionAnswer());
+      doReturn(false, false, false, false, false).when(longBiPredicate0).test(anyLong() , anyLong());
+      CountingLongPredicate countingLongPredicate0 = new CountingLongPredicate(longArray0, longBiPredicate0);
+      LongPredicate longPredicate0 = countingLongPredicate0.negate();
+      // Undeclared exception!
+      simpleBloomFilter0.processBitMaps(longPredicate0);
+  }
+
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      Shape shape0 = Shape.fromKM(1, 1);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      // Undeclared exception!
+      try { 
+        simpleBloomFilter0.processBitMaps((LongPredicate) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // consumer
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      Shape shape0 = Shape.fromNMK(15, 15, 15);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      // Undeclared exception!
+      try { 
+        simpleBloomFilter0.processBitMapPairs(simpleBloomFilter0, (LongBiPredicate) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(2147483602, 2147483602);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      // Undeclared exception!
+      simpleBloomFilter0.merge((IndexExtractor) simpleBloomFilter0);
+  }
+
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      Shape shape0 = Shape.fromKM(668, 668);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      // Undeclared exception!
+      try { 
+        simpleBloomFilter0.merge((IndexExtractor) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // indexExtractor
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      Shape shape0 = Shape.fromKM(2147483605, 2147483605);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      EnhancedDoubleHasher enhancedDoubleHasher0 = new EnhancedDoubleHasher(2147483605, 2147483605);
+      // Undeclared exception!
+      simpleBloomFilter0.merge((Hasher) enhancedDoubleHasher0);
+  }
+
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      Shape shape0 = Shape.fromKM(56, 56);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      // Undeclared exception!
+      try { 
+        simpleBloomFilter0.merge((Hasher) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // hasher
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(Integer.MAX_VALUE, Integer.MAX_VALUE);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      // Undeclared exception!
+      simpleBloomFilter0.merge((BloomFilter<?>) simpleBloomFilter0);
+  }
+
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(38, 38);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      // Undeclared exception!
+      try { 
+        simpleBloomFilter0.merge((BloomFilter<?>) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // other
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(49, 49);
+      Shape shape1 = Shape.fromKM(49, 5906);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape1);
+      SimpleBloomFilter simpleBloomFilter1 = new SimpleBloomFilter(shape0);
+      // Undeclared exception!
+      try { 
+        simpleBloomFilter1.merge((BloomFilter<?>) simpleBloomFilter0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // BitMapExtractor should send at most 1 maps
+         //
+         verifyException("org.apache.commons.collections4.bloomfilter.SimpleBloomFilter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(2147483602, 2147483602);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      SparseBloomFilter sparseBloomFilter0 = new SparseBloomFilter(shape0);
+      // Undeclared exception!
+      simpleBloomFilter0.merge((BitMapExtractor) sparseBloomFilter0);
+  }
+
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      Shape shape0 = Shape.fromKM(1, 1);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      // Undeclared exception!
+      try { 
+        simpleBloomFilter0.merge((BitMapExtractor) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // bitMapExtractor
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      Shape shape0 = Shape.fromKM(20, 20);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      BitMapExtractor bitMapExtractor0 = BitMapExtractor.fromIndexExtractor(simpleBloomFilter0, 283);
+      // Undeclared exception!
+      try { 
+        simpleBloomFilter0.merge(bitMapExtractor0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // BitMapExtractor should send at most 1 maps
+         //
+         verifyException("org.apache.commons.collections4.bloomfilter.SimpleBloomFilter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      int int0 = Integer.MAX_VALUE;
+      Shape shape0 = Shape.fromNM(Integer.MAX_VALUE, Integer.MAX_VALUE);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      EnhancedDoubleHasher enhancedDoubleHasher0 = new EnhancedDoubleHasher((-154L), 2147483647L);
+      simpleBloomFilter0.merge((Hasher) enhancedDoubleHasher0);
+      // Undeclared exception!
+      simpleBloomFilter0.isEmpty();
+  }
+
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(2147483605, 2147483605);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      EnhancedDoubleHasher enhancedDoubleHasher0 = new EnhancedDoubleHasher(2147483605, 1047039L);
+      SimpleBloomFilter simpleBloomFilter1 = simpleBloomFilter0.copy();
+      assertNotSame(simpleBloomFilter1, simpleBloomFilter0);
+  }
+
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(2147483605, 2147483605);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      CellExtractor cellExtractor0 = CellExtractor.from(simpleBloomFilter0);
+      // Undeclared exception!
+      simpleBloomFilter0.contains((IndexExtractor) cellExtractor0);
+  }
+
+  @Test(timeout = 4000)
+  public void test32()  throws Throwable  {
+      Shape shape0 = Shape.fromKM(668, 668);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      // Undeclared exception!
+      try { 
+        simpleBloomFilter0.contains((IndexExtractor) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.apache.commons.collections4.bloomfilter.SimpleBloomFilter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test33()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(10, 10);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      int[] intArray0 = new int[8];
+      intArray0[0] = 977;
+      IndexExtractor indexExtractor0 = IndexExtractor.fromIndexArray(intArray0);
+      // Undeclared exception!
+      try { 
+        simpleBloomFilter0.contains(indexExtractor0);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // 15
+         //
+         verifyException("org.apache.commons.collections4.bloomfilter.BitMaps", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test34()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(2147483605, 2147483605);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      EnhancedDoubleHasher enhancedDoubleHasher0 = new EnhancedDoubleHasher(2147483605, 2147483605);
+      simpleBloomFilter0.merge((Hasher) enhancedDoubleHasher0);
+      // Undeclared exception!
+      simpleBloomFilter0.cardinality();
+  }
+
+  @Test(timeout = 4000)
+  public void test35()  throws Throwable  {
+      SimpleBloomFilter simpleBloomFilter0 = null;
+      try {
+        simpleBloomFilter0 = new SimpleBloomFilter((Shape) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // shape
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test36()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(64, 64);
+      LayerManager<SparseBloomFilter> layerManager0 = (LayerManager<SparseBloomFilter>) mock(LayerManager.class, new ViolatedAssumptionAnswer());
+      doReturn(false).when(layerManager0).processBloomFilters(any(java.util.function.Predicate.class));
+      LayeredBloomFilter<SparseBloomFilter> layeredBloomFilter0 = new LayeredBloomFilter<SparseBloomFilter>(shape0, layerManager0);
+      SimpleBloomFilter simpleBloomFilter0 = layeredBloomFilter0.flatten();
+      boolean boolean0 = simpleBloomFilter0.merge((BitMapExtractor) simpleBloomFilter0);
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test37()  throws Throwable  {
+      Shape shape0 = Shape.fromKM(28, 28);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      BitMapExtractor bitMapExtractor0 = BitMapExtractor.fromIndexExtractor(simpleBloomFilter0, (-1));
+      LongBiPredicate longBiPredicate0 = mock(LongBiPredicate.class, new ViolatedAssumptionAnswer());
+      doReturn(false).when(longBiPredicate0).test(anyLong() , anyLong());
+      boolean boolean0 = simpleBloomFilter0.processBitMapPairs(bitMapExtractor0, longBiPredicate0);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test38()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(294, 294);
+      LayerManager<SparseBloomFilter> layerManager0 = (LayerManager<SparseBloomFilter>) mock(LayerManager.class, new ViolatedAssumptionAnswer());
+      doReturn(false).when(layerManager0).processBloomFilters(any(java.util.function.Predicate.class));
+      LayeredBloomFilter<SparseBloomFilter> layeredBloomFilter0 = new LayeredBloomFilter<SparseBloomFilter>(shape0, layerManager0);
+      SimpleBloomFilter simpleBloomFilter0 = layeredBloomFilter0.flatten();
+      LongBiPredicate longBiPredicate0 = mock(LongBiPredicate.class, new ViolatedAssumptionAnswer());
+      doReturn(false).when(longBiPredicate0).test(anyLong() , anyLong());
+      boolean boolean0 = simpleBloomFilter0.processBitMapPairs(simpleBloomFilter0, longBiPredicate0);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test39()  throws Throwable  {
+      Shape shape0 = Shape.fromKM(655, 1);
+      EnhancedDoubleHasher enhancedDoubleHasher0 = new EnhancedDoubleHasher(655, 655);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      // Undeclared exception!
+      try { 
+        simpleBloomFilter0.merge((Hasher) enhancedDoubleHasher0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // IndexExtractor should only send values in the range[0,1)
+         //
+         verifyException("org.apache.commons.collections4.bloomfilter.SimpleBloomFilter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test40()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(10, 10);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      int[] intArray0 = new int[5];
+      intArray0[2] = (int) (byte) (-89);
+      IndexExtractor indexExtractor0 = IndexExtractor.fromIndexArray(intArray0);
+      // Undeclared exception!
+      try { 
+        simpleBloomFilter0.merge(indexExtractor0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // IndexExtractor should only send values in the range[0,10)
+         //
+         verifyException("org.apache.commons.collections4.bloomfilter.SimpleBloomFilter", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test41()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(2, 2);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      SparseBloomFilter sparseBloomFilter0 = new SparseBloomFilter(shape0);
+      boolean boolean0 = simpleBloomFilter0.merge((BloomFilter<?>) sparseBloomFilter0);
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test42()  throws Throwable  {
+      Shape shape0 = Shape.fromNMK(19, 19, 19);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      boolean boolean0 = simpleBloomFilter0.merge((BloomFilter<?>) simpleBloomFilter0);
+      boolean boolean1 = simpleBloomFilter0.isEmpty();
+      assertEquals(0, simpleBloomFilter0.characteristics());
+      assertTrue(boolean1 == boolean0);
+      assertTrue(boolean1);
+  }
+
+  @Test(timeout = 4000)
+  public void test43()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(294, 294);
+      LayerManager<SparseBloomFilter> layerManager0 = (LayerManager<SparseBloomFilter>) mock(LayerManager.class, new ViolatedAssumptionAnswer());
+      doReturn(false).when(layerManager0).processBloomFilters(any(java.util.function.Predicate.class));
+      LayeredBloomFilter<SparseBloomFilter> layeredBloomFilter0 = new LayeredBloomFilter<SparseBloomFilter>(shape0, layerManager0);
+      SimpleBloomFilter simpleBloomFilter0 = layeredBloomFilter0.flatten();
+      boolean boolean0 = simpleBloomFilter0.isEmpty();
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test44()  throws Throwable  {
+      Shape shape0 = Shape.fromNMK(15, 15, 15);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      boolean boolean0 = simpleBloomFilter0.merge((BloomFilter<?>) simpleBloomFilter0);
+      assertTrue(boolean0);
+      
+      int int0 = simpleBloomFilter0.cardinality();
+      assertEquals(0, int0);
+      assertEquals(0, simpleBloomFilter0.characteristics());
+  }
+
+  @Test(timeout = 4000)
+  public void test45()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(2147483605, 2147483605);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      long[] longArray0 = simpleBloomFilter0.asBitMapArray();
+      assertEquals(33554432, longArray0.length);
+  }
+
+  @Test(timeout = 4000)
+  public void test46()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(294, 294);
+      LayerManager<SparseBloomFilter> layerManager0 = (LayerManager<SparseBloomFilter>) mock(LayerManager.class, new ViolatedAssumptionAnswer());
+      doReturn(false).when(layerManager0).processBloomFilters(any(java.util.function.Predicate.class));
+      LayeredBloomFilter<SparseBloomFilter> layeredBloomFilter0 = new LayeredBloomFilter<SparseBloomFilter>(shape0, layerManager0);
+      SimpleBloomFilter simpleBloomFilter0 = layeredBloomFilter0.flatten();
+      boolean boolean0 = simpleBloomFilter0.isFull();
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test47()  throws Throwable  {
+      Shape shape0 = Shape.fromKM(23, 23);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      simpleBloomFilter0.clear();
+      assertEquals(0, simpleBloomFilter0.characteristics());
+  }
+
+  @Test(timeout = 4000)
+  public void test48()  throws Throwable  {
+      Shape shape0 = Shape.fromKM(19, 19);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      EnhancedDoubleHasher enhancedDoubleHasher0 = new EnhancedDoubleHasher(1956L, (-2388L));
+      boolean boolean0 = simpleBloomFilter0.merge((Hasher) enhancedDoubleHasher0);
+      IndexFilter.ArrayTracker indexFilter_ArrayTracker0 = new IndexFilter.ArrayTracker(shape0);
+      IntPredicate intPredicate0 = indexFilter_ArrayTracker0.negate();
+      boolean boolean1 = simpleBloomFilter0.processIndices(intPredicate0);
+      assertFalse(boolean1 == boolean0);
+      assertFalse(boolean1);
+  }
+
+  @Test(timeout = 4000)
+  public void test49()  throws Throwable  {
+      Shape shape0 = Shape.fromNM(294, 294);
+      LayerManager<SparseBloomFilter> layerManager0 = (LayerManager<SparseBloomFilter>) mock(LayerManager.class, new ViolatedAssumptionAnswer());
+      doReturn(false).when(layerManager0).processBloomFilters(any(java.util.function.Predicate.class));
+      LayeredBloomFilter<SparseBloomFilter> layeredBloomFilter0 = new LayeredBloomFilter<SparseBloomFilter>(shape0, layerManager0);
+      SimpleBloomFilter simpleBloomFilter0 = layeredBloomFilter0.flatten();
+      boolean boolean0 = simpleBloomFilter0.contains((IndexExtractor) simpleBloomFilter0);
+      assertTrue(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test50()  throws Throwable  {
+      Shape shape0 = Shape.fromNMK(78, 78, 2);
+      SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
+      SimpleBloomFilter simpleBloomFilter1 = simpleBloomFilter0.copy();
+      assertNotSame(simpleBloomFilter0, simpleBloomFilter1);
+  }
 }
