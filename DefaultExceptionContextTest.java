@@ -1,3 +1,19 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.commons.lang3.exception;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -8,64 +24,47 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for DefaultExceptionContext that focus on how formatted messages are produced
- * when context values are null or their toString() implementations throw exceptions.
+ * JUnit tests for DefaultExceptionContext.
  */
 class DefaultExceptionContextTest extends AbstractExceptionContextTest<DefaultExceptionContext> {
-
-    private static final String LABEL_THROWS_1 = "throws 1";
-    private static final String LABEL_THROWS_2 = "throws 2";
 
     @Override
     @BeforeEach
     public void setUp() throws Exception {
-        // Ensure a fresh context for each test and let the superclass perform any shared setup.
         exceptionContext = new DefaultExceptionContext();
         super.setUp();
     }
 
     @Test
-    void shouldIncludeLabelsWhenValueToStringThrows() {
-        // Arrange: Add values whose toString() will throw at formatting time.
-        exceptionContext.addContextValue(LABEL_THROWS_1, new ObjectToStringRuntimeException(LABEL_THROWS_1));
-        exceptionContext.addContextValue(LABEL_THROWS_2, new ObjectToStringRuntimeException(LABEL_THROWS_2));
-
-        // Act
+    void testFormattedExceptionMessageExceptionHandling() {
+        exceptionContext = new DefaultExceptionContext();
+        final String label1 = "throws 1";
+        final String label2 = "throws 2";
+        exceptionContext.addContextValue(label1, new ObjectToStringRuntimeException(label1));
+        exceptionContext.addContextValue(label2, new ObjectToStringRuntimeException(label2));
         final String message = exceptionContext.getFormattedExceptionMessage(TEST_MESSAGE);
-
-        // Assert: The base message is preserved and labels are present, even if value toString() fails.
-        assertMessageStartsWithAndContainsLabels(message, TEST_MESSAGE, LABEL_THROWS_1, LABEL_THROWS_2);
+        assertTrue(message.startsWith(TEST_MESSAGE));
+        assertTrue(message.contains(label1));
+        assertTrue(message.contains(label2));
     }
 
     @Test
-    void shouldReturnEmptyStringWhenBaseMessageIsNull() {
-        // Act
-        final String message = exceptionContext.getFormattedExceptionMessage(null);
-
-        // Assert
-        assertEquals("", message);
+    void testFormattedExceptionMessageNull() {
+        exceptionContext = new DefaultExceptionContext();
+        assertEquals("", exceptionContext.getFormattedExceptionMessage(null));
     }
 
     @Test
-    void shouldIncludeLabelsWhenValuesAreNull() {
-        // Arrange: Add labels with null values.
-        exceptionContext.addContextValue(LABEL_THROWS_1, null);
-        exceptionContext.addContextValue(LABEL_THROWS_2, null);
-
-        // Act
+    void testFormattedExceptionMessageNullValue() {
+        exceptionContext = new DefaultExceptionContext();
+        final String label1 = "throws 1";
+        final String label2 = "throws 2";
+        exceptionContext.addContextValue(label1, null);
+        exceptionContext.addContextValue(label2, null);
         final String message = exceptionContext.getFormattedExceptionMessage(TEST_MESSAGE);
-
-        // Assert: The base message is preserved and labels are present for null values.
-        assertMessageStartsWithAndContainsLabels(message, TEST_MESSAGE, LABEL_THROWS_1, LABEL_THROWS_2);
+        assertTrue(message.startsWith(TEST_MESSAGE));
+        assertTrue(message.contains(label1));
+        assertTrue(message.contains(label2));
     }
 
-    private static void assertMessageStartsWithAndContainsLabels(
-            final String actual,
-            final String expectedPrefix,
-            final String... labels) {
-        assertTrue(actual.startsWith(expectedPrefix), "Message must start with the base message");
-        for (final String label : labels) {
-            assertTrue(actual.contains(label), "Message must contain label: " + label);
-        }
-    }
 }
