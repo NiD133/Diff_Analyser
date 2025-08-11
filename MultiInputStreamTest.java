@@ -33,171 +33,113 @@ import org.jspecify.annotations.NullUnmarked;
 @NullUnmarked
 public class MultiInputStreamTest extends IoTestCase {
 
-  public void testConcatenatesMultipleStreamsCorrectly() throws Exception {
-    // Test various combinations of stream sizes to ensure proper concatenation
-    testConcatenationWithStreamSizes(0);
-    testConcatenationWithStreamSizes(1);
-    testConcatenationWithStreamSizes(0, 0, 0);
-    testConcatenationWithStreamSizes(10, 20);
-    testConcatenationWithStreamSizes(10, 0, 20);
-    testConcatenationWithStreamSizes(0, 10, 20);
-    testConcatenationWithStreamSizes(10, 20, 0);
-    testConcatenationWithStreamSizes(10, 20, 1);
-    testConcatenationWithStreamSizes(1, 1, 1, 1, 1, 1, 1, 1);
-    testConcatenationWithStreamSizes(1, 0, 1, 0, 1, 0, 1, 0);
+  public void testJoin() throws Exception {
+    joinHelper(0);
+    joinHelper(1);
+    joinHelper(0, 0, 0);
+    joinHelper(10, 20);
+    joinHelper(10, 0, 20);
+    joinHelper(0, 10, 20);
+    joinHelper(10, 20, 0);
+    joinHelper(10, 20, 1);
+    joinHelper(1, 1, 1, 1, 1, 1, 1, 1);
+    joinHelper(1, 0, 1, 0, 1, 0, 1, 0);
   }
 
-  public void testOnlyOneStreamIsOpenAtATime() throws Exception {
-    // Create a source that tracks how many streams are open simultaneously
-    ByteSource originalSource = createByteSourceWithContent(0, 50);
-    int[] openStreamCounter = new int[1];
-    
-    ByteSource streamTrackingSource = new ByteSource() {
-      @Override
-      public InputStream openStream() throws IOException {
-        if (openStreamCounter[0]++ != 0) {
-          throw new IllegalStateException("More than one source open simultaneously");
-        }
-        return new FilterInputStream(originalSource.openStream()) {
+  public void testOnlyOneOpen() throws Exception {
+    ByteSource source = newByteSource(0, 50);
+    int[] counter = new int[1];
+    ByteSource checker =
+        new ByteSource() {
           @Override
-          public void close() throws IOException {
-            super.close();
-            openStreamCounter[0]--;
+          public InputStream openStream() throws IOException {
+            if (counter[0]++ != 0) {
+              throw new IllegalStateException("More than one source open");
+            }
+            return new FilterInputStream(source.openStream()) {
+              @Override
+              public void close() throws IOException {
+                super.close();
+                counter[0]--;
+              }
+            };
           }
         };
-      }
-    };
-    
-    // Concatenate multiple instances of the tracking source
-    byte[] result = ByteSource.concat(streamTrackingSource, streamTrackingSource, streamTrackingSource).read();
-    
-    // Verify the total length is correct (3 sources × 50 bytes each)
+    byte[] result = ByteSource.concat(checker, checker, checker).read();
     assertEquals(150, result.length);
   }
 
-  /**
-   * Tests that streams are properly concatenated by comparing the result
-   * with an equivalent single stream containing the same data.
-   */
-  private void testConcatenationWithStreamSizes(Integer... streamSizes) throws Exception {
-    List<ByteSource> sourcesToConcatenate = new ArrayList<>();
-    int currentStartByte = 0;
-    
-    // Create individual byte sources with sequential content
-    for (Integer streamSize : streamSizes) {
-      sourcesToConcatenate.add(createByteSourceWithContent(currentStartByte, streamSize));
-      currentStartByte += streamSize;
+  private void joinHelper(Integer... spans) throws Exception {
+    List<ByteSource> sources = new ArrayList<>();
+    int start = 0;
+    for (Integer span : spans) {
+      sources.add(newByteSource(start, span));
+      start += span;
     }
-    
-    // Concatenate all sources
-    ByteSource concatenatedSource = ByteSource.concat(sourcesToConcatenate);
-    
-    // Create expected result: a single source with all the data
-    ByteSource expectedSource = createByteSourceWithContent(0, currentStartByte);
-    
-    // Verify the concatenated result matches the expected content
-    assertTrue("Concatenated stream should match expected content", 
-               expectedSource.contentEquals(concatenatedSource));
+    ByteSource joined = ByteSource.concat(sources);
+    assertTrue(newByteSource(0, start).contentEquals(joined));
   }
 
-  public void testReadingSingleBytesWorksCorrectly() throws Exception {
-    ByteSource singleSource = createByteSourceWithContent(0, 10);
-    ByteSource concatenatedSource = ByteSource.concat(singleSource, singleSource);
-    
-    // Verify total size
-    assertEquals("Concatenated source should have combined size", 20, concatenatedSource.size());
-    
-    try (InputStream inputStream = concatenatedSource.openStream()) {
-      // MultiInputStream should not support mark/reset
-      assertFalse("MultiInputStream should not support mark", inputStream.markSupported());
-      
-      // Initially should show available bytes from first stream
-      assertEquals("Should show available bytes from first stream", 10, inputStream.available());
-      
-      // Read all bytes one by one
-      int totalBytesRead = 0;
-      while (inputStream.read() != -1) {
-        totalBytesRead++;
-      }
-      
-      // Verify we read all bytes and stream is exhausted
-      assertEquals("Should have no bytes available after reading all", 0, inputStream.available());
-      assertEquals("Should have read all bytes from both streams", 20, totalBytesRead);
+  public void testReadSingleByte() throws Exception {
+    ByteSource source = newByteSource(0, 10);
+    ByteSource joined = ByteSource.concat(source, source);
+    assertEquals(20, joined.size());
+    InputStream in = joined.openStream();
+    assertFalse(in.markSupported());
+    assertEquals(10, in.available());
+    int total = 0;
+    while (in.read() != -1) {
+      total++;
     }
+    assertEquals(0, in.available());
+    assertEquals(20, total);
   }
 
-  @SuppressWarnings("CheckReturnValue") // skip() calls intentionally return 0 in this test
-  public void testSkipBehaviorWithNonSkippableStream() throws Exception {
-    // Create a MultiInputStream with a source that doesn't support skipping
-    MultiInputStream multiStream = new MultiInputStream(
-        Collections.singleton(createNonSkippableByteSource()).iterator());
-    
-    // Test skip with negative values (should return 0)
-    assertEquals("Skip with negative value should return 0", 0, multiStream.skip(-1));
-    assertEquals("Skip with negative value should return 0", 0, multiStream.skip(-1));
-    
-    // Test skip with zero (should return 0)
-    assertEquals("Skip with zero should return 0", 0, multiStream.skip(0));
-    
-    // Use ByteStreams.skipFully to skip 20 bytes (this will read and discard)
-    ByteStreams.skipFully(multiStream, 20);
-    
-    // Verify we're now at the 21st byte (value 20, since we start from 0)
-    assertEquals("After skipping 20 bytes, should read byte with value 20", 20, multiStream.read());
+  @SuppressWarnings("CheckReturnValue") // these calls to skip always return 0
+  public void testSkip() throws Exception {
+    MultiInputStream multi =
+        new MultiInputStream(
+            Collections.singleton(
+                    new ByteSource() {
+                      @Override
+                      public InputStream openStream() {
+                        return new ByteArrayInputStream(newPreFilledByteArray(0, 50)) {
+                          @Override
+                          public long skip(long n) {
+                            return 0;
+                          }
+                        };
+                      }
+                    })
+                .iterator());
+    assertEquals(0, multi.skip(-1));
+    assertEquals(0, multi.skip(-1));
+    assertEquals(0, multi.skip(0));
+    ByteStreams.skipFully(multi, 20);
+    assertEquals(20, multi.read());
   }
 
-  public void testReadSingleByteWithManyEmptyStreams_noStackOverflow() throws IOException {
-    // Regression test for https://github.com/google/guava/issues/2996
-    // Ensures that having many empty streams doesn't cause StackOverflowException
-    MultiInputStream streamWithManyEmptySources = createStreamWithManyEmptySources();
-    
-    // Should return -1 (end of stream) without throwing StackOverflowException
-    assertEquals("Stream with only empty sources should return -1", 
-                 -1, streamWithManyEmptySources.read());
+  public void testReadSingle_noStackOverflow() throws IOException {
+    // https://github.com/google/guava/issues/2996
+    // no data, just testing that there's no StackOverflowException
+    assertEquals(-1, tenMillionEmptySources().read());
   }
 
-  public void testReadByteArrayWithManyEmptyStreams_noStackOverflow() throws IOException {
-    // Regression test for https://github.com/google/guava/issues/2996
-    // Ensures that having many empty streams doesn't cause StackOverflowException
-    MultiInputStream streamWithManyEmptySources = createStreamWithManyEmptySources();
-    
-    // Should return -1 (end of stream) without throwing StackOverflowException
-    assertEquals("Stream with only empty sources should return -1", 
-                 -1, streamWithManyEmptySources.read(new byte[1]));
+  public void testReadArray_noStackOverflow() throws IOException {
+    // https://github.com/google/guava/issues/2996
+    // no data, just testing that there's no StackOverflowException
+    assertEquals(-1, tenMillionEmptySources().read(new byte[1]));
   }
 
-  /**
-   * Creates a MultiInputStream with 10 million empty sources to test stack overflow scenarios.
-   */
-  private static MultiInputStream createStreamWithManyEmptySources() throws IOException {
+  private static MultiInputStream tenMillionEmptySources() throws IOException {
     return new MultiInputStream(Collections.nCopies(10_000_000, ByteSource.empty()).iterator());
   }
 
-  /**
-   * Creates a ByteSource that contains sequential byte values starting from the given start value.
-   */
-  private static ByteSource createByteSourceWithContent(int startValue, int size) {
+  private static ByteSource newByteSource(int start, int size) {
     return new ByteSource() {
       @Override
       public InputStream openStream() {
-        return new ByteArrayInputStream(newPreFilledByteArray(startValue, size));
-      }
-    };
-  }
-
-  /**
-   * Creates a ByteSource that wraps a stream which always returns 0 from skip() calls.
-   */
-  private static ByteSource createNonSkippableByteSource() {
-    return new ByteSource() {
-      @Override
-      public InputStream openStream() {
-        return new ByteArrayInputStream(newPreFilledByteArray(0, 50)) {
-          @Override
-          public long skip(long n) {
-            return 0; // Simulate a stream that doesn't support skipping
-          }
-        };
+        return new ByteArrayInputStream(newPreFilledByteArray(start, size));
       }
     };
   }
