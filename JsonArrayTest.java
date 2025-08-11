@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2011 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.gson;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -9,72 +25,71 @@ import java.math.BigInteger;
 import org.junit.Test;
 
 /**
- * Unit tests for JsonArray class, focusing on JSON array handling.
+ * Tests handling of JSON arrays.
+ *
+ * @author Jesse Wilson
  */
 public final class JsonArrayTest {
 
   @Test
   public void testEqualsOnEmptyArray() {
-    JsonArray emptyArray1 = new JsonArray();
-    JsonArray emptyArray2 = new JsonArray();
-    MoreAsserts.assertEqualsAndHashCode(emptyArray1, emptyArray2);
+    MoreAsserts.assertEqualsAndHashCode(new JsonArray(), new JsonArray());
   }
 
   @Test
   public void testEqualsNonEmptyArray() {
-    JsonArray array1 = new JsonArray();
-    JsonArray array2 = new JsonArray();
+    JsonArray a = new JsonArray();
+    JsonArray b = new JsonArray();
 
-    new EqualsTester().addEqualityGroup(array1).testEquals();
+    new EqualsTester().addEqualityGroup(a).testEquals();
 
-    array1.add(new JsonObject());
-    assertThat(array1.equals(array2)).isFalse();
-    assertThat(array2.equals(array1)).isFalse();
+    a.add(new JsonObject());
+    assertThat(a.equals(b)).isFalse();
+    assertThat(b.equals(a)).isFalse();
 
-    array2.add(new JsonObject());
-    MoreAsserts.assertEqualsAndHashCode(array1, array2);
+    b.add(new JsonObject());
+    MoreAsserts.assertEqualsAndHashCode(a, b);
 
-    array1.add(new JsonObject());
-    assertThat(array1.equals(array2)).isFalse();
-    assertThat(array2.equals(array1)).isFalse();
+    a.add(new JsonObject());
+    assertThat(a.equals(b)).isFalse();
+    assertThat(b.equals(a)).isFalse();
 
-    array2.add(JsonNull.INSTANCE);
-    assertThat(array1.equals(array2)).isFalse();
-    assertThat(array2.equals(array1)).isFalse();
+    b.add(JsonNull.INSTANCE);
+    assertThat(a.equals(b)).isFalse();
+    assertThat(b.equals(a)).isFalse();
   }
 
   @Test
-  public void testRemoveElement() {
+  public void testRemove() {
     JsonArray array = new JsonArray();
     assertThrows(IndexOutOfBoundsException.class, () -> array.remove(0));
 
-    JsonPrimitive elementA = new JsonPrimitive("a");
-    array.add(elementA);
-    assertThat(array.remove(elementA)).isTrue();
-    assertThat(array).doesNotContain(elementA);
-
-    array.add(elementA);
+    JsonPrimitive a = new JsonPrimitive("a");
+    array.add(a);
+    assertThat(array.remove(a)).isTrue();
+    assertThat(array).doesNotContain(a);
+    array.add(a);
     array.add(new JsonPrimitive("b"));
     assertThat(array.remove(1).getAsString()).isEqualTo("b");
     assertThat(array).hasSize(1);
-    assertThat(array).contains(elementA);
+    assertThat(array).contains(a);
   }
 
   @Test
-  public void testSetElement() {
+  public void testSet() {
     JsonArray array = new JsonArray();
     assertThrows(IndexOutOfBoundsException.class, () -> array.set(0, new JsonPrimitive(1)));
 
-    JsonPrimitive elementA = new JsonPrimitive("a");
-    array.add(elementA);
+    JsonPrimitive a = new JsonPrimitive("a");
+    array.add(a);
 
-    JsonPrimitive elementB = new JsonPrimitive("b");
-    JsonElement oldValue = array.set(0, elementB);
-    assertThat(oldValue).isEqualTo(elementA);
+    JsonPrimitive b = new JsonPrimitive("b");
+    JsonElement oldValue = array.set(0, b);
+    assertThat(oldValue).isEqualTo(a);
     assertThat(array.get(0).getAsString()).isEqualTo("b");
 
     oldValue = array.set(0, null);
-    assertThat(oldValue).isEqualTo(elementB);
+    assertThat(oldValue).isEqualTo(b);
     assertThat(array.get(0)).isEqualTo(JsonNull.INSTANCE);
 
     oldValue = array.set(0, new JsonPrimitive("c"));
@@ -85,18 +100,18 @@ public final class JsonArrayTest {
 
   @Test
   public void testDeepCopy() {
-    JsonArray originalArray = new JsonArray();
-    JsonArray nestedArray = new JsonArray();
-    originalArray.add(nestedArray);
+    JsonArray original = new JsonArray();
+    JsonArray firstEntry = new JsonArray();
+    original.add(firstEntry);
 
-    JsonArray copiedArray = originalArray.deepCopy();
-    originalArray.add(new JsonPrimitive("y"));
+    JsonArray copy = original.deepCopy();
+    original.add(new JsonPrimitive("y"));
 
-    assertThat(copiedArray).hasSize(1);
-    nestedArray.add(new JsonPrimitive("z"));
+    assertThat(copy).hasSize(1);
+    firstEntry.add(new JsonPrimitive("z"));
 
-    assertThat(originalArray.get(0).getAsJsonArray()).hasSize(1);
-    assertThat(copiedArray.get(0).getAsJsonArray()).hasSize(0);
+    assertThat(original.get(0).getAsJsonArray()).hasSize(1);
+    assertThat(copy.get(0).getAsJsonArray()).hasSize(0);
   }
 
   @Test
@@ -104,8 +119,8 @@ public final class JsonArrayTest {
     JsonArray array = new JsonArray();
     assertThat(array).isEmpty();
 
-    JsonPrimitive elementA = new JsonPrimitive("a");
-    array.add(elementA);
+    JsonPrimitive a = new JsonPrimitive("a");
+    array.add(a);
     assertThat(array).isNotEmpty();
 
     array.remove(0);
@@ -115,7 +130,14 @@ public final class JsonArrayTest {
   @Test
   public void testFailedGetArrayValues() {
     JsonArray jsonArray = new JsonArray();
-    jsonArray.add(JsonParser.parseString("{\"key1\":\"value1\",\"key2\":\"value2\",\"key3\":\"value3\",\"key4\":\"value4\"}"));
+    jsonArray.add(
+        JsonParser.parseString(
+            "{"
+                + "\"key1\":\"value1\","
+                + "\"key2\":\"value2\","
+                + "\"key3\":\"value3\","
+                + "\"key4\":\"value4\""
+                + "}"));
 
     Exception e = assertThrows(UnsupportedOperationException.class, () -> jsonArray.getAsBoolean());
     assertThat(e).hasMessageThat().isEqualTo("JsonObject");
@@ -166,19 +188,30 @@ public final class JsonArrayTest {
     jsonArray.add((String) null);
     jsonArray.add("Yes");
 
-    assertThat(jsonArray.toString()).isEqualTo("[\"Hello\",\"Goodbye\",\"Thank you\",null,\"Yes\"]");
+    assertThat(jsonArray.toString())
+        .isEqualTo("[\"Hello\",\"Goodbye\",\"Thank you\",null,\"Yes\"]");
   }
 
   @Test
   public void testIntegerPrimitiveAddition() {
     JsonArray jsonArray = new JsonArray();
 
-    jsonArray.add(1);
-    jsonArray.add(2);
-    jsonArray.add(-3);
+    int x = 1;
+    jsonArray.add(x);
+
+    x = 2;
+    jsonArray.add(x);
+
+    x = -3;
+    jsonArray.add(x);
+
     jsonArray.add((Integer) null);
-    jsonArray.add(4);
-    jsonArray.add(0);
+
+    x = 4;
+    jsonArray.add(x);
+
+    x = 0;
+    jsonArray.add(x);
 
     assertThat(jsonArray.toString()).isEqualTo("[1,2,-3,null,4,0]");
   }
@@ -187,11 +220,20 @@ public final class JsonArrayTest {
   public void testDoublePrimitiveAddition() {
     JsonArray jsonArray = new JsonArray();
 
-    jsonArray.add(1.0);
-    jsonArray.add(2.13232);
-    jsonArray.add(0.121);
+    double x = 1.0;
+    jsonArray.add(x);
+
+    x = 2.13232;
+    jsonArray.add(x);
+
+    x = 0.121;
+    jsonArray.add(x);
+
     jsonArray.add((Double) null);
-    jsonArray.add(-0.00234);
+
+    x = -0.00234;
+    jsonArray.add(x);
+
     jsonArray.add((Double) null);
 
     assertThat(jsonArray.toString()).isEqualTo("[1.0,2.13232,0.121,null,-0.00234,null]");
@@ -223,7 +265,8 @@ public final class JsonArrayTest {
     jsonArray.add('u');
     jsonArray.add("and sometimes Y");
 
-    assertThat(jsonArray.toString()).isEqualTo("[\"a\",\"e\",\"i\",\"o\",null,\"u\",\"and sometimes Y\"]");
+    assertThat(jsonArray.toString())
+        .isEqualTo("[\"a\",\"e\",\"i\",\"o\",null,\"u\",\"and sometimes Y\"]");
   }
 
   @Test
@@ -234,12 +277,18 @@ public final class JsonArrayTest {
     jsonArray.add("apple");
     jsonArray.add(12121);
     jsonArray.add((char) 111);
+
     jsonArray.add((Boolean) null);
+    assertThat(jsonArray.get(jsonArray.size() - 1)).isEqualTo(JsonNull.INSTANCE);
+
     jsonArray.add((Character) null);
+    assertThat(jsonArray.get(jsonArray.size() - 1)).isEqualTo(JsonNull.INSTANCE);
+
     jsonArray.add(12.232);
     jsonArray.add(BigInteger.valueOf(2323));
 
-    assertThat(jsonArray.toString()).isEqualTo("[\"a\",\"apple\",12121,\"o\",null,null,12.232,2323]");
+    assertThat(jsonArray.toString())
+        .isEqualTo("[\"a\",\"apple\",12121,\"o\",null,null,12.232,2323]");
   }
 
   @Test
@@ -258,6 +307,7 @@ public final class JsonArrayTest {
 
     assertThat(jsonArray.toString()).isEqualTo("[null,null,null,null,null,null,null,null,null]");
     for (int i = 0; i < jsonArray.size(); i++) {
+      // Verify that they are actually a JsonNull and not a Java null
       assertThat(jsonArray.get(i)).isEqualTo(JsonNull.INSTANCE);
     }
   }
@@ -284,7 +334,8 @@ public final class JsonArrayTest {
     jsonArray.add((Boolean) null);
     jsonArray.add((Boolean) null);
 
-    assertThat(jsonArray.toString()).isEqualTo("[\"a\",\"a\",true,true,1212,1212,34.34,34.34,null,null]");
+    assertThat(jsonArray.toString())
+        .isEqualTo("[\"a\",\"a\",true,true,1212,1212,34.34,34.34,null,null]");
   }
 
   @Test
@@ -301,7 +352,6 @@ public final class JsonArrayTest {
     JsonObject nestedObject = new JsonObject();
     nestedObject.addProperty("n\0", 1);
     array.add(nestedObject);
-
     assertThat(array.toString()).isEqualTo("[null,NaN,\"a\\u0000\",[\"\\\"\"],{\"n\\u0000\":1}]");
   }
 }
