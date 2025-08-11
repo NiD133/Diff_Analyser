@@ -54,93 +54,129 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class IntervalCategoryToolTipGeneratorTest {
 
-    /**
-     * Tests the equals() method.
-     */
+    // Test data constants for better readability
+    private static final String CUSTOM_FORMAT = "{3} - {4}";
+    private static final String DECIMAL_PATTERN = "0.000";
+    private static final String DATE_PATTERN = "d-MMM";
+
     @Test
-    public void testEquals() {
-        IntervalCategoryToolTipGenerator g1
-                = new IntervalCategoryToolTipGenerator();
-        IntervalCategoryToolTipGenerator g2
-                = new IntervalCategoryToolTipGenerator();
-        assertEquals(g1, g2);
-        assertEquals(g2, g1);
-
-        g1 = new IntervalCategoryToolTipGenerator("{3} - {4}",
-                new DecimalFormat("0.000"));
-        assertNotEquals(g1, g2);
-        g2 = new IntervalCategoryToolTipGenerator("{3} - {4}",
-                new DecimalFormat("0.000"));
-        assertEquals(g1, g2);
-
-        g1 = new IntervalCategoryToolTipGenerator("{3} - {4}",
-                new SimpleDateFormat("d-MMM"));
-        assertNotEquals(g1, g2);
-        g2 = new IntervalCategoryToolTipGenerator("{3} - {4}",
-                new SimpleDateFormat("d-MMM"));
-        assertEquals(g1, g2);
+    public void testEquals_DefaultConstructors_ShouldBeEqual() {
+        // Given: Two generators created with default constructors
+        IntervalCategoryToolTipGenerator generator1 = new IntervalCategoryToolTipGenerator();
+        IntervalCategoryToolTipGenerator generator2 = new IntervalCategoryToolTipGenerator();
+        
+        // Then: They should be equal (reflexive and symmetric)
+        assertEquals(generator1, generator2);
+        assertEquals(generator2, generator1);
     }
 
-    /**
-     * Check that the subclass is not equal to an instance of the superclass.
-     */
     @Test
-    public void testEquals2() {
-        IntervalCategoryToolTipGenerator g1
-                = new IntervalCategoryToolTipGenerator();
-        StandardCategoryToolTipGenerator g2
-                = new StandardCategoryToolTipGenerator(
+    public void testEquals_DifferentNumberFormatters_ShouldNotBeEqual() {
+        // Given: One generator with default constructor, another with custom decimal format
+        IntervalCategoryToolTipGenerator defaultGenerator = new IntervalCategoryToolTipGenerator();
+        IntervalCategoryToolTipGenerator customGenerator = new IntervalCategoryToolTipGenerator(
+                CUSTOM_FORMAT, new DecimalFormat(DECIMAL_PATTERN));
+        
+        // Then: They should not be equal
+        assertNotEquals(customGenerator, defaultGenerator);
+    }
+
+    @Test
+    public void testEquals_SameNumberFormatters_ShouldBeEqual() {
+        // Given: Two generators with identical custom decimal formatters
+        IntervalCategoryToolTipGenerator generator1 = new IntervalCategoryToolTipGenerator(
+                CUSTOM_FORMAT, new DecimalFormat(DECIMAL_PATTERN));
+        IntervalCategoryToolTipGenerator generator2 = new IntervalCategoryToolTipGenerator(
+                CUSTOM_FORMAT, new DecimalFormat(DECIMAL_PATTERN));
+        
+        // Then: They should be equal
+        assertEquals(generator1, generator2);
+    }
+
+    @Test
+    public void testEquals_DifferentDateFormatters_ShouldNotBeEqual() {
+        // Given: One generator with decimal format, another with date format
+        IntervalCategoryToolTipGenerator decimalGenerator = new IntervalCategoryToolTipGenerator(
+                CUSTOM_FORMAT, new DecimalFormat(DECIMAL_PATTERN));
+        IntervalCategoryToolTipGenerator dateGenerator = new IntervalCategoryToolTipGenerator(
+                CUSTOM_FORMAT, new SimpleDateFormat(DATE_PATTERN));
+        
+        // Then: They should not be equal
+        assertNotEquals(dateGenerator, decimalGenerator);
+    }
+
+    @Test
+    public void testEquals_SameDateFormatters_ShouldBeEqual() {
+        // Given: Two generators with identical date formatters
+        IntervalCategoryToolTipGenerator generator1 = new IntervalCategoryToolTipGenerator(
+                CUSTOM_FORMAT, new SimpleDateFormat(DATE_PATTERN));
+        IntervalCategoryToolTipGenerator generator2 = new IntervalCategoryToolTipGenerator(
+                CUSTOM_FORMAT, new SimpleDateFormat(DATE_PATTERN));
+        
+        // Then: They should be equal
+        assertEquals(generator1, generator2);
+    }
+
+    @Test
+    public void testEquals_SubclassVsSuperclass_ShouldNotBeEqual() {
+        // Given: An IntervalCategoryToolTipGenerator and its superclass StandardCategoryToolTipGenerator
+        IntervalCategoryToolTipGenerator intervalGenerator = new IntervalCategoryToolTipGenerator();
+        StandardCategoryToolTipGenerator standardGenerator = new StandardCategoryToolTipGenerator(
                 IntervalCategoryToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT_STRING,
                 NumberFormat.getInstance());
-        assertNotEquals(g1, g2);
+        
+        // Then: Subclass should not equal superclass instance
+        assertNotEquals(intervalGenerator, standardGenerator);
     }
 
-    /**
-     * Simple check that hashCode is implemented.
-     */
     @Test
-    public void testHashCode() {
-        IntervalCategoryToolTipGenerator g1
-                = new IntervalCategoryToolTipGenerator();
-        IntervalCategoryToolTipGenerator g2
-                = new IntervalCategoryToolTipGenerator();
-        assertEquals(g1, g2);
-        assertEquals(g1.hashCode(), g2.hashCode());
+    public void testHashCode_EqualObjects_ShouldHaveSameHashCode() {
+        // Given: Two equal generators
+        IntervalCategoryToolTipGenerator generator1 = new IntervalCategoryToolTipGenerator();
+        IntervalCategoryToolTipGenerator generator2 = new IntervalCategoryToolTipGenerator();
+        
+        // When: Objects are equal
+        assertEquals(generator1, generator2);
+        
+        // Then: Hash codes should also be equal
+        assertEquals(generator1.hashCode(), generator2.hashCode());
     }
 
-    /**
-     * Confirm that cloning works.
-     */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
-        IntervalCategoryToolTipGenerator g1
-                = new IntervalCategoryToolTipGenerator();
-        IntervalCategoryToolTipGenerator g2 = CloneUtils.clone(g1);
-        assertNotSame(g1, g2);
-        assertSame(g1.getClass(), g2.getClass());
-        assertEquals(g1, g2);
+    public void testCloning_ShouldCreateDistinctButEqualObject() throws CloneNotSupportedException {
+        // Given: An original generator
+        IntervalCategoryToolTipGenerator originalGenerator = new IntervalCategoryToolTipGenerator();
+        
+        // When: Cloning the generator
+        IntervalCategoryToolTipGenerator clonedGenerator = CloneUtils.clone(originalGenerator);
+        
+        // Then: Clone should be a different instance but equal in value
+        assertNotSame(originalGenerator, clonedGenerator, "Clone should be a different object instance");
+        assertSame(originalGenerator.getClass(), clonedGenerator.getClass(), "Clone should have same class");
+        assertEquals(originalGenerator, clonedGenerator, "Clone should be equal to original");
     }
 
-    /**
-     * Check to ensure that this class implements PublicCloneable.
-     */
     @Test
-    public void testPublicCloneable() {
-        IntervalCategoryToolTipGenerator g1
-                = new IntervalCategoryToolTipGenerator();
-        assertTrue(g1 instanceof PublicCloneable);
+    public void testPublicCloneable_ShouldImplementInterface() {
+        // Given: A generator instance
+        IntervalCategoryToolTipGenerator generator = new IntervalCategoryToolTipGenerator();
+        
+        // Then: It should implement PublicCloneable interface
+        assertTrue(generator instanceof PublicCloneable, 
+                "IntervalCategoryToolTipGenerator should implement PublicCloneable");
     }
 
-    /**
-     * Serialize an instance, restore it, and check for equality.
-     */
     @Test
-    public void testSerialization() {
-        IntervalCategoryToolTipGenerator g1
-                = new IntervalCategoryToolTipGenerator("{3} - {4}",
-                DateFormat.getInstance());
-        IntervalCategoryToolTipGenerator g2 = TestUtils.serialised(g1);
-        assertEquals(g1, g2);
+    public void testSerialization_ShouldPreserveEquality() {
+        // Given: A generator with custom formatting
+        IntervalCategoryToolTipGenerator originalGenerator = new IntervalCategoryToolTipGenerator(
+                CUSTOM_FORMAT, DateFormat.getInstance());
+        
+        // When: Serializing and deserializing the generator
+        IntervalCategoryToolTipGenerator deserializedGenerator = TestUtils.serialised(originalGenerator);
+        
+        // Then: Deserialized object should equal the original
+        assertEquals(originalGenerator, deserializedGenerator, 
+                "Deserialized generator should equal the original");
     }
-
 }
