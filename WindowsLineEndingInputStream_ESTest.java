@@ -20,160 +20,187 @@ import org.evosuite.runtime.EvoRunnerParameters;
 import org.evosuite.runtime.mock.java.io.MockFileInputStream;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true, 
+    useVFS = true, 
+    useVNET = true, 
+    resetStaticState = true, 
+    separateClassLoader = true
+) 
 public class WindowsLineEndingInputStream_ESTest extends WindowsLineEndingInputStream_ESTest_scaffolding {
 
   @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      byte[] byteArray0 = new byte[6];
-      byteArray0[5] = (byte)24;
-      ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
-      PushbackInputStream pushbackInputStream0 = new PushbackInputStream(byteArrayInputStream0);
-      DataInputStream dataInputStream0 = new DataInputStream(pushbackInputStream0);
-      WindowsLineEndingInputStream windowsLineEndingInputStream0 = new WindowsLineEndingInputStream(dataInputStream0, true);
-      int int0 = windowsLineEndingInputStream0.read(byteArray0);
-      assertEquals(0, byteArrayInputStream0.available());
-      assertEquals(6, int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      byte[] byteArray0 = new byte[6];
-      ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
-      WindowsLineEndingInputStream windowsLineEndingInputStream0 = new WindowsLineEndingInputStream(byteArrayInputStream0, false);
-      int int0 = windowsLineEndingInputStream0.read();
-      assertEquals(5, byteArrayInputStream0.available());
-      assertEquals(0, int0);
-  }
-
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      WindowsLineEndingInputStream windowsLineEndingInputStream0 = new WindowsLineEndingInputStream((InputStream) null, true);
-      // Undeclared exception!
-      try { 
-        windowsLineEndingInputStream0.read();
-        fail("Expecting exception: NullPointerException");
+  public void testReadWithPushbackInputStreamAndDataInputStream() throws Throwable {
+      // Test reading through decorated input streams
+      byte[] inputData = new byte[6];
+      inputData[5] = (byte) 24;  // Non-LF/CR byte
+      ByteArrayInputStream byteArrayStream = new ByteArrayInputStream(inputData);
+      PushbackInputStream pushbackStream = new PushbackInputStream(byteArrayStream);
+      DataInputStream dataStream = new DataInputStream(pushbackStream);
       
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.input.WindowsLineEndingInputStream", e);
+      WindowsLineEndingInputStream windowsStream = 
+          new WindowsLineEndingInputStream(dataStream, true);
+      
+      int bytesRead = windowsStream.read(inputData);
+      assertEquals(0, byteArrayStream.available());
+      assertEquals(6, bytesRead);
+  }
+
+  @Test(timeout = 4000)
+  public void testReadSingleByte() throws Throwable {
+      // Test reading single byte from stream
+      byte[] inputData = new byte[6];  // All zeros
+      ByteArrayInputStream byteArrayStream = new ByteArrayInputStream(inputData);
+      WindowsLineEndingInputStream windowsStream = 
+          new WindowsLineEndingInputStream(byteArrayStream, false);
+      
+      int result = windowsStream.read();
+      assertEquals(5, byteArrayStream.available());
+      assertEquals(0, result);
+  }
+
+  @Test(timeout = 4000)
+  public void testReadWithNullStreamThrowsNullPointerException() throws Throwable {
+      // Test reading from null stream throws exception
+      WindowsLineEndingInputStream windowsStream = 
+          new WindowsLineEndingInputStream((InputStream) null, true);
+      
+      try {
+          windowsStream.read();
+          fail("Expected NullPointerException");
+      } catch (NullPointerException e) {
+          // Expected exception
+          verifyException("org.apache.commons.io.input.WindowsLineEndingInputStream", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      byte[] byteArray0 = new byte[2];
-      ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0, (-1782), (byte)13);
-      WindowsLineEndingInputStream windowsLineEndingInputStream0 = new WindowsLineEndingInputStream(byteArrayInputStream0, false);
-      // Undeclared exception!
-      try { 
-        windowsLineEndingInputStream0.read();
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+  public void testReadWithInvalidOffsetThrowsArrayIndexOutOfBoundsException() throws Throwable {
+      // Test invalid stream configuration with negative offset
+      byte[] inputData = new byte[2];
+      // Invalid parameters: negative offset, positive length
+      ByteArrayInputStream byteArrayStream = 
+          new ByteArrayInputStream(inputData, -1782, (byte) 13);
+      WindowsLineEndingInputStream windowsStream = 
+          new WindowsLineEndingInputStream(byteArrayStream, false);
       
-      } catch(ArrayIndexOutOfBoundsException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
+      try {
+          windowsStream.read();
+          fail("Expected ArrayIndexOutOfBoundsException");
+      } catch (ArrayIndexOutOfBoundsException e) {
+          // Expected exception
       }
   }
 
   @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      FileDescriptor fileDescriptor0 = new FileDescriptor();
-      MockFileInputStream mockFileInputStream0 = new MockFileInputStream(fileDescriptor0);
-      WindowsLineEndingInputStream windowsLineEndingInputStream0 = new WindowsLineEndingInputStream(mockFileInputStream0, false);
-      try { 
-        windowsLineEndingInputStream0.read();
-        fail("Expecting exception: IOException");
+  public void testReadWithClosedFileDescriptorThrowsIOException() throws Throwable {
+      // Test reading from invalid file descriptor
+      FileDescriptor fileDescriptor = new FileDescriptor();
+      MockFileInputStream mockFileStream = new MockFileInputStream(fileDescriptor);
+      WindowsLineEndingInputStream windowsStream = 
+          new WindowsLineEndingInputStream(mockFileStream, false);
       
-      } catch(IOException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.evosuite.runtime.mock.java.io.NativeMockedIO", e);
+      try {
+          windowsStream.read();
+          fail("Expected IOException");
+      } catch (IOException e) {
+          // Expected exception
+          verifyException("org.evosuite.runtime.mock.java.io.NativeMockedIO", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      WindowsLineEndingInputStream windowsLineEndingInputStream0 = new WindowsLineEndingInputStream((InputStream) null, false);
-      // Undeclared exception!
-      try { 
-        windowsLineEndingInputStream0.close();
-        fail("Expecting exception: NullPointerException");
+  public void testCloseWithNullStreamThrowsNullPointerException() throws Throwable {
+      // Test closing null stream throws exception
+      WindowsLineEndingInputStream windowsStream = 
+          new WindowsLineEndingInputStream((InputStream) null, false);
       
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.input.WindowsLineEndingInputStream", e);
+      try {
+          windowsStream.close();
+          fail("Expected NullPointerException");
+      } catch (NullPointerException e) {
+          // Expected exception
+          verifyException("org.apache.commons.io.input.WindowsLineEndingInputStream", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      byte[] byteArray0 = new byte[6];
-      byteArray0[0] = (byte)10;
-      ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
-      PushbackInputStream pushbackInputStream0 = new PushbackInputStream(byteArrayInputStream0);
-      DataInputStream dataInputStream0 = new DataInputStream(pushbackInputStream0);
-      WindowsLineEndingInputStream windowsLineEndingInputStream0 = new WindowsLineEndingInputStream(dataInputStream0, true);
-      int int0 = windowsLineEndingInputStream0.read(byteArray0);
-      assertArrayEquals(new byte[] {(byte)13, (byte)10, (byte)13, (byte)10, (byte)13, (byte)10}, byteArray0);
-      assertEquals(6, int0);
+  public void testLfTransformedToCrLfSequence() throws Throwable {
+      // Test LF bytes are transformed to CRLF sequences
+      byte[] inputData = new byte[6];
+      inputData[0] = (byte) 10;  // LF character
+      ByteArrayInputStream byteArrayStream = new ByteArrayInputStream(inputData);
+      PushbackInputStream pushbackStream = new PushbackInputStream(byteArrayStream);
+      DataInputStream dataStream = new DataInputStream(pushbackStream);
+      
+      WindowsLineEndingInputStream windowsStream = 
+          new WindowsLineEndingInputStream(dataStream, true);
+      
+      int bytesRead = windowsStream.read(inputData);
+      // Expected transformation: LF becomes CR+LF, other bytes may also transform
+      assertArrayEquals(new byte[] {(byte) 13, (byte) 10, (byte) 13, (byte) 10, (byte) 13, (byte) 10}, inputData);
+      assertEquals(6, bytesRead);
   }
 
   @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      byte[] byteArray0 = new byte[0];
-      ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0, (-3187), (-3187));
-      WindowsLineEndingInputStream windowsLineEndingInputStream0 = new WindowsLineEndingInputStream(byteArrayInputStream0, false);
-      int int0 = windowsLineEndingInputStream0.read();
-      assertEquals((-1), int0);
+  public void testReadFromEmptyStreamWithNegativeOffsetReturnsEof() throws Throwable {
+      // Test reading from empty stream returns EOF
+      byte[] emptyArray = new byte[0];
+      // Invalid parameters but should handle empty read
+      ByteArrayInputStream byteArrayStream = 
+          new ByteArrayInputStream(emptyArray, -3187, -3187);
+      WindowsLineEndingInputStream windowsStream = 
+          new WindowsLineEndingInputStream(byteArrayStream, false);
+      
+      int result = windowsStream.read();
+      assertEquals(-1, result);  // EOF
   }
 
   @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      byte[] byteArray0 = new byte[0];
-      ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0, 2384, 0);
-      WindowsLineEndingInputStream windowsLineEndingInputStream0 = new WindowsLineEndingInputStream(byteArrayInputStream0, true);
-      int int0 = windowsLineEndingInputStream0.read();
-      assertEquals(13, int0);
+  public void testReadFromEmptyStreamAppendsCrLfAtEos() throws Throwable {
+      // Test empty stream appends CR+LF when configured
+      byte[] emptyArray = new byte[0];
+      ByteArrayInputStream byteArrayStream = 
+          new ByteArrayInputStream(emptyArray, 2384, 0);  // Empty stream
+      WindowsLineEndingInputStream windowsStream = 
+          new WindowsLineEndingInputStream(byteArrayStream, true);
       
-      int int1 = windowsLineEndingInputStream0.read();
-      assertEquals(10, int1);
-      
-      int int2 = windowsLineEndingInputStream0.read();
-      assertEquals((-1), int2);
+      // Should append CR then LF at end of stream
+      assertEquals(13, windowsStream.read());  // CR
+      assertEquals(10, windowsStream.read());  // LF
+      assertEquals(-1, windowsStream.read());  // EOF
   }
 
   @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      byte[] byteArray0 = new byte[6];
-      ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
-      PushbackInputStream pushbackInputStream0 = new PushbackInputStream(byteArrayInputStream0);
-      DataInputStream dataInputStream0 = new DataInputStream(pushbackInputStream0);
-      WindowsLineEndingInputStream windowsLineEndingInputStream0 = new WindowsLineEndingInputStream(dataInputStream0, true);
-      // Undeclared exception!
-      try { 
-        windowsLineEndingInputStream0.mark(0);
-        fail("Expecting exception: UnsupportedOperationException");
+  public void testMarkThrowsUnsupportedOperationException() throws Throwable {
+      // Test mark operation is not supported
+      byte[] inputData = new byte[6];
+      ByteArrayInputStream byteArrayStream = new ByteArrayInputStream(inputData);
+      PushbackInputStream pushbackStream = new PushbackInputStream(byteArrayStream);
+      DataInputStream dataStream = new DataInputStream(pushbackStream);
       
-      } catch(UnsupportedOperationException e) {
-         //
-         // mark/reset not supported
-         //
-         verifyException("org.apache.commons.io.input.UnsupportedOperationExceptions", e);
+      WindowsLineEndingInputStream windowsStream = 
+          new WindowsLineEndingInputStream(dataStream, true);
+      
+      try {
+          windowsStream.mark(0);
+          fail("Expected UnsupportedOperationException");
+      } catch (UnsupportedOperationException e) {
+          // Expected exception
+          verifyException("org.apache.commons.io.input.UnsupportedOperationExceptions", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      byte[] byteArray0 = new byte[0];
-      ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0, 2384, 0);
-      WindowsLineEndingInputStream windowsLineEndingInputStream0 = new WindowsLineEndingInputStream(byteArrayInputStream0, true);
-      windowsLineEndingInputStream0.close();
+  public void testCloseSucceeds() throws Throwable {
+      // Test close operation completes normally
+      byte[] emptyArray = new byte[0];
+      ByteArrayInputStream byteArrayStream = 
+          new ByteArrayInputStream(emptyArray, 2384, 0);
+      WindowsLineEndingInputStream windowsStream = 
+          new WindowsLineEndingInputStream(byteArrayStream, true);
+      
+      windowsStream.close();  // Should not throw
   }
 }
