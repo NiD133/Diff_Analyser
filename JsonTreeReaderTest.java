@@ -27,42 +27,23 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.MalformedJsonException;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
 
-@SuppressWarnings("resource") // Closing JsonTreeReader is not necessary
-public final class JsonTreeReaderTest {
-
+@SuppressWarnings("resource")
+public class JsonTreeReaderTest {
   @Test
-  public void skipValue_onEmptyObject_reachesEndDocument() throws IOException {
-    // Arrange
-    JsonTreeReader reader = new JsonTreeReader(new JsonObject());
-
-    // Act
-    reader.skipValue();
-
-    // Assert
-    assertThat(reader.peek()).isEqualTo(JsonToken.END_DOCUMENT);
-    assertThat(reader.getPath()).isEqualTo("$");
+  public void testSkipValue_emptyJsonObject() throws IOException {
+    JsonTreeReader in = new JsonTreeReader(new JsonObject());
+    in.skipValue();
+    assertThat(in.peek()).isEqualTo(JsonToken.END_DOCUMENT);
+    assertThat(in.getPath()).isEqualTo("$");
   }
 
   @Test
-  public void skipValue_onEmptyArray_reachesEndDocument() throws IOException {
-    // Arrange
-    JsonTreeReader reader = new JsonTreeReader(new JsonArray());
-
-    // Act
-    reader.skipValue();
-
-    // Assert
-    assertThat(reader.peek()).isEqualTo(JsonToken.END_DOCUMENT);
-    assertThat(reader.getPath()).isEqualTo("$");
-  }
-
-  @Test
-  public void skipValue_onPopulatedObject_reachesEndDocument() throws IOException {
-    // Arrange
+  public void testSkipValue_filledJsonObject() throws IOException {
     JsonObject jsonObject = new JsonObject();
     JsonArray jsonArray = new JsonArray();
     jsonArray.add('c');
@@ -75,66 +56,65 @@ public final class JsonTreeReaderTest {
     jsonObject2.addProperty("n", 2L);
     jsonObject.add("o", jsonObject2);
     jsonObject.addProperty("s", "text");
-    JsonTreeReader reader = new JsonTreeReader(jsonObject);
-
-    // Act
-    reader.skipValue();
-
-    // Assert
-    assertThat(reader.peek()).isEqualTo(JsonToken.END_DOCUMENT);
-    assertThat(reader.getPath()).isEqualTo("$");
+    JsonTreeReader in = new JsonTreeReader(jsonObject);
+    in.skipValue();
+    assertThat(in.peek()).isEqualTo(JsonToken.END_DOCUMENT);
+    assertThat(in.getPath()).isEqualTo("$");
   }
 
   @Test
-  public void skipValue_whenAtName_advancesToValue() throws IOException {
-    // Arrange
+  public void testSkipValue_name() throws IOException {
     JsonObject jsonObject = new JsonObject();
     jsonObject.addProperty("a", "value");
-    JsonTreeReader reader = new JsonTreeReader(jsonObject);
-    reader.beginObject();
-
-    // Act: When the next token is NAME, skipValue() consumes only the name.
-    // This is a specific behavior of JsonTreeReader; the general JsonReader contract
-    // implies that the corresponding value would be skipped as well.
-    reader.skipValue();
-
-    // Assert
-    assertThat(reader.peek()).isEqualTo(JsonToken.STRING);
-    assertThat(reader.getPath()).isEqualTo("$.<skipped>");
-    assertThat(reader.nextString()).isEqualTo("value");
+    JsonTreeReader in = new JsonTreeReader(jsonObject);
+    in.beginObject();
+    in.skipValue();
+    assertThat(in.peek()).isEqualTo(JsonToken.STRING);
+    assertThat(in.getPath()).isEqualTo("$.<skipped>");
+    assertThat(in.nextString()).isEqualTo("value");
   }
 
   @Test
-  public void skipValue_afterEndDocument_isNoOp() throws IOException {
-    // Arrange
+  public void testSkipValue_afterEndOfDocument() throws IOException {
     JsonTreeReader reader = new JsonTreeReader(new JsonObject());
     reader.beginObject();
     reader.endObject();
     assertThat(reader.peek()).isEqualTo(JsonToken.END_DOCUMENT);
+
     assertThat(reader.getPath()).isEqualTo("$");
-
-    // Act
     reader.skipValue();
-
-    // Assert: State remains unchanged
     assertThat(reader.peek()).isEqualTo(JsonToken.END_DOCUMENT);
     assertThat(reader.getPath()).isEqualTo("$");
   }
 
   @Test
-  public void hasNext_atEndOfDocument_returnsFalse() throws IOException {
-    // Arrange
+  public void testSkipValue_atArrayEnd() throws IOException {
+    JsonTreeReader reader = new JsonTreeReader(new JsonArray());
+    reader.beginArray();
+    reader.skipValue();
+    assertThat(reader.peek()).isEqualTo(JsonToken.END_DOCUMENT);
+    assertThat(reader.getPath()).isEqualTo("$");
+  }
+
+  @Test
+  public void testSkipValue_atObjectEnd() throws IOException {
+    JsonTreeReader reader = new JsonTreeReader(new JsonObject());
+    reader.beginObject();
+    reader.skipValue();
+    assertThat(reader.peek()).isEqualTo(JsonToken.END_DOCUMENT);
+    assertThat(reader.getPath()).isEqualTo("$");
+  }
+
+  @Test
+  public void testHasNext_endOfDocument() throws IOException {
     JsonTreeReader reader = new JsonTreeReader(new JsonObject());
     reader.beginObject();
     reader.endObject();
-
-    // Act & Assert
     assertThat(reader.hasNext()).isFalse();
   }
 
   @Test
-  public void peek_onCustomJsonElementSubclass_throwsException() throws IOException {
-    // Arrange
+  public void testCustomJsonElementSubclass() throws IOException {
     @SuppressWarnings("deprecation") // superclass constructor
     class CustomSubclass extends JsonElement {
       @Override
@@ -149,8 +129,8 @@ public final class JsonTreeReaderTest {
     JsonTreeReader reader = new JsonTreeReader(array);
     reader.beginArray();
 
-    // Act & Assert
-    var e = assertThrows(MalformedJsonException.class, reader::peek);
+    // Should fail due to custom JsonElement subclass
+    var e = assertThrows(MalformedJsonException.class, () -> reader.peek());
     assertThat(e)
         .hasMessageThat()
         .isEqualTo(
@@ -173,12 +153,11 @@ public final class JsonTreeReaderTest {
    * </ul>
    */
   @Test
-  public void nestingLimit_isIgnored() throws IOException {
-    // Arrange
+  public void testNestingLimitIgnored() throws IOException {
     int limit = 10;
     JsonArray json = new JsonArray();
     JsonArray current = json;
-    // Create a deeply nested structure exceeding the limit
+    // This adds additional `limit` nested arrays, so in total there are `limit + 1` arrays
     for (int i = 0; i < limit; i++) {
       JsonArray nested = new JsonArray();
       current.add(nested);
@@ -189,14 +168,12 @@ public final class JsonTreeReaderTest {
     reader.setNestingLimit(limit);
     assertThat(reader.getNestingLimit()).isEqualTo(limit);
 
-    // Act: Traverse the structure
     for (int i = 0; i < limit; i++) {
       reader.beginArray();
     }
-    // Assert: Exceeding the limit does not throw an exception
+    // Does not throw exception; limit is ignored
     reader.beginArray();
 
-    // Cleanup
     reader.endArray();
     for (int i = 0; i < limit; i++) {
       reader.endArray();
@@ -207,12 +184,11 @@ public final class JsonTreeReaderTest {
 
   /**
    * {@link JsonTreeReader} effectively replaces the complete reading logic of {@link JsonReader} to
-   * read from a {@link JsonElement} instead of a standard {@link java.io.Reader}. Therefore, all
-   * relevant methods of {@code JsonReader} must be overridden.
+   * read from a {@link JsonElement} instead of a {@link Reader}. Therefore all relevant methods of
+   * {@code JsonReader} must be overridden.
    */
   @Test
-  public void jsonTreeReader_overridesRequiredMethods() {
-    // Arrange
+  public void testOverrides() {
     List<String> ignoredMethods =
         Arrays.asList(
             "setLenient(boolean)",
@@ -221,8 +197,6 @@ public final class JsonTreeReaderTest {
             "getStrictness()",
             "setNestingLimit(int)",
             "getNestingLimit()");
-
-    // Act & Assert
     MoreAsserts.assertOverridesMethods(JsonReader.class, JsonTreeReader.class, ignoredMethods);
   }
 }
