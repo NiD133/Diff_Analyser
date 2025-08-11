@@ -19,7 +19,6 @@ package org.apache.commons.jxpath;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -31,55 +30,11 @@ import org.w3c.dom.Element;
  */
 class BasicNodeSetTest extends AbstractJXPathTest {
 
-    /** JXPathContext */
     protected JXPathContext context;
-    /** BasicNodeSet */
     protected BasicNodeSet nodeSet;
 
     /**
-     * Add the pointers for the specified path to {@code nodeSet}.
-     *
-     * @param xpath
-     */
-    protected void addPointers(final String xpath) {
-        for (final Iterator<Pointer> iter = context.iteratePointers(xpath); iter.hasNext();) {
-            nodeSet.add(iter.next());
-        }
-        nudge();
-    }
-
-    /**
-     * Do assertions on DOM element names.
-     *
-     * @param names    List of expected names
-     * @param elements List of DOM elements
-     */
-    protected void assertElementNames(final List names, final List elements) {
-        assertEquals(names.size(), elements.size());
-        final Iterator nameIter = names.iterator();
-        final Iterator elementIter = elements.iterator();
-        while (elementIter.hasNext()) {
-            assertEquals(nameIter.next(), ((Element) elementIter.next()).getTagName());
-        }
-    }
-
-    /**
-     * Do assertions on DOM element values.
-     *
-     * @param values   List of expected values
-     * @param elements List of DOM elements
-     */
-    protected void assertElementValues(final List values, final List elements) {
-        assertEquals(values.size(), elements.size());
-        final Iterator valueIter = values.iterator();
-        final Iterator elementIter = elements.iterator();
-        while (elementIter.hasNext()) {
-            assertEquals(valueIter.next(), ((Element) elementIter.next()).getFirstChild().getNodeValue());
-        }
-    }
-
-    /**
-     * "Nudge" the nodeSet.
+     * "Nudge" the nodeSet to update internal state.
      */
     protected void nudge() {
         nodeSet.getPointers();
@@ -88,14 +43,22 @@ class BasicNodeSetTest extends AbstractJXPathTest {
     }
 
     /**
+     * Add the pointers for the specified path to {@code nodeSet}.
+     *
+     * @param xpath
+     */
+    protected void addPointers(final String xpath) {
+        context.iteratePointers(xpath).forEachRemaining(pointer -> nodeSet.add(pointer));
+        nudge();
+    }
+
+    /**
      * Remove the pointers for the specified path from {@code nodeSet}.
      *
      * @param xpath
      */
     protected void removePointers(final String xpath) {
-        for (final Iterator<Pointer> iter = context.iteratePointers(xpath); iter.hasNext();) {
-            nodeSet.remove(iter.next());
-        }
+        context.iteratePointers(xpath).forEachRemaining(pointer -> nodeSet.remove(pointer));
         nudge();
     }
 
@@ -108,40 +71,94 @@ class BasicNodeSetTest extends AbstractJXPathTest {
     }
 
     /**
-     * Test adding pointers.
+     * Test adding pointers to the node set.
      */
     @Test
-    void testAdd() {
+    void testAddPointers() {
+        // Given: An empty node set
+        
+        // When: Adding integer pointers
         addPointers("/bean/integers");
-        assertEquals(list("/bean/integers[1]", "/bean/integers[2]", "/bean/integers[3]", "/bean/integers[4]").toString(), nodeSet.getPointers().toString());
-        assertEquals(list(Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3), Integer.valueOf(4)), nodeSet.getValues());
-        assertEquals(list(Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3), Integer.valueOf(4)), nodeSet.getNodes());
+        
+        // Then: Verify pointers, values, and nodes
+        List<String> expectedPointerPaths = list(
+            "/bean/integers[1]",
+            "/bean/integers[2]",
+            "/bean/integers[3]",
+            "/bean/integers[4]"
+        );
+        List<Integer> expectedValues = list(1, 2, 3, 4);
+        
+        assertEquals(expectedPointerPaths.toString(), nodeSet.getPointers().toString(), 
+            "Added pointers should match expected paths");
+        assertEquals(expectedValues, nodeSet.getValues(), 
+            "NodeSet values should match added integers");
+        assertEquals(expectedValues, nodeSet.getNodes(), 
+            "NodeSet nodes should match added integers");
     }
 
     /**
-     * Demonstrate when nodes != values: in XML models.
+     * Test that nodes differ from values in XML models.
      */
     @Test
-    void testNodes() {
+    void testNodesDifferFromValuesInXmlModel() {
+        // Given: An empty node set
+        
+        // When: Adding contact pointers from XML
         addPointers("/document/vendor/contact");
-        assertEquals(
-                list("/document/vendor[1]/contact[1]", "/document/vendor[1]/contact[2]", "/document/vendor[1]/contact[3]", "/document/vendor[1]/contact[4]")
-                        .toString(),
-                nodeSet.getPointers().toString());
-        assertEquals(list("John", "Jack", "Jim", "Jack Black"), nodeSet.getValues());
-        assertElementNames(list("contact", "contact", "contact", "contact"), nodeSet.getNodes());
-        assertElementValues(list("John", "Jack", "Jim", "Jack Black"), nodeSet.getNodes());
+        
+        // Then: Verify pointers, values, and node details
+        List<String> expectedPointerPaths = list(
+            "/document/vendor[1]/contact[1]",
+            "/document/vendor[1]/contact[2]",
+            "/document/vendor[1]/contact[3]",
+            "/document/vendor[1]/contact[4]"
+        );
+        List<String> expectedValues = list("John", "Jack", "Jim", "Jack Black");
+        
+        assertEquals(expectedPointerPaths.toString(), nodeSet.getPointers().toString(), 
+            "Contact pointers should match expected paths");
+        assertEquals(expectedValues, nodeSet.getValues(), 
+            "Contact values should match expected text content");
+        
+        // Validate node details
+        List<Element> elements = nodeSet.getNodes();
+        assertEquals(4, elements.size(), 
+            "Should have four contact elements");
+        
+        for (int i = 0; i < elements.size(); i++) {
+            Element element = elements.get(i);
+            assertEquals("contact", element.getTagName(), 
+                "Element tag name should be 'contact' at index " + i);
+            assertEquals(expectedValues.get(i), element.getFirstChild().getNodeValue(), 
+                "Element text content should match at index " + i);
+        }
     }
 
     /**
-     * Test removing a pointer.
+     * Test removing pointers from the node set.
      */
     @Test
-    void testRemove() {
+    void testRemovePointers() {
+        // Given: Node set with integers
         addPointers("/bean/integers");
+        
+        // When: Removing last integer
         removePointers("/bean/integers[4]");
-        assertEquals(list("/bean/integers[1]", "/bean/integers[2]", "/bean/integers[3]").toString(), nodeSet.getPointers().toString());
-        assertEquals(list(Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3)), nodeSet.getValues());
-        assertEquals(list(Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3)), nodeSet.getNodes());
+        
+        // Then: Verify remaining pointers, values, and nodes
+        List<String> expectedPointerPaths = list(
+            "/bean/integers[1]",
+            "/bean/integers[2]",
+            "/bean/integers[3]"
+        );
+        List<Integer> expectedValues = list(1, 2, 3);
+        
+        assertEquals(expectedPointerPaths.toString(), nodeSet.getPointers().toString(), 
+            "Pointers after removal should match expected paths");
+        assertEquals(expectedValues, nodeSet.getValues(), 
+            "Values after removal should match remaining integers");
+        assertEquals(expectedValues, nodeSet.getNodes(), 
+            "Nodes after removal should match remaining integers");
     }
 }
