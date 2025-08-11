@@ -22,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,122 +34,72 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-/**
- * Tests for XXHash32 implementation using test files with known checksums.
- * Reference checksums were generated using xxh32sum from https://cyan4973.github.io/xxHash/
- */
 class XXHash32Test {
 
-    private static final int BUFFER_SIZE = 10240;
+    private static long copy(final InputStream input, final OutputStream output, final int bufferSize) throws IOException {
+        return IOUtils.copyLarge(input, output, new byte[bufferSize]);
+    }
 
-    /**
-     * Test data containing file paths and their expected XXHash32 checksums.
-     * These checksums were verified using the reference xxh32sum implementation.
-     */
-    public static Stream<Arguments> testFiles() {
+    public static Stream<Arguments> data() {
+        // @formatter:off
         return Stream.of(
+            // reference checksums created with xxh32sum
+            // https://cyan4973.github.io/xxHash/
             Arguments.of("org/apache/commons/codec/bla.tar", "fbb5c8d1"),
             Arguments.of("org/apache/commons/codec/bla.tar.xz", "4106a208"),
             Arguments.of("org/apache/commons/codec/small.bin", "f66c26f8")
         );
+        // @formatter:on
     }
 
-    /**
-     * Reads all bytes from an input stream into a byte array.
-     */
-    private static byte[] readAllBytes(final InputStream input) throws IOException {
+    private static byte[] toByteArray(final InputStream input) throws IOException {
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
-        IOUtils.copyLarge(input, output, new byte[BUFFER_SIZE]);
+        copy(input, output, 10240);
         return output.toByteArray();
     }
 
-    /**
-     * Loads a test file from the classpath and returns its Path.
-     */
-    private Path loadTestFile(final String resourcePath) throws Exception {
-        final URL url = XXHash32Test.class.getClassLoader().getResource(resourcePath);
+    private Path file;
+
+    private String expectedChecksum;
+
+    public void initData(final String path, final String c) throws Exception {
+        final URL url = XXHash32Test.class.getClassLoader().getResource(path);
         if (url == null) {
-            throw new FileNotFoundException("Test file not found: " + resourcePath);
+            throw new FileNotFoundException("couldn't find " + path);
         }
-        return Paths.get(url.toURI());
+        file = Paths.get(url.toURI());
+        expectedChecksum = c;
     }
 
-    /**
-     * Tests that XXHash32 produces the correct checksum when processing entire file at once.
-     */
     @ParameterizedTest
-    @MethodSource("testFiles")
-    public void shouldProduceCorrectChecksumForCompleteFile(final String filePath, final String expectedChecksum) throws Exception {
-        // Given
-        final Path testFile = loadTestFile(filePath);
+    @MethodSource("data")
+    public void verifyChecksum(final String path, final String c) throws Exception {
+        initData(path, c);
         final XXHash32 hasher = new XXHash32();
-        
-        // When
-        try (InputStream inputStream = Files.newInputStream(testFile)) {
-            final byte[] fileBytes = readAllBytes(inputStream);
-            hasher.update(fileBytes, 0, fileBytes.length);
+        try (InputStream in = Files.newInputStream(file)) {
+            final byte[] bytes = toByteArray(in);
+            hasher.update(bytes, 0, bytes.length);
         }
-        
-        // Then
-        final String actualChecksum = Long.toHexString(hasher.getValue());
-        assertEquals(expectedChecksum, actualChecksum, 
-            "XXHash32 checksum mismatch for file: " + testFile);
+        assertEquals(expectedChecksum, Long.toHexString(hasher.getValue()), "checksum for " + file);
     }
 
-    /**
-     * Tests that XXHash32 produces the correct checksum when processing file in chunks
-     * and handles edge cases like reset() and negative length parameters.
-     */
     @ParameterizedTest
-    @MethodSource("testFiles")
-    public void shouldProduceCorrectChecksumForIncrementalProcessing(final String filePath, final String expectedChecksum) throws Exception {
-        // Given
-        final Path testFile = loadTestFile(filePath);
+    @MethodSource("data")
+    public void verifyIncrementalChecksum(final String path, final String c) throws Exception {
+        initData(path, c);
         final XXHash32 hasher = new XXHash32();
-        
-        // When
-        try (InputStream inputStream = Files.newInputStream(testFile)) {
-            final byte[] fileBytes = readAllBytes(inputStream);
-            
-            // Test reset functionality: add some data then reset
-            hasher.update(fileBytes[0]);
+        try (InputStream in = Files.newInputStream(file)) {
+            final byte[] bytes = toByteArray(in);
+            // Hit the case where the hash should be reset
+            hasher.update(bytes[0]);
             hasher.reset();
-            
-            // Process file in chunks to test incremental updates
-            processFileInChunks(hasher, fileBytes);
-            
-            // Test that negative length is ignored (edge case)
-            hasher.update(fileBytes, 0, -1);
+            // Pass in chunks
+            hasher.update(bytes[0]);
+            hasher.update(bytes, 1, bytes.length - 2);
+            hasher.update(bytes, bytes.length - 1, 1);
+            // Check the hash ignores negative length
+            hasher.update(bytes, 0, -1);
         }
-        
-        // Then
-        final String actualChecksum = Long.toHexString(hasher.getValue());
-        assertEquals(expectedChecksum, actualChecksum, 
-            "XXHash32 incremental checksum mismatch for file: " + testFile);
-    }
-
-    /**
-     * Processes file bytes in multiple chunks to test incremental hashing:
-     * - First byte individually
-     * - Middle bytes as array slice  
-     * - Last byte individually
-     */
-    private void processFileInChunks(final XXHash32 hasher, final byte[] fileBytes) {
-        if (fileBytes.length == 0) {
-            return;
-        }
-        
-        // Process first byte
-        hasher.update(fileBytes[0]);
-        
-        if (fileBytes.length > 2) {
-            // Process middle bytes (all except first and last)
-            hasher.update(fileBytes, 1, fileBytes.length - 2);
-        }
-        
-        if (fileBytes.length > 1) {
-            // Process last byte
-            hasher.update(fileBytes, fileBytes.length - 1, 1);
-        }
+        assertEquals(expectedChecksum, Long.toHexString(hasher.getValue()), "checksum for " + file);
     }
 }
