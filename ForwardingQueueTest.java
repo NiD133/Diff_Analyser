@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2007 The Guava Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.common.collect;
 
 import static java.util.Arrays.asList;
@@ -18,18 +34,14 @@ import org.jspecify.annotations.NullUnmarked;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Unit tests for the {@code ForwardingQueue} class.
- * These tests ensure that the forwarding behavior works as expected.
- * 
- * Authors: Robert Konigsberg, Louis Wasserman
+ * Tests for {@code ForwardingQueue}.
+ *
+ * @author Robert Konigsberg
+ * @author Louis Wasserman
  */
 @NullUnmarked
 public class ForwardingQueueTest extends TestCase {
 
-  /**
-   * A concrete implementation of ForwardingQueue that uses a standard Queue as its delegate.
-   * This class is used to test the standard forwarding methods.
-   */
   static final class StandardImplForwardingQueue<T> extends ForwardingQueue<T> {
     private final Queue<T> backingQueue;
 
@@ -42,7 +54,6 @@ public class ForwardingQueueTest extends TestCase {
       return backingQueue;
     }
 
-    // Override methods to use standard implementations
     @Override
     public boolean addAll(Collection<? extends T> collection) {
       return standardAddAll(collection);
@@ -109,22 +120,15 @@ public class ForwardingQueueTest extends TestCase {
     }
   }
 
-  /**
-   * Builds and returns a test suite that includes all tests for ForwardingQueue.
-   * 
-   * @return a TestSuite containing all ForwardingQueue tests.
-   */
   @AndroidIncompatible // test-suite builders
   public static Test suite() {
     TestSuite suite = new TestSuite();
 
-    // Add the ForwardingQueueTest class to the suite
     suite.addTestSuite(ForwardingQueueTest.class);
-
-    // Add a test suite for ForwardingQueue using QueueTestSuiteBuilder
     suite.addTest(
         QueueTestSuiteBuilder.using(
                 new TestStringQueueGenerator() {
+
                   @Override
                   protected Queue<String> create(String[] elements) {
                     return new StandardImplForwardingQueue<>(new LinkedList<>(asList(elements)));
@@ -140,10 +144,6 @@ public class ForwardingQueueTest extends TestCase {
     return suite;
   }
 
-  /**
-   * Tests the forwarding functionality of the ForwardingQueue.
-   * Uses ForwardingWrapperTester to ensure that method calls are correctly forwarded.
-   */
   @SuppressWarnings({"rawtypes", "unchecked"})
   public void testForwarding() {
     new ForwardingWrapperTester()
@@ -157,13 +157,6 @@ public class ForwardingQueueTest extends TestCase {
             });
   }
 
-  /**
-   * Wraps a given Queue with a ForwardingQueue.
-   * This helper method is used in forwarding tests.
-   * 
-   * @param delegate the Queue to be wrapped
-   * @return a ForwardingQueue that forwards to the given Queue
-   */
   private static <T> Queue<T> wrap(Queue<T> delegate) {
     return new ForwardingQueue<T>() {
       @Override
