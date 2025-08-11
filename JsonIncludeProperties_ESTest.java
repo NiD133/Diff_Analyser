@@ -19,176 +19,152 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class JsonIncludeProperties_ESTest extends JsonIncludeProperties_ESTest_scaffolding {
 
-    // Tests for Value creation and basic properties
-    @Test(timeout = 4000)
-    public void testAllInstanceGetIncluded_ReturnsNull()  throws Throwable  {
-        JsonIncludeProperties.Value allValue = JsonIncludeProperties.Value.ALL;
-        Set<String> includedSet = allValue.getIncluded();
-        assertNull("ALL value should have null included set", includedSet);
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      JsonIncludeProperties.Value jsonIncludeProperties_Value0 = JsonIncludeProperties.Value.ALL;
+      Set<String> set0 = jsonIncludeProperties_Value0.getIncluded();
+      assertNull(set0);
+  }
 
-    @Test(timeout = 4000)
-    public void testFromAnnotation_WithNullValue_ReturnsAllInstance()  throws Throwable  {
-        JsonIncludeProperties.Value valueFromNull = JsonIncludeProperties.Value.from((JsonIncludeProperties) null);
-        assertNotNull("from(null) should return non-null value", valueFromNull);
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      String[] stringArray0 = new String[5];
+      JsonIncludeProperties jsonIncludeProperties0 = mock(JsonIncludeProperties.class, CALLS_REAL_METHODS);
+      doReturn(stringArray0).when(jsonIncludeProperties0).value();
+      JsonIncludeProperties.Value jsonIncludeProperties_Value0 = JsonIncludeProperties.Value.from(jsonIncludeProperties0);
+      assertNotNull(jsonIncludeProperties_Value0);
+  }
 
-    @Test(timeout = 4000)
-    public void testValueFor_ReturnsCorrectAnnotationInterface()  throws Throwable  {
-        JsonIncludeProperties.Value value = JsonIncludeProperties.Value.ALL;
-        Class<JsonIncludeProperties> annotationClass = value.valueFor();
-        assertEquals("Should return JsonIncludeProperties interface", 
-                     JsonIncludeProperties.class, annotationClass);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      JsonIncludeProperties.Value jsonIncludeProperties_Value0 = JsonIncludeProperties.Value.ALL;
+      JsonIncludeProperties jsonIncludeProperties0 = mock(JsonIncludeProperties.class, CALLS_REAL_METHODS);
+      doReturn((String[]) null).when(jsonIncludeProperties0).value();
+      JsonIncludeProperties.Value jsonIncludeProperties_Value1 = JsonIncludeProperties.Value.from(jsonIncludeProperties0);
+      boolean boolean0 = jsonIncludeProperties_Value0.equals(jsonIncludeProperties_Value1);
+      assertFalse(jsonIncludeProperties_Value1.equals((Object)jsonIncludeProperties_Value0));
+      assertFalse(boolean0);
+  }
 
-    // Tests for equals() method
-    @Test(timeout = 4000)
-    public void testEquals_SameInstance_ReturnsTrue()  throws Throwable  {
-        JsonIncludeProperties.Value value = JsonIncludeProperties.Value.all();
-        boolean result = value.equals(value);
-        assertTrue("Instance should equal itself", result);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      JsonIncludeProperties.Value jsonIncludeProperties_Value0 = JsonIncludeProperties.Value.ALL;
+      JsonIncludeProperties.Value jsonIncludeProperties_Value1 = new JsonIncludeProperties.Value((Set<String>) null);
+      boolean boolean0 = jsonIncludeProperties_Value1.equals(jsonIncludeProperties_Value0);
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testEquals_NullObject_ReturnsFalse()  throws Throwable  {
-        JsonIncludeProperties.Value value = JsonIncludeProperties.Value.all();
-        boolean result = value.equals(null);
-        assertFalse("Should not equal null", result);
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      JsonIncludeProperties.Value jsonIncludeProperties_Value0 = JsonIncludeProperties.Value.all();
+      Object object0 = new Object();
+      boolean boolean0 = jsonIncludeProperties_Value0.equals(object0);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testEquals_DifferentType_ReturnsFalse()  throws Throwable  {
-        JsonIncludeProperties.Value value = JsonIncludeProperties.Value.all();
-        Object other = new Object();
-        boolean result = value.equals(other);
-        assertFalse("Should not equal different type", result);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      JsonIncludeProperties.Value jsonIncludeProperties_Value0 = JsonIncludeProperties.Value.all();
+      boolean boolean0 = jsonIncludeProperties_Value0.equals((Object) null);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testEquals_TwoInstancesWithNullIncluded_ReturnsTrue()  throws Throwable  {
-        JsonIncludeProperties.Value allValue = JsonIncludeProperties.Value.ALL;
-        JsonIncludeProperties.Value createdValue = new JsonIncludeProperties.Value((Set<String>) null);
-        boolean result = createdValue.equals(allValue);
-        assertTrue("Both values with null included should be equal", result);
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      JsonIncludeProperties.Value jsonIncludeProperties_Value0 = JsonIncludeProperties.Value.all();
+      boolean boolean0 = jsonIncludeProperties_Value0.equals(jsonIncludeProperties_Value0);
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testEquals_AllAndValueFromNullAnnotation_NotEqual()  throws Throwable  {
-        // Setup mock returning null for value()
-        JsonIncludeProperties annotation = mock(JsonIncludeProperties.class, CALLS_REAL_METHODS);
-        doReturn((String[]) null).when(annotation).value();
-        
-        JsonIncludeProperties.Value allValue = JsonIncludeProperties.Value.ALL;
-        JsonIncludeProperties.Value fromAnnotationValue = JsonIncludeProperties.Value.from(annotation);
-        
-        boolean directComparison = allValue.equals(fromAnnotationValue);
-        boolean reverseComparison = fromAnnotationValue.equals(allValue);
-        
-        assertFalse("ALL and annotation-derived value should not be equal (direct)", directComparison);
-        assertFalse("ALL and annotation-derived value should not be equal (reverse)", reverseComparison);
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      JsonIncludeProperties.Value jsonIncludeProperties_Value0 = JsonIncludeProperties.Value.ALL;
+      JsonIncludeProperties jsonIncludeProperties0 = mock(JsonIncludeProperties.class, CALLS_REAL_METHODS);
+      doReturn((String[]) null).when(jsonIncludeProperties0).value();
+      JsonIncludeProperties.Value jsonIncludeProperties_Value1 = JsonIncludeProperties.Value.from(jsonIncludeProperties0);
+      JsonIncludeProperties.Value jsonIncludeProperties_Value2 = jsonIncludeProperties_Value1.withOverrides(jsonIncludeProperties_Value0);
+      boolean boolean0 = jsonIncludeProperties_Value2.equals(jsonIncludeProperties_Value0);
+      assertFalse(boolean0);
+      assertSame(jsonIncludeProperties_Value2, jsonIncludeProperties_Value1);
+  }
 
-    // Tests for withOverrides() method
-    @Test(timeout = 4000)
-    public void testWithOverrides_NullOverride_ReturnsSameInstance()  throws Throwable  {
-        JsonIncludeProperties.Value value = JsonIncludeProperties.Value.all();
-        JsonIncludeProperties.Value result = value.withOverrides((JsonIncludeProperties.Value) null);
-        assertSame("Null override should return original instance", value, result);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      JsonIncludeProperties.Value jsonIncludeProperties_Value0 = JsonIncludeProperties.Value.ALL;
+      LinkedHashSet<String> linkedHashSet0 = new LinkedHashSet<String>();
+      boolean boolean0 = linkedHashSet0.remove(jsonIncludeProperties_Value0);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testWithOverrides_AllOverride_ReturnsAllInstance()  throws Throwable  {
-        // Setup mock returning null for value()
-        JsonIncludeProperties annotation = mock(JsonIncludeProperties.class, CALLS_REAL_METHODS);
-        doReturn((String[]) null).when(annotation).value();
-        
-        JsonIncludeProperties.Value baseValue = JsonIncludeProperties.Value.ALL;
-        JsonIncludeProperties.Value overrideValue = JsonIncludeProperties.Value.from(annotation);
-        JsonIncludeProperties.Value result = baseValue.withOverrides(overrideValue);
-        
-        assertSame("Overriding ALL with ALL should return override", overrideValue, result);
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      String[] stringArray0 = new String[0];
+      JsonIncludeProperties jsonIncludeProperties0 = mock(JsonIncludeProperties.class, CALLS_REAL_METHODS);
+      doReturn(stringArray0).when(jsonIncludeProperties0).value();
+      JsonIncludeProperties.Value jsonIncludeProperties_Value0 = JsonIncludeProperties.Value.from(jsonIncludeProperties0);
+      LinkedHashSet<String> linkedHashSet0 = new LinkedHashSet<String>();
+      boolean boolean0 = linkedHashSet0.remove(jsonIncludeProperties_Value0);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void testWithOverrides_SameNonEmptyValue_ReturnsEqualButNotSame()  throws Throwable  {
-        LinkedHashSet<String> properties = new LinkedHashSet<>();
-        properties.add("property1");
-        JsonIncludeProperties.Value value = new JsonIncludeProperties.Value(properties);
-        
-        JsonIncludeProperties.Value result = value.withOverrides(value);
-        
-        assertNotSame("Should return new instance", value, result);
-        assertTrue("Result should be equal to original", result.equals(value));
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      LinkedHashSet<String> linkedHashSet0 = new LinkedHashSet<String>();
+      linkedHashSet0.add("LI }f.Ax<09fr");
+      JsonIncludeProperties.Value jsonIncludeProperties_Value0 = new JsonIncludeProperties.Value(linkedHashSet0);
+      JsonIncludeProperties.Value jsonIncludeProperties_Value1 = jsonIncludeProperties_Value0.withOverrides(jsonIncludeProperties_Value0);
+      assertTrue(jsonIncludeProperties_Value1.equals((Object)jsonIncludeProperties_Value0));
+      assertNotSame(jsonIncludeProperties_Value1, jsonIncludeProperties_Value0);
+  }
 
-    @Test(timeout = 4000)
-    public void testWithOverrides_EmptyBaseWithNonEmptyOverride_ReturnsBase()  throws Throwable  {
-        // Create value with empty included set
-        JsonIncludeProperties annotation = mock(JsonIncludeProperties.class, CALLS_REAL_METHODS);
-        doReturn(new String[0]).when(annotation).value();
-        JsonIncludeProperties.Value baseValue = JsonIncludeProperties.Value.from(annotation);
-        
-        // Create override with non-empty set
-        LinkedHashSet<String> overrideProperties = new LinkedHashSet<>();
-        overrideProperties.add("property2");
-        JsonIncludeProperties.Value overrideValue = new JsonIncludeProperties.Value(overrideProperties);
-        
-        JsonIncludeProperties.Value result = baseValue.withOverrides(overrideValue);
-        
-        assertNotSame("Should return new instance", baseValue, result);
-        assertTrue("Result should be equal to base", result.equals(baseValue));
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      String[] stringArray0 = new String[0];
+      JsonIncludeProperties jsonIncludeProperties0 = mock(JsonIncludeProperties.class, CALLS_REAL_METHODS);
+      doReturn(stringArray0).when(jsonIncludeProperties0).value();
+      JsonIncludeProperties.Value jsonIncludeProperties_Value0 = JsonIncludeProperties.Value.from(jsonIncludeProperties0);
+      LinkedHashSet<String> linkedHashSet0 = new LinkedHashSet<String>();
+      linkedHashSet0.add("K|D{$!:2zda");
+      JsonIncludeProperties.Value jsonIncludeProperties_Value1 = new JsonIncludeProperties.Value(linkedHashSet0);
+      JsonIncludeProperties.Value jsonIncludeProperties_Value2 = jsonIncludeProperties_Value0.withOverrides(jsonIncludeProperties_Value1);
+      assertNotSame(jsonIncludeProperties_Value2, jsonIncludeProperties_Value0);
+      assertTrue(jsonIncludeProperties_Value2.equals((Object)jsonIncludeProperties_Value0));
+  }
 
-    @Test(timeout = 4000)
-    public void testWithOverrides_ValueFromNullWithAllOverride_NotEqual()  throws Throwable  {
-        // Setup mock returning null for value()
-        JsonIncludeProperties annotation = mock(JsonIncludeProperties.class, CALLS_REAL_METHODS);
-        doReturn((String[]) null).when(annotation).value();
-        
-        JsonIncludeProperties.Value baseValue = JsonIncludeProperties.Value.from(annotation);
-        JsonIncludeProperties.Value overrideValue = JsonIncludeProperties.Value.ALL;
-        JsonIncludeProperties.Value result = baseValue.withOverrides(overrideValue);
-        
-        boolean comparison = result.equals(overrideValue);
-        assertFalse("Result should not equal ALL override", comparison);
-        assertSame("Should return original instance", baseValue, result);
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      JsonIncludeProperties.Value jsonIncludeProperties_Value0 = JsonIncludeProperties.Value.ALL;
+      JsonIncludeProperties jsonIncludeProperties0 = mock(JsonIncludeProperties.class, CALLS_REAL_METHODS);
+      doReturn((String[]) null).when(jsonIncludeProperties0).value();
+      JsonIncludeProperties.Value jsonIncludeProperties_Value1 = JsonIncludeProperties.Value.from(jsonIncludeProperties0);
+      JsonIncludeProperties.Value jsonIncludeProperties_Value2 = jsonIncludeProperties_Value0.withOverrides(jsonIncludeProperties_Value1);
+      assertSame(jsonIncludeProperties_Value2, jsonIncludeProperties_Value1);
+  }
 
-    // Tests for special cases and edge conditions
-    @Test(timeout = 4000)
-    public void testToString_AllValue_ReturnsExpectedFormat()  throws Throwable  {
-        JsonIncludeProperties.Value allValue = JsonIncludeProperties.Value.ALL;
-        String stringRep = allValue.toString();
-        assertEquals("Should return correct string representation", 
-                     "JsonIncludeProperties.Value(included=null)", stringRep);
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      JsonIncludeProperties.Value jsonIncludeProperties_Value0 = JsonIncludeProperties.Value.from((JsonIncludeProperties) null);
+      assertNotNull(jsonIncludeProperties_Value0);
+  }
 
-    @Test(timeout = 4000)
-    public void testSetRemove_AllValue_ReturnsFalse()  throws Throwable  {
-        LinkedHashSet<String> set = new LinkedHashSet<>();
-        boolean result = set.remove(JsonIncludeProperties.Value.ALL);
-        assertFalse("ALL value should not be removed from empty set", result);
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      JsonIncludeProperties.Value jsonIncludeProperties_Value0 = JsonIncludeProperties.Value.ALL;
+      String string0 = jsonIncludeProperties_Value0.toString();
+      assertEquals("JsonIncludeProperties.Value(included=null)", string0);
+  }
 
-    @Test(timeout = 4000)
-    public void testSetRemove_ValueFromEmptyAnnotation_ReturnsFalse()  throws Throwable  {
-        // Create value with empty included set
-        JsonIncludeProperties annotation = mock(JsonIncludeProperties.class, CALLS_REAL_METHODS);
-        doReturn(new String[0]).when(annotation).value();
-        JsonIncludeProperties.Value value = JsonIncludeProperties.Value.from(annotation);
-        
-        LinkedHashSet<String> set = new LinkedHashSet<>();
-        boolean result = set.remove(value);
-        assertFalse("Value should not be removed from empty set", result);
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      JsonIncludeProperties.Value jsonIncludeProperties_Value0 = JsonIncludeProperties.Value.all();
+      JsonIncludeProperties.Value jsonIncludeProperties_Value1 = jsonIncludeProperties_Value0.withOverrides((JsonIncludeProperties.Value) null);
+      assertSame(jsonIncludeProperties_Value1, jsonIncludeProperties_Value0);
+  }
 
-    // Test for from() method with non-empty annotation
-    @Test(timeout = 4000)
-    public void testFromAnnotation_WithNonEmptyValue_ReturnsNonNull()  throws Throwable  {
-        JsonIncludeProperties annotation = mock(JsonIncludeProperties.class, CALLS_REAL_METHODS);
-        doReturn(new String[5]).when(annotation).value();
-        
-        JsonIncludeProperties.Value result = JsonIncludeProperties.Value.from(annotation);
-        assertNotNull("Should return non-null for non-empty annotation", result);
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      JsonIncludeProperties.Value jsonIncludeProperties_Value0 = JsonIncludeProperties.Value.ALL;
+      Class<JsonIncludeProperties> class0 = jsonIncludeProperties_Value0.valueFor();
+      assertEquals("interface com.fasterxml.jackson.annotation.JsonIncludeProperties", class0.toString());
+  }
 }
