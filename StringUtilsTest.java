@@ -1,3 +1,46 @@
+/*
+ *
+ * This file is part of the iText (R) project.
+    Copyright (c) 1998-2022 iText Group NV
+ * Authors: Bruno Lowagie, Paulo Soares, et al.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License version 3
+ * as published by the Free Software Foundation with the addition of the
+ * following permission added to Section 15 as permitted in Section 7(a):
+ * FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
+ * ITEXT GROUP. ITEXT GROUP DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
+ * OF THIRD PARTY RIGHTS
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, see http://www.gnu.org/licenses or write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA, 02110-1301 USA, or download the license from the following URL:
+ * http://itextpdf.com/terms-of-use/
+ *
+ * The interactive user interfaces in modified source and object code versions
+ * of this program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU Affero General Public License.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License,
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
+ *
+ * You can be released from the requirements of the license by purchasing
+ * a commercial license. Buying such a license is mandatory as soon as you
+ * develop commercial activities involving the iText software without
+ * disclosing the source code of your own applications.
+ * These activities include: offering paid services to customers as an ASP,
+ * serving PDFs on the fly in a web application, shipping iText with a closed
+ * source product.
+ *
+ * For more information, please contact iText Software Corp. at this
+ * address: sales@itextpdf.com
+ */
 package com.itextpdf.text.pdf;
 
 import org.junit.Assert;
@@ -9,75 +52,46 @@ import org.junit.runners.Parameterized.Parameters;
 import java.util.Arrays;
 import java.util.Collection;
 
+/**
+ * Parameterized unit tests for the method StringUtils::convertCharsToBytes
+ *
+ * @author benoit
+ */
 @RunWith(Parameterized.class)
 public class StringUtilsTest {
 
-    @Parameters(name = "{0}")
+    @Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-            {"Null character (U+0000)", 
-                '\u0000', (byte) 0x0, (byte) 0x0},
-                
-            {"Backspace control character (U+0008)", 
-                '\b', (byte) 0x0, (byte) 0x08},
-                
-            {"ASCII lowercase 'a'", 
-                'a', (byte) 0x0, (byte) 0x61},
-                
-            {"Arabic character 'ة' (U+0629)", 
-                'ة', (byte) 0x06, (byte) 0x29},
-                
-            {"Last character before surrogate range (U+D7FF)", 
-                '\ud7ff', (byte) 0xd7, (byte) 0xff},
-                
-            {"First surrogate character (U+D800)", 
-                '\ud800', (byte) 0xd8, (byte) 0x0},
-                
-            {"Surrogate character (U+DA82)", 
-                '\uda82', (byte) 0xda, (byte) 0x82},
-                
-            {"Surrogate character (U+DBB0)", 
-                '\udbb0', (byte) 0xdb, (byte) 0xb0},
-                
-            {"Last surrogate character (U+DFFF)", 
-                '\udfff', (byte) 0xdf, (byte) 0xff},
-                
-            {"First character after surrogate range (U+E000)", 
-                '\ue000', (byte) 0xe0, (byte) 0x0},
-                
-            {"Replacement character (U+FFFD)", 
-                '\ufffd', (byte) 0xff, (byte) 0xfd},
-                
-            {"Last Basic Multilingual Plane character (U+FFFF)", 
-                '\uffff', (byte) 0xff, (byte) 0xff}
-        });
+            {'\u0000', (byte) 0x0, (byte) 0x0},
+            {'\b', (byte) 0x0, (byte) 0x08},
+            {'a', (byte) 0x0, (byte) 0x61},
+            {'ة', (byte) 0x06, (byte) 0x29}, // Arabic characters
+            {'\ud7ff', (byte) 0xd7, (byte) 0xff}, // just outside of a special Unicode range
+            {'\ud800', (byte) 0xd8, (byte) 0x0}, // in a special Unicode range
+            {'\uda82', (byte) 0xda, (byte) 0x82}, // in a special Unicode range
+            {'\udbb0', (byte) 0xdb, (byte) 0xb0}, // in a special Unicode range
+            {'\udfff', (byte) 0xdf, (byte) 0xff}, // in a special Unicode range
+            {'\ue000', (byte) 0xe0, (byte) 0x0}, // just outside of a special Unicode range
+            {'\ufffd', (byte) 0xff, (byte) 0xfd},
+            {'\uffff', (byte) 0xff, (byte) 0xff},});
     }
 
-    private final char inputChar;
-    private final byte expectedHighByte;
-    private final byte expectedLowByte;
+    private final char input;
+    private final byte check1, check2;
 
-    public StringUtilsTest(String description, char input, byte highByte, byte lowByte) {
-        // Description parameter used for test naming but not in test logic
-        this.inputChar = input;
-        this.expectedHighByte = highByte;
-        this.expectedLowByte = lowByte;
+    public StringUtilsTest(char in, byte c1, byte c2) {
+        input = in;
+        check1 = c1;
+        check2 = c2;
     }
 
     @Test
-    public void convertCharsToBytes_ShouldConvertCharacterToCorrectBytePair() {
-        // Prepare
-        char[] inputChars = {inputChar};
-        byte[] expectedBytes = {expectedHighByte, expectedLowByte};
-        
-        // Execute
-        byte[] actualBytes = StringUtils.convertCharsToBytes(inputChars);
-        
-        // Verify
-        Assert.assertArrayEquals(
-            "Character conversion failed for: " + String.format("U+%04X", (int) inputChar),
-            expectedBytes, 
-            actualBytes
-        );
+    public void convertCharsToBytesTest() {
+        byte[] check = {check1, check2};
+        char[] vals = {input};
+        byte[] result = StringUtils.convertCharsToBytes(vals);
+
+        Assert.assertArrayEquals(check, result);
     }
 }
