@@ -1,7 +1,11 @@
 package org.jsoup.internal;
 
 import org.jsoup.Jsoup;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,226 +14,271 @@ import static org.jsoup.internal.StringUtil.normaliseWhitespace;
 import static org.jsoup.internal.StringUtil.resolve;
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("StringUtil tests")
 public class StringUtilTest {
 
-    @Test
-    public void join() {
-        assertEquals("", StringUtil.join(Collections.singletonList(""), " "));
-        assertEquals("one", StringUtil.join(Collections.singletonList("one"), " "));
-        assertEquals("one two three", StringUtil.join(Arrays.asList("one", "two", "three"), " "));
+    // Simple helper to make expected-space strings easy to read at a glance
+    private static String spaces(int n) {
+        StringBuilder sb = new StringBuilder(n);
+        for (int i = 0; i < n; i++) sb.append(' ');
+        return sb.toString();
     }
 
-    @Test public void padding() {
-        assertEquals("", StringUtil.padding(0));
-        assertEquals(" ", StringUtil.padding(1));
-        assertEquals("  ", StringUtil.padding(2));
-        assertEquals("               ", StringUtil.padding(15));
-        assertEquals("                              ", StringUtil.padding(45)); // we default to tap out at 30
-
-        // memoization is up to 21 blocks (0 to 20 spaces) and exits early before min checks making maxPaddingWidth unused
-        assertEquals("", StringUtil.padding(0, -1));
-        assertEquals("                    ", StringUtil.padding(20, -1));
-
-        // this test escapes memoization and continues through
-        assertEquals("                     ", StringUtil.padding(21, -1));
-
-        // this test escapes memoization and using unlimited length (-1) will allow requested spaces
-        assertEquals("                              ", StringUtil.padding(30, -1));
-        assertEquals("                                             ", StringUtil.padding(45, -1));
-
-        // we tap out at 0 for this test
-        assertEquals("", StringUtil.padding(0, 0));
-
-        // as memoization is escaped, setting zero for max padding will not allow any requested width
-        assertEquals("", StringUtil.padding(21, 0));
-
-        // we tap out at 30 for these tests making > 30 use 30
-        assertEquals("", StringUtil.padding(0, 30));
-        assertEquals(" ", StringUtil.padding(1, 30));
-        assertEquals("  ", StringUtil.padding(2, 30));
-        assertEquals("               ", StringUtil.padding(15, 30));
-        assertEquals("                              ", StringUtil.padding(45, 30));
-
-        // max applies regardless of memoized
-        assertEquals(5, StringUtil.padding(20, 5).length());
-    }
-
-    @Test public void paddingInACan() {
-        String[] padding = StringUtil.padding;
-        assertEquals(21, padding.length);
-        for (int i = 0; i < padding.length; i++) {
-            assertEquals(i, padding[i].length());
+    @Nested
+    @DisplayName("join(...)")
+    class JoinTests {
+        @Test
+        @DisplayName("joins collection with separator")
+        void joinCollection() {
+            assertEquals("", StringUtil.join(Collections.singletonList(""), " "));
+            assertEquals("one", StringUtil.join(Collections.singletonList("one"), " "));
+            assertEquals("one two three", StringUtil.join(Arrays.asList("one", "two", "three"), " "));
         }
     }
 
-    @Test public void isBlank() {
-        assertTrue(StringUtil.isBlank(null));
-        assertTrue(StringUtil.isBlank(""));
-        assertTrue(StringUtil.isBlank("      "));
-        assertTrue(StringUtil.isBlank("   \r\n  "));
+    @Nested
+    @DisplayName("padding(...)")
+    class PaddingTests {
 
-        assertFalse(StringUtil.isBlank("hello"));
-        assertFalse(StringUtil.isBlank("   hello   "));
+        @Test
+        @DisplayName("default padding (max 30) returns correct lengths")
+        void defaultPadding() {
+            assertEquals(spaces(0), StringUtil.padding(0));
+            assertEquals(spaces(1), StringUtil.padding(1));
+            assertEquals(spaces(2), StringUtil.padding(2));
+            assertEquals(spaces(15), StringUtil.padding(15));
+            assertEquals(spaces(30), StringUtil.padding(45)); // default taps out at 30
+        }
+
+        @Test
+        @DisplayName("memoized padding (0..20) and unlimited (-1) behavior")
+        void memoizedAndUnlimited() {
+            // memoization is 0..20; maxPaddingWidth is ignored when memoized path returns early
+            assertEquals(spaces(0), StringUtil.padding(0, -1));
+            assertEquals(spaces(20), StringUtil.padding(20, -1));
+
+            // escape memoization at width 21
+            assertEquals(spaces(21), StringUtil.padding(21, -1));
+
+            // unlimited (-1) allows any requested width
+            assertEquals(spaces(30), StringUtil.padding(30, -1));
+            assertEquals(spaces(45), StringUtil.padding(45, -1));
+        }
+
+        @Test
+        @DisplayName("max padding width limits are respected")
+        void respectsMaxPaddingWidth() {
+            // max = 0
+            assertEquals(spaces(0), StringUtil.padding(0, 0));
+            assertEquals(spaces(0), StringUtil.padding(21, 0)); // escapes memoization but clamped to 0
+
+            // max = 30
+            assertEquals(spaces(0), StringUtil.padding(0, 30));
+            assertEquals(spaces(1), StringUtil.padding(1, 30));
+            assertEquals(spaces(2), StringUtil.padding(2, 30));
+            assertEquals(spaces(15), StringUtil.padding(15, 30));
+            assertEquals(spaces(30), StringUtil.padding(45, 30));
+
+            // max applies even when width is memoized
+            assertEquals(5, StringUtil.padding(20, 5).length());
+        }
+
+        @Test
+        @DisplayName("precomputed padding cache is consistent (0..20)")
+        void precomputedPaddingCache() {
+            String[] padding = StringUtil.padding;
+            assertEquals(21, padding.length, "Cache should provide entries for widths 0..20 inclusive");
+            for (int i = 0; i < padding.length; i++) {
+                assertEquals(i, padding[i].length(), "Cache entry " + i + " should be " + i + " spaces");
+            }
+        }
     }
 
-    @Test public void isNumeric() {
-        assertFalse(StringUtil.isNumeric(null));
-        assertFalse(StringUtil.isNumeric(" "));
-        assertFalse(StringUtil.isNumeric("123 546"));
-        assertFalse(StringUtil.isNumeric("hello"));
-        assertFalse(StringUtil.isNumeric("123.334"));
+    @Nested
+    @DisplayName("blank / numeric / whitespace / normalization")
+    class WhitespaceAndFormatTests {
 
-        assertTrue(StringUtil.isNumeric("1"));
-        assertTrue(StringUtil.isNumeric("1234"));
+        @Test
+        @DisplayName("isBlank")
+        void isBlank() {
+            assertTrue(StringUtil.isBlank(null));
+            assertTrue(StringUtil.isBlank(""));
+            assertTrue(StringUtil.isBlank("      "));
+            assertTrue(StringUtil.isBlank("   \r\n  "));
+
+            assertFalse(StringUtil.isBlank("hello"));
+            assertFalse(StringUtil.isBlank("   hello   "));
+        }
+
+        @Test
+        @DisplayName("isNumeric (ASCII digits only)")
+        void isNumeric() {
+            assertFalse(StringUtil.isNumeric(null));
+            assertFalse(StringUtil.isNumeric(" "));
+            assertFalse(StringUtil.isNumeric("123 546"));
+            assertFalse(StringUtil.isNumeric("hello"));
+            assertFalse(StringUtil.isNumeric("123.334"));
+
+            assertTrue(StringUtil.isNumeric("1"));
+            assertTrue(StringUtil.isNumeric("1234"));
+        }
+
+        @ParameterizedTest(name = "isWhitespace returns true for ''{0}''")
+        @ValueSource(chars = {'\t', '\n', '\r', '\f', ' '})
+        @DisplayName("isWhitespace true cases")
+        void isWhitespaceTrue(char c) {
+            assertTrue(StringUtil.isWhitespace(c));
+        }
+
+        @ParameterizedTest(name = "isWhitespace returns false for ''{0}''")
+        @ValueSource(chars = {'\u00A0', '\u2000', '\u3000'})
+        @DisplayName("isWhitespace false cases (non-breaking / unicode spaces)")
+        void isWhitespaceFalse(char c) {
+            assertFalse(StringUtil.isWhitespace(c));
+        }
+
+        @Test
+        @DisplayName("normaliseWhitespace collapses runs and converts control whitespace to single spaces")
+        void normaliseWhiteSpace() {
+            assertEquals(" ", normaliseWhitespace("    \r \n \r\n"));
+            assertEquals(" hello there ", normaliseWhitespace("   hello   \r \n  there    \n"));
+            assertEquals("hello", normaliseWhitespace("hello"));
+            assertEquals("hello there", normaliseWhitespace("hello\nthere"));
+        }
+
+        @Test
+        @DisplayName("normaliseWhitespace handles high-surrogate/low-surrogate pairs")
+        void normaliseWhiteSpaceHandlesHighSurrogates() {
+            String input = "\ud869\udeb2\u304b\u309a  1";
+            String expected = "\ud869\udeb2\u304b\u309a 1";
+
+            assertEquals(expected, normaliseWhitespace(input));
+            String extractedText = Jsoup.parse(input).text();
+            assertEquals(expected, extractedText);
+        }
     }
 
-    @Test public void isWhitespace() {
-        assertTrue(StringUtil.isWhitespace('\t'));
-        assertTrue(StringUtil.isWhitespace('\n'));
-        assertTrue(StringUtil.isWhitespace('\r'));
-        assertTrue(StringUtil.isWhitespace('\f'));
-        assertTrue(StringUtil.isWhitespace(' '));
+    @Nested
+    @DisplayName("URL resolution and sanitization")
+    class UrlResolutionTests {
 
-        assertFalse(StringUtil.isWhitespace('\u00a0'));
-        assertFalse(StringUtil.isWhitespace('\u2000'));
-        assertFalse(StringUtil.isWhitespace('\u3000'));
+        private void assertResolves(String base, String rel, String expected) {
+            assertEquals(expected, resolve(base, rel),
+                "resolve(" + base + ", " + rel + ")");
+        }
+
+        @Test
+        @DisplayName("resolves relative URLs against base")
+        void resolvesRelativeUrls() {
+            assertResolves("http://example.com", "./one/two?three", "http://example.com/one/two?three");
+            assertResolves("http://example.com?one", "./one/two?three", "http://example.com/one/two?three");
+            assertResolves("http://example.com", "./one/two?three#four", "http://example.com/one/two?three#four");
+            assertResolves("http://example.com/", "https://example.com/one", "https://example.com/one");
+            assertResolves("http://example.com/two/", "../one/two.html", "http://example.com/one/two.html");
+            assertResolves("https://example.com/", "//example2.com/one", "https://example2.com/one");
+            assertResolves("https://example.com:8080", "./one", "https://example.com:8080/one");
+            assertResolves("http://example.com/", "https://example2.com/one", "https://example2.com/one");
+            assertResolves("wrong", "https://example.com/one", "https://example.com/one");
+            assertResolves("https://example.com/one", "", "https://example.com/one");
+            assertResolves("wrong", "also wrong", "");
+            assertResolves("ftp://example.com/two/", "../one", "ftp://example.com/one");
+            assertResolves("ftp://example.com/one/", "./two.c", "ftp://example.com/one/two.c");
+            assertResolves("ftp://example.com/one/", "two.c", "ftp://example.com/one/two.c");
+
+            // RFC 3986 section 5.4.2 examples
+            assertResolves("http://example.com/b/c/d;p?q", "../../../g", "http://example.com/g");
+            assertResolves("http://example.com/b/c/d;p?q", "../../../../g", "http://example.com/g");
+            assertResolves("http://example.com/b/c/d;p?q", "/./g", "http://example.com/g");
+            assertResolves("http://example.com/b/c/d;p?q", "/../g", "http://example.com/g");
+            assertResolves("http://example.com/b/c/d;p?q", "g.", "http://example.com/b/c/g.");
+            assertResolves("http://example.com/b/c/d;p?q", ".g", "http://example.com/b/c/.g");
+            assertResolves("http://example.com/b/c/d;p?q", "g..", "http://example.com/b/c/g..");
+            assertResolves("http://example.com/b/c/d;p?q", "..g", "http://example.com/b/c/..g");
+            assertResolves("http://example.com/b/c/d;p?q", "./../g", "http://example.com/b/g");
+            assertResolves("http://example.com/b/c/d;p?q", "./g/.", "http://example.com/b/c/g/");
+            assertResolves("http://example.com/b/c/d;p?q", "g/./h", "http://example.com/b/c/g/h");
+            assertResolves("http://example.com/b/c/d;p?q", "g/../h", "http://example.com/b/c/h");
+            assertResolves("http://example.com/b/c/d;p?q", "g;x=1/./y", "http://example.com/b/c/g;x=1/y");
+            assertResolves("http://example.com/b/c/d;p?q", "g;x=1/../y", "http://example.com/b/c/y");
+            assertResolves("http://example.com/b/c/d;p?q", "g?y/./x", "http://example.com/b/c/g?y/./x");
+            assertResolves("http://example.com/b/c/d;p?q", "g?y/../x", "http://example.com/b/c/g?y/../x");
+            assertResolves("http://example.com/b/c/d;p?q", "g#s/./x", "http://example.com/b/c/g#s/./x");
+            assertResolves("http://example.com/b/c/d;p?q", "g#s/../x", "http://example.com/b/c/g#s/../x");
+        }
+
+        @Test
+        @DisplayName("strips ASCII control chars before resolving")
+        void stripsControlCharsFromUrls() {
+            // should resolve to an absolute URL after control-char sanitization
+            assertEquals("foo:bar", resolve("\nhttps://\texample.com/", "\r\nfo\to:ba\br"));
+        }
+
+        @Test
+        @DisplayName("allows spaces in URL path")
+        void allowsSpaceInUrl() {
+            assertEquals("https://example.com/foo bar/", resolve("HTTPS://example.com/example/", "../foo bar/"));
+        }
     }
 
-    @Test public void normaliseWhiteSpace() {
-        assertEquals(" ", normaliseWhitespace("    \r \n \r\n"));
-        assertEquals(" hello there ", normaliseWhitespace("   hello   \r \n  there    \n"));
-        assertEquals("hello", normaliseWhitespace("hello"));
-        assertEquals("hello there", normaliseWhitespace("hello\nthere"));
-    }
+    @Nested
+    @DisplayName("ASCII checks and character classes")
+    class AsciiAndCharClassTests {
 
-    @Test public void normaliseWhiteSpaceHandlesHighSurrogates() {
-        String test71540chars = "\ud869\udeb2\u304b\u309a  1";
-        String test71540charsExpectedSingleWhitespace = "\ud869\udeb2\u304b\u309a 1";
+        @Test
+        @DisplayName("isAscii")
+        void isAscii() {
+            assertTrue(StringUtil.isAscii(""));
+            assertTrue(StringUtil.isAscii("example.com"));
+            assertTrue(StringUtil.isAscii("One Two"));
+            assertFalse(StringUtil.isAscii("🧔"));
+            assertFalse(StringUtil.isAscii("测试"));
+            assertFalse(StringUtil.isAscii("测试.com"));
+        }
 
-        assertEquals(test71540charsExpectedSingleWhitespace, normaliseWhitespace(test71540chars));
-        String extractedText = Jsoup.parse(test71540chars).text();
-        assertEquals(test71540charsExpectedSingleWhitespace, extractedText);
-    }
+        @ParameterizedTest(name = "isAsciiLetter returns true for ''{0}''")
+        @ValueSource(chars = {'a', 'n', 'z', 'A', 'N', 'Z'})
+        @DisplayName("isAsciiLetter true cases")
+        void isAsciiLetterTrue(char c) {
+            assertTrue(StringUtil.isAsciiLetter(c));
+        }
 
-    @Test public void resolvesRelativeUrls() {
-        assertEquals("http://example.com/one/two?three", resolve("http://example.com", "./one/two?three"));
-        assertEquals("http://example.com/one/two?three", resolve("http://example.com?one", "./one/two?three"));
-        assertEquals("http://example.com/one/two?three#four", resolve("http://example.com", "./one/two?three#four"));
-        assertEquals("https://example.com/one", resolve("http://example.com/", "https://example.com/one"));
-        assertEquals("http://example.com/one/two.html", resolve("http://example.com/two/", "../one/two.html"));
-        assertEquals("https://example2.com/one", resolve("https://example.com/", "//example2.com/one"));
-        assertEquals("https://example.com:8080/one", resolve("https://example.com:8080", "./one"));
-        assertEquals("https://example2.com/one", resolve("http://example.com/", "https://example2.com/one"));
-        assertEquals("https://example.com/one", resolve("wrong", "https://example.com/one"));
-        assertEquals("https://example.com/one", resolve("https://example.com/one", ""));
-        assertEquals("", resolve("wrong", "also wrong"));
-        assertEquals("ftp://example.com/one", resolve("ftp://example.com/two/", "../one"));
-        assertEquals("ftp://example.com/one/two.c", resolve("ftp://example.com/one/", "./two.c"));
-        assertEquals("ftp://example.com/one/two.c", resolve("ftp://example.com/one/", "two.c"));
-        // examples taken from rfc3986 section 5.4.2
-        assertEquals("http://example.com/g", resolve("http://example.com/b/c/d;p?q", "../../../g"));
-        assertEquals("http://example.com/g", resolve("http://example.com/b/c/d;p?q", "../../../../g"));
-        assertEquals("http://example.com/g", resolve("http://example.com/b/c/d;p?q", "/./g"));
-        assertEquals("http://example.com/g", resolve("http://example.com/b/c/d;p?q", "/../g"));
-        assertEquals("http://example.com/b/c/g.", resolve("http://example.com/b/c/d;p?q", "g."));
-        assertEquals("http://example.com/b/c/.g", resolve("http://example.com/b/c/d;p?q", ".g"));
-        assertEquals("http://example.com/b/c/g..", resolve("http://example.com/b/c/d;p?q", "g.."));
-        assertEquals("http://example.com/b/c/..g", resolve("http://example.com/b/c/d;p?q", "..g"));
-        assertEquals("http://example.com/b/g", resolve("http://example.com/b/c/d;p?q", "./../g"));
-        assertEquals("http://example.com/b/c/g/", resolve("http://example.com/b/c/d;p?q", "./g/."));
-        assertEquals("http://example.com/b/c/g/h", resolve("http://example.com/b/c/d;p?q", "g/./h"));
-        assertEquals("http://example.com/b/c/h", resolve("http://example.com/b/c/d;p?q", "g/../h"));
-        assertEquals("http://example.com/b/c/g;x=1/y", resolve("http://example.com/b/c/d;p?q", "g;x=1/./y"));
-        assertEquals("http://example.com/b/c/y", resolve("http://example.com/b/c/d;p?q", "g;x=1/../y"));
-        assertEquals("http://example.com/b/c/g?y/./x", resolve("http://example.com/b/c/d;p?q", "g?y/./x"));
-        assertEquals("http://example.com/b/c/g?y/../x", resolve("http://example.com/b/c/d;p?q", "g?y/../x"));
-        assertEquals("http://example.com/b/c/g#s/./x", resolve("http://example.com/b/c/d;p?q", "g#s/./x"));
-        assertEquals("http://example.com/b/c/g#s/../x", resolve("http://example.com/b/c/d;p?q", "g#s/../x"));
-    }
+        @ParameterizedTest(name = "isAsciiLetter returns false for ''{0}''")
+        @ValueSource(chars = {' ', '-', '0', 'ß', 'Ě'})
+        @DisplayName("isAsciiLetter false cases")
+        void isAsciiLetterFalse(char c) {
+            assertFalse(StringUtil.isAsciiLetter(c));
+        }
 
-    @Test void stripsControlCharsFromUrls() {
-        // should resovle to an absolute url:
-        assertEquals("foo:bar", resolve("\nhttps://\texample.com/", "\r\nfo\to:ba\br"));
-    }
+        @ParameterizedTest(name = "isDigit returns true for ''{0}''")
+        @ValueSource(chars = {'0','1','2','3','4','5','6','7','8','9'})
+        @DisplayName("isDigit true cases")
+        void isDigitTrue(char c) {
+            assertTrue(StringUtil.isDigit(c));
+        }
 
-    @Test void allowsSpaceInUrl() {
-        assertEquals("https://example.com/foo bar/", resolve("HTTPS://example.com/example/", "../foo bar/"));
-    }
+        @ParameterizedTest(name = "isDigit returns false for ''{0}''")
+        @ValueSource(chars = {'a','A','ä','Ä','\u0661','\u0B73'})
+        @DisplayName("isDigit false cases (letters, diacritics, non-ASCII digits)")
+        void isDigitFalse(char c) {
+            assertFalse(StringUtil.isDigit(c));
+        }
 
-    @Test
-    void isAscii() {
-        assertTrue(StringUtil.isAscii(""));
-        assertTrue(StringUtil.isAscii("example.com"));
-        assertTrue(StringUtil.isAscii("One Two"));
-        assertFalse(StringUtil.isAscii("🧔"));
-        assertFalse(StringUtil.isAscii("测试"));
-        assertFalse(StringUtil.isAscii("测试.com"));
-    }
+        @ParameterizedTest(name = "isHexDigit returns true for ''{0}''")
+        @ValueSource(chars = {
+            '0','1','2','3','4','5','6','7','8','9',
+            'a','b','c','d','e','f',
+            'A','B','C','D','E','F'
+        })
+        @DisplayName("isHexDigit true cases")
+        void isHexDigitTrue(char c) {
+            assertTrue(StringUtil.isHexDigit(c));
+        }
 
-    @Test void isAsciiLetter() {
-        assertTrue(StringUtil.isAsciiLetter('a'));
-        assertTrue(StringUtil.isAsciiLetter('n'));
-        assertTrue(StringUtil.isAsciiLetter('z'));
-        assertTrue(StringUtil.isAsciiLetter('A'));
-        assertTrue(StringUtil.isAsciiLetter('N'));
-        assertTrue(StringUtil.isAsciiLetter('Z'));
-
-        assertFalse(StringUtil.isAsciiLetter(' '));
-        assertFalse(StringUtil.isAsciiLetter('-'));
-        assertFalse(StringUtil.isAsciiLetter('0'));
-        assertFalse(StringUtil.isAsciiLetter('ß'));
-        assertFalse(StringUtil.isAsciiLetter('Ě'));
-    }
-
-    @Test void isDigit() {
-        assertTrue(StringUtil.isDigit('0'));
-        assertTrue(StringUtil.isDigit('1'));
-        assertTrue(StringUtil.isDigit('2'));
-        assertTrue(StringUtil.isDigit('3'));
-        assertTrue(StringUtil.isDigit('4'));
-        assertTrue(StringUtil.isDigit('5'));
-        assertTrue(StringUtil.isDigit('6'));
-        assertTrue(StringUtil.isDigit('7'));
-        assertTrue(StringUtil.isDigit('8'));
-        assertTrue(StringUtil.isDigit('9'));
-
-        assertFalse(StringUtil.isDigit('a'));
-        assertFalse(StringUtil.isDigit('A'));
-        assertFalse(StringUtil.isDigit('ä'));
-        assertFalse(StringUtil.isDigit('Ä'));
-        assertFalse(StringUtil.isDigit('١'));
-        assertFalse(StringUtil.isDigit('୳'));
-    }
-
-    @Test void isHexDigit() {
-        assertTrue(StringUtil.isHexDigit('0'));
-        assertTrue(StringUtil.isHexDigit('1'));
-        assertTrue(StringUtil.isHexDigit('2'));
-        assertTrue(StringUtil.isHexDigit('3'));
-        assertTrue(StringUtil.isHexDigit('4'));
-        assertTrue(StringUtil.isHexDigit('5'));
-        assertTrue(StringUtil.isHexDigit('6'));
-        assertTrue(StringUtil.isHexDigit('7'));
-        assertTrue(StringUtil.isHexDigit('8'));
-        assertTrue(StringUtil.isHexDigit('9'));
-        assertTrue(StringUtil.isHexDigit('a'));
-        assertTrue(StringUtil.isHexDigit('b'));
-        assertTrue(StringUtil.isHexDigit('c'));
-        assertTrue(StringUtil.isHexDigit('d'));
-        assertTrue(StringUtil.isHexDigit('e'));
-        assertTrue(StringUtil.isHexDigit('f'));
-        assertTrue(StringUtil.isHexDigit('A'));
-        assertTrue(StringUtil.isHexDigit('B'));
-        assertTrue(StringUtil.isHexDigit('C'));
-        assertTrue(StringUtil.isHexDigit('D'));
-        assertTrue(StringUtil.isHexDigit('E'));
-        assertTrue(StringUtil.isHexDigit('F'));
-
-        assertFalse(StringUtil.isHexDigit('g'));
-        assertFalse(StringUtil.isHexDigit('G'));
-        assertFalse(StringUtil.isHexDigit('ä'));
-        assertFalse(StringUtil.isHexDigit('Ä'));
-        assertFalse(StringUtil.isHexDigit('١'));
-        assertFalse(StringUtil.isHexDigit('୳'));
+        @ParameterizedTest(name = "isHexDigit returns false for ''{0}''")
+        @ValueSource(chars = {'g','G','ä','Ä','\u0661','\u0B73'})
+        @DisplayName("isHexDigit false cases")
+        void isHexDigitFalse(char c) {
+            assertFalse(StringUtil.isHexDigit(c));
+        }
     }
 }
