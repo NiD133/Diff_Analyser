@@ -31,6 +31,7 @@ import org.apache.commons.collections4.Bag;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.collection.AbstractCollectionTest;
 import org.apache.commons.collections4.functors.NonePredicate;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -79,53 +80,68 @@ public class CollectionBagTest<T> extends AbstractCollectionTest<T> {
     }
 
     @Test
-    void testAdd_Predicate_ComparatorCustom() throws Throwable {
-        final TreeBag<Predicate<Object>> treeBagOfPredicateOfObject = new TreeBag<>(Comparator.comparing(Predicate::toString));
-        final CollectionBag<Predicate<Object>> collectionBagOfPredicateOfObject = new CollectionBag<>(treeBagOfPredicateOfObject);
-        collectionBagOfPredicateOfObject.add(NonePredicate.nonePredicate(collectionBagOfPredicateOfObject), 24);
+    @DisplayName("add() should succeed for a non-comparable element when the decorated bag uses a custom comparator")
+    void add_shouldSucceed_forNonComparableElementWithCustomComparator() {
+        // Arrange
+        // A TreeBag requires elements to be Comparable or have a Comparator. Predicate is not Comparable.
+        final TreeBag<Predicate<Object>> decoratedBag = new TreeBag<>(Comparator.comparing(Object::toString));
+        final Bag<Predicate<Object>> collectionBag = CollectionBag.collectionBag(decoratedBag);
+        final Predicate<Object> predicate = NonePredicate.nonePredicate(collectionBag);
+        final int copiesToAdd = 24;
+
+        // Act
+        collectionBag.add(predicate, copiesToAdd);
+
+        // Assert
+        assertEquals(copiesToAdd, collectionBag.getCount(predicate),
+                "The bag should contain the correct number of copies of the added element.");
     }
 
     @Test
-    void testAdd_Predicate_ComparatorDefault() throws Throwable {
-        final TreeBag<Predicate<Object>> treeBagOfPredicateOfObject = new TreeBag<>();
-        final CollectionBag<Predicate<Object>> collectionBagOfPredicateOfObject = new CollectionBag<>(treeBagOfPredicateOfObject);
-        assertThrows(ClassCastException.class, () -> collectionBagOfPredicateOfObject.add(NonePredicate.nonePredicate(collectionBagOfPredicateOfObject), 24));
+    @DisplayName("add() should throw ClassCastException for a non-comparable element when the decorated bag uses natural ordering")
+    void add_shouldThrowException_forNonComparableElementWithDefaultComparator() {
+        // Arrange
+        // A TreeBag without a comparator uses natural ordering, which will fail for Predicate.
+        final TreeBag<Predicate<Object>> decoratedBag = new TreeBag<>();
+        final Bag<Predicate<Object>> collectionBag = CollectionBag.collectionBag(decoratedBag);
+        final Predicate<Object> predicate = NonePredicate.nonePredicate(collectionBag);
+
+        // Act & Assert
+        assertThrows(ClassCastException.class, () -> collectionBag.add(predicate, 24),
+                "Should not be able to add a non-comparable element to a TreeBag without a suitable comparator.");
     }
 
-//    void testCreate() throws Exception {
-//        resetEmpty();
-//        writeExternalFormToDisk((java.io.Serializable) getCollection(), "src/test/resources/data/test/CollectionBag.emptyCollection.version4.obj");
-//        resetFull();
-//        writeExternalFormToDisk((java.io.Serializable) getCollection(), "src/test/resources/data/test/CollectionBag.fullCollection.version4.obj");
-//    }
-
-    /**
-     * Compares the current serialized form of the Bag
-     * against the canonical version in SCM.
-     */
     @Test
-    void testEmptyBagCompatibility() throws IOException, ClassNotFoundException {
-        // test to make sure the canonical form has been preserved
+    @DisplayName("Serialization of an empty bag should be compatible with the canonical form")
+    void testEmptyBagSerializationCompatibility() throws IOException, ClassNotFoundException {
+        // Arrange
         final Bag<T> bag = makeObject();
+
+        // This test is only performed on platforms that support serialization
         if (bag instanceof Serializable && !skipSerializedCanonicalTests() && isTestSerialization()) {
-            final Bag<?> bag2 = (Bag<?>) readExternalFormFromDisk(getCanonicalEmptyCollectionName(bag));
-            assertTrue(bag2.isEmpty(), "Bag is empty");
-            assertEquals(bag, bag2);
+            // Act
+            final Bag<?> deserializedBag = (Bag<?>) readExternalFormFromDisk(getCanonicalEmptyCollectionName(bag));
+
+            // Assert
+            assertTrue(deserializedBag.isEmpty(), "Deserialized bag should be empty");
+            assertEquals(bag, deserializedBag, "Deserialized bag should equal a new empty bag");
         }
     }
 
-    /**
-     * Compares the current serialized form of the Bag
-     * against the canonical version in SCM.
-     */
     @Test
-    void testFullBagCompatibility() throws IOException, ClassNotFoundException {
-        // test to make sure the canonical form has been preserved
-        final Bag<T> bag = (Bag<T>) makeFullCollection();
+    @DisplayName("Serialization of a full bag should be compatible with the canonical form")
+    void testFullBagSerializationCompatibility() throws IOException, ClassNotFoundException {
+        // Arrange
+        final Bag<T> bag = makeFullCollection();
+
+        // This test is only performed on platforms that support serialization
         if (bag instanceof Serializable && !skipSerializedCanonicalTests() && isTestSerialization()) {
-            final Bag<?> bag2 = (Bag<?>) readExternalFormFromDisk(getCanonicalFullCollectionName(bag));
-            assertEquals(bag.size(), bag2.size(), "Bag is the right size");
-            assertEquals(bag, bag2);
+            // Act
+            final Bag<?> deserializedBag = (Bag<?>) readExternalFormFromDisk(getCanonicalFullCollectionName(bag));
+
+            // Assert
+            assertEquals(bag.size(), deserializedBag.size(), "Deserialized bag should have the same size");
+            assertEquals(bag, deserializedBag, "Deserialized bag should equal a new full bag");
         }
     }
 }
