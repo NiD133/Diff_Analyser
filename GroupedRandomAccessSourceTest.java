@@ -43,196 +43,147 @@
 package com.itextpdf.text.io;
 
 import java.io.ByteArrayOutputStream;
+
+import junit.framework.Assert;
+import junit.framework.AssertionFailedError;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-
 public class GroupedRandomAccessSourceTest {
-    private static final int DATA_SIZE = 100;
-    private byte[] data;
+	byte[] data;
+	
+	@Before
+	public void setUp() throws Exception {
+		
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		for (int i = 0; i < 100; i++){
+			baos.write((byte)i);
+		}
+		
+		data = baos.toByteArray();
+	}
 
-    @Before
-    public void setUp() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        for (int i = 0; i < DATA_SIZE; i++) {
-            baos.write((byte) i);
-        }
-        data = baos.toByteArray();
-    }
+	@After
+	public void tearDown() throws Exception {
+	}
 
-    @Test
-    public void totalLengthShouldBeSumOfAllSources() throws Exception {
-        try (GroupedRandomAccessSource groupedSource = createGroupedSource(3)) {
-            long expectedTotalLength = 3 * data.length;
-            assertEquals(expectedTotalLength, groupedSource.length());
-        }
-    }
 
-    @Test
-    public void getByte_shouldReadFromFirstSource() throws Exception {
-        try (GroupedRandomAccessSource groupedSource = createGroupedSource(3)) {
-            // Last byte of first source (index 99)
-            byte expected = data[DATA_SIZE - 1];
-            assertEquals(expected, groupedSource.get(DATA_SIZE - 1));
-        }
-    }
+	@Test
+	public void testGet() throws Exception {
+		ArrayRandomAccessSource source1 = new ArrayRandomAccessSource(data);
+		ArrayRandomAccessSource source2 = new ArrayRandomAccessSource(data);
+		ArrayRandomAccessSource source3 = new ArrayRandomAccessSource(data);
+		
+		RandomAccessSource[] inputs = new RandomAccessSource[]{
+				source1, source2, source3
+		};
+		
+		GroupedRandomAccessSource grouped = new GroupedRandomAccessSource(inputs);
+		
+		Assert.assertEquals(source1.length() + source2.length() + source3.length(), grouped.length());
 
-    @Test
-    public void getByte_shouldReadFromSecondSource() throws Exception {
-        try (GroupedRandomAccessSource groupedSource = createGroupedSource(3)) {
-            // First byte of second source (offset 100)
-            byte expected = data[0];
-            assertEquals(expected, groupedSource.get(DATA_SIZE));
-        }
-    }
+		Assert.assertEquals(source1.get(99),  grouped.get(99));
+		Assert.assertEquals(source2.get(0),  grouped.get(100));
+		Assert.assertEquals(source2.get(1),  grouped.get(101));
+		Assert.assertEquals(source1.get(99),  grouped.get(99));
+		Assert.assertEquals(source3.get(99),  grouped.get(299));
 
-    @Test
-    public void getByte_shouldReadFromThirdSource() throws Exception {
-        try (GroupedRandomAccessSource groupedSource = createGroupedSource(3)) {
-            // Last byte of third source (offset 299)
-            byte expected = data[DATA_SIZE - 1];
-            assertEquals(expected, groupedSource.get(3 * DATA_SIZE - 1));
-        }
-    }
+		Assert.assertEquals(-1, grouped.get(300));
+	}
 
-    @Test
-    public void getByte_shouldReturnMinusOneAfterLastByte() throws Exception {
-        try (GroupedRandomAccessSource groupedSource = createGroupedSource(3)) {
-            assertEquals(-1, groupedSource.get(3 * DATA_SIZE));
-        }
-    }
+	private byte[] rangeArray(int start, int count){
+		byte[] rslt = new byte[count];
+		for(int i = 0; i < count; i++){
+			rslt[i] = (byte)(i + start);
+		}
+		return rslt;
+	}
+	
+	private void assertArrayEqual(byte[] a, int offa, byte[] b, int offb, int len){
+		for(int i = 0; i < len; i++){
+			if (a[i+offa] != b[i + offb]){
+				throw new AssertionFailedError("Differ at index " + (i+offa) + " and " + (i + offb) + " -> " + a[i+offa] + " != " + b[i + offb]);
+			}
+			
+		}
+	}
+	
+	@Test
+	public void testGetArray() throws Exception {
+		ArrayRandomAccessSource source1 = new ArrayRandomAccessSource(data); // 0 - 99
+		ArrayRandomAccessSource source2 = new ArrayRandomAccessSource(data); // 100 - 199
+		ArrayRandomAccessSource source3 = new ArrayRandomAccessSource(data); // 200 - 299
+		
+		RandomAccessSource[] inputs = new RandomAccessSource[]{
+				source1, source2, source3
+		};
+		
+		GroupedRandomAccessSource grouped = new GroupedRandomAccessSource(inputs);
 
-    @Test
-    public void getArray_shouldReadFullRangeAcrossSources() throws Exception {
-        try (GroupedRandomAccessSource groupedSource = createGroupedSource(3)) {
-            byte[] output = new byte[3 * DATA_SIZE];
-            
-            int bytesRead = groupedSource.get(0, output, 0, 3 * DATA_SIZE);
-            
-            assertEquals(3 * DATA_SIZE, bytesRead);
-            assertArrayEquals(rangeArray(0, DATA_SIZE), 0, output, 0, DATA_SIZE);
-            assertArrayEquals(rangeArray(0, DATA_SIZE), 0, output, DATA_SIZE, DATA_SIZE);
-            assertArrayEquals(rangeArray(0, DATA_SIZE), 0, output, 2 * DATA_SIZE, DATA_SIZE);
-        }
-    }
+		byte[] out = new byte[500];
 
-    @Test
-    public void getArray_withLengthBeyondTotalSize_shouldReadUpToEnd() throws Exception {
-        try (GroupedRandomAccessSource groupedSource = createGroupedSource(3)) {
-            byte[] output = new byte[3 * DATA_SIZE + 10];
-            
-            int bytesRead = groupedSource.get(0, output, 0, 3 * DATA_SIZE + 10);
-            
-            assertEquals(3 * DATA_SIZE, bytesRead);
-            assertArrayEquals(rangeArray(0, DATA_SIZE), 0, output, 0, DATA_SIZE);
-            assertArrayEquals(rangeArray(0, DATA_SIZE), 0, output, DATA_SIZE, DATA_SIZE);
-            assertArrayEquals(rangeArray(0, DATA_SIZE), 0, output, 2 * DATA_SIZE, DATA_SIZE);
-        }
-    }
+		Assert.assertEquals(300, grouped.get(0, out, 0, 300));
+		assertArrayEqual(rangeArray(0, 100), 0, out, 0, 100);
+		assertArrayEqual(rangeArray(0, 100), 0, out, 100, 100);
+		assertArrayEqual(rangeArray(0, 100), 0, out, 200, 100);
+		
+		Assert.assertEquals(300, grouped.get(0, out, 0, 301));
+		assertArrayEqual(rangeArray(0, 100), 0, out, 0, 100);
+		assertArrayEqual(rangeArray(0, 100), 0, out, 100, 100);
+		assertArrayEqual(rangeArray(0, 100), 0, out, 200, 100);
+		
+		Assert.assertEquals(100, grouped.get(150, out, 0, 100));
+		assertArrayEqual(rangeArray(50, 50), 0, out, 0, 50);
+		assertArrayEqual(rangeArray(0, 50), 0, out, 50, 50);
+	}
+	
+	@Test
+	public void testRelease() throws Exception{
+		
+		ArrayRandomAccessSource source1 = new ArrayRandomAccessSource(data); // 0 - 99
+		ArrayRandomAccessSource source2 = new ArrayRandomAccessSource(data); // 100 - 199
+		ArrayRandomAccessSource source3 = new ArrayRandomAccessSource(data); // 200 - 299
+		
+		RandomAccessSource[] sources = new RandomAccessSource[]{
+				source1, source2, source3
+		};
+		
+		final RandomAccessSource[] current = new RandomAccessSource[]{null};
+		final int[] openCount = new int[]{0};
+		GroupedRandomAccessSource grouped = new GroupedRandomAccessSource(sources){
+			protected void sourceReleased(RandomAccessSource source) throws java.io.IOException {
+				openCount[0]--;
+				if (current[0] != source)
+					throw new AssertionFailedError("Released source isn't the current source");
+				current[0] = null;
+			}
+			
+			protected void sourceInUse(RandomAccessSource source) throws java.io.IOException {
+				if (current[0] != null)
+					throw new AssertionFailedError("Current source wasn't released properly");
+				openCount[0]++;
+				current[0] = source;
+			}
+		};
 
-    @Test
-    public void getArray_spanningTwoSources_shouldReadCorrectly() throws Exception {
-        try (GroupedRandomAccessSource groupedSource = createGroupedSource(3)) {
-            byte[] output = new byte[DATA_SIZE];
-            int startOffset = DATA_SIZE - 50; // Start in first source, end in second
-            
-            int bytesRead = groupedSource.get(startOffset, output, 0, DATA_SIZE);
-            
-            assertEquals(DATA_SIZE, bytesRead);
-            // First 50 bytes from end of first source
-            assertArrayEquals(rangeArray(50, 50), 0, output, 0, 50);
-            // Next 50 bytes from beginning of second source
-            assertArrayEquals(rangeArray(0, 50), 0, output, 50, 50);
-        }
-    }
+		grouped.get(250);
+		grouped.get(251);
+		Assert.assertEquals(1, openCount[0]);
+		grouped.get(150);
+		grouped.get(151);
+		Assert.assertEquals(1, openCount[0]);
+		grouped.get(50);
+		grouped.get(51);
+		Assert.assertEquals(1, openCount[0]);
+		grouped.get(150);
+		grouped.get(151);
+		Assert.assertEquals(1, openCount[0]);
+		grouped.get(250);
+		grouped.get(251);
+		Assert.assertEquals(1, openCount[0]);
 
-    @Test
-    public void sourceManagement_shouldOnlyKeepOneSourceOpen() throws Exception {
-        // Create tracking variables
-        final int[] openCount = {0};
-        final RandomAccessSource[] currentSource = {null};
-        
-        // Create grouped source with tracking
-        GroupedRandomAccessSource groupedSource = createTrackingGroupedSource(3, openCount, currentSource);
-        
-        try {
-            // Access different sources sequentially
-            groupedSource.get(250);  // Third source
-            groupedSource.get(251);
-            assertEquals(1, openCount[0]);
-            
-            groupedSource.get(150);  // Second source
-            groupedSource.get(151);
-            assertEquals(1, openCount[0]);
-            
-            groupedSource.get(50);   // First source
-            groupedSource.get(51);
-            assertEquals(1, openCount[0]);
-            
-            groupedSource.get(150);   // Back to second source
-            groupedSource.get(151);
-            assertEquals(1, openCount[0]);
-            
-            groupedSource.get(250);   // Back to third source
-            groupedSource.get(251);
-            assertEquals(1, openCount[0]);
-        } finally {
-            groupedSource.close();
-        }
-    }
-
-    private GroupedRandomAccessSource createGroupedSource(int numberOfSources) throws IOException {
-        RandomAccessSource[] sources = new RandomAccessSource[numberOfSources];
-        for (int i = 0; i < numberOfSources; i++) {
-            sources[i] = new ArrayRandomAccessSource(data);
-        }
-        return new GroupedRandomAccessSource(sources);
-    }
-
-    private GroupedRandomAccessSource createTrackingGroupedSource(int numberOfSources, 
-            final int[] openCount, final RandomAccessSource[] currentSource) throws IOException {
-        RandomAccessSource[] sources = new RandomAccessSource[numberOfSources];
-        for (int i = 0; i < numberOfSources; i++) {
-            sources[i] = new ArrayRandomAccessSource(data);
-        }
-        
-        return new GroupedRandomAccessSource(sources) {
-            @Override
-            protected void sourceReleased(RandomAccessSource source) throws IOException {
-                openCount[0]--;
-                if (currentSource[0] != source) {
-                    throw new AssertionError("Released source isn't the current source");
-                }
-                currentSource[0] = null;
-            }
-            
-            @Override
-            protected void sourceInUse(RandomAccessSource source) throws IOException {
-                if (currentSource[0] != null) {
-                    throw new AssertionError("Current source wasn't released properly");
-                }
-                openCount[0]++;
-                currentSource[0] = source;
-            }
-        };
-    }
-
-    private byte[] rangeArray(int start, int count) {
-        byte[] result = new byte[count];
-        for (int i = 0; i < count; i++) {
-            result[i] = (byte) (i + start);
-        }
-        return result;
-    }
-
-    private void assertArrayEqual(byte[] expected, int expectedOffset, 
-                                 byte[] actual, int actualOffset, int length) {
-        byte[] expectedSegment = new byte[length];
-        byte[] actualSegment = new byte[length];
-        System.arraycopy(expected, expectedOffset, expectedSegment, 0, length);
-        System.arraycopy(actual, actualOffset, actualSegment, 0, length);
-        assertArrayEquals(expectedSegment, actualSegment);
-    }
+		grouped.close();
+	}
 }
