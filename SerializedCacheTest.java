@@ -24,44 +24,72 @@ import java.util.Objects;
 
 import org.apache.ibatis.cache.decorators.SerializedCache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+@DisplayName("SerializedCache Test")
 class SerializedCacheTest {
 
+  private static final String DEFAULT_CACHE_ID = "default";
+  private static final int ITEM_COUNT = 5;
+
+  private SerializedCache cache;
+
+  @BeforeEach
+  void setUp() {
+    PerpetualCache perpetualCache = new PerpetualCache(DEFAULT_CACHE_ID);
+    cache = new SerializedCache(perpetualCache);
+  }
+
   @Test
-  void shouldDemonstrateSerializedObjectAreEqual() {
-    SerializedCache cache = new SerializedCache(new PerpetualCache("default"));
-    for (int i = 0; i < 5; i++) {
-      cache.putObject(i, new CachingObject(i));
+  @DisplayName("Should correctly store and retrieve serializable objects")
+  void shouldStoreAndRetrieveSerializableObject() {
+    // Arrange: Put several serializable objects into the cache.
+    for (int i = 0; i < ITEM_COUNT; i++) {
+      cache.putObject(i, new SerializableObject(i));
     }
-    for (int i = 0; i < 5; i++) {
-      assertEquals(new CachingObject(i), cache.getObject(i));
+
+    // Act & Assert: Retrieve each object and verify it's equal to the original.
+    for (int i = 0; i < ITEM_COUNT; i++) {
+      Object retrievedObject = cache.getObject(i);
+      assertEquals(new SerializableObject(i), retrievedObject);
     }
   }
 
   @Test
-  void shouldDemonstrateNullsAreSerializable() {
-    SerializedCache cache = new SerializedCache(new PerpetualCache("default"));
-    for (int i = 0; i < 5; i++) {
+  @DisplayName("Should correctly store and retrieve null values")
+  void shouldStoreAndRetrieveNullValue() {
+    // Arrange: Put several null values into the cache.
+    for (int i = 0; i < ITEM_COUNT; i++) {
       cache.putObject(i, null);
     }
-    for (int i = 0; i < 5; i++) {
-      assertNull(cache.getObject(i));
+
+    // Act & Assert: Retrieve each entry and verify it is null.
+    for (int i = 0; i < ITEM_COUNT; i++) {
+      Object retrievedObject = cache.getObject(i);
+      assertNull(retrievedObject);
     }
   }
 
   @Test
-  void throwExceptionWhenTryingToCacheNonSerializableObject() {
-    SerializedCache cache = new SerializedCache(new PerpetualCache("default"));
-    assertThrows(CacheException.class, () -> cache.putObject(0, new CachingObjectWithoutSerializable(0)));
+  @DisplayName("Should throw CacheException when caching a non-serializable object")
+  void shouldThrowCacheExceptionWhenPuttingNonSerializableObject() {
+    // Arrange
+    Object nonSerializableObject = new NonSerializableObject(0);
+    int key = 0;
+
+    // Act & Assert
+    assertThrows(CacheException.class, () -> cache.putObject(key, nonSerializableObject),
+        "Should throw CacheException for non-serializable objects");
   }
 
-  static class CachingObject implements Serializable {
+  private static class SerializableObject implements Serializable {
     private static final long serialVersionUID = 1L;
-    int x;
+    private final int value;
 
-    public CachingObject(int x) {
-      this.x = x;
+    public SerializableObject(int value) {
+      this.value = value;
     }
 
     @Override
@@ -72,21 +100,21 @@ class SerializedCacheTest {
       if (o == null || getClass() != o.getClass()) {
         return false;
       }
-      CachingObject obj = (CachingObject) o;
-      return x == obj.x;
+      SerializableObject that = (SerializableObject) o;
+      return value == that.value;
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(x);
+      return Objects.hash(value);
     }
   }
 
-  static class CachingObjectWithoutSerializable {
-    int x;
+  private static class NonSerializableObject {
+    private final int value;
 
-    public CachingObjectWithoutSerializable(int x) {
-      this.x = x;
+    public NonSerializableObject(int value) {
+      this.value = value;
     }
 
     @Override
@@ -97,13 +125,13 @@ class SerializedCacheTest {
       if (o == null || getClass() != o.getClass()) {
         return false;
       }
-      CachingObjectWithoutSerializable obj = (CachingObjectWithoutSerializable) o;
-      return x == obj.x;
+      NonSerializableObject that = (NonSerializableObject) o;
+      return value == that.value;
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(x);
+      return Objects.hash(value);
     }
   }
 }
