@@ -31,85 +31,144 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for LogFactory to verify that different logging implementations
+ * can be configured and used correctly.
+ */
 class LogFactoryTest {
 
+  private static final Class<?> TEST_LOGGER_CLASS = Object.class;
+  private static final String CONFIG_FILE_PATH = "org/apache/ibatis/logging/mybatis-config.xml";
+
   @AfterAll
-  static void restore() {
+  static void restoreDefaultLoggingConfiguration() {
+    // Reset to default SLF4J logging after all tests complete
     LogFactory.useSlf4jLogging();
   }
 
   @Test
-  void shouldUseCommonsLogging() {
+  void shouldConfigureCommonsLoggingImplementation() {
+    // Given: LogFactory is configured to use Commons Logging
     LogFactory.useCommonsLogging();
-    Log log = LogFactory.getLog(Object.class);
-    logSomething(log);
-    assertEquals(log.getClass().getName(), JakartaCommonsLoggingImpl.class.getName());
+    
+    // When: A logger is created
+    Log logger = LogFactory.getLog(TEST_LOGGER_CLASS);
+    
+    // Then: The logger should be a Commons Logging implementation
+    verifyLoggerFunctionality(logger);
+    assertLoggerImplementation(logger, JakartaCommonsLoggingImpl.class);
   }
 
   @Test
-  void shouldUseLog4J() {
+  void shouldConfigureLog4JImplementation() {
+    // Given: LogFactory is configured to use Log4J
     LogFactory.useLog4JLogging();
-    Log log = LogFactory.getLog(Object.class);
-    logSomething(log);
-    assertEquals(log.getClass().getName(), Log4jImpl.class.getName());
+    
+    // When: A logger is created
+    Log logger = LogFactory.getLog(TEST_LOGGER_CLASS);
+    
+    // Then: The logger should be a Log4J implementation
+    verifyLoggerFunctionality(logger);
+    assertLoggerImplementation(logger, Log4jImpl.class);
   }
 
   @Test
-  void shouldUseLog4J2() {
+  void shouldConfigureLog4J2Implementation() {
+    // Given: LogFactory is configured to use Log4J2
     LogFactory.useLog4J2Logging();
-    Log log = LogFactory.getLog(Object.class);
-    logSomething(log);
-    assertEquals(log.getClass().getName(), Log4j2Impl.class.getName());
+    
+    // When: A logger is created
+    Log logger = LogFactory.getLog(TEST_LOGGER_CLASS);
+    
+    // Then: The logger should be a Log4J2 implementation
+    verifyLoggerFunctionality(logger);
+    assertLoggerImplementation(logger, Log4j2Impl.class);
   }
 
   @Test
-  void shouldUseJdKLogging() {
+  void shouldConfigureJdkLoggingImplementation() {
+    // Given: LogFactory is configured to use JDK logging
     LogFactory.useJdkLogging();
-    Log log = LogFactory.getLog(Object.class);
-    logSomething(log);
-    assertEquals(log.getClass().getName(), Jdk14LoggingImpl.class.getName());
+    
+    // When: A logger is created
+    Log logger = LogFactory.getLog(TEST_LOGGER_CLASS);
+    
+    // Then: The logger should be a JDK logging implementation
+    verifyLoggerFunctionality(logger);
+    assertLoggerImplementation(logger, Jdk14LoggingImpl.class);
   }
 
   @Test
-  void shouldUseSlf4j() {
+  void shouldConfigureSlf4jImplementation() {
+    // Given: LogFactory is configured to use SLF4J
     LogFactory.useSlf4jLogging();
-    Log log = LogFactory.getLog(Object.class);
-    logSomething(log);
-    assertEquals(log.getClass().getName(), Slf4jImpl.class.getName());
+    
+    // When: A logger is created
+    Log logger = LogFactory.getLog(TEST_LOGGER_CLASS);
+    
+    // Then: The logger should be an SLF4J implementation
+    verifyLoggerFunctionality(logger);
+    assertLoggerImplementation(logger, Slf4jImpl.class);
   }
 
   @Test
-  void shouldUseStdOut() {
+  void shouldConfigureStdOutImplementation() {
+    // Given: LogFactory is configured to use standard output logging
     LogFactory.useStdOutLogging();
-    Log log = LogFactory.getLog(Object.class);
-    logSomething(log);
-    assertEquals(log.getClass().getName(), StdOutImpl.class.getName());
+    
+    // When: A logger is created
+    Log logger = LogFactory.getLog(TEST_LOGGER_CLASS);
+    
+    // Then: The logger should be a standard output implementation
+    verifyLoggerFunctionality(logger);
+    assertLoggerImplementation(logger, StdOutImpl.class);
   }
 
   @Test
-  void shouldUseNoLogging() {
+  void shouldConfigureNoLoggingImplementation() {
+    // Given: LogFactory is configured to disable logging
     LogFactory.useNoLogging();
-    Log log = LogFactory.getLog(Object.class);
-    logSomething(log);
-    assertEquals(log.getClass().getName(), NoLoggingImpl.class.getName());
+    
+    // When: A logger is created
+    Log logger = LogFactory.getLog(TEST_LOGGER_CLASS);
+    
+    // Then: The logger should be a no-logging implementation
+    verifyLoggerFunctionality(logger);
+    assertLoggerImplementation(logger, NoLoggingImpl.class);
   }
 
   @Test
-  void shouldReadLogImplFromSettings() throws Exception {
-    try (Reader reader = Resources.getResourceAsReader("org/apache/ibatis/logging/mybatis-config.xml")) {
-      new SqlSessionFactoryBuilder().build(reader);
+  void shouldReadLoggingImplementationFromConfigurationFile() throws Exception {
+    // Given: A MyBatis configuration file that specifies logging implementation
+    try (Reader configReader = Resources.getResourceAsReader(CONFIG_FILE_PATH)) {
+      // When: SqlSessionFactory is built from the configuration
+      new SqlSessionFactoryBuilder().build(configReader);
     }
 
-    Log log = LogFactory.getLog(Object.class);
-    log.debug("Debug message.");
-    assertEquals(log.getClass().getName(), NoLoggingImpl.class.getName());
+    // Then: LogFactory should use the implementation specified in the config file
+    Log logger = LogFactory.getLog(TEST_LOGGER_CLASS);
+    logger.debug("Debug message from configuration test.");
+    assertLoggerImplementation(logger, NoLoggingImpl.class);
   }
 
-  private void logSomething(Log log) {
-    log.warn("Warning message.");
-    log.debug("Debug message.");
-    log.error("Error message.");
-    log.error("Error with Exception.", new Exception("Test exception."));
+  /**
+   * Exercises the logger with different log levels to ensure it functions correctly.
+   * This helps verify that the logger implementation is working, not just instantiated.
+   */
+  private void verifyLoggerFunctionality(Log logger) {
+    logger.warn("Test warning message");
+    logger.debug("Test debug message");
+    logger.error("Test error message");
+    logger.error("Test error with exception", new Exception("Test exception for logging"));
   }
 
+  /**
+   * Asserts that the logger is of the expected implementation type.
+   */
+  private void assertLoggerImplementation(Log actualLogger, Class<?> expectedImplementationClass) {
+    assertEquals(expectedImplementationClass.getName(), actualLogger.getClass().getName(),
+        String.format("Expected logger implementation to be %s but was %s", 
+            expectedImplementationClass.getSimpleName(), 
+            actualLogger.getClass().getSimpleName()));
+  }
 }
