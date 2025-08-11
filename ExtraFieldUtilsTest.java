@@ -19,41 +19,38 @@
 
 package org.apache.commons.compress.archivers.zip;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Arrays;
 import java.util.zip.ZipException;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
- * JUnit tests for org.apache.commons.compress.archivers.zip.ExtraFieldUtils.
+ * JUnit tests for {@link org.apache.commons.compress.archivers.zip.ExtraFieldUtils}.
  */
+@DisplayName("ExtraFieldUtils Tests")
 class ExtraFieldUtilsTest implements UnixStat {
 
+    /**
+     * A test-only ZipExtraField implementation that throws an exception during parsing,
+     * simulating a corrupted or buggy field implementation.
+     */
     public static class AiobThrowingExtraField implements ZipExtraField {
         static final int LENGTH = 4;
-
-        @Override
-        public byte[] getCentralDirectoryData() {
-            return getLocalFileDataData();
-        }
-
-        @Override
-        public ZipShort getCentralDirectoryLength() {
-            return getLocalFileDataLength();
-        }
+        static final ZipShort HEADER_ID = new ZipShort(0x1000); // AIOB = ArrayIndexOutOfBounds
 
         @Override
         public ZipShort getHeaderId() {
-            return AIOB_HEADER;
-        }
-
-        @Override
-        public byte[] getLocalFileDataData() {
-            return new byte[LENGTH];
+            return HEADER_ID;
         }
 
         @Override
@@ -62,184 +59,204 @@ class ExtraFieldUtilsTest implements UnixStat {
         }
 
         @Override
-        public void parseFromCentralDirectoryData(final byte[] buffer, final int offset, final int length) {
-            parseFromLocalFileData(buffer, offset, length);
+        public ZipShort getCentralDirectoryLength() {
+            return getLocalFileDataLength();
+        }
+
+        @Override
+        public byte[] getLocalFileDataData() {
+            return new byte[LENGTH];
+        }
+
+        @Override
+        public byte[] getCentralDirectoryData() {
+            return getLocalFileDataData();
         }
 
         @Override
         public void parseFromLocalFileData(final byte[] buffer, final int offset, final int length) {
-            throw new ArrayIndexOutOfBoundsException();
+            throw new ArrayIndexOutOfBoundsException("Simulating a parsing error");
+        }
+
+        @Override
+        public void parseFromCentralDirectoryData(final byte[] buffer, final int offset, final int length) {
+            parseFromLocalFileData(buffer, offset, length);
         }
     }
 
-    /**
-     * Header-ID of a ZipExtraField not supported by Commons Compress.
-     *
-     * <p>
-     * Used to be ZipShort(1) but this is the ID of the Zip64 extra field.
-     * </p>
-     */
-    static final ZipShort UNRECOGNIZED_HEADER = new ZipShort(0x5555);
+    /** Header-ID of a ZipExtraField not supported by Commons Compress. */
+    private static final ZipShort UNRECOGNIZED_HEADER = new ZipShort(0x5555);
 
-    /**
-     * Header-ID of a ZipExtraField not supported by Commons Compress used for the ArrayIndexOutOfBoundsTest.
-     */
-    static final ZipShort AIOB_HEADER = new ZipShort(0x1000);
-    private AsiExtraField a;
-    private UnrecognizedExtraField dummy;
-    private byte[] data;
-
-    private byte[] aLocal;
+    private AsiExtraField asiField;
+    private UnrecognizedExtraField unrecognizedField;
 
     @BeforeEach
-    public void setUp() {
-        a = new AsiExtraField();
-        a.setMode(0755);
-        a.setDirectory(true);
-        dummy = new UnrecognizedExtraField();
-        dummy.setHeaderId(UNRECOGNIZED_HEADER);
-        dummy.setLocalFileDataData(new byte[] { 0 });
-        dummy.setCentralDirectoryData(new byte[] { 0 });
+    void setUp() {
+        asiField = new AsiExtraField();
+        asiField.setMode(0755);
+        asiField.setDirectory(true);
 
-        aLocal = a.getLocalFileDataData();
-        final byte[] dummyLocal = dummy.getLocalFileDataData();
-        data = new byte[4 + aLocal.length + 4 + dummyLocal.length];
-        System.arraycopy(a.getHeaderId().getBytes(), 0, data, 0, 2);
-        System.arraycopy(a.getLocalFileDataLength().getBytes(), 0, data, 2, 2);
-        System.arraycopy(aLocal, 0, data, 4, aLocal.length);
-        System.arraycopy(dummy.getHeaderId().getBytes(), 0, data, 4 + aLocal.length, 2);
-        System.arraycopy(dummy.getLocalFileDataLength().getBytes(), 0, data, 4 + aLocal.length + 2, 2);
-        System.arraycopy(dummyLocal, 0, data, 4 + aLocal.length + 4, dummyLocal.length);
-
+        unrecognizedField = new UnrecognizedExtraField();
+        unrecognizedField.setHeaderId(UNRECOGNIZED_HEADER);
+        unrecognizedField.setLocalFileDataData(new byte[] { 0 });
+        unrecognizedField.setCentralDirectoryData(new byte[] { 0 });
     }
 
-    /**
-     * Test merge methods
-     */
-    @Test
-    void testMerge() {
-        final byte[] local = ExtraFieldUtils.mergeLocalFileDataData(new ZipExtraField[] { a, dummy });
-        assertEquals(data.length, local.length, "local length");
-        for (int i = 0; i < local.length; i++) {
-            assertEquals(data[i], local[i], "local byte " + i);
+    @Nested
+    @DisplayName("merge methods")
+    class MergeTests {
+
+        @Test
+        @DisplayName("should correctly merge local file data which can be parsed back")
+        void shouldMergeLocalFileDataAndAllowRoundtrip() throws Exception {
+            // Arrange
+            final ZipExtraField[] originalFields = { asiField, unrecognizedField };
+
+            // Act
+            final byte[] mergedData = ExtraFieldUtils.mergeLocalFileDataData(originalFields);
+            final ZipExtraField[] parsedFields = ExtraFieldUtils.parse(mergedData, true);
+
+            // Assert
+            assertAll("Parsed fields should match original fields",
+                () -> assertEquals(2, parsedFields.length, "Should have 2 fields"),
+                () -> assertInstanceOf(AsiExtraField.class, parsedFields[0], "First field should be AsiExtraField"),
+                () -> assertEquals(040755, ((AsiExtraField) parsedFields[0]).getMode(), "Mode should match"),
+                () -> assertInstanceOf(UnrecognizedExtraField.class, parsedFields[1], "Second field should be UnrecognizedExtraField"),
+                () -> assertEquals(1, parsedFields[1].getLocalFileDataLength().getValue(), "Data length should match")
+            );
         }
 
-        final byte[] dummyCentral = dummy.getCentralDirectoryData();
-        final byte[] data2 = new byte[4 + aLocal.length + 4 + dummyCentral.length];
-        System.arraycopy(data, 0, data2, 0, 4 + aLocal.length + 2);
-        System.arraycopy(dummy.getCentralDirectoryLength().getBytes(), 0, data2, 4 + aLocal.length + 2, 2);
-        System.arraycopy(dummyCentral, 0, data2, 4 + aLocal.length + 4, dummyCentral.length);
+        @Test
+        @DisplayName("should correctly merge central directory data which can be parsed back")
+        void shouldMergeCentralDirectoryDataAndAllowRoundtrip() throws Exception {
+            // Arrange
+            final ZipExtraField[] originalFields = { asiField, unrecognizedField };
 
-        final byte[] central = ExtraFieldUtils.mergeCentralDirectoryData(new ZipExtraField[] { a, dummy });
-        assertEquals(data2.length, central.length, "central length");
-        for (int i = 0; i < central.length; i++) {
-            assertEquals(data2[i], central[i], "central byte " + i);
+            // Act
+            final byte[] mergedData = ExtraFieldUtils.mergeCentralDirectoryData(originalFields);
+            final ZipExtraField[] parsedFields = ExtraFieldUtils.parse(mergedData, false);
+
+            // Assert
+            assertAll("Parsed fields should match original fields",
+                () -> assertEquals(2, parsedFields.length, "Should have 2 fields"),
+                () -> assertInstanceOf(AsiExtraField.class, parsedFields[0], "First field should be AsiExtraField"),
+                () -> assertEquals(040755, ((AsiExtraField) parsedFields[0]).getMode(), "Mode should match"),
+                () -> assertInstanceOf(UnrecognizedExtraField.class, parsedFields[1], "Second field should be UnrecognizedExtraField"),
+                () -> assertEquals(1, parsedFields[1].getCentralDirectoryLength().getValue(), "Data length should match")
+            );
         }
 
-    }
+        @Test
+        @DisplayName("should correctly merge unparseable extra field data")
+        void shouldMergeUnparseableData() throws Exception {
+            // Arrange
+            final UnparseableExtraFieldData unparseableField = new UnparseableExtraFieldData();
+            final byte[] unparseableBytes = { UNRECOGNIZED_HEADER.getByte1(), UNRECOGNIZED_HEADER.getByte2(), 1, 0, (byte) 0xFF };
+            unparseableField.parseFromLocalFileData(unparseableBytes, 0, unparseableBytes.length);
 
-    @Test
-    void testMergeWithUnparseableData() throws Exception {
-        final ZipExtraField d = new UnparseableExtraFieldData();
-        final byte[] b = UNRECOGNIZED_HEADER.getBytes();
-        d.parseFromLocalFileData(new byte[] { b[0], b[1], 1, 0 }, 0, 4);
-        final byte[] local = ExtraFieldUtils.mergeLocalFileDataData(new ZipExtraField[] { a, d });
-        assertEquals(data.length - 1, local.length, "local length");
-        for (int i = 0; i < local.length; i++) {
-            assertEquals(data[i], local[i], "local byte " + i);
-        }
+            final ZipExtraField[] originalFields = { asiField, unparseableField };
 
-        final byte[] dCentral = d.getCentralDirectoryData();
-        final byte[] data2 = new byte[4 + aLocal.length + dCentral.length];
-        System.arraycopy(data, 0, data2, 0, 4 + aLocal.length + 2);
-        System.arraycopy(dCentral, 0, data2, 4 + aLocal.length, dCentral.length);
+            // Act
+            final byte[] mergedData = ExtraFieldUtils.mergeLocalFileDataData(originalFields);
+            // The unparseable data includes header and length, so we parse with READ to recover it.
+            final ZipExtraField[] parsedFields = ExtraFieldUtils.parse(mergedData, true, ExtraFieldUtils.UnparseableExtraField.READ);
 
-        final byte[] central = ExtraFieldUtils.mergeCentralDirectoryData(new ZipExtraField[] { a, d });
-        assertEquals(data2.length, central.length, "central length");
-        for (int i = 0; i < central.length; i++) {
-            assertEquals(data2[i], central[i], "central byte " + i);
-        }
-
-    }
-
-    /**
-     * test parser.
-     */
-    @Test
-    void testParse() throws Exception {
-        final ZipExtraField[] ze = ExtraFieldUtils.parse(data);
-        assertEquals(2, ze.length, "number of fields");
-        assertTrue(ze[0] instanceof AsiExtraField, "type field 1");
-        assertEquals(040755, ((AsiExtraField) ze[0]).getMode(), "mode field 1");
-        assertTrue(ze[1] instanceof UnrecognizedExtraField, "type field 2");
-        assertEquals(1, ze[1].getLocalFileDataLength().getValue(), "data length field 2");
-
-        final byte[] data2 = new byte[data.length - 1];
-        System.arraycopy(data, 0, data2, 0, data2.length);
-        final Exception e = assertThrows(Exception.class, () -> ExtraFieldUtils.parse(data2), "data should be invalid");
-        assertEquals("Bad extra field starting at " + (4 + aLocal.length) + ".  Block length of 1 bytes exceeds remaining data of 0 bytes.", e.getMessage(),
-                "message");
-    }
-
-    @Test
-    void testParseCentral() throws Exception {
-        final ZipExtraField[] ze = ExtraFieldUtils.parse(data, false);
-        assertEquals(2, ze.length, "number of fields");
-        assertTrue(ze[0] instanceof AsiExtraField, "type field 1");
-        assertEquals(040755, ((AsiExtraField) ze[0]).getMode(), "mode field 1");
-        assertTrue(ze[1] instanceof UnrecognizedExtraField, "type field 2");
-        assertEquals(1, ze[1].getCentralDirectoryLength().getValue(), "data length field 2");
-
-    }
-
-    @Test
-    void testParseTurnsArrayIndexOutOfBoundsIntoZipException() {
-        ExtraFieldUtils.register(AiobThrowingExtraField.class);
-        final AiobThrowingExtraField f = new AiobThrowingExtraField();
-        final byte[] d = new byte[4 + AiobThrowingExtraField.LENGTH];
-        System.arraycopy(f.getHeaderId().getBytes(), 0, d, 0, 2);
-        System.arraycopy(f.getLocalFileDataLength().getBytes(), 0, d, 2, 2);
-        System.arraycopy(f.getLocalFileDataData(), 0, d, 4, AiobThrowingExtraField.LENGTH);
-        final ZipException e = assertThrows(ZipException.class, () -> ExtraFieldUtils.parse(d), "data should be invalid");
-        assertEquals("Failed to parse corrupt ZIP extra field of type 1000", e.getMessage(), "message");
-    }
-
-    @Test
-    void testParseWithRead() throws Exception {
-        ZipExtraField[] ze = ExtraFieldUtils.parse(data, true, ExtraFieldUtils.UnparseableExtraField.READ);
-        assertEquals(2, ze.length, "number of fields");
-        assertTrue(ze[0] instanceof AsiExtraField, "type field 1");
-        assertEquals(040755, ((AsiExtraField) ze[0]).getMode(), "mode field 1");
-        assertTrue(ze[1] instanceof UnrecognizedExtraField, "type field 2");
-        assertEquals(1, ze[1].getLocalFileDataLength().getValue(), "data length field 2");
-
-        final byte[] data2 = new byte[data.length - 1];
-        System.arraycopy(data, 0, data2, 0, data2.length);
-        ze = ExtraFieldUtils.parse(data2, true, ExtraFieldUtils.UnparseableExtraField.READ);
-        assertEquals(2, ze.length, "number of fields");
-        assertTrue(ze[0] instanceof AsiExtraField, "type field 1");
-        assertEquals(040755, ((AsiExtraField) ze[0]).getMode(), "mode field 1");
-        assertTrue(ze[1] instanceof UnparseableExtraFieldData, "type field 2");
-        assertEquals(4, ze[1].getLocalFileDataLength().getValue(), "data length field 2");
-        for (int i = 0; i < 4; i++) {
-            assertEquals(data2[data.length - 5 + i], ze[1].getLocalFileDataData()[i], "byte number " + i);
+            // Assert
+            assertAll("Parsed fields should include original AsiExtraField and recovered unparseable data",
+                () -> assertEquals(2, parsedFields.length),
+                () -> assertInstanceOf(AsiExtraField.class, parsedFields[0]),
+                () -> assertInstanceOf(UnparseableExtraFieldData.class, parsedFields[1]),
+                () -> assertArrayEquals(unparseableBytes, parsedFields[1].getLocalFileDataData())
+            );
         }
     }
 
-    @Test
-    void testParseWithSkip() throws Exception {
-        ZipExtraField[] ze = ExtraFieldUtils.parse(data, true, ExtraFieldUtils.UnparseableExtraField.SKIP);
-        assertEquals(2, ze.length, "number of fields");
-        assertTrue(ze[0] instanceof AsiExtraField, "type field 1");
-        assertEquals(040755, ((AsiExtraField) ze[0]).getMode(), "mode field 1");
-        assertTrue(ze[1] instanceof UnrecognizedExtraField, "type field 2");
-        assertEquals(1, ze[1].getLocalFileDataLength().getValue(), "data length field 2");
+    @Nested
+    @DisplayName("parse method")
+    class ParseTests {
 
-        final byte[] data2 = new byte[data.length - 1];
-        System.arraycopy(data, 0, data2, 0, data2.length);
-        ze = ExtraFieldUtils.parse(data2, true, ExtraFieldUtils.UnparseableExtraField.SKIP);
-        assertEquals(1, ze.length, "number of fields");
-        assertTrue(ze[0] instanceof AsiExtraField, "type field 1");
-        assertEquals(040755, ((AsiExtraField) ze[0]).getMode(), "mode field 1");
+        @Test
+        @DisplayName("should parse valid extra field data correctly")
+        void shouldParseValidData() throws Exception {
+            // Arrange
+            final byte[] localData = ExtraFieldUtils.mergeLocalFileDataData(new ZipExtraField[] { asiField, unrecognizedField });
+
+            // Act
+            final ZipExtraField[] parsedFields = ExtraFieldUtils.parse(localData);
+
+            // Assert
+            assertAll("Parsed fields should match original structure",
+                () -> assertEquals(2, parsedFields.length, "Should have 2 fields"),
+                () -> assertInstanceOf(AsiExtraField.class, parsedFields[0], "First field should be AsiExtraField"),
+                () -> assertEquals(040755, ((AsiExtraField) parsedFields[0]).getMode(), "Mode should match"),
+                () -> assertInstanceOf(UnrecognizedExtraField.class, parsedFields[1], "Second field should be UnrecognizedExtraField"),
+                () -> assertEquals(1, parsedFields[1].getLocalFileDataLength().getValue(), "Data length should match")
+            );
+        }
+
+        @Test
+        @DisplayName("should throw ZipException for truncated extra field data")
+        void shouldThrowExceptionForTruncatedData() {
+            // Arrange
+            final byte[] validData = ExtraFieldUtils.mergeLocalFileDataData(new ZipExtraField[] { asiField, unrecognizedField });
+            final byte[] truncatedData = Arrays.copyOf(validData, validData.length - 1); // Truncate last byte
+
+            // Act & Assert
+            final int expectedOffset = 4 + asiField.getLocalFileDataLength().getValue();
+            final Exception e = assertThrows(ZipException.class, () -> ExtraFieldUtils.parse(truncatedData));
+            assertEquals("Bad extra field starting at " + expectedOffset + ".  Block length of 1 bytes exceeds remaining data of 0 bytes.", e.getMessage());
+        }
+
+        @Test
+        @DisplayName("should wrap underlying parsing exceptions in ZipException")
+        void shouldWrapUnderlyingParsingException() {
+            // Arrange
+            ExtraFieldUtils.register(AiobThrowingExtraField.class);
+            final AiobThrowingExtraField faultyField = new AiobThrowingExtraField();
+            final byte[] data = ExtraFieldUtils.mergeLocalFileDataData(new ZipExtraField[] { faultyField });
+
+            // Act & Assert
+            final ZipException e = assertThrows(ZipException.class, () -> ExtraFieldUtils.parse(data));
+            assertEquals("Failed to parse corrupt ZIP extra field of type " + AiobThrowingExtraField.HEADER_ID.getValue(), e.getMessage());
+            assertInstanceOf(ArrayIndexOutOfBoundsException.class, e.getCause());
+        }
+
+        @Test
+        @DisplayName("should read truncated field as unparseable data when in READ mode")
+        void shouldReadTruncatedFieldInReadMode() throws Exception {
+            // Arrange
+            final byte[] validData = ExtraFieldUtils.mergeLocalFileDataData(new ZipExtraField[] { asiField, unrecognizedField });
+            final byte[] truncatedData = Arrays.copyOf(validData, validData.length - 1);
+
+            // Act
+            final ZipExtraField[] parsedFields = ExtraFieldUtils.parse(truncatedData, true, ExtraFieldUtils.UnparseableExtraField.READ);
+
+            // Assert
+            assertAll("Should parse valid field and recover truncated field as unparseable",
+                () -> assertEquals(2, parsedFields.length),
+                () -> assertInstanceOf(AsiExtraField.class, parsedFields[0]),
+                () -> assertEquals(040755, ((AsiExtraField) parsedFields[0]).getMode()),
+                () -> assertInstanceOf(UnparseableExtraFieldData.class, parsedFields[1]),
+                () -> assertEquals(4, parsedFields[1].getLocalFileDataLength().getValue(), "Length of unparseable data should be header + length field")
+            );
+        }
+
+        @Test
+        @DisplayName("should skip truncated field when in SKIP mode")
+        void shouldSkipTruncatedFieldInSkipMode() throws Exception {
+            // Arrange
+            final byte[] validData = ExtraFieldUtils.mergeLocalFileDataData(new ZipExtraField[] { asiField, unrecognizedField });
+            final byte[] truncatedData = Arrays.copyOf(validData, validData.length - 1);
+
+            // Act
+            final ZipExtraField[] parsedFields = ExtraFieldUtils.parse(truncatedData, true, ExtraFieldUtils.UnparseableExtraField.SKIP);
+
+            // Assert
+            assertAll("Should parse only the valid field and skip the truncated one",
+                () -> assertEquals(1, parsedFields.length),
+                () -> assertInstanceOf(AsiExtraField.class, parsedFields[0]),
+                () -> assertEquals(040755, ((AsiExtraField) parsedFields[0]).getMode())
+            );
+        }
     }
 }
