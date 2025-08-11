@@ -24,7 +24,7 @@ import org.apache.commons.codec.EncoderException;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests {@link RefinedSoundex}.
+ * Tests RefinedSoundex.
  */
 class RefinedSoundexTest extends AbstractStringEncoderTest<RefinedSoundex> {
 
@@ -34,87 +34,73 @@ class RefinedSoundexTest extends AbstractStringEncoderTest<RefinedSoundex> {
     }
 
     @Test
-    void testStringDifference_EdgeCasesAndCommonExamples() throws EncoderException {
-        final RefinedSoundex encoder = getStringEncoder();
-
-        // Edge cases with null/empty inputs
-        assertEquals(0, encoder.difference(null, null));
-        assertEquals(0, encoder.difference("", ""));
-        assertEquals(0, encoder.difference(" ", " "));
-
-        // Common names and examples
-        assertEquals(6, encoder.difference("Smith", "Smythe"));
-        assertEquals(3, encoder.difference("Ann", "Andrew"));
-        assertEquals(1, encoder.difference("Margaret", "Andrew"));
-        assertEquals(1, encoder.difference("Janet", "Margaret"));
-
-        // Examples from external documentation:
+    void testDifference() throws EncoderException {
+        // Edge cases
+        assertEquals(0, getStringEncoder().difference(null, null));
+        assertEquals(0, getStringEncoder().difference("", ""));
+        assertEquals(0, getStringEncoder().difference(" ", " "));
+        // Normal cases
+        assertEquals(6, getStringEncoder().difference("Smith", "Smythe"));
+        assertEquals(3, getStringEncoder().difference("Ann", "Andrew"));
+        assertEquals(1, getStringEncoder().difference("Margaret", "Andrew"));
+        assertEquals(1, getStringEncoder().difference("Janet", "Margaret"));
+        // Examples from
         // https://msdn.microsoft.com/library/default.asp?url=/library/en-us/tsqlref/ts_de-dz_8co5.asp
-        assertEquals(5, encoder.difference("Green", "Greene"));
-        assertEquals(1, encoder.difference("Blotchet-Halls", "Greene"));
-
-        // Additional examples from:
+        assertEquals(5, getStringEncoder().difference("Green", "Greene"));
+        assertEquals(1, getStringEncoder().difference("Blotchet-Halls", "Greene"));
+        // Examples from
         // https://msdn.microsoft.com/library/default.asp?url=/library/en-us/tsqlref/ts_setu-sus_3o6w.asp
-        assertEquals(6, encoder.difference("Smith", "Smythe"));
-        assertEquals(8, encoder.difference("Smithers", "Smythers"));
-        assertEquals(5, encoder.difference("Anothers", "Brothers"));
+        assertEquals(6, getStringEncoder().difference("Smith", "Smythe"));
+        assertEquals(8, getStringEncoder().difference("Smithers", "Smythers"));
+        assertEquals(5, getStringEncoder().difference("Anothers", "Brothers"));
     }
 
     @Test
-    void testEncode_BasicStrings() {
-        final RefinedSoundex encoder = getStringEncoder();
+    void testEncode() {
+        assertEquals("T6036084", getStringEncoder().encode("testing"));
+        assertEquals("T6036084", getStringEncoder().encode("TESTING"));
+        assertEquals("T60", getStringEncoder().encode("The"));
+        assertEquals("Q503", getStringEncoder().encode("quick"));
+        assertEquals("B1908", getStringEncoder().encode("brown"));
+        assertEquals("F205", getStringEncoder().encode("fox"));
+        assertEquals("J408106", getStringEncoder().encode("jumped"));
+        assertEquals("O0209", getStringEncoder().encode("over"));
+        assertEquals("T60", getStringEncoder().encode("the"));
+        assertEquals("L7050", getStringEncoder().encode("lazy"));
+        assertEquals("D6043", getStringEncoder().encode("dogs"));
 
-        // Standard encoding cases
-        assertEquals("T6036084", encoder.encode("testing"));
-        assertEquals("T6036084", encoder.encode("TESTING")); // Case insensitivity
-        assertEquals("T60", encoder.encode("The"));
-        assertEquals("Q503", encoder.encode("quick"));
-        assertEquals("B1908", encoder.encode("brown"));
-        assertEquals("F205", encoder.encode("fox"));
-        assertEquals("J408106", encoder.encode("jumped"));
-        assertEquals("O0209", encoder.encode("over"));
-        assertEquals("T60", encoder.encode("the")); // Same as "The"
-        assertEquals("L7050", encoder.encode("lazy"));
-        assertEquals("D6043", encoder.encode("dogs"));
-
-        // Test CODEC-56: Verify static instance produces same result
+        // Testing CODEC-56
         assertEquals("D6043", RefinedSoundex.US_ENGLISH.encode("dogs"));
     }
 
     @Test
-    void testGetMappingCode_NonLetterCharacter_ReturnsZero() {
+    void testGetMappingCodeNonLetter() {
         final char code = getStringEncoder().getMappingCode('#');
-        assertEquals(0, code, "Non-letter characters should map to 0");
+        assertEquals(0, code, "Code does not equals zero");
     }
 
     @Test
-    void testEncode_StringWithAllPossibleCharacters_ProducesExpectedCode() {
-        // Create string containing all 256 ASCII characters
-        final char[] allChars = new char[256];
-        for (int i = 0; i < allChars.length; i++) {
-            allChars[i] = (char) i;
+    void testInvalidSoundexCharacter() {
+        final char[] invalid = new char[256];
+        for (int i = 0; i < invalid.length; i++) {
+            invalid[i] = (char) i;
         }
-        final String input = new String(allChars);
 
-        // Verify encoding handles all character values
-        final String result = new RefinedSoundex().encode(input);
-        assertEquals("A0136024043780159360205050136024043780159360205053", result);
+        assertEquals(new RefinedSoundex().encode(new String(invalid)), "A0136024043780159360205050136024043780159360205053");
     }
 
     @Test
-    void testSoundex_DefaultConstructor_ProducesExpectedEncoding() {
+    void testNewInstance() {
         assertEquals("D6043", new RefinedSoundex().soundex("dogs"));
     }
 
     @Test
-    void testSoundex_ConstructorWithMappingCharArray_ProducesExpectedEncoding() {
-        final char[] mapping = RefinedSoundex.US_ENGLISH_MAPPING_STRING.toCharArray();
-        assertEquals("D6043", new RefinedSoundex(mapping).soundex("dogs"));
+    void testNewInstance2() {
+        assertEquals("D6043", new RefinedSoundex(RefinedSoundex.US_ENGLISH_MAPPING_STRING.toCharArray()).soundex("dogs"));
     }
 
     @Test
-    void testSoundex_ConstructorWithMappingString_ProducesExpectedEncoding() {
-        final String mapping = RefinedSoundex.US_ENGLISH_MAPPING_STRING;
-        assertEquals("D6043", new RefinedSoundex(mapping).soundex("dogs"));
+    void testNewInstance3() {
+        assertEquals("D6043", new RefinedSoundex(RefinedSoundex.US_ENGLISH_MAPPING_STRING).soundex("dogs"));
     }
 }
