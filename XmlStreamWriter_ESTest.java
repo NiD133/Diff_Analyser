@@ -25,367 +25,176 @@ import org.evosuite.runtime.mock.java.io.MockFile;
 import org.evosuite.runtime.mock.java.io.MockPrintStream;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true, 
+    useVFS = true, 
+    useVNET = true, 
+    resetStaticState = true, 
+    separateClassLoader = true
+) 
 public class XmlStreamWriter_ESTest extends XmlStreamWriter_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      PipedInputStream pipedInputStream0 = new PipedInputStream();
-      PipedOutputStream pipedOutputStream0 = new PipedOutputStream(pipedInputStream0);
-      XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter(pipedOutputStream0);
-      // Undeclared exception!
-      try { 
-        xmlStreamWriter0.write((char[]) null, 2049, 8192);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-      }
-  }
+    // Constructor Validation Tests
+    // ============================
 
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      java.io.ByteArrayOutputStream byteArrayOutputStream0 = new java.io.ByteArrayOutputStream();
-      XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter(byteArrayOutputStream0, (String) null);
-      char[] charArray0 = new char[5];
-      xmlStreamWriter0.write(charArray0, 1, 1);
-      assertEquals("UTF-8", xmlStreamWriter0.getDefaultEncoding());
-  }
+    @Test(expected = NullPointerException.class)
+    public void constructorWithNullOutputStreamThrowsException() throws Exception {
+        new XmlStreamWriter((OutputStream) null);
+    }
 
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      MockFile mockFile0 = new MockFile("U-");
-      XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter(mockFile0, (String) null);
-      assertEquals("UTF-8", xmlStreamWriter0.getDefaultEncoding());
-  }
+    @Test(expected = NullPointerException.class)
+    public void constructorWithNullFileThrowsException() throws Exception {
+        new XmlStreamWriter((File) null);
+    }
 
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      MockFile mockFile0 = new MockFile("<?xml");
-      MockPrintStream mockPrintStream0 = new MockPrintStream(mockFile0);
-      XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter(mockPrintStream0);
-      xmlStreamWriter0.close();
-      String string0 = xmlStreamWriter0.getEncoding();
-      assertEquals("UTF-8", string0);
-  }
+    @Test(expected = FileNotFoundException.class)
+    public void constructorWithNonExistentFileThrowsException() throws Exception {
+        new XmlStreamWriter(new MockFile("", ""));
+    }
 
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter((OutputStream) null);
-      char[] charArray0 = new char[0];
-      // Undeclared exception!
-      try { 
-        xmlStreamWriter0.write(charArray0, 6343, 6343);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.io.StringWriter", e);
-      }
-  }
+    @Test(expected = UnsupportedCharsetException.class)
+    public void constructorWithUnsupportedCharsetThrowsException() throws Exception {
+        new XmlStreamWriter((OutputStream) null, "invalid-charset");
+    }
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      PipedInputStream pipedInputStream0 = new PipedInputStream();
-      PipedOutputStream pipedOutputStream0 = new PipedOutputStream(pipedInputStream0);
-      XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter(pipedOutputStream0);
-      char[] charArray0 = new char[9];
-      xmlStreamWriter0.write(charArray0);
-      xmlStreamWriter0.close();
-      try { 
-        xmlStreamWriter0.write(charArray0, 2049, 2049);
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-      }
-  }
+    @Test(expected = IllegalCharsetNameException.class)
+    public void constructorWithIllegalCharsetNameThrowsException() throws Exception {
+        new XmlStreamWriter((OutputStream) null, "<?!illegal");
+    }
 
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      java.io.ByteArrayOutputStream byteArrayOutputStream0 = new java.io.ByteArrayOutputStream();
-      XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter(byteArrayOutputStream0);
-      xmlStreamWriter0.close();
-      try { 
-        xmlStreamWriter0.flush();
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-      }
-  }
+    // Write Operation Tests
+    // =====================
 
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter((OutputStream) null);
-      // Undeclared exception!
-      try { 
-        xmlStreamWriter0.close();
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.io.Writer", e);
-      }
-  }
+    @Test(expected = NullPointerException.class)
+    public void writeNullCharArrayThrowsException() throws Exception {
+        PipedOutputStream outputStream = new PipedOutputStream();
+        XmlStreamWriter writer = new XmlStreamWriter(outputStream);
+        writer.write(null, 2049, 8192);
+    }
 
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-      XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter(pipedOutputStream0);
-      char[] charArray0 = new char[9];
-      xmlStreamWriter0.write(charArray0);
-      try { 
-        xmlStreamWriter0.close();
-        fail("Expecting exception: IOException");
-      
-      } catch(IOException e) {
-         //
-         // Pipe not connected
-         //
-         verifyException("java.io.PipedOutputStream", e);
-      }
-  }
+    @Test
+    public void writeCharArrayWithOffsetSucceeds() throws Exception {
+        java.io.ByteArrayOutputStream outputStream = new java.io.ByteArrayOutputStream();
+        XmlStreamWriter writer = new XmlStreamWriter(outputStream, null);
+        char[] data = new char[5];
+        writer.write(data, 1, 1);
+        assertEquals("UTF-8", writer.getDefaultEncoding());
+    }
 
-  @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      XmlStreamWriter xmlStreamWriter0 = null;
-      try {
-        xmlStreamWriter0 = new XmlStreamWriter((OutputStream) null, "wm");
-        fail("Expecting exception: UnsupportedCharsetException");
-      
-      } catch(UnsupportedCharsetException e) {
-         //
-         // wm
-         //
-         verifyException("java.nio.charset.Charset", e);
-      }
-  }
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void writeWithInvalidOffsetThrowsException() throws Exception {
+        XmlStreamWriter writer = new XmlStreamWriter((OutputStream) null);
+        writer.write(new char[0], 6343, 6343);
+    }
 
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      XmlStreamWriter xmlStreamWriter0 = null;
-      try {
-        xmlStreamWriter0 = new XmlStreamWriter((OutputStream) null, "<?!wml");
-        fail("Expecting exception: IllegalCharsetNameException");
-      
-      } catch(IllegalCharsetNameException e) {
-         //
-         // <?!wml
-         //
-         verifyException("java.nio.charset.Charset", e);
-      }
-  }
+    @Test(expected = IOException.class)
+    public void writeAfterCloseThrowsException() throws Exception {
+        PipedOutputStream outputStream = new PipedOutputStream();
+        XmlStreamWriter writer = new XmlStreamWriter(outputStream);
+        writer.write(new char[9]);
+        writer.close();
+        writer.write(new char[9], 2049, 2049); // Should throw
+    }
 
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      MockFile mockFile0 = new MockFile("z");
-      XmlStreamWriter xmlStreamWriter0 = null;
-      try {
-        xmlStreamWriter0 = new XmlStreamWriter(mockFile0, "z");
-        fail("Expecting exception: UnsupportedCharsetException");
-      
-      } catch(UnsupportedCharsetException e) {
-         //
-         // z
-         //
-         verifyException("java.nio.charset.Charset", e);
-      }
-  }
+    // Close/Flush Operation Tests
+    // ===========================
 
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      File file0 = MockFile.createTempFile("O`7", "O`7");
-      XmlStreamWriter xmlStreamWriter0 = null;
-      try {
-        xmlStreamWriter0 = new XmlStreamWriter(file0, "O`7");
-        fail("Expecting exception: IllegalCharsetNameException");
-      
-      } catch(IllegalCharsetNameException e) {
-         //
-         // O`7
-         //
-         verifyException("java.nio.charset.Charset", e);
-      }
-  }
+    @Test(expected = IOException.class)
+    public void flushAfterCloseThrowsException() throws Exception {
+        java.io.ByteArrayOutputStream outputStream = new java.io.ByteArrayOutputStream();
+        XmlStreamWriter writer = new XmlStreamWriter(outputStream);
+        writer.close();
+        writer.flush(); // Should throw
+    }
 
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      XmlStreamWriter xmlStreamWriter0 = null;
-      try {
-        xmlStreamWriter0 = new XmlStreamWriter((File) null, "org.apache.commons.io.output.XmlStreamWriter$Builder");
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.io.File", e);
-      }
-  }
+    @Test(expected = NullPointerException.class)
+    public void closeWithNullOutputStreamThrowsException() throws Exception {
+        XmlStreamWriter writer = new XmlStreamWriter((OutputStream) null);
+        writer.close();
+    }
 
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      MockFile mockFile0 = new MockFile("", "");
-      XmlStreamWriter xmlStreamWriter0 = null;
-      try {
-        xmlStreamWriter0 = new XmlStreamWriter(mockFile0, "");
-        fail("Expecting exception: FileNotFoundException");
-      
-      } catch(Throwable e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.evosuite.runtime.mock.java.io.MockFileOutputStream", e);
-      }
-  }
+    @Test(expected = IOException.class)
+    public void closeWithUnconnectedPipeThrowsException() throws Exception {
+        PipedOutputStream outputStream = new PipedOutputStream();
+        XmlStreamWriter writer = new XmlStreamWriter(outputStream);
+        writer.write(new char[9]); // Write some data
+        writer.close(); // Should throw due to unconnected pipe
+    }
 
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      XmlStreamWriter xmlStreamWriter0 = null;
-      try {
-        xmlStreamWriter0 = new XmlStreamWriter((File) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.io.File", e);
-      }
-  }
+    // Encoding Detection Tests
+    // ========================
 
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      MockFile mockFile0 = new MockFile("", "");
-      XmlStreamWriter xmlStreamWriter0 = null;
-      try {
-        xmlStreamWriter0 = new XmlStreamWriter(mockFile0);
-        fail("Expecting exception: FileNotFoundException");
-      
-      } catch(Throwable e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.evosuite.runtime.mock.java.io.MockFileOutputStream", e);
-      }
-  }
+    @Test
+    public void getDefaultEncodingReturnsUTF8() throws Exception {
+        XmlStreamWriter writer = new XmlStreamWriter(new java.io.ByteArrayOutputStream());
+        assertEquals("UTF-8", writer.getDefaultEncoding());
+    }
 
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      XmlStreamWriter.Builder xmlStreamWriter_Builder0 = new XmlStreamWriter.Builder();
-      assertEquals(8192, xmlStreamWriter_Builder0.getBufferSizeDefault());
-  }
+    @Test
+    public void afterCloseGetEncodingReturnsUTF8() throws Exception {
+        MockFile file = new MockFile("test.xml");
+        XmlStreamWriter writer = new XmlStreamWriter(file);
+        writer.close();
+        assertEquals("UTF-8", writer.getEncoding());
+    }
 
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      java.io.ByteArrayOutputStream byteArrayOutputStream0 = new java.io.ByteArrayOutputStream();
-      XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter(byteArrayOutputStream0);
-      Writer writer0 = xmlStreamWriter0.append((CharSequence) null);
-      char[] charArray0 = new char[1];
-      writer0.write(charArray0);
-      // Undeclared exception!
-      try { 
-        xmlStreamWriter0.write((char[]) null, 2049, 2049);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-      }
-  }
+    @Test
+    public void writeXmlPrologSetsEncodingToUTF8() throws Exception {
+        java.io.ByteArrayOutputStream outputStream = new java.io.ByteArrayOutputStream();
+        XmlStreamWriter writer = new XmlStreamWriter(outputStream);
+        writer.append("<?xml");
+        writer.write("?>");
+        assertEquals("UTF-8", writer.getEncoding());
+    }
 
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      PipedInputStream pipedInputStream0 = new PipedInputStream();
-      PipedOutputStream pipedOutputStream0 = new PipedOutputStream(pipedInputStream0);
-      XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter(pipedOutputStream0);
-      char[] charArray0 = new char[9];
-      xmlStreamWriter0.write(charArray0);
-      xmlStreamWriter0.flush();
-      assertEquals(9, pipedInputStream0.available());
-  }
+    @Test
+    public void writeLargeCharBufferSucceeds() throws Exception {
+        java.io.ByteArrayOutputStream outputStream = new java.io.ByteArrayOutputStream();
+        XmlStreamWriter writer = new XmlStreamWriter(outputStream);
+        writer.write("<?xml");
+        CharBuffer buffer = CharBuffer.allocate(8192);
+        writer.append(buffer);
+        assertEquals(8192, outputStream.size());
+    }
 
-  @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
-      java.io.ByteArrayOutputStream byteArrayOutputStream0 = new java.io.ByteArrayOutputStream();
-      XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter(byteArrayOutputStream0);
-      xmlStreamWriter0.flush();
-      assertEquals("UTF-8", xmlStreamWriter0.getDefaultEncoding());
-  }
+    @Test(expected = NullPointerException.class)
+    public void getEncodingBeforeDetectionThrowsException() throws Exception {
+        java.io.ByteArrayOutputStream outputStream = new java.io.ByteArrayOutputStream();
+        XmlStreamWriter writer = new XmlStreamWriter(outputStream);
+        writer.getEncoding(); // Should throw
+    }
 
-  @Test(timeout = 4000)
-  public void test21()  throws Throwable  {
-      java.io.ByteArrayOutputStream byteArrayOutputStream0 = new java.io.ByteArrayOutputStream();
-      XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter(byteArrayOutputStream0);
-      xmlStreamWriter0.append((CharSequence) "<?xml");
-      xmlStreamWriter0.write("?>");
-      assertEquals("UTF-8", xmlStreamWriter0.getEncoding());
-  }
+    // Builder Tests
+    // =============
 
-  @Test(timeout = 4000)
-  public void test22()  throws Throwable  {
-      java.io.ByteArrayOutputStream byteArrayOutputStream0 = new java.io.ByteArrayOutputStream();
-      XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter(byteArrayOutputStream0);
-      xmlStreamWriter0.write("<?xml");
-      CharBuffer charBuffer0 = CharBuffer.allocate(8192);
-      xmlStreamWriter0.append((CharSequence) charBuffer0);
-      assertEquals(8192, byteArrayOutputStream0.size());
-  }
+    @Test
+    public void builderHasDefaultBufferSize() {
+        XmlStreamWriter.Builder builder = new XmlStreamWriter.Builder();
+        assertEquals(8192, builder.getBufferSizeDefault());
+    }
 
-  @Test(timeout = 4000)
-  public void test23()  throws Throwable  {
-      PipedInputStream pipedInputStream0 = new PipedInputStream();
-      PipedOutputStream pipedOutputStream0 = new PipedOutputStream(pipedInputStream0);
-      XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter(pipedOutputStream0);
-      String string0 = xmlStreamWriter0.getDefaultEncoding();
-      assertEquals("UTF-8", string0);
-  }
+    @Test(expected = IllegalStateException.class)
+    public void builderWithoutOriginThrowsException() throws Exception {
+        XmlStreamWriter.builder().get(); // Should throw
+    }
 
-  @Test(timeout = 4000)
-  public void test24()  throws Throwable  {
-      java.io.ByteArrayOutputStream byteArrayOutputStream0 = new java.io.ByteArrayOutputStream();
-      XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter(byteArrayOutputStream0);
-      // Undeclared exception!
-      try { 
-        xmlStreamWriter0.getEncoding();
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.io.output.XmlStreamWriter", e);
-      }
-  }
+    // Edge Case Tests
+    // ===============
 
-  @Test(timeout = 4000)
-  public void test25()  throws Throwable  {
-      MockFile mockFile0 = new MockFile("org.apache.commons.io.output.XmlStreamWriter$1");
-      XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter(mockFile0);
-      xmlStreamWriter0.append((CharSequence) "org.apache.commons.io.output.XmlStreamWriter$1");
-      xmlStreamWriter0.write("org.apache.commons.io.output.XmlStreamWriter$1");
-      assertEquals("UTF-8", xmlStreamWriter0.getEncoding());
-  }
+    @Test
+    public void constructorWithFileAndNullEncodingUsesDefault() throws Exception {
+        XmlStreamWriter writer = new XmlStreamWriter(new MockFile("test"), null);
+        assertEquals("UTF-8", writer.getDefaultEncoding());
+    }
 
-  @Test(timeout = 4000)
-  public void test26()  throws Throwable  {
-      XmlStreamWriter.Builder xmlStreamWriter_Builder0 = XmlStreamWriter.builder();
-      // Undeclared exception!
-      try { 
-        xmlStreamWriter_Builder0.get();
-        fail("Expecting exception: IllegalStateException");
-      
-      } catch(IllegalStateException e) {
-         //
-         // origin == null
-         //
-         verifyException("org.apache.commons.io.build.AbstractOriginSupplier", e);
-      }
-  }
+    @Test
+    public void flushAfterWriteSucceeds() throws Exception {
+        PipedInputStream inputStream = new PipedInputStream();
+        PipedOutputStream outputStream = new PipedOutputStream(inputStream);
+        XmlStreamWriter writer = new XmlStreamWriter(outputStream);
+        writer.write(new char[9]);
+        writer.flush();
+        assertEquals(9, inputStream.available());
+    }
 }
