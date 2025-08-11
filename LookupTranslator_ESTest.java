@@ -16,213 +16,250 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(
+    mockJVMNonDeterminism = true, 
+    useVFS = true, 
+    useVNET = true, 
+    resetStaticState = true, 
+    separateClassLoader = true
+) 
 public class LookupTranslator_ESTest extends LookupTranslator_ESTest_scaffolding {
 
   @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      CharSequence[] charSequenceArray0 = new CharSequence[3];
-      char[] charArray0 = new char[2];
-      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-      charSequenceArray0[0] = (CharSequence) charBuffer0;
-      charSequenceArray0[1] = (CharSequence) "FFFFF15A";
-      CharSequence[][] charSequenceArray1 = new CharSequence[8][3];
-      charSequenceArray1[0] = charSequenceArray0;
-      CharSequence[] charSequenceArray2 = new CharSequence[5];
-      charSequenceArray2[0] = (CharSequence) "FFFFF15A";
-      charSequenceArray2[1] = (CharSequence) "FFFFF15A";
-      charSequenceArray1[1] = charSequenceArray2;
-      charSequenceArray1[2] = charSequenceArray0;
-      charSequenceArray1[3] = charSequenceArray0;
-      charSequenceArray1[4] = charSequenceArray0;
-      charSequenceArray1[5] = charSequenceArray0;
-      charSequenceArray1[6] = charSequenceArray0;
-      charSequenceArray1[7] = charSequenceArray0;
-      LookupTranslator lookupTranslator0 = new LookupTranslator(charSequenceArray1);
-      String string0 = lookupTranslator0.translate((CharSequence) "FFFFFFFF");
-      assertEquals("FFFFFFFF", string0);
+  public void testTranslate_NoMatchingLookup_ReturnsOriginalString() throws Throwable {
+      // Setup: Create a lookup table with various keys and values
+      CharSequence[] lookupEntry1 = new CharSequence[3];
+      char[] charArray = new char[2]; // Default chars: '\0', '\0'
+      CharBuffer charBuffer = CharBuffer.wrap(charArray);
+      lookupEntry1[0] = charBuffer; // Key: "\0\0"
+      lookupEntry1[1] = "FFFFF15A";  // Value
+
+      CharSequence[][] lookupTable = new CharSequence[8][3];
+      lookupTable[0] = lookupEntry1;
+
+      // Add a second entry that may cause issues during construction
+      CharSequence[] lookupEntry2 = new CharSequence[5];
+      lookupEntry2[0] = "FFFFF15A"; // Key
+      lookupEntry2[1] = "FFFFF15A"; // Value
+      lookupTable[1] = lookupEntry2;
+
+      // Fill remaining entries with the first entry
+      for (int i = 2; i < 8; i++) {
+          lookupTable[i] = lookupEntry1;
+      }
+
+      // Create translator and test translation
+      LookupTranslator translator = new LookupTranslator(lookupTable);
+      String input = "FFFFFFFF";
+      String result = translator.translate(input);
+
+      // Verify input remains unchanged as no matching key exists
+      assertEquals("Input should remain untranslated", input, result);
   }
 
   @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      CharSequence[] charSequenceArray0 = new CharSequence[3];
-      char[] charArray0 = new char[2];
-      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-      charSequenceArray0[0] = (CharSequence) charBuffer0;
-      charSequenceArray0[1] = (CharSequence) "FFFFF15A";
-      CharSequence[][] charSequenceArray1 = new CharSequence[8][3];
-      charSequenceArray1[0] = charSequenceArray0;
-      CharSequence[] charSequenceArray2 = new CharSequence[5];
-      charSequenceArray2[0] = (CharSequence) "FFFFF15A";
-      charSequenceArray2[1] = (CharSequence) "FFFFF15A";
-      charSequenceArray1[1] = charSequenceArray2;
-      LookupTranslator lookupTranslator0 = null;
+  public void testConstructor_WithNullValueInLookupTable_ThrowsNullPointerException() throws Throwable {
+      // Setup: Create a lookup table with a row containing a null value
+      CharSequence[] lookupEntry1 = new CharSequence[3];
+      char[] charArray = new char[2];
+      CharBuffer charBuffer = CharBuffer.wrap(charArray);
+      lookupEntry1[0] = charBuffer; // Key: "\0\0"
+      lookupEntry1[1] = "FFFFF15A";  // Value (non-null)
+
+      CharSequence[][] lookupTable = new CharSequence[8][3];
+      lookupTable[0] = lookupEntry1;
+
+      // Second row: first two elements are set, but the array length is 5 (remaining are null)
+      CharSequence[] lookupEntry2 = new CharSequence[5];
+      lookupEntry2[0] = "FFFFF15A"; // Key
+      lookupEntry2[1] = "FFFFF15A"; // Value
+      lookupTable[1] = lookupEntry2;
+
+      // Attempt to create translator - expecting NullPointerException due to internal processing
       try {
-        lookupTranslator0 = new LookupTranslator(charSequenceArray1);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.lang3.text.translate.LookupTranslator", e);
+          new LookupTranslator(lookupTable);
+          fail("Expected NullPointerException due to null entries in lookup table");
+      } catch (NullPointerException e) {
+          // Verify the expected exception
       }
   }
 
   @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      StringWriter stringWriter0 = new StringWriter();
-      LookupTranslator lookupTranslator0 = new LookupTranslator((CharSequence[][]) null);
-      CharBuffer charBuffer0 = CharBuffer.wrap((CharSequence) "557");
-      int int0 = lookupTranslator0.translate((CharSequence) charBuffer0, 0, (Writer) stringWriter0);
-      assertEquals(0, int0);
+  public void testTranslate_WithNullLookupTable_ReturnsZero() throws Throwable {
+      // Setup: Translator with no lookup table (null)
+      LookupTranslator translator = new LookupTranslator((CharSequence[][]) null);
+      StringWriter writer = new StringWriter();
+
+      // Test translation of a non-null input
+      CharBuffer input = CharBuffer.wrap("557");
+      int result = translator.translate(input, 0, writer);
+
+      // Verify no translation occurred (0 characters processed)
+      assertEquals("Translator should process 0 characters with null lookup table", 0, result);
   }
 
   @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      CharSequence[][] charSequenceArray0 = new CharSequence[1][7];
-      CharSequence[] charSequenceArray1 = new CharSequence[3];
-      char[] charArray0 = new char[2];
-      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-      charSequenceArray1[0] = (CharSequence) charBuffer0;
-      charSequenceArray1[1] = (CharSequence) "FFFFF15A";
-      charSequenceArray1[2] = (CharSequence) charBuffer0;
-      charSequenceArray0[0] = charSequenceArray1;
-      LookupTranslator lookupTranslator0 = new LookupTranslator(charSequenceArray0);
-      StringWriter stringWriter0 = new StringWriter(1);
-      int int0 = lookupTranslator0.translate(charSequenceArray1[2], 0, (Writer) stringWriter0);
-      assertEquals("FFFFF15A", stringWriter0.toString());
-      assertEquals(2, int0);
+  public void testTranslate_MatchingKey_ReturnsTranslatedValue() throws Throwable {
+      // Setup: Create a lookup table with one entry
+      CharSequence[] lookupEntry = new CharSequence[3];
+      char[] charArray = new char[2]; // Default chars: '\0', '\0'
+      CharBuffer charBuffer = CharBuffer.wrap(charArray);
+      lookupEntry[0] = charBuffer; // Key: "\0\0"
+      lookupEntry[1] = "FFFFF15A";  // Value
+
+      CharSequence[][] lookupTable = new CharSequence[1][3];
+      lookupTable[0] = lookupEntry;
+
+      // Create translator
+      LookupTranslator translator = new LookupTranslator(lookupTable);
+      StringWriter writer = new StringWriter(1);
+
+      // Test translation of the key
+      int result = translator.translate(lookupEntry[0], 0, writer);
+
+      // Verify translation: key "\0\0" becomes "FFFFF15A"
+      assertEquals("Translated value should match", "FFFFF15A", writer.toString());
+      assertEquals("Translator should return key length", 2, result);
   }
 
   @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      CharSequence[][] charSequenceArray0 = new CharSequence[0][3];
-      LookupTranslator lookupTranslator0 = new LookupTranslator(charSequenceArray0);
-      StringWriter stringWriter0 = new StringWriter();
-      StringBuffer stringBuffer0 = stringWriter0.getBuffer();
-      // Undeclared exception!
-      try { 
-        lookupTranslator0.translate((CharSequence) stringBuffer0, 2955, (Writer) stringWriter0);
-        fail("Expecting exception: StringIndexOutOfBoundsException");
-      
-      } catch(StringIndexOutOfBoundsException e) {
-      }
-  }
+  public void testTranslate_IndexBeyondInputLength_ThrowsStringIndexOutOfBoundsException() throws Throwable {
+      // Setup: Translator with empty lookup table
+      CharSequence[][] emptyLookupTable = new CharSequence[0][3];
+      LookupTranslator translator = new LookupTranslator(emptyLookupTable);
+      StringWriter writer = new StringWriter();
+      StringBuffer input = writer.getBuffer(); // Empty buffer
 
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      CharSequence[][] charSequenceArray0 = new CharSequence[0][9];
-      LookupTranslator lookupTranslator0 = new LookupTranslator(charSequenceArray0);
-      CharBuffer charBuffer0 = CharBuffer.allocate(1);
-      StringWriter stringWriter0 = new StringWriter(1);
-      // Undeclared exception!
-      try { 
-        lookupTranslator0.translate((CharSequence) charBuffer0, 1, (Writer) stringWriter0);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.nio.Buffer", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      CharSequence[][] charSequenceArray0 = new CharSequence[1][9];
-      CharSequence[] charSequenceArray1 = new CharSequence[2];
-      StringWriter stringWriter0 = new StringWriter();
-      StringBuffer stringBuffer0 = stringWriter0.getBuffer();
-      charSequenceArray1[1] = (CharSequence) stringBuffer0;
-      charSequenceArray0[0] = charSequenceArray1;
-      charSequenceArray1[0] = (CharSequence) stringBuffer0;
-      LookupTranslator lookupTranslator0 = null;
+      // Attempt translation at invalid index (2955)
       try {
-        lookupTranslator0 = new LookupTranslator(charSequenceArray0);
-        fail("Expecting exception: StringIndexOutOfBoundsException");
-      
-      } catch(StringIndexOutOfBoundsException e) {
+          translator.translate(input, 2955, writer);
+          fail("Expected StringIndexOutOfBoundsException for out-of-bounds index");
+      } catch (StringIndexOutOfBoundsException e) {
+          // Expected exception
       }
   }
 
   @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      CharSequence[][] charSequenceArray0 = new CharSequence[1][2];
-      CharSequence[] charSequenceArray1 = new CharSequence[2];
-      char[] charArray0 = new char[0];
-      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-      charSequenceArray1[0] = (CharSequence) charBuffer0;
-      charSequenceArray1[1] = (CharSequence) charBuffer0;
-      charSequenceArray0[0] = charSequenceArray1;
-      LookupTranslator lookupTranslator0 = null;
+  public void testTranslate_IndexBeyondCharBufferLimit_ThrowsIndexOutOfBoundsException() throws Throwable {
+      // Setup: Translator with empty lookup table
+      CharSequence[][] emptyLookupTable = new CharSequence[0][9];
+      LookupTranslator translator = new LookupTranslator(emptyLookupTable);
+      CharBuffer input = CharBuffer.allocate(1); // Buffer with one character
+      StringWriter writer = new StringWriter(1);
+
+      // Attempt translation at index 1 (beyond buffer limit)
       try {
-        lookupTranslator0 = new LookupTranslator(charSequenceArray0);
-        fail("Expecting exception: IndexOutOfBoundsException");
-      
-      } catch(IndexOutOfBoundsException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("java.nio.Buffer", e);
+          translator.translate(input, 1, writer);
+          fail("Expected IndexOutOfBoundsException for out-of-bounds index");
+      } catch (IndexOutOfBoundsException e) {
+          // Expected exception
       }
   }
 
   @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      CharSequence[][] charSequenceArray0 = new CharSequence[1][0];
-      LookupTranslator lookupTranslator0 = null;
+  public void testConstructor_WithEmptyKey_ThrowsStringIndexOutOfBoundsException() throws Throwable {
+      // Setup: Lookup table with one row containing an empty key
+      CharSequence[][] lookupTable = new CharSequence[1][2];
+      CharSequence[] entry = new CharSequence[2];
+      StringWriter stringWriter = new StringWriter();
+      StringBuffer emptyBuffer = stringWriter.getBuffer(); // Empty key
+      entry[0] = emptyBuffer;
+      entry[1] = emptyBuffer; // Value (also empty)
+      lookupTable[0] = entry;
+
+      // Attempt to create translator - expecting exception due to empty key
       try {
-        lookupTranslator0 = new LookupTranslator(charSequenceArray0);
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
-      
-      } catch(ArrayIndexOutOfBoundsException e) {
-         //
-         // 0
-         //
-         verifyException("org.apache.commons.lang3.text.translate.LookupTranslator", e);
+          new LookupTranslator(lookupTable);
+          fail("Expected StringIndexOutOfBoundsException for empty key");
+      } catch (StringIndexOutOfBoundsException e) {
+          // Expected exception
       }
   }
 
   @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      CharSequence[] charSequenceArray0 = new CharSequence[3];
-      char[] charArray0 = new char[2];
-      charArray0[1] = '1';
-      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-      charSequenceArray0[0] = (CharSequence) charBuffer0;
-      charSequenceArray0[1] = (CharSequence) "FFFFF15A";
-      CharBuffer charBuffer1 = CharBuffer.wrap(charSequenceArray0[0]);
-      CharBuffer charBuffer2 = CharBuffer.wrap(charSequenceArray0[1]);
-      CharSequence[][] charSequenceArray1 = new CharSequence[4][7];
-      charSequenceArray1[0] = charSequenceArray0;
-      charSequenceArray1[1] = charSequenceArray0;
-      charSequenceArray1[2] = charSequenceArray0;
-      charBuffer1.get();
-      CharSequence[] charSequenceArray2 = new CharSequence[10];
-      charSequenceArray2[0] = (CharSequence) charBuffer1;
-      charSequenceArray2[1] = (CharSequence) "FFFFF15A";
-      charSequenceArray1[3] = charSequenceArray2;
-      LookupTranslator lookupTranslator0 = new LookupTranslator(charSequenceArray1);
-      String string0 = lookupTranslator0.translate((CharSequence) charBuffer2);
-      assertEquals("FFFFFFFFFF15A5A", string0);
+  public void testConstructor_WithEmptyKeyInCharBuffer_ThrowsIndexOutOfBoundsException() throws Throwable {
+      // Setup: Lookup table with one row containing an empty CharBuffer key
+      CharSequence[][] lookupTable = new CharSequence[1][2];
+      CharSequence[] entry = new CharSequence[2];
+      char[] emptyArray = new char[0];
+      CharBuffer emptyBuffer = CharBuffer.wrap(emptyArray); // Empty key
+      entry[0] = emptyBuffer;
+      entry[1] = emptyBuffer; // Value (also empty)
+      lookupTable[0] = entry;
+
+      // Attempt to create translator - expecting exception due to empty key
+      try {
+          new LookupTranslator(lookupTable);
+          fail("Expected IndexOutOfBoundsException for empty CharBuffer key");
+      } catch (IndexOutOfBoundsException e) {
+          // Expected exception
+      }
   }
 
   @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      LookupTranslator lookupTranslator0 = new LookupTranslator((CharSequence[][]) null);
-      StringWriter stringWriter0 = new StringWriter(7);
-      // Undeclared exception!
-      try { 
-        lookupTranslator0.translate((CharSequence) null, 7, (Writer) stringWriter0);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("org.apache.commons.lang3.text.translate.LookupTranslator", e);
+  public void testConstructor_WithZeroLengthRow_ThrowsArrayIndexOutOfBoundsException() throws Throwable {
+      // Setup: Lookup table with one row of length 0
+      CharSequence[][] lookupTable = new CharSequence[1][0];
+
+      // Attempt to create translator - expecting exception
+      try {
+          new LookupTranslator(lookupTable);
+          fail("Expected ArrayIndexOutOfBoundsException for zero-length row");
+      } catch (ArrayIndexOutOfBoundsException e) {
+          // Expected exception (index 0 is out of bounds)
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void testTranslate_WithLookupContainingModifiedCharBuffer_ReturnsExpectedString() throws Throwable {
+      // Setup: Create a lookup table with multiple entries
+      CharSequence[] baseEntry = new CharSequence[3];
+      char[] charArray = new char[2];
+      charArray[1] = '1'; // Array becomes ['\0', '1']
+      CharBuffer charBuffer = CharBuffer.wrap(charArray);
+      baseEntry[0] = charBuffer; // Key: "\0\1"
+      baseEntry[1] = "FFFFF15A"; // Value
+
+      // Create a modified CharBuffer (position advanced by one)
+      CharBuffer modifiedBuffer = CharBuffer.wrap(charArray);
+      modifiedBuffer.get(); // Advance position -> now represents "1"
+
+      // Build lookup table
+      CharSequence[][] lookupTable = new CharSequence[4][7];
+      for (int i = 0; i < 3; i++) {
+          lookupTable[i] = baseEntry; // Entries for key "\0\1"
+      }
+
+      // Add an entry with the modified buffer (key "1")
+      CharSequence[] specialEntry = new CharSequence[10];
+      specialEntry[0] = modifiedBuffer; // Key: "1" (position advanced)
+      specialEntry[1] = "FFFFF15A";     // Value
+      lookupTable[3] = specialEntry;
+
+      // Create translator
+      LookupTranslator translator = new LookupTranslator(lookupTable);
+
+      // Test translation of "FFFFF15A"
+      String input = "FFFFF15A";
+      String result = translator.translate(input);
+
+      // Verify translation result
+      assertEquals("Translated string should match expected pattern", "FFFFFFFFFF15A5A", result);
+  }
+
+  @Test(timeout = 4000)
+  public void testTranslate_NullInput_ThrowsNullPointerException() throws Throwable {
+      // Setup: Translator with null lookup table
+      LookupTranslator translator = new LookupTranslator((CharSequence[][]) null);
+      StringWriter writer = new StringWriter(7);
+
+      // Attempt translation with null input
+      try {
+          translator.translate(null, 7, writer);
+          fail("Expected NullPointerException for null input");
+      } catch (NullPointerException e) {
+          // Expected exception
       }
   }
 }
