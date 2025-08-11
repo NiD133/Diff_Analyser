@@ -28,275 +28,546 @@ import org.locationtech.spatial4j.shape.impl.PointImpl;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class BufferedLineString_ESTest extends BufferedLineString_ESTest_scaffolding {
 
-    // Helper method to create spatial context
-    private SpatialContext createSpatialContext() {
-        return SpatialContext.GEO;
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 1071.39772, false, spatialContext0);
+      Point point0 = bufferedLineString0.getCenter();
+      linkedList0.add(point0);
+      BufferedLineString bufferedLineString1 = new BufferedLineString(linkedList0, 1071.39772, spatialContext0);
+      bufferedLineString1.hashCode();
+      assertEquals(1, linkedList0.size());
+      assertFalse(bufferedLineString1.equals((Object)bufferedLineString0));
+  }
 
-    // Helper method to create a point
-    private Point createPoint(SpatialContext ctx, double x, double y) {
-        return new PointImpl(x, y, ctx);
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, (-1498.3962), false, spatialContext0);
+      bufferedLineString0.hashCode();
+      assertEquals((-1498.3962), bufferedLineString0.getBuf(), 0.01);
+  }
 
-    // Helper method to create empty BufferedLineString
-    private BufferedLineString createEmptyLineString(SpatialContext ctx, double buf) {
-        return new BufferedLineString(new LinkedList<>(), buf, ctx);
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 0.0, spatialContext0);
+      BufferedLineString bufferedLineString1 = new BufferedLineString(linkedList0, 1114.712856653245, spatialContext0);
+      boolean boolean0 = bufferedLineString1.equals(bufferedLineString0);
+      assertFalse(boolean0);
+      assertFalse(bufferedLineString0.equals((Object)bufferedLineString1));
+      assertEquals(1114.712856653245, bufferedLineString1.getBuf(), 0.01);
+  }
 
-    // Helper method to create single-point BufferedLineString
-    private BufferedLineString createSinglePointLineString(SpatialContext ctx, double x, double y, double buf) {
-        LinkedList<Point> points = new LinkedList<>();
-        points.add(createPoint(ctx, x, y));
-        return new BufferedLineString(points, buf, ctx);
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, (-2877.398196062), true, spatialContext0);
+      Point point0 = bufferedLineString0.getCenter();
+      linkedList0.add(point0);
+      linkedList0.add(point0);
+      linkedList0.add(point0);
+      BufferedLineString bufferedLineString1 = new BufferedLineString(linkedList0, (-2877.398196062), false, spatialContext0);
+      String string0 = bufferedLineString1.toString();
+      assertEquals("BufferedLineString(buf=-2877.398196062 pts=NaN NaN, NaN NaN, NaN NaN)", string0);
+  }
 
-    /* ========================= Constructor Tests ========================= */
-    @Test(timeout = 4000)
-    public void constructor_WithValidParameters_SetsBufferValueCorrectly() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        BufferedLineString line = createEmptyLineString(ctx, 1580.13460088);
-        assertEquals("Buffer value should be set correctly", 
-                     1580.13460088, line.getBuf(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 1071.39772, false, spatialContext0);
+      Point point0 = bufferedLineString0.getCenter();
+      linkedList0.add(point0);
+      BufferedLineString bufferedLineString1 = new BufferedLineString(linkedList0, (-647.75083997), true, spatialContext0);
+      bufferedLineString1.getBuffered(Double.NaN, spatialContext0);
+      assertEquals(1, linkedList0.size());
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void constructor_WithNullContext_ThrowsNullPointerException() throws Throwable {
-        new BufferedLineString(new LinkedList<>(), -116.02777, null);
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 2689.299973955, false, spatialContext0);
+      Rectangle rectangle0 = bufferedLineString0.getBoundingBox();
+      GeodesicSphereDistCalc.LawOfCosines geodesicSphereDistCalc_LawOfCosines0 = new GeodesicSphereDistCalc.LawOfCosines();
+      PointImpl pointImpl0 = new PointImpl(2689.299973955, (-462.55989283748), spatialContext0);
+      geodesicSphereDistCalc_LawOfCosines0.calcBoxByDistFromPt(pointImpl0, 2689.299973955, spatialContext0, rectangle0);
+      bufferedLineString0.relate(rectangle0);
+      assertEquals(2689.299973955, bufferedLineString0.getBuf(), 0.01);
+  }
 
-    @Test(timeout = 4000, expected = RuntimeException.class)
-    public void constructor_WithInvalidCoordinates_ThrowsRuntimeException() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        LinkedList<Point> points = new LinkedList<>();
-        points.add(createPoint(ctx, -1498.3962, -1498.3962));
-        new BufferedLineString(points, -1498.3962, ctx);
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 1071.39772, false, spatialContext0);
+      Point point0 = bufferedLineString0.getCenter();
+      linkedList0.add(point0);
+      BufferedLineString bufferedLineString1 = new BufferedLineString(linkedList0, 1071.39772, spatialContext0);
+      boolean boolean0 = bufferedLineString1.isEmpty();
+      assertEquals(1, linkedList0.size());
+      assertFalse(boolean0);
+  }
 
-    /* ========================= hashCode() Tests ========================= */
-    @Test(timeout = 4000)
-    public void hashCode_WithDifferentBufferValues_ReturnsDifferentHashCodes() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        BufferedLineString line1 = createEmptyLineString(ctx, 0.0);
-        BufferedLineString line2 = createEmptyLineString(ctx, 1114.712856653245);
-        assertNotEquals("Hash codes should differ for different buffer values", 
-                        line1.hashCode(), line2.hashCode());
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 1071.39772, false, spatialContext0);
+      Point point0 = bufferedLineString0.getCenter();
+      linkedList0.add(point0);
+      BufferedLineString bufferedLineString1 = new BufferedLineString(linkedList0, 1071.39772, spatialContext0);
+      boolean boolean0 = bufferedLineString1.hasArea();
+      assertEquals(1, linkedList0.size());
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void hashCode_WithSameParameters_ReturnsSameHashCode() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        LinkedList<Point> points = new LinkedList<>();
-        BufferedLineString line1 = new BufferedLineString(points, -1827.67990034, ctx);
-        BufferedLineString line2 = new BufferedLineString(points, -1827.67990034, ctx);
-        assertEquals("Hash codes should be equal for identical parameters", 
-                     line1.hashCode(), line2.hashCode());
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, (-2877.398196062), true, spatialContext0);
+      Point point0 = bufferedLineString0.getCenter();
+      linkedList0.add(point0);
+      BufferedLineString bufferedLineString1 = new BufferedLineString(linkedList0, 1569.552036879501, false, spatialContext0);
+      ShapeCollection<BufferedLine> shapeCollection0 = bufferedLineString1.getSegments();
+      assertEquals(1, linkedList0.size());
+      assertEquals(1, shapeCollection0.size());
+  }
 
-    /* ========================= equals() Tests ========================= */
-    @Test(timeout = 4000)
-    public void equals_WithSameInstance_ReturnsTrue() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        BufferedLineString line = createEmptyLineString(ctx, 953.644844306585);
-        assertTrue("Instance should equal itself", line.equals(line));
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 0.0, spatialContext0);
+      double double0 = bufferedLineString0.getBuf();
+      assertEquals(0.0, double0, 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void equals_WithDifferentBufferValues_ReturnsFalse() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        LinkedList<Point> points = new LinkedList<>();
-        BufferedLineString line1 = new BufferedLineString(points, 0.0, ctx);
-        BufferedLineString line2 = new BufferedLineString(points, 1114.712856653245, ctx);
-        assertFalse("Instances with different buffer values should not be equal", 
-                    line1.equals(line2));
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      HashMap<String, String> hashMap0 = new HashMap<String, String>();
+      ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
+      SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 1580.13460088, spatialContext0);
+      double double0 = bufferedLineString0.getBuf();
+      assertEquals(1580.13460088, double0, 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void equals_WithDifferentPointLists_ReturnsFalse() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        LinkedList<Point> points1 = new LinkedList<>();
-        LinkedList<Point> points2 = new LinkedList<>();
-        points2.add(createPoint(ctx, 0, 0));
-        
-        BufferedLineString line1 = new BufferedLineString(points1, -1827.67990034, ctx);
-        BufferedLineString line2 = new BufferedLineString(points2, -1827.67990034, ctx);
-        assertFalse("Instances with different points should not be equal", 
-                    line1.equals(line2));
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      PointImpl pointImpl0 = new PointImpl(0.2730010009451199, 0.2730010009451199, spatialContext0);
+      linkedList0.add((Point) pointImpl0);
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 3477.922086, true, spatialContext0);
+      Rectangle rectangle0 = bufferedLineString0.getBoundingBox();
+      assertEquals(1, linkedList0.size());
+      assertFalse(rectangle0.isEmpty());
+  }
 
-    @Test(timeout = 4000)
-    public void equals_WithNull_ReturnsFalse() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        BufferedLineString line = new BufferedLineString(new LinkedList<>(), -1.2265789709679984, ctx);
-        assertFalse("Instance should not equal null", line.equals(null));
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      PointImpl pointImpl0 = new PointImpl(0.0, 0.0, spatialContext0);
+      linkedList0.add((Point) pointImpl0);
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 0.0, true, spatialContext0);
+      Rectangle rectangle0 = bufferedLineString0.getBoundingBox();
+      assertEquals(1, linkedList0.size());
+      assertEquals(0.0, rectangle0.getMaxY(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void equals_WithDifferentType_ReturnsFalse() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        BufferedLineString line = new BufferedLineString(new LinkedList<>(), -2877.398196062, ctx);
-        assertFalse("Instance should not equal different type", 
-                    line.equals(new SpatialContextFactory()));
-    }
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      PointImpl pointImpl0 = new PointImpl(0.0, (-1.0), spatialContext0);
+      linkedList0.add((Point) pointImpl0);
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 0.0, spatialContext0);
+      Rectangle rectangle0 = bufferedLineString0.getBoundingBox();
+      assertEquals(1, linkedList0.size());
+      assertFalse(rectangle0.isEmpty());
+  }
 
-    /* ========================= toString() Tests ========================= */
-    @Test(timeout = 4000)
-    public void toString_WithMultiplePoints_ReturnsExpectedFormat() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        LinkedList<Point> points = new LinkedList<>();
-        Point center = createSinglePointLineString(ctx, 0, 0, -2877.398196062).getCenter();
-        points.add(center);
-        points.add(center);
-        points.add(center);
-        
-        BufferedLineString line = new BufferedLineString(points, -2877.398196062, false, ctx);
-        String result = line.toString();
-        assertTrue("toString should contain buffer value", result.contains("buf=-2877.398196062"));
-        assertTrue("toString should contain point coordinates", result.contains("pts=NaN NaN, NaN NaN, NaN NaN"));
-    }
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
+      PointImpl pointImpl0 = new PointImpl((-1.0), Double.NaN, spatialContext0);
+      linkedList0.add((Point) pointImpl0);
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, (-1.0), spatialContext0);
+      Rectangle rectangle0 = bufferedLineString0.getBoundingBox();
+      assertEquals(1, linkedList0.size());
+      assertEquals(0.0, rectangle0.getMinX(), 0.01);
+  }
 
-    /* ========================= getCenter() Tests ========================= */
-    @Test(timeout = 4000)
-    public void getCenter_WithSinglePoint_ReturnsExpectedPoint() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        BufferedLineString line = createSinglePointLineString(ctx, 0, 0, 1071.39772);
-        Point center = line.getCenter();
-        assertNotNull("Center should not be null", center);
-        assertEquals("Center X should match", 0, center.getX(), 0.01);
-        assertEquals("Center Y should match", 0, center.getY(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test15()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      PointImpl pointImpl0 = new PointImpl(131.08, 131.08, spatialContext0);
+      linkedList0.add((Point) pointImpl0);
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 5451.935, true, spatialContext0);
+      double double0 = bufferedLineString0.getArea(spatialContext0);
+      assertEquals(1, linkedList0.size());
+      assertEquals(41252.96124941927, double0, 0.01);
+  }
 
-    /* ========================= getBuffered() Tests ========================= */
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void getBuffered_WithNullContext_ThrowsNullPointerException() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        BufferedLineString line = createEmptyLineString(ctx, -1.0);
-        line.getBuffered(-1.0, null);
-    }
+  @Test(timeout = 4000)
+  public void test16()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
+      PointImpl pointImpl0 = new PointImpl((-180.0), 465.46032036, spatialContext0);
+      linkedList0.add((Point) pointImpl0);
+      PointImpl pointImpl1 = new PointImpl(0.017453292519943295, 0.017453292519943295, spatialContext0);
+      linkedList0.add((Point) pointImpl1);
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 0.017453292519943295, true, spatialContext0);
+      double double0 = bufferedLineString0.getArea(spatialContext0);
+      assertEquals(0.017453292519943295, bufferedLineString0.getBuf(), 0.01);
+      assertEquals((-65.33078137174249), double0, 0.01);
+  }
 
-    @Test(timeout = 4000, expected = UnsupportedOperationException.class)
-    public void getBuffered_ResultRelate_ThrowsUnsupportedOperationException() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        BufferedLineString line = createSinglePointLineString(ctx, 16.128532143886176, 16.128532143886176, 16.128532143886176);
-        Shape buffered = line.getBuffered(16.128532143886176, ctx);
-        buffered.relate(line);
-    }
+  @Test(timeout = 4000)
+  public void test17()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      PointImpl pointImpl0 = new PointImpl(16.128532143886176, 16.128532143886176, spatialContext0);
+      linkedList0.add((Point) pointImpl0);
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 16.128532143886176, spatialContext0);
+      Shape shape0 = bufferedLineString0.getBuffered(16.128532143886176, spatialContext0);
+      // Undeclared exception!
+      try { 
+        shape0.relate(bufferedLineString0);
+        fail("Expecting exception: UnsupportedOperationException");
+      
+      } catch(UnsupportedOperationException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.locationtech.spatial4j.shape.impl.BufferedLine", e);
+      }
+  }
 
-    /* ========================= getBoundingBox() Tests ========================= */
-    @Test(timeout = 4000)
-    public void getBoundingBox_WithSinglePoint_ReturnsValidRectangle() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        BufferedLineString line = createSinglePointLineString(ctx, 0.0, -1.0, 0.0);
-        Rectangle bbox = line.getBoundingBox();
-        assertFalse("Bounding box should not be empty", bbox.isEmpty());
-        assertEquals("Max Y should be correct", -1.0, bbox.getMaxY(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test18()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      PointImpl pointImpl0 = new PointImpl(1.7224835134970418, 1.7224835134970418, spatialContext0);
+      linkedList0.add((Point) pointImpl0);
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 1.7224835134970418, spatialContext0);
+      // Undeclared exception!
+      try { 
+        bufferedLineString0.relate((Shape) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.locationtech.spatial4j.shape.impl.RectangleImpl", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void getBoundingBox_WithPositiveBuffer_ReturnsNonEmptyRectangle() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        BufferedLineString line = createSinglePointLineString(ctx, 0.2730010009451199, 0.2730010009451199, 3477.922086);
-        Rectangle bbox = line.getBoundingBox();
-        assertFalse("Bounding box should not be empty", bbox.isEmpty());
-    }
+  @Test(timeout = 4000)
+  public void test19()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      PointImpl pointImpl0 = new PointImpl(815.617824665349, 815.617824665349, spatialContext0);
+      linkedList0.add((Point) pointImpl0);
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 815.617824665349, spatialContext0);
+      // Undeclared exception!
+      try { 
+        bufferedLineString0.getBuffered(815.617824665349, spatialContext0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // maxY must be >= minY: 699.3844888966275 to 90.0
+         //
+         verifyException("org.locationtech.spatial4j.shape.impl.ShapeFactoryImpl", e);
+      }
+  }
 
-    /* ========================= getArea() Tests ========================= */
-    @Test(timeout = 4000)
-    public void getArea_WithSinglePoint_ReturnsExpectedArea() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        BufferedLineString line = createSinglePointLineString(ctx, 16.128532143886176, 16.128532143886176, 16.128532143886176);
-        double area = line.getArea(ctx);
-        assertEquals("Area should match expected value", 41252.96124941927, area, 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test20()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, (-1.0), spatialContext0);
+      // Undeclared exception!
+      try { 
+        bufferedLineString0.getBuffered((-1.0), (SpatialContext) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.locationtech.spatial4j.shape.impl.BufferedLineString", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void getArea_WithMultiplePoints_ReturnsExpectedArea() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        LinkedList<Point> points = new LinkedList<>();
-        points.add(createPoint(ctx, -180.0, 465.46032036));
-        points.add(createPoint(ctx, 0.017453292519943295, 0.017453292519943295));
-        
-        BufferedLineString line = new BufferedLineString(points, 0.017453292519943295, true, ctx);
-        double area = line.getArea(ctx);
-        assertEquals("Area should match expected value", -65.33078137174249, area, 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test21()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      PointImpl pointImpl0 = new PointImpl((-1.0), (-1.0), spatialContext0);
+      linkedList0.add((Point) pointImpl0);
+      BufferedLineString bufferedLineString0 = null;
+      try {
+        bufferedLineString0 = new BufferedLineString(linkedList0, (-1.0), true, spatialContext0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // maxY must be >= minY: 0.0 to -2.0
+         //
+         verifyException("org.locationtech.spatial4j.shape.impl.ShapeFactoryImpl", e);
+      }
+  }
 
-    /* ========================= relate() Tests ========================= */
-    @Test(timeout = 4000)
-    public void relate_WithSelf_ReturnsWithin() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        BufferedLineString line = createSinglePointLineString(ctx, 16.128532143886176, 16.128532143886176, 16.128532143886176);
-        SpatialRelation relation = line.relate(line);
-        assertEquals("Relation to self should be WITHIN", 
-                     SpatialRelation.WITHIN, relation);
-    }
+  @Test(timeout = 4000)
+  public void test22()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      BufferedLineString bufferedLineString0 = null;
+      try {
+        bufferedLineString0 = new BufferedLineString(linkedList0, (-452.80637118721), false, (SpatialContext) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.locationtech.spatial4j.shape.impl.BufferedLineString", e);
+      }
+  }
 
-    @Test(timeout = 4000, expected = NullPointerException.class)
-    public void relate_WithNull_ThrowsNullPointerException() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        BufferedLineString line = createSinglePointLineString(ctx, 1.7224835134970418, 1.7224835134970418, 1.7224835134970418);
-        line.relate(null);
-    }
+  @Test(timeout = 4000)
+  public void test23()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      PointImpl pointImpl0 = new PointImpl((-1498.3962), (-1498.3962), spatialContext0);
+      linkedList0.add((Point) pointImpl0);
+      BufferedLineString bufferedLineString0 = null;
+      try {
+        bufferedLineString0 = new BufferedLineString(linkedList0, (-1498.3962), spatialContext0);
+        fail("Expecting exception: RuntimeException");
+      
+      } catch(RuntimeException e) {
+         //
+         // maxY must be >= minY: 0.0 to -2996.7924
+         //
+         verifyException("org.locationtech.spatial4j.shape.impl.ShapeFactoryImpl", e);
+      }
+  }
 
-    /* ========================= isEmpty() Tests ========================= */
-    @Test(timeout = 4000)
-    public void isEmpty_WithPoints_ReturnsFalse() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        BufferedLineString line = createSinglePointLineString(ctx, 0, 0, 1071.39772);
-        assertFalse("Line with points should not be empty", line.isEmpty());
-    }
+  @Test(timeout = 4000)
+  public void test24()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      BufferedLineString bufferedLineString0 = null;
+      try {
+        bufferedLineString0 = new BufferedLineString(linkedList0, (-116.02777), (SpatialContext) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.locationtech.spatial4j.shape.impl.BufferedLineString", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void isEmpty_WithoutPoints_ReturnsTrue() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        BufferedLineString line = createEmptyLineString(ctx, 0.0);
-        assertTrue("Empty line should be empty", line.isEmpty());
-    }
+  @Test(timeout = 4000)
+  public void test25()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 0.0, spatialContext0);
+      bufferedLineString0.getPoints();
+      assertEquals(0.0, bufferedLineString0.getBuf(), 0.01);
+  }
 
-    /* ========================= hasArea() Tests ========================= */
-    @Test(timeout = 4000)
-    public void hasArea_WithPositiveBuffer_ReturnsTrue() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        BufferedLineString line = createSinglePointLineString(ctx, 0, 0, 1071.39772);
-        assertTrue("Line with positive buffer should have area", line.hasArea());
-    }
+  @Test(timeout = 4000)
+  public void test26()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, (-2877.398196062), true, spatialContext0);
+      Point point0 = bufferedLineString0.getCenter();
+      linkedList0.add(point0);
+      BufferedLineString bufferedLineString1 = new BufferedLineString(linkedList0, 1569.552036879501, false, spatialContext0);
+      bufferedLineString1.getPoints();
+      assertEquals(1, linkedList0.size());
+      assertEquals(1569.552036879501, bufferedLineString1.getBuf(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void hasArea_WithZeroBuffer_ReturnsFalse() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        BufferedLineString line = createSinglePointLineString(ctx, 0, 0, 0.0);
-        assertFalse("Line with zero buffer should not have area", line.hasArea());
-    }
+  @Test(timeout = 4000)
+  public void test27()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, (-2877.398196062), true, spatialContext0);
+      bufferedLineString0.isEmpty();
+      assertEquals((-2877.398196062), bufferedLineString0.getBuf(), 0.01);
+  }
 
-    /* ========================= getSegments() Tests ========================= */
-    @Test(timeout = 4000)
-    public void getSegments_WithSinglePoint_ReturnsOneSegment() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        BufferedLineString line = createSinglePointLineString(ctx, 0, 0, 1569.552036879501);
-        ShapeCollection<BufferedLine> segments = line.getSegments();
-        assertEquals("Single point should produce one segment", 1, segments.size());
-    }
+  @Test(timeout = 4000)
+  public void test28()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 0.0, spatialContext0);
+      bufferedLineString0.hashCode();
+      assertEquals(0.0, bufferedLineString0.getBuf(), 0.01);
+  }
 
-    /* ========================= getBuf() Tests ========================= */
-    @Test(timeout = 4000)
-    public void getBuf_AfterConstruction_ReturnsCorrectValue() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        BufferedLineString line = createEmptyLineString(ctx, -1.2265789709679984);
-        assertEquals("Buffer value should match constructor argument", 
-                     -1.2265789709679984, line.getBuf(), 0.01);
-    }
+  @Test(timeout = 4000)
+  public void test29()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, (-1827.67990034), false, spatialContext0);
+      Point point0 = bufferedLineString0.getCenter();
+      linkedList0.add(point0);
+      BufferedLineString bufferedLineString1 = new BufferedLineString(linkedList0, (-1827.67990034), spatialContext0);
+      boolean boolean0 = bufferedLineString0.equals(bufferedLineString1);
+      assertEquals(1, linkedList0.size());
+      assertFalse(boolean0);
+  }
 
-    /* ========================= getPoints() Tests ========================= */
-    @Test(timeout = 4000)
-    public void getPoints_WithoutPoints_ReturnsEmptyList() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        BufferedLineString line = createEmptyLineString(ctx, 0.0);
-        assertTrue("Points list should be empty", line.getPoints().isEmpty());
-    }
+  @Test(timeout = 4000)
+  public void test30()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 0.0, spatialContext0);
+      BufferedLineString bufferedLineString1 = (BufferedLineString)bufferedLineString0.getBuffered(1569.552036879501, spatialContext0);
+      boolean boolean0 = bufferedLineString0.equals(bufferedLineString1);
+      assertFalse(boolean0);
+      assertFalse(bufferedLineString1.equals((Object)bufferedLineString0));
+      assertEquals(1569.552036879501, bufferedLineString1.getBuf(), 0.01);
+  }
 
-    @Test(timeout = 4000)
-    public void getPoints_WithPoints_ReturnsCorrectCount() throws Throwable {
-        SpatialContext ctx = createSpatialContext();
-        BufferedLineString line = createSinglePointLineString(ctx, 0, 0, 1569.552036879501);
-        assertEquals("Points list should have correct size", 1, line.getPoints().size());
-    }
+  @Test(timeout = 4000)
+  public void test31()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, (-1827.67990034), false, spatialContext0);
+      BufferedLineString bufferedLineString1 = new BufferedLineString(linkedList0, (-1827.67990034), spatialContext0);
+      boolean boolean0 = bufferedLineString0.equals(bufferedLineString1);
+      assertTrue(boolean0);
+      assertEquals((-1827.67990034), bufferedLineString1.getBuf(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test32()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, (-1.2265789709679984), spatialContext0);
+      boolean boolean0 = bufferedLineString0.equals((Object) null);
+      assertFalse(boolean0);
+      assertEquals((-1.2265789709679984), bufferedLineString0.getBuf(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test33()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 953.644844306585, spatialContext0);
+      boolean boolean0 = bufferedLineString0.equals(bufferedLineString0);
+      assertTrue(boolean0);
+      assertEquals(953.644844306585, bufferedLineString0.getBuf(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test34()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, (-2877.398196062), true, spatialContext0);
+      boolean boolean0 = bufferedLineString0.equals(spatialContextFactory0);
+      assertEquals((-2877.398196062), bufferedLineString0.getBuf(), 0.01);
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test35()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, (-2877.398196062), true, spatialContext0);
+      double double0 = bufferedLineString0.getBuf();
+      assertEquals((-2877.398196062), double0, 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test36()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      PointImpl pointImpl0 = new PointImpl(16.128532143886176, 16.128532143886176, spatialContext0);
+      linkedList0.add((Point) pointImpl0);
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 16.128532143886176, spatialContext0);
+      SpatialRelation spatialRelation0 = bufferedLineString0.relate(bufferedLineString0);
+      assertEquals(1, linkedList0.size());
+      assertEquals(SpatialRelation.WITHIN, spatialRelation0);
+  }
+
+  @Test(timeout = 4000)
+  public void test37()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, (-1.0), spatialContext0);
+      bufferedLineString0.getSegments();
+      assertEquals((-1.0), bufferedLineString0.getBuf(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test38()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
+      SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 0.017453292519943295, true, spatialContext0);
+      bufferedLineString0.getArea(spatialContext0);
+      assertEquals(0.017453292519943295, bufferedLineString0.getBuf(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test39()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 2689.299973955, false, spatialContext0);
+      bufferedLineString0.hasArea();
+      assertEquals(2689.299973955, bufferedLineString0.getBuf(), 0.01);
+  }
+
+  @Test(timeout = 4000)
+  public void test40()  throws Throwable  {
+      LinkedList<Point> linkedList0 = new LinkedList<Point>();
+      SpatialContext spatialContext0 = SpatialContext.GEO;
+      BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 16.128532143886176, spatialContext0);
+      bufferedLineString0.relate(bufferedLineString0);
+      assertEquals(16.128532143886176, bufferedLineString0.getBuf(), 0.01);
+  }
 }
