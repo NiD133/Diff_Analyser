@@ -10,6 +10,7 @@ import static org.junit.Assert.*;
 import static org.evosuite.runtime.EvoAssertions.*;
 import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.time.chrono.ChronoLocalDate;
 import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.evosuite.runtime.mock.java.text.MockDateFormat;
@@ -23,144 +24,158 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class IntervalCategoryToolTipGenerator_ESTest extends IntervalCategoryToolTipGenerator_ESTest_scaffolding {
 
-    // Constructor Validation Tests
-    //----------------------------------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void constructorWithNullNumberFormat_shouldThrowIllegalArgumentException() {
-        try {
-            new IntervalCategoryToolTipGenerator("({0}, {1}) = {2}", (NumberFormat) null);
-            fail("Expected IllegalArgumentException due to null NumberFormat");
-        } catch (IllegalArgumentException e) {
-            verifyException("org.jfree.chart.internal.Args", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test00()  throws Throwable  {
+      IntervalCategoryToolTipGenerator intervalCategoryToolTipGenerator0 = new IntervalCategoryToolTipGenerator();
+      // Undeclared exception!
+      try { 
+        intervalCategoryToolTipGenerator0.createItemArray((CategoryDataset) null, 70, 70);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.jfree.chart.labels.IntervalCategoryToolTipGenerator", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void constructorWithNullDateFormat_shouldThrowIllegalArgumentException() {
-        try {
-            new IntervalCategoryToolTipGenerator("({0}, {1}) = {2}", (DateFormat) null);
-            fail("Expected IllegalArgumentException due to null DateFormat");
-        } catch (IllegalArgumentException e) {
-            verifyException("org.jfree.chart.internal.Args", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test01()  throws Throwable  {
+      IntervalCategoryToolTipGenerator intervalCategoryToolTipGenerator0 = new IntervalCategoryToolTipGenerator();
+      DefaultBoxAndWhiskerCategoryDataset<ChronoLocalDate, ChronoLocalDate> defaultBoxAndWhiskerCategoryDataset0 = new DefaultBoxAndWhiskerCategoryDataset<ChronoLocalDate, ChronoLocalDate>();
+      // Undeclared exception!
+      try { 
+        intervalCategoryToolTipGenerator0.createItemArray(defaultBoxAndWhiskerCategoryDataset0, (-2580), (-2580));
+        fail("Expecting exception: IndexOutOfBoundsException");
+      
+      } catch(IndexOutOfBoundsException e) {
+      }
+  }
 
-    // Exception Handling Tests for createItemArray
-    //----------------------------------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void createItemArrayWithNullDataset_shouldThrowNullPointerException() {
-        IntervalCategoryToolTipGenerator generator = new IntervalCategoryToolTipGenerator();
-        try {
-            generator.createItemArray(null, 70, 70);
-            fail("Expected NullPointerException for null dataset");
-        } catch (NullPointerException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      double[][] doubleArray0 = new double[0][1];
+      DefaultIntervalCategoryDataset defaultIntervalCategoryDataset0 = new DefaultIntervalCategoryDataset(doubleArray0, doubleArray0);
+      IntervalCategoryToolTipGenerator intervalCategoryToolTipGenerator0 = new IntervalCategoryToolTipGenerator();
+      // Undeclared exception!
+      try { 
+        intervalCategoryToolTipGenerator0.createItemArray(defaultIntervalCategoryDataset0, 1696, 1696);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // The 'row' argument is out of bounds.
+         //
+         verifyException("org.jfree.data.category.DefaultIntervalCategoryDataset", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void createItemArrayWithNegativeIndices_shouldThrowIndexOutOfBoundsException() {
-        IntervalCategoryToolTipGenerator generator = new IntervalCategoryToolTipGenerator();
-        DefaultBoxAndWhiskerCategoryDataset dataset = new DefaultBoxAndWhiskerCategoryDataset();
-        try {
-            generator.createItemArray(dataset, -2580, -2580);
-            fail("Expected IndexOutOfBoundsException for negative indices");
-        } catch (IndexOutOfBoundsException e) {
-            // Expected exception
-        }
-    }
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      double[][] doubleArray0 = new double[14][4];
+      DefaultIntervalCategoryDataset defaultIntervalCategoryDataset0 = new DefaultIntervalCategoryDataset(doubleArray0, doubleArray0);
+      IntervalCategoryToolTipGenerator intervalCategoryToolTipGenerator0 = new IntervalCategoryToolTipGenerator();
+      // Undeclared exception!
+      try { 
+        intervalCategoryToolTipGenerator0.createItemArray(defaultIntervalCategoryDataset0, 13, 13);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      
+      } catch(ArrayIndexOutOfBoundsException e) {
+         //
+         // Index 13 out of bounds for length 4
+         //
+         verifyException("org.jfree.data.category.DefaultIntervalCategoryDataset", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void createItemArrayWithInvalidRowIndex_shouldThrowIllegalArgumentException() {
-        double[][] data = new double[0][1];
-        DefaultIntervalCategoryDataset dataset = new DefaultIntervalCategoryDataset(data, data);
-        IntervalCategoryToolTipGenerator generator = new IntervalCategoryToolTipGenerator();
-        try {
-            generator.createItemArray(dataset, 1696, 1696);
-            fail("Expected IllegalArgumentException for invalid row index");
-        } catch (IllegalArgumentException e) {
-            verifyException("org.jfree.data.category.DefaultIntervalCategoryDataset", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      IntervalCategoryToolTipGenerator intervalCategoryToolTipGenerator0 = null;
+      try {
+        intervalCategoryToolTipGenerator0 = new IntervalCategoryToolTipGenerator("({0}, {1}) = {2}", (NumberFormat) null);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Null 'formatter' argument.
+         //
+         verifyException("org.jfree.chart.internal.Args", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void createItemArrayWithInvalidColumnIndex_shouldThrowArrayIndexOutOfBoundsException() {
-        double[][] data = new double[14][4];
-        DefaultIntervalCategoryDataset dataset = new DefaultIntervalCategoryDataset(data, data);
-        IntervalCategoryToolTipGenerator generator = new IntervalCategoryToolTipGenerator();
-        try {
-            generator.createItemArray(dataset, 13, 13);
-            fail("Expected ArrayIndexOutOfBoundsException for invalid column index");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            verifyException("org.jfree.data.category.DefaultIntervalCategoryDataset", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      IntervalCategoryToolTipGenerator intervalCategoryToolTipGenerator0 = null;
+      try {
+        intervalCategoryToolTipGenerator0 = new IntervalCategoryToolTipGenerator("({0}, {1}) = {2}", (DateFormat) null);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Null 'formatter' argument.
+         //
+         verifyException("org.jfree.chart.internal.Args", e);
+      }
+  }
 
-    // Functionality Tests for createItemArray
-    //----------------------------------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void createItemArrayWithValidInput_shouldReturnCorrectArrayLength() {
-        double[][] data = new double[8][4];
-        DefaultIntervalCategoryDataset dataset = new DefaultIntervalCategoryDataset(data, data);
-        IntervalCategoryToolTipGenerator generator = new IntervalCategoryToolTipGenerator();
-        Object[] result = generator.createItemArray(dataset, 0, 0);
-        assertEquals("Array should contain 5 elements", 5, result.length);
-    }
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      DateFormat dateFormat0 = MockDateFormat.getTimeInstance();
+      IntervalCategoryToolTipGenerator intervalCategoryToolTipGenerator0 = new IntervalCategoryToolTipGenerator("", dateFormat0);
+      IntervalCategoryToolTipGenerator intervalCategoryToolTipGenerator1 = new IntervalCategoryToolTipGenerator("({0}, {1}) = {3} - {4}", dateFormat0);
+      boolean boolean0 = intervalCategoryToolTipGenerator0.equals(intervalCategoryToolTipGenerator1);
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void createItemArrayWithDateFormat_shouldReturnCorrectArrayLength() {
-        MockSimpleDateFormat dateFormat = new MockSimpleDateFormat();
-        IntervalCategoryToolTipGenerator generator = 
-            new IntervalCategoryToolTipGenerator("org.jfree.chart.labels.IntervalCategoryToolTipGenerator", dateFormat);
-        double[][] data = new double[5][4];
-        DefaultIntervalCategoryDataset dataset = new DefaultIntervalCategoryDataset(data, data);
-        Object[] result = generator.createItemArray(dataset, 0, 0);
-        assertEquals("Array should contain 5 elements", 5, result.length);
-    }
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      IntervalCategoryToolTipGenerator intervalCategoryToolTipGenerator0 = new IntervalCategoryToolTipGenerator();
+      boolean boolean0 = intervalCategoryToolTipGenerator0.equals(intervalCategoryToolTipGenerator0);
+      assertTrue(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void createItemArrayWithDateTimeFormat_shouldReturnCorrectArrayLength() {
-        DateFormat dateFormat = DateFormat.getDateTimeInstance(0, 0);
-        IntervalCategoryToolTipGenerator generator = 
-            new IntervalCategoryToolTipGenerator("t:RbWj+5v<m\\uAAUW", dateFormat);
-        double[][] data = new double[7][4];
-        DefaultIntervalCategoryDataset dataset = new DefaultIntervalCategoryDataset(data, data);
-        Object[] result = generator.createItemArray(dataset, 0, 3);
-        assertEquals("Array should contain 5 elements", 5, result.length);
-    }
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      double[][] doubleArray0 = new double[8][4];
+      DefaultIntervalCategoryDataset defaultIntervalCategoryDataset0 = new DefaultIntervalCategoryDataset(doubleArray0, doubleArray0);
+      IntervalCategoryToolTipGenerator intervalCategoryToolTipGenerator0 = new IntervalCategoryToolTipGenerator();
+      Object[] objectArray0 = intervalCategoryToolTipGenerator0.createItemArray(defaultIntervalCategoryDataset0, 0, 0);
+      assertEquals(5, objectArray0.length);
+  }
 
-    // Equals and HashCode Tests
-    //----------------------------------------------------------------------------------------------
-    
-    @Test(timeout = 4000)
-    public void equalsWithDifferentFormatStrings_shouldReturnFalse() {
-        DateFormat dateFormat = MockDateFormat.getTimeInstance();
-        IntervalCategoryToolTipGenerator generator1 = new IntervalCategoryToolTipGenerator("", dateFormat);
-        IntervalCategoryToolTipGenerator generator2 = 
-            new IntervalCategoryToolTipGenerator("({0}, {1}) = {3} - {4}", dateFormat);
-        assertFalse("Generators with different formats should not be equal", generator1.equals(generator2));
-    }
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      MockSimpleDateFormat mockSimpleDateFormat0 = new MockSimpleDateFormat();
+      IntervalCategoryToolTipGenerator intervalCategoryToolTipGenerator0 = new IntervalCategoryToolTipGenerator("org.jfree.chart.labels.IntervalCategoryToolTipGenerator", mockSimpleDateFormat0);
+      double[][] doubleArray0 = new double[5][4];
+      DefaultIntervalCategoryDataset defaultIntervalCategoryDataset0 = new DefaultIntervalCategoryDataset(doubleArray0, doubleArray0);
+      Object[] objectArray0 = intervalCategoryToolTipGenerator0.createItemArray(defaultIntervalCategoryDataset0, 0, 0);
+      assertEquals(5, objectArray0.length);
+  }
 
-    @Test(timeout = 4000)
-    public void equalsWithSameObject_shouldReturnTrue() {
-        IntervalCategoryToolTipGenerator generator = new IntervalCategoryToolTipGenerator();
-        assertTrue("Generator should be equal to itself", generator.equals(generator));
-    }
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      NumberFormat numberFormat0 = NumberFormat.getPercentInstance();
+      IntervalCategoryToolTipGenerator intervalCategoryToolTipGenerator0 = new IntervalCategoryToolTipGenerator("Te{[wtf@3LG|<`-", numberFormat0);
+      boolean boolean0 = intervalCategoryToolTipGenerator0.equals("Te{[wtf@3LG|<`-");
+      assertFalse(boolean0);
+  }
 
-    @Test(timeout = 4000)
-    public void equalsWithNonGeneratorObject_shouldReturnFalse() {
-        NumberFormat numberFormat = NumberFormat.getPercentInstance();
-        IntervalCategoryToolTipGenerator generator = 
-            new IntervalCategoryToolTipGenerator("Te{[wtf@3LG|<`-", numberFormat);
-        assertFalse("Generator should not equal a String", generator.equals("Te{[wtf@3LG|<`-"));
-    }
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      String string0 = "t:RbWj+5v<m\\uAAUW";
+      DateFormat dateFormat0 = DateFormat.getDateTimeInstance(0, 0);
+      IntervalCategoryToolTipGenerator intervalCategoryToolTipGenerator0 = new IntervalCategoryToolTipGenerator(string0, dateFormat0);
+      double[][] doubleArray0 = new double[7][4];
+      DefaultIntervalCategoryDataset defaultIntervalCategoryDataset0 = new DefaultIntervalCategoryDataset(doubleArray0, doubleArray0);
+      Object[] objectArray0 = intervalCategoryToolTipGenerator0.createItemArray(defaultIntervalCategoryDataset0, 0, 3);
+      assertEquals(5, objectArray0.length);
+  }
 
-    @Test(timeout = 4000)
-    public void hashCode_shouldComputeWithoutException() {
-        IntervalCategoryToolTipGenerator generator = new IntervalCategoryToolTipGenerator();
-        generator.hashCode(); // Simply verify no exception
-    }
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      IntervalCategoryToolTipGenerator intervalCategoryToolTipGenerator0 = new IntervalCategoryToolTipGenerator();
+      intervalCategoryToolTipGenerator0.hashCode();
+  }
 }
