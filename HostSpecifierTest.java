@@ -17,6 +17,9 @@
 package com.google.common.net;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.testing.EqualsTester;
@@ -26,7 +29,7 @@ import junit.framework.TestCase;
 import org.jspecify.annotations.NullUnmarked;
 
 /**
- * {@link TestCase} for {@link HostSpecifier}. This is a relatively cursory test, as HostSpecifier
+ * Tests for {@link HostSpecifier}. This is a relatively cursory test, as HostSpecifier
  * is a thin wrapper around {@link InetAddresses} and {@link InternetDomainName}; the unit tests for
  * those classes explore numerous corner cases. The intent here is to confirm that everything is
  * wired up properly.
@@ -36,84 +39,152 @@ import org.jspecify.annotations.NullUnmarked;
 @NullUnmarked
 public final class HostSpecifierTest extends TestCase {
 
-  private static final ImmutableList<String> GOOD_IPS =
-      ImmutableList.of("1.2.3.4", "2001:db8::1", "[2001:db8::1]");
+  // Valid IP address test cases
+  private static final ImmutableList<String> VALID_IPV4_ADDRESSES =
+      ImmutableList.of("1.2.3.4");
+  
+  private static final ImmutableList<String> VALID_IPV6_ADDRESSES =
+      ImmutableList.of("2001:db8::1", "[2001:db8::1]");
 
-  private static final ImmutableList<String> BAD_IPS =
-      ImmutableList.of("1.2.3", "2001:db8::1::::::0", "[2001:db8::1", "[::]:80");
+  private static final ImmutableList<String> VALID_IP_ADDRESSES =
+      ImmutableList.<String>builder()
+          .addAll(VALID_IPV4_ADDRESSES)
+          .addAll(VALID_IPV6_ADDRESSES)
+          .build();
 
-  private static final ImmutableList<String> GOOD_DOMAINS =
-      ImmutableList.of("com", "google.com", "foo.co.uk");
+  // Invalid IP address test cases
+  private static final ImmutableList<String> INVALID_IP_ADDRESSES =
+      ImmutableList.of(
+          "1.2.3",                    // Incomplete IPv4
+          "2001:db8::1::::::0",       // Malformed IPv6
+          "[2001:db8::1",             // Missing closing bracket
+          "[::]:80"                   // IPv6 with port (not allowed)
+      );
 
-  private static final ImmutableList<String> BAD_DOMAINS =
-      ImmutableList.of("foo.blah", "", "[google.com]");
+  // Valid domain name test cases
+  private static final ImmutableList<String> VALID_DOMAIN_NAMES =
+      ImmutableList.of(
+          "com",           // Top-level domain
+          "google.com",    // Standard domain
+          "foo.co.uk"      // Domain with country code
+      );
 
-  public void testGoodIpAddresses() throws ParseException {
-    for (String spec : GOOD_IPS) {
-      assertGood(spec);
+  // Invalid domain name test cases
+  private static final ImmutableList<String> INVALID_DOMAIN_NAMES =
+      ImmutableList.of(
+          "foo.blah",        // Invalid TLD
+          "",                // Empty string
+          "[google.com]"     // Domain in brackets (not allowed)
+      );
+
+  public void testValidIpAddresses_ShouldBeAccepted() throws ParseException {
+    for (String validIpAddress : VALID_IP_ADDRESSES) {
+      assertHostSpecifierIsValid(validIpAddress);
     }
   }
 
-  public void testBadIpAddresses() {
-    for (String spec : BAD_IPS) {
-      assertBad(spec);
+  public void testInvalidIpAddresses_ShouldBeRejected() {
+    for (String invalidIpAddress : INVALID_IP_ADDRESSES) {
+      assertHostSpecifierIsInvalid(invalidIpAddress);
     }
   }
 
-  public void testGoodDomains() throws ParseException {
-    for (String spec : GOOD_DOMAINS) {
-      assertGood(spec);
+  public void testValidDomainNames_ShouldBeAccepted() throws ParseException {
+    for (String validDomainName : VALID_DOMAIN_NAMES) {
+      assertHostSpecifierIsValid(validDomainName);
     }
   }
 
-  public void testBadDomains() {
-    for (String spec : BAD_DOMAINS) {
-      assertBad(spec);
+  public void testInvalidDomainNames_ShouldBeRejected() {
+    for (String invalidDomainName : INVALID_DOMAIN_NAMES) {
+      assertHostSpecifierIsInvalid(invalidDomainName);
     }
   }
 
-  public void testEquality() {
+  public void testEquals_ShouldTreatEquivalentSpecifiersAsEqual() {
     new EqualsTester()
-        .addEqualityGroup(spec("1.2.3.4"), spec("1.2.3.4"))
-        .addEqualityGroup(spec("2001:db8::1"), spec("2001:db8::1"), spec("[2001:db8::1]"))
-        .addEqualityGroup(spec("2001:db8::2"))
-        .addEqualityGroup(spec("google.com"), spec("google.com"))
-        .addEqualityGroup(spec("www.google.com"))
+        // IPv4 addresses should equal themselves
+        .addEqualityGroup(
+            createHostSpecifier("1.2.3.4"), 
+            createHostSpecifier("1.2.3.4"))
+        // IPv6 addresses with and without brackets should be equal
+        .addEqualityGroup(
+            createHostSpecifier("2001:db8::1"), 
+            createHostSpecifier("2001:db8::1"), 
+            createHostSpecifier("[2001:db8::1]"))
+        // Different IPv6 addresses should not be equal
+        .addEqualityGroup(
+            createHostSpecifier("2001:db8::2"))
+        // Domain names should equal themselves
+        .addEqualityGroup(
+            createHostSpecifier("google.com"), 
+            createHostSpecifier("google.com"))
+        // Different domain names should not be equal
+        .addEqualityGroup(
+            createHostSpecifier("www.google.com"))
         .testEquals();
   }
 
-  private static HostSpecifier spec(String specifier) {
-    return HostSpecifier.fromValid(specifier);
+  public void testNullHandling_ShouldRejectNullInputs() {
+    NullPointerTester nullTester = new NullPointerTester();
+
+    // Test all public static methods reject null inputs
+    nullTester.testAllPublicStaticMethods(HostSpecifier.class);
+    
+    // Test all public instance methods reject null inputs
+    HostSpecifier validHostSpecifier = HostSpecifier.fromValid("google.com");
+    nullTester.testAllPublicInstanceMethods(validHostSpecifier);
   }
 
-  public void testNulls() {
-    NullPointerTester tester = new NullPointerTester();
-
-    tester.testAllPublicStaticMethods(HostSpecifier.class);
-    tester.testAllPublicInstanceMethods(HostSpecifier.fromValid("google.com"));
+  /**
+   * Helper method to create a HostSpecifier from a known-valid string.
+   */
+  private static HostSpecifier createHostSpecifier(String validSpecifier) {
+    return HostSpecifier.fromValid(validSpecifier);
   }
 
-  private void assertGood(String spec) throws ParseException {
-    // Throws exception if not working correctly
-    HostSpecifier unused = HostSpecifier.fromValid(spec);
-    unused = HostSpecifier.from(spec);
-    assertTrue(HostSpecifier.isValid(spec));
+  /**
+   * Asserts that the given specifier is considered valid by all HostSpecifier validation methods.
+   * 
+   * @param specifier the host specifier string to validate
+   * @throws ParseException if the specifier is unexpectedly invalid
+   */
+  private void assertHostSpecifierIsValid(String specifier) throws ParseException {
+    // Should not throw any exceptions
+    HostSpecifier fromValidResult = HostSpecifier.fromValid(specifier);
+    HostSpecifier fromResult = HostSpecifier.from(specifier);
+    
+    // Validation method should return true
+    assertTrue("Expected HostSpecifier.isValid() to return true for: " + specifier, 
+               HostSpecifier.isValid(specifier));
   }
 
-  private void assertBad(String spec) {
+  /**
+   * Asserts that the given specifier is considered invalid by all HostSpecifier validation methods.
+   * 
+   * @param specifier the host specifier string that should be invalid
+   */
+  private void assertHostSpecifierIsInvalid(String specifier) {
+    // fromValid() should throw IllegalArgumentException
     try {
-      HostSpecifier.fromValid(spec);
-      fail("Should have thrown IllegalArgumentException: " + spec);
+      HostSpecifier.fromValid(specifier);
+      fail("Expected IllegalArgumentException for invalid specifier: " + specifier);
     } catch (IllegalArgumentException expected) {
+      // This is the expected behavior
     }
 
+    // from() should throw ParseException with IllegalArgumentException as cause
     try {
-      HostSpecifier.from(spec);
-      fail("Should have thrown ParseException: " + spec);
+      HostSpecifier.from(specifier);
+      fail("Expected ParseException for invalid specifier: " + specifier);
     } catch (ParseException expected) {
-      assertThat(expected).hasCauseThat().isInstanceOf(IllegalArgumentException.class);
+      assertThat(expected)
+          .hasCauseThat()
+          .isInstanceOf(IllegalArgumentException.class);
     }
 
-    assertFalse(HostSpecifier.isValid(spec));
+    // isValid() should return false
+    assertFalse("Expected HostSpecifier.isValid() to return false for: " + specifier,
+                HostSpecifier.isValid(specifier));
   }
 }
