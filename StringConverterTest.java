@@ -1,3 +1,18 @@
+/*
+ *  Copyright 2001-2005 Stephen Colebourne
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package org.joda.time.convert;
 
 import java.lang.reflect.Constructor;
@@ -21,13 +36,12 @@ import org.joda.time.chrono.ISOChronology;
 import org.joda.time.chrono.JulianChronology;
 
 /**
- * Clearer, less repetitive tests for StringConverter.
- * Keeps JUnit 3 style to match the project, but factors out helpers and
- * uses descriptive test names and assertions to aid readability.
+ * This class is a Junit unit test for StringConverter.
+ *
+ * @author Stephen Colebourne
  */
 public class TestStringConverter extends TestCase {
 
-    // Common zones and chronologies used across tests
     private static final DateTimeZone ONE_HOUR = DateTimeZone.forOffsetHours(1);
     private static final DateTimeZone SIX = DateTimeZone.forOffsetHours(6);
     private static final DateTimeZone SEVEN = DateTimeZone.forOffsetHours(7);
@@ -35,17 +49,14 @@ public class TestStringConverter extends TestCase {
     private static final DateTimeZone UTC = DateTimeZone.UTC;
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
     private static final Chronology ISO_EIGHT = ISOChronology.getInstance(EIGHT);
     private static final Chronology ISO_PARIS = ISOChronology.getInstance(PARIS);
     private static final Chronology ISO_LONDON = ISOChronology.getInstance(LONDON);
-
     private static Chronology ISO;
     private static Chronology JULIAN;
-
-    // Test harness state
-    private DateTimeZone originalZone;
-    private Locale originalLocale;
+    
+    private DateTimeZone zone = null;
+    private Locale locale = null;
 
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
@@ -61,504 +72,514 @@ public class TestStringConverter extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        originalZone = DateTimeZone.getDefault();
-        originalLocale = Locale.getDefault();
+        zone = DateTimeZone.getDefault();
+        locale = Locale.getDefault();
         DateTimeZone.setDefault(LONDON);
         Locale.setDefault(Locale.UK);
-
-        ISO = ISOChronology.getInstance();
+        
         JULIAN = JulianChronology.getInstance();
+        ISO = ISOChronology.getInstance();
     }
 
     @Override
     protected void tearDown() throws Exception {
-        DateTimeZone.setDefault(originalZone);
-        Locale.setDefault(originalLocale);
-        originalZone = null;
-        originalLocale = null;
+        DateTimeZone.setDefault(zone);
+        Locale.setDefault(locale);
+        zone = null;
     }
 
-    // ---------------------------------------------------------------------
-    // Singleton and supported type
-    // ---------------------------------------------------------------------
-    public void testSingletonVisibilityAndInstanceField() throws Exception {
+    //-----------------------------------------------------------------------
+    public void testSingleton() throws Exception {
         Class cls = StringConverter.class;
-
-        assertFalse(Modifier.isPublic(cls.getModifiers()));
-        assertFalse(Modifier.isProtected(cls.getModifiers()));
-        assertFalse(Modifier.isPrivate(cls.getModifiers()));
-
+        assertEquals(false, Modifier.isPublic(cls.getModifiers()));
+        assertEquals(false, Modifier.isProtected(cls.getModifiers()));
+        assertEquals(false, Modifier.isPrivate(cls.getModifiers()));
+        
         Constructor con = cls.getDeclaredConstructor((Class[]) null);
         assertEquals(1, cls.getDeclaredConstructors().length);
-        assertTrue(Modifier.isProtected(con.getModifiers()));
-
+        assertEquals(true, Modifier.isProtected(con.getModifiers()));
+        
         Field fld = cls.getDeclaredField("INSTANCE");
-        assertFalse(Modifier.isPublic(fld.getModifiers()));
-        assertFalse(Modifier.isProtected(fld.getModifiers()));
-        assertFalse(Modifier.isPrivate(fld.getModifiers()));
+        assertEquals(false, Modifier.isPublic(fld.getModifiers()));
+        assertEquals(false, Modifier.isProtected(fld.getModifiers()));
+        assertEquals(false, Modifier.isPrivate(fld.getModifiers()));
     }
 
-    public void testSupportedTypeIsStringClass() {
-        assertSame(String.class, StringConverter.INSTANCE.getSupportedType());
+    //-----------------------------------------------------------------------
+    public void testSupportedType() throws Exception {
+        assertEquals(String.class, StringConverter.INSTANCE.getSupportedType());
     }
 
-    // ---------------------------------------------------------------------
-    // getInstantMillis
-    // ---------------------------------------------------------------------
-    public void testGetInstantMillis_parsesIsoInstantVariants() {
-        // Full date-time with offset
-        assertSameInstant(dt(EIGHT, 2004, 6, 9, 12, 24, 48, 501),
-                StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.501+08:00", ISO_EIGHT));
-
-        // Year only
-        assertSameInstant(dt(EIGHT, 2004, 1, 1, 0, 0, 0, 0),
-                StringConverter.INSTANCE.getInstantMillis("2004T+08:00", ISO_EIGHT));
-
-        // Year-month
-        assertSameInstant(dt(EIGHT, 2004, 6, 1, 0, 0, 0, 0),
-                StringConverter.INSTANCE.getInstantMillis("2004-06T+08:00", ISO_EIGHT));
-
-        // Calendar date (Y-M-D)
-        assertSameInstant(dt(EIGHT, 2004, 6, 9, 0, 0, 0, 0),
-                StringConverter.INSTANCE.getInstantMillis("2004-06-09T+08:00", ISO_EIGHT));
-
-        // Ordinal date (Y-dayOfYear)
-        assertSameInstant(dt(EIGHT, 2004, 6, 9, 0, 0, 0, 0),
-                StringConverter.INSTANCE.getInstantMillis("2004-161T+08:00", ISO_EIGHT));
-
-        // Week date (Y-Www-D)
-        assertSameInstant(dt(EIGHT, 2004, 6, 9, 0, 0, 0, 0),
-                StringConverter.INSTANCE.getInstantMillis("2004-W24-3T+08:00", ISO_EIGHT));
-
-        // Week date (Y-Www)
-        assertSameInstant(dt(EIGHT, 2004, 6, 7, 0, 0, 0, 0),
-                StringConverter.INSTANCE.getInstantMillis("2004-W24T+08:00", ISO_EIGHT));
-
-        // Truncated time (hour)
-        assertSameInstant(dt(EIGHT, 2004, 6, 9, 12, 0, 0, 0),
-                StringConverter.INSTANCE.getInstantMillis("2004-06-09T12+08:00", ISO_EIGHT));
-
-        // Truncated time (hour:minute)
-        assertSameInstant(dt(EIGHT, 2004, 6, 9, 12, 24, 0, 0),
-                StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24+08:00", ISO_EIGHT));
-
-        // Full time, no millis
-        assertSameInstant(dt(EIGHT, 2004, 6, 9, 12, 24, 48, 0),
-                StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48+08:00", ISO_EIGHT));
-
-        // Fractional hour
-        assertSameInstant(dt(EIGHT, 2004, 6, 9, 12, 30, 0, 0),
-                StringConverter.INSTANCE.getInstantMillis("2004-06-09T12.5+08:00", ISO_EIGHT));
-
-        // Fractional minute
-        assertSameInstant(dt(EIGHT, 2004, 6, 9, 12, 24, 30, 0),
-                StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24.5+08:00", ISO_EIGHT));
-
-        // Fractional second
-        assertSameInstant(dt(EIGHT, 2004, 6, 9, 12, 24, 48, 500),
-                StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.5+08:00", ISO_EIGHT));
-
-        // Uses parser zone when none specified, default ISO chronology
-        assertSameInstant(dt(DateTimeZone.getDefault(), 2004, 6, 9, 12, 24, 48, 501),
-                StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.501", ISO));
+    //-----------------------------------------------------------------------
+    public void testGetInstantMillis_Object() throws Exception {
+        DateTime dt = new DateTime(2004, 6, 9, 12, 24, 48, 501, EIGHT);
+        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.501+08:00", ISO_EIGHT));
+        
+        dt = new DateTime(2004, 1, 1, 0, 0, 0, 0, EIGHT);
+        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004T+08:00", ISO_EIGHT));
+        
+        dt = new DateTime(2004, 6, 1, 0, 0, 0, 0, EIGHT);
+        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06T+08:00", ISO_EIGHT));
+        
+        dt = new DateTime(2004, 6, 9, 0, 0, 0, 0, EIGHT);
+        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T+08:00", ISO_EIGHT));
+        
+        dt = new DateTime(2004, 6, 9, 0, 0, 0, 0, EIGHT);
+        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-161T+08:00", ISO_EIGHT));
+        
+        dt = new DateTime(2004, 6, 9, 0, 0, 0, 0, EIGHT);
+        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-W24-3T+08:00", ISO_EIGHT));
+        
+        dt = new DateTime(2004, 6, 7, 0, 0, 0, 0, EIGHT);
+        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-W24T+08:00", ISO_EIGHT));
+        
+        dt = new DateTime(2004, 6, 9, 12, 0, 0, 0, EIGHT);
+        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12+08:00", ISO_EIGHT));
+        
+        dt = new DateTime(2004, 6, 9, 12, 24, 0, 0, EIGHT);
+        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24+08:00", ISO_EIGHT));
+        
+        dt = new DateTime(2004, 6, 9, 12, 24, 48, 0, EIGHT);
+        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48+08:00", ISO_EIGHT));
+        
+        dt = new DateTime(2004, 6, 9, 12, 30, 0, 0, EIGHT);
+        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12.5+08:00", ISO_EIGHT));
+        
+        dt = new DateTime(2004, 6, 9, 12, 24, 30, 0, EIGHT);
+        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24.5+08:00", ISO_EIGHT));
+        
+        dt = new DateTime(2004, 6, 9, 12, 24, 48, 500, EIGHT);
+        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.5+08:00", ISO_EIGHT));
+        
+        dt = new DateTime(2004, 6, 9, 12, 24, 48, 501);
+        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.501", ISO));
     }
 
-    public void testGetInstantMillis_respectsZoneFromChronology() {
-        assertSameInstant(dt(PARIS, 2004, 6, 9, 12, 24, 48, 501),
-                StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.501+02:00", ISO_PARIS));
-
-        assertSameInstant(dt(PARIS, 2004, 6, 9, 12, 24, 48, 501),
-                StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.501", ISO_PARIS));
-
-        assertSameInstant(dt(LONDON, 2004, 6, 9, 12, 24, 48, 501),
-                StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.501+01:00", ISO_LONDON));
-
-        assertSameInstant(dt(LONDON, 2004, 6, 9, 12, 24, 48, 501),
-                StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.501", ISO_LONDON));
+    public void testGetInstantMillis_Object_Zone() throws Exception {
+        DateTime dt = new DateTime(2004, 6, 9, 12, 24, 48, 501, PARIS);
+        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.501+02:00", ISO_PARIS));
+        
+        dt = new DateTime(2004, 6, 9, 12, 24, 48, 501, PARIS);
+        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.501", ISO_PARIS));
+        
+        dt = new DateTime(2004, 6, 9, 12, 24, 48, 501, LONDON);
+        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.501+01:00", ISO_LONDON));
+        
+        dt = new DateTime(2004, 6, 9, 12, 24, 48, 501, LONDON);
+        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.501", ISO_LONDON));
     }
 
-    public void testGetInstantMillis_withNonIsoChronology() {
-        DateTime expected = new DateTime(2004, 6, 9, 12, 24, 48, 501, JulianChronology.getInstance(LONDON));
-        assertEquals(expected.getMillis(),
-                StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.501+01:00", JULIAN));
+    public void testGetInstantMillis_Object_Chronology() throws Exception {
+        DateTime dt = new DateTime(2004, 6, 9, 12, 24, 48, 501, JulianChronology.getInstance(LONDON));
+        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.501+01:00", JULIAN));
     }
 
-    public void testGetInstantMillis_invalidInputsThrowIAE() {
-        assertIllegalArgumentThrown(new ThrowingCallable() {
-            public void call() {
-                StringConverter.INSTANCE.getInstantMillis("", (Chronology) null);
-            }
-        });
-        assertIllegalArgumentThrown(new ThrowingCallable() {
-            public void call() {
-                StringConverter.INSTANCE.getInstantMillis("X", (Chronology) null);
-            }
-        });
+    public void testGetInstantMillisInvalid() {
+        try {
+            StringConverter.INSTANCE.getInstantMillis("", (Chronology) null);
+            fail();
+        } catch (IllegalArgumentException ex) {}
+        try {
+            StringConverter.INSTANCE.getInstantMillis("X", (Chronology) null);
+            fail();
+        } catch (IllegalArgumentException ex) {}
     }
 
-    // ---------------------------------------------------------------------
-    // getChronology
-    // ---------------------------------------------------------------------
-    public void testGetChronology_withZone() {
-        assertEquals(ISOChronology.getInstance(PARIS),
-                StringConverter.INSTANCE.getChronology("2004-06-09T12:24:48.501+01:00", PARIS));
-        assertEquals(ISOChronology.getInstance(PARIS),
-                StringConverter.INSTANCE.getChronology("2004-06-09T12:24:48.501", PARIS));
-
-        assertEquals(ISOChronology.getInstance(LONDON),
-                StringConverter.INSTANCE.getChronology("2004-06-09T12:24:48.501+01:00", (DateTimeZone) null));
-        assertEquals(ISOChronology.getInstance(LONDON),
-                StringConverter.INSTANCE.getChronology("2004-06-09T12:24:48.501", (DateTimeZone) null));
+    //-----------------------------------------------------------------------
+    public void testGetChronology_Object_Zone() throws Exception {
+        assertEquals(ISOChronology.getInstance(PARIS), StringConverter.INSTANCE.getChronology("2004-06-09T12:24:48.501+01:00", PARIS));
+        assertEquals(ISOChronology.getInstance(PARIS), StringConverter.INSTANCE.getChronology("2004-06-09T12:24:48.501", PARIS));
+        assertEquals(ISOChronology.getInstance(LONDON), StringConverter.INSTANCE.getChronology("2004-06-09T12:24:48.501+01:00", (DateTimeZone) null));
+        assertEquals(ISOChronology.getInstance(LONDON), StringConverter.INSTANCE.getChronology("2004-06-09T12:24:48.501", (DateTimeZone) null));
     }
 
-    public void testGetChronology_withChronology() {
-        assertEquals(JulianChronology.getInstance(LONDON),
-                StringConverter.INSTANCE.getChronology("2004-06-09T12:24:48.501+01:00", JULIAN));
-        assertEquals(JulianChronology.getInstance(LONDON),
-                StringConverter.INSTANCE.getChronology("2004-06-09T12:24:48.501", JULIAN));
-
-        assertEquals(ISOChronology.getInstance(LONDON),
-                StringConverter.INSTANCE.getChronology("2004-06-09T12:24:48.501+01:00", (Chronology) null));
-        assertEquals(ISOChronology.getInstance(LONDON),
-                StringConverter.INSTANCE.getChronology("2004-06-09T12:24:48.501", (Chronology) null));
+    public void testGetChronology_Object_Chronology() throws Exception {
+        assertEquals(JulianChronology.getInstance(LONDON), StringConverter.INSTANCE.getChronology("2004-06-09T12:24:48.501+01:00", JULIAN));
+        assertEquals(JulianChronology.getInstance(LONDON), StringConverter.INSTANCE.getChronology("2004-06-09T12:24:48.501", JULIAN));
+        assertEquals(ISOChronology.getInstance(LONDON), StringConverter.INSTANCE.getChronology("2004-06-09T12:24:48.501+01:00", (Chronology) null));
+        assertEquals(ISOChronology.getInstance(LONDON), StringConverter.INSTANCE.getChronology("2004-06-09T12:24:48.501", (Chronology) null));
     }
 
-    // ---------------------------------------------------------------------
-    // getPartialValues
-    // ---------------------------------------------------------------------
-    public void testGetPartialValues_timeOfDay() {
+    //-----------------------------------------------------------------------
+    public void testGetPartialValues() throws Exception {
         TimeOfDay tod = new TimeOfDay();
         int[] expected = new int[] {3, 4, 5, 6};
         int[] actual = StringConverter.INSTANCE.getPartialValues(tod, "T03:04:05.006", ISOChronology.getInstance());
-        assertIntArrayEquals(expected, actual);
+        assertEquals(true, Arrays.equals(expected, actual));
     }
 
-    // ---------------------------------------------------------------------
-    // DateTime(String) behavior (integration-level checks)
-    // ---------------------------------------------------------------------
-    public void testDateTime_fromString_defaultZoneAndChronology() {
-        DateTime test = new DateTime("2004-06-09T12:24:48.501+01:00");
-        assertDateTimeFields(test, 2004, 6, 9, 12, 24, 48, 501, LONDON);
-    }
-
-    public void testDateTime_fromString_noOffset_usesDefaultZone() {
-        DateTime test = new DateTime("2004-06-09T12:24:48.501");
-        assertDateTimeFields(test, 2004, 6, 9, 12, 24, 48, 501, LONDON);
-    }
-
-    public void testDateTime_fromString_withExplicitZoneParameter() {
-        DateTime test = new DateTime("2004-06-09T12:24:48.501+02:00", PARIS);
-        assertDateTimeFields(test, 2004, 6, 9, 12, 24, 48, 501, PARIS);
-    }
-
-    public void testDateTime_fromString_noOffset_withZoneParameter() {
-        DateTime test = new DateTime("2004-06-09T12:24:48.501", PARIS);
-        assertDateTimeFields(test, 2004, 6, 9, 12, 24, 48, 501, PARIS);
-    }
-
-    public void testDateTime_fromString_withNonIsoChronologyAndOffset() {
-        DateTime test = new DateTime("2004-06-09T12:24:48.501+02:00", JulianChronology.getInstance(PARIS));
-        assertDateTimeFields(test, 2004, 6, 9, 12, 24, 48, 501, PARIS);
-    }
-
-    public void testDateTime_fromString_withNonIsoChronologyNoOffset() {
-        DateTime test = new DateTime("2004-06-09T12:24:48.501", JulianChronology.getInstance(PARIS));
-        assertDateTimeFields(test, 2004, 6, 9, 12, 24, 48, 501, PARIS);
-    }
-
-    public void testDateTime_roundTrip_fromBaseToString() {
+    //-----------------------------------------------------------------------
+    public void testGetDateTime() throws Exception {
         DateTime base = new DateTime(2004, 6, 9, 12, 24, 48, 501, PARIS);
-        DateTime parsed = new DateTime(base.toString(), PARIS);
-        assertEquals(base, parsed);
+        DateTime test = new DateTime(base.toString(), PARIS);
+        assertEquals(base, test);
     }
 
-    // ---------------------------------------------------------------------
-    // getDurationMillis
-    // ---------------------------------------------------------------------
-    public void testGetDurationMillis_validInputs() {
-        assertEquals(12345, StringConverter.INSTANCE.getDurationMillis("PT12.345S"));
-        assertEquals(12345, StringConverter.INSTANCE.getDurationMillis("pt12.345s"));
-        assertEquals(12000, StringConverter.INSTANCE.getDurationMillis("pt12s"));
-        assertEquals(12000, StringConverter.INSTANCE.getDurationMillis("pt12.s"));
-        assertEquals(-12320, StringConverter.INSTANCE.getDurationMillis("pt-12.32s"));
-        assertEquals(-320, StringConverter.INSTANCE.getDurationMillis("pt-0.32s"));
-        assertEquals(0, StringConverter.INSTANCE.getDurationMillis("pt-0.0s"));
-        assertEquals(0, StringConverter.INSTANCE.getDurationMillis("pt0.0s"));
-        assertEquals(12345, StringConverter.INSTANCE.getDurationMillis("pt12.3456s")); // truncated millis
+    public void testGetDateTime1() throws Exception {
+        DateTime test = new DateTime("2004-06-09T12:24:48.501+01:00");
+        assertEquals(2004, test.getYear());
+        assertEquals(6, test.getMonthOfYear());
+        assertEquals(9, test.getDayOfMonth());
+        assertEquals(12, test.getHourOfDay());
+        assertEquals(24, test.getMinuteOfHour());
+        assertEquals(48, test.getSecondOfMinute());
+        assertEquals(501, test.getMillisOfSecond());
+        assertEquals(LONDON, test.getZone());
     }
 
-    public void testGetDurationMillis_invalidInputsThrowIAE() {
-        String[] invalid = new String[] {
-            "P2Y6M9DXYZ", "PTS", "XT0S", "PX0S", "PT0X", "PTXS", "PT0.0.0S", "PT0-00S", "PT-.001S"
-        };
-        for (int i = 0; i < invalid.length; i++) {
-            final String s = invalid[i];
-            assertIllegalArgumentThrown(new ThrowingCallable() {
-                public void call() {
-                    StringConverter.INSTANCE.getDurationMillis(s);
-                }
-            });
-        }
+    public void testGetDateTime2() throws Exception {
+        DateTime test = new DateTime("2004-06-09T12:24:48.501");
+        assertEquals(2004, test.getYear());
+        assertEquals(6, test.getMonthOfYear());
+        assertEquals(9, test.getDayOfMonth());
+        assertEquals(12, test.getHourOfDay());
+        assertEquals(24, test.getMinuteOfHour());
+        assertEquals(48, test.getSecondOfMinute());
+        assertEquals(501, test.getMillisOfSecond());
+        assertEquals(LONDON, test.getZone());
     }
 
-    // ---------------------------------------------------------------------
-    // Period parsing (setInto ReadWritablePeriod)
-    // ---------------------------------------------------------------------
-    public void testGetPeriodType_fromString() {
-        assertEquals(PeriodType.standard(), StringConverter.INSTANCE.getPeriodType("P2Y6M9D"));
+    public void testGetDateTime3() throws Exception {
+        DateTime test = new DateTime("2004-06-09T12:24:48.501+02:00", PARIS);
+        assertEquals(2004, test.getYear());
+        assertEquals(6, test.getMonthOfYear());
+        assertEquals(9, test.getDayOfMonth());
+        assertEquals(12, test.getHourOfDay());
+        assertEquals(24, test.getMinuteOfHour());
+        assertEquals(48, test.getSecondOfMinute());
+        assertEquals(501, test.getMillisOfSecond());
+        assertEquals(PARIS, test.getZone());
     }
 
-    public void testSetIntoPeriod_yearMonthDayTime() {
-        MutablePeriod p = new MutablePeriod(PeriodType.yearMonthDayTime());
-        StringConverter.INSTANCE.setInto(p, "P2Y6M9DT12H24M48S", null);
-        assertPeriod(p, 2, 6, 0, 9, 12, 24, 48, 0);
+    public void testGetDateTime4() throws Exception {
+        DateTime test = new DateTime("2004-06-09T12:24:48.501", PARIS);
+        assertEquals(2004, test.getYear());
+        assertEquals(6, test.getMonthOfYear());
+        assertEquals(9, test.getDayOfMonth());
+        assertEquals(12, test.getHourOfDay());
+        assertEquals(24, test.getMinuteOfHour());
+        assertEquals(48, test.getSecondOfMinute());
+        assertEquals(501, test.getMillisOfSecond());
+        assertEquals(PARIS, test.getZone());
     }
 
-    public void testSetIntoPeriod_yearWeekDayTime() {
-        MutablePeriod p = new MutablePeriod(PeriodType.yearWeekDayTime());
-        StringConverter.INSTANCE.setInto(p, "P2Y4W3DT12H24M48S", null);
-        assertPeriod(p, 2, 0, 4, 3, 12, 24, 48, 0);
+    public void testGetDateTime5() throws Exception {
+        DateTime test = new DateTime("2004-06-09T12:24:48.501+02:00", JulianChronology.getInstance(PARIS));
+        assertEquals(2004, test.getYear());
+        assertEquals(6, test.getMonthOfYear());
+        assertEquals(9, test.getDayOfMonth());
+        assertEquals(12, test.getHourOfDay());
+        assertEquals(24, test.getMinuteOfHour());
+        assertEquals(48, test.getSecondOfMinute());
+        assertEquals(501, test.getMillisOfSecond());
+        assertEquals(PARIS, test.getZone());
     }
 
-    public void testSetIntoPeriod_withFractionalSeconds() {
-        MutablePeriod p = new MutablePeriod(PeriodType.yearWeekDayTime());
-        StringConverter.INSTANCE.setInto(p, "P2Y4W3DT12H24M48.034S", null);
-        assertPeriod(p, 2, 0, 4, 3, 12, 24, 48, 34);
+    public void testGetDateTime6() throws Exception {
+        DateTime test = new DateTime("2004-06-09T12:24:48.501", JulianChronology.getInstance(PARIS));
+        assertEquals(2004, test.getYear());
+        assertEquals(6, test.getMonthOfYear());
+        assertEquals(9, test.getDayOfMonth());
+        assertEquals(12, test.getHourOfDay());
+        assertEquals(24, test.getMinuteOfHour());
+        assertEquals(48, test.getSecondOfMinute());
+        assertEquals(501, test.getMillisOfSecond());
+        assertEquals(PARIS, test.getZone());
     }
 
-    public void testSetIntoPeriod_onlyFractionalSeconds() {
-        MutablePeriod p = new MutablePeriod(PeriodType.yearWeekDayTime());
-        StringConverter.INSTANCE.setInto(p, "P2Y4W3DT12H24M.056S", null);
-        assertPeriod(p, 2, 0, 4, 3, 12, 24, 0, 56);
+    //-----------------------------------------------------------------------
+    public void testGetDurationMillis_Object1() throws Exception {
+        long millis = StringConverter.INSTANCE.getDurationMillis("PT12.345S");
+        assertEquals(12345, millis);
+        
+        millis = StringConverter.INSTANCE.getDurationMillis("pt12.345s");
+        assertEquals(12345, millis);
+        
+        millis = StringConverter.INSTANCE.getDurationMillis("pt12s");
+        assertEquals(12000, millis);
+        
+        millis = StringConverter.INSTANCE.getDurationMillis("pt12.s");
+        assertEquals(12000, millis);
+        
+        millis = StringConverter.INSTANCE.getDurationMillis("pt-12.32s");
+        assertEquals(-12320, millis);
+        
+        millis = StringConverter.INSTANCE.getDurationMillis("pt-0.32s");
+        assertEquals(-320, millis);
+
+        millis = StringConverter.INSTANCE.getDurationMillis("pt-0.0s");
+        assertEquals(0, millis);
+
+        millis = StringConverter.INSTANCE.getDurationMillis("pt0.0s");
+        assertEquals(0, millis);
+
+        millis = StringConverter.INSTANCE.getDurationMillis("pt12.3456s");
+        assertEquals(12345, millis);
     }
 
-    public void testSetIntoPeriod_secondsFollowedByFractionSymbol() {
-        MutablePeriod p = new MutablePeriod(PeriodType.yearWeekDayTime());
-        StringConverter.INSTANCE.setInto(p, "P2Y4W3DT12H24M56.S", null);
-        assertPeriod(p, 2, 0, 4, 3, 12, 24, 56, 0);
+    public void testGetDurationMillis_Object2() throws Exception {
+        try {
+            StringConverter.INSTANCE.getDurationMillis("P2Y6M9DXYZ");
+            fail();
+        } catch (IllegalArgumentException ex) {}
+        try {
+            StringConverter.INSTANCE.getDurationMillis("PTS");
+            fail();
+        } catch (IllegalArgumentException ex) {}
+        try {
+            StringConverter.INSTANCE.getDurationMillis("XT0S");
+            fail();
+        } catch (IllegalArgumentException ex) {}
+        try {
+            StringConverter.INSTANCE.getDurationMillis("PX0S");
+            fail();
+        } catch (IllegalArgumentException ex) {}
+        try {
+            StringConverter.INSTANCE.getDurationMillis("PT0X");
+            fail();
+        } catch (IllegalArgumentException ex) {}
+        try {
+            StringConverter.INSTANCE.getDurationMillis("PTXS");
+            fail();
+        } catch (IllegalArgumentException ex) {}
+        try {
+            StringConverter.INSTANCE.getDurationMillis("PT0.0.0S");
+            fail();
+        } catch (IllegalArgumentException ex) {}
+        try {
+            StringConverter.INSTANCE.getDurationMillis("PT0-00S");
+            fail();
+        } catch (IllegalArgumentException ex) {}
+        try {
+            StringConverter.INSTANCE.getDurationMillis("PT-.001S");
+            fail();
+        } catch (IllegalArgumentException ex) {}
     }
 
-    public void testSetIntoPeriod_fractionalSecondsTruncatedToMillis() {
-        MutablePeriod p = new MutablePeriod(PeriodType.yearWeekDayTime());
-        StringConverter.INSTANCE.setInto(p, "P2Y4W3DT12H24M56.1234567S", null);
-        assertPeriod(p, 2, 0, 4, 3, 12, 24, 56, 123);
+    //-----------------------------------------------------------------------
+    public void testGetPeriodType_Object() throws Exception {
+        assertEquals(PeriodType.standard(),
+            StringConverter.INSTANCE.getPeriodType("P2Y6M9D"));
     }
 
-    public void testSetIntoPeriod_zerosUnsetFields() {
-        MutablePeriod p = new MutablePeriod(1, 0, 1, 1, 1, 1, 1, 1, PeriodType.yearWeekDayTime());
-        StringConverter.INSTANCE.setInto(p, "P2Y4W3D", null);
-        assertPeriod(p, 2, 0, 4, 3, 0, 0, 0, 0);
+    public void testSetIntoPeriod_Object1() throws Exception {
+        MutablePeriod m = new MutablePeriod(PeriodType.yearMonthDayTime());
+        StringConverter.INSTANCE.setInto(m, "P2Y6M9DT12H24M48S", null);
+        assertEquals(2, m.getYears());
+        assertEquals(6, m.getMonths());
+        assertEquals(9, m.getDays());
+        assertEquals(12, m.getHours());
+        assertEquals(24, m.getMinutes());
+        assertEquals(48, m.getSeconds());
+        assertEquals(0, m.getMillis());
     }
 
-    public void testSetIntoPeriod_invalidInputsThrowIAE() {
-        final MutablePeriod p = new MutablePeriod();
-        assertIllegalArgumentThrown(new ThrowingCallable() {
-            public void call() {
-                StringConverter.INSTANCE.setInto(p, "", null);
-            }
-        });
-        assertIllegalArgumentThrown(new ThrowingCallable() {
-            public void call() {
-                StringConverter.INSTANCE.setInto(p, "PXY", null);
-            }
-        });
-        assertIllegalArgumentThrown(new ThrowingCallable() {
-            public void call() {
-                StringConverter.INSTANCE.setInto(p, "PT0SXY", null);
-            }
-        });
-        assertIllegalArgumentThrown(new ThrowingCallable() {
-            public void call() {
-                StringConverter.INSTANCE.setInto(p, "P2Y4W3DT12H24M48SX", null);
-            }
-        });
+    public void testSetIntoPeriod_Object2() throws Exception {
+        MutablePeriod m = new MutablePeriod(PeriodType.yearWeekDayTime());
+        StringConverter.INSTANCE.setInto(m, "P2Y4W3DT12H24M48S", null);
+        assertEquals(2, m.getYears());
+        assertEquals(4, m.getWeeks());
+        assertEquals(3, m.getDays());
+        assertEquals(12, m.getHours());
+        assertEquals(24, m.getMinutes());
+        assertEquals(48, m.getSeconds());
+        assertEquals(0, m.getMillis());
+    }        
+
+    public void testSetIntoPeriod_Object3() throws Exception {
+        MutablePeriod m = new MutablePeriod(PeriodType.yearWeekDayTime());
+        StringConverter.INSTANCE.setInto(m, "P2Y4W3DT12H24M48.034S", null);
+        assertEquals(2, m.getYears());
+        assertEquals(4, m.getWeeks());
+        assertEquals(3, m.getDays());
+        assertEquals(12, m.getHours());
+        assertEquals(24, m.getMinutes());
+        assertEquals(48, m.getSeconds());
+        assertEquals(34, m.getMillis());
+    }        
+
+    public void testSetIntoPeriod_Object4() throws Exception {
+        MutablePeriod m = new MutablePeriod(PeriodType.yearWeekDayTime());
+        StringConverter.INSTANCE.setInto(m, "P2Y4W3DT12H24M.056S", null);
+        assertEquals(2, m.getYears());
+        assertEquals(4, m.getWeeks());
+        assertEquals(3, m.getDays());
+        assertEquals(12, m.getHours());
+        assertEquals(24, m.getMinutes());
+        assertEquals(0, m.getSeconds());
+        assertEquals(56, m.getMillis());
+    }        
+
+    public void testSetIntoPeriod_Object5() throws Exception {
+        MutablePeriod m = new MutablePeriod(PeriodType.yearWeekDayTime());
+        StringConverter.INSTANCE.setInto(m, "P2Y4W3DT12H24M56.S", null);
+        assertEquals(2, m.getYears());
+        assertEquals(4, m.getWeeks());
+        assertEquals(3, m.getDays());
+        assertEquals(12, m.getHours());
+        assertEquals(24, m.getMinutes());
+        assertEquals(56, m.getSeconds());
+        assertEquals(0, m.getMillis());
+    }        
+
+    public void testSetIntoPeriod_Object6() throws Exception {
+        MutablePeriod m = new MutablePeriod(PeriodType.yearWeekDayTime());
+        StringConverter.INSTANCE.setInto(m, "P2Y4W3DT12H24M56.1234567S", null);
+        assertEquals(2, m.getYears());
+        assertEquals(4, m.getWeeks());
+        assertEquals(3, m.getDays());
+        assertEquals(12, m.getHours());
+        assertEquals(24, m.getMinutes());
+        assertEquals(56, m.getSeconds());
+        assertEquals(123, m.getMillis());
+    }        
+
+    public void testSetIntoPeriod_Object7() throws Exception {
+        MutablePeriod m = new MutablePeriod(1, 0, 1, 1, 1, 1, 1, 1, PeriodType.yearWeekDayTime());
+        StringConverter.INSTANCE.setInto(m, "P2Y4W3D", null);
+        assertEquals(2, m.getYears());
+        assertEquals(4, m.getWeeks());
+        assertEquals(3, m.getDays());
+        assertEquals(0, m.getHours());
+        assertEquals(0, m.getMinutes());
+        assertEquals(0, m.getSeconds());
+        assertEquals(0, m.getMillis());
+    }        
+
+    public void testSetIntoPeriod_Object8() throws Exception {
+        MutablePeriod m = new MutablePeriod();
+        try {
+            StringConverter.INSTANCE.setInto(m, "", null);
+            fail();
+        } catch (IllegalArgumentException ex) {}
+        
+        try {
+            StringConverter.INSTANCE.setInto(m, "PXY", null);
+            fail();
+        } catch (IllegalArgumentException ex) {}
+        
+        try {
+            StringConverter.INSTANCE.setInto(m, "PT0SXY", null);
+            fail();
+        } catch (IllegalArgumentException ex) {}
+        try {
+            StringConverter.INSTANCE.setInto(m, "P2Y4W3DT12H24M48SX", null);
+            fail();
+        } catch (IllegalArgumentException ex) {}
     }
 
-    // ---------------------------------------------------------------------
-    // Interval parsing (setInto ReadWritableInterval)
-    // ---------------------------------------------------------------------
-    public void testIsReadableInterval_returnsFalseForEmptyString() {
-        assertFalse(StringConverter.INSTANCE.isReadableInterval("", null));
+    //-----------------------------------------------------------------------
+    public void testIsReadableInterval_Object_Chronology() throws Exception {
+        assertEquals(false, StringConverter.INSTANCE.isReadableInterval("", null));
     }
 
-    public void testSetIntoInterval_startInstantSlashPeriod() {
-        MutableInterval i = new MutableInterval(-1000L, 1000L);
-        StringConverter.INSTANCE.setInto(i, "2004-06-09/P1Y2M", null);
-        assertInterval(i,
-                dt(null, 2004, 6, 9, 0, 0, 0, 0),
-                dt(null, 2005, 8, 9, 0, 0, 0, 0),
-                ISOChronology.getInstance());
+    public void testSetIntoInterval_Object_Chronology1() throws Exception {
+        MutableInterval m = new MutableInterval(-1000L, 1000L);
+        StringConverter.INSTANCE.setInto(m, "2004-06-09/P1Y2M", null);
+        assertEquals(new DateTime(2004, 6, 9, 0, 0, 0, 0), m.getStart());
+        assertEquals(new DateTime(2005, 8, 9, 0, 0, 0, 0), m.getEnd());
+        assertEquals(ISOChronology.getInstance(), m.getChronology());
     }
 
-    public void testSetIntoInterval_periodSlashEndInstant() {
-        MutableInterval i = new MutableInterval(-1000L, 1000L);
-        StringConverter.INSTANCE.setInto(i, "P1Y2M/2004-06-09", null);
-        assertInterval(i,
-                dt(null, 2003, 4, 9, 0, 0, 0, 0),
-                dt(null, 2004, 6, 9, 0, 0, 0, 0),
-                ISOChronology.getInstance());
+    public void testSetIntoInterval_Object_Chronology2() throws Exception {
+        MutableInterval m = new MutableInterval(-1000L, 1000L);
+        StringConverter.INSTANCE.setInto(m, "P1Y2M/2004-06-09", null);
+        assertEquals(new DateTime(2003, 4, 9, 0, 0, 0, 0), m.getStart());
+        assertEquals(new DateTime(2004, 6, 9, 0, 0, 0, 0), m.getEnd());
+        assertEquals(ISOChronology.getInstance(), m.getChronology());
     }
 
-    public void testSetIntoInterval_startInstantSlashEndInstant() {
-        MutableInterval i = new MutableInterval(-1000L, 1000L);
-        StringConverter.INSTANCE.setInto(i, "2003-08-09/2004-06-09", null);
-        assertInterval(i,
-                dt(null, 2003, 8, 9, 0, 0, 0, 0),
-                dt(null, 2004, 6, 9, 0, 0, 0, 0),
-                ISOChronology.getInstance());
+    public void testSetIntoInterval_Object_Chronology3() throws Exception {
+        MutableInterval m = new MutableInterval(-1000L, 1000L);
+        StringConverter.INSTANCE.setInto(m, "2003-08-09/2004-06-09", null);
+        assertEquals(new DateTime(2003, 8, 9, 0, 0, 0, 0), m.getStart());
+        assertEquals(new DateTime(2004, 6, 9, 0, 0, 0, 0), m.getEnd());
+        assertEquals(ISOChronology.getInstance(), m.getChronology());
     }
 
-    public void testSetIntoInterval_respectsExplicitOffsetOnInstants() {
-        MutableInterval i = new MutableInterval(-1000L, 1000L);
-        StringConverter.INSTANCE.setInto(i, "2004-06-09T+06:00/P1Y2M", null);
-        assertInterval(i,
-                new DateTime(2004, 6, 9, 0, 0, 0, 0, SIX).withChronology(null),
-                new DateTime(2005, 8, 9, 0, 0, 0, 0, SIX).withChronology(null),
-                ISOChronology.getInstance());
+    public void testSetIntoInterval_Object_Chronology4() throws Exception {
+        MutableInterval m = new MutableInterval(-1000L, 1000L);
+        StringConverter.INSTANCE.setInto(m, "2004-06-09T+06:00/P1Y2M", null);
+        assertEquals(new DateTime(2004, 6, 9, 0, 0, 0, 0, SIX).withChronology(null), m.getStart());
+        assertEquals(new DateTime(2005, 8, 9, 0, 0, 0, 0, SIX).withChronology(null), m.getEnd());
+        assertEquals(ISOChronology.getInstance(), m.getChronology());
     }
 
-    public void testSetIntoInterval_respectsExplicitOffsetOnInstants_endAtOffset() {
-        MutableInterval i = new MutableInterval(-1000L, 1000L);
-        StringConverter.INSTANCE.setInto(i, "P1Y2M/2004-06-09T+06:00", null);
-        assertInterval(i,
-                new DateTime(2003, 4, 9, 0, 0, 0, 0, SIX).withChronology(null),
-                new DateTime(2004, 6, 9, 0, 0, 0, 0, SIX).withChronology(null),
-                ISOChronology.getInstance());
+    public void testSetIntoInterval_Object_Chronology5() throws Exception {
+        MutableInterval m = new MutableInterval(-1000L, 1000L);
+        StringConverter.INSTANCE.setInto(m, "P1Y2M/2004-06-09T+06:00", null);
+        assertEquals(new DateTime(2003, 4, 9, 0, 0, 0, 0, SIX).withChronology(null), m.getStart());
+        assertEquals(new DateTime(2004, 6, 9, 0, 0, 0, 0, SIX).withChronology(null), m.getEnd());
+        assertEquals(ISOChronology.getInstance(), m.getChronology());
     }
 
-    public void testSetIntoInterval_differentOffsetsForStartAndEnd() {
-        MutableInterval i = new MutableInterval(-1000L, 1000L);
-        StringConverter.INSTANCE.setInto(i, "2003-08-09T+06:00/2004-06-09T+07:00", null);
-        assertInterval(i,
-                new DateTime(2003, 8, 9, 0, 0, 0, 0, SIX).withChronology(null),
-                new DateTime(2004, 6, 9, 0, 0, 0, 0, SEVEN).withChronology(null),
-                ISOChronology.getInstance());
+    public void testSetIntoInterval_Object_Chronology6() throws Exception {
+        MutableInterval m = new MutableInterval(-1000L, 1000L);
+        StringConverter.INSTANCE.setInto(m, "2003-08-09T+06:00/2004-06-09T+07:00", null);
+        assertEquals(new DateTime(2003, 8, 9, 0, 0, 0, 0, SIX).withChronology(null), m.getStart());
+        assertEquals(new DateTime(2004, 6, 9, 0, 0, 0, 0, SEVEN).withChronology(null), m.getEnd());
+        assertEquals(ISOChronology.getInstance(), m.getChronology());
     }
 
-    public void testSetIntoInterval_withNonIsoChronology() {
-        MutableInterval i = new MutableInterval(-1000L, 1000L);
-        StringConverter.INSTANCE.setInto(i, "2003-08-09/2004-06-09", BuddhistChronology.getInstance());
-        assertInterval(i,
-                new DateTime(2003, 8, 9, 0, 0, 0, 0, BuddhistChronology.getInstance()),
-                new DateTime(2004, 6, 9, 0, 0, 0, 0, BuddhistChronology.getInstance()),
-                BuddhistChronology.getInstance());
+    public void testSetIntoInterval_Object_Chronology7() throws Exception {
+        MutableInterval m = new MutableInterval(-1000L, 1000L);
+        StringConverter.INSTANCE.setInto(m, "2003-08-09/2004-06-09", BuddhistChronology.getInstance());
+        assertEquals(new DateTime(2003, 8, 9, 0, 0, 0, 0, BuddhistChronology.getInstance()), m.getStart());
+        assertEquals(new DateTime(2004, 6, 9, 0, 0, 0, 0, BuddhistChronology.getInstance()), m.getEnd());
+        assertEquals(BuddhistChronology.getInstance(), m.getChronology());
     }
 
-    public void testSetIntoInterval_withNonIsoChronologyAndExplicitOffsets() {
-        MutableInterval i = new MutableInterval(-1000L, 1000L);
-        StringConverter.INSTANCE.setInto(i, "2003-08-09T+06:00/2004-06-09T+07:00", BuddhistChronology.getInstance(EIGHT));
-        assertInterval(i,
-                new DateTime(2003, 8, 9, 0, 0, 0, 0, BuddhistChronology.getInstance(SIX)).withZone(EIGHT),
-                new DateTime(2004, 6, 9, 0, 0, 0, 0, BuddhistChronology.getInstance(SEVEN)).withZone(EIGHT),
-                BuddhistChronology.getInstance(EIGHT));
+    public void testSetIntoInterval_Object_Chronology8() throws Exception {
+        MutableInterval m = new MutableInterval(-1000L, 1000L);
+        StringConverter.INSTANCE.setInto(m, "2003-08-09T+06:00/2004-06-09T+07:00", BuddhistChronology.getInstance(EIGHT));
+        assertEquals(new DateTime(2003, 8, 9, 0, 0, 0, 0, BuddhistChronology.getInstance(SIX)).withZone(EIGHT), m.getStart());
+        assertEquals(new DateTime(2004, 6, 9, 0, 0, 0, 0, BuddhistChronology.getInstance(SEVEN)).withZone(EIGHT), m.getEnd());
+        assertEquals(BuddhistChronology.getInstance(EIGHT), m.getChronology());
     }
 
-    public void testSetIntoInterval_invalidInputsThrowIAE() {
-        final MutableInterval i1 = new MutableInterval(-1000L, 1000L);
-        assertIllegalArgumentThrown(new ThrowingCallable() {
-            public void call() {
-                StringConverter.INSTANCE.setInto(i1, "", null);
-            }
-        });
-
-        final MutableInterval i2 = new MutableInterval(-1000L, 1000L);
-        assertIllegalArgumentThrown(new ThrowingCallable() {
-            public void call() {
-                StringConverter.INSTANCE.setInto(i2, "/", null);
-            }
-        });
-
-        final MutableInterval i3 = new MutableInterval(-1000L, 1000L);
-        assertIllegalArgumentThrown(new ThrowingCallable() {
-            public void call() {
-                StringConverter.INSTANCE.setInto(i3, "P1Y/", null);
-            }
-        });
-
-        final MutableInterval i4 = new MutableInterval(-1000L, 1000L);
-        assertIllegalArgumentThrown(new ThrowingCallable() {
-            public void call() {
-                StringConverter.INSTANCE.setInto(i4, "/P1Y", null);
-            }
-        });
-
-        final MutableInterval i5 = new MutableInterval(-1000L, 1000L);
-        assertIllegalArgumentThrown(new ThrowingCallable() {
-            public void call() {
-                StringConverter.INSTANCE.setInto(i5, "P1Y/P2Y", null);
-            }
-        });
+    public void testSetIntoIntervalEx_Object_Chronology1() throws Exception {
+        MutableInterval m = new MutableInterval(-1000L, 1000L);
+        try {
+            StringConverter.INSTANCE.setInto(m, "", null);
+            fail();
+        } catch (IllegalArgumentException ex) {}
     }
 
-    // ---------------------------------------------------------------------
-    // Misc
-    // ---------------------------------------------------------------------
+    public void testSetIntoIntervalEx_Object_Chronology2() throws Exception {
+        MutableInterval m = new MutableInterval(-1000L, 1000L);
+        try {
+            StringConverter.INSTANCE.setInto(m, "/", null);
+            fail();
+        } catch (IllegalArgumentException ex) {}
+    }
+
+    public void testSetIntoIntervalEx_Object_Chronology3() throws Exception {
+        MutableInterval m = new MutableInterval(-1000L, 1000L);
+        try {
+            StringConverter.INSTANCE.setInto(m, "P1Y/", null);
+            fail();
+        } catch (IllegalArgumentException ex) {}
+    }
+
+    public void testSetIntoIntervalEx_Object_Chronology4() throws Exception {
+        MutableInterval m = new MutableInterval(-1000L, 1000L);
+        try {
+            StringConverter.INSTANCE.setInto(m, "/P1Y", null);
+            fail();
+        } catch (IllegalArgumentException ex) {}
+    }
+
+    public void testSetIntoIntervalEx_Object_Chronology5() throws Exception {
+        MutableInterval m = new MutableInterval(-1000L, 1000L);
+        try {
+            StringConverter.INSTANCE.setInto(m, "P1Y/P2Y", null);
+            fail();
+        } catch (IllegalArgumentException ex) {}
+    }
+
+    //-----------------------------------------------------------------------
     public void testToString() {
         assertEquals("Converter[java.lang.String]", StringConverter.INSTANCE.toString());
     }
 
-    // ---------------------------------------------------------------------
-    // Helpers to reduce duplication and improve readability
-    // ---------------------------------------------------------------------
-
-    private static DateTime dt(DateTimeZone zone, int y, int M, int d, int h, int m, int s, int ms) {
-        // If zone is null, use default chronology & zone
-        return (zone == null)
-                ? new DateTime(y, M, d, h, m, s, ms)
-                : new DateTime(y, M, d, h, m, s, ms, zone);
-    }
-
-    private static void assertSameInstant(DateTime expected, long actualMillis) {
-        assertEquals("Instant millis differ", expected.getMillis(), actualMillis);
-    }
-
-    private static void assertIntArrayEquals(int[] expected, int[] actual) {
-        assertTrue("Expected: " + Arrays.toString(expected) + " but was: " + Arrays.toString(actual),
-                Arrays.equals(expected, actual));
-    }
-
-    private static void assertDateTimeFields(DateTime dt, int y, int M, int d, int h, int m, int s, int ms, DateTimeZone zone) {
-        assertEquals(y, dt.getYear());
-        assertEquals(M, dt.getMonthOfYear());
-        assertEquals(d, dt.getDayOfMonth());
-        assertEquals(h, dt.getHourOfDay());
-        assertEquals(m, dt.getMinuteOfHour());
-        assertEquals(s, dt.getSecondOfMinute());
-        assertEquals(ms, dt.getMillisOfSecond());
-        assertEquals(zone, dt.getZone());
-    }
-
-    private static void assertPeriod(MutablePeriod p,
-                                     int years, int months, int weeks, int days,
-                                     int hours, int minutes, int seconds, int millis) {
-        assertEquals(years, p.getYears());
-        assertEquals(months, p.getMonths());
-        assertEquals(weeks, p.getWeeks());
-        assertEquals(days, p.getDays());
-        assertEquals(hours, p.getHours());
-        assertEquals(minutes, p.getMinutes());
-        assertEquals(seconds, p.getSeconds());
-        assertEquals(millis, p.getMillis());
-    }
-
-    private static void assertInterval(MutableInterval i, DateTime expectedStart, DateTime expectedEnd, Chronology expectedChrono) {
-        assertEquals(expectedStart, i.getStart());
-        assertEquals(expectedEnd, i.getEnd());
-        assertEquals(expectedChrono, i.getChronology());
-    }
-
-    private interface ThrowingCallable {
-        void call() throws Exception;
-    }
-
-    private static void assertIllegalArgumentThrown(ThrowingCallable c) {
-        try {
-            c.call();
-            fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException expected) {
-            // expected
-        } catch (Exception other) {
-            fail("Expected IllegalArgumentException but caught: " + other);
-        }
-    }
 }
