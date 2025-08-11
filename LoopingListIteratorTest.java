@@ -1,19 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.apache.commons.collections4.iterators;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,84 +13,100 @@ import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests the LoopingListIterator class.
+ * Tests for LoopingListIterator focusing on clarity, intent-revealing names,
+ * and small, behavior-focused scenarios. Helper methods reduce repetition and
+ * make the traversal intent explicit.
  */
 class LoopingListIteratorTest {
 
-    /**
-     * Tests the add method.
-     */
-    @Test
-    void testAdd() {
-        List<String> list = new ArrayList<>(Arrays.asList("b", "e", "f"));
-        LoopingListIterator<String> loop = new LoopingListIterator<>(list); // <b> e f
+    // -------------------- Helpers --------------------
 
-        loop.add("a");                      // <a> b e f
-        assertEquals("b", loop.next());     // a <b> e f
-        loop.reset();                       // <a> b e f
-        assertEquals("a", loop.next());     // a <b> e f
-        assertEquals("b", loop.next());     // a b <e> f
-
-        loop.add("c");                      // a b c <e> f
-        assertEquals("e", loop.next());     // a b c e <f>
-        assertEquals("e", loop.previous()); // a b c <e> f
-        assertEquals("c", loop.previous()); // a b <c> e f
-        assertEquals("c", loop.next());     // a b c <e> f
-
-        loop.add("d");                      // a b c d <e> f
-        loop.reset();                       // <a> b c d e f
-        assertEquals("a", loop.next());     // a <b> c d e f
-        assertEquals("b", loop.next());     // a b <c> d e f
-        assertEquals("c", loop.next());     // a b c <d> e f
-        assertEquals("d", loop.next());     // a b c d <e> f
-        assertEquals("e", loop.next());     // a b c d e <f>
-        assertEquals("f", loop.next());     // <a> b c d e f
-        assertEquals("a", loop.next());     // a <b> c d e f
-
-        list = new ArrayList<>(Arrays.asList("b", "e", "f"));
-        loop = new LoopingListIterator<>(list); // <b> e f
-
-        loop.add("a");                      // a <b> e f
-        assertEquals("a", loop.previous()); // a b e <f>
-        loop.reset();                       // <a> b e f
-        assertEquals("f", loop.previous()); // a b e <f>
-        assertEquals("e", loop.previous()); // a b <e> f
-
-        loop.add("d");                      // a b d <e> f
-        assertEquals("d", loop.previous()); // a b <d> e f
-
-        loop.add("c");                      // a b c <d> e f
-        assertEquals("c", loop.previous()); // a b <c> d e f
-
-        loop.reset();
-        assertEquals("a", loop.next());     // a <b> c d e f
-        assertEquals("b", loop.next());     // a b <c> d e f
-        assertEquals("c", loop.next());     // a b c <d> e f
-        assertEquals("d", loop.next());     // a b c d <e> f
-        assertEquals("e", loop.next());     // a b c d e <f>
-        assertEquals("f", loop.next());     // <a> b c d e f
-        assertEquals("a", loop.next());     // a <b> c d e f
+    private static <T> List<T> mutableListOf(final T... items) {
+        return new ArrayList<>(Arrays.asList(items));
     }
 
-    /**
-     * Tests constructor exception.
-     */
+    private static <T> void assertCycleForward(final LoopingListIterator<T> it, final List<T> expected) {
+        it.reset();
+        for (final T e : expected) {
+            assertEquals(e, it.next(), "next() should traverse in order while looping");
+        }
+    }
+
+    private static <T> void assertCycleBackward(final LoopingListIterator<T> it, final List<T> expected) {
+        it.reset();
+        for (int i = expected.size() - 1; i >= 0; i--) {
+            assertEquals(expected.get(i), it.previous(), "previous() should traverse in reverse order while looping");
+        }
+    }
+
+    // -------------------- Constructor --------------------
+
     @Test
-    void testConstructorEx() {
+    void testConstructorNullListThrows() {
         assertThrows(NullPointerException.class, () -> new LoopingListIterator<>(null));
     }
 
-    /**
-     * Tests jogging back and forth between two elements, but not over
-     * the begin/end boundary of the list.
-     */
+    // -------------------- Empty list --------------------
+
+    @Test
+    void testEmptyList_hasNoElementsAndThrowsOnTraversal() {
+        final List<Object> list = new ArrayList<>();
+        final LoopingListIterator<Object> loop = new LoopingListIterator<>(list);
+
+        assertFalse(loop.hasNext());
+        assertFalse(loop.hasPrevious());
+        assertThrows(NoSuchElementException.class, loop::next);
+        assertThrows(NoSuchElementException.class, loop::previous);
+    }
+
+    // -------------------- Single element list --------------------
+
+    @Test
+    void testSingleElement_loopsForeverBothDirections() {
+        final List<String> list = Arrays.asList("a");
+        final LoopingListIterator<String> loop = new LoopingListIterator<>(list); // <a>
+
+        for (int i = 0; i < 3; i++) {
+            assertTrue(loop.hasNext());
+            assertEquals("a", loop.next());
+        }
+        for (int i = 0; i < 3; i++) {
+            assertTrue(loop.hasPrevious());
+            assertEquals("a", loop.previous());
+        }
+    }
+
+    // -------------------- Two element list --------------------
+
+    @Test
+    void testTwoElements_nextLoopsAndPreviousLoopsWithReset() {
+        final List<String> list = Arrays.asList("a", "b");
+        final LoopingListIterator<String> loop = new LoopingListIterator<>(list); // <a> b
+
+        assertTrue(loop.hasNext());
+        assertEquals("a", loop.next()); // a <b>
+        assertTrue(loop.hasNext());
+        assertEquals("b", loop.next()); // <a> b
+        assertTrue(loop.hasNext());
+        assertEquals("a", loop.next()); // a <b>
+
+        loop.reset();                   // <a> b
+
+        assertTrue(loop.hasPrevious());
+        assertEquals("b", loop.previous()); // a <b>
+        assertTrue(loop.hasPrevious());
+        assertEquals("a", loop.previous()); // <a> b
+        assertTrue(loop.hasPrevious());
+        assertEquals("b", loop.previous()); // a <b>
+    }
+
+    // -------------------- Jogging between boundaries --------------------
+
     @Test
     void testJoggingNotOverBoundary() {
         final List<String> list = Arrays.asList("a", "b");
         final LoopingListIterator<String> loop = new LoopingListIterator<>(list); // <a> b
 
-        // Try jogging back and forth between the elements, but not
-        // over the begin/end boundary.
         loop.reset();
         assertEquals("a", loop.next());     // a <b>
         assertEquals("a", loop.previous()); // <a> b
@@ -117,17 +117,12 @@ class LoopingListIteratorTest {
         assertEquals("b", loop.next());     // <a> b
     }
 
-    /**
-     * Tests jogging back and forth between two elements over the
-     * begin/end boundary of the list.
-     */
     @Test
     void testJoggingOverBoundary() {
         final List<String> list = Arrays.asList("a", "b");
         final LoopingListIterator<String> loop = new LoopingListIterator<>(list); // <a> b
 
-        // Try jogging back and forth between the elements, but not
-        // over the begin/end boundary.
+        // Move across the end/beginning boundary in both directions.
         assertEquals("b", loop.previous()); // a <b>
         assertEquals("b", loop.next());     // <a> b
         assertEquals("b", loop.previous()); // a <b>
@@ -137,81 +132,8 @@ class LoopingListIteratorTest {
         assertEquals("a", loop.previous()); // <a> b
     }
 
-    /**
-     * Tests whether an empty looping list iterator works.
-     */
-    @Test
-    void testLooping0() {
-        final List<Object> list = new ArrayList<>();
-        final LoopingListIterator<Object> loop = new LoopingListIterator<>(list);
-        assertFalse(loop.hasNext());
-        assertFalse(loop.hasPrevious());
-        assertThrows(NoSuchElementException.class, () -> loop.next());
-        assertThrows(NoSuchElementException.class, () -> loop.previous());
-    }
+    // -------------------- Indices --------------------
 
-    /**
-     * Tests whether a looping list iterator works on a list with only
-     * one element.
-     */
-    @Test
-    void testLooping1() {
-        final List<String> list = Arrays.asList("a");
-        final LoopingListIterator<String> loop = new LoopingListIterator<>(list); // <a>
-
-        assertTrue(loop.hasNext());
-        assertEquals("a", loop.next());     // <a>
-
-        assertTrue(loop.hasNext());
-        assertEquals("a", loop.next());     // <a>
-
-        assertTrue(loop.hasNext());
-        assertEquals("a", loop.next());     // <a>
-
-        assertTrue(loop.hasPrevious());
-        assertEquals("a", loop.previous()); // <a>
-
-        assertTrue(loop.hasPrevious());
-        assertEquals("a", loop.previous()); // <a>
-
-        assertTrue(loop.hasPrevious());
-        assertEquals("a", loop.previous()); // <a>
-    }
-
-    /**
-     * Tests whether a looping list iterator works on a list with two
-     * elements.
-     */
-    @Test
-    void testLooping2() {
-        final List<String> list = Arrays.asList("a", "b");
-        final LoopingListIterator<String> loop = new LoopingListIterator<>(list); // <a> b
-
-        assertTrue(loop.hasNext());
-        assertEquals("a", loop.next());     // a <b>
-
-        assertTrue(loop.hasNext());
-        assertEquals("b", loop.next());     // <a> b
-
-        assertTrue(loop.hasNext());
-        assertEquals("a", loop.next());     // a <b>
-
-        // Reset the iterator and try using previous.
-        loop.reset();                       // <a> b
-
-        assertTrue(loop.hasPrevious());
-        assertEquals("b", loop.previous()); // a <b>
-
-        assertTrue(loop.hasPrevious());
-        assertEquals("a", loop.previous()); // <a> b
-
-        assertTrue(loop.hasPrevious());
-        assertEquals("b", loop.previous()); // a <b>
-    }
-
-    /**
-     * Tests nextIndex and previousIndex.
-     */
     @Test
     void testNextAndPreviousIndex() {
         final List<String> list = Arrays.asList("a", "b", "c");
@@ -241,40 +163,11 @@ class LoopingListIteratorTest {
         assertEquals(2, loop.previousIndex());
     }
 
-    /**
-     * Tests removing an element from a wrapped ArrayList.
-     */
+    // -------------------- Remove --------------------
+
     @Test
-    void testRemovingElementsAndIteratingBackwards() {
-        final List<String> list = new ArrayList<>(Arrays.asList("a", "b", "c"));
-        final LoopingListIterator<String> loop = new LoopingListIterator<>(list); // <a> b c
-
-        assertTrue(loop.hasPrevious());
-        assertEquals("c", loop.previous()); // a b <c>
-        loop.remove();                      // <a> b
-        assertEquals(2, list.size());
-
-        assertTrue(loop.hasPrevious());
-        assertEquals("b", loop.previous()); // a <b>
-        loop.remove();                      // <a>
-        assertEquals(1, list.size());
-
-        assertTrue(loop.hasPrevious());
-        assertEquals("a", loop.previous()); // <a>
-        loop.remove();                      // ---
-        assertEquals(0, list.size());
-
-        assertFalse(loop.hasPrevious());
-
-        assertThrows(NoSuchElementException.class, () -> loop.previous());
-    }
-
-    /**
-     * Tests removing an element from a wrapped ArrayList.
-     */
-    @Test
-    void testRemovingElementsAndIteratingForward() {
-        final List<String> list = new ArrayList<>(Arrays.asList("a", "b", "c"));
+    void testRemoveWhileIteratingForward() {
+        final List<String> list = mutableListOf("a", "b", "c");
         final LoopingListIterator<String> loop = new LoopingListIterator<>(list); // <a> b c
 
         assertTrue(loop.hasNext());
@@ -293,60 +186,121 @@ class LoopingListIteratorTest {
         assertEquals(0, list.size());
 
         assertFalse(loop.hasNext());
-
-        assertThrows(NoSuchElementException.class, () -> loop.next());
+        assertThrows(NoSuchElementException.class, loop::next);
     }
 
-    /**
-     * Tests the reset method.
-     */
     @Test
-    void testReset() {
-        final List<String> list = Arrays.asList("a", "b", "c");
+    void testRemoveWhileIteratingBackward() {
+        final List<String> list = mutableListOf("a", "b", "c");
         final LoopingListIterator<String> loop = new LoopingListIterator<>(list); // <a> b c
 
-        assertEquals("a", loop.next()); // a <b> c
-        assertEquals("b", loop.next()); // a b <c>
-        loop.reset();                   // <a> b c
-        assertEquals("a", loop.next()); // a <b> c
-        loop.reset();                   // <a> b c
-        assertEquals("a", loop.next()); // a <b> c
-        assertEquals("b", loop.next()); // a b <c>
-        assertEquals("c", loop.next()); // <a> b c
-        loop.reset();                   // <a> b c
+        assertTrue(loop.hasPrevious());
+        assertEquals("c", loop.previous()); // a b <c>
+        loop.remove();                      // <a> b
+        assertEquals(2, list.size());
 
-        assertEquals("c", loop.previous()); // a b <c>
-        assertEquals("b", loop.previous()); // a <b> c
-        loop.reset();                       // <a> b c
-        assertEquals("c", loop.previous()); // a b <c>
-        loop.reset();                       // <a> b c
-        assertEquals("c", loop.previous()); // a b <c>
-        assertEquals("b", loop.previous()); // a <b> c
-        assertEquals("a", loop.previous()); // <a> b c
+        assertTrue(loop.hasPrevious());
+        assertEquals("b", loop.previous()); // a <b>
+        loop.remove();                      // <a>
+        assertEquals(1, list.size());
+
+        assertTrue(loop.hasPrevious());
+        assertEquals("a", loop.previous()); // <a>
+        loop.remove();                      // ---
+        assertEquals(0, list.size());
+
+        assertFalse(loop.hasPrevious());
+        assertThrows(NoSuchElementException.class, loop::previous);
     }
 
-    /**
-     * Tests using the set method to change elements.
-     */
+    // -------------------- Reset --------------------
+
     @Test
-    void testSet() {
+    void testResetPositionsAtStartForBothDirections() {
+        final List<String> data = Arrays.asList("a", "b", "c");
+        final LoopingListIterator<String> loop = new LoopingListIterator<>(data); // <a> b c
+
+        assertEquals("a", loop.next()); // a <b> c
+        assertEquals("b", loop.next()); // a b <c>
+
+        loop.reset(); // <a> b c
+        assertCycleForward(loop, data); // a, b, c
+
+        loop.reset(); // <a> b c
+        assertEquals("c", loop.previous()); // a b <c>
+        assertEquals("b", loop.previous()); // a <b> c
+
+        loop.reset(); // <a> b c
+        assertCycleBackward(loop, data); // c, b, a
+    }
+
+    // -------------------- Set --------------------
+
+    @Test
+    void testSetReplacesLastReturnedElement() {
         final List<String> list = Arrays.asList("q", "r", "z");
         final LoopingListIterator<String> loop = new LoopingListIterator<>(list); // <q> r z
 
+        // Replace last returned via previous (z -> c)
         assertEquals("z", loop.previous()); // q r <z>
         loop.set("c");                      // q r <c>
 
+        // Replace last returned via next (q -> a)
         loop.reset();                       // <q> r c
         assertEquals("q", loop.next());     // q <r> c
         loop.set("a");                      // a <r> c
 
+        // Replace last returned via next (r -> b)
         assertEquals("r", loop.next());     // a r <c>
         loop.set("b");                      // a b <c>
 
-        loop.reset();                       // <a> b c
+        // Verify final order
+        loop.reset();
         assertEquals("a", loop.next());     // a <b> c
         assertEquals("b", loop.next());     // a b <c>
         assertEquals("c", loop.next());     // <a> b c
     }
 
+    // -------------------- Add --------------------
+
+    @Test
+    void testAdd_previousReturnsNewlyInsertedElement_andOrderIsCorrect() {
+        final List<String> list = mutableListOf("b", "e", "f");
+        final LoopingListIterator<String> loop = new LoopingListIterator<>(list); // <b> e f
+
+        loop.add("a");                                // a inserted before next() (b)
+        assertEquals("a", loop.previous(), "previous() should return the element just added");
+
+        loop.reset();
+        assertCycleForward(loop, Arrays.asList("a", "b", "e", "f"));
+        assertEquals(Arrays.asList("a", "b", "e", "f"), list);
+    }
+
+    @Test
+    void testAdd_multipleInsertionsBuildExpectedOrder() {
+        final List<String> list = mutableListOf("b", "e", "f");
+        final LoopingListIterator<String> loop = new LoopingListIterator<>(list); // <b> e f
+
+        // Insert at head
+        loop.add("a");                            // [a, b, e, f]
+        assertEquals("a", loop.previous());       // verify add semantics
+
+        // Move after b and insert c before e
+        loop.reset();                             // <a> b e f
+        assertEquals("a", loop.next());           // a <b> e f
+        assertEquals("b", loop.next());           // a b <e> f
+        loop.add("c");                            // a b c <e> f
+
+        // Move to e again and insert d before e
+        assertEquals("e", loop.next());           // a b c e <f>
+        assertEquals("e", loop.previous());       // a b c <e> f
+        loop.add("d");                            // a b c d <e> f
+
+        // Verify final order
+        assertEquals(Arrays.asList("a", "b", "c", "d", "e", "f"), list);
+
+        // And that the iterator loops in that order
+        assertCycleForward(loop, list);
+        assertCycleBackward(loop, list);
+    }
 }
