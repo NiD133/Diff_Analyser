@@ -31,23 +31,50 @@ import org.junit.jupiter.api.Test;
 @Deprecated
 class LookupTranslatorTest extends AbstractLangTest {
 
+    private static final String INPUT_TEXT = "one";
+    private static final String EXPECTED_TRANSLATION = "two";
+    private static final int EXPECTED_CHARACTERS_CONSUMED = 3;
+    private static final int START_INDEX = 0;
+
     @Test
-    void testBasicLookup() throws IOException {
-        final LookupTranslator lt = new LookupTranslator(new CharSequence[][] { { "one", "two" } });
-        final StringWriter out = new StringWriter();
-        final int result = lt.translate("one", 0, out);
-        assertEquals(3, result, "Incorrect code point consumption");
-        assertEquals("two", out.toString(), "Incorrect value");
+    void testBasicLookup_ShouldTranslateStringUsingLookupTable() throws IOException {
+        // Given: A translator with a simple lookup mapping "one" -> "two"
+        final CharSequence[][] lookupMapping = { { INPUT_TEXT, EXPECTED_TRANSLATION } };
+        final LookupTranslator translator = new LookupTranslator(lookupMapping);
+        final StringWriter outputWriter = new StringWriter();
+        
+        // When: Translating the input text starting at index 0
+        final int charactersConsumed = translator.translate(INPUT_TEXT, START_INDEX, outputWriter);
+        
+        // Then: The translator should consume 3 characters and output "two"
+        assertEquals(EXPECTED_CHARACTERS_CONSUMED, charactersConsumed, 
+                    "Should consume all 3 characters of 'one'");
+        assertEquals(EXPECTED_TRANSLATION, outputWriter.toString(), 
+                    "Should translate 'one' to 'two'");
     }
 
-    // Tests: https://issues.apache.org/jira/browse/LANG-882
+    /**
+     * Tests fix for LANG-882: LookupTranslator should work with StringBuffer objects.
+     * This ensures that the translator properly handles CharSequence implementations
+     * other than String by converting keys to String for HashMap compatibility.
+     */
     @Test
-    void testLang882() throws IOException {
-        final LookupTranslator lt = new LookupTranslator(new CharSequence[][] { { new StringBuffer("one"), new StringBuffer("two") } });
-        final StringWriter out = new StringWriter();
-        final int result = lt.translate(new StringBuffer("one"), 0, out);
-        assertEquals(3, result, "Incorrect code point consumption");
-        assertEquals("two", out.toString(), "Incorrect value");
+    void testStringBufferCompatibility_ShouldHandleStringBufferInputAndMapping() throws IOException {
+        // Given: A translator with StringBuffer objects in the lookup mapping
+        final CharSequence[][] lookupMapping = { 
+            { new StringBuffer(INPUT_TEXT), new StringBuffer(EXPECTED_TRANSLATION) } 
+        };
+        final LookupTranslator translator = new LookupTranslator(lookupMapping);
+        final StringWriter outputWriter = new StringWriter();
+        
+        // When: Translating a StringBuffer input
+        final StringBuffer inputBuffer = new StringBuffer(INPUT_TEXT);
+        final int charactersConsumed = translator.translate(inputBuffer, START_INDEX, outputWriter);
+        
+        // Then: The translator should work the same as with String objects
+        assertEquals(EXPECTED_CHARACTERS_CONSUMED, charactersConsumed, 
+                    "Should consume all 3 characters of StringBuffer 'one'");
+        assertEquals(EXPECTED_TRANSLATION, outputWriter.toString(), 
+                    "Should translate StringBuffer 'one' to 'two'");
     }
-
 }
