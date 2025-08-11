@@ -4,6 +4,7 @@
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
+
  * the License.  You may obtain a copy of the License at
  *
  *      https://www.apache.org/licenses/LICENSE-2.0
@@ -20,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,62 +34,122 @@ class SparseBloomFilterTest extends AbstractBloomFilterTest<SparseBloomFilter> {
         return new SparseBloomFilter(shape);
     }
 
-    @Test
-    void testBitMapExtractorEdgeCases() {
-        int[] values = {1, 2, 3, 4, 5, 6, 7, 8, 9, 65, 66, 67, 68, 69, 70, 71};
-        BloomFilter bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
+    /**
+     * Tests the edge cases of the {@code processBitMaps} method.
+     */
+    @Nested
+    class ProcessBitMapsTest {
 
-        // verify exit early before bitmap boundary
-        final int[] passes = new int[1];
-        assertFalse(bf.processBitMaps(l -> {
-            passes[0]++;
-            return false;
-        }));
-        assertEquals(1, passes[0]);
+        /**
+         * Tests that processing stops immediately if the predicate returns false on the first bitmap.
+         */
+        @Test
+        void shouldShortCircuitOnFirstCallIfPredicateIsFalse() {
+            // Arrange
+            // Create a filter with indices that span multiple 64-bit bitmap blocks.
+            final int[] indices = {1, 2, Long.SIZE + 1, Long.SIZE + 2};
+            final BloomFilter filter = createFilter(getTestShape(), IndexExtractor.fromIndexArray(indices));
+            final AtomicInteger callCounter = new AtomicInteger(0);
 
-        // verify exit early at bitmap boundary
-        bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
-        passes[0] = 0;
-        assertFalse(bf.processBitMaps(l -> {
-            final boolean result = passes[0] == 0;
-            if (result) {
-                passes[0]++;
-            }
-            return result;
-        }));
-        assertEquals(1, passes[0]);
+            // Act
+            final boolean result = filter.processBitMaps(bitmap -> {
+                callCounter.incrementAndGet();
+                return false; // Immediately request to stop processing
+            });
 
-        // verify add extra if all values in first bitmap
-        values = new int[] {1, 2, 3, 4};
-        bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
-        passes[0] = 0;
-        assertTrue(bf.processBitMaps(l -> {
-            passes[0]++;
-            return true;
-        }));
-        assertEquals(2, passes[0]);
+            // Assert
+            assertFalse(result, "Processing should return false when short-circuited");
+            assertEquals(1, callCounter.get(), "Predicate should have been called only once");
+        }
 
-        // verify exit early if all values in first bitmap and predicate returns false
-        // on 2nd block
-        values = new int[] {1, 2, 3, 4};
-        bf = createFilter(getTestShape(), IndexExtractor.fromIndexArray(values));
-        passes[0] = 0;
-        assertFalse(bf.processBitMaps(l -> {
-            final boolean result = passes[0] == 0;
-            if (result) {
-                passes[0]++;
-            }
-            return result;
-        }));
-        assertEquals(1, passes[0]);
+        /**
+         * Tests that processing stops if the predicate returns false on a subsequent bitmap.
+         */
+        @Test
+        void shouldShortCircuitOnSecondCallIfPredicateIsFalse() {
+            // Arrange
+            // Create a filter with indices that span multiple 64-bit bitmap blocks.
+            final int[] indices = {1, 2, Long.SIZE + 1, Long.SIZE + 2};
+            final BloomFilter filter = createFilter(getTestShape(), IndexExtractor.fromIndexArray(indices));
+            final AtomicInteger callCounter = new AtomicInteger(0);
+
+            // Act
+            final boolean result = filter.processBitMaps(bitmap -> {
+                // Return true for the first call, false for the second.
+                return callCounter.incrementAndGet() == 1;
+            });
+
+            // Assert
+            assertFalse(result, "Processing should return false when short-circuited");
+            assertEquals(2, callCounter.get(), "Predicate should have been called twice");
+        }
+
+        /**
+         * The SparseBloomFilter implementation of processBitMaps has a specific behavior:
+         * it processes one final empty bitmap after the last non-empty one if the predicate
+         * continues to return true. This test verifies that behavior.
+         */
+        @Test
+        void shouldProcessOneExtraEmptyBitmapWhenPredicateIsTrue() {
+            // Arrange
+            // Create a filter where all indices fall into the first bitmap block.
+            final int[] indices = {1, 2, 3, 4};
+            final BloomFilter filter = createFilter(getTestShape(), IndexExtractor.fromIndexArray(indices));
+            final AtomicInteger callCounter = new AtomicInteger(0);
+
+            // Act
+            final boolean result = filter.processBitMaps(bitmap -> {
+                callCounter.incrementAndGet();
+                return true; // Always continue processing
+            });
+
+            // Assert
+            assertTrue(result, "Processing should return true when fully completed");
+            // Expect 2 calls: one for the block with data, and one extra empty block.
+            assertEquals(2, callCounter.get());
+        }
+
+        /**
+         * This test verifies that short-circuiting works correctly on the "extra" empty
+         * bitmap that SparseBloomFilter processes.
+         */
+        @Test
+        void shouldShortCircuitOnExtraEmptyBitmap() {
+            // Arrange
+            // Create a filter where all indices fall into the first bitmap block.
+            final int[] indices = {1, 2, 3, 4};
+            final BloomFilter filter = createFilter(getTestShape(), IndexExtractor.fromIndexArray(indices));
+            final AtomicInteger callCounter = new AtomicInteger(0);
+
+            // Act
+            final boolean result = filter.processBitMaps(bitmap -> {
+                // Return true for the first call (the non-empty block), false for the second.
+                return callCounter.incrementAndGet() == 1;
+            });
+
+            // Assert
+            assertFalse(result, "Processing should return false when short-circuited");
+            assertEquals(2, callCounter.get(), "Predicate should have been called twice");
+        }
     }
 
+    /**
+     * Tests that a SparseBloomFilter can be correctly merged from a different
+     * BloomFilter implementation (SimpleBloomFilter), resulting in an identical filter.
+     */
     @Test
-    void testBloomFilterBasedMergeEdgeCases() {
-        final BloomFilter bf1 = createEmptyFilter(getTestShape());
-        final BloomFilter bf2 = new SimpleBloomFilter(getTestShape());
-        bf2.merge(TestingHashers.FROM1);
-        bf1.merge(bf2);
-        assertTrue(bf2.processBitMapPairs(bf1, (x, y) -> x == y));
+    void testMergeFromSimpleBloomFilter() {
+        // Arrange
+        final SparseBloomFilter destinationFilter = createEmptyFilter(getTestShape());
+        final BloomFilter sourceFilter = new SimpleBloomFilter(getTestShape());
+        sourceFilter.merge(TestingHashers.FROM1);
+
+        // Act
+        destinationFilter.merge(sourceFilter);
+
+        // Assert
+        // Verify that the destination filter is now identical to the source.
+        final boolean areIdentical = sourceFilter.processBitMapPairs(destinationFilter, (x, y) -> x == y);
+        assertTrue(areIdentical, "Filters should be identical after merge");
     }
 }
