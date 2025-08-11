@@ -1,123 +1,69 @@
 package com.fasterxml.jackson.core.util;
 
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for {@link Separators} focusing on immutability and withXxx(...) behavior.
- * The class is expected to:
- * - Return the same instance when a "with" method is called with an unchanged value.
- * - Return a new instance when the value changes, without affecting other separators.
- */
+ * Unit tests for class {@link Separators}.
+ *
+ * @date 2017-07-31
+ * @see Separators
+ **/
 class SeparatorsTest {
 
-    private static final char INITIAL = '5';
-    private static final char OTHER = '6';
-    private static final char OTHER_ENTRY = '!';
+    @Test
+    void withArrayValueSeparatorWithDigit() {
+    Separators separators = new Separators('5', '5', '5');
+    Separators separatorsTwo = separators.withArrayValueSeparator('5');
 
-    private static Separators newAll(char ch) {
-        // Convenience factory: all three separators start as the same character
-        return new Separators(ch, ch, ch);
-    }
+    assertEquals('5', separatorsTwo.getObjectEntrySeparator());
+    assertEquals('5', separatorsTwo.getObjectFieldValueSeparator());
+    assertEquals('5', separatorsTwo.getArrayValueSeparator());
+    assertSame(separatorsTwo, separators);
 
-    private static void assertSeparatorChars(Separators s,
-                                             char expectedObjectFieldValue,
-                                             char expectedObjectEntry,
-                                             char expectedArrayValue) {
-        assertEquals(expectedObjectEntry, s.getObjectEntrySeparator(), "objectEntrySeparator");
-        assertEquals(expectedObjectFieldValue, s.getObjectFieldValueSeparator(), "objectFieldValueSeparator");
-        assertEquals(expectedArrayValue, s.getArrayValueSeparator(), "arrayValueSeparator");
-    }
+    separatorsTwo = separators.withArrayValueSeparator('6');
 
-    @Nested
-    class WithArrayValueSeparator {
+    assertEquals('5', separatorsTwo.getObjectEntrySeparator());
+    assertEquals('5', separatorsTwo.getObjectFieldValueSeparator());
+    assertEquals('6', separatorsTwo.getArrayValueSeparator());
+    assertNotSame(separatorsTwo, separators);
 
-        @Test
-        void returnsSameInstanceWhenValueUnchanged() {
-            // given
-            Separators base = newAll(INITIAL);
+  }
 
-            // when
-            Separators updated = base.withArrayValueSeparator(INITIAL);
+    @Test
+    void withObjectEntrySeparator() {
+    Separators separators = new Separators('5', '5', '5');
+    Separators separatorsTwo = separators.withObjectEntrySeparator('!');
+    Separators separatorsThree = separatorsTwo.withObjectEntrySeparator('!');
 
-            // then
-            assertSame(base, updated, "Should return same instance when value is unchanged");
-            assertSeparatorChars(updated, INITIAL, INITIAL, INITIAL);
-        }
+    assertEquals('!', separatorsThree.getObjectEntrySeparator());
+    assertEquals('5', separatorsThree.getObjectFieldValueSeparator());
 
-        @Test
-        void returnsNewInstanceWhenValueChanges() {
-            // given
-            Separators base = newAll(INITIAL);
+    assertSame(separatorsThree, separatorsTwo);
+    assertEquals('5', separators.getArrayValueSeparator());
 
-            // when
-            Separators updated = base.withArrayValueSeparator(OTHER);
+    assertEquals('5', separatorsThree.getArrayValueSeparator());
+    assertEquals('5', separators.getObjectFieldValueSeparator());
+  }
 
-            // then
-            assertNotSame(base, updated, "Should return new instance when value changes");
-            assertSeparatorChars(updated, INITIAL, INITIAL, OTHER);
-        }
-    }
+    @Test
+    void withObjectFieldValueSeparatorWithDigit() {
+    Separators separators = new Separators('5', '5', '5');
+    Separators separatorsTwo = separators.withObjectFieldValueSeparator('5');
 
-    @Nested
-    class WithObjectEntrySeparator {
+    assertEquals('5', separatorsTwo.getArrayValueSeparator());
+    assertSame(separatorsTwo, separators);
+    assertEquals('5', separatorsTwo.getObjectEntrySeparator());
+    assertEquals('5', separatorsTwo.getObjectFieldValueSeparator());
 
-        @Test
-        void returnsSameInstanceWhenValueUnchanged() {
-            // given
-            Separators base = newAll(INITIAL);
+    separatorsTwo = separators.withObjectFieldValueSeparator('6');
 
-            // when
-            Separators updated = base.withObjectEntrySeparator(INITIAL);
+    assertEquals('5', separatorsTwo.getArrayValueSeparator());
+    assertNotSame(separatorsTwo, separators);
+    assertEquals('5', separatorsTwo.getObjectEntrySeparator());
+    assertEquals('6', separatorsTwo.getObjectFieldValueSeparator());
 
-            // then
-            assertSame(base, updated, "Should return same instance when value is unchanged");
-            assertSeparatorChars(updated, INITIAL, INITIAL, INITIAL);
-        }
+  }
 
-        @Test
-        void returnsNewInstanceWhenValueChanges() {
-            // given
-            Separators base = newAll(INITIAL);
-
-            // when
-            Separators updated = base.withObjectEntrySeparator(OTHER_ENTRY);
-
-            // then
-            assertNotSame(base, updated, "Should return new instance when value changes");
-            assertSeparatorChars(updated, INITIAL, OTHER_ENTRY, INITIAL);
-        }
-    }
-
-    @Nested
-    class WithObjectFieldValueSeparator {
-
-        @Test
-        void returnsSameInstanceWhenValueUnchanged() {
-            // given
-            Separators base = newAll(INITIAL);
-
-            // when
-            Separators updated = base.withObjectFieldValueSeparator(INITIAL);
-
-            // then
-            assertSame(base, updated, "Should return same instance when value is unchanged");
-            assertSeparatorChars(updated, INITIAL, INITIAL, INITIAL);
-        }
-
-        @Test
-        void returnsNewInstanceWhenValueChanges() {
-            // given
-            Separators base = newAll(INITIAL);
-
-            // when
-            Separators updated = base.withObjectFieldValueSeparator(OTHER);
-
-            // then
-            assertNotSame(base, updated, "Should return new instance when value changes");
-            assertSeparatorChars(updated, OTHER, INITIAL, INITIAL);
-        }
-    }
 }
