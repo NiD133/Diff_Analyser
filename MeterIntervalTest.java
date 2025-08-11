@@ -40,6 +40,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 
 import org.jfree.chart.TestUtils;
+
 import org.jfree.data.Range;
 import org.junit.jupiter.api.Test;
 
@@ -50,102 +51,53 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class MeterIntervalTest {
 
-    // Test data constants for better maintainability
-    private static final String LABEL_1 = "Label 1";
-    private static final String LABEL_2 = "Label 2";
-    private static final String SIMPLE_LABEL = "X";
-    private static final Range STANDARD_RANGE = new Range(1.2, 3.4);
-    private static final Range SIMPLE_RANGE = new Range(1.0, 2.0);
-    private static final Color OUTLINE_COLOR = Color.RED;
-    private static final Color BACKGROUND_COLOR = Color.BLUE;
-    private static final BasicStroke STANDARD_STROKE = new BasicStroke(1.0f);
-
     /**
-     * Tests that the equals method correctly identifies equal and unequal MeterInterval instances.
-     * Verifies that equals is symmetric and that changing the label makes intervals unequal.
+     * Confirm that the equals method can distinguish all the required fields.
      */
     @Test
     public void testEquals() {
-        // Given: Two identical MeterInterval instances
-        MeterInterval firstInterval = createFullyConfiguredInterval(LABEL_1);
-        MeterInterval secondInterval = createFullyConfiguredInterval(LABEL_1);
 
-        // When & Then: Identical intervals should be equal (and symmetric)
-        assertEquals(firstInterval, secondInterval, 
-            "Two MeterIntervals with identical properties should be equal");
-        assertEquals(secondInterval, firstInterval, 
-            "Equals should be symmetric");
+        MeterInterval m1 = new MeterInterval(
+            "Label 1", new Range(1.2, 3.4), Color.RED, new BasicStroke(1.0f),
+            Color.BLUE
+        );
+        MeterInterval m2 = new MeterInterval(
+            "Label 1", new Range(1.2, 3.4), Color.RED, new BasicStroke(1.0f),
+            Color.BLUE
+        );
+        assertEquals(m1, m2);
+        assertEquals(m2, m1);
 
-        // Given: Intervals with different labels
-        MeterInterval intervalWithDifferentLabel = createFullyConfiguredInterval(LABEL_2);
+        m1 = new MeterInterval(
+            "Label 2", new Range(1.2, 3.4), Color.RED, new BasicStroke(1.0f),
+            Color.BLUE
+        );
+        assertNotEquals(m1, m2);
+        m2 = new MeterInterval(
+            "Label 2", new Range(1.2, 3.4), Color.RED, new BasicStroke(1.0f),
+            Color.BLUE
+        );
+        assertEquals(m1, m2);
 
-        // When & Then: Intervals with different labels should not be equal
-        assertNotEquals(firstInterval, intervalWithDifferentLabel,
-            "MeterIntervals with different labels should not be equal");
-
-        // Given: Second interval updated to match the different label
-        MeterInterval anotherIntervalWithLabel2 = createFullyConfiguredInterval(LABEL_2);
-
-        // When & Then: Intervals with same different label should be equal
-        assertEquals(intervalWithDifferentLabel, anotherIntervalWithLabel2,
-            "MeterIntervals with same label should be equal");
     }
 
     /**
-     * Tests that MeterInterval does not implement Cloneable interface.
-     * This is expected behavior since MeterInterval is designed to be immutable.
+     * This class is immutable so cloning isn't required.
      */
     @Test
     public void testCloning() {
-        // Given: A MeterInterval instance
-        MeterInterval interval = createSimpleInterval();
-
-        // When & Then: MeterInterval should not implement Cloneable (immutable design)
-        assertFalse(interval instanceof Cloneable,
-            "MeterInterval should not implement Cloneable since it's immutable");
+        MeterInterval m1 = new MeterInterval("X", new Range(1.0, 2.0));
+        assertFalse(m1 instanceof Cloneable);
     }
 
-    /**
-     * Tests that MeterInterval instances can be serialized and deserialized correctly.
-     * The deserialized instance should be equal to the original.
+   /**
+     * Serialize an instance, restore it, and check for equality.
      */
     @Test
     public void testSerialization() {
-        // Given: A MeterInterval instance
-        MeterInterval originalInterval = createSimpleInterval();
-
-        // When: Serializing and deserializing the interval
-        MeterInterval deserializedInterval = TestUtils.serialised(originalInterval);
-
-        // Then: The deserialized interval should equal the original
-        assertEquals(originalInterval, deserializedInterval,
-            "Deserialized MeterInterval should equal the original");
+        MeterInterval m1 = new MeterInterval("X", new Range(1.0, 2.0));
+        MeterInterval m2 = TestUtils.serialised(m1);
+        assertEquals(m1, m2);
     }
 
-    // Helper methods for creating test instances
-
-    /**
-     * Creates a fully configured MeterInterval with all properties set.
-     * 
-     * @param label the label for the interval
-     * @return a MeterInterval with all properties configured
-     */
-    private MeterInterval createFullyConfiguredInterval(String label) {
-        return new MeterInterval(
-            label, 
-            STANDARD_RANGE, 
-            OUTLINE_COLOR, 
-            STANDARD_STROKE,
-            BACKGROUND_COLOR
-        );
-    }
-
-    /**
-     * Creates a simple MeterInterval with minimal configuration (using constructor defaults).
-     * 
-     * @return a MeterInterval with default styling
-     */
-    private MeterInterval createSimpleInterval() {
-        return new MeterInterval(SIMPLE_LABEL, SIMPLE_RANGE);
-    }
 }
