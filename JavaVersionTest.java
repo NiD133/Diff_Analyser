@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2017 The Gson authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.google.gson.internal;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -5,89 +20,66 @@ import static com.google.common.truth.Truth.assertThat;
 import org.junit.Test;
 
 /**
- * Tests for JavaVersion parsing and environment detection.
+ * Unit and functional tests for {@link JavaVersion}
  *
- * Focus:
- * - Parse a variety of real-world java.version strings into a major version number.
- * - Keep tests environment-stable (no assumptions beyond “current JVM is at least Java 8”).
- * - Document why each sample string exists (legacy vs. new format, vendor variations).
+ * @author Inderjeet Singh
  */
 public class JavaVersionTest {
+  // Borrowed some of test strings from
+  // https://github.com/prestodb/presto/blob/master/presto-main/src/test/java/com/facebook/presto/server/TestJavaVersion.java
 
-  /**
-   * Our build/runtime must run on at least Java 8.
-   * This assertion intentionally does not pin to an exact version to remain CI-friendly.
-   */
   @Test
-  public void currentJvmMajorVersion_isAtLeast8() {
+  public void testGetMajorJavaVersion() {
+    // Gson currently requires at least Java 8
     assertThat(JavaVersion.getMajorJavaVersion()).isAtLeast(8);
   }
 
-  /**
-   * Sanity check for the convenience method: it must reflect the same logic
-   * as getMajorJavaVersion() >= 9 regardless of the JVM the tests run on.
-   */
   @Test
-  public void isJava9OrLater_agreesWithGetMajorJavaVersion() {
-    boolean expected = JavaVersion.getMajorJavaVersion() >= 9;
-    assertThat(JavaVersion.isJava9OrLater()).isEqualTo(expected);
+  public void testJava6() {
+    // http://www.oracle.com/technetwork/java/javase/version-6-141920.html
+    assertThat(JavaVersion.parseMajorJavaVersion("1.6.0")).isEqualTo(6);
   }
 
   @Test
-  public void parses_java6_legacyScheme() {
-    // Legacy "1.x" scheme
-    assertParsesTo(6, "1.6.0");
+  public void testJava7() {
+    // http://www.oracle.com/technetwork/java/javase/jdk7-naming-418744.html
+    assertThat(JavaVersion.parseMajorJavaVersion("1.7.0")).isEqualTo(7);
   }
 
   @Test
-  public void parses_java7_legacyScheme() {
-    // Legacy "1.x" scheme
-    assertParsesTo(7, "1.7.0");
+  public void testJava8() {
+    assertThat(JavaVersion.parseMajorJavaVersion("1.8")).isEqualTo(8);
+    assertThat(JavaVersion.parseMajorJavaVersion("1.8.0")).isEqualTo(8);
+    assertThat(JavaVersion.parseMajorJavaVersion("1.8.0_131")).isEqualTo(8);
+    assertThat(JavaVersion.parseMajorJavaVersion("1.8.0_60-ea")).isEqualTo(8);
+    assertThat(JavaVersion.parseMajorJavaVersion("1.8.0_111-internal")).isEqualTo(8);
+
+    // openjdk8 per https://github.com/AdoptOpenJDK/openjdk-build/issues/93
+    assertThat(JavaVersion.parseMajorJavaVersion("1.8.0-internal")).isEqualTo(8);
+    assertThat(JavaVersion.parseMajorJavaVersion("1.8.0_131-adoptopenjdk")).isEqualTo(8);
   }
 
   @Test
-  public void parses_java8_variations() {
-    // Legacy "1.8" scheme with various vendor/build suffixes
-    assertParsesTo(
-        8,
-        "1.8",
-        "1.8.0",
-        "1.8.0_131",
-        "1.8.0_60-ea",
-        "1.8.0_111-internal",
-        // OpenJDK 8 (AdoptOpenJDK et al.) variations
-        "1.8.0-internal",
-        "1.8.0_131-adoptopenjdk");
+  public void testJava9() {
+    // Legacy style
+    assertThat(JavaVersion.parseMajorJavaVersion("9.0.4")).isEqualTo(9); // Oracle JDK 9
+    // Debian as reported in https://github.com/google/gson/issues/1310
+    assertThat(JavaVersion.parseMajorJavaVersion("9-Debian")).isEqualTo(9);
+
+    // New style
+    assertThat(JavaVersion.parseMajorJavaVersion("9-ea+19")).isEqualTo(9);
+    assertThat(JavaVersion.parseMajorJavaVersion("9+100")).isEqualTo(9);
+    assertThat(JavaVersion.parseMajorJavaVersion("9.0.1+20")).isEqualTo(9);
+    assertThat(JavaVersion.parseMajorJavaVersion("9.1.1+20")).isEqualTo(9);
   }
 
   @Test
-  public void parses_java9_variations() {
-    // Legacy dotted style
-    assertParsesTo(9, "9.0.4");   // Oracle JDK 9
-    // Debian uses a hyphenated suffix
-    assertParsesTo(9, "9-Debian");
-
-    // New versioning scheme (JEP 223), including early access and build metadata
-    assertParsesTo(9, "9-ea+19", "9+100", "9.0.1+20", "9.1.1+20");
+  public void testJava10() {
+    assertThat(JavaVersion.parseMajorJavaVersion("10.0.1")).isEqualTo(10); // Oracle JDK 10.0.1
   }
 
   @Test
-  public void parses_java10_dottedStyle() {
-    assertParsesTo(10, "10.0.1"); // Oracle JDK 10.0.1
-  }
-
-  @Test
-  public void unknownFormat_defaultsToJava6() {
-    // Defensive fallback behavior for unrecognized formats
-    assertParsesTo(6, "Java9");
-  }
-
-  // Helper to keep assertions concise and failure messages meaningful.
-  private static void assertParsesTo(int expectedMajor, String... versionStrings) {
-    for (String v : versionStrings) {
-      assertThat(JavaVersion.parseMajorJavaVersion(v))
-          .named("java.version='" + v + "'")
-          .isEqualTo(expectedMajor);
-    }
+  public void testUnknownVersionFormat() {
+    assertThat(JavaVersion.parseMajorJavaVersion("Java9")).isEqualTo(6); // unknown format
   }
 }
