@@ -22,92 +22,63 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.nio.charset.StandardCharsets;
 
+import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.codec.DecoderException;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * Tests the common functionality of the abstract RFC1522Codec class.
+ * RFC 1522 compliant codec test cases
  */
-@DisplayName("Tests for RFC1522Codec abstract class")
 class RFC1522CodecTest {
 
-    /**
-     * A minimal, concrete implementation of RFC1522Codec for testing purposes.
-     * <p>
-     * This stub uses 'T' as its encoding identifier and performs no actual
-     * encoding or decoding; it simply passes the byte arrays through. This allows
-     * for testing the parsing and formatting logic of the abstract class in
-     * isolation.
-     * </p>
-     */
-    private static class RFC1522TestCodec extends RFC1522Codec {
+    static class RFC1522TestCodec extends RFC1522Codec {
 
         RFC1522TestCodec() {
             super(StandardCharsets.UTF_8);
         }
 
         @Override
-        protected String getEncoding() {
-            // 'T' for Test
-            return "T";
+        protected byte[] doDecoding(final byte[] bytes) {
+            return bytes;
         }
 
         @Override
         protected byte[] doEncoding(final byte[] bytes) {
-            // Identity function for testing purposes
             return bytes;
         }
 
         @Override
-        protected byte[] doDecoding(final byte[] bytes) {
-            // Identity function for testing purposes
-            return bytes;
+        protected String getEncoding() {
+            return "T";
         }
+
     }
 
-    private RFC1522TestCodec codec;
-
-    @BeforeEach
-    void setUp() {
-        codec = new RFC1522TestCodec();
-    }
-
-    @Test
-    @DisplayName("decodeText() should return null when input is null")
-    void decodeTextWithNullInputShouldReturnNull() {
-        assertNull(codec.decodeText(null), "Decoding a null string should result in null.");
+    private void assertExpectedDecoderException(final String s) {
+        assertThrows(DecoderException.class, () -> new RFC1522TestCodec().decodeText(s));
     }
 
     @Test
-    @DisplayName("encodeText() should return null when input is null")
-    void encodeTextWithNullInputShouldReturnNull() {
-        assertNull(codec.encodeText(null, StandardCharsets.UTF_8), "Encoding a null string should result in null.");
+    void testDecodeInvalid() throws Exception {
+        assertExpectedDecoderException("whatever");
+        assertExpectedDecoderException("=?");
+        assertExpectedDecoderException("?=");
+        assertExpectedDecoderException("==");
+        assertExpectedDecoderException("=??=");
+        assertExpectedDecoderException("=?stuff?=");
+        assertExpectedDecoderException("=?UTF-8??=");
+        assertExpectedDecoderException("=?UTF-8?stuff?=");
+        assertExpectedDecoderException("=?UTF-8?T?stuff");
+        assertExpectedDecoderException("=??T?stuff?=");
+        assertExpectedDecoderException("=?UTF-8??stuff?=");
+        assertExpectedDecoderException("=?UTF-8?W?stuff?=");
     }
 
-    @DisplayName("decodeText() should throw DecoderException for malformed input")
-    @ParameterizedTest(name = "Input: \"{0}\"")
-    @ValueSource(strings = {
-        "whatever",          // Does not start with '=?' or end with '?='
-        "=?",                // Too short, missing required components
-        "?=",                // Does not start with '=?'
-        "==",                // Does not start with '=?'
-        "=??=",              // Missing charset, encoding, and text
-        "=?stuff?=",         // Missing encoding type and text
-        "=?UTF-8??=",        // Missing encoding type and text
-        "=?UTF-8?stuff?=",   // Missing encoding type
-        "=?UTF-8?T?stuff",   // Missing closing '?=' suffix
-        "=??T?stuff?=",     // Missing charset
-        "=?UTF-8??stuff?=",  // Missing encoding type
-        "=?UTF-8?W?stuff?="  // Incorrect encoding type (expected 'T', got 'W')
-    })
-    void decodeTextWithMalformedInputShouldThrowDecoderException(final String malformedText) {
-        assertThrows(DecoderException.class,
-            () -> codec.decodeText(malformedText),
-            () -> "Decoding malformed string \"" + malformedText + "\" should throw DecoderException."
-        );
+    @Test
+    void testNullInput() throws Exception {
+        final RFC1522TestCodec testCodec = new RFC1522TestCodec();
+        assertNull(testCodec.decodeText(null));
+        assertNull(testCodec.encodeText(null, CharEncoding.UTF_8));
     }
+
 }
