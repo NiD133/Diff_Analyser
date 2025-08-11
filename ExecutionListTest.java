@@ -19,13 +19,17 @@ package com.google.common.util.concurrent;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import com.google.common.testing.NullPointerTester;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
-import junit.framework.TestCase;
 import org.jspecify.annotations.NullUnmarked;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * Unit tests for {@link ExecutionList}.
@@ -34,130 +38,157 @@ import org.jspecify.annotations.NullUnmarked;
  * @author Sven Mawson
  */
 @NullUnmarked
-public class ExecutionListTest extends TestCase {
+@RunWith(JUnit4.class)
+public class ExecutionListTest {
 
   private final ExecutionList list = new ExecutionList();
 
-  public void testRunOnPopulatedList() throws Exception {
-    Executor exec = newCachedThreadPool();
-    CountDownLatch countDownLatch = new CountDownLatch(3);
-    list.add(new MockRunnable(countDownLatch), exec);
-    list.add(new MockRunnable(countDownLatch), exec);
-    list.add(new MockRunnable(countDownLatch), exec);
-    assertEquals(3L, countDownLatch.getCount());
+  @Test
+  public void execute_withListenersAddedBefore_allListenersAreExecuted() throws Exception {
+    // Arrange
+    Executor executor = newCachedThreadPool();
+    CountDownLatch latch = new CountDownLatch(3);
 
+    list.add(latch::countDown, executor);
+    list.add(latch::countDown, executor);
+    list.add(latch::countDown, executor);
+    assertEquals(3, latch.getCount());
+
+    // Act
     list.execute();
 
-    // Verify that all of the runnables execute in a reasonable amount of time.
-    assertTrue(countDownLatch.await(1L, SECONDS));
+    // Assert
+    // Verify that all runnables execute concurrently in a reasonable amount of time.
+    assertTrue(
+        "Listeners should have been executed within the timeout", latch.await(1L, SECONDS));
   }
 
-  public void testExecute_idempotent() {
-    AtomicInteger runCalled = new AtomicInteger();
-    list.add(
-        new Runnable() {
-          @Override
-          public void run() {
-            runCalled.getAndIncrement();
-          }
-        },
-        directExecutor());
+  @Test
+  public void execute_calledMultipleTimes_listenersRunOnlyOnce() {
+    // Arrange
+    AtomicInteger runCount = new AtomicInteger(0);
+    list.add(runCount::getAndIncrement, directExecutor());
+
+    // Act & Assert
     list.execute();
-    assertEquals(1, runCalled.get());
+    assertEquals("Listener should be run exactly once after the first execute() call", 1, runCount.get());
+
     list.execute();
-    assertEquals(1, runCalled.get());
+    assertEquals(
+        "Listener should not be run again on subsequent calls to execute()", 1, runCount.get());
   }
 
-  public void testExecute_idempotentConcurrently() throws InterruptedException {
-    CountDownLatch okayToRun = new CountDownLatch(1);
-    AtomicInteger runCalled = new AtomicInteger();
+  @Test
+  public void execute_calledConcurrently_listenersRunOnlyOnce() throws InterruptedException {
+    // Arrange
+    // This latch ensures the listener doesn't complete its work until we allow it,
+    // which gives both threads a chance to call execute() before the listener finishes.
+    CountDownLatch listenerExecutionGate = new CountDownLatch(1);
+    AtomicInteger runCount = new AtomicInteger(0);
+
     list.add(
-        new Runnable() {
-          @Override
-          public void run() {
-            try {
-              okayToRun.await();
-            } catch (InterruptedException e) {
-              Thread.currentThread().interrupt();
-              throw new RuntimeException(e);
-            }
-            runCalled.getAndIncrement();
+        () -> {
+          try {
+            listenerExecutionGate.await();
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
           }
+          runCount.getAndIncrement();
         },
         directExecutor());
-    Runnable execute =
-        new Runnable() {
-          @Override
-          public void run() {
-            list.execute();
-          }
-        };
-    Thread thread1 = new Thread(execute);
-    Thread thread2 = new Thread(execute);
+
+    Runnable executeList = list::execute;
+    Thread thread1 = new Thread(executeList);
+    Thread thread2 = new Thread(executeList);
+
+    // Act
     thread1.start();
     thread2.start();
-    assertEquals(0, runCalled.get());
-    okayToRun.countDown();
-    thread1.join();
-    thread2.join();
-    assertEquals(1, runCalled.get());
+    assertEquals("Listener should not have run yet", 0, runCount.get());
+
+    // Open the gate, allowing the listener to proceed.
+    listenerExecutionGate.countDown();
+
+    thread1.join(SECONDS.toMillis(1));
+    thread2.join(SECONDS.toMillis(1));
+
+    // Assert
+    assertEquals(
+        "Listener should have been executed exactly once despite concurrent execute() calls",
+        1,
+        runCount.get());
   }
 
-  public void testAddAfterRun() throws Exception {
-    // Run the previous test
-    testRunOnPopulatedList();
+  @Test
+  public void add_afterExecute_listenerIsExecutedImmediately() throws Exception {
+    // Arrange
+    // Mark the list as executed by calling execute() on an empty list.
+    list.execute();
 
-    // If it passed, then verify an Add will be executed without calling run
-    CountDownLatch countDownLatch = new CountDownLatch(1);
-    list.add(new MockRunnable(countDownLatch), newCachedThreadPool());
-    assertTrue(countDownLatch.await(1L, SECONDS));
+    CountDownLatch latch = new CountDownLatch(1);
+    Executor executor = newCachedThreadPool();
+
+    // Act
+    list.add(latch::countDown, executor);
+
+    // Assert
+    // The listener added after execute() should be run immediately.
+    assertTrue(
+        "Listener added after execute() should run immediately", latch.await(1L, SECONDS));
   }
 
-  public void testOrdering() throws Exception {
-    AtomicInteger integer = new AtomicInteger();
+  @Test
+  public void execute_withMultipleListeners_listenersRunInOrderOfAddition() {
+    // Arrange
+    // The listener will check that it's called in the expected order and update the counter.
+    // compareAndSet provides a strong guarantee of ordering.
+    AtomicInteger executionOrderCounter = new AtomicInteger(0);
     for (int i = 0; i < 10; i++) {
-      int expectedCount = i;
+      final int expectedOrder = i;
       list.add(
-          new Runnable() {
-            @Override
-            public void run() {
-              integer.compareAndSet(expectedCount, expectedCount + 1);
-            }
-          },
+          () -> executionOrderCounter.compareAndSet(expectedOrder, expectedOrder + 1),
           directExecutor());
     }
+
+    // Act
     list.execute();
-    assertEquals(10, integer.get());
+
+    // Assert
+    assertEquals(
+        "All listeners should have executed in the order they were added",
+        10,
+        executionOrderCounter.get());
   }
 
-  private class MockRunnable implements Runnable {
-    final CountDownLatch countDownLatch;
-
-    MockRunnable(CountDownLatch countDownLatch) {
-      this.countDownLatch = countDownLatch;
-    }
-
-    @Override
-    public void run() {
-      countDownLatch.countDown();
-    }
-  }
-
-  public void testExceptionsCaught() {
+  @Test
+  public void execute_listenerThrowsException_doesNotPropagate() {
+    // Arrange
     list.add(THROWING_RUNNABLE, directExecutor());
+
+    // Act & Assert
+    // The test passes if execute() does not throw an exception.
+    // The exception is caught and logged internally by ExecutionList.
     list.execute();
+  }
+
+  @Test
+  public void add_afterExecuteWithThrowingListener_doesNotPropagate() {
+    // Arrange
+    list.execute(); // Mark the list as executed.
+
+    // Act & Assert
+    // The test passes if add() does not throw an exception.
+    // The listener is executed immediately, and its exception is caught and logged.
     list.add(THROWING_RUNNABLE, directExecutor());
   }
 
+  @Test
   public void testNulls() {
     new NullPointerTester().testAllPublicInstanceMethods(new ExecutionList());
   }
 
   private static final Runnable THROWING_RUNNABLE =
-      new Runnable() {
-        @Override
-        public void run() {
-          throw new RuntimeException();
-        }
+      () -> {
+        throw new RuntimeException("This is an expected exception for the test.");
       };
 }
