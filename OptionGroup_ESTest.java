@@ -15,155 +15,226 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) 
+@EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class OptionGroup_ESTest extends OptionGroup_ESTest_scaffolding {
 
   @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      OptionGroup optionGroup0 = new OptionGroup();
-      optionGroup0.setRequired(true);
-      boolean boolean0 = optionGroup0.isRequired();
-      assertTrue(boolean0);
-  }
-
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      OptionGroup optionGroup0 = new OptionGroup();
-      Option option0 = new Option("oQxw", (String) null, true, "[]");
-      optionGroup0.setSelected(option0);
-      String string0 = optionGroup0.getSelected();
-      assertEquals("oQxw", string0);
-  }
-
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      OptionGroup optionGroup0 = new OptionGroup();
-      Option option0 = new Option((String) null, "", false, "cHfx;>NW^}R|1DYvgS");
-      optionGroup0.setSelected(option0);
-      String string0 = optionGroup0.getSelected();
-      assertEquals("", string0);
-  }
-
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      OptionGroup optionGroup0 = new OptionGroup();
-      Option option0 = new Option("oQxw", (String) null, true, "[]");
-      optionGroup0.setSelected(option0);
-      OptionGroup optionGroup1 = optionGroup0.addOption(option0);
-      assertTrue(optionGroup1.isSelected());
-  }
-
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      OptionGroup optionGroup0 = new OptionGroup();
-      Option option0 = new Option((String) null, (String) null);
-      optionGroup0.setRequired(true);
-      optionGroup0.addOption(option0);
-      assertTrue(optionGroup0.isRequired());
-  }
-
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      OptionGroup optionGroup0 = new OptionGroup();
-      // Undeclared exception!
-      try { 
-        optionGroup0.addOption((Option) null);
-        fail("Expecting exception: NullPointerException");
+  public void testSetRequiredToTrue_ShouldReturnTrue() throws Throwable {
+      // Given: A new option group
+      OptionGroup optionGroup = new OptionGroup();
       
+      // When: Setting the group as required
+      optionGroup.setRequired(true);
+      
+      // Then: The group should be marked as required
+      boolean isRequired = optionGroup.isRequired();
+      assertTrue("Option group should be required after setting required to true", isRequired);
+  }
+
+  @Test(timeout = 4000)
+  public void testGetSelectedWithShortOption_ShouldReturnShortOptionName() throws Throwable {
+      // Given: An option group with a selected option that has a short name
+      OptionGroup optionGroup = new OptionGroup();
+      Option optionWithShortName = new Option("oQxw", null, true, "[]");
+      
+      // When: Setting the option as selected
+      optionGroup.setSelected(optionWithShortName);
+      
+      // Then: Should return the short option name
+      String selectedOptionName = optionGroup.getSelected();
+      assertEquals("Should return the short option name", "oQxw", selectedOptionName);
+  }
+
+  @Test(timeout = 4000)
+  public void testGetSelectedWithLongOption_ShouldReturnLongOptionName() throws Throwable {
+      // Given: An option group with a selected option that has only a long name
+      OptionGroup optionGroup = new OptionGroup();
+      Option optionWithLongNameOnly = new Option(null, "", false, "cHfx;>NW^}R|1DYvgS");
+      
+      // When: Setting the option as selected
+      optionGroup.setSelected(optionWithLongNameOnly);
+      
+      // Then: Should return the long option name
+      String selectedOptionName = optionGroup.getSelected();
+      assertEquals("Should return the long option name when short name is null", "", selectedOptionName);
+  }
+
+  @Test(timeout = 4000)
+  public void testAddOptionAfterSelection_ShouldMarkGroupAsSelected() throws Throwable {
+      // Given: An option group with a pre-selected option
+      OptionGroup optionGroup = new OptionGroup();
+      Option selectedOption = new Option("oQxw", null, true, "[]");
+      optionGroup.setSelected(selectedOption);
+      
+      // When: Adding the same option to the group
+      OptionGroup resultGroup = optionGroup.addOption(selectedOption);
+      
+      // Then: The group should still be marked as selected
+      assertTrue("Option group should remain selected after adding the selected option", resultGroup.isSelected());
+  }
+
+  @Test(timeout = 4000)
+  public void testAddOptionToRequiredGroup_ShouldMaintainRequiredStatus() throws Throwable {
+      // Given: A required option group
+      OptionGroup requiredGroup = new OptionGroup();
+      Option option = new Option(null, null);
+      requiredGroup.setRequired(true);
+      
+      // When: Adding an option to the required group
+      requiredGroup.addOption(option);
+      
+      // Then: The group should still be required
+      assertTrue("Option group should remain required after adding an option", requiredGroup.isRequired());
+  }
+
+  @Test(timeout = 4000)
+  public void testAddNullOption_ShouldThrowNullPointerException() throws Throwable {
+      // Given: An option group
+      OptionGroup optionGroup = new OptionGroup();
+      
+      // When & Then: Adding a null option should throw NullPointerException
+      try { 
+        optionGroup.addOption(null);
+        fail("Expected NullPointerException when adding null option");
       } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
          verifyException("org.apache.commons.cli.OptionGroup", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      OptionGroup optionGroup0 = new OptionGroup();
-      Collection<Option> collection0 = optionGroup0.getOptions();
-      assertNotNull(collection0);
-  }
-
-  @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      OptionGroup optionGroup0 = new OptionGroup();
-      Option option0 = new Option((String) null, (String) null);
-      OptionGroup optionGroup1 = optionGroup0.addOption(option0);
-      Option option1 = new Option("vN", "", false, "");
-      optionGroup1.addOption(option1);
-      String string0 = optionGroup0.toString();
-      assertEquals("[--null, -vN ]", string0);
-  }
-
-  @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      OptionGroup optionGroup0 = new OptionGroup();
-      Option option0 = new Option("oQxw", (String) null, true, "[]");
-      optionGroup0.setSelected(option0);
-      Option option1 = new Option("Xr0g", false, "[");
-      try { 
-        optionGroup0.setSelected(option1);
-        fail("Expecting exception: Exception");
+  public void testGetOptions_ShouldReturnNonNullCollection() throws Throwable {
+      // Given: A new option group
+      OptionGroup optionGroup = new OptionGroup();
       
+      // When: Getting the options collection
+      Collection<Option> options = optionGroup.getOptions();
+      
+      // Then: Should return a non-null collection
+      assertNotNull("Options collection should not be null", options);
+  }
+
+  @Test(timeout = 4000)
+  public void testToStringWithMultipleOptions_ShouldFormatCorrectly() throws Throwable {
+      // Given: An option group with multiple options
+      OptionGroup optionGroup = new OptionGroup();
+      Option nullNameOption = new Option(null, null);
+      Option namedOption = new Option("vN", "", false, "");
+      
+      // When: Adding options and converting to string
+      optionGroup.addOption(nullNameOption);
+      optionGroup.addOption(namedOption);
+      String stringRepresentation = optionGroup.toString();
+      
+      // Then: Should format options correctly
+      assertEquals("String representation should format options correctly", "[--null, -vN ]", stringRepresentation);
+  }
+
+  @Test(timeout = 4000)
+  public void testSetSelectedTwice_ShouldThrowAlreadySelectedException() throws Throwable {
+      // Given: An option group with one selected option
+      OptionGroup optionGroup = new OptionGroup();
+      Option firstOption = new Option("oQxw", null, true, "[]");
+      optionGroup.setSelected(firstOption);
+      
+      // When & Then: Selecting a different option should throw exception
+      Option secondOption = new Option("Xr0g", false, "[");
+      try { 
+        optionGroup.setSelected(secondOption);
+        fail("Expected AlreadySelectedException when selecting a second option");
       } catch(Exception e) {
-         //
-         // The option 'Xr0g' was specified but an option from this group has already been selected: 'oQxw'
-         //
+         assertEquals("Exception message should indicate which option was already selected",
+                     "The option 'Xr0g' was specified but an option from this group has already been selected: 'oQxw'", 
+                     e.getMessage());
          verifyException("org.apache.commons.cli.OptionGroup", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      OptionGroup optionGroup0 = new OptionGroup();
-      Option option0 = new Option("oQxw", (String) null, true, "[]");
-      optionGroup0.setSelected(option0);
-      optionGroup0.setSelected(option0);
-      assertFalse(option0.isRequired());
+  public void testSetSelectedSameOptionTwice_ShouldNotThrowException() throws Throwable {
+      // Given: An option group with a selected option
+      OptionGroup optionGroup = new OptionGroup();
+      Option option = new Option("oQxw", null, true, "[]");
+      optionGroup.setSelected(option);
+      
+      // When: Setting the same option as selected again
+      optionGroup.setSelected(option);
+      
+      // Then: Should not throw an exception and option properties should remain unchanged
+      assertFalse("Option required status should remain unchanged", option.isRequired());
   }
 
   @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      OptionGroup optionGroup0 = new OptionGroup();
-      optionGroup0.setSelected((Option) null);
-      assertFalse(optionGroup0.isRequired());
+  public void testSetSelectedWithNull_ShouldClearSelection() throws Throwable {
+      // Given: An option group
+      OptionGroup optionGroup = new OptionGroup();
+      
+      // When: Setting selected option to null
+      optionGroup.setSelected(null);
+      
+      // Then: Group should not be required (default state maintained)
+      assertFalse("Option group should not be required when selection is cleared", optionGroup.isRequired());
   }
 
   @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      OptionGroup optionGroup0 = new OptionGroup();
-      Option option0 = new Option("oQxw", (String) null, true, "[]");
-      optionGroup0.setSelected(option0);
-      boolean boolean0 = optionGroup0.isSelected();
-      assertTrue(boolean0);
+  public void testIsSelectedWithSelectedOption_ShouldReturnTrue() throws Throwable {
+      // Given: An option group with a selected option
+      OptionGroup optionGroup = new OptionGroup();
+      Option selectedOption = new Option("oQxw", null, true, "[]");
+      optionGroup.setSelected(selectedOption);
+      
+      // When: Checking if an option is selected
+      boolean isSelected = optionGroup.isSelected();
+      
+      // Then: Should return true
+      assertTrue("Should return true when an option is selected", isSelected);
   }
 
   @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      OptionGroup optionGroup0 = new OptionGroup();
-      boolean boolean0 = optionGroup0.isSelected();
-      assertFalse(boolean0);
+  public void testIsSelectedWithNoSelection_ShouldReturnFalse() throws Throwable {
+      // Given: A new option group with no selection
+      OptionGroup optionGroup = new OptionGroup();
+      
+      // When: Checking if an option is selected
+      boolean isSelected = optionGroup.isSelected();
+      
+      // Then: Should return false
+      assertFalse("Should return false when no option is selected", isSelected);
   }
 
   @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      OptionGroup optionGroup0 = new OptionGroup();
-      String string0 = optionGroup0.getSelected();
-      assertNull(string0);
+  public void testGetSelectedWithNoSelection_ShouldReturnNull() throws Throwable {
+      // Given: A new option group with no selection
+      OptionGroup optionGroup = new OptionGroup();
+      
+      // When: Getting the selected option name
+      String selectedOptionName = optionGroup.getSelected();
+      
+      // Then: Should return null
+      assertNull("Should return null when no option is selected", selectedOptionName);
   }
 
   @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      OptionGroup optionGroup0 = new OptionGroup();
-      Collection<String> collection0 = optionGroup0.getNames();
-      assertNotNull(collection0);
+  public void testGetNames_ShouldReturnNonNullCollection() throws Throwable {
+      // Given: A new option group
+      OptionGroup optionGroup = new OptionGroup();
+      
+      // When: Getting the option names collection
+      Collection<String> names = optionGroup.getNames();
+      
+      // Then: Should return a non-null collection
+      assertNotNull("Names collection should not be null", names);
   }
 
   @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      OptionGroup optionGroup0 = new OptionGroup();
-      boolean boolean0 = optionGroup0.isRequired();
-      assertFalse(boolean0);
+  public void testIsRequiredByDefault_ShouldReturnFalse() throws Throwable {
+      // Given: A new option group
+      OptionGroup optionGroup = new OptionGroup();
+      
+      // When: Checking if the group is required
+      boolean isRequired = optionGroup.isRequired();
+      
+      // Then: Should return false by default
+      assertFalse("Option group should not be required by default", isRequired);
   }
 }
