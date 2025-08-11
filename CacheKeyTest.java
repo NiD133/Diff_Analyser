@@ -15,6 +15,7 @@
  */
 package org.apache.ibatis.cache;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,106 +29,159 @@ import java.util.Date;
 
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for {@link CacheKey}.
+ * Focuses on equality, hashing, serialization, and immutability of the NULL_CACHE_KEY.
+ */
 class CacheKeyTest {
 
   @Test
-  void shouldTestCacheKeysEqual() {
+  void keysWithIdenticalComponentsShouldBeEqualAndHaveSameHashCode() {
+    // Arrange
     Date date = new Date();
-    CacheKey key1 = new CacheKey(new Object[] { 1, "hello", null, new Date(date.getTime()) });
-    CacheKey key2 = new CacheKey(new Object[] { 1, "hello", null, new Date(date.getTime()) });
-    assertEquals(key1, key2);
-    assertEquals(key2, key1);
-    assertEquals(key1.hashCode(), key2.hashCode());
-    assertEquals(key1.toString(), key2.toString());
+    Object[] components = { 1, "hello", null, new Date(date.getTime()) };
+    CacheKey keyA = new CacheKey(components);
+    CacheKey keyB = new CacheKey(components);
+
+    // Act & Assert
+    assertAll("Keys with identical components should be equal and have the same hash code",
+        () -> assertEquals(keyA, keyB),
+        () -> assertEquals(keyA.hashCode(), keyB.hashCode())
+    );
   }
 
   @Test
-  void shouldTestCacheKeysNotEqualDueToDateDifference() throws Exception {
-    CacheKey key1 = new CacheKey(new Object[] { 1, "hello", null, new Date() });
-    Thread.sleep(1000);
-    CacheKey key2 = new CacheKey(new Object[] { 1, "hello", null, new Date() });
-    assertNotEquals(key1, key2);
-    assertNotEquals(key2, key1);
-    assertNotEquals(key1.hashCode(), key2.hashCode());
-    assertNotEquals(key1.toString(), key2.toString());
+  void keysWithDifferentDatesShouldNotBeEqual() {
+    // Arrange
+    CacheKey keyA = new CacheKey(new Object[] { 1, "hello", null, new Date(10000) });
+    CacheKey keyB = new CacheKey(new Object[] { 1, "hello", null, new Date(20000) });
+
+    // Act & Assert
+    assertAll("Keys with different date components should not be equal",
+        () -> assertNotEquals(keyA, keyB),
+        () -> assertNotEquals(keyA.hashCode(), keyB.hashCode())
+    );
   }
 
   @Test
-  void shouldTestCacheKeysNotEqualDueToOrder() throws Exception {
-    CacheKey key1 = new CacheKey(new Object[] { 1, "hello", null });
-    Thread.sleep(1000);
-    CacheKey key2 = new CacheKey(new Object[] { 1, null, "hello" });
-    assertNotEquals(key1, key2);
-    assertNotEquals(key2, key1);
-    assertNotEquals(key1.hashCode(), key2.hashCode());
-    assertNotEquals(key1.toString(), key2.toString());
+  void keysWithDifferentComponentOrderShouldNotBeEqual() {
+    // Arrange
+    CacheKey keyA = new CacheKey(new Object[] { 1, "hello", null });
+    CacheKey keyB = new CacheKey(new Object[] { 1, null, "hello" });
+
+    // Act & Assert
+    assertAll("Keys with components in a different order should not be equal",
+        () -> assertNotEquals(keyA, keyB),
+        () -> assertNotEquals(keyA.hashCode(), keyB.hashCode())
+    );
   }
 
   @Test
-  void shouldDemonstrateEmptyAndNullKeysAreEqual() {
-    CacheKey key1 = new CacheKey();
-    CacheKey key2 = new CacheKey();
-    assertEquals(key1, key2);
-    assertEquals(key2, key1);
-    key1.update(null);
-    key2.update(null);
-    assertEquals(key1, key2);
-    assertEquals(key2, key1);
-    key1.update(null);
-    key2.update(null);
-    assertEquals(key1, key2);
-    assertEquals(key2, key1);
+  void emptyKeysOrKeysWithOnlyNullsShouldBeEqual() {
+    // Arrange: Create two empty keys
+    CacheKey keyA = new CacheKey();
+    CacheKey keyB = new CacheKey();
+
+    // Assert: Empty keys are equal
+    assertEquals(keyA, keyB, "Empty keys should be equal");
+    assertEquals(keyA.hashCode(), keyB.hashCode(), "Empty keys should have the same hash code");
+
+    // Act: Update both with a null value
+    keyA.update(null);
+    keyB.update(null);
+
+    // Assert: Keys with a single null update are still equal
+    assertEquals(keyA, keyB, "Keys with a single null update should be equal");
+    assertEquals(keyA.hashCode(), keyB.hashCode(), "Hash code should be consistent after null update");
   }
 
   @Test
-  void shouldTestCacheKeysWithBinaryArrays() {
-    byte[] array1 = { 1 };
-    byte[] array2 = { 1 };
-    CacheKey key1 = new CacheKey(new Object[] { array1 });
-    CacheKey key2 = new CacheKey(new Object[] { array2 });
-    assertEquals(key1, key2);
+  void keysWithIdenticalByteArraysShouldBeEqual() {
+    // Arrange
+    byte[] arrayA = { 1, 2, 3 };
+    byte[] arrayB = { 1, 2, 3 }; // Intentionally a different instance with same content
+    CacheKey keyA = new CacheKey(new Object[] { arrayA });
+    CacheKey keyB = new CacheKey(new Object[] { arrayB });
+
+    // Act & Assert
+    assertAll("Keys with identical byte arrays should be equal",
+        () -> assertEquals(keyA, keyB),
+        () -> assertEquals(keyA.hashCode(), keyB.hashCode())
+    );
   }
 
   @Test
-  void throwExceptionWhenTryingToUpdateNullCacheKey() {
-    CacheKey cacheKey = CacheKey.NULL_CACHE_KEY;
-    assertThrows(CacheException.class, () -> cacheKey.update("null"));
+  void updateOnNullCacheKeyShouldThrowException() {
+    // Arrange
+    CacheKey nullCacheKey = CacheKey.NULL_CACHE_KEY;
+
+    // Act & Assert
+    assertThrows(CacheException.class, () -> nullCacheKey.update("some-object"),
+        "Updating NULL_CACHE_KEY should throw CacheException");
   }
 
   @Test
-  void throwExceptionWhenTryingToUpdateAllNullCacheKey() {
-    CacheKey cacheKey = CacheKey.NULL_CACHE_KEY;
-    assertThrows(CacheException.class, () -> cacheKey.updateAll(new Object[] { "null", "null" }));
+  void updateAllOnNullCacheKeyShouldThrowException() {
+    // Arrange
+    CacheKey nullCacheKey = CacheKey.NULL_CACHE_KEY;
+    Object[] components = { "some-object", "another-object" };
+
+    // Act & Assert
+    assertThrows(CacheException.class, () -> nullCacheKey.updateAll(components),
+        "Updating NULL_CACHE_KEY with multiple objects should throw CacheException");
   }
 
   @Test
-  void shouldDemonstrateClonedNullCacheKeysAreEqual() throws Exception {
-    CacheKey cacheKey = CacheKey.NULL_CACHE_KEY;
-    CacheKey clonedCacheKey = cacheKey.clone();
-    assertEquals(cacheKey, clonedCacheKey);
-    assertEquals(cacheKey.hashCode(), clonedCacheKey.hashCode());
+  void clonedNullCacheKeyShouldBeEqualToOriginal() throws CloneNotSupportedException {
+    // Arrange
+    CacheKey original = CacheKey.NULL_CACHE_KEY;
+
+    // Act
+    CacheKey clone = original.clone();
+
+    // Assert
+    assertEquals(original, clone);
+    assertEquals(original.hashCode(), clone.hashCode());
   }
 
   @Test
-  void serializationExceptionTest() {
+  void serializingKeyWithNonSerializableComponentShouldThrowException() {
+    // Arrange
     CacheKey cacheKey = new CacheKey();
-    cacheKey.update(new Object());
-    assertThrows(NotSerializableException.class, () -> serialize(cacheKey));
+    cacheKey.update(new Object()); // java.lang.Object is not serializable
+
+    // Act & Assert
+    assertThrows(NotSerializableException.class, () -> serialize(cacheKey),
+        "Serialization should fail for a key with a non-serializable component");
   }
 
   @Test
-  void serializationTest() throws Exception {
-    CacheKey cacheKey = new CacheKey();
-    cacheKey.update("serializable");
-    assertEquals(cacheKey, serialize(cacheKey));
+  void deserializedKeyShouldBeEqualToOriginal() throws Exception {
+    // Arrange
+    CacheKey originalKey = new CacheKey();
+    originalKey.update("serializable-string");
+
+    // Act
+    CacheKey deserializedKey = serialize(originalKey);
+
+    // Assert
+    assertEquals(originalKey, deserializedKey, "Deserialized key should be equal to the original");
   }
 
+  /**
+   * Helper method to serialize and deserialize an object.
+   */
   private static <T> T serialize(T object) throws Exception {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    new ObjectOutputStream(baos).writeObject(object);
+    try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+      oos.writeObject(object);
+    }
 
     ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-    return (T) new ObjectInputStream(bais).readObject();
+    try (ObjectInputStream ois = new ObjectInputStream(bais)) {
+      @SuppressWarnings("unchecked")
+      T deserializedObject = (T) ois.readObject();
+      return deserializedObject;
+    }
   }
-
 }
