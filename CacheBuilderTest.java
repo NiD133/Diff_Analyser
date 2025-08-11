@@ -1,7 +1,23 @@
+/*
+ *    Copyright 2009-2024 the original author or authors.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package org.apache.ibatis.mapping;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static com.googlecode.catchexception.apis.BDDCatchException.caughtException;
+import static com.googlecode.catchexception.apis.BDDCatchException.when;
+import static org.assertj.core.api.BDDAssertions.then;
 
 import java.lang.reflect.Field;
 
@@ -9,99 +25,48 @@ import org.apache.ibatis.builder.InitializingObject;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.CacheException;
 import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.junit.jupiter.api.DisplayName;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests for {@link CacheBuilder} focusing on initialization behavior for cache implementations
- * that implement {@link InitializingObject}.
- */
 class CacheBuilderTest {
 
-  private static final String CACHE_ID = "test";
-
   @Test
-  @DisplayName("CacheBuilder should call initialize() on custom cache implementations")
-  void shouldInitializeCustomCacheImplementation() {
-    Cache built = new CacheBuilder(CACHE_ID)
-        .implementation(InitializingCache.class)
-        .build();
+  void initializing() {
+    InitializingCache cache = unwrap(new CacheBuilder("test").implementation(InitializingCache.class).build());
 
-    // The built cache may be wrapped by decorators. Unwrap to the actual implementation.
-    InitializingCache target = unwrapDelegate(built, InitializingCache.class);
-
-    assertThat(target.initialized)
-        .as("initialize() should have been called on the underlying cache")
-        .isTrue();
+    Assertions.assertThat(cache.initialized).isTrue();
   }
 
   @Test
-  @DisplayName("CacheBuilder should wrap initialization failures in CacheException with a helpful message")
-  void shouldWrapInitializationFailuresInCacheException() {
-    assertThatThrownBy(() ->
-        new CacheBuilder(CACHE_ID)
-            .implementation(InitializingFailureCache.class)
-            .build())
-        .isInstanceOf(CacheException.class)
-        .hasMessage(
-            "Failed cache initialization for 'test' on 'org.apache.ibatis.mapping.CacheBuilderTest$InitializingFailureCache'");
+  void initializingFailure() {
+    when(() -> new CacheBuilder("test").implementation(InitializingFailureCache.class).build());
+    then(caughtException()).isInstanceOf(CacheException.class).hasMessage(
+        "Failed cache initialization for 'test' on 'org.apache.ibatis.mapping.CacheBuilderTest$InitializingFailureCache'");
   }
 
-  /**
-   * Unwraps cache decorators by following the "delegate" field until an instance of the expected type is found.
-   */
-  private static <T> T unwrapDelegate(Cache cache, Class<T> expectedType) {
-    Cache current = cache;
-    while (current != null) {
-      if (expectedType.isInstance(current)) {
-        return expectedType.cast(current);
-      }
-      Field delegateField = findDelegateField(current.getClass());
-      if (delegateField == null) {
-        throw new IllegalStateException(
-            "Could not find 'delegate' field while unwrapping cache of type " + current.getClass().getName());
-      }
-      Object next = getFieldValue(delegateField, current);
-      if (!(next instanceof Cache)) {
-        throw new IllegalStateException(
-            "'delegate' field is not a Cache in type " + current.getClass().getName());
-      }
-      current = (Cache) next;
-    }
-    throw new IllegalStateException("Reached null delegate while unwrapping to " + expectedType.getName());
-  }
-
-  private static Field findDelegateField(Class<?> type) {
-    Class<?> c = type;
-    while (c != null) {
-      try {
-        Field f = c.getDeclaredField("delegate");
-        f.setAccessible(true);
-        return f;
-      } catch (NoSuchFieldException ignored) {
-        c = c.getSuperclass();
-      }
-    }
-    return null;
-  }
-
-  private static Object getFieldValue(Field field, Object target) {
+  @SuppressWarnings("unchecked")
+  private <T> T unwrap(Cache cache) {
+    Field field;
     try {
-      return field.get(target);
+      field = cache.getClass().getDeclaredField("delegate");
+    } catch (NoSuchFieldException e) {
+      throw new IllegalStateException(e);
+    }
+    try {
+      field.setAccessible(true);
+      return (T) field.get(cache);
     } catch (IllegalAccessException e) {
-      throw new IllegalStateException("Unable to access field '" + field.getName() + "'", e);
+      throw new IllegalStateException(e);
     } finally {
       field.setAccessible(false);
     }
   }
 
-  /**
-   * A cache that records whether initialize() was called.
-   */
   private static class InitializingCache extends PerpetualCache implements InitializingObject {
+
     private boolean initialized;
 
-    InitializingCache(String id) {
+    public InitializingCache(String id) {
       super(id);
     }
 
@@ -109,13 +74,12 @@ class CacheBuilderTest {
     public void initialize() {
       this.initialized = true;
     }
+
   }
 
-  /**
-   * A cache that throws from initialize() to simulate initialization failure.
-   */
   private static class InitializingFailureCache extends PerpetualCache implements InitializingObject {
-    InitializingFailureCache(String id) {
+
+    public InitializingFailureCache(String id) {
       super(id);
     }
 
@@ -123,5 +87,7 @@ class CacheBuilderTest {
     public void initialize() {
       throw new IllegalStateException("error");
     }
+
   }
+
 }
