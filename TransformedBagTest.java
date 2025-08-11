@@ -26,14 +26,10 @@ import org.apache.commons.collections4.collection.TransformedCollectionTest;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test suite for {@link TransformedBag} implementation.
- * 
- * Tests the behavior of bags that automatically transform elements when they are added.
- * For example, a bag that converts strings to integers when elements are added.
+ * Extension of {@link AbstractBagTest} for exercising the {@link TransformedBag}
+ * implementation.
  */
 public class TransformedBagTest<T> extends AbstractBagTest<T> {
-
-    private static final String[] TEST_STRINGS = {"1", "3", "5", "7", "2", "4", "6"};
 
     @Override
     public String getCompatibilityVersion() {
@@ -45,9 +41,6 @@ public class TransformedBagTest<T> extends AbstractBagTest<T> {
         return UNORDERED;
     }
 
-    /**
-     * Creates a TransformedBag with a no-op transformer for standard bag tests.
-     */
     @Override
     @SuppressWarnings("unchecked")
     public Bag<T> makeObject() {
@@ -55,99 +48,50 @@ public class TransformedBagTest<T> extends AbstractBagTest<T> {
                 (Transformer<T, T>) TransformedCollectionTest.NOOP_TRANSFORMER);
     }
 
-    /**
-     * Tests that TransformedBag.transformingBag() applies transformation to newly added elements.
-     * 
-     * This test uses a string-to-integer transformer and verifies that:
-     * - String elements are transformed to integers when added
-     * - The bag contains the transformed values, not the original strings
-     * - Removal works with transformed values, not original values
-     */
     @Test
     @SuppressWarnings("unchecked")
-    void testTransformingBag_appliesTransformationToNewElements() {
-        // Given: A bag that transforms strings to integers when elements are added
-        final Bag<T> transformingBag = TransformedBag.transformingBag(new HashBag<>(),
+    void testTransformedBag() {
+        //T had better be Object!
+        final Bag<T> bag = TransformedBag.transformingBag(new HashBag<>(),
                 (Transformer<T, T>) TransformedCollectionTest.STRING_TO_INTEGER_TRANSFORMER);
-        
-        // Initially the bag should be empty
-        assertTrue(transformingBag.isEmpty());
-
-        // When: Adding string elements to the bag
-        for (int i = 0; i < TEST_STRINGS.length; i++) {
-            String stringElement = TEST_STRINGS[i];
-            transformingBag.add((T) stringElement);
-            
-            // Then: The bag size increases and contains the transformed integer value
-            assertEquals(i + 1, transformingBag.size());
-            
-            Integer expectedTransformedValue = Integer.valueOf(stringElement);
-            assertTrue(transformingBag.contains(expectedTransformedValue), 
-                "Bag should contain transformed integer value: " + expectedTransformedValue);
-            assertFalse(transformingBag.contains(stringElement), 
-                "Bag should not contain original string value: " + stringElement);
+        assertTrue(bag.isEmpty());
+        final Object[] els = {"1", "3", "5", "7", "2", "4", "6"};
+        for (int i = 0; i < els.length; i++) {
+            bag.add((T) els[i]);
+            assertEquals(i + 1, bag.size());
+            assertTrue(bag.contains(Integer.valueOf((String) els[i])));
+            assertFalse(bag.contains(els[i]));
         }
 
-        // When: Attempting to remove elements
-        String firstString = TEST_STRINGS[0];
-        Integer firstTransformedInteger = Integer.valueOf(firstString);
-        
-        // Then: Removal fails with original string but succeeds with transformed integer
-        assertFalse(transformingBag.remove(firstString), 
-            "Should not be able to remove original string value");
-        assertTrue(transformingBag.remove(firstTransformedInteger), 
-            "Should be able to remove transformed integer value");
+        assertFalse(bag.remove(els[0]));
+        assertTrue(bag.remove(Integer.valueOf((String) els[0])));
     }
 
-    /**
-     * Tests that TransformedBag.transformedBag() transforms existing elements in the decorated bag.
-     * 
-     * This test verifies that:
-     * - Existing elements in the original bag are transformed when the bag is decorated
-     * - The decorated bag contains transformed values, not original values
-     * - Removal works with transformed values
-     */
     @Test
     @SuppressWarnings("unchecked")
-    void testTransformedBag_transformsExistingElements() {
-        // Given: An original bag with string elements
+    void testTransformedBag_decorateTransform() {
         final Bag<T> originalBag = new HashBag<>();
-        for (final String stringElement : TEST_STRINGS) {
-            originalBag.add((T) stringElement);
+        final Object[] els = {"1", "3", "5", "7", "2", "4", "6"};
+        for (final Object el : els) {
+            originalBag.add((T) el);
         }
-
-        // When: Creating a transformed bag that decorates the original bag
-        final Bag<T> transformedBag = TransformedBag.transformedBag(originalBag,
+        final Bag<T> bag = TransformedBag.transformedBag(originalBag,
                 (Transformer<T, T>) TransformedCollectionTest.STRING_TO_INTEGER_TRANSFORMER);
-
-        // Then: The transformed bag should have the same size as the original
-        assertEquals(TEST_STRINGS.length, transformedBag.size());
-        
-        // And: The transformed bag should contain transformed integer values, not original strings
-        for (final String originalString : TEST_STRINGS) {
-            Integer expectedTransformedValue = Integer.valueOf(originalString);
-            assertTrue(transformedBag.contains(expectedTransformedValue), 
-                "Transformed bag should contain integer value: " + expectedTransformedValue);
-            assertFalse(transformedBag.contains(originalString), 
-                "Transformed bag should not contain original string: " + originalString);
+        assertEquals(els.length, bag.size());
+        for (final Object el : els) {
+            assertTrue(bag.contains(Integer.valueOf((String) el)));
+            assertFalse(bag.contains(el));
         }
 
-        // When: Attempting to remove elements
-        String firstString = TEST_STRINGS[0];
-        Integer firstTransformedInteger = Integer.valueOf(firstString);
-        
-        // Then: Removal fails with original string but succeeds with transformed integer
-        assertFalse(transformedBag.remove(firstString), 
-            "Should not be able to remove original string value");
-        assertTrue(transformedBag.remove(firstTransformedInteger), 
-            "Should be able to remove transformed integer value");
+        assertFalse(bag.remove(els[0]));
+        assertTrue(bag.remove(Integer.valueOf((String) els[0])));
     }
 
-    // Commented out utility method for generating test data files
-    // void testCreate() throws Exception {
-    //     Bag<T> bag = makeObject();
-    //     writeExternalFormToDisk((java.io.Serializable) bag, "src/test/resources/data/test/TransformedBag.emptyCollection.version4.obj");
-    //     bag = makeFullCollection();
-    //     writeExternalFormToDisk((java.io.Serializable) bag, "src/test/resources/data/test/TransformedBag.fullCollection.version4.obj");
-    // }
+//    void testCreate() throws Exception {
+//        Bag<T> bag = makeObject();
+//        writeExternalFormToDisk((java.io.Serializable) bag, "src/test/resources/data/test/TransformedBag.emptyCollection.version4.obj");
+//        bag = makeFullCollection();
+//        writeExternalFormToDisk((java.io.Serializable) bag, "src/test/resources/data/test/TransformedBag.fullCollection.version4.obj");
+//    }
+
 }
