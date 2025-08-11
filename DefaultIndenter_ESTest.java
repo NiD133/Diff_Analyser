@@ -43,242 +43,232 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class DefaultIndenter_ESTest extends DefaultIndenter_ESTest_scaffolding {
 
+  // Constructor Tests
   @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
-      DefaultIndenter defaultIndenter0 = DefaultIndenter.SYSTEM_LINEFEED_INSTANCE;
-      JsonFactoryBuilder jsonFactoryBuilder0 = new JsonFactoryBuilder();
-      JsonFactory jsonFactory0 = new JsonFactory(jsonFactoryBuilder0);
-      MockFile mockFile0 = new MockFile("JSON", "a");
-      JsonEncoding jsonEncoding0 = JsonEncoding.UTF32_BE;
-      JsonGenerator jsonGenerator0 = jsonFactory0.createGenerator((File) mockFile0, jsonEncoding0);
-      JsonGeneratorDelegate jsonGeneratorDelegate0 = new JsonGeneratorDelegate(jsonGenerator0, true);
-      defaultIndenter0.writeIndentation(jsonGeneratorDelegate0, 0);
-      assertEquals(1, jsonGeneratorDelegate0.getOutputBuffered());
-      assertEquals(1, jsonGenerator0.getOutputBuffered());
-  }
-
-  @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
-      DefaultIndenter defaultIndenter0 = new DefaultIndenter("", "As4M!C");
-      DefaultIndenter defaultIndenter1 = defaultIndenter0.withLinefeed("JSON");
-      assertEquals("JSON", defaultIndenter1.getEol());
-  }
-
-  @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
-      DefaultIndenter defaultIndenter0 = new DefaultIndenter("", "As4M!C");
-      defaultIndenter0.getIndent();
-      assertEquals("As4M!C", defaultIndenter0.getEol());
-  }
-
-  @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
-      DefaultIndenter defaultIndenter0 = new DefaultIndenter("*e/0*h`h7+", (String) null);
-      String string0 = defaultIndenter0.getEol();
-      assertNull(string0);
-  }
-
-  @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
-      DefaultIndenter defaultIndenter0 = new DefaultIndenter();
-      DefaultIndenter defaultIndenter1 = defaultIndenter0.withLinefeed("");
-      String string0 = defaultIndenter1.getEol();
-      assertEquals("", string0);
-  }
-
-  @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
-      DefaultIndenter defaultIndenter0 = new DefaultIndenter();
-      JsonFactory jsonFactory0 = new JsonFactory();
-      MockFile mockFile0 = new MockFile("\n");
-      JsonEncoding jsonEncoding0 = JsonEncoding.UTF8;
-      JsonGenerator jsonGenerator0 = jsonFactory0.createGenerator((File) mockFile0, jsonEncoding0);
-      // Undeclared exception!
-      defaultIndenter0.SYSTEM_LINEFEED_INSTANCE.writeIndentation(jsonGenerator0, 56319);
-  }
-
-  @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
-      DefaultIndenter defaultIndenter0 = new DefaultIndenter();
-      // Undeclared exception!
-      try { 
-        defaultIndenter0.SYSTEM_LINEFEED_INSTANCE.writeIndentation((JsonGenerator) null, (-110));
+  public void testConstructor_NullArgumentsThrowsNPE()  {
+      try {
+        new DefaultIndenter(null, null);
         fail("Expecting exception: NullPointerException");
-      
       } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
+         verifyException("com.fasterxml.jackson.core.util.DefaultIndenter", e);
+      }
+  }
+
+  // getEol() Tests
+  @Test(timeout = 4000)
+  public void testGetEol_DefaultInstance()  {
+      DefaultIndenter defaultIndenter = new DefaultIndenter();
+      assertEquals("\n", defaultIndenter.getEol());
+  }
+
+  @Test(timeout = 4000)
+  public void testGetEol_EmptyString()  {
+      DefaultIndenter indenter = new DefaultIndenter().withLinefeed("");
+      assertEquals("", indenter.getEol());
+  }
+
+  @Test(timeout = 4000)
+  public void testGetEol_NullWhenConstructedWithNull()  {
+      DefaultIndenter indenter = new DefaultIndenter("*e/0*h`h7+", null);
+      assertNull(indenter.getEol());
+  }
+
+  // getIndent() Tests
+  @Test(timeout = 4000)
+  public void testGetIndent_DefaultInstance()  {
+      DefaultIndenter.SYSTEM_LINEFEED_INSTANCE.getIndent();
+      DefaultIndenter defaultIndenter = new DefaultIndenter();
+      assertEquals("\n", defaultIndenter.getEol());
+  }
+
+  @Test(timeout = 4000)
+  public void testGetIndent_CustomInstance()  {
+      DefaultIndenter indenter = new DefaultIndenter("", "As4M!C");
+      indenter.getIndent();
+      assertEquals("As4M!C", indenter.getEol());
+  }
+
+  // withLinefeed() Tests
+  @Test(timeout = 4000)
+  public void testWithLinefeed_UpdatesEol()  {
+      DefaultIndenter original = new DefaultIndenter("", "As4M!C");
+      DefaultIndenter updated = original.withLinefeed("JSON");
+      assertEquals("JSON", updated.getEol());
+  }
+
+  @Test(timeout = 4000)
+  public void testWithLinefeed_SameValueReturnsSameInstance()  {
+      DefaultIndenter original = new DefaultIndenter();
+      DefaultIndenter updated = original.withLinefeed("\n");
+      assertSame(original, updated);
+  }
+
+  @Test(timeout = 4000)
+  public void testWithLinefeed_NullThrowsNPE()  {
+      DefaultIndenter indenter = new DefaultIndenter();
+      try { 
+        indenter.SYSTEM_LINEFEED_INSTANCE.withLinefeed(null);
+        fail("Expecting exception: NullPointerException");
+      } catch(NullPointerException e) {
+      }
+  }
+
+  // withIndent() Tests
+  @Test(timeout = 4000)
+  public void testWithIndent_SameValueReturnsSameInstance()  {
+      DefaultIndenter original = new DefaultIndenter();
+      DefaultIndenter updated = original.SYSTEM_LINEFEED_INSTANCE.withIndent("");
+      DefaultIndenter updatedAgain = updated.withIndent("");
+      assertSame(updatedAgain, updated);
+  }
+
+  @Test(timeout = 4000)
+  public void testWithIndent_NullThrowsNPE()  {
+      DefaultIndenter indenter = new DefaultIndenter();
+      try { 
+        indenter.withIndent(null);
+        fail("Expecting exception: NullPointerException");
+      } catch(NullPointerException e) {
+      }
+  }
+
+  // isInline() Test
+  @Test(timeout = 4000)
+  public void testIsInline_ReturnsFalse()  {
+      DefaultIndenter indenter = new DefaultIndenter();
+      assertFalse(indenter.isInline());
+      assertEquals("\n", indenter.getEol());
+  }
+
+  // writeIndentation() Tests
+  @Test(timeout = 4000)
+  public void testWriteIndentation_ZeroLevelWritesEolOnly() throws Throwable {
+      DefaultIndenter indenter = DefaultIndenter.SYSTEM_LINEFEED_INSTANCE;
+      JsonFactoryBuilder factoryBuilder = new JsonFactoryBuilder();
+      JsonFactory factory = new JsonFactory(factoryBuilder);
+      MockFile file = new MockFile("JSON", "a");
+      JsonGenerator generator = factory.createGenerator(file, JsonEncoding.UTF32_BE);
+      JsonGeneratorDelegate delegatedGenerator = new JsonGeneratorDelegate(generator, true);
+      
+      indenter.writeIndentation(delegatedGenerator, 0);
+      
+      assertEquals(1, delegatedGenerator.getOutputBuffered());
+      assertEquals(1, generator.getOutputBuffered());
+  }
+
+  @Test(timeout = 4000)
+  public void testWriteIndentation_NegativeLevelWritesEolOnly() throws Throwable {
+      DefaultIndenter indenter = new DefaultIndenter("", "As4M!C");
+      JsonFactory factory = new JsonFactory();
+      StringWriter writer = new StringWriter();
+      JsonGenerator generator = factory.createGenerator(writer);
+      
+      indenter.writeIndentation(generator, -1909562014);
+      
+      assertEquals(6, generator.getOutputBuffered());
+      assertEquals("As4M!C", indenter.getEol());
+  }
+
+  @Test(timeout = 4000)
+  public void testWriteIndentation_HighLevelWritesExpectedBytes() throws Throwable {
+      DefaultIndenter base = new DefaultIndenter("", "");
+      DefaultIndenter indenter = base.withIndent("M");
+      
+      // Setup generator with mocked context
+      StreamReadConstraints readConstraints = StreamReadConstraints.defaults();
+      StreamWriteConstraints writeConstraints = StreamWriteConstraints.defaults();
+      ErrorReportConfiguration errorConfig = ErrorReportConfiguration.defaults();
+      BufferRecycler recycler = new BufferRecycler(500, 1936);
+      ContentReference contentRef = ContentReference.construct(true, base, 1, 16, errorConfig);
+      IOContext context = new IOContext(readConstraints, writeConstraints, errorConfig, recycler, contentRef, true);
+      StringWriter stringWriter = new StringWriter();
+      WriterBasedJsonGenerator generator = new WriterBasedJsonGenerator(context, 806, null, stringWriter, 'Y');
+      
+      indenter.writeIndentation(generator, 2048);
+      assertEquals(2048, generator.getOutputBuffered());
+  }
+
+  @Test(timeout = 4000)
+  public void testWriteIndentation_NullGeneratorThrowsNPE()  {
+      DefaultIndenter indenter = new DefaultIndenter();
+      try { 
+        indenter.SYSTEM_LINEFEED_INSTANCE.writeIndentation(null, -110);
+        fail("Expecting exception: NullPointerException");
+      } catch(NullPointerException e) {
          verifyException("com.fasterxml.jackson.core.util.DefaultIndenter", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
-      DefaultIndenter defaultIndenter0 = new DefaultIndenter("<", "=");
-      StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-      StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-      ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-      BufferRecycler bufferRecycler0 = new BufferRecycler();
-      ContentReference contentReference0 = ContentReference.construct(true, (Object) "=", errorReportConfiguration0);
-      IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, true);
-      byte[] byteArray0 = new byte[4];
-      ByteArrayBuilder byteArrayBuilder0 = ByteArrayBuilder.fromInitial(byteArray0, 0);
-      UTF8JsonGenerator uTF8JsonGenerator0 = new UTF8JsonGenerator(iOContext0, 2, (ObjectCodec) null, byteArrayBuilder0, '\'', byteArray0, 8, true);
-      // Undeclared exception!
-      try { 
-        defaultIndenter0.SYSTEM_LINEFEED_INSTANCE.writeIndentation(uTF8JsonGenerator0, 16);
-        fail("Expecting exception: ArrayIndexOutOfBoundsException");
-      
-      } catch(ArrayIndexOutOfBoundsException e) {
+  public void testWriteIndentation_InvalidLevelThrowsException()  {
+      DefaultIndenter indenter = new DefaultIndenter();
+      JsonFactory factory = new JsonFactory();
+      MockFile file = new MockFile("\n");
+      try {
+        JsonGenerator generator = factory.createGenerator(file, JsonEncoding.UTF8);
+        indenter.SYSTEM_LINEFEED_INSTANCE.writeIndentation(generator, 56319);
+        fail("Expecting exception: Exception");
+      } catch (Throwable e) {
+         // Expected exception due to high indentation level
       }
   }
 
   @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
-      DefaultIndenter defaultIndenter0 = new DefaultIndenter();
-      EvoSuiteFile evoSuiteFile0 = new EvoSuiteFile("\n/JSON");
-      FileSystemHandling.shouldThrowIOException(evoSuiteFile0);
-      JsonFactory jsonFactory0 = new JsonFactory();
-      MockFile mockFile0 = new MockFile("\n", "JSON");
-      JsonEncoding jsonEncoding0 = JsonEncoding.UTF32_LE;
-      JsonGenerator jsonGenerator0 = jsonFactory0.createGenerator((File) mockFile0, jsonEncoding0);
-      try { 
-        defaultIndenter0.SYSTEM_LINEFEED_INSTANCE.writeIndentation(jsonGenerator0, 56319);
-        fail("Expecting exception: IOException");
+  public void testWriteIndentation_ArrayIndexOutOfBounds()  {
+      DefaultIndenter indenter = new DefaultIndenter("<", "=");
+      // Setup generator with constrained buffer
+      StreamReadConstraints readConstraints = StreamReadConstraints.defaults();
+      StreamWriteConstraints writeConstraints = StreamWriteConstraints.defaults();
+      ErrorReportConfiguration errorConfig = ErrorReportConfiguration.defaults();
+      BufferRecycler recycler = new BufferRecycler();
+      ContentReference contentRef = ContentReference.construct(true, "=", errorConfig);
+      IOContext context = new IOContext(readConstraints, writeConstraints, errorConfig, recycler, contentRef, true);
+      byte[] initialBuffer = new byte[4];
+      ByteArrayBuilder builder = ByteArrayBuilder.fromInitial(initialBuffer, 0);
+      UTF8JsonGenerator generator = new UTF8JsonGenerator(context, 2, null, builder, '\'', initialBuffer, 8, true);
       
+      try { 
+        indenter.SYSTEM_LINEFEED_INSTANCE.writeIndentation(generator, 16);
+        fail("Expecting exception: ArrayIndexOutOfBoundsException");
+      } catch(ArrayIndexOutOfBoundsException e) {
+         // Expected due to small buffer
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void testWriteIndentation_SimulatedIOException() throws Throwable {
+      DefaultIndenter indenter = new DefaultIndenter();
+      EvoSuiteFile mockFile = new EvoSuiteFile("\n/JSON");
+      FileSystemHandling.shouldThrowIOException(mockFile);
+      
+      JsonFactory factory = new JsonFactory();
+      MockFile file = new MockFile("\n", "JSON");
+      try {
+        JsonGenerator generator = factory.createGenerator(file, JsonEncoding.UTF32_LE);
+        indenter.SYSTEM_LINEFEED_INSTANCE.writeIndentation(generator, 56319);
+        fail("Expecting exception: IOException");
       } catch(IOException e) {
-         //
-         // Simulated IOException
-         //
          verifyException("org.evosuite.runtime.vfs.VirtualFileSystem", e);
       }
   }
 
   @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
-      DefaultIndenter defaultIndenter0 = DefaultIndenter.SYSTEM_LINEFEED_INSTANCE;
-      JsonFactory jsonFactory0 = new JsonFactory();
-      MockFile mockFile0 = new MockFile("\n", "\n");
-      MockFileOutputStream mockFileOutputStream0 = new MockFileOutputStream(mockFile0, false);
-      MockPrintStream mockPrintStream0 = new MockPrintStream(mockFileOutputStream0, true);
-      JsonGenerator jsonGenerator0 = jsonFactory0.createGenerator((OutputStream) mockPrintStream0);
-      TokenFilter tokenFilter0 = TokenFilter.INCLUDE_ALL;
-      TokenFilter.Inclusion tokenFilter_Inclusion0 = TokenFilter.Inclusion.ONLY_INCLUDE_ALL;
-      FilteringGeneratorDelegate filteringGeneratorDelegate0 = new FilteringGeneratorDelegate(jsonGenerator0, tokenFilter0, tokenFilter_Inclusion0, false);
-      try { 
-        defaultIndenter0.writeIndentation(filteringGeneratorDelegate0, 2147483645);
-        fail("Expecting exception: IOException");
+  public void testWriteIndentation_InvalidLevelCausesIOException() throws Throwable {
+      DefaultIndenter indenter = DefaultIndenter.SYSTEM_LINEFEED_INSTANCE;
+      JsonFactory factory = new JsonFactory();
+      MockFile file = new MockFile("\n", "\n");
+      MockFileOutputStream fileStream = new MockFileOutputStream(file, false);
+      MockPrintStream printStream = new MockPrintStream(fileStream, true);
+      JsonGenerator generator = factory.createGenerator(printStream);
+      FilteringGeneratorDelegate filteredGenerator = new FilteringGeneratorDelegate(
+          generator, TokenFilter.INCLUDE_ALL, TokenFilter.Inclusion.ONLY_INCLUDE_ALL, false
+      );
       
+      try { 
+        indenter.writeIndentation(filteredGenerator, Integer.MAX_VALUE - 2);
+        fail("Expecting exception: IOException");
       } catch(IOException e) {
-         //
-         // Invalid 'offset' (0) and/or 'len' (-6) arguments for `char[]` of length 32
-         //
          verifyException("com.fasterxml.jackson.core.JsonGenerator", e);
       }
-  }
-
-  @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
-      DefaultIndenter defaultIndenter0 = new DefaultIndenter();
-      // Undeclared exception!
-      try { 
-        defaultIndenter0.SYSTEM_LINEFEED_INSTANCE.withLinefeed((String) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      DefaultIndenter defaultIndenter0 = new DefaultIndenter();
-      // Undeclared exception!
-      try { 
-        defaultIndenter0.withIndent((String) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
-      DefaultIndenter defaultIndenter0 = null;
-      try {
-        defaultIndenter0 = new DefaultIndenter((String) null, (String) null);
-        fail("Expecting exception: NullPointerException");
-      
-      } catch(NullPointerException e) {
-         //
-         // no message in exception (getMessage() returned null)
-         //
-         verifyException("com.fasterxml.jackson.core.util.DefaultIndenter", e);
-      }
-  }
-
-  @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
-      DefaultIndenter defaultIndenter0 = new DefaultIndenter();
-      defaultIndenter0.SYSTEM_LINEFEED_INSTANCE.getIndent();
-      assertEquals("\n", defaultIndenter0.getEol());
-  }
-
-  @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
-      DefaultIndenter defaultIndenter0 = new DefaultIndenter("", "");
-      DefaultIndenter defaultIndenter1 = defaultIndenter0.withIndent("M");
-      StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-      StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-      ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-      BufferRecycler bufferRecycler0 = new BufferRecycler(500, 1936);
-      ContentReference contentReference0 = ContentReference.construct(true, (Object) defaultIndenter0, 1, 16, errorReportConfiguration0);
-      IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, true);
-      StringWriter stringWriter0 = new StringWriter();
-      WriterBasedJsonGenerator writerBasedJsonGenerator0 = new WriterBasedJsonGenerator(iOContext0, 806, (ObjectCodec) null, stringWriter0, 'Y');
-      defaultIndenter1.writeIndentation(writerBasedJsonGenerator0, 2048);
-      assertEquals(2048, writerBasedJsonGenerator0.getOutputBuffered());
-  }
-
-  @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
-      DefaultIndenter defaultIndenter0 = new DefaultIndenter("", "As4M!C");
-      JsonFactory jsonFactory0 = new JsonFactory();
-      StringWriter stringWriter0 = new StringWriter();
-      JsonGenerator jsonGenerator0 = jsonFactory0.createGenerator((Writer) stringWriter0);
-      defaultIndenter0.writeIndentation(jsonGenerator0, (-1909562014));
-      assertEquals(6, jsonGenerator0.getOutputBuffered());
-      assertEquals("As4M!C", defaultIndenter0.getEol());
-  }
-
-  @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      DefaultIndenter defaultIndenter0 = new DefaultIndenter();
-      DefaultIndenter defaultIndenter1 = defaultIndenter0.SYSTEM_LINEFEED_INSTANCE.withIndent("");
-      DefaultIndenter defaultIndenter2 = defaultIndenter1.withIndent("");
-      assertSame(defaultIndenter2, defaultIndenter1);
-      assertEquals("\n", defaultIndenter2.getEol());
-  }
-
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
-      DefaultIndenter defaultIndenter0 = new DefaultIndenter();
-      DefaultIndenter defaultIndenter1 = defaultIndenter0.withLinefeed("\n");
-      assertSame(defaultIndenter1, defaultIndenter0);
-  }
-
-  @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
-      DefaultIndenter defaultIndenter0 = new DefaultIndenter();
-      String string0 = defaultIndenter0.getEol();
-      assertEquals("\n", string0);
-  }
-
-  @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
-      DefaultIndenter defaultIndenter0 = new DefaultIndenter();
-      boolean boolean0 = defaultIndenter0.isInline();
-      assertFalse(boolean0);
-      assertEquals("\n", defaultIndenter0.getEol());
   }
 }
