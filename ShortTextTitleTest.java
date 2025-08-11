@@ -45,56 +45,73 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Tests for the {@link ShortTextTitle} class.
  */
-public class ShortTextTitleTest {
+class ShortTextTitleTest {
 
     /**
-     * Check that the equals() method distinguishes all fields.
+     * Verifies that titles with the same text are considered equal.
      */
     @Test
-    public void testEquals() {
-        ShortTextTitle t1 = new ShortTextTitle("ABC");
-        ShortTextTitle t2 = new ShortTextTitle("ABC");
-        assertEquals(t1, t2);
-
-        t1.setText("Test 1");
-        assertNotEquals(t1, t2);
-        t2.setText("Test 1");
-        assertEquals(t1, t2);
+    void equals_ShouldReturnTrueForSameText() {
+        ShortTextTitle title1 = new ShortTextTitle("ABC");
+        ShortTextTitle title2 = new ShortTextTitle("ABC");
+        assertEquals(title1, title2, "Titles with same text should be equal");
     }
 
     /**
-     * Two objects that are equal are required to return the same hashCode.
+     * Verifies that titles become unequal when one title's text changes.
      */
     @Test
-    public void testHashcode() {
-        ShortTextTitle t1 = new ShortTextTitle("ABC");
-        ShortTextTitle t2 = new ShortTextTitle("ABC");
-        assertEquals(t1, t2);
-        int h1 = t1.hashCode();
-        int h2 = t2.hashCode();
-        assertEquals(h1, h2);
+    void equals_ShouldReturnFalseWhenTextDiffers() {
+        ShortTextTitle title1 = new ShortTextTitle("ABC");
+        ShortTextTitle title2 = new ShortTextTitle("ABC");
+        title1.setText("Test 1");
+        assertNotEquals(title1, title2, "Titles should not be equal after changing one title's text");
     }
 
     /**
-     * Confirm that cloning works.
+     * Verifies that titles become equal again when both have the same updated text.
      */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
-        ShortTextTitle t1 = new ShortTextTitle("ABC");
-        ShortTextTitle t2 = CloneUtils.clone(t1);
-        assertNotSame(t1, t2);
-        assertSame(t1.getClass(), t2.getClass());
-        assertEquals(t1, t2);
+    void equals_ShouldReturnTrueAfterReconcilingText() {
+        ShortTextTitle title1 = new ShortTextTitle("ABC");
+        ShortTextTitle title2 = new ShortTextTitle("ABC");
+        title1.setText("Test 1");
+        title2.setText("Test 1");
+        assertEquals(title1, title2, "Titles should be equal after setting same text");
     }
 
     /**
-     * Serialize an instance, restore it, and check for equality.
+     * Verifies that equal titles produce identical hash codes.
      */
     @Test
-    public void testSerialization() {
-        ShortTextTitle t1 = new ShortTextTitle("ABC");
-        ShortTextTitle t2 = TestUtils.serialised(t1);
-        assertEquals(t1, t2);
+    void hashCode_ShouldBeConsistentWithEquals() {
+        ShortTextTitle title1 = new ShortTextTitle("ABC");
+        ShortTextTitle title2 = new ShortTextTitle("ABC");
+        assertEquals(title1, title2, "Titles must be equal for hashcode comparison");
+        assertEquals(title1.hashCode(), title2.hashCode(), "Equal titles must have same hashcode");
+    }
+
+    /**
+     * Verifies that cloning creates a distinct copy with same content.
+     */
+    @Test
+    void cloning_ShouldCreateEqualButDistinctInstance() throws CloneNotSupportedException {
+        ShortTextTitle original = new ShortTextTitle("ABC");
+        ShortTextTitle clone = CloneUtils.clone(original);
+        
+        assertNotSame(original, clone, "Clone should be a different object instance");
+        assertSame(original.getClass(), clone.getClass(), "Clone should have same runtime class");
+        assertEquals(original, clone, "Clone should be logically equal to original");
+    }
+
+    /**
+     * Verifies serialization and deserialization produce equal titles.
+     */
+    @Test
+    void serialization_ShouldRoundTripCorrectly() {
+        ShortTextTitle original = new ShortTextTitle("ABC");
+        ShortTextTitle deserialized = TestUtils.serialised(original);
+        assertEquals(original, deserialized, "Deserialized title should equal original");
     }
 
 }
