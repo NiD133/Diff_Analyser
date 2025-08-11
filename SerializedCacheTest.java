@@ -1,11 +1,17 @@
 /*
- * Copyright 2009-2024 the original author or authors.
+ *    Copyright 2009-2024 the original author or authors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- *     https://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 package org.apache.ibatis.cache;
 
@@ -18,92 +24,56 @@ import java.util.Objects;
 
 import org.apache.ibatis.cache.decorators.SerializedCache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests for SerializedCache.
- *
- * This cache serializes values on write and deserializes them on read.
- * These tests focus on:
- * - round-trip of Serializable values,
- * - preservation of null values,
- * - rejection of non-Serializable values.
- */
 class SerializedCacheTest {
 
-  private static final String CACHE_ID = "default";
-  private static final int ENTRY_COUNT = 5;
-
-  private static SerializedCache newCache() {
-    // PerpetualCache is a simple in-memory cache used as a delegate.
-    return new SerializedCache(new PerpetualCache(CACHE_ID));
-  }
-
   @Test
-  @DisplayName("Serializable values should round-trip through serialization")
-  void serializableValuesAreEqualAfterRoundTrip() {
-    SerializedCache cache = newCache();
-
-    // Given: cache populated with serializable values
-    for (int key = 0; key < ENTRY_COUNT; key++) {
-      cache.putObject(key, new SerializableValue(key));
+  void shouldDemonstrateSerializedObjectAreEqual() {
+    SerializedCache cache = new SerializedCache(new PerpetualCache("default"));
+    for (int i = 0; i < 5; i++) {
+      cache.putObject(i, new CachingObject(i));
     }
-
-    // Then: retrieved values are equal to the originals
-    for (int key = 0; key < ENTRY_COUNT; key++) {
-      assertEquals(new SerializableValue(key), cache.getObject(key), "Round-trip failed for key " + key);
+    for (int i = 0; i < 5; i++) {
+      assertEquals(new CachingObject(i), cache.getObject(i));
     }
   }
 
   @Test
-  @DisplayName("Null values are supported and preserved")
-  void nullValuesAreSerializable() {
-    SerializedCache cache = newCache();
-
-    // Given: cache populated with null values
-    for (int key = 0; key < ENTRY_COUNT; key++) {
-      cache.putObject(key, null);
+  void shouldDemonstrateNullsAreSerializable() {
+    SerializedCache cache = new SerializedCache(new PerpetualCache("default"));
+    for (int i = 0; i < 5; i++) {
+      cache.putObject(i, null);
     }
-
-    // Then: retrieved values are null
-    for (int key = 0; key < ENTRY_COUNT; key++) {
-      assertNull(cache.getObject(key), "Expected null for key " + key);
+    for (int i = 0; i < 5; i++) {
+      assertNull(cache.getObject(i));
     }
   }
 
   @Test
-  @DisplayName("Putting a non-Serializable value should throw CacheException")
-  void nonSerializableValueCausesException() {
-    SerializedCache cache = newCache();
-
-    assertThrows(
-        CacheException.class,
-        () -> cache.putObject(0, new NonSerializableValue(0)),
-        "Values must implement java.io.Serializable"
-    );
+  void throwExceptionWhenTryingToCacheNonSerializableObject() {
+    SerializedCache cache = new SerializedCache(new PerpetualCache("default"));
+    assertThrows(CacheException.class, () -> cache.putObject(0, new CachingObjectWithoutSerializable(0)));
   }
 
-  // ---- Test fixtures ----
-
-  /**
-   * Simple value object that is Serializable for round-trip tests.
-   */
-  static class SerializableValue implements Serializable {
+  static class CachingObject implements Serializable {
     private static final long serialVersionUID = 1L;
+    int x;
 
-    final int x;
-
-    SerializableValue(int x) {
+    public CachingObject(int x) {
       this.x = x;
     }
 
     @Override
     public boolean equals(Object o) {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
-      SerializableValue that = (SerializableValue) o;
-      return x == that.x;
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+      CachingObject obj = (CachingObject) o;
+      return x == obj.x;
     }
 
     @Override
@@ -112,23 +82,23 @@ class SerializedCacheTest {
     }
   }
 
-  /**
-   * Similar to SerializableValue but intentionally not Serializable,
-   * to verify that the cache rejects such values.
-   */
-  static class NonSerializableValue {
-    final int x;
+  static class CachingObjectWithoutSerializable {
+    int x;
 
-    NonSerializableValue(int x) {
+    public CachingObjectWithoutSerializable(int x) {
       this.x = x;
     }
 
     @Override
     public boolean equals(Object o) {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
-      NonSerializableValue that = (NonSerializableValue) o;
-      return x == that.x;
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+      CachingObjectWithoutSerializable obj = (CachingObjectWithoutSerializable) o;
+      return x == obj.x;
     }
 
     @Override
