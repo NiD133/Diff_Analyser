@@ -56,24 +56,66 @@ import org.junit.Test;
 
 import com.itextpdf.testutils.TestResourceUtils;
 
+/**
+ * Test suite for MappedRandomAccessFile class.
+ * Tests the behavior of memory-mapped file operations, particularly edge cases
+ * like zero-sized files.
+ */
 public class MappedRandomAccessFileTest {
+
+    private static final int END_OF_FILE_INDICATOR = -1;
+    private static final String READ_WRITE_MODE = "rw";
+    private static final String ZERO_SIZE_TEST_FILE = "zerosizedfile.pdf";
 
     @Before
     public void setUp() throws Exception {
+        // Clean up any temporary files from previous test runs
         TestResourceUtils.purgeTempFiles();
     }
 
     @After
     public void tearDown() throws Exception {
+        // Clean up temporary files created during tests
         TestResourceUtils.purgeTempFiles();
     }
 
+    /**
+     * Tests that reading from a zero-sized file returns EOF (-1).
+     * 
+     * This test verifies the edge case behavior when attempting to read
+     * from an empty file using MappedRandomAccessFile. The expected
+     * behavior is that the first read() call should return -1 to indicate
+     * end-of-file, similar to standard RandomAccessFile behavior.
+     */
     @Test
-    public void testZeroSize() throws Exception {
-        File pdf = TestResourceUtils.getResourceAsTempFile(getClass(), "zerosizedfile.pdf");
-        MappedRandomAccessFile f = new MappedRandomAccessFile(pdf.getCanonicalPath(), "rw");
-        Assert.assertEquals(-1, f.read());
-        f.close();
+    public void testReadFromZeroSizedFile_ReturnsEndOfFile() throws Exception {
+        // Given: A zero-sized PDF file
+        File zeroSizedPdfFile = TestResourceUtils.getResourceAsTempFile(
+            getClass(), 
+            ZERO_SIZE_TEST_FILE
+        );
+        
+        // When: Opening the file with MappedRandomAccessFile and attempting to read
+        MappedRandomAccessFile mappedFile = null;
+        try {
+            mappedFile = new MappedRandomAccessFile(
+                zeroSizedPdfFile.getCanonicalPath(), 
+                READ_WRITE_MODE
+            );
+            
+            int readResult = mappedFile.read();
+            
+            // Then: The read operation should return -1 (EOF)
+            Assert.assertEquals(
+                "Reading from zero-sized file should return EOF indicator", 
+                END_OF_FILE_INDICATOR, 
+                readResult
+            );
+        } finally {
+            // Ensure proper cleanup of file resources
+            if (mappedFile != null) {
+                mappedFile.close();
+            }
+        }
     }
-
 }
