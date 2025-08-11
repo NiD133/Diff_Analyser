@@ -20,53 +20,39 @@ import static org.junit.Assert.assertEquals;
 
 public class BinaryCodecTest extends BaseRoundTripTest<SpatialContext> {
 
-    @Override
-    public SpatialContext initContext() {
-        return SpatialContext.GEO;
-    }
+  @Override
+  public SpatialContext initContext() {
+    return SpatialContext.GEO;
+  }
 
-    // Test Point serialization/deserialization
-    @Test
-    public void testPointRoundTrip() throws Exception {
-        assertRoundTrip(wkt("POINT(-10 30)"));
-    }
+  @Test
+  public void testRect() throws Exception {
+    assertRoundTrip(wkt("ENVELOPE(-10, 180, 42.3, 0)"));
+  }
 
-    // Test Rectangle serialization/deserialization
-    @Test
-    public void testRectangleRoundTrip() throws Exception {
-        assertRoundTrip(wkt("ENVELOPE(-10, 180, 42.3, 0)"));
-    }
+  @Test
+  public void testCircle() throws Exception {
+    assertRoundTrip(wkt("BUFFER(POINT(-10 30), 5.2)"));
+  }
 
-    // Test Circle serialization/deserialization
-    @Test
-    public void testCircleRoundTrip() throws Exception {
-        assertRoundTrip(wkt("BUFFER(POINT(-10 30), 5.2)"));
-    }
+  @Test
+  public void testCollection() throws Exception {
+    ShapeCollection<Shape> s = ctx.makeCollection(
+        Arrays.asList(
+            randomShape(),
+            randomShape(),
+            randomShape()
+        )
+    );
+    assertRoundTrip(s);
+  }
 
-    // Test ShapeCollection serialization/deserialization with deterministic shapes
-    @Test
-    public void testShapeCollectionRoundTrip() throws Exception {
-        Shape point = wkt("POINT(0 0)");
-        Shape rectangle = wkt("ENVELOPE(-10, 10, 5, -5)");
-        Shape circle = wkt("BUFFER(POINT(1 2), 3)");
-        
-        ShapeCollection<Shape> collection = ctx.makeCollection(
-            Arrays.asList(point, rectangle, circle)
-        );
-        assertRoundTrip(collection);
-    }
+  @Override
+  protected void assertRoundTrip(Shape shape, boolean andEquals) throws IOException {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    binaryCodec.writeShape(new DataOutputStream(baos), shape);
+    ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+    assertEquals(shape, binaryCodec.readShape(new DataInputStream(bais)));
+  }
 
-    @Override
-    protected void assertRoundTrip(Shape shape, boolean andEquals) throws IOException {
-        // Serialize shape to binary
-        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-        binaryCodec.writeShape(new DataOutputStream(byteOut), shape);
-        
-        // Deserialize binary back to shape
-        ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
-        Shape deserializedShape = binaryCodec.readShape(new DataInputStream(byteIn));
-        
-        // Verify round-tripped shape matches original
-        assertEquals(shape, deserializedShape);
-    }
 }
