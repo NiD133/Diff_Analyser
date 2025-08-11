@@ -54,250 +54,149 @@ import static org.junit.jupiter.api.Assertions.*;
 public class XYLineAnnotationTest {
 
     private static final double EPSILON = 0.000000001;
-    
-    // Test data constants for better readability and maintainability
-    private static final double START_X = 10.0;
-    private static final double START_Y = 20.0;
-    private static final double END_X = 100.0;
-    private static final double END_Y = 200.0;
-    private static final Stroke DEFAULT_STROKE = new BasicStroke(2.0f);
-    private static final Color DEFAULT_COLOR = Color.BLUE;
 
     @Test
-    public void testConstructor_ValidParameters_SetsAllFieldsCorrectly() {
-        // Given
-        Stroke expectedStroke = DEFAULT_STROKE;
-        Color expectedColor = DEFAULT_COLOR;
-        
-        // When
-        XYLineAnnotation annotation = new XYLineAnnotation(
-            START_X, START_Y, END_X, END_Y, expectedStroke, expectedColor);
-        
-        // Then
-        assertEquals(START_X, annotation.getX1(), EPSILON, "Start X coordinate should be set correctly");
-        assertEquals(START_Y, annotation.getY1(), EPSILON, "Start Y coordinate should be set correctly");
-        assertEquals(END_X, annotation.getX2(), EPSILON, "End X coordinate should be set correctly");
-        assertEquals(END_Y, annotation.getY2(), EPSILON, "End Y coordinate should be set correctly");
-        assertEquals(expectedStroke, annotation.getStroke(), "Stroke should be set correctly");
-        assertEquals(expectedColor, annotation.getPaint(), "Paint color should be set correctly");
+    public void testConstructor() {
+        Stroke stroke = new BasicStroke(2.0f);
+        XYLineAnnotation a1 = new XYLineAnnotation(10.0, 20.0, 100.0, 200.0,
+                stroke, Color.BLUE);
+        assertEquals(10.0, a1.getX1(), EPSILON);
+        assertEquals(20.0, a1.getY1(), EPSILON);
+        assertEquals(100.0, a1.getX2(), EPSILON);
+        assertEquals(200.0, a1.getY2(), EPSILON);
+        assertEquals(stroke, a1.getStroke());
+        assertEquals(Color.BLUE, a1.getPaint());
     }
     
     @Test
-    public void testConstructor_NaNCoordinates_ThrowsIllegalArgumentException() {
-        Stroke validStroke = DEFAULT_STROKE;
-        Color validColor = DEFAULT_COLOR;
-        
-        // Test NaN for each coordinate parameter
+    public void testConstructorExceptions() {
+        Stroke stroke = new BasicStroke(2.0f);
         assertThrows(IllegalArgumentException.class, () -> {
-            new XYLineAnnotation(Double.NaN, START_Y, END_X, END_Y, validStroke, validColor);
-        }, "Constructor should reject NaN for start X coordinate");
-        
+            XYLineAnnotation a1 = new XYLineAnnotation(Double.NaN, 20.0, 100.0, 200.0,
+                stroke, Color.BLUE);
+        });
         assertThrows(IllegalArgumentException.class, () -> {
-            new XYLineAnnotation(START_X, Double.NaN, END_X, END_Y, validStroke, validColor);
-        }, "Constructor should reject NaN for start Y coordinate");
-        
+            XYLineAnnotation a1 = new XYLineAnnotation(10.0, Double.NaN, 100.0, 200.0,
+                stroke, Color.BLUE);
+        });
         assertThrows(IllegalArgumentException.class, () -> {
-            new XYLineAnnotation(START_X, START_Y, Double.NaN, END_Y, validStroke, validColor);
-        }, "Constructor should reject NaN for end X coordinate");
-        
+            XYLineAnnotation a1 = new XYLineAnnotation(10.0, 20.0, Double.NaN, 200.0,
+                stroke, Color.BLUE);
+        });
         assertThrows(IllegalArgumentException.class, () -> {
-            new XYLineAnnotation(START_X, START_Y, END_X, Double.NaN, validStroke, validColor);
-        }, "Constructor should reject NaN for end Y coordinate");
-    }
-    
-    @Test
-    public void testConstructor_NullParameters_ThrowsIllegalArgumentException() {
+            XYLineAnnotation a1 = new XYLineAnnotation(10.0, 20.0, 100.0, Double.NaN,
+                stroke, Color.BLUE);
+        });
         assertThrows(IllegalArgumentException.class, () -> {
-            new XYLineAnnotation(START_X, START_Y, END_X, END_Y, null, DEFAULT_COLOR);
-        }, "Constructor should reject null stroke");
-        
+            XYLineAnnotation a1 = new XYLineAnnotation(10.0, 20.0, 100.0, 200.0,
+                null, Color.BLUE);
+        });
         assertThrows(IllegalArgumentException.class, () -> {
-            new XYLineAnnotation(START_X, START_Y, END_X, END_Y, DEFAULT_STROKE, null);
-        }, "Constructor should reject null paint");
-    }
-    
-    @Test
-    public void testEquals_IdenticalAnnotations_ReturnsTrue() {
-        // Given
-        XYLineAnnotation annotation1 = createStandardAnnotation();
-        XYLineAnnotation annotation2 = createStandardAnnotation();
-        
-        // Then
-        assertEquals(annotation1, annotation2, "Identical annotations should be equal");
-        assertEquals(annotation2, annotation1, "Equality should be symmetric");
-    }
-
-    @Test
-    public void testEquals_DifferentStartXCoordinate_ReturnsFalse() {
-        // Given
-        XYLineAnnotation originalAnnotation = createStandardAnnotation();
-        XYLineAnnotation modifiedAnnotation = new XYLineAnnotation(
-            START_X + 1.0, START_Y, END_X, END_Y, DEFAULT_STROKE, DEFAULT_COLOR);
-        
-        // Then
-        assertNotEquals(originalAnnotation, modifiedAnnotation, 
-            "Annotations with different start X coordinates should not be equal");
-        
-        // Verify they become equal when both have the same modified value
-        XYLineAnnotation anotherModifiedAnnotation = new XYLineAnnotation(
-            START_X + 1.0, START_Y, END_X, END_Y, DEFAULT_STROKE, DEFAULT_COLOR);
-        assertEquals(modifiedAnnotation, anotherModifiedAnnotation,
-            "Annotations with same modified start X coordinate should be equal");
-    }
-
-    @Test
-    public void testEquals_DifferentStartYCoordinate_ReturnsFalse() {
-        // Given
-        XYLineAnnotation originalAnnotation = createStandardAnnotation();
-        XYLineAnnotation modifiedAnnotation = new XYLineAnnotation(
-            START_X, START_Y + 1.0, END_X, END_Y, DEFAULT_STROKE, DEFAULT_COLOR);
-        
-        // Then
-        assertNotEquals(originalAnnotation, modifiedAnnotation,
-            "Annotations with different start Y coordinates should not be equal");
-        
-        // Verify they become equal when both have the same modified value
-        XYLineAnnotation anotherModifiedAnnotation = new XYLineAnnotation(
-            START_X, START_Y + 1.0, END_X, END_Y, DEFAULT_STROKE, DEFAULT_COLOR);
-        assertEquals(modifiedAnnotation, anotherModifiedAnnotation,
-            "Annotations with same modified start Y coordinate should be equal");
-    }
-
-    @Test
-    public void testEquals_DifferentEndXCoordinate_ReturnsFalse() {
-        // Given
-        XYLineAnnotation originalAnnotation = createStandardAnnotation();
-        XYLineAnnotation modifiedAnnotation = new XYLineAnnotation(
-            START_X, START_Y, END_X + 1.0, END_Y, DEFAULT_STROKE, DEFAULT_COLOR);
-        
-        // Then
-        assertNotEquals(originalAnnotation, modifiedAnnotation,
-            "Annotations with different end X coordinates should not be equal");
-        
-        // Verify they become equal when both have the same modified value
-        XYLineAnnotation anotherModifiedAnnotation = new XYLineAnnotation(
-            START_X, START_Y, END_X + 1.0, END_Y, DEFAULT_STROKE, DEFAULT_COLOR);
-        assertEquals(modifiedAnnotation, anotherModifiedAnnotation,
-            "Annotations with same modified end X coordinate should be equal");
-    }
-
-    @Test
-    public void testEquals_DifferentEndYCoordinate_ReturnsFalse() {
-        // Given
-        XYLineAnnotation originalAnnotation = createStandardAnnotation();
-        XYLineAnnotation modifiedAnnotation = new XYLineAnnotation(
-            START_X, START_Y, END_X, END_Y + 1.0, DEFAULT_STROKE, DEFAULT_COLOR);
-        
-        // Then
-        assertNotEquals(originalAnnotation, modifiedAnnotation,
-            "Annotations with different end Y coordinates should not be equal");
-        
-        // Verify they become equal when both have the same modified value
-        XYLineAnnotation anotherModifiedAnnotation = new XYLineAnnotation(
-            START_X, START_Y, END_X, END_Y + 1.0, DEFAULT_STROKE, DEFAULT_COLOR);
-        assertEquals(modifiedAnnotation, anotherModifiedAnnotation,
-            "Annotations with same modified end Y coordinate should be equal");
-    }
-
-    @Test
-    public void testEquals_DifferentStroke_ReturnsFalse() {
-        // Given
-        XYLineAnnotation originalAnnotation = createStandardAnnotation();
-        Stroke differentStroke = new BasicStroke(0.99f);
-        XYLineAnnotation modifiedAnnotation = new XYLineAnnotation(
-            START_X, START_Y, END_X, END_Y, differentStroke, DEFAULT_COLOR);
-        
-        // Then
-        assertNotEquals(originalAnnotation, modifiedAnnotation,
-            "Annotations with different strokes should not be equal");
-        
-        // Verify they become equal when both have the same modified stroke
-        XYLineAnnotation anotherModifiedAnnotation = new XYLineAnnotation(
-            START_X, START_Y, END_X, END_Y, differentStroke, DEFAULT_COLOR);
-        assertEquals(modifiedAnnotation, anotherModifiedAnnotation,
-            "Annotations with same modified stroke should be equal");
-    }
-
-    @Test
-    public void testEquals_DifferentPaint_ReturnsFalse() {
-        // Given
-        XYLineAnnotation originalAnnotation = createStandardAnnotation();
-        GradientPaint gradientPaint1 = new GradientPaint(1.0f, 2.0f, Color.RED, 3.0f, 4.0f, Color.WHITE);
-        XYLineAnnotation modifiedAnnotation = new XYLineAnnotation(
-            START_X, START_Y, END_X, END_Y, DEFAULT_STROKE, gradientPaint1);
-        
-        // Then
-        assertNotEquals(originalAnnotation, modifiedAnnotation,
-            "Annotations with different paints should not be equal");
-        
-        // Verify they become equal when both have equivalent gradient paints
-        GradientPaint gradientPaint2 = new GradientPaint(1.0f, 2.0f, Color.RED, 3.0f, 4.0f, Color.WHITE);
-        XYLineAnnotation anotherModifiedAnnotation = new XYLineAnnotation(
-            START_X, START_Y, END_X, END_Y, DEFAULT_STROKE, gradientPaint2);
-        assertEquals(modifiedAnnotation, anotherModifiedAnnotation,
-            "Annotations with equivalent gradient paints should be equal");
-    }
-
-    @Test
-    public void testHashCode_EqualAnnotations_ReturnSameHashCode() {
-        // Given
-        XYLineAnnotation annotation1 = createStandardAnnotation();
-        XYLineAnnotation annotation2 = createStandardAnnotation();
-        
-        // When
-        int hashCode1 = annotation1.hashCode();
-        int hashCode2 = annotation2.hashCode();
-        
-        // Then
-        assertEquals(annotation1, annotation2, "Annotations should be equal");
-        assertEquals(hashCode1, hashCode2, "Equal annotations must have the same hash code");
-    }
-
-    @Test
-    public void testCloning_ValidAnnotation_CreatesIndependentCopy() throws CloneNotSupportedException {
-        // Given
-        XYLineAnnotation originalAnnotation = createStandardAnnotation();
-        
-        // When
-        XYLineAnnotation clonedAnnotation = (XYLineAnnotation) originalAnnotation.clone();
-        
-        // Then
-        assertNotSame(originalAnnotation, clonedAnnotation, 
-            "Cloned annotation should be a different object instance");
-        assertSame(originalAnnotation.getClass(), clonedAnnotation.getClass(), 
-            "Cloned annotation should have the same class");
-        assertEquals(originalAnnotation, clonedAnnotation, 
-            "Cloned annotation should be equal to the original");
-    }
-
-    @Test
-    public void testPublicCloneable_AnnotationInstance_ImplementsInterface() {
-        // Given
-        XYLineAnnotation annotation = createStandardAnnotation();
-        
-        // Then
-        assertTrue(annotation instanceof PublicCloneable, 
-            "XYLineAnnotation should implement PublicCloneable interface");
-    }
-
-    @Test
-    public void testSerialization_ValidAnnotation_PreservesStateAfterSerialization() {
-        // Given
-        XYLineAnnotation originalAnnotation = createStandardAnnotation();
-        
-        // When
-        XYLineAnnotation deserializedAnnotation = TestUtils.serialised(originalAnnotation);
-        
-        // Then
-        assertEquals(originalAnnotation, deserializedAnnotation, 
-            "Deserialized annotation should be equal to the original");
+            XYLineAnnotation a1 = new XYLineAnnotation(10.0, 20.0, 100.0, 200.0,
+                stroke, null);
+        });
     }
     
     /**
-     * Helper method to create a standard XYLineAnnotation for testing.
-     * This reduces code duplication and makes tests more maintainable.
+     * Confirm that the equals method can distinguish all the required fields.
      */
-    private XYLineAnnotation createStandardAnnotation() {
-        return new XYLineAnnotation(START_X, START_Y, END_X, END_Y, DEFAULT_STROKE, DEFAULT_COLOR);
+    @Test
+    public void testEquals() {
+        Stroke stroke = new BasicStroke(2.0f);
+        XYLineAnnotation a1 = new XYLineAnnotation(10.0, 20.0, 100.0, 200.0,
+                stroke, Color.BLUE);
+        XYLineAnnotation a2 = new XYLineAnnotation(10.0, 20.0, 100.0, 200.0,
+                stroke, Color.BLUE);
+        assertEquals(a1, a2);
+        assertEquals(a2, a1);
+
+        a1 = new XYLineAnnotation(11.0, 20.0, 100.0, 200.0, stroke, Color.BLUE);
+        assertNotEquals(a1, a2);
+        a2 = new XYLineAnnotation(11.0, 20.0, 100.0, 200.0, stroke, Color.BLUE);
+        assertEquals(a1, a2);
+
+        a1 = new XYLineAnnotation(11.0, 21.0, 100.0, 200.0, stroke, Color.BLUE);
+        assertNotEquals(a1, a2);
+        a2 = new XYLineAnnotation(11.0, 21.0, 100.0, 200.0, stroke, Color.BLUE);
+        assertEquals(a1, a2);
+
+        a1 = new XYLineAnnotation(11.0, 21.0, 101.0, 200.0, stroke, Color.BLUE);
+        assertNotEquals(a1, a2);
+        a2 = new XYLineAnnotation(11.0, 21.0, 101.0, 200.0, stroke, Color.BLUE);
+        assertEquals(a1, a2);
+
+        a1 = new XYLineAnnotation(11.0, 21.0, 101.0, 201.0, stroke, Color.BLUE);
+        assertNotEquals(a1, a2);
+        a2 = new XYLineAnnotation(11.0, 21.0, 101.0, 201.0, stroke, Color.BLUE);
+        assertEquals(a1, a2);
+
+        Stroke stroke2 = new BasicStroke(0.99f);
+        a1 = new XYLineAnnotation(11.0, 21.0, 101.0, 200.0, stroke2, Color.BLUE);
+        assertNotEquals(a1, a2);
+        a2 = new XYLineAnnotation(11.0, 21.0, 101.0, 200.0, stroke2, Color.BLUE);
+        assertEquals(a1, a2);
+
+        GradientPaint g1 = new GradientPaint(1.0f, 2.0f, Color.RED,
+                3.0f, 4.0f, Color.WHITE);
+        GradientPaint g2 = new GradientPaint(1.0f, 2.0f, Color.RED,
+                3.0f, 4.0f, Color.WHITE);
+        a1 = new XYLineAnnotation(11.0, 21.0, 101.0, 200.0, stroke2, g1);
+        assertNotEquals(a1, a2);
+        a2 = new XYLineAnnotation(11.0, 21.0, 101.0, 200.0, stroke2, g2);
+        assertEquals(a1, a2);
     }
+
+    /**
+     * Two objects that are equal are required to return the same hashCode.
+     */
+    @Test
+    public void testHashCode() {
+        Stroke stroke = new BasicStroke(2.0f);
+        XYLineAnnotation a1 = new XYLineAnnotation(10.0, 20.0, 100.0, 200.0,
+                stroke, Color.BLUE);
+        XYLineAnnotation a2 = new XYLineAnnotation(10.0, 20.0, 100.0, 200.0,
+                stroke, Color.BLUE);
+        assertEquals(a1, a2);
+        int h1 = a1.hashCode();
+        int h2 = a2.hashCode();
+        assertEquals(h1, h2);
+    }
+
+    /**
+     * Confirm that cloning works.
+     */
+    @Test
+    public void testCloning() throws CloneNotSupportedException {
+        Stroke stroke = new BasicStroke(2.0f);
+        XYLineAnnotation a1 = new XYLineAnnotation(10.0, 20.0, 100.0, 200.0,
+                stroke, Color.BLUE);
+        XYLineAnnotation a2 = (XYLineAnnotation) a1.clone();
+        assertNotSame(a1, a2);
+        assertSame(a1.getClass(), a2.getClass());
+        assertEquals(a1, a2);
+    }
+
+    /**
+     * Checks that this class implements PublicCloneable.
+     */
+    @Test
+    public void testPublicCloneable() {
+        Stroke stroke = new BasicStroke(2.0f);
+        XYLineAnnotation a1 = new XYLineAnnotation(10.0, 20.0, 100.0, 200.0,
+                stroke, Color.BLUE);
+        assertTrue(a1 instanceof PublicCloneable);
+    }
+
+    /**
+     * Serialize an instance, restore it, and check for equality.
+     */
+    @Test
+    public void testSerialization() {
+        Stroke stroke = new BasicStroke(2.0f);
+        XYLineAnnotation a1 = new XYLineAnnotation(10.0, 20.0, 100.0, 200.0,
+                stroke, Color.BLUE);
+        XYLineAnnotation a2 = TestUtils.serialised(a1);
+        assertEquals(a1, a2);
+    }
+
 }
