@@ -30,60 +30,97 @@ import org.junit.jupiter.params.provider.MethodSource;
  */
 class CountingPathVisitorTest extends TestArguments {
 
-    private void checkZeroCounts(final CountingPathVisitor visitor) {
+    // Test resource paths
+    private static final String DIR_1_FILE_SIZE_0 = 
+        "src/test/resources/org/apache/commons/io/dirs-1-file-size-0";
+    private static final String DIR_1_FILE_SIZE_1 = 
+        "src/test/resources/org/apache/commons/io/dirs-1-file-size-1";
+    private static final String DIR_2_FILE_SIZE_2 = 
+        "src/test/resources/org/apache/commons/io/dirs-2-file-size-2";
+
+    /**
+     * Asserts visitor has zero counts before any traversal occurs.
+     * This ensures the visitor starts in a clean state.
+     */
+    private void assertInitialState(final CountingPathVisitor visitor) {
         Assertions.assertEquals(CountingPathVisitor.withLongCounters(), visitor);
         Assertions.assertEquals(CountingPathVisitor.withBigIntegerCounters(), visitor);
     }
 
     /**
-     * Tests an empty folder.
+     * Tests visitor counts for an empty directory structure.
+     * Expects: 1 directory (root), 0 files, 0 bytes.
      */
     @ParameterizedTest
     @MethodSource("countingPathVisitors")
-    void testCountEmptyFolder(final CountingPathVisitor visitor) throws IOException {
-        checkZeroCounts(visitor);
+    void testEmptyDirectory(final CountingPathVisitor visitor) throws IOException {
+        assertInitialState(visitor);
         try (TempDirectory tempDir = TempDirectory.create(getClass().getCanonicalName())) {
             assertCounts(1, 0, 0, PathUtils.visitFileTree(visitor, tempDir.get()));
         }
     }
 
     /**
-     * Tests a directory with one file of size 0.
+     * Tests visitor counts for a directory containing one zero-byte file.
+     * Expects: 1 directory, 1 file, 0 bytes.
      */
     @ParameterizedTest
     @MethodSource("countingPathVisitors")
-    void testCountFolders1FileSize0(final CountingPathVisitor visitor) throws IOException {
-        checkZeroCounts(visitor);
-        assertCounts(1, 1, 0, PathUtils.visitFileTree(visitor,
-                "src/test/resources/org/apache/commons/io/dirs-1-file-size-0"));
+    void testDirectoryWithOneZeroByteFile(final CountingPathVisitor visitor) throws IOException {
+        assertInitialState(visitor);
+        assertCounts(
+            1, /* directories */
+            1, /* files */
+            0, /* bytes */
+            PathUtils.visitFileTree(visitor, DIR_1_FILE_SIZE_0)
+        );
     }
 
     /**
-     * Tests a directory with one file of size 1.
+     * Tests visitor counts for a directory containing one single-byte file.
+     * Expects: 1 directory, 1 file, 1 byte.
      */
     @ParameterizedTest
     @MethodSource("countingPathVisitors")
-    void testCountFolders1FileSize1(final CountingPathVisitor visitor) throws IOException {
-        checkZeroCounts(visitor);
-        assertCounts(1, 1, 1, PathUtils.visitFileTree(visitor,
-                "src/test/resources/org/apache/commons/io/dirs-1-file-size-1"));
+    void testDirectoryWithOneSingleByteFile(final CountingPathVisitor visitor) throws IOException {
+        assertInitialState(visitor);
+        assertCounts(
+            1, /* directories */
+            1, /* files */
+            1, /* bytes */
+            PathUtils.visitFileTree(visitor, DIR_1_FILE_SIZE_1)
+        );
     }
 
     /**
-     * Tests a directory with two subdirectories, each containing one file of size 1.
+     * Tests visitor counts for a nested directory structure:
+     * - Root directory
+     *   - Subdirectory 1
+     *     - File (1 byte)
+     *   - Subdirectory 2
+     *     - File (1 byte)
+     * Expects: 3 directories, 2 files, 2 bytes.
      */
     @ParameterizedTest
     @MethodSource("countingPathVisitors")
-    void testCountFolders2FileSize2(final CountingPathVisitor visitor) throws IOException {
-        checkZeroCounts(visitor);
-        assertCounts(3, 2, 2, PathUtils.visitFileTree(visitor,
-                "src/test/resources/org/apache/commons/io/dirs-2-file-size-2"));
+    void testNestedDirectoriesWithTwoFiles(final CountingPathVisitor visitor) throws IOException {
+        assertInitialState(visitor);
+        assertCounts(
+            3, /* directories (root + 2 subdirectories) */
+            2, /* files */
+            2, /* bytes (1+1) */
+            PathUtils.visitFileTree(visitor, DIR_2_FILE_SIZE_2)
+        );
     }
 
+    /**
+     * Tests that toString() method doesn't throw exceptions.
+     * This ensures basic debugging functionality works.
+     */
     @ParameterizedTest
     @MethodSource("countingPathVisitors")
-    void testToString(final CountingPathVisitor visitor) {
-        // Make sure it does not blow up
-        visitor.toString();
+    void testToStringDoesNotThrow(final CountingPathVisitor visitor) {
+        // toString should safely return string representation
+        Assertions.assertDoesNotThrow(visitor::toString);
     }
 }
