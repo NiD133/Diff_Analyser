@@ -27,110 +27,158 @@ import junit.framework.TestCase;
 import org.jspecify.annotations.NullMarked;
 
 /**
+ * Tests for {@link ArrayBasedUnicodeEscaper}.
+ * 
  * @author David Beaumont
  */
 @GwtCompatible
 @NullMarked
 public class ArrayBasedUnicodeEscaperTest extends TestCase {
+  
+  // Test constants with descriptive names
   private static final ImmutableMap<Character, String> NO_REPLACEMENTS = ImmutableMap.of();
   private static final ImmutableMap<Character, String> SIMPLE_REPLACEMENTS =
       ImmutableMap.of(
           '\n', "<newline>",
           '\t', "<tab>",
           '&', "<and>");
-  private static final char[] NO_CHARS = new char[0];
-
-  public void testReplacements() throws IOException {
-    // In reality this is not a very sensible escaper to have (if you are only
-    // escaping elements from a map you would use a ArrayBasedCharEscaper).
-    UnicodeEscaper escaper =
-        new ArrayBasedUnicodeEscaper(
-            SIMPLE_REPLACEMENTS, Character.MIN_VALUE, Character.MAX_CODE_POINT, null) {
-          @Override
-          protected char[] escapeUnsafe(int c) {
-            return NO_CHARS;
-          }
-        };
+  private static final char[] EMPTY_REPLACEMENT = new char[0];
+  
+  // Common test strings
+  private static final String SAFE_UNICODE_CHARS = "\0\u0100\uD800\uDC00\uFFFF";
+  private static final String MALFORMED_UNICODE = "\uDC00\uD800"; // Low surrogate before high
+  
+  public void testEscaper_withReplacementMap_escapesSpecifiedCharacters() throws IOException {
+    // Given: An escaper with specific character replacements
+    UnicodeEscaper escaper = createEscaperWithReplacements(SIMPLE_REPLACEMENTS);
+    
+    // When: Escaping text containing mapped characters
+    String input = "\tFish & Chips\n";
+    String result = escaper.escape(input);
+    
+    // Then: Mapped characters are replaced with their values
+    assertThat(result).isEqualTo("<tab>Fish <and> Chips<newline>");
+    
+    // And: Unmapped characters remain unchanged
+    assertThat(escaper.escape(SAFE_UNICODE_CHARS)).isEqualTo(SAFE_UNICODE_CHARS);
+    
+    // And: Basic escaper functionality works
     EscaperAsserts.assertBasic(escaper);
-    assertThat(escaper.escape("\tFish & Chips\n")).isEqualTo("<tab>Fish <and> Chips<newline>");
-
-    // Verify that everything else is left unescaped.
-    String safeChars = "\0\u0100\uD800\uDC00\uFFFF";
-    assertThat(escaper.escape(safeChars)).isEqualTo(safeChars);
-
-    // Ensure that Unicode escapers behave correctly wrt badly formed input.
-    String badUnicode = "\uDC00\uD800";
-    assertThrows(IllegalArgumentException.class, () -> escaper.escape(badUnicode));
+  }
+  
+  public void testEscaper_withMalformedUnicode_throwsIllegalArgumentException() {
+    // Given: An escaper
+    UnicodeEscaper escaper = createEscaperWithReplacements(SIMPLE_REPLACEMENTS);
+    
+    // When/Then: Escaping malformed Unicode throws exception
+    assertThrows(IllegalArgumentException.class, () -> escaper.escape(MALFORMED_UNICODE));
   }
 
-  public void testSafeRange() throws IOException {
-    // Basic escaping of unsafe chars (wrap them in {,}'s)
-    UnicodeEscaper wrappingEscaper =
-        new ArrayBasedUnicodeEscaper(NO_REPLACEMENTS, 'A', 'Z', null) {
-          @Override
-          protected char[] escapeUnsafe(int c) {
-            return ("{" + (char) c + "}").toCharArray();
-          }
-        };
-    EscaperAsserts.assertBasic(wrappingEscaper);
-    // '[' and '@' lie either side of [A-Z].
-    assertThat(wrappingEscaper.escape("[FOO@BAR]")).isEqualTo("{[}FOO{@}BAR{]}");
+  public void testEscaper_withSafeRange_onlyEscapesCharactersOutsideRange() throws IOException {
+    // Given: An escaper with safe range A-Z that wraps unsafe chars in braces
+    final char safeRangeStart = 'A';
+    final char safeRangeEnd = 'Z';
+    UnicodeEscaper escaper = new ArrayBasedUnicodeEscaper(
+        NO_REPLACEMENTS, safeRangeStart, safeRangeEnd, null) {
+      @Override
+      protected char[] escapeUnsafe(int codePoint) {
+        return ("{" + (char) codePoint + "}").toCharArray();
+      }
+    };
+    
+    // When: Escaping text with characters inside and outside safe range
+    String input = "[FOO@BAR]"; // '[' < 'A' and '@' < 'A', so both are unsafe
+    String result = escaper.escape(input);
+    
+    // Then: Only unsafe characters are wrapped
+    assertThat(result).isEqualTo("{[}FOO{@}BAR{]}");
+    
+    EscaperAsserts.assertBasic(escaper);
   }
 
-  public void testDeleteUnsafeChars() throws IOException {
-    UnicodeEscaper deletingEscaper =
-        new ArrayBasedUnicodeEscaper(NO_REPLACEMENTS, ' ', '~', null) {
-          @Override
-          protected char[] escapeUnsafe(int c) {
-            return NO_CHARS;
-          }
-        };
-    EscaperAsserts.assertBasic(deletingEscaper);
-    assertThat(
-            deletingEscaper.escape(
-                "\tEverything\0 outside the\uD800\uDC00 "
-                    + "printable ASCII \uFFFFrange is \u007Fdeleted.\n"))
-        .isEqualTo("Everything outside the printable ASCII range is deleted.");
+  public void testEscaper_withDeletion_removesUnsafeCharacters() throws IOException {
+    // Given: An escaper that deletes characters outside printable ASCII range (space to tilde)
+    final char printableAsciiStart = ' ';
+    final char printableAsciiEnd = '~';
+    UnicodeEscaper escaper = new ArrayBasedUnicodeEscaper(
+        NO_REPLACEMENTS, printableAsciiStart, printableAsciiEnd, null) {
+      @Override
+      protected char[] escapeUnsafe(int codePoint) {
+        return EMPTY_REPLACEMENT; // Delete unsafe characters
+      }
+    };
+    
+    // When: Escaping text with non-printable characters
+    String input = "\tEverything\0 outside the\uD800\uDC00 " +
+                   "printable ASCII \uFFFFrange is \u007Fdeleted.\n";
+    String result = escaper.escape(input);
+    
+    // Then: Non-printable characters are removed
+    assertThat(result).isEqualTo("Everything outside the printable ASCII range is deleted.");
+    
+    EscaperAsserts.assertBasic(escaper);
   }
 
-  public void testReplacementPriority() throws IOException {
-    UnicodeEscaper replacingEscaper =
-        new ArrayBasedUnicodeEscaper(SIMPLE_REPLACEMENTS, ' ', '~', null) {
-          private final char[] unknown = new char[] {'?'};
-
-          @Override
-          protected char[] escapeUnsafe(int c) {
-            return unknown;
-          }
-        };
-    EscaperAsserts.assertBasic(replacingEscaper);
-
-    // Replacements are applied first regardless of whether the character is in
-    // the safe range or not ('&' is a safe char while '\t' and '\n' are not).
-    assertThat(replacingEscaper.escape("\tFish &\0 Chips\r\n"))
-        .isEqualTo("<tab>Fish <and>? Chips?<newline>");
+  public void testEscaper_withBothReplacementsAndSafeRange_prioritizesReplacements() 
+      throws IOException {
+    // Given: An escaper with both replacements and a safe range
+    final char safeRangeStart = ' ';
+    final char safeRangeEnd = '~';
+    UnicodeEscaper escaper = new ArrayBasedUnicodeEscaper(
+        SIMPLE_REPLACEMENTS, safeRangeStart, safeRangeEnd, null) {
+      @Override
+      protected char[] escapeUnsafe(int codePoint) {
+        return new char[] {'?'}; // Replace unsafe chars with '?'
+      }
+    };
+    
+    // When: Escaping text with both mapped and unmapped characters
+    // Note: '&' is within safe range but has a replacement mapping
+    //       '\t' and '\n' are outside safe range and have replacements
+    //       '\0' and '\r' are outside safe range without replacements
+    String input = "\tFish &\0 Chips\r\n";
+    String result = escaper.escape(input);
+    
+    // Then: Replacements take priority over safe range logic
+    assertThat(result).isEqualTo("<tab>Fish <and>? Chips?<newline>");
+    
+    EscaperAsserts.assertBasic(escaper);
   }
 
-  public void testCodePointsFromSurrogatePairs() throws IOException {
-    UnicodeEscaper surrogateEscaper =
-        new ArrayBasedUnicodeEscaper(NO_REPLACEMENTS, 0, 0x20000, null) {
-          private final char[] escaped = new char[] {'X'};
-
-          @Override
-          protected char[] escapeUnsafe(int c) {
-            return escaped;
-          }
-        };
-    EscaperAsserts.assertBasic(surrogateEscaper);
-
-    // A surrogate pair defining a code point within the safe range.
-    String safeInput = "\uD800\uDC00"; // 0x10000
-    assertThat(surrogateEscaper.escape(safeInput)).isEqualTo(safeInput);
-
-    // A surrogate pair defining a code point outside the safe range (but both
-    // of the surrogate characters lie within the safe range). It is important
-    // not to accidentally treat this as a sequence of safe characters.
-    String unsafeInput = "\uDBFF\uDFFF"; // 0x10FFFF
-    assertThat(surrogateEscaper.escape(unsafeInput)).isEqualTo("X");
+  public void testEscaper_withSurrogatePairs_handlesCodePointsCorrectly() throws IOException {
+    // Given: An escaper with safe range up to 0x20000 (beyond BMP)
+    final int safeRangeStart = 0;
+    final int safeRangeEnd = 0x20000;
+    UnicodeEscaper escaper = new ArrayBasedUnicodeEscaper(
+        NO_REPLACEMENTS, safeRangeStart, safeRangeEnd, null) {
+      @Override
+      protected char[] escapeUnsafe(int codePoint) {
+        return new char[] {'X'};
+      }
+    };
+    
+    // Test case 1: Surrogate pair representing code point within safe range
+    String safeCodePoint = "\uD800\uDC00"; // Represents U+10000
+    assertThat(escaper.escape(safeCodePoint)).isEqualTo(safeCodePoint);
+    
+    // Test case 2: Surrogate pair representing code point outside safe range
+    // Important: Both surrogate chars are < 0x20000, but the code point they
+    // represent (U+10FFFF) is > 0x20000
+    String unsafeCodePoint = "\uDBFF\uDFFF"; // Represents U+10FFFF
+    assertThat(escaper.escape(unsafeCodePoint)).isEqualTo("X");
+    
+    EscaperAsserts.assertBasic(escaper);
+  }
+  
+  // Helper method to create a simple escaper with replacements
+  private static UnicodeEscaper createEscaperWithReplacements(
+      ImmutableMap<Character, String> replacements) {
+    return new ArrayBasedUnicodeEscaper(
+        replacements, Character.MIN_VALUE, Character.MAX_CODE_POINT, null) {
+      @Override
+      protected char[] escapeUnsafe(int codePoint) {
+        return EMPTY_REPLACEMENT;
+      }
+    };
   }
 }
