@@ -16,64 +16,49 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) 
-@EvoRunnerParameters(
-    mockJVMNonDeterminism = true,
-    useVFS = true,
-    useVNET = true,
-    resetStaticState = true,
-    separateClassLoader = true
-) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
 public class LangCollectors_ESTest extends LangCollectors_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void testJoiningWithNullDelimiterPrefixAndValidSuffix_ReturnsNonNullCollector() {
-        // Test joining with null delimiter and prefix, but valid suffix
-        CharBuffer suffixBuffer = CharBuffer.wrap(new char[5]);
-        Collector<Object, ?, String> collector = LangCollectors.joining(
-            null,  // delimiter
-            null,  // prefix
-            suffixBuffer // suffix
-        );
-        assertNotNull("Collector should not be null", collector);
-    }
+  @Test(timeout = 4000)
+  public void test0()  throws Throwable  {
+      char[] charArray0 = new char[5];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      Collector<Object, ?, String> collector0 = LangCollectors.joining((CharSequence) null, (CharSequence) null, (CharSequence) charBuffer0);
+      assertNotNull(collector0);
+  }
 
-    @Test(timeout = 4000)
-    public void testJoiningWithNonNullDelimitersAndNullMapper_ReturnsNonNullCollector() {
-        // Test joining with valid delimiters but null toString mapper
-        CharBuffer delimiterBuffer = CharBuffer.wrap(new char[1]);
-        Collector<Object, ?, String> collector = LangCollectors.joining(
-            delimiterBuffer, // delimiter
-            delimiterBuffer, // prefix
-            delimiterBuffer, // suffix
-            null // toString mapper
-        );
-        assertNotNull("Collector should not be null", collector);
-    }
+  @Test(timeout = 4000)
+  public void test1()  throws Throwable  {
+      char[] charArray0 = new char[1];
+      CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
+      Collector<Object, ?, String> collector0 = LangCollectors.joining((CharSequence) charBuffer0, (CharSequence) charBuffer0, (CharSequence) charBuffer0, (Function<Object, String>) null);
+      assertNotNull(collector0);
+  }
 
-    @Test(timeout = 4000)
-    public void testJoiningNoArguments_ReturnsNonNullCollector() {
-        // Test parameterless joining method
-        Collector<Object, ?, String> collector = LangCollectors.joining();
-        assertNotNull("Collector should not be null", collector);
-    }
+  @Test(timeout = 4000)
+  public void test2()  throws Throwable  {
+      Collector<Object, ?, String> collector0 = LangCollectors.joining();
+      assertNotNull(collector0);
+  }
 
-    @Test(timeout = 4000)
-    public void testCollectWithNullCollectorAndNullArray_ThrowsNullPointerException() {
-        // Verify that collect throws NullPointerException when both collector and array are null
-        try {
-            LangCollectors.collect(null, (CharBuffer[]) null);
-            fail("Expected NullPointerException");
-        } catch (NullPointerException e) {
-            // Verify the exception originates from Objects.requireNonNull
-            verifyException("java.util.Objects", e);
-        }
-    }
+  @Test(timeout = 4000)
+  public void test3()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        LangCollectors.collect((Collector<? super CharBuffer, CharBuffer, CharBuffer>) null, (CharBuffer[]) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("java.util.Objects", e);
+      }
+  }
 
-    @Test(timeout = 4000)
-    public void testJoiningWithNullDelimiter_ReturnsNonNullCollector() {
-        // Test joining with only a null delimiter
-        Collector<Object, ?, String> collector = LangCollectors.joining((CharSequence) null);
-        assertNotNull("Collector should not be null", collector);
-    }
+  @Test(timeout = 4000)
+  public void test4()  throws Throwable  {
+      Collector<Object, ?, String> collector0 = LangCollectors.joining((CharSequence) null);
+      assertNotNull(collector0);
+  }
 }
