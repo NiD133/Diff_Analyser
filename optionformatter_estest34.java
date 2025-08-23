@@ -1,24 +1,29 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
 import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class OptionFormatter_ESTestTest34 extends OptionFormatter_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        Option option0 = new Option("NO_ARGS_ALLOWED", "iRi[{-|Um");
-        OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
-        OptionFormatter.Builder optionFormatter_Builder0 = new OptionFormatter.Builder(optionFormatter0);
-        OptionFormatter.Builder optionFormatter_Builder1 = optionFormatter_Builder0.setArgumentNameDelimiters("<EEE MMM dd HH:mm:ss zzz yyyy>", "usage: ");
-        assertSame(optionFormatter_Builder1, optionFormatter_Builder0);
+/**
+ * Tests for the fluent interface of {@link OptionFormatter.Builder}.
+ */
+public class OptionFormatterBuilderFluencyTest {
+
+    @Test
+    public void setArgumentNameDelimitersShouldReturnSameBuilderInstanceForChaining() {
+        // Arrange: Create a builder instance to test.
+        // The specific option used for initialization is not relevant to this test.
+        Option option = new Option("f", "file");
+        OptionFormatter initialFormatter = OptionFormatter.from(option);
+        OptionFormatter.Builder builder = new OptionFormatter.Builder(initialFormatter);
+
+        // Act: Call the method under test.
+        OptionFormatter.Builder resultBuilder = builder.setArgumentNameDelimiters("<", ">");
+
+        // Assert: Verify that the method returns the same instance.
+        // This confirms the method supports a fluent API (method chaining).
+        assertSame("The method should return the same builder instance to enable fluent chaining.",
+                builder, resultBuilder);
     }
 }
