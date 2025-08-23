@@ -1,23 +1,25 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class SparseBloomFilter_ESTestTest43 extends SparseBloomFilter_ESTest_scaffolding {
+/**
+ * Unit tests for {@link SparseBloomFilter}.
+ */
+public class SparseBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        Shape shape0 = Shape.fromKM(994, 994);
-        SparseBloomFilter sparseBloomFilter0 = new SparseBloomFilter(shape0);
-        boolean boolean0 = sparseBloomFilter0.isEmpty();
-        assertTrue(boolean0);
+    /**
+     * Tests that a newly constructed SparseBloomFilter reports itself as empty.
+     */
+    @Test
+    public void testNewFilterIsEmpty() {
+        // Arrange: Create a shape and a new filter. The specific shape
+        // parameters are not important for this test.
+        Shape shape = Shape.fromKM(10, 100);
+        SparseBloomFilter bloomFilter = new SparseBloomFilter(shape);
+
+        // Act & Assert: A filter that has had no elements merged into it
+        // should be considered empty.
+        assertTrue("A newly created filter should be empty", bloomFilter.isEmpty());
     }
 }
