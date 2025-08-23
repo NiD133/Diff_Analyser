@@ -1,36 +1,40 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
 import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.ShapeCollection;
-import org.locationtech.spatial4j.shape.SpatialRelation;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 public class BufferedLineString_ESTestTest4 extends BufferedLineString_ESTest_scaffolding {
 
+    /**
+     * Tests the string representation of a BufferedLineString
+     * constructed with points having NaN (Not-a-Number) coordinates.
+     * This verifies that the toString() method handles invalid point data gracefully.
+     */
     @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        LinkedList<Point> linkedList0 = new LinkedList<Point>();
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
-        BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, (-2877.398196062), true, spatialContext0);
-        Point point0 = bufferedLineString0.getCenter();
-        linkedList0.add(point0);
-        linkedList0.add(point0);
-        linkedList0.add(point0);
-        BufferedLineString bufferedLineString1 = new BufferedLineString(linkedList0, (-2877.398196062), false, spatialContext0);
-        String string0 = bufferedLineString1.toString();
-        assertEquals("BufferedLineString(buf=-2877.398196062 pts=NaN NaN, NaN NaN, NaN NaN)", string0);
+    public void toStringShouldCorrectlyFormatLineStringWithNaNPoints() {
+        // Arrange
+        SpatialContext spatialContext = new SpatialContext(new SpatialContextFactory());
+        final double buffer = -2877.398196062; // A negative buffer is used to match the original test case.
+
+        // Create a point with NaN coordinates, which can result from operations on empty shapes.
+        Point nanPoint = spatialContext.makePoint(Double.NaN, Double.NaN);
+        List<Point> pointsWithNaN = Arrays.asList(nanPoint, nanPoint, nanPoint);
+
+        // Create the line string with the list of NaN points.
+        BufferedLineString lineStringWithNaNPoints = new BufferedLineString(pointsWithNaN, buffer, false, spatialContext);
+
+        // Act
+        String actualToString = lineStringWithNaNPoints.toString();
+
+        // Assert
+        String expectedToString = "BufferedLineString(buf=-2877.398196062 pts=NaN NaN, NaN NaN, NaN NaN)";
+        assertEquals(expectedToString, actualToString);
     }
 }
