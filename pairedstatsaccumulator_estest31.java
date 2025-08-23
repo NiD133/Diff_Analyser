@@ -1,28 +1,25 @@
 package com.google.common.math;
 
+import static org.junit.Assert.assertThrows;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PairedStatsAccumulator_ESTestTest31 extends PairedStatsAccumulator_ESTest_scaffolding {
+/**
+ * Tests for {@link PairedStatsAccumulator}.
+ */
+public class PairedStatsAccumulatorTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        PairedStatsAccumulator pairedStatsAccumulator0 = new PairedStatsAccumulator();
-        // Undeclared exception!
-        try {
-            pairedStatsAccumulator0.leastSquaresFit();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.base.Preconditions", e);
-        }
+    /**
+     * Verifies that calling leastSquaresFit() on an accumulator with no data
+     * throws an IllegalStateException, as there is not enough data to perform
+     * the calculation.
+     */
+    @Test
+    public void leastSquaresFit_whenAccumulatorIsEmpty_throwsIllegalStateException() {
+        // Arrange: Create an empty accumulator.
+        PairedStatsAccumulator accumulator = new PairedStatsAccumulator();
+
+        // Act & Assert: Expect an IllegalStateException when calculating the least squares fit.
+        // The method requires at least two data points for this calculation.
+        assertThrows(IllegalStateException.class, accumulator::leastSquaresFit);
     }
 }
