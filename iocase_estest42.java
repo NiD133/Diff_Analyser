@@ -1,18 +1,22 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class IOCase_ESTestTest42 extends IOCase_ESTest_scaffolding {
+/**
+ * Tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        IOCase iOCase0 = IOCase.INSENSITIVE;
-        boolean boolean0 = IOCase.isCaseSensitive(iOCase0);
-        assertFalse(boolean0);
+    @Test
+    public void isCaseSensitive_withInsensitiveEnum_shouldReturnFalse() {
+        // Arrange: Define the input for the test
+        final IOCase insensitive = IOCase.INSENSITIVE;
+
+        // Act: Call the method under test
+        final boolean isSensitive = IOCase.isCaseSensitive(insensitive);
+
+        // Assert: Verify the result is as expected
+        assertFalse("isCaseSensitive should return false for IOCase.INSENSITIVE", isSensitive);
     }
 }
