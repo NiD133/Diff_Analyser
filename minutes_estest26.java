@@ -1,18 +1,29 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Minutes_ESTestTest26 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        Minutes minutes0 = Minutes.ONE;
-        Minutes minutes1 = minutes0.minus((-241));
-        assertEquals(242, minutes1.getMinutes());
+    /**
+     * Tests that subtracting a negative number of minutes is equivalent to adding
+     * the positive (absolute) value of that number.
+     * For example, 1 minute - (-241 minutes) should result in 242 minutes.
+     */
+    @Test
+    public void minus_whenSubtractingNegativeValue_isEquivalentToAddition() {
+        // Arrange
+        final Minutes initialMinutes = Minutes.ONE;
+        final int negativeMinutesToSubtract = -241;
+        final int expectedTotalMinutes = 242;
+
+        // Act
+        final Minutes result = initialMinutes.minus(negativeMinutesToSubtract);
+
+        // Assert
+        assertEquals(expectedTotalMinutes, result.getMinutes());
     }
 }
