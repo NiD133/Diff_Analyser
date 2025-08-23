@@ -1,27 +1,39 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class SparseBloomFilter_ESTestTest36 extends SparseBloomFilter_ESTest_scaffolding {
+/**
+ * This test class contains tests for the SparseBloomFilter.
+ */
+public class SparseBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        Shape shape0 = Shape.fromKM(1045, 1045);
-        EnhancedDoubleHasher enhancedDoubleHasher0 = new EnhancedDoubleHasher(997L, (-1591L));
-        SparseBloomFilter sparseBloomFilter0 = new SparseBloomFilter(shape0);
-        boolean boolean0 = sparseBloomFilter0.merge((Hasher) enhancedDoubleHasher0);
-        SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
-        boolean boolean1 = simpleBloomFilter0.contains((BitMapExtractor) sparseBloomFilter0);
-        assertFalse(boolean1 == boolean0);
-        assertFalse(boolean1);
+    /**
+     * Tests that an empty SparseBloomFilter does not contain a populated BloomFilter.
+     * The 'contains' method should return false when checking if all bits from a non-empty
+     * filter are set in an empty filter.
+     */
+    @Test
+    public void testContainsReturnsFalseWhenEmptyFilterChecksPopulatedFilter() {
+        // Arrange: Set up the test conditions.
+        // 1. Define a shape for the Bloom filters.
+        Shape shape = Shape.fromKM(1045, 1045);
+
+        // 2. Create a hasher to populate one of the filters.
+        Hasher hasher = new EnhancedDoubleHasher(997L, -1591L);
+
+        // 3. Create a populated filter to serve as the check condition.
+        //    Here we use a SimpleBloomFilter, but any BloomFilter implementation would work.
+        BloomFilter<?> populatedFilter = new SimpleBloomFilter(shape);
+        populatedFilter.merge(hasher);
+
+        // 4. Create an empty SparseBloomFilter, which is the system under test.
+        SparseBloomFilter emptyFilter = new SparseBloomFilter(shape);
+
+        // Act: Call the method being tested.
+        boolean result = emptyFilter.contains(populatedFilter);
+
+        // Assert: Verify the outcome is as expected.
+        assertFalse("An empty filter should not 'contain' a populated filter.", result);
     }
 }
