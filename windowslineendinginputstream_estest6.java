@@ -1,33 +1,28 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class contains the refactored test case.
+ * Note: The original class name and inheritance are preserved to match the provided context.
+ */
 public class WindowsLineEndingInputStream_ESTestTest6 extends WindowsLineEndingInputStream_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        WindowsLineEndingInputStream windowsLineEndingInputStream0 = new WindowsLineEndingInputStream((InputStream) null, false);
-        // Undeclared exception!
-        try {
-            windowsLineEndingInputStream0.close();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.input.WindowsLineEndingInputStream", e);
-        }
+    /**
+     * Verifies that calling close() on a WindowsLineEndingInputStream
+     * initialized with a null underlying stream throws a NullPointerException.
+     * This is expected because the close() method attempts to delegate
+     * the close operation to the wrapped input stream.
+     */
+    @Test(expected = NullPointerException.class, timeout = 4000)
+    public void closeWithNullInputStreamThrowsNullPointerException() throws IOException {
+        // Arrange: Create an instance with a null input stream.
+        final WindowsLineEndingInputStream stream = new WindowsLineEndingInputStream(null, false);
+
+        // Act & Assert: Calling close() should immediately throw a NullPointerException.
+        stream.close();
     }
 }
