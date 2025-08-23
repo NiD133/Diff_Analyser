@@ -1,42 +1,64 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
 
-public class SecondsTestTest4 extends TestCase {
+import org.junit.Test;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Unit tests for the {@link Seconds#secondsBetween(ReadablePartial, ReadablePartial)} factory method.
+ */
+public class SecondsTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestSeconds.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testFactory_secondsBetween_RPartial() {
+    @Test
+    public void secondsBetween_withReadablePartial_calculatesPositiveDifference() {
+        // Arrange
         LocalTime start = new LocalTime(12, 0, 3);
-        LocalTime end1 = new LocalTime(12, 0, 6);
-        @SuppressWarnings("deprecation")
-        TimeOfDay end2 = new TimeOfDay(12, 0, 9);
-        assertEquals(3, Seconds.secondsBetween(start, end1).getSeconds());
-        assertEquals(0, Seconds.secondsBetween(start, start).getSeconds());
-        assertEquals(0, Seconds.secondsBetween(end1, end1).getSeconds());
-        assertEquals(-3, Seconds.secondsBetween(end1, start).getSeconds());
-        assertEquals(6, Seconds.secondsBetween(start, end2).getSeconds());
+        LocalTime end = new LocalTime(12, 0, 6);
+
+        // Act
+        Seconds result = Seconds.secondsBetween(start, end);
+
+        // Assert
+        assertEquals(3, result.getSeconds());
+    }
+
+    @Test
+    public void secondsBetween_withSameReadablePartial_isZero() {
+        // Arrange
+        LocalTime time = new LocalTime(12, 0, 3);
+
+        // Act
+        Seconds result = Seconds.secondsBetween(time, time);
+
+        // Assert
+        assertEquals(0, result.getSeconds());
+    }
+
+    @Test
+    public void secondsBetween_withEndBeforeStart_calculatesNegativeDifference() {
+        // Arrange
+        LocalTime start = new LocalTime(12, 0, 6);
+        LocalTime end = new LocalTime(12, 0, 3);
+
+        // Act
+        Seconds result = Seconds.secondsBetween(start, end);
+
+        // Assert
+        assertEquals(-3, result.getSeconds());
+    }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    public void secondsBetween_withDifferentReadablePartialTypes_calculatesCorrectly() {
+        // Arrange
+        LocalTime start = new LocalTime(12, 0, 3);
+        // TimeOfDay is a deprecated class, but should be compatible with LocalTime.
+        TimeOfDay end = new TimeOfDay(12, 0, 9);
+
+        // Act
+        Seconds result = Seconds.secondsBetween(start, end);
+
+        // Assert
+        assertEquals(6, result.getSeconds());
     }
 }
