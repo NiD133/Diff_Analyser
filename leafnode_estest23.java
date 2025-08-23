@@ -1,21 +1,29 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LeafNode_ESTestTest23 extends LeafNode_ESTest_scaffolding {
+/**
+ * Tests for attribute-related functionality in {@link LeafNode} subclasses.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        CDataNode cDataNode0 = new CDataNode("roS]");
-        String string0 = cDataNode0.attr("#cdata");
-        assertEquals("roS]", string0);
+    /**
+     * Verifies that calling attr() with the special key "#cdata" on a CDataNode
+     * correctly returns the text content of that node. This key is a special
+     * case for retrieving the content of text-based leaf nodes.
+     */
+    @Test
+    public void attrWithCDataKeyReturnsNodeText() {
+        // Arrange
+        String expectedContent = "roS]";
+        CDataNode cdataNode = new CDataNode(expectedContent);
+        String cdataContentKey = "#cdata";
+
+        // Act
+        String actualContent = cdataNode.attr(cdataContentKey);
+
+        // Assert
+        assertEquals(expectedContent, actualContent);
     }
 }
