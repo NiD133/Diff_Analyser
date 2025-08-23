@@ -1,47 +1,43 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
 import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
-import org.joda.time.MonthDay;
-import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
-import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.util.Date;
+
+import static org.junit.Assert.assertEquals;
+
+/*
+ * Note: While this test file is named for AbstractPartial, this specific test case
+ * validates the behavior of a concrete subclass, LocalDate.
+ */
 public class AbstractPartial_ESTestTest49 extends AbstractPartial_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        GregorianChronology gregorianChronology0 = GregorianChronology.getInstanceUTC();
-        LocalDate localDate0 = new LocalDate((long) 1, (Chronology) gregorianChronology0);
-        Date date0 = localDate0.toDate();
-        assertEquals("Thu Jan 01 00:00:00 GMT 1970", date0.toString());
+    /**
+     * Tests that converting a LocalDate to a java.util.Date results in an object
+     * representing midnight on that date in the system's default time zone.
+     */
+    @Test
+    public void toDate_fromLocalDate_representsMidnightInDefaultTimeZone() {
+        // Arrange
+        // A LocalDate represents a date without a time or time zone.
+        LocalDate epochLocalDate = new LocalDate(1970, 1, 1);
+
+        // The toDate() method should convert this to an instant representing
+        // midnight on that date in the default system time zone.
+        // We create an expected Date object that represents this instant for a robust comparison.
+        DateTime expectedInstant = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeZone.getDefault());
+        Date expectedDate = expectedInstant.toDate();
+
+        // Act
+        // Convert the LocalDate to a java.util.Date, which is the action under test.
+        Date actualDate = epochLocalDate.toDate();
+
+        // Assert
+        // Verify that the actual Date object matches the expected one.
+        // This correctly compares the underlying millisecond-from-epoch values.
+        assertEquals(expectedDate, actualDate);
     }
 }
