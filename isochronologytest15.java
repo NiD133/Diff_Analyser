@@ -1,94 +1,72 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.IllegalFieldValueException;
-import org.joda.time.Partial;
+import static org.junit.Assert.assertEquals;
+
 import org.joda.time.TimeOfDay;
-import org.joda.time.YearMonthDay;
+import org.junit.Test;
 
-public class ISOChronologyTestTest15 extends TestCase {
+/**
+ * Tests for adding durations to a {@link TimeOfDay} instance.
+ * This test class focuses on verifying the wrap-around behavior of time arithmetic
+ * when the result crosses midnight.
+ */
+public class TimeOfDayAdditionTest {
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    @Test
+    public void plusHours_shouldWrapAroundPastMidnight() {
+        // Arrange
+        TimeOfDay startTime = new TimeOfDay(12, 30);
+        // 12:30 + 22 hours = 34:30, which wraps around to 10:30 on the "next day".
+        TimeOfDay expectedTime = new TimeOfDay(10, 30);
 
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
+        // Act
+        TimeOfDay resultTime = startTime.plusHours(22);
 
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // Assert
+        assertEquals(expectedTime, resultTime);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestISOChronology.class);
+    @Test
+    public void minusHours_shouldWrapAroundBeforePreviousMidnight() {
+        // Arrange
+        TimeOfDay startTime = new TimeOfDay(10, 30);
+        // 10:30 - 22 hours = -11:30, which wraps around to 12:30 on the "previous day".
+        TimeOfDay expectedTime = new TimeOfDay(12, 30);
+
+        // Act
+        TimeOfDay resultTime = startTime.minusHours(22);
+
+        // Assert
+        assertEquals(expectedTime, resultTime);
     }
 
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
+    @Test
+    public void plusMinutes_shouldWrapAroundPastMidnight() {
+        // Arrange
+        TimeOfDay startTime = new TimeOfDay(12, 30);
+        int hoursToAddInMinutes = 22 * 60;
+        // 12:30 + 22 hours (in minutes) = 34:30, which wraps around to 10:30.
+        TimeOfDay expectedTime = new TimeOfDay(10, 30);
+
+        // Act
+        TimeOfDay resultTime = startTime.plusMinutes(hoursToAddInMinutes);
+
+        // Assert
+        assertEquals(expectedTime, resultTime);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
+    @Test
+    public void minusMinutes_shouldWrapAroundBeforePreviousMidnight() {
+        // Arrange
+        TimeOfDay startTime = new TimeOfDay(10, 30);
+        int hoursToSubtractInMinutes = 22 * 60;
+        // 10:30 - 22 hours (in minutes) = -11:30, which wraps around to 12:30.
+        TimeOfDay expectedTime = new TimeOfDay(12, 30);
 
-    private void testAdd(String start, DurationFieldType type, int amt, String end) {
-        DateTime dtStart = new DateTime(start, ISOChronology.getInstanceUTC());
-        DateTime dtEnd = new DateTime(end, ISOChronology.getInstanceUTC());
-        assertEquals(dtEnd, dtStart.withFieldAdded(type, amt));
-        assertEquals(dtStart, dtEnd.withFieldAdded(type, -amt));
-        DurationField field = type.getField(ISOChronology.getInstanceUTC());
-        int diff = field.getDifference(dtEnd.getMillis(), dtStart.getMillis());
-        assertEquals(amt, diff);
-        if (type == DurationFieldType.years() || type == DurationFieldType.months() || type == DurationFieldType.days()) {
-            YearMonthDay ymdStart = new YearMonthDay(start, ISOChronology.getInstanceUTC());
-            YearMonthDay ymdEnd = new YearMonthDay(end, ISOChronology.getInstanceUTC());
-            assertEquals(ymdEnd, ymdStart.withFieldAdded(type, amt));
-            assertEquals(ymdStart, ymdEnd.withFieldAdded(type, -amt));
-        }
-    }
+        // Act
+        TimeOfDay resultTime = startTime.minusMinutes(hoursToSubtractInMinutes);
 
-    public void testTimeOfDayAdd() {
-        TimeOfDay start = new TimeOfDay(12, 30);
-        TimeOfDay end = new TimeOfDay(10, 30);
-        assertEquals(end, start.plusHours(22));
-        assertEquals(start, end.minusHours(22));
-        assertEquals(end, start.plusMinutes(22 * 60));
-        assertEquals(start, end.minusMinutes(22 * 60));
+        // Assert
+        assertEquals(expectedTime, resultTime);
     }
 }
