@@ -1,19 +1,35 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSequenceUtils_ESTestTest17 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link CharSequenceUtils} class.
+ * Note: The original test class name "CharSequenceUtils_ESTestTest17" was preserved,
+ * but in a real-world scenario, it should be simplified to "CharSequenceUtilsTest".
+ */
+public class CharSequenceUtils_ESTestTest17 {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder();
-        int int0 = CharSequenceUtils.indexOf(stringBuilder0, (-1952), (-1952));
-        assertEquals((-1), int0);
+    /**
+     * Tests that indexOf returns -1 when searching an empty CharSequence.
+     *
+     * This test verifies that even with edge-case inputs like a negative search
+     * character and a negative start index, the method correctly returns -1 (not found)
+     * for an empty sequence. According to the method's contract, a negative start
+     * index is treated as 0.
+     */
+    @Test
+    public void indexOf_onEmptySequenceWithNegativeStartIndex_shouldReturnNotFound() {
+        // Arrange
+        final CharSequence emptySequence = new StringBuilder();
+        final int negativeSearchChar = -1; // An arbitrary negative (invalid) character code.
+        final int negativeStartIndex = -1; // A negative start index should be treated as 0.
+        final int expectedIndex = -1;      // The constant for "not found".
+
+        // Act
+        final int actualIndex = CharSequenceUtils.indexOf(emptySequence, negativeSearchChar, negativeStartIndex);
+
+        // Assert
+        assertEquals("indexOf on an empty sequence should always return -1", expectedIndex, actualIndex);
     }
 }
