@@ -1,85 +1,49 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertTrue;
+
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.DateTime.Property;
+import org.junit.Test;
 
-public class EthiopicChronologyTestTest19 extends TestCase {
+/**
+ * Tests for leap year/day/month properties in EthiopicChronology.
+ */
+public class EthiopicChronologyTest {
 
-    private static final int MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
+    /**
+     * Verifies that for a date representing the leap day in the Ethiopic calendar,
+     * the relevant date-time fields correctly identify themselves as being part of a leap period.
+     */
+    @Test
+    public void isLeap_onLeapDay_returnsTrueForAllRelevantFields() {
+        // Arrange
+        // Use a specific, non-default chronology to make the test deterministic and
+        // independent of the local system's time zone.
+        final Chronology ethiopicUTC = EthiopicChronology.getInstanceUTC();
 
-    private static long SKIP = 1 * MILLIS_PER_DAY;
+        // According to the Ethiopic calendar rules (similar to Julian), year 3 is a leap year.
+        // A leap year has a 13th month with 6 days. The 6th day of this "leap month"
+        // is the actual leap day.
+        final int leapYear = 3;
+        final int leapMonth = 13;
+        final int leapDayOfMonth = 6;
+        DateTime ethiopicLeapDay = new DateTime(leapYear, leapMonth, leapDayOfMonth, 0, 0, ethiopicUTC);
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+        // Act & Assert
+        // For a date that is the leap day, the corresponding year, month, and day fields
+        // should all report as being 'leap'.
 
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
+        assertTrue("Year containing a leap day should be identified as a leap year.",
+                   ethiopicLeapDay.year().isLeap());
 
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+        assertTrue("The 13th month of a leap year should be identified as a leap month.",
+                   ethiopicLeapDay.monthOfYear().isLeap());
 
-    private static final Chronology ETHIOPIC_UTC = EthiopicChronology.getInstanceUTC();
+        assertTrue("The 6th day of the 13th month should be identified as a leap day.",
+                   ethiopicLeapDay.dayOfMonth().isLeap());
 
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
-
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        SKIP = 1 * MILLIS_PER_DAY;
-        return new TestSuite(TestEthiopicChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    public void testLeap_6_13() {
-        Chronology chrono = EthiopicChronology.getInstance();
-        DateTime dt = new DateTime(3, 13, 6, 0, 0, chrono);
-        assertEquals(true, dt.year().isLeap());
-        assertEquals(true, dt.monthOfYear().isLeap());
-        assertEquals(true, dt.dayOfMonth().isLeap());
-        assertEquals(true, dt.dayOfYear().isLeap());
+        assertTrue("The 366th day of a leap year should be identified as a leap day of the year.",
+                   ethiopicLeapDay.dayOfYear().isLeap());
     }
 }
