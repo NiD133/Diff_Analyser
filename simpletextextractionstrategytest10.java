@@ -1,140 +1,92 @@
 package com.itextpdf.text.pdf.parser;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import com.itextpdf.testutils.TestResourceUtils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import com.itextpdf.awt.geom.AffineTransform;
 import com.itextpdf.text.Document;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class SimpleTextExtractionStrategyTestTest10 {
+import java.io.ByteArrayOutputStream;
 
-    String TEXT1 = "TEXT1 TEXT1";
+/**
+ * This test verifies the spacing logic of the SimpleTextExtractionStrategy.
+ * Specifically, it checks how the strategy handles a space between two separate
+ * text chunks when the first chunk already ends with a space character.
+ */
+public class SimpleTextExtractionStrategySpacingTest {
 
-    String TEXT2 = "TEXT2 TEXT2";
-
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
-    public TextExtractionStrategy createRenderListenerForTest() {
-        return new SimpleTextExtractionStrategy();
-    }
-
-    byte[] createPdfWithXObject(String xobjectText) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Document doc = new Document();
-        PdfWriter writer = PdfWriter.getInstance(doc, baos);
-        writer.setCompressionLevel(0);
-        doc.open();
-        doc.add(new Paragraph("A"));
-        doc.add(new Paragraph("B"));
-        PdfTemplate template = writer.getDirectContent().createTemplate(100, 100);
-        template.beginText();
-        template.setFontAndSize(BaseFont.createFont(), 12);
-        template.moveText(5, template.getHeight() - 5);
-        template.showText(xobjectText);
-        template.endText();
-        Image xobjectImage = Image.getInstance(template);
-        doc.add(xobjectImage);
-        doc.add(new Paragraph("C"));
-        doc.close();
-        return baos.toByteArray();
-    }
-
-    private static byte[] createPdfWithArrayText(String directContentTj) throws Exception {
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        final Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, byteStream);
-        document.setPageSize(PageSize.LETTER);
-        document.open();
-        PdfContentByte cb = writer.getDirectContent();
-        BaseFont font = BaseFont.createFont();
-        cb.transform(AffineTransform.getTranslateInstance(100, 500));
-        cb.beginText();
-        cb.setFontAndSize(font, 12);
-        cb.getInternalBuffer().append(directContentTj + "\n");
-        cb.endText();
-        document.close();
-        final byte[] pdfBytes = byteStream.toByteArray();
-        return pdfBytes;
-    }
-
-    private static byte[] createPdfWithArrayText(String text1, String text2, int spaceInPoints) throws Exception {
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        final Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, byteStream);
-        document.setPageSize(PageSize.LETTER);
-        document.open();
-        PdfContentByte cb = writer.getDirectContent();
-        BaseFont font = BaseFont.createFont();
-        cb.beginText();
-        cb.setFontAndSize(font, 12);
-        cb.getInternalBuffer().append("[(" + text1 + ")" + (-spaceInPoints) + "(" + text2 + ")]TJ\n");
-        cb.endText();
-        document.close();
-        final byte[] pdfBytes = byteStream.toByteArray();
-        return pdfBytes;
-    }
-
-    private static byte[] createPdfWithRotatedText(String text1, String text2, float rotation, boolean moveTextToNextLine, float moveTextDelta) throws Exception {
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        final Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, byteStream);
-        document.setPageSize(PageSize.LETTER);
-        document.open();
-        PdfContentByte cb = writer.getDirectContent();
-        BaseFont font = BaseFont.createFont();
-        float x = document.getPageSize().getWidth() / 2;
-        float y = document.getPageSize().getHeight() / 2;
-        cb.transform(AffineTransform.getTranslateInstance(x, y));
-        cb.moveTo(-10, 0);
-        cb.lineTo(10, 0);
-        cb.moveTo(0, -10);
-        cb.lineTo(0, 10);
-        cb.stroke();
-        cb.beginText();
-        cb.setFontAndSize(font, 12);
-        cb.transform(AffineTransform.getRotateInstance(rotation / 180f * Math.PI));
-        cb.showText(text1);
-        if (moveTextToNextLine)
-            cb.moveText(0, moveTextDelta);
-        else
-            cb.transform(AffineTransform.getTranslateInstance(moveTextDelta, 0));
-        cb.showText(text2);
-        cb.endText();
-        document.close();
-        final byte[] pdfBytes = byteStream.toByteArray();
-        return pdfBytes;
-    }
-
-    private static class SingleCharacterSimpleTextExtractionStrategy extends SimpleTextExtractionStrategy {
-
-        @Override
-        public void renderText(TextRenderInfo renderInfo) {
-            for (TextRenderInfo tri : renderInfo.getCharacterRenderInfos()) super.renderText(tri);
-        }
-    }
-
+    /**
+     * Tests that the strategy does not add an extra space between two text chunks
+     * if the first chunk already ends with a space. The strategy should correctly
+     * identify that the accumulated text already ends with a space and not insert
+     * a redundant one, even if there is a physical gap between the rendered chunks.
+     */
     @Test
-    public void testTrailingSpace() throws Exception {
-        byte[] bytes = createPdfWithRotatedText(TEXT1 + " ", TEXT2, 0, false, 6);
-        Assert.assertEquals(TEXT1 + " " + TEXT2, PdfTextExtractor.getTextFromPage(new PdfReader(bytes), 1, createRenderListenerForTest()));
+    public void shouldNotAddExtraSpaceWhenFirstChunkEndsWithSpace() throws Exception {
+        // ARRANGE
+        // Define two text chunks. The first one has a significant trailing space.
+        String textChunk1WithTrailingSpace = "TEXT1 TEXT1 ";
+        String textChunk2 = "TEXT2 TEXT2";
+
+        // The expected result is the simple concatenation of the two chunks.
+        String expectedText = "TEXT1 TEXT1 TEXT2 TEXT2";
+
+        // Create a PDF where the two chunks are rendered with a physical gap between them.
+        // A gap is necessary to trigger the strategy's space-insertion logic.
+        final float gapBetweenChunks = 6.0f;
+        byte[] pdfBytes = createPdfWithTwoSpacedTextChunks(textChunk1WithTrailingSpace, textChunk2, gapBetweenChunks);
+
+        PdfReader reader = new PdfReader(pdfBytes);
+        TextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+
+        // ACT
+        // Extract text using the strategy under test.
+        String actualText = PdfTextExtractor.getTextFromPage(reader, 1, strategy);
+        reader.close();
+
+        // ASSERT
+        Assert.assertEquals("Strategy should not add a redundant space.", expectedText, actualText);
+    }
+
+    /**
+     * Creates a simple PDF document containing two strings of text rendered on the same line
+     * with an explicit horizontal gap between them.
+     * <p>
+     * This is done with two separate "show text" operations, which causes the text extraction
+     * strategy to receive two distinct TextRenderInfo objects to process.
+     *
+     * @param chunk1 The first string to render.
+     * @param chunk2 The second string to render.
+     * @param gap    The horizontal space (in points) to insert between the two chunks.
+     * @return A byte array containing the generated PDF.
+     */
+    private byte[] createPdfWithTwoSpacedTextChunks(String chunk1, String chunk2, float gap) throws Exception {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            Document document = new Document();
+            PdfWriter writer = PdfWriter.getInstance(document, baos);
+            document.open();
+
+            PdfContentByte cb = writer.getDirectContent();
+            BaseFont font = BaseFont.createFont();
+
+            cb.beginText();
+            cb.setFontAndSize(font, 12);
+            cb.moveText(50, 750); // Set a starting position for the text.
+
+            // Render the first chunk.
+            cb.showText(chunk1);
+
+            // Introduce an explicit horizontal gap before rendering the second chunk.
+            cb.moveText(gap, 0);
+
+            // Render the second chunk.
+            cb.showText(chunk2);
+
+            cb.endText();
+            document.close();
+            return baos.toByteArray();
+        }
     }
 }
