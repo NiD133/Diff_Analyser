@@ -1,30 +1,24 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Attribute_ESTestTest77 extends Attribute_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Attribute} class.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test76() throws Throwable {
-        Attributes attributes0 = new Attributes();
-        Attribute attribute0 = new Attribute("bokmyj\"!bh4db:", (String) null, attributes0);
-        attribute0.hashCode();
-        assertEquals("", attribute0.getValue());
+    @Test
+    public void getValueShouldReturnEmptyStringForAttributeWithNullValue() {
+        // Arrange: Create an attribute with a valid key and a null value.
+        // The constructor should handle the null value gracefully.
+        Attribute attribute = new Attribute("id", null);
+
+        // Act: Retrieve the value from the attribute.
+        String actualValue = attribute.getValue();
+
+        // Assert: The getValue() method is expected to return an empty string, not null,
+        // to prevent NullPointerExceptions in consuming code.
+        assertEquals("", actualValue);
     }
 }
