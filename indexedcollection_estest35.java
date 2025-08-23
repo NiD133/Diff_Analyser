@@ -1,65 +1,41 @@
 package org.apache.commons.collections4.collection;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
+import org.apache.commons.collections4.FunctorException;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
 import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.ForClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IndexedCollection_ESTestTest35 extends IndexedCollection_ESTest_scaffolding {
+import java.util.Collection;
+import java.util.LinkedList;
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        Transformer<Integer, Integer> transformer0 = ExceptionTransformer.exceptionTransformer();
-        IndexedCollection<Integer, Integer> indexedCollection0 = IndexedCollection.uniqueIndexedCollection((Collection<Integer>) linkedList0, transformer0);
-        // Undeclared exception!
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+/**
+ * Tests for exceptional behavior in {@link IndexedCollection}.
+ */
+public class IndexedCollectionTest {
+
+    /**
+     * Tests that an exception thrown by the key transformer during a 'contains' check
+     * is propagated to the caller.
+     */
+    @Test
+    public void containsShouldPropagateExceptionFromKeyTransformer() {
+        // Arrange: Create an IndexedCollection with a transformer that always throws an exception.
+        final Collection<Integer> sourceCollection = new LinkedList<>();
+        final Transformer<Integer, Integer> exceptionThrowingTransformer = ExceptionTransformer.exceptionTransformer();
+        final IndexedCollection<Integer, Integer> indexedCollection =
+                IndexedCollection.uniqueIndexedCollection(sourceCollection, exceptionThrowingTransformer);
+
+        // Act & Assert: Verify that calling contains() triggers the exception.
         try {
-            indexedCollection0.contains(transformer0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // ExceptionTransformer invoked
-            //
-            verifyException("org.apache.commons.collections4.functors.ExceptionTransformer", e);
+            // The 'contains' method will invoke the transformer on the given element.
+            indexedCollection.contains(123);
+            fail("Expected FunctorException to be thrown");
+        } catch (final FunctorException e) {
+            // The ExceptionTransformer is designed to throw a FunctorException with this specific message.
+            assertEquals("ExceptionTransformer invoked", e.getMessage());
         }
     }
 }
