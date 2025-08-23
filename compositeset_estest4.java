@@ -2,175 +2,128 @@ package org.apache.commons.collections4.set;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
+
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
-public class CompositeSet_ESTestTest4 extends CompositeSet_ESTest_scaffolding {
+/**
+ * Contains improved, more understandable tests for the CompositeSet class,
+ * focusing on specific behaviors like initialization, modification, and iteration.
+ */
+public class CompositeSetImprovedTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        LinkedHashSet<Integer> linkedHashSet0 = new LinkedHashSet<Integer>();
-        assertNotNull(linkedHashSet0);
-        assertTrue(linkedHashSet0.isEmpty());
-        assertEquals(0, linkedHashSet0.size());
-        CompositeSet<Integer> compositeSet0 = new CompositeSet<Integer>();
-        assertNotNull(compositeSet0);
-        CompositeSet<Integer> compositeSet1 = new CompositeSet<Integer>(linkedHashSet0);
-        assertNotNull(compositeSet1);
-        assertTrue(linkedHashSet0.isEmpty());
-        assertEquals(0, linkedHashSet0.size());
-        assertTrue(compositeSet1.equals((Object) compositeSet0));
-        compositeSet1.clear();
-        assertNotSame(compositeSet1, compositeSet0);
-        assertTrue(linkedHashSet0.isEmpty());
-        assertEquals(0, linkedHashSet0.size());
-        assertTrue(compositeSet1.equals((Object) compositeSet0));
-        Set<LinkedHashSet<Integer>>[] setArray0 = (Set<LinkedHashSet<Integer>>[]) Array.newInstance(Set.class, 1);
-        CompositeSet<LinkedHashSet<Integer>> compositeSet2 = new CompositeSet<LinkedHashSet<Integer>>();
-        assertNotNull(compositeSet2);
-        assertFalse(compositeSet2.contains(linkedHashSet0));
-        setArray0[0] = (Set<LinkedHashSet<Integer>>) compositeSet2;
-        CompositeSet<LinkedHashSet<Integer>> compositeSet3 = new CompositeSet<LinkedHashSet<Integer>>(setArray0);
-        assertEquals(1, setArray0.length);
-        assertNotNull(compositeSet3);
-        assertFalse(compositeSet3.contains(linkedHashSet0));
-        assertTrue(compositeSet3.equals((Object) compositeSet2));
-        Iterator<LinkedHashSet<Integer>> iterator0 = compositeSet3.iterator();
-        assertEquals(1, setArray0.length);
-        assertNotNull(iterator0);
-        assertNotSame(compositeSet3, compositeSet2);
-        assertFalse(compositeSet3.contains(linkedHashSet0));
-        assertTrue(compositeSet3.equals((Object) compositeSet2));
-        compositeSet0.setMutator((CompositeSet.SetMutator<Integer>) null);
-        assertNotSame(compositeSet0, compositeSet1);
-        assertTrue(compositeSet0.equals((Object) compositeSet1));
-        CompositeSet<LinkedHashSet<Integer>> compositeSet4 = new CompositeSet<LinkedHashSet<Integer>>(setArray0[0]);
-        assertEquals(1, setArray0.length);
-        assertNotNull(compositeSet4);
-        assertFalse(compositeSet4.contains(linkedHashSet0));
-        assertTrue(compositeSet4.equals((Object) compositeSet3));
-        assertTrue(compositeSet4.equals((Object) compositeSet2));
-        compositeSet4.addComposited((Set<LinkedHashSet<Integer>>) compositeSet2, setArray0[0]);
-        assertEquals(1, setArray0.length);
-        assertNotSame(compositeSet2, compositeSet4);
-        assertNotSame(compositeSet2, compositeSet3);
-        assertNotSame(compositeSet4, compositeSet2);
-        assertNotSame(compositeSet4, compositeSet3);
-        assertFalse(compositeSet2.contains(linkedHashSet0));
-        assertFalse(compositeSet4.contains(linkedHashSet0));
-        assertTrue(compositeSet2.equals((Object) compositeSet4));
-        assertTrue(compositeSet2.equals((Object) compositeSet3));
-        assertTrue(compositeSet4.equals((Object) compositeSet3));
-        assertTrue(compositeSet4.equals((Object) compositeSet2));
-        compositeSet2.addComposited((Set<LinkedHashSet<Integer>>) compositeSet3);
-        assertEquals(1, setArray0.length);
-        assertNotSame(compositeSet2, compositeSet4);
-        assertNotSame(compositeSet2, compositeSet3);
-        assertNotSame(compositeSet3, compositeSet2);
-        assertNotSame(compositeSet3, compositeSet4);
-        Predicate<Integer> predicate0 = ExceptionPredicate.exceptionPredicate();
-        assertNotNull(predicate0);
-        Integer integer0 = new Integer(11);
-        assertNotNull(integer0);
-        assertEquals(11, (int) integer0);
-        boolean boolean0 = linkedHashSet0.add(integer0);
-        assertTrue(linkedHashSet0.contains(integer0));
-        assertEquals(1, linkedHashSet0.size());
-        assertFalse(linkedHashSet0.isEmpty());
-        assertTrue(boolean0);
-        Integer integer1 = new Integer((-6));
-        assertNotNull(integer1);
-        assertFalse(integer1.equals((Object) integer0));
-        assertEquals((-6), (int) integer1);
-        EqualPredicate<Integer> equalPredicate0 = new EqualPredicate<Integer>(integer1);
-        assertNotNull(equalPredicate0);
-        assertFalse(integer1.equals((Object) integer0));
-        Predicate<Integer> predicate1 = FalsePredicate.falsePredicate();
-        assertNotNull(predicate1);
-        assertFalse(predicate1.equals((Object) predicate0));
-        EqualPredicate<Integer> equalPredicate1 = new EqualPredicate<Integer>((Integer) null);
-        assertNotNull(equalPredicate1);
-        assertFalse(equalPredicate1.equals((Object) equalPredicate0));
-        Integer[] integerArray0 = new Integer[0];
-        Integer[] integerArray1 = compositeSet0.toArray(integerArray0);
-        assertEquals(0, integerArray0.length);
-        assertEquals(0, integerArray1.length);
-        assertNotNull(integerArray1);
-        assertNotSame(compositeSet0, compositeSet1);
-        assertSame(integerArray0, integerArray1);
-        assertSame(integerArray1, integerArray0);
-        assertFalse(compositeSet0.contains(integer0));
-        assertFalse(compositeSet0.equals((Object) compositeSet1));
-        Set<Integer> set0 = compositeSet0.toSet();
-        assertNotNull(set0);
-        assertNotSame(compositeSet0, compositeSet1);
-        assertFalse(compositeSet0.contains(integer0));
-        assertFalse(set0.contains(integer0));
-        assertEquals(0, set0.size());
-        assertTrue(set0.isEmpty());
-        assertFalse(compositeSet0.equals((Object) compositeSet1));
-        boolean boolean1 = compositeSet1.isEmpty();
-        assertNotSame(compositeSet1, compositeSet0);
-        assertTrue(linkedHashSet0.contains(integer0));
-        assertFalse(linkedHashSet0.contains((-6)));
-        assertTrue(compositeSet1.contains(integer0));
-        assertFalse(compositeSet1.contains((-6)));
-        assertEquals(1, linkedHashSet0.size());
-        assertFalse(linkedHashSet0.isEmpty());
-        assertFalse(compositeSet1.equals((Object) compositeSet0));
-        assertFalse(boolean1 == boolean0);
-        assertFalse(boolean1);
-        CompositeSet<CompositeSet<Object>> compositeSet5 = new CompositeSet<CompositeSet<Object>>();
-        assertNotNull(compositeSet5);
-        CompositeSet<CompositeSet<Object>> compositeSet6 = new CompositeSet<CompositeSet<Object>>(compositeSet5);
-        assertNotNull(compositeSet6);
-        assertTrue(compositeSet6.equals((Object) compositeSet5));
-        boolean boolean2 = compositeSet6.removeIf((java.util.function.Predicate<? super CompositeSet<Object>>) null);
-        assertNotSame(compositeSet5, compositeSet6);
-        assertNotSame(compositeSet6, compositeSet5);
-        assertTrue(compositeSet5.equals((Object) compositeSet6));
-        assertTrue(compositeSet6.equals((Object) compositeSet5));
-        assertFalse(boolean2 == boolean0);
-        assertTrue(boolean2 == boolean1);
-        assertFalse(boolean2);
+    /**
+     * Tests the state of a newly created empty CompositeSet.
+     * An empty CompositeSet should report that it is empty, have a size of zero,
+     * and produce an empty array or Set representation.
+     */
+    @Test
+    public void testEmptyCompositeSetBehavior() {
+        // Arrange
+        CompositeSet<String> emptySet = new CompositeSet<>();
+
+        // Act & Assert
+        assertTrue("A new composite set should be empty", emptySet.isEmpty());
+        assertEquals("An empty composite set should have size 0", 0, emptySet.size());
+        assertArrayEquals("toArray() on an empty set should return an empty array",
+                          new Object[0], emptySet.toArray());
+        assertTrue("toSet() on an empty set should return an empty set",
+                   emptySet.toSet().isEmpty());
+    }
+
+    /**
+     * Tests that a CompositeSet correctly reflects changes made to its underlying component sets.
+     * A CompositeSet is a view over its components, so modifications to a component
+     * should be visible through the composite.
+     */
+    @Test
+    public void testCompositeSetReflectsComponentSetChanges() {
+        // Arrange
+        Set<Integer> componentSet = new HashSet<>();
+        CompositeSet<Integer> compositeSet = new CompositeSet<>(componentSet);
+
+        assertTrue("Initially, the composite set should be empty", compositeSet.isEmpty());
+
+        // Act: Modify the underlying component set
+        componentSet.add(100);
+
+        // Assert: The change is reflected in the composite set
+        assertFalse("Composite set should not be empty after adding to component", compositeSet.isEmpty());
+        assertEquals("Composite set size should reflect component's size", 1, compositeSet.size());
+        assertTrue("Composite set should contain the element added to its component", compositeSet.contains(100));
+    }
+
+    /**
+     * Verifies that calling clear() on a CompositeSet removes all elements
+     * from all of its underlying component sets.
+     */
+    @Test
+    public void testClearEmptiesAllComponentSets() {
+        // Arrange
+        Set<String> componentSet1 = new HashSet<>(Arrays.asList("a", "b"));
+        Set<String> componentSet2 = new HashSet<>(Arrays.asList("c", "d"));
+        CompositeSet<String> compositeSet = new CompositeSet<>(componentSet1, componentSet2);
+
+        assertFalse("Composite set should not be empty before clear()", compositeSet.isEmpty());
+
+        // Act
+        compositeSet.clear();
+
+        // Assert
+        assertTrue("Composite set should be empty after clear()", compositeSet.isEmpty());
+        assertTrue("The first component set should be cleared", componentSet1.isEmpty());
+        assertTrue("The second component set should be cleared", componentSet2.isEmpty());
+    }
+
+    /**
+     * Tests that the iterator of a CompositeSet correctly traverses all elements
+     * from all of its component sets.
+     */
+    @Test
+    public void testIteratorCombinesAllComponentSets() {
+        // Arrange
+        Set<String> componentSet1 = new HashSet<>(Arrays.asList("a", "b"));
+        Set<String> componentSet2 = new HashSet<>(Arrays.asList("c", "d"));
+        CompositeSet<String> compositeSet = new CompositeSet<>(componentSet1, componentSet2);
+
+        // Act: Collect all elements from the iterator into a new Set
+        Set<String> iteratedElements = StreamSupport.stream(compositeSet.spliterator(), false)
+                                                    .collect(Collectors.toSet());
+
+        // Assert
+        Set<String> expectedElements = new HashSet<>(Arrays.asList("a", "b", "c", "d"));
+        assertEquals("Iterator should provide all elements from all components",
+                     expectedElements, iteratedElements);
+        assertEquals("Composite set size should be the sum of component sizes", 4, compositeSet.size());
+    }
+
+    /**
+     * Tests that removeIf() correctly removes elements that match the predicate
+     * from the composite set and its underlying components.
+     */
+    @Test
+    public void testRemoveIfRemovesMatchingElements() {
+        // Arrange
+        Set<Integer> evenNumbers = new HashSet<>(Arrays.asList(2, 4, 6));
+        Set<Integer> oddNumbers = new HashSet<>(Arrays.asList(1, 3, 5));
+        CompositeSet<Integer> compositeSet = new CompositeSet<>(evenNumbers, oddNumbers);
+
+        // Act: Remove all numbers greater than 3
+        boolean wasModified = compositeSet.removeIf(num -> num > 3);
+
+        // Assert
+        assertTrue("removeIf should return true as elements were removed", wasModified);
+
+        Set<Integer> expectedRemaining = new HashSet<>(Arrays.asList(1, 2, 3));
+        assertEquals("Composite set should only contain numbers not matching the predicate",
+                     expectedRemaining, compositeSet.toSet());
+
+        assertEquals("Component set of even numbers should be modified",
+                     new HashSet<>(Arrays.asList(2)), evenNumbers);
+        assertEquals("Component set of odd numbers should be modified",
+                     new HashSet<>(Arrays.asList(1, 3)), oddNumbers);
     }
 }
