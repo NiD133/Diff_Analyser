@@ -3,46 +3,53 @@ package org.apache.commons.io.output;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
-public class ThresholdingOutputStreamTestTest9 {
+/**
+ * Tests for {@link ThresholdingOutputStream}.
+ */
+class ThresholdingOutputStreamTest {
 
     /**
-     * Asserts initial state without changing it.
+     * Asserts the initial state of a ThresholdingOutputStream.
      *
-     * @param out the stream to test.
+     * @param stream the stream to test.
      * @param expectedThreshold the expected threshold.
-     * @param expectedByeCount the expected byte count.
+     * @param expectedByteCount the expected byte count.
      */
-    static void assertThresholdingInitialState(final ThresholdingOutputStream out, final int expectedThreshold, final int expectedByeCount) {
-        assertFalse(out.isThresholdExceeded());
-        assertEquals(expectedThreshold, out.getThreshold());
-        assertEquals(expectedByeCount, out.getByteCount());
+    private void assertInitialState(final ThresholdingOutputStream stream, final int expectedThreshold, final long expectedByteCount) {
+        assertFalse(stream.isThresholdExceeded(), "Stream should not start in an exceeded state.");
+        assertEquals(expectedThreshold, stream.getThreshold(), "Initial threshold should match the constructor argument.");
+        assertEquals(expectedByteCount, stream.getByteCount(), "Initial byte count should be zero.");
     }
 
     @Test
-    void testThresholdZero() throws IOException {
-        final AtomicBoolean reached = new AtomicBoolean();
+    void write_whenThresholdIsZero_triggersThresholdImmediately() throws IOException {
+        // Arrange
         final int threshold = 0;
-        try (ThresholdingOutputStream out = new ThresholdingOutputStream(threshold) {
+        final AtomicBoolean thresholdReachedCallbackFired = new AtomicBoolean(false);
 
-            @Override
-            protected void thresholdReached() throws IOException {
-                reached.set(true);
-            }
-        }) {
-            assertThresholdingInitialState(out, threshold, 0);
-            out.write(89);
-            assertTrue(reached.get());
-            assertTrue(out.isThresholdExceeded());
-            assertInstanceOf(NullOutputStream.class, out.getOutputStream());
-            assertTrue(out.isThresholdExceeded());
+        // Use the modern constructor with a lambda for the threshold consumer,
+        // which is cleaner than an anonymous inner class.
+        // The default output stream getter is used, which returns NullOutputStream.
+        try (ThresholdingOutputStream stream = new ThresholdingOutputStream(threshold, os -> thresholdReachedCallbackFired.set(true), null)) {
+            // Assert initial state (pre-conditions)
+            assertInitialState(stream, threshold, 0);
+
+            // Act: Write a single byte. Since the threshold is zero, this should
+            // immediately trigger the threshold consumer.
+            stream.write(1);
+
+            // Assert
+            assertTrue(thresholdReachedCallbackFired.get(), "The thresholdReached callback should have been fired.");
+            assertTrue(stream.isThresholdExceeded(), "The stream's state should be marked as threshold exceeded.");
+            assertEquals(1, stream.getByteCount(), "Byte count should be updated after the write.");
+            assertInstanceOf(NullOutputStream.class, stream.getOutputStream(),
+                "The underlying stream should switch to NullOutputStream by default after the threshold is reached.");
         }
     }
 }
