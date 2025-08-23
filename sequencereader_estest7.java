@@ -1,38 +1,39 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.List;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ConcurrentModificationException;
+import java.util.Vector;
+
+/**
+ * This test suite contains tests for the {@link SequenceReader} class.
+ * This particular test was improved for clarity and adherence to modern testing practices.
+ */
 public class SequenceReader_ESTestTest7 extends SequenceReader_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Vector<StringReader> vector0 = new Vector<StringReader>();
-        SequenceReader sequenceReader0 = new SequenceReader(vector0);
-        StringReader stringReader0 = new StringReader("_cA{/)2>I@4NJ(");
-        vector0.add(stringReader0);
-        // Undeclared exception!
-        try {
-            sequenceReader0.close();
-            fail("Expecting exception: ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.Vector$Itr", e);
-        }
+    /**
+     * Tests that modifying the underlying reader collection after the SequenceReader
+     * is created causes a ConcurrentModificationException when close() is called.
+     *
+     * This is because the SequenceReader holds an iterator to the collection,
+     * which becomes invalid if the collection is structurally modified.
+     *
+     * @throws IOException Not expected to be thrown in this test.
+     */
+    @Test(expected = ConcurrentModificationException.class)
+    public void closeShouldThrowConcurrentModificationExceptionWhenReaderCollectionIsModified() throws IOException {
+        // Arrange: Create a SequenceReader with a modifiable collection of readers.
+        Vector<StringReader> readers = new Vector<>();
+        SequenceReader sequenceReader = new SequenceReader(readers);
+
+        // Act: Modify the underlying collection *after* the SequenceReader's internal
+        // iterator has been created.
+        readers.add(new StringReader("new data"));
+
+        // Assert: Calling close() attempts to use the now-invalidated iterator,
+        // which is expected to throw a ConcurrentModificationException.
+        sequenceReader.close();
     }
 }
