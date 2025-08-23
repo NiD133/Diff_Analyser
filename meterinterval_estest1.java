@@ -1,29 +1,37 @@
 package org.jfree.chart.plot;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Paint;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.HistogramType;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class MeterInterval_ESTestTest1 extends MeterInterval_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        DefaultBoxAndWhiskerCategoryDataset<HistogramType, HistogramType> defaultBoxAndWhiskerCategoryDataset0 = new DefaultBoxAndWhiskerCategoryDataset<HistogramType, HistogramType>();
-        Range range0 = defaultBoxAndWhiskerCategoryDataset0.getRangeBounds(false);
-        MeterInterval meterInterval0 = new MeterInterval("Px$=FZ)/l);", range0);
-        Range range1 = meterInterval0.getRange();
-        assertEquals(Double.NaN, range1.getUpperBound(), 0.01);
+/**
+ * Tests for the {@link MeterInterval} class.
+ */
+public class MeterIntervalTest {
+
+    /**
+     * Verifies that the getRange() method correctly returns the Range object
+     * that was provided in the constructor. This test specifically checks the handling
+     * of a Range with NaN (Not a Number) bounds.
+     */
+    @Test
+    public void getRangeShouldReturnTheRangeProvidedInTheConstructor() {
+        // Arrange: Create a MeterInterval with a specific Range.
+        // The original test used a convoluted method to create a Range(NaN, NaN).
+        // We create it directly for clarity and simplicity.
+        String label = "Test Interval";
+        Range expectedRange = new Range(Double.NaN, Double.NaN);
+        MeterInterval meterInterval = new MeterInterval(label, expectedRange);
+
+        // Act: Retrieve the range from the MeterInterval.
+        Range actualRange = meterInterval.getRange();
+
+        // Assert: The retrieved range should be identical to the one provided.
+        // We check both bounds for completeness and include messages for clarity on failure.
+        assertEquals("The lower bound of the range should match",
+                expectedRange.getLowerBound(), actualRange.getLowerBound(), 0.0);
+        assertEquals("The upper bound of the range should match",
+                expectedRange.getUpperBound(), actualRange.getUpperBound(), 0.0);
     }
 }
