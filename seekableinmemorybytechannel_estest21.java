@@ -1,24 +1,38 @@
 package org.apache.commons.compress.utils;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.SeekableByteChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SeekableInMemoryByteChannel_ESTestTest21 extends SeekableInMemoryByteChannel_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SeekableInMemoryByteChannel} class.
+ */
+public class SeekableInMemoryByteChannelTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(1);
-        ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(1);
-        seekableInMemoryByteChannel0.read(byteBuffer0);
-        seekableInMemoryByteChannel0.truncate((byte) 0);
-        assertEquals(0L, seekableInMemoryByteChannel0.size());
+    /**
+     * Verifies that truncating a channel to zero correctly sets its size,
+     * even after the internal position has been advanced by a read operation.
+     */
+    @Test
+    public void truncateToZeroSetsSizeToZeroAfterPositionIsAdvanced() throws IOException {
+        // Arrange: Create a channel with an initial size of 1 byte.
+        final int initialSize = 1;
+        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel(initialSize);
+        assertEquals("Initial channel size should be 1.", initialSize, channel.size());
+
+        // Act: Advance the position by reading the entire channel. This ensures
+        // that the truncate operation is independent of the current position.
+        ByteBuffer buffer = ByteBuffer.allocate(initialSize);
+        channel.read(buffer);
+        assertEquals("Position should be at the end after reading.", initialSize, channel.position());
+
+        // Act: Truncate the channel to a size of 0.
+        channel.truncate(0);
+
+        // Assert: The channel's size should now be 0.
+        assertEquals("Channel size should be 0 after truncation.", 0L, channel.size());
     }
 }
