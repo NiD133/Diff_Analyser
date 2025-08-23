@@ -2,26 +2,41 @@ package org.jfree.data.flow;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.HijrahEra;
-import java.util.List;
-import java.util.Set;
-import javax.swing.Icon;
-import javax.swing.JLayeredPane;
-import javax.swing.JRadioButtonMenuItem;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class DefaultFlowDataset_ESTestTest38 extends DefaultFlowDataset_ESTest_scaffolding {
+/**
+ * This test class provides an improved version of a generated test case
+ * for the {@link DefaultFlowDataset} class.
+ */
+public class DefaultFlowDataset_ESTestTest38 {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
-        Integer integer0 = JLayeredPane.DRAG_LAYER;
-        NodeKey<Integer> nodeKey0 = new NodeKey<Integer>((-1567), integer0);
-        defaultFlowDataset0.setNodeProperty(nodeKey0, "", defaultFlowDataset0);
-        defaultFlowDataset0.setNodeProperty(nodeKey0, "", nodeKey0);
-        assertEquals((-1567), nodeKey0.getStage());
+    /**
+     * Verifies that calling {@code setNodeProperty} for an existing property
+     * key overwrites the previous value.
+     *
+     * The original test for this behavior was difficult to understand due to
+     * meaningless variable names and obscure constants (e.g., from Swing).
+     * More importantly, its assertion was incorrect, as it tested a property
+     * of the input key rather than the state of the dataset after the method
+     * call. This revised test corrects these issues.
+     */
+    @Test
+    public void setNodeProperty_whenCalledTwiceForSameKey_overwritesValue() {
+        // Arrange: Create a dataset and define a node, a property key,
+        // and two distinct values for that property.
+        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
+        NodeKey<Integer> nodeKey = new NodeKey<>(0, 100); // A simple, representative node key
+        String propertyKey = "name";
+        String initialValue = "Initial Node Name";
+        String updatedValue = "Updated Node Name";
+
+        // Act: Set the property twice with the two different values.
+        dataset.setNodeProperty(nodeKey, propertyKey, initialValue);
+        dataset.setNodeProperty(nodeKey, propertyKey, updatedValue);
+
+        // Assert: Verify that the value retrieved from the dataset is the
+        // second (updated) value, confirming the overwrite behavior.
+        Object retrievedValue = dataset.getNodeProperty(nodeKey, propertyKey);
+        assertEquals("The property value should have been overwritten by the second call.",
+                updatedValue, retrievedValue);
     }
 }
