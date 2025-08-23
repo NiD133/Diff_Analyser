@@ -1,22 +1,35 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class ByteArrayBuilder_ESTestTest12 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteArrayBuilder} class.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        JsonRecyclerPools.NonRecyclingPool jsonRecyclerPools_NonRecyclingPool0 = JsonRecyclerPools.NonRecyclingPool.GLOBAL;
-        BufferRecycler bufferRecycler0 = jsonRecyclerPools_NonRecyclingPool0.acquirePooled();
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder(bufferRecycler0);
-        byteArrayBuilder0.setCurrentSegmentLength(2);
-        int int0 = byteArrayBuilder0.getCurrentSegmentLength();
-        assertEquals(2, byteArrayBuilder0.size());
-        assertEquals(2, int0);
+    /**
+     * Verifies that setting the current segment's length correctly updates both
+     * the reported segment length and the builder's total size.
+     *
+     * This is important for scenarios where the builder's internal buffer is
+     * manipulated directly and the builder needs to be informed of the new size.
+     */
+    @Test
+    public void setCurrentSegmentLength_ShouldUpdateBothSegmentLengthAndTotalSize() {
+        // Arrange: Create a new ByteArrayBuilder. The default constructor is sufficient.
+        ByteArrayBuilder builder = new ByteArrayBuilder();
+        final int newLength = 100;
+
+        // Act: Manually set the length of the current data segment.
+        builder.setCurrentSegmentLength(newLength);
+
+        // Assert: Check that both the current segment length and the total size
+        // are updated to the specified value.
+        assertEquals("The current segment length should be updated to the new value.",
+                newLength, builder.getCurrentSegmentLength());
+
+        assertEquals("The total size of the builder should reflect the new segment length.",
+                newLength, builder.size());
     }
 }
