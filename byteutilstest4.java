@@ -1,28 +1,29 @@
 package org.apache.commons.compress.utils;
 
 import static org.apache.commons.compress.utils.ByteUtils.fromLittleEndian;
-import static org.apache.commons.compress.utils.ByteUtils.toLittleEndian;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.util.Arrays;
-import org.apache.commons.compress.utils.ByteUtils.InputStreamByteSupplier;
-import org.apache.commons.compress.utils.ByteUtils.OutputStreamByteConsumer;
+
 import org.junit.jupiter.api.Test;
 
-public class ByteUtilsTestTest4 {
+/**
+ * Tests for {@link ByteUtils}.
+ */
+class ByteUtilsTest {
 
     @Test
-    void testFromLittleEndianFromArrayOneArgUnsignedInt32() {
-        final byte[] b = { 2, 3, 4, (byte) 128 };
-        assertEquals(2 + 3 * 256 + 4 * 256 * 256 + 128L * 256 * 256 * 256, fromLittleEndian(b));
+    void fromLittleEndianShouldCorrectlyDecodeUnsigned32BitValue() {
+        // Arrange
+        // This byte array represents the 32-bit number 0x80040302 in little-endian format.
+        // The most significant byte (0x80) makes the value larger than Integer.MAX_VALUE,
+        // testing the method's ability to handle unsigned 32-bit integers correctly.
+        final byte[] littleEndianBytes = {0x02, 0x03, 0x04, (byte) 0x80};
+        final long expectedValue = 0x80040302L;
+
+        // Act
+        final long actualValue = fromLittleEndian(littleEndianBytes);
+
+        // Assert
+        assertEquals(expectedValue, actualValue,
+            "The decoded long should match the expected little-endian value.");
     }
 }
