@@ -1,41 +1,68 @@
 package org.jfree.chart.block;
 
-import org.jfree.chart.TestUtils;
-import org.jfree.data.Range;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class GridArrangementTestTest1 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-    private static final double EPSILON = 0.000000001;
-
-    private BlockContainer createTestContainer1() {
-        Block b1 = new EmptyBlock(10, 11);
-        Block b2 = new EmptyBlock(20, 22);
-        Block b3 = new EmptyBlock(30, 33);
-        BlockContainer result = new BlockContainer(new GridArrangement(1, 3));
-        result.add(b1);
-        result.add(b2);
-        result.add(b3);
-        return result;
-    }
+/**
+ * Unit tests for the {@link GridArrangement} class.
+ */
+class GridArrangementTest {
 
     /**
-     * Confirm that the equals() method can distinguish all the required fields.
+     * Tests for the equals() method, ensuring it adheres to the general contract.
      */
-    @Test
-    public void testEquals() {
-        GridArrangement f1 = new GridArrangement(11, 22);
-        GridArrangement f2 = new GridArrangement(11, 22);
-        assertEquals(f1, f2);
-        assertEquals(f2, f1);
-        f1 = new GridArrangement(33, 22);
-        assertNotEquals(f1, f2);
-        f2 = new GridArrangement(33, 22);
-        assertEquals(f1, f2);
-        f1 = new GridArrangement(33, 44);
-        assertNotEquals(f1, f2);
-        f2 = new GridArrangement(33, 44);
-        assertEquals(f1, f2);
+    @Nested
+    @DisplayName("equals() contract")
+    class EqualsContract {
+
+        @Test
+        @DisplayName("An object should be equal to itself")
+        void testEquals_Reflexive() {
+            GridArrangement arrangement = new GridArrangement(10, 20);
+            assertEquals(arrangement, arrangement);
+        }
+
+        @Test
+        @DisplayName("Two arrangements with the same rows and columns should be equal")
+        void testEquals_Symmetric() {
+            GridArrangement arrangement1 = new GridArrangement(10, 20);
+            GridArrangement arrangement2 = new GridArrangement(10, 20);
+            assertEquals(arrangement1, arrangement2, "Arrangements with same dimensions should be equal.");
+            assertEquals(arrangement2, arrangement1, "Equality should be symmetric.");
+        }
+
+        @Test
+        @DisplayName("An arrangement should not be equal to null")
+        void testEquals_withNull() {
+            GridArrangement arrangement = new GridArrangement(10, 20);
+            assertNotEquals(null, arrangement);
+        }
+
+        @Test
+        @DisplayName("An arrangement should not be equal to an object of a different type")
+        void testEquals_withDifferentObjectType() {
+            GridArrangement arrangement = new GridArrangement(10, 20);
+            assertNotEquals(arrangement, new Object());
+        }
+
+        @Test
+        @DisplayName("Two arrangements with different row counts should not be equal")
+        void testEquals_whenRowsDiffer() {
+            GridArrangement arrangement1 = new GridArrangement(10, 20);
+            GridArrangement arrangement2 = new GridArrangement(99, 20);
+            assertNotEquals(arrangement1, arrangement2);
+        }
+
+        @Test
+        @DisplayName("Two arrangements with different column counts should not be equal")
+        void testEquals_whenColumnsDiffer() {
+            GridArrangement arrangement1 = new GridArrangement(10, 20);
+            GridArrangement arrangement2 = new GridArrangement(10, 99);
+            assertNotEquals(arrangement1, arrangement2);
+        }
     }
 }
