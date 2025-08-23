@@ -1,42 +1,30 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
-import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+// The test class name is from the original. In a real-world scenario, 
+// this would be renamed to something like W3CDomTest.
 public class W3CDom_ESTestTest42 extends W3CDom_ESTest_scaffolding {
 
+    /**
+     * Verifies that the namespace-aware setting of a W3CDom instance can be configured.
+     * The test confirms the default state is namespace-aware (true) and then checks
+     * that calling `namespaceAware(false)` successfully changes the state.
+     */
     @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        assertTrue(w3CDom0.namespaceAware());
-        Element element0 = new Element("jsoupSource", "jsoupSource");
-        element0.addClass("jsoupSource");
-        W3CDom w3CDom1 = w3CDom0.namespaceAware(false);
-        w3CDom1.fromJsoup(element0);
-        assertFalse(w3CDom0.namespaceAware());
+    public void namespaceAwareCanBeDisabled() {
+        // Arrange: Create a new W3CDom instance.
+        W3CDom w3cDom = new W3CDom();
+
+        // Assert: Verify the default state is namespace-aware.
+        assertTrue("W3CDom should be namespace-aware by default.", w3cDom.namespaceAware());
+
+        // Act: Disable namespace awareness. The method returns 'this' for chaining.
+        w3cDom.namespaceAware(false);
+
+        // Assert: Verify the state has been updated.
+        assertFalse("The namespace-aware setting should be updated to false.", w3cDom.namespaceAware());
     }
 }
