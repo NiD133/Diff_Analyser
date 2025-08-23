@@ -1,54 +1,34 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
+
 import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TextHelpAppendable_ESTestTest41 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Tests for the {@link TextHelpAppendable} class, focusing on edge cases for its methods.
+ */
+public class TextHelpAppendableTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        Stack<String> stack0 = new Stack<String>();
-        stack0.add("");
-        Stack<TextStyle> stack1 = new Stack<TextStyle>();
-        // Undeclared exception!
-        try {
-            textHelpAppendable0.makeColumnQueues(stack0, stack1);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // Array index out of range: 0
-            //
-            verifyException("java.util.Vector", e);
-        }
+    /**
+     * Verifies that makeColumnQueues throws an ArrayIndexOutOfBoundsException when the
+     * list of styles is shorter than the list of column data. The method is expected
+     * to access a style for each data item, which fails if the lists are mismatched.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void makeColumnQueuesShouldThrowExceptionWhenStylesListIsShorterThanDataList() {
+        // Arrange: Create a TextHelpAppendable instance and prepare input lists where
+        // the number of data columns (1) is greater than the number of styles (0).
+        // A StringWriter is used to prevent the test from writing to System.out.
+        TextHelpAppendable textHelpAppendable = new TextHelpAppendable(new StringWriter());
+        List<String> columnData = Collections.singletonList("some-column-data");
+        List<TextStyle> styles = Collections.emptyList();
+
+        // Act: Call the method under test with the mismatched lists.
+        textHelpAppendable.makeColumnQueues(columnData, styles);
+
+        // Assert: The test will pass only if the expected ArrayIndexOutOfBoundsException
+        // is thrown, which is handled by the @Test(expected=...) annotation.
     }
 }
