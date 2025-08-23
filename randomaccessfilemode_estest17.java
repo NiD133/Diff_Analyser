@@ -1,38 +1,24 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileMode_ESTestTest17 extends RandomAccessFileMode_ESTest_scaffolding {
+/**
+ * Tests for the {@link RandomAccessFileMode#create(String)} method.
+ */
+public class RandomAccessFileModeTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_ONLY;
-        // Undeclared exception!
-        try {
-            randomAccessFileMode0.create((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.evosuite.runtime.mock.java.io.MockRandomAccessFile", e);
-        }
+    /**
+     * Tests that {@link RandomAccessFileMode#create(String)} throws a NullPointerException
+     * when the provided file path is null. The specific mode used (e.g., READ_ONLY)
+     * should not affect this behavior.
+     */
+    @Test(expected = NullPointerException.class)
+    public void createWithStringShouldThrowNullPointerExceptionForNullPath() {
+        // Arrange
+        final RandomAccessFileMode mode = RandomAccessFileMode.READ_ONLY;
+
+        // Act: Call the method under test with a null argument.
+        // Assert: The @Test(expected) annotation asserts that a NullPointerException is thrown.
+        mode.create((String) null);
     }
 }
