@@ -1,29 +1,42 @@
 package org.jfree.chart.urls;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotSame;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultKeyedValues2DDataset;
-import org.junit.runner.RunWith;
 
-public class CustomCategoryURLGenerator_ESTestTest26 extends CustomCategoryURLGenerator_ESTest_scaffolding {
+/**
+ * Tests for the {@link CustomCategoryURLGenerator} class, focusing on the
+ * behavior of the equals() and clone() methods.
+ */
+public class CustomCategoryURLGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
-        CustomCategoryURLGenerator customCategoryURLGenerator1 = (CustomCategoryURLGenerator) customCategoryURLGenerator0.clone();
-        assertTrue(customCategoryURLGenerator1.equals((Object) customCategoryURLGenerator0));
-        Vector<String> vector0 = new Vector<String>();
-        customCategoryURLGenerator1.addURLSeries(vector0);
-        boolean boolean0 = customCategoryURLGenerator0.equals(customCategoryURLGenerator1);
-        assertFalse(boolean0);
-        assertFalse(customCategoryURLGenerator1.equals((Object) customCategoryURLGenerator0));
+    /**
+     * Verifies that the equals() method returns false after a cloned
+     * CustomCategoryURLGenerator is modified. The original object and the
+     * modified clone should no longer be considered equal.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenClonedObjectIsModified() throws CloneNotSupportedException {
+        // Arrange: Create an instance and its clone.
+        CustomCategoryURLGenerator originalGenerator = new CustomCategoryURLGenerator();
+        CustomCategoryURLGenerator clonedGenerator = (CustomCategoryURLGenerator) originalGenerator.clone();
+
+        // Sanity checks: Ensure the clone is a different object but is initially equal.
+        assertNotSame("The clone should be a different object in memory.", originalGenerator, clonedGenerator);
+        assertTrue("A fresh clone should be equal to the original object.", clonedGenerator.equals(originalGenerator));
+
+        // Act: Modify the cloned instance by adding a new URL series.
+        List<String> newUrlSeries = new ArrayList<>();
+        clonedGenerator.addURLSeries(newUrlSeries);
+
+        // Assert: The original and the modified clone should no longer be equal.
+        assertFalse("Original should not be equal to the modified clone.",
+                    originalGenerator.equals(clonedGenerator));
+        assertFalse("Modified clone should not be equal to the original (testing symmetry).",
+                    clonedGenerator.equals(originalGenerator));
     }
 }
