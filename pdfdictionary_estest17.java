@@ -1,35 +1,26 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class PdfDictionary_ESTestTest17 extends PdfDictionary_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link PdfDictionary} class.
+ */
+public class PdfDictionaryTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        PdfDictionary pdfDictionary0 = new PdfDictionary();
-        // Undeclared exception!
-        try {
-            pdfDictionary0.mergeDifferent((PdfDictionary) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.PdfDictionary", e);
-        }
+    /**
+     * Verifies that the mergeDifferent() method throws a NullPointerException
+     * when a null dictionary is passed as an argument. This is the expected
+     * behavior to prevent merging with a non-existent object.
+     */
+    @Test(expected = NullPointerException.class)
+    public void mergeDifferent_withNullArgument_shouldThrowNullPointerException() {
+        // Arrange: Create an instance of the class under test.
+        PdfDictionary dictionary = new PdfDictionary();
+
+        // Act: Call the method with a null argument, which is expected to throw an exception.
+        dictionary.mergeDifferent(null);
+
+        // Assert: The test passes if a NullPointerException is thrown,
+        // as specified by the @Test(expected=...) annotation.
     }
 }
