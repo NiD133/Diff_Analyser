@@ -1,30 +1,44 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QuotedPrintableCodec_ESTestTest65 extends QuotedPrintableCodec_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test64() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec();
+/**
+ * Contains tests for the {@link QuotedPrintableCodec} class, focusing on decoding behavior.
+ */
+public class QuotedPrintableCodecTest {
+
+    /**
+     * Tests that the decode method throws a DecoderException when the input string
+     * ends with an incomplete escape sequence (a lone '=' character). According to
+     * RFC 1521, an '=' must be followed by two hexadecimal digits.
+     */
+    @Test
+    public void decodeShouldThrowExceptionForStringEndingWithIncompleteEscapeSequence() {
+        // Arrange
+        QuotedPrintableCodec codec = new QuotedPrintableCodec();
+        // This input is invalid because it ends with the escape character '=',
+        // which is not followed by the required two hexadecimal digits.
+        String invalidQuotedPrintableString = "|ZA, Gnd<#@c1f|=";
+
         try {
-            quotedPrintableCodec0.decode("|ZA, Gnd<#@c1f|=", "|ZA, Gnd<#@c1f|=");
-            fail("Expecting exception: Exception");
-        } catch (Exception e) {
-            //
-            // Invalid quoted-printable encoding
-            //
-            verifyException("org.apache.commons.codec.net.QuotedPrintableCodec", e);
+            // Act: Attempt to decode the invalid string.
+            // A valid charset is used to demonstrate that the error is in the input
+            // string's format, not the charset.
+            codec.decode(invalidQuotedPrintableString, "UTF-8");
+            fail("Expected a DecoderException to be thrown due to the incomplete escape sequence.");
+        } catch (DecoderException e) {
+            // Assert: Verify that the correct exception was thrown with the expected message.
+            assertEquals("Invalid quoted-printable encoding", e.getMessage());
+        } catch (UnsupportedEncodingException e) {
+            // This exception would indicate a problem with the test setup (e.g., an invalid charset),
+            // not the logic under test.
+            fail("Test configuration error: UTF-8 encoding should be supported.");
         }
     }
 }
