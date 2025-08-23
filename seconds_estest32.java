@@ -1,26 +1,35 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class Seconds_ESTestTest32 extends Seconds_ESTest_scaffolding {
+/**
+ * A test suite for the Seconds class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        Seconds seconds0 = Seconds.MAX_VALUE;
-        // Undeclared exception!
+    /**
+     * Verifies that adding two Seconds instances whose sum would exceed
+     * Integer.MAX_VALUE correctly throws an ArithmeticException.
+     */
+    @Test
+    public void plus_whenResultOverflows_throwsArithmeticException() {
+        // Arrange: Define the test inputs. We use Seconds.MAX_VALUE to test the overflow boundary.
+        Seconds maxSeconds = Seconds.MAX_VALUE;
+
+        // Act & Assert: Attempt the operation and verify the expected exception.
         try {
-            seconds0.plus(seconds0);
-            fail("Expecting exception: ArithmeticException");
+            // This operation should cause an integer overflow.
+            maxSeconds.plus(maxSeconds);
+            
+            // If we reach this line, the test fails because no exception was thrown.
+            fail("Expected an ArithmeticException to be thrown for integer overflow.");
         } catch (ArithmeticException e) {
-            //
-            // The calculation caused an overflow: 2147483647 + 2147483647
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
+            // Verify that the exception is the one we expect and that its message
+            // clearly indicates an overflow, confirming the cause of the failure.
+            String expectedMessage = "The calculation caused an overflow: 2147483647 + 2147483647";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
