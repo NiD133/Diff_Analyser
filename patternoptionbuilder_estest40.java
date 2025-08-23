@@ -1,17 +1,29 @@
 package org.apache.commons.cli;
 
+import static org.junit.Assert.assertNull;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PatternOptionBuilder_ESTestTest40 extends PatternOptionBuilder_ESTest_scaffolding {
+/**
+ * Tests for {@link PatternOptionBuilder}.
+ */
+public class PatternOptionBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        Class<?> class0 = PatternOptionBuilder.getValueType('2');
-        assertNull(class0);
+    /**
+     * Tests that getValueType() returns null for a character that is not a
+     * recognized value code.
+     */
+    @Test
+    public void getValueTypeShouldReturnNullForUnrecognizedCode() {
+        // Arrange
+        // The character '2' is not a special code representing a value type
+        // like '@' (Object), ':' (String), or '%' (Number).
+        final char unrecognizedCode = '2';
+
+        // Act
+        final Class<?> valueType = PatternOptionBuilder.getValueType(unrecognizedCode);
+
+        // Assert
+        assertNull("The returned type for an unrecognized code should be null.", valueType);
     }
 }
