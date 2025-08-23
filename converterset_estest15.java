@@ -1,34 +1,39 @@
 package org.joda.time.convert;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Hours;
-import org.joda.time.Interval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.Seconds;
-import org.joda.time.chrono.CopticChronology;
-import org.junit.runner.RunWith;
 
-public class ConverterSet_ESTestTest15 extends ConverterSet_ESTest_scaffolding {
+/**
+ * This test class has been improved for understandability.
+ * The original test was auto-generated and tested an edge case of the ConverterSet.add method.
+ * This version focuses on making the test's purpose clear and easy to maintain.
+ */
+public class ConverterSetTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        StringConverter stringConverter0 = StringConverter.INSTANCE;
-        Converter[] converterArray0 = new Converter[0];
-        ConverterSet converterSet0 = new ConverterSet(converterArray0);
-        // Undeclared exception!
-        try {
-            converterSet0.add(stringConverter0, converterArray0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 0
-            //
-            verifyException("org.joda.time.convert.ConverterSet", e);
-        }
+    /**
+     * Verifies that the add() method throws an ArrayIndexOutOfBoundsException
+     * if the 'removed' array parameter is too small (e.g., size 0) to hold
+     * a potentially replaced converter.
+     *
+     * The 'removed' array is an output parameter designed to hold a converter
+     * that is replaced during the add operation. If it's non-null, the implementation
+     * will attempt to write to its first element (index 0).
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void add_withEmptyRemovedArray_shouldThrowArrayIndexOutOfBoundsException() {
+        // Arrange
+        // Create an empty ConverterSet.
+        ConverterSet emptySet = new ConverterSet(new Converter[0]);
+
+        // The converter we intend to add.
+        Converter converterToAdd = StringConverter.INSTANCE;
+
+        // The 'removed' array is intentionally created with size 0. The add method
+        // will attempt to write to removed[0], which will cause the exception.
+        Converter[] emptyRemovedArray = new Converter[0];
+
+        // Act & Assert
+        // This call is expected to throw an ArrayIndexOutOfBoundsException because
+        // the 'emptyRemovedArray' cannot be written to.
+        emptySet.add(converterToAdd, emptyRemovedArray);
     }
 }
