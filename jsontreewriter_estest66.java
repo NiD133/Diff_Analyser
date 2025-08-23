@@ -1,26 +1,27 @@
 package com.google.gson.internal.bind;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeWriter_ESTestTest66 extends JsonTreeWriter_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterTest {
 
-    @Test(timeout = 4000)
-    public void test65() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.beginArray();
-        jsonTreeWriter0.endArray();
-        JsonElement jsonElement0 = jsonTreeWriter0.get();
-        assertFalse(jsonElement0.isJsonNull());
+    @Test
+    public void get_afterWritingEmptyArray_returnsJsonArray() {
+        // Arrange
+        JsonTreeWriter writer = new JsonTreeWriter();
+
+        // Act
+        writer.beginArray();
+        writer.endArray();
+        JsonElement result = writer.get();
+
+        // Assert
+        JsonArray expected = new JsonArray();
+        assertEquals(expected, result);
     }
 }
