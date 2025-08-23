@@ -1,27 +1,33 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
+import java.util.Iterator;
 import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.*;
 
-public class LinkedTreeMap_ESTestTest72 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * This test class contains tests for the LinkedTreeMap class.
+ * This specific test focuses on the behavior of the KeySet iterator.
+ */
+public class LinkedTreeMapTest {
 
-    @Test(timeout = 4000)
-    public void test71() throws Throwable {
-        Comparator<Integer> comparator0 = (Comparator<Integer>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>(comparator0, true);
-        LinkedTreeMap.KeySet linkedTreeMap_KeySet0 = linkedTreeMap0.new KeySet();
-        linkedTreeMap_KeySet0.iterator();
-        assertEquals(0, linkedTreeMap_KeySet0.size());
+    /**
+     * Verifies that calling iterator() on the keySet of an empty map
+     * returns a valid, empty iterator.
+     */
+    @Test
+    public void keySetIterator_onEmptyMap_returnsEmptyIterator() {
+        // Arrange: Create an empty LinkedTreeMap and get its key set.
+        LinkedTreeMap<String, Integer> map = new LinkedTreeMap<>();
+        Set<String> keySet = map.keySet();
+
+        // Act: Get an iterator from the key set.
+        Iterator<String> iterator = keySet.iterator();
+
+        // Assert: The iterator should be non-null and have no elements.
+        // The key set itself should remain empty.
+        assertNotNull("The iterator should not be null.", iterator);
+        assertFalse("The iterator for an empty set should not have a next element.", iterator.hasNext());
+        assertEquals("The size of the key set should be 0.", 0, keySet.size());
     }
 }
