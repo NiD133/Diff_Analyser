@@ -1,48 +1,34 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.ThaiBuddhistDate;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockThaiBuddhistDate;
-import org.junit.runner.RunWith;
 
-public class DayOfYear_ESTestTest22 extends DayOfYear_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        DayOfYear dayOfYear0 = DayOfYear.now();
-        ChronoField chronoField0 = ChronoField.CLOCK_HOUR_OF_AMPM;
-        boolean boolean0 = dayOfYear0.isSupported(chronoField0);
-        assertEquals(45, dayOfYear0.getValue());
-        assertFalse(boolean0);
+/**
+ * Unit tests for {@link DayOfYear}.
+ */
+public class DayOfYearTest {
+
+    /**
+     * Tests that isSupported() returns false for fields that are not
+     * related to the day-of-year, such as time-based fields.
+     */
+    @Test
+    public void isSupported_shouldReturnFalse_forUnsupportedTimeBasedField() {
+        // Arrange: Create a DayOfYear instance and select an unsupported field.
+        // Using a fixed value like 150 makes the test deterministic, unlike DayOfYear.now().
+        DayOfYear dayOfYear = DayOfYear.of(150);
+        TemporalField unsupportedField = ChronoField.CLOCK_HOUR_OF_AMPM;
+
+        // Act: Check if the field is supported.
+        boolean isSupported = dayOfYear.isSupported(unsupportedField);
+
+        // Assert: The time-based field should not be supported.
+        assertFalse(
+            "DayOfYear should not support time-based fields like CLOCK_HOUR_OF_AMPM.",
+            isSupported
+        );
     }
 }
