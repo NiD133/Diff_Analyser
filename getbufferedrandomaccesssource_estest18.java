@@ -1,29 +1,36 @@
 package com.itextpdf.text.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GetBufferedRandomAccessSource_ESTestTest18 extends GetBufferedRandomAccessSource_ESTest_scaffolding {
+/**
+ * Tests for the {@link GetBufferedRandomAccessSource} class.
+ */
+class GetBufferedRandomAccessSourceTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        MappedChannelRandomAccessSource mappedChannelRandomAccessSource0 = new MappedChannelRandomAccessSource((FileChannel) null, 1760L, 1760L);
-        GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(mappedChannelRandomAccessSource0);
-        try {
-            getBufferedRandomAccessSource0.get(1760L);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // RandomAccessSource not opened
-            //
-            verifyException("com.itextpdf.text.io.MappedChannelRandomAccessSource", e);
-        }
+    /**
+     * Verifies that when the underlying source is not open, any attempt to read from it
+     * via GetBufferedRandomAccessSource propagates the resulting IOException.
+     */
+    @Test
+    void get_whenUnderlyingSourceIsUnopened_throwsIOException() {
+        // Arrange: Create a source that simulates an unopened state by passing a null FileChannel.
+        // This is a dependency of the class under test.
+        RandomAccessSource unopenedSource = new MappedChannelRandomAccessSource(null, 0L, 0L);
+        GetBufferedRandomAccessSource bufferedSource = new GetBufferedRandomAccessSource(unopenedSource);
+
+        // Act & Assert: Verify that calling get() throws the expected IOException.
+        IOException thrownException = assertThrows(
+            IOException.class,
+            () -> bufferedSource.get(0L),
+            "An IOException should be thrown when the underlying source is not open."
+        );
+
+        // Further Assert: Check the exception message to confirm it originates from the underlying source.
+        assertEquals("RandomAccessSource not opened", thrownException.getMessage());
     }
 }
