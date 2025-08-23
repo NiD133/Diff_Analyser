@@ -1,18 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class Weeks_ESTestTest39 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        Weeks weeks0 = Weeks.MIN_VALUE;
-        boolean boolean0 = weeks0.isLessThan((Weeks) null);
-        assertTrue(boolean0);
+    /**
+     * Tests that isLessThan() treats a null argument as a zero-value Weeks instance.
+     * According to the method's contract, comparing any negative Weeks value to null
+     * should return true.
+     */
+    @Test
+    public void isLessThan_withNullArgument_shouldBeTreatedAsComparingToZero() {
+        // Arrange: A Weeks instance with the minimum possible (negative) value.
+        Weeks minValueWeeks = Weeks.MIN_VALUE;
+
+        // Act: Compare the negative Weeks value to null.
+        boolean result = minValueWeeks.isLessThan(null);
+
+        // Assert: The result must be true, because MIN_VALUE is less than zero.
+        assertTrue("A negative Weeks value should be less than null (which is treated as zero).", result);
     }
 }
