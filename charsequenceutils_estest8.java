@@ -1,23 +1,33 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * This test suite contains tests for the {@link CharSequenceUtils} class.
+ * This specific test case focuses on the behavior of the lastIndexOf method.
+ */
 public class CharSequenceUtils_ESTestTest8 extends CharSequenceUtils_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        StringBuffer stringBuffer0 = new StringBuffer();
-        StringBuilder stringBuilder0 = new StringBuilder(stringBuffer0);
-        stringBuilder0.insert(0, "6KY>-,V");
-        char[] charArray0 = new char[20];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        int int0 = CharSequenceUtils.lastIndexOf(charBuffer0, stringBuilder0, 2750);
-        assertEquals((-1), int0);
+    /**
+     * Tests that {@code CharSequenceUtils.lastIndexOf} returns -1 when the search
+     * sequence is not found within the text, particularly when the provided
+     * starting index is greater than the length of the text being searched.
+     */
+    @Test
+    public void lastIndexOf_shouldReturnNotFound_whenSearchStringIsAbsentAndStartIndexIsOutOfBounds() {
+        // Arrange
+        final CharSequence textToSearch = "A simple string to search within.";
+        final CharSequence searchSequence = "nonexistent";
+
+        // Use a starting index that is intentionally out of the text's bounds.
+        final int startIndex = textToSearch.length() + 10;
+        final int expectedIndex = -1; // The value indicating "not found".
+
+        // Act
+        final int actualIndex = CharSequenceUtils.lastIndexOf(textToSearch, searchSequence, startIndex);
+
+        // Assert
+        assertEquals("Expected -1 when the search sequence is not found.", expectedIndex, actualIndex);
     }
 }
