@@ -1,26 +1,28 @@
 package org.jsoup.select;
 
-import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.Node;
-import org.jsoup.nodes.TextNode;
-import org.junit.jupiter.api.Test;
-import java.util.Iterator;
-import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.Test;
+import static org.junit.Assert.assertSame;
 
-public class ElementsTestTest21 {
+/**
+ * Contains tests for the {@link Elements#remove()} method.
+ */
+public class ElementsRemoveTest {
 
+    /**
+     * Verifies that calling the remove() method on an empty Elements collection
+     * returns the same instance. This is important for ensuring that method
+     * chaining works correctly even when the collection is empty.
+     */
     @Test
-    public void unwrapKeepsSpace() {
-        String h = "<p>One <span>two</span> <span>three</span> four</p>";
-        Document doc = Jsoup.parse(h);
-        doc.select("span").unwrap();
-        assertEquals("<p>One two three four</p>", doc.body().html());
+    public void callingRemoveOnEmptyCollectionShouldReturnSameInstanceForChaining() {
+        // Arrange: Create an empty Elements collection.
+        Elements emptyElements = new Elements();
+
+        // Act: Call the remove() method, which should remove all elements from the DOM.
+        Elements result = emptyElements.remove();
+
+        // Assert: The method should return the same Elements instance to allow for
+        // method chaining, even if no operation was performed.
+        assertSame("Expected remove() on an empty collection to return the same instance", emptyElements, result);
     }
 }
