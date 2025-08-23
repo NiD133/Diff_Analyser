@@ -1,25 +1,20 @@
 package org.apache.commons.codec.digest;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MurmurHash2_ESTestTest3 extends MurmurHash2_ESTest_scaffolding {
+/**
+ * Tests for the {@link MurmurHash2} class, focusing on edge cases and invalid inputs.
+ */
+public class MurmurHash2Test {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        // Undeclared exception!
-        try {
-            MurmurHash2.hash32((String) null, 1396, 467);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.codec.digest.MurmurHash2", e);
-        }
+    /**
+     * Tests that hash32(String, int, int) throws a NullPointerException
+     * when the input string is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void hash32StringWithRangeShouldThrowNullPointerExceptionForNullInput() {
+        // The specific values for 'from' and 'length' are irrelevant here,
+        // as the method should throw a NullPointerException before using them.
+        MurmurHash2.hash32((String) null, 0, 0);
     }
 }
