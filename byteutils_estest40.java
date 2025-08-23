@@ -1,43 +1,39 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+// The test class structure is preserved from the original.
 public class ByteUtils_ESTestTest40 extends ByteUtils_ESTest_scaffolding {
 
+    /**
+     * Tests that fromLittleEndian throws an IOException when the ByteSupplier
+     * signals an end of data (-1) before the requested number of bytes has been read.
+     */
     @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        ByteUtils.ByteSupplier byteUtils_ByteSupplier0 = mock(ByteUtils.ByteSupplier.class, new ViolatedAssumptionAnswer());
-        doReturn((-1)).when(byteUtils_ByteSupplier0).getAsByte();
+    public void fromLittleEndianWithSupplierShouldThrowIOExceptionOnPrematureEndOfData() throws IOException {
+        // Arrange: Create a mock supplier that immediately signals the end of data.
+        // The contract of ByteSupplier#getAsByte is similar to InputStream#read(),
+        // returning -1 to indicate no more bytes are available.
+        ByteUtils.ByteSupplier mockSupplier = mock(ByteUtils.ByteSupplier.class);
+        when(mockSupplier.getAsByte()).thenReturn(-1);
+
+        // Act & Assert: Attempt to read one byte and verify that the correct exception is thrown.
         try {
-            ByteUtils.fromLittleEndian(byteUtils_ByteSupplier0, 1);
-            fail("Expecting exception: IOException");
+            ByteUtils.fromLittleEndian(mockSupplier, 1);
+            fail("Expected an IOException due to premature end of data, but none was thrown.");
         } catch (IOException e) {
-            //
-            // Premature end of data
-            //
-            verifyException("org.apache.commons.compress.utils.ByteUtils", e);
+            // Verify that the exception has the expected message.
+            assertEquals("Premature end of data", e.getMessage());
         }
+
+        // Verify that the getAsByte() method was indeed called on the supplier.
+        verify(mockSupplier).getAsByte();
     }
 }
