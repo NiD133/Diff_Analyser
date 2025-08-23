@@ -1,36 +1,33 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
 
-public class StringUtil_ESTestTest91 extends StringUtil_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test90() throws Throwable {
-        // Undeclared exception!
+/**
+ * Test suite for the {@link StringUtil} class.
+ */
+public class StringUtilTest {
+
+    /**
+     * Verifies that calling {@link StringUtil#padding(int, int)} with a negative width
+     * throws an {@link IllegalArgumentException}. The method must not accept negative values
+     * for the desired padding width.
+     */
+    @Test
+    public void paddingWithNegativeWidthThrowsIllegalArgumentException() {
+        // Arrange: Define an invalid input and the expected error message.
+        int invalidWidth = -1;
+        String expectedMessage = "width must be >= 0";
+
         try {
-            StringUtil.padding((-766), (-766));
-            fail("Expecting exception: IllegalArgumentException");
+            // Act: Call the method with the invalid input.
+            StringUtil.padding(invalidWidth, 10);
+            fail("Expected an IllegalArgumentException to be thrown for negative width, but it was not.");
         } catch (IllegalArgumentException e) {
-            //
-            // width must be >= 0
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Assert: Verify that the exception has the expected message.
+            assertEquals("The exception message should detail the validation error.", expectedMessage, e.getMessage());
         }
     }
 }
