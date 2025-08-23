@@ -1,45 +1,31 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Month;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.Chronology;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.MinguoDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockMinguoDate;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DayOfMonth_ESTestTest7 extends DayOfMonth_ESTest_scaffolding {
+/**
+ * Tests for the {@link DayOfMonth#compareTo(DayOfMonth)} method.
+ */
+public class DayOfMonthCompareToTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        DayOfMonth dayOfMonth0 = DayOfMonth.now();
-        DayOfMonth dayOfMonth1 = DayOfMonth.of(1);
-        int int0 = dayOfMonth0.compareTo(dayOfMonth1);
-        assertEquals(14, dayOfMonth0.getValue());
-        assertEquals(13, int0);
+    /**
+     * Tests that compareTo returns a positive integer when the first day-of-month
+     * is greater than the second.
+     */
+    @Test
+    public void compareTo_whenDayIsGreaterThanOther_shouldReturnPositiveValue() {
+        // Arrange: Create two DayOfMonth instances, one with a greater value.
+        // The original test was non-deterministic because it used DayOfMonth.now()
+        // and assumed the current day was the 14th. We make this explicit.
+        DayOfMonth day14 = DayOfMonth.of(14);
+        DayOfMonth day1 = DayOfMonth.of(1);
+
+        // Act: Compare the greater day to the lesser day.
+        int comparisonResult = day14.compareTo(day1);
+
+        // Assert: The result should be the positive difference between the two values.
+        // The contract of compareTo is to return a positive integer, and for this class,
+        // it is specifically the difference in days (14 - 1 = 13).
+        assertEquals(13, comparisonResult);
     }
 }
