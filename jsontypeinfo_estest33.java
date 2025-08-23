@@ -2,25 +2,45 @@ package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JsonTypeInfo_ESTestTest33 extends JsonTypeInfo_ESTest_scaffolding {
+/**
+ * This test class focuses on the behavior of the {@link JsonTypeInfo.Value} class.
+ */
+public class JsonTypeInfoValueTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        JsonTypeInfo.Id jsonTypeInfo_Id0 = JsonTypeInfo.Id.MINIMAL_CLASS;
-        JsonTypeInfo.As jsonTypeInfo_As0 = JsonTypeInfo.As.WRAPPER_OBJECT;
-        Class<Object> class0 = Object.class;
-        Boolean boolean0 = Boolean.valueOf("@2LLQRbW9{J2*\"1GY");
-        JsonTypeInfo.Value jsonTypeInfo_Value0 = JsonTypeInfo.Value.construct(jsonTypeInfo_Id0, jsonTypeInfo_As0, "@2LLQRbW9{J2*\"1GY", class0, false, boolean0);
-        JsonTypeInfo.Value jsonTypeInfo_Value1 = jsonTypeInfo_Value0.withDefaultImpl(class0);
-        assertSame(jsonTypeInfo_Value1, jsonTypeInfo_Value0);
-        assertEquals("@2LLQRbW9{J2*\"1GY", jsonTypeInfo_Value1.getPropertyName());
-        assertFalse(jsonTypeInfo_Value1.getIdVisible());
+    /**
+     * Tests that calling {@link JsonTypeInfo.Value#withDefaultImpl(Class)} with the
+     * same class that the object already has does not create a new instance,
+     * but returns the original instance. This is an important optimization for
+     * immutable value objects.
+     */
+    @Test
+    public void withDefaultImpl_whenProvidedSameClass_shouldReturnSameInstance() {
+        // Arrange
+        final Class<?> defaultImplClass = Object.class;
+        final String propertyName = "testProperty";
+
+        // Construct the initial JsonTypeInfo.Value instance
+        JsonTypeInfo.Value originalValue = JsonTypeInfo.Value.construct(
+                JsonTypeInfo.Id.MINIMAL_CLASS,
+                JsonTypeInfo.As.WRAPPER_OBJECT,
+                propertyName,
+                defaultImplClass,
+                false, // idVisible
+                false  // requireTypeIdForSubtypes
+        );
+
+        // Act
+        // Call withDefaultImpl using the same class it was constructed with.
+        JsonTypeInfo.Value resultValue = originalValue.withDefaultImpl(defaultImplClass);
+
+        // Assert
+        // The method should return the same instance, not a new one.
+        assertSame("Expected the same instance when the default implementation class is unchanged",
+                originalValue, resultValue);
+
+        // Sanity checks to ensure other properties are unaffected.
+        assertEquals(propertyName, resultValue.getPropertyName());
+        assertFalse(resultValue.getIdVisible());
     }
 }
