@@ -1,37 +1,29 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class MinutesTestTest15 extends TestCase {
+/**
+ * Unit tests for the {@link Minutes} class, focusing on period conversions.
+ */
+public class MinutesTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    private static final int MINUTES_PER_HOUR = 60;
+    private static final int HOURS_PER_DAY = 24;
+    private static final int DAYS_PER_WEEK = 7;
+    private static final int MINUTES_PER_WEEK = MINUTES_PER_HOUR * HOURS_PER_DAY * DAYS_PER_WEEK;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+    @Test
+    public void toStandardWeeks_forMinutesEquivalentToTwoWeeks_returnsTwoWeeks() {
+        // Arrange
+        final int numberOfWeeks = 2;
+        Minutes minutesToConvert = Minutes.minutes(numberOfWeeks * MINUTES_PER_WEEK);
+        Weeks expectedWeeks = Weeks.weeks(numberOfWeeks);
 
-    public static TestSuite suite() {
-        return new TestSuite(TestMinutes.class);
-    }
+        // Act
+        Weeks actualWeeks = minutesToConvert.toStandardWeeks();
 
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    public void testToStandardWeeks() {
-        Minutes test = Minutes.minutes(60 * 24 * 7 * 2);
-        Weeks expected = Weeks.weeks(2);
-        assertEquals(expected, test.toStandardWeeks());
+        // Assert
+        assertEquals("Conversion from minutes to weeks should be correct", expectedWeeks, actualWeeks);
     }
 }
