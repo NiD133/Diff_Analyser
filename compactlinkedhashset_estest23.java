@@ -1,29 +1,22 @@
 package com.google.common.collect;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
-import java.util.Locale;
-import java.util.Set;
-import java.util.Spliterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CompactLinkedHashSet_ESTestTest23 extends CompactLinkedHashSet_ESTest_scaffolding {
+/**
+ * Tests for {@link CompactLinkedHashSet}.
+ */
+public class CompactLinkedHashSetTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        // Undeclared exception!
+    @Test
+    public void createWithExpectedSize_shouldThrowIllegalArgumentException_whenSizeIsNegative() {
         try {
-            CompactLinkedHashSet.createWithExpectedSize((-1086));
-            fail("Expecting exception: IllegalArgumentException");
+            CompactLinkedHashSet.createWithExpectedSize(-1);
+            fail("Expected an IllegalArgumentException to be thrown for a negative expected size, but it was not.");
         } catch (IllegalArgumentException e) {
-            //
-            // Expected size must be >= 0
-            //
-            verifyException("com.google.common.base.Preconditions", e);
+            assertEquals("Expected size must be >= 0", e.getMessage());
         }
     }
 }
