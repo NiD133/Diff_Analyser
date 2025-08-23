@@ -1,33 +1,46 @@
 package org.apache.ibatis.type;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import java.sql.Array;
-import java.sql.Connection;
-import java.sql.Types;
+import java.sql.SQLException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
-public class ArrayTypeHandlerTestTest7 extends BaseTypeHandlerTest {
+/**
+ * Tests for {@link ArrayTypeHandler} focusing on result retrieval.
+ * This class was renamed from ArrayTypeHandlerTestTest7 for clarity.
+ */
+class ArrayTypeHandlerTest extends BaseTypeHandlerTest {
 
-    private static final TypeHandler<Object> TYPE_HANDLER = new ArrayTypeHandler();
+    private static final TypeHandler<Object> ARRAY_TYPE_HANDLER = new ArrayTypeHandler();
 
     @Mock
-    Array mockArray;
+    private Array mockSqlArray;
 
+    /**
+     * This test verifies that the handler correctly:
+     * 1. Extracts a Java array from a SQL ARRAY retrieved from a ResultSet by column index.
+     * 2. Calls the `free()` method on the SQL ARRAY to release its resources.
+     */
     @Override
     @Test
-    public void shouldGetResultFromResultSetByPosition() throws Exception {
-        when(rs.getArray(1)).thenReturn(mockArray);
-        String[] stringArray = { "a", "b" };
-        when(mockArray.getArray()).thenReturn(stringArray);
-        assertEquals(stringArray, TYPE_HANDLER.getResult(rs, 1));
-        verify(mockArray).free();
+    void shouldGetArrayFromResultSetByIndexAndFreeResource() throws SQLException {
+        // Arrange
+        String[] expectedArray = { "a", "b" };
+        when(rs.getArray(1)).thenReturn(mockSqlArray);
+        when(mockSqlArray.getArray()).thenReturn(expectedArray);
+
+        // Act
+        Object actualResult = ARRAY_TYPE_HANDLER.getResult(rs, 1);
+
+        // Assert
+        // Verify the returned object is the expected Java array
+        assertArrayEquals(expectedArray, (Object[]) actualResult, "The handler should return the correct Java array.");
+
+        // Verify that the handler correctly releases the SQL Array resource after use
+        verify(mockSqlArray).free();
     }
 }
