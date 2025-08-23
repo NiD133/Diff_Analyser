@@ -1,23 +1,33 @@
 package org.apache.commons.codec.net;
 
+import static org.junit.Assert.assertNull;
+
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class RFC1522Codec_ESTestTest4 extends RFC1522Codec_ESTest_scaffolding {
+/**
+ * Tests for the abstract RFC1522Codec class.
+ *
+ * <p>This test suite uses a concrete implementation (QCodec) to test
+ * the functionality provided by the abstract base class.</p>
+ */
+public class RFC1522CodecTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        QCodec qCodec0 = new QCodec();
-        String string0 = qCodec0.decodeText((String) null);
-        assertNull(string0);
+    // A concrete implementation is needed to test the abstract class.
+    private final RFC1522Codec codec = new QCodec();
+
+    /**
+     * Tests that the decodeText method returns null when the input is null.
+     * This is the expected behavior for handling null inputs gracefully.
+     */
+    @Test
+    public void decodeText_withNullInput_shouldReturnNull() throws DecoderException, UnsupportedEncodingException {
+        // Act: Call the method under test with a null input.
+        final String result = codec.decodeText(null);
+
+        // Assert: Verify that the result is null.
+        assertNull("Decoding a null string should result in null.", result);
     }
 }
