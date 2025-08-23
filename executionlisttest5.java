@@ -1,54 +1,46 @@
 package com.google.common.util.concurrent;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-import static java.util.concurrent.Executors.newCachedThreadPool;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import com.google.common.testing.NullPointerTester;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
+import static org.junit.Assert.assertEquals;
+
 import java.util.concurrent.atomic.AtomicInteger;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-public class ExecutionListTestTest5 extends TestCase {
+/** Tests for {@link ExecutionList}. */
+@RunWith(JUnit4.class)
+public class ExecutionListTest {
 
-    private final ExecutionList list = new ExecutionList();
+  private final ExecutionList executionList = new ExecutionList();
 
-    private static final Runnable THROWING_RUNNABLE = new Runnable() {
+  @Test
+  public void execute_withDirectExecutor_executesRunnablesInAdditionOrder() {
+    // Arrange
+    final int numberOfRunnables = 10;
+    final AtomicInteger executionCounter = new AtomicInteger(0);
 
-        @Override
-        public void run() {
-            throw new RuntimeException();
-        }
-    };
-
-    private class MockRunnable implements Runnable {
-
-        final CountDownLatch countDownLatch;
-
-        MockRunnable(CountDownLatch countDownLatch) {
-            this.countDownLatch = countDownLatch;
-        }
-
-        @Override
-        public void run() {
-            countDownLatch.countDown();
-        }
+    for (int i = 0; i < numberOfRunnables; i++) {
+      final int expectedExecutionIndex = i;
+      executionList.add(
+          () -> {
+            // This CAS operation verifies that runnables execute in the correct sequence.
+            // It will only succeed if the counter's current value matches the expected index,
+            // proving that no other runnable has run out of turn.
+            executionCounter.compareAndSet(expectedExecutionIndex, expectedExecutionIndex + 1);
+          },
+          directExecutor());
     }
 
-    public void testOrdering() throws Exception {
-        AtomicInteger integer = new AtomicInteger();
-        for (int i = 0; i < 10; i++) {
-            int expectedCount = i;
-            list.add(new Runnable() {
+    // Act
+    executionList.execute();
 
-                @Override
-                public void run() {
-                    integer.compareAndSet(expectedCount, expectedCount + 1);
-                }
-            }, directExecutor());
-        }
-        list.execute();
-        assertEquals(10, integer.get());
-    }
+    // Assert
+    // If all runnables executed in the correct order, each compareAndSet operation
+    // would have succeeded, and the final count will match the number of runnables added.
+    assertEquals(
+        "All runnables should have executed in the correct order.",
+        numberOfRunnables,
+        executionCounter.get());
+  }
 }
