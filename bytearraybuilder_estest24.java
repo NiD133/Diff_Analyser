@@ -1,26 +1,32 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ByteArrayBuilder_ESTestTest24 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteArrayBuilder} class, focusing on its behavior
+ * under specific initialization conditions.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        ByteArrayBuilder byteArrayBuilder0 = ByteArrayBuilder.fromInitial((byte[]) null, 131050);
-        // Undeclared exception!
-        try {
-            byteArrayBuilder0.write(131050);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.util.ByteArrayBuilder", e);
-        }
+    /**
+     * Verifies that attempting to write to a ByteArrayBuilder that was initialized
+     * with a null internal buffer results in a NullPointerException.
+     *
+     * This scenario is possible through the package-private `fromInitial` factory method,
+     * which allows setting the internal buffer directly.
+     */
+    @Test(expected = NullPointerException.class)
+    public void writeToBuilderWithNullBufferShouldThrowNPE() {
+        // Arrange: Create a ByteArrayBuilder with a null initial buffer.
+        // The `fromInitial` method sets the internal buffer directly. When it's null,
+        // any subsequent write operation is expected to fail.
+        ByteArrayBuilder builder = ByteArrayBuilder.fromInitial(null, 0);
+
+        // Act: Attempt to write a single byte to the builder.
+        builder.write(42);
+
+        // Assert: The test is expected to throw a NullPointerException.
+        // The `expected` parameter of the @Test annotation handles this assertion.
+        // If no exception or a different one is thrown, the test will fail.
     }
 }
