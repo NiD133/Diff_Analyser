@@ -1,23 +1,29 @@
 package com.google.common.collect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
-import java.util.Locale;
-import java.util.Set;
-import java.util.Spliterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CompactLinkedHashSet_ESTestTest4 extends CompactLinkedHashSet_ESTest_scaffolding {
+/**
+ * Tests for {@link CompactLinkedHashSet}.
+ */
+public class CompactLinkedHashSetTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Object[] objectArray0 = new Object[1];
-        CompactLinkedHashSet<Object> compactLinkedHashSet0 = CompactLinkedHashSet.create(objectArray0);
-        compactLinkedHashSet0.resizeEntries(41);
-        assertEquals(1, compactLinkedHashSet0.size());
+    /**
+     * Verifies that resizing the internal data structure of the set does not
+     * alter the number of elements it contains.
+     */
+    @Test
+    public void resizeEntries_whenCapacityIncreases_shouldNotChangeSetSize() {
+        // Arrange: Create a set with a single element.
+        CompactLinkedHashSet<String> set = CompactLinkedHashSet.create("one");
+        assertEquals("Precondition: Set should contain one element", 1, set.size());
+
+        // Act: Resize the internal entries array to a larger capacity.
+        // The specific new capacity is not critical, only that it's different.
+        int newCapacity = 41;
+        set.resizeEntries(newCapacity);
+
+        // Assert: The size of the set should remain unchanged after the resize.
+        assertEquals("Set size should be preserved after resizing", 1, set.size());
     }
 }
