@@ -1,18 +1,30 @@
 package com.google.common.primitives;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SignedBytes_ESTestTest31 extends SignedBytes_ESTest_scaffolding {
+/**
+ * Tests for {@link SignedBytes}.
+ */
+public class SignedBytesTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        int int0 = SignedBytes.compare((byte) 0, (byte) 84);
-        assertEquals((-84), int0);
+    @Test
+    public void compare_shouldReturnNegative_whenFirstArgumentIsSmaller() {
+        // Arrange
+        byte smallerByte = 0;
+        byte largerByte = 84;
+
+        // Act
+        int result = SignedBytes.compare(smallerByte, largerByte);
+
+        // Assert
+        // The general contract is to return a negative value.
+        assertTrue("Expected a negative result when comparing a smaller byte to a larger one.", result < 0);
+
+        // The specific implementation behaves like subtraction.
+        int expectedResult = smallerByte - largerByte; // 0 - 84 = -84
+        assertEquals(expectedResult, result);
     }
 }
