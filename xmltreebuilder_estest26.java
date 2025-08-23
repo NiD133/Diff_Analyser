@@ -1,44 +1,36 @@
 package org.jsoup.parser;
 
+import org.jsoup.nodes.LeafNode;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.CDataNode;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.LeafNode;
-import org.jsoup.select.Elements;
-import org.junit.runner.RunWith;
 
+/**
+ * This class contains tests for the {@link XmlTreeBuilder}.
+ * This specific test was improved for clarity and maintainability.
+ */
 public class XmlTreeBuilder_ESTestTest26 extends XmlTreeBuilder_ESTest_scaffolding {
 
+    /**
+     * Verifies that calling {@link XmlTreeBuilder#insertLeafNode(LeafNode)} with a null argument
+     * correctly throws an {@link IllegalArgumentException}. This ensures the method is robust
+     * against invalid input.
+     */
     @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        Parser parser0 = new Parser(xmlTreeBuilder0);
-        StreamParser streamParser0 = new StreamParser(parser0);
-        Document document0 = parser0.parseInput("class", "class");
-        streamParser0.parseFragment("{FDP|4G0#6", (Element) document0, "_',=~G~eEf3?aX_HU");
-        // Undeclared exception!
+    public void insertLeafNode_withNullNode_throwsIllegalArgumentException() {
+        // Arrange: Create a tree builder and initialize its internal state.
+        // A minimal parse is required to set up the document and ensure the builder's
+        // internal stack has a current element to which a node could be appended.
+        XmlTreeBuilder xmlTreeBuilder = new XmlTreeBuilder();
+        Parser parser = new Parser(xmlTreeBuilder);
+        parser.parseInput("", ""); // Initializes the builder with a document root.
+
+        // Act & Assert: Attempt to insert a null node and verify the expected exception.
         try {
-            xmlTreeBuilder0.insertLeafNode((LeafNode) null);
-            fail("Expecting exception: IllegalArgumentException");
+            xmlTreeBuilder.insertLeafNode(null);
+            fail("Expected an IllegalArgumentException to be thrown for a null node, but no exception was raised.");
         } catch (IllegalArgumentException e) {
-            //
-            // Object must not be null
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Verify that the exception message is correct, as it's part of the method's contract.
+            assertEquals("Object must not be null", e.getMessage());
         }
     }
 }
