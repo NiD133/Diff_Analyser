@@ -1,37 +1,38 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class RandomAccessFileMode_ESTestTest36 extends RandomAccessFileMode_ESTest_scaffolding {
+/**
+ * Tests for the {@link RandomAccessFileMode} enum.
+ */
+public class RandomAccessFileModeTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.valueOfMode("r");
-        try {
-            randomAccessFileMode0.io("r");
-            fail("Expecting exception: FileNotFoundException");
-        } catch (FileNotFoundException e) {
-            //
-            // File does not exist, and RandomAccessFile is not open in write mode
-            //
-            verifyException("org.evosuite.runtime.mock.java.io.MockRandomAccessFile", e);
-        }
+    /**
+     * Tests that attempting to open a non-existent file in read-only ('r') mode
+     * throws a {@link FileNotFoundException}, as this mode does not create files.
+     */
+    @Test
+    public void ioWithReadOnlyModeThrowsExceptionForNonexistentFile() {
+        // Arrange: Define the mode and a file that we know does not exist.
+        final RandomAccessFileMode readOnlyMode = RandomAccessFileMode.READ_ONLY;
+        final String nonExistentFileName = "non_existent_file.txt";
+
+        // Act & Assert: Execute the method and verify that it throws the correct exception.
+        // The 'r' mode is for reading only and will not create a file if it's missing.
+        FileNotFoundException thrown = assertThrows(
+            FileNotFoundException.class,
+            () -> readOnlyMode.io(nonExistentFileName)
+        );
+
+        // Further Assert: Verify the exception message for more specific and robust testing.
+        // The exact message can vary by JVM/OS, so checking for the file name is a good practice.
+        assertTrue(
+            "The exception message should contain the name of the file that was not found.",
+            thrown.getMessage().contains(nonExistentFileName)
+        );
     }
 }
