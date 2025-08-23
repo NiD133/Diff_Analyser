@@ -2,32 +2,39 @@ package com.itextpdf.text.io;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GetBufferedRandomAccessSource_ESTestTest10 extends GetBufferedRandomAccessSource_ESTest_scaffolding {
+/**
+ * This test class focuses on the behavior of GetBufferedRandomAccessSource
+ * when its underlying data source is closed.
+ */
+// The original test class extended an EvoSuite scaffolding class, which is removed
+// here to focus on the core test logic and improve readability.
+public class GetBufferedRandomAccessSource_ESTestTest10 {
 
+    /**
+     * Verifies that attempting to read from a GetBufferedRandomAccessSource
+     * after its underlying source has been closed throws an IllegalStateException.
+     */
     @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        byte[] byteArray0 = new byte[0];
-        ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-        WindowRandomAccessSource windowRandomAccessSource0 = new WindowRandomAccessSource(arrayRandomAccessSource0, (-782L), (-782L));
-        GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(windowRandomAccessSource0);
-        windowRandomAccessSource0.close();
-        // Undeclared exception!
+    public void get_whenUnderlyingSourceIsClosed_throwsIllegalStateException() throws IOException {
+        // Arrange: Create a buffered source that wraps an underlying source.
+        // We use a simple ArrayRandomAccessSource as the base.
+        byte[] emptyData = new byte[0];
+        RandomAccessSource underlyingSource = new ArrayRandomAccessSource(emptyData);
+        GetBufferedRandomAccessSource sourceUnderTest = new GetBufferedRandomAccessSource(underlyingSource);
+
+        // Act: Close the underlying source directly.
+        underlyingSource.close();
+
+        // Assert: Any subsequent read attempt on the wrapper should fail.
         try {
-            getBufferedRandomAccessSource0.get((-2836L), byteArray0, (-1), (-1));
-            fail("Expecting exception: IllegalStateException");
+            // The specific parameters for get() are not critical; any read attempt should fail.
+            sourceUnderTest.get(0L, new byte[10], 0, 1);
+            fail("Expected an IllegalStateException because the underlying source is closed.");
         } catch (IllegalStateException e) {
-            //
-            // Already closed
-            //
-            verifyException("com.itextpdf.text.io.ArrayRandomAccessSource", e);
+            // Verify that the correct exception was thrown with the expected message.
+            assertEquals("Already closed", e.getMessage());
         }
     }
 }
