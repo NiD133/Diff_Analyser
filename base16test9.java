@@ -1,61 +1,65 @@
 package org.apache.commons.codec.binary;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Random;
+
 import org.apache.commons.codec.CodecPolicy;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.Test;
 
-public class Base16TestTest9 {
+/**
+ * Tests for the {@link Base16} class.
+ */
+// Renamed from Base16TestTest9 to a more standard name.
+public class Base16Test {
 
-    private static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
+    // Note: This helper method is not called by the provided test case,
+    // but is improved here assuming it's used by other tests in the same class.
+    /**
+     * Verifies that encoding a slice of a byte array (using offset and length) works correctly.
+     *
+     * @param startPadSize The number of bytes to pad at the beginning of the buffer.
+     * @param endPadSize   The number of bytes to pad at the end of the buffer.
+     */
+    private void verifyEncodeWithBufferOffset(final int startPadSize, final int endPadSize) {
+        // Arrange
+        final String originalString = "Hello World";
+        final String expectedEncodedString = "48656C6C6F20576F726C64";
+        final byte[] originalBytes = StringUtils.getBytesUtf8(originalString);
 
-    private final Random random = new Random();
+        // Create a larger buffer with padding at the start and end.
+        byte[] buffer = ArrayUtils.addAll(new byte[startPadSize], originalBytes);
+        buffer = ArrayUtils.addAll(buffer, new byte[endPadSize]);
+
+        final Base16 base16 = new Base16();
+
+        // Act
+        // Encode only the relevant slice of the buffer, not the padding.
+        final byte[] encodedBytes = base16.encode(buffer, startPadSize, originalBytes.length);
+        final String actualEncodedString = StringUtils.newStringUtf8(encodedBytes);
+
+        // Assert
+        assertEquals(expectedEncodedString, actualEncodedString,
+            "Encoding a slice of a buffer should produce the same result as encoding the original array.");
+    }
 
     /**
-     * @return the random.
+     * Tests that the constructor with `lowerCase=false` and a `STRICT` policy
+     * correctly creates an encoder that produces upper-case hexadecimal strings.
      */
-    public Random getRandom() {
-        return this.random;
-    }
-
-    private void testBase16InBuffer(final int startPasSize, final int endPadSize) {
-        final String content = "Hello World";
-        final String encodedContent;
-        final byte[] bytesUtf8 = StringUtils.getBytesUtf8(content);
-        byte[] buffer = ArrayUtils.addAll(bytesUtf8, new byte[endPadSize]);
-        buffer = ArrayUtils.addAll(new byte[startPasSize], buffer);
-        final byte[] encodedBytes = new Base16().encode(buffer, startPasSize, bytesUtf8.length);
-        encodedContent = StringUtils.newStringUtf8(encodedBytes);
-        assertEquals("48656C6C6F20576F726C64", encodedContent, "encoding hello world");
-    }
-
-    private String toString(final byte[] data) {
-        final StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < data.length; i++) {
-            buf.append(data[i]);
-            if (i != data.length - 1) {
-                buf.append(",");
-            }
-        }
-        return buf.toString();
-    }
-
     @Test
-    void testConstructor_LowerCase_DecodingPolicy() {
+    void testConstructorWithUpperCaseAndStrictPolicyEncodesToUpperCase() {
+        // Arrange
+        final String expectedEncoded = Base16TestData.ENCODED_UTF8_UPPERCASE;
+        // The 'lowerCase' parameter is false, so we expect an upper-case alphabet.
         final Base16 base16 = new Base16(false, CodecPolicy.STRICT);
-        final byte[] encoded = base16.encode(BaseNTestData.DECODED);
-        final String expectedResult = Base16TestData.ENCODED_UTF8_UPPERCASE;
-        final String result = StringUtils.newStringUtf8(encoded);
-        assertEquals(result, expectedResult, "new base16(false, CodecPolicy.STRICT)");
+
+        // Act
+        final byte[] actualEncodedBytes = base16.encode(BaseNTestData.DECODED);
+        final String actualEncodedString = StringUtils.newStringUtf8(actualEncodedBytes);
+
+        // Assert
+        // Standard assertEquals(expected, actual, message) order is used for clarity.
+        assertEquals(expectedEncoded, actualEncodedString,
+            "Encoding with lowerCase=false should produce upper-case hex characters.");
     }
 }
