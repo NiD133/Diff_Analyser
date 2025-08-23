@@ -1,55 +1,52 @@
 package org.apache.commons.io.input;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTimeout;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.BufferedReader;
-import java.io.File;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
+
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.file.TempFile;
 import org.junit.jupiter.api.Test;
 
-public class BoundedReaderTestTest4 {
+/**
+ * Tests for {@link BoundedReader} focusing on its interaction with other Reader implementations.
+ */
+class BoundedReaderTest {
 
-    private static final Duration TIMEOUT = Duration.ofSeconds(10);
+    private static final Duration HANG_TIMEOUT = Duration.ofSeconds(5);
 
-    private static final String STRING_END_NO_EOL = "0\n1\n2";
-
-    private static final String STRING_END_EOL = "0\n1\n2\n";
-
-    private final Reader sr = new BufferedReader(new StringReader("01234567890"));
-
-    private final Reader shortReader = new BufferedReader(new StringReader("01"));
-
-    private void testLineNumberReader(final Reader source) throws IOException {
-        try (LineNumberReader reader = new LineNumberReader(new BoundedReader(source, 10_000_000))) {
-            while (reader.readLine() != null) {
-                // noop
-            }
-        }
-    }
-
-    void testLineNumberReaderAndFileReaderLastLine(final String data) throws IOException {
-        try (TempFile path = TempFile.create(getClass().getSimpleName(), ".txt")) {
-            final File file = path.toFile();
-            FileUtils.write(file, data, StandardCharsets.ISO_8859_1);
-            try (Reader source = Files.newBufferedReader(file.toPath())) {
-                testLineNumberReader(source);
-            }
-        }
-    }
-
+    /**
+     * This test verifies that a {@link BoundedReader} wrapped by a {@link LineNumberReader}
+     * does not cause an infinite loop in {@link LineNumberReader#readLine()}.
+     * <p>
+     * This issue can occur if the underlying stream ends without a newline character (EOL).
+     * The {@link BoundedReader} must correctly propagate the end-of-file (EOF) signal to prevent
+     * the {@link LineNumberReader} from hanging while waiting for a line terminator that will never arrive.
+     * </p>
+     */
     @Test
-    void testLineNumberReaderAndStringReaderLastLineEolNo() {
-        assertTimeout(TIMEOUT, () -> testLineNumberReader(new StringReader(STRING_END_NO_EOL)));
+    void readLineWithLineNumberReaderShouldNotHangOnStreamWithoutTrailingEol() {
+        // Arrange: A multi-line string that does not end with a newline.
+        final String input = "Line 1\nLine 2\nLine 3";
+        final Reader sourceReader = new StringReader(input);
+
+        // The bound is intentionally set larger than the input string length to ensure
+        // that termination is governed by the underlying reader's EOF, not the bound.
+        final int bound = input.length() + 1;
+        final BoundedReader boundedReader = new BoundedReader(sourceReader, bound);
+
+        // Act & Assert: The entire operation should complete without a timeout.
+        assertTimeoutPreemptively(HANG_TIMEOUT, () -> {
+            try (final LineNumberReader lineNumberReader = new LineNumberReader(boundedReader)) {
+                // Read all lines to consume the reader.
+                while (lineNumberReader.readLine() != null) {
+                    // Loop until EOF is reached.
+                }
+                // Verify that the loop terminated after reading the correct number of lines.
+                assertEquals(3, lineNumberReader.getLineNumber(), "Should have read 3 lines before terminating.");
+            }
+        });
     }
 }
