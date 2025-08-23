@@ -1,61 +1,46 @@
 package org.apache.commons.io.input;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTimeout;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.file.TempFile;
 import org.junit.jupiter.api.Test;
 
-public class BoundedReaderTestTest10 {
+/**
+ * Tests for {@link BoundedReader}.
+ */
+public class BoundedReaderTest {
 
-    private static final Duration TIMEOUT = Duration.ofSeconds(10);
-
-    private static final String STRING_END_NO_EOL = "0\n1\n2";
-
-    private static final String STRING_END_EOL = "0\n1\n2\n";
-
-    private final Reader sr = new BufferedReader(new StringReader("01234567890"));
-
-    private final Reader shortReader = new BufferedReader(new StringReader("01"));
-
-    private void testLineNumberReader(final Reader source) throws IOException {
-        try (LineNumberReader reader = new LineNumberReader(new BoundedReader(source, 10_000_000))) {
-            while (reader.readLine() != null) {
-                // noop
-            }
-        }
-    }
-
-    void testLineNumberReaderAndFileReaderLastLine(final String data) throws IOException {
-        try (TempFile path = TempFile.create(getClass().getSimpleName(), ".txt")) {
-            final File file = path.toFile();
-            FileUtils.write(file, data, StandardCharsets.ISO_8859_1);
-            try (Reader source = Files.newBufferedReader(file.toPath())) {
-                testLineNumberReader(source);
-            }
-        }
-    }
-
+    /**
+     * Tests that reading stops at the specified boundary, even if a mark has been set.
+     * The BoundedReader's character limit should always have precedence over the underlying
+     * reader's state or the mark's read-ahead limit.
+     */
     @Test
-    void testMarkResetWithMarkOutsideBoundedReaderMaxAndInitialOffset() throws IOException {
-        try (BoundedReader mr = new BoundedReader(sr, 3)) {
-            mr.read();
-            mr.mark(3);
-            mr.read();
-            mr.read();
-            assertEquals(-1, mr.read());
+    void readShouldReturnEofWhenBoundIsReachedEvenAfterMarking() throws IOException {
+        // Arrange
+        final String content = "0123456789";
+        final int maxCharsToRead = 3;
+        final Reader sourceReader = new BufferedReader(new StringReader(content));
+
+        try (final BoundedReader boundedReader = new BoundedReader(sourceReader, maxCharsToRead)) {
+            // Read one character to advance the position before marking.
+            boundedReader.read(); // Reads '0'
+
+            // Set a mark. The BoundedReader should still respect its own boundary.
+            boundedReader.mark(maxCharsToRead);
+
+            // Read the next two characters, which will bring the total read count to the max.
+            boundedReader.read(); // Reads '1'
+            boundedReader.read(); // Reads '2'
+
+            // Act: Attempt to read one more character, which is past the boundary.
+            final int charReadPastBoundary = boundedReader.read();
+
+            // Assert: Verify that the read operation returned EOF (-1).
+            assertEquals(-1, charReadPastBoundary, "BoundedReader should return EOF when the max character limit is reached.");
         }
     }
 }
