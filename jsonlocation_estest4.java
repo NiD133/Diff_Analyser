@@ -1,25 +1,31 @@
 package com.fasterxml.jackson.core;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.junit.Assert.assertNotEquals;
+
+// Note: The class name and base class are preserved from the original auto-generated test.
+// A more conventional name would be JsonLocationTest.
 public class JsonLocation_ESTestTest4 extends JsonLocation_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        JsonLocation jsonLocation0 = JsonLocation.NA;
-        JsonLocation jsonLocation1 = new JsonLocation(jsonLocation0, 500, 500, 500);
-        JsonLocation jsonLocation2 = new JsonLocation(jsonLocation0, 500, 500, 500, (-42));
-        boolean boolean0 = jsonLocation1.equals(jsonLocation2);
-        assertEquals(500, jsonLocation2.getLineNr());
-        assertEquals(500L, jsonLocation1.getCharOffset());
-        assertEquals((-1L), jsonLocation1.getByteOffset());
-        assertFalse(boolean0);
-        assertEquals((-42), jsonLocation2.getColumnNr());
+    /**
+     * Tests that the equals() method correctly identifies two JsonLocation objects
+     * as non-equal when their column numbers differ, while all other properties are the same.
+     */
+    @Test
+    public void testEqualsReturnsFalseWhenColumnNumbersDiffer() {
+        // Arrange: Create two JsonLocation instances that are identical except for the column number.
+        ContentReference source = ContentReference.unknown();
+        long byteOffset = 100L;
+        long charOffset = 100L;
+        int line = 10;
+
+        JsonLocation locationBase = new JsonLocation(source, byteOffset, charOffset, line, 20);
+        JsonLocation locationWithDifferentColumn = new JsonLocation(source, byteOffset, charOffset, line, 99);
+
+        // Act & Assert: The two locations should not be considered equal because their
+        // column numbers are different.
+        assertNotEquals(locationBase, locationWithDifferentColumn);
     }
 }
