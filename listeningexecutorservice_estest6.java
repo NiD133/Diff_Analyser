@@ -1,39 +1,29 @@
 package com.google.common.util.concurrent;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertThrows;
+
 import java.time.Duration;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalUnit;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.LinkedTransferQueue;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ListeningExecutorService_ESTestTest6 extends ListeningExecutorService_ESTest_scaffolding {
+/**
+ * Tests for the default methods in {@link ListeningExecutorService},
+ * focusing on contract adherence like null-handling.
+ */
+public class ListeningExecutorServiceTest {
 
-    @Test(timeout = 4000)
-    public void test5() throws Throwable {
-        DirectExecutorService directExecutorService0 = new DirectExecutorService();
-        // Undeclared exception!
-        try {
-            directExecutorService0.awaitTermination((Duration) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.util.concurrent.Internal", e);
-        }
+    /**
+     * Verifies that calling awaitTermination with a null Duration
+     * throws a NullPointerException, as expected for methods that
+     * don't explicitly allow null arguments.
+     */
+    @Test
+    public void awaitTermination_withNullDuration_throwsNullPointerException() throws InterruptedException {
+        // Arrange: Create an instance of a ListeningExecutorService.
+        // DirectExecutorService is a simple, same-thread implementation suitable for this test.
+        ListeningExecutorService executorService = new DirectExecutorService();
+
+        // Act & Assert: Verify that passing a null duration results in a NullPointerException.
+        // The assertThrows construct clearly defines the action and the expected exception in one step.
+        assertThrows(NullPointerException.class, () -> executorService.awaitTermination((Duration) null));
     }
 }
