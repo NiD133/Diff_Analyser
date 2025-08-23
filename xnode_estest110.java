@@ -1,30 +1,34 @@
 package org.apache.ibatis.parsing;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
+import static org.junit.Assert.assertNull;
+
 import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
+import org.junit.Test;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest110 extends XNode_ESTest_scaffolding {
+/**
+ * Test suite for the {@link XNode} class.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test109() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Float float0 = xNode0.getFloatBody();
-        assertNull(float0);
+    /**
+     * Verifies that getFloatBody() returns null when the underlying XML node
+     * has no text content, resulting in an empty body.
+     */
+    @Test
+    public void shouldReturnNullFloatBodyWhenNodeBodyIsEmpty() {
+        // Arrange
+        // An IIOMetadataNode is a concrete implementation of org.w3c.dom.Node.
+        // A default instance has no text content, leading to a null body in the XNode.
+        Node nodeWithEmptyBody = new IIOMetadataNode();
+        Properties variables = new Properties();
+        XNode xNode = new XNode(null, nodeWithEmptyBody, variables);
+
+        // Act
+        Float bodyAsFloat = xNode.getFloatBody();
+
+        // Assert
+        assertNull("getFloatBody() should return null for an empty node body.", bodyAsFloat);
     }
 }
