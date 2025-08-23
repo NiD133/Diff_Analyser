@@ -1,85 +1,39 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
-import org.joda.time.DateTime.Property;
 import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
+import org.junit.Test;
 
-public class CopticChronologyTestTest12 extends TestCase {
-
-    private static final int MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
-
-    private static long SKIP = 1 * MILLIS_PER_DAY;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+/**
+ * Tests the era-specific behavior of CopticChronology.
+ * This includes verifying the era constant and ensuring that dates before the first Coptic year are not allowed.
+ */
+public class CopticChronologyEraTest {
 
     private static final Chronology COPTIC_UTC = CopticChronology.getInstanceUTC();
 
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
-
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void amEra_hasSameValueAsCe() {
+        // The Coptic 'Anno Martyrum' (AM) era is defined to be equivalent to the Common Era (CE).
+        // In Joda-Time, DateTimeConstants.CE has a value of 1.
+        assertEquals("The Coptic AM era value should match the CE value",
+                DateTimeConstants.CE, CopticChronology.AM);
     }
 
-    public static TestSuite suite() {
-        SKIP = 1 * MILLIS_PER_DAY;
-        return new TestSuite(TestCopticChronology.class);
+    @Test(expected = IllegalArgumentException.class)
+    public void constructor_throwsExceptionForYearZero() {
+        // The Coptic chronology is not proleptic and does not support dates before year 1 AM.
+        // Therefore, attempting to create a DateTime in year 0 should fail.
+        new DateTime(0, 1, 1, 0, 0, 0, 0, COPTIC_UTC);
     }
 
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    public void testEra() {
-        assertEquals(1, CopticChronology.AM);
-        try {
-            new DateTime(-1, 13, 5, 0, 0, 0, 0, COPTIC_UTC);
-            fail();
-        } catch (IllegalArgumentException ex) {
-        }
+    @Test(expected = IllegalArgumentException.class)
+    public void constructor_throwsExceptionForNegativeYear() {
+        // The Coptic chronology is not proleptic and does not support dates before year 1 AM.
+        // Therefore, attempting to create a DateTime in a negative year should fail.
+        new DateTime(-1, 1, 1, 0, 0, 0, 0, COPTIC_UTC);
     }
 }
