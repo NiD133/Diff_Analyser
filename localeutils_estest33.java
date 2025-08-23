@@ -1,28 +1,32 @@
 package org.apache.commons.lang3;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class LocaleUtils_ESTestTest33 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link LocaleUtils}.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        // Undeclared exception!
-        try {
-            LocaleUtils.toLocale("q_]:a$7mI");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Invalid locale format: q_]:a$7mI
-            //
-            verifyException("org.apache.commons.lang3.LocaleUtils", e);
-        }
+    /**
+     * Tests that toLocale() throws an IllegalArgumentException when given a string
+     * with an invalid format.
+     */
+    @Test
+    void toLocaleShouldThrowIllegalArgumentExceptionForInvalidFormat() {
+        // Arrange: Define an input string that does not conform to the expected locale format.
+        final String invalidLocaleString = "q_]:a$7mI";
+        final String expectedMessage = "Invalid locale format: " + invalidLocaleString;
+
+        // Act: Call the method under test and expect an exception.
+        // The assertThrows method captures the thrown exception for further inspection.
+        IllegalArgumentException thrown = assertThrows(
+            IllegalArgumentException.class,
+            () -> LocaleUtils.toLocale(invalidLocaleString)
+        );
+
+        // Assert: Verify that the captured exception has the expected message.
+        assertEquals(expectedMessage, thrown.getMessage());
     }
 }
