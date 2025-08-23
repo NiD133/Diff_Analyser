@@ -1,30 +1,43 @@
 package org.jfree.chart.plot;
 
+import org.jfree.data.Range;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
+
 import java.awt.Color;
-import java.awt.GradientPaint;
 import java.awt.Paint;
 import java.awt.Stroke;
-import java.awt.SystemColor;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.HistogramType;
-import org.junit.runner.RunWith;
 
-public class MeterInterval_ESTestTest13 extends MeterInterval_ESTest_scaffolding {
+import static org.junit.Assert.assertNotEquals;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        Range range0 = new Range((-229.41607020985958), (-229.41607020985958));
-        MeterInterval meterInterval0 = new MeterInterval(",", range0);
-        Color color0 = Color.gray;
-        MeterInterval meterInterval1 = new MeterInterval(",", range0, color0, (Stroke) null, color0);
-        boolean boolean0 = meterInterval0.equals(meterInterval1);
-        assertFalse(boolean0);
+/**
+ * Tests for the {@link MeterInterval} class, focusing on equality checks.
+ */
+public class MeterIntervalTest {
+
+    /**
+     * Verifies that the equals() method returns false for two MeterInterval instances
+     * that have the same label and range but differ in their paint and stroke properties.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenPaintAndStrokePropertiesDiffer() {
+        // Arrange
+        String commonLabel = "Normal";
+        Range commonRange = new Range(0.0, 50.0);
+
+        // Create an interval using the constructor that applies default visual properties.
+        // The defaults are: outlinePaint=Color.YELLOW, outlineStroke=BasicStroke(2.0f), backgroundPaint=null.
+        MeterInterval intervalWithDefaults = new MeterInterval(commonLabel, commonRange);
+
+        // Create a second interval with the same label and range but with custom,
+        // different visual properties.
+        Paint customOutlinePaint = Color.GRAY;
+        Stroke customOutlineStroke = null; // Different from the default BasicStroke
+        Paint customBackgroundPaint = Color.LIGHT_GRAY; // Different from the default null
+        MeterInterval intervalWithCustomProperties = new MeterInterval(
+                commonLabel, commonRange, customOutlinePaint, customOutlineStroke, customBackgroundPaint);
+
+        // Act & Assert
+        // The two intervals should not be considered equal because their visual attributes differ.
+        assertNotEquals(intervalWithDefaults, intervalWithCustomProperties);
     }
 }
