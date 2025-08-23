@@ -1,31 +1,30 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
 
-public class FieldUtils_ESTestTest35 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link FieldUtils}.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        // Undeclared exception!
-        try {
-            FieldUtils.getWrappedValue(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE);
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // / by zero
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
-        }
+    /**
+     * Tests that getWrappedValue throws an ArithmeticException when the full
+     * integer range is used for the minimum and maximum values.
+     * <p>
+     * The method calculates the field's range as {@code maxValue - minValue + 1}.
+     * When {@code minValue} is {@code Integer.MIN_VALUE} and {@code maxValue} is
+     * {@code Integer.MAX_VALUE}, this calculation overflows, resulting in a range of 0.
+     * The subsequent modulo operation on this zero range causes the ArithmeticException.
+     */
+    @Test(expected = ArithmeticException.class)
+    public void getWrappedValue_withFullIntegerRange_throwsArithmeticExceptionForDivisionByZero() {
+        // Define arguments that span the entire integer range
+        final int value = 1; // The actual value doesn't matter for this test
+        final int minValue = Integer.MIN_VALUE;
+        final int maxValue = Integer.MAX_VALUE;
+
+        // This call is expected to throw an ArithmeticException due to overflow
+        // during the internal range calculation, leading to a division by zero.
+        FieldUtils.getWrappedValue(value, minValue, maxValue);
     }
 }
