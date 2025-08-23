@@ -1,17 +1,28 @@
 package org.apache.commons.lang3.math;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IEEE754rUtils_ESTestTest7 extends IEEE754rUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link IEEE754rUtils}.
+ */
+public class IEEE754rUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        float float0 = IEEE754rUtils.min(0.0F, 0.0F);
-        assertEquals(0.0F, float0, 0.01F);
+    /**
+     * Tests that IEEE754rUtils.min(float, float) returns the input value
+     * when both inputs are identical.
+     */
+    @Test
+    public void minFloat_shouldReturnInput_whenInputsAreEqual() {
+        // Arrange
+        final float value = 0.0F;
+        final float expected = 0.0F;
+
+        // Act
+        final float result = IEEE754rUtils.min(value, value);
+
+        // Assert
+        // A delta of 0.0F is used to assert an exact match.
+        assertEquals(expected, result, 0.0F);
     }
 }
