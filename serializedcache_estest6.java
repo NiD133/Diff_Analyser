@@ -1,27 +1,30 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SerializedCache_ESTestTest6 extends SerializedCache_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        PerpetualCache perpetualCache0 = new PerpetualCache("");
-        SerializedCache serializedCache0 = new SerializedCache(perpetualCache0);
-        int int0 = serializedCache0.getSize();
-        assertEquals(0, int0);
+/**
+ * Test suite for the {@link SerializedCache} decorator.
+ */
+public class SerializedCacheTest {
+
+    /**
+     * Verifies that a newly created SerializedCache, which wraps an empty cache,
+     * correctly reports its size as zero.
+     */
+    @Test
+    public void shouldReturnZeroSizeForNewCache() {
+        // Arrange: Create a new SerializedCache wrapping an empty delegate cache.
+        Cache delegateCache = new PerpetualCache("test-cache");
+        SerializedCache serializedCache = new SerializedCache(delegateCache);
+
+        // Act: Get the size of the newly created cache.
+        int size = serializedCache.getSize();
+
+        // Assert: The size should be 0, as the cache is empty.
+        assertEquals(0, size);
     }
 }
