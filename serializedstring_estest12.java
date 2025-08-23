@@ -1,27 +1,26 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SerializedString_ESTestTest12 extends SerializedString_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SerializedString} class.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("");
-        char[] charArray0 = serializedString0.asQuotedChars();
-        assertEquals(0, charArray0.length);
+    /**
+     * Tests that calling {@code asQuotedChars()} on a SerializedString
+     * created with an empty string returns an empty character array.
+     */
+    @Test
+    public void asQuotedChars_withEmptyString_returnsEmptyCharArray() {
+        // Arrange: Create a SerializedString instance with an empty string.
+        SerializedString emptySerializedString = new SerializedString("");
+
+        // Act: Get the JSON-quoted character representation.
+        char[] result = emptySerializedString.asQuotedChars();
+
+        // Assert: The resulting character array should have a length of 0.
+        assertEquals("The quoted char array for an empty string should be empty", 0, result.length);
     }
 }
