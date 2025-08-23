@@ -1,27 +1,26 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class SerializedString_ESTestTest28 extends SerializedString_ESTest_scaffolding {
+/**
+ * Contains unit tests for the {@link SerializedString#equals(Object)} method.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("");
-        boolean boolean0 = serializedString0.equals((Object) null);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the {@code equals} method returns {@code false} when a
+     * {@code SerializedString} instance is compared to {@code null}.
+     * This is a standard requirement of the {@code Object.equals()} contract.
+     */
+    @Test
+    public void equalsShouldReturnFalseWhenComparedToNull() {
+        // Arrange: Create an instance of SerializedString.
+        // The actual string content is irrelevant for this test.
+        SerializedString serializedString = new SerializedString("");
+
+        // Act & Assert: The result of comparing with null should be false.
+        assertFalse("A SerializedString instance should never be equal to null.",
+                serializedString.equals(null));
     }
 }
