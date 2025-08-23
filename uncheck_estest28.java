@@ -1,37 +1,20 @@
 package org.apache.commons.io.function;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.time.chrono.HijrahEra;
-import java.util.Comparator;
-import java.util.concurrent.ForkJoinTask;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.LongStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Uncheck_ESTestTest28 extends Uncheck_ESTest_scaffolding {
+/**
+ * Tests for the {@link Uncheck} utility class.
+ */
+public class UncheckTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        // Undeclared exception!
-        try {
-            Uncheck.getAsInt((IOIntSupplier) null, (Supplier<String>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.function.Uncheck", e);
-        }
+    /**
+     * Tests that Uncheck.getAsInt() throws a NullPointerException when the
+     * IOIntSupplier argument is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testGetAsIntWithNullSupplierShouldThrowNullPointerException() {
+        // This call is expected to fail because the supplier argument is null.
+        Uncheck.getAsInt((IOIntSupplier) null, (Supplier<String>) null);
     }
 }
