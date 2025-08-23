@@ -1,88 +1,54 @@
 package org.joda.time.field;
 
-import java.util.Arrays;
-import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.DurationField;
 import org.joda.time.DurationFieldType;
-import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.ISOChronology;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
-public class PreciseDurationDateTimeFieldTestTest1 extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+/**
+ * Unit tests for {@link PreciseDurationDateTimeField}.
+ */
+class PreciseDurationDateTimeFieldTest {
 
-    public static TestSuite suite() {
-        return new TestSuite(TestPreciseDurationDateTimeField.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockPreciseDurationDateTimeField extends PreciseDurationDateTimeField {
-
-        protected MockPreciseDurationDateTimeField() {
-            super(DateTimeFieldType.secondOfMinute(), new MockCountingDurationField(DurationFieldType.seconds()));
+    // A concrete implementation of the abstract class under test.
+    private static class TestPreciseDurationDateTimeField extends PreciseDurationDateTimeField {
+        TestPreciseDurationDateTimeField(DateTimeFieldType type, DurationField unit) {
+            super(type, unit);
         }
 
-        protected MockPreciseDurationDateTimeField(DateTimeFieldType type, DurationField dur) {
-            super(type, dur);
-        }
-
+        // The following methods are abstract and must be implemented, but are not
+        // relevant for the constructor tests. They return dummy values.
         @Override
         public int get(long instant) {
-            return (int) (instant / 60L);
+            return 0;
         }
 
         @Override
         public DurationField getRangeDurationField() {
-            return new MockCountingDurationField(DurationFieldType.minutes());
+            return null;
+        }
+
+        @Override
+        public int getMinimumValue() {
+            return 0;
         }
 
         @Override
         public int getMaximumValue() {
-            return 59;
+            return 0;
         }
     }
 
-    static class MockStandardBaseDateTimeField extends MockPreciseDurationDateTimeField {
-
-        protected MockStandardBaseDateTimeField() {
-            super();
-        }
-
-        @Override
-        public DurationField getDurationField() {
-            return ISOChronology.getInstanceUTC().seconds();
-        }
-
-        @Override
-        public DurationField getRangeDurationField() {
-            return ISOChronology.getInstanceUTC().minutes();
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockCountingDurationField extends BaseDurationField {
-
-        static int add_int = 0;
-
-        static int add_long = 0;
-
-        static int difference_long = 0;
-
-        protected MockCountingDurationField(DurationFieldType type) {
-            super(type);
+    // A minimal, valid DurationField for successful construction.
+    private static class StubPreciseDurationField extends BaseDurationField {
+        StubPreciseDurationField() {
+            super(DurationFieldType.seconds());
         }
 
         @Override
@@ -92,159 +58,91 @@ public class PreciseDurationDateTimeFieldTestTest1 extends TestCase {
 
         @Override
         public long getUnitMillis() {
-            return 60;
+            return 60L;
         }
 
+        // Unused dummy implementations
         @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
+        public long getValueAsLong(long duration, long instant) { return 0; }
         @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
+        public long getMillis(int value, long instant) { return 0; }
         @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
+        public long getMillis(long value, long instant) { return 0; }
         @Override
-        public long add(long instant, int value) {
-            add_int++;
-            return instant + (value * 60L);
-        }
-
+        public long add(long instant, int value) { return 0; }
         @Override
-        public long add(long instant, long value) {
-            add_long++;
-            return instant + (value * 60L);
-        }
-
+        public long add(long instant, long value) { return 0; }
         @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            difference_long++;
-            return 30;
-        }
+        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) { return 0; }
     }
 
-    //-----------------------------------------------------------------------
-    static class MockZeroDurationField extends BaseDurationField {
-
-        protected MockZeroDurationField(DurationFieldType type) {
-            super(type);
-        }
-
+    // A DurationField stub that is explicitly imprecise.
+    private static class ImpreciseDurationField extends StubPreciseDurationField {
         @Override
         public boolean isPrecise() {
-            return true;
-        }
-
-        @Override
-        public long getUnitMillis() {
-            // this is zero
-            return 0;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            return 0;
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            return 0;
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockImpreciseDurationField extends BaseDurationField {
-
-        protected MockImpreciseDurationField(DurationFieldType type) {
-            super(type);
-        }
-
-        @Override
-        public boolean isPrecise() {
-            // this is false
             return false;
         }
+    }
 
+    // A DurationField stub that has a unit millis of zero.
+    private static class ZeroMillisDurationField extends StubPreciseDurationField {
         @Override
         public long getUnitMillis() {
-            return 0;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            return 0;
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            return 0;
+            return 0L;
         }
     }
 
-    //-----------------------------------------------------------------------
-    public void test_constructor() {
-        BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(DateTimeFieldType.secondOfMinute(), field.getType());
-        try {
-            field = new MockPreciseDurationDateTimeField(null, null);
-            fail();
-        } catch (IllegalArgumentException ex) {
+    @Nested
+    @DisplayName("Constructor")
+    class ConstructorTest {
+
+        @Test
+        void shouldConstructSuccessfullyWithValidParameters() {
+            // Arrange
+            DurationField unitField = new StubPreciseDurationField();
+            DateTimeFieldType fieldType = DateTimeFieldType.secondOfMinute();
+
+            // Act
+            PreciseDurationDateTimeField field = new TestPreciseDurationDateTimeField(fieldType, unitField);
+
+            // Assert
+            assertNotNull(field);
+            assertEquals(fieldType, field.getType());
+            assertEquals(unitField, field.getDurationField());
+            assertEquals(60L, field.getUnitMillis());
         }
-        try {
-            field = new MockPreciseDurationDateTimeField(DateTimeFieldType.minuteOfHour(), new MockImpreciseDurationField(DurationFieldType.minutes()));
-            fail();
-        } catch (IllegalArgumentException ex) {
+
+        @Test
+        void shouldThrowExceptionWhenTypeIsNull() {
+            // The superclass (BaseDateTimeField) is responsible for this check.
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                    new TestPreciseDurationDateTimeField(null, new StubPreciseDurationField())
+            );
+            assertEquals("The type must not be null", exception.getMessage());
         }
-        try {
-            field = new MockPreciseDurationDateTimeField(DateTimeFieldType.minuteOfHour(), new MockZeroDurationField(DurationFieldType.minutes()));
-            fail();
-        } catch (IllegalArgumentException ex) {
+
+        @Test
+        void shouldThrowExceptionWhenUnitFieldIsNull() {
+            // A NullPointerException is thrown when the constructor calls unit.isPrecise()
+            assertThrows(NullPointerException.class, () ->
+                    new TestPreciseDurationDateTimeField(DateTimeFieldType.secondOfMinute(), null)
+            );
+        }
+
+        @Test
+        void shouldThrowExceptionWhenUnitFieldIsImprecise() {
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                    new TestPreciseDurationDateTimeField(DateTimeFieldType.minuteOfHour(), new ImpreciseDurationField())
+            );
+            assertEquals("Unit duration field must be precise", exception.getMessage());
+        }
+
+        @Test
+        void shouldThrowExceptionWhenUnitMillisIsZero() {
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                    new TestPreciseDurationDateTimeField(DateTimeFieldType.minuteOfHour(), new ZeroMillisDurationField())
+            );
+            assertEquals("The unit milliseconds must be at least 1", exception.getMessage());
         }
     }
 }
