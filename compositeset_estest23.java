@@ -1,106 +1,83 @@
 package org.apache.commons.collections4.set;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Collections;
 import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CompositeSet_ESTestTest23 extends CompositeSet_ESTest_scaffolding {
+/**
+ * Improved, understandable tests for the CompositeSet class.
+ *
+ * The original test (from CompositeSet_ESTestTest23) was automatically generated
+ * and combined multiple concerns, making it difficult to comprehend. These tests
+ * are broken down into specific, focused behaviors for clarity and maintainability.
+ */
+public class CompositeSetUnderstandableTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        CompositeSet<Integer> compositeSet0 = new CompositeSet<Integer>((Set<Integer>[]) null);
-        assertNotNull(compositeSet0);
-        compositeSet0.hashCode();
-        Integer integer0 = new Integer(1);
-        assertNotNull(integer0);
-        assertEquals(1, (int) integer0);
-        CompositeSet<Closure<Integer>> compositeSet1 = new CompositeSet<Closure<Integer>>();
-        assertNotNull(compositeSet1);
-        boolean boolean0 = compositeSet1.equals(compositeSet0);
-        assertFalse(compositeSet0.contains(integer0));
-        assertTrue(boolean0);
-        CompositeSet<Integer> compositeSet2 = new CompositeSet<Integer>();
-        assertNotNull(compositeSet2);
-        assertFalse(compositeSet2.contains(integer0));
-        assertTrue(compositeSet2.equals((Object) compositeSet0));
-        CompositeSet<Object> compositeSet3 = new CompositeSet<Object>();
-        assertNotNull(compositeSet3);
-        assertFalse(compositeSet3.contains(1));
-        CompositeSet<Object> compositeSet4 = new CompositeSet<Object>(compositeSet3);
-        assertNotNull(compositeSet4);
-        assertFalse(compositeSet3.contains(1));
-        assertFalse(compositeSet4.contains(1));
-        assertTrue(compositeSet4.equals((Object) compositeSet3));
-        boolean boolean1 = compositeSet2.retainAll(compositeSet4);
-        assertNotSame(compositeSet2, compositeSet0);
-        assertNotSame(compositeSet3, compositeSet4);
-        assertNotSame(compositeSet4, compositeSet3);
-        assertFalse(compositeSet2.contains(integer0));
-        assertFalse(compositeSet3.contains(1));
-        assertFalse(compositeSet4.contains(1));
-        assertTrue(compositeSet2.equals((Object) compositeSet0));
-        assertTrue(compositeSet3.equals((Object) compositeSet4));
-        assertTrue(compositeSet4.equals((Object) compositeSet3));
-        assertFalse(boolean1 == boolean0);
-        assertFalse(boolean1);
-        Set<Closure<Integer>> set0 = new LinkedHashSet<Closure<Integer>>();
-        assertNotNull(set0);
-        assertEquals(0, set0.size());
-        assertTrue(set0.isEmpty());
-        CompositeSet<Integer> compositeSet5 = new CompositeSet<Integer>();
-        assertNotNull(compositeSet5);
-        assertFalse(compositeSet5.contains(integer0));
-        assertTrue(compositeSet5.equals((Object) compositeSet2));
-        assertTrue(compositeSet5.equals((Object) compositeSet0));
-        // Undeclared exception!
+    /**
+     * Tests that the constructor accepting a null array of sets correctly
+     * initializes an empty CompositeSet.
+     */
+    @Test
+    public void constructorWithNullArrayCreatesEmptySet() {
+        // Arrange & Act
+        final CompositeSet<String> compositeSet = new CompositeSet<>((Set<String>[]) null);
+
+        // Assert
+        assertNotNull(compositeSet);
+        assertTrue("Set created with a null array of sets should be empty", compositeSet.isEmpty());
+    }
+
+    /**
+     * Verifies that a newly created, empty CompositeSet behaves correctly
+     * according to the Set contract for empty sets.
+     */
+    @Test
+    public void emptyCompositeSetBehavesAsExpected() {
+        // Arrange
+        final CompositeSet<String> emptySet = new CompositeSet<>();
+        final Collection<String> emptyCollection = Collections.emptyList();
+
+        // Assert basic properties of an empty set
+        assertTrue("A new CompositeSet should be empty", emptySet.isEmpty());
+        assertEquals("An empty CompositeSet should have a size of 0", 0, emptySet.size());
+        assertEquals("An empty CompositeSet should have a hash code of 0", 0, emptySet.hashCode());
+
+        // Assert equals contract
+        assertEquals("Two empty CompositeSets should be equal", new CompositeSet<String>(), emptySet);
+        assertEquals("Empty CompositeSets with different generic types should also be equal", new CompositeSet<Object>(), emptySet);
+
+        // Act: Perform an operation that should not change the set
+        final boolean changed = emptySet.retainAll(emptyCollection);
+
+        // Assert
+        assertFalse("retainAll with an empty collection should not report a change", changed);
+        assertTrue("The set should remain empty after the retainAll operation", emptySet.isEmpty());
+    }
+
+    /**
+     * Tests that calling addAll() on a CompositeSet without a configured
+     * SetMutator throws an UnsupportedOperationException, as per the class documentation.
+     */
+    @Test
+    public void addAllShouldThrowUnsupportedOperationExceptionWhenNoMutatorIsSet() {
+        // Arrange
+        final CompositeSet<Integer> compositeSet = new CompositeSet<>();
+        final Collection<Integer> collectionToAdd = Collections.singletonList(1);
+        final String expectedMessage = "addAll() is not supported on CompositeSet without a SetMutator strategy";
+
+        // Act & Assert
         try {
-            compositeSet0.addAll(compositeSet2);
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // addAll() is not supported on CompositeSet without a SetMutator strategy
-            //
-            verifyException("org.apache.commons.collections4.set.CompositeSet", e);
+            compositeSet.addAll(collectionToAdd);
+            fail("Expected an UnsupportedOperationException to be thrown");
+        } catch (final UnsupportedOperationException e) {
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
