@@ -1,42 +1,36 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Calendar;
-import java.util.TimeZone;
-import javax.swing.DropMode;
-import javax.swing.JScrollPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.legend.PaintScaleLegend;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.ThermometerPlot;
-import org.jfree.chart.renderer.LookupPaintScale;
-import org.jfree.chart.renderer.PaintScale;
-import org.jfree.chart.renderer.xy.XYShapeRenderer;
 import org.jfree.data.Range;
-import org.jfree.data.general.DefaultValueDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.time.DateRange;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class ModuloAxis_ESTestTest40 extends ModuloAxis_ESTest_scaffolding {
+/**
+ * Tests for the {@link ModuloAxis} class.
+ */
+public class ModuloAxisTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
-        ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
-        moduloAxis0.resizeRange(1005.89236, 0.13377999998920131);
-        moduloAxis0.resizeRange(0.8662200000107987, 0.13377999998920131);
-        assertFalse(moduloAxis0.isAutoRange());
+    /**
+     * Verifies that manually resizing the axis range disables the auto-range feature.
+     * A NumberAxis (the superclass) is initialized with auto-range enabled by default.
+     * Any manual call to resizeRange() should disable this behavior.
+     */
+    @Test
+    public void resizeRangeShouldDisableAutoRange() {
+        // Arrange: Create a ModuloAxis, which should have auto-range enabled by default.
+        Range fixedRange = new Range(0.0, 360.0);
+        ModuloAxis moduloAxis = new ModuloAxis("Angle", fixedRange);
+
+        // Pre-condition check: Ensure auto-range is initially true.
+        assertTrue("A new axis should have auto-range enabled by default.",
+                moduloAxis.isAutoRange());
+
+        // Act: Manually resize the axis range. The specific parameters are not
+        // critical; any call to resizeRange should trigger the behavior.
+        moduloAxis.resizeRange(0.5, 180.0);
+
+        // Assert: Verify that auto-range is now disabled.
+        assertFalse("Calling resizeRange() should disable the auto-range feature.",
+                moduloAxis.isAutoRange());
     }
 }
