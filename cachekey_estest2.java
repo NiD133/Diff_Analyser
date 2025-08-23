@@ -1,20 +1,27 @@
 package org.apache.ibatis.cache;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CacheKey_ESTestTest2 extends CacheKey_ESTest_scaffolding {
+/**
+ * Test suite for the CacheKey class.
+ */
+public class CacheKeyTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        CacheKey cacheKey0 = new CacheKey();
-        Object object0 = new Object();
-        cacheKey0.update(object0);
-        int int0 = cacheKey0.getUpdateCount();
-        assertEquals(1, int0);
+    /**
+     * Verifies that calling the update() method correctly increments the internal update count.
+     */
+    @Test
+    public void update_shouldIncrementUpdateCount() {
+        // Arrange: Create a new CacheKey. Its initial count should be 0.
+        CacheKey cacheKey = new CacheKey();
+        Object anObject = new Object();
+
+        // Act: Update the key with an object.
+        cacheKey.update(anObject);
+
+        // Assert: Verify that the update count is now 1.
+        int actualUpdateCount = cacheKey.getUpdateCount();
+        assertEquals("The update count should be 1 after a single update.", 1, actualUpdateCount);
     }
 }
