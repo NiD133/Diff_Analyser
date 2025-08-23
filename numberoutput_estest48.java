@@ -1,26 +1,35 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NumberOutput_ESTestTest48 extends NumberOutput_ESTest_scaffolding {
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        byte[] byteArray0 = new byte[14];
-        // Undeclared exception!
+/**
+ * Unit tests for the {@link NumberOutput} class, focusing on exception handling.
+ */
+public class NumberOutputTest {
+
+    /**
+     * Verifies that outputLong() throws an ArrayIndexOutOfBoundsException when the
+     * provided byte array buffer is too small to hold the string representation of the long value.
+     */
+    @Test
+    public void outputLongShouldThrowExceptionWhenBufferIsTooSmall() {
+        // Arrange: A long value that requires 18 bytes to represent as a string.
+        long largeValue = 407030665140201709L; // This number has 18 digits.
+
+        // Create a buffer that is intentionally too small to hold the number.
+        final int insufficientBufferSize = 14;
+        byte[] buffer = new byte[insufficientBufferSize];
+        int offset = 0;
+
+        // Act & Assert
         try {
-            NumberOutput.outputLong(407030665140201709L, byteArray0, 0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
+            NumberOutput.outputLong(largeValue, buffer, offset);
+            fail("Expected an ArrayIndexOutOfBoundsException because the buffer is too small.");
         } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 14
-            //
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+            // This is the expected outcome. The test passes if this exception is caught.
+            // No further assertions are needed as the exception type itself is the verification.
         }
     }
 }
