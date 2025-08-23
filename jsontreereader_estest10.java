@@ -1,34 +1,26 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
-import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeReader_ESTestTest10 extends JsonTreeReader_ESTest_scaffolding {
+/**
+ * Unit tests for {@link JsonTreeReader}.
+ */
+public class JsonTreeReaderTest {
 
-    @Test(timeout = 4000)
-    public void test009() throws Throwable {
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader((JsonElement) null);
-        // Undeclared exception!
-        try {
-            jsonTreeReader0.skipValue();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling skipValue() on a reader initialized with a null JsonElement
+     * results in a NullPointerException. This is the expected behavior because the reader
+     * has no element to operate on.
+     */
+    @Test(expected = NullPointerException.class)
+    public void skipValueOnNullElementThrowsNullPointerException() {
+        // Arrange: Create a JsonTreeReader with a null JsonElement, which is an invalid state.
+        JsonTreeReader reader = new JsonTreeReader((JsonElement) null);
+
+        // Act: Attempt to skip a value. This should fail because the internal state is invalid.
+        reader.skipValue();
+
+        // Assert: The @Test(expected) annotation asserts that a NullPointerException is thrown.
     }
 }
