@@ -1,29 +1,26 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
+import static org.junit.Assert.assertThrows;
+
 import java.io.Reader;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BoundedReader_ESTestTest13 extends BoundedReader_ESTest_scaffolding {
+/**
+ * Tests for {@link BoundedReader}.
+ */
+public class BoundedReaderTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        BoundedReader boundedReader0 = new BoundedReader((Reader) null, 1);
-        // Undeclared exception!
-        try {
-            boundedReader0.read();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.input.BoundedReader", e);
-        }
+    /**
+     * Tests that attempting to read from a BoundedReader initialized with a null
+     * underlying reader throws a NullPointerException.
+     */
+    @Test
+    public void readWithNullReaderShouldThrowNullPointerException() {
+        // Arrange: Create a BoundedReader with a null underlying reader.
+        // The max character limit is arbitrary as the read should fail immediately.
+        final BoundedReader boundedReader = new BoundedReader(null, 10);
+
+        // Act & Assert: Verify that a NullPointerException is thrown when read() is called.
+        assertThrows(NullPointerException.class, boundedReader::read);
     }
 }
