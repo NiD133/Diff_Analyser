@@ -1,32 +1,35 @@
 package com.google.common.collect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
-import java.util.Locale;
-import java.util.Set;
-import java.util.Spliterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CompactLinkedHashSet_ESTestTest26 extends CompactLinkedHashSet_ESTest_scaffolding {
+import java.util.Collections;
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        Locale.Category[] locale_CategoryArray0 = new Locale.Category[1];
-        CompactLinkedHashSet<Locale.Category> compactLinkedHashSet0 = CompactLinkedHashSet.create(locale_CategoryArray0);
-        CompactLinkedHashSet<Object> compactLinkedHashSet1 = CompactLinkedHashSet.create((Collection<?>) compactLinkedHashSet0);
-        // Undeclared exception!
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+/**
+ * Tests for internal state management of {@link CompactLinkedHashSet}.
+ */
+public class CompactLinkedHashSetTest {
+
+    /**
+     * Verifies that calling allocArrays() on a set that has already been initialized
+     * (and thus has its internal arrays allocated) throws an IllegalStateException.
+     */
+    @Test
+    public void allocArrays_whenArraysAlreadyAllocated_throwsIllegalStateException() {
+        // Arrange: Create a set using a factory method that initializes its internal arrays.
+        // The CompactLinkedHashSet.create(Collection) factory ensures the set is fully
+        // initialized and ready for use.
+        CompactLinkedHashSet<String> set = CompactLinkedHashSet.create(Collections.singleton("one element"));
+
+        // Act & Assert: Attempting to allocate the arrays again should fail.
         try {
-            compactLinkedHashSet1.allocArrays();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // Arrays already allocated
-            //
-            verifyException("com.google.common.base.Preconditions", e);
+            set.allocArrays();
+            fail("Expected an IllegalStateException because the internal arrays have already been allocated.");
+        } catch (IllegalStateException expected) {
+            // Verify the exception message to confirm the cause of the failure.
+            assertEquals("Arrays already allocated", expected.getMessage());
         }
     }
 }
