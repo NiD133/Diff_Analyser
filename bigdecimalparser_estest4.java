@@ -1,20 +1,24 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.math.BigDecimal;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class BigDecimalParser_ESTestTest4 extends BigDecimalParser_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link BigDecimalParser} class.
+ */
+public class BigDecimalParserTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        char[] charArray0 = new char[1];
-        charArray0[0] = '4';
-        BigDecimal bigDecimal0 = BigDecimalParser.parse(charArray0);
-        assertEquals((byte) 4, bigDecimal0.byteValue());
+    @Test
+    public void parse_whenGivenSingleDigitInCharArray_returnsCorrectBigDecimal() {
+        // Arrange
+        char[] numberAsChars = new char[]{'4'};
+        BigDecimal expected = new BigDecimal("4");
+
+        // Act
+        BigDecimal result = BigDecimalParser.parse(numberAsChars);
+
+        // Assert
+        assertEquals(expected, result);
     }
 }
