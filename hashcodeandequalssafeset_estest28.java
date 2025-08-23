@@ -1,29 +1,32 @@
 package org.mockito.internal.util.collections;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+
+import java.util.Collections;
 import java.util.List;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class HashCodeAndEqualsSafeSet_ESTestTest28 extends HashCodeAndEqualsSafeSet_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-        Vector<Object> vector0 = new Vector<Object>();
-        vector0.add((Object) null);
-        boolean boolean0 = hashCodeAndEqualsSafeSet0.retainAll(vector0);
-        assertFalse(boolean0);
+/**
+ * Test suite for {@link HashCodeAndEqualsSafeSet}.
+ */
+public class HashCodeAndEqualsSafeSetTest {
+
+    @Test
+    public void retainAllOnEmptySetShouldReturnFalseAndNotModifySet() {
+        // Arrange
+        HashCodeAndEqualsSafeSet emptySet = new HashCodeAndEqualsSafeSet();
+        List<Object> collectionToRetain = Collections.singletonList("any object");
+
+        // Act
+        // Calling retainAll on an empty set should not change it.
+        boolean wasModified = emptySet.retainAll(collectionToRetain);
+
+        // Assert
+        // According to the Collection#retainAll contract, the method should return 'false'
+        // if the collection was not modified.
+        assertFalse("retainAll should return false when the set is not modified.", wasModified);
+        assertTrue("The set should remain empty after the retainAll operation.", emptySet.isEmpty());
     }
 }
