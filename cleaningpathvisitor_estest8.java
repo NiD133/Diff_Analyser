@@ -1,44 +1,56 @@
 package org.apache.commons.io.file;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CleaningPathVisitor_ESTestTest8 extends CleaningPathVisitor_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link CleaningPathVisitor} class.
+ * This specific test focuses on the behavior of the preVisitDirectory method.
+ */
+public class CleaningPathVisitorTest { // Renamed for clarity
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        CountingPathVisitor.Builder countingPathVisitor_Builder0 = new CountingPathVisitor.Builder();
-        Counters.PathCounters counters_PathCounters0 = countingPathVisitor_Builder0.getPathCounters();
-        String[] stringArray0 = new String[9];
-        stringArray0[0] = "";
-        stringArray0[1] = "";
-        stringArray0[2] = "org.apache.commons.io.filefilter.AgeFileFilter";
-        stringArray0[3] = "";
-        stringArray0[4] = ">=";
-        stringArray0[5] = "org.apache.commons.io.file.Counters$NoopPathCounters";
-        stringArray0[6] = "";
-        stringArray0[7] = "org.apache.commons.io.file.CleaningPathVisitor";
-        stringArray0[8] = "egaoxgVGi-xQc=}|";
-        CleaningPathVisitor cleaningPathVisitor0 = new CleaningPathVisitor(counters_PathCounters0, stringArray0);
-        MockFile mockFile0 = new MockFile("", "egaoxgVGi-xQc=}|");
-        Path path0 = mockFile0.toPath();
-        BasicFileAttributes basicFileAttributes0 = mock(BasicFileAttributes.class, new ViolatedAssumptionAnswer());
-        FileVisitResult fileVisitResult0 = cleaningPathVisitor0.preVisitDirectory(path0, basicFileAttributes0);
-        assertEquals(FileVisitResult.SKIP_SUBTREE, fileVisitResult0);
+    /**
+     * Tests that preVisitDirectory returns SKIP_SUBTREE when the directory's
+     * name is present in the configured skip list. This prevents the visitor
+     * from traversing into directories that are meant to be preserved.
+     */
+    @Test
+    public void preVisitDirectoryShouldSkipSubtreeWhenDirectoryNameIsInSkipList() throws IOException {
+        // --- Arrange ---
+
+        // Define a directory name that the visitor should skip.
+        final String directoryNameToSkip = "do-not-clean-this-dir";
+
+        // Create a list of file/directory names to skip. The visitor should ignore any
+        // path whose file name component matches an entry in this list.
+        final String[] skipList = {"some-other-file.txt", directoryNameToSkip, "another-dir-to-keep"};
+
+        // The PathCounters are required for the constructor but are not relevant to this
+        // test's logic. Using no-op counters simplifies the setup.
+        final CleaningPathVisitor visitor = new CleaningPathVisitor(Counters.noopPathCounters(), skipList);
+
+        // Create a Path object representing the directory to be visited.
+        // The full path doesn't matter, as the visitor only checks the file name.
+        final Path directoryToVisit = Paths.get("parent/directory", directoryNameToSkip);
+        final BasicFileAttributes mockAttributes = mock(BasicFileAttributes.class);
+
+        // --- Act ---
+
+        // Attempt to visit the directory that is configured to be skipped.
+        final FileVisitResult result = visitor.preVisitDirectory(directoryToVisit, mockAttributes);
+
+        // --- Assert ---
+
+        // The visitor should return SKIP_SUBTREE, indicating that this directory
+        // and all its contents should be skipped.
+        assertEquals("Expected to skip the subtree of a directory in the skip list",
+                FileVisitResult.SKIP_SUBTREE, result);
     }
 }
