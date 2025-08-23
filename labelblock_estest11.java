@@ -1,46 +1,28 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import java.util.Hashtable;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleContext;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
 
-public class LabelBlock_ESTestTest11 extends LabelBlock_ESTest_scaffolding {
+/**
+ * Contains tests for the equals() method in the {@link LabelBlock} class,
+ * focusing on handling of null properties.
+ */
+public class LabelBlockEqualsTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        LabelBlock labelBlock0 = new LabelBlock("");
-        LabelBlock labelBlock1 = new LabelBlock("", (Font) null);
-        // Undeclared exception!
-        try {
-            labelBlock1.equals(labelBlock0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jfree.chart.block.LabelBlock", e);
-        }
+    /**
+     * Verifies that calling equals() on a LabelBlock instance with a null font
+     * throws a NullPointerException. This behavior, while likely a bug in the
+     * source class, is documented by this test. The equals() implementation
+     * should ideally handle nulls gracefully instead of throwing an exception.
+     */
+    @Test(expected = NullPointerException.class)
+    public void equals_whenInstanceHasNullFont_shouldThrowNullPointerException() {
+        // Arrange: Create one block with a null font and another with a default font.
+        LabelBlock blockWithNullFont = new LabelBlock("Test Label", (Font) null);
+        LabelBlock blockWithDefaultFont = new LabelBlock("Test Label");
+
+        // Act & Assert: Calling equals() on the instance with the null font is expected
+        // to throw a NullPointerException.
+        blockWithNullFont.equals(blockWithDefaultFont);
     }
 }
