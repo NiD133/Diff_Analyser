@@ -1,23 +1,35 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BoundedReader_ESTestTest5 extends BoundedReader_ESTest_scaffolding {
+/**
+ * Tests for {@link BoundedReader}.
+ */
+public class BoundedReaderTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        StringReader stringReader0 = new StringReader("");
-        BoundedReader boundedReader0 = new BoundedReader(stringReader0, 1);
-        char[] charArray0 = new char[3];
-        int int0 = boundedReader0.read(charArray0, (-743), 0);
-        assertEquals(0, int0);
+    /**
+     * Tests that calling read() with a length of 0 returns 0, as specified by the
+     * {@link Reader#read(char[], int, int)} contract. This should be true even
+     * when provided with an otherwise invalid offset.
+     */
+    @Test
+    public void readWithZeroLengthShouldReturnZero() throws IOException {
+        // Arrange
+        final Reader reader = new StringReader("test data");
+        final BoundedReader boundedReader = new BoundedReader(reader, 10);
+        final char[] buffer = new char[5];
+        final int invalidOffset = -1;
+        final int zeroLength = 0;
+
+        // Act
+        final int charsRead = boundedReader.read(buffer, invalidOffset, zeroLength);
+
+        // Assert
+        assertEquals("Reading zero characters should always return 0", 0, charsRead);
     }
 }
