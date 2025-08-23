@@ -1,161 +1,53 @@
 package org.apache.commons.io.input;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.ByteArrayInputStream;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.io.IOUtils;
+import java.util.List;
 import org.apache.commons.io.input.ObservableInputStream.Observer;
-import org.apache.commons.io.output.NullOutputStream;
-import org.apache.commons.io.test.CustomIOException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class ObservableInputStreamTestTest12 {
+/**
+ * Tests for {@link ObservableInputStream}.
+ * This test class focuses on verifying the behavior of observer management.
+ */
+public class ObservableInputStreamTest {
 
-    private ObservableInputStream brokenObservableInputStream() {
-        return new ObservableInputStream(BrokenInputStream.INSTANCE);
-    }
-
-    private InputStream createInputStream() {
-        final byte[] buffer = MessageDigestInputStreamTest.generateRandomByteStream(IOUtils.DEFAULT_BUFFER_SIZE);
-        return createInputStream(new ByteArrayInputStream(buffer));
-    }
-
-    private ObservableInputStream createInputStream(final InputStream origin) {
-        return new ObservableInputStream(origin);
-    }
-
-    private void testNotificationCallbacks(final int bufferSize) throws IOException {
-        final byte[] buffer = IOUtils.byteArray();
-        final LengthObserver lengthObserver = new LengthObserver();
-        final MethodCountObserver methodCountObserver = new MethodCountObserver();
-        try (ObservableInputStream ois = new ObservableInputStream(new ByteArrayInputStream(buffer), lengthObserver, methodCountObserver)) {
-            assertEquals(IOUtils.DEFAULT_BUFFER_SIZE, IOUtils.copy(ois, NullOutputStream.INSTANCE, bufferSize));
-        }
-        assertEquals(IOUtils.DEFAULT_BUFFER_SIZE, lengthObserver.getTotal());
-        assertEquals(1, methodCountObserver.getClosedCount());
-        assertEquals(1, methodCountObserver.getFinishedCount());
-        assertEquals(0, methodCountObserver.getErrorCount());
-        assertEquals(0, methodCountObserver.getDataCount());
-        assertEquals(buffer.length / bufferSize, methodCountObserver.getDataBufferCount());
-    }
-
-    private static final class DataViewObserver extends MethodCountObserver {
-
-        private byte[] buffer;
-
-        private int lastValue = -1;
-
-        private int length = -1;
-
-        private int offset = -1;
-
-        @Override
-        public void data(final byte[] buffer, final int offset, final int length) throws IOException {
-            this.buffer = buffer;
-            this.offset = offset;
-            this.length = length;
-        }
-
-        @Override
-        public void data(final int value) throws IOException {
-            super.data(value);
-            lastValue = value;
-        }
-    }
-
-    private static final class LengthObserver extends Observer {
-
-        private long total;
-
-        @Override
-        public void data(final byte[] buffer, final int offset, final int length) throws IOException {
-            this.total += length;
-        }
-
-        @Override
-        public void data(final int value) throws IOException {
-            total++;
-        }
-
-        public long getTotal() {
-            return total;
-        }
-    }
-
+    /**
+     * A test-specific observer that counts method invocations.
+     * Serves as a base for more specialized test observers.
+     */
     private static class MethodCountObserver extends Observer {
+        // Fields for counting are omitted for brevity as they are not used in the specific test.
+        // They would be included in a full test suite.
+    }
 
-        private long closedCount;
-
-        private long dataBufferCount;
-
-        private long dataCount;
-
-        private long errorCount;
-
-        private long finishedCount;
-
-        @Override
-        public void closed() throws IOException {
-            closedCount++;
-        }
-
-        @Override
-        public void data(final byte[] buffer, final int offset, final int length) throws IOException {
-            dataBufferCount++;
-        }
-
-        @Override
-        public void data(final int value) throws IOException {
-            dataCount++;
-        }
-
-        @Override
-        public void error(final IOException exception) throws IOException {
-            errorCount++;
-        }
-
-        @Override
-        public void finished() throws IOException {
-            finishedCount++;
-        }
-
-        public long getClosedCount() {
-            return closedCount;
-        }
-
-        public long getDataBufferCount() {
-            return dataBufferCount;
-        }
-
-        public long getDataCount() {
-            return dataCount;
-        }
-
-        public long getErrorCount() {
-            return errorCount;
-        }
-
-        public long getFinishedCount() {
-            return finishedCount;
-        }
+    /**
+     * A test-specific observer that captures the data passed to it.
+     * Extends MethodCountObserver to inherit counting behavior if needed.
+     */
+    private static final class DataViewObserver extends MethodCountObserver {
+        // Fields for capturing data are omitted for brevity as they are not used in this specific test.
     }
 
     @Test
-    void testGetObserversOrder() throws IOException {
-        final DataViewObserver observer0 = new DataViewObserver();
-        final DataViewObserver observer1 = new DataViewObserver();
-        try (ObservableInputStream ois = new ObservableInputStream(new NullInputStream(), observer0, observer1)) {
-            assertEquals(observer0, ois.getObservers().get(0));
-            assertEquals(observer1, ois.getObservers().get(1));
+    @DisplayName("getObservers() should return observers in the order they were added")
+    void getObservers_shouldReturnObserversInAdditionOrder() throws IOException {
+        // Arrange: Create two distinct observers to be added to the stream.
+        final Observer firstObserver = new DataViewObserver();
+        final Observer secondObserver = new DataViewObserver();
+        final List<Observer> expectedObservers = List.of(firstObserver, secondObserver);
+
+        // Act: Create a stream with the observers and then retrieve the list of observers.
+        // A NullInputStream is used as the underlying stream because we are not testing read behavior here.
+        final List<Observer> actualObservers;
+        try (ObservableInputStream observableInputStream = new ObservableInputStream(new NullInputStream(), firstObserver, secondObserver)) {
+            actualObservers = observableInputStream.getObservers();
         }
+
+        // Assert: The returned list should contain the observers in the same order they were added.
+        assertIterableEquals(expectedObservers, actualObservers,
+            "The list of observers should match the order of their addition.");
     }
 }
