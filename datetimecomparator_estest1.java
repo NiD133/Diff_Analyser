@@ -2,25 +2,32 @@ package org.joda.time;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class DateTimeComparator_ESTestTest1 extends DateTimeComparator_ESTest_scaffolding {
+/**
+ * Unit tests for {@link DateTimeComparator}.
+ */
+public class DateTimeComparatorTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        DateTimeComparator dateTimeComparator0 = DateTimeComparator.getDateOnlyInstance();
-        // Undeclared exception!
+    /**
+     * Tests that the compare method throws an IllegalArgumentException when one of the
+     * arguments is a String that cannot be parsed into a date-time object.
+     */
+    @Test
+    public void compare_withUnparseableString_shouldThrowIllegalArgumentException() {
+        // Arrange: Create a comparator and define an unparseable string argument.
+        // The 'null' argument is treated by the comparator as the current time ("now").
+        DateTimeComparator dateOnlyComparator = DateTimeComparator.getDateOnlyInstance();
+        String unparseableDateString = "DateTimeComparator[dayOfYear-]";
+        Object now = null;
+
+        // Act & Assert: Attempt the comparison and verify the expected exception.
         try {
-            dateTimeComparator0.compare((Object) null, "DateTimeComparator[dayOfYear-]");
-            fail("Expecting exception: IllegalArgumentException");
+            dateOnlyComparator.compare(now, unparseableDateString);
+            fail("Expected an IllegalArgumentException for the unparseable string.");
         } catch (IllegalArgumentException e) {
-            //
-            // Invalid format: \"DateTimeComparator[dayOfYear-]\"
-            //
-            verifyException("org.joda.time.format.DateTimeParserBucket", e);
+            // Verify that the exception message clearly indicates the cause of the failure.
+            String expectedMessage = "Invalid format: \"" + unparseableDateString + "\"";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
