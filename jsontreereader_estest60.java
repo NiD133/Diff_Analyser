@@ -1,37 +1,38 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
+import org.junit.Test;
+
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeReader_ESTestTest60 extends JsonTreeReader_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test059() throws Throwable {
-        JsonObject jsonObject0 = new JsonObject();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonObject0);
-        jsonTreeReader0.beginObject();
-        // Undeclared exception!
+/**
+ * This class contains an improved version of an auto-generated test for JsonTreeReader.
+ * The original test has been refactored for better understandability.
+ */
+public class JsonTreeReaderImprovedTest {
+
+    /**
+     * Verifies that calling nextBoolean() when the reader is positioned at the end
+     * of an empty JSON object throws an IllegalStateException.
+     */
+    @Test
+    public void nextBoolean_atEndOfEmptyObject_throwsIllegalStateException() throws IOException {
+        // Arrange: Create a reader for an empty JSON object "{}" and advance it
+        // past the opening brace.
+        JsonObject emptyObject = new JsonObject();
+        JsonTreeReader reader = new JsonTreeReader(emptyObject);
+        reader.beginObject();
+
+        // Act & Assert: Verify that calling nextBoolean() throws an exception
+        // because the next token is END_OBJECT, not a boolean.
         try {
-            jsonTreeReader0.nextBoolean();
-            fail("Expecting exception: IllegalStateException");
+            reader.nextBoolean();
+            fail("Expected an IllegalStateException to be thrown.");
         } catch (IllegalStateException e) {
-            //
-            // Expected BOOLEAN but was END_OBJECT at path $.
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeReader", e);
+            assertEquals("Expected BOOLEAN but was END_OBJECT at path $.", e.getMessage());
         }
     }
 }
