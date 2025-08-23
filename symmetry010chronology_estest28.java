@@ -1,52 +1,40 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
+
 import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.UnsupportedTemporalTypeException;
 import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.junit.runner.RunWith;
 
-public class Symmetry010Chronology_ESTestTest28 extends Symmetry010Chronology_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        Symmetry010Chronology symmetry010Chronology0 = new Symmetry010Chronology();
-        // Undeclared exception!
+/**
+ * Tests for the {@link Symmetry010Chronology} class.
+ */
+public class Symmetry010ChronologyTest {
+
+    /**
+     * Tests that dateEpochDay() throws a DateTimeException
+     * when the provided epoch day is greater than the maximum supported value.
+     */
+    @Test
+    public void dateEpochDay_throwsExceptionForEpochDayBeyondMaximum() {
+        // Arrange: Get the valid range and determine the first invalid value.
+        Symmetry010Chronology chronology = Symmetry010Chronology.INSTANCE;
+        ValueRange validRange = chronology.range(ChronoField.EPOCH_DAY);
+        long epochDayTooLarge = validRange.getMaximum() + 1;
+
+        // Act & Assert
         try {
-            symmetry010Chronology0.dateEpochDay(365250000L);
-            fail("Expecting exception: DateTimeException");
+            chronology.dateEpochDay(epochDayTooLarge);
+            fail("Expected a DateTimeException because the epoch day is out of the valid range.");
         } catch (DateTimeException e) {
-            //
-            // Invalid value for EpochDay (valid values -365961480 - 364523156): 365250003
-            //
-            verifyException("java.time.temporal.ValueRange", e);
+            // Verify that the exception message is informative and correct.
+            assertTrue(
+                "Exception message should indicate an invalid epoch day",
+                e.getMessage().contains("Invalid value for EpochDay")
+            );
         }
     }
 }
