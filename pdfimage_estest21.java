@@ -1,34 +1,41 @@
 package com.itextpdf.text.pdf;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import com.itextpdf.text.BadPdfFormatException;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.ImgJBIG2;
-import com.itextpdf.text.ImgTemplate;
-import com.itextpdf.text.Rectangle;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.junit.Assert.assertSame;
+
+/**
+ * This test suite contains tests for the {@link PdfImage} class.
+ * Note: The original test class name 'PdfImage_ESTestTest21' was preserved for context.
+ */
 public class PdfImage_ESTestTest21 extends PdfImage_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        byte[] byteArray0 = new byte[0];
-        ImgJBIG2 imgJBIG2_0 = new ImgJBIG2((-3134), 484, byteArray0, byteArray0);
-        PdfIndirectReference pdfIndirectReference0 = new PdfIndirectReference(1014, 1, 4);
-        PdfImage pdfImage0 = new PdfImage(imgJBIG2_0, "", pdfIndirectReference0);
-        Image image0 = pdfImage0.getImage();
-        assertEquals(2, Image.BX);
+    /**
+     * Tests that the getImage() method correctly returns the original Image object
+     * that was passed to the PdfImage constructor.
+     *
+     * @throws BadPdfFormatException if the PdfImage constructor fails, which is not expected in this test.
+     */
+    @Test
+    public void getImageShouldReturnTheOriginalImageInstance() throws BadPdfFormatException {
+        // Arrange: Create the necessary objects to instantiate a PdfImage.
+        // The specific image type and its data are not important for this test,
+        // as we are only verifying the behavior of the getter method.
+        Image originalImage = new ImgJBIG2(100, 200, new byte[0], new byte[0]);
+        PdfIndirectReference maskReference = new PdfIndirectReference(1, 0);
+        String imageName = "test_image";
+
+        PdfImage pdfImage = new PdfImage(originalImage, imageName, maskReference);
+
+        // Act: Call the method under test.
+        Image retrievedImage = pdfImage.getImage();
+
+        // Assert: Verify that the returned object is the exact same instance
+        // as the one passed to the constructor.
+        assertSame("The getImage() method should return the same image instance that was provided to the constructor.",
+                originalImage, retrievedImage);
     }
 }
