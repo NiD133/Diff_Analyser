@@ -1,49 +1,37 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Period;
-import java.time.Year;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
 
-public class InternationalFixedChronology_ESTestTest16 extends InternationalFixedChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        System.setCurrentTimeMillis((-1L));
-        InternationalFixedChronology internationalFixedChronology0 = InternationalFixedChronology.INSTANCE;
-        InternationalFixedDate internationalFixedDate0 = internationalFixedChronology0.dateNow();
-        assertEquals(365, internationalFixedDate0.lengthOfYear());
-        assertEquals((-1L), internationalFixedDate0.toEpochDay());
+/**
+ * Tests for the {@link InternationalFixedChronology} class.
+ */
+public class InternationalFixedChronologyTest {
+
+    /**
+     * Tests that {@code dateNow(Clock)} returns the correct date when the clock is set
+     * to the moment just before the Unix epoch.
+     */
+    @Test
+    public void dateNow_withClockSetToJustBeforeEpoch_returnsCorrectDate() {
+        // Arrange: Set up a fixed clock for one millisecond before the Unix epoch.
+        // This corresponds to 1969-12-31T23:59:59.999Z. The date part is 1969-12-31.
+        Instant instantBeforeEpoch = Instant.ofEpochMilli(-1L);
+        Clock fixedClock = Clock.fixed(instantBeforeEpoch, ZoneOffset.UTC);
+        InternationalFixedChronology ifcChronology = InternationalFixedChronology.INSTANCE;
+
+        // Act: Obtain the current date from the chronology using the fixed clock.
+        InternationalFixedDate date = ifcChronology.dateNow(fixedClock);
+
+        // Assert: Verify that the obtained date corresponds to the day before the epoch.
+        // The epoch day for 1970-01-01 is 0, so for 1969-12-31 it should be -1.
+        assertEquals("The epoch day should be -1", -1L, date.toEpochDay());
+
+        // The year 1969 is not a leap year, so it should have 365 days.
+        assertEquals("The length of the year 1969 should be 365", 365, date.lengthOfYear());
     }
 }
