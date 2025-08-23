@@ -1,34 +1,40 @@
 package org.jsoup.parser;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.*;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Node;
+import org.jsoup.nodes.XmlDeclaration;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import static org.jsoup.nodes.Document.OutputSettings.Syntax;
-import static org.jsoup.parser.Parser.NamespaceHtml;
-import static org.jsoup.parser.Parser.NamespaceXml;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class XmlTreeBuilderTestTest35 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-    private static void assertXmlNamespace(Element el) {
-        assertEquals(NamespaceXml, el.tag().namespace(), String.format("Element %s not in XML namespace", el.tagName()));
-    }
+/**
+ * Tests for the {@link XmlTreeBuilder}.
+ */
+public class XmlTreeBuilderTest {
 
     @Test
-    void declarationWithGt() {
-        // https://github.com/jhy/jsoup/issues/1947
-        String xml = "<x><?xmlDeclaration att1=\"value1\" att2=\"&lt;val2>\"?></x>";
-        Document doc = Jsoup.parse(xml, Parser.xmlParser());
-        XmlDeclaration decl = (XmlDeclaration) doc.expectFirst("x").childNode(0);
-        assertEquals("<val2>", decl.attr("att2"));
+    @DisplayName("Should correctly parse an XML declaration with an encoded '>' in an attribute value")
+    void parsesXmlDeclarationWithEncodedGreaterThanInAttribute() {
+        // This is a regression test for https://github.com/jhy/jsoup/issues/1947.
+        // It verifies that the parser correctly decodes an attribute value containing
+        // an encoded greater-than sign (e.g., att2="&lt;val2>").
+
+        // Arrange
+        String xmlWithEncodedAttribute = "<x><?xmlDeclaration att1=\"value1\" att2=\"&lt;val2>\"?></x>";
+        String expectedDecodedValue = "<val2>";
+
+        // Act
+        Document doc = Jsoup.parse(xmlWithEncodedAttribute, Parser.xmlParser());
+        Node firstChild = doc.expectFirst("x").childNode(0);
+
+        // Assert
+        assertTrue(firstChild instanceof XmlDeclaration, "The first child node should be an XmlDeclaration.");
+        XmlDeclaration decl = (XmlDeclaration) firstChild;
+
+        assertEquals(expectedDecodedValue, decl.attr("att2"), "The encoded attribute value should be correctly decoded.");
+        assertEquals("value1", decl.attr("att1"), "Other attributes should remain unaffected.");
     }
 }
