@@ -1,25 +1,40 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextAnchor;
 import org.jfree.chart.text.TextBlockAnchor;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class CategoryLabelPosition_ESTestTest2 extends CategoryLabelPosition_ESTest_scaffolding {
+/**
+ * Tests for the {@link CategoryLabelPosition} class.
+ *
+ * Note: The original test class name `CategoryLabelPosition_ESTestTest2` and its
+ * inheritance from a scaffolding class have been removed to improve clarity and
+ * focus on the test logic itself.
+ */
+public class CategoryLabelPositionTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        RectangleAnchor rectangleAnchor0 = RectangleAnchor.CENTER;
-        TextBlockAnchor textBlockAnchor0 = TextBlockAnchor.TOP_CENTER;
-        CategoryLabelWidthType categoryLabelWidthType0 = CategoryLabelWidthType.RANGE;
-        CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0, categoryLabelWidthType0, 0.0F);
-        float float0 = categoryLabelPosition0.getWidthRatio();
-        assertEquals(0.0F, float0, 0.01F);
-        assertEquals(0.0, categoryLabelPosition0.getAngle(), 0.01);
+    /**
+     * Verifies that the constructor taking a width ratio correctly initializes the
+     * object and sets a default angle of 0.0.
+     */
+    @Test
+    public void constructorWithWidthRatioShouldSetRatioAndUseDefaultAngle() {
+        // Arrange
+        RectangleAnchor categoryAnchor = RectangleAnchor.CENTER;
+        TextBlockAnchor labelAnchor = TextBlockAnchor.TOP_CENTER;
+        CategoryLabelWidthType widthType = CategoryLabelWidthType.RANGE;
+        float expectedWidthRatio = 0.0F;
+        double expectedDefaultAngle = 0.0;
+
+        // Act
+        CategoryLabelPosition position = new CategoryLabelPosition(
+                categoryAnchor, labelAnchor, widthType, expectedWidthRatio);
+
+        // Assert
+        assertEquals("The width ratio should be correctly set by the constructor.",
+                expectedWidthRatio, position.getWidthRatio(), 0.01f);
+        assertEquals("The angle should default to 0.0 for this constructor overload.",
+                expectedDefaultAngle, position.getAngle(), 0.01);
     }
 }
