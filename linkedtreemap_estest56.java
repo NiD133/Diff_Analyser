@@ -1,29 +1,36 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.util.AbstractMap;
-import java.util.Comparator;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class LinkedTreeMap_ESTestTest56 extends LinkedTreeMap_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test55() throws Throwable {
-        Integer integer0 = new Integer((-1960));
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>();
-        LinkedTreeMap.Node<Integer, Integer> linkedTreeMap_Node0 = linkedTreeMap0.find(integer0, true);
-        linkedTreeMap0.putIfAbsent(integer0, integer0);
-        LinkedTreeMap.Node<Integer, Integer> linkedTreeMap_Node1 = new LinkedTreeMap.Node<Integer, Integer>(true, linkedTreeMap_Node0, integer0, linkedTreeMap_Node0, linkedTreeMap_Node0);
-        linkedTreeMap0.findByEntry(linkedTreeMap_Node1);
-        assertEquals(1, linkedTreeMap0.size());
+    /**
+     * Tests that findByEntry() returns null when an entry with a matching key
+     * exists, but its value is different from the value of the entry being searched for.
+     * This also verifies that the find operation does not modify the map.
+     */
+    @Test
+    public void findByEntry_whenKeyMatchesButValueDoesNot_returnsNullAndMapIsUnchanged() {
+        // Arrange
+        LinkedTreeMap<Integer, Integer> map = new LinkedTreeMap<>();
+        Integer key = -1960;
+        Integer valueInMap = -1960;
+        map.put(key, valueInMap);
+
+        // Create a search entry with the same key but a different value.
+        // The original test created a new Node whose value defaulted to null, so we
+        // replicate that behavior here for an equivalent test.
+        Map.Entry<Integer, Integer> entryToFind = new AbstractMap.SimpleEntry<>(key, null);
+
+        // Act
+        LinkedTreeMap.Node<Integer, Integer> result = map.findByEntry(entryToFind);
+
+        // Assert
+        assertNull("findByEntry should return null if the entry's value does not match.", result);
+        assertEquals("The map's size should not be affected by the findByEntry call.", 1, map.size());
     }
 }
