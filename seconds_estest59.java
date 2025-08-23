@@ -1,18 +1,26 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Seconds_ESTestTest59 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test58() throws Throwable {
-        Seconds seconds0 = Seconds.TWO;
-        Days days0 = seconds0.toStandardDays();
-        assertEquals(0, days0.getDays());
+    /**
+     * Tests that converting a Seconds value that is less than a full day (86,400 seconds)
+     * correctly truncates to zero days.
+     */
+    @Test
+    public void toStandardDays_whenSecondsAreLessThanOneDay_returnsZeroDays() {
+        // Arrange: A period of 2 seconds is significantly less than a standard day.
+        Seconds twoSeconds = Seconds.TWO;
+
+        // Act: Convert the seconds period to standard days.
+        Days result = twoSeconds.toStandardDays();
+
+        // Assert: The result should be zero days, as the conversion truncates fractions.
+        assertEquals(Days.ZERO, result);
     }
 }
