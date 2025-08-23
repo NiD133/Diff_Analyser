@@ -1,35 +1,29 @@
 package org.jfree.chart.labels;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.time.chrono.ThaiBuddhistEra;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.text.MockDateFormat;
 import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IntervalCategoryItemLabelGenerator_ESTestTest3 extends IntervalCategoryItemLabelGenerator_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IntervalCategoryItemLabelGenerator} class.
+ */
+public class IntervalCategoryItemLabelGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        IntervalCategoryItemLabelGenerator intervalCategoryItemLabelGenerator0 = new IntervalCategoryItemLabelGenerator();
-        // Undeclared exception!
-        try {
-            intervalCategoryItemLabelGenerator0.createItemArray((CategoryDataset) null, 0, 0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jfree.chart.labels.IntervalCategoryItemLabelGenerator", e);
-        }
+    /**
+     * Verifies that the createItemArray method throws a NullPointerException
+     * when the provided dataset is null. The method's contract requires a
+     * non-null dataset.
+     */
+    @Test(expected = NullPointerException.class)
+    public void createItemArray_withNullDataset_shouldThrowNullPointerException() {
+        // Arrange: Create an instance of the label generator.
+        IntervalCategoryItemLabelGenerator generator = new IntervalCategoryItemLabelGenerator();
+        CategoryDataset nullDataset = null;
+        int anyRow = 0;
+        int anyColumn = 0;
+
+        // Act: Call the method under test with a null dataset.
+        // Assert: The test expects a NullPointerException, which is handled by the
+        // @Test(expected=...) annotation.
+        generator.createItemArray(nullDataset, anyRow, anyColumn);
     }
 }
