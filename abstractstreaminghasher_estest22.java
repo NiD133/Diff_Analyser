@@ -1,34 +1,38 @@
 package com.google.common.hash;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
+import java.nio.BufferOverflowException;
+import java.nio.charset.Charset;
+import org.junit.Test;
+
+/**
+ * Tests for {@link AbstractStreamingHasher}.
+ */
 public class AbstractStreamingHasher_ESTestTest22 extends AbstractStreamingHasher_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        Crc32cHashFunction.Crc32cHasher crc32cHashFunction_Crc32cHasher0 = new Crc32cHashFunction.Crc32cHasher();
-        Charset charset0 = Charset.defaultCharset();
-        ByteBuffer byteBuffer0 = charset0.encode("maximum size was already set to %s");
-        Crc32cHashFunction.Crc32cHasher crc32cHashFunction_Crc32cHasher1 = (Crc32cHashFunction.Crc32cHasher) crc32cHashFunction_Crc32cHasher0.putBytes(byteBuffer0);
-        crc32cHashFunction_Crc32cHasher0.hash();
-        byte[] byteArray0 = new byte[2];
-        // Undeclared exception!
+    @Test
+    public void putBytes_afterHashIsCalculated_throwsException() {
+        // Arrange: Create a hasher and use it to calculate a hash.
+        // A Hasher instance is stateful and not intended for reuse after hash() is called.
+        Hasher hasher = new Crc32cHashFunction.Crc32cHasher();
+        hasher.putString("some initial data", Charset.defaultCharset());
+        hasher.hash(); // This call finalizes the hasher's state.
+
+        // Act & Assert: Attempting to add more data to the finalized hasher should fail.
         try {
-            crc32cHashFunction_Crc32cHasher1.putBytes(byteArray0, 1, 1);
-            fail("Expecting exception: BufferOverflowException");
-        } catch (BufferOverflowException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.Buffer", e);
+            byte[] extraData = new byte[2];
+            // This attempts to write to the hasher's internal buffer, which was finalized
+            // by the preceding hash() call.
+            hasher.putBytes(extraData, 1, 1);
+            fail("Expected an exception to be thrown when writing to a hasher after hash() is called.");
+        } catch (BufferOverflowException expected) {
+            // SUCCESS: The expected exception was thrown.
+            // The current implementation throws BufferOverflowException. While an
+            // IllegalStateException might be more semantically appropriate, this test
+            // verifies the actual, observed behavior.
+            assertNull("The exception message was expected to be null.", expected.getMessage());
         }
     }
 }
