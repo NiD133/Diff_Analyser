@@ -1,39 +1,47 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest121 extends XNode_ESTest_scaffolding {
+import javax.imageio.metadata.IIOMetadataNode;
+import java.util.Properties;
 
-    @Test(timeout = 4000)
-    public void test120() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XPathParser xPathParser0 = new XPathParser((Document) null, false);
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        // Undeclared exception!
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+/**
+ * Test suite for the XNode class.
+ */
+public class XNodeTest {
+
+    /**
+     * Verifies that calling evalDouble with a syntactically invalid XPath expression
+     * throws a RuntimeException.
+     */
+    @Test
+    public void evalDoubleShouldThrowExceptionForInvalidXPathExpression() {
+        // Arrange
+        // 1. Define an XPath expression that is syntactically incorrect.
+        String invalidXPath = "H%7;)SgDF9";
+
+        // 2. Set up a minimal XNode instance. The underlying document can be null
+        //    because the XPath parsing fails before the document is ever accessed.
+        XPathParser xPathParser = new XPathParser((Document) null, false);
+        Node domNode = new IIOMetadataNode(); // A concrete, empty Node implementation
+        XNode xNode = new XNode(xPathParser, domNode, new Properties());
+
+        // Act & Assert
         try {
-            xNode0.evalDouble("H%7;)SgDF9");
-            fail("Expecting exception: RuntimeException");
+            xNode.evalDouble(invalidXPath);
+            fail("Expected a RuntimeException to be thrown for the invalid XPath expression.");
         } catch (RuntimeException e) {
-            //
-            // Error evaluating XPath.  Cause: javax.xml.xpath.XPathExpressionException: javax.xml.transform.TransformerException: Extra illegal tokens: ')', 'SgDF9'
-            //
-            verifyException("org.apache.ibatis.parsing.XPathParser", e);
+            // The exception is expected. We can inspect its message for more specific verification.
+            String actualMessage = e.getMessage();
+            assertTrue("Exception message should indicate an XPath evaluation error. Actual: " + actualMessage,
+                    actualMessage.contains("Error evaluating XPath"));
+            assertTrue("Exception message should detail the specific parsing error. Actual: " + actualMessage,
+                    actualMessage.contains("Extra illegal tokens"));
         }
     }
 }
