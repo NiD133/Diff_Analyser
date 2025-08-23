@@ -1,43 +1,29 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
+
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedOutputStream;
-import java.io.PipedWriter;
-import java.io.StringWriter;
 import java.nio.BufferOverflowException;
 import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class HexDump_ESTestTest5 extends HexDump_ESTest_scaffolding {
+/**
+ * Tests for the {@link HexDump} class.
+ */
+public class HexDumpTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        byte[] byteArray0 = new byte[10];
-        char[] charArray0 = new char[2];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        // Undeclared exception!
-        try {
-            HexDump.dump(byteArray0, (Appendable) charBuffer0);
-            fail("Expecting exception: BufferOverflowException");
-        } catch (BufferOverflowException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.CharBuffer", e);
-        }
+    /**
+     * Tests that HexDump.dump() throws a BufferOverflowException when the target
+     * Appendable (a CharBuffer) has insufficient capacity to hold the formatted output.
+     */
+    @Test(expected = BufferOverflowException.class)
+    public void dumpShouldThrowBufferOverflowExceptionWhenAppendableIsTooSmall() throws IOException {
+        // Arrange: Create data to be dumped. The hex dump output for 10 bytes
+        // is significantly larger than the 2-character buffer we provide.
+        byte[] dataToDump = new byte[10];
+        CharBuffer insufficientBuffer = CharBuffer.wrap(new char[2]);
+
+        // Act: Attempt to dump the data into the undersized buffer.
+        // Assert: The @Test(expected) annotation asserts that a BufferOverflowException is thrown.
+        HexDump.dump(dataToDump, insufficientBuffer);
     }
 }
