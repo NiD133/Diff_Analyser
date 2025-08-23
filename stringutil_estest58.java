@@ -1,36 +1,23 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
 
-public class StringUtil_ESTestTest58 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the {@link StringUtil#resolve(URL, String)} method.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test57() throws Throwable {
-        // Undeclared exception!
-        try {
-            StringUtil.resolve((URL) null, "?                                                                                                                                                                                                                                                   ");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.evosuite.runtime.mock.java.net.MockURL", e);
-        }
+    /**
+     * Verifies that calling resolve with a null base URL throws a NullPointerException,
+     * as the underlying URL constructor does not permit a null context.
+     */
+    @Test(expected = NullPointerException.class)
+    public void resolveWithNullBaseUrlThrowsNullPointerException() throws MalformedURLException {
+        // The 'base' URL is null, which should cause the method to throw a NullPointerException.
+        // The relative URL can be any valid string, as it's the null base that triggers the exception.
+        StringUtil.resolve(null, "/some/path");
     }
 }
