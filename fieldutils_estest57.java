@@ -1,24 +1,36 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
 
-public class FieldUtils_ESTestTest57 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link FieldUtils}.
+ * This class focuses on the safeDivide method with rounding.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test56() throws Throwable {
-        RoundingMode roundingMode0 = RoundingMode.UP;
-        long long0 = FieldUtils.safeDivide((-9223372036854775808L), 319L, roundingMode0);
-        assertEquals((-28913391965061994L), long0);
+    /**
+     * Tests that safeDivide correctly handles Long.MIN_VALUE with RoundingMode.UP.
+     * RoundingMode.UP rounds away from zero. For a negative result, this means rounding
+     * down to the next more negative integer.
+     */
+    @Test
+    public void safeDivide_withLongMinValueAndRoundingUp_roundsAwayFromZero() {
+        // Arrange
+        final long dividend = Long.MIN_VALUE; // -9,223,372,036,854,775,808
+        final long divisor = 319L;
+
+        // The exact division result is ~ -28,913,391,965,061,993.75
+        // With RoundingMode.UP (away from zero), this rounds to the next integer
+        // further from zero, which is -28,913,391,965,061,994.
+        final long expectedResult = -28913391965061994L;
+
+        // Act
+        long actualResult = FieldUtils.safeDivide(dividend, divisor, RoundingMode.UP);
+
+        // Assert
+        assertEquals(expectedResult, actualResult);
     }
 }
