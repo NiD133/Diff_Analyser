@@ -1,26 +1,33 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-public class Weeks_ESTestTest32 extends Weeks_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Weeks} class, focusing on arithmetic operations.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        Weeks weeks0 = Weeks.MAX_VALUE;
-        // Undeclared exception!
-        try {
-            weeks0.plus(weeks0);
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // The calculation caused an overflow: 2147483647 + 2147483647
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
-        }
+    /**
+     * Verifies that adding a value to Weeks.MAX_VALUE that causes an integer overflow
+     * correctly throws an ArithmeticException.
+     */
+    @Test
+    public void plus_whenSumExceedsIntegerMax_throwsArithmeticException() {
+        // Arrange: Start with the maximum possible value for Weeks.
+        final Weeks maxWeeks = Weeks.MAX_VALUE;
+        final String expectedMessage = "The calculation caused an overflow: 2147483647 + 2147483647";
+
+        // Act & Assert: Execute the operation and verify that it throws the expected exception.
+        // The assertThrows method captures the thrown exception for further inspection.
+        ArithmeticException thrown = assertThrows(
+            "Adding MAX_VALUE to itself should cause an overflow.",
+            ArithmeticException.class,
+            () -> maxWeeks.plus(maxWeeks)
+        );
+
+        // Assert: Verify that the exception message is correct, confirming the cause of the error.
+        assertEquals(expectedMessage, thrown.getMessage());
     }
 }
