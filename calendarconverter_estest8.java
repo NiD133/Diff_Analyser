@@ -1,37 +1,28 @@
 package org.joda.time.convert;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
 import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+/**
+ * This test suite focuses on the behavior of the CalendarConverter class,
+ * specifically its handling of invalid input types.
+ */
 public class CalendarConverter_ESTestTest8 extends CalendarConverter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        CalendarConverter calendarConverter0 = new CalendarConverter();
-        // Undeclared exception!
-        try {
-            calendarConverter0.getChronology((Object) calendarConverter0, (Chronology) null);
-            fail("Expecting exception: ClassCastException");
-        } catch (ClassCastException e) {
-            //
-            // org.joda.time.convert.CalendarConverter cannot be cast to java.util.Calendar
-            //
-            verifyException("org.joda.time.convert.CalendarConverter", e);
-        }
+    /**
+     * Verifies that getChronology() throws a ClassCastException when passed an object
+     * that is not an instance of java.util.Calendar. The method contract requires
+     * a Calendar object, and this test ensures it fails correctly for other types.
+     */
+    @Test(expected = ClassCastException.class)
+    public void getChronology_whenObjectIsNotCalendar_shouldThrowClassCastException() {
+        // Arrange: Create a converter instance and an object of an invalid type.
+        // The method under test expects a java.util.Calendar.
+        CalendarConverter converter = new CalendarConverter();
+        Object invalidInput = new Object();
+
+        // Act & Assert: Call getChronology with the invalid object.
+        // The @Test(expected) annotation asserts that a ClassCastException is thrown.
+        converter.getChronology(invalidInput, (Chronology) null);
     }
 }
