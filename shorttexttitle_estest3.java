@@ -1,48 +1,48 @@
 package org.jfree.chart.title;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.JapaneseDate;
-import java.util.Calendar;
-import java.util.List;
-import javax.swing.JTable;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.evosuite.runtime.mock.java.util.MockCalendar;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.block.RectangleConstraint;
-import org.jfree.chart.block.Size2D;
-import org.jfree.chart.plot.CombinedDomainXYPlot;
-import org.jfree.chart.plot.SpiderWebPlot;
-import org.jfree.chart.plot.pie.PiePlot;
-import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import org.jfree.chart.block.Size2D;
+import org.jfree.data.Range;
+
+// The original class name and inheritance are preserved.
 public class ShortTextTitle_ESTestTest3 extends ShortTextTitle_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        ShortTextTitle shortTextTitle0 = new ShortTextTitle("Not yet implemented.");
-        CombinedDomainXYPlot<ChronoLocalDate> combinedDomainXYPlot0 = new CombinedDomainXYPlot<ChronoLocalDate>();
-        JFreeChart jFreeChart0 = new JFreeChart((String) null, combinedDomainXYPlot0);
-        BufferedImage bufferedImage0 = jFreeChart0.createBufferedImage(1, 10, (ChartRenderingInfo) null);
-        Graphics2D graphics2D0 = bufferedImage0.createGraphics();
-        Range range0 = new Range(229.0, 913.12026869883);
-        Size2D size2D0 = shortTextTitle0.arrangeRR(graphics2D0, range0, range0);
-        assertEquals(134.0, size2D0.width, 0.01);
+    /**
+     * Tests that the arrangeRR method correctly calculates the title's size
+     * when the text fits within the given width constraint. The 'RR' in arrangeRR
+     * signifies that both width and height are constrained by a Range.
+     */
+    @Test
+    public void arrangeRR_WhenTextFitsWithinWidthConstraint_ShouldReturnTextDimensions() {
+        // Arrange
+        final String titleText = "Not yet implemented.";
+        // This expected width is specific to the text and the default font settings
+        // (SansSerif, BOLD, 12) used by the title object in the test environment.
+        final double expectedWidth = 134.0;
+        final double delta = 0.01;
+
+        ShortTextTitle title = new ShortTextTitle(titleText);
+
+        // A dummy Graphics2D context is required for font metrics calculations.
+        // The original test's method of creating a JFreeChart was overly complex.
+        BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = image.createGraphics();
+
+        // Define a width constraint that is large enough to accommodate the text.
+        // For ShortTextTitle, arrangeRR only checks if the text width is within
+        // the upper bound of the widthRange.
+        Range widthConstraint = new Range(200.0, 1000.0);
+        Range heightConstraint = new Range(0.0, 100.0); // Height constraint is not critical here.
+
+        // Act
+        Size2D arrangedSize = title.arrangeRR(graphics, widthConstraint, heightConstraint);
+
+        // Assert
+        assertEquals("The calculated width should match the expected text width.",
+                expectedWidth, arrangedSize.width, delta);
     }
 }
