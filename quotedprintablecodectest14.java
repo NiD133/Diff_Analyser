@@ -1,37 +1,53 @@
 package org.apache.commons.codec.net;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CharEncoding;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class QuotedPrintableCodecTestTest14 {
+/**
+ * Tests for the QuotedPrintableCodec, focusing on its handling of characters
+ * that should not be encoded.
+ */
+class QuotedPrintableCodecTest {
 
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
+    /**
+     * According to RFC 1521, all printable ASCII characters (decimal 33-126)
+     * except for '=' (decimal 61) are considered "safe" and do not require encoding.
+     * This string includes a comprehensive set of such characters.
+     */
+    private static final String SAFE_CHARACTERS = "abc123_-.*~!@#$%^&()+{}\"\\;:`,/[]";
 
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
+    private QuotedPrintableCodec codec;
 
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
+    @BeforeEach
+    void setUp() {
+        // Using the default constructor which uses UTF-8 and non-strict mode.
+        codec = new QuotedPrintableCodec();
     }
 
     @Test
-    void testSafeCharEncodeDecode() throws Exception {
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec();
-        final String plain = "abc123_-.*~!@#$%^&()+{}\"\\;:`,/[]";
-        final String encoded = qpcodec.encode(plain);
-        assertEquals(plain, encoded, "Safe chars quoted-printable encoding test");
-        assertEquals(plain, qpcodec.decode(encoded), "Safe chars quoted-printable decoding test");
+    @DisplayName("Safe characters should remain unchanged after encoding and decoding")
+    void safeCharactersShouldRemainUnchangedAfterEncodingAndDecoding() throws EncoderException, DecoderException {
+        // This test verifies two things:
+        // 1. Encoding a string of "safe" characters results in an identical string.
+        // 2. Decoding that string returns the original string, confirming the round-trip integrity.
+
+        // Act: Encode the string of safe characters.
+        final String encodedString = codec.encode(SAFE_CHARACTERS);
+
+        // Assert: The encoded string should be identical to the original.
+        assertEquals(SAFE_CHARACTERS, encodedString,
+            "Encoding safe characters should not alter the original string.");
+
+        // Act: Decode the (unaltered) encoded string.
+        final String decodedString = codec.decode(encodedString);
+
+        // Assert: The decoded string should also be identical to the original.
+        assertEquals(SAFE_CHARACTERS, decodedString,
+            "Decoding the result of an safe-character encoding should yield the original string.");
     }
 }
