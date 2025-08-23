@@ -1,73 +1,110 @@
 package org.apache.commons.cli.help;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Function;
+
 import java.util.stream.Stream;
 import org.apache.commons.cli.DeprecatedAttributes;
 import org.apache.commons.cli.Option;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class OptionFormatterTestTest13 {
+/**
+ * Tests for {@link OptionFormatter}.
+ */
+@DisplayName("OptionFormatter Test")
+class OptionFormatterTest {
 
-    public static Stream<Arguments> deprecatedAttributesData() {
-        final List<Arguments> lst = new ArrayList<>();
-        final DeprecatedAttributes.Builder daBuilder = DeprecatedAttributes.builder();
-        lst.add(Arguments.of(daBuilder.get(), "[Deprecated]"));
-        daBuilder.setSince("now");
-        lst.add(Arguments.of(daBuilder.get(), "[Deprecated since now]"));
-        daBuilder.setForRemoval(true);
-        lst.add(Arguments.of(daBuilder.get(), "[Deprecated for removal since now]"));
-        daBuilder.setSince(null);
-        lst.add(Arguments.of(daBuilder.get(), "[Deprecated for removal]"));
-        daBuilder.setForRemoval(false);
-        daBuilder.setDescription("Use something else");
-        lst.add(Arguments.of(daBuilder.get(), "[Deprecated. Use something else]"));
-        daBuilder.setForRemoval(true);
-        lst.add(Arguments.of(daBuilder.get(), "[Deprecated for removal. Use something else]"));
-        daBuilder.setForRemoval(false);
-        daBuilder.setSince("then");
-        lst.add(Arguments.of(daBuilder.get(), "[Deprecated since then. Use something else]"));
-        daBuilder.setForRemoval(true);
-        lst.add(Arguments.of(daBuilder.get(), "[Deprecated for removal since then. Use something else]"));
-        return lst.stream();
+    @Nested
+    @DisplayName("Deprecation Formatting")
+    class DeprecationFormatting {
+
+        static Stream<Arguments> deprecatedAttributesData() {
+            // Each Arguments instance is self-contained, making it easy to understand
+            // the inputs for each specific test case without tracking state.
+            return Stream.of(
+                Arguments.of("Default deprecation",
+                    DeprecatedAttributes.builder().get(),
+                    "[Deprecated]"),
+                Arguments.of("Deprecation with 'since'",
+                    DeprecatedAttributes.builder().setSince("now").get(),
+                    "[Deprecated since now]"),
+                Arguments.of("Deprecation with 'forRemoval' and 'since'",
+                    DeprecatedAttributes.builder().setForRemoval(true).setSince("now").get(),
+                    "[Deprecated for removal since now]"),
+                Arguments.of("Deprecation with 'forRemoval' only",
+                    DeprecatedAttributes.builder().setForRemoval(true).setSince(null).get(),
+                    "[Deprecated for removal]"),
+                Arguments.of("Deprecation with 'description' only",
+                    DeprecatedAttributes.builder().setForRemoval(false).setDescription("Use something else").get(),
+                    "[Deprecated. Use something else]"),
+                Arguments.of("Deprecation with 'forRemoval' and 'description'",
+                    DeprecatedAttributes.builder().setForRemoval(true).setDescription("Use something else").get(),
+                    "[Deprecated for removal. Use something else]"),
+                Arguments.of("Deprecation with 'since' and 'description'",
+                    DeprecatedAttributes.builder().setForRemoval(false).setSince("then").setDescription("Use something else").get(),
+                    "[Deprecated since then. Use something else]"),
+                Arguments.of("Deprecation with all attributes",
+                    DeprecatedAttributes.builder().setForRemoval(true).setSince("then").setDescription("Use something else").get(),
+                    "[Deprecated for removal since then. Use something else]")
+            );
+        }
+
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("deprecatedAttributesData")
+        @DisplayName("COMPLEX_DEPRECATED_FORMAT should format based on attributes")
+        void testComplexDeprecatedFormat(final String testName, final DeprecatedAttributes deprecatedAttributes, final String expectedFormat) {
+            // Test case 1: Option without its own description
+            final Option option = Option.builder("o").deprecated(deprecatedAttributes).get();
+            assertEquals(expectedFormat, OptionFormatter.COMPLEX_DEPRECATED_FORMAT.apply(option));
+
+            // Test case 2: Option with its own description, which should be appended
+            final String optionDescription = "The description";
+            final Option optionWithDesc = Option.builder("o").desc(optionDescription).deprecated(deprecatedAttributes).get();
+            final String expectedFormatWithDesc = expectedFormat + " " + optionDescription;
+            assertEquals(expectedFormatWithDesc, OptionFormatter.COMPLEX_DEPRECATED_FORMAT.apply(optionWithDesc));
+        }
     }
 
-    private void assertEquivalent(final OptionFormatter formatter, final OptionFormatter formatter2) {
-        assertEquals(formatter.toSyntaxOption(), formatter2.toSyntaxOption());
-        assertEquals(formatter.toSyntaxOption(true), formatter2.toSyntaxOption(true));
-        assertEquals(formatter.toSyntaxOption(false), formatter2.toSyntaxOption(false));
-        assertEquals(formatter.getOpt(), formatter2.getOpt());
-        assertEquals(formatter.getLongOpt(), formatter2.getLongOpt());
-        assertEquals(formatter.getBothOpt(), formatter2.getBothOpt());
-        assertEquals(formatter.getDescription(), formatter2.getDescription());
-        assertEquals(formatter.getArgName(), formatter2.getArgName());
-        assertEquals(formatter.toOptional("foo"), formatter2.toOptional("foo"));
-    }
+    @Nested
+    @DisplayName("Separator Handling")
+    class SeparatorHandling {
 
-    @ParameterizedTest(name = "{index} {0}")
-    @MethodSource("deprecatedAttributesData")
-    void testComplexDeprecationFormat(final DeprecatedAttributes da, final String expected) {
-        final Option.Builder builder = Option.builder("o").deprecated(da);
-        final Option.Builder builderWithDesc = Option.builder("o").desc("The description").deprecated(da);
-        assertEquals(expected, OptionFormatter.COMPLEX_DEPRECATED_FORMAT.apply(builder.get()));
-        assertEquals(expected + " The description", OptionFormatter.COMPLEX_DEPRECATED_FORMAT.apply(builderWithDesc.get()));
-    }
+        private static final Option OPTION_WITH_LONG_OPT = Option.builder("o").longOpt("opt").hasArg().get();
 
-    @Test
-    void testSetOptSeparator() {
-        final Option option = Option.builder().option("o").longOpt("opt").hasArg().get();
-        OptionFormatter.Builder builder = OptionFormatter.builder().setOptSeparator(" and ");
-        assertEquals("-o and --opt", builder.build(option).getBothOpt());
-        builder = OptionFormatter.builder().setOptSeparator("");
-        assertEquals("-o--opt", builder.build(option).getBothOpt(), "Empty string should return default");
-        builder = OptionFormatter.builder().setOptSeparator(null);
-        assertEquals("-o--opt", builder.build(option).getBothOpt(), "null string should return default");
+        @Test
+        @DisplayName("should use a custom option separator")
+        void shouldUseCustomOptSeparator() {
+            final OptionFormatter formatter = OptionFormatter.builder()
+                .setOptSeparator(" and ")
+                .build(OPTION_WITH_LONG_OPT);
+
+            assertEquals("-o and --opt", formatter.getBothOpt());
+        }
+
+        @Test
+        @DisplayName("should treat an empty option separator as an empty string")
+        void shouldTreatEmptyOptSeparatorAsEmpty() {
+            final OptionFormatter formatter = OptionFormatter.builder()
+                .setOptSeparator("")
+                .build(OPTION_WITH_LONG_OPT);
+
+            assertEquals("-o--opt", formatter.getBothOpt(),
+                "An empty separator should result in no separator between options.");
+        }
+
+        @Test
+        @DisplayName("should treat a null option separator as an empty string")
+        void shouldTreatNullOptSeparatorAsEmpty() {
+            final OptionFormatter formatter = OptionFormatter.builder()
+                .setOptSeparator(null)
+                .build(OPTION_WITH_LONG_OPT);
+
+            assertEquals("-o--opt", formatter.getBothOpt(),
+                "A null separator should result in no separator between options.");
+        }
     }
 }
