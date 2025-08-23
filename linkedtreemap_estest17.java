@@ -1,33 +1,26 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class LinkedTreeMap_ESTestTest17 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * This test class contains unit tests for the LinkedTreeMap class.
+ * This specific test focuses on the behavior of the package-private `removeInternal` method.
+ */
+public class LinkedTreeMapTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>();
-        // Undeclared exception!
-        try {
-            linkedTreeMap0.removeInternal((LinkedTreeMap.Node<Integer, Integer>) null, true);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.internal.LinkedTreeMap", e);
-        }
+    /**
+     * Verifies that calling the `removeInternal` method with a null node
+     * correctly throws a NullPointerException. This ensures robust handling of
+     * invalid arguments for this internal-use method.
+     */
+    @Test(expected = NullPointerException.class)
+    public void removeInternal_whenNodeIsNull_throwsNullPointerException() {
+        // Arrange: Create an empty LinkedTreeMap instance.
+        LinkedTreeMap<Integer, Integer> map = new LinkedTreeMap<>();
+
+        // Act: Attempt to remove a null node.
+        // The 'expected' attribute of the @Test annotation handles the assertion,
+        // ensuring that a NullPointerException is thrown by this call.
+        map.removeInternal(null, true);
     }
 }
