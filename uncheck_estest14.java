@@ -1,31 +1,36 @@
 package org.apache.commons.io.function;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.time.chrono.HijrahEra;
-import java.util.Comparator;
-import java.util.concurrent.ForkJoinTask;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.LongStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.io.IOException;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-public class Uncheck_ESTestTest14 extends Uncheck_ESTest_scaffolding {
+/**
+ * Tests for the {@link Uncheck} utility class.
+ * This focuses on the getAsInt() method.
+ */
+public class UncheckTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        IOIntSupplier iOIntSupplier0 = mock(IOIntSupplier.class, new ViolatedAssumptionAnswer());
-        doReturn((-1830)).when(iOIntSupplier0).getAsInt();
-        int int0 = Uncheck.getAsInt(iOIntSupplier0);
-        assertEquals((-1830), int0);
+    /**
+     * Tests that Uncheck.getAsInt() correctly returns the integer value
+     * provided by the IOIntSupplier when no exception is thrown.
+     */
+    @Test
+    public void getAsInt_shouldReturnValue_whenSupplierSucceeds() throws IOException {
+        // Arrange: Define the expected value and mock the supplier.
+        final int expectedValue = -1830;
+        final IOIntSupplier mockSupplier = mock(IOIntSupplier.class);
+
+        // Configure the mock to return the expected value.
+        // The 'throws IOException' is required by the compiler because the
+        // getAsInt() method in the IOIntSupplier interface is declared to throw it.
+        when(mockSupplier.getAsInt()).thenReturn(expectedValue);
+
+        // Act: Call the method under test.
+        final int actualValue = Uncheck.getAsInt(mockSupplier);
+
+        // Assert: Verify that the returned value matches the expected value.
+        assertEquals(expectedValue, actualValue);
     }
 }
