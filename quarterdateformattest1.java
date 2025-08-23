@@ -1,32 +1,88 @@
 package org.jfree.chart.axis;
 
-import java.util.TimeZone;
-import org.jfree.chart.TestUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import java.util.TimeZone;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-public class QuarterDateFormatTestTest1 {
+/**
+ * Tests for the equals() method in the QuarterDateFormat class.
+ */
+@DisplayName("QuarterDateFormat.equals()")
+class QuarterDateFormatTestTest1 {
 
-    /**
-     * Confirm that the equals method can distinguish all the required fields.
-     */
+    private static final TimeZone GMT = TimeZone.getTimeZone("GMT");
+    private static final TimeZone PST = TimeZone.getTimeZone("PST");
+    private static final String[] DEFAULT_QUARTERS = new String[]{"1", "2", "3", "4"};
+    private static final String[] ROMAN_QUARTERS = new String[]{"I", "II", "III", "IV"};
+
+    private QuarterDateFormat baseFormat;
+
+    @BeforeEach
+    void setUp() {
+        baseFormat = new QuarterDateFormat(GMT, DEFAULT_QUARTERS, false);
+    }
+
     @Test
-    public void testEquals() {
-        QuarterDateFormat qf1 = new QuarterDateFormat(TimeZone.getTimeZone("GMT"), new String[] { "1", "2", "3", "4" });
-        QuarterDateFormat qf2 = new QuarterDateFormat(TimeZone.getTimeZone("GMT"), new String[] { "1", "2", "3", "4" });
-        assertEquals(qf1, qf2);
-        assertEquals(qf2, qf1);
-        qf1 = new QuarterDateFormat(TimeZone.getTimeZone("PST"), new String[] { "1", "2", "3", "4" });
-        assertNotEquals(qf1, qf2);
-        qf2 = new QuarterDateFormat(TimeZone.getTimeZone("PST"), new String[] { "1", "2", "3", "4" });
-        assertEquals(qf1, qf2);
-        qf1 = new QuarterDateFormat(TimeZone.getTimeZone("PST"), new String[] { "A", "2", "3", "4" });
-        assertNotEquals(qf1, qf2);
-        qf2 = new QuarterDateFormat(TimeZone.getTimeZone("PST"), new String[] { "A", "2", "3", "4" });
-        assertEquals(qf1, qf2);
-        qf1 = new QuarterDateFormat(TimeZone.getTimeZone("PST"), new String[] { "A", "2", "3", "4" }, true);
-        assertNotEquals(qf1, qf2);
-        qf2 = new QuarterDateFormat(TimeZone.getTimeZone("PST"), new String[] { "A", "2", "3", "4" }, true);
-        assertEquals(qf1, qf2);
+    @DisplayName("should be reflexive")
+    void anObjectShouldBeEqualToItself() {
+        assertEquals(baseFormat, baseFormat);
+    }
+
+    @Test
+    @DisplayName("should return true for two identical instances")
+    void identicalObjectsShouldBeEqual() {
+        // Arrange
+        QuarterDateFormat identicalFormat = new QuarterDateFormat(GMT, DEFAULT_QUARTERS, false);
+
+        // Assert
+        assertEquals(baseFormat, identicalFormat);
+        assertEquals(baseFormat.hashCode(), identicalFormat.hashCode());
+    }
+
+    @Test
+    @DisplayName("should return false when compared to null")
+    void anObjectShouldNotBeEqualToNull() {
+        assertNotEquals(null, baseFormat);
+    }
+
+    @Test
+    @DisplayName("should return false when compared to an object of a different type")
+    void shouldNotBeEqualToDifferentType() {
+        assertNotEquals("a string", baseFormat);
+    }
+
+    @Test
+    @DisplayName("should return false for different time zones")
+    void objectsWithDifferentTimeZonesShouldNotBeEqual() {
+        // Arrange
+        QuarterDateFormat differentTimeZoneFormat = new QuarterDateFormat(PST, DEFAULT_QUARTERS, false);
+
+        // Assert
+        assertNotEquals(baseFormat, differentTimeZoneFormat);
+    }
+
+    @Test
+    @DisplayName("should return false for different quarter symbols")
+    void objectsWithDifferentQuarterSymbolsShouldNotBeEqual() {
+        // Arrange
+        QuarterDateFormat differentSymbolsFormat = new QuarterDateFormat(GMT, ROMAN_QUARTERS, false);
+
+        // Assert
+        assertNotEquals(baseFormat, differentSymbolsFormat);
+    }
+
+    @Test
+    @DisplayName("should return false for different 'quarterFirst' flags")
+    void objectsWithDifferentQuarterFirstFlagsShouldNotBeEqual() {
+        // Arrange
+        QuarterDateFormat quarterFirstFormat = new QuarterDateFormat(GMT, DEFAULT_QUARTERS, true);
+
+        // Assert
+        assertNotEquals(baseFormat, quarterFirstFormat);
     }
 }
