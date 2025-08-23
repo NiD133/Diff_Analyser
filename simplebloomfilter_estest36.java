@@ -1,29 +1,21 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class SimpleBloomFilter_ESTestTest36 extends SimpleBloomFilter_ESTest_scaffolding {
+/**
+ * Unit tests for {@link SimpleBloomFilter}.
+ */
+public class SimpleBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        SimpleBloomFilter simpleBloomFilter0 = null;
-        try {
-            simpleBloomFilter0 = new SimpleBloomFilter((Shape) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // shape
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Tests that the SimpleBloomFilter constructor throws a NullPointerException
+     * when the provided Shape is null. The Shape is a mandatory dependency.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructorShouldThrowNullPointerExceptionWhenShapeIsNull() {
+        // Attempt to create a SimpleBloomFilter with a null Shape.
+        // This action is expected to throw a NullPointerException, which is
+        // handled and asserted by the @Test(expected=...) annotation.
+        new SimpleBloomFilter(null);
     }
 }
