@@ -1,40 +1,36 @@
 package org.jsoup.helper;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
-import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.junit.Test;
 
-public class W3CDom_ESTestTest5 extends W3CDom_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        Document document0 = Document.createShell("javax.xml.xpath.XPathFactory:jsoup");
-        org.w3c.dom.Document document1 = w3CDom0.fromJsoup(document0);
-        w3CDom0.selectXpath("jsoupSource", document1);
-        assertTrue(w3CDom0.namespaceAware());
+/**
+ * Test suite for {@link W3CDom}.
+ * This class focuses on specific behaviors of the W3CDom converter.
+ */
+public class W3CDomTest {
+
+    /**
+     * Verifies that executing an XPath query does not permanently alter the
+     * namespace-aware configuration of the W3CDom instance.
+     * The selectXpath method may temporarily modify this state for compatibility,
+     * but it should be restored after the operation.
+     */
+    @Test
+    public void selectXpathDoesNotAlterNamespaceAwareState() {
+        // Arrange: Create a W3CDom converter and a sample document.
+        // By default, a new W3CDom instance is namespace-aware.
+        W3CDom w3cDom = new W3CDom();
+        assertTrue("Initial state should be namespace-aware", w3cDom.namespaceAware());
+
+        Document jsoupDoc = Document.createShell("http://example.com");
+        org.w3c.dom.Document w3cDoc = w3cDom.fromJsoup(jsoupDoc);
+
+        // Act: Execute an XPath query.
+        w3cDom.selectXpath("//body", w3cDoc);
+
+        // Assert: Verify that the W3CDom instance's public state is unchanged.
+        assertTrue("State should remain namespace-aware after selectXpath call", w3cDom.namespaceAware());
     }
 }
