@@ -1,68 +1,42 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.function.Function;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AndPredicate;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class ObjectGraphIterator_ESTestTest21 extends ObjectGraphIterator_ESTest_scaffolding {
+/**
+ * This test class was improved to focus on a specific behavior of the ObjectGraphIterator.
+ * The original test was auto-generated and contained significant irrelevant code.
+ */
+public class ObjectGraphIterator_ESTestTest21 { // Original class name kept for context
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        Integer integer0 = new Integer(566);
-        ObjectGraphIterator<Integer> objectGraphIterator0 = new ObjectGraphIterator<Integer>(integer0, (Transformer<? super Integer, ? extends Integer>) null);
-        ObjectGraphIterator<Integer> objectGraphIterator1 = new ObjectGraphIterator<Integer>(objectGraphIterator0);
-        Object object0 = objectGraphIterator1.next();
-        Comparator<Object> comparator0 = (Comparator<Object>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        ComparatorPredicate.Criterion comparatorPredicate_Criterion0 = ComparatorPredicate.Criterion.LESS_OR_EQUAL;
-        Predicate<Object> predicate0 = ComparatorPredicate.comparatorPredicate((Object) object0, comparator0, (ComparatorPredicate.Criterion) comparatorPredicate_Criterion0);
-        OrPredicate.orPredicate((Predicate<? super Object>) predicate0, (Predicate<? super Object>) predicate0);
-        String string0 = "comparator";
-        // Undeclared exception!
+    /**
+     * Tests that calling remove() on a nested ObjectGraphIterator throws an IllegalStateException
+     * if the element being removed originated as a root object of the inner iterator,
+     * which does not support removal.
+     */
+    @Test
+    public void removeThrowsExceptionWhenElementIsFromRootOfNestedIterator() {
+        // Arrange: Set up a nested iterator scenario.
+        // 1. Create an inner iterator with a single root object. The remove() operation
+        //    on this iterator will fail because the element is not from a sub-iterator.
+        final Integer rootElement = 566;
+        final ObjectGraphIterator<Integer> innerIterator = new ObjectGraphIterator<>(rootElement);
+
+        // 2. Create the main iterator that wraps the inner one.
+        final ObjectGraphIterator<Integer> graphIterator = new ObjectGraphIterator<>(innerIterator);
+
+        // 3. Advance the iterator to prepare for the remove() call.
+        graphIterator.next(); // This retrieves the rootElement from the innerIterator.
+
+        // Act & Assert: Attempting to remove the element should fail.
         try {
-            objectGraphIterator1.remove();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // Iterator remove() cannot be called at this time
-            //
-            verifyException("org.apache.commons.collections4.iterators.ObjectGraphIterator", e);
+            graphIterator.remove();
+            fail("Expected an IllegalStateException to be thrown.");
+        } catch (final IllegalStateException e) {
+            // The exception is expected because the inner iterator's remove() was called
+            // on an element that was its root, not from an underlying iterator.
+            assertEquals("Iterator remove() cannot be called at this time", e.getMessage());
         }
     }
 }
