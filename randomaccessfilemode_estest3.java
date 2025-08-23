@@ -1,29 +1,27 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomAccessFileMode_ESTestTest3 extends RandomAccessFileMode_ESTest_scaffolding {
+/**
+ * Tests for the {@link RandomAccessFileMode} enum.
+ */
+public class RandomAccessFileModeTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.valueOf("READ_WRITE");
-        assertEquals(RandomAccessFileMode.READ_WRITE, randomAccessFileMode0);
+    /**
+     * Tests that {@link RandomAccessFileMode#valueOf(String)} returns the correct enum constant
+     * for a valid mode name.
+     */
+    @Test
+    public void testValueOfReturnsCorrectEnumForValidName() {
+        // Arrange
+        final String modeName = "READ_WRITE";
+        final RandomAccessFileMode expectedMode = RandomAccessFileMode.READ_WRITE;
+
+        // Act
+        final RandomAccessFileMode actualMode = RandomAccessFileMode.valueOf(modeName);
+
+        // Assert
+        assertEquals(expectedMode, actualMode);
     }
 }
