@@ -1,48 +1,30 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Calendar;
-import java.util.TimeZone;
-import javax.swing.DropMode;
-import javax.swing.JScrollPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.legend.PaintScaleLegend;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.ThermometerPlot;
-import org.jfree.chart.renderer.LookupPaintScale;
-import org.jfree.chart.renderer.PaintScale;
-import org.jfree.chart.renderer.xy.XYShapeRenderer;
 import org.jfree.data.Range;
-import org.jfree.data.general.DefaultValueDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.time.DateRange;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ModuloAxis_ESTestTest27 extends ModuloAxis_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ModuloAxis} class.
+ */
+public class ModuloAxisTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        ModuloAxis moduloAxis0 = new ModuloAxis((String) null, (Range) null);
-        // Undeclared exception!
-        try {
-            moduloAxis0.resizeRange(142.0, 142.0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jfree.chart.axis.ModuloAxis", e);
-        }
+    /**
+     * Verifies that calling resizeRange() with an anchor value throws a
+     * NullPointerException if the axis was constructed with a null range.
+     * This is expected because the resize calculation depends on the axis's
+     * fixed range, which is null in this setup.
+     */
+    @Test(expected = NullPointerException.class)
+    public void resizeRangeWithAnchorShouldThrowNPEWhenConstructedWithNullRange() {
+        // Arrange: Create a ModuloAxis with a null fixedRange.
+        ModuloAxis axis = new ModuloAxis("Test Axis", null);
+
+        // Act: Attempt to resize the range. This should trigger an NPE.
+        // The specific values for percent (2.0) and anchor (100.0) are arbitrary
+        // as the exception occurs before they are used in the calculation.
+        axis.resizeRange(2.0, 100.0);
+
+        // Assert: The test passes if a NullPointerException is thrown,
+        // which is handled by the @Test(expected=...) annotation.
     }
 }
