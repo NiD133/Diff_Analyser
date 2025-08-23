@@ -1,19 +1,34 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSequenceUtils_ESTestTest69 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Contains test cases for the {@link CharSequenceUtils} class.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test68() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder("");
-        int int0 = CharSequenceUtils.indexOf("", stringBuilder0, 8);
-        assertEquals(0, int0);
+    /**
+     * Tests that indexOf returns the source's length (0) when searching for an
+     * empty CharSequence in an empty source with a start index greater than the source length.
+     * This behavior is consistent with {@link String#indexOf(String, int)}.
+     */
+    @Test
+    public void indexOf_emptySearchInEmptySourceWithStartIndexOutOfBounds_shouldReturnZero() {
+        // Arrange
+        final CharSequence sourceText = "";
+        final CharSequence textToFind = new StringBuilder("");
+        final int startIndex = 8; // An index well beyond the source length
+        final int expectedIndex = 0; // Expect the length of the source CharSequence
+
+        // Act
+        final int actualIndex = CharSequenceUtils.indexOf(sourceText, textToFind, startIndex);
+
+        // Assert
+        assertEquals(
+            "Searching for an empty sequence with an out-of-bounds start index should return the source's length.",
+            expectedIndex,
+            actualIndex
+        );
     }
 }
