@@ -1,61 +1,39 @@
 package org.apache.commons.codec.binary;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Random;
+
 import org.apache.commons.codec.CodecPolicy;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
-import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.Test;
 
-public class Base16TestTest29 {
-
-    private static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
-
-    private final Random random = new Random();
+/**
+ * Tests the behavior of the {@link Base16} codec when using the {@link CodecPolicy#STRICT} policy.
+ * This test focuses on handling invalid input that should be rejected in strict mode.
+ */
+public class Base16StrictDecodingTest {
 
     /**
-     * @return the random.
+     * Tests that decoding a Base16 string with an odd number of characters
+     * throws an {@link IllegalArgumentException} when the codec is in STRICT mode.
+     * According to RFC 4648, Base16 encoded data must have an even number of characters,
+     * as each byte of original data is represented by two hexadecimal characters.
      */
-    public Random getRandom() {
-        return this.random;
-    }
-
-    private void testBase16InBuffer(final int startPasSize, final int endPadSize) {
-        final String content = "Hello World";
-        final String encodedContent;
-        final byte[] bytesUtf8 = StringUtils.getBytesUtf8(content);
-        byte[] buffer = ArrayUtils.addAll(bytesUtf8, new byte[endPadSize]);
-        buffer = ArrayUtils.addAll(new byte[startPasSize], buffer);
-        final byte[] encodedBytes = new Base16().encode(buffer, startPasSize, bytesUtf8.length);
-        encodedContent = StringUtils.newStringUtf8(encodedBytes);
-        assertEquals("48656C6C6F20576F726C64", encodedContent, "encoding hello world");
-    }
-
-    private String toString(final byte[] data) {
-        final StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < data.length; i++) {
-            buf.append(data[i]);
-            if (i != data.length - 1) {
-                buf.append(",");
-            }
-        }
-        return buf.toString();
-    }
-
     @Test
-    void testStrictDecoding() {
-        // Note the trailing `e` which does not make up a hex-pair and so is only 1/2 byte
-        final String encoded = "aabbccdde";
-        final Base16 b16 = new Base16(true, CodecPolicy.STRICT);
-        assertEquals(CodecPolicy.STRICT, b16.getCodecPolicy());
-        assertThrows(IllegalArgumentException.class, () -> b16.decode(StringUtils.getBytesUtf8(encoded)));
+    void strictDecodingShouldThrowExceptionForInputWithOddLength() {
+        // Arrange
+        // The trailing 'e' gives this string an odd length (9), which is invalid for Base16.
+        final String invalidEncodedString = "aabbccdde";
+        final byte[] encodedBytes = StringUtils.getBytesUtf8(invalidEncodedString);
+        final Base16 base16Strict = new Base16(true, CodecPolicy.STRICT);
+
+        // Sanity check to ensure the test setup is correct.
+        assertEquals(CodecPolicy.STRICT, base16Strict.getCodecPolicy(), "Precondition failed: Codec was not in STRICT mode.");
+
+        // Act & Assert
+        // The decode operation is expected to fail fast on invalid input length in strict mode.
+        assertThrows(IllegalArgumentException.class,
+            () -> base16Strict.decode(encodedBytes),
+            "Decoding a string with an odd number of characters should fail in strict mode."
+        );
     }
 }
