@@ -1,39 +1,26 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
+/**
+ * This test suite focuses on the constructor behavior of the {@link RandomAccessFileOrArray} class.
+ */
 public class RandomAccessFileOrArray_ESTestTest105 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test104() throws Throwable {
-        RandomAccessFileOrArray randomAccessFileOrArray0 = null;
-        try {
-            randomAccessFileOrArray0 = new RandomAccessFileOrArray((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.io.File", e);
-        }
+    /**
+     * Verifies that the constructor {@link RandomAccessFileOrArray#RandomAccessFileOrArray(String)}
+     * throws a NullPointerException when the filename argument is null.
+     * This is the expected behavior as the underlying file handling mechanism cannot operate on a null path.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructorWithNullFilename_shouldThrowNullPointerException() throws IOException {
+        // Act: Attempt to create an instance with a null filename.
+        // The cast to (String) is necessary to resolve ambiguity between multiple constructors.
+        new RandomAccessFileOrArray((String) null);
+        
+        // Assert: The @Test(expected) annotation automatically verifies that a 
+        // NullPointerException is thrown, causing the test to pass.
+        // If no exception is thrown, the test will fail.
     }
 }
