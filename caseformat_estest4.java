@@ -1,19 +1,30 @@
 package com.google.common.base;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CaseFormat_ESTestTest4 extends CaseFormat_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CaseFormat}.
+ */
+public class CaseFormatTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        CaseFormat caseFormat0 = CaseFormat.UPPER_CAMEL;
-        CaseFormat caseFormat1 = CaseFormat.LOWER_UNDERSCORE;
-        String string0 = caseFormat1.to(caseFormat0, "bDU\"5");
-        assertEquals("Bdu\"5", string0);
+    /**
+     * Tests the conversion from LOWER_UNDERSCORE to UPPER_CAMEL for a string
+     * that doesn't strictly conform to the source format (as it contains no underscores).
+     * The expected behavior is a "best effort" conversion, treating the entire
+     * string as a single word and capitalizing it according to UPPER_CAMEL rules.
+     */
+    @Test
+    public void to_fromLowerUnderscoreToUpperCamel_withNonConformingSingleWord() {
+        // Arrange: Define the input string and the expected outcome.
+        // The input "bDU\"5" is treated as a single word because it lacks the '_' separator.
+        String input = "bDU\"5";
+        String expectedOutput = "Bdu\"5"; // UPPER_CAMEL capitalizes the first letter and lowercases the rest.
+
+        // Act: Perform the conversion from LOWER_UNDERSCORE to UPPER_CAMEL.
+        String result = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, input);
+
+        // Assert: Verify that the result matches the expected format.
+        assertEquals(expectedOutput, result);
     }
 }
