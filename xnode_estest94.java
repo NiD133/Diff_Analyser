@@ -1,36 +1,40 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
+
 import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest94 extends XNode_ESTest_scaffolding {
+/**
+ * Test suite for the XNode class.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test093() throws Throwable {
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode("2pY");
-        iIOMetadataNode0.setAttribute("2pY", "2pY");
-        XPathParser xPathParser0 = new XPathParser((Document) null, false);
-        Properties properties0 = new Properties();
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        // Undeclared exception!
-        try {
-            xNode0.getFloatAttribute("2pY");
-            fail("Expecting exception: NumberFormatException");
-        } catch (NumberFormatException e) {
-        }
+    /**
+     * Verifies that getFloatAttribute throws a NumberFormatException
+     * when the attribute value is not a valid float.
+     */
+    @Test(expected = NumberFormatException.class)
+    public void getFloatAttributeShouldThrowExceptionForNonNumericValue() {
+        // Arrange
+        // Create a DOM Node with an attribute whose value is not a number.
+        Node node = new IIOMetadataNode("node");
+        String attributeName = "value";
+        String nonNumericValue = "not-a-float";
+        node.setAttribute(attributeName, nonNumericValue);
+
+        // The XPathParser and Properties are required by the XNode constructor
+        // but are not relevant to this specific test.
+        XPathParser parser = new XPathParser(null, false, null, null);
+        Properties variables = new Properties();
+        XNode xNode = new XNode(parser, node, variables);
+
+        // Act
+        // Attempt to parse the non-numeric attribute as a float.
+        xNode.getFloatAttribute(attributeName);
+
+        // Assert
+        // The @Test(expected) annotation asserts that a NumberFormatException is thrown.
     }
 }
