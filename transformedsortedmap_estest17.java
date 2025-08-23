@@ -1,52 +1,43 @@
 package org.apache.commons.collections4.map;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.NoSuchElementException;
+
 import java.util.SortedMap;
 import java.util.TreeMap;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TransformedSortedMap_ESTestTest17 extends TransformedSortedMap_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        TreeMap<Integer, Integer> treeMap0 = new TreeMap<Integer, Integer>();
-        Integer integer0 = new Integer(512);
-        SortedMap<Integer, Integer> sortedMap0 = treeMap0.subMap(integer0, integer0);
-        Transformer<Integer, Integer> transformer0 = MapTransformer.mapTransformer((Map<? super Integer, ? extends Integer>) sortedMap0);
-        TransformedSortedMap<Integer, Integer> transformedSortedMap0 = TransformedSortedMap.transformingSortedMap(sortedMap0, (Transformer<? super Integer, ? extends Integer>) transformer0, (Transformer<? super Integer, ? extends Integer>) transformer0);
-        // Undeclared exception!
+public class TransformedSortedMap_ESTestTest17 {
+
+    /**
+     * Tests that TransformedSortedMap propagates IllegalArgumentException from the
+     * decorated map when a method is called with an out-of-range key.
+     */
+    @Test
+    public void tailMapShouldThrowExceptionWhenKeyIsOutOfDecoratedSubMapRange() {
+        // ARRANGE
+        // Create a base map and a sub-map with a restricted key range.
+        // The sub-map's range is [512, 512), so it's always empty, and any key
+        // supplied to its range methods (headMap, tailMap, etc.) will be out of range.
+        final TreeMap<Integer, Integer> baseMap = new TreeMap<>();
+        final Integer outOfRangeKey = 512;
+        final SortedMap<Integer, Integer> restrictedSubMap = baseMap.subMap(outOfRangeKey, outOfRangeKey);
+
+        // Create a TransformedSortedMap decorating the restricted sub-map.
+        // The transformers are not relevant to this test's logic, so we pass null.
+        final SortedMap<Integer, Integer> transformedMap =
+                TransformedSortedMap.transformingSortedMap(restrictedSubMap, null, null);
+
+        // ACT & ASSERT
+        // Calling tailMap with a key outside the sub-map's allowed range
+        // should propagate the IllegalArgumentException from the underlying sub-map.
         try {
-            transformedSortedMap0.tailMap(integer0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // fromKey out of range
-            //
-            verifyException("java.util.TreeMap$AscendingSubMap", e);
+            transformedMap.tailMap(outOfRangeKey);
+            fail("Expected an IllegalArgumentException to be thrown.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the correct exception was thrown by the underlying TreeMap.subMap.
+            assertEquals("fromKey out of range", e.getMessage());
         }
     }
 }
