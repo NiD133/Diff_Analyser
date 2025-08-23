@@ -1,30 +1,43 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import java.nio.charset.StandardCharsets;
 
-public class SerializedString_ESTestTest3 extends SerializedString_ESTest_scaffolding {
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("E]`R4#OI%");
-        MockFile mockFile0 = new MockFile("E]`R4#OI%", "E]`R4#OI%");
-        MockFileOutputStream mockFileOutputStream0 = new MockFileOutputStream(mockFile0);
-        int int0 = serializedString0.writeUnquotedUTF8(mockFileOutputStream0);
-        assertEquals(9, int0);
-        assertEquals(9L, mockFile0.length());
+/**
+ * Unit tests for the {@link SerializedString} class, focusing on its writing capabilities.
+ */
+public class SerializedStringTest {
+
+    /**
+     * Tests that {@link SerializedString#writeUnquotedUTF8(OutputStream)}
+     * correctly writes the unquoted UTF-8 representation of the string to an OutputStream
+     * and returns the correct number of bytes written.
+     */
+    @Test
+    public void writeUnquotedUTF8_shouldWriteCorrectBytesAndReturnLength() throws IOException {
+        // Arrange: Create a test string and a stream to capture the output.
+        final String testString = "E]`R4#OI%";
+        final SerializedString serializedString = new SerializedString(testString);
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        // Act: Call the method under test.
+        final int bytesWritten = serializedString.writeUnquotedUTF8(outputStream);
+
+        // Assert: Verify the output is correct.
+        final byte[] expectedBytes = testString.getBytes(StandardCharsets.UTF_8);
+
+        // 1. Verify that the method returns the correct number of bytes written.
+        assertEquals("The method should return the number of bytes written.",
+                expectedBytes.length, bytesWritten);
+
+        // 2. Verify that the correct bytes were written to the output stream.
+        assertArrayEquals("The bytes written to the stream should match the string's UTF-8 representation.",
+                expectedBytes, outputStream.toByteArray());
     }
 }
