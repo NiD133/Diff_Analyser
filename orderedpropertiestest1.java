@@ -2,91 +2,121 @@ package org.apache.commons.collections4.properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Collections;
+
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class OrderedPropertiesTestTest1 {
+/**
+ * Tests for the compute() method in {@link OrderedProperties}.
+ */
+@DisplayName("OrderedProperties.compute()")
+class OrderedPropertiesComputeTest {
 
-    private void assertAscendingOrder(final OrderedProperties orderedProperties) {
-        final int first = 1;
-        final int last = 11;
-        final Enumeration<Object> enumObjects = orderedProperties.keys();
-        for (int i = first; i <= last; i++) {
-            assertEquals("key" + i, enumObjects.nextElement());
-        }
-        final Iterator<Object> iterSet = orderedProperties.keySet().iterator();
-        for (int i = first; i <= last; i++) {
-            assertEquals("key" + i, iterSet.next());
-        }
-        final Iterator<Entry<Object, Object>> iterEntrySet = orderedProperties.entrySet().iterator();
-        for (int i = first; i <= last; i++) {
-            final Entry<Object, Object> next = iterEntrySet.next();
-            assertEquals("key" + i, next.getKey());
-            assertEquals("value" + i, next.getValue());
-        }
-        final Enumeration<?> propertyNames = orderedProperties.propertyNames();
-        for (int i = first; i <= last; i++) {
-            assertEquals("key" + i, propertyNames.nextElement());
-        }
+    private static final String KEY_PREFIX = "key";
+    private static final String VALUE_PREFIX = "value";
+    private static final int START_INDEX = 1;
+    private static final int END_INDEX = 11;
+
+    private OrderedProperties orderedProperties;
+
+    @BeforeEach
+    void setUp() {
+        orderedProperties = new OrderedProperties();
     }
 
-    private OrderedProperties assertDescendingOrder(final OrderedProperties orderedProperties) {
-        final int first = 11;
-        final int last = 1;
-        final Enumeration<Object> enumObjects = orderedProperties.keys();
-        for (int i = first; i <= last; i--) {
-            assertEquals("key" + i, enumObjects.nextElement());
-        }
-        final Iterator<Object> iterSet = orderedProperties.keySet().iterator();
-        for (int i = first; i <= last; i--) {
-            assertEquals("key" + i, iterSet.next());
-        }
-        final Iterator<Entry<Object, Object>> iterEntrySet = orderedProperties.entrySet().iterator();
-        for (int i = first; i <= last; i--) {
-            final Entry<Object, Object> next = iterEntrySet.next();
-            assertEquals("key" + i, next.getKey());
-            assertEquals("value" + i, next.getValue());
-        }
-        final Enumeration<?> propertyNames = orderedProperties.propertyNames();
-        for (int i = first; i <= last; i--) {
-            assertEquals("key" + i, propertyNames.nextElement());
-        }
-        return orderedProperties;
-    }
+    /**
+     * Asserts that the properties are in the expected order by checking keys(),
+     * keySet(), entrySet(), and propertyNames().
+     *
+     * @param properties The OrderedProperties instance to check.
+     * @param expectedKeys The list of keys in their expected order.
+     */
+    private void assertPropertyOrder(final OrderedProperties properties, final List<String> expectedKeys) {
+        final List<String> expectedValues = expectedKeys.stream()
+                .map(key -> key.replace(KEY_PREFIX, VALUE_PREFIX))
+                .collect(Collectors.toList());
 
-    private OrderedProperties loadOrderedKeysReverse() throws FileNotFoundException, IOException {
-        final OrderedProperties orderedProperties = new OrderedProperties();
-        try (FileReader reader = new FileReader("src/test/resources/org/apache/commons/collections4/properties/test-reverse.properties")) {
-            orderedProperties.load(reader);
+        // 1. Verify order via keys()
+        final Enumeration<Object> keysEnum = properties.keys();
+        for (final String expectedKey : expectedKeys) {
+            assertEquals(expectedKey, keysEnum.nextElement(), "keys() enumeration is out of order.");
         }
-        return assertDescendingOrder(orderedProperties);
+        assertFalse(keysEnum.hasMoreElements(), "keys() has more elements than expected.");
+
+        // 2. Verify order via keySet()
+        final Iterator<Object> keySetIter = properties.keySet().iterator();
+        for (final String expectedKey : expectedKeys) {
+            assertEquals(expectedKey, keySetIter.next(), "keySet() iterator is out of order.");
+        }
+        assertFalse(keySetIter.hasNext(), "keySet() has more elements than expected.");
+
+        // 3. Verify order and values via entrySet()
+        final Iterator<Entry<Object, Object>> entrySetIter = properties.entrySet().iterator();
+        for (int i = 0; i < expectedKeys.size(); i++) {
+            final Entry<Object, Object> entry = entrySetIter.next();
+            assertEquals(expectedKeys.get(i), entry.getKey(), "entrySet() key is out of order.");
+            assertEquals(expectedValues.get(i), entry.getValue(), "entrySet() value is incorrect.");
+        }
+        assertFalse(entrySetIter.hasNext(), "entrySet() has more elements than expected.");
+
+        // 4. Verify order via propertyNames()
+        final Enumeration<?> propertyNamesEnum = properties.propertyNames();
+        for (final String expectedKey : expectedKeys) {
+            assertEquals(expectedKey, propertyNamesEnum.nextElement(), "propertyNames() enumeration is out of order.");
+        }
+        assertFalse(propertyNamesEnum.hasMoreElements(), "propertyNames() has more elements than expected.");
     }
 
     @Test
-    void testCompute() {
-        final OrderedProperties orderedProperties = new OrderedProperties();
-        int first = 1;
-        int last = 11;
-        for (int i = first; i <= last; i++) {
-            final AtomicInteger aInt = new AtomicInteger(i);
-            orderedProperties.compute("key" + i, (k, v) -> "value" + aInt.get());
+    @DisplayName("should maintain insertion order when adding new keys")
+    void computeShouldMaintainAscendingInsertionOrder() {
+        // Arrange
+        final List<String> expectedKeys = new ArrayList<>();
+        for (int i = START_INDEX; i <= END_INDEX; i++) {
+            expectedKeys.add(KEY_PREFIX + i);
         }
-        assertAscendingOrder(orderedProperties);
+
+        // Act
+        for (int i = START_INDEX; i <= END_INDEX; i++) {
+            final int index = i;
+            orderedProperties.compute(KEY_PREFIX + i, (k, v) -> VALUE_PREFIX + index);
+        }
+
+        // Assert
+        assertPropertyOrder(orderedProperties, expectedKeys);
+    }
+
+    @Test
+    @DisplayName("should maintain new insertion order after being cleared and repopulated")
+    void computeShouldMaintainNewOrderAfterClear() {
+        // Arrange: Pre-populate and clear to ensure the internal state is reset.
+        for (int i = START_INDEX; i <= END_INDEX; i++) {
+            orderedProperties.put(KEY_PREFIX + i, VALUE_PREFIX + i);
+        }
         orderedProperties.clear();
-        first = 11;
-        last = 1;
-        for (int i = first; i >= last; i--) {
-            final AtomicInteger aInt = new AtomicInteger(i);
-            orderedProperties.compute("key" + i, (k, v) -> "value" + aInt.get());
+
+        final List<String> expectedKeysInDescendingOrder = new ArrayList<>();
+        for (int i = END_INDEX; i >= START_INDEX; i--) {
+            expectedKeysInDescendingOrder.add(KEY_PREFIX + i);
         }
-        assertDescendingOrder(orderedProperties);
+
+        // Act: Repopulate in a different (descending) order.
+        for (int i = END_INDEX; i >= START_INDEX; i--) {
+            final int index = i;
+            orderedProperties.compute(KEY_PREFIX + i, (k, v) -> VALUE_PREFIX + index);
+        }
+
+        // Assert
+        assertPropertyOrder(orderedProperties, expectedKeysInDescendingOrder);
     }
 }
