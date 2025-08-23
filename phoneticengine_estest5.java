@@ -1,34 +1,44 @@
 package org.apache.commons.codec.language.bm;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.LinkedHashSet;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import java.util.Collections;
 import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PhoneticEngine_ESTestTest5 extends PhoneticEngine_ESTest_scaffolding {
+import org.junit.Test;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        NameType nameType0 = NameType.GENERIC;
-        RuleType ruleType0 = RuleType.EXACT;
-        PhoneticEngine phoneticEngine0 = new PhoneticEngine(nameType0, ruleType0, false);
-        LinkedHashSet<String> linkedHashSet0 = new LinkedHashSet<String>();
-        linkedHashSet0.add("de la daorg.apache.commons.codec.language.bm.languages$languageset");
-        Languages.LanguageSet languages_LanguageSet0 = Languages.LanguageSet.from(linkedHashSet0);
-        // Undeclared exception!
+/**
+ * Tests for {@link PhoneticEngine}.
+ */
+public class PhoneticEngineTest {
+
+    /**
+     * Tests that the encode method throws an IllegalArgumentException when provided with a language
+     * for which no phonetic rules are defined.
+     */
+    @Test
+    public void encodeShouldThrowIllegalArgumentExceptionForLanguageWithNoRules() {
+        // ARRANGE
+        // Create an engine configured for generic names and exact rule matching.
+        final PhoneticEngine engine = new PhoneticEngine(NameType.GENERIC, RuleType.EXACT, false);
+
+        // Define a language that has no associated phonetic rules.
+        final String nonExistentLanguage = "nolang";
+        final Set<String> languageNames = Collections.singleton(nonExistentLanguage);
+        final Languages.LanguageSet languageSet = Languages.LanguageSet.from(languageNames);
+
+        final String anyInput = "any name";
+
+        // ACT & ASSERT
         try {
-            phoneticEngine0.encode("de la daorg.apache.commons.codec.language.bm.languages$languageset", languages_LanguageSet0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // No rules found for gen, rules, de la daorg.apache.commons.codec.language.bm.languages$languageset.
-            //
-            verifyException("org.apache.commons.codec.language.bm.Rule", e);
+            engine.encode(anyInput, languageSet);
+            fail("Expected an IllegalArgumentException to be thrown, but no exception occurred.");
+        } catch (final IllegalArgumentException e) {
+            // The engine is expected to fail when it cannot find the rules for the given language.
+            // It constructs a resource name like "gen_rules_nolang.txt" and fails when it's not found.
+            final String expectedMessage = "No rules found for gen, rules, " + nonExistentLanguage + ".";
+            assertEquals("The exception message did not match the expected format.", expectedMessage, e.getMessage());
         }
     }
 }
