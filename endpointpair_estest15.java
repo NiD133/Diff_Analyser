@@ -1,23 +1,24 @@
 package com.google.common.graph;
 
+import static org.junit.Assert.assertFalse;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.common.collect.UnmodifiableIterator;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class EndpointPair_ESTestTest15 extends EndpointPair_ESTest_scaffolding {
+/**
+ * Tests for {@link EndpointPair#equals(Object)}.
+ */
+public class EndpointPairTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        Locale.Category locale_Category0 = Locale.Category.FORMAT;
-        Object object0 = new Object();
-        EndpointPair<Object> endpointPair0 = EndpointPair.unordered((Object) locale_Category0, object0);
-        EndpointPair<Object> endpointPair1 = EndpointPair.unordered((Object) endpointPair0, (Object) locale_Category0);
-        boolean boolean0 = endpointPair0.equals(endpointPair1);
-        assertFalse(boolean0);
+    @Test
+    public void unorderedPairsWithDifferentNodes_areNotEqual() {
+        // Arrange: Create two unordered pairs that share one node but differ in the other.
+        // Using simple, descriptive strings as nodes makes the test's purpose clear,
+        // unlike the original's use of arbitrary objects like Locale.Category.
+        EndpointPair<String> pairAB = EndpointPair.unordered("A", "B");
+        EndpointPair<String> pairAC = EndpointPair.unordered("A", "C");
+
+        // Act & Assert: The two pairs should not be equal because their sets of nodes
+        // are different ({A, B} is not equal to {A, C}).
+        assertFalse("Pairs with different nodes should not be equal.", pairAB.equals(pairAC));
     }
 }
