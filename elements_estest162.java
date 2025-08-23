@@ -1,35 +1,27 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class Elements_ESTestTest162 extends Elements_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Elements} class.
+ */
+public class ElementsTest {
 
-    @Test(timeout = 4000)
-    public void test161() throws Throwable {
-        Elements elements0 = new Elements();
-        elements0.clear();
-        assertTrue(elements0.isEmpty());
+    /**
+     * Verifies that calling the {@code clear()} method on an already empty
+     * Elements collection does not cause an error and results in the
+     * collection remaining empty.
+     */
+    @Test
+    public void clearOnEmptyCollectionShouldRemainEmpty() {
+        // Arrange: Create an empty Elements collection.
+        Elements elements = new Elements();
+
+        // Act: Call the clear() method.
+        elements.clear();
+
+        // Assert: The collection should still be empty.
+        assertTrue("The Elements collection should be empty after clear() is called.", elements.isEmpty());
     }
 }
