@@ -2,28 +2,31 @@ package org.jfree.chart;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.jfree.chart.plot.CombinedRangeCategoryPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.data.xy.XYDatasetTableModel;
-import org.junit.runner.RunWith;
 
-public class ChartRenderingInfo_ESTestTest1 extends ChartRenderingInfo_ESTest_scaffolding {
+/**
+ * Tests for the {@link ChartRenderingInfo} class.
+ */
+public class ChartRenderingInfoTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        Rectangle rectangle0 = new Rectangle((-1), (-1), 1, 7);
-        chartRenderingInfo0.setChartArea(rectangle0);
-        chartRenderingInfo0.hashCode();
+    /**
+     * Verifies that the hashCode() method's result is dependent on the chartArea property.
+     * When the chartArea is changed, the hash code should also change.
+     */
+    @Test
+    public void hashCode_shouldChangeWhenChartAreaIsSet() {
+        // Arrange: Create a ChartRenderingInfo instance and get its initial hash code.
+        ChartRenderingInfo info = new ChartRenderingInfo();
+        int initialHashCode = info.hashCode();
+
+        // Act: Set a new chart area on the instance.
+        Rectangle2D newChartArea = new Rectangle(10, 20, 30, 40);
+        info.setChartArea(newChartArea);
+        int updatedHashCode = info.hashCode();
+
+        // Assert: The new hash code should be different from the initial one.
+        assertNotEquals("Setting the chart area should change the hash code.", initialHashCode, updatedHashCode);
     }
 }
