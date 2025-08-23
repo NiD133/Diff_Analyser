@@ -1,55 +1,30 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
 import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Period;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class InternationalFixedChronology_ESTestTest45 extends InternationalFixedChronology_ESTest_scaffolding {
+/**
+ * Tests for {@link InternationalFixedChronology}.
+ */
+public class InternationalFixedChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        InternationalFixedChronology internationalFixedChronology0 = new InternationalFixedChronology();
-        // Undeclared exception!
+    @Test
+    public void dateYearDay_whenDayOfYearIsOutOfBounds_throwsException() {
+        // Arrange
+        InternationalFixedChronology chronology = InternationalFixedChronology.INSTANCE;
+        int year = 2191; // A valid, non-leap year
+        int invalidDayOfYear = 2191; // An invalid day, well outside the valid range of 1-365
+
+        // Act & Assert
         try {
-            internationalFixedChronology0.dateYearDay(2191, 2191);
-            fail("Expecting exception: DateTimeException");
+            chronology.dateYearDay(year, invalidDayOfYear);
+            fail("Expected a DateTimeException to be thrown for an invalid day-of-year.");
         } catch (DateTimeException e) {
-            //
-            // Invalid value for DayOfYear (valid values 1 - 365/366): 2191
-            //
-            verifyException("java.time.temporal.ValueRange", e);
+            // Verify that the exception message is informative and correct
+            String expectedMessage = "Invalid value for DayOfYear (valid values 1 - 365/366): " + invalidDayOfYear;
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
