@@ -2,17 +2,28 @@ package org.joda.time;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Weeks_ESTestTest46 extends Weeks_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        Weeks weeks0 = Weeks.standardWeeksIn((ReadablePeriod) null);
-        Weeks weeks1 = weeks0.dividedBy(1);
-        assertEquals(0, weeks1.getWeeks());
+    /**
+     * Tests that dividing a zero-week period by one results in a zero-week period.
+     * This test specifically obtains the initial zero-week period by calling
+     * {@code Weeks.standardWeeksIn(null)}, which is documented to return zero.
+     */
+    @Test
+    public void dividingZeroWeeksByOneShouldReturnZeroWeeks() {
+        // Arrange
+        // The Javadoc for standardWeeksIn states that a null input returns zero weeks.
+        Weeks zeroWeeks = Weeks.standardWeeksIn(null);
+        int divisor = 1;
+
+        // Act
+        Weeks result = zeroWeeks.dividedBy(divisor);
+
+        // Assert
+        assertEquals("Dividing zero by one should result in zero.", Weeks.ZERO, result);
     }
 }
