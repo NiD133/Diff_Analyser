@@ -1,48 +1,31 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Period;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.UnsupportedTemporalTypeException;
 import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
 
-public class InternationalFixedChronology_ESTestTest57 extends InternationalFixedChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test56() throws Throwable {
-        InternationalFixedChronology internationalFixedChronology0 = new InternationalFixedChronology();
-        ChronoField chronoField0 = ChronoField.ALIGNED_WEEK_OF_MONTH;
-        ValueRange valueRange0 = internationalFixedChronology0.range(chronoField0);
-        assertNotNull(valueRange0);
+/**
+ * Tests for the range of fields in {@link InternationalFixedChronology}.
+ */
+public class InternationalFixedChronologyTest {
+
+    /**
+     * Tests that the valid value range for the ALIGNED_WEEK_OF_MONTH field is correct.
+     * In the International Fixed Calendar, every month has exactly 28 days, which is 4 weeks.
+     */
+    @Test
+    public void range_forAlignedWeekOfMonth_returnsCorrectRange() {
+        // Arrange
+        InternationalFixedChronology chronology = InternationalFixedChronology.INSTANCE;
+        // In the International Fixed calendar, each month has exactly 4 weeks (28 days).
+        ValueRange expectedRange = ValueRange.of(1, 4);
+
+        // Act
+        ValueRange actualRange = chronology.range(ChronoField.ALIGNED_WEEK_OF_MONTH);
+
+        // Assert
+        assertEquals("The range for ALIGNED_WEEK_OF_MONTH should be 1-4.", expectedRange, actualRange);
     }
 }
