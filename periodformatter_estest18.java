@@ -2,45 +2,40 @@ package org.joda.time.format;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
 import java.io.PipedWriter;
-import java.io.StringWriter;
 import java.io.Writer;
-import java.util.LinkedList;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Duration;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritablePeriod;
 import org.joda.time.ReadablePeriod;
-import org.joda.time.Seconds;
 import org.joda.time.Weeks;
-import org.joda.time.Years;
-import org.junit.runner.RunWith;
 
-public class PeriodFormatter_ESTestTest18 extends PeriodFormatter_ESTest_scaffolding {
+public class PeriodFormatter_ESTestTest18 {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        PeriodFormatterBuilder.Literal periodFormatterBuilder_Literal0 = PeriodFormatterBuilder.Literal.EMPTY;
-        PeriodFormatter periodFormatter0 = new PeriodFormatter(periodFormatterBuilder_Literal0, periodFormatterBuilder_Literal0);
-        PipedWriter pipedWriter0 = new PipedWriter();
-        Weeks weeks0 = Weeks.TWO;
-        Minutes minutes0 = weeks0.toStandardMinutes();
+    /**
+     * Tests that an IOException from the underlying Writer is correctly propagated
+     * by the printTo(Writer, ReadablePeriod) method.
+     */
+    @Test
+    public void printToWriterShouldThrowIOExceptionWhenWriterFails() {
+        // Arrange
+        // A simple formatter that doesn't actually format anything, used for testing the printTo method.
+        PeriodFormatter formatter = new PeriodFormatter(
+                PeriodFormatterBuilder.Literal.EMPTY,
+                PeriodFormatterBuilder.Literal.EMPTY);
+
+        // A PipedWriter that is not connected to a PipedReader will throw an
+        // IOException upon any write attempt. This simulates a faulty writer.
+        Writer faultyWriter = new PipedWriter();
+        ReadablePeriod anyPeriod = Weeks.TWO;
+
+        // Act & Assert
         try {
-            periodFormatter0.printTo((Writer) pipedWriter0, (ReadablePeriod) minutes0);
-            fail("Expecting exception: IOException");
+            formatter.printTo(faultyWriter, anyPeriod);
+            fail("Expected an IOException because the writer is not connected.");
         } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("java.io.PipedWriter", e);
+            // The test passes if an IOException is caught.
+            // We assert the message to ensure it's the specific exception we expect.
+            assertEquals("Pipe not connected", e.getMessage());
         }
     }
 }
