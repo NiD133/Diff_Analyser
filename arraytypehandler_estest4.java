@@ -1,41 +1,31 @@
 package org.apache.ibatis.type;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.Array;
-import java.sql.CallableStatement;
-import java.sql.Date;
+
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.Month;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.junit.runner.RunWith;
+import java.sql.SQLException;
 
-public class ArrayTypeHandler_ESTestTest4 extends ArrayTypeHandler_ESTest_scaffolding {
+/**
+ * Test suite for {@link ArrayTypeHandler}.
+ */
+public class ArrayTypeHandlerTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        JdbcType jdbcType0 = JdbcType.TIMESTAMP;
-        ArrayTypeHandler arrayTypeHandler0 = new ArrayTypeHandler();
-        // Undeclared exception!
-        try {
-            arrayTypeHandler0.setNonNullParameter((PreparedStatement) null, 9, (Object) null, jdbcType0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.ibatis.type.ArrayTypeHandler", e);
-        }
+    /**
+     * The original test passed null for both the PreparedStatement and the parameter.
+     * Based on the implementation of ArrayTypeHandler, the NullPointerException is thrown
+     * because the 'parameter' argument is null, not the PreparedStatement.
+     * This improved test clarifies this specific behavior.
+     */
+    @Test(expected = NullPointerException.class)
+    public void shouldThrowNullPointerExceptionWhenParameterIsNull() throws SQLException {
+        // Arrange
+        ArrayTypeHandler handler = new ArrayTypeHandler();
+        int anyIndex = 1;
+        JdbcType anyJdbcType = JdbcType.ARRAY;
+
+        // Act & Assert
+        // The following call is expected to throw a NullPointerException because the `parameter`
+        // argument is null. The handler attempts to access its class before using the PreparedStatement.
+        handler.setNonNullParameter(null, anyIndex, null, anyJdbcType);
     }
 }
