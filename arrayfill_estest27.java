@@ -1,21 +1,29 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Arrays;
-import org.apache.commons.lang3.function.FailableIntFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
 
-public class ArrayFill_ESTestTest27 extends ArrayFill_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.ArrayFill}.
+ */
+public class ArrayFillTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        char[] charArray0 = new char[0];
-        char[] charArray1 = ArrayFill.fill(charArray0, 's');
-        assertEquals(0, charArray1.length);
+    /**
+     * Tests that filling an empty char array returns the same empty array instance.
+     */
+    @Test
+    public void testFillWithEmptyCharArray() {
+        // Arrange
+        final char[] emptyArray = new char[0];
+
+        // Act
+        final char[] resultArray = ArrayFill.fill(emptyArray, 's');
+
+        // Assert
+        // The method should return the exact same array instance.
+        assertSame("The returned array should be the same instance as the input", emptyArray, resultArray);
+        // The length should, of course, remain 0.
+        assertEquals("The array length should be 0", 0, resultArray.length);
     }
 }
