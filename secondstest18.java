@@ -1,36 +1,27 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class SecondsTestTest18 extends TestCase {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    /**
+     * Tests that a Seconds object representing a whole number of minutes
+     * is correctly converted to a Minutes object.
+     */
+    @Test
+    public void toStandardMinutes_convertsSecondsToEquivalentMinutes() {
+        // Arrange: Create a Seconds object representing 120 seconds.
+        Seconds oneHundredAndTwentySeconds = Seconds.seconds(120);
+        Minutes expectedTwoMinutes = Minutes.minutes(2);
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+        // Act: Convert the Seconds object to standard Minutes.
+        Minutes actualMinutes = oneHundredAndTwentySeconds.toStandardMinutes();
 
-    public static TestSuite suite() {
-        return new TestSuite(TestSeconds.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testToStandardMinutes() {
-        Seconds test = Seconds.seconds(60 * 2);
-        Minutes expected = Minutes.minutes(2);
-        assertEquals(expected, test.toStandardMinutes());
+        // Assert: The result should be exactly 2 minutes.
+        assertEquals(expectedTwoMinutes, actualMinutes);
     }
 }
