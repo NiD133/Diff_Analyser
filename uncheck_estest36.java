@@ -1,31 +1,42 @@
 package org.apache.commons.io.function;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.time.chrono.HijrahEra;
-import java.util.Comparator;
-import java.util.concurrent.ForkJoinTask;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.LongStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class Uncheck_ESTestTest36 extends Uncheck_ESTest_scaffolding {
+import java.io.IOException;
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        IOTriFunction<String, String, String, String> iOTriFunction0 = (IOTriFunction<String, String, String, String>) mock(IOTriFunction.class, new ViolatedAssumptionAnswer());
-        doReturn("%s #%,d: %s").when(iOTriFunction0).apply(anyString(), anyString(), anyString());
-        String string0 = Uncheck.apply(iOTriFunction0, "http", "", "");
-        assertEquals("%s #%,d: %s", string0);
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+/**
+ * Tests for the {@link Uncheck} utility class, focusing on the successful execution path
+ * of the {@code apply} method for an {@link IOTriFunction}.
+ */
+public class UncheckTest {
+
+    /**
+     * Tests that {@link Uncheck#apply(IOTriFunction, Object, Object, Object)}
+     * correctly calls the underlying function and returns its result when no
+     * IOException is thrown.
+     */
+    @Test
+    public void testApplyForTriFunctionShouldReturnResultOnSuccess() throws IOException {
+        // Arrange: Set up the mock function and test data.
+        @SuppressWarnings("unchecked")
+        final IOTriFunction<String, String, String, String> mockIoTriFunction = mock(IOTriFunction.class);
+
+        final String expectedResult = "Function executed successfully";
+        final String arg1 = "first-input";
+        final String arg2 = "second-input";
+        final String arg3 = "third-input";
+
+        // Configure the mock to return the expected result when called with our specific arguments.
+        when(mockIoTriFunction.apply(arg1, arg2, arg3)).thenReturn(expectedResult);
+
+        // Act: Call the method under test.
+        final String actualResult = Uncheck.apply(mockIoTriFunction, arg1, arg2, arg3);
+
+        // Assert: Verify that the result from the Uncheck.apply call matches the expected result.
+        assertEquals("The result from the underlying function should be returned.", expectedResult, actualResult);
     }
 }
