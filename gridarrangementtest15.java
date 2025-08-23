@@ -1,35 +1,45 @@
 package org.jfree.chart.block;
 
-import org.jfree.chart.TestUtils;
-import org.jfree.data.Range;
+import org.jfree.chart.util.Size2D;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class GridArrangementTestTest15 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    private static final double EPSILON = 0.000000001;
+/**
+ * Tests for the {@link GridArrangement} class.
+ */
+class GridArrangementTest {
 
-    private BlockContainer createTestContainer1() {
-        Block b1 = new EmptyBlock(10, 11);
-        Block b2 = new EmptyBlock(20, 22);
-        Block b3 = new EmptyBlock(30, 33);
-        BlockContainer result = new BlockContainer(new GridArrangement(1, 3));
-        result.add(b1);
-        result.add(b2);
-        result.add(b3);
-        return result;
-    }
+    private static final double DELTA = 1e-9;
 
     /**
-     * The arrangement should be able to handle less blocks than grid spaces.
+     * Verifies that when arranging with a fixed-size constraint, the arrangement
+     * reports the full size of the constraint, even if the grid is only
+     * partially populated with blocks. This is the expected behavior for a
+     * fixed-size layout.
      */
     @Test
-    public void testGridNotFull_FF() {
-        Block b1 = new EmptyBlock(5, 5);
-        BlockContainer c = new BlockContainer(new GridArrangement(2, 3));
-        c.add(b1);
-        Size2D s = c.arrange(null, new RectangleConstraint(200, 100));
-        assertEquals(200.0, s.getWidth(), EPSILON);
-        assertEquals(100.0, s.getHeight(), EPSILON);
+    void arrangeWithFixedConstraintOnPartiallyFilledGridShouldReturnFullConstraintSize() {
+        // Arrange
+        final int gridRows = 2;
+        final int gridCols = 3; // A 2x3 grid has 6 cells
+        final double constraintWidth = 200.0;
+        final double constraintHeight = 100.0;
+
+        // Create a container with a 2x3 grid, but add only one small block.
+        BlockContainer container = new BlockContainer(new GridArrangement(gridRows, gridCols));
+        container.add(new EmptyBlock(5.0, 5.0));
+
+        RectangleConstraint fixedSizeConstraint = new RectangleConstraint(constraintWidth, constraintHeight);
+
+        // Act
+        // Arrange the container within the fixed-size constraint.
+        Size2D arrangedSize = container.arrange(null, fixedSizeConstraint);
+
+        // Assert
+        // The resulting size should match the constraint's dimensions, not the size
+        // of the single block within the container.
+        assertEquals(constraintWidth, arrangedSize.getWidth(), DELTA);
+        assertEquals(constraintHeight, arrangedSize.getHeight(), DELTA);
     }
 }
