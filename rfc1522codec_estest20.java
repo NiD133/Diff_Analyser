@@ -1,23 +1,28 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RFC1522Codec_ESTestTest20 extends RFC1522Codec_ESTest_scaffolding {
+/**
+ * Tests for the {@link RFC1522Codec} class, using its concrete implementation {@link BCodec}.
+ */
+public class BCodecTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        BCodec bCodec0 = new BCodec();
-        String string0 = bCodec0.getDefaultCharset();
-        assertEquals("UTF-8", string0);
+    /**
+     * Tests that an instance of BCodec created with the default constructor
+     * correctly reports its default charset as "UTF-8".
+     */
+    @Test
+    public void getDefaultCharsetShouldReturnUtf8ForDefaultConstructor() {
+        // Arrange
+        // The BCodec default constructor should initialize with the UTF-8 charset.
+        BCodec bCodec = new BCodec();
+        String expectedCharset = "UTF-8";
+
+        // Act
+        String actualCharset = bCodec.getDefaultCharset();
+
+        // Assert
+        assertEquals("The default charset should be UTF-8.", expectedCharset, actualCharset);
     }
 }
