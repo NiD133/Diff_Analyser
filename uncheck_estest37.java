@@ -1,31 +1,36 @@
 package org.apache.commons.io.function;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.time.chrono.HijrahEra;
-import java.util.Comparator;
-import java.util.concurrent.ForkJoinTask;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.LongStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class Uncheck_ESTestTest37 extends Uncheck_ESTest_scaffolding {
+/**
+ * Tests for the {@link Uncheck} utility class.
+ */
+public class UncheckTest {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        IOLongSupplier iOLongSupplier0 = mock(IOLongSupplier.class, new ViolatedAssumptionAnswer());
-        doReturn((-2307L)).when(iOLongSupplier0).getAsLong();
-        long long0 = Uncheck.getAsLong(iOLongSupplier0);
-        assertEquals((-2307L), long0);
+    /**
+     * Tests that {@link Uncheck#getAsLong(IOLongSupplier)} returns the value from the
+     * supplier when the supplier executes successfully without throwing an IOException.
+     */
+    @Test
+    public void getAsLong_shouldReturnValueFromSupplier_whenNoExceptionIsThrown() throws IOException {
+        // Arrange: Set up the test conditions and inputs.
+        final long expectedValue = -2307L;
+        
+        // Create a mock IOLongSupplier.
+        final IOLongSupplier mockSupplier = mock(IOLongSupplier.class);
+        
+        // Configure the mock to return a specific value when its getAsLong() method is called.
+        when(mockSupplier.getAsLong()).thenReturn(expectedValue);
+
+        // Act: Call the method under test.
+        final long actualValue = Uncheck.getAsLong(mockSupplier);
+
+        // Assert: Verify the result is as expected.
+        assertEquals(expectedValue, actualValue);
     }
 }
