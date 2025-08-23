@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2007 The Guava Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.google.common.collect;
 
 import static java.util.Arrays.asList;
@@ -34,28 +18,37 @@ import org.jspecify.annotations.NullUnmarked;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Tests for {@code ForwardingQueue}.
+ * Tests for ForwardingQueue.
  *
- * @author Robert Konigsberg
- * @author Louis Wasserman
+ * This file focuses on:
+ * - Verifying that a simple ForwardingQueue truly forwards all calls to its delegate.
+ * - Verifying the behavior of the provided "standard*" convenience methods via a concrete subclass.
  */
 @NullUnmarked
 public class ForwardingQueueTest extends TestCase {
 
-  static final class StandardImplForwardingQueue<T> extends ForwardingQueue<T> {
-    private final Queue<T> backingQueue;
+  /**
+   * A simple ForwardingQueue that explicitly opts into the "standard*" implementations.
+   *
+   * This class is used to ensure the standard* helpers behave as documented when a subclass
+   * chooses to adopt them.
+   */
+  static final class StandardForwardingQueue<E> extends ForwardingQueue<E> {
+    private final Queue<E> delegate;
 
-    StandardImplForwardingQueue(Queue<T> backingQueue) {
-      this.backingQueue = backingQueue;
+    StandardForwardingQueue(Queue<E> delegate) {
+      this.delegate = delegate;
     }
 
     @Override
-    protected Queue<T> delegate() {
-      return backingQueue;
+    protected Queue<E> delegate() {
+      return delegate;
     }
 
+    // Collection "standard*" implementations
+
     @Override
-    public boolean addAll(Collection<? extends T> collection) {
+    public boolean addAll(Collection<? extends E> collection) {
       return standardAddAll(collection);
     }
 
@@ -94,6 +87,8 @@ public class ForwardingQueueTest extends TestCase {
       return standardToArray();
     }
 
+    // Note: The type parameter <T> here intentionally shadows the class's <E>.
+    // This mirrors the signature in Collection and is conventional for toArray.
     @Override
     public <T> T[] toArray(T[] array) {
       return standardToArray(array);
@@ -104,63 +99,76 @@ public class ForwardingQueueTest extends TestCase {
       return standardToString();
     }
 
+    // Queue-specific "standard*" implementations
+
     @Override
-    public boolean offer(T o) {
-      return standardOffer(o);
+    public boolean offer(E e) {
+      return standardOffer(e);
     }
 
     @Override
-    public @Nullable T peek() {
+    public @Nullable E peek() {
       return standardPeek();
     }
 
     @Override
-    public @Nullable T poll() {
+    public @Nullable E poll() {
       return standardPoll();
     }
   }
 
+  /**
+   * Builds a comprehensive suite that includes:
+   * - This file's direct tests, and
+   * - Generated tests that exercise the standard* implementations via a backing LinkedList.
+   */
   @AndroidIncompatible // test-suite builders
   public static Test suite() {
     TestSuite suite = new TestSuite();
-
     suite.addTestSuite(ForwardingQueueTest.class);
-    suite.addTest(
-        QueueTestSuiteBuilder.using(
-                new TestStringQueueGenerator() {
-
-                  @Override
-                  protected Queue<String> create(String[] elements) {
-                    return new StandardImplForwardingQueue<>(new LinkedList<>(asList(elements)));
-                  }
-                })
-            .named("ForwardingQueue[LinkedList] with standard implementations")
-            .withFeatures(
-                CollectionSize.ANY,
-                CollectionFeature.ALLOWS_NULL_VALUES,
-                CollectionFeature.GENERAL_PURPOSE)
-            .createTestSuite());
-
+    suite.addTest(buildStandardImplSuite());
     return suite;
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
-  public void testForwarding() {
+  private static Test buildStandardImplSuite() {
+    return QueueTestSuiteBuilder.using(new LinkedListStringQueueGenerator())
+        .named("ForwardingQueue[LinkedList] with standard implementations")
+        .withFeatures(
+            CollectionSize.ANY,
+            CollectionFeature.ALLOWS_NULL_VALUES,
+            CollectionFeature.GENERAL_PURPOSE)
+        .createTestSuite();
+  }
+
+  /**
+   * Generator that produces a ForwardingQueue wrapping a LinkedList, opting into the
+   * standard* implementations for queue and collection operations.
+   */
+  private static final class LinkedListStringQueueGenerator extends TestStringQueueGenerator {
+    @Override
+    protected Queue<String> create(String[] elements) {
+      return new StandardForwardingQueue<>(new LinkedList<>(asList(elements)));
+    }
+  }
+
+  /**
+   * Verifies that a minimal ForwardingQueue truly forwards every method to its delegate.
+   */
+  public void testForwarding_delegatesAllMethods() {
     new ForwardingWrapperTester()
         .testForwarding(
             Queue.class,
-            new Function<Queue, Queue>() {
-              @Override
-              public Queue apply(Queue delegate) {
-                return wrap(delegate);
-              }
-            });
+            (Function<Queue<Object>, Queue<Object>>) ForwardingQueueTest::wrap);
   }
 
-  private static <T> Queue<T> wrap(Queue<T> delegate) {
-    return new ForwardingQueue<T>() {
+  /**
+   * Returns a ForwardingQueue that delegates directly to the provided delegate.
+   * This is the minimal forwarding wrapper (no behavior changes).
+   */
+  private static <E> Queue<E> wrap(Queue<E> delegate) {
+    return new ForwardingQueue<E>() {
       @Override
-      protected Queue<T> delegate() {
+      protected Queue<E> delegate() {
         return delegate;
       }
     };
