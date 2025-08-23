@@ -1,42 +1,60 @@
 package org.apache.ibatis.jdbc;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PrintWriter;
+
 import java.io.Reader;
 import java.io.StringReader;
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLWarning;
-import java.sql.Statement;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import java.sql.SQLException;
 
-public class ScriptRunner_ESTestTest2 extends ScriptRunner_ESTest_scaffolding {
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        Connection connection0 = mock(Connection.class, new ViolatedAssumptionAnswer());
-        doReturn(true, true, true).when(connection0).getAutoCommit();
-        ScriptRunner scriptRunner0 = new ScriptRunner(connection0);
-        StringReader stringReader0 = new StringReader("M&.?G0tfcHspB ");
-        // Undeclared exception!
+/**
+ * Test suite for the ScriptRunner class.
+ */
+public class ScriptRunnerTest {
+
+    /**
+     * Verifies that ScriptRunner throws a descriptive RuntimeException when a SQL statement
+     * in the script is not properly terminated by the default delimiter (a semicolon).
+     */
+    @Test
+    public void shouldThrowExceptionWhenStatementIsMissingTerminator() throws Exception {
+        // Arrange: Set up the test environment.
+        
+        // 1. Mock the database connection. We are unit-testing ScriptRunner's logic,
+        //    not its interaction with a live database.
+        Connection mockConnection = mock(Connection.class);
+
+        // 2. The ScriptRunner checks the connection's auto-commit mode. Stub this call
+        //    to return true, simulating a typical connection state.
+        when(mockConnection.getAutoCommit()).thenReturn(true);
+
+        // 3. Instantiate the class under test.
+        ScriptRunner scriptRunner = new ScriptRunner(mockConnection);
+
+        // 4. Define a simple SQL script that is intentionally missing the trailing semicolon.
+        String scriptWithoutTerminator = "SELECT * FROM users";
+        Reader scriptReader = new StringReader(scriptWithoutTerminator);
+
+        // Act & Assert: Execute the script and verify the expected exception.
         try {
-            scriptRunner0.runScript(stringReader0);
-            fail("Expecting exception: RuntimeException");
+            scriptRunner.runScript(scriptReader);
+            fail("Expected a RuntimeException because the SQL statement is missing a terminator.");
         } catch (RuntimeException e) {
-            //
-            // Error executing: M&.?G0tfcHspB
-            // .  Cause: org.evosuite.runtime.mock.java.lang.MockThrowable: Line missing end-of-line terminator (;) => M&.?G0tfcHspB
-            //
-            verifyException("org.apache.ibatis.jdbc.ScriptRunner", e);
+            // Verify that the exception provides a clear error message about the failure.
+            String expectedError = "Error executing: " + scriptWithoutTerminator;
+            assertEquals(expectedError, e.getMessage());
+
+            // Verify that the cause of the exception is an SQLException detailing the specific syntax error.
+            Throwable cause = e.getCause();
+            assertNotNull("Exception should have a cause.", cause);
+            assertTrue("The cause should be an instance of SQLException.", cause instanceof SQLException);
+
+            String expectedCauseMessage = "Line missing end-of-line terminator (;) => " + scriptWithoutTerminator;
+            assertEquals(expectedCauseMessage, cause.getMessage());
         }
     }
 }
