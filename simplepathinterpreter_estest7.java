@@ -1,70 +1,71 @@
 package org.apache.commons.jxpath.ri.axes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.apache.commons.jxpath.BasicVariables;
-import org.apache.commons.jxpath.JXPathBasicBeanInfo;
 import org.apache.commons.jxpath.JXPathContext;
+import org.apache.commons.jxpath.ri.Compiler;
 import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
 import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.compiler.Constant;
-import org.apache.commons.jxpath.ri.compiler.CoreFunction;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationAnd;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationGreaterThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationLessThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMod;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMultiply;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNegate;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNotEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationOr;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationSubtract;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationUnion;
 import org.apache.commons.jxpath.ri.compiler.Expression;
-import org.apache.commons.jxpath.ri.compiler.NameAttributeTest;
-import org.apache.commons.jxpath.ri.compiler.NodeNameTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTypeTest;
-import org.apache.commons.jxpath.ri.compiler.ProcessingInstructionTest;
 import org.apache.commons.jxpath.ri.compiler.Step;
-import org.apache.commons.jxpath.ri.compiler.VariableReference;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPropertyPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPropertyPointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.evosuite.shaded.org.mockito.Mockito.mock;
+import static org.evosuite.shaded.org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+
+/**
+ * Contains tests for the {@link SimplePathInterpreter} class.
+ * This class provides a refactored test case from the original generated suite.
+ */
 public class SimplePathInterpreter_ESTestTest7 extends SimplePathInterpreter_ESTest_scaffolding {
 
+    /**
+     * Tests that interpreting a simple path consisting only of "self::" axis steps
+     * correctly returns the original root node pointer.
+     *
+     * <p>The original test was auto-generated and difficult to understand. This version
+     * clarifies the intent by using descriptive names, simplifying the setup, and adding
+     * more specific assertions to verify the behavior.</p>
+     */
     @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Expression[] expressionArray0 = new Expression[0];
-        CoreOperationUnion coreOperationUnion0 = new CoreOperationUnion(expressionArray0);
-        CoreOperationMultiply coreOperationMultiply0 = new CoreOperationMultiply(coreOperationUnion0, coreOperationUnion0);
-        PredicateContext predicateContext0 = new PredicateContext((EvalContext) null, coreOperationMultiply0);
-        QName qName0 = new QName((String) null, "");
-        BasicVariables basicVariables0 = new BasicVariables();
-        VariablePointer variablePointer0 = new VariablePointer(basicVariables0, qName0);
-        NodePointer nodePointer0 = NodePointer.newChildNodePointer(variablePointer0, qName0, qName0);
-        Step[] stepArray0 = new Step[4];
-        Step step0 = mock(Step.class, new ViolatedAssumptionAnswer());
-        doReturn(0, 0, 0, 0).when(step0).getAxis();
-        doReturn((Object) null, (Object) null, (Object) null, (Object) null).when(step0).getPredicates();
-        stepArray0[0] = step0;
-        stepArray0[1] = step0;
-        stepArray0[2] = step0;
-        stepArray0[3] = step0;
-        NodePointer nodePointer1 = SimplePathInterpreter.interpretSimpleExpressionPath(predicateContext0, nodePointer0, expressionArray0, stepArray0);
-        assertNotNull(nodePointer1);
-        assertEquals(Integer.MIN_VALUE, nodePointer1.getIndex());
+    public void interpretPathWithOnlySelfAxisStepsShouldReturnOriginalRootPointer() {
+        // Arrange: Set up the context, root pointer, and path steps.
+
+        // A simple evaluation context is sufficient as it's not deeply used for this path.
+        JXPathContext context = JXPathContext.newContext(null);
+        EvalContext evalContext = context.getAbsoluteRootContext();
+
+        // Create a non-null root pointer to start the path interpretation.
+        // A BeanPointer is a concrete implementation suitable for this test.
+        QName rootName = new QName("root");
+        Object bean = "some-bean-object";
+        NodePointer rootPointer = NodePointer.newChildNodePointer(null, rootName, bean);
+
+        // Define a path step representing "self::node()".
+        // The "self" axis is represented by Compiler.AXIS_SELF (value 0).
+        // The step has no predicates.
+        Step selfAxisStep = mock(Step.class);
+        when(selfAxisStep.getAxis()).thenReturn(Compiler.AXIS_SELF);
+        when(selfAxisStep.getPredicates()).thenReturn(new Expression[0]);
+
+        // Create a path consisting of multiple "self::" steps.
+        Step[] pathSteps = {selfAxisStep, selfAxisStep, selfAxisStep, selfAxisStep};
+
+        // The overall expression path has no top-level predicates.
+        Expression[] noPredicates = new Expression[0];
+
+        // Act: Execute the method under test.
+        NodePointer resultPointer = SimplePathInterpreter.interpretSimpleExpressionPath(
+                evalContext, rootPointer, noPredicates, pathSteps);
+
+        // Assert: The result should be identical to the original root pointer.
+        assertNotNull("The result pointer should not be null", resultPointer);
+        assertSame("The result pointer should be the same instance as the root pointer",
+                rootPointer, resultPointer);
+
+        // A BeanPointer for a whole object has an index of WHOLE_COLLECTION.
+        // This confirms the returned pointer is the original, unmodified pointer.
+        assertEquals("The pointer's index should be unchanged",
+                NodePointer.WHOLE_COLLECTION, resultPointer.getIndex());
     }
 }
