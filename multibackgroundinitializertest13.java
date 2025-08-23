@@ -30,6 +30,11 @@ public class MultiBackgroundInitializerTestTest13 extends AbstractLangTest {
     protected static final long PERIOD_MILLIS = 50;
 
     /**
+     * A timeout for waiting for background tasks to start.
+     */
+    private static final long START_TIMEOUT_MILLIS = 3000;
+
+    /**
      * The initializer to be tested.
      */
     protected MultiBackgroundInitializer initializer;
@@ -219,33 +224,56 @@ public class MultiBackgroundInitializerTestTest13 extends AbstractLangTest {
     }
 
     @Test
-    void testIsInitialized() throws ConcurrentException, InterruptedException {
+    void testIsInitializedTracksCompletionStatusOfChildren() throws ConcurrentException, InterruptedException {
+        // Arrange: Create two child initializers that can be controlled via latches.
         final AbstractChildBackgroundInitializer childOne = createChildBackgroundInitializer();
         final AbstractChildBackgroundInitializer childTwo = createChildBackgroundInitializer();
         childOne.enableLatch();
         childTwo.enableLatch();
-        assertFalse(initializer.isInitialized(), "Initialized without having anything to initialize");
+
+        // Assert: Before adding children, isInitialized() is false.
+        assertFalse(initializer.isInitialized(), "isInitialized() should be false for a new instance with no children");
+
         initializer.addInitializer("child one", childOne);
         initializer.addInitializer("child two", childTwo);
+
+        // Act: Start the main initializer, which will start the children.
         initializer.start();
-        final long startTime = System.currentTimeMillis();
-        final long waitTime = 3000;
-        final long endTime = startTime + waitTime;
-        //wait for the children to start
-        while (!childOne.isStarted() || !childTwo.isStarted()) {
-            if (System.currentTimeMillis() > endTime) {
-                fail("children never started");
+        waitForInitializersToStart(childOne, childTwo);
+
+        // Assert: While both children are running (blocked by latches), isInitialized() is false.
+        assertFalse(initializer.isInitialized(), "isInitialized() should be false when children are running");
+
+        // Act: Allow the first child to complete.
+        childOne.releaseLatch();
+        childOne.get(); // Wait for completion to be certain.
+
+        // Assert: With one child finished and one still running, isInitialized() is still false.
+        assertFalse(initializer.isInitialized(), "isInitialized() should be false when at least one child is still running");
+
+        // Act: Allow the second child to complete.
+        childTwo.releaseLatch();
+        childTwo.get(); // Wait for completion.
+
+        // Assert: Once all children have completed, isInitialized() becomes true.
+        assertTrue(initializer.isInitialized(), "isInitialized() should be true after all children have completed");
+    }
+
+    /**
+     * Waits until the given initializers have started executing. Fails if the timeout is exceeded.
+     *
+     * @param initializers The initializers to check.
+     * @throws InterruptedException if the thread is interrupted.
+     */
+    private void waitForInitializersToStart(final BackgroundInitializer<?>... initializers) throws InterruptedException {
+        final long endTime = System.currentTimeMillis() + START_TIMEOUT_MILLIS;
+        for (final BackgroundInitializer<?> init : initializers) {
+            while (!init.isStarted()) {
+                if (System.currentTimeMillis() > endTime) {
+                    fail("Initializer " + init + " did not start within " + START_TIMEOUT_MILLIS + " ms.");
+                }
                 Thread.sleep(PERIOD_MILLIS);
             }
         }
-        assertFalse(initializer.isInitialized(), "Initialized with two children running");
-        childOne.releaseLatch();
-        //ensure this child finishes initializing
-        childOne.get();
-        assertFalse(initializer.isInitialized(), "Initialized with one child running");
-        childTwo.releaseLatch();
-        //ensure this child finishes initializing
-        childTwo.get();
-        assertTrue(initializer.isInitialized(), "Not initialized with no children running");
     }
 }
