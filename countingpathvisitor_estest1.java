@@ -1,42 +1,48 @@
 package org.apache.commons.io.file;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.NoSuchFileException;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.function.UnaryOperator;
-import org.apache.commons.io.filefilter.CanWriteFileFilter;
-import org.apache.commons.io.filefilter.EmptyFileFilter;
-import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.NotFileFilter;
-import org.apache.commons.io.filefilter.PathEqualsFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.function.IOBiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import org.apache.commons.io.file.Counters.PathCounters;
+import org.junit.Test;
 
-public class CountingPathVisitor_ESTestTest1 extends CountingPathVisitor_ESTest_scaffolding {
+/**
+ * Tests for the {@link CountingPathVisitor} class, focusing on its internal counter update logic.
+ */
+public class CountingPathVisitorTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        AccumulatorPathVisitor.Builder accumulatorPathVisitor_Builder0 = new AccumulatorPathVisitor.Builder();
-        AccumulatorPathVisitor accumulatorPathVisitor0 = accumulatorPathVisitor_Builder0.get();
-        MockFile mockFile0 = new MockFile("");
-        Path path0 = mockFile0.toPath();
-        BasicFileAttributes basicFileAttributes0 = mock(BasicFileAttributes.class, new ViolatedAssumptionAnswer());
-        doReturn(0L).when(basicFileAttributes0).size();
-        accumulatorPathVisitor0.updateFileCounters(path0, basicFileAttributes0);
+    /**
+     * Tests that the protected method {@code updateFileCounters} correctly increments the file count
+     * and the total byte size when visiting a file.
+     */
+    @Test
+    public void testUpdateFileCountersIncrementsFileAndByteCounts() {
+        // Arrange
+        final long fileSize = 123L;
+        final CountingPathVisitor visitor = CountingPathVisitor.withLongCounters();
+        final Path mockPath = mock(Path.class);
+        final BasicFileAttributes mockAttributes = mock(BasicFileAttributes.class);
+
+        // Stub the size() method to return a specific file size.
+        when(mockAttributes.size()).thenReturn(fileSize);
+
+        // Pre-check: Ensure counters are initially zero.
+        PathCounters initialCounters = visitor.getPathCounters();
+        assertEquals("Initial file count should be zero.", 0, initialCounters.getFileCounter().get());
+        assertEquals("Initial byte count should be zero.", 0, initialCounters.getByteCounter().get());
+
+        // Act
+        // Call the protected method under test. This is possible because the test
+        // is in the same package as the class being tested.
+        visitor.updateFileCounters(mockPath, mockAttributes);
+
+        // Assert
+        PathCounters finalCounters = visitor.getPathCounters();
+        assertEquals("File count should be incremented to 1.", 1, finalCounters.getFileCounter().get());
+        assertEquals("Byte count should be updated to the file's size.", fileSize, finalCounters.getByteCounter().get());
+        assertEquals("Directory count should remain unchanged.", 0, finalCounters.getDirectoryCounter().get());
     }
 }
