@@ -2,32 +2,35 @@ package org.jfree.chart.urls;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
+
 import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultKeyedValues2DDataset;
-import org.junit.runner.RunWith;
 
-public class CustomCategoryURLGenerator_ESTestTest24 extends CustomCategoryURLGenerator_ESTest_scaffolding {
+/**
+ * Tests for the equals() method in the {@link CustomCategoryURLGenerator} class.
+ */
+public class CustomCategoryURLGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
-        CustomCategoryURLGenerator customCategoryURLGenerator1 = new CustomCategoryURLGenerator();
-        assertTrue(customCategoryURLGenerator1.equals((Object) customCategoryURLGenerator0));
-        Vector<String> vector0 = new Vector<String>();
-        vector0.add("N8)j");
-        customCategoryURLGenerator0.addURLSeries(vector0);
-        Stack<String> stack0 = new Stack<String>();
-        stack0.add("NmY|");
-        customCategoryURLGenerator1.addURLSeries(stack0);
-        boolean boolean0 = customCategoryURLGenerator0.equals(customCategoryURLGenerator1);
-        assertFalse(customCategoryURLGenerator1.equals((Object) customCategoryURLGenerator0));
-        assertFalse(boolean0);
+    /**
+     * Verifies that two CustomCategoryURLGenerator instances are not equal
+     * if they contain different URL series.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenURLSeriesAreDifferent() {
+        // Arrange: Create two identical generators.
+        CustomCategoryURLGenerator generator1 = new CustomCategoryURLGenerator();
+        CustomCategoryURLGenerator generator2 = new CustomCategoryURLGenerator();
+
+        // Assert that they are equal when newly created.
+        assertEquals("Two new generators should be equal", generator1, generator2);
+
+        // Act: Add a different list of URLs to each generator.
+        List<String> urlSeries1 = List.of("http://example.com/series-a-url");
+        generator1.addURLSeries(urlSeries1);
+
+        List<String> urlSeries2 = List.of("http://example.com/series-b-url");
+        generator2.addURLSeries(urlSeries2);
+
+        // Assert: The generators should no longer be equal.
+        assertNotEquals("Generators with different URL series should not be equal", generator1, generator2);
     }
 }
