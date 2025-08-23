@@ -1,40 +1,43 @@
 package org.jsoup.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.CDataNode;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.LeafNode;
-import org.jsoup.select.Elements;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class XmlTreeBuilder_ESTestTest42 extends XmlTreeBuilder_ESTest_scaffolding {
+/**
+ * Test suite for the XmlTreeBuilder class.
+ * This class focuses on namespace handling during the tree construction process.
+ */
+public class XmlTreeBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        Parser parser0 = new Parser(xmlTreeBuilder0);
-        StreamParser streamParser0 = new StreamParser(parser0);
-        Element element0 = new Element("http://www.w3.org/XML/1998/namespace", "http://www.w3.org/2000/svg");
-        streamParser0.parseFragment("http://www.w3.org/2000/svg", element0, "http://www.w3.org/1998/Math/MathML");
-        Tokeniser tokeniser0 = new Tokeniser(xmlTreeBuilder0);
-        Token.StartTag token_StartTag0 = tokeniser0.startPending;
-        Attributes attributes0 = new Attributes();
-        Token.StartTag token_StartTag1 = token_StartTag0.nameAttr("V#,{/v8G", attributes0);
-        xmlTreeBuilder0.insertElementFor(token_StartTag1);
-        assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
+    /**
+     * Verifies that when a new element is inserted via insertElementFor,
+     * it correctly inherits the default namespace from its parent in the parsing context.
+     */
+    @Test
+    public void insertElementForInheritsDefaultNamespaceFromParent() {
+        // Arrange
+        final String expectedNamespace = "http://www.w3.org/XML/1998/namespace";
+        String xmlWithNamespace = "<doc xmlns='" + expectedNamespace + "'></doc>";
+
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        Parser parser = new Parser(builder);
+
+        // Parse the initial XML to establish a context. After this, the <doc> element
+        // is on the builder's stack, and its default namespace is active.
+        parser.parse(xmlWithNamespace, "");
+
+        // Create a token for a new element to be inserted into the <doc> context.
+        Token.StartTag newElementToken = new Token.StartTag();
+        newElementToken.nameAttr("newChild", new Attributes());
+
+        // Act
+        // Insert the new element. It should be placed within the current namespace scope.
+        builder.insertElementFor(newElementToken);
+
+        // Assert
+        // The builder's current default namespace should be the one inherited from the <doc> parent.
+        String currentDefaultNamespace = builder.defaultNamespace();
+        assertEquals(expectedNamespace, currentDefaultNamespace);
     }
 }
