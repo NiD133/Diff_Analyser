@@ -1,31 +1,41 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest77 extends XNode_ESTest_scaffolding {
+/**
+ * Test suite for the XNode class, focusing on attribute handling.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test076() throws Throwable {
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XPathParser xPathParser0 = new XPathParser((Document) null, true);
-        Properties properties0 = new Properties();
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        String string0 = xNode0.getStringAttribute("=)coWX*V^N1)|]", "=)coWX*V^N1)|]");
-        assertEquals("=)coWX*V^N1)|]", string0);
+    /**
+     * Verifies that getStringAttribute() returns the provided default value
+     * when the requested attribute does not exist on the underlying XML node.
+     */
+    @Test
+    public void getStringAttributeShouldReturnDefaultValueForMissingAttribute() {
+        // Arrange
+        // Create a DOM node that has no attributes.
+        Node nodeWithoutAttributes = new IIOMetadataNode();
+
+        // The XNode constructor requires an XPathParser and variables, even if they are not
+        // directly used for this specific test of reading a non-existent attribute.
+        XPathParser dummyParser = new XPathParser((Document) null, true);
+        XNode xNode = new XNode(dummyParser, nodeWithoutAttributes, new Properties());
+
+        String attributeName = "nonExistentAttribute";
+        String expectedDefaultValue = "defaultValue";
+
+        // Act
+        String actualValue = xNode.getStringAttribute(attributeName, expectedDefaultValue);
+
+        // Assert
+        assertEquals("Should return the default value when the attribute is not found.",
+                expectedDefaultValue, actualValue);
     }
 }
