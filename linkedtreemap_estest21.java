@@ -2,34 +2,40 @@ package com.google.gson.internal;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
 public class LinkedTreeMap_ESTestTest21 extends LinkedTreeMap_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        LinkedTreeMap<Map.Entry<Integer, Object>, Object> linkedTreeMap0 = new LinkedTreeMap<Map.Entry<Integer, Object>, Object>(false);
-        LinkedTreeMap.Node<Map.Entry<Integer, Object>, Object> linkedTreeMap_Node0 = new LinkedTreeMap.Node<Map.Entry<Integer, Object>, Object>(false);
-        linkedTreeMap0.root = linkedTreeMap_Node0;
-        Integer integer0 = new Integer((-2105));
-        // Undeclared exception!
+    /**
+     * Tests that get() throws a NullPointerException if the map is in a corrupt state
+     * where the root node has a null key.
+     *
+     * <p>This is a white-box test that manually manipulates the map's internal state.
+     * The public API does not allow inserting null keys, so this state cannot be
+     * achieved through normal use. The test ensures that the underlying comparator
+     * logic correctly fails when encountering an unexpected null key during a search.
+     */
+    @Test
+    public void get_whenRootNodeHasNullKey_throwsNullPointerException() {
+        // Arrange: Create a map and manually set its root to a node with a null key
+        // to simulate a corrupt internal state.
+        LinkedTreeMap<String, Integer> map = new LinkedTreeMap<>();
+        
+        // The Node constructor with a single boolean argument creates a "header" node,
+        // which has a null key. We use this to create our corrupted root.
+        LinkedTreeMap.Node<String, Integer> corruptedRootNode = new LinkedTreeMap.Node<>(true);
+        map.root = corruptedRootNode;
+
+        String searchKey = "anyKey";
+
+        // Act & Assert: Attempting to get an element should trigger an NPE when the
+        // search key is compared against the root's null key.
         try {
-            linkedTreeMap0.get(integer0);
-            fail("Expecting exception: NullPointerException");
+            map.get(searchKey);
+            fail("Expected a NullPointerException because the root node's key is null.");
         } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
+            // This is the expected outcome. The default comparator cannot handle the null key
+            // in the corrupted root node. The original exception has no message,
+            // so we don't assert on its content.
         }
     }
 }
