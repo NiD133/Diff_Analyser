@@ -1,23 +1,27 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class QuotedPrintableCodec_ESTestTest24 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link QuotedPrintableCodec} class.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec();
-        String string0 = quotedPrintableCodec0.decode("");
-        assertEquals("", string0);
+    /**
+     * Tests that decoding an empty string correctly results in an empty string.
+     */
+    @Test
+    public void decodeEmptyStringShouldReturnEmptyString() throws DecoderException {
+        // Arrange: Create a codec instance and the input string.
+        QuotedPrintableCodec codec = new QuotedPrintableCodec();
+        String input = "";
+
+        // Act: Perform the decoding operation.
+        String decodedString = codec.decode(input);
+
+        // Assert: Verify that the output is an empty string.
+        assertEquals("Decoding an empty string should yield an empty string.", "", decodedString);
     }
 }
