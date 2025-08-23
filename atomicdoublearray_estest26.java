@@ -1,30 +1,27 @@
 package com.google.common.util.concurrent;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.DoubleBinaryOperator;
+import static org.junit.Assert.assertThrows;
+
 import java.util.function.DoubleUnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AtomicDoubleArray_ESTestTest26 extends AtomicDoubleArray_ESTest_scaffolding {
+/**
+ * Tests for {@link AtomicDoubleArray}.
+ */
+public class AtomicDoubleArrayTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(19);
-        // Undeclared exception!
-        try {
-            atomicDoubleArray0.getAndUpdate(4, (DoubleUnaryOperator) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.util.concurrent.AtomicDoubleArray", e);
-        }
+    @Test
+    public void getAndUpdate_withNullFunction_shouldThrowNullPointerException() {
+        // Arrange
+        // Create an array with a single element; the size and content are not relevant.
+        AtomicDoubleArray array = new AtomicDoubleArray(1);
+        int aValidIndex = 0;
+
+        // Act & Assert
+        // The getAndUpdate method is documented to reject a null updater function.
+        // We verify that it throws a NullPointerException as expected.
+        assertThrows(
+            NullPointerException.class,
+            () -> array.getAndUpdate(aValidIndex, (DoubleUnaryOperator) null));
     }
 }
