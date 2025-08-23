@@ -1,17 +1,23 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Years_ESTestTest40 extends Years_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Years} class.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        Years years0 = Years.yearsIn((ReadableInterval) null);
-        assertEquals(0, years0.getYears());
+    /**
+     * Tests that the factory method `yearsIn()` returns zero years when
+     * the input interval is null.
+     */
+    @Test
+    public void yearsIn_givenNullInterval_shouldReturnZeroYears() {
+        // Act: Call the factory method with a null interval.
+        Years result = Years.yearsIn(null);
+
+        // Assert: The result should be the constant for zero years.
+        assertEquals(Years.ZERO, result);
     }
 }
