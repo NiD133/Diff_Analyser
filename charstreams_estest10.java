@@ -1,53 +1,39 @@
 package com.google.common.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
-import java.io.EOFException;
 import java.io.FileDescriptor;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.PushbackReader;
 import java.io.Reader;
-import java.io.StringReader;
-import java.io.Writer;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.MalformedInputException;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.evosuite.runtime.mock.java.io.MockFileReader;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.junit.runner.RunWith;
 
 public class CharStreams_ESTestTest10 extends CharStreams_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        FileDescriptor fileDescriptor0 = new FileDescriptor();
-        MockFileReader mockFileReader0 = new MockFileReader(fileDescriptor0);
-        // Undeclared exception!
-        try {
-            CharStreams.skipFully(mockFileReader0, 222L);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.evosuite.runtime.mock.java.io.MockFileReader", e);
-        }
+    /**
+     * Verifies that {@code CharStreams.skipFully()} propagates exceptions thrown by the underlying reader.
+     *
+     * <p><b>Test Scenario:</b>
+     * <ul>
+     *   <li><b>Given:</b> An invalid {@link MockFileReader} is created with a default, uninitialized
+     *       {@link FileDescriptor}. Any attempt to read from this reader will cause a
+     *       {@code NullPointerException}.</li>
+     *   <li><b>When:</b> {@code CharStreams.skipFully()} is invoked with this invalid reader.</li>
+     *   <li><b>Then:</b> The method is expected to throw a {@code NullPointerException}, demonstrating
+     *       that the exception from the reader is not caught and suppressed.</li>
+     * </ul>
+     */
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void skipFully_whenReaderThrowsException_propagatesException() throws Throwable {
+        // Arrange: Create a reader that is guaranteed to fail upon use.
+        // A MockFileReader initialized with a default FileDescriptor is in an invalid
+        // state and will throw a NullPointerException on any read operation.
+        FileDescriptor invalidFileDescriptor = new FileDescriptor();
+        Reader faultyReader = new MockFileReader(invalidFileDescriptor);
+        long charactersToSkip = 222L;
+
+        // Act: Attempt to skip characters using the faulty reader.
+        // This is expected to trigger the NullPointerException from the reader.
+        CharStreams.skipFully(faultyReader, charactersToSkip);
+
+        // Assert: The test will pass if the expected NullPointerException is thrown,
+        // as specified by the 'expected' attribute in the @Test annotation.
     }
 }
