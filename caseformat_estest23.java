@@ -1,18 +1,37 @@
 package com.google.common.base;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CaseFormat_ESTestTest23 extends CaseFormat_ESTest_scaffolding {
+/**
+ * Tests for {@link CaseFormat}.
+ */
+public class CaseFormatTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        CaseFormat caseFormat0 = CaseFormat.LOWER_HYPHEN;
-        String string0 = caseFormat0.convert(caseFormat0, "83pvzR?h!");
-        assertEquals("83pvzr?h!", string0);
+    /**
+     * Tests that the internal `convert` method normalizes a string even when
+     * converting from a format to itself. For {@code LOWER_HYPHEN}, this means
+     * converting the entire input string to lowercase.
+     *
+     * <p>Note: The public {@code to(CaseFormat, String)} method short-circuits
+     * and returns the original string for identity conversions. This test targets the
+     * package-private {@code convert} method directly to verify its normalization logic.
+     */
+    @Test
+    public void convert_fromLowerHyphenToItself_normalizesInputToLowerCase() {
+        // Arrange
+        CaseFormat format = CaseFormat.LOWER_HYPHEN;
+        String mixedCaseInput = "83pvzR?h!";
+        String expectedLowercaseOutput = "83pvzr?h!";
+
+        // Act
+        // Calling the internal convert method directly.
+        String actualOutput = format.convert(format, mixedCaseInput);
+
+        // Assert
+        assertEquals(
+            "Converting from a format to itself should normalize the string to that format's standard.",
+            expectedLowercaseOutput,
+            actualOutput);
     }
 }
