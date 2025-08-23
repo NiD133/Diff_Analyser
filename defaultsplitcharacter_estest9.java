@@ -1,30 +1,30 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.Chunk;
-import com.itextpdf.text.GreekList;
-import com.itextpdf.text.TabSettings;
-import java.util.ArrayList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class DefaultSplitCharacter_ESTestTest9 extends DefaultSplitCharacter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultSplitCharacter} class.
+ */
+public class DefaultSplitCharacterTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        DefaultSplitCharacter defaultSplitCharacter0 = new DefaultSplitCharacter();
-        // Undeclared exception!
-        try {
-            defaultSplitCharacter0.getCurrentCharacter(1522, (char[]) null, (PdfChunk[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.DefaultSplitCharacter", e);
-        }
+    /**
+     * Verifies that getCurrentCharacter throws a NullPointerException when the
+     * character array is null and the PdfChunk array is also null.
+     *
+     * The underlying implementation first checks the PdfChunk array. If it's null,
+     * it attempts to access the character array, which will cause the NPE.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getCurrentCharacter_shouldThrowNullPointerException_whenCharacterArrayIsNull() {
+        // Arrange
+        DefaultSplitCharacter splitCharacter = new DefaultSplitCharacter();
+        int arbitraryCurrentIndex = 1522;
+        char[] nullCharacterArray = null;
+        PdfChunk[] nullChunkArray = null;
+
+        // Act
+        // This call is expected to throw a NullPointerException because the character array is null.
+        // The assertion is handled by the @Test(expected=...) annotation.
+        splitCharacter.getCurrentCharacter(arbitraryCurrentIndex, nullCharacterArray, nullChunkArray);
     }
 }
