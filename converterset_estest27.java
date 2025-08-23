@@ -1,27 +1,36 @@
 package org.joda.time.convert;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Hours;
-import org.joda.time.Interval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.Seconds;
-import org.joda.time.chrono.CopticChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class ConverterSet_ESTestTest27 extends ConverterSet_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ConverterSet}.
+ */
+public class ConverterSetTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        Converter[] converterArray0 = new Converter[10];
-        ReadableInstantConverter readableInstantConverter0 = new ReadableInstantConverter();
-        converterArray0[0] = (Converter) readableInstantConverter0;
-        ConverterSet converterSet0 = new ConverterSet(converterArray0);
-        ConverterSet converterSet1 = converterSet0.add(converterArray0[0], (Converter[]) null);
-        assertSame(converterSet1, converterSet0);
+    /**
+     * Tests that adding a converter that is already present in the set
+     * returns the original set instance, confirming its immutable behavior.
+     */
+    @Test
+    public void add_whenConverterAlreadyExists_returnsSameInstance() {
+        // Arrange
+        // Create a converter that will be present in the initial set.
+        Converter existingConverter = ReadableInstantConverter.INSTANCE;
+        Converter[] initialConverters = new Converter[]{existingConverter};
+        ConverterSet initialSet = new ConverterSet(initialConverters);
+
+        // Act
+        // Attempt to add the exact same converter instance to the set.
+        ConverterSet resultSet = initialSet.add(existingConverter, null);
+
+        // Assert
+        // The method should return the original set instance, not a new one,
+        // because no change was made.
+        assertSame(
+            "Adding an existing converter should return the same set instance",
+            initialSet,
+            resultSet
+        );
     }
 }
