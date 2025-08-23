@@ -1,44 +1,34 @@
 package org.threeten.extra.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
+import static org.junit.Assert.assertEquals;
+
 import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Symmetry010Chronology_ESTestTest59 extends Symmetry010Chronology_ESTest_scaffolding {
+/**
+ * Tests for the {@link Symmetry010Chronology} class.
+ */
+public class Symmetry010ChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test58() throws Throwable {
-        Symmetry010Chronology symmetry010Chronology0 = new Symmetry010Chronology();
-        Symmetry010Date symmetry010Date0 = symmetry010Chronology0.dateEpochDay(719162L);
-        assertEquals(IsoEra.CE, symmetry010Date0.getEra());
+    /**
+     * Tests that creating a date from epoch day 0 results in the correct
+     * representation of the epoch date, 1970-01-01.
+     */
+    @Test
+    public void dateEpochDay_whenEpochDayIsZero_returnsDateFor1970_01_01() {
+        // Arrange: The Symmetry010 chronology and the epoch day for 1970-01-01.
+        Symmetry010Chronology chronology = Symmetry010Chronology.INSTANCE;
+        long epochDay = 0L;
+
+        // Act: Create a Symmetry010Date from the epoch day.
+        Symmetry010Date date = chronology.dateEpochDay(epochDay);
+
+        // Assert: The resulting date should correspond to 1970-01-01.
+        // The source documentation states this calendar is aligned with the ISO calendar.
+        assertEquals("Era should be Common Era", IsoEra.CE, date.getEra());
+        assertEquals("Year should be 1970", 1970, date.get(ChronoField.YEAR));
+        assertEquals("Month should be 1", 1, date.get(ChronoField.MONTH_OF_YEAR));
+        assertEquals("Day should be 1", 1, date.get(ChronoField.DAY_OF_MONTH));
     }
 }
