@@ -1,37 +1,44 @@
 package org.jfree.chart;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
 import org.jfree.chart.plot.CombinedRangeCategoryPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.data.xy.XYDatasetTableModel;
-import org.junit.runner.RunWith;
+import org.jfree.chart.plot.Plot;
+import org.junit.Test;
 
-public class ChartRenderingInfo_ESTestTest12 extends ChartRenderingInfo_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
+/**
+ * Contains tests for the {@link ChartRenderingInfo} class, focusing on its equality logic.
+ */
+public class ImprovedChartRenderingInfoTest {
+
+    /**
+     * Verifies that the equals() method returns false after one of two
+     * identical ChartRenderingInfo instances is modified by a chart rendering operation.
+     * The rendering process populates the instance with data (like the chart area),
+     * which should cause the equality check to fail.
+     */
     @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        ChartRenderingInfo chartRenderingInfo1 = new ChartRenderingInfo();
-        assertTrue(chartRenderingInfo1.equals((Object) chartRenderingInfo0));
-        SimpleTimeZone simpleTimeZone0 = new SimpleTimeZone(1, ",:Q.N1exKdJ$");
-        Locale locale0 = Locale.JAPANESE;
-        DateAxis dateAxis0 = new DateAxis(",:Q.N1exKdJ$", simpleTimeZone0, locale0);
-        CombinedRangeCategoryPlot combinedRangeCategoryPlot0 = new CombinedRangeCategoryPlot(dateAxis0);
-        JFreeChart jFreeChart0 = new JFreeChart(combinedRangeCategoryPlot0);
-        jFreeChart0.createBufferedImage(10, 10, 1749.95538, (double) 2.0F, chartRenderingInfo0);
-        boolean boolean0 = chartRenderingInfo0.equals(chartRenderingInfo1);
-        assertFalse(chartRenderingInfo1.equals((Object) chartRenderingInfo0));
-        assertFalse(boolean0);
+    public void equals_shouldReturnFalse_whenStateIsModifiedByChartRendering() {
+        // Arrange: Create two identical ChartRenderingInfo objects.
+        ChartRenderingInfo info1 = new ChartRenderingInfo();
+        ChartRenderingInfo info2 = new ChartRenderingInfo();
+
+        // Sanity check: two newly created instances should be equal.
+        assertEquals("Two new ChartRenderingInfo instances should be equal.", info1, info2);
+
+        // Arrange: Create a simple chart. The specific chart type is not important;
+        // we only need it to trigger the rendering process that modifies the info object.
+        Plot plot = new CombinedRangeCategoryPlot(new DateAxis("Time"));
+        JFreeChart chart = new JFreeChart("Test Chart", plot);
+
+        // Act: Render the chart. This action populates 'info1' with details about
+        // the chart's rendered area, thus changing its internal state. The 'info2'
+        // object remains in its original, pristine state.
+        chart.createBufferedImage(100, 100, info1);
+
+        // Assert: After modification, 'info1' should no longer be equal to 'info2'.
+        assertNotEquals("An instance modified by rendering should not be equal to a pristine instance.", info1, info2);
     }
 }
