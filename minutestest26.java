@@ -1,42 +1,47 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
 
-public class MinutesTestTest26 extends TestCase {
+import org.junit.Test;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Unit tests for the negated() method in the {@link Minutes} class.
+ */
+public class MinutesNegatedTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void negated_shouldReturnNegativeValue_forPositiveInput() {
+        // Arrange
+        final Minutes twelveMinutes = Minutes.minutes(12);
+        final int expectedNegatedValue = -12;
+
+        // Act
+        final Minutes negatedResult = twelveMinutes.negated();
+
+        // Assert
+        assertEquals(expectedNegatedValue, negatedResult.getMinutes());
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestMinutes.class);
+    @Test
+    public void negated_shouldNotChangeOriginalObject() {
+        // Arrange
+        final Minutes twelveMinutes = Minutes.minutes(12);
+        final int originalValue = 12;
+
+        // Act
+        // The result of the operation is intentionally ignored.
+        twelveMinutes.negated();
+
+        // Assert
+        // Verify that the original object remains unmodified, confirming its immutability.
+        assertEquals("The original Minutes object should not be modified.",
+                     originalValue, twelveMinutes.getMinutes());
     }
 
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testNegated() {
-        Minutes test = Minutes.minutes(12);
-        assertEquals(-12, test.negated().getMinutes());
-        assertEquals(12, test.getMinutes());
-        try {
-            Minutes.MIN_VALUE.negated();
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+    @Test(expected = ArithmeticException.class)
+    public void negated_whenValueIsMinValue_shouldThrowArithmeticException() {
+        // Act: Attempting to negate the minimum integer value should cause an overflow.
+        // Assert: An ArithmeticException is expected.
+        Minutes.MIN_VALUE.negated();
     }
 }
