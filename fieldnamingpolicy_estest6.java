@@ -1,18 +1,22 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Field;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class FieldNamingPolicy_ESTestTest6 extends FieldNamingPolicy_ESTest_scaffolding {
+/**
+ * Test for the static helper methods in {@link FieldNamingPolicy}.
+ */
+public class FieldNamingPolicyTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        String string0 = FieldNamingPolicy.upperCaseFirstLetter("LOWER_CASE_WITH_UNDERSCORES");
-        assertEquals("LOWER_CASE_WITH_UNDERSCORES", string0);
+    @Test
+    public void upperCaseFirstLetter_whenFirstLetterIsAlreadyUpperCase_returnsOriginalString() {
+        // Arrange
+        String input = "AlreadyUpperCase";
+
+        // Act
+        String result = FieldNamingPolicy.upperCaseFirstLetter(input);
+
+        // Assert
+        assertEquals("The string should remain unchanged", input, result);
     }
 }
