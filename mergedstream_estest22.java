@@ -1,39 +1,43 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
-import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedInputStream;
+
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Contains tests for the {@link MergedStream} class.
+ * This class name is retained from the original auto-generated test suite.
+ */
 public class MergedStream_ESTestTest22 extends MergedStream_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        PipedInputStream pipedInputStream0 = new PipedInputStream();
-        byte[] byteArray0 = new byte[1];
-        MergedStream mergedStream0 = new MergedStream((IOContext) null, pipedInputStream0, byteArray0, (-629), (-629));
-        long long0 = mergedStream0.skip((-629));
-        assertEquals((-629L), long0);
+    /**
+     * Tests that calling skip() with a negative number of bytes is a no-op
+     * that returns the provided negative number.
+     *
+     * <p>Note: The standard contract for {@link InputStream#skip(long)} implies
+     * a non-negative return value representing the number of bytes actually skipped.
+     * This test verifies a specific, non-standard behavior of this implementation.
+     */
+    @Test
+    public void skipWithNegativeArgumentShouldReturnTheArgument() throws IOException {
+        // Arrange
+        final long negativeBytesToSkip = -629L;
+
+        // Use minimal dependencies since the internal state of the stream and buffer
+        // should not affect the handling of a negative skip value.
+        InputStream dummyInputStream = new ByteArrayInputStream(new byte[0]);
+        byte[] emptyBuffer = new byte[0];
+        MergedStream mergedStream = new MergedStream(null, dummyInputStream, emptyBuffer, 0, 0);
+
+        // Act
+        long actualBytesSkipped = mergedStream.skip(negativeBytesToSkip);
+
+        // Assert
+        assertEquals("The skip() method should return the negative argument it was given.",
+                negativeBytesToSkip, actualBytesSkipped);
     }
 }
