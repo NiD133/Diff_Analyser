@@ -1,31 +1,35 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.IdentityHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class SegmentConstantPoolArrayCache_ESTestTest14 extends SegmentConstantPoolArrayCache_ESTest_scaffolding {
+/**
+ * Unit tests for {@link SegmentConstantPoolArrayCache}.
+ */
+public class SegmentConstantPoolArrayCacheTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        SegmentConstantPoolArrayCache segmentConstantPoolArrayCache0 = new SegmentConstantPoolArrayCache();
-        String[] stringArray0 = new String[8];
-        segmentConstantPoolArrayCache0.cacheArray(stringArray0);
-        // Undeclared exception!
+    /**
+     * Verifies that attempting to cache the same array instance twice
+     * results in an IllegalArgumentException. The cache should not
+     * allow duplicate entries for the same array object.
+     */
+    @Test
+    public void shouldThrowExceptionWhenCachingSameArrayTwice() {
+        // Arrange: Create a cache and an array to be cached.
+        final SegmentConstantPoolArrayCache cache = new SegmentConstantPoolArrayCache();
+        final String[] arrayToCache = new String[8];
+
+        // Pre-condition: Cache the array for the first time, which should succeed.
+        cache.cacheArray(arrayToCache);
+
+        // Act & Assert: Attempt to cache the same array again and expect an exception.
         try {
-            segmentConstantPoolArrayCache0.cacheArray(stringArray0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Trying to cache an array that already exists
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPoolArrayCache", e);
+            cache.cacheArray(arrayToCache);
+            fail("Expected an IllegalArgumentException because the array is already cached.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception has the expected message.
+            assertEquals("Trying to cache an array that already exists", e.getMessage());
         }
     }
 }
