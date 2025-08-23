@@ -1,50 +1,47 @@
 package org.apache.commons.cli;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.Properties;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class OptionGroupTestTest10 {
-
-    private Options options;
+/**
+ * Tests the precedence rules for options within an OptionGroup when provided
+ * from multiple sources (e.g., command-line arguments and properties).
+ */
+class OptionGroupPrecedenceTest {
 
     private final Parser parser = new PosixParser();
 
-    @BeforeEach
-    public void setUp() {
-        final Option file = new Option("f", "file", false, "file to process");
-        final Option dir = new Option("d", "directory", false, "directory to process");
-        final OptionGroup optionGroup1 = new OptionGroup();
-        optionGroup1.addOption(file);
-        optionGroup1.addOption(dir);
-        options = new Options().addOptionGroup(optionGroup1);
-        final Option section = new Option("s", "section", false, "section to process");
-        final Option chapter = new Option("c", "chapter", false, "chapter to process");
-        final OptionGroup optionGroup2 = new OptionGroup();
-        optionGroup2.addOption(section);
-        optionGroup2.addOption(chapter);
-        options.addOptionGroup(optionGroup2);
-        final Option importOpt = new Option(null, "import", false, "section to process");
-        final Option exportOpt = new Option(null, "export", false, "chapter to process");
-        final OptionGroup optionGroup3 = new OptionGroup();
-        optionGroup3.addOption(importOpt);
-        optionGroup3.addOption(exportOpt);
-        options.addOptionGroup(optionGroup3);
-        options.addOption("r", "revision", false, "revision number");
-    }
-
     @Test
-    void testTwoOptionsFromGroupWithProperties() throws Exception {
-        final String[] args = { "-f" };
+    @DisplayName("CLI arguments should have precedence over properties for options in the same group")
+    void shouldPrioritizeCliArgumentOverPropertyWhenBothInSameOptionGroup() throws Exception {
+        // Arrange
+        // Define a mutually exclusive group for a "file" option and a "directory" option.
+        final Option fileOption = new Option("f", "file", false, "file to process");
+        final Option dirOption = new Option("d", "directory", false, "directory to process");
+        final OptionGroup fileOrDirGroup = new OptionGroup();
+        fileOrDirGroup.addOption(fileOption);
+        fileOrDirGroup.addOption(dirOption);
+
+        final Options options = new Options().addOptionGroup(fileOrDirGroup);
+
+        // Provide the '-f' option via command-line arguments.
+        final String[] args = {"-f"};
+
+        // Provide the conflicting '-d' option via properties.
         final Properties properties = new Properties();
-        properties.put("d", "true");
+        properties.setProperty("d", "true");
+
+        // Act
+        // Parse the inputs. The parser must resolve the conflict based on precedence rules.
         final CommandLine cl = parser.parse(options, args, properties);
-        assertTrue(cl.hasOption("f"));
-        assertFalse(cl.hasOption("d"));
+
+        // Assert
+        // The command-line argument ('-f') should be selected, and the property ('d') should be ignored.
+        assertTrue(cl.hasOption("f"), "The option from command-line arguments should be selected.");
+        assertFalse(cl.hasOption("d"), "The option from properties should be ignored due to CLI argument precedence.");
     }
 }
