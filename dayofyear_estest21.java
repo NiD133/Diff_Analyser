@@ -1,47 +1,33 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
+import java.time.Instant;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.ThaiBuddhistDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockThaiBuddhistDate;
-import org.junit.runner.RunWith;
 
-public class DayOfYear_ESTestTest21 extends DayOfYear_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        DayOfYear dayOfYear0 = DayOfYear.now();
-        ChronoField chronoField0 = ChronoField.DAY_OF_YEAR;
-        dayOfYear0.isSupported(chronoField0);
-        assertEquals(45, dayOfYear0.getValue());
+/**
+ * Contains tests for the {@link DayOfYear} class, focusing on its factory methods.
+ */
+public class DayOfYearTest {
+
+    /**
+     * Tests that DayOfYear.now(clock) correctly determines the day of the year
+     * from a fixed clock.
+     */
+    @Test
+    public void now_withFixedClock_returnsCorrectDayOfYear() {
+        // Arrange: Create a clock fixed to a specific date.
+        // February 14th is the 45th day of a non-leap year (31 days in Jan + 14).
+        Instant instant = Instant.parse("2021-02-14T10:00:00Z");
+        Clock fixedClock = Clock.fixed(instant, ZoneOffset.UTC);
+
+        // Act: Get the DayOfYear using the fixed clock.
+        DayOfYear dayOfYear = DayOfYear.now(fixedClock);
+
+        // Assert: The value should match the day of the year for the fixed date.
+        assertEquals(45, dayOfYear.getValue());
     }
 }
