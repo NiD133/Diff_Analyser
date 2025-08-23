@@ -1,46 +1,42 @@
 package org.joda.time.format;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.LinkedList;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Duration;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
 import org.joda.time.MutablePeriod;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadablePeriod;
-import org.joda.time.Seconds;
-import org.joda.time.Weeks;
-import org.joda.time.Years;
-import org.junit.runner.RunWith;
+import org.joda.time.format.PeriodFormatterBuilder.Composite;
 
+import java.util.Collections;
+
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
+// The test class name is kept for consistency with the original file,
+// but a more descriptive name like `PeriodFormatterParseTest` would be preferable in a real project.
 public class PeriodFormatter_ESTestTest27 extends PeriodFormatter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        PeriodFormatterBuilder.Composite periodFormatterBuilder_Composite0 = new PeriodFormatterBuilder.Composite(linkedList0);
-        PeriodFormatter periodFormatter0 = new PeriodFormatter(periodFormatterBuilder_Composite0, periodFormatterBuilder_Composite0);
-        MutablePeriod mutablePeriod0 = new MutablePeriod();
-        // Undeclared exception!
+    /**
+     * Verifies that calling parseInto() on a PeriodFormatter that does not support parsing
+     * throws an UnsupportedOperationException.
+     */
+    @Test
+    public void parseInto_whenParserIsNotSupported_throwsUnsupportedOperationException() {
+        // Arrange: Create a PeriodFormatter with a parser that is incapable of parsing.
+        // A PeriodFormatterBuilder.Composite created with an empty list of components
+        // acts as a non-functional parser.
+        Composite unsupportedParser = new PeriodFormatterBuilder.Composite(Collections.emptyList());
+        PeriodFormatter formatter = new PeriodFormatter(null, unsupportedParser);
+
+        MutablePeriod period = new MutablePeriod();
+        String anyText = "P1Y2M3D";
+        int startPosition = 0;
+
+        // Act & Assert
         try {
-            periodFormatter0.parseInto(mutablePeriod0, "", (-711));
-            fail("Expecting exception: UnsupportedOperationException");
+            formatter.parseInto(period, anyText, startPosition);
+            fail("Expected an UnsupportedOperationException to be thrown.");
         } catch (UnsupportedOperationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.joda.time.format.PeriodFormatterBuilder$Composite", e);
+            // This is the expected outcome.
+            // The specific Composite parser implementation throws an exception with no message.
+            assertNull("The exception message should be null.", e.getMessage());
         }
     }
 }
