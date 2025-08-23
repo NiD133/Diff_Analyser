@@ -1,27 +1,33 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-public class LinkedTreeMap_ESTestTest30 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link LinkedTreeMap.KeySet} class, focusing on its remove behavior.
+ */
+public class LinkedTreeMapKeySetTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>((Comparator<? super Integer>) null, true);
-        LinkedTreeMap.KeySet linkedTreeMap_KeySet0 = linkedTreeMap0.new KeySet();
-        boolean boolean0 = linkedTreeMap_KeySet0.remove(linkedTreeMap0);
-        assertFalse(boolean0);
-        assertEquals(0, linkedTreeMap_KeySet0.size());
+    /**
+     * Tests that attempting to remove an object of an incompatible type from the key set
+     * returns false and does not modify the set, as per the contract of Set.remove(Object).
+     */
+    @Test
+    public void removeIncompatibleTypeFromKeySetShouldReturnFalse() {
+        // Arrange: Create an empty map and get its key set.
+        LinkedTreeMap<Integer, String> map = new LinkedTreeMap<>();
+        Set<Integer> keySet = map.keySet();
+
+        // An object that is not of type Integer and thus cannot be in the key set.
+        Object incompatibleObject = new Object();
+
+        // Act: Attempt to remove the incompatible object from the key set.
+        boolean wasRemoved = keySet.remove(incompatibleObject);
+
+        // Assert: The remove operation should fail, and the set should remain unchanged.
+        assertFalse("remove() should return false for an object of an incompatible type.", wasRemoved);
+        assertEquals("The key set should remain empty after the failed removal attempt.", 0, keySet.size());
     }
 }
