@@ -1,17 +1,28 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TokenQueue_ESTestTest2 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Tests for the static utility methods in {@link TokenQueue}.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        String string0 = TokenQueue.unescape("H<b:oK|jCxQ\\P4C3U.");
-        assertEquals("H<b:oK|jCxQP4C3U.", string0);
+    /**
+     * Verifies that the unescape method correctly removes a single backslash
+     * that is used to escape a subsequent character.
+     */
+    @Test
+    public void unescapeRemovesSingleBackslash() {
+        // Arrange: Define an input string with an escaped character ('\P')
+        // and the expected result after unescaping.
+        String inputWithEscape = "H<b:oK|jCxQ\\P4C3U.";
+        String expectedOutput = "H<b:oK|jCxQP4C3U.";
+
+        // Act: Call the method under test.
+        String actualOutput = TokenQueue.unescape(inputWithEscape);
+
+        // Assert: Verify that the backslash was removed and the rest of the string is unchanged.
+        assertEquals(expectedOutput, actualOutput);
     }
 }
