@@ -1,25 +1,25 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NumberOutput_ESTestTest20 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class, focusing on handling invalid arguments.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        // Undeclared exception!
-        try {
-            NumberOutput.outputInt(12, (char[]) null, 12);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
-        }
+    /**
+     * Verifies that calling {@code outputInt} with a null character buffer
+     * correctly throws a {@link NullPointerException}. This ensures robust
+     * handling of invalid input.
+     */
+    @Test(expected = NullPointerException.class)
+    public void outputIntShouldThrowNullPointerExceptionForNullBuffer() {
+        // Arrange: Define an integer value and offset, but use a null buffer.
+        int value = 12;
+        int offset = 0;
+        char[] nullBuffer = null;
+
+        // Act & Assert: Calling outputInt with a null buffer should throw a NullPointerException.
+        NumberOutput.outputInt(value, nullBuffer, offset);
     }
 }
