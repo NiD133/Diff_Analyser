@@ -1,29 +1,27 @@
 package org.apache.commons.compress.harmony.pack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class CodecEncoding_ESTestTest5 extends CodecEncoding_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CodecEncoding} class.
+ */
+public class CodecEncodingTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        BHSDCodec bHSDCodec0 = CodecEncoding.getCanonicalCodec(0);
-        assertNull(bHSDCodec0);
+    /**
+     * Verifies that getCanonicalCodec(0) returns null.
+     * According to the Pack200 specification, the canonical codec at index 0
+     * is defined as null, representing the absence of a specific encoding.
+     */
+    @Test
+    public void getCanonicalCodecForIndexZeroShouldReturnNull() {
+        // Arrange: The index for the first canonical codec, which is defined as null.
+        final int nullCodecIndex = 0;
+
+        // Act: Retrieve the canonical codec for the specified index.
+        final BHSDCodec codec = CodecEncoding.getCanonicalCodec(nullCodecIndex);
+
+        // Assert: The returned codec should be null.
+        assertNull("The canonical codec for index 0 is expected to be null.", codec);
     }
 }
