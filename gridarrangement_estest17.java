@@ -1,80 +1,49 @@
 package org.jfree.chart.block;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
+import org.jfree.chart.util.Size2D;
 import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+// Unused imports from the original test have been removed to reduce clutter.
 
 public class GridArrangement_ESTestTest17 extends GridArrangement_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(105, 105);
-        assertNotNull(gridArrangement0);
-        Range range0 = new Range(105, 105);
-        assertEquals("Range[105.0,105.0]", range0.toString());
-        assertFalse(range0.isNaNRange());
-        assertEquals(105.0, range0.getLowerBound(), 0.01);
-        assertEquals(105.0, range0.getCentralValue(), 0.01);
-        assertEquals(105.0, range0.getUpperBound(), 0.01);
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertNotNull(range0);
-        RectangleConstraint rectangleConstraint0 = new RectangleConstraint(range0, range0);
-        assertEquals("Range[105.0,105.0]", range0.toString());
-        assertFalse(range0.isNaNRange());
-        assertEquals(105.0, range0.getLowerBound(), 0.01);
-        assertEquals(105.0, range0.getCentralValue(), 0.01);
-        assertEquals(105.0, range0.getUpperBound(), 0.01);
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertNotNull(rectangleConstraint0);
-        BlockContainer blockContainer0 = new BlockContainer();
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertNotNull(blockContainer0);
-        Size2D size2D0 = gridArrangement0.arrangeNR(blockContainer0, (Graphics2D) null, rectangleConstraint0);
-        assertEquals("Range[105.0,105.0]", range0.toString());
-        assertFalse(range0.isNaNRange());
-        assertEquals(105.0, range0.getLowerBound(), 0.01);
-        assertEquals(105.0, range0.getCentralValue(), 0.01);
-        assertEquals(105.0, range0.getUpperBound(), 0.01);
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertEquals(105.0, size2D0.getWidth(), 0.01);
-        assertEquals("Size2D[width=105.0, height=105.0]", size2D0.toString());
-        assertEquals(105.0, size2D0.getHeight(), 0.01);
-        assertNotNull(size2D0);
-        assertEquals(105.0, size2D0.height, 0.01);
-        assertEquals(105.0, size2D0.width, 0.01);
+    /**
+     * Tests that arranging an empty container with a specific ranged constraint
+     * results in a size that matches the upper bound of that constraint.
+     *
+     * The method under test is `arrangeNR`, which is intended for arrangements
+     * with a ranged height and no width constraint. This test verifies its
+     * behavior when a width constraint is also provided.
+     */
+    @Test
+    public void arrangeNR_withEmptyContainerAndRangedConstraint_returnsSizeMatchingConstraint() {
+        // Arrange
+        final int gridRows = 105;
+        final int gridCols = 105;
+        final double expectedDimension = 105.0;
+
+        GridArrangement arrangement = new GridArrangement(gridRows, gridCols);
+        BlockContainer emptyContainer = new BlockContainer();
+
+        // Create a constraint where width and height are both a range of [105.0, 105.0],
+        // which effectively simulates a fixed-size constraint.
+        Range dimensionRange = new Range(expectedDimension, expectedDimension);
+        RectangleConstraint constraint = new RectangleConstraint(dimensionRange, dimensionRange);
+
+        // Act
+        // The arrangeNR method is called with a null Graphics2D context, as rendering
+        // is not required to calculate the size of an empty container.
+        Size2D resultingSize = arrangement.arrangeNR(emptyContainer, null, constraint);
+
+        // Assert
+        assertNotNull("The resulting size should not be null.", resultingSize);
+        assertEquals("The resulting width should match the constraint's dimension.",
+                expectedDimension, resultingSize.getWidth(), 0.01);
+        assertEquals("The resulting height should match the constraint's dimension.",
+                expectedDimension, resultingSize.getHeight(), 0.01);
     }
 }
