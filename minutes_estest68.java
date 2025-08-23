@@ -1,17 +1,23 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Minutes_ESTestTest68 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test67() throws Throwable {
-        Minutes minutes0 = Minutes.standardMinutesIn((ReadablePeriod) null);
-        assertEquals(0, minutes0.getMinutes());
+    /**
+     * Tests that {@link Minutes#standardMinutesIn(ReadablePeriod)} returns zero
+     * when the input period is null, as specified by its Javadoc.
+     */
+    @Test
+    public void standardMinutesIn_withNullPeriod_returnsZero() {
+        // Act: Call the method under test with a null input.
+        Minutes result = Minutes.standardMinutesIn(null);
+
+        // Assert: The result should be a Minutes object representing zero.
+        assertEquals(Minutes.ZERO, result);
     }
 }
