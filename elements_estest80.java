@@ -1,43 +1,35 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class Elements_ESTestTest80 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test079() throws Throwable {
-        Elements elements0 = new Elements();
-        // Undeclared exception!
+/**
+ * Contains tests for the {@link Elements} class.
+ * The original test class name "Elements_ESTestTest80" was likely auto-generated.
+ * A more conventional name would be "ElementsTest".
+ */
+public class Elements_ESTestTest80 {
+
+    /**
+     * Verifies that the is() method throws an IllegalStateException when provided
+     * with a syntactically invalid CSS query.
+     */
+    @Test
+    public void isShouldThrowIllegalStateExceptionForInvalidQuery() {
+        // Arrange: Create an empty Elements collection and define an invalid query string.
+        Elements elements = new Elements();
+        String invalidQuery = "{xrk0 ";
+        String expectedErrorMessage = "Could not parse query '{xrk0': unexpected token at '{xrk0'";
+
+        // Act & Assert: Attempt to call is() with the invalid query and verify the exception.
         try {
-            elements0.is("{xrk0 ");
-            fail("Expecting exception: IllegalStateException");
+            elements.is(invalidQuery);
+            fail("Expected an IllegalStateException to be thrown for the invalid query, but it was not.");
         } catch (IllegalStateException e) {
-            //
-            // Could not parse query '{xrk0': unexpected token at '{xrk0'
-            //
-            verifyException("org.jsoup.select.QueryParser", e);
+            // Verify that the exception message is correct, confirming the query parser failed as expected.
+            assertEquals(expectedErrorMessage, e.getMessage());
         }
     }
 }
