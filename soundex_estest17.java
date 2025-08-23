@@ -1,18 +1,27 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class Soundex_ESTestTest17 extends Soundex_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Soundex} class.
+ */
+public class SoundexTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Soundex soundex0 = new Soundex();
-        soundex0.soundex((String) null);
-        assertEquals(4, soundex0.getMaxLength());
+    /**
+     * Tests that the soundex method correctly handles a null input by returning null,
+     * as specified by its behavior.
+     */
+    @Test
+    public void soundexShouldReturnNullForNullInput() {
+        // Arrange
+        Soundex soundex = new Soundex();
+        String nullInput = null;
+
+        // Act
+        String result = soundex.soundex(nullInput);
+
+        // Assert
+        assertNull("The soundex of a null string should be null.", result);
     }
 }
