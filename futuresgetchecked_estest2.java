@@ -1,35 +1,31 @@
 package com.google.common.util.concurrent;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.SQLException;
-import java.sql.SQLInvalidAuthorizationSpecException;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Delayed;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
+import static org.junit.Assert.assertNull;
+
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.lang.MockThread;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FuturesGetChecked_ESTestTest2 extends FuturesGetChecked_ESTest_scaffolding {
+/**
+ * Tests for {@link FuturesGetChecked}.
+ */
+public class FuturesGetCheckedTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        Callable<Exception> callable0 = (Callable<Exception>) mock(Callable.class, new ViolatedAssumptionAnswer());
-        doReturn((Object) null).when(callable0).call();
-        ForkJoinTask<Exception> forkJoinTask0 = ForkJoinTask.adapt((Callable<? extends Exception>) callable0);
-        ForkJoinTask<Exception> forkJoinTask1 = forkJoinTask0.fork();
-        Class<Exception> class0 = Exception.class;
-        TimeUnit timeUnit0 = TimeUnit.MILLISECONDS;
-        FuturesGetChecked.getChecked((Future<Exception>) forkJoinTask1, class0, 422L, timeUnit0);
+    /**
+     * Tests that getChecked returns null without throwing an exception when the input Future
+     * is already successfully completed with a null value.
+     */
+    @Test
+    public void getChecked_withCompletedFutureReturningNull_returnsNull() throws Exception {
+        // Arrange: Create a future that is already successfully completed with a null result.
+        // Using Futures.immediateFuture is much clearer than mocking a complex execution chain.
+        Future<Object> completedFuture = Futures.immediateFuture(null);
+        Class<Exception> exceptionType = Exception.class;
+
+        // Act: Call the method under test with a short timeout.
+        Object result = FuturesGetChecked.getChecked(completedFuture, exceptionType, 1, TimeUnit.SECONDS);
+
+        // Assert: Verify that the method returns the null value from the future.
+        assertNull("Expected getChecked to return the null result from the completed future.", result);
     }
 }
