@@ -1,29 +1,34 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 
-public class SerializedString_ESTestTest51 extends SerializedString_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SerializedString} class, focusing on its caching behavior.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test50() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("Null String illegal for SerializedString");
-        byte[] byteArray0 = serializedString0.asQuotedUTF8();
-        byte[] byteArray1 = serializedString0.asQuotedUTF8();
-        assertSame(byteArray1, byteArray0);
-        assertNotNull(byteArray1);
+    /**
+     * Verifies that the {@code asQuotedUTF8()} method caches its result after the first call.
+     * <p>
+     * This test ensures that subsequent calls to the method return the exact same
+     * byte array instance, confirming the intended lazy-initialization and performance optimization.
+     */
+    @Test
+    public void asQuotedUTF8ShouldReturnCachedByteArrayOnSubsequentCalls() {
+        // Arrange: Create a SerializedString instance with a sample value.
+        SerializedString serializedString = new SerializedString("A test string");
+
+        // Act: Call the method twice to trigger the caching mechanism.
+        byte[] firstCallResult = serializedString.asQuotedUTF8();
+        byte[] secondCallResult = serializedString.asQuotedUTF8();
+
+        // Assert: Verify that the same instance is returned on both calls.
+        assertNotNull("The result of the first call should not be null.", firstCallResult);
+        
+        // The core assertion: check that the second call returned the cached object instance.
+        assertSame("Subsequent calls should return the same cached byte array instance.",
+                firstCallResult, secondCallResult);
     }
 }
