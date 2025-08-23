@@ -1,26 +1,33 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.util.zip.ZipException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ExtraFieldUtils_ESTestTest28 extends ExtraFieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ExtraFieldUtils} class.
+ */
+public class ExtraFieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        ResourceAlignmentExtraField resourceAlignmentExtraField0 = new ResourceAlignmentExtraField();
-        // Undeclared exception!
-        try {
-            ExtraFieldUtils.fillExtraField(resourceAlignmentExtraField0, (byte[]) null, 2, 2, true);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Tests that fillExtraField throws a NullPointerException when the data buffer argument is null.
+     * This verifies that the method does not handle null input gracefully and fails fast,
+     * which is the expected behavior for a low-level utility method.
+     */
+    @Test(expected = NullPointerException.class)
+    public void fillExtraFieldWithNullBufferThrowsNullPointerException() throws ZipException {
+        // Arrange: Create an extra field instance and define parameters for the method call.
+        // The byte array is intentionally set to null to trigger the exception.
+        final ResourceAlignmentExtraField extraField = new ResourceAlignmentExtraField();
+        final byte[] nullDataBuffer = null;
+        final int offset = 2;
+        final int length = 2;
+        final boolean isLocal = true;
+
+        // Act: Call the method under test with the null buffer.
+        ExtraFieldUtils.fillExtraField(extraField, nullDataBuffer, offset, length, isLocal);
+
+        // Assert: The test will pass only if a NullPointerException is thrown,
+        // as specified by the `expected` attribute in the @Test annotation.
     }
 }
