@@ -1,28 +1,72 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class StringUtil_ESTestTest3 extends StringUtil_ESTest_scaffolding {
+/**
+ * Contains tests for the utility methods in {@link StringUtil}.
+ * This suite focuses on the isHexDigit() method.
+ */
+public class StringUtilIsHexDigitTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        boolean boolean0 = StringUtil.isHexDigit('f');
-        assertTrue(boolean0);
+    @Test
+    public void isHexDigit_ShouldReturnTrue_ForLowercaseLetter() {
+        // Arrange: A valid lowercase hexadecimal character.
+        char lowercaseHexChar = 'f';
+
+        // Act: Call the method under test.
+        boolean isHex = StringUtil.isHexDigit(lowercaseHexChar);
+
+        // Assert: Verify that the character is correctly identified as a hex digit.
+        assertTrue("The character 'f' should be recognized as a valid hex digit.", isHex);
+    }
+
+    @Test
+    public void isHexDigit_ShouldReturnTrue_ForUppercaseLetter() {
+        // Arrange
+        char uppercaseHexChar = 'B';
+
+        // Act
+        boolean isHex = StringUtil.isHexDigit(uppercaseHexChar);
+
+        // Assert
+        assertTrue("The character 'B' should be recognized as a valid hex digit.", isHex);
+    }
+
+    @Test
+    public void isHexDigit_ShouldReturnTrue_ForDigit() {
+        // Arrange
+        char digitChar = '7';
+
+        // Act
+        boolean isHex = StringUtil.isHexDigit(digitChar);
+
+        // Assert
+        assertTrue("The digit '7' should be recognized as a valid hex digit.", isHex);
+    }
+
+    @Test
+    public void isHexDigit_ShouldReturnFalse_ForNonHexLetter() {
+        // Arrange: A letter that is not a valid hexadecimal character.
+        char nonHexChar = 'g';
+
+        // Act
+        boolean isHex = StringUtil.isHexDigit(nonHexChar);
+
+        // Assert
+        assertFalse("The character 'g' should not be recognized as a hex digit.", isHex);
+    }
+
+    @Test
+    public void isHexDigit_ShouldReturnFalse_ForSymbol() {
+        // Arrange
+        char symbolChar = '#';
+
+        // Act
+        boolean isHex = StringUtil.isHexDigit(symbolChar);
+
+        // Assert
+        assertFalse("The symbol '#' should not be recognized as a hex digit.", isHex);
     }
 }
