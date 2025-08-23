@@ -1,30 +1,34 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * Test suite for the {@link Attribute} class.
+ * This refactored test focuses on the behavior of the setValue method.
+ */
+// The original test class name and scaffolding are kept for context,
+// but a more descriptive name like `AttributeTest` would be preferable.
 public class Attribute_ESTestTest69 extends Attribute_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test68() throws Throwable {
-        Attributes attributes0 = new Attributes();
-        Attribute attribute0 = new Attribute("5|pc", "Bi", attributes0);
-        attribute0.setValue("@");
-        assertEquals("@", attribute0.getValue());
+    /**
+     * Verifies that {@link Attribute#setValue(String)} correctly updates the attribute's value
+     * and returns the previous value.
+     */
+    @Test
+    public void setValueShouldUpdateValueAndReturnOldValue() {
+        // Arrange: Create an attribute with an initial key and value.
+        // The parent Attributes object is not relevant to this test's logic, so it's set to null.
+        String key = "id";
+        String initialValue = "product-123";
+        Attribute attribute = new Attribute(key, initialValue, null);
+
+        // Act: Set a new value for the attribute.
+        String newValue = "product-456";
+        String returnedOldValue = attribute.setValue(newValue);
+
+        // Assert: Check that the value was updated and the old value was returned.
+        assertEquals("The attribute's value should be updated to the new value.", newValue, attribute.getValue());
+        assertEquals("The method should return the previous value.", initialValue, returnedOldValue);
     }
 }
