@@ -1,32 +1,33 @@
 package org.jfree.chart;
 
+import org.jfree.chart.entity.EntityCollection;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.jfree.chart.plot.CombinedRangeCategoryPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.data.xy.XYDatasetTableModel;
-import org.junit.runner.RunWith;
 
+/**
+ * This test suite focuses on the equals() method of the ChartRenderingInfo class.
+ */
+// The original class name and inheritance are preserved as they may be part of a larger test setup.
 public class ChartRenderingInfo_ESTestTest11 extends ChartRenderingInfo_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        ChartRenderingInfo chartRenderingInfo1 = new ChartRenderingInfo();
-        assertTrue(chartRenderingInfo1.equals((Object) chartRenderingInfo0));
-        chartRenderingInfo1.setEntityCollection((EntityCollection) null);
-        boolean boolean0 = chartRenderingInfo0.equals(chartRenderingInfo1);
-        assertFalse(chartRenderingInfo1.equals((Object) chartRenderingInfo0));
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false when comparing two
+     * ChartRenderingInfo objects with different entity collections.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenEntityCollectionsDiffer() {
+        // Arrange: Create two ChartRenderingInfo objects. By default, they are
+        // constructed with a non-null StandardEntityCollection and are equal.
+        ChartRenderingInfo info1 = new ChartRenderingInfo();
+        ChartRenderingInfo info2 = new ChartRenderingInfo();
+
+        // Sanity check: Ensure the two new instances are equal initially.
+        assertEquals("Two newly created ChartRenderingInfo instances should be equal.", info1, info2);
+
+        // Act: Modify the entity collection of the second object to be null.
+        info2.setEntityCollection(null);
+
+        // Assert: The two objects should no longer be equal.
+        assertNotEquals("Instances should not be equal after one's entity collection is set to null.", info1, info2);
     }
 }
