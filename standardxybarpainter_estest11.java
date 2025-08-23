@@ -1,29 +1,24 @@
 package org.jfree.chart.renderer.xy;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class StandardXYBarPainter_ESTestTest11 extends StandardXYBarPainter_ESTest_scaffolding {
+/**
+ * Tests for the {@link StandardXYBarPainter} class, focusing on the equals() method.
+ */
+public class StandardXYBarPainterTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        StandardXYBarPainter standardXYBarPainter0 = new StandardXYBarPainter();
-        boolean boolean0 = standardXYBarPainter0.equals(standardXYBarPainter0);
-        assertTrue(boolean0);
+    /**
+     * Verifies the reflexive property of the equals() method.
+     * An object must always be equal to itself.
+     */
+    @Test
+    public void equals_onSameInstance_returnsTrue() {
+        // Arrange
+        StandardXYBarPainter painter = new StandardXYBarPainter();
+
+        // Act & Assert
+        assertTrue("An instance of StandardXYBarPainter should be equal to itself.",
+                painter.equals(painter));
     }
 }
