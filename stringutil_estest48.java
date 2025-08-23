@@ -1,29 +1,23 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class StringUtil_ESTestTest48 extends StringUtil_ESTest_scaffolding {
+/**
+ * Tests for the StringUtil.StringJoiner inner class.
+ */
+public class StringUtilStringJoinerTest {
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        StringUtil.StringJoiner stringUtil_StringJoiner0 = new StringUtil.StringJoiner((String) null);
-        String string0 = stringUtil_StringJoiner0.complete();
-        assertEquals("", string0);
+    @Test
+    public void completeOnEmptyJoinerShouldReturnEmptyString() {
+        // Arrange: Create a StringJoiner with a null separator, to which no items are added.
+        // This also tests that a null separator is handled gracefully.
+        StringUtil.StringJoiner joiner = new StringUtil.StringJoiner(null);
+
+        // Act: Immediately complete the joining process.
+        String result = joiner.complete();
+
+        // Assert: The result for an empty joiner should be an empty string.
+        assertEquals("", result);
     }
 }
