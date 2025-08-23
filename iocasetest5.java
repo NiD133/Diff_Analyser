@@ -2,51 +2,72 @@ package org.apache.commons.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+
 import java.io.File;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Arrays;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-public class IOCaseTestTest5 {
+/**
+ * Tests for the {@link IOCase#checkEquals(String, String)} method.
+ */
+@DisplayName("IOCase.checkEquals()")
+class IOCaseCheckEqualsTest {
 
-    private static final boolean WINDOWS = File.separatorChar == '\\';
+    private static final boolean IS_WINDOWS = File.separatorChar == '\\';
 
-    private void assert0(final byte[] arr) {
-        for (final byte e : arr) {
-            assertEquals(0, e);
+    @Nested
+    @DisplayName("when case is SENSITIVE")
+    class SensitiveCase {
+
+        @Test
+        @DisplayName("should return true for identical strings")
+        void returnsTrueForIdenticalStrings() {
+            assertTrue(IOCase.SENSITIVE.checkEquals("ABC", "ABC"));
+        }
+
+        @Test
+        @DisplayName("should return false for strings with different casing")
+        void returnsFalseForDifferentCaseStrings() {
+            assertFalse(IOCase.SENSITIVE.checkEquals("ABC", "Abc"));
         }
     }
 
-    private void assert0(final char[] arr) {
-        for (final char e : arr) {
-            assertEquals(0, e);
+    @Nested
+    @DisplayName("when case is INSENSITIVE")
+    class InsensitiveCase {
+
+        @Test
+        @DisplayName("should return true for identical strings")
+        void returnsTrueForIdenticalStrings() {
+            assertTrue(IOCase.INSENSITIVE.checkEquals("ABC", "ABC"));
+        }
+
+        @Test
+        @DisplayName("should return true for strings with different casing")
+        void returnsTrueForDifferentCaseStrings() {
+            assertTrue(IOCase.INSENSITIVE.checkEquals("ABC", "Abc"));
         }
     }
 
-    private IOCase serialize(final IOCase value) throws Exception {
-        final ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        try (ObjectOutputStream out = new ObjectOutputStream(buf)) {
-            out.writeObject(value);
-            out.flush();
-        }
-        final ByteArrayInputStream bufin = new ByteArrayInputStream(buf.toByteArray());
-        final ObjectInputStream in = new ObjectInputStream(bufin);
-        return (IOCase) in.readObject();
-    }
+    @Nested
+    @DisplayName("when case is SYSTEM")
+    class SystemCase {
 
-    @Test
-    void test_checkEquals_case() {
-        assertTrue(IOCase.SENSITIVE.checkEquals("ABC", "ABC"));
-        assertFalse(IOCase.SENSITIVE.checkEquals("ABC", "Abc"));
-        assertTrue(IOCase.INSENSITIVE.checkEquals("ABC", "ABC"));
-        assertTrue(IOCase.INSENSITIVE.checkEquals("ABC", "Abc"));
-        assertTrue(IOCase.SYSTEM.checkEquals("ABC", "ABC"));
-        assertEquals(WINDOWS, IOCase.SYSTEM.checkEquals("ABC", "Abc"));
+        @Test
+        @DisplayName("should return true for identical strings")
+        void returnsTrueForIdenticalStrings() {
+            assertTrue(IOCase.SYSTEM.checkEquals("ABC", "ABC"));
+        }
+
+        @Test
+        @DisplayName("should behave according to the operating system for strings with different casing")
+        void returnsOSDependentResultForDifferentCaseStrings() {
+            // On Windows (case-insensitive FS), this should be true.
+            // On Unix-like systems (case-sensitive FS), this should be false.
+            final boolean expected = IS_WINDOWS;
+            assertEquals(expected, IOCase.SYSTEM.checkEquals("ABC", "Abc"));
+        }
     }
 }
