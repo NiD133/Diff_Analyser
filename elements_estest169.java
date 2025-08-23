@@ -1,37 +1,40 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest169 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
-    @Test(timeout = 4000)
-    public void test168() throws Throwable {
-        Document document0 = Parser.parse("Bb,Y|a8", "Bb,Y|a8");
-        Elements elements0 = document0.getAllElements();
-        Elements elements1 = elements0.clone();
-        assertNotSame(elements1, elements0);
-        assertEquals(4, elements1.size());
+/**
+ * Test suite for the {@link Elements#clone()} method.
+ */
+public class ElementsCloneTest {
+
+    @Test
+    public void cloneCreatesIndependentCopyOfElements() {
+        // Arrange: Create a document and select a list of elements.
+        String html = "<div><p>One</p><p>Two</p></div>";
+        Document doc = Parser.parse(html, ""); // baseUri is not needed for this test.
+        Elements originalElements = doc.select("p");
+
+        // Act: Clone the Elements object.
+        Elements clonedElements = originalElements.clone();
+
+        // Assert: Verify the properties of the cloned object.
+        
+        // 1. The clone must be a different object instance from the original.
+        assertNotSame("The cloned object should be a new instance.", originalElements, clonedElements);
+
+        // 2. The clone must be equal in content to the original.
+        // This checks that size, order, and contained elements are the same.
+        assertEquals("The cloned list should have the same elements as the original.", originalElements, clonedElements);
+
+        // 3. (Optional but good) Modifying the cloned list's structure should not affect the original.
+        // This confirms it's a shallow copy of the list, not a reference to the same list.
+        clonedElements.remove(0);
+        assertEquals("Original list size should be unchanged after modifying the clone.", 2, originalElements.size());
+        assertEquals("Cloned list size should be smaller after modification.", 1, clonedElements.size());
     }
 }
