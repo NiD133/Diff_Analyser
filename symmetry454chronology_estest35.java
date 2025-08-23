@@ -1,51 +1,31 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahEra;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class contains tests for the Symmetry454Chronology class.
+ * This specific test case focuses on the behavior of the localDateTime() method.
+ */
+// The original test class name is kept, but a more descriptive name like
+// Symmetry454ChronologyTest would be preferable in a real-world scenario.
 public class Symmetry454Chronology_ESTestTest35 extends Symmetry454Chronology_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
-        // Undeclared exception!
-        try {
-            symmetry454Chronology0.localDateTime((TemporalAccessor) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.threeten.extra.chrono.Symmetry454Date", e);
-        }
+    /**
+     * Verifies that calling localDateTime() with a null TemporalAccessor
+     * throws a NullPointerException.
+     *
+     * The method is expected to delegate to other internal methods that perform
+     * a null check on the input.
+     */
+    @Test(expected = NullPointerException.class)
+    public void localDateTime_withNullTemporal_throwsNullPointerException() {
+        // Arrange: Get the singleton instance of the chronology.
+        // The constructor is deprecated, so using the INSTANCE field is the correct approach.
+        Symmetry454Chronology chronology = Symmetry454Chronology.INSTANCE;
+
+        // Act & Assert: Call localDateTime with a null input.
+        // The @Test(expected) annotation asserts that a NullPointerException is thrown.
+        chronology.localDateTime((TemporalAccessor) null);
     }
 }
