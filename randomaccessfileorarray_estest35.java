@@ -1,34 +1,34 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomAccessFileOrArray_ESTestTest35 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class, focusing on data reading methods.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test034() throws Throwable {
-        byte[] byteArray0 = new byte[14];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        long long0 = randomAccessFileOrArray0.readLong();
-        assertEquals(8L, randomAccessFileOrArray0.getFilePointer());
-        assertEquals(0L, long0);
+    /**
+     * Verifies that readLong() correctly reads an 8-byte long from a byte array,
+     * returns the expected value (0 for a zeroed array), and advances the internal pointer by 8 bytes.
+     */
+    @Test
+    public void readLong_readsEightBytesAndAdvancesPointerCorrectly() throws IOException {
+        // Arrange: Create a data source with all zero bytes. A long is 8 bytes, so the
+        // array must be at least that long. We use a size of 16 to ensure the
+        // implementation doesn't rely on the source being exactly 8 bytes.
+        byte[] inputData = new byte[16];
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(inputData);
+
+        // Act: Read a long value from the start of the data source.
+        long actualValue = reader.readLong();
+
+        // Assert: Verify both the returned value and the new pointer position.
+        long expectedValue = 0L;
+        assertEquals("The long value read from a zeroed array should be 0.", expectedValue, actualValue);
+
+        long expectedPointerPosition = 8L; // A long consists of 8 bytes.
+        assertEquals("The file pointer should advance by 8 bytes after reading a long.", expectedPointerPosition, reader.getFilePointer());
     }
 }
