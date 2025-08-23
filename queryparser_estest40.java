@@ -1,26 +1,33 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QueryParser_ESTestTest40 extends QueryParser_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        // Undeclared exception!
-        try {
-            QueryParser.parse(":nth-of-type(16n+24) ~ ");
-            //  fail("Expecting exception: IllegalStateException");
-            // Unstable assertion
-        } catch (IllegalStateException e) {
-            //
-            // No match found
-            //
-            verifyException("java.util.regex.Matcher", e);
-        }
+/**
+ * Test suite for {@link QueryParser} focusing on handling invalid query syntax.
+ */
+public class QueryParserTest {
+
+    @Test
+    public void parse_whenQueryEndsWithDanglingCombinator_throwsException() {
+        // GIVEN: An invalid CSS query that ends with a dangling combinator.
+        // A combinator (like the general sibling '~') must be followed by another selector sequence.
+        String invalidQuery = ":nth-of-type(16n+24) ~ ";
+
+        // WHEN: The invalid query is parsed.
+        // THEN: The parser should throw an exception because it expects another selector
+        // component after the combinator but instead finds the end of the string.
+        IllegalStateException exception = assertThrows(
+            "Parsing should fail for a query ending with a combinator.",
+            IllegalStateException.class,
+            () -> QueryParser.parse(invalidQuery)
+        );
+
+        // AND: The exception message should reflect the specific internal parsing failure.
+        // Note: This assertion is tied to the current implementation's internal error
+        // message, which originates from a failing regex Matcher.
+        assertEquals("No match found", exception.getMessage());
     }
 }
