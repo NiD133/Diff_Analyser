@@ -1,28 +1,20 @@
 package com.google.common.graph;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.common.collect.UnmodifiableIterator;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class EndpointPair_ESTestTest11 extends EndpointPair_ESTest_scaffolding {
+/**
+ * Tests for {@link EndpointPair}.
+ */
+public class EndpointPairTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        Locale.Category locale_Category0 = Locale.Category.FORMAT;
-        // Undeclared exception!
-        try {
-            EndpointPair.of((Graph<?>) null, (Object) locale_Category0, (Object) locale_Category0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.graph.EndpointPair", e);
-        }
+    @Test(expected = NullPointerException.class)
+    public void of_graph_whenGraphIsNull_throwsNullPointerException() {
+        // Arrange: Define two arbitrary nodes for the endpoint pair.
+        String nodeU = "A";
+        String nodeV = "B";
+
+        // Act: Call the method under test with a null graph.
+        // The @Test(expected=...) annotation will handle the assertion.
+        EndpointPair.of(null, nodeU, nodeV);
     }
 }
