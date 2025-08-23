@@ -1,27 +1,35 @@
 package org.apache.commons.codec.binary;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 
-public class Base16_ESTestTest5 extends Base16_ESTest_scaffolding {
+/**
+ * Tests for the {@link Base16} class, focusing on handling invalid input.
+ */
+public class Base16Test {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Base16 base16_0 = new Base16();
-        // Undeclared exception!
-        try {
-            base16_0.decode("Gw");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Invalid octet in encoded value: 71
-            //
-            verifyException("org.apache.commons.codec.binary.Base16", e);
-        }
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    /**
+     * Tests that decoding a string containing characters outside of the Base16
+     * alphabet (0-9, A-F) throws an IllegalArgumentException.
+     */
+    @Test
+    public void decodeWithInvalidCharacterThrowsIllegalArgumentException() {
+        // Arrange: Create a Base16 codec instance.
+        final Base16 codec = new Base16();
+        // The input string "Gw" contains 'G', which is not a valid hexadecimal character.
+        final String invalidInput = "Gw";
+
+        // Assert: Configure the test to expect an IllegalArgumentException.
+        // We also verify the message to ensure it correctly identifies the invalid
+        // character's byte value (ASCII for 'G' is 71).
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Invalid octet in encoded value: 71");
+
+        // Act: Attempt to decode the invalid string. This call is expected to throw.
+        codec.decode(invalidInput);
     }
 }
