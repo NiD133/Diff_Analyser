@@ -1,72 +1,48 @@
 package org.apache.commons.jxpath.ri.axes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.apache.commons.jxpath.BasicVariables;
-import org.apache.commons.jxpath.JXPathBasicBeanInfo;
-import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
 import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.compiler.Constant;
-import org.apache.commons.jxpath.ri.compiler.CoreFunction;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationAnd;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationGreaterThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationLessThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMod;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMultiply;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNegate;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNotEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationOr;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationSubtract;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationUnion;
 import org.apache.commons.jxpath.ri.compiler.Expression;
-import org.apache.commons.jxpath.ri.compiler.NameAttributeTest;
-import org.apache.commons.jxpath.ri.compiler.NodeNameTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTypeTest;
-import org.apache.commons.jxpath.ri.compiler.ProcessingInstructionTest;
 import org.apache.commons.jxpath.ri.compiler.Step;
-import org.apache.commons.jxpath.ri.compiler.VariableReference;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPropertyPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPropertyPointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.util.Locale;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+// The original test class name and inheritance are kept for context.
 public class SimplePathInterpreter_ESTestTest12 extends SimplePathInterpreter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        QName qName0 = new QName("#{WI2%=9byO>t{^<");
-        Locale locale0 = Locale.KOREA;
-        NodePointer nodePointer0 = NodePointer.newNodePointer(qName0, locale0, locale0);
-        Step[] stepArray0 = new Step[1];
-        Expression[] expressionArray0 = new Expression[1];
-        CoreOperationAnd coreOperationAnd0 = new CoreOperationAnd(expressionArray0);
-        CoreOperationLessThanOrEqual coreOperationLessThanOrEqual0 = new CoreOperationLessThanOrEqual(coreOperationAnd0, coreOperationAnd0);
-        expressionArray0[0] = (Expression) coreOperationLessThanOrEqual0;
-        Step step0 = mock(Step.class, new ViolatedAssumptionAnswer());
-        doReturn(Integer.MIN_VALUE).when(step0).getAxis();
-        doReturn((Object) expressionArray0, (Object) null).when(step0).getPredicates();
-        stepArray0[0] = step0;
-        // Undeclared exception!
-        try {
-            SimplePathInterpreter.interpretSimpleLocationPath((EvalContext) null, nodePointer0, stepArray0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that interpretSimpleLocationPath throws a NullPointerException
+     * when it must evaluate predicates but is given a null EvalContext.
+     * <p>
+     * The predicate evaluation logic requires a valid context to function, and
+     * providing null should result in an immediate failure.
+     */
+    @Test(expected = NullPointerException.class)
+    public void interpretSimpleLocationPath_whenStepHasPredicatesAndContextIsNull_throwsNullPointerException() {
+        // ARRANGE
+        // A root node to start the path interpretation from. Its specific value is not important.
+        NodePointer rootPointer = NodePointer.newNodePointer(new QName("root"), new Object(), Locale.getDefault());
+
+        // A mock step that has at least one predicate. This is crucial to force
+        // the interpreter to enter the predicate evaluation code path.
+        Expression[] predicates = {mock(Expression.class)};
+        Step mockStepWithPredicate = mock(Step.class);
+        when(mockStepWithPredicate.getPredicates()).thenReturn(predicates);
+
+        Step[] steps = {mockStepWithPredicate};
+
+        // ACT
+        // Call the method under test with a null EvalContext.
+        // This should trigger an NPE when the method attempts to process the predicates.
+        SimplePathInterpreter.interpretSimpleLocationPath(null, rootPointer, steps);
+
+        // ASSERT
+        // The @Test(expected = NullPointerException.class) annotation asserts that the
+        // expected exception is thrown, so no further assertion is needed.
     }
 }
