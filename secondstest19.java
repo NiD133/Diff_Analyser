@@ -1,38 +1,48 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
 
-public class SecondsTestTest19 extends TestCase {
+import org.junit.Test;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * This class contains unit tests for the {@link Seconds} class, focusing on the
+ * {@link Seconds#toStandardDuration()} method.
+ */
+public class SecondsTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    /**
+     * Tests that a typical Seconds value is correctly converted to a standard Duration.
+     */
+    @Test
+    public void toStandardDuration_convertsRegularValue() {
+        // Arrange
+        final int secondsValue = 20;
+        Seconds seconds = Seconds.seconds(secondsValue);
+        Duration expectedDuration = new Duration((long) secondsValue * DateTimeConstants.MILLIS_PER_SECOND);
+
+        // Act
+        Duration actualDuration = seconds.toStandardDuration();
+
+        // Assert
+        assertEquals("20 seconds should convert to the equivalent duration in milliseconds",
+                expectedDuration, actualDuration);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestSeconds.class);
-    }
+    /**
+     * Tests that the maximum Seconds value is correctly converted to a standard Duration,
+     * verifying the handling of boundary values.
+     */
+    @Test
+    public void toStandardDuration_convertsMaxValue() {
+        // Arrange
+        Seconds maxSeconds = Seconds.MAX_VALUE;
+        Duration expectedDuration = new Duration((long) Integer.MAX_VALUE * DateTimeConstants.MILLIS_PER_SECOND);
 
-    @Override
-    protected void setUp() throws Exception {
-    }
+        // Act
+        Duration actualDuration = maxSeconds.toStandardDuration();
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testToStandardDuration() {
-        Seconds test = Seconds.seconds(20);
-        Duration expected = new Duration(20L * DateTimeConstants.MILLIS_PER_SECOND);
-        assertEquals(expected, test.toStandardDuration());
-        expected = new Duration(((long) Integer.MAX_VALUE) * DateTimeConstants.MILLIS_PER_SECOND);
-        assertEquals(expected, Seconds.MAX_VALUE.toStandardDuration());
+        // Assert
+        assertEquals("Seconds.MAX_VALUE should convert correctly to a duration",
+                expectedDuration, actualDuration);
     }
 }
