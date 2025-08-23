@@ -1,61 +1,51 @@
 package org.apache.commons.jxpath.ri.axes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.apache.commons.jxpath.BasicVariables;
-import org.apache.commons.jxpath.JXPathBasicBeanInfo;
-import org.apache.commons.jxpath.JXPathContext;
+import org.apache.commons.jxpath.ri.Compiler;
 import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
 import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.compiler.Constant;
-import org.apache.commons.jxpath.ri.compiler.CoreFunction;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationAnd;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationGreaterThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationLessThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMod;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMultiply;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNegate;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNotEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationOr;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationSubtract;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationUnion;
-import org.apache.commons.jxpath.ri.compiler.Expression;
-import org.apache.commons.jxpath.ri.compiler.NameAttributeTest;
-import org.apache.commons.jxpath.ri.compiler.NodeNameTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTypeTest;
-import org.apache.commons.jxpath.ri.compiler.ProcessingInstructionTest;
 import org.apache.commons.jxpath.ri.compiler.Step;
-import org.apache.commons.jxpath.ri.compiler.VariableReference;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPropertyPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPropertyPointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SimplePathInterpreter_ESTestTest30 extends SimplePathInterpreter_ESTest_scaffolding {
+import java.util.Locale;
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        QName qName0 = new QName("#{WI2%=9byI>t{^<");
-        Locale locale0 = Locale.JAPAN;
-        NodePointer nodePointer0 = NodePointer.newNodePointer(qName0, locale0, locale0);
-        Step[] stepArray0 = new Step[1];
-        Step step0 = mock(Step.class, new ViolatedAssumptionAnswer());
-        doReturn(0).when(step0).getAxis();
-        doReturn((Expression[]) null).when(step0).getPredicates();
-        stepArray0[0] = step0;
-        NodePointer nodePointer1 = SimplePathInterpreter.interpretSimpleLocationPath((EvalContext) null, nodePointer0, stepArray0);
-        assertTrue(nodePointer1.isNode());
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+/**
+ * Test suite for {@link SimplePathInterpreter}.
+ * This version focuses on providing clear, understandable, and maintainable tests.
+ */
+public class SimplePathInterpreterTest {
+
+    /**
+     * Tests that interpreting a simple path consisting of a single "self::node()" step
+     * returns the starting node pointer itself. This is the simplest possible path traversal.
+     */
+    @Test
+    public void interpretSimpleLocationPathWithSelfStepReturnsSameNode() {
+        // Arrange: Create a starting node and a path with a single "self" step.
+        QName qName = new QName("testNode");
+        Object bean = new Object();
+        NodePointer startNode = NodePointer.newNodePointer(qName, bean, Locale.ENGLISH);
+
+        // A "self::node()" step is represented by a Step object with axis SELF
+        // and no predicates. We use a mock to simulate this.
+        Step selfStep = mock(Step.class);
+        when(selfStep.getAxis()).thenReturn(Compiler.AXIS_SELF);
+        when(selfStep.getPredicates()).thenReturn(null);
+
+        Step[] steps = {selfStep};
+
+        // Act: Interpret the simple location path.
+        // The EvalContext can be null for this type of simple interpretation.
+        NodePointer resultNode = SimplePathInterpreter.interpretSimpleLocationPath(null, startNode, steps);
+
+        // Assert: The returned node pointer should be the exact same instance as the starting node.
+        assertNotNull("The result node pointer should not be null", resultNode);
+        assertSame("For a 'self::node()' step, the original node pointer should be returned",
+                startNode, resultNode);
     }
 }
