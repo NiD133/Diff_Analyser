@@ -1,18 +1,26 @@
 package com.google.common.base;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CaseFormat_ESTestTest14 extends CaseFormat_ESTest_scaffolding {
+/**
+ * Tests for {@link CaseFormat}.
+ */
+public class CaseFormatTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        CaseFormat caseFormat0 = CaseFormat.LOWER_CAMEL;
-        String string0 = caseFormat0.to(caseFormat0, "0P|{HG$S{ax$v|r_ ");
-        assertEquals("0P|{HG$S{ax$v|r_ ", string0);
+    @Test
+    public void to_whenTargetFormatIsSameAsSource_returnsOriginalStringUnchanged() {
+        // Arrange
+        // The input string is intentionally chosen to not conform to the LOWER_CAMEL format.
+        // This verifies that an identity conversion (source format == target format)
+        // is a no-op that returns the original string, regardless of its content.
+        CaseFormat format = CaseFormat.LOWER_CAMEL;
+        String nonConformingInput = "0P|{HG$S{ax$v|r_  ";
+
+        // Act
+        String result = format.to(format, nonConformingInput);
+
+        // Assert
+        assertEquals(nonConformingInput, result);
     }
 }
