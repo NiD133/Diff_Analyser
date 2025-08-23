@@ -2,17 +2,28 @@ package org.joda.time;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Minutes_ESTestTest4 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class, focusing on comparison logic.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Minutes minutes0 = Minutes.minutesIn((ReadableInterval) null);
-        boolean boolean0 = minutes0.isGreaterThan((Minutes) null);
-        assertFalse(boolean0);
+    /**
+     * Tests that isGreaterThan() returns false when comparing a zero-minute instance to null.
+     * The Joda-Time API specifies that a null Minutes object is treated as zero.
+     * Therefore, this test is equivalent to checking if zero is greater than zero.
+     */
+    @Test
+    public void isGreaterThan_shouldReturnFalse_whenComparingZeroToNull() {
+        // Arrange
+        // The minutesIn(null) factory method returns a Minutes object representing zero.
+        Minutes zeroMinutes = Minutes.minutesIn(null);
+
+        // Act
+        // Comparing to a null Minutes object, which is treated as zero.
+        boolean isGreater = zeroMinutes.isGreaterThan(null);
+
+        // Assert
+        assertFalse("Zero minutes should not be greater than null (which is treated as zero).", isGreater);
     }
 }
