@@ -1,92 +1,31 @@
 package org.apache.commons.lang3.concurrent;
 
-import static org.apache.commons.lang3.LangAssertions.assertNullPointerException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.AbstractLangTest;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class MultiBackgroundInitializerTestTest16 extends AbstractLangTest {
+/**
+ * Tests for {@link MultiBackgroundInitializer.MultiBackgroundInitializerResults}.
+ * This refactored test focuses on a single behavior for clarity.
+ */
+public class MultiBackgroundInitializerTest extends AbstractLangTest {
 
     /**
      * Constant for the names of the child initializers.
      */
-    private static final String CHILD_INIT = "childInitializer";
-
-    /**
-     * A short time to wait for background threads to run.
-     */
-    protected static final long PERIOD_MILLIS = 50;
+    private static final String CHILD_INIT_PREFIX = "childInitializer";
 
     /**
      * The initializer to be tested.
      */
-    protected MultiBackgroundInitializer initializer;
-
-    /**
-     * Tests whether a child initializer has been executed. Optionally the
-     * expected executor service can be checked, too.
-     *
-     * @param child the child initializer
-     * @param expExec the expected executor service (null if the executor should
-     * not be checked)
-     * @throws ConcurrentException if an error occurs
-     */
-    private void checkChild(final BackgroundInitializer<?> child, final ExecutorService expExec) throws ConcurrentException {
-        final AbstractChildBackgroundInitializer cinit = (AbstractChildBackgroundInitializer) child;
-        final Integer result = cinit.get().getInitializeCalls();
-        assertEquals(1, result.intValue(), "Wrong result");
-        assertEquals(1, cinit.initializeCalls, "Wrong number of executions");
-        if (expExec != null) {
-            assertEquals(expExec, cinit.currentExecutor, "Wrong executor service");
-        }
-    }
-
-    /**
-     * Helper method for testing the initialize() method. This method can
-     * operate with both an external and a temporary executor service.
-     *
-     * @return the result object produced by the initializer
-     * @throws org.apache.commons.lang3.concurrent.ConcurrentException so we don't have to catch it
-     */
-    private MultiBackgroundInitializer.MultiBackgroundInitializerResults checkInitialize() throws ConcurrentException {
-        final int count = 5;
-        for (int i = 0; i < count; i++) {
-            initializer.addInitializer(CHILD_INIT + i, createChildBackgroundInitializer());
-        }
-        initializer.start();
-        final MultiBackgroundInitializer.MultiBackgroundInitializerResults res = initializer.get();
-        assertEquals(count, res.initializerNames().size(), "Wrong number of child initializers");
-        for (int i = 0; i < count; i++) {
-            final String key = CHILD_INIT + i;
-            assertTrue(res.initializerNames().contains(key), "Name not found: " + key);
-            assertEquals(CloseableCounter.wrapInteger(1), res.getResultObject(key), "Wrong result object");
-            assertFalse(res.isException(key), "Exception flag");
-            assertNull(res.getException(key), "Got an exception");
-            checkChild(res.getInitializer(key), initializer.getActiveExecutor());
-        }
-        return res;
-    }
-
-    /**
-     * An overrideable method to create concrete implementations of
-     * {@code BackgroundInitializer} used for defining background tasks
-     * for {@code MultiBackgroundInitializer}.
-     */
-    protected AbstractChildBackgroundInitializer createChildBackgroundInitializer() {
-        return new MethodChildBackgroundInitializer();
-    }
+    private MultiBackgroundInitializer initializer;
 
     @BeforeEach
     public void setUp() {
@@ -94,88 +33,78 @@ public class MultiBackgroundInitializerTestTest16 extends AbstractLangTest {
     }
 
     /**
-     * A mostly complete implementation of {@code BackgroundInitializer} used for
-     * defining background tasks for {@code MultiBackgroundInitializer}.
-     *
-     * Subclasses will contain the initializer, either as an method implementation
-     * or by using a supplier.
+     * Tests that attempting to retrieve a result for an initializer that does not exist
+     * throws the expected exception.
      */
-    protected static class AbstractChildBackgroundInitializer extends BackgroundInitializer<CloseableCounter> {
+    @Test
+    @DisplayName("getResultObject() should throw NoSuchElementException for an unknown initializer name")
+    void getResultObjectForUnknownInitializerShouldThrowException() throws ConcurrentException {
+        // Arrange
+        final MultiBackgroundInitializer.MultiBackgroundInitializerResults results = initializeWithChildrenAndGetResults(5);
+        final String unknownInitializerName = "unknownInitializer";
 
-        /**
-         * Stores the current executor service.
-         */
-        volatile ExecutorService currentExecutor;
+        // Act & Assert
+        assertThrows(NoSuchElementException.class, () -> {
+            results.getResultObject(unknownInitializerName);
+        }, "Expected a NoSuchElementException for an unknown initializer name");
+    }
 
-        /**
-         * An object containing the state we are testing
-         */
-        CloseableCounter counter = new CloseableCounter();
-
-        /**
-         * A counter for the invocations of initialize().
-         */
-        volatile int initializeCalls;
-
-        /**
-         * An exception to be thrown by initialize().
-         */
-        Exception ex;
-
-        /**
-         * A latch tests can use to control when initialize completes.
-         */
-        final CountDownLatch latch = new CountDownLatch(1);
-
-        boolean waitForLatch;
-
-        public void enableLatch() {
-            waitForLatch = true;
+    /**
+     * Helper method to set up the MultiBackgroundInitializer with a given number of
+     * child initializers, start it, and return the results. This method performs
+     * no assertions.
+     *
+     * @param childCount the number of child initializers to add
+     * @return the results object after initialization
+     * @throws ConcurrentException if the initialization fails
+     */
+    private MultiBackgroundInitializer.MultiBackgroundInitializerResults initializeWithChildrenAndGetResults(final int childCount)
+            throws ConcurrentException {
+        for (int i = 0; i < childCount; i++) {
+            initializer.addInitializer(CHILD_INIT_PREFIX + i, new ChildBackgroundInitializer());
         }
+        initializer.start();
+        return initializer.get();
+    }
 
-        public CloseableCounter getCloseableCounter() {
-            return counter;
-        }
+    // Inner classes below are test fixtures used to simulate child initializers.
+    // They are kept from the original test to support the test case.
 
-        /**
-         * Records this invocation. Optionally throws an exception.
-         */
-        protected CloseableCounter initializeInternal() throws Exception {
-            initializeCalls++;
-            currentExecutor = getActiveExecutor();
-            if (waitForLatch) {
-                latch.await();
-            }
-            if (ex != null) {
-                throw ex;
-            }
+    /**
+     * A concrete implementation of {@code BackgroundInitializer} for testing purposes.
+     * It simulates a background task that produces a {@link CloseableCounter}.
+     */
+    protected static class ChildBackgroundInitializer extends BackgroundInitializer<CloseableCounter> {
+        private final CloseableCounter counter = new CloseableCounter();
+
+        @Override
+        protected CloseableCounter initialize() {
             return counter.increment();
-        }
-
-        public void releaseLatch() {
-            latch.countDown();
         }
     }
 
+    /**
+     * A helper class to represent the result of an initialization and track its state.
+     */
     protected static class CloseableCounter {
+        private int initializeCalls;
+        private boolean closed;
 
-        // A convenience for testing that a CloseableCounter typed as Object has a specific initializeCalls value
-        public static CloseableCounter wrapInteger(final int i) {
-            return new CloseableCounter().setInitializeCalls(i);
+        public CloseableCounter increment() {
+            initializeCalls++;
+            return this;
         }
 
-        /**
-         * The number of invocations of initialize().
-         */
-        volatile int initializeCalls;
-
-        /**
-         * Has the close consumer successfully reached this object.
-         */
-        volatile boolean closed;
+        public int getInitializeCalls() {
+            return initializeCalls;
+        }
 
         public void close() {
             closed = true;
+        }
+
+        public boolean isClosed() {
+            return closed;
         }
 
         @Override
@@ -186,47 +115,9 @@ public class MultiBackgroundInitializerTestTest16 extends AbstractLangTest {
             return false;
         }
 
-        public int getInitializeCalls() {
-            return initializeCalls;
-        }
-
         @Override
         public int hashCode() {
             return initializeCalls;
         }
-
-        public CloseableCounter increment() {
-            initializeCalls++;
-            return this;
-        }
-
-        public boolean isClosed() {
-            return closed;
-        }
-
-        public CloseableCounter setInitializeCalls(final int i) {
-            initializeCalls = i;
-            return this;
-        }
-    }
-
-    protected static class MethodChildBackgroundInitializer extends AbstractChildBackgroundInitializer {
-
-        @Override
-        protected CloseableCounter initialize() throws Exception {
-            return initializeInternal();
-        }
-    }
-
-    /**
-     * Tries to query the results of an unknown child initializer from the
-     * results object. This should cause an exception.
-     *
-     * @throws org.apache.commons.lang3.concurrent.ConcurrentException so we don't have to catch it
-     */
-    @Test
-    void testResultGetResultObjectUnknown() throws ConcurrentException {
-        final MultiBackgroundInitializer.MultiBackgroundInitializerResults res = checkInitialize();
-        assertThrows(NoSuchElementException.class, () -> res.getResultObject("unknown"));
     }
 }
