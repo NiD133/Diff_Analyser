@@ -1,45 +1,34 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
+
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
-import java.nio.channels.SeekableByteChannel;
-import java.util.Enumeration;
-import java.util.zip.Deflater;
-import org.apache.commons.compress.parallel.ScatterGatherBackingStore;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
+import java.util.zip.ZipEntry;
 
-public class StreamCompressor_ESTestTest18 extends StreamCompressor_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link StreamCompressor} class.
+ */
+public class StreamCompressorTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        StreamCompressor streamCompressor0 = StreamCompressor.create((OutputStream) pipedOutputStream0);
-        PipedInputStream pipedInputStream0 = new PipedInputStream();
-        try {
-            streamCompressor0.deflate(pipedInputStream0, 2573);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("java.io.PipedInputStream", e);
-        }
+    /**
+     * Verifies that the deflate method throws an IOException when trying to read
+     * from a PipedInputStream that is not connected to a PipedOutputStream.
+     */
+    @Test(expected = IOException.class)
+    public void deflateShouldThrowIOExceptionWhenPipesAreNotConnected() throws IOException {
+        // Arrange: Create a compressor with a PipedOutputStream. The corresponding
+        // PipedInputStream is created but intentionally left unconnected.
+        PipedOutputStream outputStream = new PipedOutputStream();
+        StreamCompressor streamCompressor = StreamCompressor.create(outputStream);
+        PipedInputStream unconnectedInputStream = new PipedInputStream();
+
+        // Act: Attempting to deflate from the unconnected input stream. This should
+        // cause an IOException when the compressor tries to read from it.
+        streamCompressor.deflate(unconnectedInputStream, ZipEntry.DEFLATED);
+
+        // Assert: The test succeeds if an IOException is thrown, as specified by the
+        // 'expected' parameter in the @Test annotation.
     }
 }
