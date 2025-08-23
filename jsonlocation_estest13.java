@@ -1,25 +1,27 @@
 package com.fasterxml.jackson.core;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonLocation_ESTestTest13 extends JsonLocation_ESTest_scaffolding {
+/**
+ * This test suite focuses on verifying the behavior of the {@link JsonLocation} class.
+ */
+public class JsonLocationTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        JsonLocation jsonLocation0 = JsonLocation.NA;
-        JsonLocation jsonLocation1 = new JsonLocation((Object) null, 500, 500, 500);
-        ContentReference contentReference0 = ContentReference.redacted();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        ErrorReportConfiguration.overrideDefaultErrorReportConfiguration(errorReportConfiguration0);
-        JsonLocation._wrap(contentReference0);
-        Object object0 = new Object();
-        String string0 = jsonLocation0.sourceDescription();
-        assertEquals("UNKNOWN", string0);
+    /**
+     * Verifies that the source description for the special 'Not Available' (NA)
+     * location constant is "UNKNOWN". This is the expected behavior as of Jackson 2.9.
+     */
+    @Test
+    public void sourceDescriptionForNALocationShouldReturnUnknown() {
+        // Arrange: The JsonLocation.NA constant represents a non-available location.
+        final String expectedDescription = "UNKNOWN";
+
+        // Act: Get the source description from the NA constant.
+        final String actualDescription = JsonLocation.NA.sourceDescription();
+
+        // Assert: The description should match the expected value.
+        assertEquals("The source description for JsonLocation.NA should be 'UNKNOWN'",
+                expectedDescription, actualDescription);
     }
 }
