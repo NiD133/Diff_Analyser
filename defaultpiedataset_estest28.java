@@ -2,36 +2,35 @@ package org.jfree.data.general;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.List;
-import java.util.Vector;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.SortOrder;
-import org.jfree.chart.api.TableOrder;
-import org.jfree.data.DefaultKeyedValues;
-import org.jfree.data.KeyedValues;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.CategoryToPieDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.category.SlidingCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class contains tests for the DefaultPieDataset class.
+ * This particular test focuses on the behavior of the equals() method.
+ */
 public class DefaultPieDataset_ESTestTest28 extends DefaultPieDataset_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        DefaultPieDataset<Integer> defaultPieDataset0 = new DefaultPieDataset<Integer>();
-        Integer integer0 = JLayeredPane.DRAG_LAYER;
-        defaultPieDataset0.setValue(integer0, (Number) null);
-        DefaultPieDataset<Integer> defaultPieDataset1 = new DefaultPieDataset<Integer>(defaultPieDataset0);
-        assertTrue(defaultPieDataset1.equals((Object) defaultPieDataset0));
-        defaultPieDataset1.setValue(integer0, (Number) integer0);
-        boolean boolean0 = defaultPieDataset0.equals(defaultPieDataset1);
-        assertFalse(defaultPieDataset1.equals((Object) defaultPieDataset0));
-        assertFalse(boolean0);
+    /**
+     * Tests that the equals() method returns false when two datasets,
+     * initially identical, are made different by changing a value in one of them.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenValuesForSameKeyDiffer() {
+        // Arrange: Create a dataset with a key mapped to a null value.
+        DefaultPieDataset<Integer> dataset1 = new DefaultPieDataset<>();
+        Integer testKey = 1;
+        dataset1.setValue(testKey, null);
+
+        // Create a second dataset as a copy of the first.
+        DefaultPieDataset<Integer> dataset2 = new DefaultPieDataset<>(dataset1);
+
+        // Sanity check: The two datasets should be equal immediately after copying.
+        assertEquals("Datasets should be equal after one is copied from the other.", dataset1, dataset2);
+        assertEquals("Hash codes should be equal for equal objects.", dataset1.hashCode(), dataset2.hashCode());
+
+        // Act: Modify the value for the key in the second dataset, changing it from null to a number.
+        dataset2.setValue(testKey, 400);
+
+        // Assert: The datasets should no longer be equal after the modification.
+        assertNotEquals("Datasets should not be equal after a value is modified in one.", dataset1, dataset2);
     }
 }
