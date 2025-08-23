@@ -1,43 +1,36 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
-import java.io.EOFException;
-import java.io.FileDescriptor;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.PushbackReader;
-import java.io.Reader;
 import java.io.StringReader;
-import java.io.Writer;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.MalformedInputException;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileReader;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharStreams_ESTestTest32 extends CharStreams_ESTest_scaffolding {
+/**
+ * Tests for {@link CharStreams}.
+ */
+public class CharStreamsTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        StringReader stringReader0 = new StringReader("Funnels.unencodedCharsFunnel()");
-        CharStreams.skipFully(stringReader0, (-1932L));
+    /**
+     * Tests that calling {@link CharStreams#skipFully(Reader, long)} with a negative
+     * number of characters to skip does not read from the reader or throw an exception.
+     * The reader's position should remain unchanged.
+     */
+    @Test
+    public void skipFully_withNegativeCount_shouldDoNothing() throws IOException {
+        // Arrange
+        String originalContent = "This is the original content of the reader.";
+        StringReader reader = new StringReader(originalContent);
+
+        // Act
+        // Attempt to skip a negative number of characters. Based on the implementation,
+        // this should be a no-op.
+        CharStreams.skipFully(reader, -100L);
+
+        // Assert
+        // Verify that the reader's content is still intact by reading it to a string.
+        String remainingContent = CharStreams.toString(reader);
+        assertEquals("Reader content should be unchanged after skipping a negative count.",
+                originalContent, remainingContent);
     }
 }
