@@ -1,20 +1,23 @@
 package com.google.common.primitives;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SignedBytes_ESTestTest21 extends SignedBytes_ESTest_scaffolding {
+/**
+ * Tests for {@link SignedBytes#max(byte...)}.
+ */
+public class SignedBytesMaxTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        byte[] byteArray0 = new byte[3];
-        byteArray0[1] = (byte) 110;
-        byte byte0 = SignedBytes.max(byteArray0);
-        assertEquals((byte) 110, byte0);
+    @Test
+    public void max_shouldReturnLargestValue_whenArrayContainsPositiveAndZeroValues() {
+        // Arrange: Create an array of bytes including a clear maximum value.
+        byte[] numbers = {0, 110, 0};
+        byte expectedMax = 110;
+
+        // Act: Call the method under test.
+        byte actualMax = SignedBytes.max(numbers);
+
+        // Assert: Verify that the result is the expected maximum value.
+        assertEquals(expectedMax, actualMax);
     }
 }
