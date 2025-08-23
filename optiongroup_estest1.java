@@ -1,20 +1,22 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class OptionGroup_ESTestTest1 extends OptionGroup_ESTest_scaffolding {
+/**
+ * Tests for the {@link OptionGroup} class.
+ */
+public class OptionGroupTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        OptionGroup optionGroup0 = new OptionGroup();
-        optionGroup0.setRequired(true);
-        boolean boolean0 = optionGroup0.isRequired();
-        assertTrue(boolean0);
+    @Test
+    public void isRequiredShouldReturnTrueWhenGroupIsSetAsRequired() {
+        // Arrange: Create a new OptionGroup instance.
+        OptionGroup optionGroup = new OptionGroup();
+
+        // Act: Set the option group to be required.
+        optionGroup.setRequired(true);
+
+        // Assert: Verify that the isRequired() method now returns true.
+        assertTrue("The option group should be marked as required after being set.", optionGroup.isRequired());
     }
 }
