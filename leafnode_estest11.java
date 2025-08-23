@@ -1,22 +1,31 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class LeafNode_ESTestTest11 extends LeafNode_ESTest_scaffolding {
+/**
+ * Test suite for the LeafNode abstract class.
+ * This class focuses on behaviors specific to nodes that cannot have children.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        TextNode textNode0 = TextNode.createFromEncoded(".");
-        textNode0.setSiblingIndex((-2159));
-        Node node0 = textNode0.empty();
-        assertSame(node0, textNode0);
+    /**
+     * Verifies that calling empty() on a LeafNode is a no-op and returns the same instance.
+     */
+    @Test
+    public void emptyOnLeafNodeShouldReturnSameInstance() {
+        // Background: A LeafNode, by definition, cannot have children. The empty()
+        // method is designed to remove all children from a node.
+        // Expectation: When called on a LeafNode, empty() should do nothing
+        // and return the node itself to allow for method chaining.
+
+        // Arrange: Create an instance of a LeafNode subclass. TextNode is used here.
+        TextNode leafNode = TextNode.createFromEncoded("sample text");
+
+        // Act: Call the empty() method.
+        Node result = leafNode.empty();
+
+        // Assert: The method should return the very same instance.
+        assertSame("Calling empty() on a LeafNode should return the instance itself.", leafNode, result);
     }
 }
