@@ -1,37 +1,37 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.jupiter.api.Test;
+
 import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
-public class WindowsLineEndingInputStream_ESTestTest10 extends WindowsLineEndingInputStream_ESTest_scaffolding {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        byte[] byteArray0 = new byte[6];
-        ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
-        PushbackInputStream pushbackInputStream0 = new PushbackInputStream(byteArrayInputStream0);
-        DataInputStream dataInputStream0 = new DataInputStream(pushbackInputStream0);
-        WindowsLineEndingInputStream windowsLineEndingInputStream0 = new WindowsLineEndingInputStream(dataInputStream0, true);
-        // Undeclared exception!
-        try {
-            windowsLineEndingInputStream0.mark(0);
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // mark/reset not supported
-            //
-            verifyException("org.apache.commons.io.input.UnsupportedOperationExceptions", e);
-        }
+/**
+ * Tests for {@link WindowsLineEndingInputStream}.
+ */
+public class WindowsLineEndingInputStreamTest {
+
+    /**
+     * Tests that calling mark() on the stream throws an UnsupportedOperationException,
+     * as the stream does not support mark/reset operations.
+     */
+    @Test
+    public void markShouldThrowUnsupportedOperationException() {
+        // Arrange: Create a WindowsLineEndingInputStream. The underlying stream's content
+        // and the lineFeedAtEos flag are irrelevant for this test.
+        InputStream emptyStream = new ByteArrayInputStream(new byte[0]);
+        WindowsLineEndingInputStream windowsStream = new WindowsLineEndingInputStream(emptyStream, false);
+
+        // Act & Assert: Verify that calling mark() throws the expected exception.
+        UnsupportedOperationException exception = assertThrows(
+            UnsupportedOperationException.class,
+            () -> windowsStream.mark(0),
+            "mark() should throw an UnsupportedOperationException."
+        );
+
+        // Assert: Verify the exception has the expected message.
+        assertEquals("mark/reset not supported", exception.getMessage());
     }
 }
