@@ -1,32 +1,26 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.CDataNode;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.LeafNode;
-import org.jsoup.select.Elements;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class XmlTreeBuilder_ESTestTest17 extends XmlTreeBuilder_ESTest_scaffolding {
+/**
+ * Tests for the {@link XmlTreeBuilder} class.
+ */
+public class XmlTreeBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        ParseSettings parseSettings0 = xmlTreeBuilder0.defaultSettings();
-        assertTrue(parseSettings0.preserveTagCase());
+    /**
+     * Verifies that the default ParseSettings for the XmlTreeBuilder are configured
+     * to preserve the case of tags, which is the expected behavior for XML parsing.
+     */
+    @Test
+    public void defaultSettingsShouldPreserveTagCase() {
+        // Arrange
+        XmlTreeBuilder xmlTreeBuilder = new XmlTreeBuilder();
+
+        // Act
+        ParseSettings settings = xmlTreeBuilder.defaultSettings();
+
+        // Assert
+        assertTrue("XML parser should preserve tag case by default", settings.preserveTagCase());
     }
 }
