@@ -1,32 +1,35 @@
 package org.apache.commons.codec.net;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
+import java.nio.charset.StandardCharsets;
 import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BCodec_ESTestTest14 extends BCodec_ESTest_scaffolding {
+/**
+ * Tests for {@link BCodec}.
+ *
+ * Note: The original test class name 'BCodec_ESTestTest14' was auto-generated.
+ * It has been renamed to 'BCodecTest' for clarity.
+ */
+public class BCodecTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        Charset charset0 = Charset.defaultCharset();
-        BCodec bCodec0 = new BCodec(charset0, (CodecPolicy) null);
-        byte[] byteArray0 = new byte[22];
-        // Undeclared exception!
-        try {
-            bCodec0.doDecoding(byteArray0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // codecPolicy
-            //
-            verifyException("java.util.Objects", e);
-        }
+    @Test
+    public void doDecodingWithNullCodecPolicyShouldThrowNullPointerException() {
+        // Arrange: The BCodec constructor allows a null CodecPolicy, deferring the null check.
+        final BCodec codec = new BCodec(StandardCharsets.UTF_8, null);
+        final byte[] dummyInput = new byte[]{1, 2, 3}; // Content is irrelevant for this test.
+
+        // Act & Assert: The doDecoding method internally creates a Base64 decoder that
+        // requires a non-null CodecPolicy, which should trigger the exception.
+        final NullPointerException thrown = assertThrows(
+            NullPointerException.class,
+            () -> codec.doDecoding(dummyInput)
+        );
+
+        // Verify the exception message to confirm the cause. The underlying Base64
+        // implementation uses Objects.requireNonNull("codecPolicy").
+        assertEquals("codecPolicy", thrown.getMessage());
     }
 }
