@@ -1,24 +1,41 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
 
-public class PosixParser_ESTestTest6 extends PosixParser_ESTest_scaffolding {
+/**
+ * Tests for {@link PosixParser}.
+ */
+public class PosixParserTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        Options options0 = new Options();
-        Options options1 = options0.addRequiredOption("j", "j", false, "j");
-        PosixParser posixParser0 = new PosixParser();
-        String[] stringArray0 = new String[11];
-        stringArray0[5] = "--=<iy";
-        String[] stringArray1 = posixParser0.flatten(options1, stringArray0, false);
-        String[] stringArray2 = posixParser0.flatten(options1, stringArray1, true);
-        assertEquals(3, stringArray2.length);
+    /**
+     * This test verifies that when the 'stopAtNonOption' flag is true, the flatten method
+     * correctly handles an unrecognized long option. It should insert a double-hyphen ("--")
+     * before the unrecognized option, effectively treating it and all subsequent tokens
+     * as non-option arguments.
+     */
+    @Test
+    public void flattenShouldStopAtUnrecognizedLongOptionWhenStopAtNonOptionIsTrue() throws ParseException {
+        // Arrange
+        PosixParser parser = new PosixParser();
+        Options options = new Options();
+        options.addOption("j", "known-option", false, "A known option.");
+
+        // An array with an unrecognized long option followed by another argument.
+        String[] arguments = {"--unrecognized-option", "some-value"};
+
+        // Act
+        // Call flatten with stopAtNonOption set to true.
+        String[] flattenedArgs = parser.flatten(options, arguments, true);
+
+        // Assert
+        // The expected result is that the parser inserts "--" to terminate option processing.
+        String[] expected = {
+            "--",                      // Inserted to stop option processing.
+            "--unrecognized-option",   // The unrecognized option is now a plain argument.
+            "some-value"               // The subsequent token is also a plain argument.
+        };
+
+        assertArrayEquals("Flatten should insert '--' before the unrecognized long option", expected, flattenedArgs);
     }
 }
