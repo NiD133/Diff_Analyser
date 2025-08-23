@@ -2,57 +2,62 @@ package org.apache.commons.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Arrays;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
-public class IOCaseTestTest4 {
+/**
+ * Tests for the {@link IOCase} enum.
+ * This version focuses on improving clarity and structure.
+ */
+@DisplayName("IOCase Test")
+class IOCaseTest {
 
-    private static final boolean WINDOWS = File.separatorChar == '\\';
+    /**
+     * Groups tests for the {@code checkEndsWith} method using {@code IOCase.SENSITIVE}.
+     */
+    @Nested
+    @DisplayName("checkEndsWith with IOCase.SENSITIVE")
+    class CheckEndsWithSensitiveTest {
 
-    private void assert0(final byte[] arr) {
-        for (final byte e : arr) {
-            assertEquals(0, e);
+        @ParameterizedTest(name = "''{0}'' ends with ''{1}'' should be {2}")
+        @CsvSource({
+            // str,    end,   expected
+            "ABC,     '',    true",   // An empty suffix is always considered to be present.
+            "ABC,     'C',   true",
+            "ABC,     'BC',  true",
+            "ABC,     'ABC', true",   // The string is a valid suffix of itself.
+            "ABC,     'A',   false",
+            "ABC,     'AB',  false",
+            "ABC,     'c',   false",  // Fails due to case sensitivity.
+            "ABC,     'bC',  false",  // Fails due to case sensitivity.
+            "ABC,     'ABCD',false",  // Suffix cannot be longer than the string.
+            "'',      'ABC', false",  // An empty string cannot end with a non-empty suffix.
+            "'',      '',    true"    // An empty string ends with an empty suffix.
+        })
+        void whenCheckingVariousSuffixes_thenReturnsExpectedResult(final String str, final String end, final boolean expected) {
+            assertEquals(expected, IOCase.SENSITIVE.checkEndsWith(str, end));
         }
-    }
 
-    private void assert0(final char[] arr) {
-        for (final char e : arr) {
-            assertEquals(0, e);
+        @Test
+        @DisplayName("should return false when the string to check is null")
+        void whenStringIsNull_thenReturnsFalse() {
+            assertFalse(IOCase.SENSITIVE.checkEndsWith(null, "A"));
         }
-    }
 
-    private IOCase serialize(final IOCase value) throws Exception {
-        final ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        try (ObjectOutputStream out = new ObjectOutputStream(buf)) {
-            out.writeObject(value);
-            out.flush();
+        @Test
+        @DisplayName("should return false when the suffix is null")
+        void whenSuffixIsNull_thenReturnsFalse() {
+            assertFalse(IOCase.SENSITIVE.checkEndsWith("ABC", null));
         }
-        final ByteArrayInputStream bufin = new ByteArrayInputStream(buf.toByteArray());
-        final ObjectInputStream in = new ObjectInputStream(bufin);
-        return (IOCase) in.readObject();
-    }
 
-    @Test
-    void test_checkEndsWith_functionality() {
-        assertTrue(IOCase.SENSITIVE.checkEndsWith("ABC", ""));
-        assertFalse(IOCase.SENSITIVE.checkEndsWith("ABC", "A"));
-        assertFalse(IOCase.SENSITIVE.checkEndsWith("ABC", "AB"));
-        assertTrue(IOCase.SENSITIVE.checkEndsWith("ABC", "ABC"));
-        assertTrue(IOCase.SENSITIVE.checkEndsWith("ABC", "BC"));
-        assertTrue(IOCase.SENSITIVE.checkEndsWith("ABC", "C"));
-        assertFalse(IOCase.SENSITIVE.checkEndsWith("ABC", "ABCD"));
-        assertFalse(IOCase.SENSITIVE.checkEndsWith("", "ABC"));
-        assertTrue(IOCase.SENSITIVE.checkEndsWith("", ""));
-        assertFalse(IOCase.SENSITIVE.checkEndsWith("ABC", null));
-        assertFalse(IOCase.SENSITIVE.checkEndsWith(null, "ABC"));
-        assertFalse(IOCase.SENSITIVE.checkEndsWith(null, null));
+        @Test
+        @DisplayName("should return false when both strings are null")
+        void whenBothStringAndSuffixAreNull_thenReturnsFalse() {
+            assertFalse(IOCase.SENSITIVE.checkEndsWith(null, null));
+        }
     }
 }
