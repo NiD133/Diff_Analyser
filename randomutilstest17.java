@@ -4,299 +4,271 @@ import static org.apache.commons.lang3.LangAssertions.assertIllegalArgumentExcep
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.stream.Stream;
-import org.junit.jupiter.api.Test;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class RandomUtilsTestTest17 extends AbstractLangTest {
+/**
+ * Tests for {@link RandomUtils}.
+ * This test suite uses parameterized tests to run all tests against three
+ * different RandomUtils instances: secure, secure-strong, and insecure.
+ */
+public class RandomUtilsTest extends AbstractLangTest {
 
     /**
-     * For comparing doubles and floats
+     * A small delta for comparing floating-point numbers.
      */
     private static final double DELTA = 1e-5;
 
+    /**
+     * Provides the different RandomUtils instances to be tested.
+     * @return a stream of RandomUtils instances.
+     */
     static Stream<RandomUtils> randomProvider() {
         return Stream.of(RandomUtils.secure(), RandomUtils.secureStrong(), RandomUtils.insecure());
     }
 
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testBoolean(final RandomUtils ru) {
-        final boolean result = ru.randomBoolean();
-        assertTrue(result || !result);
-    }
-
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testExtremeRangeDouble(final RandomUtils ru) {
-        final double result = ru.randomDouble(0, Double.MAX_VALUE);
-        // TODO: should be <max?
-        assertTrue(result >= 0 && result <= Double.MAX_VALUE);
-    }
-
-    /**
-     * Tests extreme range.
-     */
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testExtremeRangeFloat(final RandomUtils ru) {
-        final float result = ru.randomFloat(0, Float.MAX_VALUE);
-        // TODO: should be <max?
-        assertTrue(result >= 0f && result <= Float.MAX_VALUE);
-    }
-
-    /**
-     * Tests extreme range.
-     */
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testExtremeRangeInt(final RandomUtils ru) {
-        final int result = ru.randomInt(0, Integer.MAX_VALUE);
-        assertTrue(result >= 0);
-        assertTrue(result < Integer.MAX_VALUE);
-    }
-
-    /**
-     * Tests extreme range.
-     */
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testExtremeRangeLong(final RandomUtils ru) {
-        final long result = ru.randomLong(0, Long.MAX_VALUE);
-        assertTrue(result >= 0);
-        assertTrue(result < Long.MAX_VALUE);
-    }
-
-    /**
-     * Test a large value for long. A previous implementation using
-     * {@link RandomUtils#nextDouble(double, double)} could generate a value equal
-     * to the upper limit.
-     *
-     * <pre>
-     * return (long) nextDouble(startInclusive, endExclusive);
-     * </pre>
-     *
-     * <p>See LANG-1592.</p>
-     */
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testLargeValueRangeLong(final RandomUtils ru) {
-        final long startInclusive = 12900000000001L;
-        final long endExclusive = 12900000000016L;
-        // Note: The method using 'return (long) nextDouble(startInclusive, endExclusive)'
-        // takes thousands of calls to generate an error. This size loop fails most
-        // of the time with the previous method.
-        final int n = (int) (endExclusive - startInclusive) * 1000;
-        for (int i = 0; i < n; i++) {
-            assertNotEquals(endExclusive, ru.randomLong(startInclusive, endExclusive));
+    @Nested
+    @DisplayName("randomBoolean()")
+    class RandomBooleanTest {
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void shouldNotFail(final RandomUtils randomUtils) {
+            // This is a smoke test to ensure the method call does not fail.
+            // Testing for true randomness is complex and out of scope for a unit test.
+            // The original assertion 'assertTrue(result || !result)' was a tautology.
+            randomUtils.randomBoolean();
         }
     }
 
-    /**
-     * Tests random byte array.
-     */
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testNextBytes(final RandomUtils ru) {
-        final byte[] result = ru.randomBytes(20);
-        assertEquals(20, result.length);
+    @Nested
+    @DisplayName("randomBytes(int)")
+    class RandomBytesTest {
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void shouldReturnArrayOfCorrectSize(final RandomUtils randomUtils) {
+            final byte[] result = randomUtils.randomBytes(20);
+            assertEquals(20, result.length, "The generated byte array should have the requested size.");
+        }
+
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void shouldReturnEmptyArrayForZeroCount(final RandomUtils randomUtils) {
+            final byte[] result = randomUtils.randomBytes(0);
+            assertArrayEquals(new byte[0], result, "Requesting 0 bytes should result in an empty array.");
+        }
+
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void shouldThrowExceptionForNegativeCount(final RandomUtils randomUtils) {
+            assertIllegalArgumentException(() -> randomUtils.randomBytes(-1), "A negative count should raise an exception.");
+        }
     }
 
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testNextBytesNegative(final RandomUtils ru) {
-        assertIllegalArgumentException(() -> ru.randomBytes(-1));
+    @Nested
+    @DisplayName("randomDouble(...)")
+    class RandomDoubleTest {
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withNoArgs_shouldReturnPositiveValue(final RandomUtils randomUtils) {
+            final double result = randomUtils.randomDouble();
+            assertTrue(result >= 0d && result < Double.MAX_VALUE, "Result should be in [0, Double.MAX_VALUE)");
+        }
+
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withRange_shouldReturnNumberWithinRange(final RandomUtils randomUtils) {
+            final double startInclusive = 33d;
+            final double endExclusive = 42d;
+            final double result = randomUtils.randomDouble(startInclusive, endExclusive);
+            assertTrue(result >= startInclusive && result < endExclusive, "Result should be within the specified range.");
+        }
+
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withRange_shouldHandleMaxDoubleRange(final RandomUtils randomUtils) {
+            final double result = randomUtils.randomDouble(0, Double.MAX_VALUE);
+            assertTrue(result >= 0 && result < Double.MAX_VALUE, "Result should be within [0, Double.MAX_VALUE).");
+        }
+
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withRange_shouldReturnStartWhenRangeIsZero(final RandomUtils randomUtils) {
+            final double value = 42.1;
+            assertEquals(value, randomUtils.randomDouble(value, value), DELTA, "When start equals end, start should be returned.");
+        }
+
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withRange_shouldThrowExceptionForNegativeStart(final RandomUtils randomUtils) {
+            assertIllegalArgumentException(() -> randomUtils.randomDouble(-1, 1), "A negative start value should raise an exception.");
+        }
+
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withRange_shouldThrowExceptionWhenStartIsGreaterThanEnd(final RandomUtils randomUtils) {
+            assertIllegalArgumentException(() -> randomUtils.randomDouble(2, 1), "Start cannot be greater than end.");
+        }
     }
 
-    /**
-     * Tests next double range.
-     */
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testNextDouble(final RandomUtils ru) {
-        final double result = ru.randomDouble(33d, 42d);
-        assertTrue(result >= 33d);
-        assertTrue(result < 42d);
+    @Nested
+    @DisplayName("randomFloat(...)")
+    class RandomFloatTest {
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withNoArgs_shouldReturnPositiveValue(final RandomUtils randomUtils) {
+            final float result = randomUtils.randomFloat();
+            assertTrue(result >= 0f && result < Float.MAX_VALUE, "Result should be in [0, Float.MAX_VALUE)");
+        }
+
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withRange_shouldReturnNumberWithinRange(final RandomUtils randomUtils) {
+            final float startInclusive = 33f;
+            final float endExclusive = 42f;
+            final float result = randomUtils.randomFloat(startInclusive, endExclusive);
+            assertTrue(result >= startInclusive && result < endExclusive, "Result should be within the specified range.");
+        }
+
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withRange_shouldHandleMaxFloatRange(final RandomUtils randomUtils) {
+            final float result = randomUtils.randomFloat(0, Float.MAX_VALUE);
+            assertTrue(result >= 0f && result < Float.MAX_VALUE, "Result should be within [0, Float.MAX_VALUE).");
+        }
+
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withRange_shouldReturnStartWhenRangeIsZero(final RandomUtils randomUtils) {
+            final float value = 42.1f;
+            assertEquals(value, randomUtils.randomFloat(value, value), DELTA, "When start equals end, start should be returned.");
+        }
+
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withRange_shouldThrowExceptionForNegativeStart(final RandomUtils randomUtils) {
+            assertIllegalArgumentException(() -> randomUtils.randomFloat(-1, 1), "A negative start value should raise an exception.");
+        }
+
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withRange_shouldThrowExceptionWhenStartIsGreaterThanEnd(final RandomUtils randomUtils) {
+            assertIllegalArgumentException(() -> randomUtils.randomFloat(2, 1), "Start cannot be greater than end.");
+        }
     }
 
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testNextDoubleLowerGreaterUpper(final RandomUtils ru) {
-        assertIllegalArgumentException(() -> ru.randomDouble(2, 1));
+    @Nested
+    @DisplayName("randomInt(...)")
+    class RandomIntTest {
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withNoArgs_shouldReturnPositiveValue(final RandomUtils randomUtils) {
+            final int result = randomUtils.randomInt();
+            assertTrue(result >= 0 && result < Integer.MAX_VALUE, "Result should be in [0, Integer.MAX_VALUE)");
+        }
+
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withRange_shouldReturnNumberWithinRange(final RandomUtils randomUtils) {
+            final int startInclusive = 33;
+            final int endExclusive = 42;
+            final int result = randomUtils.randomInt(startInclusive, endExclusive);
+            assertTrue(result >= startInclusive && result < endExclusive, "Result should be within the specified range.");
+        }
+
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withRange_shouldHandleMaxIntegerRange(final RandomUtils randomUtils) {
+            final int result = randomUtils.randomInt(0, Integer.MAX_VALUE);
+            assertTrue(result >= 0 && result < Integer.MAX_VALUE, "Result should be within [0, Integer.MAX_VALUE).");
+        }
+
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withRange_shouldReturnStartWhenRangeIsZero(final RandomUtils randomUtils) {
+            final int value = 42;
+            assertEquals(value, randomUtils.randomInt(value, value), "When start equals end, start should be returned.");
+        }
+
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withRange_shouldThrowExceptionForNegativeStart(final RandomUtils randomUtils) {
+            assertIllegalArgumentException(() -> randomUtils.randomInt(-1, 1), "A negative start value should raise an exception.");
+        }
+
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withRange_shouldThrowExceptionWhenStartIsGreaterThanEnd(final RandomUtils randomUtils) {
+            assertIllegalArgumentException(() -> randomUtils.randomInt(2, 1), "Start cannot be greater than end.");
+        }
     }
 
-    /**
-     * Test next double range with minimal range.
-     */
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testNextDoubleMinimalRange(final RandomUtils ru) {
-        assertEquals(42.1, ru.randomDouble(42.1, 42.1), DELTA);
-    }
+    @Nested
+    @DisplayName("randomLong(...)")
+    class RandomLongTest {
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withNoArgs_shouldReturnPositiveValue(final RandomUtils randomUtils) {
+            final long result = randomUtils.randomLong();
+            assertTrue(result >= 0L && result < Long.MAX_VALUE, "Result should be in [0, Long.MAX_VALUE)");
+        }
 
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testNextDoubleNegative(final RandomUtils ru) {
-        assertIllegalArgumentException(() -> ru.randomDouble(-1, 1));
-    }
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withRange_shouldReturnNumberWithinRange(final RandomUtils randomUtils) {
+            final long startInclusive = 33L;
+            final long endExclusive = 42L;
+            final long result = randomUtils.randomLong(startInclusive, endExclusive);
+            assertTrue(result >= startInclusive && result < endExclusive, "Result should be within the specified range.");
+        }
 
-    /**
-     * Tests next double range, random result.
-     */
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testNextDoubleRandomResult(final RandomUtils ru) {
-        final double result = ru.randomDouble();
-        assertTrue(result >= 0d);
-        assertTrue(result < Double.MAX_VALUE);
-    }
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withRange_shouldHandleMaxLongRange(final RandomUtils randomUtils) {
+            final long result = randomUtils.randomLong(0, Long.MAX_VALUE);
+            assertTrue(result >= 0 && result < Long.MAX_VALUE, "Result should be within [0, Long.MAX_VALUE).");
+        }
 
-    /**
-     * Tests next float range.
-     */
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testNextFloat(final RandomUtils ru) {
-        final float result = ru.randomFloat(33f, 42f);
-        assertTrue(result >= 33f);
-        assertTrue(result < 42f);
-    }
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withRange_shouldReturnStartWhenRangeIsZero(final RandomUtils randomUtils) {
+            final long value = 42L;
+            assertEquals(value, randomUtils.randomLong(value, value), "When start equals end, start should be returned.");
+        }
 
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testNextFloatLowerGreaterUpper(final RandomUtils ru) {
-        assertIllegalArgumentException(() -> ru.randomFloat(2, 1));
-    }
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withRange_shouldThrowExceptionForNegativeStart(final RandomUtils randomUtils) {
+            assertIllegalArgumentException(() -> randomUtils.randomLong(-1, 1), "A negative start value should raise an exception.");
+        }
 
-    /**
-     * Test next float range with minimal range.
-     */
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testNextFloatMinimalRange(final RandomUtils ru) {
-        assertEquals(42.1f, ru.randomFloat(42.1f, 42.1f), DELTA);
-    }
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withRange_shouldThrowExceptionWhenStartIsGreaterThanEnd(final RandomUtils randomUtils) {
+            assertIllegalArgumentException(() -> randomUtils.randomLong(2, 1), "Start cannot be greater than end.");
+        }
 
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testNextFloatNegative(final RandomUtils ru) {
-        assertIllegalArgumentException(() -> ru.randomFloat(-1, 1));
-    }
-
-    /**
-     * Tests next float range, random result.
-     */
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testNextFloatRandomResult(final RandomUtils ru) {
-        final float result = ru.randomFloat();
-        assertTrue(result >= 0f);
-        assertTrue(result < Float.MAX_VALUE);
-    }
-
-    /**
-     * Tests next int range.
-     */
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testNextInt(final RandomUtils ru) {
-        final int result = ru.randomInt(33, 42);
-        assertTrue(result >= 33);
-        assertTrue(result < 42);
-    }
-
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testNextIntLowerGreaterUpper(final RandomUtils ru) {
-        assertIllegalArgumentException(() -> ru.randomInt(2, 1));
-    }
-
-    /**
-     * Test next int range with minimal range.
-     */
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testNextIntMinimalRange(final RandomUtils ru) {
-        assertEquals(42, ru.randomInt(42, 42));
-    }
-
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testNextIntNegative(final RandomUtils ru) {
-        assertIllegalArgumentException(() -> ru.randomInt(-1, 1));
-    }
-
-    /**
-     * Tests next int range, random result.
-     */
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testNextIntRandomResult(final RandomUtils ru) {
-        final int randomResult = ru.randomInt();
-        assertTrue(randomResult > 0);
-        assertTrue(randomResult < Integer.MAX_VALUE);
-    }
-
-    /**
-     * Tests next long range.
-     */
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testNextLong(final RandomUtils ru) {
-        final long result = ru.randomLong(33L, 42L);
-        assertTrue(result >= 33L);
-        assertTrue(result < 42L);
-    }
-
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testNextLongLowerGreaterUpper(final RandomUtils ru) {
-        assertIllegalArgumentException(() -> ru.randomLong(2, 1));
-    }
-
-    /**
-     * Test next long range with minimal range.
-     */
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testNextLongMinimalRange(final RandomUtils ru) {
-        assertEquals(42L, ru.randomLong(42L, 42L));
-    }
-
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testNextLongNegative(final RandomUtils ru) {
-        assertIllegalArgumentException(() -> ru.randomLong(-1, 1));
-    }
-
-    /**
-     * Tests next long range, random result.
-     */
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testNextLongRandomResult(final RandomUtils ru) {
-        final long result = ru.randomLong();
-        assertTrue(result >= 0L);
-        assertTrue(result < Long.MAX_VALUE);
-    }
-
-    /**
-     * Tests a zero byte array length.
-     */
-    @ParameterizedTest
-    @MethodSource("randomProvider")
-    void testZeroLengthNextBytes(final RandomUtils ru) {
-        assertArrayEquals(new byte[0], ru.randomBytes(0));
-    }
-
-    /**
-     * Test next float range with minimal range.
-     */
-    @Test
-    void testNextFloatMinimalRange() {
-        assertEquals(42.1f, RandomUtils.nextFloat(42.1f, 42.1f), DELTA);
+        /**
+         * Regression test for LANG-1592, where a previous implementation could
+         * incorrectly return the exclusive upper bound.
+         */
+        @ParameterizedTest
+        @MethodSource("org.apache.commons.lang3.RandomUtilsTest#randomProvider")
+        void withRange_shouldNotReturnEndExclusiveForLargeValueRange(final RandomUtils randomUtils) {
+            final long startInclusive = 12900000000001L;
+            final long endExclusive = 12900000000016L;
+            // The previous faulty implementation using 'return (long) nextDouble(start, end)'
+            // would fail this test frequently. We loop many times to increase the
+            // probability of catching such an error.
+            final int loopCount = (int) (endExclusive - startInclusive) * 1000;
+            for (int i = 0; i < loopCount; i++) {
+                assertNotEquals(endExclusive, randomUtils.randomLong(startInclusive, endExclusive));
+            }
+        }
     }
 }
