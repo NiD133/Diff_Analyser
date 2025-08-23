@@ -1,29 +1,26 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class BoundedReader_ESTestTest18 extends BoundedReader_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link BoundedReader} class, focusing on error handling.
+ */
+public class BoundedReaderTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        BoundedReader boundedReader0 = new BoundedReader((Reader) null, (-1235));
-        // Undeclared exception!
-        try {
-            boundedReader0.close();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.input.BoundedReader", e);
-        }
+    /**
+     * Tests that calling close() on a BoundedReader that was constructed with a null
+     * underlying reader throws a NullPointerException. This happens because BoundedReader
+     * delegates the close() call directly to the underlying reader.
+     */
+    @Test(expected = NullPointerException.class)
+    public void closeShouldThrowNullPointerExceptionWhenReaderIsNull() throws IOException {
+        // Arrange: Create a BoundedReader with a null underlying reader.
+        // The max character limit is not relevant to this specific test.
+        final BoundedReader boundedReader = new BoundedReader(null, 100);
+
+        // Act & Assert: Attempting to close the reader should throw a NullPointerException
+        // because it tries to call close() on the null target.
+        boundedReader.close();
     }
 }
