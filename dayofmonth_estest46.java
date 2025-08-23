@@ -1,43 +1,30 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Month;
-import java.time.YearMonth;
-import java.time.ZoneId;
+import java.time.Instant;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.Chronology;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.MinguoDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockMinguoDate;
-import org.junit.runner.RunWith;
 
-public class DayOfMonth_ESTestTest46 extends DayOfMonth_ESTest_scaffolding {
+public class DayOfMonth_ESTestTest46 {
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        DayOfMonth dayOfMonth0 = DayOfMonth.now();
-        dayOfMonth0.hashCode();
-        assertEquals(14, dayOfMonth0.getValue());
+    /**
+     * Tests that DayOfMonth.now(clock) correctly retrieves the day from a fixed clock.
+     *
+     * <p>This test uses a fixed clock to ensure it is deterministic and independent of the
+     * actual system time. This makes the test reliable, repeatable, and easier to understand.
+     */
+    @Test
+    public void testNowWithFixedClock() {
+        // Arrange: Create a fixed clock set to a specific date (February 14th, 2024).
+        Instant fixedInstant = Instant.parse("2024-02-14T10:15:30.00Z");
+        Clock fixedClock = Clock.fixed(fixedInstant, ZoneOffset.UTC);
+
+        // Act: Obtain the DayOfMonth using the fixed clock.
+        DayOfMonth dayOfMonth = DayOfMonth.now(fixedClock);
+
+        // Assert: Verify that the DayOfMonth object represents the 14th day.
+        assertEquals(14, dayOfMonth.getValue());
     }
 }
