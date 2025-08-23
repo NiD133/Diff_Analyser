@@ -1,20 +1,28 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
+import static org.junit.Assert.assertFalse;
 import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CopticChronology_ESTestTest6 extends CopticChronology_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CopticChronology}.
+ */
+public class CopticChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        CopticChronology copticChronology0 = CopticChronology.getInstance();
-        CopticChronology copticChronology1 = new CopticChronology(copticChronology0, copticChronology0, 1);
-        assertFalse(copticChronology1.equals((Object) copticChronology0));
+    /**
+     * Tests that two CopticChronology instances are not considered equal if they are
+     * configured with a different minimum number of days in the first week.
+     */
+    @Test
+    public void chronologiesWithDifferentMinDaysInFirstWeekAreNotEqual() {
+        // Arrange: Create two CopticChronology instances for the same time zone
+        // but with different values for 'minimum days in the first week'.
+        // The default getInstance() uses a value of 4.
+        CopticChronology defaultChronology = CopticChronology.getInstance();
+        CopticChronology chronologyWithMinDays1 = CopticChronology.getInstance(defaultChronology.getZone(), 1);
+
+        // Act & Assert: The two instances should not be equal, as the equals()
+        // implementation checks for this specific property.
+        assertFalse(chronologyWithMinDays1.equals(defaultChronology));
     }
 }
