@@ -1,17 +1,27 @@
 package org.apache.commons.compress.compressors.lzma;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LZMAUtils_ESTestTest7 extends LZMAUtils_ESTest_scaffolding {
+/**
+ * Tests for the {@link LZMAUtils} class.
+ */
+public class LZMAUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        String string0 = LZMAUtils.getUncompressedFileName("");
-        assertEquals("", string0);
+    /**
+     * Tests that getUncompressedFileName returns an empty string when the input is an empty string.
+     * This verifies the handling of an edge case.
+     */
+    @Test
+    public void getUncompressedFileNameShouldReturnEmptyStringForEmptyInput() {
+        // Arrange
+        final String emptyFileName = "";
+        final String expectedResult = "";
+
+        // Act
+        final String actualResult = LZMAUtils.getUncompressedFileName(emptyFileName);
+
+        // Assert
+        assertEquals("An empty file name should remain empty.", expectedResult, actualResult);
     }
 }
