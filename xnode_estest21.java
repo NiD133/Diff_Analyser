@@ -1,31 +1,34 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
+import java.util.Properties;
+import static org.junit.Assert.assertEquals;
 
-public class XNode_ESTestTest21 extends XNode_ESTest_scaffolding {
+/**
+ * Test suite for the XNode class.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test020() throws Throwable {
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        Properties properties0 = new Properties();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Integer integer0 = new Integer(0);
-        Integer integer1 = xNode0.getIntAttribute("biJO]9XZVS~T!6D,E{", integer0);
-        assertEquals(0, (int) integer1);
+    /**
+     * Verifies that getIntAttribute returns the default value when the attribute is not present.
+     */
+    @Test
+    public void getIntAttributeShouldReturnDefaultValueWhenAttributeIsMissing() {
+        // Arrange
+        // Create an empty XML node that has no attributes.
+        IIOMetadataNode emptyNode = new IIOMetadataNode();
+        XNode xNode = new XNode(null, emptyNode, new Properties());
+
+        String nonExistentAttribute = "id";
+        Integer defaultValue = 100;
+
+        // Act
+        // Attempt to retrieve the integer value of an attribute that does not exist.
+        Integer actualValue = xNode.getIntAttribute(nonExistentAttribute, defaultValue);
+
+        // Assert
+        // The method should return the provided default value.
+        assertEquals(defaultValue, actualValue);
     }
 }
