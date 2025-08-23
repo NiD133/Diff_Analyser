@@ -1,36 +1,34 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
+import org.junit.Test;
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeReader_ESTestTest21 extends JsonTreeReader_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test020() throws Throwable {
-        JsonPrimitive jsonPrimitive0 = new JsonPrimitive("||9{dvk.\"Ana");
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonPrimitive0);
-        // Undeclared exception!
+/**
+ * Unit tests for the {@link JsonTreeReader} class.
+ */
+public class JsonTreeReaderTest {
+
+    @Test
+    public void nextLong_onNonNumericString_throwsNumberFormatException() throws IOException {
+        // Arrange: Create a JsonTreeReader with a string that cannot be parsed as a long.
+        // The specific string is from the original test to ensure behavior is preserved.
+        String nonNumericString = "||9{dvk.\"Ana";
+        JsonPrimitive nonNumericPrimitive = new JsonPrimitive(nonNumericString);
+        JsonTreeReader reader = new JsonTreeReader(nonNumericPrimitive);
+
+        // Act & Assert: Verify that calling nextLong() throws the expected exception.
         try {
-            jsonTreeReader0.nextLong();
-            fail("Expecting exception: NumberFormatException");
+            reader.nextLong();
+            fail("Expected NumberFormatException was not thrown for a non-numeric string.");
         } catch (NumberFormatException e) {
-            //
-            // For input string: \"||9{dvk.\"Ana\"
-            //
-            verifyException("java.lang.NumberFormatException", e);
+            // Verify the exception message to confirm it's caused by the correct input.
+            // This behavior is delegated to Long.parseLong() via JsonPrimitive.getAsLong().
+            String expectedMessage = "For input string: \"" + nonNumericString + "\"";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
