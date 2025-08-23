@@ -1,20 +1,35 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
+import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CopticChronology_ESTestTest15 extends CopticChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        CopticChronology copticChronology0 = CopticChronology.getInstance();
-        boolean boolean0 = copticChronology0.isLeapDay(9223371994233600000L);
-        assertFalse(boolean0);
+/**
+ * Unit tests for the {@link CopticChronology} class.
+ */
+public class CopticChronologyTest {
+
+    /**
+     * The maximum year supported by CopticChronology, as defined in the source.
+     * This is used to test behavior at the upper bounds of the chronology.
+     */
+    private static final int COPTIC_MAX_YEAR = 292272708;
+
+    @Test
+    public void isLeapDay_forNonLeapDayAtMaxSupportedYear_returnsFalse() {
+        // Arrange: Create a CopticChronology instance and a date near the maximum
+        // supported value. This date, December 26th of the max year, is not a leap day.
+        // Using an explicit date makes the test's intent clear, avoiding magic numbers.
+        CopticChronology copticChronology = CopticChronology.getInstance(DateTimeZone.UTC);
+        DateTime dateAtMaxYear = new DateTime(COPTIC_MAX_YEAR, 12, 26, 0, 0, copticChronology);
+        long instant = dateAtMaxYear.getMillis();
+
+        // Act: Check if this instant is considered a leap day.
+        boolean isLeapDay = copticChronology.isLeapDay(instant);
+
+        // Assert: The result should be false, as it's a regular day.
+        assertFalse("A regular day at the maximum supported year should not be a leap day.", isLeapDay);
     }
 }
