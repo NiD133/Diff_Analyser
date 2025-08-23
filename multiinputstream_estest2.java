@@ -1,29 +1,38 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class MultiInputStream_ESTestTest2 extends MultiInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link MultiInputStream}.
+ */
+public class MultiInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        LinkedList<ByteSource> linkedList0 = new LinkedList<ByteSource>();
-        Iterator<ByteSource> iterator0 = linkedList0.descendingIterator();
-        MultiInputStream multiInputStream0 = new MultiInputStream(iterator0);
-        byte[] byteArray0 = new byte[7];
-        int int0 = multiInputStream0.read(byteArray0, (int) (byte) 0, 387);
-        assertEquals((-1), int0);
+    private static final int END_OF_STREAM = -1;
+
+    /**
+     * Verifies that reading from a MultiInputStream created with an empty
+     * iterator immediately returns -1, indicating the end of the stream.
+     */
+    @Test
+    public void read_withEmptyIterator_returnsEndOfStream() throws IOException {
+        // Arrange: Create a MultiInputStream from an empty iterator of ByteSources.
+        // This simulates a scenario with no input files or data sources.
+        Iterator<ByteSource> emptySourceIterator = Collections.emptyIterator();
+        InputStream multiInputStream = new MultiInputStream(emptySourceIterator);
+        
+        byte[] buffer = new byte[1024];
+
+        // Act: Attempt to read from the empty stream.
+        int bytesRead = multiInputStream.read(buffer, 0, buffer.length);
+
+        // Assert: The read operation should return -1, as there is no data to read.
+        assertEquals("Reading from an empty MultiInputStream should immediately signal end-of-stream.",
+                END_OF_STREAM, bytesRead);
     }
 }
