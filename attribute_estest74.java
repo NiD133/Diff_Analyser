@@ -1,30 +1,31 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class Attribute_ESTestTest74 extends Attribute_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Attribute} class.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test73() throws Throwable {
-        Attributes attributes0 = new Attributes();
-        Attribute attribute0 = new Attribute("RU-^t-03BGs9<q?", "RU-^t-03BGs9<q?", attributes0);
-        attribute0.setKey("jqU#:WT5 $");
-        assertTrue(attribute0.hasDeclaredValue());
+    /**
+     * Verifies that updating an attribute's key does not affect its existing value.
+     */
+    @Test
+    public void setKeyShouldUpdateKeyWithoutAffectingValue() {
+        // Arrange: Create an attribute with an initial key and a non-null value.
+        // The parent Attributes object is required by the constructor but is not the focus of this test.
+        Attributes parentAttributes = new Attributes();
+        Attribute attribute = new Attribute("initial-key", "some-value", parentAttributes);
+
+        // Act: Change the attribute's key.
+        String newKey = "updated-key";
+        attribute.setKey(newKey);
+
+        // Assert: Verify the key was updated and the original value remains unchanged.
+        assertEquals("The key should be updated to the new value.", newKey, attribute.getKey());
+        assertTrue("The attribute should still have a declared value.", attribute.hasDeclaredValue());
+        assertEquals("The original value should not be affected by the key change.", "some-value", attribute.getValue());
     }
 }
