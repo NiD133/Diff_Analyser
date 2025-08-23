@@ -1,33 +1,33 @@
 package org.apache.commons.io.file.attribute;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
+
 import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
 import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
 
-public class FileTimes_ESTestTest49 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for the {@link FileTimes} class, focusing on arithmetic operations and edge cases.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        FileTime fileTime0 = FileTimes.now();
-        // Undeclared exception!
-        try {
-            FileTimes.plusSeconds(fileTime0, 9223372036854775800L);
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // long overflow
-            //
-            verifyException("java.lang.Math", e);
-        }
+    /**
+     * Tests that {@link FileTimes#plusSeconds(FileTime, long)} throws an
+     * {@link ArithmeticException} when the addition results in a value
+     * that overflows the capacity of a {@code long} for epoch-seconds.
+     */
+    @Test(expected = ArithmeticException.class)
+    public void plusSecondsShouldThrowArithmeticExceptionOnOverflow() {
+        // Arrange: Create a starting FileTime. Any positive time combined with
+        // Long.MAX_VALUE will cause an overflow. Using a fixed instant like
+        // one second past the epoch makes the test deterministic.
+        final FileTime startTime = FileTime.from(Instant.ofEpochSecond(1));
+        final long secondsToAdd = Long.MAX_VALUE;
+
+        // Act: Attempt to add a number of seconds that will cause the underlying
+        // epoch-second calculation to overflow. The method is expected to throw.
+        FileTimes.plusSeconds(startTime, secondsToAdd);
+
+        // Assert: The 'expected' attribute of the @Test annotation handles the
+        // verification that an ArithmeticException is thrown.
     }
 }
