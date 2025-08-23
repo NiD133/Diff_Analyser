@@ -1,45 +1,40 @@
 package org.jfree.chart.title;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Font;
+import static org.junit.Assert.assertEquals;
+
 import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.JapaneseDate;
-import java.util.Calendar;
-import java.util.List;
-import javax.swing.JTable;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.evosuite.runtime.mock.java.util.MockCalendar;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.block.RectangleConstraint;
 import org.jfree.chart.block.Size2D;
-import org.jfree.chart.plot.CombinedDomainXYPlot;
-import org.jfree.chart.plot.SpiderWebPlot;
-import org.jfree.chart.plot.pie.PiePlot;
-import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
 
-public class ShortTextTitle_ESTestTest7 extends ShortTextTitle_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ShortTextTitle} class, focusing on layout arrangement.
+ */
+public class ShortTextTitleTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        BufferedImage bufferedImage0 = new BufferedImage(10, 10, 10);
-        Graphics2D graphics2D0 = bufferedImage0.createGraphics();
-        ShortTextTitle shortTextTitle0 = new ShortTextTitle("");
-        Size2D size2D0 = shortTextTitle0.arrangeFN(graphics2D0, 0.4);
-        assertEquals(0.4, size2D0.width, 0.01);
+    /**
+     * Verifies that arrangeFN() returns a Size2D object that respects the provided
+     * fixed width, even when the title's text is empty. The height should be zero.
+     *
+     * 'FN' in arrangeFN stands for arranging with a Fixed width and No height constraint.
+     */
+    @Test
+    public void arrangeFN_withEmptyText_shouldReturnSizeWithGivenWidthAndZeroHeight() {
+        // Arrange: Create a graphics context (required by the arrange method) and
+        // a ShortTextTitle with an empty string.
+        BufferedImage image = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics2D = image.createGraphics();
+        ShortTextTitle emptyTitle = new ShortTextTitle("");
+        double fixedWidth = 0.4;
+
+        // Act: Arrange the title's layout with the fixed width constraint.
+        Size2D arrangedSize = emptyTitle.arrangeFN(graphics2D, fixedWidth);
+
+        // Assert: The resulting size should have the specified width and zero height.
+        final double delta = 0.001;
+        assertEquals("The width of the arranged size should match the fixed width constraint.",
+                fixedWidth, arrangedSize.width, delta);
+        assertEquals("The height of an empty title should be zero.",
+                0.0, arrangedSize.height, delta);
     }
 }
