@@ -1,19 +1,49 @@
 package org.apache.commons.codec.language;
 
+import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Metaphone_ESTestTest37 extends Metaphone_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Metaphone} class.
+ */
+public class MetaphoneTest {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        Metaphone metaphone0 = new Metaphone();
-        String string0 = metaphone0.metaphone("H]H0>$Z");
-        assertEquals("S", string0);
-        assertEquals(4, metaphone0.getMaxCodeLen());
+    private Metaphone metaphone;
+
+    @Before
+    public void setUp() {
+        this.metaphone = new Metaphone();
+    }
+
+    @Test
+    public void shouldIgnoreNonAlphabeticCharactersWhenEncoding() {
+        // Arrange
+        // The Metaphone algorithm is documented to work on A-Z characters.
+        // This test verifies that non-alphabetic characters are stripped out
+        // before encoding. The input "H]H0>$Z" becomes "HHZ", which Metaphone
+        // encodes as "S".
+        final String inputWithNonLetters = "H]H0>$Z";
+        final String expectedEncoding = "S";
+
+        // Act
+        final String actualEncoding = metaphone.metaphone(inputWithNonLetters);
+
+        // Assert
+        assertEquals("The metaphone encoding should match the expected value.",
+                expectedEncoding, actualEncoding);
+    }
+
+    @Test
+    public void shouldHaveDefaultMaxCodeLengthOfFour() {
+        // Arrange
+        final int expectedMaxCodeLen = 4;
+
+        // Act
+        final int actualMaxCodeLen = metaphone.getMaxCodeLen();
+
+        // Assert
+        assertEquals("The default max code length should be 4.",
+                expectedMaxCodeLen, actualMaxCodeLen);
     }
 }
