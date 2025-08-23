@@ -1,44 +1,73 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Calendar;
-import java.util.TimeZone;
-import javax.swing.DropMode;
-import javax.swing.JScrollPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
 import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.legend.PaintScaleLegend;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.ThermometerPlot;
-import org.jfree.chart.renderer.LookupPaintScale;
-import org.jfree.chart.renderer.PaintScale;
-import org.jfree.chart.renderer.xy.XYShapeRenderer;
 import org.jfree.data.Range;
-import org.jfree.data.general.DefaultValueDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.time.DateRange;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ModuloAxis_ESTestTest39 extends ModuloAxis_ESTest_scaffolding {
+import java.awt.geom.Rectangle2D;
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        Range range0 = ValueAxis.DEFAULT_RANGE;
-        ModuloAxis moduloAxis0 = new ModuloAxis("", range0);
-        JScrollPane jScrollPane0 = new JScrollPane();
-        Rectangle rectangle0 = jScrollPane0.getViewportBorderBounds();
-        RectangleEdge rectangleEdge0 = RectangleEdge.RIGHT;
-        double double0 = moduloAxis0.lengthToJava2D(1.0E-8, rectangle0, rectangleEdge0);
-        assertEquals(1.675977653631285E-10, double0, 0.01);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Contains tests for the {@link ModuloAxis#lengthToJava2D(double, Rectangle2D, RectangleEdge)} method.
+ */
+public class ModuloAxisLengthToJava2DTest {
+
+    private static final double DELTA = 1e-9;
+
+    @Test
+    public void lengthToJava2D_forVerticalAxis_shouldReturnProportionalPixelLength() {
+        // Arrange
+        // Define a simple data range for the axis, from 0.0 to 1.0.
+        Range axisRange = new Range(0.0, 1.0);
+        ModuloAxis axis = new ModuloAxis("Test Modulo Axis", axisRange);
+
+        // Define a plotting area with a clear width and height.
+        Rectangle2D plotArea = new Rectangle2D.Double(0, 0, 100, 200); // width=100, height=200
+
+        // The axis is positioned vertically on the right edge.
+        RectangleEdge edge = RectangleEdge.RIGHT;
+
+        // We want to find the Java2D length for a data length that covers 10% of the axis range.
+        double dataLength = 0.1;
+
+        // Act
+        // Convert the data length to its corresponding length in Java2D coordinates.
+        double java2dLength = axis.lengthToJava2D(dataLength, plotArea, edge);
+
+        // Assert
+        // For a vertical axis, the Java2D length is proportional to the plot area's height.
+        // The expected calculation is: (dataLength / totalRange) * plotHeight
+        // Expected = (0.1 / 1.0) * 200.0 = 20.0
+        double expectedLength = 20.0;
+        assertEquals(expectedLength, java2dLength, DELTA);
+    }
+
+    @Test
+    public void lengthToJava2D_forHorizontalAxis_shouldReturnProportionalPixelLength() {
+        // Arrange
+        // Define a data range for the axis, from 0.0 to 50.0.
+        Range axisRange = new Range(0.0, 50.0);
+        ModuloAxis axis = new ModuloAxis("Test Modulo Axis", axisRange);
+
+        // Define a plotting area with a clear width and height.
+        Rectangle2D plotArea = new Rectangle2D.Double(0, 0, 300, 200); // width=300, height=200
+
+        // The axis is positioned horizontally at the bottom.
+        RectangleEdge edge = RectangleEdge.BOTTOM;
+
+        // We want to find the Java2D length for a data length of 5.0 units.
+        double dataLength = 5.0;
+
+        // Act
+        // Convert the data length to its corresponding length in Java2D coordinates.
+        double java2dLength = axis.lengthToJava2D(dataLength, plotArea, edge);
+
+        // Assert
+        // For a horizontal axis, the Java2D length is proportional to the plot area's width.
+        // The expected calculation is: (dataLength / totalRange) * plotWidth
+        // Expected = (5.0 / 50.0) * 300.0 = 30.0
+        double expectedLength = 30.0;
+        assertEquals(expectedLength, java2dLength, DELTA);
     }
 }
