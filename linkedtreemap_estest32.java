@@ -1,29 +1,37 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
+
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class LinkedTreeMap_ESTestTest32 extends LinkedTreeMap_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        Comparator<Integer> comparator0 = (Comparator<Integer>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>(comparator0, false);
-        LinkedTreeMap.EntrySet linkedTreeMap_EntrySet0 = linkedTreeMap0.new EntrySet();
-        Integer integer0 = new Integer((-54));
-        boolean boolean0 = linkedTreeMap_EntrySet0.remove(integer0);
-        assertFalse(boolean0);
-        assertEquals(0, linkedTreeMap_EntrySet0.size());
+/**
+ * Tests for the {@link LinkedTreeMap.EntrySet} inner class.
+ */
+public class LinkedTreeMapEntrySetTest {
+
+    /**
+     * Verifies that calling remove() on an EntrySet with an object that is not a
+     * Map.Entry returns false and does not modify the underlying map. The Set contract
+     * for remove(Object) requires this behavior.
+     */
+    @Test
+    public void remove_objectThatIsNotAMapEntry_shouldReturnFalseAndNotModifySet() {
+        // Arrange
+        LinkedTreeMap<Integer, String> map = new LinkedTreeMap<>();
+        Set<Map.Entry<Integer, String>> entrySet = map.entrySet();
+
+        // An object that is not of type Map.Entry.
+        Object objectToRemove = -54;
+
+        // Act
+        boolean wasRemoved = entrySet.remove(objectToRemove);
+
+        // Assert
+        assertFalse("remove() should return false when called with an object that is not a Map.Entry.", wasRemoved);
+        assertEquals("The entry set's size should remain unchanged.", 0, entrySet.size());
     }
 }
