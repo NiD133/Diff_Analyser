@@ -1,29 +1,33 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.itextpdf.awt.geom.Rectangle2D;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class MultiFilteredRenderListener_ESTestTest3 extends MultiFilteredRenderListener_ESTest_scaffolding {
+/**
+ * This test suite focuses on the MultiFilteredRenderListener class.
+ */
+// The original test class name was unclear. Renaming it makes its purpose obvious.
+public class MultiFilteredRenderListenerTest extends MultiFilteredRenderListener_ESTest_scaffolding {
 
+    /**
+     * Verifies that the renderImage method is robust and does not throw an exception
+     * when called with a null ImageRenderInfo object. This is a common defensive check.
+     */
     @Test(timeout = 4000)
-    public void test2() throws Throwable {
-        MultiFilteredRenderListener multiFilteredRenderListener0 = new MultiFilteredRenderListener();
-        LocationTextExtractionStrategy.TextChunkLocationStrategy locationTextExtractionStrategy_TextChunkLocationStrategy0 = mock(LocationTextExtractionStrategy.TextChunkLocationStrategy.class, new ViolatedAssumptionAnswer());
-        LocationTextExtractionStrategy locationTextExtractionStrategy0 = new LocationTextExtractionStrategy(locationTextExtractionStrategy_TextChunkLocationStrategy0);
-        RenderFilter[] renderFilterArray0 = new RenderFilter[3];
-        Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double((-2030.332760438), (-2030.332760438), (-2030.332760438), (-846.7357066836466));
-        RegionTextRenderFilter regionTextRenderFilter0 = new RegionTextRenderFilter(rectangle2D_Double0);
-        renderFilterArray0[0] = (RenderFilter) regionTextRenderFilter0;
-        renderFilterArray0[1] = (RenderFilter) regionTextRenderFilter0;
-        renderFilterArray0[2] = (RenderFilter) regionTextRenderFilter0;
-        multiFilteredRenderListener0.attachRenderListener(locationTextExtractionStrategy0, renderFilterArray0);
-        multiFilteredRenderListener0.renderImage((ImageRenderInfo) null);
+    public void renderImage_withNullImageRenderInfo_shouldNotThrowException() {
+        // Arrange: Set up the MultiFilteredRenderListener with a delegate listener and a filter.
+        // The specific types of listener and filter are not important for this test,
+        // as we are only checking for null-safety.
+        MultiFilteredRenderListener multiListener = new MultiFilteredRenderListener();
+        RenderListener delegateListener = new LocationTextExtractionStrategy();
+        RenderFilter regionFilter = new RegionTextRenderFilter(new Rectangle2D.Double(0, 0, 100, 100));
+
+        multiListener.attachRenderListener(delegateListener, regionFilter);
+
+        // Act: Call the method under test with a null argument.
+        multiListener.renderImage(null);
+
+        // Assert: No explicit assertions are needed. The test succeeds if the "Act" phase
+        // completes without throwing a NullPointerException or any other exception.
     }
 }
