@@ -17,10 +17,10 @@ public class JsonTypeInfo_ESTestTest27 extends JsonTypeInfo_ESTest_scaffolding {
         JsonTypeInfo.As jsonTypeInfo_As0 = JsonTypeInfo.As.WRAPPER_OBJECT;
         Class<Integer> class0 = Integer.class;
         Boolean boolean0 = Boolean.TRUE;
-        JsonTypeInfo.Value jsonTypeInfo_Value0 = JsonTypeInfo.Value.construct(jsonTypeInfo_Id0, jsonTypeInfo_As0, "dwi]|QzT;beNe4DG", class0, false, boolean0);
+        JsonTypeInfo.Value jsonTypeInfo_Value0 = JsonTypeInfo.Value.construct(jsonTypeInfo_Id0, jsonTypeInfo_As0, "dwi ]|QzT;beNe4DG", class0, false, boolean0);
         Class<?> class1 = jsonTypeInfo_Value0.getDefaultImpl();
         assertNotNull(class1);
         assertFalse(jsonTypeInfo_Value0.getIdVisible());
-        assertEquals("dwi]|QzT;beNe4DG", jsonTypeInfo_Value0.getPropertyName());
+        assertEquals("dwi ]|QzT;beNe4DG", jsonTypeInfo_Value0.getPropertyName());
     }
 }
