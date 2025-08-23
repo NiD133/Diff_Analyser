@@ -1,44 +1,31 @@
 package org.joda.time.format;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.LinkedList;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Duration;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadablePeriod;
-import org.joda.time.Seconds;
-import org.joda.time.Weeks;
-import org.joda.time.Years;
-import org.junit.runner.RunWith;
 
-public class PeriodFormatter_ESTestTest24 extends PeriodFormatter_ESTest_scaffolding {
+/**
+ * Unit tests for the PeriodFormatter class, focusing on parsing behavior.
+ */
+public class PeriodFormatterTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        PeriodFormatterBuilder.Literal periodFormatterBuilder_Literal0 = PeriodFormatterBuilder.Literal.EMPTY;
-        PeriodFormatter periodFormatter0 = new PeriodFormatter(periodFormatterBuilder_Literal0, periodFormatterBuilder_Literal0);
-        // Undeclared exception!
-        try {
-            periodFormatter0.parsePeriod((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.joda.time.format.PeriodFormatterBuilder$Literal", e);
-        }
+    /**
+     * Verifies that calling parsePeriod() with a null input string
+     * results in a NullPointerException.
+     *
+     * This is the expected behavior because the underlying parser, when invoked,
+     * will fail to process a null reference.
+     */
+    @Test(expected = NullPointerException.class)
+    public void parsePeriod_withNullInput_throwsNullPointerException() {
+        // Arrange: Create a formatter with a valid (but simple) parser.
+        // PeriodFormatterBuilder.Literal.EMPTY provides a non-null parser instance.
+        PeriodFormatterBuilder.Literal emptyParser = PeriodFormatterBuilder.Literal.EMPTY;
+        PeriodFormatter formatter = new PeriodFormatter(emptyParser, emptyParser);
+
+        // Act: Attempt to parse a null string.
+        // This action is expected to throw the exception.
+        formatter.parsePeriod(null);
+
+        // Assert: The test passes if a NullPointerException is thrown,
+        // which is handled by the 'expected' parameter of the @Test annotation.
     }
 }
