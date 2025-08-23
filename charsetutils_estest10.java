@@ -1,17 +1,27 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertNull;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CharSetUtils_ESTestTest10 extends CharSetUtils_ESTest_scaffolding {
+/**
+ * Test suite for the {@link CharSetUtils} class.
+ */
+public class CharSetUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        String[] stringArray0 = new String[8];
-        String string0 = CharSetUtils.squeeze((String) null, stringArray0);
-        assertNull(string0);
+    /**
+     * Tests that CharSetUtils.squeeze() returns null when the input string is null,
+     * regardless of the character set provided. This aligns with the method's Javadoc.
+     */
+    @Test
+    public void squeezeWithNullStringShouldReturnNull() {
+        // Arrange: A null input string and a non-null character set.
+        // The content of the set should not affect the outcome.
+        final String[] anyCharSet = {"a", "b", "c"};
+
+        // Act: Call the squeeze method with the null string.
+        final String result = CharSetUtils.squeeze(null, anyCharSet);
+
+        // Assert: The result should be null, as specified in the contract.
+        assertNull("Squeezing a null string should return null.", result);
     }
 }
