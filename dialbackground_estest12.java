@@ -1,34 +1,32 @@
 package org.jfree.chart.plot.dial;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.plot.FastScatterPlot;
-import org.jfree.chart.plot.pie.PiePlot;
-import org.jfree.chart.util.GradientPaintTransformType;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.jfree.chart.util.StandardGradientPaintTransformer;
-import org.jfree.data.general.DefaultValueDataset;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
-public class DialBackground_ESTestTest12 extends DialBackground_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DialBackground} class.
+ */
+public class DialBackgroundTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        DialBackground dialBackground0 = new DialBackground();
-        Object object0 = dialBackground0.clone();
-        assertNotSame(object0, dialBackground0);
+    /**
+     * Verifies that the clone() method creates a new instance that is a deep
+     * copy of the original. A correct clone should be logically equal to the
+     * original but reside at a different memory address.
+     */
+    @Test
+    public void clone_shouldReturnIndependentButEqualInstance() throws CloneNotSupportedException {
+        // Arrange: Create an instance of DialBackground.
+        DialBackground original = new DialBackground();
+
+        // Act: Clone the original instance.
+        DialBackground clone = (DialBackground) original.clone();
+
+        // Assert: Verify the properties of the clone.
+        // 1. The clone must not be the same instance as the original.
+        assertNotSame("The cloned object should be a new instance.", original, clone);
+
+        // 2. The clone must be logically equal to the original.
+        assertEquals("The cloned object should be equal to the original.", original, clone);
     }
 }
