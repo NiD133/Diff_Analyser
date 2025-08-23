@@ -1,36 +1,54 @@
 package org.locationtech.spatial4j.shape;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
-import org.locationtech.spatial4j.shape.jts.JtsPoint;
 
-public class ShapeCollection_ESTestTest15 extends ShapeCollection_ESTest_scaffolding {
+import java.util.ArrayList;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        ArrayList<JtsPoint> arrayList0 = new ArrayList<JtsPoint>();
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        ShapeCollection<JtsPoint> shapeCollection0 = new ShapeCollection<JtsPoint>(arrayList0, spatialContext0);
-        PointImpl pointImpl0 = new PointImpl(0.02516, 0.02516, spatialContext0);
-        Rectangle rectangle0 = shapeCollection0.getBoundingBox();
-        GeodesicSphereDistCalc.LawOfCosines geodesicSphereDistCalc_LawOfCosines0 = new GeodesicSphereDistCalc.LawOfCosines();
-        geodesicSphereDistCalc_LawOfCosines0.calcBoxByDistFromPt(pointImpl0, 0.02516, spatialContext0, rectangle0);
-        Rectangle rectangle1 = shapeCollection0.getBoundingBox();
-        assertEquals(0.05032000242580961, rectangle1.getMaxX(), 0.01);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+
+public class ShapeCollection_ESTestTest15_Refactored extends ShapeCollection_ESTest_scaffolding {
+
+    /**
+     * This test verifies that getBoundingBox() returns a mutable internal Rectangle instance.
+     * Modifying this returned instance affects the internal state of the ShapeCollection,
+     * which is reflected in subsequent calls to getBoundingBox().
+     *
+     * This behavior can be unexpected and suggests that the class exposes its internal
+     * representation. A more robust implementation might return a defensive copy.
+     */
+    @Test
+    public void getBoundingBox_shouldReturnMutableRectangle_whoseChangesAreVisibleOnSubsequentCalls() {
+        // Arrange: Create an empty ShapeCollection.
+        List<Shape> emptyShapeList = new ArrayList<>();
+        SpatialContext geoContext = SpatialContext.GEO;
+        ShapeCollection<Shape> shapeCollection = new ShapeCollection<>(emptyShapeList, geoContext);
+
+        // Act:
+        // 1. Retrieve the bounding box for the first time.
+        Rectangle firstBbox = shapeCollection.getBoundingBox();
+
+        // 2. Directly modify the state of the retrieved bounding box object.
+        //    This replaces the original test's obscure use of GeodesicSphereDistCalc
+        //    to make the intent of the modification perfectly clear.
+        double newMaxX = 10.0;
+        double newMaxY = 20.0;
+        firstBbox.reset(0, newMaxX, 0, newMaxY);
+
+        // 3. Retrieve the bounding box again.
+        Rectangle secondBbox = shapeCollection.getBoundingBox();
+
+        // Assert:
+        // Verify that the second call returns the *exact same* instance as the first.
+        assertSame("Subsequent calls to getBoundingBox should return the same instance",
+                firstBbox, secondBbox);
+
+        // Verify that the changes made to the first retrieved instance are reflected.
+        assertEquals("The modification to the bounding box's maxX was not reflected",
+                newMaxX, secondBbox.getMaxX(), 0.0);
+        assertEquals("The modification to the bounding box's maxY was not reflected",
+                newMaxY, secondBbox.getMaxY(), 0.0);
     }
 }
