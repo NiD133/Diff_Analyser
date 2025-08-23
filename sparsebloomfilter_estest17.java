@@ -1,31 +1,34 @@
 package org.apache.commons.collections4.bloomfilter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class SparseBloomFilter_ESTestTest17 extends SparseBloomFilter_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SparseBloomFilter} class.
+ */
+public class SparseBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Shape shape0 = Shape.fromNM(10, 10);
-        SparseBloomFilter sparseBloomFilter0 = new SparseBloomFilter(shape0);
-        // Undeclared exception!
+    /**
+     * Tests that attempting to merge a null Hasher throws a NullPointerException.
+     * A null Hasher is invalid because it cannot produce the indices to merge into the filter.
+     */
+    @Test
+    public void testMergeWithNullHasherThrowsNullPointerException() {
+        // Arrange: Create a standard Bloom filter. The shape is required for instantiation
+        // but its specific values are not relevant to this null-check test.
+        final Shape shape = Shape.fromNM(10, 10);
+        final SparseBloomFilter filter = new SparseBloomFilter(shape);
+
+        // Act & Assert: Attempt to merge a null hasher and verify the exception.
         try {
-            sparseBloomFilter0.merge((Hasher) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // hasher
-            //
-            verifyException("java.util.Objects", e);
+            filter.merge((Hasher) null);
+            fail("Expected a NullPointerException to be thrown, but no exception was thrown.");
+        } catch (final NullPointerException e) {
+            // Verify that the exception message correctly identifies the null parameter.
+            // This confirms that the intended null-check was triggered.
+            assertEquals("hasher", e.getMessage());
         }
     }
 }
