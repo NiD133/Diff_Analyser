@@ -1,23 +1,33 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LocaleUtils_ESTestTest24 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.LocaleUtils}.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        Locale locale0 = Locale.ENGLISH;
-        Locale locale1 = Locale.ROOT;
-        List<Locale> list0 = LocaleUtils.localeLookupList(locale0, locale1);
-        assertEquals(2, list0.size());
-        assertTrue(list0.contains(locale1));
+    /**
+     * Tests that localeLookupList correctly generates a list for a language-only locale,
+     * appending the specified default locale.
+     */
+    @Test
+    public void localeLookupList_withLanguageOnlyLocale_shouldIncludeDefaultLocale() {
+        // Arrange
+        final Locale baseLocale = Locale.ENGLISH; // "en"
+        final Locale defaultLocale = Locale.ROOT; // "" (empty language, country, variant)
+        final List<Locale> expectedList = Arrays.asList(baseLocale, defaultLocale);
+
+        // Act
+        final List<Locale> actualList = LocaleUtils.localeLookupList(baseLocale, defaultLocale);
+
+        // Assert
+        // The method should return a list containing the base locale followed by the default.
+        assertEquals(expectedList, actualList);
     }
 }
