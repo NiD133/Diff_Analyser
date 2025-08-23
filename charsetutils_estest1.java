@@ -1,18 +1,28 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSetUtils_ESTestTest1 extends CharSetUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CharSetUtils} class, focusing on the squeeze method.
+ */
+public class CharSetUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        String[] stringArray0 = new String[4];
-        stringArray0[0] = "0-9";
-        String string0 = CharSetUtils.squeeze("offset cannot be negative", stringArray0);
-        assertEquals("offset cannot be negative", string0);
+    /**
+     * Tests that squeeze() does not change the input string when the character
+     * set contains no characters present in the string.
+     */
+    @Test
+    public void testSqueezeWithNonMatchingSetReturnsUnchangedString() {
+        // Arrange
+        final String originalString = "offset cannot be negative";
+        final String[] characterSet = {"0-9"}; // A set of characters (digits) not in the original string.
+
+        // Act
+        final String result = CharSetUtils.squeeze(originalString, characterSet);
+
+        // Assert
+        assertEquals("The string should remain unchanged when the set has no matching characters.",
+                originalString, result);
     }
 }
