@@ -1,28 +1,23 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class StringUtil_ESTestTest13 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for {@link StringUtil}.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        boolean boolean0 = StringUtil.isInvisibleChar(8222);
-        assertFalse(boolean0);
+    @Test
+    public void isInvisibleCharShouldReturnFalseForVisibleCharacter() {
+        // Arrange: The character '„' (U+201E, decimal 8222) is a "DOUBLE LOW-9 QUOTATION MARK".
+        // This is a standard, visible character and should not be classified as invisible.
+        final int visibleQuotationMarkCodePoint = '„';
+
+        // Act
+        boolean isConsideredInvisible = StringUtil.isInvisibleChar(visibleQuotationMarkCodePoint);
+
+        // Assert
+        assertFalse("The double low-9 quotation mark '„' should be considered a visible character.", isConsideredInvisible);
     }
 }
