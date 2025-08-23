@@ -1,35 +1,33 @@
 package org.jfree.chart.plot.dial;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.plot.FastScatterPlot;
-import org.jfree.chart.plot.pie.PiePlot;
-import org.jfree.chart.util.GradientPaintTransformType;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.jfree.chart.util.StandardGradientPaintTransformer;
-import org.jfree.data.general.DefaultValueDataset;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DialBackground_ESTestTest9 extends DialBackground_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DialBackground} class.
+ */
+public class DialBackgroundTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        DialBackground dialBackground0 = new DialBackground();
-        DialBackground dialBackground1 = new DialBackground();
-        boolean boolean0 = dialBackground0.equals(dialBackground1);
-        assertTrue(boolean0);
+    /**
+     * Verifies that two distinct DialBackground instances created with the default
+     * constructor are considered equal. This confirms the correct implementation
+     * of the equals() and hashCode() contract for default objects.
+     */
+    @Test
+    public void twoDefaultInstancesShouldBeEqual() {
+        // Arrange: Create two separate instances using the default constructor.
+        // According to the source, this initializes them with a default paint (Color.WHITE)
+        // and a StandardGradientPaintTransformer.
+        DialBackground background1 = new DialBackground();
+        DialBackground background2 = new DialBackground();
+
+        // Act & Assert: Verify that the two instances are equal.
+        // We use assertEquals, which calls the .equals() method internally and provides
+        // a more informative failure message than assertTrue(background1.equals(background2)).
+        assertEquals(background1, background2);
+
+        // Per the Java contract, if two objects are equal, their hash codes must also be equal.
+        assertEquals("Hash codes must be equal for equal objects.",
+                background1.hashCode(), background2.hashCode());
     }
 }
