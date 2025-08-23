@@ -1,19 +1,30 @@
 package org.jfree.chart.labels;
 
-import org.jfree.chart.TestUtils;
-import org.jfree.chart.internal.CloneUtils;
 import org.jfree.chart.api.PublicCloneable;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class SymbolicXYItemLabelGeneratorTestTest4 {
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+
+/**
+ * Tests for the {@link SymbolicXYItemLabelGenerator} class, focusing on its implementation contracts.
+ */
+class SymbolicXYItemLabelGeneratorTest {
 
     /**
-     * Check to ensure that this class implements PublicCloneable.
+     * Verifies that SymbolicXYItemLabelGenerator correctly implements the PublicCloneable interface,
+     * signaling that it supports public cloning.
      */
     @Test
-    public void testPublicCloneable() {
-        SymbolicXYItemLabelGenerator g1 = new SymbolicXYItemLabelGenerator();
-        assertTrue(g1 instanceof PublicCloneable);
+    @DisplayName("Should implement the PublicCloneable interface")
+    void shouldImplementPublicCloneable() {
+        // Arrange
+        SymbolicXYItemLabelGenerator generator = new SymbolicXYItemLabelGenerator();
+
+        // Assert
+        // This check confirms that the generator can be safely cast and cloned
+        // through the PublicCloneable interface, which is a key part of JFreeChart's API.
+        assertInstanceOf(PublicCloneable.class, generator,
+                "SymbolicXYItemLabelGenerator must implement PublicCloneable.");
     }
 }
