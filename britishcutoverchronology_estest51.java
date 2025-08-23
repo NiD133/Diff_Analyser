@@ -1,55 +1,40 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
+
 import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.MinguoEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
 
-public class BritishCutoverChronology_ESTestTest51 extends BritishCutoverChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test50() throws Throwable {
-        BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
-        // Undeclared exception!
+/**
+ * Tests for {@link BritishCutoverChronology}.
+ */
+public class BritishCutoverChronologyTest {
+
+    /**
+     * Tests that creating a date with an epoch day that is too far in the past
+     * throws a DateTimeException. The valid year range for this chronology is
+     * -999,998 to 999,999.
+     */
+    @Test
+    public void dateEpochDay_withEpochDayBelowSupportedRange_throwsDateTimeException() {
+        // Arrange: Set up the chronology and an epoch day value that is known to be out of bounds.
+        BritishCutoverChronology chronology = BritishCutoverChronology.INSTANCE;
+        // This epoch day value corresponds to a year far below the minimum supported year.
+        long epochDayBelowRange = -2_135_812_540L;
+
+        // Act & Assert: Attempt to create a date and verify that the correct exception is thrown.
         try {
-            britishCutoverChronology0.dateEpochDay((-2135812540L));
-            fail("Expecting exception: DateTimeException");
+            chronology.dateEpochDay(epochDayBelowRange);
+            fail("Expected a DateTimeException to be thrown for an epoch day outside the supported range.");
         } catch (DateTimeException e) {
-            //
-            // Invalid value for Year (valid values -999998 - 999999): -5845567
-            //
-            verifyException("java.time.temporal.ValueRange", e);
+            // Verify that the exception message correctly identifies an invalid year as the cause.
+            String expectedMessageContent = "Invalid value for Year";
+            assertTrue(
+                "Exception message should contain '" + expectedMessageContent + "'. Actual: " + e.getMessage(),
+                e.getMessage().contains(expectedMessageContent)
+            );
         }
     }
 }
