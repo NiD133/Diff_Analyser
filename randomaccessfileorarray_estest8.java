@@ -1,41 +1,37 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
+import java.io.EOFException;
+import java.io.IOException;
+
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class.
+ * This class focuses on improving a single test case for clarity.
+ */
 public class RandomAccessFileOrArray_ESTestTest8 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test007() throws Throwable {
-        byte[] byteArray0 = new byte[5];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.readLine();
-        try {
-            randomAccessFileOrArray0.readLongLE();
-            fail("Expecting exception: EOFException");
-        } catch (EOFException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.RandomAccessFileOrArray", e);
-        }
+    /**
+     * Verifies that readLongLE() throws an EOFException when attempting to read
+     * beyond the end of the underlying data source.
+     *
+     * A long requires 8 bytes, but this test sets up a condition where the read pointer
+     * is at the end of a 5-byte source, making a full read impossible.
+     */
+    @Test(expected = EOFException.class)
+    public void readLongLE_shouldThrowEOFException_whenReadingPastEndOfStream() throws IOException {
+        // Arrange: Create a reader with a 5-byte source. A long is 8 bytes, so there
+        // isn't enough data to begin with.
+        byte[] sourceBytes = new byte[5];
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(sourceBytes);
+
+        // To ensure we are at the end of the stream, we consume all available bytes.
+        // readLine() will read all 5 bytes since there is no newline character.
+        reader.readLine();
+
+        // Act & Assert: Attempt to read a long (8 bytes) from the end of the stream.
+        // This action is expected to throw an EOFException, which is verified by the
+        // @Test(expected = ...) annotation.
+        reader.readLongLE();
     }
 }
