@@ -1,27 +1,37 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 
-public class BBoxCalculator_ESTestTest22 extends BBoxCalculator_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
-        bBoxCalculator0.expandXRange((-10.370441159547157), (-10.370441159547157));
-        bBoxCalculator0.expandXRange(685.7212616972, (-10.370441159547157));
-        assertEquals(Double.POSITIVE_INFINITY, bBoxCalculator0.getMinY(), 0.01);
-        assertEquals(Double.NEGATIVE_INFINITY, bBoxCalculator0.getMaxY(), 0.01);
+/**
+ * Test suite for {@link BBoxCalculator}.
+ * This focuses on specific behaviors of the bounding box calculation logic.
+ */
+public class BBoxCalculatorTest {
+
+    /**
+     * Tests that expanding only the X-range (longitude) does not affect the Y-range (latitude).
+     * The Y-range coordinates should remain in their initial, unexpanded state.
+     */
+    @Test
+    public void expandXRange_shouldNotModifyYCoordinates() {
+        // Arrange: Create a calculator for a geodetic context.
+        // By default, minY is Double.POSITIVE_INFINITY and maxY is Double.NEGATIVE_INFINITY.
+        SpatialContext geoContext = SpatialContext.GEO;
+        BBoxCalculator calculator = new BBoxCalculator(geoContext);
+
+        // Act: Expand the bounding box along the X-axis (longitude) multiple times.
+        // These operations should only affect the X-dimension of the bounding box.
+        calculator.expandXRange(-10.0, 10.0);
+        calculator.expandXRange(170.0, -170.0); // A range crossing the anti-meridian
+
+        // Assert: Verify that the Y-coordinates remain at their initial, sentinel values.
+        String minYMessage = "Min Y should remain at its initial positive infinity value after only X-expansions.";
+        assertEquals(minYMessage, Double.POSITIVE_INFINITY, calculator.getMinY(), 0.0);
+
+        String maxYMessage = "Max Y should remain at its initial negative infinity value after only X-expansions.";
+        assertEquals(maxYMessage, Double.NEGATIVE_INFINITY, calculator.getMaxY(), 0.0);
     }
 }
