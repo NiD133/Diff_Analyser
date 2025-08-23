@@ -1,27 +1,21 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class Entities_ESTestTest43 extends Entities_ESTest_scaffolding {
+/**
+ * Tests for the {@link Entities} class.
+ */
+public class EntitiesTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        boolean boolean0 = Entities.isNamedEntity("US-ASCII");
-        assertFalse(boolean0);
+    /**
+     * Verifies that isNamedEntity() returns false for a string that is not a valid HTML entity.
+     */
+    @Test
+    public void isNamedEntityReturnsFalseForNonExistentEntity() {
+        // "US-ASCII" is a common string (a charset name) but not a named HTML entity.
+        // The method should correctly identify it as such.
+        boolean isEntity = Entities.isNamedEntity("US-ASCII");
+        assertFalse(isEntity);
     }
 }
