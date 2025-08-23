@@ -1,34 +1,31 @@
 package org.jfree.data.general;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.List;
-import java.util.Vector;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.SortOrder;
-import org.jfree.chart.api.TableOrder;
-import org.jfree.data.DefaultKeyedValues;
-import org.jfree.data.KeyedValues;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.CategoryToPieDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.category.SlidingCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
+import javax.swing.JLayeredPane; // Retained to explain the original constant's value
+import static org.junit.Assert.assertTrue;
 
-public class DefaultPieDataset_ESTestTest40 extends DefaultPieDataset_ESTest_scaffolding {
+/**
+ * Contains tests for the equals() method of the {@link DefaultPieDataset} class.
+ */
+public class DefaultPieDataset_ESTestTest40 { // Note: Class name kept as per the original file.
 
+    /**
+     * Verifies that a DefaultPieDataset created via the copy constructor is equal
+     * to the original, especially when the original dataset contains a null value.
+     */
     @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        DefaultPieDataset<Integer> defaultPieDataset0 = new DefaultPieDataset<Integer>();
-        Integer integer0 = JLayeredPane.DRAG_LAYER;
-        defaultPieDataset0.setValue(integer0, (Number) null);
-        DefaultPieDataset<Integer> defaultPieDataset1 = new DefaultPieDataset<Integer>(defaultPieDataset0);
-        boolean boolean0 = defaultPieDataset1.equals(defaultPieDataset0);
-        assertTrue(boolean0);
+    public void equals_whenCopiedFromDatasetWithNullValue_shouldReturnTrue() {
+        // Arrange: Create an original dataset and add an entry with a null value.
+        // The key '400' is used here because the original test used JLayeredPane.DRAG_LAYER, which is an integer constant with the value 400.
+        DefaultPieDataset<Integer> originalDataset = new DefaultPieDataset<>();
+        Integer key = 400;
+        originalDataset.setValue(key, null);
+
+        // Act: Create a new dataset by copying the original one.
+        DefaultPieDataset<Integer> copiedDataset = new DefaultPieDataset<>(originalDataset);
+
+        // Assert: The copied dataset should be considered equal to the original.
+        assertTrue("A dataset created from a copy should be equal to the original.",
+                copiedDataset.equals(originalDataset));
     }
 }
