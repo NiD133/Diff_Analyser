@@ -1,54 +1,32 @@
 package org.threeten.extra;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.ThaiBuddhistDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockThaiBuddhistDate;
-import org.junit.runner.RunWith;
 
-public class DayOfYear_ESTestTest19 extends DayOfYear_ESTest_scaffolding {
+/**
+ * Test suite for the {@link DayOfYear} class, focusing on specific method contracts.
+ */
+public class DayOfYearTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        DayOfYear dayOfYear0 = DayOfYear.now();
-        // Undeclared exception!
+    /**
+     * Verifies that calling adjustInto() with a null argument throws a NullPointerException.
+     * The method contract requires the temporal object to be non-null.
+     */
+    @Test
+    public void adjustInto_withNullTemporal_throwsNullPointerException() {
+        // Arrange: Create a deterministic DayOfYear instance. Any valid day will suffice.
+        DayOfYear dayOfYear = DayOfYear.of(150);
+
+        // Act & Assert: Expect a NullPointerException when calling the method with null.
         try {
-            dayOfYear0.adjustInto((Temporal) null);
-            fail("Expecting exception: NullPointerException");
+            dayOfYear.adjustInto(null);
+            fail("Expected a NullPointerException to be thrown, but it wasn't.");
         } catch (NullPointerException e) {
-            //
-            // temporal
-            //
-            verifyException("java.util.Objects", e);
+            // Verify that the exception message is as expected from Objects.requireNonNull.
+            // The parameter name is "temporal".
+            assertEquals("temporal", e.getMessage());
         }
     }
 }
