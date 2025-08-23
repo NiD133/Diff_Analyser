@@ -1,38 +1,41 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.Test;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class YearsTestTest11 extends TestCase {
+/**
+ * Unit tests for the Years class, focusing on comparison logic.
+ */
+public class YearsTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void isLessThan_shouldReturnTrue_whenComparingToLargerValue() {
+        // A smaller Years instance should be less than a larger one.
+        assertTrue("2 years should be less than 3 years", Years.TWO.isLessThan(Years.THREE));
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestYears.class);
+    @Test
+    public void isLessThan_shouldReturnFalse_whenComparingToSmallerValue() {
+        // A larger Years instance should not be less than a smaller one.
+        assertFalse("3 years should not be less than 2 years", Years.THREE.isLessThan(Years.TWO));
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void isLessThan_shouldReturnFalse_whenComparingToEqualValue() {
+        // An instance should not be less than another instance with the same value.
+        assertFalse("3 years should not be less than 3 years", Years.THREE.isLessThan(Years.THREE));
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
+    @Test
+    public void isLessThan_shouldTreatNullAsZero() {
+        // The isLessThan method treats a null argument as a Years instance of zero.
+        // This is documented in the method's Javadoc.
 
-    public void testIsLessThan() {
-        assertEquals(false, Years.THREE.isLessThan(Years.TWO));
-        assertEquals(false, Years.THREE.isLessThan(Years.THREE));
-        assertEquals(true, Years.TWO.isLessThan(Years.THREE));
-        assertEquals(false, Years.ONE.isLessThan(null));
-        assertEquals(true, Years.years(-1).isLessThan(null));
+        // Scenario 1: A positive value (1) is not less than null (0).
+        assertFalse("Years(1) should not be less than null (0)", Years.ONE.isLessThan(null));
+
+        // Scenario 2: A negative value (-1) is less than null (0).
+        assertTrue("Years(-1) should be less than null (0)", Years.years(-1).isLessThan(null));
     }
 }
