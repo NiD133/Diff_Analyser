@@ -1,26 +1,39 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+// Note: The original test class name and inheritance are kept as per the prompt's context.
+// In a real-world scenario, these would be cleaned up (e.g., to `NumberOutputTest`).
 public class NumberOutput_ESTestTest50 extends NumberOutput_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test49() throws Throwable {
-        byte[] byteArray0 = new byte[12];
-        // Undeclared exception!
+    /**
+     * Verifies that {@link NumberOutput#outputLong(long, byte[], int)} throws an
+     * {@link ArrayIndexOutOfBoundsException} when the provided offset is outside
+     * the bounds of the destination byte array.
+     */
+    @Test
+    public void outputLongShouldThrowExceptionForOutOfBoundsOffset() {
+        // Arrange: A buffer of a fixed size and an offset that is clearly out of bounds.
+        byte[] buffer = new byte[12];
+        int outOfBoundsOffset = 57;
+        // The actual long value is not relevant for this boundary check, so any value will do.
+        long anyLongValue = 1L;
+
+        // Act & Assert: Call the method and verify that the expected exception is thrown.
         try {
-            NumberOutput.outputLong(9999999999988L, byteArray0, (int) (byte) 57);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
+            NumberOutput.outputLong(anyLongValue, buffer, outOfBoundsOffset);
+            fail("Expected an ArrayIndexOutOfBoundsException due to an out-of-bounds offset.");
         } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 57
-            //
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+            // Success: The correct exception type was caught.
+            // For better validation, we can check if the exception message includes the invalid offset.
+            String expectedMessageContent = String.valueOf(outOfBoundsOffset);
+            assertTrue(
+                "Exception message should contain the out-of-bounds offset.",
+                e.getMessage().contains(expectedMessageContent)
+            );
         }
     }
 }
