@@ -1,43 +1,36 @@
 package org.apache.commons.compress.utils;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
 
-public class ByteUtils_ESTestTest25 extends ByteUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteUtils} class.
+ */
+public class ByteUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        byte[] byteArray0 = new byte[18];
-        // Undeclared exception!
-        try {
-            ByteUtils.fromLittleEndian(byteArray0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Can't read more than eight bytes into a long value
-            //
-            verifyException("org.apache.commons.compress.utils.ByteUtils", e);
-        }
+    /**
+     * Tests that calling {@link ByteUtils#fromLittleEndian(byte[])} with a byte array
+     * longer than 8 bytes throws an {@link IllegalArgumentException}, as a long
+     * can only store up to 8 bytes of data.
+     */
+    @Test
+    public void fromLittleEndianWithTooLongArrayThrowsIllegalArgumentException() {
+        // Arrange: A long is 8 bytes, so an array of 9 bytes is too large to convert.
+        final byte[] inputArray = new byte[9];
+        final String expectedMessage = "Can't read more than eight bytes into a long value";
+
+        // Act & Assert: Call the method and verify the correct exception is thrown.
+        // The assertThrows method (from JUnit 4.13+) is a modern and clear way
+        // to test for expected exceptions.
+        final IllegalArgumentException thrown = assertThrows(
+            IllegalArgumentException.class,
+            () -> ByteUtils.fromLittleEndian(inputArray)
+        );
+
+        // Assert: Verify the exception message is as expected to ensure the
+        // exception was thrown for the correct reason.
+        assertEquals(expectedMessage, thrown.getMessage());
     }
 }
