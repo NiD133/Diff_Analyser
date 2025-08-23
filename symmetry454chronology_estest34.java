@@ -1,42 +1,28 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahEra;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Symmetry454Chronology_ESTestTest34 extends Symmetry454Chronology_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Symmetry454Chronology} class.
+ */
+public class Symmetry454ChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        long long0 = Symmetry454Chronology.getLeapYearsBefore(0L);
-        assertEquals(0L, long0);
+    /**
+     * Tests the calculation of leap years for a proleptic year before the Common Era begins.
+     * The method should return 0 for year 0, as the count of leap years starts from year 1 CE.
+     */
+    @Test
+    public void getLeapYearsBefore_withYearZero_returnsZero() {
+        // Arrange: Define the input and expected outcome for this boundary case.
+        // Proleptic year 0 is the year immediately preceding year 1 CE.
+        long prolepticYear = 0L;
+        long expectedLeapYears = 0L;
+
+        // Act: Call the method under test.
+        long actualLeapYears = Symmetry454Chronology.getLeapYearsBefore(prolepticYear);
+
+        // Assert: Verify that the actual result matches the expected result.
+        assertEquals("The number of leap years before year 1 CE should be 0.", expectedLeapYears, actualLeapYears);
     }
 }
