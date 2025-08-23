@@ -1,26 +1,30 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SerializedString_ESTestTest54 extends SerializedString_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SerializedString} class.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test53() throws Throwable {
-        SerializedString serializedString0 = new SerializedString(">l2[BA");
-        serializedString0.hashCode();
+    /**
+     * Tests that the hashCode of a SerializedString is identical to the
+     * hashCode of its underlying String value. This ensures consistency
+     * and correct behavior when used in hash-based collections like HashMap or HashSet.
+     */
+    @Test
+    public void hashCodeShouldBeConsistentWithUnderlyingString() {
+        // Arrange
+        String originalValue = ">l2[BA";
+        SerializedString serializedString = new SerializedString(originalValue);
+
+        // Act
+        int expectedHashCode = originalValue.hashCode();
+        int actualHashCode = serializedString.hashCode();
+
+        // Assert
+        assertEquals("The hash code of SerializedString should match the hash code of the original String.",
+                expectedHashCode, actualHashCode);
     }
 }
