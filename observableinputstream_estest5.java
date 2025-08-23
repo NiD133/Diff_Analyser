@@ -1,43 +1,34 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
 import java.io.StringWriter;
-import java.nio.CharBuffer;
-import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
+/**
+ * This test suite contains tests for the {@link ObservableInputStream} class,
+ * focusing on the notification mechanism for observers.
+ */
 public class ObservableInputStream_ESTestTest5 extends ObservableInputStream_ESTest_scaffolding {
 
+    /**
+     * Tests that calling {@link ObservableInputStream#noteClosed()} on a stream
+     * with no registered observers completes without throwing an exception.
+     *
+     * @throws IOException if an I/O error occurs during the test.
+     */
     @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        ObservableInputStream.Builder observableInputStream_Builder0 = new ObservableInputStream.Builder();
-        StringWriter stringWriter0 = new StringWriter();
-        StringBuffer stringBuffer0 = stringWriter0.getBuffer();
-        observableInputStream_Builder0.setCharSequence(stringBuffer0);
-        ObservableInputStream observableInputStream0 = new ObservableInputStream(observableInputStream_Builder0);
-        observableInputStream0.noteClosed();
+    public void noteClosedWithNoObserversDoesNotThrowException() throws IOException {
+        // Arrange: Create an ObservableInputStream with an empty source and no observers.
+        final ObservableInputStream.Builder builder = new ObservableInputStream.Builder();
+        final StringWriter stringWriter = new StringWriter();
+        final StringBuffer stringBuffer = stringWriter.getBuffer();
+        builder.setCharSequence(stringBuffer);
+        final ObservableInputStream observableInputStream = new ObservableInputStream(builder);
+
+        // Act: Notify potential observers that the stream has been closed.
+        observableInputStream.noteClosed();
+
+        // Assert: The test is successful if no exception is thrown.
+        // The JUnit framework handles this implicitly.
     }
 }
