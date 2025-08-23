@@ -2,162 +2,59 @@ package org.apache.commons.collections4.iterators;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.apache.commons.collections4.IteratorUtils;
-import org.apache.commons.collections4.Transformer;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class ObjectGraphIteratorTestTest14 extends AbstractIteratorTest<Object> {
-
-    protected String[] testArray = { "One", "Two", "Three", "Four", "Five", "Six" };
-
-    protected List<String> list1;
-
-    protected List<String> list2;
-
-    protected List<String> list3;
-
-    protected List<Iterator<String>> iteratorList;
-
-    @Override
-    public ObjectGraphIterator<Object> makeEmptyIterator() {
-        final ArrayList<Object> list = new ArrayList<>();
-        return new ObjectGraphIterator<>(list.iterator());
-    }
-
-    @Override
-    public ObjectGraphIterator<Object> makeObject() {
-        setUp();
-        return new ObjectGraphIterator<>(iteratorList.iterator());
-    }
-
-    @BeforeEach
-    public void setUp() {
-        list1 = new ArrayList<>();
-        list1.add("One");
-        list1.add("Two");
-        list1.add("Three");
-        list2 = new ArrayList<>();
-        list2.add("Four");
-        list3 = new ArrayList<>();
-        list3.add("Five");
-        list3.add("Six");
-        iteratorList = new ArrayList<>();
-        iteratorList.add(list1.iterator());
-        iteratorList.add(list2.iterator());
-        iteratorList.add(list3.iterator());
-    }
-
-    static class Branch {
-
-        List<Leaf> leaves = new ArrayList<>();
-
-        Leaf addLeaf() {
-            leaves.add(new Leaf());
-            return getLeaf(leaves.size() - 1);
-        }
-
-        Leaf getLeaf(final int index) {
-            return leaves.get(index);
-        }
-
-        Iterator<Leaf> leafIterator() {
-            return leaves.iterator();
-        }
-    }
-
-    static class Forest {
-
-        List<Tree> trees = new ArrayList<>();
-
-        Tree addTree() {
-            trees.add(new Tree());
-            return getTree(trees.size() - 1);
-        }
-
-        Tree getTree(final int index) {
-            return trees.get(index);
-        }
-
-        Iterator<Tree> treeIterator() {
-            return trees.iterator();
-        }
-    }
-
-    static class Leaf {
-
-        String color;
-
-        String getColor() {
-            return color;
-        }
-
-        void setColor(final String color) {
-            this.color = color;
-        }
-    }
-
-    static class LeafFinder implements Transformer<Object, Object> {
-
-        @Override
-        public Object transform(final Object input) {
-            if (input instanceof Forest) {
-                return ((Forest) input).treeIterator();
-            }
-            if (input instanceof Tree) {
-                return ((Tree) input).branchIterator();
-            }
-            if (input instanceof Branch) {
-                return ((Branch) input).leafIterator();
-            }
-            if (input instanceof Leaf) {
-                return input;
-            }
-            throw new ClassCastException();
-        }
-    }
-
-    static class Tree {
-
-        List<Branch> branches = new ArrayList<>();
-
-        Branch addBranch() {
-            branches.add(new Branch());
-            return getBranch(branches.size() - 1);
-        }
-
-        Iterator<Branch> branchIterator() {
-            return branches.iterator();
-        }
-
-        Branch getBranch(final int index) {
-            return branches.get(index);
-        }
-    }
+/**
+ * Tests for {@link ObjectGraphIterator}, focusing on its ability to handle
+ * a root iterator that contains other iterators, including empty ones.
+ */
+public class ObjectGraphIteratorTest {
 
     @Test
-    void testIteratorConstructorIteration_WithEmptyIterators() {
-        final List<Iterator<String>> iteratorList = new ArrayList<>();
-        iteratorList.add(IteratorUtils.<String>emptyIterator());
-        iteratorList.add(list1.iterator());
-        iteratorList.add(IteratorUtils.<String>emptyIterator());
-        iteratorList.add(list2.iterator());
-        iteratorList.add(IteratorUtils.<String>emptyIterator());
-        iteratorList.add(list3.iterator());
-        iteratorList.add(IteratorUtils.<String>emptyIterator());
-        final Iterator<Object> it = new ObjectGraphIterator<>(iteratorList.iterator());
-        for (int i = 0; i < 6; i++) {
-            assertTrue(it.hasNext());
-            assertEquals(testArray[i], it.next());
+    void objectGraphIteratorShouldSkipEmptyNestedIterators() {
+        // This test verifies that ObjectGraphIterator can correctly navigate an
+        // iterator of iterators, seamlessly skipping any that are empty.
+
+        // ARRANGE
+        // Define the data that will be spread across multiple iterators.
+        final List<String> list1 = List.of("One", "Two", "Three");
+        final List<String> list2 = List.of("Four");
+        final List<String> list3 = List.of("Five", "Six");
+
+        // Create a list of iterators, interspersing the data iterators with empty ones.
+        // This setup simulates a common scenario where some branches in a graph are empty.
+        final List<Iterator<String>> nestedIterators = new ArrayList<>();
+        nestedIterators.add(IteratorUtils.emptyIterator());
+        nestedIterators.add(list1.iterator());
+        nestedIterators.add(IteratorUtils.emptyIterator());
+        nestedIterators.add(list2.iterator());
+        nestedIterators.add(IteratorUtils.emptyIterator());
+        nestedIterators.add(list3.iterator());
+        nestedIterators.add(IteratorUtils.emptyIterator());
+
+        // The ObjectGraphIterator is initialized with an iterator over our list of iterators.
+        // It is expected to "flatten" this structure into a single sequence of elements.
+        final Iterator<String> graphIterator = new ObjectGraphIterator<>(nestedIterators.iterator());
+
+        // ACT & ASSERT
+        // 1. Verify that the iterator correctly yields all elements from the non-empty lists in order.
+        final String[] expectedElements = {"One", "Two", "Three", "Four", "Five", "Six"};
+        for (final String expectedElement : expectedElements) {
+            assertTrue(graphIterator.hasNext(), "Iterator should have another element before getting '" + expectedElement + "'");
+            assertEquals(expectedElement, graphIterator.next(), "Iterator should return the correct element");
         }
-        assertFalse(it.hasNext());
-        assertThrows(NoSuchElementException.class, () -> it.next());
+
+        // 2. Assert that the iterator is exhausted after all elements have been consumed.
+        assertFalse(graphIterator.hasNext(), "Iterator should be exhausted after iterating through all elements");
+        assertThrows(NoSuchElementException.class, graphIterator::next,
+            "Calling next() on an exhausted iterator should throw an exception");
     }
 }
