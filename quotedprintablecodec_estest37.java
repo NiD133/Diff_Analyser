@@ -1,30 +1,29 @@
 package org.apache.commons.codec.net;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QuotedPrintableCodec_ESTestTest37 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * Tests for the {@link QuotedPrintableCodec} class.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = null;
+    /**
+     * Tests that the constructor throws an IllegalArgumentException when a null
+     * charset name is provided.
+     */
+    @Test
+    public void constructorWithNullCharsetNameShouldThrowIllegalArgumentException() {
         try {
-            quotedPrintableCodec0 = new QuotedPrintableCodec((String) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Null charset name
-            //
-            verifyException("java.nio.charset.Charset", e);
+            // Attempt to instantiate the codec with a null charset name.
+            new QuotedPrintableCodec((String) null);
+            fail("Expected an IllegalArgumentException to be thrown for a null charset name.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the caught exception has the expected message.
+            // The underlying java.nio.charset.Charset.forName(null) call is the source of this exception.
+            assertEquals("Null charset name", e.getMessage());
         }
     }
 }
