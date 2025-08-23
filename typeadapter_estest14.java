@@ -1,34 +1,38 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TypeAdapter_ESTestTest14 extends TypeAdapter_ESTest_scaffolding {
+/**
+ * Tests for the internal {@link Gson.FutureTypeAdapter} class.
+ */
+public class TypeAdapterTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        Gson.FutureTypeAdapter<Object> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Object>();
-        // Undeclared exception!
+    /**
+     * Tests that using a {@link Gson.FutureTypeAdapter} before its delegate
+     * has been resolved (i.e., set) results in an {@link IllegalStateException}.
+     * This is a crucial check for handling cyclic dependencies in Gson's type
+     * adapter resolution logic.
+     */
+    @Test
+    public void futureTypeAdapter_readBeforeBeingResolved_throwsIllegalStateException() throws IOException {
+        // Arrange: Create a FutureTypeAdapter which has not been resolved with a delegate.
+        // This simulates the state during the resolution of a cyclic dependency.
+        Gson.FutureTypeAdapter<Object> futureAdapter = new Gson.FutureTypeAdapter<>();
+
+        // Act & Assert
         try {
-            gson_FutureTypeAdapter0.read((JsonReader) null);
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // Adapter for type with cyclic dependency has been used before dependency has been resolved
-            //
-            verifyException("com.google.gson.Gson$FutureTypeAdapter", e);
+            // Attempting to read should fail because the delegate adapter is not yet set.
+            futureAdapter.read(null);
+            fail("Expected an IllegalStateException to be thrown, but no exception was thrown.");
+        } catch (IllegalStateException expected) {
+            // Verify that the exception message is correct, confirming the reason for the failure.
+            String expectedMessage = "Adapter for type with cyclic dependency has been used before dependency has been resolved";
+            assertEquals(expectedMessage, expected.getMessage());
         }
     }
 }
