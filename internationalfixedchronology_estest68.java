@@ -1,49 +1,33 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Period;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class InternationalFixedChronology_ESTestTest68 extends InternationalFixedChronology_ESTest_scaffolding {
+/**
+ * Tests for {@link InternationalFixedChronology#date(java.time.temporal.TemporalAccessor)}.
+ */
+public class InternationalFixedChronology_ESTestTest68 {
 
-    @Test(timeout = 4000)
-    public void test67() throws Throwable {
-        InternationalFixedChronology internationalFixedChronology0 = InternationalFixedChronology.INSTANCE;
-        InternationalFixedDate internationalFixedDate0 = internationalFixedChronology0.dateNow();
-        InternationalFixedDate internationalFixedDate1 = internationalFixedDate0.plusMonths((-2645L));
-        InternationalFixedDate internationalFixedDate2 = internationalFixedChronology0.date((TemporalAccessor) internationalFixedDate1);
-        assertEquals((-58199L), internationalFixedDate2.toEpochDay());
+    /**
+     * Tests that creating a date from a TemporalAccessor that is already an
+     * InternationalFixedDate returns an equal InternationalFixedDate.
+     */
+    @Test
+    public void dateFromTemporalAccessor_givenInternationalFixedDate_returnsEqualDate() {
+        // Arrange
+        InternationalFixedChronology ifcChronology = InternationalFixedChronology.INSTANCE;
+        
+        // The original test used a complex calculation resulting in a date with an epoch day
+        // of -58199. We create this date directly for a clear and stable test setup.
+        InternationalFixedDate originalDate = InternationalFixedDate.ofEpochDay(-58199L);
+
+        // Act
+        // Call the method under test, which should correctly handle an input that is
+        // already of the target chronology and type.
+        InternationalFixedDate convertedDate = ifcChronology.date(originalDate);
+
+        // Assert
+        // The chronology should recognize the input and return an equal date instance.
+        assertEquals("The converted date should be equal to the original date.", originalDate, convertedDate);
     }
 }
