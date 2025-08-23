@@ -1,29 +1,52 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.ConcurrentModificationException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.List;
 
-public class ZippingIterator_ESTestTest1 extends ZippingIterator_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        Iterator<Integer> iterator0 = linkedList0.descendingIterator();
-        ZippingIterator<Integer> zippingIterator0 = new ZippingIterator<Integer>(iterator0, iterator0);
-        Iterator<Integer>[] iteratorArray0 = (Iterator<Integer>[]) Array.newInstance(Iterator.class, 1);
-        iteratorArray0[0] = (Iterator<Integer>) zippingIterator0;
-        ZippingIterator<Integer> zippingIterator1 = new ZippingIterator<Integer>(iteratorArray0);
-        assertFalse(zippingIterator1.equals((Object) zippingIterator0));
+/**
+ * Tests for {@link ZippingIterator}.
+ */
+public class ZippingIteratorTest {
+
+    /**
+     * Tests that a ZippingIterator can correctly wrap another ZippingIterator
+     * and produce the expected sequence of elements.
+     */
+    @Test
+    public void testZippingIteratorOfAnotherZippingIterator() {
+        // --- Arrange ---
+        // Create two simple source iterators with distinct, non-empty content.
+        Iterator<String> iteratorA = Arrays.asList("A1", "A2").iterator();
+        Iterator<String> iteratorB = Arrays.asList("B1").iterator();
+
+        // Create an inner ZippingIterator. We expect it to interleave elements
+        // from iteratorA and iteratorB, resulting in the sequence: "A1", "B1", "A2".
+        ZippingIterator<String> innerZippingIterator = new ZippingIterator<>(iteratorA, iteratorB);
+
+        // --- Act ---
+        // Create an outer ZippingIterator that takes the inner one as its only source.
+        // It should simply delegate to the inner iterator, producing the same sequence.
+        ZippingIterator<String> outerZippingIterator = new ZippingIterator<>(innerZippingIterator);
+
+        // --- Assert ---
+        // 1. Verify that the outer iterator produces the correct interleaved sequence.
+        List<String> actualElements = new ArrayList<>();
+        outerZippingIterator.forEachRemaining(actualElements::add);
+
+        List<String> expectedElements = Arrays.asList("A1", "B1", "A2");
+        assertEquals("The iterator should produce the correctly zipped sequence",
+                expectedElements, actualElements);
+
+        // 2. The original test asserted that two different instances are not equal.
+        // We can confirm they are different objects, which is a more precise check.
+        assertNotSame("The outer and inner iterators should be distinct objects",
+                innerZippingIterator, outerZippingIterator);
     }
 }
