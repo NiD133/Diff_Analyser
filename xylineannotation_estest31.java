@@ -1,46 +1,39 @@
 package org.jfree.chart.annotations;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.image.BufferedImage;
-import java.time.chrono.ChronoLocalDate;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.PeriodAxis;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.CombinedRangeXYPlot;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.RingPlot;
-import org.jfree.chart.plot.SpiderWebPlot;
-import org.jfree.chart.plot.WaferMapPlot;
-import org.jfree.chart.plot.pie.PiePlot;
-import org.jfree.chart.renderer.WaferMapRenderer;
-import org.jfree.chart.renderer.xy.SamplingXYLineRenderer;
-import org.jfree.data.time.Day;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class XYLineAnnotation_ESTestTest31 extends XYLineAnnotation_ESTest_scaffolding {
+/**
+ * Tests for the {@link XYLineAnnotation} class, focusing on its constructor and getters.
+ */
+public class XYLineAnnotationTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        XYLineAnnotation xYLineAnnotation0 = new XYLineAnnotation(0.0, (-7304.15211577795), 1447.795, 1447.795);
-        double double0 = xYLineAnnotation0.getX2();
-        assertEquals(1447.795, double0, 0.01);
-        assertEquals(1447.795, xYLineAnnotation0.getY2(), 0.01);
-        assertEquals(0.0, xYLineAnnotation0.getX1(), 0.01);
-        assertEquals((-7304.15211577795), xYLineAnnotation0.getY1(), 0.01);
+    private static final double TOLERANCE = 0.0000001;
+
+    /**
+     * Verifies that the constructor correctly initializes the line coordinates
+     * and that the corresponding getter methods return the expected values.
+     */
+    @Test
+    public void constructorShouldSetAndGettersShouldReturnCorrectCoordinates() {
+        // Arrange: Define the coordinates for the line annotation.
+        final double expectedX1 = 0.0;
+        final double expectedY1 = -7304.152;
+        final double expectedX2 = 1447.795;
+        final double expectedY2 = 1447.795;
+
+        // Act: Create a new XYLineAnnotation instance using the constructor.
+        XYLineAnnotation annotation = new XYLineAnnotation(
+                expectedX1, expectedY1, expectedX2, expectedY2);
+
+        // Assert: Confirm that each getter returns the value provided to the constructor.
+        assertEquals("The x1 coordinate should match the constructor argument.",
+                expectedX1, annotation.getX1(), TOLERANCE);
+        assertEquals("The y1 coordinate should match the constructor argument.",
+                expectedY1, annotation.getY1(), TOLERANCE);
+        assertEquals("The x2 coordinate should match the constructor argument.",
+                expectedX2, annotation.getX2(), TOLERANCE);
+        assertEquals("The y2 coordinate should match the constructor argument.",
+                expectedY2, annotation.getY2(), TOLERANCE);
     }
 }
