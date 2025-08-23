@@ -1,29 +1,22 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class BCodec_ESTestTest20 extends BCodec_ESTest_scaffolding {
+/**
+ * Tests for the {@link BCodec} class, focusing on constructor behavior.
+ */
+public class BCodecTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        BCodec bCodec0 = null;
-        try {
-            bCodec0 = new BCodec("encodeTable must have exactly 64 entries.");
-            fail("Expecting exception: IllegalCharsetNameException");
-        } catch (IllegalCharsetNameException e) {
-            //
-            // encodeTable must have exactly 64 entries.
-            //
-            verifyException("java.nio.charset.Charset", e);
-        }
+    /**
+     * Tests that the BCodec(String) constructor throws an IllegalCharsetNameException
+     * when initialized with a syntactically invalid charset name.
+     */
+    @Test(expected = IllegalCharsetNameException.class, timeout = 4000)
+    public void constructorWithInvalidCharsetNameShouldThrowException() {
+        // The BCodec(String) constructor delegates to Charset.forName(charsetName).
+        // Per the Charset.forName() Javadoc, an IllegalCharsetNameException is thrown
+        // for names that contain illegal characters (e.g., spaces).
+        new BCodec("!@#$ an invalid charset name %^&*");
     }
 }
