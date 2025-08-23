@@ -1,23 +1,32 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-public class CharRange_ESTestTest6 extends CharRange_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.CharRange}.
+ */
+public class CharRangeTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        CharRange charRange0 = CharRange.isNot('j');
-        boolean boolean0 = charRange0.contains('j');
-        assertFalse(boolean0);
-        assertEquals('j', charRange0.getEnd());
-        assertEquals('j', charRange0.getStart());
+    @Test
+    public void isNotShouldCreateNegatedRangeThatExcludesTheSpecifiedChar() {
+        // Arrange: Define the character to be excluded from the range.
+        final char excludedChar = 'j';
+
+        // Act: Create a negated range using the factory method.
+        // This range represents all characters *except* 'j'.
+        final CharRange negatedRange = CharRange.isNot(excludedChar);
+
+        // Assert:
+        // The range should not contain the character it was created with.
+        assertFalse("A negated range should not contain the excluded character.",
+                    negatedRange.contains(excludedChar));
+
+        // The start and end points of the range definition should still be the character itself.
+        assertEquals("The start of the range definition should be the excluded character.",
+                     excludedChar, negatedRange.getStart());
+        assertEquals("The end of the range definition should be the excluded character.",
+                     excludedChar, negatedRange.getEnd());
     }
 }
