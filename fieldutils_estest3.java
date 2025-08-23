@@ -1,31 +1,29 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
 
-public class FieldUtils_ESTestTest3 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        // Undeclared exception!
-        try {
-            FieldUtils.getWrappedValue(823, 317351877, 1363, (-3977));
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // MIN > MAX
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
-        }
+    /**
+     * Tests that getWrappedValue throws an IllegalArgumentException when the
+     * minimum value is greater than the maximum value, which is an invalid range.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void getWrappedValue_shouldThrowException_whenMinIsGreaterThanMax() {
+        // Given an invalid range where the minimum value is greater than the maximum.
+        int minValue = 1363;
+        int maxValue = -3977;
+
+        // The actual value and wrap amount are irrelevant for this test condition.
+        int anyCurrentValue = 823;
+        int anyWrapValue = 317351877;
+
+        // When getWrappedValue is called with this invalid range
+        FieldUtils.getWrappedValue(anyCurrentValue, anyWrapValue, minValue, maxValue);
+
+        // Then an IllegalArgumentException is expected, as specified by the @Test annotation.
     }
 }
