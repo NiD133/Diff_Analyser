@@ -1,36 +1,35 @@
 package com.google.gson.internal.bind.util;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
+
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.util.TimeZone;
 import org.junit.Test;
 
-public class ISO8601UtilsTestTest4 {
+/**
+ * Tests for {@link ISO8601Utils}, focusing on date parsing behavior.
+ */
+public class ISO8601UtilsTest {
 
-    private static TimeZone utcTimeZone() {
-        return TimeZone.getTimeZone("UTC");
-    }
+  @Test
+  public void parse_dateOnlyString_usesDefaultTimezone() throws ParseException {
+    // Arrange
+    String dateString = "2018-06-25";
 
-    private static GregorianCalendar createUtcCalendar() {
-        TimeZone utc = utcTimeZone();
-        GregorianCalendar calendar = new GregorianCalendar(utc);
-        // Calendar was created with current time, must clear it
-        calendar.clear();
-        return calendar;
-    }
+    // The ISO8601Utils.parse method should interpret a date-only string
+    // (with no time or timezone info) as midnight in the default system timezone.
+    // To verify this, we create an expected Date object for the same date,
+    // which will also be set to midnight in the default timezone.
+    // Note: Calendar months are 0-indexed, so Calendar.JUNE represents the 6th month.
+    Date expectedDate = new GregorianCalendar(2018, Calendar.JUNE, 25).getTime();
 
-    @Test
-    @SuppressWarnings("UndefinedEquals")
-    public void testDateParseWithDefaultTimezone() throws ParseException {
-        String dateStr = "2018-06-25";
-        Date date = ISO8601Utils.parse(dateStr, new ParsePosition(0));
-        Date expectedDate = new GregorianCalendar(2018, Calendar.JUNE, 25).getTime();
-        assertThat(date).isEqualTo(expectedDate);
-    }
+    // Act
+    Date actualDate = ISO8601Utils.parse(dateString, new ParsePosition(0));
+
+    // Assert
+    assertThat(actualDate).isEqualTo(expectedDate);
+  }
 }
