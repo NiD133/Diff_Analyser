@@ -1,41 +1,41 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
+import org.junit.Test;
+
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.Collections;
+
+import static org.junit.Assert.assertNull;
 
 public class TextRenderInfo_ESTestTest58 extends TextRenderInfo_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test57() throws Throwable {
-        PdfDate pdfDate0 = new PdfDate();
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        Matrix matrix0 = new Matrix(2, 4);
-        HashSet<MarkedContentInfo> hashSet0 = new HashSet<MarkedContentInfo>();
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, hashSet0);
-        Integer integer0 = textRenderInfo0.getMcid();
-        assertNull(integer0);
+    /**
+     * Tests that getMcid() returns null when the TextRenderInfo is created
+     * with no marked content information.
+     */
+    @Test
+    public void getMcid_whenNoMarkedContentInfoIsProvided_shouldReturnNull() {
+        // Arrange: Set up the necessary objects for creating a TextRenderInfo instance.
+        // A GraphicsState with a valid font is required by the constructor.
+        GraphicsState graphicsState = new GraphicsState();
+        CMapAwareDocumentFont font = new CMapAwareDocumentFont(new PdfGState());
+        graphicsState.font = font;
+
+        PdfString text = new PdfString("test text");
+        Matrix textMatrix = new Matrix(); // An identity matrix is sufficient.
+
+        // Use an empty collection to simulate the absence of marked content.
+        Collection<MarkedContentInfo> emptyMarkedContentInfos = Collections.emptySet();
+
+        TextRenderInfo textRenderInfo = new TextRenderInfo(text, graphicsState, textMatrix, emptyMarkedContentInfos);
+
+        // Act: Call the method under test.
+        Integer mcid = textRenderInfo.getMcid();
+
+        // Assert: Verify that the Marked Content ID (MCID) is null, as expected.
+        assertNull("The MCID should be null when the marked content info collection is empty.", mcid);
     }
 }
