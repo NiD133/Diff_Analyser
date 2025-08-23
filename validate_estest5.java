@@ -1,33 +1,37 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
 import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class Validate_ESTestTest5 extends Validate_ESTest_scaffolding {
+/**
+ * Tests for the {@link Validate} helper class, focusing on exception-throwing methods.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Object[] objectArray0 = new Object[2];
-        // Undeclared exception!
+    /**
+     * Verifies that Validate.fail() propagates a MissingFormatWidthException when the
+     * format string is malformed in a way that violates java.util.Formatter rules.
+     */
+    @Test
+    public void fail_whenFormatStringIsMissingRequiredWidth_throwsMissingFormatWidthException() {
+        // Arrange: A format string that is invalid according to java.util.Formatter.
+        // The specifier "%-." is malformed because specifying a precision ('.')
+        // requires a width to be defined beforehand, but it is absent.
+        final String malformedFormatString = "Invalid specifier: %-.f";
+        final Object[] args = { 3.14 };
+
+        // Act & Assert: The call to Validate.fail() should fail during string formatting
+        // and propagate the underlying exception.
         try {
-            Validate.fail("FU?~WMWfE%-xniuY", objectArray0);
-            fail("Expecting exception: MissingFormatWidthException");
+            Validate.fail(malformedFormatString, args);
+            fail("Expected a MissingFormatWidthException to be thrown, but no exception occurred.");
         } catch (MissingFormatWidthException e) {
-            //
-            // %-x
-            //
-            verifyException("java.util.Formatter$FormatSpecifier", e);
+            // This is the expected outcome.
+            // We can further assert that the exception message correctly identifies the
+            // faulty specifier, confirming the exception was thrown for the right reason.
+            assertEquals("The exception message should pinpoint the invalid format specifier.", "%-.", e.getMessage());
         }
     }
 }
