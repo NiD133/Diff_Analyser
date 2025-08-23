@@ -1,28 +1,23 @@
 package org.jfree.chart;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.jfree.chart.plot.CombinedRangeCategoryPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.data.xy.XYDatasetTableModel;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class ChartRenderingInfo_ESTestTest14 extends ChartRenderingInfo_ESTest_scaffolding {
+/**
+ * Tests for the equals() method in the {@link ChartRenderingInfo} class.
+ */
+public class ChartRenderingInfoTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        boolean boolean0 = chartRenderingInfo0.equals(chartRenderingInfo0);
-        assertTrue(boolean0);
+    /**
+     * Verifies the reflexive property of the equals() method.
+     * According to the equals() contract, an object must be equal to itself.
+     */
+    @Test
+    public void testEqualsIsReflexive() {
+        // Arrange: Create an instance of the class under test.
+        ChartRenderingInfo info = new ChartRenderingInfo();
+
+        // Act & Assert: An object must always be equal to itself.
+        assertTrue("An instance of ChartRenderingInfo should be equal to itself.", info.equals(info));
     }
 }
