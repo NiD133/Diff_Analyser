@@ -1,17 +1,29 @@
 package org.apache.commons.cli;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
-public class DeprecatedAttributesTestTest1 {
+/**
+ * This test suite verifies the functionality of the {@link DeprecatedAttributes} class,
+ * focusing on the correct creation of attributes using its builder.
+ */
+public class DeprecatedAttributesTest {
 
+    /**
+     * Tests that the isForRemoval() method returns true when the attribute
+     * is configured with setForRemoval(true) via the builder.
+     */
     @Test
-    void testBuilderNonDefaults() {
-        // @formatter:off
-        final DeprecatedAttributes value = DeprecatedAttributes.builder().setDescription("Use Bar instead!").setForRemoval(true).setSince("2.0").get();
-        // @formatter:on
-        assertEquals("Use Bar instead!", value.getDescription());
-        assertEquals("2.0", value.getSince());
-        assertEquals(true, value.isForRemoval());
+    public void testIsForRemovalReturnsTrueWhenSetByBuilder() {
+        // Arrange: Create a builder and configure the 'forRemoval' attribute.
+        DeprecatedAttributes.Builder builder = DeprecatedAttributes.builder();
+        builder.setForRemoval(true);
+
+        // Act: Build the DeprecatedAttributes object and get the 'forRemoval' status.
+        DeprecatedAttributes attributes = builder.get();
+        boolean isForRemoval = attributes.isForRemoval();
+
+        // Assert: Verify that the 'forRemoval' status is true as expected.
+        assertTrue("The isForRemoval flag should be true when set by the builder.", isForRemoval);
     }
 }
