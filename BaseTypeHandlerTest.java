@@ -24,29 +24,72 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+/**
+ * Abstract base class for testing {@link BaseTypeHandler} implementations.
+ * Provides common setup and utility methods for subclasses.
+ */
 @ExtendWith(MockitoExtension.class)
 abstract class BaseTypeHandlerTest {
 
+  // Mocked SQL objects to be used in test cases
   @Mock
-  protected ResultSet rs;
+  protected ResultSet resultSet;
+  
   @Mock
-  protected PreparedStatement ps;
+  protected PreparedStatement preparedStatement;
+  
   @Mock
-  protected CallableStatement cs;
+  protected CallableStatement callableStatement;
+  
   @Mock
-  protected ResultSetMetaData rsmd;
+  protected ResultSetMetaData resultSetMetaData;
 
-  public abstract void shouldSetParameter() throws Exception;
+  /**
+   * Test the setting of a parameter in a PreparedStatement.
+   * 
+   * @throws Exception if an error occurs during the test
+   */
+  public abstract void testSetParameter() throws Exception;
 
-  public abstract void shouldGetResultFromResultSetByName() throws Exception;
+  /**
+   * Test retrieving a result from a ResultSet by column name.
+   * 
+   * @throws Exception if an error occurs during the test
+   */
+  public abstract void testGetResultFromResultSetByName() throws Exception;
 
-  public abstract void shouldGetResultNullFromResultSetByName() throws Exception;
+  /**
+   * Test retrieving a null result from a ResultSet by column name.
+   * 
+   * @throws Exception if an error occurs during the test
+   */
+  public abstract void testGetNullResultFromResultSetByName() throws Exception;
 
-  public abstract void shouldGetResultFromResultSetByPosition() throws Exception;
+  /**
+   * Test retrieving a result from a ResultSet by column index.
+   * 
+   * @throws Exception if an error occurs during the test
+   */
+  public abstract void testGetResultFromResultSetByPosition() throws Exception;
 
-  public abstract void shouldGetResultNullFromResultSetByPosition() throws Exception;
+  /**
+   * Test retrieving a null result from a ResultSet by column index.
+   * 
+   * @throws Exception if an error occurs during the test
+   */
+  public abstract void testGetNullResultFromResultSetByPosition() throws Exception;
 
-  public abstract void shouldGetResultFromCallableStatement() throws Exception;
+  /**
+   * Test retrieving a result from a CallableStatement.
+   * 
+   * @throws Exception if an error occurs during the test
+   */
+  public abstract void testGetResultFromCallableStatement() throws Exception;
 
-  public abstract void shouldGetResultNullFromCallableStatement() throws Exception;
+  /**
+   * Test retrieving a null result from a CallableStatement.
+   * 
+   * @throws Exception if an error occurs during the test
+   */
+  public abstract void testGetNullResultFromCallableStatement() throws Exception;
 }
