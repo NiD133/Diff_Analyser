@@ -1,46 +1,27 @@
 package org.jfree.chart.renderer.xy;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.text.DateFormatSymbols;
-import java.util.Date;
-import java.util.Locale;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.text.MockSimpleDateFormat;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.plot.CategoryCrosshairState;
-import org.jfree.chart.plot.CombinedRangeXYPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.util.DirectionalGradientPaintTransformer;
-import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerXYDataset;
-import org.jfree.data.statistics.SimpleHistogramBin;
-import org.jfree.data.statistics.SimpleHistogramDataset;
-import org.jfree.data.time.TimeSeriesDataItem;
-import org.jfree.data.xy.CategoryTableXYDataset;
-import org.jfree.data.xy.DefaultOHLCDataset;
-import org.jfree.data.xy.DefaultWindDataset;
-import org.jfree.data.xy.DefaultXYZDataset;
-import org.jfree.data.xy.IntervalXYDataset;
-import org.jfree.data.xy.OHLCDataItem;
-import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class ClusteredXYBarRenderer_ESTestTest20 extends ClusteredXYBarRenderer_ESTest_scaffolding {
+/**
+ * A test suite for the equals() method in the {@link ClusteredXYBarRenderer} class.
+ */
+public class ClusteredXYBarRendererEqualsTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        ClusteredXYBarRenderer clusteredXYBarRenderer0 = new ClusteredXYBarRenderer();
-        Object object0 = new Object();
-        boolean boolean0 = clusteredXYBarRenderer0.equals(object0);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false when a ClusteredXYBarRenderer
+     * instance is compared to an object of a different type.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenComparedWithDifferentObjectType() {
+        // Arrange
+        ClusteredXYBarRenderer renderer = new ClusteredXYBarRenderer();
+        Object otherObject = new Object();
+
+        // Act
+        boolean isEqual = renderer.equals(otherObject);
+
+        // Assert
+        assertFalse("A renderer instance should not be equal to an object of a completely different type.", isEqual);
     }
 }
