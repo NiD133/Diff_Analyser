@@ -1,28 +1,35 @@
 package org.jfree.chart.plot;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Paint;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.HistogramType;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertFalse;
 
-public class MeterInterval_ESTestTest18 extends MeterInterval_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link MeterInterval} class.
+ */
+public class MeterIntervalTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        Range range0 = new Range((-229.41607020985958), (-229.41607020985958));
-        MeterInterval meterInterval0 = new MeterInterval("d|V&g", range0);
-        boolean boolean0 = meterInterval0.equals("d|V&g");
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false when a MeterInterval
+     * is compared with an object of a different class, even if the object's
+     * string representation might seem related.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenComparingWithDifferentObjectType() {
+        // Arrange
+        // Create a standard MeterInterval instance.
+        Range range = new Range(0.0, 50.0);
+        MeterInterval meterInterval = new MeterInterval("Normal", range);
+
+        // Create an object of a different type (String) to compare against.
+        Object objectOfDifferentType = "Normal";
+
+        // Act
+        // Compare the MeterInterval with the String object.
+        boolean isEqual = meterInterval.equals(objectOfDifferentType);
+
+        // Assert
+        // The result must be false because the types are different.
+        assertFalse("A MeterInterval instance should not be equal to a String instance.", isEqual);
     }
 }
