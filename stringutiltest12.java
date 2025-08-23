@@ -1,22 +1,38 @@
 package org.jsoup.internal;
 
-import org.jsoup.Jsoup;
-import org.junit.jupiter.api.Test;
-import java.util.Arrays;
-import java.util.Collections;
-import static org.jsoup.internal.StringUtil.normaliseWhitespace;
-import static org.jsoup.internal.StringUtil.resolve;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-public class StringUtilTestTest12 {
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-    @Test
-    void isAscii() {
-        assertTrue(StringUtil.isAscii(""));
-        assertTrue(StringUtil.isAscii("example.com"));
-        assertTrue(StringUtil.isAscii("One Two"));
-        assertFalse(StringUtil.isAscii("🧔"));
-        assertFalse(StringUtil.isAscii("测试"));
-        assertFalse(StringUtil.isAscii("测试.com"));
+/**
+ * Tests for the StringUtil.isAscii() method.
+ */
+class StringUtilTest {
+
+    @DisplayName("should return true for strings containing only ASCII characters")
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "",              // Empty string
+        "example.com",   // Simple ASCII text
+        "One Two",       // ASCII with whitespace
+        "123-!@#$%"      // ASCII with numbers and symbols
+    })
+    void isAscii_givenAsciiString_returnsTrue(String asciiString) {
+        assertTrue(StringUtil.isAscii(asciiString));
+    }
+
+    @DisplayName("should return false for strings containing non-ASCII characters")
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "🧔",            // Emoji
+        "测试",          // Chinese characters (CJK)
+        "测试.com",      // Mixed ASCII and non-ASCII
+        "français"       // Latin-1 Supplement characters
+    })
+    void isAscii_givenNonAsciiString_returnsFalse(String nonAsciiString) {
+        assertFalse(StringUtil.isAscii(nonAsciiString));
     }
 }
