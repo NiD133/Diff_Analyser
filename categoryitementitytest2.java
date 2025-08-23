@@ -1,28 +1,44 @@
 package org.jfree.chart.entity;
 
 import java.awt.geom.Rectangle2D;
-import org.jfree.chart.TestUtils;
 import org.jfree.chart.internal.CloneUtils;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
-public class CategoryItemEntityTestTest2 {
+/**
+ * Tests for the {@link CategoryItemEntity} class, focusing on cloning behavior.
+ */
+class CategoryItemEntityTest {
 
     /**
-     * Confirm that cloning works.
+     * Verifies that cloning a CategoryItemEntity creates a new instance
+     * that is equal to the original but is not the same object reference.
      */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
-        DefaultCategoryDataset<String, String> d = new DefaultCategoryDataset<>();
-        d.addValue(1.0, "R1", "C1");
-        d.addValue(2.0, "R1", "C2");
-        d.addValue(3.0, "R2", "C1");
-        d.addValue(4.0, "R2", "C2");
-        CategoryItemEntity<String, String> e1 = new CategoryItemEntity<>(new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0), "ToolTip", "URL", d, "R2", "C2");
-        CategoryItemEntity<String, String> e2 = CloneUtils.clone(e1);
-        assertNotSame(e1, e2);
-        assertSame(e1.getClass(), e2.getClass());
-        assertEquals(e1, e2);
+    @DisplayName("A cloned CategoryItemEntity should be equal to the original but independent")
+    void clone_shouldBeEqualToOriginalButNotTheSameInstance() throws CloneNotSupportedException {
+        // Arrange: Create a dataset and an entity to be cloned.
+        DefaultCategoryDataset<String, String> dataset = new DefaultCategoryDataset<>();
+        dataset.addValue(1.0, "R1", "C1");
+        dataset.addValue(4.0, "R2", "C2");
+
+        CategoryItemEntity<String, String> originalEntity = new CategoryItemEntity<>(
+                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0),
+                "ToolTip Text",
+                "URL Text",
+                dataset,
+                "R2",
+                "C2"
+        );
+
+        // Act: Clone the original entity.
+        CategoryItemEntity<String, String> clonedEntity = CloneUtils.clone(originalEntity);
+
+        // Assert: Verify the properties of the cloned entity.
+        assertNotSame(originalEntity, clonedEntity, "The cloned entity should be a new object instance.");
+        assertEquals(originalEntity, clonedEntity, "The cloned entity should be equal to the original in value.");
     }
 }
