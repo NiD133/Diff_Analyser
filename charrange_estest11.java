@@ -1,23 +1,27 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-public class CharRange_ESTestTest11 extends CharRange_ESTest_scaffolding {
+/**
+ * Tests for {@link CharRange}.
+ */
+public class CharRangeTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        CharRange charRange0 = CharRange.is('4');
-        char char0 = charRange0.getEnd();
-        assertEquals('4', charRange0.getStart());
-        assertFalse(charRange0.isNegated());
-        assertEquals('4', char0);
+    @Test
+    public void is_shouldCreateCorrectRangeForSingleCharacter() {
+        // Arrange
+        final char testChar = '4';
+
+        // Act: Create a CharRange for a single character.
+        final CharRange range = CharRange.is(testChar);
+
+        // Assert: Verify the properties of the created range.
+        // A single-character range should have the same start and end character
+        // and should not be negated.
+        assertEquals("The start character should match the input.", testChar, range.getStart());
+        assertEquals("The end character should match the input.", testChar, range.getEnd());
+        assertFalse("The range for a single character should not be negated.", range.isNegated());
     }
 }
