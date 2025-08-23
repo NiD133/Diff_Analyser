@@ -1,28 +1,32 @@
 package org.apache.commons.lang3;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class LocaleUtils_ESTestTest9 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link LocaleUtils}.
+ */
+class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        // Undeclared exception!
-        try {
-            LocaleUtils.toLocale("-CIIN");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Invalid locale format: -CIIN
-            //
-            verifyException("org.apache.commons.lang3.LocaleUtils", e);
-        }
+    /**
+     * Tests that toLocale() throws an IllegalArgumentException for an invalid format
+     * that starts with a separator.
+     */
+    @Test
+    void toLocale_shouldThrowIllegalArgumentException_whenStringStartsWithSeparator() {
+        // Arrange: Define an invalid locale string that starts with a separator.
+        // The LocaleUtils.toLocale method expects a format like "en_GB", not "_GB".
+        final String invalidLocaleString = "-CIIN";
+
+        // Act & Assert: Verify that calling toLocale with the invalid string
+        // throws the expected exception with the correct message.
+        final IllegalArgumentException thrown = assertThrows(
+            IllegalArgumentException.class,
+            () -> LocaleUtils.toLocale(invalidLocaleString)
+        );
+
+        // Further assert that the exception message is informative and correct.
+        assertEquals("Invalid locale format: " + invalidLocaleString, thrown.getMessage());
     }
 }
