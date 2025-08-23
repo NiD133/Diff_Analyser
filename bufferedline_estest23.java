@@ -1,33 +1,25 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest23 extends BufferedLine_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link BufferedLine} class.
+ */
+public class BufferedLineTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        // Undeclared exception!
-        try {
-            BufferedLine.expandBufForLongitudeSkew((Point) null, (Point) null, (-2061.3583581165));
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.locationtech.spatial4j.shape.impl.BufferedLine", e);
-        }
+    /**
+     * Verifies that expandBufForLongitudeSkew throws a NullPointerException
+     * when invoked with null Point arguments. The method is expected to fail fast
+     * as it cannot operate on null inputs.
+     */
+    @Test(expected = NullPointerException.class)
+    public void expandBufForLongitudeSkew_withNullPoints_throwsNullPointerException() {
+        // Define an arbitrary buffer value; it's irrelevant as the method should
+        // throw the exception before using this value.
+        double irrelevantBuffer = -2061.36;
+
+        // This call should fail because both point arguments are null.
+        BufferedLine.expandBufForLongitudeSkew(null, null, irrelevantBuffer);
     }
 }
