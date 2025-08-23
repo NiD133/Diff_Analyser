@@ -1,30 +1,26 @@
 package com.google.common.hash;
 
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class AbstractStreamingHasher_ESTestTest2 extends AbstractStreamingHasher_ESTest_scaffolding {
+/**
+ * Tests for {@link AbstractStreamingHasher}, focusing on exception handling for invalid inputs.
+ */
+public class AbstractStreamingHasherTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        Crc32cHashFunction.Crc32cHasher crc32cHashFunction_Crc32cHasher0 = new Crc32cHashFunction.Crc32cHasher();
-        byte[] byteArray0 = new byte[3];
-        // Undeclared exception!
-        try {
-            crc32cHashFunction_Crc32cHasher0.putBytes(byteArray0, 0, (int) (byte) 67);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.ByteBuffer", e);
-        }
+    @Test
+    public void putBytes_withLengthExceedingArrayBounds_throwsIndexOutOfBoundsException() {
+        // Arrange: Create a hasher and a small byte array.
+        Hasher hasher = new Crc32cHashFunction.Crc32cHasher();
+        byte[] sourceBytes = new byte[10];
+        int offset = 0;
+        int invalidLength = 11; // A length greater than the array's size.
+
+        // Act & Assert: Verify that calling putBytes with a length that extends beyond
+        // the array's bounds throws an IndexOutOfBoundsException.
+        assertThrows(
+                IndexOutOfBoundsException.class,
+                () -> hasher.putBytes(sourceBytes, offset, invalidLength));
     }
 }
