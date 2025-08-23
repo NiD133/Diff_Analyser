@@ -1,68 +1,43 @@
 package org.apache.commons.collections4.set;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class CompositeSet_ESTestTest33 extends CompositeSet_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link CompositeSet} class.
+ */
+public class CompositeSetTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        LinkedHashSet<Integer> linkedHashSet0 = new LinkedHashSet<Integer>(1720);
-        assertNotNull(linkedHashSet0);
-        assertFalse(linkedHashSet0.contains(1720));
-        assertTrue(linkedHashSet0.isEmpty());
-        assertEquals(0, linkedHashSet0.size());
-        CompositeSet<Integer> compositeSet0 = new CompositeSet<Integer>(linkedHashSet0);
-        assertNotNull(compositeSet0);
-        assertFalse(linkedHashSet0.contains(1720));
-        assertFalse(compositeSet0.contains(1720));
-        assertTrue(linkedHashSet0.isEmpty());
-        assertEquals(0, linkedHashSet0.size());
-        compositeSet0.addComposited((Set<Integer>) linkedHashSet0);
-        assertFalse(linkedHashSet0.contains(1720));
-        assertFalse(compositeSet0.contains(1720));
-        assertTrue(linkedHashSet0.isEmpty());
-        assertEquals(0, linkedHashSet0.size());
+    /**
+     * Tests that calling addComposited() with a set that is already part of the composite
+     * adds the set instance again to the internal list of sets.
+     */
+    @Test
+    public void addComposited_withExistingEmptySet_addsSetAgain() {
+        // Arrange
+        // Create an empty set that will be a component of the composite set.
+        final Set<Integer> componentSet = new LinkedHashSet<>();
+
+        // Create a composite set, initially containing the single empty component set.
+        final CompositeSet<Integer> compositeSet = new CompositeSet<>(componentSet);
+
+        // Verify initial state: one component set, but zero total elements.
+        assertEquals("CompositeSet should initially contain one component set.", 1, compositeSet.getSets().size());
+        assertTrue("CompositeSet should initially be empty.", compositeSet.isEmpty());
+
+        // Act
+        // Add the *same* empty set instance to the composite set again.
+        compositeSet.addComposited(componentSet);
+
+        // Assert
+        // The composite set should now hold two references to the same empty set.
+        assertEquals("CompositeSet should now contain two component sets.", 2, compositeSet.getSets().size());
+        
+        // The overall contents and size of the composite set should remain unchanged (still empty).
+        assertTrue("CompositeSet should still be empty after the operation.", compositeSet.isEmpty());
+        assertEquals("The size of the composite set should still be 0.", 0, compositeSet.size());
     }
 }
