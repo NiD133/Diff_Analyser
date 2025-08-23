@@ -1,48 +1,56 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
 import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfDate;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfIndirectReference;
-import com.itextpdf.text.pdf.PdfSigLockDictionary;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.CharBuffer;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import javax.swing.text.Segment;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SimpleTextExtractionStrategy_ESTestTest5 extends SimpleTextExtractionStrategy_ESTest_scaffolding {
+import java.util.Collections;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        GraphicsState graphicsState0 = new GraphicsState();
-        Matrix matrix0 = graphicsState0.getCtm();
-        LinkedHashSet<MarkedContentInfo> linkedHashSet0 = new LinkedHashSet<MarkedContentInfo>();
-        PdfAction pdfAction0 = new PdfAction("");
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfAction0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        SimpleTextExtractionStrategy simpleTextExtractionStrategy0 = new SimpleTextExtractionStrategy();
-        PdfString pdfString0 = new PdfString("Cp1252", "Cp1250");
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfString0, graphicsState0, matrix0, linkedHashSet0);
-        // Undeclared exception!
-        try {
-            simpleTextExtractionStrategy0.renderText(textRenderInfo0);
-            fail("Expecting exception: NoSuchMethodError");
-        } catch (NoSuchMethodError e) {
-            //
-            // java.nio.ByteBuffer.rewind()Ljava/nio/ByteBuffer;
-            //
-            verifyException("com.itextpdf.text.pdf.PdfEncodings", e);
-        }
+/**
+ * Test suite for {@link SimpleTextExtractionStrategy}.
+ * This class focuses on specific rendering scenarios.
+ */
+public class SimpleTextExtractionStrategyTest {
+
+    /**
+     * Verifies that renderText throws a NoSuchMethodError when processing a PdfString
+     * that triggers a specific, problematic encoding conversion path.
+     *
+     * This test case simulates a low-level binary incompatibility issue that can occur
+     * in certain runtime environments when iText's PdfEncodings class is invoked.
+     */
+    @Test(expected = NoSuchMethodError.class, timeout = 4000)
+    public void renderText_whenPdfStringRequiresEncodingConversion_throwsErrorOnCompatibilityIssue() {
+        // Arrange
+        // 1. Create the strategy instance to be tested.
+        SimpleTextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+
+        // 2. Set up the necessary rendering context (GraphicsState).
+        // A font must be present for the TextRenderInfo to be valid.
+        GraphicsState graphicsState = new GraphicsState();
+        graphicsState.font = new CMapAwareDocumentFont(new PdfAction(""));
+
+        // 3. Create a PdfString with a value and a different encoding. This specific
+        // constructor forces a call into the PdfEncodings utility class, which is
+        // the source of the expected error in an incompatible environment.
+        PdfString textWithMismatchedEncoding = new PdfString("Cp1252", "Cp1250");
+
+        // 4. Assemble the TextRenderInfo object with the prepared data.
+        TextRenderInfo textRenderInfo = new TextRenderInfo(
+                textWithMismatchedEncoding,
+                graphicsState,
+                graphicsState.getCtm(),
+                Collections.emptySet()
+        );
+
+        // Act
+        // Call the method under test. This will trigger the encoding conversion
+        // that leads to the expected NoSuchMethodError.
+        strategy.renderText(textRenderInfo);
+
+        // Assert
+        // The test passes if a NoSuchMethodError is thrown, as declared by the
+        // @Test(expected = ...) annotation. No further assertions are needed.
     }
 }
