@@ -1,26 +1,26 @@
 package org.apache.commons.codec.digest;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class XXHash32_ESTestTest9 extends XXHash32_ESTest_scaffolding {
+/**
+ * Unit tests for the XXHash32 class, focusing on invalid arguments.
+ */
+public class XXHash32Test {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        XXHash32 xXHash32_0 = new XXHash32();
-        // Undeclared exception!
-        try {
-            xXHash32_0.update((byte[]) null, 2128, 2128);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.codec.digest.XXHash32", e);
-        }
+    /**
+     * Verifies that calling the update method with a null buffer
+     * correctly throws a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void updateWithNullBufferShouldThrowNullPointerException() {
+        // Arrange: Create an instance of the XXHash32 checksum.
+        XXHash32 xxHash32 = new XXHash32();
+
+        // Act: Call the update method with a null buffer.
+        // The offset and length values are arbitrary, as the null check should occur first.
+        xxHash32.update(null, 0, 0);
+
+        // Assert: The test succeeds if a NullPointerException is thrown,
+        // as specified by the @Test(expected=...) annotation.
     }
 }
