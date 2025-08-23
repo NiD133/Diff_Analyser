@@ -1,18 +1,25 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class RefinedSoundex_ESTestTest10 extends RefinedSoundex_ESTest_scaffolding {
+/**
+ * Tests for the {@link RefinedSoundex} class.
+ */
+public class RefinedSoundexTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        RefinedSoundex refinedSoundex0 = new RefinedSoundex();
-        String string0 = refinedSoundex0.soundex((String) null);
-        assertNull(string0);
+    /**
+     * Tests that the soundex method handles null input gracefully by returning null.
+     */
+    @Test
+    public void soundexShouldReturnNullForNullInput() {
+        // Arrange
+        RefinedSoundex refinedSoundex = new RefinedSoundex();
+
+        // Act
+        String result = refinedSoundex.soundex(null);
+
+        // Assert
+        assertNull("The soundex of a null string should be null", result);
     }
 }
