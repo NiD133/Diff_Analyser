@@ -1,55 +1,24 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Period;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
 
+/**
+ * Test class for {@link InternationalFixedChronology}.
+ * This refactored test focuses on the behavior of the zonedDateTime method with null input.
+ */
 public class InternationalFixedChronology_ESTestTest23 extends InternationalFixedChronology_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        InternationalFixedChronology internationalFixedChronology0 = new InternationalFixedChronology();
-        // Undeclared exception!
-        try {
-            internationalFixedChronology0.zonedDateTime((TemporalAccessor) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.time.ZoneId", e);
-        }
+    /**
+     * Tests that calling zonedDateTime() with a null TemporalAccessor throws a NullPointerException.
+     * The method is expected to fail fast when given invalid input.
+     */
+    @Test(expected = NullPointerException.class)
+    public void zonedDateTime_withNullInput_throwsNullPointerException() {
+        // Arrange: The singleton instance of the chronology is used, as recommended.
+        InternationalFixedChronology chronology = InternationalFixedChronology.INSTANCE;
+
+        // Act & Assert: Call the method with null, which is expected to throw a NullPointerException.
+        // The assertion is handled by the @Test(expected=...) annotation.
+        chronology.zonedDateTime(null);
     }
 }
