@@ -1,23 +1,29 @@
 package com.google.common.util.concurrent;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.DoubleBinaryOperator;
-import java.util.function.DoubleUnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class AtomicDoubleArray_ESTestTest39 extends AtomicDoubleArray_ESTest_scaffolding {
+/**
+ * Tests for {@link AtomicDoubleArray}.
+ */
+public class AtomicDoubleArrayTest {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        double[] doubleArray0 = new double[2];
-        AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-        int int0 = atomicDoubleArray0.length();
-        assertEquals(2, int0);
+    /**
+     * Verifies that the length() method returns the correct size when the
+     * AtomicDoubleArray is constructed from an existing double array.
+     */
+    @Test
+    public void length_whenCreatedFromArray_returnsCorrectLength() {
+        // Arrange: Create a source array and the AtomicDoubleArray under test.
+        double[] sourceArray = new double[2];
+        AtomicDoubleArray atomicArray = new AtomicDoubleArray(sourceArray);
+        int expectedLength = sourceArray.length;
+
+        // Act: Get the length of the AtomicDoubleArray.
+        int actualLength = atomicArray.length();
+
+        // Assert: Verify that the reported length matches the source array's length.
+        assertEquals(expectedLength, actualLength);
     }
 }
