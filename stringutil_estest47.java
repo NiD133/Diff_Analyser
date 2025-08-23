@@ -1,36 +1,25 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
 
-public class StringUtil_ESTestTest47 extends StringUtil_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        // Undeclared exception!
+/**
+ * Tests for {@link StringUtil#releaseBuilder(StringBuilder)}.
+ */
+public class StringUtil_ESTestTest47 { // Note: Class name kept for consistency with the original file.
+
+    @Test
+    public void releaseBuilderShouldThrowExceptionForNullInput() {
+        // The releaseBuilder method is expected to validate its input and reject nulls.
         try {
-            StringUtil.releaseBuilder((StringBuilder) null);
-            fail("Expecting exception: IllegalArgumentException");
+            StringUtil.releaseBuilder(null);
+            fail("Expected an IllegalArgumentException to be thrown for a null StringBuilder.");
         } catch (IllegalArgumentException e) {
-            //
-            // Object must not be null
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Verify that the exception message is clear and helpful.
+            // This is the standard message from org.jsoup.helper.Validate.notNull.
+            assertEquals("Object must not be null", e.getMessage());
         }
     }
 }
