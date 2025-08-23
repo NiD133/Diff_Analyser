@@ -1,35 +1,35 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SerializedCache_ESTestTest18 extends SerializedCache_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        PerpetualCache perpetualCache0 = new PerpetualCache((String) null);
-        SerializedCache serializedCache0 = new SerializedCache(perpetualCache0);
-        // Undeclared exception!
+/**
+ * Test suite for the {@link SerializedCache} decorator.
+ */
+public class SerializedCacheTest {
+
+    /**
+     * Verifies that calling hashCode() on a SerializedCache delegates the call
+     * to the underlying cache. If the delegate cache (a PerpetualCache in this test)
+     * was instantiated with a null ID, it is expected to throw a RuntimeException.
+     */
+    @Test
+    public void hashCodeShouldThrowExceptionWhenDelegateCacheHasNoId() {
+        // Arrange: Create a delegate cache with a null ID, which is an invalid state for PerpetualCache.
+        Cache delegateCache = new PerpetualCache(null);
+        SerializedCache serializedCache = new SerializedCache(delegateCache);
+
         try {
-            serializedCache0.hashCode();
-            fail("Expecting exception: RuntimeException");
+            // Act: Calling hashCode on the decorator, which should trigger the exception from the delegate.
+            serializedCache.hashCode();
+            fail("A RuntimeException was expected because the delegate cache has a null ID.");
         } catch (RuntimeException e) {
-            //
-            // Cache instances require an ID.
-            //
-            verifyException("org.apache.ibatis.cache.impl.PerpetualCache", e);
+            // Assert: Verify the exception is the one we expect from PerpetualCache.
+            assertEquals("Cache instances require an ID.", e.getMessage());
         }
     }
 }
