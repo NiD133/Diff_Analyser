@@ -1,40 +1,36 @@
 package org.jfree.chart.renderer.xy;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class StandardXYBarPainter_ESTestTest17 extends StandardXYBarPainter_ESTest_scaffolding {
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        StandardXYBarPainter standardXYBarPainter0 = new StandardXYBarPainter();
-        XYBarRenderer xYBarRenderer0 = new XYBarRenderer();
-        RectangleEdge rectangleEdge0 = RectangleEdge.BOTTOM;
-        DefaultCaret defaultCaret0 = new DefaultCaret();
-        // Undeclared exception!
-        try {
-            standardXYBarPainter0.paintBarShadow((Graphics2D) null, xYBarRenderer0, 0, 0, defaultCaret0, rectangleEdge0, true);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jfree.chart.renderer.xy.StandardXYBarPainter", e);
-        }
+/**
+ * Unit tests for the {@link StandardXYBarPainter} class.
+ */
+public class StandardXYBarPainterTest {
+
+    /**
+     * Verifies that paintBarShadow() throws a NullPointerException
+     * when the Graphics2D argument is null, ensuring null-safety.
+     */
+    @Test(expected = NullPointerException.class)
+    public void paintBarShadowShouldThrowExceptionWhenGraphics2DIsNull() {
+        // Arrange: Set up the painter and necessary arguments for the method call.
+        StandardXYBarPainter painter = new StandardXYBarPainter();
+        XYBarRenderer renderer = new XYBarRenderer();
+        Rectangle2D.Double bar = new Rectangle2D.Double(10.0, 20.0, 30.0, 40.0);
+        RectangleEdge baseEdge = RectangleEdge.BOTTOM;
+        int row = 0;
+        int column = 0;
+        boolean pegShadow = true;
+
+        // Act: Call the method with a null Graphics2D context.
+        // This is the action expected to cause an exception.
+        painter.paintBarShadow(null, renderer, row, column, bar, baseEdge, pegShadow);
+
+        // Assert: The test passes if a NullPointerException is thrown,
+        // which is handled by the @Test(expected) annotation.
     }
 }
