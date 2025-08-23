@@ -2,33 +2,32 @@ package org.jfree.chart.plot.compass;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import javax.swing.JScrollPane;
-import javax.swing.text.DefaultCaret;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class focuses on the MeterNeedle's property setters.
+ *
+ * Note: The original test was auto-generated and had a non-descriptive name (test34).
+ * It also tested properties (size, rotation) that were unrelated to the method being
+ * called (setOutlinePaint), making its purpose unclear. This revised test focuses on
+ * correctly verifying the behavior of the setOutlinePaint() method.
+ */
 public class MeterNeedle_ESTestTest35 extends MeterNeedle_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        ShipNeedle shipNeedle0 = new ShipNeedle();
-        shipNeedle0.setOutlinePaint((Paint) null);
-        assertEquals(0.5, shipNeedle0.getRotateX(), 0.01);
-        assertEquals(5, shipNeedle0.getSize());
-        assertEquals(0.5, shipNeedle0.getRotateY(), 0.01);
+    /**
+     * Verifies that calling setOutlinePaint() with a null value correctly
+     * updates the needle's outline paint property.
+     */
+    @Test
+    public void setOutlinePaint_withNullValue_updatesOutlinePaintProperty() {
+        // Arrange: Create a concrete instance of MeterNeedle.
+        ShipNeedle needle = new ShipNeedle();
+
+        // Act: Set the outline paint to null.
+        needle.setOutlinePaint(null);
+
+        // Assert: Verify that the outline paint property is now null.
+        assertNull("The outline paint should be null after being set to null.",
+                   needle.getOutlinePaint());
     }
 }
