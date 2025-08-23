@@ -1,30 +1,30 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.Chunk;
-import com.itextpdf.text.GreekList;
-import com.itextpdf.text.TabSettings;
-import java.util.ArrayList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class DefaultSplitCharacter_ESTestTest7 extends DefaultSplitCharacter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultSplitCharacter} class.
+ */
+public class DefaultSplitCharacterTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        DefaultSplitCharacter defaultSplitCharacter0 = new DefaultSplitCharacter();
-        // Undeclared exception!
-        try {
-            defaultSplitCharacter0.isSplitCharacter(505, 505, 505, (char[]) null, (PdfChunk[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.DefaultSplitCharacter", e);
-        }
+    /**
+     * Verifies that isSplitCharacter throws a NullPointerException when the character array is null.
+     * <p>
+     * The method's implementation attempts to access the character array when the PdfChunk array is null,
+     * which should result in an NPE if the character array is also null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void isSplitCharacter_whenCharacterArrayIsNull_throwsNullPointerException() {
+        // Arrange
+        DefaultSplitCharacter splitCharacter = new DefaultSplitCharacter();
+        int start = 0;
+        int current = 0;
+        int end = 1;
+        char[] nullCharArray = null;
+        PdfChunk[] nullChunkArray = null;
+
+        // Act & Assert
+        // This call is expected to throw a NullPointerException.
+        splitCharacter.isSplitCharacter(start, current, end, nullCharArray, nullChunkArray);
     }
 }
