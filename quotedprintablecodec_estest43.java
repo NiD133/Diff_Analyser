@@ -1,25 +1,37 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.nio.charset.StandardCharsets;
+import static org.junit.Assert.assertArrayEquals;
 
-public class QuotedPrintableCodec_ESTestTest43 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * This test suite contains improved, human-readable tests for the QuotedPrintableCodec class.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        byte[] byteArray0 = new byte[5];
-        byteArray0[4] = (byte) 32;
-        byte[] byteArray1 = QuotedPrintableCodec.encodeQuotedPrintable((BitSet) null, byteArray0, true);
-        assertNotNull(byteArray1);
-        assertEquals(15, byteArray1.length);
+    /**
+     * Tests that the strict encoding mode correctly escapes a trailing space character.
+     * According to RFC 1521, in strict Quoted-Printable encoding, space or tab characters
+     * at the end of a line must be encoded.
+     */
+    @Test
+    public void encodeQuotedPrintableWithStrictTrueShouldEncodeTrailingSpace() {
+        // Arrange
+        // Input data containing four null bytes followed by a space.
+        final byte[] originalData = {0, 0, 0, 0, ' '};
+
+        // In Quoted-Printable, non-printable characters like null (0x00) are
+        // encoded as "=00". In strict mode, a trailing space (0x20) must also
+        // be encoded, becoming "=20".
+        final byte[] expectedEncodedData = "=00=00=00=00=20".getBytes(StandardCharsets.US_ASCII);
+
+        // Act
+        // Encode the data with the 'strict' flag enabled.
+        // Passing a null BitSet uses the default set of printable characters.
+        final byte[] actualEncodedData = QuotedPrintableCodec.encodeQuotedPrintable(null, originalData, true);
+
+        // Assert
+        // Verify that the actual encoded content matches the expected result.
+        assertArrayEquals(expectedEncodedData, actualEncodedData);
     }
 }
