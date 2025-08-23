@@ -1,40 +1,38 @@
 package org.apache.commons.compress.compressors.gzip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FilterOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class GzipCompressorOutputStream_ESTestTest4 extends GzipCompressorOutputStream_ESTest_scaffolding {
+/**
+ * Contains improved tests for the GzipCompressorOutputStream class.
+ */
+public class GzipCompressorOutputStreamImprovedTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        ByteArrayOutputStream byteArrayOutputStream0 = new ByteArrayOutputStream();
-        GzipCompressorOutputStream gzipCompressorOutputStream0 = new GzipCompressorOutputStream(byteArrayOutputStream0);
-        byte[] byteArray0 = new byte[0];
-        // Undeclared exception!
-        try {
-            gzipCompressorOutputStream0.write(byteArray0, 2860, 2860);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.zip.Deflater", e);
-        }
+    /**
+     * Tests that calling write() with an offset and length that are out of bounds for the
+     * source buffer correctly throws an ArrayIndexOutOfBoundsException.
+     *
+     * This is expected behavior, as the call is delegated to java.util.zip.Deflater,
+     * which performs these boundary checks.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void writeWithOutOfBoundsParametersShouldThrowException() throws IOException {
+        // Arrange: Set up a GzipCompressorOutputStream and an empty data buffer.
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        GzipCompressorOutputStream gzipOutputStream = new GzipCompressorOutputStream(outputStream);
+        byte[] emptyBuffer = new byte[0];
+
+        // Define an offset and length that are clearly invalid for the empty buffer.
+        int invalidOffset = 1;
+        int invalidLength = 1;
+
+        // Act: Attempt to write from the buffer using the out-of-bounds parameters.
+        // This action is expected to throw an exception.
+        gzipOutputStream.write(emptyBuffer, invalidOffset, invalidLength);
+
+        // Assert: The test expects an ArrayIndexOutOfBoundsException, which is
+        // declared in the @Test annotation. If no exception is thrown, the test will fail.
     }
 }
