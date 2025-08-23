@@ -1,58 +1,41 @@
 package com.google.common.graph;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.testing.EqualsTester;
-import java.util.Collection;
-import java.util.Set;
-import org.jspecify.annotations.NullUnmarked;
+
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
-public class EndpointPairTestTest1 {
+/** Tests for {@link EndpointPair}. */
+public class EndpointPairTest {
 
-    private static final Integer N0 = 0;
+  @Test
+  public void ordered_api_returnsCorrectValues() {
+    // Arrange
+    String sourceNode = "source";
+    String targetNode = "target";
 
-    private static final Integer N1 = 1;
+    // Act
+    EndpointPair<String> orderedPair = EndpointPair.ordered(sourceNode, targetNode);
 
-    private static final Integer N2 = 2;
+    // Assert
+    // An "ordered" pair represents a directed edge.
+    assertThat(orderedPair.isOrdered()).isTrue();
 
-    private static final Integer N3 = 3;
+    // Specific accessors for ordered pairs.
+    assertThat(orderedPair.source()).isEqualTo(sourceNode);
+    assertThat(orderedPair.target()).isEqualTo(targetNode);
 
-    private static final Integer N4 = 4;
+    // General accessors, which are consistent with source/target for ordered pairs.
+    assertThat(orderedPair.nodeU()).isEqualTo(sourceNode);
+    assertThat(orderedPair.nodeV()).isEqualTo(targetNode);
 
-    private static final String E12 = "1-2";
+    // Behavior.
+    assertThat(orderedPair.adjacentNode(sourceNode)).isEqualTo(targetNode);
+    assertThat(orderedPair.adjacentNode(targetNode)).isEqualTo(sourceNode);
 
-    private static final String E12_A = "1-2a";
+    // Iterable contract.
+    assertThat(orderedPair).containsExactly(sourceNode, targetNode).inOrder();
 
-    private static final String E21 = "2-1";
-
-    private static final String E13 = "1-3";
-
-    private static final String E44 = "4-4";
-
-    private static void containsExactlySanityCheck(Collection<?> collection, Object... varargs) {
-        assertThat(collection).hasSize(varargs.length);
-        for (Object obj : varargs) {
-            assertThat(collection).contains(obj);
-        }
-        assertThat(collection).containsExactly(varargs);
-    }
-
-    @Test
-    public void testOrderedEndpointPair() {
-        EndpointPair<String> ordered = EndpointPair.ordered("source", "target");
-        assertThat(ordered.isOrdered()).isTrue();
-        assertThat(ordered).containsExactly("source", "target").inOrder();
-        assertThat(ordered.source()).isEqualTo("source");
-        assertThat(ordered.target()).isEqualTo("target");
-        assertThat(ordered.nodeU()).isEqualTo("source");
-        assertThat(ordered.nodeV()).isEqualTo("target");
-        assertThat(ordered.adjacentNode("source")).isEqualTo("target");
-        assertThat(ordered.adjacentNode("target")).isEqualTo("source");
-        assertThat(ordered.toString()).isEqualTo("<source -> target>");
-    }
+    // String representation.
+    assertThat(orderedPair.toString()).isEqualTo("<source -> target>");
+  }
 }
