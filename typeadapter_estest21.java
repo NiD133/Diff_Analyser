@@ -1,34 +1,28 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TypeAdapter_ESTestTest21 extends TypeAdapter_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link TypeAdapter} class, focusing on its public API.
+ */
+public class TypeAdapterTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        Gson.FutureTypeAdapter<Object> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Object>();
-        // Undeclared exception!
-        try {
-            gson_FutureTypeAdapter0.fromJson((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.io.StringReader", e);
-        }
+    /**
+     * Verifies that calling fromJson(String) with a null input throws a NullPointerException.
+     * <p>
+     * This behavior is expected because the method internally attempts to create a
+     * {@code new StringReader(null)}, which is an invalid operation.
+     */
+    @Test(expected = NullPointerException.class)
+    public void fromJson_withNullString_throwsNullPointerException() {
+        // Arrange: Create an instance of a TypeAdapter.
+        // Gson.FutureTypeAdapter is a convenient, accessible implementation for this test.
+        TypeAdapter<Object> typeAdapter = new Gson.FutureTypeAdapter<>();
+
+        // Act: Call the method under test with a null argument.
+        typeAdapter.fromJson((String) null);
+
+        // Assert: The test expects a NullPointerException, which is declared in the @Test annotation.
+        // If no exception is thrown, the test will fail.
     }
 }
