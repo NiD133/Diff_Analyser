@@ -1,26 +1,29 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class TokenQueue_ESTestTest61 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for the {@link TokenQueue} class.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test60() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue(" 5mL\"2HD\"v");
-        // Undeclared exception!
+    @Test
+    public void chompBalancedThrowsExceptionWhenNoClosingMarkerIsFound() {
+        // Arrange: Create a queue where the opening marker exists but a closing one does not.
+        String input = " 5mL\"2HD\"v"; // The initial space is the 'open' marker.
+        TokenQueue queue = new TokenQueue(input);
+
+        // Act & Assert
         try {
-            tokenQueue0.chompBalanced(' ', ' ');
-            fail("Expecting exception: IllegalArgumentException");
+            // Attempt to find a balanced segment where the open and close markers are both spaces.
+            queue.chompBalanced(' ', ' ');
+            fail("Expected an IllegalArgumentException to be thrown, but it was not.");
         } catch (IllegalArgumentException e) {
-            //
-            // Did not find balanced marker at '5mL\"2HD\"v'
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Verify that the exception message correctly identifies the failure point.
+            String expectedMessage = "Did not find balanced marker at '5mL\"2HD\"v'";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
