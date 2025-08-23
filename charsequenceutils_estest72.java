@@ -1,20 +1,32 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSequenceUtils_ESTestTest72 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Test suite for {@link CharSequenceUtils}.
+ */
+public class CharSequenceUtilsRefactoredTest {
 
-    @Test(timeout = 4000)
-    public void test71() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder("er of tpp mer of tpp map.entry nor an array");
-        StringBuilder stringBuilder1 = stringBuilder0.deleteCharAt(22);
-        int int0 = CharSequenceUtils.lastIndexOf("er of tpp mer of tpp map.entry nor an array", stringBuilder1, 22);
-        assertEquals((-1), int0);
+    @Test
+    public void testLastIndexOfWithNonMatchingCharSequenceShouldReturnNotFound() {
+        // Arrange
+        String textToSearch = "A test string to search within.";
+
+        // Create a search sequence that is almost identical to the textToSearch,
+        // but with one character removed to ensure it does not match.
+        StringBuilder nonMatchingSearchSequence = new StringBuilder(textToSearch);
+        nonMatchingSearchSequence.deleteCharAt(10); // Deletes 'g' from "string"
+
+        // The search will start from the end of the string.
+        int startIndex = textToSearch.length();
+
+        // Act
+        // Attempt to find the last index of the modified sequence within the original, unmodified string.
+        int actualIndex = CharSequenceUtils.lastIndexOf(textToSearch, nonMatchingSearchSequence, startIndex);
+
+        // Assert
+        // The non-matching sequence should not be found, so the result must be -1.
+        assertEquals(-1, actualIndex);
     }
 }
