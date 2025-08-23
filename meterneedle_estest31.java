@@ -1,43 +1,28 @@
 package org.jfree.chart.plot.compass;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import javax.swing.JScrollPane;
-import javax.swing.text.DefaultCaret;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MeterNeedle_ESTestTest31 extends MeterNeedle_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link MeterNeedle} class, focusing on its interaction
+ * with drawing contexts.
+ */
+public class MeterNeedle_ESTestTest31 { // Note: Class name kept as per original for context.
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        SystemColor systemColor0 = SystemColor.info;
-        WindNeedle windNeedle0 = new WindNeedle();
-        windNeedle0.setFillPaint(systemColor0);
-        DefaultCaret defaultCaret0 = new DefaultCaret();
-        // Undeclared exception!
-        try {
-            windNeedle0.defaultDisplay((Graphics2D) null, defaultCaret0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jfree.chart.plot.compass.MeterNeedle", e);
-        }
+    /**
+     * Verifies that the defaultDisplay method throws a NullPointerException
+     * when the Graphics2D argument is null, as this is a required parameter.
+     */
+    @Test(expected = NullPointerException.class)
+    public void defaultDisplay_shouldThrowNullPointerException_whenGraphicsIsNull() {
+        // Arrange: Create a concrete needle instance and a dummy shape.
+        // WindNeedle is a simple, concrete subclass of the abstract MeterNeedle.
+        MeterNeedle needle = new WindNeedle();
+        Rectangle2D.Double dummyShape = new Rectangle2D.Double(0, 0, 10, 10);
+
+        // Act & Assert: Call the method with a null Graphics2D context.
+        // The @Test(expected=...) annotation asserts that a NullPointerException is thrown.
+        needle.defaultDisplay(null, dummyShape);
     }
 }
