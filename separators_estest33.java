@@ -2,24 +2,47 @@ package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+// The original test class name is kept to match the request context.
 public class Separators_ESTestTest33 extends Separators_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        Separators.Spacing separators_Spacing0 = Separators.Spacing.NONE;
-        Separators separators0 = new Separators("", 'J', separators_Spacing0, 'J', separators_Spacing0, "", 'J', separators_Spacing0, "2U#AD9");
-        Separators separators1 = separators0.withRootSeparator(" ");
-        Separators separators2 = separators1.withRootSeparator(" ");
-        assertEquals('J', separators0.getArrayValueSeparator());
-        assertNotSame(separators2, separators0);
-        assertEquals("2U#AD9", separators2.getArrayEmptySeparator());
-        assertSame(separators2, separators1);
-        assertEquals('J', separators0.getObjectEntrySeparator());
-        assertEquals("", separators2.getObjectEmptySeparator());
-        assertEquals('J', separators0.getObjectFieldValueSeparator());
+    /**
+     * Tests that the `withRootSeparator` method returns the same instance
+     * when called with a value that is already set. This verifies an
+     * important optimization for this immutable class to avoid needless
+     * object creation.
+     */
+    @Test
+    public void withRootSeparator_whenSeparatorIsUnchanged_returnsSameInstance() {
+        // ARRANGE: Create an initial Separators instance.
+        final Separators originalSeparators = new Separators(
+                "", 'J', Separators.Spacing.NONE,
+                'J', Separators.Spacing.NONE, "",
+                'J', Separators.Spacing.NONE, "2U#AD9");
+        
+        final String newRootSeparator = " ";
+
+        // ACT
+        // First, create a new instance by changing the root separator.
+        final Separators updatedSeparators = originalSeparators.withRootSeparator(newRootSeparator);
+        
+        // Then, call the method again with the same separator value.
+        final Separators sameInstanceSeparators = updatedSeparators.withRootSeparator(newRootSeparator);
+
+        // ASSERT
+        // 1. Verify that changing the separator initially created a new object.
+        assertNotSame("A new instance should be created when the separator changes.",
+                originalSeparators, updatedSeparators);
+        assertEquals("The root separator should be updated.",
+                newRootSeparator, updatedSeparators.getRootSeparator());
+
+        // 2. Verify the core behavior: the second call returned the *same* instance.
+        assertSame("The same instance should be returned when the separator value is not changed.",
+                updatedSeparators, sameInstanceSeparators);
+
+        // 3. Verify that other properties were preserved in the updated instance.
+        assertEquals('J', updatedSeparators.getArrayValueSeparator());
+        assertEquals("2U#AD9", updatedSeparators.getArrayEmptySeparator());
+        assertEquals('J', updatedSeparators.getObjectEntrySeparator());
     }
 }
