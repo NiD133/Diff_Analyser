@@ -1,29 +1,36 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.CountDownLatch;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BlockingCache_ESTestTest12 extends BlockingCache_ESTest_scaffolding {
+/**
+ * Test suite for {@link BlockingCache}.
+ */
+public class BlockingCacheTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        BlockingCache blockingCache0 = new BlockingCache((Cache) null);
-        // Undeclared exception!
-        try {
-            blockingCache0.putObject((Object) null, (Object) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.concurrent.ConcurrentHashMap", e);
-        }
+    /**
+     * Verifies that attempting to put an object with a null key throws a NullPointerException.
+     *
+     * The BlockingCache uses an internal ConcurrentHashMap to manage locks.
+     * ConcurrentHashMap does not permit null keys. The putObject method attempts to
+     * release a lock using the key in a 'finally' block, which results in an NPE
+     * when the key is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void shouldThrowNullPointerExceptionWhenPuttingNullKey() {
+        // Arrange
+        // A real delegate cache is used to ensure the test reflects a realistic scenario.
+        Cache delegate = new PerpetualCache("test-delegate-cache");
+        BlockingCache blockingCache = new BlockingCache(delegate);
+        Object key = null;
+        Object value = "any-value";
+
+        // Act
+        // This call is expected to throw a NullPointerException.
+        blockingCache.putObject(key, value);
+
+        // Assert
+        // The exception is verified by the 'expected' attribute of the @Test annotation.
     }
 }
