@@ -1,34 +1,54 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class TaiInstant_ESTestTest53 extends TaiInstant_ESTest_scaffolding {
+/**
+ * Tests for the {@link TaiInstant} class, focusing on method contracts and behavior.
+ */
+public class TaiInstantTest {
 
-    @Test(timeout = 4000)
-    public void test52() throws Throwable {
-        TaiInstant taiInstant0 = TaiInstant.ofTaiSeconds((-604800L), (-604800L));
-        // Undeclared exception!
+    /**
+     * Tests that withNano() throws an IllegalArgumentException when the provided
+     * nano-of-second value is greater than the maximum allowed value.
+     */
+    @Test
+    public void withNano_shouldThrowException_whenNanoValueIsTooLarge() {
+        // Arrange: Create a base instant and define an invalid nano-of-second value
+        // that is just above the maximum allowed limit.
+        TaiInstant baseInstant = TaiInstant.ofTaiSeconds(0, 0);
+        int invalidNanoValue = 1_000_000_000; // Max is 999,999,999
+
+        // Act & Assert: Verify that calling withNano with the invalid value throws
+        // an IllegalArgumentException with the correct message.
         try {
-            taiInstant0.withNano(2147424333);
-            fail("Expecting exception: IllegalArgumentException");
+            baseInstant.withNano(invalidNanoValue);
+            fail("Expected an IllegalArgumentException to be thrown for a nano-of-second value greater than 999,999,999.");
         } catch (IllegalArgumentException e) {
-            //
-            // NanoOfSecond must be from 0 to 999,999,999
-            //
-            verifyException("org.threeten.extra.scale.TaiInstant", e);
+            // Verify the exception message is as expected.
+            assertEquals("NanoOfSecond must be from 0 to 999,999,999", e.getMessage());
+        }
+    }
+
+    /**
+     * Tests that withNano() throws an IllegalArgumentException when the provided
+     * nano-of-second value is negative.
+     */
+    @Test
+    public void withNano_shouldThrowException_whenNanoValueIsNegative() {
+        // Arrange: Create a base instant and define a negative, invalid nano-of-second value.
+        TaiInstant baseInstant = TaiInstant.ofTaiSeconds(0, 0);
+        int invalidNanoValue = -1; // Min is 0
+
+        // Act & Assert: Verify that calling withNano with the invalid value throws
+        // an IllegalArgumentException with the correct message.
+        try {
+            baseInstant.withNano(invalidNanoValue);
+            fail("Expected an IllegalArgumentException to be thrown for a negative nano-of-second value.");
+        } catch (IllegalArgumentException e) {
+            // Verify the exception message is as expected.
+            assertEquals("NanoOfSecond must be from 0 to 999,999,999", e.getMessage());
         }
     }
 }
