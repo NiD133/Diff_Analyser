@@ -1,26 +1,32 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ByteArrayBuilder_ESTestTest39 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteArrayBuilder} class, focusing on specific edge cases.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        ByteArrayBuilder byteArrayBuilder0 = ByteArrayBuilder.fromInitial((byte[]) null, (-1623));
-        // Undeclared exception!
-        try {
-            byteArrayBuilder0.appendFourBytes((-1623));
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.util.ByteArrayBuilder", e);
-        }
+    /**
+     * Verifies that attempting to append data to a ByteArrayBuilder initialized
+     * with a null internal buffer results in a NullPointerException.
+     *
+     * This test simulates an invalid internal state to ensure the class behaves
+     * predictably even under unexpected conditions.
+     */
+    @Test(expected = NullPointerException.class)
+    public void appendFourBytes_whenBufferIsNull_shouldThrowNullPointerException() {
+        // Arrange: Create a ByteArrayBuilder in an invalid state where its internal
+        // buffer is null. The package-private fromInitial() factory method allows
+        // us to set up this specific scenario for testing.
+        ByteArrayBuilder builder = ByteArrayBuilder.fromInitial(null, -1);
+
+        // Act: Attempt to append four bytes to the builder.
+        // This action is expected to throw a NullPointerException because it will
+        // try to access the null internal buffer.
+        builder.appendFourBytes(0x1A2B3C4D);
+
+        // Assert: The test passes if a NullPointerException is thrown, which is
+        // handled by the @Test(expected = ...) annotation.
     }
 }
