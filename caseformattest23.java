@@ -1,24 +1,37 @@
 package com.google.common.base;
 
-import static com.google.common.base.CaseFormat.LOWER_CAMEL;
 import static com.google.common.base.CaseFormat.LOWER_HYPHEN;
-import static com.google.common.base.CaseFormat.LOWER_UNDERSCORE;
-import static com.google.common.base.CaseFormat.UPPER_CAMEL;
 import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
-import com.google.common.annotations.GwtCompatible;
-import com.google.common.annotations.GwtIncompatible;
-import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.testing.NullPointerTester;
-import com.google.common.testing.SerializableTester;
+
 import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
 
-public class CaseFormatTestTest23 extends TestCase {
+/**
+ * Tests for {@link CaseFormat}, focusing on conversions.
+ */
+public class CaseFormatTest extends TestCase {
 
-    public void testUpperUnderscoreToLowerHyphen() {
-        assertThat(UPPER_UNDERSCORE.to(LOWER_HYPHEN, "FOO")).isEqualTo("foo");
-        assertThat(UPPER_UNDERSCORE.to(LOWER_HYPHEN, "FOO_BAR")).isEqualTo("foo-bar");
-    }
+  public void testTo_fromUpperUnderscoreToLowerHyphen_singleWord() {
+    // Arrange
+    String input = "FOO";
+    String expected = "foo";
+
+    // Act
+    String actual = UPPER_UNDERSCORE.to(LOWER_HYPHEN, input);
+
+    // Assert
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  public void testTo_fromUpperUnderscoreToLowerHyphen_multipleWords() {
+    // Arrange
+    String input = "FOO_BAR";
+    String expected = "foo-bar";
+
+    // Act
+    String actual = UPPER_UNDERSCORE.to(LOWER_HYPHEN, input);
+
+    // Assert
+    assertThat(actual).isEqualTo(expected);
+  }
 }
