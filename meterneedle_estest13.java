@@ -1,37 +1,48 @@
 package org.jfree.chart.plot.compass;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import javax.swing.JScrollPane;
-import javax.swing.text.DefaultCaret;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MeterNeedle_ESTestTest13 extends MeterNeedle_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link MeterNeedle} class, using the concrete subclass 
+ * {@link WindNeedle} for instantiation and testing property accessors.
+ */
+public class MeterNeedleTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        WindNeedle windNeedle0 = new WindNeedle();
-        Color color0 = Color.blue;
-        windNeedle0.setFillPaint(color0);
-        Paint paint0 = windNeedle0.getFillPaint();
-        assertEquals(0.5, windNeedle0.getRotateX(), 0.01);
-        assertEquals(0.5, windNeedle0.getRotateY(), 0.01);
-        assertEquals(5, windNeedle0.getSize());
-        assertNotNull(paint0);
+    /**
+     * Verifies that the setFillPaint() method correctly updates the fill paint
+     * property, which can then be retrieved by getFillPaint().
+     */
+    @Test
+    public void setFillPaintShouldUpdateTheFillPaintProperty() {
+        // Arrange: Create a needle instance and the paint to be set.
+        WindNeedle needle = new WindNeedle();
+        Paint expectedPaint = Color.BLUE;
+
+        // Act: Set the fill paint on the needle.
+        needle.setFillPaint(expectedPaint);
+        Paint actualPaint = needle.getFillPaint();
+
+        // Assert: Verify that the retrieved paint is the one that was set.
+        assertNotNull("The retrieved paint should not be null", actualPaint);
+        assertEquals("The fill paint should match the value set", expectedPaint, actualPaint);
+    }
+
+    /**
+     * Verifies that a new WindNeedle instance is created with the expected
+     * default property values.
+     */
+    @Test
+    public void newWindNeedleShouldHaveDefaultProperties() {
+        // Arrange & Act: Create a new WindNeedle instance.
+        WindNeedle needle = new WindNeedle();
+
+        // Assert: Check that the properties have their expected default values.
+        assertEquals("Default size should be 5", 5, needle.getSize());
+        assertEquals("Default rotateX should be 0.5", 0.5, needle.getRotateX(), 0.01);
+        assertEquals("Default rotateY should be 0.5", 0.5, needle.getRotateY(), 0.01);
     }
 }
