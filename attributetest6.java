@@ -1,22 +1,34 @@
 package org.jsoup.nodes;
 
 import org.jsoup.Jsoup;
-import org.jsoup.parser.ParseSettings;
-import org.jsoup.parser.Parser;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AttributeTestTest6 {
+/**
+ * Tests for the {@link Attribute} class.
+ */
+public class AttributeTest {
 
     @Test
-    public void booleanAttributesAreEmptyStringValues() {
-        Document doc = Jsoup.parse("<div hidden>");
-        Attributes attributes = doc.body().child(0).attributes();
-        assertEquals("", attributes.get("hidden"));
-        Attribute first = attributes.iterator().next();
-        assertEquals("hidden", first.getKey());
-        assertEquals("", first.getValue());
-        assertFalse(first.hasDeclaredValue());
-        assertTrue(Attribute.isBooleanAttribute(first.getKey()));
+    void parsedBooleanAttributeShouldHaveCorrectProperties() {
+        // Arrange: Parse an element with a boolean attribute (e.g., 'hidden') that has no explicit value.
+        String html = "<div hidden></div>";
+        Element div = Jsoup.parse(html).selectFirst("div");
+        assertNotNull(div, "The 'div' element should be found in the parsed HTML.");
+
+        // Act: Retrieve the attribute from the element.
+        // There's only one attribute, so we can safely get the first one from the iterator.
+        Attribute hiddenAttribute = div.attributes().iterator().next();
+
+        // Assert: Verify the properties of the parsed boolean attribute.
+        // A boolean attribute without a value is parsed as having a key, but its value is an empty string.
+        assertEquals("", div.attr("hidden"), "Element.attr() should return an empty string for a boolean attribute.");
+
+        assertAll("Properties of the Attribute object",
+            () -> assertEquals("hidden", hiddenAttribute.getKey(), "The key should be 'hidden'."),
+            () -> assertEquals("", hiddenAttribute.getValue(), "The value should be an empty string."),
+            () -> assertFalse(hiddenAttribute.hasDeclaredValue(), "Should be false as no value was explicitly declared in the HTML."),
+            () -> assertTrue(Attribute.isBooleanAttribute(hiddenAttribute.getKey()), "The key 'hidden' should be recognized as a boolean attribute type.")
+        );
     }
 }
