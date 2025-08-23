@@ -1,27 +1,30 @@
 package org.mockito.internal.creation.instance;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.mockito.creation.instance.InstantiationException;
 
-public class ConstructorInstantiator_ESTestTest1 extends ConstructorInstantiator_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ConstructorInstantiator}.
+ */
+public class ConstructorInstantiatorTest {
 
-    @Test(timeout = 4000)
-    public void test0() throws Throwable {
-        Object[] objectArray0 = new Object[3];
-        Object object0 = new Object();
-        objectArray0[0] = object0;
-        objectArray0[1] = objectArray0[0];
-        ConstructorInstantiator constructorInstantiator0 = new ConstructorInstantiator(false, objectArray0);
-        Class<Object> class0 = Object.class;
-        // Undeclared exception!
-        try {
-            constructorInstantiator0.newInstance(class0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-        }
+    /**
+     * Verifies that an InstantiationException is thrown when attempting to instantiate a class
+     * with arguments that do not match any of its available constructors.
+     */
+    @Test(expected = InstantiationException.class)
+    public void newInstance_shouldThrowException_whenNoMatchingConstructorIsFound() {
+        // Arrange
+        // The java.lang.Object class has only a single, parameterless constructor.
+        // We will attempt to instantiate it with three arguments, which should fail.
+        Object[] nonMatchingArgs = {new Object(), "some-string", 42};
+        ConstructorInstantiator instantiator = new ConstructorInstantiator(false, nonMatchingArgs);
+
+        // Act
+        // This call is expected to fail because no constructor for Object matches the signature
+        // of the provided arguments (Object, String, Integer).
+        instantiator.newInstance(Object.class);
+
+        // Assert is handled by the @Test(expected) annotation
     }
 }
