@@ -1,41 +1,52 @@
 package org.apache.commons.codec.net;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.nio.charset.StandardCharsets;
-import org.apache.commons.codec.CharEncoding;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class URLCodecTestTest14 {
+/**
+ * Tests for {@link URLCodec} focusing on the handling of "safe" characters
+ * that do not require URL encoding.
+ */
+// Renamed from URLCodecTestTest14 for clarity and to follow standard naming conventions.
+public class URLCodecTest {
 
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
+    // According to RFC 3986, "unreserved" characters (alphanumerics and '-', '_', '.', '*')
+    // do not need to be percent-encoded. These are considered safe.
+    private static final String SAFE_CHARS_STRING = "abc123_-.*";
 
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
+    private URLCodec urlCodec;
 
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
-    }
-
-    private void validateState(final URLCodec urlCodec) {
-        // no tests for now.
+    @BeforeEach
+    void setUp() {
+        urlCodec = new URLCodec();
     }
 
     @Test
-    void testSafeCharEncodeDecode() throws Exception {
-        final URLCodec urlCodec = new URLCodec();
-        final String plain = "abc123_-.*";
-        final String encoded = urlCodec.encode(plain);
-        assertEquals(plain, encoded, "Safe chars URL encoding test");
-        assertEquals(plain, urlCodec.decode(encoded), "Safe chars URL decoding test");
-        validateState(urlCodec);
+    @DisplayName("Encoding a string containing only safe characters should not alter the string")
+    void encodingSafeCharactersShouldReturnOriginalString() throws EncoderException {
+        // Arrange: The SAFE_CHARS_STRING constant and the urlCodec instance are prepared.
+
+        // Act: Encode the string of safe characters.
+        final String encodedString = urlCodec.encode(SAFE_CHARS_STRING);
+
+        // Assert: The encoded string should be identical to the original.
+        assertEquals(SAFE_CHARS_STRING, encodedString);
+    }
+
+    @Test
+    @DisplayName("Decoding a string containing only safe characters should not alter the string")
+    void decodingSafeCharactersShouldReturnOriginalString() throws DecoderException {
+        // Arrange: The SAFE_CHARS_STRING constant and the urlCodec instance are prepared.
+
+        // Act: Decode the string of safe characters.
+        final String decodedString = urlCodec.decode(SAFE_CHARS_STRING);
+
+        // Assert: The decoded string should be identical to the original.
+        assertEquals(SAFE_CHARS_STRING, decodedString);
     }
 }
