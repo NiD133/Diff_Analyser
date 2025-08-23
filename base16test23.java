@@ -1,58 +1,32 @@
 package org.apache.commons.codec.binary;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.nio.charset.Charset;
+
 import java.nio.charset.StandardCharsets;
-import java.util.Random;
-import org.apache.commons.codec.CodecPolicy;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
-import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.Test;
 
-public class Base16TestTest23 {
-
-    private static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
-
-    private final Random random = new Random();
+/**
+ * Tests for the {@link Base16} class.
+ */
+public class Base16Test {
 
     /**
-     * @return the random.
+     * Tests that the Base16 encoder correctly converts a byte array
+     * into its uppercase hexadecimal string representation.
      */
-    public Random getRandom() {
-        return this.random;
-    }
-
-    private void testBase16InBuffer(final int startPasSize, final int endPadSize) {
-        final String content = "Hello World";
-        final String encodedContent;
-        final byte[] bytesUtf8 = StringUtils.getBytesUtf8(content);
-        byte[] buffer = ArrayUtils.addAll(bytesUtf8, new byte[endPadSize]);
-        buffer = ArrayUtils.addAll(new byte[startPasSize], buffer);
-        final byte[] encodedBytes = new Base16().encode(buffer, startPasSize, bytesUtf8.length);
-        encodedContent = StringUtils.newStringUtf8(encodedBytes);
-        assertEquals("48656C6C6F20576F726C64", encodedContent, "encoding hello world");
-    }
-
-    private String toString(final byte[] data) {
-        final StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < data.length; i++) {
-            buf.append(data[i]);
-            if (i != data.length - 1) {
-                buf.append(",");
-            }
-        }
-        return buf.toString();
-    }
-
     @Test
-    void testObjectEncode() {
-        final Base16 b16 = new Base16();
-        assertEquals(new String(b16.encode("Hello World".getBytes(CHARSET_UTF8))), "48656C6C6F20576F726C64");
+    void shouldEncodeByteArrayAsUpperCaseHexString() {
+        // Arrange
+        final String plainText = "Hello World";
+        final byte[] dataToEncode = plainText.getBytes(StandardCharsets.UTF_8);
+        final String expectedHexString = "48656C6C6F20576F726C64";
+        final Base16 base16Codec = new Base16();
+
+        // Act
+        final byte[] encodedBytes = base16Codec.encode(dataToEncode);
+        final String actualHexString = new String(encodedBytes, StandardCharsets.US_ASCII);
+
+        // Assert
+        assertEquals(expectedHexString, actualHexString);
     }
 }
