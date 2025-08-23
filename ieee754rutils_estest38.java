@@ -1,26 +1,27 @@
 package org.apache.commons.lang3.math;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class IEEE754rUtils_ESTestTest38 extends IEEE754rUtils_ESTest_scaffolding {
+import org.junit.jupiter.api.Test;
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        float[] floatArray0 = new float[0];
-        // Undeclared exception!
-        try {
-            IEEE754rUtils.max(floatArray0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Array cannot be empty.
-            //
-            verifyException("org.apache.commons.lang3.Validate", e);
-        }
+/**
+ * Tests for {@link IEEE754rUtils}.
+ */
+class IEEE754rUtilsTest {
+
+    @Test
+    void maxFloatArrayShouldThrowExceptionForEmptyInput() {
+        // Arrange: Create an empty float array.
+        final float[] emptyArray = new float[0];
+
+        // Act & Assert: Verify that calling max() with an empty array throws
+        // an IllegalArgumentException with the expected message.
+        final IllegalArgumentException thrown = assertThrows(
+            IllegalArgumentException.class,
+            () -> IEEE754rUtils.max(emptyArray)
+        );
+
+        assertEquals("Array cannot be empty.", thrown.getMessage());
     }
 }
