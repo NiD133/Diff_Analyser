@@ -1,47 +1,34 @@
 package org.apache.commons.io.file;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.function.UnaryOperator;
-import org.apache.commons.io.filefilter.CanWriteFileFilter;
-import org.apache.commons.io.filefilter.EmptyFileFilter;
-import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.NotFileFilter;
-import org.apache.commons.io.filefilter.PathEqualsFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.function.IOBiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
+import org.junit.Test;
 import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class CountingPathVisitor_ESTestTest14 extends CountingPathVisitor_ESTest_scaffolding {
+/**
+ * Tests for {@link CountingPathVisitor} and its subclasses.
+ * This test case focuses on the behavior of {@link DeletingPathVisitor}.
+ */
+public class CountingPathVisitorTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        DeletingPathVisitor deletingPathVisitor0 = DeletingPathVisitor.withLongCounters();
-        MockIOException mockIOException0 = new MockIOException();
-        // Undeclared exception!
-        try {
-            deletingPathVisitor0.postVisitDirectory((Path) null, (IOException) mockIOException0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.file.Files", e);
-        }
+    /**
+     * Tests that DeletingPathVisitor#postVisitDirectory throws a NullPointerException
+     * when invoked with a null path.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testPostVisitDirectoryWithNullPathThrowsNPE() throws IOException {
+        // Arrange
+        // DeletingPathVisitor is a subclass of CountingPathVisitor, used here to test
+        // its specific implementation of post-visit directory handling.
+        final DeletingPathVisitor visitor = DeletingPathVisitor.withLongCounters();
+        final IOException visitException = new MockIOException("Simulated visit error");
+
+        // Act
+        // Calling postVisitDirectory with a null path, which is invalid input.
+        // The method is expected to fail fast by throwing an exception.
+        visitor.postVisitDirectory(null, visitException);
+
+        // Assert
+        // The test asserts that a NullPointerException is thrown, which is handled
+        // by the 'expected' attribute of the @Test annotation.
     }
 }
