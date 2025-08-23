@@ -1,28 +1,24 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.stream.JsonReader;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ToNumberPolicy_ESTestTest6 extends ToNumberPolicy_ESTest_scaffolding {
+/**
+ * Tests for {@link ToNumberPolicy} focusing on invalid or edge-case inputs.
+ */
+public class ToNumberPolicyTest {
 
-    @Test(timeout = 4000)
-    public void test5() throws Throwable {
-        ToNumberPolicy toNumberPolicy0 = ToNumberPolicy.DOUBLE;
-        // Undeclared exception!
-        try {
-            toNumberPolicy0.readNumber((JsonReader) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.ToNumberPolicy$1", e);
-        }
+    /**
+     * Verifies that calling readNumber with a null JsonReader throws a NullPointerException.
+     * This is a fundamental contract test to ensure the method handles null inputs gracefully.
+     */
+    @Test(expected = NullPointerException.class)
+    public void readNumber_whenReaderIsNull_throwsNullPointerException() {
+        // The specific policy instance (DOUBLE) is arbitrary; any policy should exhibit
+        // the same behavior for a null reader.
+        ToNumberPolicy policy = ToNumberPolicy.DOUBLE;
+
+        // This call is expected to throw a NullPointerException.
+        policy.readNumber(null);
     }
 }
