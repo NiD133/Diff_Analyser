@@ -1,30 +1,26 @@
 package org.jfree.chart.renderer.xy;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
+import static org.junit.Assert.assertFalse;
 import java.awt.geom.Arc2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.junit.runner.RunWith;
 
-public class StandardXYBarPainter_ESTestTest12 extends StandardXYBarPainter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link StandardXYBarPainter} class.
+ */
+public class StandardXYBarPainterTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        StandardXYBarPainter standardXYBarPainter0 = new StandardXYBarPainter();
-        Arc2D.Float arc2D_Float0 = new Arc2D.Float(1);
-        boolean boolean0 = standardXYBarPainter0.equals(arc2D_Float0);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false when a StandardXYBarPainter
+     * is compared with an object of a completely different type.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenComparedWithDifferentTypeObject() {
+        // Arrange
+        StandardXYBarPainter painter = new StandardXYBarPainter();
+        Object otherObject = new Arc2D.Float();
+
+        // Act & Assert
+        assertFalse("A StandardXYBarPainter instance should not be equal to an object of a different type.",
+                painter.equals(otherObject));
     }
 }
