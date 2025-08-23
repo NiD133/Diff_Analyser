@@ -1,28 +1,31 @@
 package org.apache.commons.compress.utils;
 
 import static org.apache.commons.compress.utils.ByteUtils.fromLittleEndian;
-import static org.apache.commons.compress.utils.ByteUtils.toLittleEndian;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
 import java.io.EOFException;
-import java.io.IOException;
-import java.util.Arrays;
-import org.apache.commons.compress.utils.ByteUtils.InputStreamByteSupplier;
-import org.apache.commons.compress.utils.ByteUtils.OutputStreamByteConsumer;
 import org.junit.jupiter.api.Test;
 
-public class ByteUtilsTestTest9 {
+/**
+ * Tests for {@link ByteUtils}.
+ */
+class ByteUtilsTest {
 
+    /**
+     * Tests that {@link ByteUtils#fromLittleEndian(DataInput, int)} throws an EOFException
+     * if the stream ends before the requested number of bytes has been read.
+     */
     @Test
-    void testFromLittleEndianFromDataInputThrowsForPrematureEnd() {
-        final DataInput din = new DataInputStream(new ByteArrayInputStream(new byte[] { 2, 3 }));
-        assertThrows(EOFException.class, () -> fromLittleEndian(din, 3));
+    void fromLittleEndianWithDataInputShouldThrowEOFExceptionIfStreamEndsPrematurely() {
+        // Arrange: Create an input stream with fewer bytes than we will request.
+        final byte[] inputBytes = { 0x01, 0x02 }; // 2 bytes available
+        final DataInput dataInput = new DataInputStream(new ByteArrayInputStream(inputBytes));
+        final int bytesToRead = 3; // But we request 3 bytes
+
+        // Act & Assert: Expect an EOFException when trying to read past the end of the stream.
+        assertThrows(EOFException.class, () -> fromLittleEndian(dataInput, bytesToRead));
     }
 }
