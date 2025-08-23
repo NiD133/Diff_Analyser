@@ -1,25 +1,39 @@
 package org.apache.commons.lang3.reflect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class ConstructorUtils_ESTestTest17 extends ConstructorUtils_ESTest_scaffolding {
+/**
+ * Contains tests for {@link ConstructorUtils}.
+ */
+public class ConstructorUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Class<Integer>[] classArray0 = (Class<Integer>[]) Array.newInstance(Class.class, 1);
-        Class<Integer> class0 = Integer.class;
-        Constructor<Integer> constructor0 = ConstructorUtils.getMatchingAccessibleConstructor(class0, (Class<?>[]) classArray0);
-        assertNotNull(constructor0);
-        assertEquals("public java.lang.Integer(java.lang.String) throws java.lang.NumberFormatException", constructor0.toString());
+    /**
+     * Tests that {@code getMatchingAccessibleConstructor} can find a constructor
+     * when a {@code null} is provided in the parameter types array.
+     * <p>
+     * The {@code null} acts as a wildcard for any reference type. For the {@code Integer}
+     * class, which has constructors {@code Integer(int)} and {@code Integer(String)},
+     * this test verifies that the {@code Integer(String)} constructor is matched, as
+     * {@code String} is a reference type.
+     */
+    @Test
+    public void testGetMatchingAccessibleConstructorWithNullParameterType() {
+        // Arrange
+        // A null in the parameter types array is treated as a wildcard for any reference type.
+        final Class<?>[] parameterTypes = { null };
+
+        // Act
+        final Constructor<Integer> foundConstructor = ConstructorUtils.getMatchingAccessibleConstructor(Integer.class, parameterTypes);
+
+        // Assert
+        assertNotNull("A matching constructor should have been found.", foundConstructor);
+
+        // Verify that the specific constructor Integer(String) was returned.
+        final Class<?>[] actualParameterTypes = foundConstructor.getParameterTypes();
+        assertEquals("The constructor should have exactly one parameter.", 1, actualParameterTypes.length);
+        assertEquals("The parameter type should be String.", String.class, actualParameterTypes[0]);
     }
 }
