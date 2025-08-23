@@ -1,34 +1,40 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
+
 import java.io.IOException;
-import java.io.PipedReader;
+import java.io.Reader;
 import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class ProxyReader_ESTestTest23 extends ProxyReader_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ProxyReader} class.
+ */
+public class ProxyReaderTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        StringReader stringReader0 = new StringReader("");
-        CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(stringReader0);
-        char[] charArray0 = new char[0];
-        // Undeclared exception!
-        try {
-            closeShieldReader0.read(charArray0, 49, 49);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.io.StringReader", e);
-        }
+    /**
+     * Tests that a call to read(char[], int, int) with parameters that are out of
+     * bounds for the destination buffer correctly throws an IndexOutOfBoundsException.
+     * This test verifies that the exception from the underlying (proxied) reader
+     * is properly propagated.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testReadWithInvalidBufferParametersThrowsIndexOutOfBoundsException() throws IOException {
+        // Arrange: Set up the proxy reader and test parameters.
+        // We use CloseShieldReader as a concrete implementation of the abstract ProxyReader.
+        final Reader sourceReader = new StringReader("any-data");
+        final ProxyReader proxyReader = CloseShieldReader.wrap(sourceReader);
+
+        final char[] buffer = new char[0];
+        // Define offset and length values that are intentionally out of bounds for the empty buffer.
+        final int invalidOffset = 49;
+        final int invalidLength = 49;
+
+        // Act: Attempt to read using the invalid parameters.
+        // This call should be delegated to the underlying StringReader, which will
+        // throw the IndexOutOfBoundsException.
+        proxyReader.read(buffer, invalidOffset, invalidLength);
+
+        // Assert: The test is successful if an IndexOutOfBoundsException is thrown,
+        // which is handled by the @Test(expected) annotation.
     }
 }
