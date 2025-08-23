@@ -1,33 +1,52 @@
 package org.apache.commons.collections4.sequence;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ConcurrentModificationException;
+import static org.junit.Assert.assertEquals;
+
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SequencesComparator_ESTestTest11 extends SequencesComparator_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SequencesComparator} class.
+ */
+public class SequencesComparatorTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        LinkedList<Object> linkedList1 = new LinkedList<Object>();
-        linkedList0.offerFirst(linkedList1);
-        Object object0 = new Object();
-        linkedList1.add(object0);
-        linkedList1.add((Object) linkedList0);
-        linkedList1.add(object0);
-        SequencesComparator<Object> sequencesComparator0 = new SequencesComparator<Object>(linkedList0, linkedList1);
-        EditScript<Object> editScript0 = sequencesComparator0.getScript();
-        assertEquals(4, editScript0.getModifications());
+    @Test
+    public void getScript_shouldCalculateCorrectModifications_forListsWithCircularReference() {
+        // Arrange: Create two lists, listA and listB, that reference each other,
+        // forming a circular dependency.
+        final List<Object> listA = new LinkedList<>();
+        final List<Object> listB = new LinkedList<>();
+        final Object sharedObject = new Object();
+
+        // listA will contain only listB.
+        // listA: [ listB ]
+        listA.add(listB);
+
+        // listB will contain a shared object, listA, and the shared object again.
+        // listB: [ sharedObject, listA, sharedObject ]
+        listB.add(sharedObject);
+        listB.add(listA);
+        listB.add(sharedObject);
+
+        // The comparison algorithm should handle this circular reference gracefully.
+        // Since the lists have no equal elements, the transformation from listA to listB
+        // requires deleting the single element of listA and inserting all three
+        // elements of listB.
+        //
+        // 1. Delete listB from listA (1 modification)
+        // 2. Insert sharedObject (1 modification)
+        // 3. Insert listA (1 modification)
+        // 4. Insert sharedObject (1 modification)
+        // Total modifications = 1 delete + 3 inserts = 4.
+        final int expectedModifications = 4;
+        final SequencesComparator<Object> comparator = new SequencesComparator<>(listA, listB);
+
+        // Act
+        final EditScript<Object> editScript = comparator.getScript();
+
+        // Assert
+        assertEquals("The number of modifications should be the sum of deletions and insertions.",
+                     expectedModifications, editScript.getModifications());
     }
 }
