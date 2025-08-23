@@ -1,33 +1,69 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
+
+import java.util.Collections;
 import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+
+import static org.junit.Assert.*;
 
 public class JsonIgnoreProperties_ESTestTest54 extends JsonIgnoreProperties_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test53() throws Throwable {
-        LinkedHashSet<String> linkedHashSet0 = new LinkedHashSet<String>();
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.construct(linkedHashSet0, true, true, true, true);
-        JsonIgnoreProperties.Value[] jsonIgnoreProperties_ValueArray0 = new JsonIgnoreProperties.Value[8];
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value1 = new JsonIgnoreProperties.Value(linkedHashSet0, false, true, true, true);
-        assertTrue(jsonIgnoreProperties_Value1.getAllowSetters());
-        jsonIgnoreProperties_ValueArray0[5] = jsonIgnoreProperties_Value1;
-        jsonIgnoreProperties_ValueArray0[7] = jsonIgnoreProperties_Value0;
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value2 = JsonIgnoreProperties.Value.mergeAll(jsonIgnoreProperties_ValueArray0);
-        assertNotSame(jsonIgnoreProperties_Value2, jsonIgnoreProperties_Value0);
-        assertNotSame(jsonIgnoreProperties_Value2, jsonIgnoreProperties_Value1);
-        assertTrue(jsonIgnoreProperties_Value2.getAllowGetters());
-        assertTrue(jsonIgnoreProperties_Value2.equals((Object) jsonIgnoreProperties_Value0));
-        assertTrue(jsonIgnoreProperties_Value2.getIgnoreUnknown());
-        assertNotNull(jsonIgnoreProperties_Value2);
+    /**
+     * Tests that the {@code JsonIgnoreProperties.Value.mergeAll()} method correctly
+     * combines boolean properties from multiple {@code Value} instances.
+     * <p>
+     * The expected behavior is that for boolean flags like {@code ignoreUnknown},
+     * the merged result is {@code true} if any of the input values have it set to {@code true}.
+     * The test also verifies that the method handles {@code null} entries in the input array gracefully.
+     */
+    @Test
+    public void mergeAllShouldCombineBooleanFlagsWithTrueAsTheWinningValue() {
+        // Arrange
+        Set<String> ignoredProperties = Collections.emptySet();
+
+        // Create a base configuration where 'ignoreUnknown' is true.
+        // This represents the expected outcome after the merge.
+        JsonIgnoreProperties.Value configWithIgnoreUnknownTrue = JsonIgnoreProperties.Value.construct(
+                ignoredProperties,
+                true, // ignoreUnknown
+                true, // allowGetters
+                true, // allowSetters
+                true  // merge
+        );
+
+        // Create a second configuration where 'ignoreUnknown' is false.
+        JsonIgnoreProperties.Value configWithIgnoreUnknownFalse = JsonIgnoreProperties.Value.construct(
+                ignoredProperties,
+                false, // ignoreUnknown
+                true,  // allowGetters
+                true,  // allowSetters
+                true   // merge
+        );
+
+        // Create an array containing the two configurations and several nulls to test robustness.
+        JsonIgnoreProperties.Value[] valuesToMerge = new JsonIgnoreProperties.Value[8];
+        valuesToMerge[0] = configWithIgnoreUnknownFalse;
+        valuesToMerge[1] = configWithIgnoreUnknownTrue;
+
+        // Act
+        JsonIgnoreProperties.Value mergedConfig = JsonIgnoreProperties.Value.mergeAll(valuesToMerge);
+
+        // Assert
+        assertNotNull("The merged configuration should not be null", mergedConfig);
+
+        // The merged value should be a new instance, not one of the inputs.
+        assertNotSame("Merged config should be a new instance", configWithIgnoreUnknownTrue, mergedConfig);
+        assertNotSame("Merged config should be a new instance", configWithIgnoreUnknownFalse, mergedConfig);
+
+        // Verify that the boolean properties were merged correctly (true wins).
+        assertTrue("ignoreUnknown should be true after merge", mergedConfig.getIgnoreUnknown());
+        assertTrue("allowGetters should be true after merge", mergedConfig.getAllowGetters());
+        assertTrue("allowSetters should be true after merge", mergedConfig.getAllowSetters());
+        assertTrue("merge should be true after merge", mergedConfig.getMerge());
+
+        // The merged configuration should be logically equal to the one where 'ignoreUnknown' was true.
+        assertEquals("Merged config should be equal to the one with the 'strongest' (true) flags",
+                configWithIgnoreUnknownTrue, mergedConfig);
     }
 }
