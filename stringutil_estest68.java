@@ -1,28 +1,26 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class StringUtil_ESTestTest68 extends StringUtil_ESTest_scaffolding {
+/**
+ * Tests for the {@link StringUtil} class, focusing on character type validation.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test67() throws Throwable {
-        boolean boolean0 = StringUtil.isInvisibleChar(8203);
-        assertTrue(boolean0);
+    /**
+     * Verifies that the isInvisibleChar() method correctly identifies the
+     * "zero-width space" character (Unicode 8203) as an invisible character.
+     */
+    @Test
+    public void isInvisibleCharShouldReturnTrueForZeroWidthSpace() {
+        // The integer 8203 represents the Unicode code point for a "zero-width space" (U+200B).
+        // This character is expected to be treated as invisible by the utility method.
+        final int zeroWidthSpaceCodePoint = 8203;
+
+        assertTrue(
+            "The zero-width space character should be classified as invisible.",
+            StringUtil.isInvisibleChar(zeroWidthSpaceCodePoint)
+        );
     }
 }
