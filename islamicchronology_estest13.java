@@ -1,25 +1,31 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
-public class IslamicChronology_ESTestTest13 extends IslamicChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the IslamicChronology class, focusing on leap year calculations.
+ */
+public class IslamicChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        TimeZone timeZone0 = TimeZone.getTimeZone("");
-        DateTimeZone dateTimeZone0 = DateTimeZone.forTimeZone(timeZone0);
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstance(dateTimeZone0);
-        IslamicChronology islamicChronology1 = IslamicChronology.getInstance(dateTimeZone0, islamicChronology0.LEAP_YEAR_HABASH_AL_HASIB);
-        boolean boolean0 = islamicChronology1.isLeapYear(30);
-        assertTrue(boolean0);
+    /**
+     * Verifies that year 30 is correctly identified as a leap year
+     * when using the Habash al-Hasib leap year pattern.
+     */
+    @Test
+    public void isLeapYear_withHabashAlHasibPattern_returnsTrueForYear30() {
+        // Arrange
+        // The source documentation for IslamicChronology specifies that for the
+        // Habash al-Hasib pattern, the 30th year of a 30-year cycle is a leap year.
+        IslamicChronology.LeapYearPatternType habashAlHasibPattern = IslamicChronology.LEAP_YEAR_HABASH_AL_HASIB;
+        IslamicChronology chronology = IslamicChronology.getInstance(DateTimeZone.UTC, habashAlHasibPattern);
+        int yearInCycle = 30;
+
+        // Act
+        boolean isLeap = chronology.isLeapYear(yearInCycle);
+
+        // Assert
+        assertTrue("Year 30 should be a leap year in the Habash al-Hasib pattern.", isLeap);
     }
 }
