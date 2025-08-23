@@ -1,26 +1,18 @@
 package com.google.common.primitives;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SignedBytes_ESTestTest14 extends SignedBytes_ESTest_scaffolding {
+/**
+ * Tests for {@link SignedBytes}.
+ */
+public class SignedBytesTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        // Undeclared exception!
-        try {
-            SignedBytes.min((byte[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.primitives.SignedBytes", e);
-        }
+    /**
+     * Verifies that calling min() with a null array throws a NullPointerException.
+     * This is the expected behavior as per Guava's standard contract for non-null parameters.
+     */
+    @Test(expected = NullPointerException.class)
+    public void min_withNullArray_shouldThrowNullPointerException() {
+        SignedBytes.min(null);
     }
 }
