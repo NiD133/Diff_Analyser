@@ -1,59 +1,59 @@
 package org.apache.commons.collections4.multimap;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.AbstractMap;
-import java.util.ArrayDeque;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.PriorityQueue;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Factory;
 import org.apache.commons.collections4.MultiValuedMap;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
 import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionFactory;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TransformedMultiValuedMap_ESTestTest8 extends TransformedMultiValuedMap_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        ArrayListValuedHashMap<Integer, Integer> arrayListValuedHashMap0 = new ArrayListValuedHashMap<Integer, Integer>(1, 1);
-        Transformer<Object, Integer> transformer0 = ConstantTransformer.nullTransformer();
-        TransformedMultiValuedMap<Integer, Integer> transformedMultiValuedMap0 = TransformedMultiValuedMap.transformedMap((MultiValuedMap<Integer, Integer>) arrayListValuedHashMap0, (Transformer<? super Integer, ? extends Integer>) null, (Transformer<? super Integer, ? extends Integer>) transformer0);
-        Integer integer0 = new Integer(1);
-        transformedMultiValuedMap0.put(integer0, (Integer) null);
-        HashSetValuedHashMap<Integer, Object> hashSetValuedHashMap0 = new HashSetValuedHashMap<Integer, Object>();
-        TransformedMultiValuedMap<Integer, Object> transformedMultiValuedMap1 = new TransformedMultiValuedMap<Integer, Object>(hashSetValuedHashMap0, transformer0, transformer0);
-        boolean boolean0 = transformedMultiValuedMap1.putAll((MultiValuedMap<? extends Integer, ?>) arrayListValuedHashMap0);
-        assertTrue(boolean0);
+/**
+ * Contains improved tests for {@link TransformedMultiValuedMap}.
+ */
+public class TransformedMultiValuedMapTest {
+
+    /**
+     * Tests that putAll(MultiValuedMap) correctly applies both key and value
+     * transformers to every entry from the source map before adding them.
+     * This specific case verifies the behavior when transformers convert
+     * all keys and values to null.
+     */
+    @Test
+    public void testPutAllWithMultiValuedMapTransformsEntriesToNull() {
+        // Arrange
+        // 1. Create a source map with a non-null key and value.
+        final MultiValuedMap<Integer, String> sourceMap = new ArrayListValuedHashMap<>();
+        sourceMap.put(1, "VALUE");
+
+        // 2. Create the transformer that will convert any input to null.
+        final Transformer<Object, Object> alwaysNullTransformer = ConstantTransformer.nullTransformer();
+
+        // 3. Create the destination map which will be decorated.
+        final MultiValuedMap<Object, Object> decoratedDestinationMap = new HashSetValuedHashMap<>();
+
+        // 4. Create the TransformedMultiValuedMap under test.
+        // It will transform keys and values from the sourceMap before putting them
+        // into the decoratedDestinationMap.
+        final TransformedMultiValuedMap<Object, Object> transformedDestinationMap =
+                new TransformedMultiValuedMap<>(decoratedDestinationMap, alwaysNullTransformer, alwaysNullTransformer);
+
+        // Act
+        // Add all entries from the source map to the transformed map.
+        // The entry (1, "VALUE") should be transformed to (null, null).
+        final boolean wasModified = transformedDestinationMap.putAll(sourceMap);
+
+        // Assert
+        // The operation should report that the map was changed.
+        assertTrue("putAll should return true as the map was modified.", wasModified);
+
+        // The underlying map should now contain one entry.
+        assertEquals("The destination map should contain one entry.", 1, decoratedDestinationMap.size());
+
+        // The entry should be the result of the transformation: (null, null).
+        assertTrue("The destination map should contain the transformed key (null).",
+                   decoratedDestinationMap.containsKey(null));
+        assertTrue("The values for the null key should contain the transformed value (null).",
+                   decoratedDestinationMap.get(null).contains(null));
     }
 }
