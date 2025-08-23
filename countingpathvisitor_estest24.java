@@ -1,40 +1,35 @@
 package org.apache.commons.io.file;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.NoSuchFileException;
+import static org.junit.Assert.assertTrue;
+
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.function.UnaryOperator;
-import org.apache.commons.io.filefilter.CanWriteFileFilter;
-import org.apache.commons.io.filefilter.EmptyFileFilter;
-import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.NotFileFilter;
-import org.apache.commons.io.filefilter.PathEqualsFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.function.IOBiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
+// The test class name and inheritance are preserved from the original.
 public class CountingPathVisitor_ESTestTest24 extends CountingPathVisitor_ESTest_scaffolding {
 
+    /**
+     * Tests that the accept() method returns true for any path when the
+     * CountingPathVisitor is created with default filters.
+     *
+     * This scenario specifically verifies that the method handles null
+     * BasicFileAttributes gracefully, as the default filter should
+     * not depend on them.
+     */
     @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        CountingPathVisitor countingPathVisitor0 = CountingPathVisitor.withBigIntegerCounters();
-        MockFile mockFile0 = new MockFile("");
-        Path path0 = mockFile0.toPath();
-        boolean boolean0 = countingPathVisitor0.accept(path0, (BasicFileAttributes) null);
-        assertTrue(boolean0);
+    public void acceptShouldReturnTrueForAnyPathWhenUsingDefaultFilters() {
+        // Arrange: Create a visitor with default settings.
+        // The default visitor is configured to accept all files and directories.
+        final CountingPathVisitor visitor = CountingPathVisitor.withBigIntegerCounters();
+        final Path path = new MockFile("any/path").toPath();
+        final BasicFileAttributes nullAttributes = null;
+
+        // Act: Call the accept method with a path and null attributes.
+        final boolean isAccepted = visitor.accept(path, nullAttributes);
+
+        // Assert: Verify that the path was accepted.
+        assertTrue("The path should be accepted by the default filter, even with null attributes.", isAccepted);
     }
 }
