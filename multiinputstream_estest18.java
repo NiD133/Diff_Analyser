@@ -1,33 +1,36 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class MultiInputStream_ESTestTest18 extends MultiInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link MultiInputStream}.
+ */
+public class MultiInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        LinkedList<ByteSource> linkedList0 = new LinkedList<ByteSource>();
-        ByteSource[] byteSourceArray0 = new ByteSource[3];
-        byte[] byteArray0 = new byte[8];
-        ByteSource byteSource0 = ByteSource.wrap(byteArray0);
-        byteSourceArray0[0] = byteSource0;
-        linkedList0.add(byteSourceArray0[0]);
-        Iterator<ByteSource> iterator0 = linkedList0.descendingIterator();
-        MultiInputStream multiInputStream0 = new MultiInputStream(iterator0);
-        int int0 = multiInputStream0.read();
-        assertEquals(0, int0);
+    /**
+     * Verifies that the read() method correctly reads the first byte from a stream
+     * that is composed of a single ByteSource.
+     */
+    @Test
+    public void read_fromSingleSource_returnsFirstByte() throws IOException {
+        // Arrange: Set up a single ByteSource containing specific data.
+        byte[] sourceData = {42, 100, -1}; // Use explicit, non-zero data for clarity.
+        ByteSource singleSource = ByteSource.wrap(sourceData);
+        Iterator<ByteSource> sources = Collections.singletonList(singleSource).iterator();
+
+        MultiInputStream multiInputStream = new MultiInputStream(sources);
+
+        // Act: Read the first byte from the stream.
+        int firstByteRead = multiInputStream.read();
+
+        // Assert: The byte read should be the first byte from our source data.
+        assertEquals("The first byte read should match the first byte of the source.", 42, firstByteRead);
+        
+        multiInputStream.close();
     }
 }
