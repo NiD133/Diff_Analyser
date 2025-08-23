@@ -1,36 +1,24 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
-public class SecondsTestTest8 extends TestCase {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest extends TestCase {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    /**
+     * Tests that getSeconds() returns the same value used to create the instance.
+     */
+    public void testGetSeconds_returnsValueFromConstructor() {
+        // Arrange
+        final int expectedSeconds = 20;
+        Seconds secondsInstance = Seconds.seconds(expectedSeconds);
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+        // Act
+        int actualSeconds = secondsInstance.getSeconds();
 
-    public static TestSuite suite() {
-        return new TestSuite(TestSeconds.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    public void testGetMethods() {
-        Seconds test = Seconds.seconds(20);
-        assertEquals(20, test.getSeconds());
+        // Assert
+        assertEquals(expectedSeconds, actualSeconds);
     }
 }
