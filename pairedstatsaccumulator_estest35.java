@@ -1,28 +1,20 @@
 package com.google.common.math;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PairedStatsAccumulator_ESTestTest35 extends PairedStatsAccumulator_ESTest_scaffolding {
+/**
+ * Tests for {@link PairedStatsAccumulator}.
+ */
+public class PairedStatsAccumulatorTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        PairedStatsAccumulator pairedStatsAccumulator0 = new PairedStatsAccumulator();
-        // Undeclared exception!
-        try {
-            pairedStatsAccumulator0.pearsonsCorrelationCoefficient();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.base.Preconditions", e);
-        }
+    @Test(expected = IllegalStateException.class)
+    public void pearsonsCorrelationCoefficient_whenAccumulatorIsEmpty_throwsIllegalStateException() {
+        // Arrange: Create an accumulator with no data.
+        PairedStatsAccumulator accumulator = new PairedStatsAccumulator();
+
+        // Act: Attempt to calculate the correlation coefficient, which is undefined for an empty set.
+        accumulator.pearsonsCorrelationCoefficient();
+
+        // Assert: The @Test(expected=...) annotation handles the exception assertion.
     }
 }
