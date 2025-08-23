@@ -1,27 +1,46 @@
 package com.fasterxml.jackson.core;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonLocation_ESTestTest22 extends JsonLocation_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        Object object0 = new Object();
-        ErrorReportConfiguration errorReportConfiguration0 = new ErrorReportConfiguration((-1262), (-1262));
-        ContentReference contentReference0 = ContentReference.construct(true, object0, errorReportConfiguration0);
-        ContentReference contentReference1 = ContentReference.construct(true, (Object) contentReference0, 4615, 0, errorReportConfiguration0);
-        JsonLocation jsonLocation0 = new JsonLocation(contentReference1, 3039L, 575, (-559));
-        ContentReference contentReference2 = jsonLocation0.contentReference();
-        assertEquals(575, jsonLocation0.getLineNr());
-        assertEquals(0, contentReference2.contentLength());
-        assertEquals((-559), jsonLocation0.getColumnNr());
-        assertEquals((-1L), jsonLocation0.getByteOffset());
-        assertEquals(3039L, jsonLocation0.getCharOffset());
+/**
+ * Unit tests for the {@link JsonLocation} class.
+ */
+public class JsonLocationTest {
+
+    /**
+     * Tests that the constructor correctly initializes all location properties
+     * and that the getter methods return the expected values.
+     */
+    @Test
+    public void constructorShouldSetAllPropertiesCorrectly() {
+        // Arrange: Define the properties for our test location.
+        final long expectedCharOffset = 3039L;
+        final int expectedLineNumber = 575;
+        final int expectedColumnNumber = -559; // The constructor accepts any integer value.
+        final String sourceDescription = "test-source";
+        final ContentReference contentReference = ContentReference.construct(false, sourceDescription);
+
+        // Act: Create a new JsonLocation instance.
+        // We use the constructor that does not take a byte offset, which should
+        // result in a default byte offset of -1.
+        JsonLocation location = new JsonLocation(contentReference, expectedCharOffset, expectedLineNumber, expectedColumnNumber);
+
+        // Assert: Verify that all properties were set as expected.
+        assertEquals("Line number should match the constructor argument",
+                expectedLineNumber, location.getLineNr());
+        assertEquals("Column number should match the constructor argument",
+                expectedColumnNumber, location.getColumnNr());
+        assertEquals("Character offset should match the constructor argument",
+                expectedCharOffset, location.getCharOffset());
+        assertEquals("Byte offset should default to -1 for this constructor",
+                -1L, location.getByteOffset());
+
+        // Also, verify that the content reference is the same instance that was passed in.
+        assertSame("ContentReference should be the same object instance provided to the constructor",
+                contentReference, location.contentReference());
     }
 }
