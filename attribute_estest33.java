@@ -1,37 +1,28 @@
 package org.jsoup.nodes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
 import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+/**
+ * Test suite for the {@link Attribute} class.
+ * This test focuses on the static {@code html} method.
+ */
 public class Attribute_ESTestTest33 extends Attribute_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        // Undeclared exception!
-        try {
-            Attribute.html(">Qu{B", "org.jsoup.select.Evaluator$ContainsOwnText", (QuietAppendable) null, document_OutputSettings0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.nodes.Attribute", e);
-        }
+    /**
+     * Verifies that the static Attribute.html() method throws a NullPointerException
+     * when the provided Appendable (the destination for the output) is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void htmlMethodThrowsNullPointerExceptionWhenAppendableIsNull() {
+        // Arrange
+        Document.OutputSettings outputSettings = new Document.OutputSettings();
+        String key = "some-key";
+        String value = "some-value";
+        QuietAppendable nullAppendable = null;
+
+        // Act & Assert
+        // This call is expected to throw a NullPointerException because the appendable is null.
+        Attribute.html(key, value, nullAppendable, outputSettings);
     }
 }
