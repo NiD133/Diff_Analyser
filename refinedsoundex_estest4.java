@@ -1,18 +1,28 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RefinedSoundex_ESTestTest4 extends RefinedSoundex_ESTest_scaffolding {
+/**
+ * Tests for the {@link RefinedSoundex} class, focusing on its custom mapping capabilities.
+ */
+public class RefinedSoundexTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        RefinedSoundex refinedSoundex0 = new RefinedSoundex("org.apache.commons.codec.language.RefinedSoundex");
-        char char0 = refinedSoundex0.getMappingCode('X');
-        assertEquals('c', char0);
+    /**
+     * Tests that the getMappingCode() method correctly returns a character
+     * from a custom mapping provided during instantiation.
+     */
+    @Test
+    public void getMappingCodeShouldReturnCorrectCharFromCustomMapping() {
+        // Arrange: Create a custom mapping where the code for 'X' (the 24th letter) is 'c'.
+        // The rest of the mapping is standard for clarity.
+        final String customMapping = "ABCDEFGHIJKLMNOPQRSTUVWcYZ";
+        final RefinedSoundex soundex = new RefinedSoundex(customMapping);
+
+        // Act: Get the mapping code for the character 'X'.
+        final char mappingCode = soundex.getMappingCode('X');
+
+        // Assert: Verify that the returned code is 'c', as defined in our custom mapping.
+        assertEquals('c', mappingCode);
     }
 }
