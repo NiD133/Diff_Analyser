@@ -1,50 +1,41 @@
 package org.apache.commons.io;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
-public class IOCaseTestTest15 {
+/**
+ * Tests for the scratch buffer methods in {@link IOUtils}.
+ *
+ * Note: The original test was incorrectly placed in a class named 'IOCaseTestTest15'
+ * but was testing methods from 'IOUtils'. This class has been renamed for clarity.
+ */
+class IOUtilsTest {
 
-    private static final boolean WINDOWS = File.separatorChar == '\\';
-
-    private void assert0(final byte[] arr) {
-        for (final byte e : arr) {
-            assertEquals(0, e);
-        }
-    }
-
-    private void assert0(final char[] arr) {
-        for (final char e : arr) {
-            assertEquals(0, e);
-        }
-    }
-
-    private IOCase serialize(final IOCase value) throws Exception {
-        final ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        try (ObjectOutputStream out = new ObjectOutputStream(buf)) {
-            out.writeObject(value);
-            out.flush();
-        }
-        final ByteArrayInputStream bufin = new ByteArrayInputStream(buf.toByteArray());
-        final ObjectInputStream in = new ObjectInputStream(bufin);
-        return (IOCase) in.readObject();
-    }
-
+    /**
+     * Tests that the scratch byte and char arrays provided by IOUtils are independent
+     * and are initially filled with zeros. IOUtils uses thread-local buffers for performance,
+     * and this test verifies that the buffer for bytes and the buffer for chars do not
+     * interfere with each other.
+     */
     @Test
-    void test_getScratchByteArray() {
-        final byte[] array = IOUtils.getScratchByteArray();
-        assert0(array);
-        Arrays.fill(array, (byte) 1);
-        assert0(IOUtils.getScratchCharArray());
+    void getScratchArrays_areIndependentAndInitiallyZeroed() {
+        // Arrange: No specific setup needed.
+
+        // Act & Assert: Verify the initial state of the byte array
+        final byte[] byteArray = IOUtils.getScratchByteArray();
+        final int byteArrayLength = byteArray.length;
+        assertArrayEquals(new byte[byteArrayLength], byteArray,
+            "The initial scratch byte array should be zeroed.");
+
+        // Act: Modify the byte array to test for independence
+        Arrays.fill(byteArray, (byte) 1);
+
+        // Act & Assert: Verify the char array is unaffected
+        final char[] charArray = IOUtils.getScratchCharArray();
+        final int charArrayLength = charArray.length;
+        assertArrayEquals(new char[charArrayLength], charArray,
+            "The scratch char array should be zeroed and independent of the byte array.");
     }
 }
