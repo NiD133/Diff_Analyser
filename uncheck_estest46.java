@@ -1,31 +1,35 @@
 package org.apache.commons.io.function;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.time.chrono.HijrahEra;
-import java.util.Comparator;
-import java.util.concurrent.ForkJoinTask;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
 import java.util.function.Supplier;
-import java.util.stream.Collector;
 import java.util.stream.LongStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class Uncheck_ESTestTest46 extends Uncheck_ESTest_scaffolding {
+import org.junit.Test;
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        IOSupplier<LongStream> iOSupplier0 = (IOSupplier<LongStream>) mock(IOSupplier.class, new ViolatedAssumptionAnswer());
-        doReturn((Object) null).when(iOSupplier0).get();
-        LongStream longStream0 = Uncheck.get(iOSupplier0, (Supplier<String>) null);
-        assertNull(longStream0);
+/**
+ * Tests for the {@link Uncheck} utility class.
+ */
+public class UncheckTest {
+
+    /**
+     * Tests that {@link Uncheck#get(IOSupplier, Supplier)} returns null
+     * when the provided supplier successfully returns null.
+     */
+    @Test
+    public void testGet_whenSupplierReturnsNull_shouldReturnNull() throws IOException {
+        // Arrange: Create a mock IOSupplier that returns null without throwing an exception.
+        @SuppressWarnings("unchecked")
+        final IOSupplier<LongStream> nullReturningSupplier = mock(IOSupplier.class);
+        when(nullReturningSupplier.get()).thenReturn(null);
+
+        // Act: Call the method under test. The message supplier is irrelevant here.
+        final LongStream result = Uncheck.get(nullReturningSupplier, (Supplier<String>) null);
+
+        // Assert: The result should be the null value passed through from the supplier.
+        assertNull("Expected Uncheck.get() to return null when the supplier provides a null value.", result);
     }
 }
