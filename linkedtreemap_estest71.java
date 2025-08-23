@@ -1,26 +1,24 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
+import static org.junit.Assert.assertEquals;
 import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+// The test class name and inheritance are kept to match the original structure.
 public class LinkedTreeMap_ESTestTest71 extends LinkedTreeMap_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test70() throws Throwable {
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>(true);
-        LinkedTreeMap.KeySet linkedTreeMap_KeySet0 = linkedTreeMap0.new KeySet();
-        int int0 = linkedTreeMap_KeySet0.size();
-        assertEquals(0, int0);
+    /**
+     * Tests that the size of the key set for a newly created, empty LinkedTreeMap is 0.
+     */
+    @Test
+    public void keySet_onEmptyMap_shouldHaveSizeZero() {
+        // Arrange: Create a new, empty LinkedTreeMap.
+        LinkedTreeMap<Integer, Integer> map = new LinkedTreeMap<>();
+
+        // Act: Get the key set from the map.
+        Set<Integer> keySet = map.keySet();
+
+        // Assert: Verify that the size of the key set is 0.
+        assertEquals(0, keySet.size());
     }
 }
