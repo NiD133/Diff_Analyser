@@ -1,28 +1,45 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 
-public class BBoxCalculator_ESTestTest35 extends BBoxCalculator_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
-        bBoxCalculator0.expandXRange(1396.8914426933839, (-10.370441159547157));
-        bBoxCalculator0.expandXRange((-10.370441159547157), 1396.8914426933839);
-        bBoxCalculator0.expandXRange(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-        assertEquals(Double.POSITIVE_INFINITY, bBoxCalculator0.getMinY(), 0.01);
-        assertEquals(Double.NEGATIVE_INFINITY, bBoxCalculator0.getMaxY(), 0.01);
+/**
+ * Test suite for {@link BBoxCalculator}.
+ */
+public class BBoxCalculatorTest {
+
+    /**
+     * Tests that calling expandXRange does not affect the Y-axis boundaries of the
+     * bounding box. The Y boundaries should remain at their initial, un-set values.
+     */
+    @Test
+    public void expandXRangeShouldNotAffectYBoundaries() {
+        // Arrange: Create a calculator for a geographic context.
+        // The initial Y boundaries are positive and negative infinity, respectively.
+        SpatialContext geoContext = SpatialContext.GEO;
+        BBoxCalculator bboxCalculator = new BBoxCalculator(geoContext);
+
+        double initialMinY = bboxCalculator.getMinY();
+        double initialMaxY = bboxCalculator.getMaxY();
+
+        // Act: Expand the X-range with various values, including non-standard ones.
+        // These calls should only affect the X-axis boundaries.
+        bboxCalculator.expandXRange(10.0, 20.0);
+        bboxCalculator.expandXRange(-10.0, 1400.0); // Value outside standard [-180, 180] longitude
+        bboxCalculator.expandXRange(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY); // Edge case
+
+        // Assert: Verify that the Y boundaries remain unchanged from their initial state.
+        assertEquals("minY should not be changed by expandXRange",
+                initialMinY, bboxCalculator.getMinY(), 0.0);
+        assertEquals("maxY should not be changed by expandXRange",
+                initialMaxY, bboxCalculator.getMaxY(), 0.0);
+
+        // For completeness, we can also assert the known initial values.
+        assertEquals("minY should remain at its initial value of +Infinity",
+                Double.POSITIVE_INFINITY, bboxCalculator.getMinY(), 0.0);
+        assertEquals("maxY should remain at its initial value of -Infinity",
+                Double.NEGATIVE_INFINITY, bboxCalculator.getMaxY(), 0.0);
     }
 }
