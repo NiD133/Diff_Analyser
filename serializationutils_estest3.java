@@ -1,30 +1,24 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class SerializationUtils_ESTestTest3 extends SerializationUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.SerializationUtils}.
+ */
+public class SerializationUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        Integer integer0 = SerializationUtils.roundtrip((Integer) null);
-        assertNull(integer0);
+    /**
+     * Tests that {@link SerializationUtils#roundtrip(java.io.Serializable)}
+     * returns null when given a null input.
+     */
+    @Test
+    public void roundtripShouldReturnNullForNullInput() {
+        // The cast to a specific Serializable type (e.g., Integer) is necessary
+        // to help the compiler resolve the generic method signature:
+        // <T extends Serializable> T roundtrip(T obj)
+        final Integer result = SerializationUtils.roundtrip((Integer) null);
+
+        assertNull("Roundtripping a null object should result in null.", result);
     }
 }
