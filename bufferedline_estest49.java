@@ -1,30 +1,49 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
 import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
 import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest49 extends BufferedLine_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        PointImpl pointImpl0 = new PointImpl(0.0, 0.0, spatialContext0);
-        BufferedLine bufferedLine0 = new BufferedLine(pointImpl0, pointImpl0, 0.0, spatialContext0);
-        Rectangle rectangle0 = pointImpl0.getBoundingBox();
-        SpatialRelation spatialRelation0 = bufferedLine0.relate((Shape) rectangle0);
-        assertEquals(SpatialRelation.CONTAINS, spatialRelation0);
-        assertEquals(0.0, bufferedLine0.getBuf(), 0.01);
+/**
+ * Test suite for {@link BufferedLine}.
+ */
+public class BufferedLineTest {
+
+    private final SpatialContext spatialContext = SpatialContext.GEO;
+
+    /**
+     * Tests a degenerate case where a BufferedLine has zero length (start and end points are the same)
+     * and a zero buffer. In this scenario, the line is effectively a single point. The test
+     * verifies that this point-like line contains its own bounding box, which is also a point.
+     */
+    @Test
+    public void whenLineIsZeroLengthAndBufferIsZero_thenItContainsItself() {
+        // Arrange
+        // A point at (0,0) which will serve as both start and end of the line.
+        Point point = new PointImpl(0.0, 0.0, spatialContext);
+
+        // A line with zero length (from the point to itself) and zero buffer.
+        // This is effectively just the original point.
+        BufferedLine zeroLengthZeroBufferLine = new BufferedLine(point, point, 0.0, spatialContext);
+
+        // The bounding box of a point is a rectangle of zero width and height at the same location.
+        Rectangle pointBoundingBox = point.getBoundingBox();
+
+        // Act
+        // Check the spatial relationship between the line and the point's bounding box.
+        SpatialRelation relation = zeroLengthZeroBufferLine.relate(pointBoundingBox);
+
+        // Assert
+        // The line (which is a point) should contain its own bounding box (which is also the same point).
+        assertEquals("A zero-length, zero-buffer line should contain itself.",
+                SpatialRelation.CONTAINS, relation);
+        
+        // Sanity check that the buffer was correctly initialized.
+        assertEquals("The buffer of the line should be 0.0.",
+                0.0, zeroLengthZeroBufferLine.getBuf(), 0.01);
     }
 }
