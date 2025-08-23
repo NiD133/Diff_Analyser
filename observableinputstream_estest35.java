@@ -1,44 +1,38 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.io.StringWriter;
-import java.nio.CharBuffer;
-import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
-public class ObservableInputStream_ESTestTest35 extends ObservableInputStream_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ObservableInputStream.Observer} class.
+ */
+public class ObservableInputStreamObserverTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        TimestampedObserver timestampedObserver0 = new TimestampedObserver();
-        MockIOException mockIOException0 = new MockIOException("org.apache.commons.io.input.ObservableInputStream$Builder");
+    /**
+     * Tests that the default implementation of the {@code Observer.error()} method
+     * re-throws the exact exception instance it receives. This ensures that
+     * errors are correctly propagated through the observer chain.
+     */
+    @Test
+    public void testErrorCallbackRethrowsGivenException() {
+        // Arrange: Create a concrete observer instance and the exception to be thrown.
+        // An anonymous class is used to test the default behavior of the abstract
+        // Observer class without relying on other specific implementations.
+        final ObservableInputStream.Observer observer = new ObservableInputStream.Observer() {
+            // No methods are overridden; we are testing the default implementation.
+        };
+        final IOException expectedException = new IOException("Test exception");
+
+        // Act & Assert: Call the error method and verify the outcome.
         try {
-            timestampedObserver0.error(mockIOException0);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
+            observer.error(expectedException);
+            fail("Expected an IOException to be thrown, but no exception occurred.");
+        } catch (final IOException actualException) {
+            // Verify that the thrown exception is the same instance that was passed in.
+            assertSame("The exception thrown by the error() method should be the same instance " +
+                       "as the one provided.", expectedException, actualException);
         }
     }
 }
