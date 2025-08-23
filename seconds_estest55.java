@@ -1,17 +1,26 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Seconds_ESTestTest55 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test54() throws Throwable {
-        Seconds seconds0 = Seconds.seconds(Integer.MAX_VALUE);
-        assertEquals(Integer.MAX_VALUE, seconds0.getSeconds());
+    /**
+     * Tests that the factory method {@link Seconds#seconds(int)} can successfully
+     * create an instance with the maximum possible integer value.
+     */
+    @Test
+    public void secondsFactory_shouldCreateInstanceWithMaxValue() {
+        // Arrange: Define the maximum value to be used.
+        final int maxIntValue = Integer.MAX_VALUE;
+
+        // Act: Create a Seconds instance using the factory method with the max value.
+        Seconds maxSeconds = Seconds.seconds(maxIntValue);
+
+        // Assert: Verify that the created instance holds the correct value.
+        assertEquals(maxIntValue, maxSeconds.getSeconds());
     }
 }
