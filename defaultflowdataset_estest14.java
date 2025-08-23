@@ -1,33 +1,38 @@
 package org.jfree.data.flow;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.HijrahEra;
-import java.util.List;
-import java.util.Set;
-import javax.swing.Icon;
-import javax.swing.JLayeredPane;
-import javax.swing.JRadioButtonMenuItem;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+/**
+ * Tests for the {@link DefaultFlowDataset#setFlow(int, K, K, double)} method,
+ * focusing on invalid argument handling.
+ */
 public class DefaultFlowDataset_ESTestTest14 extends DefaultFlowDataset_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
-        Integer integer0 = JLayeredPane.MODAL_LAYER;
-        // Undeclared exception!
+    /**
+     * Verifies that calling setFlow() with a negative stage index throws an
+     * IllegalArgumentException.
+     */
+    @Test
+    public void setFlow_whenStageIsNegative_throwsIllegalArgumentException() {
+        // Arrange: Create an empty dataset and define test data with an invalid stage.
+        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
+        int invalidStage = -1;
+        Integer sourceNode = 1;
+        Integer destinationNode = 2;
+        double flowValue = 10.0;
+        
+        // For a newly created dataset, the valid stage range is [0, 1].
+        String expectedMessage = "Require 'stage' (" + invalidStage + ") to be in the range 0 to 1";
+
+        // Act & Assert: Call the method and verify the exception.
         try {
-            defaultFlowDataset0.setFlow((-882), integer0, integer0, (-882));
-            fail("Expecting exception: IllegalArgumentException");
+            dataset.setFlow(invalidStage, sourceNode, destinationNode, flowValue);
+            fail("Expected an IllegalArgumentException because the stage is negative.");
         } catch (IllegalArgumentException e) {
-            //
-            // Require 'stage' (-882) to be in the range 0 to 1
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
+            assertEquals("The exception message should match the expected format.",
+                    expectedMessage, e.getMessage());
         }
     }
 }
