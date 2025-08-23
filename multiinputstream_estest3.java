@@ -1,32 +1,43 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class MultiInputStream_ESTestTest3 extends MultiInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link MultiInputStream}.
+ */
+public class MultiInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        ArrayDeque<ByteSource> arrayDeque0 = new ArrayDeque<ByteSource>();
-        byte[] byteArray0 = new byte[1];
-        byteArray0[0] = (byte) (-98);
-        ByteSource byteSource0 = ByteSource.wrap(byteArray0);
-        arrayDeque0.add(byteSource0);
-        Iterator<ByteSource> iterator0 = arrayDeque0.iterator();
-        MultiInputStream multiInputStream0 = new MultiInputStream(iterator0);
-        int int0 = multiInputStream0.read();
-        assertEquals(158, int0);
+    @Test
+    public void read_withSingleByteInSource_returnsUnsignedByteValue() throws IOException {
+        // Arrange
+        // Use a byte with a negative value to test that it's correctly converted to an unsigned int.
+        byte testByte = (byte) -98;
+        // InputStream.read() returns an int from 0-255. The unsigned value of (byte)-98 is 158.
+        int expectedIntValue = 158;
+
+        ByteSource byteSource = ByteSource.wrap(new byte[] {testByte});
+        Iterator<ByteSource> sources = Collections.singletonList(byteSource).iterator();
+
+        // Act & Assert
+        try (MultiInputStream multiInputStream = new MultiInputStream(sources)) {
+            int actualValue = multiInputStream.read();
+
+            // Assert that the correct byte value was read.
+            assertEquals(
+                "The read byte should match the expected unsigned integer value.",
+                expectedIntValue,
+                actualValue);
+
+            // Assert that the stream is now empty.
+            assertEquals(
+                "The stream should be exhausted after reading the single byte.",
+                -1,
+                multiInputStream.read());
+        }
     }
 }
