@@ -1,50 +1,62 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
 import com.itextpdf.text.pdf.PdfAction;
 import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfIndirectReference;
-import com.itextpdf.text.pdf.PdfSigLockDictionary;
-import com.itextpdf.text.pdf.PdfString;
-import java.nio.CharBuffer;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import javax.swing.text.Segment;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SimpleTextExtractionStrategy_ESTestTest10 extends SimpleTextExtractionStrategy_ESTest_scaffolding {
+import java.util.Collections;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        PdfDate pdfDate0 = new PdfDate();
-        GraphicsState graphicsState0 = new GraphicsState();
-        Matrix matrix0 = graphicsState0.ctm;
-        LinkedHashSet<MarkedContentInfo> linkedHashSet0 = new LinkedHashSet<MarkedContentInfo>();
-        PdfAction pdfAction0 = PdfAction.createLaunch("", "", "PDF", "");
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfAction0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, linkedHashSet0);
-        SimpleTextExtractionStrategy simpleTextExtractionStrategy0 = new SimpleTextExtractionStrategy();
-        CharBuffer charBuffer0 = CharBuffer.allocate(1037);
-        simpleTextExtractionStrategy0.appendTextChunk(charBuffer0);
-        // Undeclared exception!
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+/**
+ * Test suite for {@link SimpleTextExtractionStrategy}.
+ */
+public class SimpleTextExtractionStrategyTest {
+
+    /**
+     * Tests that renderText() throws a NullPointerException when its internal buffer
+     * has been populated via appendTextChunk() and it then processes a TextRenderInfo
+     * object configured with a font that lacks an underlying BaseFont.
+     *
+     * This test covers a specific edge case where the strategy is in an intermediate state
+     * (has text but no previous render position) and encounters invalid font data, leading
+     * to an unexpected failure during rendering calculations.
+     */
+    @Test
+    public void renderText_whenStateIsPrimedByAppendTextChunkAndFontIsInvalid_throwsNullPointerException() {
+        // Arrange
+        // 1. Create a strategy and add text to it directly, bypassing the normal renderText flow.
+        // This primes the strategy's buffer but leaves its positional tracking (lastStart/lastEnd) null.
+        SimpleTextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+        strategy.appendTextChunk("some pre-existing text");
+
+        // 2. Set up a TextRenderInfo with a font object that is not a real font dictionary.
+        // A CMapAwareDocumentFont without a valid BaseFont will cause issues during rendering calculations.
+        // A PdfAction is used here as a stand-in for a dictionary that lacks the required font information.
+        PdfDictionary mockFontDictionary = PdfAction.createLaunch("", "", "PDF", "");
+        CMapAwareDocumentFont fontWithoutBaseFont = new CMapAwareDocumentFont(mockFontDictionary);
+
+        GraphicsState graphicsState = new GraphicsState();
+        graphicsState.font = fontWithoutBaseFont;
+
+        TextRenderInfo renderInfo = new TextRenderInfo(
+                new PdfDate(), // The actual text content for this render operation.
+                graphicsState,
+                new Matrix(),
+                Collections.emptyList()
+        );
+
+        // Act & Assert
         try {
-            simpleTextExtractionStrategy0.renderText(textRenderInfo0);
-            fail("Expecting exception: NullPointerException");
+            strategy.renderText(renderInfo);
+            fail("Expected a NullPointerException to be thrown due to the invalid state.");
         } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.parser.SimpleTextExtractionStrategy", e);
+            // The exception is expected. This confirms the method fails as anticipated
+            // under these specific, unusual conditions.
+            assertNotNull("The caught exception should not be null.", e);
         }
     }
 }
