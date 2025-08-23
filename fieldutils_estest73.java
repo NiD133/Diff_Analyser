@@ -1,23 +1,28 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class FieldUtils_ESTestTest73 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the utility methods in {@link FieldUtils}.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test72() throws Throwable {
-        long long0 = FieldUtils.safeMultiply((long) 0, 0);
-        assertEquals(0L, long0);
+    /**
+     * Tests that safeMultiply(long, long) correctly returns zero
+     * when multiplying zero by zero. This serves as a basic sanity check.
+     */
+    @Test
+    public void safeMultiply_shouldReturnZero_whenMultiplyingZeroByZero() {
+        // Arrange
+        final long multiplicand = 0L;
+        final long multiplier = 0L;
+        final long expectedProduct = 0L;
+
+        // Act
+        long actualProduct = FieldUtils.safeMultiply(multiplicand, multiplier);
+
+        // Assert
+        assertEquals(expectedProduct, actualProduct);
     }
 }
