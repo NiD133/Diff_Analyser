@@ -1,49 +1,72 @@
 package org.jfree.chart.annotations;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
-import java.math.BigInteger;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.Drawable;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.block.BlockContainer;
-import org.jfree.chart.legend.LegendTitle;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.PolarAxisLocation;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.AbstractRenderer;
-import org.jfree.chart.renderer.category.ScatterRenderer;
-import org.jfree.chart.renderer.xy.XYBarRenderer;
-import org.jfree.chart.title.CompositeTitle;
 import org.jfree.chart.title.DateTitle;
-import org.jfree.chart.title.ShortTextTitle;
-import org.jfree.chart.title.TextTitle;
-import org.jfree.data.general.DefaultValueDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class XYDrawableAnnotation_ESTestTest16 extends XYDrawableAnnotation_ESTest_scaffolding {
+/**
+ * Tests for the {@link XYDrawableAnnotation} class, focusing on its constructor and getters.
+ */
+public class XYDrawableAnnotationTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        DateTitle dateTitle0 = new DateTitle(0);
-        XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(0.0, 0.0, (-1.0), 0.0, (-3958.9), dateTitle0);
-        double double0 = xYDrawableAnnotation0.getDisplayWidth();
-        assertEquals((-3958.9), xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
-        assertEquals(0.0, xYDrawableAnnotation0.getX(), 0.01);
-        assertEquals(0.0, xYDrawableAnnotation0.getY(), 0.01);
-        assertEquals(0.0, xYDrawableAnnotation0.getDisplayHeight(), 0.01);
-        assertEquals((-1.0), double0, 0.01);
+    /**
+     * Verifies that the getDisplayWidth() method returns the exact value
+     * that was provided to the constructor.
+     */
+    @Test
+    public void getDisplayWidth_shouldReturnConstructorValue() {
+        // Arrange: Define test data and create the annotation instance.
+        // The specific values for other parameters are not relevant to this test.
+        double expectedWidth = -1.0;
+        Drawable dummyDrawable = new DateTitle();
+
+        XYDrawableAnnotation annotation = new XYDrawableAnnotation(
+                0.0,           // x
+                0.0,           // y
+                expectedWidth, // displayWidth
+                0.0,           // displayHeight
+                -3958.9,       // drawScaleFactor
+                dummyDrawable
+        );
+
+        // Act: Call the method under test.
+        double actualWidth = annotation.getDisplayWidth();
+
+        // Assert: Check if the returned value matches the expected value.
+        assertEquals(expectedWidth, actualWidth, 0.01);
+    }
+
+    /**
+     * Verifies that the constructor correctly initializes all properties of the annotation.
+     * This is an alternative to the focused test above, combining the assertions
+     * from the original generated test into a single, clear state-verification test.
+     */
+    @Test
+    public void constructor_shouldCorrectlyInitializeAllProperties() {
+        // Arrange
+        double expectedX = 0.0;
+        double expectedY = 0.0;
+        double expectedWidth = -1.0;
+        double expectedHeight = 0.0;
+        double expectedScaleFactor = -3958.9;
+        Drawable dummyDrawable = new DateTitle();
+
+        // Act
+        XYDrawableAnnotation annotation = new XYDrawableAnnotation(
+                expectedX,
+                expectedY,
+                expectedWidth,
+                expectedHeight,
+                expectedScaleFactor,
+                dummyDrawable
+        );
+
+        // Assert
+        assertEquals("X-coordinate should match constructor argument", expectedX, annotation.getX(), 0.01);
+        assertEquals("Y-coordinate should match constructor argument", expectedY, annotation.getY(), 0.01);
+        assertEquals("Display width should match constructor argument", expectedWidth, annotation.getDisplayWidth(), 0.01);
+        assertEquals("Display height should match constructor argument", expectedHeight, annotation.getDisplayHeight(), 0.01);
+        assertEquals("Draw scale factor should match constructor argument", expectedScaleFactor, annotation.getDrawScaleFactor(), 0.01);
     }
 }
