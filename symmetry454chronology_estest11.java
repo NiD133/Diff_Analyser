@@ -1,43 +1,30 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahEra;
 import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Symmetry454Chronology_ESTestTest11 extends Symmetry454Chronology_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Symmetry454Chronology} class.
+ */
+public class Symmetry454ChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
-        Symmetry454Date symmetry454Date0 = symmetry454Chronology0.dateYearDay(19, 19);
-        assertEquals(IsoEra.CE, symmetry454Date0.getEra());
+    /**
+     * Tests that creating a date with a positive proleptic year
+     * using {@link Symmetry454Chronology#dateYearDay(int, int)}
+     * correctly assigns the Common Era (CE).
+     */
+    @Test
+    public void dateYearDay_withPositiveYear_returnsDateInCEEra() {
+        // Arrange
+        Symmetry454Chronology chronology = Symmetry454Chronology.INSTANCE;
+        int prolepticYear = 19;
+        int dayOfYear = 19;
+
+        // Act
+        Symmetry454Date date = chronology.dateYearDay(prolepticYear, dayOfYear);
+
+        // Assert
+        assertEquals("The era for a positive year should be Common Era (CE).", IsoEra.CE, date.getEra());
     }
 }
