@@ -1,29 +1,26 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
+import static org.junit.Assert.assertEquals;
+
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
-import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeReader_ESTestTest56 extends JsonTreeReader_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonTreeReader}.
+ */
+public class JsonTreeReaderTest {
 
-    @Test(timeout = 4000)
-    public void test055() throws Throwable {
-        JsonObject jsonObject0 = new JsonObject();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonObject0);
-        jsonTreeReader0.beginObject();
-        jsonTreeReader0.endObject();
-        assertEquals(255, jsonTreeReader0.getNestingLimit());
+    @Test
+    public void newReaderHasDefaultNestingLimit() {
+        // Arrange
+        JsonObject emptyObject = new JsonObject();
+        JsonTreeReader reader = new JsonTreeReader(emptyObject);
+
+        // Act
+        int nestingLimit = reader.getNestingLimit();
+
+        // Assert
+        // The default nesting limit (255) is inherited from the superclass JsonReader.
+        assertEquals(255, nestingLimit);
     }
 }
