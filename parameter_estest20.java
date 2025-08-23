@@ -1,25 +1,38 @@
 package com.google.common.reflect;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+
 import java.lang.annotation.Annotation;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Parameter_ESTestTest20 extends Parameter_ESTest_scaffolding {
+/**
+ * Unit tests for {@link Parameter}.
+ */
+public class ParameterTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        Invokable<Object, Annotation> invokable0 = (Invokable<Object, Annotation>) mock(Invokable.class, new ViolatedAssumptionAnswer());
-        Class<Annotation> class0 = Annotation.class;
-        TypeToken<Annotation> typeToken0 = TypeToken.of(class0);
-        Annotation[] annotationArray0 = new Annotation[0];
-        Parameter parameter0 = new Parameter(invokable0, 0, typeToken0, annotationArray0, invokable0);
-        Annotation[] annotationArray1 = parameter0.getAnnotations();
-        assertEquals(0, annotationArray1.length);
+    @Test
+    public void getAnnotations_whenParameterHasNoAnnotations_returnsEmptyArray() {
+        // Arrange: Create a Parameter instance that has no annotations.
+        Invokable<?, ?> mockDeclaringInvokable = mock(Invokable.class);
+        TypeToken<?> parameterType = TypeToken.of(String.class);
+        Annotation[] noAnnotations = new Annotation[0];
+
+        // The 'annotatedType' parameter is not relevant for this test, so we pass null.
+        Parameter parameter = new Parameter(
+            mockDeclaringInvokable,
+            0, // position
+            parameterType,
+            noAnnotations,
+            null // annotatedType
+        );
+
+        // Act: Call the method under test.
+        Annotation[] actualAnnotations = parameter.getAnnotations();
+
+        // Assert: Verify that the returned array is empty.
+        assertNotNull("getAnnotations() should never return null.", actualAnnotations);
+        assertEquals("Expected an empty array for a parameter with no annotations.", 0, actualAnnotations.length);
     }
 }
