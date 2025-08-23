@@ -1,64 +1,47 @@
 package org.apache.commons.collections4.multimap;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.AbstractMap;
-import java.util.ArrayDeque;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.PriorityQueue;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Factory;
 import org.apache.commons.collections4.MultiValuedMap;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionFactory;
 import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TransformedMultiValuedMap_ESTestTest13 extends TransformedMultiValuedMap_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        HashMap<Integer, Integer> hashMap0 = new HashMap<Integer, Integer>();
-        ArrayListValuedLinkedHashMap<Integer, Object> arrayListValuedLinkedHashMap0 = new ArrayListValuedLinkedHashMap<Integer, Object>(hashMap0);
-        Transformer<Object, Integer> transformer0 = ExceptionTransformer.exceptionTransformer();
-        TransformedMultiValuedMap<Integer, Object> transformedMultiValuedMap0 = TransformedMultiValuedMap.transformedMap((MultiValuedMap<Integer, Object>) arrayListValuedLinkedHashMap0, (Transformer<? super Integer, ? extends Integer>) null, (Transformer<? super Object, ?>) transformer0);
-        // Undeclared exception!
+/**
+ * This test class contains tests for TransformedMultiValuedMap.
+ * Note: The original class name "TransformedMultiValuedMap_ESTestTest13" was auto-generated.
+ * A more appropriate name would be "TransformedMultiValuedMapTest".
+ */
+public class TransformedMultiValuedMapTest {
+
+    /**
+     * Tests that the transformValue method correctly propagates exceptions
+     * thrown by the underlying value transformer.
+     */
+    @Test
+    public void transformValueShouldPropagateExceptionFromTransformer() {
+        // Arrange
+        // 1. Create a base map to be decorated.
+        final MultiValuedMap<Integer, Object> baseMap = new ArrayListValuedLinkedHashMap<>();
+
+        // 2. Use a transformer that is designed to always throw a RuntimeException.
+        final Transformer<Object, Object> exceptionTransformer = ExceptionTransformer.exceptionTransformer();
+
+        // 3. Decorate the base map, providing the exception-throwing transformer for values.
+        //    The key transformer is null, so keys will not be transformed.
+        final TransformedMultiValuedMap<Integer, Object> transformedMap =
+                TransformedMultiValuedMap.transformingMap(baseMap, null, exceptionTransformer);
+
+        // Act & Assert
         try {
-            transformedMultiValuedMap0.transformValue((Object) null);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // ExceptionTransformer invoked
-            //
-            verifyException("org.apache.commons.collections4.functors.ExceptionTransformer", e);
+            // 4. Call the method under test. It should delegate to the exceptionTransformer,
+            //    which will throw an exception.
+            transformedMap.transformValue(null);
+            fail("Expected a RuntimeException to be thrown.");
+        } catch (final RuntimeException e) {
+            // 5. Verify that the caught exception is the one thrown by ExceptionTransformer.
+            assertEquals("ExceptionTransformer invoked", e.getMessage());
         }
     }
 }
