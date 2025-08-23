@@ -1,28 +1,30 @@
 package org.apache.ibatis.cache;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.NotSerializableException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Date;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class CacheKeyTestTest7 {
-
-    private static <T> T serialize(T object) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        new ObjectOutputStream(baos).writeObject(object);
-        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        return (T) new ObjectInputStream(bais).readObject();
-    }
+/**
+ * Tests for the special {@link CacheKey#NULL_CACHE_KEY} instance.
+ * This key is designed to be an immutable singleton.
+ */
+@DisplayName("Null Cache Key")
+class NullCacheKeyTest {
 
     @Test
-    void throwExceptionWhenTryingToUpdateAllNullCacheKey() {
-        CacheKey cacheKey = CacheKey.NULL_CACHE_KEY;
-        assertThrows(CacheException.class, () -> cacheKey.updateAll(new Object[] { "null", "null" }));
+    @DisplayName("should be immutable and throw CacheException on updateAll")
+    void shouldThrowExceptionOnUpdateAll() {
+        // Arrange: The NULL_CACHE_KEY is a special, immutable instance.
+        CacheKey nullCacheKey = CacheKey.NULL_CACHE_KEY;
+        Object[] anyObjects = new Object[]{"any-object"};
+
+        // Act & Assert: Any attempt to update it should throw a CacheException.
+        CacheException thrown = assertThrows(CacheException.class,
+            () -> nullCacheKey.updateAll(anyObjects));
+
+        // Assert: Verify the exception message for correctness.
+        assertEquals("Not allowed to update a NullCacheKey instance.", thrown.getMessage());
     }
 }
