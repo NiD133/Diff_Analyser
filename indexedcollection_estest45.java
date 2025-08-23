@@ -1,64 +1,32 @@
 package org.apache.commons.collections4.collection;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
+
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.ForClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class IndexedCollection_ESTestTest45 extends IndexedCollection_ESTest_scaffolding {
+/**
+ * Contains test cases for the {@link IndexedCollection} class.
+ */
+public class IndexedCollectionTest {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        IndexedCollection<Object, Object> indexedCollection0 = IndexedCollection.uniqueIndexedCollection((Collection<Object>) linkedList0, (Transformer<Object, Object>) null);
-        // Undeclared exception!
-        try {
-            indexedCollection0.add((Object) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.collections4.collection.IndexedCollection", e);
-        }
+    /**
+     * Tests that adding an element to an IndexedCollection throws a NullPointerException
+     * if the collection was initialized with a null key transformer.
+     */
+    @Test(expected = NullPointerException.class)
+    public void addShouldThrowNullPointerExceptionWhenKeyTransformerIsNull() {
+        // Arrange: Create an IndexedCollection with a null transformer.
+        // The transformer is necessary to generate a key for any element being added.
+        final Collection<Object> sourceCollection = new ArrayList<>();
+        final IndexedCollection<Object, Object> indexedCollection =
+                IndexedCollection.uniqueIndexedCollection(sourceCollection, null);
+
+        // Act: Attempt to add an element to the collection.
+        // This action should trigger the use of the null transformer.
+        indexedCollection.add("any element");
+
+        // Assert: A NullPointerException is expected, which is handled by the
+        // @Test(expected=...) annotation.
     }
 }
