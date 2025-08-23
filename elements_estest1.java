@@ -1,36 +1,32 @@
 package org.jsoup.select;
 
+import org.jsoup.nodes.Document;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class Elements_ESTestTest1 extends Elements_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Elements} class.
+ */
+public class Elements_ESTestTest1 {
 
-    @Test(timeout = 4000)
-    public void test000() throws Throwable {
-        Document document0 = Document.createShell("<m-2,eXTA:N5y7");
-        Elements elements0 = document0.getAllElements();
-        Elements elements1 = elements0.eq(4);
-        assertFalse(elements1.equals((Object) elements0));
+    /**
+     * Tests that calling the eq() method with an index that is out of the list's bounds
+     * returns an empty Elements collection, rather than throwing an exception or returning null.
+     */
+    @Test
+    public void eqWithOutOfBoundsIndexReturnsEmptyElements() {
+        // Arrange: Create a document and select its elements.
+        // A default shell document contains <html>, <head>, and <body> tags.
+        Document doc = Document.createShell("");
+        Elements elements = doc.getAllElements();
+        assertEquals("A shell document should contain 3 elements", 3, elements.size());
+
+        // Act: Call eq() with an index equal to the list size, which is out of bounds.
+        int outOfBoundsIndex = elements.size();
+        Elements result = elements.eq(outOfBoundsIndex);
+
+        // Assert: The resulting Elements collection should be empty.
+        assertNotNull("The result of eq() should never be null.", result);
+        assertTrue("eq() with an out-of-bounds index should return an empty Elements object.", result.isEmpty());
     }
 }
