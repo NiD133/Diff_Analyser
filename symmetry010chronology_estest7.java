@@ -1,44 +1,39 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
+/**
+ * Tests for the {@link Symmetry010Chronology#isLeapYear(long)} method.
+ *
+ * Note: The original test class appeared to be auto-generated. This version has been
+ * refactored for human readability and maintainability.
+ */
 public class Symmetry010Chronology_ESTestTest7 extends Symmetry010Chronology_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Symmetry010Chronology symmetry010Chronology0 = new Symmetry010Chronology();
-        boolean boolean0 = symmetry010Chronology0.isLeapYear((-1547L));
-        assertTrue(boolean0);
+    /**
+     * Tests that a known negative leap year is correctly identified.
+     */
+    @Test
+    public void isLeapYear_shouldReturnTrue_forKnownNegativeLeapYear() {
+        // Arrange
+        // The class under test is a singleton, so we should use its public INSTANCE.
+        Symmetry010Chronology chronology = Symmetry010Chronology.INSTANCE;
+        long yearKnownToBeLeap = -1547L;
+
+        // According to the Symmetry010Chronology documentation, the leap year formula is:
+        // isLeap = (52 > ((52 * year + 146) % 293))
+        // For year = -1547:
+        // (52 * -1547 + 146) % 293 = (-80298) % 293 = -16
+        // The condition (52 > -16) is true, so -1547 must be a leap year.
+
+        // Act
+        boolean isLeap = chronology.isLeapYear(yearKnownToBeLeap);
+
+        // Assert
+        assertTrue(
+            "Year " + yearKnownToBeLeap + " should be correctly identified as a leap year.",
+            isLeap
+        );
     }
 }
