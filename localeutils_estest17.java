@@ -1,21 +1,23 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class LocaleUtils_ESTestTest17 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link LocaleUtils#toLocale(Locale)}.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Locale locale0 = Locale.ITALIAN;
-        Locale locale1 = LocaleUtils.toLocale(locale0);
-        assertEquals("ita", locale1.getISO3Language());
+    @Test
+    public void toLocale_withNonNullLocale_shouldReturnSameLocaleInstance() {
+        // Arrange: Define a non-null input locale.
+        final Locale inputLocale = Locale.ITALIAN;
+
+        // Act: Call the method under test.
+        final Locale resultLocale = LocaleUtils.toLocale(inputLocale);
+
+        // Assert: The method should return the exact same instance that was passed in.
+        assertSame("Expected the same Locale instance to be returned", inputLocale, resultLocale);
     }
 }
