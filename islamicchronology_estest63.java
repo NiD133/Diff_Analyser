@@ -1,29 +1,32 @@
 package org.joda.time.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
 
+// Note: The original test class name "IslamicChronology_ESTestTest63" and its scaffolding
+// are preserved as they were part of the original code provided for improvement.
 public class IslamicChronology_ESTestTest63 extends IslamicChronology_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test62() throws Throwable {
-        IslamicChronology islamicChronology0 = new IslamicChronology((Chronology) null, (Object) null, (IslamicChronology.LeapYearPatternType) null);
-        // Undeclared exception!
-        try {
-            islamicChronology0.getDaysInYear(1);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that getDaysInYear() throws a NullPointerException if the chronology
+     * is constructed with a null LeapYearPatternType.
+     *
+     * This test ensures the internal robustness of the class when it's put into an
+     * invalid state using its package-private constructor, which is a scenario that
+     * could occur within the package.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getDaysInYear_throwsNPE_whenConstructedWithNullLeapYearPattern() {
+        // Arrange: Create an IslamicChronology instance with a null leap year pattern.
+        // This is done using the package-private constructor to test an internal state.
+        IslamicChronology.LeapYearPatternType nullPattern = null;
+        IslamicChronology chronology = new IslamicChronology(null, null, nullPattern);
+
+        // Act: Attempt to get the number of days in a year. This is expected to fail
+        // because the underlying isLeapYear() check will dereference the null pattern.
+        chronology.getDaysInYear(1);
+
+        // Assert: The test passes if a NullPointerException is thrown, as specified
+        // by the @Test(expected) annotation.
     }
 }
