@@ -1,66 +1,48 @@
 package org.apache.commons.collections4.collection;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
 import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.ForClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IndexedCollection_ESTestTest30 extends IndexedCollection_ESTest_scaffolding {
+import java.util.Collection;
+import java.util.LinkedList;
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        Transformer<Object, Object> transformer0 = ConstantTransformer.nullTransformer();
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        IndexedCollection<Object, Object> indexedCollection0 = IndexedCollection.nonUniqueIndexedCollection((Collection<Object>) linkedList0, transformer0);
-        indexedCollection0.add(linkedList0);
-        Transformer<Object, Object> transformer1 = CloneTransformer.cloneTransformer();
-        // Undeclared exception!
+import static org.junit.Assert.fail;
+
+/**
+ * Contains tests for the {@link IndexedCollection} class, focusing on edge cases
+ * during its construction.
+ */
+public class IndexedCollectionTest {
+
+    /**
+     * Tests that creating an IndexedCollection with a cloning transformer on a
+     * self-referential collection causes a StackOverflowError.
+     * <p>
+     * The constructor of IndexedCollection immediately indexes the elements of the
+     * source collection. This involves applying the provided key transformer to each
+     * element. When the transformer attempts to clone a collection that contains
+     * itself, it results in an infinite recursion, leading to a StackOverflowError.
+     */
+    @Test
+    public void constructorWithCloningTransformerOnSelfReferentialCollectionThrowsStackOverflowError() {
+        // Arrange: Create a collection that contains a reference to itself.
+        Collection<Object> selfReferentialCollection = new LinkedList<>();
+        selfReferentialCollection.add(selfReferentialCollection);
+
+        // Arrange: A transformer that attempts to deep-clone its input.
+        Transformer<Object, Object> cloningTransformer = CloneTransformer.cloneTransformer();
+
+        // Act & Assert: Expect a StackOverflowError when creating the IndexedCollection.
+        // The constructor's re-indexing process will trigger the cloning transformer on the
+        // self-referential collection, causing the overflow.
+        // Note: A try-catch block is used here because @Test(expected=...) may not
+        // reliably catch Errors like StackOverflowError in all JUnit versions.
         try {
-            IndexedCollection.nonUniqueIndexedCollection((Collection<Object>) indexedCollection0, transformer1);
-            fail("Expecting exception: StackOverflowError");
-        } catch (StackOverflowError e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
+            IndexedCollection.nonUniqueIndexedCollection(selfReferentialCollection, cloningTransformer);
+            fail("A StackOverflowError was expected but not thrown.");
+        } catch (final StackOverflowError e) {
+            // This is the expected outcome, so the test passes.
         }
     }
 }
