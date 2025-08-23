@@ -1,20 +1,31 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSequenceUtils_ESTestTest48 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CharSequenceUtils}.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder("er of tpp mer of tpp map.entry nor an array");
-        stringBuilder0.delete(22, 789);
-        int int0 = CharSequenceUtils.lastIndexOf("er of tpp mer of tpp map.entry nor an array", stringBuilder0, 22);
-        assertEquals(0, int0);
+    /**
+     * Tests that lastIndexOf correctly finds a prefix at the beginning of a CharSequence
+     * even when the search starts from the end of the sequence.
+     */
+    @Test
+    public void testLastIndexOfFindsPrefixWhenStartingSearchFromEnd() {
+        // Arrange
+        final CharSequence sourceText = "prefix_and_suffix";
+        final CharSequence prefixToSearch = "prefix_";
+        final int startIndex = sourceText.length() - 1; // Start search from the end of the source text
+        final int expectedIndex = 0;
+
+        // Act
+        // Search backwards for the prefix within the source text.
+        final int actualIndex = CharSequenceUtils.lastIndexOf(sourceText, prefixToSearch, startIndex);
+
+        // Assert
+        // The method should find the prefix at the beginning of the source text.
+        assertEquals(expectedIndex, actualIndex);
     }
 }
