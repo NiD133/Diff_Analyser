@@ -1,20 +1,30 @@
 package org.apache.commons.compress.harmony.unpack200;
 
+import static org.junit.Assert.assertEquals;
+
+import org.apache.commons.compress.harmony.pack200.Pack200Exception;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ClassFileEntry;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ConstantPoolEntry;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SegmentConstantPool_ESTestTest66 extends SegmentConstantPool_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SegmentConstantPool} class.
+ */
+public class SegmentConstantPoolTest {
 
-    @Test(timeout = 4000)
-    public void test65() throws Throwable {
-        int int0 = SegmentConstantPool.toIntExact(1);
-        assertEquals(1, int0);
+    /**
+     * Tests that {@link SegmentConstantPool#toIntExact(long)} correctly converts a long
+     * value that is within the valid range of an integer.
+     * @throws Pack200Exception if the conversion fails, which is not expected in this test case.
+     */
+    @Test
+    public void toIntExactShouldReturnSameValueForInputWithinIntRange() throws Pack200Exception {
+        // Arrange: Define a long value that can be safely cast to an int.
+        final long input = 1L;
+        final int expected = 1;
+
+        // Act: Call the method under test.
+        final int result = SegmentConstantPool.toIntExact(input);
+
+        // Assert: Verify that the result matches the expected integer value.
+        assertEquals(expected, result);
     }
 }
