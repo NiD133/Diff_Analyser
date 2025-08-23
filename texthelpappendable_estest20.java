@@ -1,46 +1,34 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TextHelpAppendable_ESTestTest20 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Tests for {@link TextHelpAppendable}.
+ */
+public class TextHelpAppendableTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-        textHelpAppendable0.resize(textStyle_Builder0, (-1107.3268963148316));
-        int int0 = textHelpAppendable0.getMaxWidth();
-        assertEquals(0, textHelpAppendable0.getIndent());
-        assertEquals(0, int0);
+    @Test
+    public void resizeWithNegativeFractionShouldSetWidthAndIndentToZero() {
+        // Arrange
+        // The resize method uses Math.max(0, ...) to prevent negative sizes.
+        // This test verifies that behavior by using a negative fraction.
+        final double negativeFraction = -2.0;
+        TextHelpAppendable helpAppendable = TextHelpAppendable.systemOut();
+        TextStyle.Builder styleBuilder = helpAppendable.getTextStyleBuilder();
+
+        // Pre-condition check (optional but good for clarity):
+        // Default width and indent are expected to be positive.
+        // assertEquals(TextHelpAppendable.DEFAULT_WIDTH, helpAppendable.getMaxWidth());
+        // assertEquals(TextHelpAppendable.DEFAULT_INDENT, helpAppendable.getIndent());
+
+        // Act
+        // The resize method modifies the builder instance directly.
+        helpAppendable.resize(styleBuilder, negativeFraction);
+
+        // Assert
+        // The resulting width and indent should be capped at 0, not a negative value.
+        assertEquals("Max width should be 0 after resizing with a negative fraction", 0, helpAppendable.getMaxWidth());
+        assertEquals("Indent should be 0 after resizing with a negative fraction", 0, helpAppendable.getIndent());
     }
 }
