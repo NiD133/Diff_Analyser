@@ -1,49 +1,53 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
+import org.junit.Test;
+
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.Collections;
 
-public class TextRenderInfo_ESTestTest35 extends TextRenderInfo_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        Stack<MarkedContentInfo> stack0 = new Stack<MarkedContentInfo>();
-        Matrix matrix0 = new Matrix();
-        PdfString pdfString0 = new PdfString("Helvetica-Bold", "Courier-Oblique");
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfString0, graphicsState0, matrix0, stack0);
-        // Undeclared exception!
+/**
+ * Test suite for the {@link TextRenderInfo} class.
+ */
+public class TextRenderInfoTest {
+
+    /**
+     * Verifies that the getText() method throws an UnsupportedCharsetException
+     * when the underlying PdfString was created with an encoding that is not
+     * a valid or supported character set.
+     */
+    @Test
+    public void getText_whenPdfStringHasUnsupportedEncoding_throwsUnsupportedCharsetException() {
+        // Arrange
+        // 1. Define an encoding name that is not a valid Java charset.
+        // The PDF specification allows font encoding names that don't map to standard charsets.
+        final String unsupportedEncoding = "Courier-Oblique";
+
+        // 2. Set up the necessary objects to create a TextRenderInfo instance.
+        GraphicsState graphicsState = new GraphicsState();
+        graphicsState.font = new CMapAwareDocumentFont(new PdfGState());
+        PdfString pdfStringWithInvalidEncoding = new PdfString("some-text", unsupportedEncoding);
+
+        TextRenderInfo textRenderInfo = new TextRenderInfo(
+                pdfStringWithInvalidEncoding,
+                graphicsState,
+                new Matrix(),
+                Collections.emptyList()
+        );
+
+        // Act & Assert
         try {
-            textRenderInfo0.getText();
-            fail("Expecting exception: UnsupportedCharsetException");
+            textRenderInfo.getText();
+            fail("Expected UnsupportedCharsetException was not thrown.");
         } catch (UnsupportedCharsetException e) {
-            //
-            // Courier-Oblique
-            //
-            verifyException("java.nio.charset.Charset", e);
+            // The exception message from java.nio.charset.Charset is expected to be the invalid encoding name.
+            assertEquals("The exception message should contain the unsupported encoding name.",
+                    unsupportedEncoding, e.getMessage());
         }
     }
 }
