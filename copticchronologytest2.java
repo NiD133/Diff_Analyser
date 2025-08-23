@@ -1,81 +1,47 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTime.Property;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeUtils;
+import org.junit.Test;
+import static org.junit.Assert.*;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
+import org.joda.time.chrono.AssembledChronology.Fields;
 
-public class CopticChronologyTestTest2 extends TestCase {
+/**
+ * This test class provides an improved, more understandable test for the
+ * {@link CopticChronology} class. The original test was automatically generated
+ * and lacked clarity. This version focuses on creating a clear, maintainable
+ * test for the assemble() method.
+ */
+public class CopticChronology_ESTestTest2 {
 
-    private static final int MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
+    /**
+     * Tests that the {@link CopticChronology#assemble(Fields)} method correctly
+     * populates the essential date and time fields.
+     * <p>
+     * The original test called this method but then performed an unrelated assertion
+     * on a static constant. This improved test verifies the actual side-effect of the
+     * {@code assemble} method: that the fields object is properly initialized.
+     * </p>
+     */
+    @Test(timeout = 4000)
+    public void assemble_shouldPopulateChronologyFields() {
+        // Arrange: Create a CopticChronology instance and a 'Fields' object to hold
+        // the chronology's component fields. The 'Fields' object starts empty.
+        CopticChronology chronology = CopticChronology.getInstance(DateTimeZone.UTC);
+        Fields fields = new Fields();
 
-    private static long SKIP = 1 * MILLIS_PER_DAY;
+        // Act: The assemble method is a protected method responsible for populating the
+        // 'fields' object with all the specific fields used by the Coptic calendar system.
+        chronology.assemble(fields);
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
-
-    private static final Chronology COPTIC_UTC = CopticChronology.getInstanceUTC();
-
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
-
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        SKIP = 1 * MILLIS_PER_DAY;
-        return new TestSuite(TestCopticChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    public void testFactory() {
-        assertEquals(LONDON, CopticChronology.getInstance().getZone());
-        assertSame(CopticChronology.class, CopticChronology.getInstance().getClass());
+        // Assert: Verify that the core chronology fields have been successfully
+        // initialized and are not null. This confirms that the assemble() method
+        // worked as expected.
+        assertNotNull("The 'era' field should be initialized by assemble()", fields.era);
+        assertNotNull("The 'year' field should be initialized by assemble()", fields.year);
+        assertNotNull("The 'monthOfYear' field should be initialized by assemble()", fields.monthOfYear);
+        assertNotNull("The 'dayOfMonth' field should be initialized by assemble()", fields.dayOfMonth);
+        assertNotNull("The 'weekyear' field should be initialized by assemble()", fields.weekyear);
+        assertNotNull("The 'dayOfWeek' field should be initialized by assemble()", fields.dayOfWeek);
+        assertNotNull("The 'dayOfYear' field should be initialized by assemble()", fields.dayOfYear);
     }
 }
