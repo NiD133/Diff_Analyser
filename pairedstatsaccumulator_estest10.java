@@ -1,21 +1,28 @@
 package com.google.common.math;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PairedStatsAccumulator_ESTestTest10 extends PairedStatsAccumulator_ESTest_scaffolding {
+/**
+ * Tests for {@link PairedStatsAccumulator}.
+ */
+public class PairedStatsAccumulatorTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        PairedStatsAccumulator pairedStatsAccumulator0 = new PairedStatsAccumulator();
-        pairedStatsAccumulator0.add(4.9E-324, 1.0);
-        Stats stats0 = pairedStatsAccumulator0.yStats();
-        assertEquals(1.0, stats0.sum(), 0.01);
+    private static final double TOLERANCE = 1e-9;
+
+    @Test
+    public void yStats_afterAddingSinglePair_returnsCorrectSum() {
+        // Arrange
+        PairedStatsAccumulator accumulator = new PairedStatsAccumulator();
+        double xValue = 10.0;
+        double yValue = 20.0;
+
+        // Act
+        accumulator.add(xValue, yValue);
+        Stats yStats = accumulator.yStats();
+
+        // Assert
+        assertEquals("The sum of y-values should be the single y-value added.", yValue, yStats.sum(), TOLERANCE);
     }
 }
