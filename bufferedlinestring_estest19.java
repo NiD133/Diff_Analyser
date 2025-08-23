@@ -1,40 +1,36 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.ShapeCollection;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLineString_ESTestTest19 extends BufferedLineString_ESTest_scaffolding {
+import java.util.Collections;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        LinkedList<Point> linkedList0 = new LinkedList<Point>();
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        PointImpl pointImpl0 = new PointImpl(1.7224835134970418, 1.7224835134970418, spatialContext0);
-        linkedList0.add((Point) pointImpl0);
-        BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 1.7224835134970418, spatialContext0);
-        // Undeclared exception!
-        try {
-            bufferedLineString0.relate((Shape) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.locationtech.spatial4j.shape.impl.RectangleImpl", e);
-        }
+/**
+ * Unit tests for {@link BufferedLineString}.
+ */
+public class BufferedLineStringTest {
+
+    private final SpatialContext geoContext = SpatialContext.GEO;
+
+    /**
+     * Tests that calling the relate() method with a null argument
+     * correctly throws a NullPointerException. This is a standard contract test
+     * for methods that do not permit null arguments.
+     */
+    @Test(expected = NullPointerException.class)
+    public void relateWithNullShapeShouldThrowNullPointerException() {
+        // Arrange: Create a simple BufferedLineString with one point.
+        // The constructor handles this by creating a zero-length line segment.
+        Point point = geoContext.makePoint(10, 20);
+        List<Point> points = Collections.singletonList(point);
+        double bufferDistance = 5.0;
+        BufferedLineString lineString = new BufferedLineString(points, bufferDistance, geoContext);
+
+        // Act: Call the method under test with a null argument.
+        // The @Test(expected) annotation will handle the assertion.
+        lineString.relate((Shape) null);
     }
 }
