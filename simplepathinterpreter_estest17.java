@@ -1,76 +1,50 @@
 package org.apache.commons.jxpath.ri.axes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.apache.commons.jxpath.BasicVariables;
-import org.apache.commons.jxpath.JXPathBasicBeanInfo;
-import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.compiler.Constant;
-import org.apache.commons.jxpath.ri.compiler.CoreFunction;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationAnd;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationGreaterThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationLessThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMod;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMultiply;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNegate;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNotEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationOr;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationSubtract;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationUnion;
+import org.apache.commons.jxpath.ri.compiler.Compiler;
 import org.apache.commons.jxpath.ri.compiler.Expression;
-import org.apache.commons.jxpath.ri.compiler.NameAttributeTest;
 import org.apache.commons.jxpath.ri.compiler.NodeNameTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTest;
 import org.apache.commons.jxpath.ri.compiler.NodeTypeTest;
-import org.apache.commons.jxpath.ri.compiler.ProcessingInstructionTest;
 import org.apache.commons.jxpath.ri.compiler.Step;
-import org.apache.commons.jxpath.ri.compiler.VariableReference;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPropertyPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPropertyPointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SimplePathInterpreter_ESTestTest17 extends SimplePathInterpreter_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Expression[] expressionArray0 = new Expression[0];
-        CoreOperationUnion coreOperationUnion0 = new CoreOperationUnion(expressionArray0);
-        CoreOperationMultiply coreOperationMultiply0 = new CoreOperationMultiply(coreOperationUnion0, coreOperationUnion0);
-        PredicateContext predicateContext0 = new PredicateContext((EvalContext) null, coreOperationMultiply0);
-        QName qName0 = new QName((String) null, (String) null);
-        BasicVariables basicVariables0 = new BasicVariables();
-        VariablePointer variablePointer0 = new VariablePointer(basicVariables0, qName0);
-        NodePointer nodePointer0 = NodePointer.newChildNodePointer(variablePointer0, qName0, qName0);
-        Step[] stepArray0 = new Step[4];
-        NodeTypeTest nodeTypeTest0 = new NodeTypeTest(Integer.MIN_VALUE);
-        Step step0 = mock(Step.class, new ViolatedAssumptionAnswer());
-        doReturn(5).when(step0).getAxis();
-        doReturn(nodeTypeTest0).when(step0).getNodeTest();
-        doReturn(expressionArray0).when(step0).getPredicates();
-        stepArray0[0] = step0;
-        // Undeclared exception!
-        try {
-            SimplePathInterpreter.interpretSimpleExpressionPath(predicateContext0, nodePointer0, expressionArray0, stepArray0);
-            fail("Expecting exception: ClassCastException");
-        } catch (ClassCastException e) {
-            //
-            // org.apache.commons.jxpath.ri.compiler.NodeTypeTest cannot be cast to org.apache.commons.jxpath.ri.compiler.NodeNameTest
-            //
-            verifyException("org.apache.commons.jxpath.ri.axes.SimplePathInterpreter", e);
-        }
+/**
+ * Contains tests for the {@link SimplePathInterpreter} class.
+ */
+public class SimplePathInterpreterTest {
+
+    /**
+     * Tests that interpretSimpleExpressionPath throws a ClassCastException
+     * when a step contains a NodeTypeTest instead of the expected NodeNameTest.
+     * The interpreter is an optimization for simple paths and does not support
+     * all node test types, directly attempting to cast to NodeNameTest.
+     */
+    @Test
+    public void interpretSimpleExpressionPathWithUnsupportedNodeTypeTestThrowsException() {
+        // Arrange: Create a step with a NodeTypeTest. The interpreter's fast path
+        // expects a NodeNameTest to extract a QName and will fail to cast.
+        NodeTypeTest unsupportedNodeTest = new NodeTypeTest(Compiler.NODE_TYPE_NODE);
+        Step stepWithUnsupportedNodeTest = mock(Step.class);
+        doReturn(Compiler.AXIS_CHILD).when(stepWithUnsupportedNodeTest).getAxis();
+        doReturn(unsupportedNodeTest).when(stepWithUnsupportedNodeTest).getNodeTest();
+        doReturn(new Expression[0]).when(stepWithUnsupportedNodeTest).getPredicates();
+
+        Step[] steps = {stepWithUnsupportedNodeTest};
+
+        // Arrange: Provide dummy context and pointer, as they are not relevant for this exception.
+        EvalContext dummyContext = null;
+        NodePointer dummyRootPointer = mock(NodePointer.class);
+        Expression[] noPredicates = new Expression[0];
+
+        // Act & Assert: The method should throw a ClassCastException because it cannot
+        // cast NodeTypeTest to NodeNameTest.
+        assertThrows(ClassCastException.class, () ->
+                SimplePathInterpreter.interpretSimpleExpressionPath(dummyContext, dummyRootPointer, noPredicates, steps)
+        );
     }
 }
