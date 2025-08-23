@@ -1,28 +1,22 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.util.Date;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
 
-public class TypeHandler_ESTestTest17 extends TypeHandler_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link TypeHandler} class.
+ */
+public class TypeHandlerTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        try {
-            TypeHandler.createNumber("I%5HIg?GFqZ!&");
-            fail("Expecting exception: Exception");
-        } catch (Exception e) {
-            //
-            // java.lang.NumberFormatException: For input string: \"I%5HIg?GFqZ!&\"
-            //
-            verifyException("org.apache.commons.cli.ParseException", e);
-        }
+    /**
+     * Tests that createNumber() throws a ParseException when given a string
+     * that cannot be parsed into a number.
+     */
+    @Test(expected = ParseException.class)
+    public void createNumberShouldThrowParseExceptionForNonNumericString() throws ParseException {
+        // Arrange: A string that is not a valid number.
+        final String nonNumericString = "I%5HIg?GFqZ!&";
+
+        // Act & Assert: Calling createNumber with the invalid string should throw a ParseException.
+        TypeHandler.createNumber(nonNumericString);
     }
 }
