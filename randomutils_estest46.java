@@ -1,20 +1,30 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class RandomUtils_ESTestTest46 extends RandomUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link RandomUtils} class.
+ */
+public class RandomUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        RandomUtils randomUtils0 = new RandomUtils();
-        double double0 = randomUtils0.randomDouble();
-        //  // Unstable assertion: assertEquals(3.3080842984798963E307, double0, 0.01);
+    /**
+     * Tests that the instance method {@code randomDouble()} returns a value within the
+     * valid range of [0, Double.MAX_VALUE).
+     */
+    @Test
+    public void testRandomDoubleInstanceMethodReturnsValueWithinExpectedRange() {
+        // Arrange
+        // The no-arg constructor is deprecated but was used in the original test.
+        // It defaults to using a strong secure random generator.
+        final RandomUtils randomUtils = new RandomUtils();
+
+        // Act
+        final double randomValue = randomUtils.randomDouble();
+
+        // Assert
+        // According to the Javadoc, the result must be non-negative and less than Double.MAX_VALUE.
+        assertTrue("The generated double must be non-negative.", randomValue >= 0.0);
+        assertTrue("The generated double must be less than Double.MAX_VALUE.", randomValue < Double.MAX_VALUE);
     }
 }
