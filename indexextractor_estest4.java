@@ -1,28 +1,33 @@
 package org.apache.commons.collections4.bloomfilter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class IndexExtractor_ESTestTest4 extends IndexExtractor_ESTest_scaffolding {
+/**
+ * Tests for {@link IndexExtractor}.
+ */
+public class IndexExtractorTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        int[] intArray0 = new int[1];
-        intArray0[0] = (-1);
-        IndexExtractor indexExtractor0 = IndexExtractor.fromIndexArray(intArray0);
-        // Undeclared exception!
+    /**
+     * Tests that {@code uniqueIndices()} throws an IndexOutOfBoundsException
+     * if the extractor was created with a negative index. This aligns with the
+     * method's Javadoc contract.
+     */
+    @Test
+    public void uniqueIndicesShouldThrowExceptionWhenCreatedWithNegativeIndex() {
+        // Arrange: Create an IndexExtractor from an array containing a negative index.
+        int[] indicesWithNegativeValue = {-1};
+        IndexExtractor indexExtractor = IndexExtractor.fromIndexArray(indicesWithNegativeValue);
+
+        // Act & Assert: Attempt to get unique indices and verify the correct exception is thrown.
         try {
-            indexExtractor0.uniqueIndices();
-            fail("Expecting exception: IndexOutOfBoundsException");
+            indexExtractor.uniqueIndices();
+            fail("Expected an IndexOutOfBoundsException to be thrown");
         } catch (IndexOutOfBoundsException e) {
-            //
-            // bitIndex < 0: -1
-            //
-            verifyException("java.util.BitSet", e);
+            // Verify that the exception message is as expected, confirming the cause.
+            assertEquals("bitIndex < 0: -1", e.getMessage());
         }
     }
 }
