@@ -1,51 +1,31 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Month;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.Chronology;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.MinguoDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockMinguoDate;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class DayOfMonth_ESTestTest21 extends DayOfMonth_ESTest_scaffolding {
+/**
+ * Tests for {@link DayOfMonth#adjustInto(Temporal)}.
+ */
+public class DayOfMonthTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        DayOfMonth dayOfMonth0 = DayOfMonth.now();
-        // Undeclared exception!
+    /**
+     * Tests that adjustInto throws a NullPointerException when the input temporal is null.
+     */
+    @Test
+    public void adjustInto_whenTemporalIsNull_throwsNullPointerException() {
+        // Arrange: Create a DayOfMonth instance. The specific value doesn't matter for this test.
+        DayOfMonth dayOfMonth = DayOfMonth.of(15);
+
+        // Act & Assert: Call adjustInto with null and verify the exception.
         try {
-            dayOfMonth0.adjustInto((Temporal) null);
-            fail("Expecting exception: NullPointerException");
+            dayOfMonth.adjustInto(null);
+            fail("Expected a NullPointerException to be thrown, but no exception was thrown.");
         } catch (NullPointerException e) {
-            //
-            // temporal
-            //
-            verifyException("java.util.Objects", e);
+            // The method is expected to use Objects.requireNonNull(temporal, "temporal"),
+            // so we can check for the specific message.
+            assertEquals("temporal", e.getMessage());
         }
     }
 }
