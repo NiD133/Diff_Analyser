@@ -1,25 +1,32 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NumberOutput_ESTestTest51 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link NumberOutput} class, focusing on handling invalid arguments.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test50() throws Throwable {
-        // Undeclared exception!
-        try {
-            NumberOutput.outputLong(100000000000000L, (char[]) null, (-152));
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
-        }
+    /**
+     * Verifies that calling {@code outputLong} with a null buffer
+     * results in a {@code NullPointerException}.
+     * <p>
+     * The method should perform a null check on its buffer argument before
+     * attempting to write to it, thus ensuring robustness against invalid input.
+     */
+    @Test(expected = NullPointerException.class)
+    public void outputLongShouldThrowNullPointerExceptionForNullBuffer() {
+        // Arrange: Define inputs for the method under test.
+        // The specific long value and offset are irrelevant for this test case,
+        // as the null buffer should cause an exception immediately.
+        long anyLongValue = 100_000_000_000_000L;
+        char[] nullBuffer = null;
+        int anyOffset = -152;
+
+        // Act: Call the method that is expected to throw an exception.
+        NumberOutput.outputLong(anyLongValue, nullBuffer, anyOffset);
+
+        // Assert: The test framework verifies that a NullPointerException is thrown.
+        // This is configured by the `expected` attribute of the @Test annotation.
     }
 }
