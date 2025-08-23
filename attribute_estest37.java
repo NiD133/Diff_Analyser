@@ -1,38 +1,32 @@
 package org.jsoup.nodes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
 import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import org.jsoup.nodes.Document.OutputSettings;
+import org.junit.Test;
 
+/**
+ * This class contains tests for the {@link Attribute} class.
+ * The original test was auto-generated and has been improved for clarity.
+ */
 public class Attribute_ESTestTest37 extends Attribute_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        Attribute attribute0 = new Attribute(" /@", " /@");
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        // Undeclared exception!
-        try {
-            attribute0.html((QuietAppendable) null, document_OutputSettings0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.nodes.Attribute", e);
-        }
+    /**
+     * Tests that calling the internal html() method with a null Appendable
+     * throws a NullPointerException. This is a contract test ensuring the method
+     * handles invalid arguments gracefully.
+     */
+    @Test(expected = NullPointerException.class, timeout = 4000)
+    public void htmlWithNullAppendableThrowsNullPointerException() {
+        // Arrange: Create a standard attribute and output settings.
+        // The specific key and value of the attribute are not relevant for this test.
+        Attribute attribute = new Attribute("id", "test-id");
+        OutputSettings settings = new OutputSettings();
+
+        // Act: Call the html() method with a null appendable.
+        // The method is expected to throw a NullPointerException.
+        attribute.html((QuietAppendable) null, settings);
+
+        // Assert: The test will pass if a NullPointerException is thrown,
+        // as specified by the @Test(expected=...) annotation.
     }
 }
