@@ -1,18 +1,23 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Weeks_ESTestTest14 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        Weeks weeks0 = Weeks.ZERO;
-        Days days0 = weeks0.THREE.toStandardDays();
-        assertEquals(21, days0.getDays());
+    @Test
+    public void toStandardDays_convertsThreeWeeksToTwentyOneDays() {
+        // Arrange
+        Weeks threeWeeks = Weeks.THREE;
+        int expectedDays = 21; // 3 weeks * 7 days/week
+
+        // Act
+        Days actualDays = threeWeeks.toStandardDays();
+
+        // Assert
+        assertEquals(expectedDays, actualDays.getDays());
     }
 }
