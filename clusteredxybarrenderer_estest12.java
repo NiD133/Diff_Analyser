@@ -1,53 +1,26 @@
 package org.jfree.chart.renderer.xy;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.text.DateFormatSymbols;
-import java.util.Date;
-import java.util.Locale;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.text.MockSimpleDateFormat;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.plot.CategoryCrosshairState;
-import org.jfree.chart.plot.CombinedRangeXYPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.util.DirectionalGradientPaintTransformer;
-import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerXYDataset;
-import org.jfree.data.statistics.SimpleHistogramBin;
-import org.jfree.data.statistics.SimpleHistogramDataset;
-import org.jfree.data.time.TimeSeriesDataItem;
-import org.jfree.data.xy.CategoryTableXYDataset;
-import org.jfree.data.xy.DefaultOHLCDataset;
-import org.jfree.data.xy.DefaultWindDataset;
-import org.jfree.data.xy.DefaultXYZDataset;
 import org.jfree.data.xy.IntervalXYDataset;
-import org.jfree.data.xy.OHLCDataItem;
-import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ClusteredXYBarRenderer_ESTestTest12 extends ClusteredXYBarRenderer_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ClusteredXYBarRenderer} class.
+ */
+public class ClusteredXYBarRendererTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        ClusteredXYBarRenderer clusteredXYBarRenderer0 = new ClusteredXYBarRenderer();
-        // Undeclared exception!
-        try {
-            clusteredXYBarRenderer0.findDomainBoundsWithOffset((IntervalXYDataset) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Null 'dataset' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
-        }
+    /**
+     * Verifies that calling findDomainBoundsWithOffset() with a null dataset
+     * throws an IllegalArgumentException. This is the expected behavior for
+     * methods that require a non-null dataset.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void findDomainBoundsWithOffset_withNullDataset_shouldThrowException() {
+        // Given
+        ClusteredXYBarRenderer renderer = new ClusteredXYBarRenderer();
+
+        // When
+        renderer.findDomainBoundsWithOffset((IntervalXYDataset) null);
+
+        // Then: an IllegalArgumentException is expected, as declared by the @Test annotation.
     }
 }
