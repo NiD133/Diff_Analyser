@@ -1,26 +1,40 @@
 package com.itextpdf.text.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class GroupedRandomAccessSource_ESTestTest24 extends GroupedRandomAccessSource_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link GroupedRandomAccessSource} class.
+ */
+public class GroupedRandomAccessSourceTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[1];
-        byte[] byteArray0 = new byte[7];
-        ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-        randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-        GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-        int int0 = groupedRandomAccessSource0.get((long) (-3), byteArray0, (-3), (-3));
-        assertEquals(7L, groupedRandomAccessSource0.length());
-        assertEquals((-1), int0);
+    /**
+     * Tests that the get() method correctly handles invalid negative arguments
+     * by returning -1, indicating that no bytes were read.
+     */
+    @Test
+    public void get_withNegativeParameters_returnsNegativeOne() throws IOException {
+        // Arrange: Create a GroupedRandomAccessSource from a single, simple source.
+        final int sourceLength = 7;
+        RandomAccessSource source = new ArrayRandomAccessSource(new byte[sourceLength]);
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(new RandomAccessSource[]{source});
+
+        // A buffer to read data into. Its contents are not relevant for this test.
+        byte[] destinationBuffer = new byte[10];
+        
+        // Define invalid parameters for the get() method call.
+        long invalidPosition = -3L;
+        int invalidOffset = -3;
+        int invalidLength = -3;
+
+        // Act: Attempt to read from the source using the negative parameters.
+        int bytesRead = groupedSource.get(invalidPosition, destinationBuffer, invalidOffset, invalidLength);
+
+        // Assert: The method should return -1, and the source's length should be unaffected.
+        assertEquals("The length of the grouped source should be correctly initialized.",
+                sourceLength, groupedSource.length());
+        assertEquals("get() should return -1 to indicate failure when provided with a negative length.",
+                -1, bytesRead);
     }
 }
