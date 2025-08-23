@@ -1,39 +1,32 @@
 package org.jfree.data.general;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.List;
-import java.util.Vector;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.SortOrder;
-import org.jfree.chart.api.TableOrder;
-import org.jfree.data.DefaultKeyedValues;
-import org.jfree.data.KeyedValues;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.CategoryToPieDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.category.SlidingCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 
-public class DefaultPieDataset_ESTestTest18 extends DefaultPieDataset_ESTest_scaffolding {
+/**
+ * Tests for the {@link DefaultPieDataset} class, focusing on handling invalid arguments.
+ */
+public class DefaultPieDataset_ESTestTest18 {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        DefaultKeyedValuesDataset<Integer> defaultKeyedValuesDataset0 = new DefaultKeyedValuesDataset<Integer>();
-        // Undeclared exception!
-        try {
-            defaultKeyedValuesDataset0.getValue((Integer) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Null 'key' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
-        }
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    /**
+     * Verifies that calling getValue() with a null key throws an IllegalArgumentException.
+     * A null key is considered invalid input, and the method should reject it
+     * explicitly rather than failing with a NullPointerException later.
+     */
+    @Test
+    public void getValueWithNullKeyThrowsIllegalArgumentException() {
+        // Arrange: Create an empty dataset.
+        DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
+
+        // Assert: Specify the expected exception and its message.
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Null 'key' argument.");
+
+        // Act: Attempt to retrieve a value using a null key.
+        dataset.getValue(null);
     }
 }
