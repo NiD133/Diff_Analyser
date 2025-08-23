@@ -1,33 +1,41 @@
 package org.locationtech.spatial4j.shape;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
-import org.locationtech.spatial4j.shape.jts.JtsPoint;
 
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+// The original class name is kept for context, though in a real scenario,
+// it would be renamed to something like ShapeCollectionTest.
 public class ShapeCollection_ESTestTest36 extends ShapeCollection_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        Vector<JtsPoint> vector0 = new Vector<JtsPoint>();
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
-        ShapeCollection<JtsPoint> shapeCollection0 = new ShapeCollection<JtsPoint>(vector0, spatialContext0);
-        ShapeCollection shapeCollection1 = shapeCollection0.getBuffered(0.0, spatialContext0);
-        assertEquals(0, shapeCollection1.size());
+    /**
+     * Verifies that buffering an empty ShapeCollection results in another empty ShapeCollection.
+     * This ensures the buffering operation correctly handles the edge case of an empty input.
+     */
+    @Test
+    public void getBuffered_withEmptyCollection_returnsEmptyCollection() {
+        // Arrange: Create an empty ShapeCollection using a standard geographic context.
+        SpatialContext spatialContext = SpatialContext.GEO;
+        List<Shape> emptyList = Collections.emptyList();
+        ShapeCollection<Shape> emptyCollection = new ShapeCollection<>(emptyList, spatialContext);
+
+        // Act: Apply a buffer of 0.0 to the empty collection. The distance value
+        // should not affect the outcome for an empty collection.
+        Shape bufferedResult = emptyCollection.getBuffered(0.0, spatialContext);
+
+        // Assert: The result should be a non-null, empty ShapeCollection.
+        assertNotNull("The buffered result should not be null.", bufferedResult);
+        assertTrue("The result should be an instance of ShapeCollection.",
+                bufferedResult instanceof ShapeCollection);
+
+        ShapeCollection<?> bufferedCollection = (ShapeCollection<?>) bufferedResult;
+        assertEquals("Buffering an empty collection should produce an empty collection.",
+                0, bufferedCollection.size());
     }
 }
