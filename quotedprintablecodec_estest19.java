@@ -1,24 +1,35 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
+
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.nio.charset.StandardCharsets;
 
-public class QuotedPrintableCodec_ESTestTest19 extends QuotedPrintableCodec_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        Charset charset0 = Charset.defaultCharset();
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec(charset0, true);
-        String string0 = quotedPrintableCodec0.decode("q]}Ms![j+3/5Ic", charset0);
-        assertEquals("q]}Ms![j+3/5Ic", string0);
+/**
+ * Contains unit tests for the QuotedPrintableCodec class.
+ */
+public class QuotedPrintableCodecTest {
+
+    /**
+     * Tests that decoding a string that contains no Quoted-Printable encoded characters
+     * results in the original, unchanged string.
+     */
+    @Test
+    public void decodeUnencodedStringShouldReturnOriginalString() throws DecoderException {
+        // Arrange
+        final String originalString = "q]}Ms![j+3/5Ic";
+        final Charset charset = StandardCharsets.UTF_8;
+        // The 'strict' parameter is set to true, enforcing all RFC 1521 rules.
+        final QuotedPrintableCodec codec = new QuotedPrintableCodec(charset, true);
+
+        // Act
+        final String decodedString = codec.decode(originalString, charset);
+
+        // Assert
+        assertEquals("The decoded string should be identical to the original.",
+                originalString, decodedString);
     }
 }
