@@ -1,25 +1,28 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class IllegalFieldValueException_ESTestTest11 extends IllegalFieldValueException_ESTest_scaffolding {
+/**
+ * Unit tests for {@link IllegalFieldValueException}.
+ */
+public class IllegalFieldValueExceptionTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        IllegalFieldValueException illegalFieldValueException0 = null;
-        try {
-            illegalFieldValueException0 = new IllegalFieldValueException((DateTimeFieldType) null, (Number) null, (Number) null, (Number) null, (String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.joda.time.IllegalFieldValueException", e);
-        }
+    /**
+     * Verifies that the constructor throws a NullPointerException when the
+     * DateTimeFieldType argument is null.
+     * <p>
+     * The constructor internally calls {@code fieldType.getName()}, which is the
+     * expected cause of the NPE.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructor_withDateTimeFieldType_shouldThrowNPEForNullType() {
+        // Call the constructor with a null DateTimeFieldType to trigger the exception.
+        // The other arguments are irrelevant for this specific test case.
+        new IllegalFieldValueException(
+                (DateTimeFieldType) null,
+                (Number) null,
+                (Number) null,
+                (Number) null,
+                (String) null);
     }
 }
