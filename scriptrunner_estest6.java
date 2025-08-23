@@ -1,44 +1,61 @@
 package org.apache.ibatis.jdbc;
 
+import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PrintWriter;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+
 import java.io.Reader;
 import java.io.StringReader;
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLWarning;
-import java.sql.Statement;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import java.sql.SQLException;
 
-public class ScriptRunner_ESTestTest6 extends ScriptRunner_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        Connection connection0 = mock(Connection.class, new ViolatedAssumptionAnswer());
-        doReturn(true, true, true).when(connection0).getAutoCommit();
-        ScriptRunner scriptRunner0 = new ScriptRunner(connection0);
-        scriptRunner0.setErrorLogWriter((PrintWriter) null);
-        StringReader stringReader0 = new StringReader("//");
-        stringReader0.read();
-        // Undeclared exception!
+/**
+ * Test suite for the ScriptRunner class.
+ */
+@RunWith(MockitoJUnitRunner.class)
+public class ScriptRunnerTest {
+
+    @Mock
+    private Connection mockConnection;
+
+    private ScriptRunner scriptRunner;
+
+    @Before
+    public void setUp() throws SQLException {
+        // Configure the mock connection to behave as if auto-commit is enabled.
+        // This is checked by the ScriptRunner before and after script execution.
+        when(mockConnection.getAutoCommit()).thenReturn(true);
+        scriptRunner = new ScriptRunner(mockConnection);
+
+        // Suppress console output for a clean test run
+        scriptRunner.setErrorLogWriter(null);
+        scriptRunner.setLogWriter(null);
+    }
+
+    /**
+     * Tests that ScriptRunner throws a RuntimeException when a script
+     * contains a command that is not terminated by the required delimiter.
+     */
+    @Test
+    public void shouldThrowExceptionForScriptWithMissingDelimiter() {
+        // Arrange
+        // A script containing a single command ('/') that is not terminated by the default delimiter (';').
+        Reader scriptReader = new StringReader("/");
+
+        // Act & Assert
         try {
-            scriptRunner0.runScript(stringReader0);
-            fail("Expecting exception: RuntimeException");
+            scriptRunner.runScript(scriptReader);
+            fail("Expected a RuntimeException because the script is missing a delimiter.");
         } catch (RuntimeException e) {
-            //
-            // Error executing: /
-            // .  Cause: org.evosuite.runtime.mock.java.lang.MockThrowable: Line missing end-of-line terminator (;) => /
-            //
-            verifyException("org.apache.ibatis.jdbc.ScriptRunner", e);
+            // The ScriptRunner should identify the unterminated line and report it in the exception message.
+            String expectedMessage = "Line missing end-of-line terminator (;) => /";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
