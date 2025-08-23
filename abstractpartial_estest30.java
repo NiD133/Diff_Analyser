@@ -1,47 +1,35 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
-import org.joda.time.MonthDay;
-import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
 import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
+/**
+ * This test class focuses on the behavior of the AbstractPartial class.
+ */
 public class AbstractPartial_ESTestTest30 extends AbstractPartial_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        YearMonth yearMonth0 = new YearMonth(4, 4);
-        DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.era();
-        int int0 = yearMonth0.indexOf(dateTimeFieldType0);
-        assertEquals((-1), int0);
+    /**
+     * Tests that indexOf() returns -1 when the specified field type is not supported by the partial.
+     */
+    @Test
+    public void indexOf_shouldReturnMinusOne_forUnsupportedFieldType() {
+        // Arrange
+        // A YearMonth is a concrete implementation of AbstractPartial that supports
+        // only 'year' and 'monthOfYear' fields.
+        YearMonth yearMonth = new YearMonth(2023, 4); // April 2023
+
+        // The 'era' field is a valid DateTimeFieldType but is not supported by YearMonth.
+        DateTimeFieldType unsupportedFieldType = DateTimeFieldType.era();
+
+        // Act
+        // Attempt to find the index of the unsupported field type.
+        int actualIndex = yearMonth.indexOf(unsupportedFieldType);
+
+        // Assert
+        // The expected result is -1, as defined by the indexOf() contract for unsupported fields.
+        assertEquals(-1, actualIndex);
     }
 }
