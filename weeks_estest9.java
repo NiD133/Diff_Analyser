@@ -1,18 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Weeks_ESTestTest9 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        Weeks weeks0 = Weeks.ZERO;
-        Hours hours0 = weeks0.toStandardHours();
-        assertEquals(0, hours0.getHours());
+    /**
+     * Tests that converting a period of zero weeks to standard hours
+     * correctly results in zero hours.
+     */
+    @Test
+    public void toStandardHours_forZeroWeeks_returnsZeroHours() {
+        // Arrange: Define the input and the expected outcome.
+        Weeks zeroWeeks = Weeks.ZERO;
+        int expectedHours = 0;
+
+        // Act: Perform the conversion from weeks to hours.
+        Hours actualHours = zeroWeeks.toStandardHours();
+
+        // Assert: Verify that the actual result matches the expected result.
+        assertEquals(expectedHours, actualHours.getHours());
     }
 }
