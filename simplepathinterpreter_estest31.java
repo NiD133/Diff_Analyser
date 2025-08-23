@@ -1,55 +1,39 @@
 package org.apache.commons.jxpath.ri.axes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.apache.commons.jxpath.BasicVariables;
-import org.apache.commons.jxpath.JXPathBasicBeanInfo;
-import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.compiler.Constant;
-import org.apache.commons.jxpath.ri.compiler.CoreFunction;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationAnd;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationGreaterThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationLessThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMod;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMultiply;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNegate;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNotEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationOr;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationSubtract;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationUnion;
 import org.apache.commons.jxpath.ri.compiler.Expression;
-import org.apache.commons.jxpath.ri.compiler.NameAttributeTest;
-import org.apache.commons.jxpath.ri.compiler.NodeNameTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTypeTest;
-import org.apache.commons.jxpath.ri.compiler.ProcessingInstructionTest;
 import org.apache.commons.jxpath.ri.compiler.Step;
-import org.apache.commons.jxpath.ri.compiler.VariableReference;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPropertyPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPropertyPointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SimplePathInterpreter_ESTestTest31 extends SimplePathInterpreter_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        Step[] stepArray0 = new Step[0];
-        Expression[] expressionArray0 = new Expression[0];
-        NodePointer nodePointer0 = SimplePathInterpreter.interpretSimpleExpressionPath((EvalContext) null, (NodePointer) null, expressionArray0, stepArray0);
-        assertNull(nodePointer0);
+/**
+ * Contains tests for the static utility methods in {@link SimplePathInterpreter}.
+ */
+public class SimplePathInterpreterTest {
+
+    /**
+     * Tests that interpretSimpleExpressionPath returns null when provided with a null root node
+     * and empty path components (predicates and steps). This verifies the method's handling of
+     * null and empty inputs.
+     */
+    @Test
+    public void interpretSimpleExpressionPath_withNullRootAndEmptyPath_shouldReturnNull() {
+        // Arrange: Define the inputs for the edge case scenario.
+        // The method is called with a null context, a null root node,
+        // and empty arrays for path steps and predicates.
+        NodePointer rootPointer = null;
+        Step[] emptySteps = new Step[0];
+        Expression[] emptyPredicates = new Expression[0];
+
+        // Act: Execute the method under test.
+        NodePointer result = SimplePathInterpreter.interpretSimpleExpressionPath(
+                null, // EvalContext is null
+                rootPointer,
+                emptyPredicates,
+                emptySteps);
+
+        // Assert: Verify that the result is null as expected.
+        assertNull("The method should return null for a null root and empty path", result);
     }
 }
