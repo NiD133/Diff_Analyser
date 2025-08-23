@@ -1,30 +1,33 @@
 package org.apache.ibatis.parsing;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
+import static org.junit.Assert.assertNull;
+
 import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
+import org.junit.Test;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest115 extends XNode_ESTest_scaffolding {
+/**
+ * Test suite for the {@link XNode} class, focusing on attribute parsing.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test114() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Integer integer0 = xNode0.getIntAttribute("9>K6|");
-        assertNull(integer0);
+    /**
+     * Verifies that getIntAttribute() returns null when the requested attribute does not exist on the node.
+     */
+    @Test
+    public void getIntAttributeShouldReturnNullForNonExistentAttribute() {
+        // Arrange: Create an XNode based on a DOM node that has no attributes.
+        Node nodeWithoutAttributes = new IIOMetadataNode();
+        Properties variables = new Properties();
+        // The XPathParser is not used by the getIntAttribute method, so it can be null for this test.
+        XNode xNode = new XNode(null, nodeWithoutAttributes, variables);
+        String nonExistentAttributeName = "someAttribute";
+
+        // Act: Attempt to retrieve the integer value of an attribute that isn't there.
+        Integer attributeValue = xNode.getIntAttribute(nonExistentAttributeName);
+
+        // Assert: The result should be null, indicating the attribute was not found.
+        assertNull("Expected a null value for a non-existent integer attribute.", attributeValue);
     }
 }
