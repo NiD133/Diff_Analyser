@@ -1,29 +1,32 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.Reader;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 
-public class JsonParser_ESTestTest19 extends JsonParser_ESTest_scaffolding {
+/**
+ * Tests for the {@link JsonParser} class, focusing on edge cases and error handling.
+ */
+class JsonParserTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        JsonParser jsonParser0 = new JsonParser();
-        // Undeclared exception!
-        try {
-            jsonParser0.parse((Reader) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // in == null
-            //
-            verifyException("java.util.Objects", e);
-        }
+    @Test
+    @DisplayName("Parsing from a null Reader should throw NullPointerException")
+    void parseReader_withNullReader_throwsNullPointerException() {
+        // The method under test is the static `JsonParser.parseReader(Reader)`.
+        // This is the modern, recommended replacement for the deprecated instance method `parse(Reader)`.
+        
+        // We expect a NullPointerException because the underlying JsonReader
+        // constructor does not accept a null Reader argument.
+        NullPointerException exception = assertThrows(
+            NullPointerException.class,
+            () -> JsonParser.parseReader((Reader) null)
+        );
+
+        // Verify that the exception message is clear and helpful,
+        // originating from the null check.
+        assertEquals("in == null", exception.getMessage());
     }
 }
