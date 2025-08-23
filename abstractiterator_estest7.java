@@ -1,37 +1,51 @@
 package com.google.common.collect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
+
 import java.util.LinkedList;
-import java.util.Locale;
 import java.util.NoSuchElementException;
-import java.util.PriorityQueue;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.util.Queue;
 
-public class AbstractIterator_ESTestTest7 extends AbstractIterator_ESTest_scaffolding {
+/**
+ * Test suite for {@link AbstractIterator}.
+ */
+public class AbstractIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test6() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        ConsumingQueueIterator<Object> consumingQueueIterator0 = new ConsumingQueueIterator<Object>(linkedList0);
-        Consumer<Object> consumer0 = (Consumer<Object>) mock(Consumer.class, new ViolatedAssumptionAnswer());
-        consumingQueueIterator0.forEachRemaining(consumer0);
-        // Undeclared exception!
-        try {
-            consumingQueueIterator0.peek();
-            fail("Expecting exception: NoSuchElementException");
-        } catch (NoSuchElementException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.collect.AbstractIterator", e);
+    /**
+     * A helper class to create a concrete AbstractIterator for testing.
+     * This is based on com.google.common.collect.ConsumingQueueIterator,
+     * which is a test-only helper in Guava's own test suite. It creates an
+     * iterator that consumes elements from a provided queue.
+     */
+    private static class ConsumingQueueIterator<T> extends AbstractIterator<T> {
+        private final Queue<T> queue;
+
+        ConsumingQueueIterator(Queue<T> queue) {
+            this.queue = queue;
         }
+
+        @Override
+        protected T computeNext() {
+            if (queue.isEmpty()) {
+                return endOfData();
+            }
+            return queue.remove();
+        }
+    }
+
+    /**
+     * Verifies that calling peek() on an iterator that is exhausted
+     * (i.e., has no more elements) throws a NoSuchElementException.
+     */
+    @Test(expected = NoSuchElementException.class)
+    public void peekOnExhaustedIterator_throwsNoSuchElementException() {
+        // Arrange: Create an iterator over an empty collection.
+        // This iterator is considered exhausted from the moment it's created.
+        Queue<String> emptyQueue = new LinkedList<>();
+        AbstractIterator<String> iterator = new ConsumingQueueIterator<>(emptyQueue);
+
+        // Act: Attempt to peek at the next element from the exhausted iterator.
+        // Assert: A NoSuchElementException is expected, as declared in the @Test annotation.
+        iterator.peek();
     }
 }
