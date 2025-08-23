@@ -1,32 +1,41 @@
 package org.apache.commons.compress.archivers;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import java.io.IOException;
-import java.nio.file.FileSystemException;
-import java.nio.file.InvalidPathException;
-import java.nio.file.NoSuchFileException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+/**
+ * Test suite for the {@link Lister} class.
+ * This class contains the refactored test case.
+ */
+// The original test extended a scaffolding class. We keep it to maintain structural integrity.
 public class Lister_ESTestTest9 extends Lister_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        String[] stringArray0 = new String[9];
-        stringArray0[0] = "";
-        stringArray0[1] = "not encodeable";
-        Lister lister0 = new Lister(false, stringArray0);
+    /**
+     * Tests that Lister#go() throws an IOException when an explicitly provided
+     * archive format is not recognized by the ArchiveStreamFactory.
+     */
+    @Test
+    public void goShouldThrowIOExceptionForUnknownArchiveFormat() {
+        // Arrange: Set up command-line arguments with a dummy file path and an
+        // unsupported archive format name.
+        final String dummyFilePath = "any-file.archive";
+        final String unknownArchiveFormat = "unsupported-archive-format";
+        final String[] args = {dummyFilePath, unknownArchiveFormat};
+
+        final Lister lister = new Lister(false, args);
+
+        // Act & Assert: Verify that calling go() throws the expected exception
+        // with a specific message.
         try {
-            lister0.go();
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Archiver: not encodeable not found.
-            //
-            verifyException("org.apache.commons.compress.archivers.ArchiveStreamFactory", e);
+            lister.go();
+            fail("Expected an IOException because the archive format is unknown.");
+        } catch (final IOException e) {
+            // The underlying ArchiveStreamFactory throws an ArchiveException (a subclass of IOException).
+            // We verify the exception type and message to ensure the failure is for the correct reason.
+            final String expectedMessage = "Archiver: " + unknownArchiveFormat + " not found.";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
