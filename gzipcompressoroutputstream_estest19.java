@@ -1,39 +1,28 @@
 package org.apache.commons.compress.compressors.gzip;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FilterOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+/**
+ * This test class contains tests for the GzipCompressorOutputStream class.
+ * The original test was auto-generated and has been refactored for clarity.
+ */
 public class GzipCompressorOutputStream_ESTestTest19 extends GzipCompressorOutputStream_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        ByteArrayOutputStream byteArrayOutputStream0 = new ByteArrayOutputStream();
-        GzipCompressorOutputStream gzipCompressorOutputStream0 = new GzipCompressorOutputStream(byteArrayOutputStream0);
-        // Undeclared exception!
-        try {
-            gzipCompressorOutputStream0.write((byte[]) null, 10, 10);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.zip.Deflater", e);
-        }
+    /**
+     * Verifies that calling the write(byte[], int, int) method with a null buffer
+     * correctly throws a NullPointerException.
+     */
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void writeWithNullBufferShouldThrowNullPointerException() throws IOException {
+        // Arrange: Set up the output stream for compression.
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        GzipCompressorOutputStream gzipOutputStream = new GzipCompressorOutputStream(byteArrayOutputStream);
+
+        // Act: Attempt to write a null buffer to the stream.
+        // The @Test(expected) annotation will automatically handle the assertion
+        // that a NullPointerException is thrown.
+        gzipOutputStream.write(null, 10, 10);
     }
 }
