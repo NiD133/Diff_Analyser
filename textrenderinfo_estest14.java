@@ -1,44 +1,49 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
-import com.itextpdf.text.pdf.PdfGState;
+import com.itextpdf.text.pdf.PdfDictionary;
+import com.itextpdf.text.pdf.PdfName;
+import com.itextpdf.text.pdf.PdfNumber;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
+import org.junit.Test;
+
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertFalse;
 
 public class TextRenderInfo_ESTestTest14 extends TextRenderInfo_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        Stack<MarkedContentInfo> stack0 = new Stack<MarkedContentInfo>();
-        MarkedContentInfo markedContentInfo0 = new MarkedContentInfo(pdfGState0.BM_DIFFERENCE, pdfGState0);
-        stack0.add(markedContentInfo0);
-        stack0.add(markedContentInfo0);
-        PdfDate pdfDate0 = new PdfDate();
-        Matrix matrix0 = graphicsState0.getCtm();
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, stack0);
-        boolean boolean0 = textRenderInfo0.hasMcid(1046, true);
-        assertFalse(boolean0);
+    /**
+     * Tests that hasMcid returns false when searching for a non-existent Marked Content ID (MCID)
+     * at only the topmost level of the content stack.
+     */
+    @Test
+    public void hasMcid_withTopmostOnlyCheck_returnsFalseWhenMcidIsAbsent() {
+        // Arrange: Set up a TextRenderInfo with marked content that does not contain the target MCID.
+        final int mcidToSearchFor = 1046;
+        final int existingMcid = 99;
+
+        // Create a marked content item with a different MCID to ensure the method checks for the correct value.
+        PdfDictionary properties = new PdfDictionary();
+        properties.put(PdfName.MCID, new PdfNumber(existingMcid));
+        MarkedContentInfo existingMarkedContent = new MarkedContentInfo(PdfName.P, properties);
+
+        List<MarkedContentInfo> markedContentInfos = new ArrayList<>();
+        markedContentInfos.add(existingMarkedContent);
+
+        // Create the necessary GraphicsState and other parameters for TextRenderInfo.
+        GraphicsState graphicsState = new GraphicsState();
+        graphicsState.font = new CMapAwareDocumentFont(new PdfDictionary()); // A non-null font is required.
+        PdfString dummyText = new PdfString("test text");
+        Matrix ctm = new Matrix();
+
+        TextRenderInfo textRenderInfo = new TextRenderInfo(dummyText, graphicsState, ctm, markedContentInfos);
+
+        // Act: Check for an MCID that is not present, searching only the topmost level.
+        boolean result = textRenderInfo.hasMcid(mcidToSearchFor, true);
+
+        // Assert: The method should return false as the specified MCID was not found.
+        assertFalse("hasMcid should return false for a non-existent MCID.", result);
     }
 }
