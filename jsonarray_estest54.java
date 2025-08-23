@@ -1,22 +1,23 @@
 package com.google.gson;
 
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest54 extends JsonArray_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonArray} class.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test53() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        boolean boolean0 = jsonArray0.isEmpty();
-        assertTrue(boolean0);
+    /**
+     * Verifies that the isEmpty() method correctly identifies a newly created
+     * JsonArray as empty.
+     */
+    @Test
+    public void testIsEmptyReturnsTrueForNewArray() {
+        // Arrange: Create a new, empty JsonArray.
+        JsonArray jsonArray = new JsonArray();
+
+        // Act & Assert: Verify that the array is empty.
+        assertTrue("A newly created JsonArray should be empty", jsonArray.isEmpty());
     }
 }
