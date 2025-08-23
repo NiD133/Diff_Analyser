@@ -1,38 +1,33 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
-import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class UTF8Writer_ESTestTest16 extends UTF8Writer_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link UTF8Writer} class, focusing on its helper methods.
+ */
+public class UTF8WriterTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
+    /**
+     * Verifies that the {@code illegalSurrogate()} method throws an {@link IOException}
+     * with a correctly formatted error message when passed an invalid character code.
+     */
+    @Test
+    public void illegalSurrogateShouldThrowIOExceptionForInvalidCodePoint() {
+        // Arrange: Define an invalid code point and the expected error message.
+        // The value -554 is used as an example of an illegal character code.
+        int invalidCodePoint = -554;
+        String expectedMessage = "Illegal character point (0xfffffdd6) to output";
+
+        // Act & Assert: Call the method and verify the exception.
         try {
-            UTF8Writer.illegalSurrogate((-554));
-            fail("Expecting exception: IOException");
+            UTF8Writer.illegalSurrogate(invalidCodePoint);
+            fail("Expected an IOException to be thrown for an invalid surrogate code.");
         } catch (IOException e) {
-            //
-            // Illegal character point (0xfffffdd6) to output
-            //
-            verifyException("com.fasterxml.jackson.core.io.UTF8Writer", e);
+            // Verify that the exception message is exactly as expected.
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
