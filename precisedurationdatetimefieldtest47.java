@@ -1,88 +1,62 @@
 package org.joda.time.field;
 
-import java.util.Arrays;
-import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.DurationField;
 import org.joda.time.DurationFieldType;
-import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.ISOChronology;
+import org.junit.Test;
 
-public class PreciseDurationDateTimeFieldTestTest47 extends TestCase {
+import static org.junit.Assert.assertEquals;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+/**
+ * Unit tests for the rounding behavior of {@link PreciseDurationDateTimeField}.
+ * This test focuses on the {@code roundHalfCeiling} method.
+ */
+public class PreciseDurationDateTimeFieldRoundingTest {
 
-    public static TestSuite suite() {
-        return new TestSuite(TestPreciseDurationDateTimeField.class);
-    }
+    /**
+     * A mock DateTimeField that uses a fixed 60-millisecond duration field.
+     * This setup is necessary to test the rounding logic, which depends on the field's unit size.
+     * The methods here are required to create a concrete instance of the abstract
+     * {@code PreciseDurationDateTimeField} but are not directly used by the rounding test.
+     */
+    private static class FieldWithSixtyMillisUnit extends PreciseDurationDateTimeField {
 
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockPreciseDurationDateTimeField extends PreciseDurationDateTimeField {
-
-        protected MockPreciseDurationDateTimeField() {
-            super(DateTimeFieldType.secondOfMinute(), new MockCountingDurationField(DurationFieldType.seconds()));
+        FieldWithSixtyMillisUnit() {
+            super(DateTimeFieldType.secondOfMinute(), new MockSixtyMillisDurationField());
         }
 
-        protected MockPreciseDurationDateTimeField(DateTimeFieldType type, DurationField dur) {
-            super(type, dur);
-        }
-
+        // The following methods are abstract in a parent class and must be implemented.
+        // They return dummy values as they are not relevant to the rounding logic being tested.
         @Override
         public int get(long instant) {
-            return (int) (instant / 60L);
+            return 0;
         }
 
         @Override
         public DurationField getRangeDurationField() {
-            return new MockCountingDurationField(DurationFieldType.minutes());
+            return null;
         }
 
         @Override
         public int getMaximumValue() {
-            return 59;
-        }
-    }
-
-    static class MockStandardBaseDateTimeField extends MockPreciseDurationDateTimeField {
-
-        protected MockStandardBaseDateTimeField() {
-            super();
+            return 0;
         }
 
         @Override
-        public DurationField getDurationField() {
-            return ISOChronology.getInstanceUTC().seconds();
-        }
-
-        @Override
-        public DurationField getRangeDurationField() {
-            return ISOChronology.getInstanceUTC().minutes();
+        public int getMinimumValue() {
+            return 0;
         }
     }
 
-    //-----------------------------------------------------------------------
-    static class MockCountingDurationField extends BaseDurationField {
+    /**
+     * A mock duration field that provides a precise unit of 60 milliseconds.
+     * This is the core dependency for the rounding logic, as {@code roundHalfCeiling}
+     * operates based on the value returned by {@code getUnitMillis()}.
+     */
+    private static class MockSixtyMillisDurationField extends BaseDurationField {
 
-        static int add_int = 0;
-
-        static int add_long = 0;
-
-        static int difference_long = 0;
-
-        protected MockCountingDurationField(DurationFieldType type) {
-            super(type);
+        MockSixtyMillisDurationField() {
+            super(DurationFieldType.seconds());
         }
 
         @Override
@@ -92,147 +66,51 @@ public class PreciseDurationDateTimeFieldTestTest47 extends TestCase {
 
         @Override
         public long getUnitMillis() {
-            return 60;
+            return 60L;
         }
 
+        // The following methods are abstract and must be implemented, but are not
+        // used by the rounding logic, so they can return dummy values.
         @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
+        public long getValueAsLong(long duration, long instant) { return 0; }
         @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
+        public long getMillis(int value, long instant) { return 0; }
         @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
+        public long getMillis(long value, long instant) { return 0; }
         @Override
-        public long add(long instant, int value) {
-            add_int++;
-            return instant + (value * 60L);
-        }
-
+        public long add(long instant, int value) { return 0; }
         @Override
-        public long add(long instant, long value) {
-            add_long++;
-            return instant + (value * 60L);
-        }
-
+        public long add(long instant, long value) { return 0; }
         @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            difference_long++;
-            return 30;
-        }
+        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) { return 0; }
     }
 
     //-----------------------------------------------------------------------
-    static class MockZeroDurationField extends BaseDurationField {
 
-        protected MockZeroDurationField(DurationFieldType type) {
-            super(type);
-        }
+    @Test
+    public void roundHalfCeiling_shouldRoundUpAtMidpoint() {
+        // ARRANGE: Create a field where the rounding unit is 60ms.
+        BaseDateTimeField field = new FieldWithSixtyMillisUnit();
+        final long unitMillis = 60L;
+        final long halfUnit = unitMillis / 2; // 30L
 
-        @Override
-        public boolean isPrecise() {
-            return true;
-        }
+        // ACT & ASSERT
 
-        @Override
-        public long getUnitMillis() {
-            // this is zero
-            return 0;
-        }
+        // Test rounding for values around the midpoint (30)
+        assertEquals("Rounding down: value just below midpoint should round to zero",
+                0L, field.roundHalfCeiling(halfUnit - 1)); // 29 -> 0
 
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
+        assertEquals("Rounding up: value at midpoint should round up to the next unit",
+                unitMillis, field.roundHalfCeiling(halfUnit)); // 30 -> 60
 
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
+        assertEquals("Rounding up: value just above midpoint should round up to the next unit",
+                unitMillis, field.roundHalfCeiling(halfUnit + 1)); // 31 -> 60
 
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
+        // Test rounding at the boundaries
+        assertEquals("Rounding boundary: zero should remain zero",
+                0L, field.roundHalfCeiling(0L));
 
-        @Override
-        public long add(long instant, int value) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            return 0;
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            return 0;
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockImpreciseDurationField extends BaseDurationField {
-
-        protected MockImpreciseDurationField(DurationFieldType type) {
-            super(type);
-        }
-
-        @Override
-        public boolean isPrecise() {
-            // this is false
-            return false;
-        }
-
-        @Override
-        public long getUnitMillis() {
-            return 0;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            return 0;
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            return 0;
-        }
-    }
-
-    public void test_roundHalfCeiling_long() {
-        BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(0L, field.roundHalfCeiling(0L));
-        assertEquals(0L, field.roundHalfCeiling(29L));
-        assertEquals(60L, field.roundHalfCeiling(30L));
-        assertEquals(60L, field.roundHalfCeiling(31L));
-        assertEquals(60L, field.roundHalfCeiling(60L));
+        assertEquals("Rounding boundary: a value on the unit should remain on the unit",
+                unitMillis, field.roundHalfCeiling(unitMillis));
     }
 }
