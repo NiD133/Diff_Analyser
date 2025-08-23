@@ -1,23 +1,29 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
 import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class OptionFormatter_ESTestTest26 extends OptionFormatter_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        Option option0 = new Option((String) null, (String) null, true, "");
-        OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
-        boolean boolean0 = optionFormatter0.isRequired();
-        assertFalse(boolean0);
+/**
+ * Test suite for the {@link OptionFormatter} class.
+ * Note: The original class name 'OptionFormatter_ESTestTest26' and its scaffolding
+ * were artifacts of a test generation tool and have been simplified for clarity.
+ */
+public class OptionFormatterTest {
+
+    /**
+     * Verifies that the isRequired() method correctly reports an option as not required
+     * when the underlying Option object has not been explicitly marked as required.
+     */
+    @Test
+    public void isRequiredShouldReturnFalseWhenOptionIsNotRequired() {
+        // Arrange: Create a standard option. By default, an Option is not required.
+        final Option nonRequiredOption = new Option("f", "file", true, "The file to process");
+        final OptionFormatter formatter = OptionFormatter.from(nonRequiredOption);
+
+        // Act & Assert: The isRequired() method should reflect the Option's default state.
+        assertFalse("The formatter should report the option is not required by default.",
+                formatter.isRequired());
     }
 }
