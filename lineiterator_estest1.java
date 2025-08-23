@@ -1,23 +1,40 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.Reader;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.StringReader;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LineIterator_ESTestTest1 extends LineIterator_ESTest_scaffolding {
+/**
+ * Tests for {@link LineIterator}.
+ */
+public class LineIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        StringReader stringReader0 = new StringReader("_MA");
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        String string0 = lineIterator0.nextLine();
-        assertEquals("_MA", string0);
+    /**
+     * Tests that the iterator correctly reads a single line of text
+     * from a reader that contains no line terminators.
+     */
+    @Test
+    public void next_whenReaderHasOnlyOneLine_shouldReturnThatLine() {
+        // Arrange: Create a reader with a single, simple line of text.
+        final String singleLine = "This is the only line.";
+        final StringReader reader = new StringReader(singleLine);
+
+        // Act & Assert: Use try-with-resources to ensure the iterator is closed.
+        try (LineIterator lineIterator = new LineIterator(reader)) {
+            // The iterator should report that a line is available.
+            assertTrue("Iterator should have a next line.", lineIterator.hasNext());
+
+            // Retrieve the line using the current 'next()' method.
+            final String actualLine = lineIterator.next();
+
+            // The retrieved line must match the original input.
+            assertEquals("The line read should match the input.", singleLine, actualLine);
+
+            // After reading the only line, the iterator should be exhausted.
+            assertFalse("Iterator should have no more lines.", lineIterator.hasNext());
+        }
     }
 }
