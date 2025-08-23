@@ -1,24 +1,42 @@
 package com.google.gson.internal.bind.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.text.ParseException;
 import java.text.ParsePosition;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.SimpleTimeZone;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.junit.runner.RunWith;
 
-public class ISO8601Utils_ESTestTest17 extends ISO8601Utils_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        ParsePosition parsePosition0 = new ParsePosition(0);
-        Date date0 = ISO8601Utils.parse("2014-02-14T20:21:22.575+00:00", parsePosition0);
-        assertEquals("Fri Feb 14 20:21:21 GMT 2014", date0.toString());
+/**
+ * Tests for {@link ISO8601Utils}.
+ */
+public class ISO8601UtilsTest {
+
+    /**
+     * Tests that parsing a complete ISO 8601 date-time string with milliseconds
+     * and a UTC timezone offset ("+00:00") produces the correct Date object.
+     */
+    @Test
+    public void parse_fullDateTimeWithMillisAndUtcOffset_returnsCorrectDate() throws ParseException {
+        // Arrange
+        String iso8601DateTimeString = "2014-02-14T20:21:22.575+00:00";
+        ParsePosition parsePosition = new ParsePosition(0);
+
+        // Create the expected Date object to ensure a robust, type-safe comparison.
+        // This avoids relying on the brittle Date.toString() format.
+        Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        calendar.set(2014, Calendar.FEBRUARY, 14, 20, 21, 22);
+        calendar.set(Calendar.MILLISECOND, 575);
+        Date expectedDate = calendar.getTime();
+
+        // Act
+        Date actualDate = ISO8601Utils.parse(iso8601DateTimeString, parsePosition);
+
+        // Assert
+        assertEquals("The parsed Date object should match the expected value.", expectedDate, actualDate);
+        assertEquals("The parser should consume the entire string.", iso8601DateTimeString.length(), parsePosition.getIndex());
     }
 }
