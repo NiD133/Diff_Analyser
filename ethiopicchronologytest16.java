@@ -1,120 +1,142 @@
 package org.joda.time.chrono;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Locale;
 import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.DateTime.Property;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class EthiopicChronologyTestTest16 extends TestCase {
+/**
+ * Tests for the year DurationField in EthiopicChronology.
+ * This test focuses on how the duration field handles leap years.
+ * The Ethiopic calendar has a leap year every four years, similar to the Julian calendar.
+ */
+public class EthiopicChronologyYearFieldTest {
 
-    private static final int MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
-
-    private static long SKIP = 1 * MILLIS_PER_DAY;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+    // In the Ethiopic calendar, year 1999 is a leap year.
+    private static final int LEAP_YEAR = 1999;
+    private static final int PRECEDING_NORMAL_YEAR = 1998;
+    private static final int FOLLOWING_NORMAL_YEAR = 2000;
 
     private static final Chronology ETHIOPIC_UTC = EthiopicChronology.getInstanceUTC();
+    private static final long MILLIS_IN_NORMAL_YEAR = 365L * DateTimeConstants.MILLIS_PER_DAY;
+    private static final long MILLIS_IN_LEAP_YEAR = 366L * DateTimeConstants.MILLIS_PER_DAY;
+    private static final long MILLIS_IN_FOUR_YEAR_CYCLE = 3 * MILLIS_IN_NORMAL_YEAR + MILLIS_IN_LEAP_YEAR;
 
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
+    // A fixed date for "now" to ensure tests are repeatable.
+    private static final long TEST_TIME_NOW = new DateTime(2002, 6, 9, 0, 0, 0, ISOChronology.getInstanceUTC()).getMillis();
 
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
+    private DateTimeZone originalDateTimeZone;
+    private TimeZone originalTimeZone;
+    private Locale originalLocale;
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        SKIP = 1 * MILLIS_PER_DAY;
-        return new TestSuite(TestEthiopicChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
         originalDateTimeZone = DateTimeZone.getDefault();
         originalTimeZone = TimeZone.getDefault();
         originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
+        DateTimeZone.setDefault(DateTimeZone.forID("Europe/London"));
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
         Locale.setDefault(Locale.UK);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         DateTimeUtils.setCurrentMillisSystem();
         DateTimeZone.setDefault(originalDateTimeZone);
         TimeZone.setDefault(originalTimeZone);
         Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
     }
 
-    public void testDurationYear() {
-        // Leap 1999, NotLeap 1996,97,98
-        DateTime dt96 = new DateTime(1996, 10, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
-        DateTime dt97 = new DateTime(1997, 10, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
-        DateTime dt98 = new DateTime(1998, 10, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
-        DateTime dt99 = new DateTime(1999, 10, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
-        DateTime dt00 = new DateTime(2000, 10, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
-        DurationField fld = dt96.year().getDurationField();
-        assertEquals(ETHIOPIC_UTC.years(), fld);
-        assertEquals(1L * 365L * MILLIS_PER_DAY, fld.getMillis(1, dt96.getMillis()));
-        assertEquals(2L * 365L * MILLIS_PER_DAY, fld.getMillis(2, dt96.getMillis()));
-        assertEquals(3L * 365L * MILLIS_PER_DAY, fld.getMillis(3, dt96.getMillis()));
-        assertEquals((4L * 365L + 1L) * MILLIS_PER_DAY, fld.getMillis(4, dt96.getMillis()));
-        assertEquals(((4L * 365L + 1L) * MILLIS_PER_DAY) / 4, fld.getMillis(1));
-        assertEquals(((4L * 365L + 1L) * MILLIS_PER_DAY) / 2, fld.getMillis(2));
-        assertEquals(1L * 365L * MILLIS_PER_DAY, fld.getMillis(1L, dt96.getMillis()));
-        assertEquals(2L * 365L * MILLIS_PER_DAY, fld.getMillis(2L, dt96.getMillis()));
-        assertEquals(3L * 365L * MILLIS_PER_DAY, fld.getMillis(3L, dt96.getMillis()));
-        assertEquals((4L * 365L + 1L) * MILLIS_PER_DAY, fld.getMillis(4L, dt96.getMillis()));
-        assertEquals(((4L * 365L + 1L) * MILLIS_PER_DAY) / 4, fld.getMillis(1L));
-        assertEquals(((4L * 365L + 1L) * MILLIS_PER_DAY) / 2, fld.getMillis(2L));
-        assertEquals(((4L * 365L + 1L) * MILLIS_PER_DAY) / 4, fld.getUnitMillis());
-        assertEquals(0, fld.getValue(1L * 365L * MILLIS_PER_DAY - 1L, dt96.getMillis()));
-        assertEquals(1, fld.getValue(1L * 365L * MILLIS_PER_DAY, dt96.getMillis()));
-        assertEquals(1, fld.getValue(1L * 365L * MILLIS_PER_DAY + 1L, dt96.getMillis()));
-        assertEquals(1, fld.getValue(2L * 365L * MILLIS_PER_DAY - 1L, dt96.getMillis()));
-        assertEquals(2, fld.getValue(2L * 365L * MILLIS_PER_DAY, dt96.getMillis()));
-        assertEquals(2, fld.getValue(2L * 365L * MILLIS_PER_DAY + 1L, dt96.getMillis()));
-        assertEquals(2, fld.getValue(3L * 365L * MILLIS_PER_DAY - 1L, dt96.getMillis()));
-        assertEquals(3, fld.getValue(3L * 365L * MILLIS_PER_DAY, dt96.getMillis()));
-        assertEquals(3, fld.getValue(3L * 365L * MILLIS_PER_DAY + 1L, dt96.getMillis()));
-        assertEquals(3, fld.getValue((4L * 365L + 1L) * MILLIS_PER_DAY - 1L, dt96.getMillis()));
-        assertEquals(4, fld.getValue((4L * 365L + 1L) * MILLIS_PER_DAY, dt96.getMillis()));
-        assertEquals(4, fld.getValue((4L * 365L + 1L) * MILLIS_PER_DAY + 1L, dt96.getMillis()));
-        assertEquals(dt97.getMillis(), fld.add(dt96.getMillis(), 1));
-        assertEquals(dt98.getMillis(), fld.add(dt96.getMillis(), 2));
-        assertEquals(dt99.getMillis(), fld.add(dt96.getMillis(), 3));
-        assertEquals(dt00.getMillis(), fld.add(dt96.getMillis(), 4));
-        assertEquals(dt97.getMillis(), fld.add(dt96.getMillis(), 1L));
-        assertEquals(dt98.getMillis(), fld.add(dt96.getMillis(), 2L));
-        assertEquals(dt99.getMillis(), fld.add(dt96.getMillis(), 3L));
-        assertEquals(dt00.getMillis(), fld.add(dt96.getMillis(), 4L));
+    @Test
+    public void testGetMillis_forSpecificDuration() {
+        // Arrange: Start from a year that is not a leap year.
+        DateTime startOfYear1996 = new DateTime(1996, 1, 1, 0, 0, ETHIOPIC_UTC);
+        DurationField yearField = startOfYear1996.year().getDurationField();
+        long startMillis = startOfYear1996.getMillis();
+
+        // Act & Assert: Check durations, accounting for the leap year 1999.
+        assertEquals(MILLIS_IN_NORMAL_YEAR, yearField.getMillis(1, startMillis));
+        assertEquals(2 * MILLIS_IN_NORMAL_YEAR, yearField.getMillis(2, startMillis));
+        assertEquals(3 * MILLIS_IN_NORMAL_YEAR, yearField.getMillis(3, startMillis));
+        assertEquals(MILLIS_IN_FOUR_YEAR_CYCLE, yearField.getMillis(4, startMillis));
+
+        // Assert the same for the long overload
+        assertEquals(MILLIS_IN_FOUR_YEAR_CYCLE, yearField.getMillis(4L, startMillis));
+    }
+
+    @Test
+    public void testGetMillis_forAverageDuration() {
+        // Arrange
+        DurationField yearField = ETHIOPIC_UTC.years();
+        long averageYearMillis = (long) (365.25 * DateTimeConstants.MILLIS_PER_DAY);
+
+        // Act & Assert: getMillis() without a start instant returns an average.
+        assertEquals(averageYearMillis, yearField.getMillis(1));
+        assertEquals(2 * averageYearMillis, yearField.getMillis(2));
+        assertEquals(averageYearMillis, yearField.getMillis(1L));
+        assertEquals(2 * averageYearMillis, yearField.getMillis(2L));
+    }
+
+    @Test
+    public void testGetValue_convertsMillisToYears() {
+        // Arrange
+        DateTime startOfYear1996 = new DateTime(1996, 1, 1, 0, 0, ETHIOPIC_UTC);
+        DurationField yearField = startOfYear1996.year().getDurationField();
+        long startMillis = startOfYear1996.getMillis();
+
+        // Act & Assert: Check values at year boundaries.
+        assertEquals(0, yearField.getValue(MILLIS_IN_NORMAL_YEAR - 1, startMillis));
+        assertEquals(1, yearField.getValue(MILLIS_IN_NORMAL_YEAR, startMillis));
+        assertEquals(1, yearField.getValue(MILLIS_IN_NORMAL_YEAR + 1, startMillis));
+
+        long twoNormalYears = 2 * MILLIS_IN_NORMAL_YEAR;
+        assertEquals(1, yearField.getValue(twoNormalYears - 1, startMillis));
+        assertEquals(2, yearField.getValue(twoNormalYears, startMillis));
+        assertEquals(2, yearField.getValue(twoNormalYears + 1, startMillis));
+
+        assertEquals(3, yearField.getValue(MILLIS_IN_FOUR_YEAR_CYCLE - 1, startMillis));
+        assertEquals(4, yearField.getValue(MILLIS_IN_FOUR_YEAR_CYCLE, startMillis));
+        assertEquals(4, yearField.getValue(MILLIS_IN_FOUR_YEAR_CYCLE + 1, startMillis));
+    }
+
+    @Test
+    public void testAdd_addsYearsToInstant() {
+        // Arrange
+        DateTime startDateTime = new DateTime(PRECEDING_NORMAL_YEAR, 10, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
+        DurationField yearField = startDateTime.year().getDurationField();
+
+        // Adding 1 year crosses into the leap year 1999
+        DateTime expectedAfter1Year = new DateTime(LEAP_YEAR, 10, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
+        // Adding 2 years crosses the leap day of year 1999
+        DateTime expectedAfter2Years = new DateTime(FOLLOWING_NORMAL_YEAR, 10, 2, 0, 0, 0, 0, ETHIOPIC_UTC);
+
+        // Act & Assert (int overload)
+        assertEquals(expectedAfter1Year.getMillis(), yearField.add(startDateTime.getMillis(), 1));
+        assertEquals(expectedAfter2Years.getMillis(), yearField.add(startDateTime.getMillis(), 2));
+
+        // Act & Assert (long overload)
+        assertEquals(expectedAfter1Year.getMillis(), yearField.add(startDateTime.getMillis(), 1L));
+        assertEquals(expectedAfter2Years.getMillis(), yearField.add(startDateTime.getMillis(), 2L));
+    }
+
+    @Test
+    public void testGetUnitMillis_isAverageYear() {
+        // Arrange
+        DurationField yearField = ETHIOPIC_UTC.years();
+        // Unit millis is the average length of a year: (365*3 + 366) / 4 = 365.25 days
+        long expectedAverageMillis = (long) (365.25 * DateTimeConstants.MILLIS_PER_DAY);
+
+        // Act & Assert
+        assertEquals(expectedAverageMillis, yearField.getUnitMillis());
     }
 }
