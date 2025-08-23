@@ -1,35 +1,37 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomAccessFileOrArray_ESTestTest33 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test032() throws Throwable {
-        byte[] byteArray0 = new byte[9];
-        byteArray0[0] = (byte) 16;
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        long long0 = randomAccessFileOrArray0.readLongLE();
-        assertEquals(8L, randomAccessFileOrArray0.getFilePointer());
-        assertEquals(16L, long0);
+    /**
+     * Verifies that readLongLE() correctly reads an 8-byte long value in
+     * little-endian format and advances the internal pointer by 8 bytes.
+     */
+    @Test
+    public void readLongLE_shouldReadLittleEndianLongAndAdvancePointer() throws IOException {
+        // Arrange
+        // A long is 8 bytes. In little-endian format, the number 16 is represented
+        // by the least significant byte having the value 16, followed by 7 zero bytes.
+        // The input array is slightly larger to ensure we aren't just reading to the end of the file.
+        byte[] littleEndianLongBytes = new byte[] {16, 0, 0, 0, 0, 0, 0, 0, 99};
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(littleEndianLongBytes);
+
+        long expectedValue = 16L;
+        long expectedPointerPosition = Long.BYTES; // A long is 8 bytes
+
+        // Act
+        long actualValue = reader.readLongLE();
+
+        // Assert
+        assertEquals("The method should correctly interpret the little-endian byte order.",
+                expectedValue, actualValue);
+        assertEquals("The pointer should advance by the number of bytes in a long.",
+                expectedPointerPosition, reader.getFilePointer());
     }
 }
