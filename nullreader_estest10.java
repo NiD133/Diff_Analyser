@@ -1,27 +1,30 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.io.EOFException;
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NullReader_ESTestTest10 extends NullReader_ESTest_scaffolding {
+/**
+ * Tests for the {@link NullReader} class, focusing on its behavior at the end of the emulated stream.
+ */
+public class NullReaderTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        NullReader nullReader0 = new NullReader(0, true, true);
-        try {
-            nullReader0.skip(512L);
-            fail("Expecting exception: EOFException");
-        } catch (EOFException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.input.NullReader", e);
-        }
+    /**
+     * Verifies that skip() throws an EOFException on an empty reader
+     * when it's configured to do so.
+     */
+    @Test(expected = EOFException.class)
+    public void testSkipOnEmptyReaderWhenThrowEofExceptionIsTrueThrowsEOFException() throws IOException {
+        // Arrange: Create a NullReader with a size of 0.
+        // The constructor is NullReader(size, markSupported, throwEofException).
+        // The key setting for this test is the final argument, 'throwEofException', set to true.
+        final NullReader emptyReader = new NullReader(0, true, true);
+
+        // Act: Attempt to skip any number of characters. Since the reader is empty,
+        // this should immediately trigger the end-of-file condition.
+        emptyReader.skip(512L);
+
+        // Assert: An EOFException is expected, which is declared by the
+        // @Test(expected = ...) annotation. If no exception is thrown, the test will fail.
     }
 }
