@@ -1,30 +1,28 @@
 package com.google.common.hash;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractStreamingHasher_ESTestTest17 extends AbstractStreamingHasher_ESTest_scaffolding {
+/**
+ * Tests for {@link AbstractStreamingHasher}.
+ */
+public class AbstractStreamingHasherTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Crc32cHashFunction.Crc32cHasher crc32cHashFunction_Crc32cHasher0 = new Crc32cHashFunction.Crc32cHasher();
-        crc32cHashFunction_Crc32cHasher0.hash();
-        // Undeclared exception!
-        try {
-            crc32cHashFunction_Crc32cHasher0.putByte((byte) (-115));
-            fail("Expecting exception: BufferOverflowException");
-        } catch (BufferOverflowException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.Buffer", e);
-        }
+    /**
+     * Verifies that attempting to add data to a hasher after its {@code hash()} method has been
+     * called results in an exception. Once the hash is computed, the hasher instance is considered
+     * finalized and should not accept further input.
+     */
+    @Test(expected = BufferOverflowException.class)
+    public void putByte_afterHashIsCalculated_throwsException() {
+        // Arrange: Create a concrete hasher and finalize it by calling hash().
+        // We use Crc32cHashFunction as a concrete implementation of a streaming hash.
+        Hasher hasher = new Crc32cHashFunction().newHasher();
+        hasher.hash(); // This call finalizes the hasher.
+
+        // Act & Assert: Attempting to add more data should throw an exception.
+        // In this implementation, a BufferOverflowException is thrown because the
+        // internal buffer is finalized. A different design might throw IllegalStateException.
+        hasher.putByte((byte) 1);
     }
 }
