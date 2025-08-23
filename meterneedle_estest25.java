@@ -1,38 +1,36 @@
 package org.jfree.chart.plot.compass;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
+import static org.junit.Assert.assertFalse;
 import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import javax.swing.JScrollPane;
-import javax.swing.text.DefaultCaret;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MeterNeedle_ESTestTest25 extends MeterNeedle_ESTest_scaffolding {
+/**
+ * Contains tests for the equals() method of the MeterNeedle class and its subclasses.
+ */
+public class MeterNeedleTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        ShipNeedle shipNeedle0 = new ShipNeedle();
-        Color color0 = Color.BLUE;
-        shipNeedle0.setFillPaint(color0);
-        PointerNeedle pointerNeedle0 = new PointerNeedle();
-        shipNeedle0.equals(pointerNeedle0);
-        assertEquals(5, pointerNeedle0.getSize());
-        assertEquals(0.5, pointerNeedle0.getRotateX(), 0.01);
-        assertEquals(0.5, pointerNeedle0.getRotateY(), 0.01);
-        assertEquals(5, shipNeedle0.getSize());
+    /**
+     * Verifies that the equals() method returns false when comparing two different
+     * subclasses of MeterNeedle.
+     * <p>
+     * The original test called equals() on two different needle types but failed
+     * to assert the result, instead checking unrelated default properties. This
+     * revised test clarifies the intent by focusing on the inequality of different types.
+     * </p>
+     */
+    @Test
+    public void equals_whenComparingDifferentNeedleTypes_shouldReturnFalse() {
+        // Arrange: Create two instances of different MeterNeedle subclasses.
+        // A property is set on one to further ensure they are not identical.
+        ShipNeedle shipNeedle = new ShipNeedle();
+        shipNeedle.setFillPaint(Color.BLUE);
+
+        PointerNeedle pointerNeedle = new PointerNeedle();
+
+        // Act: Compare the two objects using the equals method.
+        boolean areEqual = shipNeedle.equals(pointerNeedle);
+
+        // Assert: The result should be false, as the objects are of different types.
+        assertFalse("A ShipNeedle instance should not be equal to a PointerNeedle instance.", areEqual);
     }
 }
