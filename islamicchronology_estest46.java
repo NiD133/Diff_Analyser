@@ -1,22 +1,27 @@
 package org.joda.time.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IslamicChronology_ESTestTest46 extends IslamicChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IslamicChronology} class.
+ */
+public class IslamicChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
-        int int0 = islamicChronology0.getDaysInYear(1);
-        assertEquals(354, int0);
+    private static final int DAYS_IN_ISLAMIC_COMMON_YEAR = 354;
+
+    @Test
+    public void getDaysInYear_shouldReturn354ForCommonYear() {
+        // Arrange: The Islamic calendar has common years (354 days) and leap years (355 days).
+        // Year 1 AH is a common year according to the standard leap year patterns.
+        IslamicChronology islamicChronology = IslamicChronology.getInstance();
+        int commonYear = 1;
+
+        // Act: Calculate the number of days in year 1.
+        int actualDays = islamicChronology.getDaysInYear(commonYear);
+
+        // Assert: Verify that the result is correct for a common year.
+        assertEquals("A common Islamic year should have 354 days",
+                     DAYS_IN_ISLAMIC_COMMON_YEAR, actualDays);
     }
 }
