@@ -1,38 +1,32 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
+import java.util.Properties;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
+/**
+ * This test class contains tests for the XNode class.
+ * The original test was auto-generated and has been refactored for clarity.
+ */
 public class XNode_ESTestTest61 extends XNode_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test060() throws Throwable {
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        Properties properties0 = new Properties();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        // Undeclared exception!
-        try {
-            xNode0.evalString("null");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.ibatis.parsing.XNode", e);
-        }
+    /**
+     * Verifies that calling evalString() on an XNode initialized with a null XPathParser
+     * results in a NullPointerException. This is the expected behavior, as the evaluation
+     * methods rely on the XPathParser instance.
+     */
+    @Test(expected = NullPointerException.class)
+    public void evalStringShouldThrowNullPointerExceptionWhenXPathParserIsNull() {
+        // Arrange: Create an XNode with a null XPathParser.
+        // The specific node type and variables are not critical for this test's objective.
+        Node domNode = new IIOMetadataNode();
+        Properties variables = new Properties();
+        XNode xNode = new XNode(null, domNode, variables);
+
+        // Act & Assert: Attempting to evaluate an expression should throw a NullPointerException.
+        // The @Test(expected=...) annotation handles the assertion, failing the test
+        // if this specific exception is not thrown.
+        xNode.evalString("any/xpath/expression");
     }
 }
