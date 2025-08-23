@@ -1,31 +1,30 @@
 package org.apache.commons.lang3.text.translate;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LookupTranslator_ESTestTest7 extends LookupTranslator_ESTest_scaffolding {
+/**
+ * Tests for {@link LookupTranslator}.
+ * This class focuses on specific constructor validation scenarios.
+ */
+// The original test class name 'LookupTranslator_ESTestTest7' is kept for context,
+// but in a real-world scenario, it would be merged into a single 'LookupTranslatorTest'.
+public class LookupTranslator_ESTestTest7 {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        CharSequence[][] charSequenceArray0 = new CharSequence[1][9];
-        CharSequence[] charSequenceArray1 = new CharSequence[2];
-        StringWriter stringWriter0 = new StringWriter();
-        StringBuffer stringBuffer0 = stringWriter0.getBuffer();
-        charSequenceArray1[1] = (CharSequence) stringBuffer0;
-        charSequenceArray0[0] = charSequenceArray1;
-        charSequenceArray1[0] = (CharSequence) stringBuffer0;
-        LookupTranslator lookupTranslator0 = null;
-        try {
-            lookupTranslator0 = new LookupTranslator(charSequenceArray0);
-            fail("Expecting exception: StringIndexOutOfBoundsException");
-        } catch (StringIndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that the constructor throws a StringIndexOutOfBoundsException
+     * when a lookup key is an empty string. The constructor attempts to access
+     * the first character of each key, which is not possible for an empty string.
+     */
+    @Test(expected = StringIndexOutOfBoundsException.class)
+    public void constructorShouldThrowExceptionForEmptyLookupKey() {
+        // Arrange: Define a lookup table with a key-value pair where the key is empty.
+        final CharSequence[][] lookupTable = {
+            { "", "value" }
+        };
+
+        // Act & Assert: Instantiating the translator with this table should throw
+        // a StringIndexOutOfBoundsException. The expected exception is declared
+        // in the @Test annotation, making the test fail if it's not thrown.
+        new LookupTranslator(lookupTable);
     }
 }
