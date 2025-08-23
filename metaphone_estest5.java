@@ -1,19 +1,30 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Metaphone_ESTestTest5 extends Metaphone_ESTest_scaffolding {
+/**
+ * Tests for the {@link Metaphone} class, focusing on its property accessors.
+ */
+public class MetaphoneTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Metaphone metaphone0 = new Metaphone();
-        metaphone0.setMaxCodeLen((-3486));
-        int int0 = metaphone0.getMaxCodeLen();
-        assertEquals((-3486), int0);
+    /**
+     * Tests that the maxCodeLen property can be set and retrieved correctly.
+     * The Metaphone implementation does not validate this value, so any integer,
+     * including a negative one, should be accepted by the setter and returned by the getter.
+     */
+    @Test
+    public void shouldSetAndGetMaxCodeLen() {
+        // Arrange
+        final Metaphone metaphone = new Metaphone();
+        final int expectedMaxCodeLen = -10; // Use a simple, representative negative value
+
+        // Act
+        metaphone.setMaxCodeLen(expectedMaxCodeLen);
+        final int actualMaxCodeLen = metaphone.getMaxCodeLen();
+
+        // Assert
+        assertEquals("The retrieved max code length should match the value that was set.",
+                     expectedMaxCodeLen, actualMaxCodeLen);
     }
 }
