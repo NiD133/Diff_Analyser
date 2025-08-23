@@ -1,18 +1,22 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Weeks_ESTestTest70 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for {@link Weeks}.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test69() throws Throwable {
-        Instant instant0 = Instant.EPOCH;
-        Weeks weeks0 = Weeks.weeksBetween((ReadableInstant) instant0, (ReadableInstant) instant0);
-        assertEquals(0, weeks0.getWeeks());
+    @Test
+    public void weeksBetween_shouldReturnZero_whenInstantsAreTheSame() {
+        // Arrange
+        Instant instant = Instant.EPOCH;
+
+        // Act
+        Weeks result = Weeks.weeksBetween(instant, instant);
+
+        // Assert
+        assertEquals("Calculating weeks between the same instant should result in zero.", Weeks.ZERO, result);
     }
 }
