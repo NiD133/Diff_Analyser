@@ -1,30 +1,29 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
+import java.util.Properties;
+import static org.junit.Assert.assertNull;
 
-public class XNode_ESTestTest30 extends XNode_ESTest_scaffolding {
+/**
+ * Test suite for the XNode class.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test029() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Float float0 = xNode0.getFloatAttribute("");
-        assertNull(float0);
+    @Test
+    public void getFloatAttributeShouldReturnNullWhenAttributeDoesNotExist() {
+        // Arrange
+        // Create a DOM node that has no attributes.
+        // IIOMetadataNode is a concrete implementation of org.w3c.dom.Node,
+        // suitable for creating a simple, attribute-less node for this test.
+        IIOMetadataNode nodeWithoutAttributes = new IIOMetadataNode();
+        XNode xNode = new XNode(null, nodeWithoutAttributes, new Properties());
+
+        // Act
+        // Attempt to retrieve a float value from an attribute that does not exist.
+        Float attributeValue = xNode.getFloatAttribute("nonExistentAttribute");
+
+        // Assert
+        assertNull("The method should return null when the float attribute is not found.", attributeValue);
     }
 }
