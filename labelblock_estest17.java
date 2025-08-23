@@ -1,44 +1,27 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import java.util.Hashtable;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleContext;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class LabelBlock_ESTestTest17 extends LabelBlock_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LabelBlock} class, focusing on constructor validation.
+ */
+public class LabelBlockTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        LabelBlock labelBlock0 = null;
+    /**
+     * Verifies that the constructor throws an IllegalArgumentException when the
+     * 'text' argument is null. A null text argument is not permitted.
+     */
+    @Test
+    public void constructorShouldThrowExceptionForNullText() {
         try {
-            labelBlock0 = new LabelBlock((String) null);
-            fail("Expecting exception: IllegalArgumentException");
+            new LabelBlock(null);
+            fail("Expected an IllegalArgumentException to be thrown for a null 'text' argument.");
         } catch (IllegalArgumentException e) {
-            //
-            // Null 'text' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
+            // This is the expected behavior.
+            // We can also verify the exception message for more precise testing.
+            assertEquals("Null 'text' argument.", e.getMessage());
         }
     }
 }
