@@ -1,42 +1,57 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
+import org.junit.Test;
+
+import java.util.Collections;
 import java.util.List;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TextRenderInfo_ESTestTest11 extends TextRenderInfo_ESTest_scaffolding {
+import static org.junit.Assert.assertNotNull;
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        PdfDate pdfDate0 = new PdfDate();
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.rise = 1296.0F;
-        graphicsState0.font = cMapAwareDocumentFont0;
-        Stack<MarkedContentInfo> stack0 = new Stack<MarkedContentInfo>();
-        Matrix matrix0 = graphicsState0.getCtm();
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, stack0);
-        LineSegment lineSegment0 = textRenderInfo0.getAscentLine();
-        assertNotNull(lineSegment0);
+/**
+ * This class contains improved tests for the TextRenderInfo class.
+ * The original test was an auto-generated one (TextRenderInfo_ESTestTest11)
+ * that was functionally correct but difficult to comprehend.
+ */
+public class TextRenderInfoTest {
+
+    /**
+     * Verifies that getAscentLine() returns a non-null LineSegment
+     * when the graphics state includes a non-default text 'rise'.
+     *
+     * The 'rise' parameter in a PDF's graphics state specifies a vertical
+     * shift from the baseline, often used for superscripts or subscripts.
+     * This test ensures that this vertical shift is handled correctly
+     * without causing errors during the ascent line calculation.
+     */
+    @Test
+    public void getAscentLine_withNonZeroTextRise_returnsNotNull() {
+        // ARRANGE: Set up a GraphicsState with a font and a non-zero 'rise' value.
+        // This simulates rendering text that is vertically shifted from the baseline.
+        final float textRise = 1296.0F;
+        
+        GraphicsState graphicsState = new GraphicsState();
+        graphicsState.rise = textRise;
+        
+        // A font must be set in the graphics state for text operations.
+        // We use a CMapAwareDocumentFont with a default PdfGState for this setup.
+        CMapAwareDocumentFont font = new CMapAwareDocumentFont(new PdfGState());
+        graphicsState.font = font;
+
+        // Create the other necessary parameters for the TextRenderInfo constructor.
+        PdfString text = new PdfString("");
+        Matrix ctm = graphicsState.getCtm(); // Current Transformation Matrix
+        List<MarkedContentInfo> markedContentInfo = Collections.emptyList();
+
+        TextRenderInfo renderInfo = new TextRenderInfo(text, graphicsState, ctm, markedContentInfo);
+
+        // ACT: Call the method under test to calculate the ascent line.
+        LineSegment ascentLine = renderInfo.getAscentLine();
+
+        // ASSERT: Verify that the calculation completes successfully and returns a valid object.
+        // A null return value would indicate a potential issue in handling the text 'rise'.
+        assertNotNull("The ascent line should be successfully calculated even when a text rise is applied.", ascentLine);
     }
 }
