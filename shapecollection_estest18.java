@@ -1,42 +1,47 @@
 package org.locationtech.spatial4j.shape;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
 import org.locationtech.spatial4j.shape.jts.JtsPoint;
 
-public class ShapeCollection_ESTestTest18 extends ShapeCollection_ESTest_scaffolding {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        ArrayList<JtsPoint> arrayList0 = new ArrayList<JtsPoint>();
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        ShapeCollection<JtsPoint> shapeCollection0 = new ShapeCollection<JtsPoint>(arrayList0, spatialContext0);
-        arrayList0.add((JtsPoint) null);
-        arrayList0.add((JtsPoint) null);
-        arrayList0.add((JtsPoint) null);
-        arrayList0.add((JtsPoint) null);
-        arrayList0.add((JtsPoint) null);
-        arrayList0.add((JtsPoint) null);
-        arrayList0.add((JtsPoint) null);
-        arrayList0.add((JtsPoint) null);
-        arrayList0.add((JtsPoint) null);
-        arrayList0.add((JtsPoint) null);
-        arrayList0.add((JtsPoint) null);
-        shapeCollection0.get(10);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+/**
+ * Test suite for {@link ShapeCollection}.
+ * This class contains the refactored test from the original auto-generated test file.
+ */
+public class ShapeCollectionTest {
+
+    /**
+     * Tests that get(index) correctly retrieves an element from the underlying list,
+     * even when the element is null.
+     */
+    @Test
+    public void get_withValidIndex_shouldReturnCorrectElement() {
+        // Arrange
+        // Create a list containing 11 null elements to mirror the original test's setup.
+        final int numberOfShapes = 11;
+        List<JtsPoint> shapes = new ArrayList<>(Collections.nCopies(numberOfShapes, null));
+        
+        SpatialContext context = SpatialContext.GEO;
+        ShapeCollection<JtsPoint> shapeCollection = new ShapeCollection<>(shapes, context);
+
+        // A precondition check to ensure the collection was set up correctly.
+        assertEquals("Precondition failed: Collection size should match the source list.",
+                numberOfShapes, shapeCollection.size());
+
+        // Act
+        // Retrieve the element at the last valid index.
+        int lastIndex = numberOfShapes - 1;
+        Shape retrievedShape = shapeCollection.get(lastIndex);
+
+        // Assert
+        // The retrieved element should be null, as that's what was placed in the list.
+        assertNull("The element retrieved from the last index should be null.", retrievedShape);
     }
 }
