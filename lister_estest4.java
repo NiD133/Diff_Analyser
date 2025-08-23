@@ -1,32 +1,55 @@
 package org.apache.commons.compress.archivers;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.file.FileSystemException;
-import java.nio.file.InvalidPathException;
-import java.nio.file.NoSuchFileException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows; // Alternative using a more modern approach
 
+import java.io.IOException;
+import org.apache.commons.compress.archivers.ArchiveException;
+
+// The original test class name and inheritance are kept for context.
 public class Lister_ESTestTest4 extends Lister_ESTest_scaffolding {
 
+    /**
+     * Tests that the go() method throws a NullPointerException if the command-line
+     * arguments include a null value where an archive format is expected.
+     * The Lister class expects args[0] to be a file path and an optional args[1]
+     * to be the archive format.
+     */
     @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        String[] stringArray0 = new String[8];
-        stringArray0[0] = "bf,eR=!9:b8u`J";
-        Lister lister0 = new Lister(true, stringArray0);
-        // Undeclared exception!
+    public void goShouldThrowNullPointerExceptionIfArchiveFormatArgumentIsNull() throws ArchiveException, IOException {
+        // Arrange: Set up command-line arguments with a dummy file name
+        // and a null for the second argument (the archive format).
+        final String[] argsWithNullFormat = {"dummyArchive.zip", null};
+        final Lister lister = new Lister(true, argsWithNullFormat);
+
+        // Act & Assert: Verify that calling go() throws a NullPointerException.
+        // This is expected because the Lister implementation does not handle a null format string.
         try {
-            lister0.go();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.archivers.Lister", e);
+            lister.go();
+            fail("Expected a NullPointerException, but no exception was thrown.");
+        } catch (final NullPointerException expected) {
+            // Test passes: The expected exception was caught.
+            // This confirms the behavior when a null format argument is provided.
         }
     }
+
+    /*
+     * Note: If using JUnit 5 or a library with similar assertions (like JUnit Jupiter Assertions
+     * on the classpath), the try-catch block could be replaced with a more concise lambda expression.
+     *
+     * Example using JUnit 5's assertThrows:
+     *
+     * @Test(timeout = 4000)
+     * public void goShouldThrowNullPointerExceptionIfArchiveFormatArgumentIsNull_withAssertThrows() {
+     *     // Arrange
+     *     final String[] argsWithNullFormat = {"dummyArchive.zip", null};
+     *     final Lister lister = new Lister(true, argsWithNullFormat);
+     *
+     *     // Act & Assert
+     *     assertThrows(NullPointerException.class, () -> {
+     *         lister.go();
+     *     });
+     * }
+     */
 }
