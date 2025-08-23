@@ -1,26 +1,27 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TokenQueue_ESTestTest34 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for the {@link TokenQueue#consumeToAny(String...)} method.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("Grh3(>~p#auroy");
-        // Undeclared exception!
-        try {
-            tokenQueue0.consumeToAny((String[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.parser.TokenQueue", e);
-        }
+    /**
+     * Verifies that calling consumeToAny with a null array of sequences
+     * throws a NullPointerException. This ensures the method correctly handles
+     * invalid null input for its varargs parameter.
+     */
+    @Test(expected = NullPointerException.class)
+    public void consumeToAnyShouldThrowNullPointerExceptionWhenSequencesArrayIsNull() {
+        // Arrange: Create a TokenQueue instance. The initial data is not relevant for this test.
+        TokenQueue tokenQueue = new TokenQueue("some-data");
+
+        // Act: Call the method under test with a null argument.
+        // The cast to (String[]) is necessary to resolve ambiguity for the varargs method.
+        tokenQueue.consumeToAny((String[]) null);
+
+        // Assert: The test passes if a NullPointerException is thrown, as declared
+        // by the @Test(expected) annotation.
     }
 }
