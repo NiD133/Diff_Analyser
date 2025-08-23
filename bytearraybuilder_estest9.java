@@ -1,20 +1,30 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class ByteArrayBuilder_ESTestTest9 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteArrayBuilder} class.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder();
-        byteArrayBuilder0.append(8000);
-        int int0 = byteArrayBuilder0.size();
-        assertEquals(1, byteArrayBuilder0.getCurrentSegmentLength());
-        assertEquals(1, int0);
+    /**
+     * Tests that appending an integer correctly adds a single byte
+     * and updates the builder's size accordingly.
+     */
+    @Test
+    public void append_whenAddingInteger_shouldAddOneByteAndIncreaseSize() {
+        // Arrange
+        ByteArrayBuilder builder = new ByteArrayBuilder();
+        // The append(int) method truncates the integer to its lowest 8 bits.
+        // For example, 8000 (0x1F40) becomes 64 (0x40).
+        int valueToAppend = 8000;
+
+        // Act
+        builder.append(valueToAppend);
+
+        // Assert
+        assertEquals("Total size should be 1 after appending one byte.", 1, builder.size());
+        assertEquals("Current segment length should also be 1.", 1, builder.getCurrentSegmentLength());
     }
 }
