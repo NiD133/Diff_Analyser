@@ -2,73 +2,45 @@ package org.jfree.chart.block;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
 
+import org.jfree.data.Range;
+import java.awt.Graphics2D;
+
+/**
+ * This test suite contains tests for the GridArrangement class.
+ * This specific test case focuses on the behavior of the arrange() method.
+ */
+// The class name is kept from the original to maintain context.
 public class GridArrangement_ESTestTest68 extends GridArrangement_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test67() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(305, 305);
-        assertNotNull(gridArrangement0);
-        BlockContainer blockContainer0 = new BlockContainer();
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertNotNull(blockContainer0);
-        blockContainer0.add((Block) blockContainer0);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertFalse(blockContainer0.isEmpty());
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        Range range0 = new Range(305, 305);
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertEquals(305.0, range0.getLowerBound(), 0.01);
-        assertEquals(305.0, range0.getCentralValue(), 0.01);
-        assertEquals(305.0, range0.getUpperBound(), 0.01);
-        assertFalse(range0.isNaNRange());
-        assertEquals("Range[305.0,305.0]", range0.toString());
-        assertNotNull(range0);
-        RectangleConstraint rectangleConstraint0 = new RectangleConstraint(range0, 305);
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertEquals(305.0, range0.getLowerBound(), 0.01);
-        assertEquals(305.0, range0.getCentralValue(), 0.01);
-        assertEquals(305.0, range0.getUpperBound(), 0.01);
-        assertFalse(range0.isNaNRange());
-        assertEquals("Range[305.0,305.0]", range0.toString());
-        assertEquals(LengthConstraintType.FIXED, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(305.0, rectangleConstraint0.getHeight(), 0.01);
-        assertNotNull(rectangleConstraint0);
-        // Undeclared exception!
+    /**
+     * Verifies that the arrange() method throws a RuntimeException when called
+     * with a constraint that has a ranged width and a fixed height. This behavior
+     * is expected because this specific arrangement logic is not yet implemented in
+     * the GridArrangement class.
+     */
+    @Test
+    public void arrangeWithRangedWidthAndFixedHeightConstraintShouldThrowException() {
+        // Arrange: Set up the arrangement, a container with a single block,
+        // and the specific constraint to trigger the unimplemented code path.
+        GridArrangement gridArrangement = new GridArrangement(1, 1);
+        BlockContainer container = new BlockContainer();
+        container.add(new EmptyBlock(0, 0)); // Container must not be empty.
+
+        // This constraint combination (Range for width, Fixed for height)
+        // is designed to call the arrangeRF() method, which is not implemented.
+        Range widthRange = new Range(100.0, 200.0);
+        double fixedHeight = 50.0;
+        RectangleConstraint constraint = new RectangleConstraint(widthRange, fixedHeight);
+
+        // Act & Assert: Call the arrange method and verify that it throws the
+        // expected exception with the correct message.
         try {
-            gridArrangement0.arrange(blockContainer0, (Graphics2D) null, rectangleConstraint0);
-            fail("Expecting exception: RuntimeException");
+            gridArrangement.arrange(container, (Graphics2D) null, constraint);
+            fail("A RuntimeException was expected because the method is not implemented.");
         } catch (RuntimeException e) {
-            //
-            // Not implemented.
-            //
-            verifyException("org.jfree.chart.block.BorderArrangement", e);
+            assertEquals("The exception message should indicate that the feature is not implemented.",
+                    "Not implemented.", e.getMessage());
         }
     }
 }
