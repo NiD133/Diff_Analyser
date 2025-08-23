@@ -1,17 +1,31 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JavaVersion_ESTestTest5 extends JavaVersion_ESTest_scaffolding {
+/**
+ * Tests for {@link JavaVersion}.
+ */
+public class JavaVersionTest {
 
-    @Test(timeout = 4000)
-    public void test4() throws Throwable {
-        int int0 = JavaVersion.parseMajorJavaVersion("-8");
-        assertEquals((-8), int0);
+    /**
+     * Tests that {@code parseMajorJavaVersion} correctly handles a string
+     * representing a negative number.
+     *
+     * <p>While Java versions are not expected to be negative, this test verifies
+     * the current parsing behavior for such an edge case. The method is expected
+     * to simply parse and return the negative integer value.
+     */
+    @Test
+    public void parseMajorJavaVersion_withNegativeString_returnsNegativeInteger() {
+        // Arrange
+        String negativeVersionString = "-8";
+        int expectedVersion = -8;
+
+        // Act
+        int actualVersion = JavaVersion.parseMajorJavaVersion(negativeVersionString);
+
+        // Assert
+        assertEquals(expectedVersion, actualVersion);
     }
 }
