@@ -1,46 +1,33 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
-import java.io.EOFException;
-import java.io.FileDescriptor;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.PushbackReader;
-import java.io.Reader;
-import java.io.StringReader;
 import java.io.Writer;
-import java.nio.BufferOverflowException;
 import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.MalformedInputException;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileReader;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharStreams_ESTestTest2 extends CharStreams_ESTest_scaffolding {
+/**
+ * Tests for {@link CharStreams}.
+ */
+public class CharStreamsTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        Writer writer0 = CharStreams.nullWriter();
-        CharBuffer charBuffer0 = CharBuffer.allocate(546);
-        CharStreams.copy(charBuffer0, writer0);
-        String string0 = CharStreams.toString((Readable) charBuffer0);
-        assertEquals("", string0);
+    @Test
+    public void toString_onConsumedReadable_returnsEmptyString() throws IOException {
+        // Arrange: Create a Readable (a CharBuffer) with some initial content.
+        CharBuffer readableBuffer = CharBuffer.wrap("test content");
+
+        // Act 1: Consume the readable by copying its content to a writer.
+        // This operation advances the buffer's internal position to the end,
+        // leaving nothing left to be read.
+        Writer discardingWriter = CharStreams.nullWriter();
+        CharStreams.copy(readableBuffer, discardingWriter);
+
+        // Act 2: Call toString() on the now-consumed readable.
+        String result = CharStreams.toString(readableBuffer);
+
+        // Assert: The result should be an empty string because the readable's
+        // content has already been fully read.
+        assertEquals("", result);
     }
 }
