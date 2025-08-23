@@ -1,29 +1,31 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
+import static org.junit.Assert.assertEquals;
+
 import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeReader_ESTestTest5 extends JsonTreeReader_ESTest_scaffolding {
+/**
+ * Unit tests for {@link JsonTreeReader}.
+ */
+public class JsonTreeReaderTest {
 
-    @Test(timeout = 4000)
-    public void test004() throws Throwable {
-        Long long0 = new Long((-1977L));
-        JsonPrimitive jsonPrimitive0 = new JsonPrimitive(long0);
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonPrimitive0);
-        int int0 = jsonTreeReader0.nextInt();
-        assertEquals((-1977), int0);
+    /**
+     * Tests that {@link JsonTreeReader#nextInt()} correctly reads an integer
+     * value from a {@link JsonPrimitive}.
+     */
+    @Test
+    public void nextInt_whenReadingNumericPrimitive_returnsIntegerValue() throws IOException {
+        // Arrange
+        int expectedValue = -1977;
+        JsonPrimitive numberPrimitive = new JsonPrimitive(expectedValue);
+        JsonTreeReader jsonTreeReader = new JsonTreeReader(numberPrimitive);
+
+        // Act
+        int actualValue = jsonTreeReader.nextInt();
+
+        // Assert
+        assertEquals(expectedValue, actualValue);
     }
 }
