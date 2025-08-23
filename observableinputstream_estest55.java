@@ -1,43 +1,39 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.io.StringWriter;
 import java.nio.CharBuffer;
-import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class ObservableInputStream_ESTestTest55 extends ObservableInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link ObservableInputStream} focusing on its creation via the {@link ObservableInputStream.Builder}.
+ */
+public class ObservableInputStream_ESTestTest55 { // Note: Original class name retained for context.
 
-    @Test(timeout = 4000)
-    public void test54() throws Throwable {
-        ObservableInputStream.Builder observableInputStream_Builder0 = new ObservableInputStream.Builder();
-        CharBuffer charBuffer0 = CharBuffer.allocate(1332);
-        observableInputStream_Builder0.setCharSequence(charBuffer0);
-        ObservableInputStream observableInputStream0 = observableInputStream_Builder0.get();
-        int int0 = observableInputStream0.read();
-        assertEquals(0, int0);
+    /**
+     * Tests that an ObservableInputStream, created from a CharBuffer source using the builder,
+     * correctly reads the first byte. A newly allocated CharBuffer is filled with null
+     * characters ('\u0000'), which have a byte value of 0.
+     */
+    @Test
+    public void readShouldReturnFirstByteFromCharSequenceSource() throws IOException {
+        // Arrange
+        final int bufferSize = 10;
+        // A CharBuffer allocated this way is filled with null characters ('\u0000').
+        final CharBuffer sourceBuffer = CharBuffer.allocate(bufferSize);
+
+        final ObservableInputStream.Builder builder = new ObservableInputStream.Builder();
+        builder.setCharSequence(sourceBuffer);
+        final ObservableInputStream inputStream = builder.get();
+
+        // Act
+        final int firstByteRead = inputStream.read();
+
+        // Assert
+        // The byte representation of a null character is 0.
+        final int expectedByte = 0;
+        assertEquals("The first byte read from a buffer of null characters should be 0.",
+                expectedByte, firstByteRead);
     }
 }
