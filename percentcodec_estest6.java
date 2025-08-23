@@ -1,27 +1,31 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PercentCodec_ESTestTest6 extends PercentCodec_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        byte[] byteArray0 = new byte[1];
-        byteArray0[0] = (byte) (-50);
-        PercentCodec percentCodec0 = null;
-        try {
-            percentCodec0 = new PercentCodec(byteArray0, true);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // byte must be >= 0
-            //
-            verifyException("org.apache.commons.codec.net.PercentCodec", e);
-        }
+/**
+ * Tests for the constructor of {@link PercentCodec}.
+ */
+public class PercentCodecConstructorTest {
+
+    @Test
+    public void shouldThrowIllegalArgumentExceptionWhenAlwaysEncodeCharsContainsNegativeByte() {
+        // Arrange: Create an array of bytes for the 'alwaysEncodeChars' parameter
+        // that contains an invalid negative value. The constructor is expected to reject it.
+        final byte[] invalidCharsToEncode = {(byte) -50};
+        final boolean plusForSpace = true;
+        final String expectedMessage = "byte must be >= 0";
+
+        // Act & Assert: Verify that creating a PercentCodec with the invalid input
+        // throws an IllegalArgumentException with the correct message.
+        // Using JUnit's assertThrows for clear and concise exception testing.
+        final IllegalArgumentException thrown = assertThrows(
+            IllegalArgumentException.class,
+            () -> new PercentCodec(invalidCharsToEncode, plusForSpace)
+        );
+
+        assertEquals(expectedMessage, thrown.getMessage());
     }
 }
