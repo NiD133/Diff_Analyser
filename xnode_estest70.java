@@ -1,37 +1,36 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
+
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
+import java.util.Properties;
 
-public class XNode_ESTestTest70 extends XNode_ESTest_scaffolding {
+/**
+ * Test suite for the {@link XNode} class, focusing on attribute parsing.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test069() throws Throwable {
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        iIOMetadataNode0.setAttribute("2pY", "2pY");
-        XPathParser xPathParser0 = new XPathParser((Document) null, false);
-        Properties properties0 = new Properties();
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        Float float0 = new Float(1325.6389109520017);
-        // Undeclared exception!
-        try {
-            xNode0.getFloatAttribute("2pY", float0);
-            fail("Expecting exception: NumberFormatException");
-        } catch (NumberFormatException e) {
-        }
+    /**
+     * Verifies that getFloatAttribute throws a NumberFormatException
+     * when the attribute's value cannot be parsed as a float.
+     */
+    @Test(expected = NumberFormatException.class)
+    public void getFloatAttributeShouldThrowNumberFormatExceptionForInvalidValue() {
+        // Arrange: Create a node with an attribute whose value is not a valid float.
+        IIOMetadataNode node = new IIOMetadataNode("element");
+        String attributeName = "value";
+        String invalidFloatValue = "not-a-float";
+        node.setAttribute(attributeName, invalidFloatValue);
+
+        // The XPathParser is a required constructor argument but is not used by the
+        // getFloatAttribute method, so it can be null for this test.
+        XNode xNode = new XNode(null, node, new Properties());
+
+        Float defaultValue = 99.9f;
+
+        // Act & Assert: Attempt to get the attribute as a float.
+        // This call is expected to throw a NumberFormatException.
+        // The @Test(expected=...) annotation handles the assertion.
+        xNode.getFloatAttribute(attributeName, defaultValue);
     }
 }
