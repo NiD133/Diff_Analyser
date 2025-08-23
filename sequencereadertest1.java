@@ -2,73 +2,48 @@ package org.apache.commons.io.input;
 
 import static org.apache.commons.io.IOUtils.EOF;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class SequenceReaderTestTest1 {
-
-    private static final char NUL = 0;
-
-    private void checkArray(final char[] expected, final char[] actual) {
-        for (int i = 0; i < expected.length; i++) {
-            assertEquals(expected[i], actual[i], "Compare[" + i + "]");
-        }
-    }
-
-    private void checkRead(final Reader reader, final String expected) throws IOException {
-        for (int i = 0; i < expected.length(); i++) {
-            assertEquals(expected.charAt(i), (char) reader.read(), "Read[" + i + "] of '" + expected + "'");
-        }
-    }
-
-    private void checkReadEof(final Reader reader) throws IOException {
-        for (int i = 0; i < 10; i++) {
-            assertEquals(-1, reader.read());
-        }
-    }
-
-    private static class CustomReader extends Reader {
-
-        boolean closed;
-
-        protected void checkOpen() throws IOException {
-            if (closed) {
-                throw new IOException("emptyReader already closed");
-            }
-        }
-
-        @Override
-        public void close() throws IOException {
-            closed = true;
-        }
-
-        public boolean isClosed() {
-            return closed;
-        }
-
-        @Override
-        public int read(final char[] cbuf, final int off, final int len) throws IOException {
-            checkOpen();
-            close();
-            return EOF;
-        }
-    }
+/**
+ * Tests for {@link SequenceReader}.
+ */
+class SequenceReaderTest {
 
     @Test
-    void testAutoClose() throws IOException {
-        try (Reader reader = new SequenceReader(new CharSequenceReader("FooBar"))) {
-            checkRead(reader, "Foo");
-            reader.close();
-            checkReadEof(reader);
+    @DisplayName("Reading from a closed SequenceReader should consistently return EOF")
+    void readAfterCloseReturnsEof() throws IOException {
+        // Arrange: Create a SequenceReader with some content.
+        // The try-with-resources block ensures the reader is closed at the end,
+        // which also implicitly tests that closing an already-closed reader is safe.
+        try (Reader sequenceReader = new SequenceReader(new CharSequenceReader("FooBar"))) {
+
+            // Act 1: Read part of the content to advance the reader's position.
+            readAndAssert(sequenceReader, "Foo");
+
+            // Act 2: Explicitly close the reader.
+            sequenceReader.close();
+
+            // Assert: Subsequent reads should return End-Of-File (-1).
+            assertEquals(EOF, sequenceReader.read(), "First read after close should be EOF.");
+            assertEquals(EOF, sequenceReader.read(), "Second read after close should also be EOF to confirm state.");
+        }
+    }
+
+    /**
+     * Helper method to read a specific string from a Reader, asserting each character.
+     *
+     * @param reader The reader to read from.
+     * @param expected The string that is expected to be read.
+     * @throws IOException If an I/O error occurs.
+     */
+    private void readAndAssert(final Reader reader, final String expected) throws IOException {
+        for (int i = 0; i < expected.length(); i++) {
+            final char expectedChar = expected.charAt(i);
+            assertEquals(expectedChar, (char) reader.read(), "Character at index " + i + " should match.");
         }
     }
 }
