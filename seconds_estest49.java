@@ -2,17 +2,25 @@ package org.joda.time;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Seconds_ESTestTest49 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        Seconds seconds0 = Seconds.ZERO;
-        Seconds seconds1 = seconds0.plus(0);
-        assertEquals(0, seconds1.getSeconds());
+    /**
+     * Tests that adding zero to a Seconds instance returns the same instance,
+     * which is an important optimization for immutable objects.
+     */
+    @Test
+    public void plus_whenAddingZero_shouldReturnSameInstance() {
+        // Arrange
+        Seconds initialSeconds = Seconds.ZERO;
+
+        // Act
+        Seconds result = initialSeconds.plus(0);
+
+        // Assert
+        assertSame("Adding zero should return the same instance, not just an equal one.", initialSeconds, result);
     }
 }
