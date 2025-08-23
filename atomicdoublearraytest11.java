@@ -1,80 +1,70 @@
 package com.google.common.util.concurrent;
 
-import static java.lang.Math.max;
-import static org.junit.Assert.assertThrows;
-import com.google.common.annotations.GwtIncompatible;
-import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.testing.NullPointerTester;
-import java.util.Arrays;
-import org.jspecify.annotations.NullUnmarked;
+import static org.junit.Assert.assertTrue;
 
-public class AtomicDoubleArrayTestTest11 extends JSR166TestCase {
+import java.util.concurrent.atomic.AtomicReference;
+import org.junit.Test;
 
-    private static final double[] VALUES = { Double.NEGATIVE_INFINITY, -Double.MAX_VALUE, (double) Long.MIN_VALUE, (double) Integer.MIN_VALUE, -Math.PI, -1.0, -Double.MIN_VALUE, -0.0, +0.0, Double.MIN_VALUE, 1.0, Math.PI, (double) Integer.MAX_VALUE, (double) Long.MAX_VALUE, Double.MAX_VALUE, Double.POSITIVE_INFINITY, Double.NaN, Float.MAX_VALUE };
+/**
+ * Tests for {@link AtomicDoubleArray}.
+ *
+ * <p>This is a rewritten version of a test from the JSR-166 test suite.
+ */
+public class AtomicDoubleArrayConcurrencyTest {
 
-    static final long COUNTDOWN = 100000;
+  /**
+   * Asserts that two double values are bitwise-equal. This is the equality contract used by {@link
+   * AtomicDoubleArray}.
+   */
+  private static void assertBitEquals(double expected, double actual) {
+    assertEquals(
+        "Expected bitwise equality, but values differed.",
+        Double.doubleToRawLongBits(expected),
+        Double.doubleToRawLongBits(actual));
+  }
 
-    /**
-     * The notion of equality used by AtomicDoubleArray
-     */
-    static boolean bitEquals(double x, double y) {
-        return Double.doubleToRawLongBits(x) == Double.doubleToRawLongBits(y);
-    }
+  /**
+   * Tests a common concurrency scenario where one thread waits for a value to be set by another
+   * thread before proceeding. This test verifies that a `compareAndSet` operation in one thread can
+   * successfully "unblock" another thread that is spin-waiting on a `compareAndSet` for a specific
+   * value.
+   */
+  @Test(timeout = 5000)
+  public void compareAndSet_inParallel_successfulHandOffBetweenThreads() throws Exception {
+    // ARRANGE
+    // These constants define the states for the hand-off between threads.
+    final double initialValue = 1.0;
+    final double intermediateValue = 2.0; // Set by main thread, awaited by background thread.
+    final double finalValue = 3.0; // Set by background thread after the hand-off.
 
-    static void assertBitEquals(double x, double y) {
-        assertEquals(Double.doubleToRawLongBits(x), Double.doubleToRawLongBits(y));
-    }
+    final AtomicDoubleArray atomicArray = new AtomicDoubleArray(1);
+    atomicArray.set(0, initialValue);
 
-    class Counter extends CheckedRunnable {
+    // This thread will spin-wait until the value is `intermediateValue`, then update it to
+    // `finalValue`.
+    Thread backgroundUpdater =
+        new Thread(
+            () -> {
+              // Spin until the value is successfully updated from intermediate to final.
+              while (!atomicArray.compareAndSet(0, intermediateValue, finalValue)) {
+                // Yield to give the main thread a chance to run and perform its update.
+                Thread.yield();
+              }
+            });
 
-        final AtomicDoubleArray aa;
+    // ACT
+    backgroundUpdater.start();
 
-        volatile long counts;
+    // The main thread updates the value from `initialValue` to `intermediateValue`.
+    // This action should succeed and, in doing so, unblock the background thread.
+    boolean casSucceeded = atomicArray.compareAndSet(0, initialValue, intermediateValue);
+    assertTrue("Main thread's CAS should succeed to enable the hand-off", casSucceeded);
 
-        Counter(AtomicDoubleArray a) {
-            aa = a;
-        }
+    // ASSERT
+    // Wait for the background thread to complete its work.
+    backgroundUpdater.join();
 
-        @Override
-        public void realRun() {
-            for (; ; ) {
-                boolean done = true;
-                for (int i = 0; i < aa.length(); i++) {
-                    double v = aa.get(i);
-                    assertTrue(v >= 0);
-                    if (v != 0) {
-                        done = false;
-                        if (aa.compareAndSet(i, v, v - 1.0)) {
-                            ++counts;
-                        }
-                    }
-                }
-                if (done) {
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
-     * compareAndSet in one thread enables another waiting for value to succeed
-     */
-    public void testCompareAndSetInMultipleThreads() throws InterruptedException {
-        AtomicDoubleArray a = new AtomicDoubleArray(1);
-        a.set(0, 1.0);
-        Thread t = newStartedThread(new CheckedRunnable() {
-
-            @Override
-            // doing our best to test for races
-            @SuppressWarnings("ThreadPriorityCheck")
-            public void realRun() {
-                while (!a.compareAndSet(0, 2.0, 3.0)) {
-                    Thread.yield();
-                }
-            }
-        });
-        assertTrue(a.compareAndSet(0, 1.0, 2.0));
-        awaitTermination(t);
-        assertBitEquals(3.0, a.get(0));
-    }
+    // Verify that the background thread successfully updated the value to its final state.
+    assertBitEquals(finalValue, atomicArray.get(0));
+  }
 }
