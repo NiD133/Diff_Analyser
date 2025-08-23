@@ -1,40 +1,36 @@
 package org.jsoup.nodes;
 
+import org.jsoup.internal.QuietAppendable;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
+
 import java.nio.BufferOverflowException;
 import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Attribute_ESTestTest21 extends Attribute_ESTest_scaffolding {
+/**
+ * Tests for the static {@link Attribute#html(String, String, QuietAppendable, Document.OutputSettings)} method.
+ */
+public class AttributeHtmlMethodTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        char[] charArray0 = new char[4];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        QuietAppendable quietAppendable0 = QuietAppendable.wrap(charBuffer0);
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        // Undeclared exception!
-        try {
-            Attribute.html("checked", "org.jsoup.select.Evaluator$AttributeWithValueStarting", quietAppendable0, document_OutputSettings0);
-            fail("Expecting exception: BufferOverflowException");
-        } catch (BufferOverflowException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.CharBuffer", e);
-        }
+    /**
+     * Verifies that the html() method throws a BufferOverflowException when the provided
+     * Appendable has insufficient capacity to hold the attribute's string representation.
+     */
+    @Test(expected = BufferOverflowException.class)
+    public void htmlThrowsBufferOverflowWhenAppendableIsTooSmall() {
+        // Arrange: Create an Appendable with a capacity that is too small for the attribute's HTML.
+        // The output for an attribute is ` key="value"`, which requires more than 4 characters.
+        final int bufferCapacity = 4;
+        CharBuffer smallCharBuffer = CharBuffer.allocate(bufferCapacity);
+        QuietAppendable smallAppendable = QuietAppendable.wrap(smallCharBuffer);
+
+        Document.OutputSettings outputSettings = new Document.OutputSettings();
+        String attributeKey = "checked";
+        String attributeValue = "some-long-value";
+
+        // Act: Attempt to write the attribute's HTML to the small appendable.
+        // This should trigger a BufferOverflowException because the output string is larger than the buffer's capacity.
+        Attribute.html(attributeKey, attributeValue, smallAppendable, outputSettings);
+
+        // Assert: The test passes if a BufferOverflowException is thrown, as declared in the @Test annotation.
     }
 }
