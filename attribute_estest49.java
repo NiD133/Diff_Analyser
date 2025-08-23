@@ -1,30 +1,30 @@
 package org.jsoup.nodes;
 
+import org.jsoup.nodes.Document.OutputSettings.Syntax;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Attribute_ESTestTest49 extends Attribute_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        Document.OutputSettings.Syntax document_OutputSettings_Syntax0 = Document.OutputSettings.Syntax.html;
-        String string0 = Attribute.getValidKey("AkY'Y", document_OutputSettings_Syntax0);
-        assertNotNull(string0);
-        assertEquals("AkY_Y", string0);
+/**
+ * Tests for the {@link Attribute} class, focusing on key validation.
+ */
+public class AttributeTest {
+
+    /**
+     * Verifies that getValidKey() replaces an invalid character (a single quote)
+     * with an underscore when using HTML syntax.
+     */
+    @Test
+    public void getValidKeyShouldReplaceInvalidCharacterForHtmlSyntax() {
+        // Arrange
+        String invalidKey = "AkY'Y";
+        String expectedKey = "AkY_Y";
+        Syntax syntax = Syntax.html;
+
+        // Act
+        String actualKey = Attribute.getValidKey(invalidKey, syntax);
+
+        // Assert
+        assertEquals("The single quote should be replaced with an underscore.", expectedKey, actualKey);
     }
 }
