@@ -1,29 +1,40 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
+import java.nio.charset.StandardCharsets;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class SerializedString_ESTestTest50 extends SerializedString_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SerializedString} class, focusing on its caching behavior.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test49() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("R^$t>9-hl+");
-        byte[] byteArray0 = serializedString0.asUnquotedUTF8();
-        byte[] byteArray1 = serializedString0.asUnquotedUTF8();
-        assertSame(byteArray1, byteArray0);
-        assertNotNull(byteArray1);
+    /**
+     * Verifies that the {@code asUnquotedUTF8()} method caches its result.
+     * The test ensures that subsequent calls to the method return the exact same
+     * byte array instance, which confirms the lazy-initialization and caching mechanism is working correctly.
+     */
+    @Test
+    public void asUnquotedUTF8_whenCalledMultipleTimes_returnsSameCachedInstance() {
+        // Arrange
+        final String originalValue = "test-string-for-caching";
+        SerializedString serializedString = new SerializedString(originalValue);
+
+        // Act
+        // The first call computes and caches the UTF-8 byte array.
+        byte[] firstResult = serializedString.asUnquotedUTF8();
+        // The second call should retrieve the value from the cache.
+        byte[] secondResult = serializedString.asUnquotedUTF8();
+
+        // Assert
+        // 1. Verify the initial result is correct and not null.
+        assertNotNull("The byte array should not be null", firstResult);
+        assertArrayEquals("The byte array content should match the original string's UTF-8 representation",
+                originalValue.getBytes(StandardCharsets.UTF_8), firstResult);
+
+        // 2. The core assertion: Confirm that both calls return the same object instance.
+        // This proves that the result was cached.
+        assertSame("Subsequent calls should return the same cached byte array instance",
+                firstResult, secondResult);
     }
 }
