@@ -1,43 +1,40 @@
 package org.apache.commons.compress.utils;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ByteUtils_ESTestTest37 extends ByteUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteUtils} class.
+ */
+public class ByteUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        byte[] byteArray0 = new byte[6];
-        ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
+    /**
+     * Tests that {@link ByteUtils#fromLittleEndian(InputStream, int)} throws an IOException
+     * when the stream contains fewer bytes than requested.
+     */
+    @Test
+    public void fromLittleEndianInputStreamShouldThrowIOExceptionWhenStreamIsTooShort() {
+        // Arrange: Set up an input stream that has fewer bytes than we attempt to read.
+        final int bytesToRead = 8;
+        final int availableBytes = 6; // Intentionally less than bytesToRead
+        final byte[] inputData = new byte[availableBytes];
+        final InputStream inputStream = new ByteArrayInputStream(inputData);
+
+        // Act & Assert: Verify that an IOException is thrown with the correct message.
+        // We use a try-catch block to assert the specific exception message,
+        // which is more precise than using @Test(expected = IOException.class).
         try {
-            ByteUtils.fromLittleEndian((InputStream) byteArrayInputStream0, 8);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Premature end of data
-            //
-            verifyException("org.apache.commons.compress.utils.ByteUtils", e);
+            ByteUtils.fromLittleEndian(inputStream, bytesToRead);
+            fail("Expected an IOException because the stream ended prematurely.");
+        } catch (final IOException e) {
+            // The method is expected to throw an IOException with a specific message
+            // when it cannot read the requested number of bytes.
+            assertEquals("Premature end of data", e.getMessage());
         }
     }
 }
