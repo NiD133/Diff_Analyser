@@ -1,24 +1,31 @@
 package com.google.gson.internal.bind;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
+
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.Strictness;
-import com.google.gson.common.MoreAsserts;
-import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
-import java.io.Writer;
-import java.util.Arrays;
-import java.util.List;
 import org.junit.Test;
 
 public class JsonTreeWriterTestTest18 {
 
     @Test
-    public void testLenientNansAndInfinities() throws IOException {
+    public void write_allowsSpecialFloatingPointValues_whenLenient() throws IOException {
+        // Arrange
         JsonTreeWriter writer = new JsonTreeWriter();
         writer.setStrictness(Strictness.LENIENT);
+
+        JsonArray expectedJson = new JsonArray();
+        expectedJson.add(new JsonPrimitive(Float.NaN));
+        expectedJson.add(new JsonPrimitive(Float.NEGATIVE_INFINITY));
+        expectedJson.add(new JsonPrimitive(Float.POSITIVE_INFINITY));
+        expectedJson.add(new JsonPrimitive(Double.NaN));
+        expectedJson.add(new JsonPrimitive(Double.NEGATIVE_INFINITY));
+        expectedJson.add(new JsonPrimitive(Double.POSITIVE_INFINITY));
+
+        // Act
         writer.beginArray();
         writer.value(Float.NaN);
         writer.value(Float.NEGATIVE_INFINITY);
@@ -27,6 +34,10 @@ public class JsonTreeWriterTestTest18 {
         writer.value(Double.NEGATIVE_INFINITY);
         writer.value(Double.POSITIVE_INFINITY);
         writer.endArray();
-        assertThat(writer.get().toString()).isEqualTo("[NaN,-Infinity,Infinity,NaN,-Infinity,Infinity]");
+
+        JsonElement actualJson = writer.get();
+
+        // Assert
+        assertThat(actualJson).isEqualTo(expectedJson);
     }
 }
