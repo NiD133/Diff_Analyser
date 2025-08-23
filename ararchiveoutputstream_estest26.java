@@ -1,40 +1,46 @@
 package org.apache.commons.compress.archivers.ar;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.LinkOption;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class ArArchiveOutputStream_ESTestTest26 extends ArArchiveOutputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link ArArchiveOutputStream}.
+ */
+public class ArArchiveOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        ByteArrayOutputStream byteArrayOutputStream0 = new ByteArrayOutputStream();
-        ArArchiveOutputStream arArchiveOutputStream0 = new ArArchiveOutputStream(byteArrayOutputStream0);
-        ArArchiveEntry arArchiveEntry0 = new ArArchiveEntry("_&2@hm@'}", 1);
-        arArchiveOutputStream0.putArchiveEntry(arArchiveEntry0);
+    /**
+     * Tests that attempting to add a new entry when the previous entry's data
+     * has not been fully written results in an IOException.
+     */
+    @Test
+    public void addingEntryWhenPreviousEntrySizeMismatchesThrowsIOException() throws IOException {
+        // Arrange: Create an archive entry that expects 1 byte of data, but for which
+        // no data will be written.
+        final String entryName = "test_entry.txt";
+        final long declaredSize = 1L;
+        ArArchiveEntry firstEntry = new ArArchiveEntry(entryName, declaredSize);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ArArchiveOutputStream arOut = new ArArchiveOutputStream(outputStream);
+
+        // Write the header for the first entry. The stream now expects 1 byte of data.
+        arOut.putArchiveEntry(firstEntry);
+
+        // Act & Assert: Attempt to add a second entry. This implicitly closes the first
+        // entry, triggering a check on its size. Since no data was written, the
+        // actual size (0) mismatches its declared size (1), causing an IOException.
         try {
-            arArchiveOutputStream0.putArchiveEntry(arArchiveEntry0);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Length does not match entry (1 != 0
-            //
-            verifyException("org.apache.commons.compress.archivers.ar.ArArchiveOutputStream", e);
+            ArArchiveEntry secondEntry = new ArArchiveEntry("another_entry.txt", 0);
+            arOut.putArchiveEntry(secondEntry);
+            fail("Expected an IOException because the previous entry's size was not met.");
+        } catch (final IOException e) {
+            // Verify the exception message clearly states the size mismatch.
+            final String expectedMessage = "Length does not match entry (0 != 1)";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
