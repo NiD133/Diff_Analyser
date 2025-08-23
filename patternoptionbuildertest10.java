@@ -1,30 +1,51 @@
 package org.apache.commons.cli;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.File;
-import java.io.FileInputStream;
+
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Vector;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class PatternOptionBuilderTestTest10 {
+/**
+ * Tests for {@link PatternOptionBuilder} with URL patterns.
+ */
+// The original class name 'PatternOptionBuilderTestTest10' was redundant.
+// A more standard name is used.
+public class PatternOptionBuilderTest {
 
     @Test
-    void testURLPattern() throws Exception {
-        final Options options = PatternOptionBuilder.parsePattern("u/v/");
+    @DisplayName("URL pattern ('/') should parse valid URLs and return null for invalid ones")
+    void testUrlPatternParsing() throws Exception {
+        // Arrange
+        // The pattern "u/v/" defines two options, 'u' and 'v'.
+        // The '/' character specifies that each option expects a URL as its value.
+        final String urlPattern = "u/v/";
+        final Options options = PatternOptionBuilder.parsePattern(urlPattern);
+
+        final String validUrlString = "https://commons.apache.org";
+        // "foo://" is not a standard protocol, so it's expected to fail URL parsing.
+        final String invalidUrlString = "foo://commons.apache.org";
+        final String[] args = {
+            "-u", validUrlString,
+            "-v", invalidUrlString
+        };
+
         final CommandLineParser parser = new PosixParser();
-        final CommandLine line = parser.parse(options, new String[] { "-u", "https://commons.apache.org", "-v", "foo://commons.apache.org" });
-        assertEquals(new URL("https://commons.apache.org"), line.getOptionObject("u"), "u value");
-        assertNull(line.getOptionObject("v"), "v value");
+
+        // Act
+        final CommandLine cmd = parser.parse(options, args);
+
+        // Assert
+        // 1. Verify that the valid URL string was correctly converted to a URL object.
+        final URL expectedUrl = new URL(validUrlString);
+        assertEquals(expectedUrl, cmd.getOptionObject("u"),
+            "A valid URL string should be parsed into a URL object.");
+
+        // 2. Verify that the invalid URL string resulted in a null value.
+        // This happens because the internal TypeHandler catches the MalformedURLException
+        // during parsing and returns null.
+        assertNull(cmd.getOptionObject("v"),
+            "An invalid URL string should result in a null object.");
     }
 }
