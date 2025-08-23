@@ -1,35 +1,37 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class, focusing on integer reading.
+ */
+// The original test class name is preserved for context, though in a real-world scenario,
+// it would be renamed to something like RandomAccessFileOrArrayTest.
 public class RandomAccessFileOrArray_ESTestTest6 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test005() throws Throwable {
-        byte[] byteArray0 = new byte[8];
-        byteArray0[3] = (byte) 52;
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        long long0 = randomAccessFileOrArray0.readUnsignedInt();
-        assertEquals(4L, randomAccessFileOrArray0.getFilePointer());
-        assertEquals(52L, long0);
+    /**
+     * Verifies that readUnsignedInt() correctly reads a 4-byte, big-endian integer
+     * from a byte array and advances the internal pointer accordingly.
+     */
+    @Test
+    public void readUnsignedInt_shouldReadBigEndianIntegerAndAdvancePointer() throws IOException {
+        // Arrange
+        // An unsigned int is 4 bytes. The value 52 in big-endian is represented as {0, 0, 0, 52}.
+        // We add extra bytes at the end to ensure the reader processes only the first four bytes.
+        byte[] sourceData = {0, 0, 0, 52, (byte) 0xFF, (byte) 0xFF};
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(sourceData);
+
+        long expectedValue = 52L;
+        long expectedPositionAfterRead = 4L;
+
+        // Act
+        long actualValue = reader.readUnsignedInt();
+        long actualPositionAfterRead = reader.getFilePointer();
+
+        // Assert
+        assertEquals("The read unsigned integer should match the expected value.", expectedValue, actualValue);
+        assertEquals("The file pointer should advance by 4 bytes after the read.", expectedPositionAfterRead, actualPositionAfterRead);
     }
 }
