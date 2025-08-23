@@ -1,18 +1,28 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class StringUtils_ESTestTest2 extends StringUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link StringUtils} class.
+ */
+public class StringUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        char[] charArray0 = new char[0];
-        byte[] byteArray0 = StringUtils.convertCharsToBytes(charArray0);
-        assertEquals(0, byteArray0.length);
+    /**
+     * Verifies that converting an empty character array results in an empty byte array.
+     * This tests the edge case of handling empty input.
+     */
+    @Test
+    public void convertCharsToBytes_withEmptyArray_returnsEmptyByteArray() {
+        // Arrange: Define an empty character array as input.
+        char[] emptyInput = new char[0];
+
+        // Act: Call the method under test.
+        byte[] result = StringUtils.convertCharsToBytes(emptyInput);
+
+        // Assert: The resulting byte array should be non-null and have a length of zero.
+        assertNotNull("The result should not be null for an empty input.", result);
+        assertEquals("The length of the resulting byte array should be 0.", 0, result.length);
     }
 }
