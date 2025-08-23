@@ -1,57 +1,39 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
 import org.joda.time.MonthDay;
-import org.joda.time.Partial;
 import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
 import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractPartial_ESTestTest24 extends AbstractPartial_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
-        LocalTime localTime0 = LocalTime.fromMillisOfDay(9223372036854775807L, (Chronology) islamicChronology0);
-        LocalDateTime localDateTime0 = LocalDateTime.now();
-        Partial partial0 = new Partial(localDateTime0);
-        // Undeclared exception!
+/**
+ * Contains tests for the {@link AbstractPartial#compareTo(ReadablePartial)} method.
+ */
+public class AbstractPartialTest {
+
+    /**
+     * Tests that compareTo() throws a ClassCastException when comparing two ReadablePartial
+     * instances that have different sets of field types, as required by the method's contract.
+     */
+    @Test
+    public void compareTo_whenPartialsHaveMismatchedFieldTypes_throwsClassCastException() {
+        // Arrange: Create two ReadablePartial objects with different field types.
+        // A YearMonth contains the fields [year, monthOfYear].
+        // A MonthDay contains the fields [monthOfYear, dayOfMonth].
+        // Although both have a size of 2, their field types at index 0 are different,
+        // which should trigger the exception.
+        ReadablePartial yearMonth = new YearMonth(2023, 10);
+        ReadablePartial monthDay = new MonthDay(10, 27);
+
+        // Act & Assert
         try {
-            partial0.compareTo((ReadablePartial) localTime0);
-            fail("Expecting exception: ClassCastException");
+            yearMonth.compareTo(monthDay);
+            fail("Expected ClassCastException due to mismatched field types, but none was thrown.");
         } catch (ClassCastException e) {
-            //
-            // ReadablePartial objects must have matching field types
-            //
-            verifyException("org.joda.time.base.AbstractPartial", e);
+            // Verify that the exception and its message are correct.
+            assertEquals("ReadablePartial objects must have matching field types", e.getMessage());
         }
     }
 }
