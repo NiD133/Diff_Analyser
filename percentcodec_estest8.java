@@ -1,18 +1,24 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.EncoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class PercentCodec_ESTestTest8 extends PercentCodec_ESTest_scaffolding {
+/**
+ * Tests for the {@link PercentCodec} class.
+ */
+public class PercentCodecTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        PercentCodec percentCodec0 = new PercentCodec();
-        Object object0 = percentCodec0.encode((Object) null);
-        assertNull(object0);
+    @Test
+    public void encodeShouldReturnNullWhenGivenNullObject() throws EncoderException {
+        // Arrange
+        PercentCodec percentCodec = new PercentCodec();
+        Object nullInput = null;
+
+        // Act
+        Object result = percentCodec.encode(nullInput);
+
+        // Assert
+        assertNull("Encoding a null object should return null.", result);
     }
 }
