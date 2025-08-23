@@ -1,44 +1,39 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Calendar;
-import java.util.TimeZone;
-import javax.swing.DropMode;
-import javax.swing.JScrollPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.legend.PaintScaleLegend;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.ThermometerPlot;
-import org.jfree.chart.renderer.LookupPaintScale;
-import org.jfree.chart.renderer.PaintScale;
-import org.jfree.chart.renderer.xy.XYShapeRenderer;
 import org.jfree.data.Range;
-import org.jfree.data.general.DefaultValueDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.time.DateRange;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 
 public class ModuloAxis_ESTestTest35 extends ModuloAxis_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
-        ModuloAxis moduloAxis0 = new ModuloAxis("TOKP_OR_LEFT", dateRange0);
-        ModuloAxis moduloAxis1 = new ModuloAxis("TOKP_OR_LEFT", moduloAxis0.DEFAULT_RANGE);
-        moduloAxis1.resizeRange((double) 2.0F);
-        boolean boolean0 = moduloAxis0.equals(moduloAxis1);
-        assertFalse(moduloAxis1.isAutoRange());
-        assertFalse(boolean0);
+    /**
+     * Verifies that two ModuloAxis instances are not equal after one of them
+     * has its range resized. The equals() method should consider the axis range
+     * in its comparison.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenOneAxisHasRangeResized() {
+        // Arrange: Create two identical ModuloAxis instances. A range of 0-360
+        // is a common use case for a modulo axis (e.g., for degrees).
+        String commonLabel = "Angle (Degrees)";
+        Range initialRange = new Range(0.0, 360.0);
+        ModuloAxis axis1 = new ModuloAxis(commonLabel, initialRange);
+        ModuloAxis axis2 = new ModuloAxis(commonLabel, initialRange);
+
+        // Sanity check: The two axes should be equal before any modifications.
+        assertEquals("Initially, the two identical axes should be equal.", axis1, axis2);
+
+        // Act: Resize the range of the second axis. This action should
+        // differentiate it from the first axis.
+        axis2.resizeRange(2.0); // Double the length of the axis range.
+
+        // Assert: The axes should no longer be equal because their ranges differ.
+        assertNotEquals("After resizing one axis, it should not be equal to the original.", axis1, axis2);
+
+        // Also, verify the side-effect that resizing disables auto-ranging.
+        assertFalse("Resizing the range should set auto-range to false.", axis2.isAutoRange());
     }
 }
