@@ -1,56 +1,32 @@
 package org.threeten.extra.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Period;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
 import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
 import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class InternationalFixedChronology_ESTestTest38 extends InternationalFixedChronology_ESTest_scaffolding {
+/**
+ * Tests for the {@link InternationalFixedChronology} class.
+ */
+public class InternationalFixedChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        InternationalFixedChronology internationalFixedChronology0 = new InternationalFixedChronology();
-        JapaneseEra japaneseEra0 = JapaneseEra.TAISHO;
-        // Undeclared exception!
-        try {
-            internationalFixedChronology0.date((Era) japaneseEra0, (-2073432486), (-2073432486), (-2073432486));
-            fail("Expecting exception: ClassCastException");
-        } catch (ClassCastException e) {
-            //
-            // Invalid era: Taisho
-            //
-            verifyException("org.threeten.extra.chrono.InternationalFixedChronology", e);
-        }
+    /**
+     * Tests that the date() method throws a ClassCastException when provided with an Era
+     * from a different calendar system.
+     */
+    @Test(expected = ClassCastException.class)
+    public void date_whenEraIsFromDifferentChronology_throwsClassCastException() {
+        // Arrange
+        InternationalFixedChronology chronology = InternationalFixedChronology.INSTANCE;
+        Era invalidEra = JapaneseEra.TAISHO; // An era from a non-IFC chronology.
+        
+        // The specific date values are irrelevant, as the type check on the Era happens first.
+        int year = 2012;
+        int month = 6;
+        int day = 15;
+
+        // Act
+        // The date() method expects an InternationalFixedEra. This call should fail
+        // because it's being passed a JapaneseEra.
+        chronology.date(invalidEra, year, month, day);
     }
 }
