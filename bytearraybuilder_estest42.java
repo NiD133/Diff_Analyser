@@ -1,27 +1,32 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ByteArrayBuilder_ESTestTest42 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * This test suite focuses on the behavior of the ByteArrayBuilder class.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder();
-        byteArrayBuilder0.setCurrentSegmentLength((-2612));
-        // Undeclared exception!
-        try {
-            byteArrayBuilder0.append((-2612));
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // -2612
-            //
-            verifyException("com.fasterxml.jackson.core.util.ByteArrayBuilder", e);
-        }
+    /**
+     * Verifies that attempting to append a byte after the internal buffer pointer
+     * has been set to an invalid negative index throws an
+     * {@link ArrayIndexOutOfBoundsException}.
+     *
+     * This test case simulates a scenario where the builder's internal state
+     * has been corrupted.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void appendShouldThrowExceptionWhenSegmentLengthIsNegative() {
+        // Arrange: Create a builder and manually set its internal state to be invalid.
+        // The current segment length (which acts as a pointer) is set to a negative value.
+        ByteArrayBuilder builder = new ByteArrayBuilder();
+        builder.setCurrentSegmentLength(-1);
+
+        // Act: Attempt to append a byte. This operation should try to access the
+        // backing array at a negative index, causing an exception.
+        builder.append(42);
+
+        // Assert: The test framework verifies that an ArrayIndexOutOfBoundsException is thrown,
+        // as specified by the `expected` parameter in the @Test annotation.
     }
 }
