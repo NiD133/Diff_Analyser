@@ -1,22 +1,27 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharSequenceReader_ESTestTest31 extends CharSequenceReader_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CharSequenceReader}.
+ */
+public class CharSequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        CharBuffer charBuffer0 = CharBuffer.allocate(0);
-        CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
-        boolean boolean0 = charSequenceReader0.ready();
-        assertTrue(boolean0);
+    /**
+     * Verifies that ready() returns true for an open reader, even if the
+     * underlying sequence is empty. The method's contract is to return true
+     * as long as the reader has not been closed.
+     */
+    @Test
+    public void ready_whenReaderIsOpen_shouldReturnTrue() throws IOException {
+        // Arrange: Create a reader with an empty CharSequence.
+        // Using an empty string is a simple way to test this state.
+        CharSequenceReader reader = new CharSequenceReader("");
+
+        // Act & Assert: An open reader should always report itself as ready.
+        assertTrue("An open CharSequenceReader should be ready.", reader.ready());
     }
 }
