@@ -1,28 +1,27 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class Attribute_ESTestTest46 extends Attribute_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Attribute#isDataAttribute(String)} method.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        boolean boolean0 = Attribute.isDataAttribute("data-");
-        assertFalse(boolean0);
+    /**
+     * Verifies that isDataAttribute() returns false for a key that consists
+     * only of the "data-" prefix. A valid data attribute requires a name
+     * following the prefix (e.g., "data-foo"). This test checks that boundary case.
+     */
+    @Test
+    public void isDataAttributeShouldReturnFalseForPrefixOnlyKey() {
+        // Arrange: Define a key that is exactly the data attribute prefix.
+        String keyWithPrefixOnly = "data-";
+
+        // Act: Call the method under test.
+        boolean result = Attribute.isDataAttribute(keyWithPrefixOnly);
+
+        // Assert: The method should return false, as the key has no name part.
+        assertFalse("A key consisting only of 'data-' should not be a valid data attribute.", result);
     }
 }
