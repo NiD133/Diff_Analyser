@@ -1,18 +1,30 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Weeks_ESTestTest23 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        Weeks weeks0 = Weeks.weeks(317351877);
-        Weeks weeks1 = weeks0.minus(2285);
-        assertEquals(317349592, weeks1.getWeeks());
+    /**
+     * Tests that subtracting a positive number of weeks from a Weeks object
+     * results in a new Weeks object with the correctly calculated value.
+     */
+    @Test
+    public void minus_shouldReturnCorrectWeeks_whenSubtractingAnInteger() {
+        // Arrange
+        final int initialWeekCount = 317351877;
+        final int weeksToSubtract = 2285;
+        final Weeks initialWeeks = Weeks.weeks(initialWeekCount);
+
+        final int expectedWeekCount = initialWeekCount - weeksToSubtract;
+
+        // Act
+        Weeks result = initialWeeks.minus(weeksToSubtract);
+
+        // Assert
+        assertEquals(expectedWeekCount, result.getWeeks());
     }
 }
