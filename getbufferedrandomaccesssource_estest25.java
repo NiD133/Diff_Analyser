@@ -1,23 +1,33 @@
 package com.itextpdf.text.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GetBufferedRandomAccessSource_ESTestTest25 extends GetBufferedRandomAccessSource_ESTest_scaffolding {
+/**
+ * Contains unit tests for the {@link GetBufferedRandomAccessSource} class.
+ */
+public class GetBufferedRandomAccessSourceTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        byte[] byteArray0 = new byte[15];
-        ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-        GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(arrayRandomAccessSource0);
-        int int0 = getBufferedRandomAccessSource0.get((long) (byte) 0, byteArray0, (int) (byte) 0, (int) (byte) 0);
-        assertEquals(0, int0);
+    /**
+     * Verifies that the get() method correctly returns 0 when asked to read zero bytes.
+     * This is an important edge case to ensure the method handles "do nothing" requests gracefully.
+     */
+    @Test
+    public void get_whenReadingZeroBytes_returnsZero() throws IOException {
+        // Arrange: Set up the source and the object under test.
+        byte[] sourceData = new byte[15];
+        RandomAccessSource source = new ArrayRandomAccessSource(sourceData);
+        GetBufferedRandomAccessSource bufferedSource = new GetBufferedRandomAccessSource(source);
+
+        byte[] destinationBuffer = new byte[15];
+        int lengthToRead = 0;
+
+        // Act: Call the method with a request to read zero bytes.
+        int bytesRead = bufferedSource.get(0L, destinationBuffer, 0, lengthToRead);
+
+        // Assert: Verify that the number of bytes read is 0.
+        assertEquals("The method should return 0 when the requested read length is 0.", 0, bytesRead);
     }
 }
