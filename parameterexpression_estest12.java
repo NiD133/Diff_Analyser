@@ -1,25 +1,31 @@
 package org.apache.ibatis.builder;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ParameterExpression_ESTestTest12 extends ParameterExpression_ESTest_scaffolding {
+/**
+ * Test suite for the {@link ParameterExpression} parser.
+ */
+public class ParameterExpressionTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        ParameterExpression parameterExpression0 = null;
+    /**
+     * The constructor should throw a BuilderException when given an expression
+     * with a syntax error, such as a misplaced semicolon inside parentheses.
+     */
+    @Test
+    public void shouldThrowBuilderExceptionForInvalidExpressionSyntax() {
+        // Arrange
+        String invalidExpression = "(;)$ ";
+        String expectedErrorMessage = "Parsing error in {" + invalidExpression + "} in position 3";
+
+        // Act & Assert
         try {
-            parameterExpression0 = new ParameterExpression("(;)$");
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // Parsing error in {(;)$} in position 3
-            //
-            verifyException("org.apache.ibatis.builder.ParameterExpression", e);
+            new ParameterExpression(invalidExpression);
+            fail("Expected a BuilderException to be thrown due to a parsing error.");
+        } catch (BuilderException e) {
+            assertEquals(expectedErrorMessage, e.getMessage());
         }
     }
 }
