@@ -1,30 +1,34 @@
 package org.apache.commons.compress.archivers;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.file.FileSystemException;
-import java.nio.file.InvalidPathException;
-import java.nio.file.NoSuchFileException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 
-public class Lister_ESTestTest5 extends Lister_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Lister} class.
+ */
+public class ListerTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        String[] stringArray0 = new String[3];
-        Lister lister0 = null;
-        try {
-            lister0 = new Lister(false, stringArray0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // args[0]
-            //
-            verifyException("java.util.Objects", e);
-        }
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    /**
+     * Tests that the Lister constructor throws a NullPointerException
+     * when the first command-line argument (the archive path) is null.
+     */
+    @Test
+    public void constructorShouldThrowNullPointerExceptionWhenFirstArgumentIsNull() {
+        // Arrange: Prepare arguments where the first element is null.
+        // The Lister class expects this to be a non-null file path.
+        final String[] argsWithNullPath = { null };
+
+        // Assert: We expect a NullPointerException with a specific message,
+        // which confirms that the null check on the first argument is working.
+        thrown.expect(NullPointerException.class);
+        thrown.expectMessage("args[0]");
+
+        // Act: Attempt to create a Lister instance with the invalid arguments.
+        // This line is expected to throw the exception.
+        new Lister(false, argsWithNullPath);
     }
 }
