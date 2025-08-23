@@ -31,13 +31,31 @@ class SimpleBloomFilterTest extends AbstractBloomFilterTest<SimpleBloomFilter> {
         return new SimpleBloomFilter(shape);
     }
 
+    /**
+     * Verifies that merging from a BitMapExtractor that emits fewer longs than the Shape requires
+     * still succeeds and only affects the bits represented by the provided longs.
+     *
+     * The test shape used by the base class expects multiple longs (e.g. 2). Here we provide just one.
+     */
     @Test
-    void testMergeShortBitMapExtractor() {
-        final SimpleBloomFilter filter = createEmptyFilter(getTestShape());
-        // create a bitMapExtractor that returns too few values
-        // shape expects 2 longs we are sending 1.
-        final BitMapExtractor bitMapExtractor = p -> p.test(2L);
-        assertTrue(filter.merge(bitMapExtractor));
-        assertEquals(1, filter.cardinality());
+    void mergeHandlesExtractorWithFewerBitMapsThanShape() {
+        // Given: an empty filter
+        final SimpleBloomFilter sut = createEmptyFilter(getTestShape());
+
+        // And: a BitMapExtractor that emits only a single long with a single bit set
+        // (cardinality contribution should be exactly 1)
+        final long providedBitmap = 1L; // 0b...0001
+        final BitMapExtractor singleLongExtractor = consumer -> consumer.test(providedBitmap);
+
+        // When: merging the short extractor
+        final boolean changed = sut.merge(singleLongExtractor);
+
+        // Then: the merge reports a change and only one bit is set
+        assertTrue(changed, "merge should return true when any bit is set");
+        assertEquals(1, sut.cardinality(), "Only the single provided bit should be set");
+
+        // And: the first long in the internal bit map reflects the provided value
+        assertEquals(providedBitmap, sut.asBitMapArray()[0],
+                "The first bitmap long should equal the value provided by the extractor");
     }
 }
