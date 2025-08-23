@@ -1,20 +1,28 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JacksonInject_ESTestTest34 extends JacksonInject_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JacksonInject.Value} class.
+ */
+public class JacksonInjectValueTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        JacksonInject.Value jacksonInject_Value0 = JacksonInject.Value.empty();
-        Class<JacksonInject> class0 = jacksonInject_Value0.valueFor();
-        assertTrue(class0.isInterface());
+    /**
+     * Tests that the {@code valueFor()} method on a {@link JacksonInject.Value}
+     * instance correctly returns the {@link JacksonInject} annotation class.
+     * This is part of the contract from the {@link JacksonAnnotationValue} interface.
+     */
+    @Test
+    public void valueFor_shouldReturnJacksonInjectAnnotationClass() {
+        // Arrange: Create an instance of the class under test.
+        // The specific state (e.g., empty) of the Value instance does not affect this behavior.
+        JacksonInject.Value injectValue = JacksonInject.Value.empty();
+
+        // Act: Call the method being tested.
+        Class<JacksonInject> annotationType = injectValue.valueFor();
+
+        // Assert: Verify that the returned class is exactly the JacksonInject annotation class.
+        assertEquals(JacksonInject.class, annotationType);
     }
 }
