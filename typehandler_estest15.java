@@ -1,29 +1,38 @@
 package org.apache.commons.cli;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.util.Date;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
 
-public class TypeHandler_ESTestTest15 extends TypeHandler_ESTest_scaffolding {
+/**
+ * Tests for the {@link TypeHandler} class.
+ */
+public class TypeHandlerTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        // Undeclared exception!
-        try {
-            TypeHandler.createDate("w2E%~v5+#");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // org.evosuite.runtime.mock.java.lang.MockThrowable: java.text.ParseException: Unparseable date: \"w2E%~v5+#\"
-            //
-            verifyException("org.apache.commons.cli.TypeHandler", e);
-        }
+    /**
+     * Verifies that createDate() throws an IllegalArgumentException when provided
+     * with a string that does not conform to a recognizable date format.
+     */
+    @Test
+    public void createDate_withInvalidFormat_shouldThrowIllegalArgumentException() {
+        // Arrange: Define an input string that is not a valid date.
+        final String invalidDateString = "w2E%~v5+#";
+
+        // Act & Assert: Expect an IllegalArgumentException to be thrown.
+        // The modern assertThrows is preferred for its clarity and conciseness.
+        IllegalArgumentException thrown = assertThrows(
+            IllegalArgumentException.class,
+            () -> TypeHandler.createDate(invalidDateString)
+        );
+
+        // Assert: Further inspect the exception to ensure it's for the right reason.
+        // The underlying implementation is expected to wrap a ParseException.
+        String expectedMessageContent = "Unparseable date: \"" + invalidDateString + "\"";
+        assertTrue(
+            "Exception message should contain details about the parsing failure.",
+            thrown.getMessage().contains(expectedMessageContent)
+        );
     }
 }
