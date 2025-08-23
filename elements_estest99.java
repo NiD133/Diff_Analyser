@@ -1,42 +1,27 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class Elements_ESTestTest99 extends Elements_ESTest_scaffolding {
+/**
+ * Tests for the {@link Elements} class, focusing on edge cases and exception handling.
+ */
+public class ElementsTest {
 
-    @Test(timeout = 4000)
-    public void test098() throws Throwable {
-        Elements elements0 = new Elements();
-        // Undeclared exception!
-        try {
-            elements0.remove((-12));
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling the remove() method with a negative index
+     * on an Elements collection correctly throws an ArrayIndexOutOfBoundsException.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void removeWithNegativeIndexThrowsException() {
+        // Arrange: Create an empty Elements collection.
+        Elements elements = new Elements();
+        int invalidIndex = -1;
+
+        // Act: Attempt to remove an element using the invalid negative index.
+        // The test expects this line to throw the exception.
+        elements.remove(invalidIndex);
+
+        // Assert: The test passes if an ArrayIndexOutOfBoundsException is thrown,
+        // as specified by the @Test(expected=...) annotation.
     }
 }
