@@ -1,28 +1,27 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class StringUtil_ESTestTest82 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the {@link StringUtil} class.
+ * This improved version focuses on clarity, maintainability, and adherence to best practices.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test81() throws Throwable {
-        boolean boolean0 = StringUtil.startsWithNewline("");
-        assertFalse(boolean0);
+    /**
+     * Verifies that the startsWithNewline() method correctly handles an empty string.
+     * An empty string cannot start with a newline, so the method is expected to return false.
+     */
+    @Test
+    public void startsWithNewline_withEmptyString_shouldReturnFalse() {
+        // Arrange: Define the input for the test case.
+        String input = "";
+
+        // Act: Call the method under test.
+        boolean result = StringUtil.startsWithNewline(input);
+
+        // Assert: Verify that the result is the expected value.
+        assertFalse("An empty string should not be considered as starting with a newline.", result);
     }
 }
