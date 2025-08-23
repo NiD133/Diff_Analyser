@@ -1,39 +1,40 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class SecondsTestTest11 extends TestCase {
+import org.junit.Test;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Unit tests for the isGreaterThan() method in the Seconds class.
+ */
+public class SecondsTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void isGreaterThan_shouldReturnTrue_whenComparingToSmallerValue() {
+        assertTrue("Three seconds should be greater than two seconds", Seconds.THREE.isGreaterThan(Seconds.TWO));
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestSeconds.class);
+    @Test
+    public void isGreaterThan_shouldReturnFalse_whenComparingToEqualValue() {
+        assertFalse("Three seconds should not be greater than three seconds", Seconds.THREE.isGreaterThan(Seconds.THREE));
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void isGreaterThan_shouldReturnFalse_whenComparingToLargerValue() {
+        assertFalse("Two seconds should not be greater than three seconds", Seconds.TWO.isGreaterThan(Seconds.THREE));
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @Test
+    public void isGreaterThan_shouldReturnTrue_whenComparingPositiveValueToNull() {
+        // Per Javadoc, a null parameter is treated as a zero-second duration.
+        assertTrue("One second should be greater than null (zero seconds)", Seconds.ONE.isGreaterThan(null));
     }
 
-    //-----------------------------------------------------------------------
-    public void testIsGreaterThan() {
-        assertEquals(true, Seconds.THREE.isGreaterThan(Seconds.TWO));
-        assertEquals(false, Seconds.THREE.isGreaterThan(Seconds.THREE));
-        assertEquals(false, Seconds.TWO.isGreaterThan(Seconds.THREE));
-        assertEquals(true, Seconds.ONE.isGreaterThan(null));
-        assertEquals(false, Seconds.seconds(-1).isGreaterThan(null));
+    @Test
+    public void isGreaterThan_shouldReturnFalse_whenComparingNegativeValueToNull() {
+        // Per Javadoc, a null parameter is treated as a zero-second duration.
+        Seconds negativeOne = Seconds.seconds(-1);
+        assertFalse("Negative one second should not be greater than null (zero seconds)", negativeOne.isGreaterThan(null));
     }
 }
