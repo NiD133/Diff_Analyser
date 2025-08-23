@@ -1,28 +1,27 @@
 package org.mockito.internal.util.collections;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class HashCodeAndEqualsSafeSet_ESTestTest12 extends HashCodeAndEqualsSafeSet_ESTest_scaffolding {
+import java.util.Collections;
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-        ArrayList<HashCodeAndEqualsMockWrapper> arrayList0 = new ArrayList<HashCodeAndEqualsMockWrapper>();
-        boolean boolean0 = hashCodeAndEqualsSafeSet0.containsAll(arrayList0);
-        assertTrue(boolean0);
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Tests for {@link HashCodeAndEqualsSafeSet}.
+ */
+public class HashCodeAndEqualsSafeSetTest {
+
+    @Test
+    public void containsAll_shouldReturnTrue_whenCheckingAgainstAnEmptyCollection() {
+        // Arrange
+        // Per the Collection#containsAll contract, any collection is considered to
+        // contain all the elements of an empty collection.
+        HashCodeAndEqualsSafeSet emptySet = new HashCodeAndEqualsSafeSet();
+
+        // Act & Assert
+        assertTrue(
+            "containsAll should return true when the provided collection is empty",
+            emptySet.containsAll(Collections.emptyList())
+        );
     }
 }
