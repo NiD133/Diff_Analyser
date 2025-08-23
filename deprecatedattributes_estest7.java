@@ -1,17 +1,26 @@
 package org.apache.commons.cli;
 
+import static org.junit.Assert.assertFalse;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class DeprecatedAttributes_ESTestTest7 extends DeprecatedAttributes_ESTest_scaffolding {
+/**
+ * Tests for the {@link DeprecatedAttributes} class.
+ */
+public class DeprecatedAttributesTest {
 
-    @Test(timeout = 4000)
-    public void test6() throws Throwable {
-        DeprecatedAttributes deprecatedAttributes0 = DeprecatedAttributes.DEFAULT;
-        boolean boolean0 = deprecatedAttributes0.isForRemoval();
-        assertFalse(boolean0);
+    /**
+     * Verifies that the default DeprecatedAttributes instance is correctly
+     * configured to not be "for removal".
+     */
+    @Test
+    public void isForRemovalShouldReturnFalseForDefaultInstance() {
+        // Arrange: The static DEFAULT instance is pre-configured with forRemoval=false.
+        DeprecatedAttributes defaultAttributes = DeprecatedAttributes.DEFAULT;
+
+        // Act: Call the method under test.
+        boolean forRemoval = defaultAttributes.isForRemoval();
+
+        // Assert: The result should be false as per the default configuration.
+        assertFalse("The default instance should not be marked for removal", forRemoval);
     }
 }
