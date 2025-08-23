@@ -1,34 +1,38 @@
 package org.jfree.chart.urls;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.jfree.chart.TestUtils;
-import org.jfree.chart.internal.CloneUtils;
-import org.jfree.chart.api.PublicCloneable;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class CustomCategoryURLGeneratorTestTest1 {
+/**
+ * This test suite verifies the behavior of the {@link CustomCategoryURLGenerator} class,
+ * focusing on its cloning and equality logic.
+ */
+public class CustomCategoryURLGeneratorTest {
 
     /**
-     * Some checks for the equals() method.
+     * Tests that a cloned CustomCategoryURLGenerator is considered equal to the original object,
+     * but is not the same instance. This verifies the correctness of both the clone() and equals() methods.
      */
     @Test
-    public void testEquals() {
-        CustomCategoryURLGenerator g1 = new CustomCategoryURLGenerator();
-        CustomCategoryURLGenerator g2 = new CustomCategoryURLGenerator();
-        assertEquals(g1, g2);
-        List<String> u1 = new ArrayList<>();
-        u1.add("URL A1");
-        u1.add("URL A2");
-        u1.add("URL A3");
-        g1.addURLSeries(u1);
-        assertNotEquals(g1, g2);
-        List<String> u2 = new ArrayList<>();
-        u2.add("URL A1");
-        u2.add("URL A2");
-        u2.add("URL A3");
-        g2.addURLSeries(u2);
-        assertEquals(g1, g2);
+    public void equals_onClonedObject_returnsTrue() throws CloneNotSupportedException {
+        // Arrange: Create a generator and add a list of URLs. [1, 2, 3]
+        CustomCategoryURLGenerator originalGenerator = new CustomCategoryURLGenerator();
+        List<String> urlSeries = new ArrayList<>();
+        urlSeries.add("https://www.jfree.org/jfreechart/series1-url1");
+        urlSeries.add("https://www.jfree.org/jfreechart/series1-url2");
+        originalGenerator.addURLSeries(urlSeries);
+
+        // Act: Clone the original generator. [4]
+        CustomCategoryURLGenerator clonedGenerator = (CustomCategoryURLGenerator) originalGenerator.clone();
+
+        // Assert: The cloned object should be equal to the original, but not the same instance. [5]
+        // Verifies that the clone has the same content as the original.
+        assertEquals(originalGenerator, clonedGenerator);
+
+        // Verifies that the clone is a separate object in memory.
+        assertNotSame(originalGenerator, clonedGenerator);
     }
 }
