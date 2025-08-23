@@ -1,25 +1,42 @@
 package com.google.common.graph;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ImmutableNetwork_ESTestTest5 extends ImmutableNetwork_ESTest_scaffolding {
+/**
+ * Tests for {@link ImmutableNetwork}.
+ */
+public class ImmutableNetwork_ESTestTest5 { // Retaining original class name as requested
 
-    @Test(timeout = 4000)
-    public void test4() throws Throwable {
-        NetworkBuilder<Object, Object> networkBuilder0 = NetworkBuilder.directed();
-        networkBuilder0.allowsParallelEdges(true);
-        StandardNetwork<Integer, Integer> standardNetwork0 = new StandardNetwork<Integer, Integer>(networkBuilder0);
-        ImmutableNetwork<Integer, Integer> immutableNetwork0 = ImmutableNetwork.copyOf((Network<Integer, Integer>) standardNetwork0);
-        NetworkBuilder<Integer, Integer> networkBuilder1 = NetworkBuilder.from((Network<Integer, Integer>) immutableNetwork0);
-        ImmutableNetwork.Builder<Integer, Integer> immutableNetwork_Builder0 = networkBuilder1.immutable();
-        Integer integer0 = new Integer((-967));
-        ImmutableNetwork.Builder<Integer, Integer> immutableNetwork_Builder1 = immutableNetwork_Builder0.addNode(integer0);
-        ImmutableNetwork<Integer, Integer> immutableNetwork1 = immutableNetwork_Builder1.build();
-        assertNotSame(immutableNetwork1, immutableNetwork0);
+    /**
+     * Tests that building a network from a builder creates a new instance,
+     * distinct from any network the builder may have been based on.
+     */
+    @Test
+    public void build_fromBuilderBasedOnExistingNetwork_createsNewInstance() {
+        // Arrange: Create an initial empty immutable network.
+        ImmutableNetwork<Integer, Integer> emptyNetwork = NetworkBuilder.directed()
+                .<Integer, Integer>immutable()
+                .build();
+
+        // Arrange: Create a builder from the empty network and prepare a new node.
+        ImmutableNetwork.Builder<Integer, Integer> builder = NetworkBuilder.from(emptyNetwork).immutable();
+        Integer node = -967;
+
+        // Act: Add the node to the builder and build a new network.
+        ImmutableNetwork<Integer, Integer> networkWithNode = builder.addNode(node).build();
+
+        // Assert: The new network is a different instance from the original.
+        assertNotSame("Building should create a new network instance", emptyNetwork, networkWithNode);
+
+        // Assert: The original network remains unchanged (and empty).
+        assertTrue("Original network should remain empty", emptyNetwork.nodes().isEmpty());
+
+        // Assert: The new network correctly contains the added node.
+        assertEquals("New network should have one node", 1, networkWithNode.nodes().size());
+        assertTrue("New network should contain the added node", networkWithNode.nodes().contains(node));
     }
 }
