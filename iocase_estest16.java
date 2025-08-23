@@ -1,18 +1,28 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class IOCase_ESTestTest16 extends IOCase_ESTest_scaffolding {
+/**
+ * Tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        IOCase iOCase0 = IOCase.forName("Sensitive");
-        boolean boolean0 = iOCase0.checkRegionMatches("NUL", 0, "NUL");
-        assertTrue(boolean0);
+    /**
+     * Tests that checkRegionMatches returns true for an exact, case-sensitive match.
+     */
+    @Test
+    public void checkRegionMatches_sensitive_whenRegionsMatch_shouldReturnTrue() {
+        // Arrange
+        final IOCase sensitiveCase = IOCase.SENSITIVE;
+        final String text = "NUL";
+        final String search = "NUL";
+        final int startIndex = 0;
+
+        // Act
+        final boolean isMatch = sensitiveCase.checkRegionMatches(text, startIndex, search);
+
+        // Assert
+        assertTrue("Expected a match for identical strings with case-sensitive comparison.", isMatch);
     }
 }
