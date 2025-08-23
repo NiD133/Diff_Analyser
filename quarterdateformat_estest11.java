@@ -1,31 +1,37 @@
 package org.jfree.chart.axis;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
-import java.text.FieldPosition;
-import java.text.Format;
-import java.text.NumberFormat;
-import java.text.ParsePosition;
-import java.util.Date;
-import java.util.SimpleTimeZone;
 import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class QuarterDateFormat_ESTestTest11 extends QuarterDateFormat_ESTest_scaffolding {
+/**
+ * A test case for the equals() method of the {@link QuarterDateFormat} class.
+ */
+public class QuarterDateFormat_ESTestTest11 {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        TimeZone timeZone0 = TimeZone.getDefault();
-        QuarterDateFormat quarterDateFormat0 = new QuarterDateFormat(timeZone0);
-        QuarterDateFormat quarterDateFormat1 = new QuarterDateFormat(timeZone0, quarterDateFormat0.ROMAN_QUARTERS, true);
-        boolean boolean0 = quarterDateFormat0.equals(quarterDateFormat1);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false when comparing two
+     * instances of QuarterDateFormat that were constructed with different
+     * properties (specifically, different quarter symbols and a different
+     * 'quarterFirst' flag).
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenInstancesHaveDifferentProperties() {
+        // Arrange
+        TimeZone commonTimeZone = TimeZone.getDefault();
+
+        // Create an instance with default settings: regular quarter symbols ("1", "2", ..)
+        // and year-first formatting (e.g., "2023 1").
+        QuarterDateFormat defaultFormat = new QuarterDateFormat(commonTimeZone);
+
+        // Create another instance with custom settings: Roman numeral symbols ("I", "II", ..)
+        // and quarter-first formatting (e.g., "I 2023").
+        QuarterDateFormat customFormat = new QuarterDateFormat(
+                commonTimeZone, QuarterDateFormat.ROMAN_QUARTERS, true);
+
+        // Act & Assert
+        // The two instances should not be equal because both their quarter symbols
+        // and their 'quarterFirst' formatting flag are different.
+        assertFalse(defaultFormat.equals(customFormat));
     }
 }
