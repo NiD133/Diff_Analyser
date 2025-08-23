@@ -1,31 +1,30 @@
 package org.jfree.chart.labels;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.time.chrono.ChronoLocalDate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.text.MockDateFormat;
-import org.evosuite.runtime.mock.java.text.MockSimpleDateFormat;
 import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+/**
+ * This test suite contains tests for the {@link IntervalCategoryToolTipGenerator} class.
+ * This specific test was improved for clarity and maintainability.
+ */
+// The original test class name and inheritance from a scaffolding class are preserved.
 public class IntervalCategoryToolTipGenerator_ESTestTest2 extends IntervalCategoryToolTipGenerator_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        IntervalCategoryToolTipGenerator intervalCategoryToolTipGenerator0 = new IntervalCategoryToolTipGenerator();
-        DefaultBoxAndWhiskerCategoryDataset<ChronoLocalDate, ChronoLocalDate> defaultBoxAndWhiskerCategoryDataset0 = new DefaultBoxAndWhiskerCategoryDataset<ChronoLocalDate, ChronoLocalDate>();
-        // Undeclared exception!
-        try {
-            intervalCategoryToolTipGenerator0.createItemArray(defaultBoxAndWhiskerCategoryDataset0, (-2580), (-2580));
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that calling createItemArray with negative row and column indices
+     * correctly throws an IndexOutOfBoundsException.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void createItemArray_withNegativeIndices_shouldThrowIndexOutOfBoundsException() {
+        // Arrange: Create a generator instance and an empty dataset.
+        IntervalCategoryToolTipGenerator generator = new IntervalCategoryToolTipGenerator();
+        CategoryDataset dataset = new DefaultBoxAndWhiskerCategoryDataset();
+        int invalidRow = -1;
+        int invalidColumn = -1;
+
+        // Act & Assert: Call the method with invalid indices, which is expected
+        // to throw an IndexOutOfBoundsException.
+        generator.createItemArray(dataset, invalidRow, invalidColumn);
     }
 }
