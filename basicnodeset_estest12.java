@@ -1,22 +1,29 @@
 package org.apache.commons.jxpath;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.util.List;
-import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class BasicNodeSet_ESTestTest12 extends BasicNodeSet_ESTest_scaffolding {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        BasicNodeSet basicNodeSet0 = new BasicNodeSet();
-        basicNodeSet0.getNodes();
-        List list0 = basicNodeSet0.getNodes();
-        assertTrue(list0.isEmpty());
+/**
+ * Unit tests for the {@link BasicNodeSet} class.
+ */
+public class BasicNodeSetTest {
+
+    /**
+     * Tests that a newly created BasicNodeSet returns an empty, non-null list of nodes.
+     */
+    @Test
+    public void getNodesOnNewNodeSetShouldReturnEmptyList() {
+        // Arrange: Create a new instance of BasicNodeSet.
+        BasicNodeSet nodeSet = new BasicNodeSet();
+
+        // Act: Retrieve the list of nodes.
+        List<?> nodes = nodeSet.getNodes();
+
+        // Assert: Verify that the returned list is not null and is empty.
+        assertNotNull("The getNodes() method should never return null.", nodes);
+        assertTrue("A new BasicNodeSet should have an empty list of nodes.", nodes.isEmpty());
     }
 }
