@@ -1,15 +1,31 @@
 package org.apache.commons.cli;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class DeprecatedAttributesTestTest3 {
+/**
+ * Tests for {@link DeprecatedAttributes}.
+ */
+@DisplayName("Tests for DeprecatedAttributes")
+class DeprecatedAttributesTest {
 
     @Test
-    void testDefaultBuilder() {
-        final DeprecatedAttributes defaultValue = DeprecatedAttributes.builder().get();
-        assertEquals(DeprecatedAttributes.DEFAULT.getDescription(), defaultValue.getDescription());
-        assertEquals(DeprecatedAttributes.DEFAULT.getSince(), defaultValue.getSince());
-        assertEquals(DeprecatedAttributes.DEFAULT.isForRemoval(), defaultValue.isForRemoval());
+    @DisplayName("An empty builder should create an instance with default values")
+    void emptyBuilderShouldCreateDefaultInstance() {
+        // Arrange: The expected object is the predefined default instance.
+        final DeprecatedAttributes expectedDefaults = DeprecatedAttributes.DEFAULT;
+
+        // Act: Create an instance from a new, unmodified builder.
+        final DeprecatedAttributes actualInstance = DeprecatedAttributes.builder().get();
+
+        // Assert: The created instance's properties must match the default properties.
+        assertAll("Default attributes should match",
+            () -> assertEquals(expectedDefaults.getDescription(), actualInstance.getDescription(), "description"),
+            () -> assertEquals(expectedDefaults.getSince(), actualInstance.getSince(), "since"),
+            () -> assertEquals(expectedDefaults.isForRemoval(), actualInstance.isForRemoval(), "forRemoval")
+        );
     }
 }
