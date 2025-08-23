@@ -1,36 +1,47 @@
 package com.fasterxml.jackson.core.format;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.ObjectCodec;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
-import java.io.CharConversionException;
-import java.io.FileDescriptor;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
-public class DataFormatMatcher_ESTestTest1 extends DataFormatMatcher_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        PipedInputStream pipedInputStream0 = new PipedInputStream();
-        byte[] byteArray0 = new byte[6];
-        InputAccessor.Std inputAccessor_Std0 = new InputAccessor.Std(pipedInputStream0, byteArray0);
-        JsonFactory jsonFactory0 = new JsonFactory();
-        MatchStrength matchStrength0 = MatchStrength.SOLID_MATCH;
-        DataFormatMatcher dataFormatMatcher0 = inputAccessor_Std0.createMatcher(jsonFactory0, matchStrength0);
-        JsonFactory jsonFactory1 = dataFormatMatcher0.getMatch();
-        assertNotNull(jsonFactory1);
-        assertEquals(MatchStrength.SOLID_MATCH, dataFormatMatcher0.getMatchStrength());
+/**
+ * Unit tests for the DataFormatMatcher class.
+ */
+public class DataFormatMatcherTest {
+
+    /**
+     * Tests that the getters for the matched factory and match strength
+     * return the values provided during the matcher's creation.
+     */
+    @Test
+    public void shouldReturnMatchAndStrengthProvidedOnCreation() {
+        // Arrange
+        // An empty input stream and buffer are sufficient, as we are only testing
+        // the state of the DataFormatMatcher, not the detection logic itself.
+        InputStream inputStream = new ByteArrayInputStream(new byte[0]);
+        byte[] buffer = new byte[8];
+        InputAccessor.Std inputAccessor = new InputAccessor.Std(inputStream, buffer);
+
+        JsonFactory expectedJsonFactory = new JsonFactory();
+        MatchStrength expectedMatchStrength = MatchStrength.SOLID_MATCH;
+
+        // Act
+        // The createMatcher method acts as a factory for the DataFormatMatcher.
+        DataFormatMatcher matcher = inputAccessor.createMatcher(expectedJsonFactory, expectedMatchStrength);
+
+        // Assert
+        // Verify that the matcher correctly stores and returns the provided factory and strength.
+        JsonFactory actualJsonFactory = matcher.getMatch();
+        MatchStrength actualMatchStrength = matcher.getMatchStrength();
+
+        assertSame("The matched JsonFactory should be the same instance provided at creation.",
+                expectedJsonFactory, actualJsonFactory);
+        assertEquals("The match strength should be the one provided at creation.",
+                expectedMatchStrength, actualMatchStrength);
     }
 }
