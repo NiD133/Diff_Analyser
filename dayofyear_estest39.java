@@ -1,46 +1,29 @@
 package org.threeten.extra;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.ThaiBuddhistDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockThaiBuddhistDate;
-import org.junit.runner.RunWith;
 
+/**
+ * This class is a refactored version of a single test case from an auto-generated suite.
+ * The original class name and inheritance are preserved for context.
+ */
 public class DayOfYear_ESTestTest39 extends DayOfYear_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        DayOfYear dayOfYear0 = DayOfYear.now();
-        DayOfYear dayOfYear1 = DayOfYear.from(dayOfYear0);
-        assertEquals(45, dayOfYear1.getValue());
+    /**
+     * Tests that DayOfYear.from() correctly creates a DayOfYear instance
+     * when the input TemporalAccessor is another DayOfYear.
+     */
+    @Test
+    public void from_whenGivenDayOfYearInstance_createsEquivalentInstance() {
+        // Arrange: Create a source DayOfYear instance.
+        // Using DayOfYear.of() is more explicit and deterministic than relying on a mocked DayOfYear.now().
+        DayOfYear sourceDayOfYear = DayOfYear.of(45);
+
+        // Act: Create a new DayOfYear from the source instance.
+        DayOfYear resultDayOfYear = DayOfYear.from(sourceDayOfYear);
+
+        // Assert: The new instance should be equal to the source,
+        // confirming that the value was extracted correctly.
+        assertEquals(sourceDayOfYear, resultDayOfYear);
     }
 }
