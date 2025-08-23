@@ -1,26 +1,29 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class IllegalFieldValueException_ESTestTest10 extends IllegalFieldValueException_ESTest_scaffolding {
+/**
+ * Unit tests for {@link IllegalFieldValueException}.
+ */
+public class IllegalFieldValueExceptionTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        Float float0 = new Float(2440587.5);
-        IllegalFieldValueException illegalFieldValueException0 = null;
-        try {
-            illegalFieldValueException0 = new IllegalFieldValueException((DateTimeFieldType) null, float0, "");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.joda.time.IllegalFieldValueException", e);
-        }
+    /**
+     * Tests that the constructor throws a NullPointerException when the
+     * DateTimeFieldType is null.
+     *
+     * The constructor {@code IllegalFieldValueException(DateTimeFieldType, Number, String)}
+     * is expected to immediately use the provided field type to construct a message
+     * (e.g., by calling {@code fieldType.getName()}). If the field type is null, this
+     * operation will result in a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructorWithNumberAndExplanation_shouldThrowNPE_whenDateTimeFieldTypeIsNull() {
+        // Arrange: Define arguments for the constructor, with a null DateTimeFieldType.
+        Number someValue = 123.45F;
+        String someExplanation = "A test explanation";
+
+        // Act: Call the constructor with the null DateTimeFieldType.
+        // The @Test(expected=...) annotation will handle the assertion.
+        new IllegalFieldValueException((DateTimeFieldType) null, someValue, someExplanation);
     }
 }
