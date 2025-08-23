@@ -1,39 +1,38 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LoopingListIterator_ESTestTest5 extends LoopingListIterator_ESTest_scaffolding {
+/**
+ * Test suite for the LoopingListIterator class.
+ */
+public class LoopingListIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        Integer integer0 = new Integer((-844));
-        linkedList0.add(integer0);
-        LoopingListIterator<Integer> loopingListIterator0 = new LoopingListIterator<Integer>(linkedList0);
-        Integer integer1 = loopingListIterator0.previous();
-        UniquePredicate<Object> uniquePredicate0 = new UniquePredicate<Object>();
-        linkedList0.removeIf(uniquePredicate0);
-        // Undeclared exception!
-        try {
-            loopingListIterator0.set(integer1);
-            fail("Expecting exception: ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.LinkedList$ListItr", e);
-        }
+    /**
+     * Verifies that the iterator's set() method throws a ConcurrentModificationException
+     * if the underlying list is modified externally after the iterator has been created.
+     */
+    @Test(expected = ConcurrentModificationException.class)
+    public void setShouldThrowConcurrentModificationExceptionWhenListIsModifiedExternally() {
+        // Arrange: Create a list with one element and a LoopingListIterator for it.
+        final List<Integer> list = new LinkedList<>();
+        list.add(100);
+        final LoopingListIterator<Integer> iterator = new LoopingListIterator<>(list);
+
+        // To enable the set() method, we must first call next() or previous().
+        // Calling previous() on a new iterator over a single-element list will
+        // loop around and position the iterator after that element.
+        iterator.previous();
+
+        // Act: Modify the list directly, not through the iterator. This is a
+        // "concurrent modification" that invalidates the iterator's state.
+        list.clear();
+
+        // Assert: Attempting to use the iterator's set() method should now fail.
+        // The @Test(expected) annotation handles the exception verification.
+        iterator.set(200);
     }
 }
