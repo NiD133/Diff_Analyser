@@ -27,60 +27,48 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.MalformedJsonException;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
 
 @SuppressWarnings("resource")
 public class JsonTreeReaderTest {
+
   @Test
-  public void testSkipValue_emptyJsonObject() throws IOException {
-    JsonTreeReader in = new JsonTreeReader(new JsonObject());
-    in.skipValue();
-    assertThat(in.peek()).isEqualTo(JsonToken.END_DOCUMENT);
-    assertThat(in.getPath()).isEqualTo("$");
+  public void skipValue_shouldHandleEmptyJsonObject() throws IOException {
+    JsonTreeReader reader = new JsonTreeReader(new JsonObject());
+    reader.skipValue();
+    assertThat(reader.peek()).isEqualTo(JsonToken.END_DOCUMENT);
+    assertThat(reader.getPath()).isEqualTo("$");
   }
 
   @Test
-  public void testSkipValue_filledJsonObject() throws IOException {
-    JsonObject jsonObject = new JsonObject();
-    JsonArray jsonArray = new JsonArray();
-    jsonArray.add('c');
-    jsonArray.add("text");
-    jsonObject.add("a", jsonArray);
-    jsonObject.addProperty("b", true);
-    jsonObject.addProperty("i", 1);
-    jsonObject.add("n", JsonNull.INSTANCE);
-    JsonObject jsonObject2 = new JsonObject();
-    jsonObject2.addProperty("n", 2L);
-    jsonObject.add("o", jsonObject2);
-    jsonObject.addProperty("s", "text");
-    JsonTreeReader in = new JsonTreeReader(jsonObject);
-    in.skipValue();
-    assertThat(in.peek()).isEqualTo(JsonToken.END_DOCUMENT);
-    assertThat(in.getPath()).isEqualTo("$");
+  public void skipValue_shouldHandleFilledJsonObject() throws IOException {
+    JsonObject jsonObject = createFilledJsonObject();
+    JsonTreeReader reader = new JsonTreeReader(jsonObject);
+    reader.skipValue();
+    assertThat(reader.peek()).isEqualTo(JsonToken.END_DOCUMENT);
+    assertThat(reader.getPath()).isEqualTo("$");
   }
 
   @Test
-  public void testSkipValue_name() throws IOException {
+  public void skipValue_shouldSkipNameInJsonObject() throws IOException {
     JsonObject jsonObject = new JsonObject();
     jsonObject.addProperty("a", "value");
-    JsonTreeReader in = new JsonTreeReader(jsonObject);
-    in.beginObject();
-    in.skipValue();
-    assertThat(in.peek()).isEqualTo(JsonToken.STRING);
-    assertThat(in.getPath()).isEqualTo("$.<skipped>");
-    assertThat(in.nextString()).isEqualTo("value");
+    JsonTreeReader reader = new JsonTreeReader(jsonObject);
+    reader.beginObject();
+    reader.skipValue();
+    assertThat(reader.peek()).isEqualTo(JsonToken.STRING);
+    assertThat(reader.getPath()).isEqualTo("$.<skipped>");
+    assertThat(reader.nextString()).isEqualTo("value");
   }
 
   @Test
-  public void testSkipValue_afterEndOfDocument() throws IOException {
+  public void skipValue_shouldNotAffectAfterEndOfDocument() throws IOException {
     JsonTreeReader reader = new JsonTreeReader(new JsonObject());
     reader.beginObject();
     reader.endObject();
     assertThat(reader.peek()).isEqualTo(JsonToken.END_DOCUMENT);
-
     assertThat(reader.getPath()).isEqualTo("$");
     reader.skipValue();
     assertThat(reader.peek()).isEqualTo(JsonToken.END_DOCUMENT);
@@ -88,7 +76,7 @@ public class JsonTreeReaderTest {
   }
 
   @Test
-  public void testSkipValue_atArrayEnd() throws IOException {
+  public void skipValue_shouldHandleArrayEnd() throws IOException {
     JsonTreeReader reader = new JsonTreeReader(new JsonArray());
     reader.beginArray();
     reader.skipValue();
@@ -97,7 +85,7 @@ public class JsonTreeReaderTest {
   }
 
   @Test
-  public void testSkipValue_atObjectEnd() throws IOException {
+  public void skipValue_shouldHandleObjectEnd() throws IOException {
     JsonTreeReader reader = new JsonTreeReader(new JsonObject());
     reader.beginObject();
     reader.skipValue();
@@ -106,7 +94,7 @@ public class JsonTreeReaderTest {
   }
 
   @Test
-  public void testHasNext_endOfDocument() throws IOException {
+  public void hasNext_shouldReturnFalseAtEndOfDocument() throws IOException {
     JsonTreeReader reader = new JsonTreeReader(new JsonObject());
     reader.beginObject();
     reader.endObject();
@@ -114,8 +102,7 @@ public class JsonTreeReaderTest {
   }
 
   @Test
-  public void testCustomJsonElementSubclass() throws IOException {
-    @SuppressWarnings("deprecation") // superclass constructor
+  public void customJsonElementSubclass_shouldThrowException() throws IOException {
     class CustomSubclass extends JsonElement {
       @Override
       public JsonElement deepCopy() {
@@ -129,40 +116,16 @@ public class JsonTreeReaderTest {
     JsonTreeReader reader = new JsonTreeReader(array);
     reader.beginArray();
 
-    // Should fail due to custom JsonElement subclass
-    var e = assertThrows(MalformedJsonException.class, () -> reader.peek());
-    assertThat(e)
+    MalformedJsonException exception = assertThrows(MalformedJsonException.class, reader::peek);
+    assertThat(exception)
         .hasMessageThat()
-        .isEqualTo(
-            "Custom JsonElement subclass " + CustomSubclass.class.getName() + " is not supported");
+        .isEqualTo("Custom JsonElement subclass " + CustomSubclass.class.getName() + " is not supported");
   }
 
-  /**
-   * {@link JsonTreeReader} ignores nesting limit because:
-   *
-   * <ul>
-   *   <li>It is an internal class and often created implicitly without the user having access to it
-   *       (as {@link JsonReader}), so they cannot easily adjust the limit
-   *   <li>{@link JsonTreeReader} may be created based on an existing {@link JsonReader}; in that
-   *       case it would be necessary to propagate settings to account for a custom nesting limit,
-   *       see also related https://github.com/google/gson/pull/2151
-   *   <li>Nesting limit as protection against {@link StackOverflowError} is not that relevant for
-   *       {@link JsonTreeReader} because a deeply nested {@link JsonElement} tree would first have
-   *       to be constructed; and if it is constructed from a regular {@link JsonReader}, then its
-   *       nesting limit would already apply
-   * </ul>
-   */
   @Test
-  public void testNestingLimitIgnored() throws IOException {
+  public void nestingLimit_shouldBeIgnored() throws IOException {
     int limit = 10;
-    JsonArray json = new JsonArray();
-    JsonArray current = json;
-    // This adds additional `limit` nested arrays, so in total there are `limit + 1` arrays
-    for (int i = 0; i < limit; i++) {
-      JsonArray nested = new JsonArray();
-      current.add(nested);
-      current = nested;
-    }
+    JsonArray json = createNestedJsonArray(limit);
 
     JsonTreeReader reader = new JsonTreeReader(json);
     reader.setNestingLimit(limit);
@@ -182,21 +145,43 @@ public class JsonTreeReaderTest {
     reader.close();
   }
 
-  /**
-   * {@link JsonTreeReader} effectively replaces the complete reading logic of {@link JsonReader} to
-   * read from a {@link JsonElement} instead of a {@link Reader}. Therefore all relevant methods of
-   * {@code JsonReader} must be overridden.
-   */
   @Test
-  public void testOverrides() {
-    List<String> ignoredMethods =
-        Arrays.asList(
-            "setLenient(boolean)",
-            "isLenient()",
-            "setStrictness(com.google.gson.Strictness)",
-            "getStrictness()",
-            "setNestingLimit(int)",
-            "getNestingLimit()");
+  public void shouldOverrideRelevantMethods() {
+    List<String> ignoredMethods = Arrays.asList(
+        "setLenient(boolean)",
+        "isLenient()",
+        "setStrictness(com.google.gson.Strictness)",
+        "getStrictness()",
+        "setNestingLimit(int)",
+        "getNestingLimit()"
+    );
     MoreAsserts.assertOverridesMethods(JsonReader.class, JsonTreeReader.class, ignoredMethods);
+  }
+
+  private JsonObject createFilledJsonObject() {
+    JsonObject jsonObject = new JsonObject();
+    JsonArray jsonArray = new JsonArray();
+    jsonArray.add('c');
+    jsonArray.add("text");
+    jsonObject.add("a", jsonArray);
+    jsonObject.addProperty("b", true);
+    jsonObject.addProperty("i", 1);
+    jsonObject.add("n", JsonNull.INSTANCE);
+    JsonObject jsonObject2 = new JsonObject();
+    jsonObject2.addProperty("n", 2L);
+    jsonObject.add("o", jsonObject2);
+    jsonObject.addProperty("s", "text");
+    return jsonObject;
+  }
+
+  private JsonArray createNestedJsonArray(int depth) {
+    JsonArray jsonArray = new JsonArray();
+    JsonArray current = jsonArray;
+    for (int i = 0; i < depth; i++) {
+      JsonArray nested = new JsonArray();
+      current.add(nested);
+      current = nested;
+    }
+    return jsonArray;
   }
 }
