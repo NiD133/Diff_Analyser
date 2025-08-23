@@ -1,36 +1,32 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
 import org.apache.ibatis.cache.Cache;
-import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SerializedCache_ESTestTest22 extends SerializedCache_ESTest_scaffolding {
+/**
+ * Test suite for {@link SerializedCache}.
+ */
+public class SerializedCacheTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        SynchronizedCache synchronizedCache0 = new SynchronizedCache((Cache) null);
-        SoftCache softCache0 = new SoftCache(synchronizedCache0);
-        SerializedCache serializedCache0 = new SerializedCache(softCache0);
-        // Undeclared exception!
-        try {
-            serializedCache0.getObject((Object) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.ibatis.cache.decorators.SynchronizedCache", e);
-        }
+    /**
+     * Verifies that SerializedCache correctly propagates exceptions thrown by its underlying delegate cache.
+     * In this case, a NullPointerException is triggered deep in the decorator chain and is expected
+     * to bubble up.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getObjectShouldPropagateNPEFromDelegateWhenKeyIsNull() {
+        // Arrange: Create a decorator chain where the innermost delegate is null.
+        // This setup is designed to cause a NullPointerException when the chain is accessed.
+        Cache synchronizedCacheWithNullDelegate = new SynchronizedCache(null);
+        Cache softCache = new SoftCache(synchronizedCacheWithNullDelegate);
+        SerializedCache serializedCache = new SerializedCache(softCache);
+
+        // Act: Attempt to retrieve a null key. This call is passed down the decorator chain
+        // until SynchronizedCache tries to call a method on its null delegate,
+        // which triggers the expected NullPointerException.
+        serializedCache.getObject(null);
+
+        // Assert: The test passes if a NullPointerException is thrown, as declared
+        // by the @Test(expected = ...) annotation.
     }
 }
