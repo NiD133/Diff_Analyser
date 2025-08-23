@@ -1,20 +1,33 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.math.BigDecimal;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class BigDecimalParser_ESTestTest2 extends BigDecimalParser_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link BigDecimalParser} class.
+ */
+public class BigDecimalParserTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        char[] charArray0 = new char[9];
-        charArray0[1] = '2';
-        BigDecimal bigDecimal0 = BigDecimalParser.parse(charArray0, 1, 1);
-        assertEquals((short) 2, bigDecimal0.shortValue());
+    /**
+     * Tests that {@link BigDecimalParser#parse(char[], int, int)} correctly parses a single digit
+     * from a sub-section of a character array.
+     */
+    @Test
+    public void parse_whenGivenSliceOfCharArrayWithSingleDigit_shouldReturnCorrectBigDecimal() {
+        // Arrange
+        // The input array contains the target number '2' surrounded by other characters
+        // to ensure the offset and length parameters are correctly handled.
+        char[] inputChars = "x2y".toCharArray();
+        int offset = 1; // Start parsing at index 1
+        int length = 1; // Parse one character
+        BigDecimal expectedResult = new BigDecimal("2");
+
+        // Act
+        BigDecimal actualResult = BigDecimalParser.parse(inputChars, offset, length);
+
+        // Assert
+        // We use assertEquals on BigDecimal objects for a precise comparison.
+        assertEquals(expectedResult, actualResult);
     }
 }
