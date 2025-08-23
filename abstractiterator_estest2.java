@@ -1,29 +1,48 @@
 package com.google.common.collect;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
+import static org.junit.Assert.assertTrue;
+
+import com.google.common.base.Preconditions;
 import java.util.LinkedList;
-import java.util.Locale;
-import java.util.NoSuchElementException;
-import java.util.PriorityQueue;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.util.Queue;
+import org.junit.Test;
 
-public class AbstractIterator_ESTestTest2 extends AbstractIterator_ESTest_scaffolding {
+/**
+ * Tests for {@link AbstractIterator}.
+ */
+public class AbstractIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test1() throws Throwable {
-        PriorityQueue<Locale.FilteringMode> priorityQueue0 = new PriorityQueue<Locale.FilteringMode>();
-        Locale.FilteringMode locale_FilteringMode0 = Locale.FilteringMode.REJECT_EXTENDED_RANGES;
-        priorityQueue0.add(locale_FilteringMode0);
-        ConsumingQueueIterator<Locale.FilteringMode> consumingQueueIterator0 = new ConsumingQueueIterator<Locale.FilteringMode>(priorityQueue0);
-        boolean boolean0 = consumingQueueIterator0.hasNext();
-        assertTrue(boolean0);
+    /**
+     * A simple implementation of AbstractIterator that wraps and consumes a queue.
+     * This is used as a concrete class to test the behavior of the abstract AbstractIterator.
+     */
+    private static class ConsumingQueueIterator<T> extends AbstractIterator<T> {
+        private final Queue<T> queue;
+
+        ConsumingQueueIterator(Queue<T> queue) {
+            this.queue = Preconditions.checkNotNull(queue);
+        }
+
+        @Override
+        protected T computeNext() {
+            // If the queue is empty, signal that the iteration is complete.
+            if (queue.isEmpty()) {
+                return endOfData();
+            }
+            // Otherwise, return the next element from the queue.
+            return queue.poll();
+        }
+    }
+
+    @Test
+    public void hasNext_whenIteratorIsNotEmpty_returnsTrue() {
+        // Arrange: Create a non-empty queue and an iterator for it.
+        Queue<String> backingQueue = new LinkedList<>();
+        backingQueue.add("first element");
+        AbstractIterator<String> iterator = new ConsumingQueueIterator<>(backingQueue);
+
+        // Act & Assert: hasNext() should return true because the iterator has not been advanced yet
+        // and the underlying queue is not empty.
+        assertTrue("Expected hasNext() to be true for an iterator with elements.", iterator.hasNext());
     }
 }
