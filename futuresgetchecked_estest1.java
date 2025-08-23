@@ -1,30 +1,47 @@
 package com.google.common.util.concurrent;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.SQLException;
-import java.sql.SQLInvalidAuthorizationSpecException;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Delayed;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.lang.MockThread;
-import org.junit.runner.RunWith;
 
-public class FuturesGetChecked_ESTestTest1 extends FuturesGetChecked_ESTest_scaffolding {
+/**
+ * Unit tests for {@link FuturesGetChecked}.
+ */
+public class FuturesGetCheckedTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Class<Exception> class0 = Exception.class;
-        FuturesGetChecked.isCheckedException(class0);
+    /**
+     * Verifies that isCheckedException() correctly identifies a standard checked exception.
+     */
+    @Test
+    public void isCheckedException_whenGivenCheckedException_shouldReturnTrue() {
+        // The method should return true for Exception.class, as it is a checked exception
+        // (i.e., not a subclass of RuntimeException).
+        assertTrue(
+            "Exception.class should be identified as a checked exception",
+            FuturesGetChecked.isCheckedException(Exception.class));
+    }
+
+    /**
+     * Verifies that isCheckedException() correctly identifies a runtime (unchecked) exception.
+     */
+    @Test
+    public void isCheckedException_whenGivenRuntimeException_shouldReturnFalse() {
+        // The method should return false for RuntimeException.class, as it is an
+        // unchecked exception.
+        assertFalse(
+            "RuntimeException.class should be identified as an unchecked exception",
+            FuturesGetChecked.isCheckedException(RuntimeException.class));
+    }
+
+    /**
+     * Verifies that isCheckedException() correctly identifies a subclass of a runtime exception.
+     */
+    @Test
+    public void isCheckedException_whenGivenSubclassOfRuntimeException_shouldReturnFalse() {
+        // Subclasses of RuntimeException, like IllegalArgumentException, are also unchecked.
+        assertFalse(
+            "IllegalArgumentException should be identified as an unchecked exception",
+            FuturesGetChecked.isCheckedException(IllegalArgumentException.class));
     }
 }
