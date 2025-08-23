@@ -1,49 +1,32 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
-import org.joda.time.MonthDay;
-import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
 import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractPartial_ESTestTest45 extends AbstractPartial_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        YearMonth yearMonth0 = new YearMonth();
-        YearMonth yearMonth1 = yearMonth0.plusYears(1);
-        boolean boolean0 = yearMonth1.equals(yearMonth0);
-        assertFalse(boolean0);
-        assertEquals(2, yearMonth1.getMonthOfYear());
-        assertFalse(yearMonth0.equals((Object) yearMonth1));
+/**
+ * Test class for the equals method in {@link AbstractPartial}.
+ * This test uses {@link YearMonth} as a concrete implementation of AbstractPartial.
+ */
+// Note: The original test class name "AbstractPartial_ESTestTest45" was renamed for clarity.
+public class AbstractPartialTest {
+
+    @Test
+    public void equals_shouldReturnFalse_whenComparingPartialsWithDifferentValues() {
+        // Arrange: Create two YearMonth instances with different year values.
+        // Using a fixed date ensures the test is deterministic and not dependent on when it is run.
+        YearMonth yearMonth2023 = new YearMonth(2023, 2); // February 2023
+        YearMonth yearMonth2024 = yearMonth2023.plusYears(1); // February 2024
+
+        // Sanity check to ensure the test setup is correct.
+        assertEquals(2024, yearMonth2024.getYear());
+        assertEquals(2, yearMonth2024.getMonthOfYear());
+
+        // Act & Assert: The equals method, inherited from AbstractPartial, should
+        // return false when comparing two partials with different values.
+        // We use assertNotEquals for a clear and concise comparison.
+        assertNotEquals(yearMonth2023, yearMonth2024);
     }
 }
