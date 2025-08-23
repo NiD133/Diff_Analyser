@@ -1,29 +1,41 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class OptionGroup_ESTestTest9 extends OptionGroup_ESTest_scaffolding {
+/**
+ * Tests for the {@link OptionGroup} class, focusing on exception handling.
+ */
+public class OptionGroupTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        OptionGroup optionGroup0 = new OptionGroup();
-        Option option0 = new Option("oQxw", (String) null, true, "[]");
-        optionGroup0.setSelected(option0);
-        Option option1 = new Option("Xr0g", false, "[");
+    /**
+     * Tests that attempting to select a second option in a group where one is
+     * already selected throws an AlreadySelectedException.
+     */
+    @Test
+    public void setSelected_whenAnOptionIsAlreadySelected_shouldThrowAlreadySelectedException() {
+        // Arrange: Create an option group and two options.
+        // Then, select the first option to set the initial state.
+        OptionGroup optionGroup = new OptionGroup();
+        Option firstOption = new Option("a", "first-option", false, "The first option");
+        Option secondOption = new Option("b", "second-option", false, "The second option");
+
         try {
-            optionGroup0.setSelected(option1);
-            fail("Expecting exception: Exception");
-        } catch (Exception e) {
-            //
-            // The option 'Xr0g' was specified but an option from this group has already been selected: 'oQxw'
-            //
-            verifyException("org.apache.commons.cli.OptionGroup", e);
+            optionGroup.setSelected(firstOption);
+        } catch (AlreadySelectedException e) {
+            fail("Setup failed: Selecting the first option should not have thrown an exception.");
+        }
+
+        // Act & Assert: Attempt to select the second option and verify that the
+        // correct exception is thrown with a descriptive message.
+        try {
+            optionGroup.setSelected(secondOption);
+            fail("Expected an AlreadySelectedException to be thrown, but it was not.");
+        } catch (AlreadySelectedException e) {
+            // Verify the exception message clearly identifies the conflicting options.
+            String expectedMessage = "The option 'b' was specified but an option from this group has already been selected: 'a'";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
