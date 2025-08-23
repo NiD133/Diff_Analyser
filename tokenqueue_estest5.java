@@ -1,17 +1,23 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TokenQueue_ESTestTest5 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for the static methods of {@link TokenQueue}.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        String string0 = TokenQueue.unescape("");
-        assertEquals("", string0);
+    @Test
+    public void unescape_shouldReturnEmptyString_whenInputIsEmpty() {
+        // Arrange
+        String input = "";
+        String expected = "";
+
+        // Act
+        String result = TokenQueue.unescape(input);
+
+        // Assert
+        assertEquals(expected, result);
     }
 }
