@@ -2,30 +2,36 @@ package com.google.gson.internal;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class LinkedTreeMap_ESTestTest38 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * This class contains tests for the inner class {@link LinkedTreeMap.Node}.
+ * This specific test file was improved from an auto-generated test.
+ */
+public class LinkedTreeMap_ESTestTest38 {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        LinkedTreeMap.Node<LinkedTreeMap<Object, Object>, LinkedTreeMap<Integer, Object>> linkedTreeMap_Node0 = new LinkedTreeMap.Node<LinkedTreeMap<Object, Object>, LinkedTreeMap<Integer, Object>>(false);
-        LinkedTreeMap.Node<LinkedTreeMap<Object, Object>, LinkedTreeMap<Integer, Object>> linkedTreeMap_Node1 = new LinkedTreeMap.Node<LinkedTreeMap<Object, Object>, LinkedTreeMap<Integer, Object>>(false);
-        linkedTreeMap_Node0.next = linkedTreeMap_Node1;
-        LinkedTreeMap<Integer, Object> linkedTreeMap0 = new LinkedTreeMap<Integer, Object>();
-        LinkedTreeMap<Integer, Object> linkedTreeMap1 = linkedTreeMap_Node0.next.setValue(linkedTreeMap0);
-        assertEquals(0, linkedTreeMap0.size());
-        assertNull(linkedTreeMap1);
-        boolean boolean0 = linkedTreeMap_Node1.equals(linkedTreeMap_Node0.next);
-        assertTrue(boolean0);
+    /**
+     * Tests that calling setValue on a newly created Node correctly updates its value
+     * and returns the previous value, which should be null.
+     */
+    @Test
+    public void setValueOnNewNode_shouldUpdateValueAndReturnNull() {
+        // Arrange
+        // A Node is an inner class of LinkedTreeMap. We create a "header" node,
+        // which has a null key, similar to the original test's setup.
+        LinkedTreeMap.Node<String, Integer> node = new LinkedTreeMap.Node<>(true);
+        Integer newValue = 123;
+
+        // Pre-condition check: A new node should have a null value.
+        assertNull("A newly created node should have a null value.", node.getValue());
+
+        // Act
+        // Call setValue, which should return the old value.
+        Integer oldValue = node.setValue(newValue);
+
+        // Assert
+        // The old value returned by setValue should be null.
+        assertNull("The old value should be null for a new node.", oldValue);
+        // The node's value should now be updated to the new value.
+        assertEquals("The node's value should have been updated.", newValue, node.getValue());
     }
 }
