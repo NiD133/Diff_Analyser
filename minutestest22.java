@@ -1,44 +1,63 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
-public class MinutesTestTest22 extends TestCase {
+/**
+ * Contains unit tests for the {@link Minutes#minus(int)} method.
+ */
+public class MinutesTest extends TestCase {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    /**
+     * Tests that subtracting a value returns a new instance with the correct
+     * result, and that the original instance remains unchanged (is immutable).
+     */
+    public void testMinus_subtractsValueAndIsImmutable() {
+        // Arrange
+        final Minutes initialMinutes = Minutes.minutes(2);
+        final int valueToSubtract = 3;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // Act
+        final Minutes result = initialMinutes.minus(valueToSubtract);
+
+        // Assert
+        assertEquals("The original Minutes object should be immutable.",
+                2, initialMinutes.getMinutes());
+        assertEquals("The result of 2 - 3 should be -1.",
+                -1, result.getMinutes());
+        assertNotSame("A new object should be returned.", initialMinutes, result);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestMinutes.class);
+    /**
+     * Tests that subtracting zero from a Minutes instance results in an
+     * equal instance. For cached constants, it should return the same instance.
+     */
+    public void testMinus_whenSubtractingZero_returnsEqualInstance() {
+        // Arrange
+        final Minutes oneMinute = Minutes.ONE;
+
+        // Act
+        final Minutes result = oneMinute.minus(0);
+
+        // Assert
+        assertEquals("Subtracting zero should not change the value.", 1, result.getMinutes());
+        assertSame("For cached constants, subtracting zero should return the same instance.",
+                oneMinute, result);
     }
 
-    @Override
-    protected void setUp() throws Exception {
-    }
+    /**
+     * Tests that attempting to subtract a value that would cause an integer
+     * underflow throws an ArithmeticException.
+     */
+    public void testMinus_whenResultUnderflows_throwsArithmeticException() {
+        // Arrange
+        final Minutes minMinutes = Minutes.MIN_VALUE;
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testMinus_int() {
-        Minutes test2 = Minutes.minutes(2);
-        Minutes result = test2.minus(3);
-        assertEquals(2, test2.getMinutes());
-        assertEquals(-1, result.getMinutes());
-        assertEquals(1, Minutes.ONE.minus(0).getMinutes());
+        // Act & Assert
         try {
-            Minutes.MIN_VALUE.minus(1);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
+            minMinutes.minus(1);
+            fail("Expected an ArithmeticException to be thrown for integer underflow.");
+        } catch (ArithmeticException expected) {
+            // This is the expected behavior, so the test passes.
         }
     }
 }
