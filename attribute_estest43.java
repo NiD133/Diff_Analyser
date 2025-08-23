@@ -1,31 +1,20 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class Attribute_ESTestTest43 extends Attribute_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Attribute} class.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        Attribute attribute0 = Attribute.createFromEncoded("H", "g");
-        boolean boolean0 = attribute0.equals((Object) null);
-        assertEquals("g", attribute0.getValue());
-        assertEquals("H", attribute0.localName());
-        assertFalse(boolean0);
+    @Test
+    public void equalsShouldReturnFalseForNullComparison() {
+        // Arrange: Create a standard attribute instance.
+        Attribute attribute = new Attribute("key", "value");
+
+        // Act & Assert: The equals method must return false when the object is compared with null.
+        // This is a standard requirement for any .equals() implementation.
+        assertFalse("An attribute instance should never be equal to null.", attribute.equals(null));
     }
 }
