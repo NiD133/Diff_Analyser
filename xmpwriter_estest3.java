@@ -1,46 +1,34 @@
 package com.itextpdf.text.xml.xmp;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.awt.AsianFontMapper;
-import com.itextpdf.awt.DefaultFontMapper;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfDocument;
-import com.itextpdf.text.pdf.PdfName;
-import com.itextpdf.text.pdf.PdfObject;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.xmp.XMPMeta;
+
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-import javax.swing.DebugGraphics;
-import javax.swing.DropMode;
-import javax.swing.JTree;
-import javax.swing.tree.TreeModel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class XmpWriter_ESTestTest3 extends XmpWriter_ESTest_scaffolding {
+/**
+ * Test suite for the {@link XmpWriter} class.
+ */
+public class XmpWriterTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        MockPrintStream mockPrintStream0 = new MockPrintStream("SpaceBefore");
-        XmpWriter xmpWriter0 = new XmpWriter(mockPrintStream0, "SpaceBefore", 6229);
-        xmpWriter0.close();
+    /**
+     * Tests that an XmpWriter can be successfully instantiated and closed without errors.
+     * This acts as a basic "smoke test" to ensure the fundamental lifecycle of the writer
+     * (creation with parameters and closing) works as expected.
+     */
+    @Test
+    public void writerCanBeCreatedAndClosedSuccessfully() throws Exception {
+        // Arrange: Set up the necessary objects for the test.
+        // We use a standard ByteArrayOutputStream as a sink for the writer's output.
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        String encoding = XmpWriter.UTF8;
+        int padding = 2048; // A typical padding size for XMP metadata.
+
+        // Act: Create an instance of XmpWriter and immediately close it.
+        // The close() method is expected to write the initial XMP structure to the stream.
+        XmpWriter xmpWriter = new XmpWriter(outputStream, encoding, padding);
+        xmpWriter.close();
+
+        // Assert: The test passes if no exceptions were thrown during the Arrange and Act steps.
+        // This confirms that the writer's constructor and close() method can execute
+        // without issues under normal conditions.
     }
 }
