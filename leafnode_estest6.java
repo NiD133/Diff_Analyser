@@ -1,22 +1,29 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class LeafNode_ESTestTest6 extends LeafNode_ESTest_scaffolding {
+/**
+ * Test suite for the LeafNode abstract class.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        CDataNode cDataNode0 = new CDataNode("Gyb$AWbT${");
-        cDataNode0.attr("PUBLIC", (String) null);
-        boolean boolean0 = cDataNode0.hasAttributes();
-        assertTrue(boolean0);
+    /**
+     * Verifies that a LeafNode reports having attributes after an attribute is set,
+     * even when the attribute's value is null. This ensures the internal
+     * attributes map is correctly initialized.
+     */
+    @Test
+    public void hasAttributesIsTrueAfterSettingAttributeWithNullValue() {
+        // Arrange: Create a concrete instance of LeafNode. CDataNode is a suitable choice.
+        CDataNode leafNode = new CDataNode("Initial text content");
+        String attributeKey = "data-is-present";
+
+        // Act: Set an attribute with a null value. This is the core action under test.
+        leafNode.attr(attributeKey, null);
+
+        // Assert: Verify that the node now reports having attributes.
+        boolean hasAttributes = leafNode.hasAttributes();
+        assertTrue("A LeafNode should report having attributes after one is set, even with a null value.", hasAttributes);
     }
 }
