@@ -1,43 +1,48 @@
 package com.fasterxml.jackson.core.json;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonWriteContext_ESTestTest36 extends JsonWriteContext_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        JsonWriteContext jsonWriteContext0 = JsonWriteContext.createRootContext();
-        JsonGeneratorDelegate jsonGeneratorDelegate0 = new JsonGeneratorDelegate((JsonGenerator) null, false);
-        DupDetector dupDetector0 = DupDetector.rootDetector((JsonGenerator) jsonGeneratorDelegate0);
-        JsonWriteContext jsonWriteContext1 = JsonWriteContext.createRootContext(dupDetector0);
-        jsonWriteContext0._child = jsonWriteContext1;
-        JsonWriteContext jsonWriteContext2 = jsonWriteContext0.createChildObjectContext();
-        jsonWriteContext2.writeFieldName("/");
-        jsonWriteContext2.writeValue();
+/**
+ * Contains tests for the {@link JsonWriteContext} class, focusing on its
+ * behavior related to duplicate field detection.
+ */
+public class JsonWriteContextTest {
+
+    /**
+     * Verifies that attempting to write a duplicate field name within the same
+     * object context throws a JsonGenerationException when duplicate detection
+     * is enabled.
+     */
+    @Test
+    public void writeFieldName_whenDuplicateInObjectContext_shouldThrowException() {
+        // Arrange: Set up a context hierarchy that can detect duplicate field names.
+        // A DupDetector is required, which can be created from a (potentially null) JsonGenerator.
+        DupDetector dupDetector = DupDetector.rootDetector((JsonGenerator) null);
+        JsonWriteContext rootContext = JsonWriteContext.createRootContext(dupDetector);
+        JsonWriteContext objectContext = rootContext.createChildObjectContext();
+        final String fieldName = "duplicateField";
+
+        // Write the field name and a value for the first time, which should succeed.
         try {
-            jsonWriteContext2.writeFieldName("/");
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Duplicate field '/'
-            //
-            verifyException("com.fasterxml.jackson.core.json.JsonWriteContext", e);
+            objectContext.writeFieldName(fieldName);
+            objectContext.writeValue();
+        } catch (JsonGenerationException e) {
+            fail("Writing a new field name should not have thrown an exception: " + e.getMessage());
+        }
+
+        // Act & Assert: Attempt to write the same field name again and expect an exception.
+        try {
+            objectContext.writeFieldName(fieldName);
+            fail("Expected a JsonGenerationException for duplicate field name, but none was thrown.");
+        } catch (JsonGenerationException e) {
+            // The exception message should clearly indicate the duplicate field.
+            String expectedMessage = "Duplicate field '" + fieldName + "'";
+            assertEquals(expectedMessage, e.getOriginalMessage());
         }
     }
 }
