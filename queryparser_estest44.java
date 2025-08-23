@@ -1,17 +1,28 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class QueryParser_ESTestTest44 extends QueryParser_ESTest_scaffolding {
+/**
+ * Tests for the {@link QueryParser}.
+ * This test focuses on parsing simple pseudo-selectors.
+ */
+public class QueryParserTest {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        Evaluator evaluator0 = QueryParser.parse(":first-child");
-        assertEquals(":first-child", evaluator0.toString());
+    /**
+     * Verifies that the {@code :first-child} pseudo-selector is parsed correctly.
+     * The test ensures that the {@code toString()} representation of the resulting
+     * {@link Evaluator} matches the original query string.
+     */
+    @Test
+    public void shouldCorrectlyParseFirstChildPseudoSelector() {
+        // Arrange: Define the CSS query for the :first-child pseudo-selector.
+        String query = ":first-child";
+
+        // Act: Parse the query to create an Evaluator.
+        Evaluator evaluator = QueryParser.parse(query);
+
+        // Assert: The string representation of the parsed evaluator should match the original query.
+        assertEquals(query, evaluator.toString());
     }
 }
