@@ -1,26 +1,28 @@
 package org.jfree.data.flow;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.HijrahEra;
-import java.util.List;
-import java.util.Set;
-import javax.swing.Icon;
-import javax.swing.JLayeredPane;
-import javax.swing.JRadioButtonMenuItem;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class DefaultFlowDataset_ESTestTest40 extends DefaultFlowDataset_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultFlowDataset} class.
+ */
+public class DefaultFlowDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        Integer integer0 = JLayeredPane.MODAL_LAYER;
-        DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
-        NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(0, integer0);
-        Object object0 = defaultFlowDataset0.getNodeProperty(nodeKey0, "selected");
-        assertNull(object0);
+    /**
+     * Verifies that getNodeProperty() returns null when queried for a property
+     * on a node that does not exist in the dataset.
+     */
+    @Test
+    public void getNodePropertyShouldReturnNullForNonexistentNode() {
+        // Arrange: Create an empty dataset and a key for a node that has not been added.
+        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
+        NodeKey<Integer> nonexistentNodeKey = new NodeKey<>(0, 123);
+        String propertyKey = "selected";
+
+        // Act: Attempt to retrieve a property for the non-existent node.
+        Object propertyValue = dataset.getNodeProperty(nonexistentNodeKey, propertyKey);
+
+        // Assert: The returned property value should be null.
+        assertNull("Getting a property for a non-existent node should return null.", propertyValue);
     }
 }
