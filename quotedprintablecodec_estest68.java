@@ -1,31 +1,31 @@
 package org.apache.commons.codec.net;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class QuotedPrintableCodec_ESTestTest68 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * This test case verifies the behavior of the QuotedPrintableCodec
+ * when it is constructed with a null Charset.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test67() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec((Charset) null);
-        // Undeclared exception!
-        try {
-            quotedPrintableCodec0.getDefaultCharset();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.codec.net.QuotedPrintableCodec", e);
-        }
+    /**
+     * Tests that calling getDefaultCharset() on a codec initialized with a null charset
+     * throws a NullPointerException. This is expected because the method attempts to
+     * access a method on the null charset field.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getDefaultCharsetShouldThrowNpeWhenConstructedWithNullCharset() {
+        // Arrange: Create a codec instance, passing a null charset.
+        // The constructor allows this, but subsequent method calls that use the
+        // charset are expected to fail.
+        final QuotedPrintableCodec codec = new QuotedPrintableCodec((Charset) null);
+
+        // Act: Attempt to retrieve the default charset name.
+        // This action is expected to throw the NullPointerException.
+        codec.getDefaultCharset();
+
+        // Assert: The test framework verifies that a NullPointerException was thrown,
+        // as specified by the @Test(expected = ...) annotation.
     }
 }
