@@ -1,32 +1,37 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.io.PipedReader;
-import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import java.io.Reader;
+import org.junit.Test;
 
-public class ProxyReader_ESTestTest15 extends ProxyReader_ESTest_scaffolding {
+/**
+ * Test suite for the {@link ProxyReader} class, focusing on exception propagation.
+ */
+public class ProxyReaderTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        PipedReader pipedReader0 = new PipedReader(1018);
-        TaggedReader taggedReader0 = new TaggedReader(pipedReader0);
+    /**
+     * Tests that an {@link IOException} thrown by the underlying reader's {@code skip()}
+     * method is correctly propagated by the {@link ProxyReader}.
+     */
+    @Test
+    public void skipShouldPropagateIOExceptionFromUnderlyingReader() {
+        // Arrange: Create a ProxyReader with a delegate reader that is known to fail.
+        // A PipedReader that is not connected to a PipedWriter will throw an
+        // IOException on read or skip operations.
+        final Reader failingReader = new PipedReader();
+        final ProxyReader proxyReader = new TaggedReader(failingReader);
+
+        // Act & Assert
         try {
-            taggedReader0.skip(1018);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("org.apache.commons.io.input.TaggedReader", e);
+            proxyReader.skip(100L);
+            fail("An IOException should have been thrown because the underlying pipe is not connected.");
+        } catch (final IOException e) {
+            // Verify that the expected exception was caught and has the correct message.
+            assertEquals("Pipe not connected", e.getMessage());
         }
     }
 }
