@@ -1,27 +1,33 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
 import com.google.gson.stream.JsonWriter;
+import org.junit.Test;
+
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeWriter_ESTestTest34 extends JsonTreeWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        JsonWriter jsonWriter0 = jsonTreeWriter0.beginObject();
-        jsonWriter0.setHtmlSafe(true);
-        jsonWriter0.name("C,[}efl!G5<Uxw~gz");
-        JsonWriter jsonWriter1 = jsonTreeWriter0.beginArray();
-        assertSame(jsonTreeWriter0, jsonWriter1);
+/**
+ * This test class contains tests for the JsonTreeWriter.
+ * The original test was refactored for improved clarity.
+ */
+public class JsonTreeWriter_ESTestTest34 { // Note: In a real-world scenario, this test would be part of a comprehensive JsonTreeWriterTest class.
+
+    /**
+     * Verifies that beginArray() returns the same writer instance to support a fluent API.
+     */
+    @Test
+    public void beginArray_returnsSameWriterInstanceForChaining() throws IOException {
+        // Arrange: Create a writer and start an object, ready to add a named array.
+        JsonTreeWriter writer = new JsonTreeWriter();
+        writer.beginObject();
+        writer.name("data");
+
+        // Act: Call the method under test.
+        JsonWriter returnedWriter = writer.beginArray();
+
+        // Assert: The returned writer should be the exact same instance as the original.
+        assertSame("The beginArray() method should return the same writer instance to allow for method chaining.",
+                writer, returnedWriter);
     }
 }
