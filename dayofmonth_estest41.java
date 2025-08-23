@@ -1,44 +1,34 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
 import java.time.Month;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.Chronology;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.MinguoDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockMinguoDate;
-import org.junit.runner.RunWith;
+import java.time.MonthDay;
 
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Contains tests for the {@link DayOfMonth} class.
+ * This class focuses on the behavior of the atMonth() method.
+ */
 public class DayOfMonth_ESTestTest41 extends DayOfMonth_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        DayOfMonth dayOfMonth0 = DayOfMonth.now();
-        Month month0 = Month.AUGUST;
-        dayOfMonth0.atMonth(month0);
-        assertEquals(14, dayOfMonth0.getValue());
+    /**
+     * Tests that calling atMonth() creates a correct MonthDay
+     * and does not modify the original DayOfMonth instance, confirming its immutability.
+     */
+    @Test
+    public void atMonth_shouldReturnCorrectMonthDay_andRemainImmutable() {
+        // Arrange: Create a DayOfMonth instance with a fixed, known value.
+        final int dayValue = 15;
+        DayOfMonth dayOfMonth = DayOfMonth.of(dayValue);
+        Month month = Month.AUGUST;
+        MonthDay expectedMonthDay = MonthDay.of(month, dayValue);
+
+        // Act: Call the method under test.
+        MonthDay actualMonthDay = dayOfMonth.atMonth(month);
+
+        // Assert: Verify both the returned value and the state of the original object.
+        assertEquals("The returned MonthDay should combine the month and day.", expectedMonthDay, actualMonthDay);
+        assertEquals("The original DayOfMonth object should not be modified.", dayValue, dayOfMonth.getValue());
     }
 }
