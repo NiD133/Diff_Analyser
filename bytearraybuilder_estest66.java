@@ -1,19 +1,35 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class ByteArrayBuilder_ESTestTest66 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ByteArrayBuilder} class.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test65() throws Throwable {
-        byte[] byteArray0 = new byte[0];
-        ByteArrayBuilder byteArrayBuilder0 = ByteArrayBuilder.fromInitial(byteArray0, 1);
-        byteArrayBuilder0.flush();
-        assertEquals(1, byteArrayBuilder0.size());
+    /**
+     * Tests that the size of a ByteArrayBuilder, created with an initial buffer
+     * and a specified length, remains unchanged after calling the flush() method.
+     *
+     * The flush() method in ByteArrayBuilder is a no-op, so it should not
+     * affect the internal state, including the reported size. This test verifies
+     * that the size correctly reflects the length provided during construction.
+     */
+    @Test
+    public void testSizeIsUnaffectedByFlushWhenCreatedWithInitialBuffer() {
+        // Arrange: Create a ByteArrayBuilder with an initial buffer and a specified length.
+        // The builder is initialized to believe it contains one byte, even though the
+        // provided buffer is empty. This tests that the builder trusts the provided length.
+        byte[] initialBuffer = new byte[0];
+        int initialSize = 1;
+        ByteArrayBuilder builder = ByteArrayBuilder.fromInitial(initialBuffer, initialSize);
+
+        // Act: Call the flush() method, which is expected to be a no-op.
+        builder.flush();
+
+        // Assert: The size of the builder should still be the specified initial length.
+        assertEquals("flush() should not change the size of the builder.",
+                initialSize, builder.size());
     }
 }
