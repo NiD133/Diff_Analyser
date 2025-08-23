@@ -1,99 +1,51 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.DateTime.Property;
+import org.junit.Before;
+import org.junit.Test;
 
-public class IslamicChronologyTestTest10 extends TestCase {
+/**
+ * Tests for the time-related DateTimeFields in IslamicChronology.
+ * This test verifies that standard time fields are supported and have the correct names.
+ */
+public class IslamicChronologyTimeFieldsTest {
 
-    private static long SKIP = 1 * DateTimeConstants.MILLIS_PER_DAY;
+    private Chronology islamicChronology;
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
-
-    private static final Chronology ISLAMIC_UTC = IslamicChronology.getInstanceUTC();
-
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
-
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Before
+    public void setUp() {
+        // Use the default instance of IslamicChronology for testing.
+        islamicChronology = IslamicChronology.getInstance();
     }
 
-    public static TestSuite suite() {
-        SKIP = 1 * DateTimeConstants.MILLIS_PER_DAY;
-        return new TestSuite(TestIslamicChronology.class);
+    @Test
+    public void testTimeFieldsAreSupportedAndHaveCorrectNames() {
+        assertField(islamicChronology.halfdayOfDay(), "halfdayOfDay");
+        assertField(islamicChronology.clockhourOfHalfday(), "clockhourOfHalfday");
+        assertField(islamicChronology.hourOfHalfday(), "hourOfHalfday");
+        assertField(islamicChronology.clockhourOfDay(), "clockhourOfDay");
+        assertField(islamicChronology.hourOfDay(), "hourOfDay");
+        assertField(islamicChronology.minuteOfDay(), "minuteOfDay");
+        assertField(islamicChronology.minuteOfHour(), "minuteOfHour");
+        assertField(islamicChronology.secondOfDay(), "secondOfDay");
+        assertField(islamicChronology.secondOfMinute(), "secondOfMinute");
+        assertField(islamicChronology.millisOfDay(), "millisOfDay");
+        assertField(islamicChronology.millisOfSecond(), "millisOfSecond");
     }
 
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    public void testTimeFields() {
-        final IslamicChronology islamic = IslamicChronology.getInstance();
-        assertEquals("halfdayOfDay", islamic.halfdayOfDay().getName());
-        assertEquals("clockhourOfHalfday", islamic.clockhourOfHalfday().getName());
-        assertEquals("hourOfHalfday", islamic.hourOfHalfday().getName());
-        assertEquals("clockhourOfDay", islamic.clockhourOfDay().getName());
-        assertEquals("hourOfDay", islamic.hourOfDay().getName());
-        assertEquals("minuteOfDay", islamic.minuteOfDay().getName());
-        assertEquals("minuteOfHour", islamic.minuteOfHour().getName());
-        assertEquals("secondOfDay", islamic.secondOfDay().getName());
-        assertEquals("secondOfMinute", islamic.secondOfMinute().getName());
-        assertEquals("millisOfDay", islamic.millisOfDay().getName());
-        assertEquals("millisOfSecond", islamic.millisOfSecond().getName());
-        assertEquals(true, islamic.halfdayOfDay().isSupported());
-        assertEquals(true, islamic.clockhourOfHalfday().isSupported());
-        assertEquals(true, islamic.hourOfHalfday().isSupported());
-        assertEquals(true, islamic.clockhourOfDay().isSupported());
-        assertEquals(true, islamic.hourOfDay().isSupported());
-        assertEquals(true, islamic.minuteOfDay().isSupported());
-        assertEquals(true, islamic.minuteOfHour().isSupported());
-        assertEquals(true, islamic.secondOfDay().isSupported());
-        assertEquals(true, islamic.secondOfMinute().isSupported());
-        assertEquals(true, islamic.millisOfDay().isSupported());
-        assertEquals(true, islamic.millisOfSecond().isSupported());
+    /**
+     * Helper method to assert that a DateTimeField is supported and has the expected name.
+     * This reduces code duplication and improves the readability of the main test method.
+     *
+     * @param field        the DateTimeField to check
+     * @param expectedName the expected name of the field
+     */
+    private void assertField(DateTimeField field, String expectedName) {
+        assertEquals("Field name should be correct.", expectedName, field.getName());
+        assertTrue("Field '" + expectedName + "' should be supported.", field.isSupported());
     }
 }
