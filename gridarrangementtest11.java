@@ -1,34 +1,40 @@
 package org.jfree.chart.block;
 
-import org.jfree.chart.TestUtils;
-import org.jfree.data.Range;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class GridArrangementTestTest11 {
+/**
+ * Tests for the {@link GridArrangement} class.
+ */
+public class GridArrangementTest {
 
     private static final double EPSILON = 0.000000001;
 
-    private BlockContainer createTestContainer1() {
-        Block b1 = new EmptyBlock(10, 11);
-        Block b2 = new EmptyBlock(20, 22);
-        Block b3 = new EmptyBlock(30, 33);
-        BlockContainer result = new BlockContainer(new GridArrangement(1, 3));
-        result.add(b1);
-        result.add(b2);
-        result.add(b3);
-        return result;
-    }
-
     /**
-     * The arrangement should be able to handle null blocks in the layout.
+     * Verifies that arranging a container with a null block and a fixed-size
+     * constraint results in a size that matches the constraint. This ensures the
+     * arrangement gracefully handles empty or null cells in the grid.
      */
     @Test
-    public void testNullBlock_FF() {
-        BlockContainer c = new BlockContainer(new GridArrangement(1, 1));
-        c.add(null);
-        Size2D s = c.arrange(null, new RectangleConstraint(20, 10));
-        assertEquals(20.0, s.getWidth(), EPSILON);
-        assertEquals(10.0, s.getHeight(), EPSILON);
+    public void arrangeWithNullBlockAndFixedConstraintShouldReturnConstraintSize() {
+        // Arrange: Create a 1x1 grid container and add a null block.
+        GridArrangement arrangement = new GridArrangement(1, 1);
+        BlockContainer container = new BlockContainer(arrangement);
+        container.add(null); // The key element being tested.
+
+        // Define a fixed-size constraint for the arrangement.
+        RectangleConstraint fixedConstraint = new RectangleConstraint(20.0, 10.0);
+
+        // Act: Arrange the container. The Graphics2D context is null as it's not
+        // needed for this size calculation.
+        Size2D arrangedSize = container.arrange(null, fixedConstraint);
+
+        // Assert: The resulting size should be equal to the fixed constraint dimensions.
+        assertAll("Arranged size with null block and fixed constraint",
+            () -> assertEquals(20.0, arrangedSize.getWidth(), EPSILON,
+                    "The width should match the fixed constraint width."),
+            () -> assertEquals(10.0, arrangedSize.getHeight(), EPSILON,
+                    "The height should match the fixed constraint height.")
+        );
     }
 }
