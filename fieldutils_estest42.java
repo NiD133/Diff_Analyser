@@ -1,24 +1,23 @@
 package org.joda.time.field;
 
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
 
-public class FieldUtils_ESTestTest42 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        Object object0 = new Object();
-        boolean boolean0 = FieldUtils.equals(object0, object0);
-        assertTrue(boolean0);
+    /**
+     * Tests that FieldUtils.equals() returns true when comparing an object to itself,
+     * confirming the reflexive property of equality.
+     */
+    @Test
+    public void testEqualsReturnsTrueForSameObjectInstance() {
+        // Arrange
+        Object testObject = new Object();
+
+        // Act & Assert
+        assertTrue("An object should be considered equal to itself.", FieldUtils.equals(testObject, testObject));
     }
 }
