@@ -1,22 +1,34 @@
 package org.apache.commons.codec.net;
 
+import static org.junit.Assert.assertEquals;
+
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class BCodec_ESTestTest32 extends BCodec_ESTest_scaffolding {
+/**
+ * Tests for the {@link BCodec} class.
+ */
+public class BCodecTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        BCodec bCodec0 = new BCodec();
-        Object object0 = bCodec0.decode((Object) "=?UTF-8?B?LHcuLHAlKw==?=");
-        assertEquals(",w.,p%+", object0);
+    /**
+     * Tests that the {@link BCodec#decode(Object)} method correctly decodes a valid
+     * RFC 1522 B-encoded string. The input is provided as an Object.
+     *
+     * @throws DecoderException if the decoding process fails, which is not expected here.
+     */
+    @Test
+    public void testDecodeValidBEncodedStringAsObject() throws DecoderException {
+        // Arrange
+        final BCodec bCodec = new BCodec();
+        // This is an RFC 1522 B-encoded string for ",w.,p%+" using UTF-8.
+        final String encodedString = "=?UTF-8?B?LHcuLHAlKw==?=";
+        final String expectedDecodedString = ",w.,p%+";
+
+        // Act
+        final Object decodedResult = bCodec.decode((Object) encodedString);
+
+        // Assert
+        assertEquals("The decoded object should be the correctly decoded string.",
+                     expectedDecodedString, decodedResult);
     }
 }
