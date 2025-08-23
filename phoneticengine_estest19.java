@@ -1,23 +1,34 @@
 package org.apache.commons.codec.language.bm;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class PhoneticEngine_ESTestTest19 extends PhoneticEngine_ESTest_scaffolding {
+import java.util.Collections;
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        LinkedHashSet<String> linkedHashSet0 = new LinkedHashSet<String>();
-        Languages.LanguageSet languages_LanguageSet0 = Languages.LanguageSet.from(linkedHashSet0);
-        PhoneticEngine.PhonemeBuilder phoneticEngine_PhonemeBuilder0 = PhoneticEngine.PhonemeBuilder.empty(languages_LanguageSet0);
-        String string0 = phoneticEngine_PhonemeBuilder0.makeString();
-        assertFalse(linkedHashSet0.contains(string0));
+/**
+ * Tests for the {@link PhoneticEngine.PhonemeBuilder} inner class.
+ */
+public class PhoneticEngine_PhonemeBuilderTest {
+
+    /**
+     * Tests that calling makeString() on a PhonemeBuilder created via the static
+     * empty() factory method results in an empty string.
+     *
+     * According to its documentation, PhonemeBuilder.empty() creates a builder
+     * containing "a single phoneme of zero characters". This test verifies that
+     * serializing this empty phoneme correctly produces an empty string.
+     */
+    @Test
+    public void makeStringOnEmptyBuilderShouldReturnEmptyString() {
+        // Arrange: Create an empty PhonemeBuilder.
+        // This requires an empty LanguageSet.
+        Languages.LanguageSet emptyLanguageSet = Languages.LanguageSet.from(Collections.emptySet());
+        PhoneticEngine.PhonemeBuilder builder = PhoneticEngine.PhonemeBuilder.empty(emptyLanguageSet);
+
+        // Act: Generate the string representation from the builder.
+        String phonemeString = builder.makeString();
+
+        // Assert: The resulting string should be empty.
+        assertEquals("The string from an empty PhonemeBuilder should be empty", "", phonemeString);
     }
 }
