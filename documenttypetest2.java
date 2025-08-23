@@ -1,24 +1,44 @@
 package org.jsoup.nodes;
 
-import org.jsoup.Jsoup;
-import org.jsoup.parser.Parser;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class DocumentTypeTestTest2 {
+/**
+ * Unit tests for the DocumentType class.
+ */
+public class DocumentTypeTest {
 
-    private String htmlOutput(String in) {
-        DocumentType type = (DocumentType) Jsoup.parse(in).childNode(0);
-        return type.outerHtml();
-    }
-
-    private String xmlOutput(String in) {
-        return Jsoup.parse(in, "", Parser.xmlParser()).childNode(0).outerHtml();
-    }
-
+    /**
+     * Tests that the systemId() getter correctly returns the value
+     * provided in the constructor.
+     */
     @Test
-    public void constructorValidationThrowsExceptionOnNulls() {
-        assertThrows(IllegalArgumentException.class, () -> new DocumentType("html", null, null));
+    public void systemIdShouldReturnIdSetInConstructor() {
+        // Arrange: Create a DocumentType with empty strings for name and public ID,
+        // and a specific value for the system ID.
+        DocumentType docType = new DocumentType("", "", "systemId_value");
+
+        // Act: Retrieve the system ID.
+        String systemId = docType.systemId();
+
+        // Assert: Verify that the retrieved system ID matches the one set in the constructor.
+        assertEquals("systemId_value", systemId);
+    }
+
+    /**
+     * Tests that the nodeName() method consistently returns the predefined
+     * string "#doctype" for any DocumentType instance.
+     */
+    @Test
+    public void nodeNameShouldAlwaysReturnHashDoctype() {
+        // Arrange: Create a DocumentType with arbitrary values.
+        // The constructor parameters do not affect the outcome of this test.
+        DocumentType docType = new DocumentType("name", "publicId", "systemId");
+
+        // Act: Retrieve the node name.
+        String nodeName = docType.nodeName();
+
+        // Assert: Verify that the node name is the constant string "#doctype".
+        assertEquals("#doctype", nodeName);
     }
 }
