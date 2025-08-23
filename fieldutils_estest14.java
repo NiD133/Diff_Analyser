@@ -1,23 +1,28 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class FieldUtils_ESTestTest14 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the utility methods in {@link FieldUtils}.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        int int0 = FieldUtils.safeToInt((-2147483648L));
-        assertEquals(Integer.MIN_VALUE, int0);
+    /**
+     * Tests that safeToInt correctly converts a long that is exactly at the
+     * lower boundary of the integer range (Integer.MIN_VALUE).
+     * The method should return the correct integer value without throwing an exception.
+     */
+    @Test
+    public void safeToInt_shouldCorrectlyConvertIntegerMinValue() {
+        // Arrange: Define the input value as the minimum integer value, cast to a long.
+        // This represents the lower boundary for a valid conversion.
+        long valueToConvert = (long) Integer.MIN_VALUE;
+
+        // Act: Call the method under test.
+        int result = FieldUtils.safeToInt(valueToConvert);
+
+        // Assert: Verify that the converted value is equal to Integer.MIN_VALUE.
+        assertEquals(Integer.MIN_VALUE, result);
     }
 }
