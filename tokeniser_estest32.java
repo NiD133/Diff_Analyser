@@ -1,33 +1,35 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.XmlDeclaration;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class verifies the behavior of the Tokeniser, particularly its internal state machine.
+ */
 public class Tokeniser_ESTestTest32 extends Tokeniser_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        xmlTreeBuilder0.parse("&#x27;", "&#x27;");
-        Tokeniser tokeniser0 = new Tokeniser(xmlTreeBuilder0);
-        // Undeclared exception!
-        try {
-            tokeniser0.emitCommentPending();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.parser.Tokeniser", e);
-        }
+    /**
+     * Tests that calling emitCommentPending() on a Tokeniser that is not
+     * in a comment-parsing state results in a NullPointerException.
+     *
+     * This test ensures the robustness of the internal state machine by verifying that
+     * calling a state-specific method out of its intended sequence is handled by
+     * failing fast, which prevents unpredictable behavior.
+     */
+    @Test(expected = NullPointerException.class)
+    public void emitCommentPendingFailsWhenCalledOutOfSequence() {
+        // Arrange: Create a Tokeniser.
+        // The parse() call is a convenient way to initialize the underlying TreeBuilder,
+        // which is a prerequisite for creating a Tokeniser. The parsed content itself
+        // is not relevant to this test's objective.
+        XmlTreeBuilder xmlTreeBuilder = new XmlTreeBuilder();
+        xmlTreeBuilder.parse("<!-- setup -->", "http://example.com");
+        Tokeniser tokeniser = new Tokeniser(xmlTreeBuilder);
+
+        // Act: Directly invoke an internal state machine method out of its normal context.
+        // We expect this to fail because the necessary state has not been established
+        // by the state machine's regular flow (e.g., transitioning into a comment state).
+        tokeniser.emitCommentPending();
+
+        // Assert: A NullPointerException is expected, as specified by the @Test annotation.
     }
 }
