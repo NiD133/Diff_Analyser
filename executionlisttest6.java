@@ -1,44 +1,50 @@
 package com.google.common.util.concurrent;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-import static java.util.concurrent.Executors.newCachedThreadPool;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import com.google.common.testing.NullPointerTester;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicInteger;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-public class ExecutionListTestTest6 extends TestCase {
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-    private final ExecutionList list = new ExecutionList();
+/**
+ * Tests for {@link ExecutionList} focusing on its exception handling behavior.
+ *
+ * <p>This test verifies that the ExecutionList correctly catches and suppresses exceptions thrown by
+ * its listeners, as specified in its documentation.
+ */
+class ExecutionListExceptionHandlingTest {
 
-    private static final Runnable THROWING_RUNNABLE = new Runnable() {
-
-        @Override
-        public void run() {
-            throw new RuntimeException();
-        }
+    // A runnable that always fails, to test the exception-catching logic.
+    private static final Runnable THROWING_RUNNABLE = () -> {
+        throw new RuntimeException("Simulated listener failure");
     };
 
-    private class MockRunnable implements Runnable {
+    private ExecutionList executionList;
 
-        final CountDownLatch countDownLatch;
-
-        MockRunnable(CountDownLatch countDownLatch) {
-            this.countDownLatch = countDownLatch;
-        }
-
-        @Override
-        public void run() {
-            countDownLatch.countDown();
-        }
+    @BeforeEach
+    void setUp() {
+        executionList = new ExecutionList();
     }
 
-    public void testExceptionsCaught() {
-        list.add(THROWING_RUNNABLE, directExecutor());
-        list.execute();
-        list.add(THROWING_RUNNABLE, directExecutor());
+    @Test
+    @DisplayName("ExecutionList should not propagate exceptions from listeners")
+    void executionListShouldNotPropagateExceptionsFromListeners() {
+        // Arrange: Add a listener that is designed to throw an exception.
+        executionList.add(THROWING_RUNNABLE, directExecutor());
+
+        // Act & Assert (Scenario 1): During execute()
+        // The ExecutionList's contract states it will catch and log exceptions from listeners,
+        // not propagate them to the caller of execute().
+        assertDoesNotThrow(
+                () -> executionList.execute(),
+                "execute() should not propagate exceptions from its listeners.");
+
+        // Act & Assert (Scenario 2): When adding a listener after execute()
+        // Listeners added after execution are run immediately. The same exception-catching
+        // behavior should apply.
+        assertDoesNotThrow(
+                () -> executionList.add(THROWING_RUNNABLE, directExecutor()),
+                "add() after execution should not propagate exceptions from its listeners.");
     }
 }
