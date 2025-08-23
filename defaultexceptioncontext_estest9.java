@@ -1,23 +1,35 @@
 package org.apache.commons.lang3.exception;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.List;
-import java.util.Set;
-import org.apache.commons.lang3.tuple.Pair;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class DefaultExceptionContext_ESTestTest9 extends DefaultExceptionContext_ESTest_scaffolding {
+/**
+ * Unit tests for {@link DefaultExceptionContext}.
+ */
+public class DefaultExceptionContextTest {
 
-    @Test(timeout = 4000)
-    public void test8() throws Throwable {
-        DefaultExceptionContext defaultExceptionContext0 = new DefaultExceptionContext();
-        Set<String> set0 = defaultExceptionContext0.getContextLabels();
-        defaultExceptionContext0.addContextValue("=", set0);
-        List<Object> list0 = defaultExceptionContext0.getContextValues("=");
-        assertEquals(1, list0.size());
+    /**
+     * Tests that getContextValues() returns a list containing the single value
+     * that was added for a specific label.
+     */
+    @Test
+    public void getContextValues_whenSingleValueIsAddedForLabel_returnsListContainingThatValue() {
+        // Arrange
+        final DefaultExceptionContext context = new DefaultExceptionContext();
+        final String testLabel = "Error Code";
+        final Object testValue = 404;
+
+        context.addContextValue(testLabel, testValue);
+
+        // Act
+        final List<Object> actualValues = context.getContextValues(testLabel);
+
+        // Assert
+        assertNotNull("The returned list of values should not be null.", actualValues);
+        assertEquals("The list should contain exactly one value.", 1, actualValues.size());
+        assertEquals("The value in the list should match the one that was added.", testValue, actualValues.get(0));
     }
 }
