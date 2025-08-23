@@ -1,40 +1,30 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest102 extends RandomAccessFileOrArray_ESTest_scaffolding {
+import java.io.IOException;
+import java.net.URL;
 
-    @Test(timeout = 4000)
-    public void test101() throws Throwable {
-        URL uRL0 = MockURL.getHttpExample();
-        RandomAccessFileOrArray randomAccessFileOrArray0 = null;
-        try {
-            randomAccessFileOrArray0 = new RandomAccessFileOrArray(uRL0);
-            fail("Expecting exception: IOException");
-        } catch (Throwable e) {
-            //
-            // Could not find: www.someFakeButWellFormedURL.org
-            //
-            verifyException("org.evosuite.runtime.mock.java.net.EvoHttpURLConnection", e);
-        }
+/**
+ * Test suite for the URL constructor of {@link RandomAccessFileOrArray}.
+ */
+public class RandomAccessFileOrArrayUrlConstructorTest {
+
+    /**
+     * Verifies that the RandomAccessFileOrArray constructor throws an IOException
+     * when attempting to open a URL that points to a non-existent resource.
+     *
+     * @throws IOException because the constructor is expected to fail with this exception.
+     */
+    @Test(expected = IOException.class)
+    public void constructorWithNonExistentUrlShouldThrowIOException() throws IOException {
+        // Arrange: Create a mock URL that is well-formed but points to a resource
+        // that cannot be reached.
+        URL nonExistentUrl = MockURL.getHttpExample();
+
+        // Act & Assert: Attempting to create a RandomAccessFileOrArray from this URL
+        // should fail and throw an IOException. The @Test(expected) annotation handles the assertion.
+        new RandomAccessFileOrArray(nonExistentUrl);
     }
 }
