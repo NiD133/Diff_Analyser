@@ -1,32 +1,28 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class TaiInstant_ESTestTest4 extends TaiInstant_ESTest_scaffolding {
+/**
+ * Tests for {@link TaiInstant}.
+ * This focuses on the isBefore() method's logic.
+ */
+public class TaiInstantTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Instant instant0 = MockInstant.now();
-        TaiInstant taiInstant0 = TaiInstant.of(instant0);
-        Duration duration0 = Duration.ofHours((-3507L));
-        TaiInstant taiInstant1 = taiInstant0.minus(duration0);
-        boolean boolean0 = taiInstant1.isBefore(taiInstant0);
-        assertEquals(320000000, taiInstant1.getNano());
-        assertEquals(1783725716L, taiInstant1.getTaiSeconds());
-        assertFalse(boolean0);
-        assertEquals(320000000, taiInstant0.getNano());
+    @Test
+    public void isBefore_shouldReturnFalse_whenComparingToAnEarlierInstant() {
+        // Arrange: Create a base instant and a second instant that is later in time.
+        // Subtracting a negative duration is equivalent to adding a positive one,
+        // thus creating an instant that is later on the time-line.
+        TaiInstant baseInstant = TaiInstant.ofTaiSeconds(1_000_000L, 0);
+        Duration negativeDuration = Duration.ofHours(-1);
+        TaiInstant laterInstant = baseInstant.minus(negativeDuration);
+
+        // Act: Check if the later instant is "before" the base instant.
+        boolean isBefore = laterInstant.isBefore(baseInstant);
+
+        // Assert: The result should be false, as a later time is not before an earlier time.
+        assertFalse("A later instant should not be considered 'before' an earlier one.", isBefore);
     }
 }
