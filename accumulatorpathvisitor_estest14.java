@@ -32,7 +32,7 @@ public class AccumulatorPathVisitor_ESTestTest14 extends AccumulatorPathVisitor_
         AccumulatorPathVisitor accumulatorPathVisitor0 = new AccumulatorPathVisitor();
         AccumulatorPathVisitor accumulatorPathVisitor1 = new AccumulatorPathVisitor();
         assertTrue(accumulatorPathVisitor1.equals((Object) accumulatorPathVisitor0));
-        MockFile mockFile0 = new MockFile("+By\"=^s%<");
+        MockFile mockFile0 = new MockFile("+By\"=^s% <");
         Path path0 = mockFile0.toPath();
         MockIOException mockIOException0 = new MockIOException();
         accumulatorPathVisitor1.postVisitDirectory(path0, (IOException) mockIOException0);
