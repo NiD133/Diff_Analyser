@@ -1,35 +1,30 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
-public class Elements_ESTestTest124 extends Elements_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Elements} class.
+ */
+public class ElementsTest {
 
-    @Test(timeout = 4000)
-    public void test123() throws Throwable {
-        Elements elements0 = new Elements();
-        Elements elements1 = elements0.before("3\"S4UaramE=:hhtC");
-        assertEquals(0, elements1.size());
+    /**
+     * Verifies that calling the {@code before(html)} method on an empty Elements
+     * collection has no effect and returns the same instance.
+     */
+    @Test
+    public void beforeShouldHaveNoEffectWhenCalledOnEmptyElements() {
+        // Arrange: Create an empty Elements collection.
+        Elements emptyElements = new Elements();
+        String htmlToInsert = "<div>This HTML should not be inserted</div>";
+
+        // Act: Attempt to insert HTML before the elements in the empty collection.
+        Elements result = emptyElements.before(htmlToInsert);
+
+        // Assert: The collection should remain empty, and the method should return the
+        // original instance to allow for method chaining.
+        assertTrue("The Elements collection should remain empty.", result.isEmpty());
+        assertSame("The method should return the same instance for chaining.", emptyElements, result);
     }
 }
