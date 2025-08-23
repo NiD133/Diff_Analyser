@@ -1,28 +1,41 @@
 package org.joda.time.convert;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Hours;
-import org.joda.time.Interval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.Seconds;
-import org.joda.time.chrono.CopticChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotSame;
 
-public class ConverterSet_ESTestTest25 extends ConverterSet_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ConverterSet}.
+ */
+public class ConverterSetTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        Converter[] converterArray0 = new Converter[3];
-        ReadableInstantConverter readableInstantConverter0 = ReadableInstantConverter.INSTANCE;
-        converterArray0[0] = (Converter) readableInstantConverter0;
-        ReadableInstantConverter readableInstantConverter1 = new ReadableInstantConverter();
-        ConverterSet converterSet0 = new ConverterSet(converterArray0);
-        ConverterSet converterSet1 = converterSet0.add(readableInstantConverter1, (Converter[]) null);
-        assertNotSame(converterSet1, converterSet0);
+    /**
+     * Tests that adding a new converter instance for an already-supported type
+     * returns a new ConverterSet instance.
+     *
+     * This verifies the immutable nature of ConverterSet: modifications should
+     * result in a new object rather than changing the original.
+     */
+    @Test
+    public void add_whenReplacingConverterForExistingType_shouldReturnNewSet() {
+        // Arrange
+        // 1. Create an initial set containing the standard singleton converter.
+        Converter initialConverter = ReadableInstantConverter.INSTANCE;
+        ConverterSet initialSet = new ConverterSet(new Converter[]{initialConverter});
+
+        // 2. Create a new, distinct instance of the same converter type.
+        //    This is possible because the constructor is package-private.
+        Converter replacingConverter = new ReadableInstantConverter();
+
+        // Act
+        // 3. Add the new converter. This should replace the existing one because it
+        //    handles the same type, but since it's a different instance, a new
+        //    set must be created.
+        ConverterSet resultSet = initialSet.add(replacingConverter, null);
+
+        // Assert
+        // 4. Verify that the returned set is a different instance from the original,
+        //    confirming the immutability of ConverterSet.
+        assertNotSame("A new ConverterSet instance should be returned when a converter is replaced",
+                initialSet, resultSet);
     }
 }
