@@ -1,28 +1,22 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class StringUtil_ESTestTest11 extends StringUtil_ESTest_scaffolding {
+/**
+ * Tests for the {@link StringUtil} class.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        boolean boolean0 = StringUtil.isAscii("{3f\"nUAQw7TH,Y-");
-        assertTrue(boolean0);
+    @Test
+    public void isAsciiReturnsTrueForStringContainingOnlyAsciiCharacters() {
+        // Arrange: Define a string that contains only characters within the standard ASCII set (0-127).
+        String inputString = "{3 f\"nUAQw7TH,Y-";
+
+        // Act: Call the method under test.
+        boolean result = StringUtil.isAscii(inputString);
+
+        // Assert: Verify that the method correctly identifies the string as ASCII.
+        assertTrue("The string contains only ASCII characters and should be identified as such.", result);
     }
 }
