@@ -1,49 +1,60 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
+import org.junit.Test;
+
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TextRenderInfo_ESTestTest46 extends TextRenderInfo_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        Matrix matrix0 = graphicsState0.getCtm();
-        Stack<MarkedContentInfo> stack0 = new Stack<MarkedContentInfo>();
-        PdfString pdfString0 = new PdfString("Symbol", "MacRoman");
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfString0, graphicsState0, matrix0, stack0);
-        // Undeclared exception!
+/**
+ * Test suite for {@link TextRenderInfo}.
+ */
+public class TextRenderInfoTest {
+
+    /**
+     * Tests that getCharacterRenderInfos propagates a NoSuchMethodError when a
+     * binary incompatibility is encountered during font decoding.
+     *
+     * This unusual scenario can occur if the application is compiled against one
+     * version of a library (e.g., a newer JDK) but run in an environment with an
+     * older, incompatible version. The test ensures that such a critical linkage
+     * error, specifically from the PdfEncodings class, is not silently swallowed.
+     */
+    @Test
+    public void getCharacterRenderInfos_whenFontDecodingFailsDueToLinkageError_throwsNoSuchMethodError() {
+        // Arrange: Set up a TextRenderInfo instance with a font that requires
+        // complex decoding, which is the path where the linkage error is triggered.
+        GraphicsState graphicsState = new GraphicsState();
+        CMapAwareDocumentFont font = new CMapAwareDocumentFont(new PdfGState());
+        graphicsState.font = font;
+
+        Matrix textMatrix = graphicsState.getCtm();
+        PdfString pdfString = new PdfString("Symbol", "MacRoman");
+        Collection<MarkedContentInfo> markedContentStack = new Stack<>();
+
+        TextRenderInfo renderInfo = new TextRenderInfo(pdfString, graphicsState, textMatrix, markedContentStack);
+
+        // Act & Assert: Expect a NoSuchMethodError originating from the PdfEncodings class.
         try {
-            textRenderInfo0.getCharacterRenderInfos();
-            fail("Expecting exception: NoSuchMethodError");
+            renderInfo.getCharacterRenderInfos();
+            fail("A NoSuchMethodError was expected but not thrown.");
         } catch (NoSuchMethodError e) {
-            //
-            // java.nio.ByteBuffer.rewind()Ljava/nio/ByteBuffer;
-            //
-            verifyException("com.itextpdf.text.pdf.PdfEncodings", e);
+            // Verify that the error originates from the expected class. This confirms
+            // that the test is validating the intended failure scenario within the
+            // font encoding mechanism.
+            boolean errorOriginatedInPdfEncodings = Arrays.stream(e.getStackTrace())
+                    .anyMatch(element -> element.getClassName().equals("com.itextpdf.text.pdf.PdfEncodings"));
+
+            assertTrue(
+                "The NoSuchMethodError should originate from the PdfEncodings class.",
+                errorOriginatedInPdfEncodings
+            );
         }
     }
 }
