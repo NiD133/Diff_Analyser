@@ -1,19 +1,29 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class Years_ESTestTest31 extends Years_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Years} class.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        Years years0 = Years.years(0);
-        boolean boolean0 = years0.isGreaterThan((Years) null);
-        assertEquals(0, years0.getYears());
-        assertFalse(boolean0);
+    /**
+     * Tests that isGreaterThan() correctly handles a null argument.
+     * The method's contract specifies that a null 'other' period is treated as zero.
+     * Therefore, comparing zero years to null is equivalent to comparing zero to zero,
+     * which should return false (as they are equal, not greater).
+     */
+    @Test
+    public void isGreaterThan_shouldReturnFalse_whenComparingZeroToNull() {
+        // Arrange
+        Years zeroYears = Years.ZERO;
+
+        // Act
+        // The null argument should be treated as Years.ZERO according to the method's contract.
+        boolean result = zeroYears.isGreaterThan(null);
+
+        // Assert
+        assertFalse("Years(0) should not be greater than null (which is treated as 0)", result);
     }
 }
