@@ -1,17 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Weeks_ESTestTest36 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        Weeks weeks0 = Weeks.weeks(Integer.MAX_VALUE);
-        assertEquals(Integer.MAX_VALUE, weeks0.getWeeks());
+    /**
+     * Tests that the {@code Weeks.weeks(int)} factory method correctly creates an instance
+     * when provided with the maximum possible integer value.
+     */
+    @Test
+    public void testWeeksFactoryWithMaxValue() {
+        // Arrange
+        final int expectedWeeks = Integer.MAX_VALUE;
+
+        // Act
+        final Weeks weeks = Weeks.weeks(expectedWeeks);
+
+        // Assert
+        assertEquals("The number of weeks should match the maximum integer value provided.",
+                expectedWeeks, weeks.getWeeks());
     }
 }
