@@ -1,38 +1,26 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileMode_ESTestTest24 extends RandomAccessFileMode_ESTest_scaffolding {
+/**
+ * Tests for the {@link RandomAccessFileMode} enum, focusing on exception handling.
+ */
+public class RandomAccessFileModeTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_ALL;
-        // Undeclared exception!
-        try {
-            randomAccessFileMode0.create((Path) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.RandomAccessFileMode", e);
-        }
+    /**
+     * Verifies that calling the create(Path) method with a null Path argument
+     * results in a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void createWithNullPathShouldThrowNullPointerException() {
+        // Arrange: Select any mode, as the null-check behavior should be consistent across all modes.
+        final RandomAccessFileMode mode = RandomAccessFileMode.READ_WRITE_SYNC_ALL;
+        final Path nullPath = null;
+
+        // Act: Call the method with the null argument.
+        // The @Test annotation's 'expected' parameter handles the assertion
+        // that a NullPointerException is thrown.
+        mode.create(nullPath);
     }
 }
