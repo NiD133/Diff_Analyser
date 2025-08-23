@@ -1,82 +1,76 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.Chronology;
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.BuddhistChronology;
 import org.joda.time.chrono.ISOChronology;
 import org.joda.time.chrono.JulianChronology;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class StringConverterTestTest8 extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    private static final DateTimeZone ONE_HOUR = DateTimeZone.forOffsetHours(1);
+/**
+ * Tests for {@link StringConverter#getChronology(Object, Chronology)}.
+ * This test focuses on how the converter determines the correct Chronology
+ * based on the input string and a potentially provided Chronology.
+ */
+class StringConverterGetChronologyTest {
 
-    private static final DateTimeZone SIX = DateTimeZone.forOffsetHours(6);
-
-    private static final DateTimeZone SEVEN = DateTimeZone.forOffsetHours(7);
-
-    private static final DateTimeZone EIGHT = DateTimeZone.forOffsetHours(8);
-
-    private static final DateTimeZone UTC = DateTimeZone.UTC;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
+    private static final String DATE_TIME_WITH_ZONE = "2004-06-09T12:24:48.501+01:00";
+    private static final String DATE_TIME_WITHOUT_ZONE = "2004-06-09T12:24:48.501";
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
 
-    private static final Chronology ISO_EIGHT = ISOChronology.getInstance(EIGHT);
+    private DateTimeZone originalDefaultZone;
 
-    private static final Chronology ISO_PARIS = ISOChronology.getInstance(PARIS);
-
-    private static final Chronology ISO_LONDON = ISOChronology.getInstance(LONDON);
-
-    private static Chronology ISO;
-
-    private static Chronology JULIAN;
-
-    private DateTimeZone zone = null;
-
-    private Locale locale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestStringConverter.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        zone = DateTimeZone.getDefault();
-        locale = Locale.getDefault();
+    @BeforeEach
+    void setUp() {
+        // Save and set a specific default time zone to ensure tests are predictable.
+        originalDefaultZone = DateTimeZone.getDefault();
         DateTimeZone.setDefault(LONDON);
-        Locale.setDefault(Locale.UK);
-        JULIAN = JulianChronology.getInstance();
-        ISO = ISOChronology.getInstance();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeZone.setDefault(zone);
-        Locale.setDefault(locale);
-        zone = null;
+    @AfterEach
+    void tearDown() {
+        // Restore the original default time zone to avoid side effects on other tests.
+        DateTimeZone.setDefault(originalDefaultZone);
     }
 
-    public void testGetChronology_Object_Chronology() throws Exception {
-        assertEquals(JulianChronology.getInstance(LONDON), StringConverter.INSTANCE.getChronology("2004-06-09T12:24:48.501+01:00", JULIAN));
-        assertEquals(JulianChronology.getInstance(LONDON), StringConverter.INSTANCE.getChronology("2004-06-09T12:24:48.501", JULIAN));
-        assertEquals(ISOChronology.getInstance(LONDON), StringConverter.INSTANCE.getChronology("2004-06-09T12:24:48.501+01:00", (Chronology) null));
-        assertEquals(ISOChronology.getInstance(LONDON), StringConverter.INSTANCE.getChronology("2004-06-09T12:24:48.501", (Chronology) null));
+    @Test
+    void getChronology_whenChronologyIsProvided_returnsSameChronology() {
+        // Arrange
+        // The converter should return the provided chronology, ignoring the string's content.
+        Chronology expectedChronology = JulianChronology.getInstance(LONDON);
+
+        // Act & Assert
+        assertEquals(expectedChronology, StringConverter.INSTANCE.getChronology(DATE_TIME_WITH_ZONE, expectedChronology));
+        assertEquals(expectedChronology, StringConverter.INSTANCE.getChronology(DATE_TIME_WITHOUT_ZONE, expectedChronology));
+    }
+
+    @Test
+    void getChronology_whenChronologyIsNullAndStringHasZone_returnsISOChronologyWithParsedZone() {
+        // Arrange
+        // The string contains a zone offset "+01:00". For the given date in June,
+        // this corresponds to the LONDON zone (which is in British Summer Time, BST).
+        Chronology expectedChronology = ISOChronology.getInstance(LONDON);
+
+        // Act
+        Chronology actualChronology = StringConverter.INSTANCE.getChronology(DATE_TIME_WITH_ZONE, null);
+
+        // Assert
+        assertEquals(expectedChronology, actualChronology);
+    }
+
+    @Test
+    void getChronology_whenChronologyIsNullAndStringHasNoZone_returnsISOChronologyWithDefaultZone() {
+        // Arrange
+        // The default zone is set to LONDON in setUp().
+        Chronology expectedChronology = ISOChronology.getInstance(LONDON);
+
+        // Act
+        Chronology actualChronology = StringConverter.INSTANCE.getChronology(DATE_TIME_WITHOUT_ZONE, null);
+
+        // Assert
+        assertEquals(expectedChronology, actualChronology);
     }
 }
