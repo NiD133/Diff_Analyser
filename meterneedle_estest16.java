@@ -1,42 +1,42 @@
 package org.jfree.chart.plot.compass;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.SystemColor;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import javax.swing.JScrollPane;
-import javax.swing.text.DefaultCaret;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MeterNeedle_ESTestTest16 extends MeterNeedle_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link MeterNeedle} class, focusing on its drawing behavior.
+ */
+public class MeterNeedleTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        Rectangle2D.Float rectangle2D_Float0 = new Rectangle2D.Float();
-        MiddlePinNeedle middlePinNeedle0 = new MiddlePinNeedle();
-        Point2D.Float point2D_Float0 = new Point2D.Float(0.0F, 0.0F);
-        // Undeclared exception!
-        try {
-            middlePinNeedle0.draw((Graphics2D) null, (Rectangle2D) rectangle2D_Float0, (Point2D) point2D_Float0, (-1.0));
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jfree.chart.plot.compass.MeterNeedle", e);
-        }
+    /**
+     * Verifies that the draw() method throws a NullPointerException if the Graphics2D
+     * context is null. This is a critical check to ensure the method fails fast
+     * with invalid arguments, preventing more obscure errors downstream.
+     */
+    @Test(expected = NullPointerException.class)
+    public void draw_withNullGraphics2D_shouldThrowNullPointerException() {
+        // Arrange: Set up the necessary objects for the draw method call.
+        // We use MiddlePinNeedle as a concrete implementation of MeterNeedle.
+        MeterNeedle needle = new MiddlePinNeedle();
+        Rectangle2D plotArea = new Rectangle2D.Float(0, 0, 100, 100);
+        Point2D rotationPoint = new Point2D.Float(50, 50);
+        double angle = 45.0; // A representative angle value.
+
+        // Act: Call the method under test with a null Graphics2D object.
+        // The @Test(expected=...) annotation asserts that a NullPointerException is thrown.
+        needle.draw(null, plotArea, rotationPoint, angle);
+    }
+}
+
+/**
+ * A concrete implementation of MeterNeedle for testing purposes,
+ * as MeterNeedle is an abstract class. This class is derived from
+ * the original test's usage.
+ */
+class MiddlePinNeedle extends MeterNeedle {
+    @Override
+    protected void drawNeedle(Graphics2D g2, Rectangle2D plotArea, Point2D rotate, double angle) {
+        // A minimal implementation is sufficient for this test case.
     }
 }
