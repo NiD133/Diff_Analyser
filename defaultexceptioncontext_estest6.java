@@ -1,21 +1,26 @@
 package org.apache.commons.lang3.exception;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Set;
-import org.apache.commons.lang3.tuple.Pair;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DefaultExceptionContext_ESTestTest6 extends DefaultExceptionContext_ESTest_scaffolding {
+/**
+ * Tests for {@link DefaultExceptionContext}.
+ */
+public class DefaultExceptionContextTest {
 
-    @Test(timeout = 4000)
-    public void test5() throws Throwable {
-        DefaultExceptionContext defaultExceptionContext0 = new DefaultExceptionContext();
-        String string0 = defaultExceptionContext0.getFormattedExceptionMessage((String) null);
-        assertEquals("", string0);
+    /**
+     * Tests that getFormattedExceptionMessage returns an empty string when the base message is null
+     * and the context contains no values.
+     */
+    @Test
+    public void getFormattedExceptionMessage_withNullBaseMessageAndNoContext_returnsEmptyString() {
+        // Arrange
+        final DefaultExceptionContext context = new DefaultExceptionContext();
+
+        // Act
+        final String formattedMessage = context.getFormattedExceptionMessage(null);
+
+        // Assert
+        assertEquals("The formatted message should be an empty string.", "", formattedMessage);
     }
 }
