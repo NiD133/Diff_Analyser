@@ -1,31 +1,60 @@
 package org.mockito.internal.verification;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.mockito.internal.creation.MockSettingsImpl;
-import org.mockito.internal.invocation.InvocationMatcher;
-import org.mockito.internal.stubbing.InvocationContainerImpl;
 import org.mockito.internal.util.Timer;
-import org.mockito.internal.verification.api.VerificationData;
-import org.mockito.verification.After;
-import org.mockito.verification.Timeout;
 import org.mockito.verification.VerificationMode;
 
-public class VerificationOverTimeImpl_ESTestTest2 extends VerificationOverTimeImpl_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
-        After after0 = new After(2416L, noMoreInteractions0);
-        VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(5157L, 1L, after0, false);
-        Timer timer0 = verificationOverTimeImpl0.getTimer();
-        VerificationOverTimeImpl verificationOverTimeImpl1 = new VerificationOverTimeImpl(5157L, noMoreInteractions0, true, timer0);
-        verificationOverTimeImpl1.isReturnOnSuccess();
-        assertEquals(5157L, verificationOverTimeImpl1.getPollingPeriodMillis());
+/**
+ * Tests for {@link VerificationOverTimeImpl}.
+ */
+public class VerificationOverTimeImplTest {
+
+    /**
+     * Verifies that the constructor correctly initializes the object's properties
+     * when a pre-configured Timer instance is provided.
+     */
+    @Test
+    public void constructorWithTimerShouldSetPropertiesCorrectly() {
+        // Arrange
+        long expectedPollingPeriod = 500L;
+        long timerDuration = 100L;
+        boolean shouldReturnOnSuccess = true;
+
+        VerificationMode delegateMode = new NoMoreInteractions();
+        Timer timer = new Timer(timerDuration);
+
+        // Act
+        VerificationOverTimeImpl verificationOverTime = new VerificationOverTimeImpl(
+            expectedPollingPeriod,
+            delegateMode,
+            shouldReturnOnSuccess,
+            timer
+        );
+
+        // Assert
+        // Verify that all properties were set as expected by the constructor.
+        assertTrue(
+            "Should be configured to return on success",
+            verificationOverTime.isReturnOnSuccess()
+        );
+        assertEquals(
+            "Polling period should match the constructor argument",
+            expectedPollingPeriod,
+            verificationOverTime.getPollingPeriodMillis()
+        );
+        assertSame(
+            "Delegate verification mode should be the one passed to the constructor",
+            delegateMode,
+            verificationOverTime.getDelegate()
+        );
+        assertSame(
+            "Timer instance should be the one passed to the constructor",
+            timer,
+            verificationOverTime.getTimer()
+        );
     }
 }
