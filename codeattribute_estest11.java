@@ -1,38 +1,66 @@
 package org.apache.commons.compress.harmony.unpack200.bytecode;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.PipedOutputStream;
-import java.util.LinkedList;
-import java.util.List;
+import org.apache.commons.compress.harmony.pack200.Pack200Exception;
 import org.apache.commons.compress.harmony.unpack200.Segment;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CodeAttribute_ESTestTest11 extends CodeAttribute_ESTest_scaffolding {
+import java.util.Collections;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        int[] intArray0 = new int[0];
-        OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0);
-        byte[] byteArray0 = new byte[4];
-        LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-        linkedList0.add((ExceptionTableEntry) null);
-        CodeAttribute codeAttribute0 = new CodeAttribute((byte) 0, (byte) 0, byteArray0, (Segment) null, operandManager0, linkedList0);
-        // Undeclared exception!
-        try {
-            codeAttribute0.getNestedClassFileEntries();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.bytecode.CodeAttribute", e);
-        }
+/**
+ * Test cases for {@link CodeAttribute}.
+ * This improved version focuses on clarity and maintainability.
+ */
+public class CodeAttributeTest {
+
+    /**
+     * Tests that {@link CodeAttribute#getNestedClassFileEntries()} throws a NullPointerException
+     * when its exception table contains a null entry. The method is expected to iterate over
+     * the table and access each entry, which fails when an entry is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getNestedClassFileEntriesShouldThrowNPEWhenExceptionTableContainsNull() throws Pack200Exception {
+        // Arrange
+        // Create an exception table list containing a single null entry.
+        // This is the specific condition that should trigger the NullPointerException.
+        final List<ExceptionTableEntry> exceptionTableWithNull = Collections.singletonList(null);
+
+        // The CodeAttribute constructor requires an OperandManager and a code byte array.
+        // Their specific contents are not relevant to this test, so we provide minimal, valid instances.
+        final OperandManager operandManager = createEmptyOperandManager();
+        final byte[] packedCode = new byte[1]; // A minimal, non-empty code array.
+
+        final CodeAttribute codeAttribute = new CodeAttribute(
+            0, // maxStack
+            0, // maxLocals
+            packedCode,
+            null, // segment is not used in this path
+            operandManager,
+            exceptionTableWithNull
+        );
+
+        // Act & Assert
+        // This call is expected to throw a NullPointerException because the implementation
+        // will attempt to call a method on the null entry within the exception table.
+        // The @Test(expected=...) annotation handles the assertion.
+        codeAttribute.getNestedClassFileEntries();
+    }
+
+    /**
+     * Creates a default OperandManager with empty operand arrays.
+     * <p>
+     * This helper method encapsulates the verbose construction of an OperandManager,
+     * which is required by the CodeAttribute constructor but whose internal state
+     * is not relevant for this test.
+     * </p>
+     * @return A new OperandManager instance initialized with empty arrays.
+     */
+    private OperandManager createEmptyOperandManager() {
+        final int[] empty = new int[0];
+        // The OperandManager constructor requires 21 integer arrays.
+        return new OperandManager(
+            empty, empty, empty, empty, empty, empty, empty, empty, empty, empty,
+            empty, empty, empty, empty, empty, empty, empty, empty, empty, empty, empty
+        );
     }
 }
