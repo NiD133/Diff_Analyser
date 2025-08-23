@@ -1,71 +1,60 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
+
+import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.function.Consumer;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class FilterListIterator_ESTestTest27 extends FilterListIterator_ESTest_scaffolding {
+import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        linkedList0.listIterator(0);
-        Integer integer0 = new Integer(681);
-        linkedList0.offerLast(integer0);
-        ListIterator<Integer> listIterator0 = linkedList0.listIterator();
-        FilterListIterator<Object> filterListIterator0 = new FilterListIterator<Object>(listIterator0);
-        // Undeclared exception!
+/**
+ * Contains tests for {@link FilterListIterator}.
+ * This class focuses on improving the understandability of an auto-generated test case.
+ */
+public class FilterListIteratorTest {
+
+    /**
+     * Verifies that calling next() on a FilterListIterator throws a NullPointerException
+     * if the iterator was created without a predicate.
+     */
+    @Test
+    public void testNextThrowsNullPointerExceptionWhenPredicateIsNull() {
+        // Arrange: Create a source list and its iterator.
+        // The list must not be empty, so the iterator has an element to evaluate.
+        List<Integer> sourceList = new LinkedList<>(Arrays.asList(100));
+        ListIterator<Integer> sourceIterator = sourceList.listIterator();
+
+        // Instantiate FilterListIterator without providing a predicate.
+        // This leaves the internal 'predicate' field as null.
+        FilterListIterator<Integer> filterListIterator = new FilterListIterator<>(sourceIterator);
+
+        // Act & Assert: Expect a NullPointerException when next() is called.
+        // The iterator will try to invoke predicate.evaluate(), which fails.
+        assertThrows(NullPointerException.class, () -> {
+            filterListIterator.next();
+        });
+    }
+
+    /**
+     * This is an alternative implementation using a try-catch block, which can be
+     * more readable for developers less familiar with JUnit 5's assertThrows.
+     */
+    @Test
+    public void testNextThrowsNullPointerExceptionWhenPredicateIsNull_withTryCatch() {
+        // Arrange
+        List<Integer> sourceList = new LinkedList<>(Arrays.asList(100));
+        ListIterator<Integer> sourceIterator = sourceList.listIterator();
+        FilterListIterator<Integer> filterListIterator = new FilterListIterator<>(sourceIterator);
+
+        // Act & Assert
         try {
-            filterListIterator0.next();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.collections4.iterators.FilterListIterator", e);
+            filterListIterator.next();
+            fail("Expected a NullPointerException because no predicate was set, but no exception was thrown.");
+        } catch (final NullPointerException e) {
+            // This is the expected behavior, so the test passes.
         }
     }
 }
