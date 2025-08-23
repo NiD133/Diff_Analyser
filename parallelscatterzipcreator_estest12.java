@@ -1,51 +1,45 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.net.URI;
-import java.nio.file.Path;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import org.apache.commons.compress.archivers.jar.JarArchiveEntry;
-import org.apache.commons.compress.parallel.InputStreamSupplier;
-import org.apache.commons.compress.parallel.ScatterGatherBackingStoreSupplier;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.net.MockURI;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import java.io.File;
+import org.evosuite.runtime.mock.java.io.MockFile;
+
+// Note: The test class name, likely auto-generated, is misleading.
+// The tests within do not pertain to ParallelScatterZipCreator.
 public class ParallelScatterZipCreator_ESTestTest12 extends ParallelScatterZipCreator_ESTest_scaffolding {
 
+    /**
+     * Verifies that the ZipArchiveOutputStream constructor throws a NoClassDefFoundError
+     * when its static dependency, ZipEncodingHelper, fails to initialize.
+     *
+     * <p>This test case likely originates from an automated test generation tool (EvoSuite)
+     * and captures a specific, environment-dependent failure. In a typical development
+     * scenario, a NoClassDefFoundError would indicate a build or classpath issue rather
+     * than a bug in the code's logic. This test is preserved to document that specific
+     * failure mode.
+     */
     @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        ForkJoinPool forkJoinPool0 = ForkJoinPool.commonPool();
-        URI uRI0 = MockURI.aFileURI;
-        MockFile mockFile0 = new MockFile(uRI0);
-        mockFile0.renameTo(mockFile0);
-        Path path0 = mockFile0.toPath();
-        DefaultBackingStoreSupplier defaultBackingStoreSupplier0 = new DefaultBackingStoreSupplier(path0);
-        ParallelScatterZipCreator parallelScatterZipCreator0 = new ParallelScatterZipCreator(forkJoinPool0, defaultBackingStoreSupplier0, 0);
-        ZipArchiveOutputStream zipArchiveOutputStream0 = null;
+    public void zipArchiveOutputStreamConstructorFailsWhenDependencyInitializationFails() {
+        // Arrange: Create a mock file to pass to the constructor. No other setup is needed.
+        File dummyOutputFile = new MockFile("dummy.zip");
+
+        // Act & Assert: Expect a NoClassDefFoundError when instantiating the stream.
         try {
-            zipArchiveOutputStream0 = new ZipArchiveOutputStream(mockFile0, 0);
-            fail("Expecting exception: NoClassDefFoundError");
+            new ZipArchiveOutputStream(dummyOutputFile, 0);
+            fail("Expected a NoClassDefFoundError because a required class could not be initialized.");
         } catch (NoClassDefFoundError e) {
-            //
-            // Could not initialize class org.apache.commons.compress.archivers.zip.ZipEncodingHelper
-            //
-            verifyException("org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream", e);
+            // This error is expected in the specific test environment where the
+            // ZipEncodingHelper class fails its static initialization.
+            String message = e.getMessage();
+            assertNotNull("The error message should not be null.", message);
+            assertTrue(
+                "The error message should indicate a problem with ZipEncodingHelper. Actual: " + message,
+                message.contains("ZipEncodingHelper")
+            );
         }
     }
 }
