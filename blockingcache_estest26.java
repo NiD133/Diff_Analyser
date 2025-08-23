@@ -1,24 +1,32 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.CountDownLatch;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BlockingCache_ESTestTest26 extends BlockingCache_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        PerpetualCache perpetualCache0 = new PerpetualCache("x");
-        SoftCache softCache0 = new SoftCache(perpetualCache0);
-        BlockingCache blockingCache0 = new BlockingCache(softCache0);
-        blockingCache0.setTimeout(1L);
-        long long0 = blockingCache0.getTimeout();
-        assertEquals(1L, long0);
+/**
+ * Unit tests for the BlockingCache decorator.
+ */
+public class BlockingCacheTest {
+
+    /**
+     * Verifies that the timeout value can be set and then retrieved correctly.
+     */
+    @Test
+    public void shouldSetAndGetTimeout() {
+        // Arrange
+        // A simple delegate cache is sufficient for testing the timeout property.
+        Cache delegateCache = new PerpetualCache("test-delegate");
+        BlockingCache blockingCache = new BlockingCache(delegateCache);
+        long expectedTimeout = 1L;
+
+        // Act
+        blockingCache.setTimeout(expectedTimeout);
+        long actualTimeout = blockingCache.getTimeout();
+
+        // Assert
+        assertEquals("The retrieved timeout should match the value that was set.", expectedTimeout, actualTimeout);
     }
 }
