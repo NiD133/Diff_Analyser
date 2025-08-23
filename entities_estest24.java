@@ -1,30 +1,39 @@
 package org.jsoup.nodes;
 
+import org.jsoup.nodes.Document.OutputSettings;
+import org.jsoup.nodes.Entities.EscapeMode;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Entities_ESTestTest24 extends Entities_ESTest_scaffolding {
+/**
+ * Tests for the {@link Entities#escape(String, Document.OutputSettings)} method.
+ */
+public class EntitiesTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        Entities.EscapeMode entities_EscapeMode0 = Entities.EscapeMode.xhtml;
-        Document.OutputSettings document_OutputSettings1 = document_OutputSettings0.escapeMode(entities_EscapeMode0);
-        String string0 = Entities.escape("\"PvE5H.,d+SC ,Q,}'xM", document_OutputSettings1);
-        assertEquals("&quot;PvE5H.,d+SC ,Q,}&#x27;xM", string0);
+    /**
+     * Verifies that when using the XHTML escape mode, special characters like
+     * double quotes (") and single quotes (') are correctly escaped to their
+     * respective named or numeric entities.
+     */
+    @Test
+    public void escapeWithXhtmlModeEscapesQuotesAndApostrophes() {
+        // Arrange
+        // An input string containing characters that require escaping in XHTML.
+        String inputText = "\"PvE5H.,d+SC ,Q,}'xM";
+        
+        // Expected output where " is escaped to &quot; and ' is escaped to &#x27;
+        String expectedEscapedText = "&quot;PvE5H.,d+SC ,Q,}&#x27;xM";
+
+        // Configure the output settings to use the strict XHTML escape mode.
+        OutputSettings outputSettings = new OutputSettings();
+        outputSettings.escapeMode(EscapeMode.xhtml);
+
+        // Act
+        // Escape the input string using the configured settings.
+        String actualEscapedText = Entities.escape(inputText, outputSettings);
+
+        // Assert
+        // Check that the actual output matches the expected escaped string.
+        assertEquals(expectedEscapedText, actualEscapedText);
     }
 }
