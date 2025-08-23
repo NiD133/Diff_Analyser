@@ -1,45 +1,51 @@
 package org.joda.time;
 
+import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertSame;
 
-public class WeeksTestTest14 extends TestCase {
+/**
+ * Test suite for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    /**
+     * Verifies that deserializing a {@link Weeks} constant returns the canonical singleton instance.
+     * <p>
+     * The {@link Weeks} class pre-defines constants like {@link Weeks#ZERO}, {@link Weeks#ONE}, etc.
+     * To preserve the singleton pattern across serialization, the class implements the
+     * {@code readResolve()} method. This test ensures that when a constant like {@link Weeks#THREE}
+     * is serialized and then deserialized, the resulting object is the *same instance* as the
+     * original, not merely an equal one. This is confirmed using {@code assertSame}.
+     */
+    @Test
+    public void serializationOfConstant_shouldReturnSameInstance() throws IOException, ClassNotFoundException {
+        // Arrange: Use a pre-defined singleton constant from the Weeks class.
+        final Weeks originalInstance = Weeks.THREE;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+        // Act: Serialize the constant to a byte array.
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteStream)) {
+            objectOutputStream.writeObject(originalInstance);
+        }
+        byte[] serializedBytes = byteStream.toByteArray();
 
-    public static TestSuite suite() {
-        return new TestSuite(TestWeeks.class);
-    }
+        // Act: Deserialize the byte array back into an object.
+        Weeks deserializedInstance;
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(serializedBytes);
+             ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)) {
+            deserializedInstance = (Weeks) objectInputStream.readObject();
+        }
 
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    public void testSerialization() throws Exception {
-        Weeks test = Weeks.THREE;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(test);
-        oos.close();
-        byte[] bytes = baos.toByteArray();
-        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-        ObjectInputStream ois = new ObjectInputStream(bais);
-        Weeks result = (Weeks) ois.readObject();
-        ois.close();
-        assertSame(test, result);
+        // Assert: The deserialized object should be the exact same instance as the original.
+        assertSame(
+            "Deserialization of a Weeks constant should return the canonical singleton instance.",
+            originalInstance,
+            deserializedInstance
+        );
     }
 }
