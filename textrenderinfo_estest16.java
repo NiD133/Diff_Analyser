@@ -1,42 +1,55 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.util.Collections;
+
+import static org.junit.Assert.assertEquals;
+
+/**
+ * This test class contains tests for the TextRenderInfo class.
+ * Note: The original test was auto-generated and has been refactored for clarity.
+ */
 public class TextRenderInfo_ESTestTest16 extends TextRenderInfo_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        PdfDate pdfDate0 = new PdfDate();
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        graphicsState0.characterSpacing = (float) 7;
-        Stack<MarkedContentInfo> stack0 = new Stack<MarkedContentInfo>();
-        Matrix matrix0 = graphicsState0.getCtm();
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, stack0);
-        float float0 = textRenderInfo0.getUnscaledWidth();
-        assertEquals(63.0F, float0, 0.01F);
+    /**
+     * Tests that getUnscaledWidth() correctly calculates the total width of a string
+     * by factoring in the character spacing.
+     *
+     * <p>The test assumes a mock font where individual character widths are zero.
+     * Therefore, the total unscaled width is expected to be the number of characters
+     * multiplied by the character spacing value.</p>
+     */
+    @Test
+    public void getUnscaledWidth_withCharacterSpacing_returnsCorrectTotalWidth() {
+        // ARRANGE
+        final float CHARACTER_SPACING = 7.0f;
+        final String TEXT_CONTENT = "Test Text"; // 9 characters
+        final float EXPECTED_WIDTH = CHARACTER_SPACING * TEXT_CONTENT.length(); // 7.0f * 9 = 63.0f
+
+        // Set up a graphics state with a mock font and the specified character spacing.
+        GraphicsState graphicsState = new GraphicsState();
+        graphicsState.font = new CMapAwareDocumentFont(new PdfGState()); // A mock font with default (zero) widths.
+        graphicsState.characterSpacing = CHARACTER_SPACING;
+
+        PdfString textAsPdfString = new PdfString(TEXT_CONTENT);
+        Matrix identityMatrix = new Matrix();
+
+        TextRenderInfo renderInfo = new TextRenderInfo(
+                textAsPdfString,
+                graphicsState,
+                identityMatrix,
+                Collections.emptyList()
+        );
+
+        // ACT
+        float actualWidth = renderInfo.getUnscaledWidth();
+
+        // ASSERT
+        assertEquals("The unscaled width should be the sum of character spacings",
+                EXPECTED_WIDTH, actualWidth, 0.01f);
     }
 }
