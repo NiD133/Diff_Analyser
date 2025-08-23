@@ -1,27 +1,35 @@
 package com.fasterxml.jackson.core.json;
 
+import com.fasterxml.jackson.core.JsonStreamContext;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonFactoryBuilder;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonLocation;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.io.ContentReference;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonReadContext_ESTestTest44 extends JsonReadContext_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonReadContext} class, focusing on its initial state
+ * upon construction.
+ */
+public class JsonReadContextTest {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        JsonReadContext jsonReadContext0 = new JsonReadContext((JsonReadContext) null, (DupDetector) null, 2, 1, 0);
-        assertEquals(0, jsonReadContext0.getNestingDepth());
-        assertTrue(jsonReadContext0.inObject());
-        assertEquals(0, jsonReadContext0.getEntryCount());
+    /**
+     * Tests that a root-level object context is correctly initialized with expected default values
+     * when using its constructor. This verifies the initial nesting depth, context type, and entry count.
+     */
+    @Test
+    public void constructor_whenCreatingRootObjectContext_initializesStateCorrectly() {
+        // Arrange: Define clear and descriptive variables for constructor arguments.
+        final int expectedLineNumber = 1;
+        final int expectedColumnNumber = 0;
+
+        // Act: Create a new root-level object context.
+        // This test targets the constructor:
+        // JsonReadContext(JsonReadContext parent, DupDetector dups, int type, int lineNr, int colNr)
+        // We pass 'null' for the parent to signify a root context.
+        JsonReadContext context = new JsonReadContext(null, null, JsonStreamContext.TYPE_OBJECT,
+                expectedLineNumber, expectedColumnNumber);
+
+        // Assert: Verify the state of the newly created context.
+        assertEquals("Nesting depth for a root context should be 0", 0, context.getNestingDepth());
+        assertTrue("Context should be identified as an object", context.inObject());
+        assertEquals("A new context should have 0 entries", 0, context.getEntryCount());
     }
 }
