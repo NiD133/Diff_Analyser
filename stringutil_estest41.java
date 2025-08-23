@@ -1,28 +1,22 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class StringUtil_ESTestTest41 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for {@link StringUtil}.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        boolean boolean0 = StringUtil.isActuallyWhitespace((-5106));
-        assertFalse(boolean0);
+    @Test
+    public void isActuallyWhitespaceReturnsFalseForNegativeCodePoint() {
+        // Arrange: A negative integer is not a valid Unicode code point.
+        int invalidCodePoint = -1;
+
+        // Act: Check if the invalid code point is considered whitespace.
+        boolean isWhitespace = StringUtil.isActuallyWhitespace(invalidCodePoint);
+
+        // Assert: The result should be false.
+        assertFalse("A negative code point should not be considered whitespace", isWhitespace);
     }
 }
