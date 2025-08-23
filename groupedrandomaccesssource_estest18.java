@@ -1,29 +1,28 @@
 package com.itextpdf.text.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GroupedRandomAccessSource_ESTestTest18 extends GroupedRandomAccessSource_ESTest_scaffolding {
+/**
+ * Contains tests for the constructor of the {@link GroupedRandomAccessSource} class.
+ */
+public class GroupedRandomAccessSourceTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[0];
-        GroupedRandomAccessSource groupedRandomAccessSource0 = null;
-        try {
-            groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // -1
-            //
-            verifyException("com.itextpdf.text.io.GroupedRandomAccessSource", e);
-        }
+    /**
+     * Verifies that the {@link GroupedRandomAccessSource} constructor throws an
+     * {@link ArrayIndexOutOfBoundsException} when initialized with an empty array of sources.
+     * <p>
+     * This is an important edge case, as the constructor logic attempts to access
+     * the last element of the sources array to set an initial internal state, which is
+     * not possible for an empty array.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void constructor_whenGivenEmptySourceArray_throwsArrayIndexOutOfBoundsException() throws IOException {
+        // Arrange: Create an empty array of sources.
+        RandomAccessSource[] emptySources = new RandomAccessSource[0];
+
+        // Act & Assert: Attempt to create a GroupedRandomAccessSource with the empty array.
+        // The test will pass if an ArrayIndexOutOfBoundsException is thrown, and fail otherwise.
+        new GroupedRandomAccessSource(emptySources);
     }
 }
