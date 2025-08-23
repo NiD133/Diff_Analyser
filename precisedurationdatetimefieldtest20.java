@@ -1,265 +1,163 @@
 package org.joda.time.field;
 
-import java.util.Arrays;
-import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
 import org.joda.time.TimeOfDay;
 import org.joda.time.chrono.ISOChronology;
+import org.junit.Before;
+import org.junit.Test;
 
-public class PreciseDurationDateTimeFieldTestTest20 extends TestCase {
+import static org.junit.Assert.assertArrayEquals;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+/**
+ * Unit tests for the add(ReadablePartial, ...) method in BaseDateTimeField.
+ *
+ * This test class focuses on the cascading add/subtract logic for a field within a partial instant.
+ * The field under test is a mock "second of minute" field, and the partial is a TimeOfDay.
+ * The tests verify that adding or subtracting seconds correctly handles carry-over and borrow
+ * operations with the minute and hour fields.
+ */
+public class PreciseDurationDateTimeFieldAddPartialTest {
+
+    // The index of the 'secondOfMinute' field in a TimeOfDay partial's values array.
+    private static final int SECOND_OF_MINUTE_FIELD_INDEX = 2;
+
+    // The subject under test (SUT). A mock field representing 'secondOfMinute'.
+    private BaseDateTimeField secondOfMinuteField;
+
+    @Before
+    public void setUp() {
+        // The method under test, BaseDateTimeField.add(ReadablePartial, ...),
+        // primarily relies on getMaximumValue() and getMinimumValue() to perform
+        // its cascading logic. This mock provides the necessary behavior.
+        secondOfMinuteField = new MockSecondOfMinuteField();
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestPreciseDurationDateTimeField.class);
+    @Test
+    public void add_whenAmountIsZero_shouldNotChangeValues() {
+        // Arrange
+        int[] initialTime = {10, 20, 30, 40}; // 10:20:30.040
+        int[] expectedTime = {10, 20, 30, 40};
+
+        // Act
+        int[] actualTime = secondOfMinuteField.add(new TimeOfDay(), SECOND_OF_MINUTE_FIELD_INDEX, initialTime, 0);
+
+        // Assert
+        assertArrayEquals(expectedTime, actualTime);
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void add_whenAmountIsPositiveWithoutCarry_shouldIncrementField() {
+        // Arrange
+        int[] initialTime = {10, 20, 30, 40}; // 10:20:30.040
+        int[] expectedTime = {10, 20, 31, 40}; // Expect 10:20:31.040
+
+        // Act
+        int[] actualTime = secondOfMinuteField.add(new TimeOfDay(), SECOND_OF_MINUTE_FIELD_INDEX, initialTime, 1);
+
+        // Assert
+        assertArrayEquals(expectedTime, actualTime);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @Test
+    public void add_whenAmountIsPositiveWithCarry_shouldRollOverToNextField() {
+        // Arrange
+        // Adding 30 seconds to 10:20:30 should result in 10:21:00
+        int[] initialTime = {10, 20, 30, 40};
+        int[] expectedTime = {10, 21, 0, 40};
+
+        // Act
+        int[] actualTime = secondOfMinuteField.add(new TimeOfDay(), SECOND_OF_MINUTE_FIELD_INDEX, initialTime, 30);
+
+        // Assert
+        assertArrayEquals(expectedTime, actualTime);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void add_whenAmountCausesOverflow_shouldThrowException() {
+        // Arrange
+        // Adding 30 seconds to 23:59:30 would roll over past 23:59:59, which is invalid for TimeOfDay.
+        int[] initialTime = {23, 59, 30, 40};
+
+        // Act: This should throw an exception as the hour field would overflow.
+        secondOfMinuteField.add(new TimeOfDay(), SECOND_OF_MINUTE_FIELD_INDEX, initialTime, 30);
+    }
+
+    @Test
+    public void add_whenAmountIsNegativeWithoutBorrow_shouldDecrementField() {
+        // Arrange
+        int[] initialTime = {10, 20, 30, 40}; // 10:20:30.040
+        int[] expectedTime = {10, 20, 29, 40}; // Expect 10:20:29.040
+
+        // Act
+        int[] actualTime = secondOfMinuteField.add(new TimeOfDay(), SECOND_OF_MINUTE_FIELD_INDEX, initialTime, -1);
+
+        // Assert
+        assertArrayEquals(expectedTime, actualTime);
+    }
+
+    @Test
+    public void add_whenAmountIsNegativeWithBorrow_shouldRollUnderFromNextField() {
+        // Arrange
+        // Subtracting 31 seconds from 10:20:30 should result in 10:19:59
+        int[] initialTime = {10, 20, 30, 40};
+        int[] expectedTime = {10, 19, 59, 40};
+
+        // Act
+        int[] actualTime = secondOfMinuteField.add(new TimeOfDay(), SECOND_OF_MINUTE_FIELD_INDEX, initialTime, -31);
+
+        // Assert
+        assertArrayEquals(expectedTime, actualTime);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void add_whenAmountCausesUnderflow_shouldThrowException() {
+        // Arrange
+        // Subtracting 31 seconds from 00:00:30 would roll under past 00:00:00, which is invalid.
+        int[] initialTime = {0, 0, 30, 40};
+
+        // Act: This should throw an exception as the hour field would underflow.
+        secondOfMinuteField.add(new TimeOfDay(), SECOND_OF_MINUTE_FIELD_INDEX, initialTime, -31);
     }
 
     //-----------------------------------------------------------------------
-    static class MockPreciseDurationDateTimeField extends PreciseDurationDateTimeField {
+    // Mock classes for the test
+    //-----------------------------------------------------------------------
 
-        protected MockPreciseDurationDateTimeField() {
-            super(DateTimeFieldType.secondOfMinute(), new MockCountingDurationField(DurationFieldType.seconds()));
+    /**
+     * A simplified mock of a "second of minute" field.
+     * It extends PreciseDurationDateTimeField to gain access to the method under test,
+     * which is actually the final method BaseDateTimeField.add(ReadablePartial, ...).
+     */
+    private static class MockSecondOfMinuteField extends PreciseDurationDateTimeField {
+
+        protected MockSecondOfMinuteField() {
+            // The constructor requires a precise duration field. We use seconds() as it's appropriate.
+            super(DateTimeFieldType.secondOfMinute(), ISOChronology.getInstanceUTC().seconds());
         }
 
-        protected MockPreciseDurationDateTimeField(DateTimeFieldType type, DurationField dur) {
-            super(type, dur);
-        }
-
+        // The method under test does not use get() or set(), so these can be stubbed.
         @Override
         public int get(long instant) {
-            return (int) (instant / 60L);
+            return 0; // Not used in these tests
         }
+
 
         @Override
-        public DurationField getRangeDurationField() {
-            return new MockCountingDurationField(DurationFieldType.minutes());
+        public long set(long instant, int value) {
+            return 0; // Not used in these tests
         }
 
+        // This is used by the add logic to handle wrapping. For seconds, the max is 59.
         @Override
         public int getMaximumValue() {
             return 59;
         }
-    }
 
-    static class MockStandardBaseDateTimeField extends MockPreciseDurationDateTimeField {
-
-        protected MockStandardBaseDateTimeField() {
-            super();
-        }
-
-        @Override
-        public DurationField getDurationField() {
-            return ISOChronology.getInstanceUTC().seconds();
-        }
-
+        // This is used by the add logic to determine the range for carry-over.
         @Override
         public DurationField getRangeDurationField() {
             return ISOChronology.getInstanceUTC().minutes();
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockCountingDurationField extends BaseDurationField {
-
-        static int add_int = 0;
-
-        static int add_long = 0;
-
-        static int difference_long = 0;
-
-        protected MockCountingDurationField(DurationFieldType type) {
-            super(type);
-        }
-
-        @Override
-        public boolean isPrecise() {
-            return true;
-        }
-
-        @Override
-        public long getUnitMillis() {
-            return 60;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            add_int++;
-            return instant + (value * 60L);
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            add_long++;
-            return instant + (value * 60L);
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            difference_long++;
-            return 30;
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockZeroDurationField extends BaseDurationField {
-
-        protected MockZeroDurationField(DurationFieldType type) {
-            super(type);
-        }
-
-        @Override
-        public boolean isPrecise() {
-            return true;
-        }
-
-        @Override
-        public long getUnitMillis() {
-            // this is zero
-            return 0;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            return 0;
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            return 0;
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockImpreciseDurationField extends BaseDurationField {
-
-        protected MockImpreciseDurationField(DurationFieldType type) {
-            super(type);
-        }
-
-        @Override
-        public boolean isPrecise() {
-            // this is false
-            return false;
-        }
-
-        @Override
-        public long getUnitMillis() {
-            return 0;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            return 0;
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            return 0;
-        }
-    }
-
-    public void test_add_RP_int_intarray_int() {
-        int[] values = new int[] { 10, 20, 30, 40 };
-        int[] expected = new int[] { 10, 20, 30, 40 };
-        BaseDateTimeField field = new MockStandardBaseDateTimeField();
-        int[] result = field.add(new TimeOfDay(), 2, values, 0);
-        assertEquals(true, Arrays.equals(expected, result));
-        values = new int[] { 10, 20, 30, 40 };
-        expected = new int[] { 10, 20, 31, 40 };
-        result = field.add(new TimeOfDay(), 2, values, 1);
-        assertEquals(true, Arrays.equals(expected, result));
-        values = new int[] { 10, 20, 30, 40 };
-        expected = new int[] { 10, 21, 0, 40 };
-        result = field.add(new TimeOfDay(), 2, values, 30);
-        assertEquals(true, Arrays.equals(expected, result));
-        values = new int[] { 23, 59, 30, 40 };
-        try {
-            field.add(new TimeOfDay(), 2, values, 30);
-            fail();
-        } catch (IllegalArgumentException ex) {
-        }
-        values = new int[] { 10, 20, 30, 40 };
-        expected = new int[] { 10, 20, 29, 40 };
-        result = field.add(new TimeOfDay(), 2, values, -1);
-        assertEquals(true, Arrays.equals(expected, result));
-        values = new int[] { 10, 20, 30, 40 };
-        expected = new int[] { 10, 19, 59, 40 };
-        result = field.add(new TimeOfDay(), 2, values, -31);
-        assertEquals(true, Arrays.equals(expected, result));
-        values = new int[] { 0, 0, 30, 40 };
-        try {
-            field.add(new TimeOfDay(), 2, values, -31);
-            fail();
-        } catch (IllegalArgumentException ex) {
         }
     }
 }
