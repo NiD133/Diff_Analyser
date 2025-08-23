@@ -1,19 +1,34 @@
 package org.jfree.chart.axis;
 
-import java.util.TimeZone;
 import org.jfree.chart.TestUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class QuarterDateFormatTestTest4 {
+import java.util.TimeZone;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+/**
+ * Serialization tests for the {@link QuarterDateFormat} class.
+ */
+@DisplayName("QuarterDateFormat Serialization")
+class QuarterDateFormatSerializationTest {
 
     /**
-     * Serialize an instance, restore it, and check for equality.
+     * Verifies that a QuarterDateFormat instance remains equal to the original
+     * after serialization and subsequent deserialization.
      */
     @Test
-    public void testSerialization() {
-        QuarterDateFormat qf1 = new QuarterDateFormat(TimeZone.getTimeZone("GMT"), new String[] { "1", "2", "3", "4" });
-        QuarterDateFormat qf2 = TestUtils.serialised(qf1);
-        assertEquals(qf1, qf2);
+    @DisplayName("An object should be equal to its deserialized copy")
+    void objectShouldBeEqualAfterSerializationAndDeserialization() {
+        // Arrange: Create a formatter with a specific timezone and quarter symbols.
+        TimeZone gmt = TimeZone.getTimeZone("GMT");
+        QuarterDateFormat originalFormatter = new QuarterDateFormat(gmt, QuarterDateFormat.REGULAR_QUARTERS);
+
+        // Act: Serialize the original object and then deserialize it back.
+        QuarterDateFormat deserializedFormatter = (QuarterDateFormat) TestUtils.serialised(originalFormatter);
+
+        // Assert: The deserialized object should be equal to the original.
+        assertEquals(originalFormatter, deserializedFormatter, "The deserialized object should be equal to the original.");
     }
 }
