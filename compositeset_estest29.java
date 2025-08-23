@@ -1,81 +1,41 @@
 package org.apache.commons.collections4.set;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
+
+import java.util.HashSet;
 import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class CompositeSet_ESTestTest29 extends CompositeSet_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        UniquePredicate<Integer> uniquePredicate0 = new UniquePredicate<Integer>();
-        assertNotNull(uniquePredicate0);
-        LinkedHashSet<Object> linkedHashSet0 = new LinkedHashSet<Object>();
-        assertNotNull(linkedHashSet0);
-        assertTrue(linkedHashSet0.isEmpty());
-        assertEquals(0, linkedHashSet0.size());
-        boolean boolean0 = linkedHashSet0.add(uniquePredicate0);
-        assertEquals(1, linkedHashSet0.size());
-        assertFalse(linkedHashSet0.isEmpty());
-        assertTrue(boolean0);
-        CompositeSet<Object> compositeSet0 = new CompositeSet<Object>(linkedHashSet0);
-        assertNotNull(compositeSet0);
-        assertEquals(1, linkedHashSet0.size());
-        assertFalse(linkedHashSet0.isEmpty());
-        boolean boolean1 = compositeSet0.containsAll(linkedHashSet0);
-        assertEquals(1, linkedHashSet0.size());
-        assertFalse(linkedHashSet0.isEmpty());
-        assertTrue(boolean1 == boolean0);
-        assertTrue(boolean1);
-        // Undeclared exception!
+public class CompositeSetRefactoredTest {
+
+    /**
+     * Tests that addComposited() throws an UnsupportedOperationException when
+     * adding a set that has elements in common with an existing set in the composite,
+     * and no SetMutator has been configured to resolve the collision.
+     */
+    @Test
+    public void addComposited_shouldThrowUnsupportedOperationException_forCollisionWithoutMutator() {
+        // Arrange
+        // Create a composite set containing a set with one element.
+        Set<String> set1 = new HashSet<>();
+        set1.add("collision_element");
+        CompositeSet<String> compositeSet = new CompositeSet<>(set1);
+
+        // Create a second set that also contains the same element. This will cause a collision.
+        Set<String> set2 = new HashSet<>();
+        set2.add("collision_element");
+
+        // Act & Assert
         try {
-            compositeSet0.addComposited((Set<Object>) linkedHashSet0);
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // Collision adding composited set with no SetMutator set
-            //
-            verifyException("org.apache.commons.collections4.set.CompositeSet", e);
+            // Attempt to add the second set, which should trigger the collision.
+            compositeSet.addComposited(set2);
+            fail("Expected an UnsupportedOperationException because a collision occurred without a SetMutator.");
+        } catch (final UnsupportedOperationException e) {
+            // Verify that the exception was thrown for the expected reason.
+            final String expectedMessage = "Collision adding composited set with no SetMutator set";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
