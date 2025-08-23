@@ -1,19 +1,22 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class URLCodec_ESTestTest48 extends URLCodec_ESTest_scaffolding {
+/**
+ * Contains tests for the static methods of the {@link URLCodec} class.
+ */
+public class URLCodecStaticTest {
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        byte[] byteArray0 = URLCodec.decodeUrl((byte[]) null);
-        assertNull(byteArray0);
+    @Test
+    public void decodeUrlShouldReturnNullForNullInput() {
+        // The static decodeUrl method is expected to handle a null input
+        // gracefully by returning null, without throwing an exception.
+
+        // Act
+        final byte[] result = URLCodec.decodeUrl(null);
+
+        // Assert
+        assertNull("Decoding a null byte array should result in null.", result);
     }
 }
