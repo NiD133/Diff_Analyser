@@ -1,47 +1,41 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TextHelpAppendable_ESTestTest5 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Tests for {@link TextHelpAppendable}.
+ * This class focuses on the writeColumnQueues method.
+ */
+// The original test class name "TextHelpAppendable_ESTestTest5" was likely auto-generated.
+// A more descriptive name like "TextHelpAppendableTest" would be better.
+public class TextHelpAppendableTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        LinkedList<Queue<String>> linkedList0 = new LinkedList<Queue<String>>();
-        Vector<TextStyle> vector0 = new Vector<TextStyle>();
-        textHelpAppendable0.writeColumnQueues(linkedList0, vector0);
-        assertEquals(1, textHelpAppendable0.getLeftPad());
-        assertEquals(3, textHelpAppendable0.getIndent());
-        assertEquals(74, textHelpAppendable0.getMaxWidth());
+    /**
+     * Verifies that calling writeColumnQueues with empty lists does not cause errors
+     * and does not alter the configuration of the TextHelpAppendable instance.
+     */
+    @Test
+    public void writeColumnQueuesWithEmptyInputsShouldBeANoOp() throws IOException {
+        // Arrange: Create a TextHelpAppendable instance with default settings.
+        // The method under test should not produce any output with empty inputs,
+        // so using systemOut() is safe and simple.
+        final TextHelpAppendable helpAppendable = TextHelpAppendable.systemOut();
+        final List<Queue<String>> emptyColumnQueues = Collections.emptyList();
+        final List<TextStyle> emptyStyles = Collections.emptyList();
+
+        // Act: Call the method with empty lists for columns and styles.
+        helpAppendable.writeColumnQueues(emptyColumnQueues, emptyStyles);
+
+        // Assert: Verify that the properties of the helpAppendable instance remain
+        // unchanged and equal to their default values.
+        assertEquals("Left pad should remain at default", TextHelpAppendable.DEFAULT_LEFT_PAD, helpAppendable.getLeftPad());
+        assertEquals("Indent should remain at default", TextHelpAppendable.DEFAULT_INDENT, helpAppendable.getIndent());
+        assertEquals("Max width should remain at default", TextHelpAppendable.DEFAULT_WIDTH, helpAppendable.getMaxWidth());
     }
 }
