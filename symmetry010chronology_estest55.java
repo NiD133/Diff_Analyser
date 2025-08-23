@@ -1,52 +1,33 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
+
 import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.junit.runner.RunWith;
 
-public class Symmetry010Chronology_ESTestTest55 extends Symmetry010Chronology_ESTest_scaffolding {
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test54() throws Throwable {
-        Symmetry010Chronology symmetry010Chronology0 = new Symmetry010Chronology();
-        // Undeclared exception!
+/**
+ * Unit tests for the {@link Symmetry010Chronology} class.
+ */
+public class Symmetry010ChronologyTest {
+
+    @Test
+    public void date_shouldThrowException_whenDayOfMonthIsInvalid() {
+        // Arrange: The Symmetry010 calendar has 31 days in May.
+        // We will attempt to create a date with an invalid day, 35.
+        Symmetry010Chronology chronology = Symmetry010Chronology.INSTANCE;
+        int year = 5;
+        int month = 5; // May
+        int invalidDayOfMonth = 35;
+
+        // Act & Assert
         try {
-            symmetry010Chronology0.date(5, 5, 35);
-            fail("Expecting exception: DateTimeException");
-        } catch (DateTimeException e) {
-            //
-            // Invalid date: 5/5/35
-            //
-            verifyException("org.threeten.extra.chrono.Symmetry010Date", e);
+            chronology.date(year, month, invalidDayOfMonth);
+            fail("Expected a DateTimeException to be thrown for an invalid day of the month, but it was not.");
+        } catch (DateTimeException expectedException) {
+            // Success: The expected exception was correctly thrown.
+            // For a more robust test, we could also assert the exception message, e.g.:
+            // assertTrue(expectedException.getMessage().contains("Invalid value for DayOfMonth"));
         }
     }
 }
