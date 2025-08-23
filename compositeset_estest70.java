@@ -1,58 +1,49 @@
 package org.apache.commons.collections4.set;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+import java.util.HashSet;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+
+/**
+ * This class contains the improved test case for the CompositeSet.
+ * The original test class name and inheritance are kept for context,
+ * but in a real-world scenario, they would likely be refactored.
+ */
 public class CompositeSet_ESTestTest70 extends CompositeSet_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test69() throws Throwable {
-        CompositeSet<Object> compositeSet0 = new CompositeSet<Object>();
-        Set<Object> set0 = compositeSet0.toSet();
-        compositeSet0.addComposited(set0, set0);
-        Set<Integer>[] setArray0 = (Set<Integer>[]) Array.newInstance(Set.class, 3);
-        Object[] objectArray0 = compositeSet0.toArray((Object[]) setArray0);
-        assertEquals(3, objectArray0.length);
+    /**
+     * Tests that calling toArray(T[] array) on an empty CompositeSet
+     * with an array larger than the set's size (0) returns the original array instance.
+     * It also verifies that the element at index 0 of the array is set to null,
+     * as per the Collection.toArray(T[]) contract.
+     */
+    @Test
+    public void toArrayWithSufficientlyLargeArrayOnEmptySetShouldReturnTheGivenArray() {
+        // Arrange
+        // Create a composite set that is empty of elements, but contains two empty component sets.
+        CompositeSet<String> emptyCompositeSet = new CompositeSet<>(new HashSet<>(), new HashSet<>());
+
+        // Create a destination array that is larger than the composite set's size (0).
+        // Initialize an element to ensure it gets nulled out by the toArray call.
+        String[] destinationArray = {"should be overwritten", "b", "c"};
+
+        // Act
+        String[] resultArray = emptyCompositeSet.toArray(destinationArray);
+
+        // Assert
+        // 1. The method should return the same array instance that was passed in.
+        assertSame("The returned array should be the same instance as the destination array",
+                     destinationArray, resultArray);
+
+        // 2. The length of the array should be unchanged.
+        assertEquals("The array length should not change", 3, resultArray.length);
+
+        // 3. Per the toArray(T[]) contract, the element at index 'size' (which is 0)
+        //    should be set to null.
+        assertNull("The element at index 0 should be nulled out", resultArray[0]);
     }
 }
