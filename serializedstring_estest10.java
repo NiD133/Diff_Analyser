@@ -1,27 +1,28 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SerializedString_ESTestTest10 extends SerializedString_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SerializedString} class.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("");
-        String string0 = serializedString0.getValue();
-        assertEquals("", string0);
+    /**
+     * Verifies that the {@link SerializedString#getValue()} method
+     * returns the original string value it was constructed with.
+     * This test specifically uses an empty string as input.
+     */
+    @Test
+    public void getValueShouldReturnTheOriginalEmptyString() {
+        // Arrange: Create a SerializedString with an empty string.
+        String expectedValue = "";
+        SerializedString serializedString = new SerializedString(expectedValue);
+
+        // Act: Retrieve the value from the SerializedString.
+        String actualValue = serializedString.getValue();
+
+        // Assert: The retrieved value should be identical to the original.
+        assertEquals(expectedValue, actualValue);
     }
 }
