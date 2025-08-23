@@ -1,44 +1,37 @@
 package com.itextpdf.text.xml.xmp;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.awt.AsianFontMapper;
-import com.itextpdf.awt.DefaultFontMapper;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfDocument;
-import com.itextpdf.text.pdf.PdfName;
-import com.itextpdf.text.pdf.PdfObject;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.xmp.XMPMeta;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-import javax.swing.DebugGraphics;
-import javax.swing.DropMode;
-import javax.swing.JTree;
-import javax.swing.tree.TreeModel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
+import static org.junit.Assert.assertNotNull;
+
+/**
+ * Contains tests for the {@link XmpWriter} constructor.
+ */
+// The original test class name and inheritance are preserved as per the request.
+// In a real-world scenario, this class would likely be named XmpWriterTest.
 public class XmpWriter_ESTestTest32 extends XmpWriter_ESTest_scaffolding {
 
+    /**
+     * Verifies that the XmpWriter constructor does not throw an exception when provided
+     * with a null output stream and a negative padding value. This tests the constructor's
+     * robustness with potentially invalid inputs.
+     */
     @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        XmpWriter xmpWriter0 = new XmpWriter((OutputStream) null, "UTF-16LE", (-1912709396));
+    public void constructorShouldSucceedWithNullStreamAndNegativePadding() throws IOException {
+        // Arrange
+        OutputStream nullOutputStream = null;
+        String encoding = "UTF-16LE";
+        int negativePadding = -1;
+
+        // Act
+        XmpWriter xmpWriter = new XmpWriter(nullOutputStream, encoding, negativePadding);
+
+        // Assert
+        // The primary test is that the constructor call above does not throw an exception.
+        // This explicit assertion confirms that the object was created successfully.
+        assertNotNull("The XmpWriter instance should not be null.", xmpWriter);
     }
 }
