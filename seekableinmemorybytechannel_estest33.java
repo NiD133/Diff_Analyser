@@ -1,22 +1,26 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.SeekableByteChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SeekableInMemoryByteChannel_ESTestTest33 extends SeekableInMemoryByteChannel_ESTest_scaffolding {
+/**
+ * Tests for {@link SeekableInMemoryByteChannel}.
+ */
+public class SeekableInMemoryByteChannelTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel();
-        long long0 = seekableInMemoryByteChannel0.position();
-        assertEquals(0L, long0);
+    /**
+     * Verifies that a newly created channel using the default constructor
+     * has an initial position of 0.
+     */
+    @Test
+    public void newChannelShouldHavePositionZero() {
+        // Arrange: Create a new, empty channel.
+        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel();
+
+        // Act: Get the channel's position.
+        long position = channel.position();
+
+        // Assert: The initial position should be 0.
+        assertEquals(0L, position);
     }
 }
