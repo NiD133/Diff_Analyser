@@ -1,18 +1,35 @@
 package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Vector_ESTestTest8 extends Vector_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Vector} class.
+ */
+public class VectorTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        Vector vector0 = new Vector((-1465.0F), (-1465.0F), 1);
-        float float0 = vector0.lengthSquared();
-        assertEquals(4292451.0F, float0, 0.01F);
+    /**
+     * Verifies that the lengthSquared() method correctly calculates the sum of the squares
+     * of the vector's components. The test uses negative coordinates to ensure they are
+     * handled correctly.
+     */
+    @Test
+    public void lengthSquared_shouldReturnSumOfSquaresOfComponents() {
+        // Arrange: Define the vector's components and create the vector instance.
+        float x = -1465.0F;
+        float y = -1465.0F;
+        float z = 1.0F;
+        Vector vector = new Vector(x, y, z);
+
+        // Calculate the expected result explicitly to make the test's logic transparent.
+        // The expected squared length is x² + y² + z².
+        float expectedLengthSquared = (x * x) + (y * y) + (z * z);
+
+        // Act: Call the method under test.
+        float actualLengthSquared = vector.lengthSquared();
+
+        // Assert: Verify that the actual result matches the expected result.
+        // A small delta is used for floating-point comparisons to account for precision errors.
+        assertEquals(expectedLengthSquared, actualLengthSquared, 0.01F);
     }
 }
