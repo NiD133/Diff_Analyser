@@ -1,18 +1,22 @@
 package com.google.gson;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Field;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class FieldNamingPolicy_ESTestTest8 extends FieldNamingPolicy_ESTest_scaffolding {
+/**
+ * Tests for the helper methods in {@link FieldNamingPolicy}.
+ */
+public class FieldNamingPolicyTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        String string0 = FieldNamingPolicy.upperCaseFirstLetter("");
-        assertEquals("", string0);
+    @Test
+    public void upperCaseFirstLetter_withEmptyString_returnsEmptyString() {
+        // Arrange
+        String emptyString = "";
+
+        // Act
+        String result = FieldNamingPolicy.upperCaseFirstLetter(emptyString);
+
+        // Assert
+        assertEquals("The method should return an empty string when the input is empty.", "", result);
     }
 }
