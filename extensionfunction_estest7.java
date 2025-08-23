@@ -1,48 +1,43 @@
 package org.apache.commons.jxpath.ri.compiler;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.apache.commons.jxpath.BasicNodeSet;
-import org.apache.commons.jxpath.Function;
-import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.commons.jxpath.ri.NamespaceResolver;
 import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.axes.InitialContext;
-import org.apache.commons.jxpath.ri.axes.NodeSetContext;
-import org.apache.commons.jxpath.ri.axes.RootContext;
-import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+/**
+ * Contains tests for the {@link ExtensionFunction} class.
+ */
 public class ExtensionFunction_ESTestTest7 extends ExtensionFunction_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        QName qName0 = new QName("N(", "N(");
-        Double double0 = Expression.NOT_A_NUMBER;
-        Constant constant0 = new Constant(double0);
-        CoreOperationNegate coreOperationNegate0 = new CoreOperationNegate(constant0);
-        Expression[] expressionArray0 = new Expression[1];
-        coreOperationNegate0.args = expressionArray0;
-        expressionArray0[0] = (Expression) coreOperationNegate0;
-        ExtensionFunction extensionFunction0 = new ExtensionFunction(qName0, expressionArray0);
-        // Undeclared exception!
-        try {
-            extensionFunction0.compute((EvalContext) null);
-            fail("Expecting exception: StackOverflowError");
-        } catch (StackOverflowError e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Tests that calling compute() on an ExtensionFunction with a circularly referenced
+     * argument expression results in a StackOverflowError. This simulates an
+     * infinitely recursive expression evaluation.
+     */
+    @Test(timeout = 4000, expected = StackOverflowError.class)
+    public void computeWithCircularArgumentShouldThrowStackOverflowError() {
+        // Arrange: Create an expression that contains itself as an argument, forming a circular reference.
+        // We use CoreOperationNegate as a concrete Expression subclass for this setup.
+        CoreOperationNegate selfReferencingExpression = new CoreOperationNegate(new Constant(0));
+
+        // To create the circular reference, we must manipulate the internal 'args' array.
+        // 1. Create an array that will hold the arguments.
+        Expression[] arguments = new Expression[1];
+
+        // 2. Point the expression's internal argument list to our new array.
+        //    This is a white-box approach necessary for this specific test scenario.
+        selfReferencingExpression.args = arguments;
+
+        // 3. Place the expression itself into its own argument list, completing the cycle.
+        arguments[0] = selfReferencingExpression;
+
+        // Now, create the ExtensionFunction with this problematic, recursive argument.
+        QName functionName = new QName("test", "recursive-function");
+        ExtensionFunction extensionFunction = new ExtensionFunction(functionName, arguments);
+
+        // Act: Attempt to compute the value of the function.
+        // This will trigger an infinite recursion while trying to evaluate the
+        // self-referencing argument, which is expected to throw a StackOverflowError.
+        extensionFunction.compute(null); // EvalContext is not relevant for triggering the error.
     }
 }
