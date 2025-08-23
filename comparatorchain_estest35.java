@@ -1,35 +1,31 @@
 package org.apache.commons.collections4.comparators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
-import java.util.BitSet;
+import static org.junit.Assert.assertEquals;
 import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+/**
+ * Contains tests for the {@link ComparatorChain} class, focusing on its size management.
+ * The test class name and inheritance are preserved from the original auto-generated code.
+ */
 public class ComparatorChain_ESTestTest35 extends ComparatorChain_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        ToIntFunction<Integer> toIntFunction0 = (ToIntFunction<Integer>) mock(ToIntFunction.class, new ViolatedAssumptionAnswer());
-        Comparator<Integer> comparator0 = Comparator.comparingInt((ToIntFunction<? super Integer>) toIntFunction0);
-        ComparatorChain<Integer> comparatorChain0 = new ComparatorChain<Integer>(comparator0, true);
-        comparatorChain0.addComparator(comparator0);
-        assertEquals(2, comparatorChain0.size());
+    /**
+     * Tests that calling addComparator() on a chain increases its size.
+     */
+    @Test
+    public void addComparatorIncreasesChainSize() {
+        // Arrange: Create a ComparatorChain initialized with a single comparator.
+        final Comparator<Integer> initialComparator = Comparator.naturalOrder();
+        final ComparatorChain<Integer> comparatorChain = new ComparatorChain<>(initialComparator, true);
+
+        // Sanity check the initial state.
+        assertEquals("The chain should initially contain one comparator.", 1, comparatorChain.size());
+
+        // Act: Add a second comparator to the chain.
+        comparatorChain.addComparator(initialComparator);
+
+        // Assert: The size of the chain should now be 2.
+        assertEquals("The size should be 2 after adding a second comparator.", 2, comparatorChain.size());
     }
 }
