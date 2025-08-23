@@ -1,29 +1,26 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class PdfDictionary_ESTestTest31 extends PdfDictionary_ESTest_scaffolding {
+/**
+ * This test class verifies the behavior of the PdfDictionary class.
+ */
+public class PdfDictionaryRefactoredTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        PdfRectangle pdfRectangle0 = new PdfRectangle(0.0F, 0.0F, 2884.4F, 2884.4F);
-        LinkedHashMap<String, PdfRectangle> linkedHashMap0 = new LinkedHashMap<String, PdfRectangle>(4, 5);
-        PdfPage pdfPage0 = new PdfPage(pdfRectangle0, linkedHashMap0, (PdfDictionary) null, 1836);
-        PdfBoolean pdfBoolean0 = pdfPage0.getAsBoolean(pdfPage0.PAGES);
-        assertNull(pdfBoolean0);
+    /**
+     * Tests that getAsBoolean() returns null when the requested key does not exist in the dictionary.
+     */
+    @Test
+    public void getAsBoolean_shouldReturnNull_whenKeyIsMissing() {
+        // Arrange: Create an empty dictionary.
+        PdfDictionary dictionary = new PdfDictionary();
+        PdfName nonExistentKey = PdfDictionary.PAGES; // A standard key that is not in an empty dictionary.
+
+        // Act: Attempt to retrieve a PdfBoolean for a key that is not present.
+        PdfBoolean result = dictionary.getAsBoolean(nonExistentKey);
+
+        // Assert: The method should return null, indicating the key was not found.
+        assertNull("Expected getAsBoolean to return null for a non-existent key.", result);
     }
 }
