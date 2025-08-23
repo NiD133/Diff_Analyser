@@ -1,39 +1,29 @@
 package org.apache.commons.compress.compressors.gzip;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FilterOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
 import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class GzipCompressorOutputStream_ESTestTest10 extends GzipCompressorOutputStream_ESTest_scaffolding {
+/**
+ * Unit tests for the GzipCompressorOutputStream class.
+ */
+public class GzipCompressorOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        MockFileOutputStream mockFileOutputStream0 = new MockFileOutputStream("Y[6ArI`UH_`7e@4");
-        GzipCompressorOutputStream gzipCompressorOutputStream0 = new GzipCompressorOutputStream(mockFileOutputStream0);
-        mockFileOutputStream0.close();
-        try {
-            gzipCompressorOutputStream0.finish();
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.evosuite.runtime.mock.java.io.MockFileOutputStream", e);
-        }
+    /**
+     * Verifies that calling finish() throws an IOException if the underlying
+     * stream has already been closed. This is expected behavior, as the
+     * finish() method needs to write trailer data to the stream.
+     */
+    @Test(expected = IOException.class)
+    public void finishShouldThrowIOExceptionWhenUnderlyingStreamIsClosed() throws IOException {
+        // Arrange: Create a GZIP output stream and then close its underlying stream prematurely.
+        MockFileOutputStream underlyingStream = new MockFileOutputStream("test.gz");
+        GzipCompressorOutputStream gzipOutputStream = new GzipCompressorOutputStream(underlyingStream);
+
+        underlyingStream.close();
+
+        // Act & Assert: Attempting to finish the GZIP stream should now fail.
+        // The @Test(expected) annotation asserts that an IOException is thrown.
+        gzipOutputStream.finish();
     }
 }
