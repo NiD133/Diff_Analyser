@@ -1,60 +1,41 @@
 package org.jfree.chart.block;
 
+import org.jfree.chart.util.Size2D;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class GridArrangement_ESTestTest71 extends GridArrangement_ESTest_scaffolding {
+/**
+ * Tests for the {@link GridArrangement} class.
+ */
+public class GridArrangementTest {
 
-    @Test(timeout = 4000)
-    public void test70() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(2394, 2394);
-        assertNotNull(gridArrangement0);
-        BlockContainer blockContainer0 = new BlockContainer(gridArrangement0);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertNotNull(blockContainer0);
-        RectangleConstraint rectangleConstraint0 = new RectangleConstraint((-900), (-2.147483648E9));
-        assertEquals(LengthConstraintType.FIXED, rectangleConstraint0.getWidthConstraintType());
-        assertEquals((-2.147483648E9), rectangleConstraint0.getHeight(), 0.01);
-        assertEquals((-900.0), rectangleConstraint0.getWidth(), 0.01);
-        assertEquals(LengthConstraintType.FIXED, rectangleConstraint0.getHeightConstraintType());
-        assertNotNull(rectangleConstraint0);
-        Size2D size2D0 = gridArrangement0.arrange(blockContainer0, (Graphics2D) null, rectangleConstraint0);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertEquals(LengthConstraintType.FIXED, rectangleConstraint0.getWidthConstraintType());
-        assertEquals((-2.147483648E9), rectangleConstraint0.getHeight(), 0.01);
-        assertEquals((-900.0), rectangleConstraint0.getWidth(), 0.01);
-        assertEquals(LengthConstraintType.FIXED, rectangleConstraint0.getHeightConstraintType());
-        assertEquals((-900.0), size2D0.getWidth(), 0.01);
-        assertEquals((-2.147483648E9), size2D0.getHeight(), 0.01);
-        assertEquals("Size2D[width=-900.0, height=-2.147483648E9]", size2D0.toString());
-        assertNotNull(size2D0);
-        assertEquals((-900.0), size2D0.width, 0.01);
-        assertEquals((-2.147483648E9), size2D0.height, 0.01);
+    /**
+     * Verifies that arranging an empty container with a fixed-size constraint
+     * returns a Size2D object that matches the constraint's dimensions, even
+     * when those dimensions are negative.
+     */
+    @Test
+    public void arrange_withEmptyContainerAndFixedNegativeConstraint_shouldReturnConstraintSize() {
+        // Arrange: Set up the test objects and preconditions.
+        // The grid dimensions are arbitrary since the container is empty.
+        GridArrangement gridArrangement = new GridArrangement(10, 20);
+        BlockContainer emptyContainer = new BlockContainer(gridArrangement);
+
+        // Define a constraint with fixed negative width and height.
+        final double expectedWidth = -900.0;
+        final double expectedHeight = -2.147483648E9; // A large negative value.
+        RectangleConstraint fixedNegativeConstraint = new RectangleConstraint(expectedWidth, expectedHeight);
+
+        // Act: Call the method under test.
+        // The Graphics2D object is not used in this arrangement scenario.
+        Size2D resultSize = gridArrangement.arrange(emptyContainer, null, fixedNegativeConstraint);
+
+        // Assert: Verify the outcome.
+        assertNotNull("The resulting size should not be null.", resultSize);
+        assertEquals("The resulting width should match the fixed constraint width.",
+                expectedWidth, resultSize.getWidth(), 0.01);
+        assertEquals("The resulting height should match the fixed constraint height.",
+                expectedHeight, resultSize.getHeight(), 0.01);
     }
 }
