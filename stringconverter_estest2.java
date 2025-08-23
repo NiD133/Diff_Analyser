@@ -1,54 +1,33 @@
 package org.joda.time.convert;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
-import org.joda.time.MonthDay;
-import org.joda.time.MutableDateTime;
-import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Partial;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritableInterval;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadableInstant;
-import org.joda.time.ReadablePartial;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.EthiopicChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 
-public class StringConverter_ESTestTest2 extends StringConverter_ESTest_scaffolding {
+/**
+ * Unit tests for {@link StringConverter}.
+ */
+public class StringConverterTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        StringConverter stringConverter0 = new StringConverter();
-        // Undeclared exception!
-        try {
-            stringConverter0.getDurationMillis("Pt!8CF");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Invalid format: \"Pt!8CF\"
-            //
-            verifyException("org.joda.time.convert.StringConverter", e);
-        }
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    private final StringConverter converter = new StringConverter();
+
+    /**
+     * Tests that getDurationMillis() throws an IllegalArgumentException when provided
+     * with a string that does not conform to the ISO 8601 duration format.
+     */
+    @Test
+    public void getDurationMillis_shouldThrowException_forInvalidDurationFormat() {
+        // Arrange: An invalid duration string that does not follow the ISO format (e.g., "PT1H").
+        final String invalidDurationString = "Pt! 8CF";
+
+        // Assert: Expect an IllegalArgumentException with a specific message.
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Invalid format: \"" + invalidDurationString + "\"");
+
+        // Act: Attempt to convert the invalid string to a duration.
+        converter.getDurationMillis(invalidDurationString);
     }
 }
