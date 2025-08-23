@@ -1,39 +1,31 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import static org.junit.Assert.assertThrows;
+
 import java.io.RandomAccessFile;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class RandomAccessFileMode_ESTestTest21 extends RandomAccessFileMode_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileMode} enum.
+ */
+public class RandomAccessFileModeTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_ALL;
-        IOConsumer<RandomAccessFile> iOConsumer0 = IOConsumer.noop();
-        // Undeclared exception!
-        try {
-            randomAccessFileMode0.accept((Path) null, iOConsumer0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.RandomAccessFileMode", e);
-        }
+    /**
+     * Tests that {@link RandomAccessFileMode#accept(Path, IOConsumer)} throws
+     * a NullPointerException when the provided path is null.
+     */
+    @Test
+    public void acceptWithNullPathShouldThrowNullPointerException() {
+        // Arrange: Set up the test objects and inputs.
+        final RandomAccessFileMode mode = RandomAccessFileMode.READ_WRITE_SYNC_ALL;
+        final IOConsumer<RandomAccessFile> noopConsumer = IOConsumer.noop();
+        final Path nullPath = null;
+
+        // Act & Assert: Verify that calling the method with a null path throws the expected exception.
+        assertThrows(NullPointerException.class, () -> {
+            mode.accept(nullPath, noopConsumer);
+        });
     }
 }
