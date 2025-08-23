@@ -1,23 +1,39 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
+import static org.junit.Assert.assertEquals;
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NullReader_ESTestTest23 extends NullReader_ESTest_scaffolding {
+/**
+ * Test suite for the {@link NullReader} class.
+ */
+public class NullReaderTest {
 
+    /**
+     * Tests that skip() on a NullReader with a negative size immediately returns EOF.
+     * <p>
+     * A NullReader initialized with a negative size is considered to be at the
+     * end-of-file from the very beginning, because its initial position (0) is
+     * greater than or equal to its size.
+     * </p>
+     */
     @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        NullReader nullReader0 = new NullReader((-3294L), false, false);
-        char[] charArray0 = new char[7];
-        nullReader0.read(charArray0, 2144545913, 0);
-        long long0 = nullReader0.skip((-2904L));
-        assertEquals((-3294L), nullReader0.getPosition());
-        assertEquals((-1L), long0);
+    public void skipOnReaderWithNegativeSizeShouldReturnEof() throws IOException {
+        // Arrange: Create a NullReader with a negative size.
+        final long negativeSize = -3294L;
+        final boolean markSupported = false;
+        final boolean throwEofException = false;
+        NullReader reader = new NullReader(negativeSize, markSupported, throwEofException);
+
+        // The initial position is 0, which is already past the negative "end" of the reader.
+        long initialPosition = reader.getPosition();
+        assertEquals("Initial position should be 0", 0L, initialPosition);
+
+        // Act: Attempt to skip any number of characters.
+        long skippedCount = reader.skip(-2904L);
+
+        // Assert: The skip operation should detect EOF, return -1, and not change the position.
+        assertEquals("Should return -1 to indicate EOF", -1L, skippedCount);
+        assertEquals("Position should not change when at EOF", initialPosition, reader.getPosition());
     }
 }
