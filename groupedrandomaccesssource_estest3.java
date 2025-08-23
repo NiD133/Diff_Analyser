@@ -1,27 +1,30 @@
 package com.itextpdf.text.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+/**
+ * This class contains tests for the GroupedRandomAccessSource.
+ * Note: This specific test was refactored from an auto-generated test file.
+ */
 public class GroupedRandomAccessSource_ESTestTest3 extends GroupedRandomAccessSource_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[2];
-        byte[] byteArray0 = new byte[0];
-        ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-        randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-        GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(arrayRandomAccessSource0);
-        randomAccessSourceArray0[1] = (RandomAccessSource) getBufferedRandomAccessSource0;
-        GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-        groupedRandomAccessSource0.sourceInUse(arrayRandomAccessSource0);
-        assertEquals(0L, groupedRandomAccessSource0.length());
+    /**
+     * Verifies that the total length of a GroupedRandomAccessSource is zero
+     * when it is constructed from multiple empty underlying sources.
+     */
+    @Test
+    public void length_shouldBeZero_whenConstructedWithEmptySources() throws IOException {
+        // Arrange: Create an array of two distinct sources, each with a length of zero.
+        RandomAccessSource emptySource1 = new ArrayRandomAccessSource(new byte[0]);
+        RandomAccessSource emptySource2 = new ArrayRandomAccessSource(new byte[0]);
+        RandomAccessSource[] sources = {emptySource1, emptySource2};
+
+        // Act: Create a GroupedRandomAccessSource from the array of empty sources.
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(sources);
+
+        // Assert: The total length should be the sum of the underlying sources' lengths (0 + 0).
+        assertEquals("The total length of a group of empty sources should be 0.", 0L, groupedSource.length());
     }
 }
