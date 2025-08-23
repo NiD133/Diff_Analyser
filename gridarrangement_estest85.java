@@ -1,80 +1,39 @@
 package org.jfree.chart.block;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
 import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class GridArrangement_ESTestTest85 extends GridArrangement_ESTest_scaffolding {
+import java.awt.Graphics2D;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * This test class contains tests for the GridArrangement class.
+ * This particular test was refactored for clarity from an auto-generated test case.
+ */
+public class GridArrangement_ESTestTest85 {
+
+    /**
+     * Verifies the behavior of the arrange method when the GridArrangement is
+     * configured with zero rows and a negative number of columns. This is an
+     * edge case that could lead to calculation errors like division by zero.
+     */
     @Test(timeout = 4000)
-    public void test84() throws Throwable {
-        Range range0 = new Range(0, 0);
-        assertEquals(0.0, range0.getUpperBound(), 0.01);
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertEquals("Range[0.0,0.0]", range0.toString());
-        assertFalse(range0.isNaNRange());
-        assertEquals(0.0, range0.getCentralValue(), 0.01);
-        assertEquals(0.0, range0.getLowerBound(), 0.01);
-        assertNotNull(range0);
-        RectangleConstraint rectangleConstraint0 = new RectangleConstraint(range0, range0);
-        assertEquals(0.0, range0.getUpperBound(), 0.01);
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertEquals("Range[0.0,0.0]", range0.toString());
-        assertFalse(range0.isNaNRange());
-        assertEquals(0.0, range0.getCentralValue(), 0.01);
-        assertEquals(0.0, range0.getLowerBound(), 0.01);
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertNotNull(rectangleConstraint0);
-        BlockContainer blockContainer0 = new BlockContainer();
-        assertTrue(blockContainer0.isEmpty());
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertNotNull(blockContainer0);
-        GridArrangement gridArrangement0 = new GridArrangement(0, (-2597));
-        assertNotNull(gridArrangement0);
-        Size2D size2D0 = gridArrangement0.arrange(blockContainer0, (Graphics2D) null, rectangleConstraint0);
-        assertEquals(0.0, range0.getUpperBound(), 0.01);
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertEquals("Range[0.0,0.0]", range0.toString());
-        assertFalse(range0.isNaNRange());
-        assertEquals(0.0, range0.getCentralValue(), 0.01);
-        assertEquals(0.0, range0.getLowerBound(), 0.01);
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertEquals("Size2D[width=-0.0, height=NaN]", size2D0.toString());
-        assertEquals(Double.NaN, size2D0.getHeight(), 0.01);
-        assertEquals(-0.0, size2D0.getWidth(), 0.01);
-        assertNotNull(size2D0);
-        assertEquals(Double.NaN, size2D0.height, 0.01);
-        assertEquals(-0.0, size2D0.width, 0.01);
+    public void arrangeWithZeroRowsAndNegativeColumnsShouldReturnSizeWithZeroWidthAndNaNHeight() {
+        // Arrange: Set up a grid arrangement with invalid dimensions (0 rows, negative columns)
+        // and an empty container to lay out.
+        GridArrangement arrangement = new GridArrangement(0, -2597);
+        BlockContainer emptyContainer = new BlockContainer();
+        RectangleConstraint zeroSizeConstraint = new RectangleConstraint(0.0, 0.0);
+
+        // Act: Attempt to arrange the empty container with the invalid grid layout.
+        Size2D resultSize = arrangement.arrange(emptyContainer, (Graphics2D) null, zeroSizeConstraint);
+
+        // Assert: The resulting width should be zero, and the height should be NaN.
+        // The NaN height is the expected outcome of a calculation that likely involves
+        // division by the number of rows (which is zero).
+        assertEquals("Width should be zero for an invalid grid arrangement", 0.0, resultSize.getWidth(), 0.01);
+        assertTrue("Height should be NaN due to division by zero rows", Double.isNaN(resultSize.getHeight()));
     }
 }
