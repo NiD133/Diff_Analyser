@@ -1,20 +1,28 @@
 package com.google.common.net;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.text.ParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class HostSpecifier_ESTestTest11 extends HostSpecifier_ESTest_scaffolding {
+/**
+ * Unit tests for {@link HostSpecifier}.
+ */
+public class HostSpecifierTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        HostSpecifier hostSpecifier0 = HostSpecifier.from("127.0.0.1");
-        HostSpecifier hostSpecifier1 = HostSpecifier.from("127.0.0.1");
-        boolean boolean0 = hostSpecifier0.equals(hostSpecifier1);
-        assertTrue(boolean0);
+    /**
+     * Verifies that two HostSpecifier instances created from the exact same
+     * valid IP address string are considered equal.
+     */
+    @Test
+    public void equals_whenCreatedFromSameIpAddress_shouldBeEqual() throws ParseException {
+        // Arrange
+        String ipAddress = "127.0.0.1";
+        HostSpecifier specifier1 = HostSpecifier.from(ipAddress);
+        HostSpecifier specifier2 = HostSpecifier.from(ipAddress);
+
+        // Assert
+        // The .equals() method should return true, and assertEquals uses this method.
+        assertEquals(specifier1, specifier2);
     }
 }
