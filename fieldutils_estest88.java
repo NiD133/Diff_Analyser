@@ -1,31 +1,36 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class FieldUtils_ESTestTest88 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Test suite for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test87() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Tests that safeMultiplyToInt throws an ArithmeticException if the intermediate
+     * multiplication of the two long arguments overflows, which occurs before
+     * the result is cast to an int.
+     */
+    @Test
+    public void safeMultiplyToInt_shouldThrowException_whenIntermediateMultiplicationOverflowsLong() {
+        // Arrange: Define two long values whose product will exceed Long.MAX_VALUE.
+        // The square root of Long.MAX_VALUE is approximately 3,037,000,499.
+        // We choose a number slightly larger than that to ensure its square causes an overflow.
+        final long valueJustOverSqrtOfMaxLong = 3037000500L;
+
         try {
-            FieldUtils.safeMultiplyToInt(26607895200000L, 26607895200000L);
-            fail("Expecting exception: ArithmeticException");
+            // Act: Attempt to multiply the two large numbers.
+            FieldUtils.safeMultiplyToInt(valueJustOverSqrtOfMaxLong, valueJustOverSqrtOfMaxLong);
+            fail("Expected an ArithmeticException due to long overflow, but none was thrown.");
         } catch (ArithmeticException e) {
-            //
-            // Multiplication overflows a long: 26607895200000 * 26607895200000
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
+            // Assert: Verify that the correct exception was thrown with a descriptive message
+            // confirming that the overflow happened during the long multiplication step.
+            String expectedMessage = "Multiplication overflows a long: "
+                + valueJustOverSqrtOfMaxLong + " * " + valueJustOverSqrtOfMaxLong;
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
