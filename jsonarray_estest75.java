@@ -1,30 +1,31 @@
 package com.google.gson;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest75 extends JsonArray_ESTest_scaffolding {
+/**
+ * Test suite for the {@link JsonArray} class.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test74() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        // Undeclared exception!
+    /**
+     * Verifies that calling getAsBigInteger() on an empty array throws an IllegalStateException.
+     * This method is only valid for arrays containing a single element.
+     */
+    @Test
+    public void getAsBigIntegerOnEmptyArrayShouldThrowIllegalStateException() {
+        // Arrange: Create an empty JsonArray.
+        JsonArray emptyArray = new JsonArray();
+        String expectedMessage = "Array must have size 1, but has size 0";
+
+        // Act & Assert: Verify that the expected exception is thrown.
         try {
-            jsonArray0.getAsBigInteger();
-            fail("Expecting exception: IllegalStateException");
+            emptyArray.getAsBigInteger();
+            fail("Expected an IllegalStateException to be thrown, but it wasn't.");
         } catch (IllegalStateException e) {
-            //
-            // Array must have size 1, but has size 0
-            //
-            verifyException("com.google.gson.JsonArray", e);
+            // Verify that the exception message is correct.
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
