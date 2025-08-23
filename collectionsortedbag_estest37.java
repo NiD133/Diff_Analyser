@@ -1,55 +1,49 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.SortedBag;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CollectionSortedBag_ESTestTest37 extends CollectionSortedBag_ESTest_scaffolding {
+import java.util.Arrays;
+import java.util.Collection;
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        Comparator<Object> comparator0 = (Comparator<Object>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        doReturn((-1959), (-1959), (-1959), 0, 0).when(comparator0).compare(any(), any());
-        TreeBag<Object> treeBag0 = new TreeBag<Object>(comparator0);
-        IfClosure<Object> ifClosure0 = new IfClosure<Object>((Predicate<? super Object>) null, (Closure<? super Object>) null);
-        treeBag0.add((Object) ifClosure0);
-        CollectionSortedBag<Object> collectionSortedBag0 = new CollectionSortedBag<Object>(treeBag0);
-        treeBag0.add((Object) null);
-        HashBag<Object> hashBag0 = new HashBag<Object>((Iterable<?>) collectionSortedBag0);
-        boolean boolean0 = collectionSortedBag0.removeAll(hashBag0);
-        assertFalse(collectionSortedBag0.contains(0));
-        assertTrue(boolean0);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * This test class contains a refactored test for the {@link CollectionSortedBag}.
+ * The original test was auto-generated and has been rewritten for improved clarity and maintainability.
+ */
+public class CollectionSortedBag_ESTestTest37 { // Retaining original class name for context
+
+    /**
+     * Tests that calling removeAll with a collection containing all of the bag's
+     * elements successfully removes them and results in an empty bag.
+     */
+    @Test
+    public void testRemoveAll_whenRemovingAllElements_shouldLeaveBagEmpty() {
+        // Arrange
+        // 1. Create the underlying sorted bag (TreeBag) and populate it.
+        //    Using simple, comparable Strings avoids the need for a complex mock comparator.
+        final SortedBag<String> underlyingBag = new TreeBag<>();
+        underlyingBag.add("A");
+        underlyingBag.add("B");
+
+        // 2. Decorate the underlying bag with CollectionSortedBag, the class under test.
+        final SortedBag<String> decoratedBag = new CollectionSortedBag<>(underlyingBag);
+
+        // 3. Create a collection containing all the elements to be removed.
+        final Collection<String> elementsToRemove = new HashBag<>(Arrays.asList("A", "B"));
+
+        // Act
+        // Call the method under test.
+        final boolean wasModified = decoratedBag.removeAll(elementsToRemove);
+
+        // Assert
+        // 1. The operation should return true, indicating the collection was changed.
+        assertTrue("removeAll should return true when elements are removed.", wasModified);
+
+        // 2. The decorated bag should be empty after the operation.
+        assertTrue("The bag should be empty after removing all its elements.", decoratedBag.isEmpty());
+        assertEquals("The bag size should be 0 after removing all elements.", 0, decoratedBag.size());
     }
 }
