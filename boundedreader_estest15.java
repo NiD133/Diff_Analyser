@@ -1,29 +1,29 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class BoundedReader_ESTestTest15 extends BoundedReader_ESTest_scaffolding {
+/**
+ * Tests for {@link BoundedReader}.
+ */
+public class BoundedReaderTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        BoundedReader boundedReader0 = new BoundedReader((Reader) null, 4168);
-        // Undeclared exception!
-        try {
-            boundedReader0.mark(4168);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.input.BoundedReader", e);
-        }
+    /**
+     * Tests that calling mark() on a BoundedReader initialized with a null
+     * underlying reader throws a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void markShouldThrowNullPointerExceptionWhenReaderIsNull() throws IOException {
+        // Arrange: Create a BoundedReader with a null target reader.
+        // The specific value for maxChars is irrelevant for this test.
+        final int irrelevantMaxChars = 100;
+        final BoundedReader boundedReader = new BoundedReader(null, irrelevantMaxChars);
+
+        // Act & Assert: Calling mark() should throw a NullPointerException because it
+        // attempts to delegate to the null target reader.
+        final int irrelevantReadAheadLimit = 100;
+        boundedReader.mark(irrelevantReadAheadLimit);
     }
 }
