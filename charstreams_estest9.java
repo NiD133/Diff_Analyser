@@ -1,0 +1,56 @@
+package com.google.common.io;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+import static org.evosuite.shaded.org.mockito.Mockito.*;
+import static org.evosuite.runtime.EvoAssertions.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.CharArrayReader;
+import java.io.EOFException;
+import java.io.FileDescriptor;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PipedInputStream;
+import java.io.PipedReader;
+import java.io.PipedWriter;
+import java.io.PushbackReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.Writer;
+import java.nio.BufferOverflowException;
+import java.nio.CharBuffer;
+import java.nio.ReadOnlyBufferException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.MalformedInputException;
+import java.util.List;
+import org.evosuite.runtime.EvoRunner;
+import org.evosuite.runtime.EvoRunnerParameters;
+import org.evosuite.runtime.ViolatedAssumptionAnswer;
+import org.evosuite.runtime.mock.java.io.MockFileReader;
+import org.evosuite.runtime.mock.java.io.MockFileWriter;
+import org.evosuite.runtime.mock.java.io.MockPrintWriter;
+import org.junit.runner.RunWith;
+
+public class CharStreams_ESTestTest9 extends CharStreams_ESTest_scaffolding {
+
+    @Test(timeout = 4000)
+    public void test08() throws Throwable {
+        byte[] byteArray0 = new byte[9];
+        byteArray0[1] = (byte) (-1);
+        ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
+        Charset charset0 = Charset.defaultCharset();
+        CharsetDecoder charsetDecoder0 = charset0.newDecoder();
+        InputStreamReader inputStreamReader0 = new InputStreamReader(byteArrayInputStream0, charsetDecoder0);
+        try {
+            CharStreams.skipFully(inputStreamReader0, 336L);
+            fail("Expecting exception: MalformedInputException");
+        } catch (MalformedInputException e) {
+            //
+            // Input length = 1
+            //
+            verifyException("java.nio.charset.CoderResult", e);
+        }
+    }
+}
