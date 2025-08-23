@@ -1,19 +1,28 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class ByteOrderMark_ESTestTest11 extends ByteOrderMark_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteOrderMark} class.
+ */
+public class ByteOrderMarkTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        ByteOrderMark byteOrderMark0 = ByteOrderMark.UTF_16BE;
-        int[] intArray0 = new int[8];
-        boolean boolean0 = byteOrderMark0.matches(intArray0);
-        assertFalse(boolean0);
+    /**
+     * Tests that the matches() method correctly returns false when the provided
+     * byte array does not start with the Byte Order Mark.
+     */
+    @Test
+    public void matchesShouldReturnFalseForNonMatchingByteArray() {
+        // Arrange: The UTF-16BE BOM is defined as 0xFE, 0xFF.
+        // We will test it against an array of zeros, which should not match.
+        final ByteOrderMark utf16beBom = ByteOrderMark.UTF_16BE;
+        final int[] nonMatchingBytes = new int[8]; // Initialized to all zeros
+
+        // Act: Check if the byte array matches the BOM.
+        final boolean isMatch = utf16beBom.matches(nonMatchingBytes);
+
+        // Assert: The result should be false.
+        assertFalse("Expected matches() to return false for a non-matching array.", isMatch);
     }
 }
