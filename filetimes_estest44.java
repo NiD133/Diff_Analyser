@@ -1,24 +1,30 @@
 package org.apache.commons.io.file.attribute;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
+import static org.junit.Assert.assertNull;
+
 import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
-import java.time.Instant;
 import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
 
-public class FileTimes_ESTestTest44 extends FileTimes_ESTest_scaffolding {
+import org.junit.Test;
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        Date date0 = FileTimes.toDate((FileTime) null);
-        assertNull(date0);
+/**
+ * Tests for {@link FileTimes}.
+ */
+public class FileTimesTest {
+
+    /**
+     * Tests that {@link FileTimes#toDate(FileTime)} returns null when the input is null,
+     * as specified by its Javadoc.
+     */
+    @Test
+    public void testToDateWithNullInputShouldReturnNull() {
+        // Arrange: The input FileTime is null.
+        final FileTime nullFileTime = null;
+
+        // Act: Call the method under test.
+        final Date result = FileTimes.toDate(nullFileTime);
+
+        // Assert: The result should also be null.
+        assertNull("Expected a null Date when the input FileTime is null", result);
     }
 }
