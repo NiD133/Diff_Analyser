@@ -1,233 +1,93 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.Modifier;
+import org.junit.Test;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.chrono.ISOChronology;
 
-public class DateTimeComparatorTestTest27 extends TestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-    private static final Chronology ISO = ISOChronology.getInstance();
+/**
+ * Tests for {@link DateTimeComparator}.
+ * This suite focuses on verifying the sorting behavior of different standard comparators.
+ */
+public class DateTimeComparatorTest {
 
-    /**
-     * A reference to a DateTime object.
-     */
-    DateTime aDateTime = null;
-
-    /**
-     * A reference to a DateTime object.
-     */
-    DateTime bDateTime = null;
+    // Note: Using "Z" at the end of the date-time string specifies the UTC time zone.
+    private static final DateTime DATE_1998_01_20 = new DateTime("1998-01-20T10:00:00Z");
+    private static final DateTime DATE_1999_02_01 = new DateTime("1999-02-01T10:00:00Z");
 
     /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for millis of seconds.
+     * Tests the default comparator, which should sort chronologically based on the full date and time.
+     * This is equivalent to the natural ordering of DateTime objects.
      */
-    Comparator cMillis = null;
+    @Test
+    public void sortUsingDefaultComparator_sortsByChronology() {
+        // Arrange
+        List<DateTime> dateTimes = new ArrayList<>(Arrays.asList(DATE_1999_02_01, DATE_1998_01_20));
+        Comparator<Object> defaultComparator = DateTimeComparator.getInstance();
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for seconds.
-     */
-    Comparator cSecond = null;
+        // Act
+        dateTimes.sort(defaultComparator);
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for minutes.
-     */
-    Comparator cMinute = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for hours.
-     */
-    Comparator cHour = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the week.
-     */
-    Comparator cDayOfWeek = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the month.
-     */
-    Comparator cDayOfMonth = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the year.
-     */
-    Comparator cDayOfYear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for week of the weekyear.
-     */
-    Comparator cWeekOfWeekyear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for year given a week of the year.
-     */
-    Comparator cWeekyear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for months.
-     */
-    Comparator cMonth = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for year.
-     */
-    Comparator cYear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for the date portion of an
-     * object.
-     */
-    Comparator cDate = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for the time portion of an
-     * object.
-     */
-    Comparator cTime = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestDateTimeComparator.class);
+        // Assert
+        List<DateTime> expectedOrder = Arrays.asList(DATE_1998_01_20, DATE_1999_02_01);
+        assertEquals(expectedOrder, dateTimes);
     }
 
     /**
-     * Junit <code>setUp()</code> method.
+     * Tests the date-only comparator, which should ignore the time part of a DateTime.
+     * Two DateTimes on the same day but with different times should be considered equal.
      */
-    @Override
-    public void setUp() /* throws Exception */
-    {
-        Chronology chrono = ISOChronology.getInstanceUTC();
-        // super.setUp();
-        // Obtain comparator's
-        cMillis = DateTimeComparator.getInstance(null, DateTimeFieldType.secondOfMinute());
-        cSecond = DateTimeComparator.getInstance(DateTimeFieldType.secondOfMinute(), DateTimeFieldType.minuteOfHour());
-        cMinute = DateTimeComparator.getInstance(DateTimeFieldType.minuteOfHour(), DateTimeFieldType.hourOfDay());
-        cHour = DateTimeComparator.getInstance(DateTimeFieldType.hourOfDay(), DateTimeFieldType.dayOfYear());
-        cDayOfWeek = DateTimeComparator.getInstance(DateTimeFieldType.dayOfWeek(), DateTimeFieldType.weekOfWeekyear());
-        cDayOfMonth = DateTimeComparator.getInstance(DateTimeFieldType.dayOfMonth(), DateTimeFieldType.monthOfYear());
-        cDayOfYear = DateTimeComparator.getInstance(DateTimeFieldType.dayOfYear(), DateTimeFieldType.year());
-        cWeekOfWeekyear = DateTimeComparator.getInstance(DateTimeFieldType.weekOfWeekyear(), DateTimeFieldType.weekyear());
-        cWeekyear = DateTimeComparator.getInstance(DateTimeFieldType.weekyear());
-        cMonth = DateTimeComparator.getInstance(DateTimeFieldType.monthOfYear(), DateTimeFieldType.year());
-        cYear = DateTimeComparator.getInstance(DateTimeFieldType.year());
-        cDate = DateTimeComparator.getDateOnlyInstance();
-        cTime = DateTimeComparator.getTimeOnlyInstance();
+    @Test
+    public void sortUsingDateOnlyComparator_ignoresTime() {
+        // Arrange
+        DateTime sameDayEarlierTime = new DateTime("2022-06-09T10:00:00Z");
+        DateTime sameDayLaterTime = new DateTime("2022-06-09T15:00:00Z");
+        DateTime nextDay = new DateTime("2022-06-10T12:00:00Z");
+
+        List<DateTime> dateTimes = new ArrayList<>(Arrays.asList(nextDay, sameDayLaterTime, sameDayEarlierTime));
+        Comparator<Object> dateOnlyComparator = DateTimeComparator.getDateOnlyInstance();
+
+        // Act
+        dateTimes.sort(dateOnlyComparator);
+
+        // Assert
+        // The two dates on June 9th are considered equal, so their relative order is preserved by the stable sort.
+        List<DateTime> expectedOrder = Arrays.asList(sameDayLaterTime, sameDayEarlierTime, nextDay);
+        assertEquals(expectedOrder, dateTimes);
+
+        // Also, explicitly verify the comparison logic
+        assertEquals("Dates on the same day should be equal", 0, dateOnlyComparator.compare(sameDayEarlierTime, sameDayLaterTime));
+        assertTrue("A date should be less than the next day's date", dateOnlyComparator.compare(sameDayEarlierTime, nextDay) < 0);
     }
 
     /**
-     * Junit <code>tearDown()</code> method.
+     * Tests the time-only comparator, which should ignore the date part of a DateTime.
+     * Two DateTimes with the same time of day but on different dates should be considered equal.
      */
-    @Override
-    protected void tearDown() /* throws Exception */
-    {
-        // super.tearDown();
-        aDateTime = null;
-        bDateTime = null;
-        //
-        cMillis = null;
-        cSecond = null;
-        cMinute = null;
-        cHour = null;
-        cDayOfWeek = null;
-        cDayOfMonth = null;
-        cDayOfYear = null;
-        cWeekOfWeekyear = null;
-        cWeekyear = null;
-        cMonth = null;
-        cYear = null;
-        cDate = null;
-        cTime = null;
-    }
+    @Test
+    public void sortUsingTimeOnlyComparator_ignoresDate() {
+        // Arrange
+        DateTime sameTimeEarlierDate = new DateTime("2022-06-09T10:00:00Z");
+        DateTime sameTimeLaterDate = new DateTime("2023-08-20T10:00:00Z");
+        DateTime laterTime = new DateTime("2022-01-01T11:00:00Z");
 
-    /**
-     * Creates a date to test with.
-     */
-    private DateTime getADate(String s) {
-        DateTime retDT = null;
-        try {
-            retDT = new DateTime(s, DateTimeZone.UTC);
-        } catch (IllegalArgumentException pe) {
-            pe.printStackTrace();
-        }
-        return retDT;
-    }
+        List<DateTime> dateTimes = new ArrayList<>(Arrays.asList(laterTime, sameTimeLaterDate, sameTimeEarlierDate));
+        Comparator<Object> timeOnlyComparator = DateTimeComparator.getTimeOnlyInstance();
 
-    /**
-     * Load a string array.
-     */
-    private List loadAList(String[] someStrs) {
-        List newList = new ArrayList();
-        try {
-            for (int i = 0; i < someStrs.length; ++i) {
-                newList.add(new DateTime(someStrs[i], DateTimeZone.UTC));
-            }
-            // end of the for
-        } catch (IllegalArgumentException pe) {
-            pe.printStackTrace();
-        }
-        return newList;
-    }
+        // Act
+        dateTimes.sort(timeOnlyComparator);
 
-    /**
-     * Check if the list is sorted.
-     */
-    private boolean isListSorted(List tl) {
-        // tl must be populated with DateTime objects.
-        DateTime lhDT = (DateTime) tl.get(0);
-        DateTime rhDT = null;
-        Long lhVal = new Long(lhDT.getMillis());
-        Long rhVal = null;
-        for (int i = 1; i < tl.size(); ++i) {
-            rhDT = (DateTime) tl.get(i);
-            rhVal = new Long(rhDT.getMillis());
-            if (lhVal.compareTo(rhVal) > 0)
-                return false;
-            //
-            // swap for next iteration
-            lhVal = rhVal;
-            // swap for next iteration
-            lhDT = rhDT;
-        }
-        return true;
-    }
+        // Assert
+        // The two dates at 10:00 are considered equal, so their relative order is preserved by the stable sort.
+        List<DateTime> expectedOrder = Arrays.asList(sameTimeLaterDate, sameTimeEarlierDate, laterTime);
+        assertEquals(expectedOrder, dateTimes);
 
-    /**
-     * Test sorting with full default comparator.
-     */
-    public void testListBasic() {
-        String[] dtStrs = { "1999-02-01T00:00:00", "1998-01-20T00:00:00" };
-        //
-        List sl = loadAList(dtStrs);
-        boolean isSorted1 = isListSorted(sl);
-        Collections.sort(sl);
-        boolean isSorted2 = isListSorted(sl);
-        assertEquals("ListBasic", !isSorted1, isSorted2);
+        // Also, explicitly verify the comparison logic
+        assertEquals("Times that are the same should be equal, regardless of date", 0, timeOnlyComparator.compare(sameTimeEarlierDate, sameTimeLaterDate));
+        assertTrue("10:00 should be less than 11:00", timeOnlyComparator.compare(sameTimeEarlierDate, laterTime) < 0);
     }
 }
