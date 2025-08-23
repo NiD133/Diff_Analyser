@@ -1,41 +1,35 @@
 package com.itextpdf.text.pdf;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
 import com.itextpdf.text.io.IndependentRandomAccessSource;
 import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
+import org.junit.Test;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest66 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * This test case verifies the behavior of the RandomAccessFileOrArray class
+ * when it is initialized with a null underlying data source.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test065() throws Throwable {
-        IndependentRandomAccessSource independentRandomAccessSource0 = new IndependentRandomAccessSource((RandomAccessSource) null);
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(independentRandomAccessSource0);
-        // Undeclared exception!
-        try {
-            randomAccessFileOrArray0.readUnsignedByte();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.io.IndependentRandomAccessSource", e);
-        }
+    /**
+     * Verifies that readUnsignedByte() throws a NullPointerException if the
+     * underlying RandomAccessSource is null.
+     *
+     * This ensures that the class fails fast when its dependencies are not
+     * correctly initialized, rather than masking the problem or causing
+     * unexpected behavior later.
+     */
+    @Test(expected = NullPointerException.class)
+    public void readUnsignedByte_whenSourceIsNull_throwsNullPointerException() throws IOException {
+        // Arrange: Create a RandomAccessFileOrArray instance backed by a source
+        // that wraps a null delegate. This simulates an invalid state.
+        IndependentRandomAccessSource sourceWithNullDelegate = new IndependentRandomAccessSource((RandomAccessSource) null);
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray(sourceWithNullDelegate);
+
+        // Act & Assert: Attempting to read from the fileOrArray should propagate
+        // the NullPointerException from the underlying source. The @Test annotation
+        // expects this exception, so the test will pass if it's thrown.
+        fileOrArray.readUnsignedByte();
     }
 }
