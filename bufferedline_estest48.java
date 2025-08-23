@@ -1,29 +1,37 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
 import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest48 extends BufferedLine_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        PointImpl pointImpl0 = new PointImpl(0.0, 0.0, spatialContext0);
-        BufferedLine bufferedLine0 = new BufferedLine(pointImpl0, pointImpl0, 0.0, spatialContext0);
-        SpatialRelation spatialRelation0 = bufferedLine0.relate((Shape) pointImpl0);
-        assertEquals(0.0, bufferedLine0.getBuf(), 0.01);
-        assertEquals(SpatialRelation.CONTAINS, spatialRelation0);
+/**
+ * Unit tests for {@link BufferedLine}.
+ */
+public class BufferedLineTest {
+
+    private final SpatialContext geoContext = SpatialContext.GEO;
+
+    /**
+     * A BufferedLine with the same start and end point and a zero buffer
+     * is a degenerate case that should behave like a single point. This test
+     * verifies that such a line correctly reports that it contains its own point.
+     */
+    @Test
+    public void relate_withZeroLengthAndZeroBuffer_shouldContainItself() {
+        // Arrange: Create a degenerate line that is effectively a single point.
+        // A zero-length line (start point equals end point) with a zero buffer.
+        Point point = new PointImpl(0.0, 0.0, geoContext);
+        BufferedLine pointAsLine = new BufferedLine(point, point, 0.0, geoContext);
+
+        // Act: Check the spatial relationship of the line to its own point.
+        SpatialRelation relation = pointAsLine.relate(point);
+
+        // Assert: The line should contain the point.
+        assertEquals("The buffer should be zero as specified", 0.0, pointAsLine.getBuf(), 0.0);
+        assertEquals("A zero-length, zero-buffer line should contain its own point",
+                SpatialRelation.CONTAINS, relation);
     }
 }
