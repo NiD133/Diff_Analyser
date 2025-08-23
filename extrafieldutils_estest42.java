@@ -1,18 +1,42 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.zip.ZipException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-public class ExtraFieldUtils_ESTestTest42 extends ExtraFieldUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link ExtraFieldUtils}.
+ */
+public class ExtraFieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        Class<UnparseableExtraFieldData> class0 = UnparseableExtraFieldData.class;
-        ExtraFieldUtils.register(class0);
+    /**
+     * Tests that a custom ZipExtraField implementation can be registered and
+     * subsequently instantiated by ExtraFieldUtils.
+     */
+    @Test
+    public void registerShouldAllowCreationOfCustomExtraField() {
+        // Arrange
+        // UnparseableExtraFieldData is a concrete implementation of ZipExtraField,
+        // which is suitable for testing the registration functionality.
+        final Class<UnparseableExtraFieldData> customExtraFieldClass = UnparseableExtraFieldData.class;
+        final ZipShort expectedHeaderId = new UnparseableExtraFieldData().getHeaderId();
+
+        // Act
+        // Register the custom extra field implementation.
+        // Note: This method is deprecated, but its functionality is still being tested
+        // for backward compatibility.
+        ExtraFieldUtils.register(customExtraFieldClass);
+
+        // Assert
+        // Verify that createExtraField now returns an instance of our registered class
+        // when given the corresponding header ID.
+        final ZipExtraField createdField = ExtraFieldUtils.createExtraField(expectedHeaderId);
+
+        assertNotNull("createExtraField should not return null for a registered header ID.", createdField);
+        assertTrue("The created field should be an instance of the registered class.",
+                createdField instanceof UnparseableExtraFieldData);
+        assertEquals("The header ID of the created field should match the expected ID.",
+                expectedHeaderId, createdField.getHeaderId());
     }
 }
