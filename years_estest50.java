@@ -1,26 +1,32 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-public class Years_ESTestTest50 extends Years_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Years} class.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test49() throws Throwable {
-        Years years0 = Years.ZERO;
-        // Undeclared exception!
-        try {
-            years0.MIN_VALUE.negated();
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // Integer.MIN_VALUE cannot be negated
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
-        }
+    /**
+     * The Years class stores its value as an int. Negating Integer.MIN_VALUE
+     * causes an arithmetic overflow. This test verifies that the negated() method
+     * correctly throws an ArithmeticException in this edge case.
+     */
+    @Test
+    public void negated_shouldThrowArithmeticException_whenNegatingMinValue() {
+        // Arrange: The subject of our test is the constant representing the minimum value.
+        // No explicit arrangement is needed besides using Years.MIN_VALUE.
+
+        // Act & Assert: Call the method and verify that the expected exception is thrown.
+        // The assertThrows method, available in JUnit 4.13+, is a clean way to handle this.
+        ArithmeticException exception = assertThrows(
+            ArithmeticException.class,
+            () -> Years.MIN_VALUE.negated()
+        );
+
+        // Assert: Further inspect the exception to ensure it has the correct, informative message.
+        assertEquals("Integer.MIN_VALUE cannot be negated", exception.getMessage());
     }
 }
