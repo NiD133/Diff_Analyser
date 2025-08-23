@@ -1,34 +1,42 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.XmlDeclaration;
-import org.junit.runner.RunWith;
 
-public class Tokeniser_ESTestTest7 extends Tokeniser_ESTest_scaffolding {
+/**
+ * Test suite for the Tokeniser class.
+ */
+public class TokeniserTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        xmlTreeBuilder0.parse("missing semicolon on [&#%s]", "missing semicolon on [&#%s]");
-        Tokeniser tokeniser0 = new Tokeniser(xmlTreeBuilder0);
-        TokeniserState tokeniserState0 = TokeniserState.TagOpen;
-        // Undeclared exception!
-        try {
-            tokeniser0.transition(tokeniserState0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.parser.Tokeniser", e);
-        }
+    /**
+     * Verifies that calling transition() on a Tokeniser created from a completed
+     * TreeBuilder throws a NullPointerException.
+     * <p>
+     * This is an edge case test. When a TreeBuilder completes parsing, it nullifies its
+     * internal CharacterReader. If a Tokeniser is then initialized with this "spent"
+     * TreeBuilder, it will inherit the null reader. Any subsequent state transition
+     * that attempts to access the reader (e.g., to get the current position) will
+     * result in an NPE.
+     * </p>
+     */
+    @Test(expected = NullPointerException.class)
+    public void transitionThrowsNPEWhenTokeniserIsCreatedFromACompletedParser() {
+        // Arrange:
+        // 1. Create a TreeBuilder and run a full parse on a simple XML string.
+        // After parsing, the builder's internal reader is set to null.
+        XmlTreeBuilder treeBuilder = new XmlTreeBuilder();
+        treeBuilder.parse("<root/>", "http://example.com");
+
+        // 2. Create a Tokeniser from the completed TreeBuilder.
+        // This Tokeniser will now have a null CharacterReader.
+        Tokeniser tokeniser = new Tokeniser(treeBuilder);
+        TokeniserState targetState = TokeniserState.TagOpen;
+
+        // Act:
+        // 3. Attempt to transition to a new state. This will trigger an NPE
+        // when the Tokeniser tries to access its null reader.
+        tokeniser.transition(targetState);
+
+        // Assert:
+        // The @Test(expected) annotation asserts that a NullPointerException is thrown.
     }
 }
