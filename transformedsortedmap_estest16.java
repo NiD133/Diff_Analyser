@@ -1,51 +1,44 @@
 package org.apache.commons.collections4.map;
 
+import org.apache.commons.collections4.Transformer;
+import org.apache.commons.collections4.functors.ConstantTransformer;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.NoSuchElementException;
+
 import java.util.SortedMap;
 import java.util.TreeMap;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TransformedSortedMap_ESTestTest16 extends TransformedSortedMap_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        TreeMap<Object, Object> treeMap0 = new TreeMap<Object, Object>();
-        Integer integer0 = new Integer(1);
-        treeMap0.put(integer0, integer0);
-        ConstantTransformer<Object, Object> constantTransformer0 = new ConstantTransformer<Object, Object>(treeMap0);
-        // Undeclared exception!
+/**
+ * Contains tests for the factory method {@link TransformedSortedMap#transformedSortedMap(SortedMap, Transformer, Transformer)},
+ * focusing on error handling when transforming existing map elements.
+ */
+public class TransformedSortedMapTest {
+
+    @Test
+    public void transformedSortedMap_whenExistingKeyIsTransformedToNonComparable_shouldThrowClassCastException() {
+        // Arrange
+        // Create a source map that will be used both as the input map and as the
+        // non-comparable object returned by the transformer.
+        final SortedMap<Object, Object> sourceMap = new TreeMap<>();
+        sourceMap.put(1, 1);
+
+        // Create a transformer that always returns the sourceMap itself.
+        // A TreeMap instance is not Comparable, which will cause an issue when it's used as a key.
+        final Transformer<Object, Object> transformer = ConstantTransformer.constantTransformer(sourceMap);
+
+        // Act & Assert
+        // The transformedSortedMap() method processes existing entries. When it applies the
+        // transformer to the key '1', the result is 'sourceMap'. It then tries to
+        // put this new key into the underlying sorted map, which fails because a TreeMap
+        // key must be Comparable.
         try {
-            TransformedSortedMap.transformedSortedMap((SortedMap<Object, Object>) treeMap0, (Transformer<? super Object, ?>) constantTransformer0, (Transformer<? super Object, ?>) constantTransformer0);
-            fail("Expecting exception: ClassCastException");
-        } catch (ClassCastException e) {
-            //
-            // java.util.TreeMap cannot be cast to java.lang.Comparable
-            //
-            verifyException("java.util.TreeMap", e);
+            TransformedSortedMap.transformedSortedMap(sourceMap, transformer, transformer);
+            fail("Expected a ClassCastException because the transformed key is not Comparable.");
+        } catch (final ClassCastException e) {
+            // Verify that the exception is thrown for the expected reason.
+            assertEquals("java.util.TreeMap cannot be cast to java.lang.Comparable", e.getMessage());
         }
     }
 }
