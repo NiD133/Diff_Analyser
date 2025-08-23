@@ -1,23 +1,40 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class ArraySorter_ESTestTest12 extends ArraySorter_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        Integer[] integerArray0 = new Integer[5];
-        Comparator<Object> comparator0 = (Comparator<Object>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        doReturn(0, 0, 0, 0).when(comparator0).compare(any(), any());
-        Integer[] integerArray1 = ArraySorter.sort(integerArray0, (Comparator<? super Integer>) comparator0);
-        assertEquals(5, integerArray1.length);
+/**
+ * Tests for {@link ArraySorter}.
+ */
+public class ArraySorterTest {
+
+    @Test
+    public void sortWithComparatorShouldReturnSameArrayInstance() {
+        // Arrange: Create an array and a mock comparator.
+        // The comparator will treat all elements as equal, which is a valid edge case.
+        final Integer[] array = new Integer[5];
+
+        @SuppressWarnings("unchecked") // Necessary for mocking generic types like Comparator.
+        final Comparator<Integer> mockComparator = mock(Comparator.class);
+        when(mockComparator.compare(any(), any())).thenReturn(0);
+
+        // Act: Call the method under test.
+        final Integer[] sortedArray = ArraySorter.sort(array, mockComparator);
+
+        // Assert: Verify the behavior of the sort method.
+        // 1. The method should sort the array in-place and return the same instance.
+        assertSame("The sorted array should be the same instance as the input array.", array, sortedArray);
+
+        // 2. Verify that our custom comparator was actually invoked by the sorting algorithm.
+        // We check for atLeastOnce() because the exact number of calls is an
+        // implementation detail of the underlying Arrays.sort() method.
+        verify(mockComparator, atLeastOnce()).compare(any(), any());
     }
 }
