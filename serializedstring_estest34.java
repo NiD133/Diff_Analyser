@@ -1,28 +1,37 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
 import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SerializedString_ESTestTest34 extends SerializedString_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SerializedString} class, focusing on buffer operations.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(7);
-        SerializedString serializedString0 = new SerializedString("8g9F:23V=x");
-        int int0 = serializedString0.putQuotedUTF8(byteBuffer0);
-        assertEquals((-1), int0);
+    /**
+     * Tests that {@link SerializedString#putQuotedUTF8(ByteBuffer)} returns -1
+     * when the provided ByteBuffer does not have enough remaining capacity to hold
+     * the entire quoted, UTF-8 encoded string.
+     */
+    @Test
+    public void putQuotedUTF8ShouldReturnNegativeOneWhenBufferIsTooSmall() {
+        // Arrange
+        // The string "8g9F:23V=x" is 10 characters long. Its JSON-quoted UTF-8
+        // representation is ""8g9F:23V=x"", which requires 12 bytes.
+        SerializedString serializedString = new SerializedString("8g9F:23V=x");
+
+        // We create a buffer that is intentionally too small to hold the 12-byte result.
+        final int insufficientCapacity = 7;
+        ByteBuffer smallBuffer = ByteBuffer.allocate(insufficientCapacity);
+
+        // Act
+        // Attempt to write the quoted string into the buffer.
+        int bytesWritten = serializedString.putQuotedUTF8(smallBuffer);
+
+        // Assert
+        // The method's contract specifies returning -1 to indicate failure due to lack of space.
+        final int expectedFailureCode = -1;
+        assertEquals("Should return -1 for insufficient buffer space", expectedFailureCode, bytesWritten);
     }
 }
