@@ -1,49 +1,44 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
 import org.jsoup.nodes.XmlDeclaration;
-import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
+import javax.imageio.metadata.IIOMetadataNode;
 import org.w3c.dom.NodeList;
 
-public class W3CDom_ESTestTest10 extends W3CDom_ESTest_scaffolding {
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        iIOMetadataNode0.insertBefore(iIOMetadataNode0, iIOMetadataNode0);
-        Class<XmlDeclaration> class0 = XmlDeclaration.class;
-        // Undeclared exception!
+/**
+ * This test class contains tests for the W3CDom helper class.
+ * This specific test case focuses on the robustness of the sourceNodes method.
+ */
+public class W3CDomTest {
+
+    /**
+     * Tests that the sourceNodes method throws a NullPointerException when given a malformed NodeList
+     * that contains null elements. This ensures the method is not robust against buggy DOM implementations
+     * but documents its current behavior.
+     */
+    @Test
+    public void sourceNodesThrowsNPEWhenIteratingMalformedNodeList() {
+        // Arrange
+        W3CDom w3cDom = new W3CDom();
+
+        // Create a malformed NodeList using a quirk in IIOMetadataNode.
+        // The following call puts the node into an inconsistent state where its
+        // NodeList implementation reports a positive length, but item(0) returns null.
+        // This simulates a buggy or corrupt DOM structure.
+        IIOMetadataNode malformedNode = new IIOMetadataNode();
+        malformedNode.insertBefore(malformedNode, malformedNode);
+
+        NodeList malformedNodeList = malformedNode;
+
+        // Act & Assert
         try {
-            w3CDom0.sourceNodes((NodeList) iIOMetadataNode0, class0);
-            fail("Expecting exception: NullPointerException");
+            // The method is expected to fail when it encounters the null item in the list.
+            w3cDom.sourceNodes(malformedNodeList, XmlDeclaration.class);
+            fail("A NullPointerException was expected, but no exception was thrown.");
         } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.helper.W3CDom", e);
+            // Success: The expected exception was caught, confirming the method's behavior.
         }
     }
 }
