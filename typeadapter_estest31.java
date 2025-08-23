@@ -2,36 +2,40 @@ package com.google.gson;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class focuses on the behavior of Gson's internal FutureTypeAdapter.
+ * Note: The original class name "TypeAdapter_ESTestTest31" was auto-generated.
+ */
 public class TypeAdapter_ESTestTest31 extends TypeAdapter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        Gson.FutureTypeAdapter<Object> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Object>();
-        Character character0 = new Character('B');
-        JsonPrimitive jsonPrimitive0 = new JsonPrimitive(character0);
-        TypeAdapter<Object> typeAdapter0 = gson_FutureTypeAdapter0.nullSafe();
-        // Undeclared exception!
+    /**
+     * Tests that using a FutureTypeAdapter for deserialization before its delegate
+     * adapter has been set results in an IllegalStateException.
+     *
+     * This is a crucial safeguard for handling cyclic type dependencies, ensuring
+     * the adapter isn't used in an invalid, unresolved state.
+     */
+    @Test
+    public void fromJsonTree_onUnresolvedFutureAdapter_throwsIllegalStateException() {
+        // Arrange: Create a FutureTypeAdapter which has not been resolved with a delegate.
+        // This simulates the state during the setup of a type with a cyclic dependency.
+        Gson.FutureTypeAdapter<Object> futureAdapter = new Gson.FutureTypeAdapter<>();
+        
+        // Wrap it with nullSafe(), which is a common use case. The behavior should be the same.
+        TypeAdapter<Object> nullSafeFutureAdapter = futureAdapter.nullSafe();
+        
+        // Create an arbitrary JSON element to use as input for deserialization.
+        JsonPrimitive jsonInput = new JsonPrimitive('B');
+
+        // Act & Assert: Attempting to use the unresolved adapter should fail.
         try {
-            typeAdapter0.fromJsonTree(jsonPrimitive0);
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // Adapter for type with cyclic dependency has been used before dependency has been resolved
-            //
-            verifyException("com.google.gson.Gson$FutureTypeAdapter", e);
+            nullSafeFutureAdapter.fromJsonTree(jsonInput);
+            fail("Expected an IllegalStateException because the FutureTypeAdapter's delegate has not been set.");
+        } catch (IllegalStateException expected) {
+            // Verify that the exception message clearly explains the problem.
+            String expectedMessage = "Adapter for type with cyclic dependency has been used before dependency has been resolved";
+            assertEquals(expectedMessage, expected.getMessage());
         }
     }
 }
