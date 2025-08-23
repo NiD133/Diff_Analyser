@@ -1,42 +1,30 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Stack;
-import java.util.TreeSet;
 import org.apache.commons.collections4.Bag;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.SortedBag;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertFalse;
 
-public class CollectionBag_ESTestTest40 extends CollectionBag_ESTest_scaffolding {
+/**
+ * Contains understandable tests for the {@link CollectionBag} class, focusing on
+ * its adherence to the Collection contract and specific implementation details.
+ */
+public class CollectionBagTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        HashBag<Integer> hashBag0 = new HashBag<Integer>((Collection<? extends Integer>) linkedList0);
-        CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(hashBag0);
-        boolean boolean0 = collectionBag0.removeAll((Collection<?>) null);
-        assertFalse(boolean0);
+    /**
+     * Tests that calling removeAll() with a null collection argument
+     * does not throw an exception and correctly returns false, indicating
+     * that the bag was not modified.
+     */
+    @Test
+    public void testRemoveAllWithNullCollectionReturnsFalse() {
+        // Arrange: Create an empty CollectionBag. The behavior under test
+        // is independent of the bag's contents.
+        final Bag<String> bag = new CollectionBag<>(new HashBag<>());
+
+        // Act: Call the removeAll method with a null argument.
+        final boolean wasModified = bag.removeAll(null);
+
+        // Assert: The method should return false, as the collection was not changed.
+        assertFalse("removeAll(null) should return false, indicating no modification.", wasModified);
     }
 }
