@@ -1,30 +1,38 @@
 package org.apache.commons.compress.archivers;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.file.FileSystemException;
-import java.nio.file.InvalidPathException;
-import java.nio.file.NoSuchFileException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Lister_ESTestTest1 extends Lister_ESTest_scaffolding {
+/**
+ * Tests for the {@link Lister} command-line application.
+ */
+public class ListerTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        String[] stringArray0 = new String[3];
-        // Undeclared exception!
+    /**
+     * Verifies that Lister.main() throws a NullPointerException if the first
+     * command-line argument, which represents the archive path, is null.
+     */
+    @Test
+    public void mainShouldThrowNullPointerExceptionForNullArchivePath() {
+        // Arrange: Prepare arguments where the first element (the file path) is null.
+        final String[] argsWithNullPath = { null };
+
         try {
-            Lister.main(stringArray0);
-            fail("Expecting exception: NoClassDefFoundError");
-        } catch (NoClassDefFoundError e) {
-            //
-            // org/apache/commons/lang3/ArrayUtils
-            //
-            verifyException("org.apache.commons.compress.archivers.Lister", e);
+            // Act: Call the main method with the invalid arguments.
+            Lister.main(argsWithNullPath);
+
+            // Assert: If no exception is thrown, the test should fail.
+            fail("Expected a NullPointerException because the archive path cannot be null.");
+        } catch (final NullPointerException e) {
+            // Assert: The correct exception was caught. This is the expected outcome.
+            // The Lister constructor uses Objects.requireNonNull(args[0], "args[0]"),
+            // so we can optionally verify the exception message for more precise testing.
+            assertEquals("args[0]", e.getMessage());
+        } catch (final Exception e) {
+            // Assert: Fail if an unexpected exception type is caught.
+            fail("Caught an unexpected exception type: " + e.getClass().getName());
         }
     }
 }
