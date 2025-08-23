@@ -1,21 +1,26 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LeafNode_ESTestTest36 extends LeafNode_ESTest_scaffolding {
+/**
+ * Tests for the abstract LeafNode class.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        CDataNode cDataNode0 = new CDataNode("Gyb$AWbT${");
-        String string0 = cDataNode0.baseUri();
-        assertEquals("", string0);
+    /**
+     * Verifies that a newly created LeafNode has an empty base URI by default.
+     */
+    @Test
+    public void newLeafNodeHasEmptyBaseUri() {
+        // Arrange: Create a concrete instance of a LeafNode.
+        // CDataNode is used here as a representative subclass.
+        LeafNode node = new CDataNode("some cdata content");
+
+        // Act: Retrieve the base URI from the node.
+        String baseUri = node.baseUri();
+
+        // Assert: The base URI should be an empty string, as it has not been set.
+        assertEquals("", baseUri);
     }
 }
