@@ -2,40 +2,48 @@ package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
+
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
 import java.io.Writer;
 import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
+/**
+ * Contains an improved test case for the UTF8Writer class, focusing on clarity,
+ * correctness, and maintainability.
+ */
 public class UTF8Writer_ESTestTest5 extends UTF8Writer_ESTest_scaffolding {
 
+    /**
+     * Tests that appending a CharSequence to the UTF8Writer correctly writes the
+     * corresponding UTF-8 byte representation to the underlying output stream.
+     *
+     * This test replaces a generated test that had a misleading and unrelated assertion.
+     * It now properly verifies the behavior of the append() method.
+     */
     @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.unknown();
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, true);
-        char[] charArray0 = new char[2];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        UTF8Writer uTF8Writer0 = new UTF8Writer(iOContext0, pipedOutputStream0);
-        UTF8Writer uTF8Writer1 = (UTF8Writer) uTF8Writer0.append((CharSequence) charBuffer0);
-        assertEquals((-56613888), UTF8Writer.SURROGATE_BASE);
+    public void append_whenGivenCharSequence_writesEquivalentUTF8Bytes() throws IOException {
+        // Arrange: Set up the writer, the input data, and the expected output.
+        // A ByteArrayOutputStream is used to capture the written bytes for verification.
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        // IOContext is required by the UTF8Writer constructor.
+        IOContext ioContext = new IOContext(new BufferRecycler(), ContentReference.unknown(), false);
+        Writer writer = new UTF8Writer(ioContext, outputStream);
+
+        // The input CharSequence consists of two null characters ('\u0000').
+        char[] inputChars = new char[]{'\u0000', '\u0000'};
+        CharSequence inputSequence = CharBuffer.wrap(inputChars);
+
+        // In UTF-8, a null character is represented by a single zero byte.
+        byte[] expectedBytes = new byte[]{0, 0};
+
+        // Act: Append the character sequence to the writer and close it to flush the buffer.
+        writer.append(inputSequence);
+        writer.close();
+
+        // Assert: Verify that the bytes written to the stream match the expected UTF-8 sequence.
+        byte[] actualBytes = outputStream.toByteArray();
+        assertArrayEquals("The output bytes should match the expected UTF-8 representation.", expectedBytes, actualBytes);
     }
 }
