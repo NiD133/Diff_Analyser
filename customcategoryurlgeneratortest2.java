@@ -1,37 +1,45 @@
 package org.jfree.chart.urls;
 
+import org.jfree.chart.internal.CloneUtils;
+import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.jfree.chart.TestUtils;
-import org.jfree.chart.internal.CloneUtils;
-import org.jfree.chart.api.PublicCloneable;
-import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CustomCategoryURLGeneratorTestTest2 {
+/**
+ * Tests for the {@link CustomCategoryURLGenerator} class, focusing on cloning behavior.
+ */
+class CustomCategoryURLGeneratorTest {
 
     /**
-     * Confirm that cloning works.
-     * @throws java.lang.CloneNotSupportedException
+     * Verifies that cloning a CustomCategoryURLGenerator creates a deep,
+     * independent copy. Changes to the original object after cloning should not
+     * affect the clone.
      */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
-        CustomCategoryURLGenerator g1 = new CustomCategoryURLGenerator();
-        List<String> u1 = new ArrayList<>();
-        u1.add("URL A1");
-        u1.add("URL A2");
-        u1.add("URL A3");
-        g1.addURLSeries(u1);
-        CustomCategoryURLGenerator g2 = CloneUtils.clone(g1);
-        assertNotSame(g1, g2);
-        assertSame(g1.getClass(), g2.getClass());
-        assertEquals(g1, g2);
-        // check independence
-        List<String> u2 = new ArrayList<>();
-        u2.add("URL XXX");
-        g1.addURLSeries(u2);
-        assertNotEquals(g1, g2);
-        g2.addURLSeries(new ArrayList<>(u2));
-        assertEquals(g1, g2);
+    void clone_shouldCreateIndependentCopy() throws CloneNotSupportedException {
+        // Arrange: Create a generator and add an initial series of URLs.
+        CustomCategoryURLGenerator original = new CustomCategoryURLGenerator();
+        List<String> initialUrlSeries = new ArrayList<>();
+        initialUrlSeries.add("https://example.com/series1/item1");
+        initialUrlSeries.add("https://example.com/series1/item2");
+        original.addURLSeries(initialUrlSeries);
+
+        // Act: Clone the original generator.
+        CustomCategoryURLGenerator clone = CloneUtils.clone(original);
+
+        // Assert: The clone should be a new instance but logically equal to the original.
+        assertNotSame(original, clone, "The clone must be a different object instance.");
+        assertEquals(original, clone, "The clone should be equal to the original before any modifications.");
+
+        // Act: Modify the original generator by adding a new URL series.
+        List<String> additionalUrlSeries = new ArrayList<>();
+        additionalUrlSeries.add("https://example.com/series2/item1");
+        original.addURLSeries(additionalUrlSeries);
+
+        // Assert: The modification to the original should not affect the clone.
+        assertNotEquals(original, clone, "Modifying the original should not impact the clone, proving independence.");
     }
 }
