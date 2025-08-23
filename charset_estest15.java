@@ -1,19 +1,26 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
+/**
+ * This test case verifies the behavior of the CharSet.getInstance(String...)
+ * factory method when provided with null input.
+ */
 public class CharSet_ESTestTest15 extends CharSet_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        String[] stringArray0 = new String[9];
-        CharSet charSet0 = CharSet.getInstance(stringArray0);
-        boolean boolean0 = charSet0.contains('T');
-        assertFalse(boolean0);
+    /**
+     * Tests that a CharSet created from an array of null strings is empty
+     * and therefore does not contain any characters.
+     */
+    @Test
+    public void testGetInstanceWithNullArrayCreatesEmptySet() {
+        // Arrange: Create a CharSet from an array containing only null strings.
+        // According to the documentation, this should result in an empty set.
+        String[] inputWithNulls = new String[9];
+        CharSet emptySet = CharSet.getInstance(inputWithNulls);
+
+        // Act & Assert: Verify that an arbitrary character is not present in the set.
+        assertFalse("A CharSet created from null strings should be empty and not contain 'T'.", emptySet.contains('T'));
     }
 }
