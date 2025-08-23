@@ -1,28 +1,17 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class StringUtil_ESTestTest72 extends StringUtil_ESTest_scaffolding {
+/**
+ * Tests for {@link StringUtil}.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test71() throws Throwable {
-        boolean boolean0 = StringUtil.isActuallyWhitespace(9);
-        assertTrue(boolean0);
+    @Test
+    public void isActuallyWhitespaceRecognizesTabAsWhitespace() {
+        // The character code 9 corresponds to the tab character ('\t').
+        // The isActuallyWhitespace method should identify it as whitespace.
+        assertTrue("The tab character should be classified as whitespace.", StringUtil.isActuallyWhitespace('\t'));
     }
 }
