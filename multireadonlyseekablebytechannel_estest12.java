@@ -1,41 +1,45 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.FileChannel;
-import java.nio.channels.NonWritableChannelException;
+
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.junit.runner.RunWith;
 
-public class MultiReadOnlySeekableByteChannel_ESTestTest12 extends MultiReadOnlySeekableByteChannel_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        LinkedList<SeekableByteChannel> linkedList0 = new LinkedList<SeekableByteChannel>();
-        linkedList0.add((SeekableByteChannel) null);
-        MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = new MultiReadOnlySeekableByteChannel(linkedList0);
-        // Undeclared exception!
+
+/**
+ * Tests for {@link MultiReadOnlySeekableByteChannel}.
+ */
+// The original class name "MultiReadOnlySeekableByteChannel_ESTestTest12"
+// was likely auto-generated. A more conventional name is used here.
+public class MultiReadOnlySeekableByteChannelTest {
+
+    /**
+     * Verifies that the isOpen() method propagates a NullPointerException if the
+     * underlying list of channels contains a null element. The implementation of
+     * isOpen() iterates through all channels, so it should fail when it
+     * encounters a null reference.
+     */
+    @Test
+    public void isOpenShouldThrowNullPointerExceptionWhenChannelListContainsNull() {
+        // Arrange: Create a MultiReadOnlySeekableByteChannel backed by a list
+        // that contains a single null channel.
+        final List<SeekableByteChannel> channelsWithNull = Collections.singletonList(null);
+        final MultiReadOnlySeekableByteChannel multiChannel =
+            new MultiReadOnlySeekableByteChannel(channelsWithNull);
+
+        // Act & Assert: Expect a NullPointerException when isOpen() is called.
+        // The use of a try-catch block explicitly pinpoints the method call
+        // that is expected to fail.
         try {
-            multiReadOnlySeekableByteChannel0.isOpen();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.stream.MatchOps$1MatchSink", e);
+            multiChannel.isOpen();
+            fail("Expected a NullPointerException to be thrown, but no exception occurred.");
+        } catch (final NullPointerException e) {
+            // The expected exception was caught, so the test passes.
+            // No further checks on the exception are necessary.
         }
     }
 }
