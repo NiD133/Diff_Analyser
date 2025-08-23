@@ -1,41 +1,50 @@
 package org.joda.time.field;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Days;
 import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.Weeks;
-import org.joda.time.chrono.EthiopicChronology;
 import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.chrono.LenientChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PreciseDurationDateTimeField_ESTestTest6 extends PreciseDurationDateTimeField_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfCentury();
-        MillisDurationField millisDurationField0 = (MillisDurationField) MillisDurationField.INSTANCE;
-        JulianChronology julianChronology0 = JulianChronology.getInstance();
-        DateTimeZone dateTimeZone0 = DateTimeZone.UTC;
-        ZonedChronology zonedChronology0 = ZonedChronology.getInstance(julianChronology0, dateTimeZone0);
-        DurationField durationField0 = zonedChronology0.days();
-        PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, millisDurationField0, durationField0);
-        long long0 = preciseDateTimeField0.set(2979L, 0);
-        assertEquals(0L, long0);
+/**
+ * Contains tests for the {@link PreciseDurationDateTimeField} class.
+ */
+public class PreciseDurationDateTimeFieldTest {
+
+    /**
+     * Tests that setting the field's value to zero on a given instant effectively
+     * subtracts the original value of the field from that instant.
+     *
+     * <p>The {@code set} method is implemented as:
+     * {@code instant + (newValue - get(instant)) * unitMillis}
+     *
+     * <p>In this test, {@code newValue} is 0, so this simplifies to:
+     * {@code instant - get(instant) * unitMillis}
+     * which is the definition of rounding down to the beginning of the range.
+     *
+     * <p>We construct a field representing "millisecond of day".
+     * The initial instant is 2979ms. The {@code get()} value is therefore 2979.
+     * Setting the value to 0 should result in a new instant of 0ms (the epoch).
+     */
+    @Test
+    public void set_toZero_resetsTheFieldValue() {
+        // Arrange
+        // Create a field that behaves like "millisecond of day" to test the set logic.
+        // The unit is milliseconds, and the range is one day.
+        DateTimeFieldType fieldType = DateTimeFieldType.millisOfDay();
+        DurationField millisecondUnit = MillisDurationField.INSTANCE;
+        DurationField dayRange = GJChronology.getInstanceUTC().days();
+        PreciseDateTimeField millisecondOfDayField = new PreciseDateTimeField(fieldType, millisecondUnit, dayRange);
+
+        long initialInstant = 2979L; // 2979 milliseconds past the epoch
+        int valueToSet = 0;
+
+        // Act
+        long resultInstant = millisecondOfDayField.set(initialInstant, valueToSet);
+
+        // Assert
+        long expectedInstant = 0L; // The start of the day (which is the epoch)
+        assertEquals(expectedInstant, resultInstant);
     }
 }
