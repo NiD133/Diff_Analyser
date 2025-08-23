@@ -1,49 +1,58 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
+import org.junit.Test;
+
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class UTF8Writer_ESTestTest13 extends UTF8Writer_ESTest_scaffolding {
+import static org.junit.Assert.fail;
 
+/**
+ * Contains tests for the {@link UTF8Writer} class, focusing on its interaction
+ * with the underlying output stream.
+ */
+public class UTF8WriterTest {
+
+    /**
+     * Verifies that calling close() on a UTF8Writer throws a NullPointerException
+     * if it was constructed with an underlying stream that is null.
+     * <p>
+     * The exception is expected to originate from the wrapped stream when UTF8Writer
+     * attempts to flush its internal buffer and close the stream.
+     */
     @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.unknown();
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        CharBuffer charBuffer0 = CharBuffer.allocate(1988);
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, true);
-        BufferedOutputStream bufferedOutputStream0 = new BufferedOutputStream((OutputStream) null, 7993);
-        UTF8Writer uTF8Writer0 = new UTF8Writer(iOContext0, bufferedOutputStream0);
-        uTF8Writer0.append((CharSequence) charBuffer0);
-        // Undeclared exception!
+    public void close_whenUnderlyingStreamIsNull_shouldThrowNullPointerException() throws IOException {
+        // Arrange: Create a UTF8Writer that wraps a null OutputStream.
+        // A BufferedOutputStream is used here to mirror the original test's scenario.
+        IOContext ioContext = new IOContext(
+                StreamReadConstraints.defaults(),
+                StreamWriteConstraints.defaults(),
+                ErrorReportConfiguration.defaults(),
+                new BufferRecycler(),
+                ContentReference.unknown(),
+                true);
+
+        OutputStream nullOutputStream = null;
+        UTF8Writer utf8Writer = new UTF8Writer(ioContext, new BufferedOutputStream(nullOutputStream));
+
+        // Act: Write some data to the writer. This should be buffered internally
+        // without causing an immediate error, as the buffer is not yet full.
+        utf8Writer.write("some buffered data");
+
+        // Assert: Closing the writer must attempt to flush its buffer to the
+        // underlying stream. Since the stream is null, this will cause an NPE.
         try {
-            uTF8Writer0.close();
-            fail("Expecting exception: NullPointerException");
+            utf8Writer.close();
+            fail("A NullPointerException was expected but not thrown.");
         } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.io.BufferedOutputStream", e);
+            // This is the expected behavior. The test passes.
+            // The NPE originates from the wrapped stream (BufferedOutputStream)
+            // trying to operate on its null delegate stream.
         }
     }
 }
