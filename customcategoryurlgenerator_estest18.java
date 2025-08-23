@@ -1,29 +1,36 @@
 package org.jfree.chart.urls;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultKeyedValues2DDataset;
-import org.junit.runner.RunWith;
 
+/**
+ * Contains tests for the clone() and equals() contract of the {@link CustomCategoryURLGenerator} class.
+ */
+// The test class name and inheritance are preserved from the original EvoSuite-generated code.
 public class CustomCategoryURLGenerator_ESTestTest18 extends CustomCategoryURLGenerator_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
-        Stack<String> stack0 = new Stack<String>();
-        stack0.add((String) null);
-        customCategoryURLGenerator0.addURLSeries(stack0);
-        Object object0 = customCategoryURLGenerator0.clone();
-        boolean boolean0 = customCategoryURLGenerator0.equals(object0);
-        assertNotSame(object0, customCategoryURLGenerator0);
-        assertTrue(boolean0);
+    /**
+     * Verifies that a cloned CustomCategoryURLGenerator is equal to the original
+     * but is a separate object instance, fulfilling the general contract for clone().
+     * This test includes a URL series with a null value to ensure it's handled correctly.
+     */
+    @Test
+    public void clone_shouldProduceEqualButNotSameInstance() throws CloneNotSupportedException {
+        // Arrange: Create a generator and add a URL series containing a null value.
+        CustomCategoryURLGenerator originalGenerator = new CustomCategoryURLGenerator();
+        List<String> urlSeriesWithNull = new ArrayList<>();
+        urlSeriesWithNull.add(null);
+        originalGenerator.addURLSeries(urlSeriesWithNull);
+
+        // Act: Clone the original generator.
+        CustomCategoryURLGenerator clonedGenerator = (CustomCategoryURLGenerator) originalGenerator.clone();
+
+        // Assert: The clone should be a different instance but equal in value.
+        assertNotSame("The cloned object should be a new instance.", originalGenerator, clonedGenerator);
+        assertEquals("The cloned object should be equal to the original.", originalGenerator, clonedGenerator);
     }
 }
