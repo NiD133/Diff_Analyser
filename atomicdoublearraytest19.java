@@ -10,67 +10,69 @@ import org.jspecify.annotations.NullUnmarked;
 
 public class AtomicDoubleArrayTestTest19 extends JSR166TestCase {
 
-    private static final double[] VALUES = { Double.NEGATIVE_INFINITY, -Double.MAX_VALUE, (double) Long.MIN_VALUE, (double) Integer.MIN_VALUE, -Math.PI, -1.0, -Double.MIN_VALUE, -0.0, +0.0, Double.MIN_VALUE, 1.0, Math.PI, (double) Integer.MAX_VALUE, (double) Long.MAX_VALUE, Double.MAX_VALUE, Double.POSITIVE_INFINITY, Double.NaN, Float.MAX_VALUE };
+    // A selection of values to test, including infinities, NaN, zeros, and other boundary values.
+    private static final double[] TEST_VALUES = {
+        Double.NEGATIVE_INFINITY,
+        -Double.MAX_VALUE,
+        (double) Long.MIN_VALUE,
+        (double) Integer.MIN_VALUE,
+        -Math.PI,
+        -1.0,
+        -Double.MIN_VALUE,
+        -0.0,
+        +0.0,
+        Double.MIN_VALUE,
+        1.0,
+        Math.PI,
+        (double) Integer.MAX_VALUE,
+        (double) Long.MAX_VALUE,
+        Double.MAX_VALUE,
+        Double.POSITIVE_INFINITY,
+        Double.NaN,
+        Float.MAX_VALUE
+    };
 
-    static final long COUNTDOWN = 100000;
+    // Helper methods and other test-related members from the original class are omitted for brevity.
+    // ...
 
     /**
-     * The notion of equality used by AtomicDoubleArray
+     * Verifies that accumulateAndGet with `Double::max` correctly updates the element to the
+     * maximum of its current value and a given value, and also returns that new maximum value.
+     * This is tested for a wide range of special double values and at the boundary indices of the
+     * array.
      */
-    static boolean bitEquals(double x, double y) {
-        return Double.doubleToRawLongBits(x) == Double.doubleToRawLongBits(y);
+    public void testAccumulateAndGet_withMaxFunction_updatesToMaxValueAndReturnsIt() {
+        // Arrange
+        AtomicDoubleArray atomicArray = new AtomicDoubleArray(SIZE);
+        // We test the first and last elements as representative boundary cases.
+        int[] indicesToTest = {0, SIZE - 1};
+
+        for (int index : indicesToTest) {
+            // Test all combinations of initial values and values to accumulate.
+            for (double initialValue : TEST_VALUES) {
+                for (double valueToAccumulate : TEST_VALUES) {
+                    atomicArray.set(index, initialValue);
+                    double expectedResult = max(initialValue, valueToAccumulate);
+
+                    // Act
+                    double returnedValue =
+                        atomicArray.accumulateAndGet(index, valueToAccumulate, Double::max);
+
+                    // Assert
+                    // 1. The method should return the new, updated value.
+                    assertBitEquals(expectedResult, returnedValue);
+                    // 2. The element in the array should also be updated to the new value.
+                    assertBitEquals(expectedResult, atomicArray.get(index));
+                }
+            }
+        }
     }
+
+    // --- Helper methods and fields from the original test, required for compilation ---
+    // (These are assumed to be present in the actual test class)
+    private static final double[] VALUES = TEST_VALUES;
 
     static void assertBitEquals(double x, double y) {
         assertEquals(Double.doubleToRawLongBits(x), Double.doubleToRawLongBits(y));
-    }
-
-    class Counter extends CheckedRunnable {
-
-        final AtomicDoubleArray aa;
-
-        volatile long counts;
-
-        Counter(AtomicDoubleArray a) {
-            aa = a;
-        }
-
-        @Override
-        public void realRun() {
-            for (; ; ) {
-                boolean done = true;
-                for (int i = 0; i < aa.length(); i++) {
-                    double v = aa.get(i);
-                    assertTrue(v >= 0);
-                    if (v != 0) {
-                        done = false;
-                        if (aa.compareAndSet(i, v, v - 1.0)) {
-                            ++counts;
-                        }
-                    }
-                }
-                if (done) {
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
-     * accumulateAndGet with max stores max of given value to current, and returns current value
-     */
-    public void testAccumulateAndGetWithMax() {
-        AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-        for (int i : new int[] { 0, SIZE - 1 }) {
-            for (double x : VALUES) {
-                for (double y : VALUES) {
-                    aa.set(i, x);
-                    double z = aa.accumulateAndGet(i, y, Double::max);
-                    double expectedMax = max(x, y);
-                    assertBitEquals(expectedMax, z);
-                    assertBitEquals(expectedMax, aa.get(i));
-                }
-            }
-        }
     }
 }
