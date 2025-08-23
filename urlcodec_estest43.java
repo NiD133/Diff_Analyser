@@ -1,28 +1,55 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class URLCodec_ESTestTest43 extends URLCodec_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        URLCodec uRLCodec0 = new URLCodec("3X{`l{LuA3.3r K44");
-        Object object0 = new Object();
+/**
+ * Test cases for the URLCodec class.
+ */
+public class URLCodecTest {
+
+    /**
+     * Verifies that attempting to decode an object of an unsupported type (i.e., not a String or byte[])
+     * results in a DecoderException with a specific error message.
+     */
+    @Test
+    public void decode_withUnsupportedObjectType_shouldThrowDecoderException() {
+        // Arrange: Create a URLCodec instance and an object of an unsupported type.
+        URLCodec urlCodec = new URLCodec();
+        Object unsupportedInput = new Object();
+        String expectedMessage = "Objects of type java.lang.Object cannot be URL decoded";
+
+        // Act & Assert: Verify that a DecoderException is thrown with the correct message.
+        // This uses the modern assertThrows from JUnit 4.13+ for cleaner exception testing.
+        DecoderException thrown = assertThrows(DecoderException.class, () -> {
+            urlCodec.decode(unsupportedInput);
+        });
+
+        assertEquals(expectedMessage, thrown.getMessage());
+    }
+
+    /**
+     * Below is an alternative implementation using a traditional try-catch block,
+     * which is also clear and works with older versions of JUnit 4.
+     */
+    @Test
+    public void decode_withUnsupportedObjectType_shouldThrowDecoderException_withTryCatch() {
+        // Arrange
+        URLCodec urlCodec = new URLCodec();
+        Object unsupportedInput = new Object();
+        String expectedMessage = "Objects of type java.lang.Object cannot be URL decoded";
+
+        // Act & Assert
         try {
-            uRLCodec0.decode(object0);
-            fail("Expecting exception: Exception");
-        } catch (Exception e) {
-            //
-            // Objects of type java.lang.Object cannot be URL decoded
-            //
-            verifyException("org.apache.commons.codec.net.URLCodec", e);
+            urlCodec.decode(unsupportedInput);
+            fail("Expected a DecoderException to be thrown, but it was not.");
+        } catch (DecoderException e) {
+            // This is the expected outcome. Now, verify the exception message.
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
