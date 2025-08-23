@@ -1,73 +1,87 @@
 package com.google.common.util.concurrent;
 
-import static java.lang.Math.max;
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertEquals;
+
 import com.google.common.annotations.GwtIncompatible;
 import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.testing.NullPointerTester;
-import java.util.Arrays;
+import java.util.function.DoubleBinaryOperator;
 import org.jspecify.annotations.NullUnmarked;
 
+@GwtIncompatible
+@J2ktIncompatible
+@NullUnmarked
 public class AtomicDoubleArrayTestTest16 extends JSR166TestCase {
 
-    private static final double[] VALUES = { Double.NEGATIVE_INFINITY, -Double.MAX_VALUE, (double) Long.MIN_VALUE, (double) Integer.MIN_VALUE, -Math.PI, -1.0, -Double.MIN_VALUE, -0.0, +0.0, Double.MIN_VALUE, 1.0, Math.PI, (double) Integer.MAX_VALUE, (double) Long.MAX_VALUE, Double.MAX_VALUE, Double.POSITIVE_INFINITY, Double.NaN, Float.MAX_VALUE };
-
-    static final long COUNTDOWN = 100000;
+    /**
+     * A wide range of doubles for comprehensive testing, including infinities,
+     * max/min values, zero, subnormals, and NaN.
+     */
+    private static final double[] TEST_VALUES = {
+        Double.NEGATIVE_INFINITY,
+        -Double.MAX_VALUE,
+        (double) Long.MIN_VALUE,
+        (double) Integer.MIN_VALUE,
+        -Math.PI,
+        -1.0,
+        -Double.MIN_VALUE,
+        -0.0,
+        +0.0,
+        Double.MIN_VALUE,
+        1.0,
+        Math.PI,
+        (double) Integer.MAX_VALUE,
+        (double) Long.MAX_VALUE,
+        Double.MAX_VALUE,
+        Double.POSITIVE_INFINITY,
+        Double.NaN,
+        Float.MAX_VALUE
+    };
 
     /**
-     * The notion of equality used by AtomicDoubleArray
+     * Asserts that two double values are bitwise-equal, which is the
+     * equality contract used by AtomicDoubleArray. A custom message is used
+     * for clearer test failure reports.
      */
-    static boolean bitEquals(double x, double y) {
-        return Double.doubleToRawLongBits(x) == Double.doubleToRawLongBits(y);
-    }
-
-    static void assertBitEquals(double x, double y) {
-        assertEquals(Double.doubleToRawLongBits(x), Double.doubleToRawLongBits(y));
-    }
-
-    class Counter extends CheckedRunnable {
-
-        final AtomicDoubleArray aa;
-
-        volatile long counts;
-
-        Counter(AtomicDoubleArray a) {
-            aa = a;
-        }
-
-        @Override
-        public void realRun() {
-            for (; ; ) {
-                boolean done = true;
-                for (int i = 0; i < aa.length(); i++) {
-                    double v = aa.get(i);
-                    assertTrue(v >= 0);
-                    if (v != 0) {
-                        done = false;
-                        if (aa.compareAndSet(i, v, v - 1.0)) {
-                            ++counts;
-                        }
-                    }
-                }
-                if (done) {
-                    break;
-                }
-            }
-        }
+    private static void assertBitEquals(String message, double expected, double actual) {
+        assertEquals(message, Double.doubleToRawLongBits(expected), Double.doubleToRawLongBits(actual));
     }
 
     /**
-     * getAndAccumulate with sum adds given value to current, and returns previous value
+     * Verifies that getAndAccumulate with a sum function returns the previous value
+     * and correctly updates the element to the new sum.
+     *
+     * <p>This test is performed across a comprehensive set of special and boundary
+     * double values to ensure correctness in edge cases.
      */
-    public void testGetAndAccumulateWithSum() {
-        AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-        for (int i : new int[] { 0, SIZE - 1 }) {
-            for (double x : VALUES) {
-                for (double y : VALUES) {
-                    aa.set(i, x);
-                    double z = aa.getAndAccumulate(i, y, Double::sum);
-                    assertBitEquals(x, z);
-                    assertBitEquals(x + y, aa.get(i));
+    public void testGetAndAccumulate_withSum_returnsOldValueAndStoresNewSum() {
+        // Test on the first and last elements of the array as representative indices.
+        int[] indicesToTest = {0, SIZE - 1};
+
+        for (int index : indicesToTest) {
+            for (double initialValue : TEST_VALUES) {
+                for (double valueToAdd : TEST_VALUES) {
+                    // Arrange
+                    AtomicDoubleArray atomicArray = new AtomicDoubleArray(SIZE);
+                    atomicArray.set(index, initialValue);
+                    DoubleBinaryOperator sum = Double::sum;
+
+                    // Act
+                    double returnedValue = atomicArray.getAndAccumulate(index, valueToAdd, sum);
+
+                    // Assert
+                    // 1. The method must return the value as it was *before* the operation.
+                    assertBitEquals(
+                        "getAndAccumulate should return the previous value",
+                        initialValue,
+                        returnedValue);
+
+                    // 2. The element in the array must be updated to the new sum.
+                    double finalValue = atomicArray.get(index);
+                    double expectedFinalValue = initialValue + valueToAdd;
+                    assertBitEquals(
+                        "The element should be updated to the new sum",
+                        expectedFinalValue,
+                        finalValue);
                 }
             }
         }
