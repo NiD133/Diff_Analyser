@@ -1,46 +1,43 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
-import org.joda.time.MonthDay;
-import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
-import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractPartial_ESTestTest53 extends AbstractPartial_ESTest_scaffolding {
+import static org.junit.Assert.assertArrayEquals;
 
-    @Test(timeout = 4000)
-    public void test52() throws Throwable {
-        LocalDateTime localDateTime0 = LocalDateTime.now();
-        int[] intArray0 = localDateTime0.getValues();
-        assertArrayEquals(new int[] { 2014, 2, 14, 73281320 }, intArray0);
+/**
+ * Test suite for the AbstractPartial class.
+ *
+ * <p>This test focuses on the getValues() method, using LocalDateTime as a concrete
+ * implementation of AbstractPartial to verify its behavior.
+ */
+public class AbstractPartialTest {
+
+    /**
+     * Verifies that getValues() on a LocalDateTime instance returns an integer array
+     * containing the correct values for each of its date and time fields.
+     */
+    @Test
+    public void getValues_onLocalDateTime_shouldReturnArrayOfFieldValues() {
+        // Arrange: Create a specific LocalDateTime to make the test deterministic and explicit.
+        // The original test relied on a mocked `LocalDateTime.now()`.
+        LocalDateTime dateTime = new LocalDateTime(2014, 2, 14, 20, 21, 21, 320);
+
+        // For LocalDateTime, the values are [year, monthOfYear, dayOfMonth, millisOfDay].
+        // We define the expected values with clear variable names to document the array structure.
+        int expectedYear = 2014;
+        int expectedMonth = 2;
+        int expectedDay = 14;
+        // Calculate millisOfDay explicitly to show how the value is derived, avoiding a "magic number".
+        int expectedMillisOfDay = new LocalTime(20, 21, 21, 320).getMillisOfDay(); // 73281320
+
+        int[] expectedValues = new int[]{expectedYear, expectedMonth, expectedDay, expectedMillisOfDay};
+
+        // Act: Call the method under test.
+        int[] actualValues = dateTime.getValues();
+
+        // Assert: Verify that the actual values match the expected values.
+        assertArrayEquals(expectedValues, actualValues);
     }
 }
