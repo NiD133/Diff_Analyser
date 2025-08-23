@@ -1,20 +1,29 @@
 package com.itextpdf.text.error_messages;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class MessageLocalization_ESTestTest13 extends MessageLocalization_ESTest_scaffolding {
+/**
+ * Tests for the {@link MessageLocalization} class, focusing on message composition.
+ */
+public class MessageLocalizationTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        String string0 = MessageLocalization.getComposedMessage("you.can.only.add.cells.to.rows.no.objects.of.type.1", (-83190818));
-        assertNotNull(string0);
+    /**
+     * Verifies that getComposedMessage correctly formats a message string
+     * by substituting a placeholder with an integer value.
+     */
+    @Test
+    public void getComposedMessage_withIntegerParameter_shouldReturnFormattedString() {
+        // Arrange: Define the message key, the parameter, and the expected output.
+        // The key corresponds to the message: "You can only add cells to rows, no objects of type {1}."
+        String messageKey = "you.can.only.add.cells.to.rows.no.objects.of.type.1";
+        int objectTypeParameter = 42;
+        String expectedMessage = "You can only add cells to rows, no objects of type " + objectTypeParameter + ".";
+
+        // Act: Call the method under test.
+        String actualMessage = MessageLocalization.getComposedMessage(messageKey, objectTypeParameter);
+
+        // Assert: Verify that the actual output matches the expected formatted string.
+        assertEquals(expectedMessage, actualMessage);
     }
 }
