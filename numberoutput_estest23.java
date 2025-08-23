@@ -1,26 +1,34 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NumberOutput_ESTestTest23 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class, focusing on edge cases and exception handling.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        char[] charArray0 = new char[9];
-        // Undeclared exception!
-        try {
-            NumberOutput.outputLong((-2147483648L), charArray0, 0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 9
-            //
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
-        }
+    /**
+     * Verifies that {@link NumberOutput#outputLong(long, char[], int)} throws an
+     * {@link ArrayIndexOutOfBoundsException} when the provided buffer is too small
+     * to hold the string representation of the number.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void outputLong_shouldThrowException_whenBufferIsTooSmall() {
+        // Arrange
+        // The string representation of Integer.MIN_VALUE ("-2147483648") has 11 characters.
+        long valueToConvert = Integer.MIN_VALUE;
+        
+        // We provide a buffer that is intentionally too small to hold the result.
+        // A buffer of size 10 is one character short.
+        char[] buffer = new char[10];
+        int offset = 0;
+
+        // Act
+        // This call should attempt to write past the end of the buffer, triggering an exception.
+        NumberOutput.outputLong(valueToConvert, buffer, offset);
+
+        // Assert
+        // The test will pass if the expected ArrayIndexOutOfBoundsException is thrown.
+        // If no exception is thrown, the test will fail.
     }
 }
