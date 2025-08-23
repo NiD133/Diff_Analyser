@@ -1,29 +1,43 @@
 package org.apache.commons.codec.language;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import org.apache.commons.codec.AbstractStringEncoderTest;
-import org.apache.commons.codec.EncoderException;
-import org.junit.jupiter.api.Test;
 
-public class SoundexTestTest27 extends AbstractStringEncoderTest<Soundex> {
+import org.apache.commons.codec.AbstractStringEncoderTest;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
+/**
+ * Tests the {@link Soundex} algorithm using the default US English mapping.
+ */
+public class SoundexTest extends AbstractStringEncoderTest<Soundex> {
 
     @Override
     protected Soundex createStringEncoder() {
+        // The default Soundex constructor uses the US English mapping.
         return new Soundex();
     }
 
     /**
-     * Tests example from https://en.wikipedia.org/wiki/Soundex#American_Soundex as of 2015-03-22.
+     * Tests examples from the Wikipedia article on American Soundex. This ensures
+     * the encoder conforms to well-known, standard examples.
+     *
+     * @see <a href="https://en.wikipedia.org/wiki/Soundex#American_Soundex">Wikipedia - American Soundex</a>
+     * @param name the input name to encode
+     * @param expectedSoundexCode the expected Soundex code
      */
-    @Test
-    void testWikipediaAmericanSoundex() {
-        assertEquals("R163", getStringEncoder().encode("Robert"));
-        assertEquals("R163", getStringEncoder().encode("Rupert"));
-        assertEquals("A261", getStringEncoder().encode("Ashcraft"));
-        assertEquals("A261", getStringEncoder().encode("Ashcroft"));
-        assertEquals("T522", getStringEncoder().encode("Tymczak"));
-        assertEquals("P236", getStringEncoder().encode("Pfister"));
+    @ParameterizedTest(name = "Encoding ''{0}'' should result in ''{1}''")
+    @CsvSource({
+        // Names that should produce the same code
+        "Robert,   R163",
+        "Rupert,   R163",
+        // Another pair of names with the same code
+        "Ashcraft, A261",
+        "Ashcroft, A261",
+        // Other examples
+        "Tymczak,  T522",
+        "Pfister,  P236"
+    })
+    void shouldEncodeWikipediaAmericanSoundexExamples(final String name, final String expectedSoundexCode) {
+        assertEquals(expectedSoundexCode, getStringEncoder().encode(name));
     }
 }
