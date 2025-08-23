@@ -1,35 +1,23 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class YearsTestTest9 extends TestCase {
+/**
+ * Unit tests for the {@link Years} class.
+ */
+public class YearsTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    @Test
+    public void getPeriodType_shouldReturnYearsType() {
+        // Arrange: Create an instance of Years.
+        Years twentyYears = Years.years(20);
+        PeriodType expectedType = PeriodType.years();
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+        // Act: Get the period type from the instance.
+        PeriodType actualType = twentyYears.getPeriodType();
 
-    public static TestSuite suite() {
-        return new TestSuite(TestYears.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testGetPeriodType() {
-        Years test = Years.years(20);
-        assertEquals(PeriodType.years(), test.getPeriodType());
+        // Assert: Verify that the period type is correct.
+        assertEquals(expectedType, actualType);
     }
 }
