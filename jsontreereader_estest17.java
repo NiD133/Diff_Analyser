@@ -1,34 +1,27 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
+import org.junit.Test;
+
+// The test runner and scaffolding dependencies from the original test are preserved.
 import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
 public class JsonTreeReader_ESTestTest17 extends JsonTreeReader_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test016() throws Throwable {
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader((JsonElement) null);
-        // Undeclared exception!
-        try {
-            jsonTreeReader0.nextString();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling nextString() on a JsonTreeReader initialized with a null
+     * JsonElement throws a NullPointerException. This is the expected behavior as the
+     * reader has no element to process.
+     */
+    @Test(expected = NullPointerException.class, timeout = 4000)
+    public void nextStringShouldThrowNullPointerExceptionWhenReaderIsCreatedWithNull() throws IOException {
+        // Arrange: Create a reader with a null JsonElement, which is an invalid state.
+        JsonTreeReader jsonTreeReader = new JsonTreeReader((JsonElement) null);
+
+        // Act & Assert: Attempting to read a string should fail with a NullPointerException.
+        jsonTreeReader.nextString();
     }
 }
