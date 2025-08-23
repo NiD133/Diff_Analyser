@@ -1,21 +1,25 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class LeafNode_ESTestTest7 extends LeafNode_ESTest_scaffolding {
+/**
+ * Tests for the abstract LeafNode class, focusing on behavior common to all its subclasses.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        CDataNode cDataNode0 = new CDataNode("");
-        boolean boolean0 = cDataNode0.hasAttributes();
-        assertFalse(boolean0);
+    /**
+     * Verifies that a newly created LeafNode, which has no attributes by default,
+     * correctly reports that it has no attributes.
+     */
+    @Test
+    public void hasAttributesReturnsFalseWhenNodeHasNoAttributes() {
+        // Arrange: A LeafNode is abstract, so we must use a concrete subclass for testing.
+        // CDataNode is a simple LeafNode implementation suitable for this purpose.
+        LeafNode node = new CDataNode("");
+
+        // Act & Assert: Check if the node reports having attributes.
+        // It should return false as no attributes have been added.
+        assertFalse(node.hasAttributes());
     }
 }
