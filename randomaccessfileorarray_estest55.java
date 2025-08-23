@@ -1,35 +1,32 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomAccessFileOrArray_ESTestTest55 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test054() throws Throwable {
-        byte[] byteArray0 = new byte[8];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        byte[] byteArray1 = new byte[0];
-        int int0 = randomAccessFileOrArray0.read(byteArray1);
-        assertEquals(0, int0);
-        assertEquals(0L, randomAccessFileOrArray0.getFilePointer());
+    /**
+     * Tests that calling the read(byte[]) method with a zero-length buffer
+     * correctly returns 0 and does not advance the file pointer. This is the
+     * expected behavior according to the Java InputStream contract.
+     */
+    @Test
+    public void read_withEmptyBuffer_returnsZeroAndPointerIsUnchanged() throws IOException {
+        // Arrange: Create a RandomAccessFileOrArray with some source data
+        // and an empty buffer to read into.
+        byte[] sourceData = new byte[8];
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray(sourceData);
+        byte[] emptyBuffer = new byte[0];
+
+        // Act: Attempt to read data into the empty buffer.
+        int bytesRead = fileOrArray.read(emptyBuffer);
+
+        // Assert: Verify that no bytes were read and the file pointer remains at the start.
+        assertEquals("Reading into a zero-length buffer should return 0.", 0, bytesRead);
+        assertEquals("File pointer should not advance after a zero-length read.", 0L, fileOrArray.getFilePointer());
     }
 }
