@@ -1,17 +1,26 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TokenQueue_ESTestTest56 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Tests for the static utility methods in {@link TokenQueue}.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test55() throws Throwable {
-        String string0 = TokenQueue.escapeCssIdentifier("-");
-        assertEquals("\\-", string0);
+    @Test
+    public void escapeCssIdentifier_shouldEscapeLeadingHyphen() {
+        // The CSS Object Model spec requires a hyphen at the start of an identifier to be escaped.
+        // See: https://www.w3.org/TR/cssom-1/#serialize-an-identifier
+
+        // Arrange
+        String identifier = "-";
+        String expected = "\\-";
+
+        // Act
+        String actual = TokenQueue.escapeCssIdentifier(identifier);
+
+        // Assert
+        assertEquals(expected, actual);
     }
 }
