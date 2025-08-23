@@ -1,36 +1,26 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class MinutesTestTest17 extends TestCase {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    private static final int MINUTES_PER_HOUR = 60;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+    @Test
+    public void toStandardHours_convertsCorrectly() {
+        // Arrange
+        final int hoursValue = 3;
+        final Minutes threeHoursInMinutes = Minutes.minutes(hoursValue * MINUTES_PER_HOUR);
+        final Hours expected = Hours.hours(hoursValue);
 
-    public static TestSuite suite() {
-        return new TestSuite(TestMinutes.class);
-    }
+        // Act
+        final Hours actual = threeHoursInMinutes.toStandardHours();
 
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testToStandardHours() {
-        Minutes test = Minutes.minutes(3 * 60);
-        Hours expected = Hours.hours(3);
-        assertEquals(expected, test.toStandardHours());
+        // Assert
+        assertEquals("Conversion from minutes to hours should be correct", expected, actual);
     }
 }
