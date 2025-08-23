@@ -1,50 +1,44 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
+import org.joda.time.Chronology;
+import org.joda.time.chrono.JulianChronology;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.BuddhistChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.JulianChronology;
 
-public class CalendarConverterTestTest6 extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Tests for {@link CalendarConverter}.
+ * This test focuses on the getChronology(Object, Chronology) method.
+ */
+class CalendarConverterTest {
 
-    private static final DateTimeZone MOSCOW = DateTimeZone.forID("Europe/Moscow");
+    private CalendarConverter converter;
+    private Chronology julianChronology;
 
-    private static Chronology JULIAN;
-
-    private static Chronology ISO;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @BeforeEach
+    void setUp() {
+        converter = CalendarConverter.INSTANCE;
+        julianChronology = JulianChronology.getInstance();
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestCalendarConverter.class);
-    }
+    @Test
+    @DisplayName("getChronology() should return the provided chronology if it is not null")
+    void getChronology_whenChronologyIsProvided_returnsProvidedChronology() {
+        // Arrange
+        Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("Europe/Paris"));
+        Chronology expectedChronology = julianChronology;
 
-    @Override
-    protected void setUp() throws Exception {
-        JULIAN = JulianChronology.getInstance();
-        ISO = ISOChronology.getInstance();
-    }
+        // Act
+        Chronology actualChronology = converter.getChronology(calendar, expectedChronology);
 
-    public void testGetChronology_Object_Chronology() throws Exception {
-        GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("Europe/Paris"));
-        assertEquals(JULIAN, CalendarConverter.INSTANCE.getChronology(cal, JULIAN));
+        // Assert
+        assertEquals(expectedChronology, actualChronology,
+                "The converter should always return the explicitly provided chronology.");
     }
 }
