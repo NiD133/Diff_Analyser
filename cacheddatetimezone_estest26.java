@@ -1,25 +1,29 @@
 package org.joda.time.tz;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
-import org.joda.time.LocalDateTime;
-import org.joda.time.chrono.GregorianChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CachedDateTimeZone_ESTestTest26 extends CachedDateTimeZone_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        Instant instant0 = Instant.now();
-        DateTimeZone dateTimeZone0 = instant0.getZone();
-        CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-        boolean boolean0 = cachedDateTimeZone0.equals(cachedDateTimeZone0);
-        assertTrue(boolean0);
+/**
+ * Unit tests for the {@link CachedDateTimeZone} class.
+ */
+public class CachedDateTimeZoneTest {
+
+    /**
+     * Tests that a CachedDateTimeZone instance is equal to itself,
+     * verifying the reflexive property of the equals method.
+     */
+    @Test
+    public void equals_returnsTrue_whenComparedToItself() {
+        // Arrange
+        // Use a non-fixed, well-known time zone to ensure the test is deterministic.
+        DateTimeZone underlyingZone = DateTimeZone.forID("Europe/London");
+        CachedDateTimeZone cachedZone = CachedDateTimeZone.forZone(underlyingZone);
+
+        // Act & Assert
+        // According to the Java contract for Object.equals(), an object must be equal to itself.
+        // Using assertEquals is idiomatic for testing this property.
+        assertEquals(cachedZone, cachedZone);
     }
 }
