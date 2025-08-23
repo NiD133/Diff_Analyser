@@ -1,28 +1,48 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Attribute_ESTestTest1 extends Attribute_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        boolean boolean0 = Attribute.isBooleanAttribute("allowfullscreen");
-        assertTrue(boolean0);
+/**
+ * Tests for the {@link Attribute} class, focusing on boolean attribute detection.
+ */
+public class AttributeTest {
+
+    @Test
+    public void isBooleanAttributeShouldReturnTrueForKnownBooleanAttributes() {
+        // A known boolean attribute from the HTML5 spec
+        String booleanAttributeName = "allowfullscreen";
+
+        boolean result = Attribute.isBooleanAttribute(booleanAttributeName);
+
+        assertTrue("'" + booleanAttributeName + "' should be recognized as a boolean attribute.", result);
+    }
+
+    @Test
+    public void isBooleanAttributeShouldReturnFalseForNonBooleanAttributes() {
+        // A common, non-boolean attribute
+        String nonBooleanAttributeName = "href";
+
+        boolean result = Attribute.isBooleanAttribute(nonBooleanAttributeName);
+
+        assertFalse("'" + nonBooleanAttributeName + "' should not be recognized as a boolean attribute.", result);
+    }
+
+    @Test
+    public void isBooleanAttributeShouldBeCaseInsensitive() {
+        // Boolean attributes are case-insensitive in HTML
+        String mixedCaseAttributeName = "aLlOwFuLlScReEn";
+
+        boolean result = Attribute.isBooleanAttribute(mixedCaseAttributeName);
+
+        assertTrue("Boolean attribute check should be case-insensitive.", result);
+    }
+
+    @Test
+    public void isBooleanAttributeShouldReturnFalseForNullOrEmptyInput() {
+        assertFalse("Null input should not be a boolean attribute.", Attribute.isBooleanAttribute(null));
+        assertFalse("Empty string should not be a boolean attribute.", Attribute.isBooleanAttribute(""));
     }
 }
