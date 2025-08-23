@@ -1,32 +1,44 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.PipedReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.List;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SequenceReader_ESTestTest1 extends SequenceReader_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SequenceReader} class, focusing on its core functionalities.
+ */
+public class SequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        ArrayDeque<StringReader> arrayDeque0 = new ArrayDeque<StringReader>();
-        StringReader stringReader0 = new StringReader("!DROK>c");
-        arrayDeque0.add(stringReader0);
-        StringReader stringReader1 = new StringReader("org.apache.commons.io.filefilter.CanExecuteFileFilter");
-        arrayDeque0.add(stringReader1);
-        SequenceReader sequenceReader0 = new SequenceReader(arrayDeque0);
-        long long0 = sequenceReader0.skip(204L);
-        assertEquals(60L, long0);
+    /**
+     * Tests that calling skip() with a value larger than the remaining content
+     * skips all available characters and returns the number of characters actually skipped.
+     */
+    @Test
+    public void skipPastEndOfStreamShouldReturnTotalCharactersSkipped() throws IOException {
+        // Arrange
+        String content1 = "Hello";
+        String content2 = " World";
+        long totalLength = content1.length() + content2.length();
+        long charactersToSkip = totalLength + 10; // A number larger than the total content
+
+        Reader reader1 = new StringReader(content1);
+        Reader reader2 = new StringReader(content2);
+        
+        // Use the simpler varargs constructor for SequenceReader
+        try (SequenceReader sequenceReader = new SequenceReader(reader1, reader2)) {
+            // Act
+            long actualSkippedCount = sequenceReader.skip(charactersToSkip);
+
+            // Assert
+            assertEquals("Should skip all characters up to the end of the stream", 
+                         totalLength, actualSkippedCount);
+            
+            // Further verify that the stream is at its end
+            assertEquals("Stream should be at the end after skipping all characters", 
+                         -1, sequenceReader.read());
+        }
     }
 }
