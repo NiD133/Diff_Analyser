@@ -1,19 +1,33 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ByteArrayBuilder_ESTestTest11 extends ByteArrayBuilder_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder();
-        ByteArrayBuilder byteArrayBuilder1 = ByteArrayBuilder.fromInitial(byteArrayBuilder0.NO_BYTES, 4000);
-        byte[] byteArray0 = byteArrayBuilder1.resetAndGetFirstSegment();
-        assertEquals(0, byteArray0.length);
+/**
+ * Contains tests for the {@link ByteArrayBuilder} class, focusing on its buffer management.
+ */
+public class ByteArrayBuilderTest {
+
+    /**
+     * Tests that calling {@code resetAndGetFirstSegment()} on a builder that was
+     * initialized with an empty byte array returns that same empty array.
+     * This verifies that the method correctly handles this edge case without
+     * allocating a new buffer.
+     */
+    @Test
+    public void resetAndGetFirstSegment_whenInitializedWithEmptyArray_shouldReturnEmptyArray() {
+        // Arrange: Create a ByteArrayBuilder from an empty initial byte array.
+        // The initial length parameter is irrelevant because reset() will clear it,
+        // so we use 0 for clarity instead of a confusing arbitrary value.
+        ByteArrayBuilder builder = ByteArrayBuilder.fromInitial(ByteArrayBuilder.NO_BYTES, 0);
+
+        // Act: Reset the builder and get the first segment.
+        byte[] firstSegment = builder.resetAndGetFirstSegment();
+
+        // Assert: The returned segment should be a non-null, empty array.
+        assertNotNull("The returned segment should not be null.", firstSegment);
+        assertEquals("The first segment should be an empty array.", 0, firstSegment.length);
     }
 }
