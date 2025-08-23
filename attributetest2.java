@@ -1,16 +1,28 @@
 package org.jsoup.nodes;
 
-import org.jsoup.Jsoup;
-import org.jsoup.parser.ParseSettings;
-import org.jsoup.parser.Parser;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class AttributeTestTest2 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+/**
+ * Tests for the {@link Attribute} class, focusing on its HTML representation.
+ */
+@DisplayName("Attribute HTML Generation")
+class AttributeTest {
 
     @Test
-    public void htmlWithLtAndGtInValue() {
-        Attribute attr = new Attribute("key", "<value>");
-        assertEquals("key=\"&lt;value&gt;\"", attr.html());
+    @DisplayName("html() should correctly escape special HTML characters in the attribute's value")
+    void html_whenValueContainsSpecialCharacters_shouldEscapeThem() {
+        // Arrange
+        String valueWithSpecialChars = "<value>";
+        Attribute attribute = new Attribute("key", valueWithSpecialChars);
+        String expectedHtml = "key=\"&lt;value&gt;\"";
+
+        // Act
+        String actualHtml = attribute.html();
+
+        // Assert
+        assertEquals(expectedHtml, actualHtml, "Attribute value should be HTML-escaped.");
     }
 }
