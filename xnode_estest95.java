@@ -1,36 +1,33 @@
 package org.apache.ibatis.parsing;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
 import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest95 extends XNode_ESTest_scaffolding {
+/**
+ * Test suite for the {@link XNode} class.
+ * This class contains the improved version of the original test case.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test094() throws Throwable {
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        iIOMetadataNode0.setAttribute("name", "2iY");
-        XPathParser xPathParser0 = new XPathParser((Document) null, false);
-        Properties properties0 = new Properties();
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        // Undeclared exception!
-        try {
-            xNode0.getDoubleAttribute("name");
-            fail("Expecting exception: NumberFormatException");
-        } catch (NumberFormatException e) {
-        }
+    /**
+     * Verifies that getDoubleAttribute throws a NumberFormatException
+     * when the attribute's value is not a valid double.
+     */
+    @Test(expected = NumberFormatException.class)
+    public void getDoubleAttributeShouldThrowNumberFormatExceptionForNonNumericValue() {
+        // Arrange: Create an XNode with an attribute that cannot be parsed as a double.
+        IIOMetadataNode node = new IIOMetadataNode();
+        node.setAttribute("value", "not-a-double");
+
+        // The XPathParser and variables are required for the XNode constructor,
+        // but their specific state is not relevant to this test.
+        XPathParser dummyParser = new XPathParser((Document) null, false);
+        Properties variables = new Properties();
+        XNode xNode = new XNode(dummyParser, node, variables);
+
+        // Act & Assert: Attempting to get the attribute as a double should throw an exception.
+        xNode.getDoubleAttribute("value");
     }
 }
