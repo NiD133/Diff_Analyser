@@ -1,45 +1,35 @@
 package org.threeten.extra;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Month;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.Chronology;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.MinguoDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockMinguoDate;
-import org.junit.runner.RunWith;
 
-public class DayOfMonth_ESTestTest1 extends DayOfMonth_ESTest_scaffolding {
+/**
+ * Unit tests for the DayOfMonth class, focusing on the equals() method.
+ */
+public class DayOfMonthTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        DayOfMonth dayOfMonth0 = DayOfMonth.of(31);
-        DayOfMonth dayOfMonth1 = DayOfMonth.now();
-        boolean boolean0 = dayOfMonth0.equals(dayOfMonth1);
-        assertFalse(dayOfMonth1.equals((Object) dayOfMonth0));
-        assertFalse(boolean0);
+    @Test
+    public void equals_returnsFalse_forDifferentDayOfMonthInstances() {
+        // Arrange: Create two DayOfMonth instances with different values.
+        DayOfMonth day31 = DayOfMonth.of(31);
+        DayOfMonth day15 = DayOfMonth.of(15);
+
+        // Act & Assert: Verify that the two instances are not considered equal.
+        // The check is performed both ways to ensure the equals() method is symmetric.
+        assertNotEquals(day31, day15);
+        assertNotEquals(day15, day31);
+    }
+
+    @Test
+    public void equals_returnsTrue_forSameDayOfMonthInstances() {
+        // Arrange: Create two DayOfMonth instances representing the same day.
+        // The 'of' method is expected to return cached, identical instances.
+        DayOfMonth day20_first_instance = DayOfMonth.of(20);
+        DayOfMonth day20_second_instance = DayOfMonth.of(20);
+
+        // Act & Assert: Verify that the two instances are considered equal.
+        assertEquals(day20_first_instance, day20_second_instance);
     }
 }
