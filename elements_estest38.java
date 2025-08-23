@@ -1,39 +1,58 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest38 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test037() throws Throwable {
-        Document document0 = Document.createShell("<m-2,eXTA:N5y7");
-        Elements elements0 = document0.getAllElements();
-        Elements elements1 = elements0.prev();
-        elements0.prepend("<m-2,eXTA:N5y7");
-        Element element0 = elements1.first();
-        assertEquals(1, elements1.size());
-        assertEquals(2, element0.siblingIndex());
+/**
+ * Tests the behavior of the Elements collection, particularly how it interacts
+ * with a changing DOM.
+ */
+public class ElementsDomInteractionTest {
+
+    /**
+     * Verifies that an Element reference obtained from an Elements collection
+     * reflects subsequent changes to the DOM's structure. This demonstrates
+     * that Elements collections hold live references to the DOM nodes.
+     */
+    @Test
+    public void elementReferenceRemainsLiveAfterDomModification() {
+        // Arrange: Create a document, select a group of elements, and then
+        // find their preceding siblings.
+        String html = "<body>" +
+                      "  <p>First Paragraph</p>" +
+                      "  <h1>First Header</h1>" +
+                      "  <h2>Second Header</h2>" +
+                      "</body>";
+        Document doc = Jsoup.parse(html);
+
+        Elements headers = doc.select("h1, h2"); // Contains <h1> and <h2>
+        Elements prevElements = headers.prev();  // Contains <p> (from h1) and <h1> (from h2)
+
+        // Get a direct reference to the <p> element, which is the first in the 'prevElements' list.
+        Element pElement = prevElements.first();
+        
+        // Sanity-check our initial assumptions before modification.
+        assertEquals("p", pElement.tagName());
+        assertEquals(2, prevElements.size());
+        // The <p> element is the first child of <body>, so its sibling index is 0.
+        assertEquals(0, pElement.siblingIndex());
+
+        // Act: Modify the DOM by prepending a new element to the body.
+        // This action will shift the position of all existing children.
+        doc.body().prepend("<div>A New First Element</div>");
+
+        // Assert: The pElement reference, obtained before the modification,
+        // should now reflect the new state of the DOM.
+        
+        // The collection size should remain unchanged.
+        assertEquals(2, prevElements.size());
+
+        // The sibling index of our referenced <p> element should now be 1,
+        // as the new <div> has been inserted at index 0.
+        assertEquals(1, pElement.siblingIndex());
     }
 }
