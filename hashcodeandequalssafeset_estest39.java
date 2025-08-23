@@ -1,27 +1,23 @@
 package org.mockito.internal.util.collections;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-public class HashCodeAndEqualsSafeSet_ESTestTest39 extends HashCodeAndEqualsSafeSet_ESTest_scaffolding {
+/**
+ * Tests for {@link HashCodeAndEqualsSafeSet}.
+ */
+public class HashCodeAndEqualsSafeSetTest {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = HashCodeAndEqualsSafeSet.of((Iterable<Object>) null);
-        boolean boolean0 = hashCodeAndEqualsSafeSet0.isEmpty();
-        assertTrue(boolean0);
+    @Test
+    public void of_shouldReturnEmptySet_whenCalledWithNullIterable() {
+        // Arrange: No setup is needed as we are testing a static factory method with a null argument.
+
+        // Act: Create a set from a null iterable.
+        HashCodeAndEqualsSafeSet safeSet = HashCodeAndEqualsSafeSet.of((Iterable<Object>) null);
+
+        // Assert: The resulting set should be non-null and empty.
+        assertNotNull("The factory method should always return a set instance, even for null input.", safeSet);
+        assertTrue("A set created from a null iterable should be empty.", safeSet.isEmpty());
     }
 }
