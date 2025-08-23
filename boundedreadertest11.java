@@ -1,61 +1,41 @@
 package org.apache.commons.io.input;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTimeout;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.io.LineNumberReader;
-import java.io.Reader;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.file.TempFile;
 import org.junit.jupiter.api.Test;
 
-public class BoundedReaderTestTest11 {
+/**
+ * Tests for {@link BoundedReader}.
+ */
+public class BoundedReaderTest {
 
-    private static final Duration TIMEOUT = Duration.ofSeconds(10);
-
-    private static final String STRING_END_NO_EOL = "0\n1\n2";
-
-    private static final String STRING_END_EOL = "0\n1\n2\n";
-
-    private final Reader sr = new BufferedReader(new StringReader("01234567890"));
-
-    private final Reader shortReader = new BufferedReader(new StringReader("01"));
-
-    private void testLineNumberReader(final Reader source) throws IOException {
-        try (LineNumberReader reader = new LineNumberReader(new BoundedReader(source, 10_000_000))) {
-            while (reader.readLine() != null) {
-                // noop
-            }
-        }
-    }
-
-    void testLineNumberReaderAndFileReaderLastLine(final String data) throws IOException {
-        try (TempFile path = TempFile.create(getClass().getSimpleName(), ".txt")) {
-            final File file = path.toFile();
-            FileUtils.write(file, data, StandardCharsets.ISO_8859_1);
-            try (Reader source = Files.newBufferedReader(file.toPath())) {
-                testLineNumberReader(source);
-            }
-        }
-    }
-
+    /**
+     * Tests that reading lines from a BoundedReader stops at the boundary.
+     * Specifically, it verifies that once the character limit is reached,
+     * subsequent calls to BufferedReader.readLine() return null, indicating the
+     * end of the stream.
+     */
     @Test
-    void testReadBytesEOF() {
-        assertTimeout(TIMEOUT, () -> {
-            final BoundedReader mr = new BoundedReader(sr, 3);
-            try (BufferedReader br = new BufferedReader(mr)) {
-                br.readLine();
-                br.readLine();
-            }
-        });
+    void testReadLinePastBoundaryReturnsNull() throws IOException {
+        // Arrange: Create a BoundedReader with a 3-character limit on an input
+        // string that is longer and contains no newlines.
+        final String input = "01234567890";
+        final StringReader sourceReader = new StringReader(input);
+        final BoundedReader boundedReader = new BoundedReader(sourceReader, 3);
+
+        // Act & Assert
+        try (BufferedReader bufferedReader = new BufferedReader(boundedReader)) {
+            // The first readLine() should consume the first 3 characters ("012"),
+            // as the BoundedReader will report EOF after the 3rd character.
+            assertEquals("012", bufferedReader.readLine());
+
+            // The second readLine() should immediately return null because the
+            // BoundedReader has already reached its limit.
+            assertNull(bufferedReader.readLine(), "Should return null after boundary is reached");
+        }
     }
 }
