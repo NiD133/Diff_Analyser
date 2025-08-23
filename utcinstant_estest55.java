@@ -1,28 +1,44 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class UtcInstant_ESTestTest55 extends UtcInstant_ESTest_scaffolding {
+/**
+ * This test class contains an improved, more understandable version of an
+ * auto-generated test for the {@link UtcInstant} class.
+ */
+public class UtcInstantTest {
 
-    @Test(timeout = 4000)
-    public void test54() throws Throwable {
-        UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(83843999999988L, 83843999999988L);
-        assertEquals(83843999999988L, utcInstant0.getNanoOfDay());
-        UtcInstant utcInstant1 = utcInstant0.withModifiedJulianDay((-1406L));
-        boolean boolean0 = utcInstant0.isAfter(utcInstant1);
-        assertEquals(83843999999988L, utcInstant1.getNanoOfDay());
-        assertEquals((-1406L), utcInstant1.getModifiedJulianDay());
-        assertTrue(boolean0);
+    /**
+     * Tests that {@link UtcInstant#isAfter(UtcInstant)} correctly returns true
+     * when comparing an instant to one that is chronologically earlier.
+     * The comparison is primarily based on the Modified Julian Day (MJD).
+     */
+    @Test
+    public void isAfter_shouldReturnTrue_whenComparingToAnEarlierInstant() {
+        // Arrange
+        // Create a "later" instant with a positive Modified Julian Day (MJD).
+        long nanoOfDay = 123_456_789L;
+        UtcInstant laterInstant = UtcInstant.ofModifiedJulianDay(100L, nanoOfDay);
+
+        // Create an "earlier" instant by taking the later one and setting
+        // a smaller (in this case, negative) MJD. The nano-of-day remains the same.
+        UtcInstant earlierInstant = laterInstant.withModifiedJulianDay(-100L);
+
+        // Sanity check: Verify the state of the earlier instant after its creation.
+        assertEquals(-100L, earlierInstant.getModifiedJulianDay());
+        assertEquals(nanoOfDay, earlierInstant.getNanoOfDay());
+
+        // Act
+        // Perform the comparison.
+        boolean isAfter = laterInstant.isAfter(earlierInstant);
+
+        // Assert
+        // The later instant should be after the earlier one.
+        assertTrue(
+            "An instant with a greater MJD should be considered 'after' an instant with a smaller MJD.",
+            isAfter
+        );
     }
 }
