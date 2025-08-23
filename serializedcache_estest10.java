@@ -1,27 +1,31 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
+import static org.junit.Assert.assertEquals;
+
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SerializedCache_ESTestTest10 extends SerializedCache_ESTest_scaffolding {
+/**
+ * Tests for the {@link SerializedCache} decorator.
+ */
+public class SerializedCacheTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        PerpetualCache perpetualCache0 = new PerpetualCache("");
-        SerializedCache serializedCache0 = new SerializedCache(perpetualCache0);
-        String string0 = serializedCache0.getId();
-        assertEquals("", string0);
+    /**
+     * Verifies that the getId() method correctly delegates the call
+     * to the underlying cache instance.
+     */
+    @Test
+    public void shouldReturnIdOfDelegateCache() {
+        // Arrange
+        String expectedId = "test-cache-id";
+        Cache delegateCache = new PerpetualCache(expectedId);
+        Cache serializedCache = new SerializedCache(delegateCache);
+
+        // Act
+        String actualId = serializedCache.getId();
+
+        // Assert
+        assertEquals(expectedId, actualId);
     }
 }
