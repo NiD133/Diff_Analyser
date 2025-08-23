@@ -1,35 +1,55 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
 import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.ShapeCollection;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLineString_ESTestTest30 extends BufferedLineString_ESTest_scaffolding {
+import java.util.LinkedList;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        LinkedList<Point> linkedList0 = new LinkedList<Point>();
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
-        BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, (-1827.67990034), false, spatialContext0);
-        Point point0 = bufferedLineString0.getCenter();
-        linkedList0.add(point0);
-        BufferedLineString bufferedLineString1 = new BufferedLineString(linkedList0, (-1827.67990034), spatialContext0);
-        boolean boolean0 = bufferedLineString0.equals(bufferedLineString1);
-        assertEquals(1, linkedList0.size());
-        assertFalse(boolean0);
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+
+/**
+ * Test for the equals() method of BufferedLineString.
+ */
+public class BufferedLineStringRefactoredTest {
+
+    private final SpatialContext spatialContext = new SpatialContextFactory().newSpatialContext();
+
+    /**
+     * Tests that a BufferedLineString created with an empty list of points is not
+     * equal to a BufferedLineString created with a single point.
+     *
+     * This test also implicitly verifies that the BufferedLineString constructor
+     * makes a defensive copy of the input point list, as the original list is
+     * modified after the first object's creation.
+     */
+    @Test
+    public void equals_returnsFalse_whenComparingEmptyAndSinglePointLineStrings() {
+        // Arrange
+        final double buffer = -1827.67990034; // Using a negative buffer to test edge cases.
+        List<Point> points = new LinkedList<>();
+
+        // Create the first line string from an empty list of points.
+        BufferedLineString emptyLineString = new BufferedLineString(points, buffer, false, spatialContext);
+
+        // Now, modify the list to contain a single point (the center of the empty shape).
+        Point centerOfEmptyShape = emptyLineString.getCenter();
+        points.add(centerOfEmptyShape);
+
+        // Create a second line string from the now single-element list.
+        // Note: This uses a different constructor overload for completeness.
+        BufferedLineString singlePointLineString = new BufferedLineString(points, buffer, spatialContext);
+
+        // Act
+        boolean areEqual = emptyLineString.equals(singlePointLineString);
+
+        // Assert
+        assertFalse("An empty line string should not be equal to a single-point line string", areEqual);
+
+        // A more direct assertion:
+        assertNotEquals(emptyLineString, singlePointLineString);
     }
 }
