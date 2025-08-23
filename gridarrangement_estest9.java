@@ -1,30 +1,26 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
 
-public class GridArrangement_ESTestTest9 extends GridArrangement_ESTest_scaffolding {
+/**
+ * Tests for the {@link GridArrangement} class.
+ */
+public class GridArrangementTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement((-3031), (-3031));
-        assertNotNull(gridArrangement0);
-        gridArrangement0.clear();
+    /**
+     * Verifies that the clear() method executes without throwing an exception,
+     * even when the GridArrangement is constructed with negative row and column counts.
+     * The clear() method is specified to have no effect, so this test confirms
+     * it can be safely called on any instance.
+     */
+    @Test
+    public void clearShouldNotThrowExceptionWhenDimensionsAreNegative() {
+        // Arrange: Create a GridArrangement with negative dimensions. The constructor
+        // is expected to accept these values without throwing an exception.
+        GridArrangement arrangement = new GridArrangement(-1, -1);
+
+        // Act & Assert: Call the clear() method. The test succeeds if this call
+        // completes without throwing any exceptions.
+        arrangement.clear();
     }
 }
