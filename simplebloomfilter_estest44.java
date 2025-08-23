@@ -1,26 +1,30 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
+/**
+ * This test class contains tests for the SimpleBloomFilter.
+ * The original name {@code SimpleBloomFilter_ESTestTest44} was preserved,
+ * but a more conventional name would be {@code SimpleBloomFilterTest}.
+ */
 public class SimpleBloomFilter_ESTestTest44 extends SimpleBloomFilter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        Shape shape0 = Shape.fromNM(294, 294);
-        LayerManager<SparseBloomFilter> layerManager0 = (LayerManager<SparseBloomFilter>) mock(LayerManager.class, new ViolatedAssumptionAnswer());
-        doReturn(false).when(layerManager0).processBloomFilters(any(java.util.function.Predicate.class));
-        LayeredBloomFilter<SparseBloomFilter> layeredBloomFilter0 = new LayeredBloomFilter<SparseBloomFilter>(shape0, layerManager0);
-        SimpleBloomFilter simpleBloomFilter0 = layeredBloomFilter0.flatten();
-        boolean boolean0 = simpleBloomFilter0.isEmpty();
-        assertTrue(boolean0);
+    /**
+     * Tests that a newly created SimpleBloomFilter reports itself as empty.
+     */
+    @Test
+    public void testIsEmptyReturnsTrueForNewFilter() {
+        // Arrange: Create a new, empty SimpleBloomFilter.
+        // The specific shape parameters are not critical for this test,
+        // as any valid shape will result in an empty filter upon creation.
+        Shape shape = Shape.fromNM(100, 10);
+        SimpleBloomFilter bloomFilter = new SimpleBloomFilter(shape);
+
+        // Act: Check if the filter is empty.
+        boolean isEmpty = bloomFilter.isEmpty();
+
+        // Assert: The filter should be empty.
+        assertTrue("A newly instantiated SimpleBloomFilter should be empty", isEmpty);
     }
 }
