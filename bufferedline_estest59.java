@@ -1,35 +1,36 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
+/**
+ * This test class contains tests for the {@link BufferedLine} class.
+ */
 public class BufferedLine_ESTestTest59 extends BufferedLine_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test58() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        PointImpl pointImpl0 = new PointImpl(0.0, 0.0, spatialContext0);
-        BufferedLine bufferedLine0 = new BufferedLine(pointImpl0, pointImpl0, 0.0, spatialContext0);
-        // Undeclared exception!
-        try {
-            bufferedLine0.getBuffered((-3307.844427), spatialContext0);
-            fail("Expecting exception: AssertionError");
-        } catch (AssertionError e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Tests that calling getBuffered() with a negative distance, which would result
+     * in an overall negative buffer, throws an AssertionError. The constructor of
+     * BufferedLine asserts that the buffer distance must be non-negative.
+     */
+    @Test(expected = AssertionError.class)
+    public void getBufferedWithNegativeDistanceShouldThrowAssertionError() {
+        // Arrange: Create a zero-length line (a point) with a zero buffer.
+        // The spatial context is required for shape creation.
+        SpatialContext geoContext = SpatialContext.GEO;
+        Point point = new PointImpl(0.0, 0.0, geoContext);
+        BufferedLine line = new BufferedLine(point, point, 0.0, geoContext);
+
+        // A negative distance that will cause the resulting buffer to be negative.
+        double negativeDistance = -10.0;
+
+        // Act: Attempt to create a new buffered line where the new buffer size
+        // (original buffer + distance) is negative (0.0 + -10.0 = -10.0).
+        line.getBuffered(negativeDistance, geoContext);
+
+        // Assert: The test expects an AssertionError, which is declared in the
+        // @Test annotation. This is because the BufferedLine constructor does not
+        // allow negative buffer values.
     }
 }
