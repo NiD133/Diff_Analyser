@@ -1,22 +1,30 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class BCodec_ESTestTest31 extends BCodec_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        BCodec bCodec0 = new BCodec();
-        Object object0 = bCodec0.decode((Object) null);
-        assertNull(object0);
+/**
+ * Unit tests for the {@link BCodec} class.
+ */
+public class BCodecTest {
+
+    /**
+     * Tests that decoding a null Object input returns null, which is the expected
+     * behavior according to the Decoder interface contract.
+     *
+     * @see BCodec#decode(Object)
+     */
+    @Test
+    public void decodeObjectWithNullInputShouldReturnNull() throws DecoderException {
+        // Arrange
+        BCodec bCodec = new BCodec();
+
+        // Act
+        Object result = bCodec.decode((Object) null);
+
+        // Assert
+        assertNull("Decoding a null object should result in a null value.", result);
     }
 }
