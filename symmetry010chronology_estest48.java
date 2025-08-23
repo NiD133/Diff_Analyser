@@ -1,45 +1,30 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.UnsupportedTemporalTypeException;
 import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.junit.runner.RunWith;
 
-public class Symmetry010Chronology_ESTestTest48 extends Symmetry010Chronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        Symmetry010Chronology symmetry010Chronology0 = new Symmetry010Chronology();
-        ChronoField chronoField0 = ChronoField.DAY_OF_WEEK;
-        ValueRange valueRange0 = symmetry010Chronology0.range(chronoField0);
-        assertNotNull(valueRange0);
+/**
+ * Tests for the range() method in {@link Symmetry010Chronology}.
+ */
+public class Symmetry010ChronologyTest {
+
+    /**
+     * Tests that the range for the DAY_OF_WEEK field is correct.
+     * The day-of-week should always be a value from 1 (Monday) to 7 (Sunday).
+     */
+    @Test
+    public void range_forDayOfWeek_shouldReturn1to7() {
+        // Arrange: Define the expected value range for a day of the week.
+        Symmetry010Chronology chronology = Symmetry010Chronology.INSTANCE;
+        ValueRange expectedRange = ValueRange.of(1, 7);
+
+        // Act: Get the actual range for the DAY_OF_WEEK field from the chronology.
+        ValueRange actualRange = chronology.range(ChronoField.DAY_OF_WEEK);
+
+        // Assert: Verify that the actual range matches the expected range.
+        assertEquals("The range for DAY_OF_WEEK should be 1-7", expectedRange, actualRange);
     }
 }
