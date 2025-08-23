@@ -1,18 +1,32 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class IOCase_ESTestTest18 extends IOCase_ESTest_scaffolding {
+/**
+ * Tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        IOCase iOCase0 = IOCase.INSENSITIVE;
-        boolean boolean0 = iOCase0.checkEquals(")", ")");
-        assertTrue(boolean0);
+    /**
+     * Verifies that IOCase.INSENSITIVE.checkEquals() returns true for two strings
+     * that differ only in their character case. This confirms the case-insensitive
+     * comparison logic.
+     */
+    @Test
+    public void checkEqualsWithInsensitiveShouldReturnTrueForStringsDifferingOnlyInCase() {
+        // Arrange
+        final String string1 = "Apache Commons IO";
+        final String string2 = "apache commons io";
+        final IOCase insensitiveCase = IOCase.INSENSITIVE;
+
+        // Act
+        final boolean areEqual = insensitiveCase.checkEquals(string1, string2);
+
+        // Assert
+        assertTrue(
+            "Strings differing only in case should be considered equal for IOCase.INSENSITIVE",
+            areEqual
+        );
     }
 }
