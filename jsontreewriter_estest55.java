@@ -1,34 +1,27 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeWriter_ESTestTest55 extends JsonTreeWriter_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link JsonTreeWriter} class.
+ */
+public class JsonTreeWriterTest {
 
-    @Test(timeout = 4000)
-    public void test54() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        JsonWriter jsonWriter0 = jsonTreeWriter0.beginObject();
-        jsonTreeWriter0.name("");
-        // Undeclared exception!
-        try {
-            jsonWriter0.endObject();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
-        }
+    /**
+     * Verifies that attempting to close a JSON object immediately after writing a name
+     * (but before writing its corresponding value) throws an IllegalStateException.
+     * This is often referred to as a "dangling name" scenario.
+     */
+    @Test(expected = IllegalStateException.class)
+    public void endObject_withDanglingName_throwsIllegalStateException() throws IOException {
+        // Arrange
+        JsonTreeWriter writer = new JsonTreeWriter();
+        writer.beginObject();
+        writer.name("some_property"); // Set a name, creating a "dangling name" state.
+
+        // Act: Attempt to close the object while in an invalid state.
+        // The @Test(expected) annotation asserts that an IllegalStateException is thrown.
+        writer.endObject();
     }
 }
