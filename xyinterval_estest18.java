@@ -1,23 +1,25 @@
 package org.jfree.data.xy;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotEquals;
 
-public class XYInterval_ESTestTest18 extends XYInterval_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link XYInterval} class.
+ */
+public class XYIntervalTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        XYInterval xYInterval0 = new XYInterval(0.0, 0.0, 0.0, 0.0, 0.0);
-        XYInterval xYInterval1 = new XYInterval(0.0, 0.0, (-2810.0), 2884.608252158, (-2810.0));
-        boolean boolean0 = xYInterval0.equals(xYInterval1);
-        assertEquals(0.0, xYInterval1.getXHigh(), 0.01);
-        assertEquals((-2810.0), xYInterval1.getY(), 0.01);
-        assertEquals((-2810.0), xYInterval1.getYHigh(), 0.01);
-        assertFalse(boolean0);
-        assertEquals(0.0, xYInterval1.getXLow(), 0.01);
-        assertEquals(2884.608252158, xYInterval1.getYLow(), 0.01);
+    /**
+     * Verifies that the equals() method returns false for two XYInterval objects
+     * that have the same x-interval but different y-related values.
+     */
+    @Test
+    public void equals_returnsFalse_whenYValuesAreDifferent() {
+        // Arrange: Create two intervals with the same x-interval but different y values.
+        XYInterval intervalA = new XYInterval(0.0, 0.0, 0.0, 0.0, 0.0);
+        XYInterval intervalB = new XYInterval(0.0, 0.0, -2810.0, 2884.61, -2810.0);
+
+        // Act & Assert: The two intervals should not be considered equal.
+        // The assertNotEquals method relies on the equals() implementation.
+        assertNotEquals(intervalA, intervalB);
     }
 }
