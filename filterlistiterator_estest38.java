@@ -1,77 +1,44 @@
 package org.apache.commons.collections4.iterators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.function.Consumer;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
 import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FilterListIterator_ESTestTest38 extends FilterListIterator_ESTest_scaffolding {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ListIterator;
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        ListIterator<Integer> listIterator0 = linkedList0.listIterator();
-        int int0 = 0;
-        Integer integer0 = new Integer(0);
-        Comparator<Integer> comparator0 = (Comparator<Integer>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        Predicate<Integer> predicate0 = ComparatorPredicate.comparatorPredicate(integer0, comparator0);
-        Transformer<Object, Boolean> transformer0 = InvokerTransformer.invokerTransformer("' threw an exception");
-        TransformerPredicate<Integer> transformerPredicate0 = new TransformerPredicate<Integer>(transformer0);
-        predicate0.and(transformerPredicate0);
-        FilterListIterator<Integer> filterListIterator0 = new FilterListIterator<Integer>(listIterator0, predicate0);
-        Predicate<Object> predicate1 = null;
-        filterListIterator0.setPredicate((Predicate<? super Integer>) null);
-        // Undeclared exception!
-        try {
-            predicate0.or((java.util.function.Predicate<? super Integer>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.Objects", e);
-        }
+import static org.junit.Assert.assertEquals;
+
+/**
+ * This test class contains a rewritten test case. The original, auto-generated test
+ * did not correctly test the FilterListIterator class. It has been replaced with a
+ * meaningful test that verifies a core feature of the class.
+ */
+public class FilterListIterator_ESTestTest38 { // Retaining original class name
+
+    /**
+     * Tests that setting the predicate to null effectively removes all filtering,
+     * allowing the iterator to return all elements from the underlying collection.
+     */
+    @Test
+    public void setPredicateWithNullShouldRemoveFiltering() {
+        // GIVEN: A list and a FilterListIterator that initially filters for even numbers.
+        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6);
+        ListIterator<Integer> underlyingIterator = numbers.listIterator();
+
+        // A predicate that only accepts even numbers.
+        Predicate<Integer> evenNumberPredicate = n -> (n % 2 == 0);
+
+        FilterListIterator<Integer> filterIterator = new FilterListIterator<>(underlyingIterator, evenNumberPredicate);
+
+        // WHEN: The predicate is set to null, which should disable filtering.
+        filterIterator.setPredicate(null);
+
+        // THEN: The iterator should behave as if there is no filter, returning all elements.
+        List<Integer> actualElements = new ArrayList<>();
+        filterIterator.forEachRemaining(actualElements::add);
+
+        assertEquals("Iterator should return all original elements when predicate is null", numbers, actualElements);
     }
 }
