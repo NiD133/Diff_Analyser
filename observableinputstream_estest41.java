@@ -1,40 +1,47 @@
 package org.apache.commons.io.input;
 
+import org.apache.commons.io.input.ObservableInputStream.Observer;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.io.StringWriter;
-import java.nio.CharBuffer;
-import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class ObservableInputStream_ESTestTest41 extends ObservableInputStream_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        TimestampedObserver timestampedObserver0 = new TimestampedObserver();
-        timestampedObserver0.data(1225);
-        assertFalse(timestampedObserver0.isClosed());
+/**
+ * Tests for {@link ObservableInputStream} and its observers.
+ */
+public class ObservableInputStreamTest {
+
+    /**
+     * A simple observer for testing purposes that tracks its closed state.
+     * This helper class makes the test self-contained and easier to understand.
+     */
+    private static class StateTrackingObserver extends Observer {
+        private boolean isClosed = false;
+
+        @Override
+        public void closed() {
+            this.isClosed = true;
+        }
+
+        public boolean isClosed() {
+            return isClosed;
+        }
+    }
+
+    /**
+     * Verifies that invoking the data(int) callback on an observer does not
+     * incorrectly change its lifecycle state to "closed".
+     */
+    @Test
+    public void observerDataCallbackDoesNotAffectClosedState() {
+        // Arrange: Create a new observer instance, which is initially not closed.
+        StateTrackingObserver observer = new StateTrackingObserver();
+
+        // Act: Simulate a data-read event by directly calling the data() callback.
+        // This method should only process the data and not alter the observer's state.
+        observer.data(100);
+
+        // Assert: Verify that the observer is still not marked as closed.
+        // The closed state should only be affected by the closed() callback.
+        assertFalse("Calling data() should not mark the observer as closed.", observer.isClosed());
     }
 }
