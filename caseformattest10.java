@@ -1,24 +1,42 @@
 package com.google.common.base;
 
 import static com.google.common.base.CaseFormat.LOWER_CAMEL;
-import static com.google.common.base.CaseFormat.LOWER_HYPHEN;
 import static com.google.common.base.CaseFormat.LOWER_UNDERSCORE;
-import static com.google.common.base.CaseFormat.UPPER_CAMEL;
-import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
-import com.google.common.annotations.GwtCompatible;
-import com.google.common.annotations.GwtIncompatible;
-import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.testing.NullPointerTester;
-import com.google.common.testing.SerializableTester;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
 
-public class CaseFormatTestTest10 extends TestCase {
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-    public void testLowerUnderscoreToLowerCamel() {
-        assertThat(LOWER_UNDERSCORE.to(LOWER_CAMEL, "foo")).isEqualTo("foo");
-        assertThat(LOWER_UNDERSCORE.to(LOWER_CAMEL, "foo_bar")).isEqualTo("fooBar");
+/**
+ * Tests for {@link CaseFormat#to(CaseFormat, String)} focusing on LOWER_UNDERSCORE to LOWER_CAMEL
+ * conversions.
+ */
+@RunWith(JUnit4.class)
+public class CaseFormatTest {
+
+    @Test
+    public void toLowerCamel_fromLowerUnderscoreWithSingleWord_isUnchanged() {
+        // Arrange
+        String singleWord = "foo";
+
+        // Act
+        String result = LOWER_UNDERSCORE.to(LOWER_CAMEL, singleWord);
+
+        // Assert
+        assertThat(result).isEqualTo("foo");
+    }
+
+    @Test
+    public void toLowerCamel_fromLowerUnderscoreWithMultipleWords_convertsCorrectly() {
+        // Arrange
+        String lowerUnderscore = "foo_bar";
+        String expectedLowerCamel = "fooBar";
+
+        // Act
+        String result = LOWER_UNDERSCORE.to(LOWER_CAMEL, lowerUnderscore);
+
+        // Assert
+        assertThat(result).isEqualTo(expectedLowerCamel);
     }
 }
