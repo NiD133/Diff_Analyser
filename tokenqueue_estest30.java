@@ -1,27 +1,24 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TokenQueue_ESTestTest30 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for {@link TokenQueue}.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("fXjR3=h^{j^|Zu");
-        tokenQueue0.close();
-        // Undeclared exception!
-        try {
-            tokenQueue0.matchChomp('A');
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.parser.CharacterReader", e);
-        }
+    /**
+     * Verifies that attempting to use a TokenQueue after it has been closed
+     * results in a NullPointerException, as its internal state is invalidated.
+     */
+    @Test(expected = NullPointerException.class)
+    public void shouldThrowNullPointerExceptionWhenOperatingOnClosedQueue() {
+        // Arrange: Create a queue and then close it to invalidate its state.
+        TokenQueue queue = new TokenQueue("some-data");
+        queue.close();
+
+        // Act & Assert: Attempting to use the queue should throw a NullPointerException.
+        // The assertion is handled by the `expected` parameter of the @Test annotation.
+        queue.matchChomp('A');
     }
 }
