@@ -1,49 +1,52 @@
 package org.apache.commons.io;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Arrays;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
-public class IOCaseTestTest21 {
+/**
+ * Tests the serialization and deserialization of the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    private static final boolean WINDOWS = File.separatorChar == '\\';
+    /**
+     * Serializes and then deserializes the given {@link IOCase} instance.
+     *
+     * @param original The enum instance to serialize and deserialize.
+     * @return The deserialized instance.
+     * @throws Exception if an I/O or class-loading error occurs.
+     */
+    private IOCase serializeAndDeserialize(final IOCase original) throws Exception {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+            oos.writeObject(original);
+        }
 
-    private void assert0(final byte[] arr) {
-        for (final byte e : arr) {
-            assertEquals(0, e);
+        final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        try (ObjectInputStream ois = new ObjectInputStream(bais)) {
+            return (IOCase) ois.readObject();
         }
     }
 
-    private void assert0(final char[] arr) {
-        for (final char e : arr) {
-            assertEquals(0, e);
-        }
-    }
+    /**
+     * Verifies that deserializing an {@link IOCase} constant returns the canonical
+     * singleton instance. This ensures that the custom {@code readResolve()} method
+     * correctly preserves the identity of the enum constants.
+     *
+     * @param ioCase The IOCase constant provided by the EnumSource.
+     */
+    @ParameterizedTest
+    @EnumSource(IOCase.class)
+    void serializationPreservesSingletonInstance(final IOCase ioCase) throws Exception {
+        // Act
+        final IOCase deserialized = serializeAndDeserialize(ioCase);
 
-    private IOCase serialize(final IOCase value) throws Exception {
-        final ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        try (ObjectOutputStream out = new ObjectOutputStream(buf)) {
-            out.writeObject(value);
-            out.flush();
-        }
-        final ByteArrayInputStream bufin = new ByteArrayInputStream(buf.toByteArray());
-        final ObjectInputStream in = new ObjectInputStream(bufin);
-        return (IOCase) in.readObject();
-    }
-
-    @Test
-    void test_serialization() throws Exception {
-        assertSame(IOCase.SENSITIVE, serialize(IOCase.SENSITIVE));
-        assertSame(IOCase.INSENSITIVE, serialize(IOCase.INSENSITIVE));
-        assertSame(IOCase.SYSTEM, serialize(IOCase.SYSTEM));
+        // Assert
+        assertSame(ioCase, deserialized, "Deserialization should return the same singleton instance");
     }
 }
