@@ -1,37 +1,53 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
 import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest5 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.*;
 
-    @Test(timeout = 4000)
-    public void test004() throws Throwable {
-        Document document0 = new Document("]RCd 5P[V");
-        Element element0 = document0.body();
-        Elements elements0 = element0.getAllElements();
-        Elements elements1 = elements0.unwrap();
-        assertFalse(elements1.isEmpty());
+/**
+ * Test suite for the {@link Elements} class.
+ */
+public class ElementsTest {
+
+    /**
+     * Verifies that the unwrap() method correctly removes an element from the DOM,
+     * promotes its children, and leaves the original Elements collection intact.
+     */
+    @Test
+    public void unwrapRemovesElementFromDomButKeepsItInTheCollection() {
+        // Arrange: Create a simple DOM structure where a <p> tag can be unwrapped.
+        // The structure is <div><p>Hello</p></div>
+        Document doc = Jsoup.parse("<div><p>Hello</p></div>");
+        Element div = doc.selectFirst("div");
+        Elements paragraphs = doc.select("p");
+
+        // Sanity check the initial state.
+        assertEquals("Initial state should have one <p> element.", 1, paragraphs.size());
+        assertEquals("The <div> should be the parent of the <p>.", div, paragraphs.first().parent());
+
+        // Act: Unwrap the <p> element.
+        Elements result = paragraphs.unwrap();
+
+        // Assert:
+
+        // 1. The method returns the same Elements instance for method chaining.
+        assertSame("unwrap() should return the same Elements instance.", paragraphs, result);
+
+        // 2. The collection itself is not modified and still contains the element.
+        assertEquals("The collection should still contain one element.", 1, result.size());
+        Element unwrappedParagraph = result.first();
+        assertNotNull(unwrappedParagraph);
+
+        // 3. The element has been removed from the DOM (it has no parent).
+        assertNull("The unwrapped element should be removed from its parent.", unwrappedParagraph.parent());
+
+        // 4. The element's children (the text "Hello") have been moved up to its original parent (the <div>).
+        assertEquals("The parent <div> should now contain the unwrapped text.", "Hello", div.text());
+        assertTrue("The <div>'s first child should now be a TextNode.", div.childNode(0) instanceof TextNode);
+        assertEquals("The <div> should no longer have any element children.", 0, div.children().size());
     }
 }
