@@ -1,23 +1,45 @@
 package org.jfree.data;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
 
-public class ComparableObjectItem_ESTestTest4 extends ComparableObjectItem_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ComparableObjectItem} class, focusing on the compareTo method.
+ */
+public class ComparableObjectItemTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Comparable<Object> comparable0 = (Comparable<Object>) mock(Comparable.class, new ViolatedAssumptionAnswer());
-        doReturn((-1236)).when(comparable0).compareTo(any());
-        doReturn("^VA/-a*$;'d").when(comparable0).toString();
-        ComparableObjectItem comparableObjectItem0 = new ComparableObjectItem(comparable0, comparable0);
-        int int0 = comparableObjectItem0.compareTo(comparableObjectItem0);
-        assertEquals((-1236), int0);
+    /**
+     * Verifies that the compareTo() method correctly delegates the comparison
+     * to the underlying 'x' value (the Comparable object).
+     */
+    @Test
+    public void compareToShouldDelegateToInternalComparable() {
+        // Arrange
+        final int expectedComparisonResult = -1236;
+
+        // Create a mock for the internal Comparable object.
+        @SuppressWarnings("unchecked")
+        Comparable<Object> mockComparable = mock(Comparable.class);
+
+        // Configure the mock's compareTo method to return a specific, non-zero value.
+        // This ensures we can verify that the call is correctly delegated.
+        when(mockComparable.compareTo(any())).thenReturn(expectedComparisonResult);
+
+        // Create an instance of ComparableObjectItem using the mock.
+        // The second parameter (the 'object') is not relevant for comparison.
+        ComparableObjectItem item = new ComparableObjectItem(mockComparable, "any-object-value");
+
+        // Act
+        // The compareTo method of ComparableObjectItem should invoke the compareTo
+        // method of our mockComparable.
+        int actualResult = item.compareTo(item);
+
+        // Assert
+        // The result should be the value we configured the mock to return.
+        assertEquals("The comparison result must be delegated from the internal Comparable object.",
+                expectedComparisonResult, actualResult);
     }
 }
