@@ -1,24 +1,49 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonTypeInfo_ESTestTest11 extends JsonTypeInfo_ESTest_scaffolding {
+/**
+ * Tests for the {@link JsonTypeInfo.Value} class, focusing on its {@code toString()} method.
+ */
+public class JsonTypeInfoValueToStringTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        JsonTypeInfo.Id jsonTypeInfo_Id0 = JsonTypeInfo.Id.MINIMAL_CLASS;
-        JsonTypeInfo.As jsonTypeInfo_As0 = JsonTypeInfo.As.WRAPPER_OBJECT;
-        Class<Object> class0 = Object.class;
-        Boolean boolean0 = Boolean.valueOf("@2LLQRbW9{J2*\"1GY");
-        JsonTypeInfo.Value jsonTypeInfo_Value0 = JsonTypeInfo.Value.construct(jsonTypeInfo_Id0, jsonTypeInfo_As0, "@2LLQRbW9{J2*\"1GY", class0, false, boolean0);
-        String string0 = jsonTypeInfo_Value0.toString();
-        assertEquals("JsonTypeInfo.Value(idType=MINIMAL_CLASS,includeAs=WRAPPER_OBJECT,propertyName=@2LLQRbW9{J2*\"1GY,defaultImpl=java.lang.Object,idVisible=false,requireTypeIdForSubtypes=false)", string0);
+    /**
+     * Verifies that the toString() method of JsonTypeInfo.Value generates a correct
+     * and comprehensive string representation of its state.
+     */
+    @Test
+    public void toStringShouldGenerateCorrectStringRepresentation() {
+        // Arrange: Define the configuration for a JsonTypeInfo.Value instance.
+        final JsonTypeInfo.Id idType = JsonTypeInfo.Id.MINIMAL_CLASS;
+        final JsonTypeInfo.As inclusion = JsonTypeInfo.As.WRAPPER_OBJECT;
+        final String propertyName = "@2LLQRbW9{J2*\"1GY";
+        final Class<?> defaultImpl = Object.class;
+        final boolean idVisible = false;
+        
+        // The original test used Boolean.valueOf(propertyName), which results in 'false'.
+        // Using Boolean.FALSE directly is much clearer and less error-prone.
+        final Boolean requireTypeIdForSubtypes = Boolean.FALSE;
+
+        // Act: Construct the Value object and get its string representation.
+        JsonTypeInfo.Value value = JsonTypeInfo.Value.construct(
+                idType,
+                inclusion,
+                propertyName,
+                defaultImpl,
+                idVisible,
+                requireTypeIdForSubtypes
+        );
+        String actualToString = value.toString();
+
+        // Assert: Verify the string representation matches the expected format.
+        String expectedToString = "JsonTypeInfo.Value(idType=MINIMAL_CLASS,"
+                + "includeAs=WRAPPER_OBJECT,"
+                + "propertyName=@2LLQRbW9{J2*\"1GY,"
+                + "defaultImpl=java.lang.Object,"
+                + "idVisible=false,"
+                + "requireTypeIdForSubtypes=false)";
+
+        assertEquals(expectedToString, actualToString);
     }
 }
