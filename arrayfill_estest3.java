@@ -1,22 +1,29 @@
 package org.apache.commons.lang3;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Arrays;
 import org.apache.commons.lang3.function.FailableIntFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ArrayFill_ESTestTest3 extends ArrayFill_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        Object[] objectArray0 = new Object[0];
-        FailableIntFunction<Object, Throwable> failableIntFunction0 = FailableIntFunction.nop();
-        Object[] objectArray1 = ArrayFill.fill(objectArray0, (FailableIntFunction<?, Throwable>) failableIntFunction0);
-        assertSame(objectArray1, objectArray0);
+/**
+ * Tests for {@link ArrayFill}.
+ */
+public class ArrayFillTest {
+
+    /**
+     * Tests that ArrayFill.fill() with a generator function returns the same
+     * instance when given an empty array, as no filling is necessary.
+     */
+    @Test
+    public void testFillWithGeneratorOnEmptyArrayReturnsSameInstance() {
+        // Arrange: Create an empty array and a no-op generator function.
+        final Object[] emptyArray = new Object[0];
+        final FailableIntFunction<Object, ?> generator = FailableIntFunction.nop();
+
+        // Act: Call the fill method with the empty array.
+        final Object[] resultArray = ArrayFill.fill(emptyArray, generator);
+
+        // Assert: The returned array should be the exact same instance as the input array.
+        assertSame("For an empty array, the returned instance should be the same", emptyArray, resultArray);
     }
 }
