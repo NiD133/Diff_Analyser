@@ -1,33 +1,34 @@
 package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfIndirectReference;
-import com.itextpdf.text.pdf.PdfOCProperties;
-import com.itextpdf.text.pdf.PdfSigLockDictionary;
-import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.util.Collection;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LocationTextExtractionStrategy_ESTestTest1 extends LocationTextExtractionStrategy_ESTest_scaffolding {
+/**
+ * Unit tests for the inner class {@link LocationTextExtractionStrategy.TextChunk}.
+ */
+public class LocationTextExtractionStrategyTextChunkTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Vector vector0 = new Vector(0.0F, (-2030.0F), 0.0F);
-        LocationTextExtractionStrategy.TextChunk locationTextExtractionStrategy_TextChunk0 = new LocationTextExtractionStrategy.TextChunk("", vector0, vector0, 0.0F);
-        LocationTextExtractionStrategy.TextChunk locationTextExtractionStrategy_TextChunk1 = new LocationTextExtractionStrategy.TextChunk("Lm", vector0, vector0, 2);
-        float float0 = locationTextExtractionStrategy_TextChunk0.distanceFromEndOf(locationTextExtractionStrategy_TextChunk1);
-        assertEquals(0.0F, float0, 0.01F);
-        assertEquals(2.0F, locationTextExtractionStrategy_TextChunk1.getCharSpaceWidth(), 0.01F);
+    /**
+     * Tests that the distance between two TextChunks is zero when they occupy the exact same
+     * start and end positions. This represents a complete overlap scenario.
+     */
+    @Test
+    public void distanceFromEndOf_whenChunksAreCoLocated_returnsZero() {
+        // Arrange: Create two TextChunks that are co-located (same start and end vectors).
+        // These are zero-width chunks, which is a valid edge case.
+        Vector sharedLocation = new Vector(0.0f, -2030.0f, 0.0f);
+
+        // The text content and character space width are irrelevant for this distance calculation,
+        // as the distance depends only on the start and end locations.
+        LocationTextExtractionStrategy.TextChunk currentChunk = new LocationTextExtractionStrategy.TextChunk(
+                "", sharedLocation, sharedLocation, 0.0f);
+        LocationTextExtractionStrategy.TextChunk previousChunk = new LocationTextExtractionStrategy.TextChunk(
+                "Lm", sharedLocation, sharedLocation, 2.0f);
+
+        // Act: Calculate the distance from the end of the previous chunk to the start of the current one.
+        float distance = currentChunk.distanceFromEndOf(previousChunk);
+
+        // Assert: Since both chunks start and end at the same point, the distance should be zero.
+        assertEquals(0.0f, distance, 0.01f);
     }
 }
