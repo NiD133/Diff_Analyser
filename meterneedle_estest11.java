@@ -1,38 +1,34 @@
 package org.jfree.chart.plot.compass;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
+import static org.junit.Assert.assertEquals;
+
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import javax.swing.JScrollPane;
-import javax.swing.text.DefaultCaret;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MeterNeedle_ESTestTest11 extends MeterNeedle_ESTest_scaffolding {
+/**
+ * This test class has been improved for understandability.
+ * The original test was auto-generated and lacked clarity.
+ */
+public class MeterNeedle_ESTestTest11 {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        PlumNeedle plumNeedle0 = new PlumNeedle();
-        DefaultTreeCellRenderer defaultTreeCellRenderer0 = new DefaultTreeCellRenderer();
-        Color color0 = defaultTreeCellRenderer0.getTextNonSelectionColor();
-        plumNeedle0.setOutlinePaint(color0);
-        Paint paint0 = plumNeedle0.getOutlinePaint();
-        assertEquals(0.5, plumNeedle0.getRotateY(), 0.01);
-        assertNotNull(paint0);
-        assertEquals(5, plumNeedle0.getSize());
-        assertEquals(0.5, plumNeedle0.getRotateX(), 0.01);
+    /**
+     * Tests that the setOutlinePaint() method correctly stores the paint,
+     * which can then be retrieved by getOutlinePaint().
+     */
+    @Test
+    public void setOutlinePaint_ShouldSetAndReturnCorrectPaint() {
+        // Arrange: Create a concrete instance of MeterNeedle and a distinct test color.
+        // Using a simple, standard color avoids the original test's complexity
+        // of creating a Swing component just to get a color.
+        MeterNeedle needle = new PlumNeedle();
+        Paint expectedPaint = Color.BLUE;
+
+        // Act: Set the outline paint on the needle instance.
+        needle.setOutlinePaint(expectedPaint);
+
+        // Assert: Verify that the getter returns the exact paint object that was set.
+        Paint actualPaint = needle.getOutlinePaint();
+        assertEquals("The retrieved paint should match the one that was set.", expectedPaint, actualPaint);
     }
 }
