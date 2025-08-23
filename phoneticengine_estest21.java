@@ -1,23 +1,28 @@
 package org.apache.commons.codec.language.bm;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.LinkedHashSet;
+
+import java.util.Collections;
 import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PhoneticEngine_ESTestTest21 extends PhoneticEngine_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        LinkedHashSet<String> linkedHashSet0 = new LinkedHashSet<String>();
-        Languages.LanguageSet languages_LanguageSet0 = Languages.LanguageSet.from(linkedHashSet0);
-        PhoneticEngine.PhonemeBuilder phoneticEngine_PhonemeBuilder0 = PhoneticEngine.PhonemeBuilder.empty(languages_LanguageSet0);
-        Set<Rule.Phoneme> set0 = phoneticEngine_PhonemeBuilder0.getPhonemes();
-        assertEquals(1, set0.size());
+/**
+ * Test suite for the {@link PhoneticEngine.PhonemeBuilder} class.
+ */
+public class PhoneticEnginePhonemeBuilderTest {
+
+    @Test
+    public void emptyBuilderShouldContainOneInitialPhoneme() {
+        // Arrange: Create an empty language set, which is a required parameter.
+        Languages.LanguageSet emptyLanguageSet = Languages.LanguageSet.from(Collections.emptySet());
+
+        // Act: Create an "empty" PhonemeBuilder.
+        PhoneticEngine.PhonemeBuilder builder = PhoneticEngine.PhonemeBuilder.empty(emptyLanguageSet);
+        Set<Rule.Phoneme> phonemes = builder.getPhonemes();
+
+        // Assert: The builder should contain a single, base phoneme.
+        // This initial phoneme acts as a starting point for appending other phonemes.
+        assertEquals("An 'empty' builder should start with one base phoneme.", 1, phonemes.size());
     }
 }
