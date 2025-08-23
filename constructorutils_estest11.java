@@ -1,31 +1,29 @@
 package org.apache.commons.lang3.reflect;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 
-public class ConstructorUtils_ESTestTest11 extends ConstructorUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ConstructorUtils}.
+ */
+public class ConstructorUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        Class<Integer>[] classArray0 = (Class<Integer>[]) Array.newInstance(Class.class, 1);
-        // Undeclared exception!
-        try {
-            ConstructorUtils.getMatchingAccessibleConstructor((Class<Integer>) null, (Class<?>[]) classArray0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // cls
-            //
-            verifyException("java.util.Objects", e);
-        }
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    /**
+     * Tests that getMatchingAccessibleConstructor throws a NullPointerException
+     * when the class parameter is null.
+     */
+    @Test
+    public void getMatchingAccessibleConstructorWithNullClassThrowsNullPointerException() {
+        // Arrange: Define expectations for the exception
+        thrown.expect(NullPointerException.class);
+        // The method under test uses Objects.requireNonNull(cls, "cls"), which results in this specific message.
+        thrown.expectMessage("cls");
+
+        // Act: Call the method with a null class, which should trigger the exception
+        ConstructorUtils.getMatchingAccessibleConstructor(null, String.class);
     }
 }
