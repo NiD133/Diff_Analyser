@@ -1,30 +1,51 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class LinkedTreeMap_ESTestTest33 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link LinkedTreeMap.EntrySet} class.
+ */
+public class LinkedTreeMapEntrySetTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        LinkedTreeMap<Integer, Object> linkedTreeMap0 = new LinkedTreeMap<Integer, Object>();
-        LinkedTreeMap<Integer, Integer> linkedTreeMap1 = new LinkedTreeMap<Integer, Integer>();
-        Integer integer0 = Integer.valueOf((-2139));
-        LinkedTreeMap.Node<Integer, Integer> linkedTreeMap_Node0 = linkedTreeMap1.find(integer0, true);
-        LinkedTreeMap.EntrySet linkedTreeMap_EntrySet0 = linkedTreeMap0.new EntrySet();
-        boolean boolean0 = linkedTreeMap_EntrySet0.remove(linkedTreeMap_Node0);
-        assertEquals(1, linkedTreeMap1.size());
-        assertFalse(boolean0);
+    /**
+     * Tests that calling remove() on an EntrySet with a Node object
+     * that belongs to a different LinkedTreeMap instance does not remove the node
+     * and correctly returns false.
+     */
+    @Test
+    public void remove_whenGivenNodeFromDifferentMap_shouldReturnFalseAndNotModifyMaps() {
+        // Arrange
+        // Create the primary map from which we'll get the EntrySet.
+        LinkedTreeMap<Integer, Object> map = new LinkedTreeMap<>();
+        Set<Map.Entry<Integer, Object>> entrySet = map.entrySet();
+
+        // Create a second, different map and add a node to it.
+        LinkedTreeMap<Integer, Integer> anotherMap = new LinkedTreeMap<>();
+        Integer key = -2139;
+        // The find(key, true) method creates and adds the node if it doesn't exist.
+        LinkedTreeMap.Node<Integer, Integer> nodeFromAnotherMap = anotherMap.find(key, true);
+
+        // Sanity check to ensure the setup is correct.
+        assertEquals(1, anotherMap.size());
+        assertTrue(anotherMap.containsKey(key));
+        assertTrue(map.isEmpty());
+
+        // Act
+        // Attempt to remove the node from the *first* map's entry set,
+        // using the node object that belongs to the *second* map.
+        boolean wasRemoved = entrySet.remove(nodeFromAnotherMap);
+
+        // Assert
+        // The remove operation should fail because the node is not part of the first map.
+        assertFalse("remove() should return false for a node from a different map", wasRemoved);
+
+        // Verify that neither map was modified by the operation.
+        assertEquals("The original map should remain empty", 0, map.size());
+        assertEquals("The other map's size should not be affected", 1, anotherMap.size());
     }
 }
