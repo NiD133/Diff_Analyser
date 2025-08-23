@@ -1,19 +1,24 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class RandomUtils_ESTestTest9 extends RandomUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.RandomUtils}.
+ */
+public class RandomUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        byte[] byteArray0 = RandomUtils.nextBytes(0);
-        assertEquals(0, byteArray0.length);
+    /**
+     * Tests that calling nextBytes with a count of 0 returns an empty, non-null byte array.
+     */
+    @Test
+    public void nextBytesShouldReturnEmptyArrayWhenCountIsZero() {
+        // Act: Call the method with a count of 0
+        final byte[] result = RandomUtils.nextBytes(0);
+
+        // Assert: Verify the result is an empty, non-null array
+        assertNotNull("The returned array should not be null.", result);
+        assertEquals("The length of the returned array should be 0.", 0, result.length);
     }
 }
