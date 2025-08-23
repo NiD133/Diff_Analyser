@@ -1,27 +1,33 @@
 package org.apache.ibatis.cache;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CacheKey_ESTestTest12 extends CacheKey_ESTest_scaffolding {
+/**
+ * Test suite for the {@link CacheKey} class.
+ */
+public class CacheKeyTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        Object[] objectArray0 = new Object[4];
-        CacheKey cacheKey0 = new CacheKey(objectArray0);
-        // Undeclared exception!
+    /**
+     * Verifies that the special NULL_CACHE_KEY instance is immutable.
+     * An attempt to modify it by calling updateAll() should result in a RuntimeException.
+     */
+    @Test
+    public void shouldThrowExceptionWhenAttemptingToUpdateNullCacheKey() {
+        // Arrange
+        Object[] anyObjects = new Object[] { "any-object" };
+        String expectedErrorMessage = "Not allowed to update a null cache key instance.";
+
+        // Act & Assert
         try {
-            cacheKey0.NULL_CACHE_KEY.updateAll(objectArray0);
-            fail("Expecting exception: RuntimeException");
+            // Attempt to call updateAll on the immutable NULL_CACHE_KEY
+            CacheKey.NULL_CACHE_KEY.updateAll(anyObjects);
+            fail("Expected a RuntimeException because NULL_CACHE_KEY cannot be modified.");
         } catch (RuntimeException e) {
-            //
-            // Not allowed to update a null cache key instance.
-            //
-            verifyException("org.apache.ibatis.cache.CacheKey$1", e);
+            // Verify that the exception has the expected message
+            assertEquals(expectedErrorMessage, e.getMessage());
         }
     }
 }
