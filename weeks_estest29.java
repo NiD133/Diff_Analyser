@@ -1,25 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class Weeks_ESTestTest29 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Verifies that calling weeksBetween() with null start and end instants 
+     * throws an IllegalArgumentException.
+     */
+    @Test
+    public void weeksBetween_withNullInstants_shouldThrowIllegalArgumentException() {
         try {
-            Weeks.weeksBetween((ReadableInstant) null, (ReadableInstant) null);
-            fail("Expecting exception: IllegalArgumentException");
+            // Act: Attempt to calculate the period between two null instants.
+            Weeks.weeksBetween(null, null);
+            fail("Expected an IllegalArgumentException to be thrown for null instants.");
         } catch (IllegalArgumentException e) {
-            //
-            // ReadableInstant objects must not be null
-            //
-            verifyException("org.joda.time.base.BaseSingleFieldPeriod", e);
+            // Assert: Verify the exception message is correct.
+            assertEquals("ReadableInstant objects must not be null", e.getMessage());
         }
     }
 }
