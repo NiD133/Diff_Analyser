@@ -1,39 +1,32 @@
 package com.itextpdf.text.pdf;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
 import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+/**
+ * Test suite for the {@link RandomAccessFileOrArray} class.
+ */
+// The original test class name and inheritance are preserved.
 public class RandomAccessFileOrArray_ESTestTest69 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test068() throws Throwable {
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray((RandomAccessSource) null);
-        // Undeclared exception!
-        try {
-            randomAccessFileOrArray0.readString(2919, "xEp}d]>:P4jFt\" =");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling readString() on an instance created with a null
+     * RandomAccessSource throws a NullPointerException.
+     * <p>
+     * This is the expected behavior, as the underlying source is required for
+     * any read operations.
+     */
+    @Test(expected = NullPointerException.class)
+    public void readStringWithNullSourceThrowsNullPointerException() throws Exception {
+        // Arrange: Create an instance of RandomAccessFileOrArray with a null data source.
+        RandomAccessFileOrArray randomAccessFileOrArray = new RandomAccessFileOrArray((RandomAccessSource) null);
+
+        // Act: Attempt to read a string. This action is expected to throw the exception.
+        // The arguments for length and encoding are representative values; the NPE
+        // should occur before they are actually used.
+        randomAccessFileOrArray.readString(10, "UTF-8");
+
+        // Assert: The @Test(expected) annotation automatically verifies that a
+        // NullPointerException was thrown. No further assertions are needed.
     }
 }
