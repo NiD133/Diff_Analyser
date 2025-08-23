@@ -1,38 +1,25 @@
 package org.apache.commons.compress.harmony.pack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+/**
+ * This test case verifies the behavior of the CodecEncoding.getSpecifier() method,
+ * specifically its handling of null inputs.
+ */
 public class CodecEncoding_ESTestTest8 extends CodecEncoding_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        PopulationCodec populationCodec0 = new PopulationCodec((Codec) null, (Codec) null, (Codec) null);
-        // Undeclared exception!
-        try {
-            CodecEncoding.getSpecifier(populationCodec0, (Codec) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.harmony.pack200.CodecEncoding", e);
-        }
+    /**
+     * Tests that CodecEncoding.getSpecifier() throws a NullPointerException
+     * when the second argument (the default codec) is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getSpecifierShouldThrowNullPointerExceptionWhenDefaultCodecIsNull() {
+        // Arrange: Create a PopulationCodec to pass as the first argument.
+        // The internal codecs can be null as they are not relevant to this test.
+        final PopulationCodec codec = new PopulationCodec(null, null, null);
+
+        // Act & Assert: Call the method with a null default codec.
+        // This is expected to throw a NullPointerException.
+        CodecEncoding.getSpecifier(codec, null);
     }
 }
