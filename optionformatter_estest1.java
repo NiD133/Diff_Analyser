@@ -1,25 +1,39 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
 import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class OptionFormatter_ESTestTest1 extends OptionFormatter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Option option0 = new Option("?Wf", "?Wf", true, "?Wf");
-        OptionFormatter.Builder optionFormatter_Builder0 = OptionFormatter.builder();
-        OptionFormatter.Builder optionFormatter_Builder1 = optionFormatter_Builder0.setLongOptPrefix("?Wf");
-        OptionFormatter optionFormatter0 = optionFormatter_Builder1.build(option0);
-        String string0 = optionFormatter0.getLongOpt();
-        assertEquals("?Wf?Wf", string0);
+/**
+ * Tests for {@link OptionFormatter}.
+ */
+public class OptionFormatterTest {
+
+    /**
+     * Verifies that getLongOpt() correctly prepends a custom long option prefix
+     * to the option's long name.
+     */
+    @Test
+    public void getLongOptShouldReturnLongOptionNameWithCustomPrefix() {
+        // Arrange
+        final String longOptionName = "file";
+        final String customPrefix = "++";
+        final String expectedFormattedLongOpt = "++file";
+
+        // Create an option that has a long name.
+        final Option option = new Option("f", longOptionName, true, "The file to process");
+
+        // Build a formatter with a custom prefix for long options.
+        final OptionFormatter formatter = OptionFormatter.builder()
+                .setLongOptPrefix(customPrefix)
+                .build(option);
+
+        // Act
+        final String actualFormattedLongOpt = formatter.getLongOpt();
+
+        // Assert
+        assertEquals("The formatted long option should include the custom prefix.",
+                expectedFormattedLongOpt, actualFormattedLongOpt);
     }
 }
