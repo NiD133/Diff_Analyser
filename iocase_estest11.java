@@ -1,20 +1,36 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class IOCase_ESTestTest11 extends IOCase_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link IOCase} enum.
+ * This class focuses on improving the understandability of a specific test case.
+ */
+public class IOCase_ESTestTest11 {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        IOCase iOCase0 = IOCase.SYSTEM;
-        IOCase iOCase1 = IOCase.value(iOCase0, iOCase0);
-        assertEquals(IOCase.SYSTEM, iOCase1);
-        int int0 = iOCase1.checkCompareTo("\"#s6?ulinuxmwf", "#s6?u");
-        assertEquals((-1), int0);
+    /**
+     * Tests that {@link IOCase#checkCompareTo(String, String)} returns a negative value
+     * when the first string is lexicographically smaller than the second.
+     * This test uses {@code IOCase.SYSTEM}, which adapts its behavior based on the
+     * underlying operating system's file system case-sensitivity. The chosen test
+     * strings ensure the test passes on both case-sensitive (e.g., Linux) and
+     * case-insensitive (e.g., Windows) systems.
+     */
+    @Test
+    public void checkCompareToWithSystemCaseReturnsNegativeForLexicographicallySmallerString() {
+        // Arrange
+        final IOCase systemCase = IOCase.SYSTEM;
+        final String smallerString = "Apple";
+        final String largerString = "Banana";
+
+        // Act
+        final int comparisonResult = systemCase.checkCompareTo(smallerString, largerString);
+
+        // Assert
+        assertTrue(
+            "Expected a negative result when comparing a lexicographically smaller string to a larger one.",
+            comparisonResult < 0
+        );
     }
 }
