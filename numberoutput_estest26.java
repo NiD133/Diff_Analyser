@@ -1,26 +1,28 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NumberOutput_ESTestTest26 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class, focusing on edge cases and exception handling.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        char[] charArray0 = new char[7];
-        // Undeclared exception!
-        try {
-            NumberOutput.outputLong(274877907L, charArray0, (int) (byte) 0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 7
-            //
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
-        }
+    /**
+     * Verifies that outputLong() throws an ArrayIndexOutOfBoundsException when the provided
+     * character buffer is too small to hold the string representation of the long value.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void outputLongShouldThrowExceptionWhenBufferIsTooSmall() {
+        // GIVEN a long value that requires 9 characters for its string representation.
+        long value = 274877907L; // This number has 9 digits.
+
+        // AND a character buffer that is intentionally too small.
+        // A buffer of size 8 can only hold indices 0 through 7.
+        char[] insufficientBuffer = new char[8];
+        int offset = 0;
+
+        // WHEN attempting to write the 9-character long into the 8-character buffer
+        // THEN an ArrayIndexOutOfBoundsException is expected.
+        NumberOutput.outputLong(value, insufficientBuffer, offset);
     }
 }
