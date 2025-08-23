@@ -1,29 +1,29 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+// The original class name and inheritance are kept to show a focused refactoring
+// of the test method. In a real-world scenario, the class might also be renamed
+// to something like `JsonTreeReaderTest`.
 public class JsonTreeReader_ESTestTest7 extends JsonTreeReader_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test006() throws Throwable {
-        Long long0 = new Long((-1977L));
-        JsonPrimitive jsonPrimitive0 = new JsonPrimitive(long0);
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonPrimitive0);
-        double double0 = jsonTreeReader0.nextDouble();
-        assertEquals((-1977.0), double0, 0.01);
+    /**
+     * Verifies that nextDouble() correctly converts a JsonPrimitive holding a long
+     * into its equivalent double representation.
+     */
+    @Test
+    public void nextDouble_whenReadingLongPrimitive_returnsEquivalentDouble() throws IOException {
+        // Arrange: Create a JsonTreeReader with a JSON primitive containing a long value.
+        JsonPrimitive longJsonPrimitive = new JsonPrimitive(-1977L);
+        JsonTreeReader jsonTreeReader = new JsonTreeReader(longJsonPrimitive);
+
+        // Act: Call the method under test to read the value as a double.
+        double result = jsonTreeReader.nextDouble();
+
+        // Assert: Verify that the returned double is the correct representation of the long.
+        assertEquals(-1977.0, result, 0.01);
     }
 }
