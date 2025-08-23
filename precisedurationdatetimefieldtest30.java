@@ -56,175 +56,22 @@ public class PreciseDurationDateTimeFieldTestTest30 extends TestCase {
     }
 
     static class MockStandardBaseDateTimeField extends MockPreciseDurationDateTimeField {
-
-        protected MockStandardBaseDateTimeField() {
-            super();
-        }
-
-        @Override
-        public DurationField getDurationField() {
-            return ISOChronology.getInstanceUTC().seconds();
-        }
-
-        @Override
-        public DurationField getRangeDurationField() {
-            return ISOChronology.getInstanceUTC().minutes();
-        }
+        // ...
     }
 
     //-----------------------------------------------------------------------
     static class MockCountingDurationField extends BaseDurationField {
-
-        static int add_int = 0;
-
-        static int add_long = 0;
-
-        static int difference_long = 0;
-
-        protected MockCountingDurationField(DurationFieldType type) {
-            super(type);
-        }
-
-        @Override
-        public boolean isPrecise() {
-            return true;
-        }
-
-        @Override
-        public long getUnitMillis() {
-            return 60;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            add_int++;
-            return instant + (value * 60L);
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            add_long++;
-            return instant + (value * 60L);
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            difference_long++;
-            return 30;
-        }
+        // ...
     }
 
     //-----------------------------------------------------------------------
     static class MockZeroDurationField extends BaseDurationField {
-
-        protected MockZeroDurationField(DurationFieldType type) {
-            super(type);
-        }
-
-        @Override
-        public boolean isPrecise() {
-            return true;
-        }
-
-        @Override
-        public long getUnitMillis() {
-            // this is zero
-            return 0;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            return 0;
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            return 0;
-        }
+        // ...
     }
 
     //-----------------------------------------------------------------------
     static class MockImpreciseDurationField extends BaseDurationField {
-
-        protected MockImpreciseDurationField(DurationFieldType type) {
-            super(type);
-        }
-
-        @Override
-        public boolean isPrecise() {
-            // this is false
-            return false;
-        }
-
-        @Override
-        public long getUnitMillis() {
-            return 0;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            return 0;
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            return 0;
-        }
+        // ...
     }
 
     public void test_convertText() {
