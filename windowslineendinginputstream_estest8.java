@@ -1,27 +1,34 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
-public class WindowsLineEndingInputStream_ESTestTest8 extends WindowsLineEndingInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link WindowsLineEndingInputStream}.
+ */
+public class WindowsLineEndingInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        byte[] byteArray0 = new byte[0];
-        ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0, (-3187), (-3187));
-        WindowsLineEndingInputStream windowsLineEndingInputStream0 = new WindowsLineEndingInputStream(byteArrayInputStream0, false);
-        int int0 = windowsLineEndingInputStream0.read();
-        assertEquals((-1), int0);
+    /**
+     * Tests that reading from an empty input stream immediately returns EOF (-1)
+     * when the option to ensure a final line ending is disabled.
+     */
+    @Test
+    public void shouldReturnEofForEmptyStreamWhenNotEnsuringLineFeedAtEos() throws IOException {
+        // Arrange: Create an empty input stream and wrap it.
+        // The 'lineFeedAtEos' parameter is set to false, so no CRLF should be added.
+        final InputStream emptyStream = new ByteArrayInputStream(new byte[0]);
+        final boolean ensureLineFeedAtEos = false;
+        final WindowsLineEndingInputStream windowsStream = new WindowsLineEndingInputStream(emptyStream, ensureLineFeedAtEos);
+
+        // Act: Attempt to read from the stream.
+        final int result = windowsStream.read();
+
+        // Assert: The stream should be at its end.
+        final int EOF = -1;
+        assertEquals("Should return EOF for an empty stream", EOF, result);
     }
 }
