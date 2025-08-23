@@ -3,76 +3,85 @@ package org.apache.commons.io.input;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-public class WindowsLineEndingInputStreamTestTest14 {
+/**
+ * Tests for {@link WindowsLineEndingInputStream}.
+ */
+class WindowsLineEndingInputStreamTest {
 
-    private String roundtripReadByte(final String msg) throws IOException {
-        return roundtripReadByte(msg, true);
-    }
+    /**
+     * Creates a WindowsLineEndingInputStream for a given string input, reads the entire
+     * stream using the read(byte[]) method, and returns the result as a string.
+     *
+     * @param input The string to be processed.
+     * @param ensureLineFeedAtEos The flag for the WindowsLineEndingInputStream.
+     * @return The transformed string after passing through the stream.
+     * @throws IOException If an I/O error occurs.
+     */
+    private String transformWithReadByteArray(final String input, final boolean ensureLineFeedAtEos) throws IOException {
+        try (WindowsLineEndingInputStream windowsStream = new WindowsLineEndingInputStream(
+                CharSequenceInputStream.builder()
+                        .setCharSequence(input)
+                        .setCharset(StandardCharsets.UTF_8)
+                        .get(),
+                ensureLineFeedAtEos)) {
 
-    private String roundtripReadByte(final String msg, final boolean ensure) throws IOException {
-        // read(byte[])
-        try (WindowsLineEndingInputStream lf = new WindowsLineEndingInputStream(CharSequenceInputStream.builder().setCharSequence(msg).setCharset(StandardCharsets.UTF_8).get(), ensure)) {
-            final byte[] buf = new byte[100];
-            int i = 0;
-            while (i < buf.length) {
-                final int read = lf.read();
-                if (read < 0) {
-                    break;
-                }
-                buf[i++] = (byte) read;
+            // A buffer large enough for test data to test the read(byte[]) method.
+            final byte[] buffer = new byte[1024];
+            final int bytesRead = windowsStream.read(buffer);
+            if (bytesRead == -1) {
+                return "";
             }
-            return new String(buf, 0, i, StandardCharsets.UTF_8);
-        }
-    }
-
-    private String roundtripReadByteArray(final String msg) throws IOException {
-        return roundtripReadByteArray(msg, true);
-    }
-
-    private String roundtripReadByteArray(final String msg, final boolean ensure) throws IOException {
-        // read(byte[])
-        try (WindowsLineEndingInputStream lf = new WindowsLineEndingInputStream(CharSequenceInputStream.builder().setCharSequence(msg).setCharset(StandardCharsets.UTF_8).get(), ensure)) {
-            final byte[] buf = new byte[100];
-            final int read = lf.read(buf);
-            return new String(buf, 0, read, StandardCharsets.UTF_8);
-        }
-    }
-
-    private String roundtripReadByteArrayIndex(final String msg) throws IOException {
-        return roundtripReadByteArrayIndex(msg, true);
-    }
-
-    private String roundtripReadByteArrayIndex(final String msg, final boolean ensure) throws IOException {
-        // read(byte[])
-        try (WindowsLineEndingInputStream lf = new WindowsLineEndingInputStream(CharSequenceInputStream.builder().setCharSequence(msg).setCharset(StandardCharsets.UTF_8).get(), ensure)) {
-            final byte[] buf = new byte[100];
-            final int read = lf.read(buf, 0, 100);
-            return new String(buf, 0, read, StandardCharsets.UTF_8);
+            return new String(buffer, 0, bytesRead, StandardCharsets.UTF_8);
         }
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = { false, true })
-    void testMark(final boolean ensureLineFeedAtEndOfFile) {
-        assertThrows(UnsupportedOperationException.class, () -> new WindowsLineEndingInputStream(new NullInputStream(), true).mark(1));
+    @ValueSource(booleans = {false, true})
+    void markShouldThrowUnsupportedOperationException(final boolean ensureLineFeedAtEos) {
+        try (WindowsLineEndingInputStream stream = new WindowsLineEndingInputStream(new NullInputStream(), ensureLineFeedAtEos)) {
+            assertThrows(UnsupportedOperationException.class, () -> stream.mark(1),
+                "mark() should not be supported.");
+        }
     }
 
-    @SuppressWarnings("resource")
     @ParameterizedTest
-    @ValueSource(booleans = { false, true })
-    void testMarkSupported(final boolean ensureLineFeedAtEndOfFile) {
-        assertFalse(new WindowsLineEndingInputStream(new NullInputStream(), true).markSupported());
+    @ValueSource(booleans = {false, true})
+    void markSupportedShouldReturnFalse(final boolean ensureLineFeedAtEos) {
+        try (WindowsLineEndingInputStream stream = new WindowsLineEndingInputStream(new NullInputStream(), ensureLineFeedAtEos)) {
+            assertFalse(stream.markSupported(), "markSupported() should return false.");
+        }
     }
 
     @Test
-    void testRetainLineFeed_ByteArray() throws Exception {
-        assertEquals("a\r\n\r\n", roundtripReadByteArray("a\r\n\r\n", false));
-        assertEquals("a", roundtripReadByteArray("a", false));
+    void readByteArrayWithEnsureLineFeedFalseShouldPreserveExistingCrLf() throws Exception {
+        // Arrange
+        final String input = "a\r\n\r\n";
+        final String expected = "a\r\n\r\n";
+
+        // Act
+        final String result = transformWithReadByteArray(input, false);
+
+        // Assert
+        assertEquals(expected, result, "Existing CRLF sequences should be preserved.");
+    }
+
+    @Test
+    void readByteArrayWithEnsureLineFeedFalseShouldNotAddCrLfForInputWithoutLineEndings() throws Exception {
+        // Arrange
+        final String input = "a";
+        final String expected = "a";
+
+        // Act
+        final String result = transformWithReadByteArray(input, false);
+
+        // Assert
+        assertEquals(expected, result, "Should not add a CRLF to a string that doesn't end with a line feed.");
     }
 }
