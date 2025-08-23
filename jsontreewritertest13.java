@@ -1,23 +1,25 @@
 package com.google.gson.internal.bind;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.Strictness;
-import com.google.gson.common.MoreAsserts;
+
 import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Arrays;
-import java.util.List;
 import org.junit.Test;
 
-public class JsonTreeWriterTestTest13 {
+/**
+ * Tests for the fluent API of {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterTest {
 
     @Test
-    public void testBeginArray() throws Exception {
+    public void beginArray_returnsSameWriterInstanceForChaining() throws Exception {
+        // Arrange
         JsonTreeWriter writer = new JsonTreeWriter();
-        assertThat(writer.beginArray()).isEqualTo(writer);
+
+        // Act
+        JsonWriter returnedWriter = writer.beginArray();
+
+        // Assert
+        // The method should return the same instance to allow for method chaining.
+        assertThat(returnedWriter).isSameInstanceAs(writer);
     }
 }
