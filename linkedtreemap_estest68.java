@@ -1,26 +1,24 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LinkedTreeMap_ESTestTest68 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LinkedTreeMap} class, focusing on its initial state.
+ */
+public class LinkedTreeMapInitialStateTest {
 
-    @Test(timeout = 4000)
-    public void test67() throws Throwable {
-        Comparator<Object> comparator0 = (Comparator<Object>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        LinkedTreeMap<Object, Object> linkedTreeMap0 = new LinkedTreeMap<Object, Object>(comparator0, true);
-        int int0 = linkedTreeMap0.size();
-        assertEquals(0, int0);
+    /**
+     * Verifies that a newly instantiated LinkedTreeMap has a size of zero.
+     */
+    @Test
+    public void newMapShouldBeEmpty() {
+        // Arrange: Create a new LinkedTreeMap instance.
+        // Using the default constructor with standard types (e.g., String, Integer)
+        // is simpler and more readable than using a mock comparator.
+        LinkedTreeMap<String, Integer> map = new LinkedTreeMap<>();
+
+        // Act & Assert: Check that the size of the newly created map is 0.
+        assertEquals(0, map.size());
     }
 }
