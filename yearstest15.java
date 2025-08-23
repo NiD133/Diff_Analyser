@@ -1,47 +1,70 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-public class YearsTestTest15 extends TestCase {
+import org.junit.Test;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Test cases for the Years class, focusing on the plus() method.
+ */
+public class YearsTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void testPlus_addsYearsCorrectly() {
+        // Arrange
+        final Years twoYears = Years.years(2);
+        final Years threeYears = Years.years(3);
+        final Years expected = Years.years(5);
+
+        // Act
+        final Years actual = twoYears.plus(threeYears);
+
+        // Assert
+        assertEquals(expected, actual);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestYears.class);
+    @Test
+    public void testPlus_isImmutable() {
+        // Arrange
+        final Years twoYears = Years.years(2);
+        final Years threeYears = Years.years(3);
+
+        // Act: Call the plus method, but ignore the result.
+        twoYears.plus(threeYears);
+
+        // Assert: Verify the original objects were not mutated.
+        assertEquals("Original object should be immutable", 2, twoYears.getYears());
+        assertEquals("Parameter object should be immutable", 3, threeYears.getYears());
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void testPlus_whenAddingNull_treatsNullAsZero() {
+        // Arrange
+        final Years oneYear = Years.ONE;
+
+        // Act
+        final Years result = oneYear.plus((Years) null);
+
+        // Assert: Adding null should be a no-op and return the same instance.
+        assertSame(oneYear, result);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @Test
+    public void testPlus_whenAddingZero_returnsSameInstance() {
+        // Arrange
+        final Years oneYear = Years.ONE;
+
+        // Act
+        final Years result = oneYear.plus(Years.ZERO);
+
+        // Assert: Adding zero should be a no-op and return the same instance.
+        assertSame(oneYear, result);
     }
 
-    public void testPlus_Years() {
-        Years test2 = Years.years(2);
-        Years test3 = Years.years(3);
-        Years result = test2.plus(test3);
-        assertEquals(2, test2.getYears());
-        assertEquals(3, test3.getYears());
-        assertEquals(5, result.getYears());
-        assertEquals(1, Years.ONE.plus(Years.ZERO).getYears());
-        assertEquals(1, Years.ONE.plus((Years) null).getYears());
-        try {
-            Years.MAX_VALUE.plus(Years.ONE);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+    @Test(expected = ArithmeticException.class)
+    public void testPlus_whenResultExceedsMaxValue_throwsArithmeticException() {
+        // Act: This operation should cause an integer overflow.
+        Years.MAX_VALUE.plus(Years.ONE);
     }
 }
