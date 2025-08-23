@@ -1,17 +1,23 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class NumberOutput_ESTestTest10 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        String string0 = NumberOutput.toString(1);
-        assertEquals("1", string0);
+    @Test
+    public void toString_shouldConvertPositiveIntegerToString() {
+        // Arrange: Define the input number and the expected string output.
+        final int number = 1;
+        final String expected = "1";
+
+        // Act: Call the method under test.
+        final String actual = NumberOutput.toString(number);
+
+        // Assert: Verify that the actual output matches the expected output.
+        assertEquals(expected, actual);
     }
 }
