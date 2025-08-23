@@ -1,31 +1,33 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class SparseBloomFilter_ESTestTest22 extends SparseBloomFilter_ESTest_scaffolding {
+/**
+ * Tests for the {@link SparseBloomFilter} class.
+ */
+public class SparseBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        Shape shape0 = Shape.fromKM(989, 989);
-        SparseBloomFilter sparseBloomFilter0 = new SparseBloomFilter(shape0);
-        // Undeclared exception!
+    /**
+     * Tests that calling merge() with a null BitMapExtractor throws a NullPointerException.
+     * This is the expected behavior for methods that require non-null arguments.
+     */
+    @Test
+    public void mergeWithNullBitMapExtractorShouldThrowNullPointerException() {
+        // Arrange: Create a filter with an arbitrary shape.
+        Shape shape = Shape.fromKM(10, 100);
+        SparseBloomFilter filter = new SparseBloomFilter(shape);
+        BitMapExtractor nullExtractor = null;
+
+        // Act & Assert: Verify that a NullPointerException is thrown with a specific message.
         try {
-            sparseBloomFilter0.merge((BitMapExtractor) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // bitMapExtractor
-            //
-            verifyException("java.util.Objects", e);
+            filter.merge(nullExtractor);
+            fail("Expected a NullPointerException to be thrown.");
+        } catch (final NullPointerException e) {
+            // The source code uses Objects.requireNonNull("bitMapExtractor", ...),
+            // which results in this specific message.
+            assertEquals("bitMapExtractor", e.getMessage());
         }
     }
 }
