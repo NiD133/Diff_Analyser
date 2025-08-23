@@ -1,20 +1,27 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertFalse;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LocaleUtils_ESTestTest37 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.LocaleUtils}.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        boolean boolean0 = LocaleUtils.isAvailableLocale((Locale) null);
-        assertFalse(boolean0);
+    /**
+     * Tests that {@link LocaleUtils#isAvailableLocale(Locale)} returns false
+     * for a null input, as the class is designed to handle nulls gracefully.
+     */
+    @Test
+    public void isAvailableLocale_shouldReturnFalse_forNullInput() {
+        // Arrange: No arrangement is needed as we are testing a null input.
+
+        // Act: Call the method under test with a null locale.
+        final boolean result = LocaleUtils.isAvailableLocale(null);
+
+        // Assert: The method should return false.
+        assertFalse("isAvailableLocale(null) should return false", result);
     }
 }
