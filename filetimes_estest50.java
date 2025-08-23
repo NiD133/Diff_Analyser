@@ -1,25 +1,30 @@
 package org.apache.commons.io.file.attribute;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
+import static org.junit.Assert.assertEquals;
+
 import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import java.util.concurrent.TimeUnit;
+import org.junit.Test;
 
-public class FileTimes_ESTestTest50 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for the {@link FileTimes} utility class.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test49() throws Throwable {
-        FileTime fileTime0 = FileTimes.ntfsTimeToFileTime(369L);
-        FileTime fileTime1 = FileTimes.minusMillis(fileTime0, 0L);
-        assertTrue(fileTime1.equals((Object) fileTime0));
+    /**
+     * Tests that subtracting zero milliseconds from a FileTime results in an equal FileTime.
+     */
+    @Test
+    public void minusMillisWithZeroShouldReturnEqualFileTime() {
+        // Arrange: Create a starting FileTime instance.
+        // Using a clear, arbitrary value like "one day after epoch" avoids magic numbers.
+        final FileTime originalFileTime = FileTime.from(1, TimeUnit.DAYS);
+        final long millisToSubtract = 0L;
+
+        // Act: Call the method under test.
+        final FileTime resultFileTime = FileTimes.minusMillis(originalFileTime, millisToSubtract);
+
+        // Assert: The resulting FileTime should be identical to the original.
+        assertEquals(originalFileTime, resultFileTime);
     }
 }
