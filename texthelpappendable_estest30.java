@@ -1,53 +1,41 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TextHelpAppendable_ESTestTest30 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Tests for {@link TextHelpAppendable} to ensure it correctly handles I/O exceptions.
+ */
+public class TextHelpAppendableIoExceptionTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        PipedWriter pipedWriter0 = new PipedWriter();
-        TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable(pipedWriter0);
-        Vector<Queue<String>> vector0 = new Vector<Queue<String>>();
-        LinkedList<TextStyle> linkedList0 = new LinkedList<TextStyle>();
+    @Test
+    public void writeColumnQueues_shouldPropagateIOException_whenUnderlyingWriterFails() {
+        // Arrange: Create a TextHelpAppendable with an underlying writer that is known
+        // to fail. A PipedWriter that is not connected to a PipedReader will throw an
+        // IOException upon any write attempt.
+        final PipedWriter failingWriter = new PipedWriter();
+        final TextHelpAppendable textHelpAppendable = new TextHelpAppendable(failingWriter);
+
+        // The actual data for columns and styles is not relevant to this test,
+        // as the write operation will fail immediately. Empty lists are sufficient.
+        final List<Queue<String>> emptyColumnQueues = Collections.emptyList();
+        final List<TextStyle> emptyStyles = Collections.emptyList();
+
+        // Act & Assert
         try {
-            textHelpAppendable0.writeColumnQueues(vector0, linkedList0);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("java.io.PipedWriter", e);
+            textHelpAppendable.writeColumnQueues(emptyColumnQueues, emptyStyles);
+            fail("Expected an IOException to be thrown because the underlying PipedWriter is not connected.");
+        } catch (final IOException e) {
+            // Verify that the expected IOException is caught and that its message
+            // confirms the cause of the failure originated from the PipedWriter.
+            assertEquals("Pipe not connected", e.getMessage());
         }
     }
 }
