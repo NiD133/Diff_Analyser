@@ -1,29 +1,30 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Attribute_ESTestTest32 extends Attribute_ESTest_scaffolding {
+/**
+ * Tests for the {@link Attribute} class, focusing on key validation.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        Document.OutputSettings.Syntax document_OutputSettings_Syntax0 = Document.OutputSettings.Syntax.html;
-        String string0 = Attribute.getValidKey("1$uMT~<$2", document_OutputSettings_Syntax0);
-        assertEquals("1$uMT~<$2", string0);
+    /**
+     * Verifies that getValidKey() returns the original string when provided with a key
+     * that is already valid for HTML syntax.
+     */
+    @Test
+    public void getValidKeyShouldReturnUnalteredKeyForValidHtmlSyntax() {
+        // Arrange
+        // This key contains various characters that are valid in HTML but might be
+        // considered special, such as '$', '~', and '<'.
+        String validHtmlKey = "1$uMT~<$2";
+        Document.OutputSettings.Syntax syntax = Document.OutputSettings.Syntax.html;
+
+        // Act
+        String validatedKey = Attribute.getValidKey(validHtmlKey, syntax);
+
+        // Assert
+        // The method should recognize the key as valid for HTML and return it unchanged.
+        assertEquals("The valid key should not have been modified", validHtmlKey, validatedKey);
     }
 }
