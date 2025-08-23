@@ -1,64 +1,39 @@
 package org.apache.commons.codec.binary;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+
 import java.util.Random;
-import org.apache.commons.codec.CodecPolicy;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
-import org.apache.commons.lang3.ArrayUtils;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-public class Base16TestTest15 {
+/**
+ * Tests the round-trip consistency of the Base16 codec (encode -> decode).
+ */
+public class Base16Test {
 
-    private static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
-
+    private final Base16 base16 = new Base16();
     private final Random random = new Random();
 
     /**
-     * @return the random.
+     * Tests that encoding a byte array and then decoding it returns the original data.
+     * This test is parameterized to run for several small array sizes (0 to 11),
+     * covering edge cases like empty and single-byte arrays.
+     *
+     * @param arraySize the size of the random byte array to generate and test.
      */
-    public Random getRandom() {
-        return this.random;
-    }
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11})
+    void encodeAndDecodeShouldBeReversibleForRandomArrays(final int arraySize) {
+        // Arrange: Create a random byte array of the specified size.
+        final byte[] originalData = new byte[arraySize];
+        random.nextBytes(originalData);
 
-    private void testBase16InBuffer(final int startPasSize, final int endPadSize) {
-        final String content = "Hello World";
-        final String encodedContent;
-        final byte[] bytesUtf8 = StringUtils.getBytesUtf8(content);
-        byte[] buffer = ArrayUtils.addAll(bytesUtf8, new byte[endPadSize]);
-        buffer = ArrayUtils.addAll(new byte[startPasSize], buffer);
-        final byte[] encodedBytes = new Base16().encode(buffer, startPasSize, bytesUtf8.length);
-        encodedContent = StringUtils.newStringUtf8(encodedBytes);
-        assertEquals("48656C6C6F20576F726C64", encodedContent, "encoding hello world");
-    }
+        // Act: Encode the data and then decode it back.
+        final byte[] encodedData = base16.encode(originalData);
+        final byte[] decodedData = base16.decode(encodedData);
 
-    private String toString(final byte[] data) {
-        final StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < data.length; i++) {
-            buf.append(data[i]);
-            if (i != data.length - 1) {
-                buf.append(",");
-            }
-        }
-        return buf.toString();
-    }
-
-    // encode/decode random arrays from size 0 to size 11
-    @Test
-    void testEncodeDecodeSmall() {
-        for (int i = 0; i < 12; i++) {
-            final byte[] data = new byte[i];
-            getRandom().nextBytes(data);
-            final byte[] enc = new Base16().encode(data);
-            final byte[] data2 = new Base16().decode(enc);
-            assertArrayEquals(data, data2, toString(data) + " equals " + toString(data2));
-        }
+        // Assert: The decoded data should be identical to the original data.
+        assertArrayEquals(originalData, decodedData,
+            "Round-trip encoding/decoding failed for a byte array of size " + arraySize);
     }
 }
