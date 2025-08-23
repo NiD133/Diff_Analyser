@@ -1,60 +1,30 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.function.Consumer;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
+/**
+ * This class contains tests for FilterListIterator, focusing on specific edge cases.
+ * The original test was auto-generated and has been rewritten for clarity.
+ */
 public class FilterListIterator_ESTestTest37 extends FilterListIterator_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        FilterListIterator<Transformer<Object, Object>> filterListIterator0 = new FilterListIterator<Transformer<Object, Object>>();
-        FilterListIterator<Transformer<Object, Object>> filterListIterator1 = new FilterListIterator<Transformer<Object, Object>>(filterListIterator0);
-        filterListIterator1.setListIterator(filterListIterator0);
-        boolean boolean0 = filterListIterator1.hasNext();
-        assertFalse(boolean0);
+    /**
+     * Tests that hasNext() returns false when the FilterListIterator wraps another
+     * iterator that is also empty. This ensures that the empty state is correctly
+     * propagated through nested iterators.
+     */
+    @Test
+    public void hasNextShouldReturnFalseWhenWrappingAnotherEmptyIterator() {
+        // Arrange: Create an inner FilterListIterator that is empty because it doesn't
+        // wrap any underlying collection iterator.
+        FilterListIterator<Object> emptyInnerIterator = new FilterListIterator<>();
+
+        // Arrange: Create the outer FilterListIterator, configured to wrap the empty inner iterator.
+        FilterListIterator<Object> outerIterator = new FilterListIterator<>(emptyInnerIterator);
+
+        // Act & Assert: Verify that hasNext() on the outer iterator returns false,
+        // as the wrapped inner iterator has no elements.
+        assertFalse("hasNext() should return false when the wrapped iterator is empty", outerIterator.hasNext());
     }
 }
