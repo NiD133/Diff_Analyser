@@ -1,18 +1,22 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Minutes_ESTestTest41 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        Minutes minutes0 = Minutes.MAX_VALUE;
-        Minutes minutes1 = minutes0.plus(0);
-        assertEquals(Integer.MAX_VALUE, minutes1.getMinutes());
+    @Test
+    public void plus_addingZeroToMaxValue_shouldNotChangeValue() {
+        // Arrange
+        Minutes maxMinutes = Minutes.MAX_VALUE;
+
+        // Act
+        Minutes result = maxMinutes.plus(0);
+
+        // Assert
+        assertEquals("Adding zero should not change the value", maxMinutes, result);
     }
 }
