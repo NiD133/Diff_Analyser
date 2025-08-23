@@ -1,38 +1,65 @@
 package org.apache.commons.compress.harmony.unpack200.bytecode;
 
+import org.apache.commons.compress.harmony.pack200.Pack200Exception;
+import org.apache.commons.compress.harmony.unpack200.Segment;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.PipedOutputStream;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
-import org.apache.commons.compress.harmony.unpack200.Segment;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class contains tests for the {@link CodeAttribute} class.
+ * This particular test focuses on I/O exception handling.
+ */
 public class CodeAttribute_ESTestTest6 extends CodeAttribute_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        int[] intArray0 = new int[1];
-        OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0);
-        byte[] byteArray0 = new byte[3];
-        LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-        CodeAttribute codeAttribute0 = new CodeAttribute((byte) 0, (byte) 0, byteArray0, (Segment) null, operandManager0, linkedList0);
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        DataOutputStream dataOutputStream0 = new DataOutputStream(pipedOutputStream0);
-        try {
-            codeAttribute0.writeBody(dataOutputStream0);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("java.io.PipedOutputStream", e);
-        }
+    /**
+     * Tests that {@link CodeAttribute#writeBody(DataOutputStream)} correctly propagates an
+     * {@link IOException} when the underlying output stream fails.
+     *
+     * @throws Pack200Exception if the CodeAttribute cannot be constructed, which would indicate a
+     *                          problem in the test setup rather than the tested method.
+     */
+    @Test(expected = IOException.class)
+    public void writeBodyShouldPropagateIOExceptionOnStreamError() throws Pack200Exception {
+        // ARRANGE: Set up a CodeAttribute instance and a stream designed to fail.
+
+        // 1. Define minimal data needed to construct a CodeAttribute.
+        // The specific values are not important as we only want to test I/O behavior.
+        final int maxStack = 0;
+        final int maxLocals = 0;
+        final byte[] packedCode = new byte[1];
+        final List<ExceptionTableEntry> exceptionTable = Collections.emptyList();
+
+        // The OperandManager constructor requires 21 integer arrays. We can use a single
+        // dummy array for all parameters since their content is irrelevant for this test.
+        final int[] dummyOperandData = new int[1];
+        final OperandManager operandManager = new OperandManager(
+            dummyOperandData, dummyOperandData, dummyOperandData, dummyOperandData,
+            dummyOperandData, dummyOperandData, dummyOperandData, dummyOperandData,
+            dummyOperandData, dummyOperandData, dummyOperandData, dummyOperandData,
+            dummyOperandData, dummyOperandData, dummyOperandData, dummyOperandData,
+            dummyOperandData, dummyOperandData, dummyOperandData, dummyOperandData,
+            dummyOperandData
+        );
+
+        final CodeAttribute codeAttribute = new CodeAttribute(
+            maxStack, maxLocals, packedCode, null, operandManager, exceptionTable
+        );
+
+        // 2. Create a DataOutputStream that is guaranteed to throw an IOException on write.
+        // An unconnected PipedOutputStream serves this purpose perfectly.
+        final PipedOutputStream unconnectedPipe = new PipedOutputStream();
+        final DataOutputStream failingStream = new DataOutputStream(unconnectedPipe);
+
+        // ACT: Attempt to write the attribute's body to the failing stream.
+        codeAttribute.writeBody(failingStream);
+
+        // ASSERT: The test is expected to throw an IOException.
+        // The @Test(expected = IOException.class) annotation handles this assertion.
+        // If no exception is thrown, the test will fail.
     }
 }
