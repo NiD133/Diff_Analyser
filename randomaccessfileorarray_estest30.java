@@ -1,35 +1,35 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomAccessFileOrArray_ESTestTest30 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test029() throws Throwable {
-        byte[] byteArray0 = new byte[2];
-        byteArray0[0] = (byte) 114;
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        short short0 = randomAccessFileOrArray0.readShort();
-        assertEquals(2L, randomAccessFileOrArray0.getFilePointer());
-        assertEquals((short) 29184, short0);
+    /**
+     * Verifies that readShort() correctly interprets two bytes as a big-endian short
+     * and advances the internal pointer by two positions.
+     */
+    @Test
+    public void readShort_shouldReadTwoBytesAsBigEndianShort_andAdvancePointer() throws IOException {
+        // Arrange: Set up the input data and the expected outcome.
+        // The readShort() method reads two bytes in big-endian order.
+        // The byte array {0x72, 0x00} represents the short value 0x7200.
+        byte[] inputBytes = {(byte) 0x72, (byte) 0x00};
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(inputBytes);
+        
+        short expectedShort = (short) 0x7200; // This is 29184 in decimal
+        long expectedPositionAfterRead = 2L;
+
+        // Act: Call the method under test.
+        short actualShort = reader.readShort();
+        long actualPositionAfterRead = reader.getFilePointer();
+
+        // Assert: Verify that the returned value and the new pointer position are correct.
+        assertEquals("The read value should be the big-endian interpretation of the input bytes.", expectedShort, actualShort);
+        assertEquals("The file pointer should advance by 2 bytes after reading a short.", expectedPositionAfterRead, actualPositionAfterRead);
     }
 }
