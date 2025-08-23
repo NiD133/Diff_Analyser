@@ -1,28 +1,24 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class StringUtil_ESTestTest77 extends StringUtil_ESTest_scaffolding {
+/**
+ * Tests for the utility methods in {@link StringUtil}.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test76() throws Throwable {
-        boolean boolean0 = StringUtil.isWhitespace(9);
-        assertTrue(boolean0);
+    /**
+     * Verifies that the isWhitespace method correctly identifies the
+     * horizontal tab character as whitespace.
+     */
+    @Test
+    public void isWhitespaceReturnsTrueForTabCharacter() {
+        // The original test used the integer 9, which is the code point for a horizontal tab.
+        // Using the character literal '\t' makes the test's intent much clearer.
+        assertTrue(
+            "The tab character should be considered whitespace.",
+            StringUtil.isWhitespace('\t')
+        );
     }
 }
