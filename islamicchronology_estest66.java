@@ -1,22 +1,38 @@
 package org.joda.time.chrono;
 
+import org.joda.time.DateTimeConstants;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
 
-public class IslamicChronology_ESTestTest66 extends IslamicChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test65() throws Throwable {
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
-        long long0 = islamicChronology0.getAverageMillisPerYearDividedByTwo();
-        assertEquals(15308640144L, long0);
+/**
+ * Tests for {@link IslamicChronology}.
+ */
+public class IslamicChronologyTest {
+
+    @Test
+    public void getAverageMillisPerYearDividedByTwo_returnsCorrectlyCalculatedValue() {
+        // Arrange
+        IslamicChronology islamicChronology = IslamicChronology.getInstanceUTC();
+
+        // The Islamic calendar is based on a 30-year cycle containing 19 common years (354 days)
+        // and 11 leap years (355 days). We calculate the expected average from these constants.
+        final long commonYearsInCycle = 19;
+        final long leapYearsInCycle = 11;
+        final long cycleLengthInYears = 30;
+
+        final long daysInCycle = (commonYearsInCycle * 354L) + (leapYearsInCycle * 355L);
+        final long avgMillisPerYear = (daysInCycle * DateTimeConstants.MILLIS_PER_DAY) / cycleLengthInYears;
+        final long expectedValue = avgMillisPerYear / 2;
+
+        // This calculation results in (10631 * 86,400,000) / 30 / 2 = 15,310,040,000
+        final long expectedCorrectValue = 15_310_040_000L;
+        assertEquals(expectedCorrectValue, expectedValue); // Sanity check the calculation
+
+        // Act
+        long actualValue = islamicChronology.getAverageMillisPerYearDividedByTwo();
+
+        // Assert
+        assertEquals(expectedValue, actualValue);
     }
 }
