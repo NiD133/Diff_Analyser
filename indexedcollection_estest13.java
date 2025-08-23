@@ -1,66 +1,43 @@
 package org.apache.commons.collections4.collection;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
 import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.ForClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IndexedCollection_ESTestTest13 extends IndexedCollection_ESTest_scaffolding {
+/**
+ * Contains tests for the static factory methods of {@link IndexedCollection}.
+ */
+public class IndexedCollectionTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        Transformer<Object, Object> transformer0 = ConstantTransformer.nullTransformer();
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        linkedList0.add((Object) transformer0);
-        linkedList0.add((Object) transformer0);
-        // Undeclared exception!
+    /**
+     * Tests that {@link IndexedCollection#uniqueIndexedCollection(Collection, Transformer)}
+     * throws an IllegalArgumentException if the provided collection contains elements
+     * that result in duplicate keys.
+     */
+    @Test
+    public void uniqueIndexedCollectionShouldThrowExceptionForDuplicateKeys() {
+        // Arrange: Create a transformer that maps any object to the same constant key.
+        final Transformer<String, String> keyTransformer = ConstantTransformer.constantTransformer("DUPLICATE_KEY");
+
+        // Arrange: Create a source collection with two distinct elements. The keyTransformer
+        // will generate the same key for both, violating the uniqueness constraint.
+        final Collection<String> sourceCollection = new ArrayList<>();
+        sourceCollection.add("element1");
+        sourceCollection.add("element2");
+
+        // Act & Assert: Attempt to create the unique indexed collection and verify that it
+        // throws an IllegalArgumentException with the expected message.
         try {
-            IndexedCollection.uniqueIndexedCollection((Collection<Object>) linkedList0, transformer0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Duplicate key in uniquely indexed collection.
-            //
-            verifyException("org.apache.commons.collections4.collection.IndexedCollection", e);
+            IndexedCollection.uniqueIndexedCollection(sourceCollection, keyTransformer);
+            fail("Expected an IllegalArgumentException because of duplicate keys, but none was thrown.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception has the expected message.
+            assertEquals("Duplicate key in uniquely indexed collection.", e.getMessage());
         }
     }
 }
