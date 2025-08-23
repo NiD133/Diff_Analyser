@@ -1,50 +1,29 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Stack;
-import java.util.TreeSet;
 import org.apache.commons.collections4.Bag;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.SortedBag;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CollectionBag_ESTestTest37 extends CollectionBag_ESTest_scaffolding {
+import java.util.Collection;
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
-        SynchronizedBag<Integer> synchronizedBag0 = new SynchronizedBag<Integer>(treeBag0);
-        CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(synchronizedBag0);
-        // Undeclared exception!
-        try {
-            collectionBag0.retainAll((Collection<?>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.collections4.bag.AbstractMapBag", e);
-        }
+/**
+ * Contains tests for the {@link CollectionBag} class.
+ */
+public class CollectionBagTest {
+
+    /**
+     * Tests that calling retainAll() with a null collection throws a NullPointerException,
+     * as required by the java.util.Collection interface contract.
+     */
+    @Test(expected = NullPointerException.class)
+    public void retainAll_withNullCollection_throwsNullPointerException() {
+        // Arrange: Create an empty CollectionBag. The specific type of the decorated
+        // bag does not matter for this test, so a simple HashBag is used.
+        final Bag<String> decorated = new HashBag<>();
+        final Collection<String> bag = new CollectionBag<>(decorated);
+
+        // Act: Attempt to retain a null collection.
+        bag.retainAll(null);
+
+        // Assert: A NullPointerException is expected, as declared in the @Test annotation.
     }
 }
