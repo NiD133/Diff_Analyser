@@ -1,17 +1,28 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class QueryParser_ESTestTest32 extends QueryParser_ESTest_scaffolding {
+/**
+ * Tests for the {@link QueryParser}.
+ * This test focuses on the correct parsing of CSS pseudo-selectors.
+ */
+public class QueryParserTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        Evaluator evaluator0 = QueryParser.parse(":first-of-type");
-        assertEquals(":first-of-type", evaluator0.toString());
+    /**
+     * Verifies that the {@code :first-of-type} pseudo-selector is parsed correctly.
+     * The test ensures that the resulting Evaluator's string representation
+     * matches the original query string.
+     */
+    @Test
+    public void shouldParseFirstOfTypePseudoSelector() {
+        // Arrange
+        String query = ":first-of-type";
+
+        // Act
+        Evaluator evaluator = QueryParser.parse(query);
+
+        // Assert
+        assertEquals(query, evaluator.toString());
     }
 }
