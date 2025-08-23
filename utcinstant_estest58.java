@@ -1,24 +1,29 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class UtcInstant_ESTestTest58 extends UtcInstant_ESTest_scaffolding {
+/**
+ * Tests for {@link UtcInstant}.
+ */
+public class UtcInstantTest {
 
-    @Test(timeout = 4000)
-    public void test57() throws Throwable {
-        Instant instant0 = MockInstant.parse("1858-11-17T00:00:00Z");
-        UtcInstant utcInstant0 = UtcInstant.of(instant0);
-        assertEquals(0L, utcInstant0.getNanoOfDay());
+    /**
+     * Tests that creating a UtcInstant from a java.time.Instant that represents
+     * the Modified Julian Day (MJD) epoch (1858-11-17T00:00:00Z) correctly
+     * results in a nano-of-day value of 0.
+     */
+    @Test
+    public void of_instantAtMjdEpoch_hasZeroNanoOfDay() {
+        // Arrange: The MJD epoch as a standard java.time.Instant.
+        // This is the reference point for the UtcInstant's internal calendar system.
+        Instant mjdEpochStartInstant = Instant.parse("1858-11-17T00:00:00Z");
+
+        // Act: Create a UtcInstant from the epoch Instant.
+        UtcInstant utcInstant = UtcInstant.of(mjdEpochStartInstant);
+
+        // Assert: The nano-of-day should be 0 at the very start of the epoch day.
+        assertEquals("Nano-of-day at MJD epoch start should be 0", 0L, utcInstant.getNanoOfDay());
     }
 }
