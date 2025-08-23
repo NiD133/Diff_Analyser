@@ -1,37 +1,26 @@
 package org.locationtech.spatial4j.shape;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
-import org.locationtech.spatial4j.shape.jts.JtsPoint;
 
-public class ShapeCollection_ESTestTest22 extends ShapeCollection_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        // Undeclared exception!
-        try {
-            ShapeCollection.computeMutualDisjoint((List<? extends Shape>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.locationtech.spatial4j.shape.ShapeCollection", e);
-        }
+/**
+ * Test suite for the {@link ShapeCollection} class.
+ * Note: The original test class name and inheritance from scaffolding suggest
+ * it was auto-generated. This version uses a more conventional name and structure.
+ */
+public class ShapeCollectionTest {
+
+    /**
+     * Verifies that the static method computeMutualDisjoint throws a
+     * NullPointerException when passed a null list.
+     */
+    @Test
+    public void computeMutualDisjoint_withNullList_throwsNullPointerException() {
+        // The method under test is expected to fail fast with a NullPointerException
+        // when its input list is null, as it does not perform a null check.
+        assertThrows(NullPointerException.class, () -> {
+            ShapeCollection.computeMutualDisjoint(null);
+        });
     }
 }
