@@ -1,20 +1,31 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CharSequenceUtils_ESTestTest52 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * This class contains tests for the CharSequenceUtils class.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test51() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder();
-        CharBuffer charBuffer0 = CharBuffer.allocate(30);
-        int int0 = CharSequenceUtils.lastIndexOf(stringBuilder0, charBuffer0, 30);
-        assertEquals((-1), int0);
+    /**
+     * Tests that {@link CharSequenceUtils#lastIndexOf(CharSequence, CharSequence, int)}
+     * returns -1 when searching for a non-empty sequence within an empty sequence.
+     */
+    @Test
+    public void testLastIndexOf_inEmptySequence_shouldReturnNotFound() {
+        // Arrange: Define the test data
+        final CharSequence emptySequence = new StringBuilder();
+        final CharSequence searchSequence = "a";
+        // The start index is arbitrary since the sequence being searched is empty.
+        final int startIndex = 5;
+
+        // Act: Call the method under test
+        final int result = CharSequenceUtils.lastIndexOf(emptySequence, searchSequence, startIndex);
+
+        // Assert: Verify the outcome
+        final int expected = -1; // The constant for "not found"
+        assertEquals("Searching in an empty sequence should always return -1.", expected, result);
     }
 }
