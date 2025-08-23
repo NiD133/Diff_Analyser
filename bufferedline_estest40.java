@@ -1,28 +1,42 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Test suite for the {@link BufferedLine} class.
+ *
+ * Note: The original class name "BufferedLine_ESTestTest40" and its scaffolding
+ * are artifacts of a test generation tool (EvoSuite). A more conventional
+ * name would be "BufferedLineTest".
+ */
 public class BufferedLine_ESTestTest40 extends BufferedLine_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        PointImpl pointImpl0 = new PointImpl(1.5, 1.5, spatialContext0);
-        BufferedLine bufferedLine0 = new BufferedLine(pointImpl0, pointImpl0, 1.5, spatialContext0);
-        boolean boolean0 = bufferedLine0.hasArea();
-        assertTrue(boolean0);
+    /**
+     * Tests that a {@link BufferedLine} with a positive buffer distance
+     * correctly reports that it has an area.
+     */
+    @Test
+    public void hasArea_shouldReturnTrue_forLineWithPositiveBuffer() {
+        // Arrange
+        // A buffered line is defined by two points, a buffer distance, and a spatial context.
+        SpatialContext spatialContext = SpatialContext.GEO;
+        Point point = new PointImpl(1.5, 1.5, spatialContext);
+        double positiveBuffer = 1.5;
+
+        // In this specific test case, the start and end points are the same. This creates
+        // a shape equivalent to a buffered point (a circle). The principle remains the same.
+        BufferedLine bufferedLine = new BufferedLine(point, point, positiveBuffer, spatialContext);
+
+        // Act
+        // The hasArea() method indicates if the shape occupies a 2D space.
+        boolean result = bufferedLine.hasArea();
+
+        // Assert
+        // Any line with a non-zero buffer will have an area.
+        assertTrue("A BufferedLine with a positive buffer should be considered to have an area.", result);
     }
 }
