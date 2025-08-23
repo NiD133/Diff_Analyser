@@ -1,21 +1,34 @@
 package org.apache.commons.io.input.buffer;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CircularByteBuffer_ESTestTest46 extends CircularByteBuffer_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CircularByteBuffer} class.
+ */
+public class CircularByteBufferTest {
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        CircularByteBuffer circularByteBuffer0 = new CircularByteBuffer((byte) 1);
-        circularByteBuffer0.add((byte) 1);
-        assertEquals(0, circularByteBuffer0.getSpace());
-        byte byte0 = circularByteBuffer0.read();
-        assertEquals(1, circularByteBuffer0.getSpace());
-        assertEquals((byte) 1, byte0);
+    /**
+     * Tests that adding a byte to a full buffer and then reading it
+     * correctly updates the available space and returns the correct byte.
+     */
+    @Test
+    public void addAndReadSingleByteShouldUpdateSpaceAndReturnCorrectValue() {
+        // Arrange: Create a buffer with a capacity of exactly one byte.
+        final CircularByteBuffer buffer = new CircularByteBuffer(1);
+        final byte byteToWrite = 42;
+
+        // Act 1: Add a byte to fill the buffer.
+        buffer.add(byteToWrite);
+
+        // Assert 1: Verify the buffer is full.
+        assertEquals("After adding one byte, the buffer should be full.", 0, buffer.getSpace());
+
+        // Act 2: Read the byte from the buffer.
+        final byte readByte = buffer.read();
+
+        // Assert 2: Verify the buffer is empty again and the correct byte was read.
+        assertEquals("After reading the byte, the buffer should have space for one byte.", 1, buffer.getSpace());
+        assertEquals("The byte read from the buffer should match the byte that was written.", byteToWrite, readByte);
     }
 }
