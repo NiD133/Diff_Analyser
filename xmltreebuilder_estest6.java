@@ -1,37 +1,41 @@
 package org.jsoup.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.CDataNode;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.LeafNode;
-import org.jsoup.select.Elements;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class XmlTreeBuilder_ESTestTest6 extends XmlTreeBuilder_ESTest_scaffolding {
+/**
+ * Test suite for {@link XmlTreeBuilder}.
+ */
+public class XmlTreeBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        Parser parser0 = new Parser(xmlTreeBuilder0);
-        StreamParser streamParser0 = new StreamParser(parser0);
-        Element element0 = new Element("http://www.w3.org/1999/xhtml", "http://www.w3.org/XML/1998/namespace");
-        streamParser0.parseFragment("z>!GVh", element0, "u");
-        Token.Doctype token_Doctype0 = new Token.Doctype();
-        xmlTreeBuilder0.insertDoctypeFor(token_Doctype0);
-        assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
+    /**
+     * Verifies that the XmlTreeBuilder inherits the default namespace from the
+     * context element when parsing an XML fragment. This is important for ensuring
+     * that newly parsed nodes are placed in the correct namespace.
+     */
+    @Test
+    public void defaultNamespaceIsInheritedFromContextElementWhenParsingFragment() {
+        // Arrange
+        XmlTreeBuilder xmlTreeBuilder = new XmlTreeBuilder();
+        Parser parser = new Parser(xmlTreeBuilder);
+
+        // Define a context element that has a specific namespace.
+        final String expectedNamespace = "http://www.example.com/namespace";
+        Element contextElement = new Element("div", expectedNamespace);
+
+        // Act
+        // Initialize the tree builder by parsing a fragment with the context element.
+        // The content of the fragment and base URI are not relevant to this test.
+        parser.parseXmlFragment("<p>child</p>", "http://example.com/", contextElement);
+
+        // The original test also inserted a doctype after initialization. We'll keep this
+        // step to ensure the namespace state persists across subsequent operations.
+        xmlTreeBuilder.insertDoctypeFor(new Token.Doctype());
+
+        // Assert
+        // The tree builder's default namespace should now be the one from the context element.
+        String actualNamespace = xmlTreeBuilder.defaultNamespace();
+        assertEquals(expectedNamespace, actualNamespace);
     }
 }
