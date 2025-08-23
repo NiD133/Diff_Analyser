@@ -1,35 +1,27 @@
 package org.jfree.chart;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.jfree.chart.plot.CombinedRangeCategoryPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.data.xy.XYDatasetTableModel;
-import org.junit.runner.RunWith;
 
-public class ChartRenderingInfo_ESTestTest9 extends ChartRenderingInfo_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ChartRenderingInfo} class, focusing on method argument validation.
+ */
+public class ChartRenderingInfoTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        // Undeclared exception!
-        try {
-            chartRenderingInfo0.setChartArea((Rectangle2D) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that the setChartArea() method rejects a null argument by throwing a
+     * NullPointerException. This test documents the expected behavior that the chart
+     * area cannot be set to null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void setChartArea_withNullArgument_shouldThrowNullPointerException() {
+        // Arrange: Create a new ChartRenderingInfo instance.
+        ChartRenderingInfo info = new ChartRenderingInfo();
+
+        // Act: Attempt to set the chart area to null.
+        info.setChartArea(null);
+
+        // Assert: The test expects a NullPointerException, which is declared
+        // in the @Test annotation. If no exception is thrown, the test will fail.
     }
 }
