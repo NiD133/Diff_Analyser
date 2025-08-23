@@ -1,40 +1,44 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
+import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiConsumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.TextNode;
-import org.junit.runner.RunWith;
 
-public class CookieUtil_ESTestTest6 extends CookieUtil_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        MockFile mockFile0 = new MockFile("\u0005!/", "\u0005!/");
-        URL uRL0 = mockFile0.toURL();
+/**
+ * Tests for the {@link CookieUtil} helper class.
+ */
+public class CookieUtilTest {
+
+    /**
+     * Verifies that {@link CookieUtil#asUri(URL)} throws a MalformedURLException
+     * when given a URL containing characters that are illegal in a URI, such as a space.
+     * <p>
+     * The underlying {@link URL#toURI()} method fails for such URLs, and CookieUtil is
+     * expected to wrap this failure in a MalformedURLException.
+     */
+    @Test
+    public void asUriThrowsExceptionForUrlWithIllegalCharacters() throws MalformedURLException {
+        // Arrange: Create a URL with a space in its path. While the URL object can be
+        // created, it cannot be converted to a valid URI without encoding.
+        URL urlWithInvalidUriChar = new URL("http://example.com/path with space");
+
+        // Act & Assert
         try {
-            CookieUtil.asUri(uRL0);
-            fail("Expecting exception: MalformedURLException");
-        } catch (MalformedURLException e) {
-            //
-            // Illegal character in path at index 52: file:/Users/tenghaha/Desktop/EvoSuiteProjects/jsoup/\u0005!/\u0005!
-            //
-            verifyException("org.jsoup.helper.CookieUtil", e);
+            CookieUtil.asUri(urlWithInvalidUriChar);
+            fail("Expected an exception to be thrown for a URL with illegal characters.");
+        } catch (IOException e) {
+            // The method signature declares IOException, but we expect a MalformedURLException specifically.
+            assertTrue("Exception should be an instance of MalformedURLException.", e instanceof MalformedURLException);
+
+            // Verify that the exception message clearly indicates the root cause.
+            String message = e.getMessage();
+            assertTrue("Exception message should indicate an illegal character problem.",
+                message != null && message.contains("Illegal character in path"));
         }
     }
 }
