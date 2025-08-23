@@ -1,31 +1,25 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
 
-public class FieldUtils_ESTestTest31 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        // Undeclared exception!
-        try {
-            FieldUtils.safeDivide((-9223372036854775808L), (-9223372036854775808L), (RoundingMode) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.math.BigDecimal", e);
-        }
+    /**
+     * Tests that safeDivide() throws a NullPointerException when the provided RoundingMode is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void safeDivide_whenRoundingModeIsNull_throwsNullPointerException() {
+        // The safeDivide method with a RoundingMode parameter is expected to fail fast
+        // if the rounding mode is null, as this is an invalid argument.
+        
+        // The specific dividend and divisor values are not relevant to triggering this exception.
+        final long dividend = Long.MIN_VALUE;
+        final long divisor = Long.MIN_VALUE;
+
+        FieldUtils.safeDivide(dividend, divisor, (RoundingMode) null);
     }
 }
