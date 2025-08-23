@@ -1,30 +1,27 @@
 package org.locationtech.spatial4j.context;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.io.PolyshapeReader;
-import org.locationtech.spatial4j.shape.ShapeFactory;
+import org.junit.rules.ExpectedException;
 
-public class SpatialContextFactory_ESTestTest19 extends SpatialContextFactory_ESTest_scaffolding {
+/**
+ * Test suite for {@link SpatialContextFactory}.
+ */
+public class SpatialContextFactoryTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        // Undeclared exception!
-        try {
-            spatialContextFactory0.initWorldBounds();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
-        }
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    @Test
+    public void initWorldBounds_whenArgsNotInitialized_throwsNullPointerException() {
+        // Arrange: Create a factory instance directly. Its internal 'args' map will be null
+        // because the init() method, which is typically called by makeSpatialContext(), has not been run.
+        SpatialContextFactory factory = new SpatialContextFactory();
+
+        // Assert: We expect a NullPointerException because the method relies on the 'args' map.
+        thrown.expect(NullPointerException.class);
+
+        // Act: Call the method under test.
+        factory.initWorldBounds();
     }
 }
