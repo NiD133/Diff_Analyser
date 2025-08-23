@@ -1,18 +1,24 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LazilyParsedNumber_ESTestTest26 extends LazilyParsedNumber_ESTest_scaffolding {
+/**
+ * Test suite for the {@link LazilyParsedNumber} class.
+ */
+public class LazilyParsedNumberTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        LazilyParsedNumber lazilyParsedNumber0 = new LazilyParsedNumber("-6");
-        long long0 = lazilyParsedNumber0.longValue();
-        assertEquals((-6L), long0);
+    @Test
+    public void longValue_whenGivenNegativeIntegerString_returnsCorrectLong() {
+        // Arrange: Create a LazilyParsedNumber with a string representing a negative integer.
+        String negativeNumberString = "-6";
+        LazilyParsedNumber number = new LazilyParsedNumber(negativeNumberString);
+        long expectedLong = -6L;
+
+        // Act: Call the longValue() method to get the parsed long.
+        long actualLong = number.longValue();
+
+        // Assert: Verify that the returned long value matches the expected value.
+        assertEquals(expectedLong, actualLong);
     }
 }
