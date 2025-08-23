@@ -1,35 +1,26 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class WeeksTestTest9 extends TestCase {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    /**
+     * Verifies that getFieldType() consistently returns the 'weeks' duration field type.
+     */
+    @Test
+    public void getFieldType_shouldReturnWeeksType() {
+        // Arrange
+        Weeks twentyWeeks = Weeks.weeks(20);
+        DurationFieldType expectedType = DurationFieldType.weeks();
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+        // Act
+        DurationFieldType actualType = twentyWeeks.getFieldType();
 
-    public static TestSuite suite() {
-        return new TestSuite(TestWeeks.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testGetFieldType() {
-        Weeks test = Weeks.weeks(20);
-        assertEquals(DurationFieldType.weeks(), test.getFieldType());
+        // Assert
+        assertEquals(expectedType, actualType);
     }
 }
