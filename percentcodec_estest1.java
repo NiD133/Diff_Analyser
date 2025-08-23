@@ -1,20 +1,37 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.nio.charset.StandardCharsets;
+import static org.junit.Assert.assertArrayEquals;
 
-public class PercentCodec_ESTestTest1 extends PercentCodec_ESTest_scaffolding {
+/**
+ * Tests for the {@link PercentCodec} class.
+ */
+public class PercentCodecTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        byte[] byteArray0 = new byte[5];
-        byteArray0[3] = (byte) 70;
-        PercentCodec percentCodec0 = new PercentCodec(byteArray0, true);
-        byte[] byteArray1 = percentCodec0.encode(byteArray0);
-        assertEquals(15, byteArray1.length);
+    /**
+     * Tests that the encode method correctly percent-encodes bytes that are
+     * configured as "unsafe", while leaving other "safe" bytes unchanged.
+     */
+    @Test
+    public void encodeShouldEncodeUnsafeBytesAndPassThroughSafeBytes() throws Exception {
+        // Arrange
+        // Define a set of characters that should always be percent-encoded.
+        final byte[] unsafeBytes = {'A', 'B'};
+        final PercentCodec percentCodec = new PercentCodec(unsafeBytes, false);
+
+        // The input contains characters configured as unsafe ('A', 'B')
+        // and one that is not ('C'), which should be treated as safe.
+        final byte[] input = {'A', 'B', 'C'};
+
+        // Act
+        final byte[] encoded = percentCodec.encode(input);
+
+        // Assert
+        // 'A' (ASCII 65, hex 41) should be encoded to "%41".
+        // 'B' (ASCII 66, hex 42) should be encoded to "%42".
+        // 'C' is not in the unsafe set, so it should pass through unchanged.
+        final byte[] expected = "%41%42C".getBytes(StandardCharsets.US_ASCII);
+        assertArrayEquals(expected, encoded);
     }
 }
