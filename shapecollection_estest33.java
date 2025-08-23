@@ -1,35 +1,38 @@
 package org.locationtech.spatial4j.shape;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
 import org.locationtech.spatial4j.shape.impl.PointImpl;
-import org.locationtech.spatial4j.shape.jts.JtsPoint;
 
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Note: This class name and its parent class appear to be auto-generated.
+ * For a production test suite, they would typically be renamed to something
+ * more conventional, like `ShapeCollectionTest`.
+ */
 public class ShapeCollection_ESTestTest33 extends ShapeCollection_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        ArrayList<JtsPoint> arrayList0 = new ArrayList<JtsPoint>();
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        PointImpl pointImpl0 = new PointImpl(0.5, 0.5, spatialContext0);
-        ShapeCollection<JtsPoint> shapeCollection0 = new ShapeCollection<JtsPoint>(arrayList0, spatialContext0);
-        Rectangle rectangle0 = shapeCollection0.getBoundingBox();
-        GeodesicSphereDistCalc.LawOfCosines geodesicSphereDistCalc_LawOfCosines0 = new GeodesicSphereDistCalc.LawOfCosines();
-        geodesicSphereDistCalc_LawOfCosines0.calcBoxByDistFromPt(pointImpl0, 0.5, spatialContext0, rectangle0);
-        shapeCollection0.relate(pointImpl0);
+    /**
+     * Verifies that calling relate() on an empty ShapeCollection correctly
+     * returns DISJOINT, as there are no shapes to intersect with.
+     */
+    @Test
+    public void relateWithEmptyCollectionShouldReturnDisjoint() {
+        // Arrange
+        SpatialContext spatialContext = SpatialContext.GEO;
+        List<Shape> emptyShapes = Collections.emptyList();
+        ShapeCollection<Shape> emptyCollection = new ShapeCollection<>(emptyShapes, spatialContext);
+        Point testPoint = new PointImpl(0.5, 0.5, spatialContext);
+
+        // Act
+        SpatialRelation relation = emptyCollection.relate(testPoint);
+
+        // Assert
+        assertEquals("An empty collection should be disjoint from any shape.",
+                SpatialRelation.DISJOINT, relation);
     }
 }
