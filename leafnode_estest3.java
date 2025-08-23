@@ -1,21 +1,25 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LeafNode_ESTestTest3 extends LeafNode_ESTest_scaffolding {
+/**
+ * Tests for the abstract {@link LeafNode} class, using a concrete implementation like {@link CDataNode}.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        CDataNode cDataNode0 = new CDataNode("~p1SkcF]Q'5D");
-        cDataNode0.coreValue("");
-        assertEquals(0, cDataNode0.siblingIndex());
+    @Test
+    public void coreValueShouldUpdateTheNodeContent() {
+        // Arrange: Create a CDataNode, a concrete implementation of LeafNode, with an initial value.
+        CDataNode cdataNode = new CDataNode("Initial content");
+        String newContent = "Updated content";
+
+        // Act: Call the method under test to change the node's internal value.
+        // Note: coreValue(String) is a package-private method on the abstract LeafNode.
+        cdataNode.coreValue(newContent);
+
+        // Assert: Verify that the node's content was successfully updated by checking its public value.
+        // For a CDataNode, getWholeText() returns its content.
+        assertEquals(newContent, cdataNode.getWholeText());
     }
 }
