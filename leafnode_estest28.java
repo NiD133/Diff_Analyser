@@ -1,25 +1,27 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class LeafNode_ESTestTest28 extends LeafNode_ESTest_scaffolding {
+/**
+ * Tests for the {@link LeafNode} class, focusing on attribute handling.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        CDataNode cDataNode0 = new CDataNode("%:~n@");
-        // Undeclared exception!
-        try {
-            cDataNode0.attr((String) null, (String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-        }
+    /**
+     * Verifies that calling the attr(key, value) method with a null key
+     * throws an IllegalArgumentException, as per the API contract.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void attrWithNullKeyThrowsIllegalArgumentException() {
+        // Arrange: Create an instance of a LeafNode subclass.
+        // The specific subclass (CDataNode) and its content are not critical for this test.
+        LeafNode node = new CDataNode("");
+
+        // Act: Attempt to set an attribute with a null key.
+        // This action is expected to trigger the exception.
+        node.attr(null, "any-value");
+
+        // Assert: The test passes if an IllegalArgumentException is thrown,
+        // which is handled by the @Test(expected=...) annotation.
     }
 }
