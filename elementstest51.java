@@ -1,25 +1,32 @@
 package org.jsoup.select;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.Node;
-import org.jsoup.nodes.TextNode;
 import org.junit.jupiter.api.Test;
-import java.util.Iterator;
-import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class ElementsTestTest51 {
+import static org.junit.jupiter.api.Assertions.assertNull;
 
+/**
+ * Test suite for the {@link Elements} class.
+ */
+public class ElementsTest {
+
+    /**
+     * Verifies that {@link Elements#selectFirst(String)} returns null
+     * when the CSS selector does not match any element in the collection.
+     */
     @Test
-    void selectFirstNullOnNoMatch() {
-        Document doc = Jsoup.parse("<p>One</p><p>Two</p><p>Three</p>");
-        Element span = doc.children().selectFirst("span");
-        assertNull(span);
+    void selectFirstShouldReturnNullWhenNoElementMatches() {
+        // Arrange: Create a document with <p> tags but no <span> tags.
+        String html = "<p>One</p><p>Two</p><p>Three</p>";
+        Document doc = Jsoup.parse(html);
+        Elements elements = doc.children();
+
+        // Act: Attempt to select the first <span> element, which does not exist.
+        Element foundElement = elements.selectFirst("span");
+
+        // Assert: The method should return null to indicate no match was found.
+        assertNull(foundElement, "selectFirst should return null for a non-matching selector.");
     }
 }
