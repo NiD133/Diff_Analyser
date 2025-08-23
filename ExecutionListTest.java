@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2007 The Guava Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.common.util.concurrent;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
@@ -13,152 +29,135 @@ import org.jspecify.annotations.NullUnmarked;
 
 /**
  * Unit tests for {@link ExecutionList}.
+ *
+ * @author Nishant Thakkar
+ * @author Sven Mawson
  */
 @NullUnmarked
 public class ExecutionListTest extends TestCase {
 
-  private final ExecutionList executionList = new ExecutionList();
+  private final ExecutionList list = new ExecutionList();
 
-  /**
-   * Tests that runnables added to the list are executed when the list is executed.
-   */
   public void testRunOnPopulatedList() throws Exception {
-    Executor executor = newCachedThreadPool();
-    CountDownLatch latch = new CountDownLatch(3);
+    Executor exec = newCachedThreadPool();
+    CountDownLatch countDownLatch = new CountDownLatch(3);
+    list.add(new MockRunnable(countDownLatch), exec);
+    list.add(new MockRunnable(countDownLatch), exec);
+    list.add(new MockRunnable(countDownLatch), exec);
+    assertEquals(3L, countDownLatch.getCount());
 
-    // Add three runnables to the execution list
-    executionList.add(new MockRunnable(latch), executor);
-    executionList.add(new MockRunnable(latch), executor);
-    executionList.add(new MockRunnable(latch), executor);
+    list.execute();
 
-    // Ensure the latch count is 3 before execution
-    assertEquals(3L, latch.getCount());
-
-    // Execute the list and verify all runnables are executed
-    executionList.execute();
-    assertTrue(latch.await(1L, SECONDS));
+    // Verify that all of the runnables execute in a reasonable amount of time.
+    assertTrue(countDownLatch.await(1L, SECONDS));
   }
 
-  /**
-   * Tests that executing the list multiple times does not re-run the runnables.
-   */
   public void testExecute_idempotent() {
-    AtomicInteger runCount = new AtomicInteger();
-
-    // Add a runnable that increments the run count
-    executionList.add(() -> runCount.getAndIncrement(), directExecutor());
-
-    // Execute the list and verify the runnable is executed once
-    executionList.execute();
-    assertEquals(1, runCount.get());
-
-    // Execute the list again and verify the runnable is not executed again
-    executionList.execute();
-    assertEquals(1, runCount.get());
+    AtomicInteger runCalled = new AtomicInteger();
+    list.add(
+        new Runnable() {
+          @Override
+          public void run() {
+            runCalled.getAndIncrement();
+          }
+        },
+        directExecutor());
+    list.execute();
+    assertEquals(1, runCalled.get());
+    list.execute();
+    assertEquals(1, runCalled.get());
   }
 
-  /**
-   * Tests that executing the list concurrently does not re-run the runnables.
-   */
   public void testExecute_idempotentConcurrently() throws InterruptedException {
-    CountDownLatch readyToRun = new CountDownLatch(1);
-    AtomicInteger runCount = new AtomicInteger();
-
-    // Add a runnable that waits for a latch before incrementing the run count
-    executionList.add(() -> {
-      try {
-        readyToRun.await();
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        throw new RuntimeException(e);
-      }
-      runCount.getAndIncrement();
-    }, directExecutor());
-
-    // Create two threads that execute the list
-    Runnable executeTask = executionList::execute;
-    Thread thread1 = new Thread(executeTask);
-    Thread thread2 = new Thread(executeTask);
-
-    // Start both threads
+    CountDownLatch okayToRun = new CountDownLatch(1);
+    AtomicInteger runCalled = new AtomicInteger();
+    list.add(
+        new Runnable() {
+          @Override
+          public void run() {
+            try {
+              okayToRun.await();
+            } catch (InterruptedException e) {
+              Thread.currentThread().interrupt();
+              throw new RuntimeException(e);
+            }
+            runCalled.getAndIncrement();
+          }
+        },
+        directExecutor());
+    Runnable execute =
+        new Runnable() {
+          @Override
+          public void run() {
+            list.execute();
+          }
+        };
+    Thread thread1 = new Thread(execute);
+    Thread thread2 = new Thread(execute);
     thread1.start();
     thread2.start();
-
-    // Ensure the runnable has not yet run
-    assertEquals(0, runCount.get());
-
-    // Allow the runnable to run and wait for threads to finish
-    readyToRun.countDown();
+    assertEquals(0, runCalled.get());
+    okayToRun.countDown();
     thread1.join();
     thread2.join();
-
-    // Verify the runnable was executed only once
-    assertEquals(1, runCount.get());
+    assertEquals(1, runCalled.get());
   }
 
-  /**
-   * Tests that adding a runnable after the list has been executed runs it immediately.
-   */
   public void testAddAfterRun() throws Exception {
-    // Run the populated list test to execute the list
+    // Run the previous test
     testRunOnPopulatedList();
 
-    // Add a new runnable and verify it runs immediately
-    CountDownLatch latch = new CountDownLatch(1);
-    executionList.add(new MockRunnable(latch), newCachedThreadPool());
-    assertTrue(latch.await(1L, SECONDS));
+    // If it passed, then verify an Add will be executed without calling run
+    CountDownLatch countDownLatch = new CountDownLatch(1);
+    list.add(new MockRunnable(countDownLatch), newCachedThreadPool());
+    assertTrue(countDownLatch.await(1L, SECONDS));
   }
 
-  /**
-   * Tests that runnables are executed in the order they were added.
-   */
   public void testOrdering() throws Exception {
-    AtomicInteger counter = new AtomicInteger();
-
-    // Add runnables that increment the counter in order
+    AtomicInteger integer = new AtomicInteger();
     for (int i = 0; i < 10; i++) {
-      int expectedValue = i;
-      executionList.add(() -> counter.compareAndSet(expectedValue, expectedValue + 1), directExecutor());
+      int expectedCount = i;
+      list.add(
+          new Runnable() {
+            @Override
+            public void run() {
+              integer.compareAndSet(expectedCount, expectedCount + 1);
+            }
+          },
+          directExecutor());
     }
-
-    // Execute the list and verify the counter reaches 10
-    executionList.execute();
-    assertEquals(10, counter.get());
+    list.execute();
+    assertEquals(10, integer.get());
   }
 
-  /**
-   * Tests that exceptions thrown by runnables are caught.
-   */
-  public void testExceptionsCaught() {
-    executionList.add(THROWING_RUNNABLE, directExecutor());
-    executionList.execute();
-    executionList.add(THROWING_RUNNABLE, directExecutor());
-  }
+  private class MockRunnable implements Runnable {
+    final CountDownLatch countDownLatch;
 
-  /**
-   * Tests that null values are not allowed in public methods.
-   */
-  public void testNulls() {
-    new NullPointerTester().testAllPublicInstanceMethods(new ExecutionList());
-  }
-
-  /**
-   * A mock runnable that decrements a latch when run.
-   */
-  private static class MockRunnable implements Runnable {
-    final CountDownLatch latch;
-
-    MockRunnable(CountDownLatch latch) {
-      this.latch = latch;
+    MockRunnable(CountDownLatch countDownLatch) {
+      this.countDownLatch = countDownLatch;
     }
 
     @Override
     public void run() {
-      latch.countDown();
+      countDownLatch.countDown();
     }
   }
 
-  private static final Runnable THROWING_RUNNABLE = () -> {
-    throw new RuntimeException();
-  };
+  public void testExceptionsCaught() {
+    list.add(THROWING_RUNNABLE, directExecutor());
+    list.execute();
+    list.add(THROWING_RUNNABLE, directExecutor());
+  }
+
+  public void testNulls() {
+    new NullPointerTester().testAllPublicInstanceMethods(new ExecutionList());
+  }
+
+  private static final Runnable THROWING_RUNNABLE =
+      new Runnable() {
+        @Override
+        public void run() {
+          throw new RuntimeException();
+        }
+      };
 }
