@@ -1,21 +1,45 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Arrays;
-import org.apache.commons.lang3.function.FailableIntFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertSame;
 
-public class ArrayFill_ESTestTest2 extends ArrayFill_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ArrayFill}.
+ */
+public class ArrayFillTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        short[] shortArray0 = new short[6];
-        short[] shortArray1 = ArrayFill.fill(shortArray0, (short) (-838));
-        assertArrayEquals(new short[] { (short) (-838), (short) (-838), (short) (-838), (short) (-838), (short) (-838), (short) (-838) }, shortArray1);
+    /**
+     * Tests that {@code ArrayFill.fill(short[], short)} correctly fills all
+     * elements of the array with the specified value.
+     */
+    @Test
+    public void testFillShortArray() {
+        // Arrange: Define the input array and the value to fill it with.
+        final short[] array = new short[5];
+        final short fillValue = -100;
+
+        // Act: Call the method under test.
+        final short[] result = ArrayFill.fill(array, fillValue);
+
+        // Assert: Verify that the array is filled correctly.
+        final short[] expected = {-100, -100, -100, -100, -100};
+        assertArrayEquals(expected, array);
+    }
+
+    /**
+     * Tests that {@code ArrayFill.fill(short[], short)} returns the same
+     * array instance that was passed as input, enabling a fluent style.
+     */
+    @Test
+    public void testFillShortArrayReturnsSameInstance() {
+        // Arrange
+        final short[] array = new short[3];
+
+        // Act
+        final short[] result = ArrayFill.fill(array, (short) 42);
+
+        // Assert
+        assertSame("The method should return the same array instance.", array, result);
     }
 }
