@@ -1,31 +1,25 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class SimpleBloomFilter_ESTestTest25 extends SimpleBloomFilter_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SimpleBloomFilter} class.
+ */
+public class SimpleBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        Shape shape0 = Shape.fromNM(38, 38);
-        SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
-        // Undeclared exception!
-        try {
-            simpleBloomFilter0.merge((BloomFilter<?>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // other
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Tests that calling merge() with a null BloomFilter argument
+     * correctly throws a NullPointerException. This ensures the method
+     * adheres to the common contract of rejecting null inputs for this parameter.
+     */
+    @Test(expected = NullPointerException.class)
+    public void mergeWithNullBloomFilterShouldThrowNullPointerException() {
+        // Arrange: Create a filter instance. The specific shape is not important for this test.
+        Shape shape = Shape.fromNM(10, 100);
+        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
+
+        // Act: Attempt to merge with a null filter.
+        // The @Test(expected) annotation handles the assertion.
+        filter.merge((BloomFilter<?>) null);
     }
 }
