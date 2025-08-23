@@ -1,41 +1,47 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertFalse;
+
+/**
+ * This class contains tests for the {@link TextRenderInfo} class.
+ * This specific test focuses on the behavior of the hasMcid method.
+ */
 public class TextRenderInfo_ESTestTest69 extends TextRenderInfo_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test68() throws Throwable {
-        PdfDate pdfDate0 = new PdfDate();
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        Stack<MarkedContentInfo> stack0 = new Stack<MarkedContentInfo>();
-        Matrix matrix0 = new Matrix();
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, stack0);
-        boolean boolean0 = textRenderInfo0.hasMcid((int) (byte) 32);
-        assertFalse(boolean0);
+    /**
+     * Verifies that hasMcid returns false when the TextRenderInfo object
+     * is initialized with an empty collection of marked content.
+     */
+    @Test
+    public void hasMcid_shouldReturnFalse_whenMarkedContentIsEmpty() {
+        // ARRANGE
+        // The TextRenderInfo constructor requires a GraphicsState with a non-null font.
+        GraphicsState graphicsState = new GraphicsState();
+        graphicsState.font = new CMapAwareDocumentFont(new PdfGState());
+
+        // Create an empty collection for marked content information.
+        Collection<MarkedContentInfo> emptyMarkedContent = new ArrayList<>();
+
+        // Create other required constructor arguments.
+        PdfString text = new PdfString("test");
+        Matrix textMatrix = new Matrix();
+
+        TextRenderInfo textRenderInfo = new TextRenderInfo(text, graphicsState, textMatrix, emptyMarkedContent);
+
+        int mcidToSearchFor = 32;
+
+        // ACT
+        boolean hasMcid = textRenderInfo.hasMcid(mcidToSearchFor);
+
+        // ASSERT
+        assertFalse("hasMcid should return false if the marked content list is empty.", hasMcid);
     }
 }
