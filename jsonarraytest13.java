@@ -1,24 +1,31 @@
 package com.google.gson;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
-import com.google.common.testing.EqualsTester;
-import com.google.gson.common.MoreAsserts;
-import java.math.BigInteger;
+
 import org.junit.Test;
 
-public class JsonArrayTestTest13 {
+/**
+ * Tests for {@link JsonArray} focusing on element addition.
+ */
+public class JsonArrayTest {
 
     @Test
-    public void testCharPrimitiveAddition() {
+    public void testAdd_withMixedTypes_createsCorrectJsonString() {
+        // Arrange
         JsonArray jsonArray = new JsonArray();
+        String expectedJson = "[\"a\",\"e\",\"i\",\"o\",null,\"u\",\"and sometimes Y\"]";
+
+        // Act: Add a mix of characters, a null Character, and a String.
+        // The test verifies that each type is correctly converted and added.
         jsonArray.add('a');
         jsonArray.add('e');
         jsonArray.add('i');
-        jsonArray.add((char) 111);
-        jsonArray.add((Character) null);
+        jsonArray.add('o');
+        jsonArray.add((Character) null); // A null Character should be converted to JsonNull.
         jsonArray.add('u');
         jsonArray.add("and sometimes Y");
-        assertThat(jsonArray.toString()).isEqualTo("[\"a\",\"e\",\"i\",\"o\",null,\"u\",\"and sometimes Y\"]");
+
+        // Assert
+        assertThat(jsonArray.toString()).isEqualTo(expectedJson);
     }
 }
