@@ -1,42 +1,45 @@
 package org.joda.time.field;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.joda.time.Chronology;
 import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Days;
 import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.Weeks;
-import org.joda.time.chrono.EthiopicChronology;
-import org.joda.time.chrono.GJChronology;
 import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.chrono.LenientChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PreciseDurationDateTimeField_ESTestTest13 extends PreciseDurationDateTimeField_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.dayOfWeek();
-        GregorianChronology gregorianChronology0 = GregorianChronology.getInstanceUTC();
-        LenientChronology lenientChronology0 = LenientChronology.getInstance(gregorianChronology0);
-        DateTimeZone dateTimeZone0 = DateTimeZone.forID((String) null);
-        ZonedChronology zonedChronology0 = ZonedChronology.getInstance(lenientChronology0, dateTimeZone0);
-        DurationField durationField0 = zonedChronology0.minutes();
-        DurationField durationField1 = zonedChronology0.halfdays();
-        PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, durationField0, durationField1);
-        boolean boolean0 = preciseDateTimeField0.isLenient();
-        assertFalse(boolean0);
+/**
+ * Unit tests for {@link PreciseDateTimeField}.
+ * This test focuses on the leniency behavior of the field.
+ */
+public class PreciseDateTimeFieldTest {
+
+    /**
+     * Tests that a PreciseDateTimeField is not lenient by default.
+     * The leniency of a field is an intrinsic property and should not be affected
+     * by the chronology from which its dependent duration fields are derived.
+     */
+    @Test
+    public void isLenient_shouldReturnFalseByDefault() {
+        // Arrange
+        // 1. Get the necessary duration fields from a standard chronology.
+        //    The specific chronology used (e.g., Gregorian, Julian) is not important
+        //    for this test, as the field's leniency is independent of it.
+        Chronology chronology = GregorianChronology.getInstanceUTC();
+        DurationField minutesField = chronology.minutes();
+        DurationField halfdaysField = chronology.halfdays();
+        DateTimeFieldType fieldType = DateTimeFieldType.minuteOfHalfday();
+
+        // 2. Create the field under test. PreciseDateTimeField is a concrete implementation
+        //    of the abstract PreciseDurationDateTimeField.
+        PreciseDateTimeField minuteOfHalfdayField = new PreciseDateTimeField(fieldType, minutesField, halfdaysField);
+
+        // Act
+        // Call the method under test.
+        boolean isLenient = minuteOfHalfdayField.isLenient();
+
+        // Assert
+        // Verify that the field is not lenient.
+        assertFalse("A PreciseDateTimeField should not be lenient by default", isLenient);
     }
 }
