@@ -1,45 +1,60 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-public class YearsTestTest14 extends TestCase {
+import org.junit.Test;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Test cases for the {@link Years} class, focusing on the plus(int) method.
+ */
+public class YearsTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void plus_shouldAddNewYearsToAnInstance() {
+        // Arrange
+        final Years twoYears = Years.years(2);
+        final int yearsToAdd = 3;
+        final int expectedResult = 5;
+
+        // Act
+        final Years result = twoYears.plus(yearsToAdd);
+
+        // Assert
+        assertEquals(expectedResult, result.getYears());
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestYears.class);
+    @Test
+    public void plus_shouldBeImmutable() {
+        // Arrange
+        final Years twoYears = Years.years(2);
+        final int initialValue = 2;
+
+        // Act
+        twoYears.plus(3); // This operation should not change the original instance
+
+        // Assert
+        assertEquals("Original instance should not be modified (immutability)",
+                     initialValue, twoYears.getYears());
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void plus_shouldReturnSameInstanceWhenAddingZero() {
+        // Arrange
+        final Years oneYear = Years.ONE;
+
+        // Act
+        final Years result = oneYear.plus(0);
+
+        // Assert
+        assertSame("Adding zero should return the same instance, not a new one",
+                   oneYear, result);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    public void testPlus_int() {
-        Years test2 = Years.years(2);
-        Years result = test2.plus(3);
-        assertEquals(2, test2.getYears());
-        assertEquals(5, result.getYears());
-        assertEquals(1, Years.ONE.plus(0).getYears());
-        try {
-            Years.MAX_VALUE.plus(1);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+    @Test(expected = ArithmeticException.class)
+    public void plus_shouldThrowExceptionOnIntegerOverflow() {
+        // Act
+        Years.MAX_VALUE.plus(1);
+        // Assert: The test passes if an ArithmeticException is thrown.
     }
 }
