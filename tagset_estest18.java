@@ -1,29 +1,55 @@
 package org.jsoup.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-public class TagSet_ESTestTest18 extends TagSet_ESTest_scaffolding {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        TagSet tagSet0 = TagSet.initHtmlDefault();
-        // Undeclared exception!
-        try {
-            tagSet0.get((String) null, (String) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Object must not be null
-            //
-            verifyException("org.jsoup.helper.Validate", e);
-        }
+/**
+ * Tests for the {@link TagSet#get(String, String)} method, focusing on input validation.
+ */
+@DisplayName("TagSet.get() Input Validation")
+class TagSetGetValidationTest {
+
+    private TagSet tagSet;
+
+    @BeforeEach
+    void setUp() {
+        // Arrange: Create a fresh default HTML TagSet instance before each test.
+        tagSet = TagSet.initHtmlDefault();
+    }
+
+    @Test
+    @DisplayName("should throw IllegalArgumentException for a null tag name")
+    void get_withNullTagName_shouldThrowIllegalArgumentException() {
+        // Arrange
+        final String validNamespace = "html";
+
+        // Act & Assert: Verify that calling get() with a null tagName throws the expected exception.
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> tagSet.get(null, validNamespace)
+        );
+
+        // Assert: Check that the exception message is correct.
+        assertEquals("Object must not be null", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("should throw IllegalArgumentException for a null namespace")
+    void get_withNullNamespace_shouldThrowIllegalArgumentException() {
+        // Arrange
+        final String validTagName = "div";
+
+        // Act & Assert: Verify that calling get() with a null namespace throws the expected exception.
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> tagSet.get(validTagName, null)
+        );
+
+        // Assert: Check that the exception message is correct.
+        assertEquals("Object must not be null", exception.getMessage());
     }
 }
