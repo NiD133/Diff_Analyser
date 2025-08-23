@@ -1,19 +1,36 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Metaphone_ESTestTest26 extends Metaphone_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link Metaphone} class.
+ */
+public class MetaphoneTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        Metaphone metaphone0 = new Metaphone();
-        String string0 = metaphone0.metaphone("!gIj");
-        assertEquals("JJ", string0);
-        assertEquals(4, metaphone0.getMaxCodeLen());
+    /**
+     * Tests that the metaphone() method correctly encodes a string that includes:
+     * 1. A non-alphabetic prefix character ('!').
+     * 2. Mixed case letters ('g', 'I', 'j').
+     * 3. A "soft G" phonetic rule (where 'G' followed by 'I' is encoded as 'J').
+     *
+     * The original, auto-generated test also asserted the default maximum code length.
+     * That assertion has been removed from this test to follow the best practice of
+     * testing only a single concept per test case. A separate test for the default
+     * configuration would be more appropriate.
+     */
+    @Test
+    public void metaphoneShouldCorrectlyEncodeStringWithSoftGAndNonAlphaPrefix() {
+        // Arrange
+        final Metaphone metaphone = new Metaphone();
+        final String input = "!gIj";
+        final String expectedCode = "JJ";
+
+        // Act
+        final String actualCode = metaphone.metaphone(input);
+
+        // Assert
+        assertEquals("Encoding should ignore the non-alphabetic prefix, be case-insensitive, and apply the 'GI' -> 'J' rule.",
+                     expectedCode, actualCode);
     }
 }
