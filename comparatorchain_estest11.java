@@ -1,40 +1,34 @@
 package org.apache.commons.collections4.comparators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
-import java.util.BitSet;
 import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class focuses on verifying the behavior of the {@link ComparatorChain}
+ * when handling invalid arguments.
+ */
+// The original class name 'ComparatorChain_ESTestTest11' and its scaffolding are
+// retained to provide context for the original auto-generated test.
 public class ComparatorChain_ESTestTest11 extends ComparatorChain_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        ComparatorChain<Object> comparatorChain0 = new ComparatorChain<Object>();
-        // Undeclared exception!
-        try {
-            comparatorChain0.setComparator((-2), (Comparator<Object>) comparatorChain0, false);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling setComparator() with a negative index throws an
+     * ArrayIndexOutOfBoundsException.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void setComparatorWithNegativeIndexShouldThrowException() {
+        // Arrange: Create an empty ComparatorChain. An empty chain is sufficient
+        // because the index validation occurs before any other operation.
+        final ComparatorChain<Object> chain = new ComparatorChain<>();
+
+        // Act: Attempt to set a comparator at an invalid negative index.
+        // The comparator instance and the 'reverse' flag are irrelevant here,
+        // as the exception is expected due to the invalid index. We pass null
+        // for simplicity.
+        chain.setComparator(-2, (Comparator<Object>) null, false);
+
+        // Assert: The test expects an ArrayIndexOutOfBoundsException, which is
+        // declared in the @Test annotation. If the exception is not thrown,
+        // the test will fail automatically.
     }
 }
