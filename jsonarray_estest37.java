@@ -1,31 +1,30 @@
 package com.google.gson;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest37 extends JsonArray_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonArray} focusing on type conversion methods for single-element arrays.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        jsonArray0.add((Number) null);
-        // Undeclared exception!
+    @Test
+    public void getAsDoubleOnArrayWithSingleNullElementThrowsException() {
+        // Arrange: Create a JsonArray containing a single JsonNull element.
+        JsonArray jsonArray = new JsonArray();
+        // According to JsonArray's contract, adding a null value converts it to a JsonNull instance.
+        jsonArray.add((Number) null);
+
+        // Act & Assert: Verify that calling getAsDouble() throws the expected exception.
         try {
-            jsonArray0.getAsDouble();
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // JsonNull
-            //
-            verifyException("com.google.gson.JsonElement", e);
+            jsonArray.getAsDouble();
+            fail("Expected an UnsupportedOperationException to be thrown, but no exception was thrown.");
+        } catch (UnsupportedOperationException expected) {
+            // JsonArray's getAsDouble() delegates to the single element's getAsDouble() method.
+            // For a JsonNull element, this throws an exception with the message "JsonNull".
+            assertEquals("JsonNull", expected.getMessage());
         }
     }
 }
