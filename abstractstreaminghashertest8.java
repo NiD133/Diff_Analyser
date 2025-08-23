@@ -1,118 +1,146 @@
 package com.google.common.hash;
 
-import static java.nio.charset.StandardCharsets.UTF_16LE;
-import static org.junit.Assert.assertThrows;
-import com.google.common.collect.Iterables;
-import com.google.common.hash.HashTestUtils.RandomHasherAction;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
 import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
 
-public class AbstractStreamingHasherTestTest8 extends TestCase {
+/**
+ * Tests for {@link AbstractStreamingHasher}, focusing on the {@code putDouble} method.
+ */
+public class AbstractStreamingHasherPutDoubleTest extends TestCase {
 
+    /**
+     * A test-only implementation of {@link AbstractStreamingHasher} that spies on the abstract
+     * methods to verify interactions. It accumulates all processed bytes into a
+     * {@link ByteArrayOutputStream} for inspection.
+     */
     private static class Sink extends AbstractStreamingHasher {
 
-        final int chunkSize;
-
-        final int bufferSize;
-
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
-
         int processCalled = 0;
-
         boolean remainingCalled = false;
-
-        Sink(int chunkSize, int bufferSize) {
-            super(chunkSize, bufferSize);
-            this.chunkSize = chunkSize;
-            this.bufferSize = bufferSize;
-        }
 
         Sink(int chunkSize) {
             super(chunkSize);
-            this.chunkSize = chunkSize;
-            this.bufferSize = chunkSize;
         }
 
         @Override
         protected HashCode makeHash() {
+            // The actual hash value is not important for these tests, but we must return something.
             return HashCode.fromBytes(out.toByteArray());
         }
 
         @Override
         protected void process(ByteBuffer bb) {
             processCalled++;
-            assertEquals(ByteOrder.LITTLE_ENDIAN, bb.order());
-            assertTrue(bb.remaining() >= chunkSize);
-            for (int i = 0; i < chunkSize; i++) {
+            assertEquals("Buffer should be in LITTLE_ENDIAN order", ByteOrder.LITTLE_ENDIAN, bb.order());
+            assertTrue(
+                    "Buffer remaining bytes should be >= chunk size", bb.remaining() >= getChunkSize());
+            // Write the bytes of a single chunk to the output stream.
+            for (int i = 0; i < getChunkSize(); i++) {
                 out.write(bb.get());
             }
         }
 
         @Override
         protected void processRemaining(ByteBuffer bb) {
-            assertFalse(remainingCalled);
+            assertFalse("processRemaining should only be called once", remainingCalled);
             remainingCalled = true;
             assertEquals(ByteOrder.LITTLE_ENDIAN, bb.order());
-            assertTrue(bb.remaining() > 0);
-            assertTrue(bb.remaining() < bufferSize);
-            int before = processCalled;
+            assertTrue("Remaining buffer must not be empty", bb.remaining() > 0);
+            assertTrue(
+                    "Remaining buffer must be smaller than bufferSize", bb.remaining() < getBufferSize());
+
+            // The default implementation of processRemaining pads the buffer and calls process().
+            // We want to track 'user-data' chunks vs the final padded chunk separately.
+            int processCallsBefore = processCalled;
             super.processRemaining(bb);
-            int after = processCalled;
-            // default implementation pads and calls process()
-            assertEquals(before + 1, after);
-            // don't count the tail invocation (makes tests a bit more understandable)
+            int processCallsAfter = processCalled;
+
+            // Verify that the default implementation did indeed call process() once.
+            assertEquals(
+                    "super.processRemaining() should call process() once",
+                    processCallsBefore + 1,
+                    processCallsAfter);
+
+            // Decrement the counter so our tests only count calls to process() for full chunks
+            // of original data, making test assertions simpler.
             processCalled--;
         }
 
-        // ensures that the number of invocations looks sane
-        void assertInvariants(int expectedBytes) {
-            // we should have seen as many bytes as the next multiple of chunk after expectedBytes - 1
-            assertEquals(out.toByteArray().length, ceilToMultiple(expectedBytes, chunkSize));
-            assertEquals(expectedBytes / chunkSize, processCalled);
-            assertEquals(expectedBytes % chunkSize != 0, remainingCalled);
-        }
-
-        // returns the minimum x such as x >= a && (x % b) == 0
-        private static int ceilToMultiple(int a, int b) {
-            int remainder = a % b;
-            return remainder == 0 ? a : a + b - remainder;
-        }
-
-        void assertBytes(byte[] expected) {
+        /**
+         * Asserts that the prefix of the bytes processed by the hasher matches the expected bytes.
+         *
+         * @param expectedPrefix the expected byte prefix
+         */
+        void assertBytesPrefix(byte[] expectedPrefix) {
             byte[] got = out.toByteArray();
-            for (int i = 0; i < expected.length; i++) {
-                assertEquals(expected[i], got[i]);
+            assertTrue(
+                    "Actual byte array is shorter than expected prefix. Got: "
+                            + got.length
+                            + ", expected: "
+                            + expectedPrefix.length,
+                    got.length >= expectedPrefix.length);
+            for (int i = 0; i < expectedPrefix.length; i++) {
+                assertEquals("Byte mismatch at index " + i, expectedPrefix[i], got[i]);
+            }
+        }
+
+        private int getChunkSize() {
+            // Expose protected field for test assertions.
+            try {
+                java.lang.reflect.Field field = AbstractStreamingHasher.class.getDeclaredField("chunkSize");
+                field.setAccessible(true);
+                return (int) field.get(this);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        private int getBufferSize() {
+            // Expose protected field for test assertions.
+            try {
+                java.lang.reflect.Field field = AbstractStreamingHasher.class.getDeclaredField("bufferSize");
+                field.setAccessible(true);
+                return (int) field.get(this);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
     }
 
-    // Assumes that AbstractNonStreamingHashFunction works properly (must be tested elsewhere!)
-    private static class Control extends AbstractNonStreamingHashFunction {
-
-        @Override
-        public HashCode hashBytes(byte[] input, int off, int len) {
-            return HashCode.fromBytes(Arrays.copyOfRange(input, off, off + len));
-        }
-
-        @Override
-        public int bits() {
-            throw new UnsupportedOperationException();
-        }
-    }
-
-    public void testDouble() {
+    public void testPutDouble_withFullChunk_processesBytesInLittleEndianOrder() {
+        // Arrange
+        // The Sink is a test-specific hasher that uses an 8-byte chunk size, the size of a double.
         Sink sink = new Sink(8);
-        sink.putDouble(Double.longBitsToDouble(0x0807060504030201L));
-        HashCode unused = sink.hash();
-        sink.assertInvariants(8);
-        sink.assertBytes(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 });
+
+        // A test value with distinct, sequential bytes, making it easy to verify byte ordering.
+        // The long 0x0807060504030201L represents the byte sequence [8, 7, 6, 5, 4, 3, 2, 1].
+        long testValueAsLong = 0x0807060504030201L;
+        double testValue = Double.longBitsToDouble(testValueAsLong);
+
+        // Act
+        sink.putDouble(testValue);
+        sink.hash(); // Finalize the hash to trigger processing of any buffered data.
+
+        // Assert
+        // AbstractStreamingHasher is little-endian, so the bytes of the long should be reversed.
+        byte[] expectedBytes = {1, 2, 3, 4, 5, 6, 7, 8};
+        sink.assertBytesPrefix(expectedBytes);
+        assertEquals(
+                "Total processed bytes should match expected",
+                expectedBytes.length,
+                sink.out.toByteArray().length);
+
+        // Verify the interaction with the streaming mechanism.
+        // Since we provided exactly 8 bytes (a full chunk), process() should be called once.
+        assertEquals("process() should be called once for a full chunk", 1, sink.processCalled);
+        // And since there are no leftover bytes, processRemaining() should not be called.
+        assertFalse("processRemaining() should not be called for a full chunk", sink.remainingCalled);
     }
 }
