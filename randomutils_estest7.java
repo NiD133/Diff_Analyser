@@ -1,19 +1,27 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomUtils_ESTestTest7 extends RandomUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.RandomUtils}.
+ */
+public class RandomUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        float float0 = RandomUtils.nextFloat(0.0F, 0.0F);
-        assertEquals(0.0F, float0, 0.01F);
+    /**
+     * Tests that {@code RandomUtils.nextFloat(start, end)} returns the start value
+     * when the start and end of the range are identical. This effectively tests
+     * the behavior for an empty range [start, start).
+     */
+    @Test
+    public void testNextFloatWithEmptyRangeReturnsStartValue() {
+        // Arrange: Define an empty range where start and end are the same.
+        final float rangeBoundary = 0.0F;
+
+        // Act: Call the method with the empty range.
+        final float result = RandomUtils.nextFloat(rangeBoundary, rangeBoundary);
+
+        // Assert: The result should be exactly the start value.
+        assertEquals(rangeBoundary, result, 0.0F);
     }
 }
