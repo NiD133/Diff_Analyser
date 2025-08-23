@@ -1,41 +1,30 @@
 package org.jfree.chart.plot.dial;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Graphics2D;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.plot.FastScatterPlot;
-import org.jfree.chart.plot.pie.PiePlot;
-import org.jfree.chart.util.GradientPaintTransformType;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.jfree.chart.util.StandardGradientPaintTransformer;
-import org.jfree.data.general.DefaultValueDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class DialBackground_ESTestTest4 extends DialBackground_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DialBackground} class.
+ */
+public class DialBackgroundTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        DialBackground dialBackground0 = null;
+    /**
+     * Verifies that the constructor throws an IllegalArgumentException when a null
+     * 'paint' argument is provided, as this is not a permitted value.
+     */
+    @Test
+    public void constructor_shouldThrowExceptionForNullPaint() {
         try {
-            dialBackground0 = new DialBackground((Paint) null);
-            fail("Expecting exception: IllegalArgumentException");
+            // Attempt to create a DialBackground with a null Paint object.
+            new DialBackground((Paint) null);
+            fail("Expected an IllegalArgumentException to be thrown, but it was not.");
         } catch (IllegalArgumentException e) {
-            //
-            // Null 'paint' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
+            // This is the expected outcome.
+            // Verify that the exception message is correct.
+            assertEquals("Null 'paint' argument.", e.getMessage());
         }
     }
 }
