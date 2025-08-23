@@ -1,38 +1,34 @@
 package org.apache.commons.io.file;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Comparator;
-import java.util.List;
-import java.util.regex.Pattern;
 import org.apache.commons.io.filefilter.CanExecuteFileFilter;
 import org.apache.commons.io.filefilter.CanReadFileFilter;
-import org.apache.commons.io.filefilter.CanWriteFileFilter;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.PrefixFileFilter;
-import org.apache.commons.io.filefilter.RegexFileFilter;
-import org.apache.commons.io.function.IOBiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+
+/**
+ * Tests for {@link AccumulatorPathVisitor}.
+ *
+ * Note: This class name "AccumulatorPathVisitor_ESTestTest1" appears to be generated.
+ * In a real-world scenario, it would be renamed to "AccumulatorPathVisitorTest".
+ */
 public class AccumulatorPathVisitor_ESTestTest1 extends AccumulatorPathVisitor_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        CanReadFileFilter canReadFileFilter0 = (CanReadFileFilter) CanReadFileFilter.CAN_READ;
-        String[] stringArray0 = new String[7];
-        PrefixFileFilter prefixFileFilter0 = new PrefixFileFilter(stringArray0);
-        AccumulatorPathVisitor accumulatorPathVisitor0 = AccumulatorPathVisitor.withBigIntegerCounters((PathFilter) canReadFileFilter0, (PathFilter) prefixFileFilter0);
-        assertNotNull(accumulatorPathVisitor0);
+    /**
+     * Tests that the factory method {@link AccumulatorPathVisitor#withBigIntegerCounters(PathFilter, PathFilter)}
+     * successfully creates a non-null instance when provided with valid filters.
+     */
+    @Test
+    public void withBigIntegerCounters_withValidFilters_createsNonNullVisitor() {
+        // Arrange: Define filters for files and directories.
+        // Using standard, self-explanatory filters to keep the test focused on the visitor's creation.
+        final PathFilter fileFilter = CanReadFileFilter.CAN_READ;
+        final PathFilter dirFilter = CanExecuteFileFilter.CAN_EXECUTE;
+
+        // Act: Create an AccumulatorPathVisitor using the factory method.
+        final AccumulatorPathVisitor visitor = AccumulatorPathVisitor.withBigIntegerCounters(fileFilter, dirFilter);
+
+        // Assert: Verify that the factory method returned a valid, non-null instance.
+        assertNotNull("The created visitor should not be null.", visitor);
     }
 }
