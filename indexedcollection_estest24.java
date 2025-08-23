@@ -1,67 +1,51 @@
 package org.apache.commons.collections4.collection;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.ForClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
 import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IndexedCollection_ESTestTest24 extends IndexedCollection_ESTest_scaffolding {
+import java.util.Collection;
+import java.util.LinkedList;
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        Transformer<Integer, Object> transformer0 = InvokerTransformer.invokerTransformer("/E/U4$mgt;KZkD7^7P");
-        IndexedCollection<Object, Integer> indexedCollection0 = IndexedCollection.uniqueIndexedCollection((Collection<Integer>) linkedList0, transformer0);
-        Integer integer0 = new Integer(630);
-        linkedList0.add(integer0);
-        // Undeclared exception!
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+/**
+ * Test suite for {@link IndexedCollection}.
+ * This class contains the refactored test case.
+ */
+public class IndexedCollectionTest {
+
+    /**
+     * Tests that if the keyTransformer throws an exception during a remove operation,
+     * that exception is propagated to the caller.
+     */
+    @Test
+    public void removeShouldPropagateExceptionFromKeyTransformer() {
+        // Arrange
+        // 1. Create a transformer that is guaranteed to fail because the method name is invalid.
+        final String invalidMethodName = "nonExistentMethod";
+        final Transformer<Integer, Object> faultyTransformer = InvokerTransformer.invokerTransformer(invalidMethodName);
+
+        // 2. Create the collection to be decorated.
+        final Collection<Integer> sourceCollection = new LinkedList<>();
+        final IndexedCollection<Object, Integer> indexedCollection =
+                IndexedCollection.uniqueIndexedCollection(sourceCollection, faultyTransformer);
+
+        // 3. Add an element to the collection. The remove() operation will act on this element.
+        final Integer elementToRemove = 123;
+        sourceCollection.add(elementToRemove);
+
+        // Act & Assert
+        // The remove() method must first use the transformer to calculate the element's key
+        // to remove it from the internal index. This transformation will fail.
         try {
-            indexedCollection0.remove(integer0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // InvokerTransformer: The method '/E/U4$mgt;KZkD7^7P' on 'class java.lang.Integer' does not exist
-            //
-            verifyException("org.apache.commons.collections4.functors.InvokerTransformer", e);
+            indexedCollection.remove(elementToRemove);
+            fail("Expected a RuntimeException to be thrown due to the faulty transformer.");
+        } catch (final RuntimeException e) {
+            // Verify that the exception is the one we expect from InvokerTransformer.
+            final String expectedMessage = "InvokerTransformer: The method 'nonExistentMethod' on 'class java.lang.Integer' does not exist";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
