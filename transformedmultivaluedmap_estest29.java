@@ -1,63 +1,35 @@
 package org.apache.commons.collections4.multimap;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.AbstractMap;
-import java.util.ArrayDeque;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.PriorityQueue;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.MultiValuedMap;
-import org.apache.commons.collections4.Predicate;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionFactory;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
 import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TransformedMultiValuedMap_ESTestTest29 extends TransformedMultiValuedMap_ESTest_scaffolding {
+/**
+ * Unit tests for {@link TransformedMultiValuedMap}.
+ */
+public class TransformedMultiValuedMapTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        Integer integer0 = new Integer((-606));
-        AbstractMap.SimpleImmutableEntry<Integer, Integer> abstractMap_SimpleImmutableEntry0 = new AbstractMap.SimpleImmutableEntry<Integer, Integer>(integer0, integer0);
-        ConstantTransformer<Object, AbstractMap.SimpleImmutableEntry<Integer, Integer>> constantTransformer0 = new ConstantTransformer<Object, AbstractMap.SimpleImmutableEntry<Integer, Integer>>(abstractMap_SimpleImmutableEntry0);
-        TransformedMultiValuedMap<Integer, AbstractMap.SimpleImmutableEntry<Integer, Integer>> transformedMultiValuedMap0 = null;
+    /**
+     * Tests that the constructor throws a NullPointerException when the decorated map is null.
+     */
+    @Test
+    public void constructorShouldThrowNullPointerExceptionWhenMapIsNull() {
+        // Arrange: Define transformers. Their specific logic is irrelevant for this test,
+        // as the constructor should fail before they are ever used.
+        final Transformer<Object, Object> keyTransformer = null; // A null transformer is allowed.
+        final Transformer<Object, Object> valueTransformer = NOPTransformer.nopTransformer();
+
         try {
-            transformedMultiValuedMap0 = new TransformedMultiValuedMap<Integer, AbstractMap.SimpleImmutableEntry<Integer, Integer>>((MultiValuedMap<Integer, AbstractMap.SimpleImmutableEntry<Integer, Integer>>) null, (Transformer<? super Integer, ? extends Integer>) null, constantTransformer0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // map
-            //
-            verifyException("java.util.Objects", e);
+            // Act: Attempt to create a TransformedMultiValuedMap with a null decorated map.
+            new TransformedMultiValuedMap<>(null, keyTransformer, valueTransformer);
+            fail("A NullPointerException was expected but not thrown.");
+        } catch (final NullPointerException e) {
+            // Assert: Verify that the exception is thrown for the correct reason.
+            // The superclass constructor is responsible for this null check.
+            assertEquals("The exception message should indicate the 'map' parameter is null.", "map", e.getMessage());
         }
     }
 }
