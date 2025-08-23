@@ -1,32 +1,32 @@
 package org.jsoup.parser;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.*;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import static org.jsoup.nodes.Document.OutputSettings.Syntax;
-import static org.jsoup.parser.Parser.NamespaceHtml;
-import static org.jsoup.parser.Parser.NamespaceXml;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class XmlTreeBuilderTestTest10 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    private static void assertXmlNamespace(Element el) {
-        assertEquals(NamespaceXml, el.tag().namespace(), String.format("Element %s not in XML namespace", el.tagName()));
-    }
+/**
+ * Tests for the {@link XmlTreeBuilder}.
+ */
+class XmlTreeBuilderTest {
 
+    /**
+     * Tests that the XML parser can gracefully handle an End-Of-File (EOF)
+     * that occurs in the middle of a tag's attribute.
+     */
     @Test
-    public void testDoesHandleEOFInTag() {
-        String html = "<img src=asdf onerror=\"alert(1)\" x=";
-        Document xmlDoc = Jsoup.parse(html, "", Parser.xmlParser());
-        assertEquals("<img src=\"asdf\" onerror=\"alert(1)\" x=\"\"></img>", xmlDoc.html());
+    void handlesEofWithinTagGracefully() {
+        // Arrange: Input XML with an unclosed tag and an unterminated attribute at the very end.
+        String malformedXml = "<img src=asdf onerror=\"alert(1)\" x=";
+        String expectedXml = "<img src=\"asdf\" onerror=\"alert(1)\" x=\"\"></img>";
+
+        // Act: Parse the input using the XML parser.
+        Document doc = Jsoup.parse(malformedXml, "", Parser.xmlParser());
+        String actualXml = doc.html();
+
+        // Assert: The parser should correctly quote the unquoted attribute, provide an empty
+        // value for the unterminated attribute, and close the tag.
+        assertEquals(expectedXml, actualXml);
     }
 }
