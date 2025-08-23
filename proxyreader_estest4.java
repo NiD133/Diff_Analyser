@@ -1,24 +1,47 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
-import java.io.IOException;
-import java.io.PipedReader;
-import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
+import java.io.StringReader;
+
+// Note: The class name and inheritance from a scaffolding class are artifacts
+// of the test generation tool. In a manually written test suite, this would
+// typically be a standalone class named ProxyReaderTest.
 public class ProxyReader_ESTestTest4 extends ProxyReader_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        StringReader stringReader0 = new StringReader("*=jeP");
-        TaggedReader taggedReader0 = new TaggedReader(stringReader0);
-        taggedReader0.mark(47);
+    /**
+     * Tests that the mark() method correctly delegates to the underlying reader,
+     * allowing the stream to be subsequently reset to the marked position.
+     * This verifies that the proxy mechanism for mark() and reset() is working.
+     */
+    @Test
+    public void markShouldDelegateToUnderlyingReaderAndAllowReset() throws IOException {
+        // Arrange
+        final String testData = "abcdef";
+        final StringReader underlyingReader = new StringReader(testData);
+        // ProxyReader is abstract, so we use a concrete subclass (TaggedReader) for testing.
+        final ProxyReader proxyReader = new TaggedReader(underlyingReader);
+
+        // Advance the reader to the 4th character ('d' at index 3).
+        final long skipped = proxyReader.skip(3);
+        assertEquals(3, skipped);
+
+        // Act: Mark the current position. The read-ahead limit must be large enough
+        // for subsequent reads before the reset.
+        proxyReader.mark(10);
+
+        // Assert
+        // 1. Read a couple of characters to move the stream past the marked position.
+        assertEquals('d', (char) proxyReader.read());
+        assertEquals('e', (char) proxyReader.read());
+
+        // 2. Reset the reader, which should return it to the marked position.
+        proxyReader.reset();
+
+        // 3. Verify that the next character read is from the marked position ('d').
+        assertEquals("After reset, reader should be at the marked position",
+                'd', (char) proxyReader.read());
     }
 }
