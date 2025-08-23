@@ -1,36 +1,32 @@
 package org.jfree.chart.axis;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
-import java.text.FieldPosition;
-import java.text.Format;
-import java.text.NumberFormat;
-import java.text.ParsePosition;
-import java.util.Date;
-import java.util.SimpleTimeZone;
+
 import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.junit.runner.RunWith;
 
-public class QuarterDateFormat_ESTestTest15 extends QuarterDateFormat_ESTest_scaffolding {
+/**
+ * Tests for the constructor of the {@link QuarterDateFormat} class.
+ * This focuses on handling invalid arguments.
+ */
+public class QuarterDateFormatConstructorTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        QuarterDateFormat quarterDateFormat0 = null;
+    /**
+     * Verifies that the constructor throws an IllegalArgumentException
+     * when a null TimeZone is provided, as this is a required dependency.
+     */
+    @Test
+    public void constructor_withNullTimeZone_shouldThrowIllegalArgumentException() {
+        // The constructor under test requires a non-null TimeZone.
+        // We expect an IllegalArgumentException if null is passed.
         try {
-            quarterDateFormat0 = new QuarterDateFormat((TimeZone) null);
-            fail("Expecting exception: IllegalArgumentException");
+            new QuarterDateFormat((TimeZone) null);
+            fail("Expected an IllegalArgumentException to be thrown for a null TimeZone.");
         } catch (IllegalArgumentException e) {
-            //
-            // Null 'zone' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
+            // Verify that the exception message is correct, confirming the right check failed.
+            assertEquals("Null 'zone' argument.", e.getMessage());
         }
     }
 }
