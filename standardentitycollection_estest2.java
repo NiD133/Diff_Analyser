@@ -1,28 +1,32 @@
 package org.jfree.chart.entity;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Dimension;
-import java.awt.Point;
+import static org.junit.Assert.assertNull;
+
 import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.util.Collection;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class StandardEntityCollection_ESTestTest2 extends StandardEntityCollection_ESTest_scaffolding {
+/**
+ * Tests for the {@link StandardEntityCollection} class.
+ */
+public class StandardEntityCollectionTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        StandardEntityCollection standardEntityCollection0 = new StandardEntityCollection();
-        Line2D.Double line2D_Double0 = new Line2D.Double();
-        ChartEntity chartEntity0 = new ChartEntity(line2D_Double0);
-        standardEntityCollection0.add(chartEntity0);
-        standardEntityCollection0.add(chartEntity0);
-        ChartEntity chartEntity1 = standardEntityCollection0.getEntity(0.0, 0.0);
-        assertNull(chartEntity1);
+    /**
+     * Verifies that getEntity(x, y) returns null when the collection contains
+     * entities, but none of them enclose the specified coordinates.
+     */
+    @Test
+    public void getEntityByCoordinates_WhenNoEntityContainsPoint_ShouldReturnNull() {
+        // Arrange: Create a collection with one entity whose shape is a rectangle.
+        StandardEntityCollection entityCollection = new StandardEntityCollection();
+        Rectangle entityArea = new Rectangle(10, 10, 100, 100);
+        ChartEntity chartEntity = new ChartEntity(entityArea);
+        entityCollection.add(chartEntity);
+
+        // Act: Attempt to retrieve an entity from a point (0, 0) that is
+        // clearly outside the entity's area.
+        ChartEntity foundEntity = entityCollection.getEntity(0.0, 0.0);
+
+        // Assert: The method should return null as no entity was found.
+        assertNull("Expected no entity to be found at coordinates (0,0)", foundEntity);
     }
 }
