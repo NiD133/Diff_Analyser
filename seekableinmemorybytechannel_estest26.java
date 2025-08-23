@@ -1,26 +1,52 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.SeekableByteChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.Arrays;
 
-public class SeekableInMemoryByteChannel_ESTestTest26 extends SeekableInMemoryByteChannel_ESTest_scaffolding {
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(1);
-        ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(1);
-        seekableInMemoryByteChannel0.read(byteBuffer0);
-        byteBuffer0.clear();
-        int int0 = seekableInMemoryByteChannel0.write(byteBuffer0);
-        assertEquals(0, byteBuffer0.remaining());
-        assertEquals(1, int0);
+/**
+ * Unit tests for the SeekableInMemoryByteChannel class.
+ */
+public class SeekableInMemoryByteChannelTest {
+
+    /**
+     * Tests that writing data past the current end of the channel correctly
+     * expands the channel's internal buffer and updates its size.
+     */
+    @Test
+    public void writeShouldExpandChannelWhenWritingPastEnd() throws IOException {
+        // Arrange: Create a channel with one byte of initial data.
+        byte[] initialData = { 10 };
+        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel(initialData);
+
+        // Move the position to the end of the channel, ready for appending.
+        channel.position(1);
+        assertEquals("Initial position should be at the end", 1, channel.position());
+        assertEquals("Initial size should be 1", 1, channel.size());
+
+        // Prepare a buffer with one byte to write.
+        byte[] dataToWrite = { 42 };
+        ByteBuffer buffer = ByteBuffer.wrap(dataToWrite);
+
+        // Act: Write the buffer's content to the channel.
+        int bytesWritten = channel.write(buffer);
+
+        // Assert: Verify the write operation was successful and the channel state is correct.
+        assertEquals("Should have written 1 byte", 1, bytesWritten);
+        assertEquals("Buffer should be fully drained", 0, buffer.remaining());
+
+        // Verify the channel expanded and the position was updated.
+        assertEquals("Channel size should expand to accommodate new data", 2, channel.size());
+        assertEquals("Position should be at the new end of the channel", 2, channel.position());
+
+        // Verify the final content of the channel's buffer.
+        byte[] expectedChannelContent = { 10, 42 };
+        byte[] actualChannelContent = Arrays.copyOf(channel.array(), (int) channel.size());
+        assertArrayEquals("Channel content is incorrect after write", expectedChannelContent, actualChannelContent);
     }
 }
