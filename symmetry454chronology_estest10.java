@@ -1,46 +1,31 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
 import java.time.chrono.Era;
-import java.time.chrono.HijrahEra;
 import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * Tests for {@link Symmetry454Chronology#dateYearDay(Era, int, int)}.
+ */
 public class Symmetry454Chronology_ESTestTest10 extends Symmetry454Chronology_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
-        Clock clock0 = MockClock.systemDefaultZone();
-        Symmetry454Date symmetry454Date0 = Symmetry454Date.now(clock0);
-        IsoEra isoEra0 = symmetry454Date0.getEra();
-        Symmetry454Date symmetry454Date1 = symmetry454Chronology0.dateYearDay((Era) isoEra0, 29, 11);
-        assertEquals(IsoEra.CE, symmetry454Date1.getEra());
+    /**
+     * Verifies that dateYearDay(Era, year, dayOfYear) creates a date
+     * with the correct era.
+     */
+    @Test
+    public void testDateYearDayWithEraPreservesTheEra() {
+        // Arrange
+        Symmetry454Chronology chronology = Symmetry454Chronology.INSTANCE;
+        Era expectedEra = IsoEra.CE;
+        int yearOfEra = 29;
+        int dayOfYear = 11;
+
+        // Act
+        Symmetry454Date resultDate = chronology.dateYearDay(expectedEra, yearOfEra, dayOfYear);
+
+        // Assert
+        assertEquals("The era of the created date should match the input era.", expectedEra, resultDate.getEra());
     }
 }
