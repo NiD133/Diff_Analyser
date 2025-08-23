@@ -1,39 +1,51 @@
 package org.jsoup.nodes;
 
+import org.jsoup.nodes.Document.OutputSettings;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
+
+import java.io.IOException;
 import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Attribute_ESTestTest23 extends Attribute_ESTest_scaffolding {
+import static org.junit.Assert.*;
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        Attribute attribute0 = new Attribute("zyixbn`lOB*#", "bokmyj\"!bh4db:");
-        PipedWriter pipedWriter0 = new PipedWriter();
-        // Undeclared exception!
+/**
+ * Test suite for the {@link Attribute} class.
+ * This test focuses on how the html() method handles IOExceptions.
+ */
+public class AttributeRefactoredTest {
+
+    /**
+     * Tests that when rendering an attribute to an Appendable, if the Appendable
+     * throws an IOException, it is caught and wrapped in an unchecked RuntimeException.
+     * This behavior simplifies the method signature of `html()`, as callers don't
+     * need to handle IOExceptions.
+     */
+    @Test
+    public void htmlToFailingAppendableWrapsIOException() {
+        // Arrange
+        Attribute attribute = new Attribute("id", "test-id");
+        OutputSettings outputSettings = new OutputSettings();
+
+        // Use an unconnected PipedWriter as an Appendable that is guaranteed to
+        // throw an IOException upon any write attempt.
+        Appendable failingWriter = new PipedWriter();
+
+        // Act & Assert
         try {
-            attribute0.html((Appendable) pipedWriter0, document_OutputSettings0);
-            fail("Expecting exception: RuntimeException");
+            // The deprecated `html(Appendable, ...)` method is being tested here.
+            // It internally wraps the Appendable in a QuietAppendable, which
+            // is responsible for catching the IOException.
+            attribute.html(failingWriter, outputSettings);
+            fail("Expected a RuntimeException to be thrown because the underlying writer failed.");
         } catch (RuntimeException e) {
-            //
-            // java.io.IOException: Pipe not connected
-            //
-            verifyException("org.jsoup.internal.QuietAppendable$BaseAppendable", e);
+            // Verify that the thrown exception is a RuntimeException...
+            assertEquals(RuntimeException.class, e.getClass());
+            
+            // ...and that its cause is the original IOException.
+            Throwable cause = e.getCause();
+            assertNotNull("The RuntimeException should have a cause.", cause);
+            assertTrue("The cause should be an IOException.", cause instanceof IOException);
+            assertEquals("Pipe not connected", cause.getMessage());
         }
     }
 }
