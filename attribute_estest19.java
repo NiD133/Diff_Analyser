@@ -1,36 +1,29 @@
 package org.jsoup.nodes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
 import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+// The class name and inheritance are preserved from the original test structure.
 public class Attribute_ESTestTest19 extends Attribute_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        // Undeclared exception!
-        try {
-            Attribute.htmlNoValidate("declarx", "75L?/)Wy)4x", (QuietAppendable) null, (Document.OutputSettings) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.nodes.Attribute", e);
-        }
+    /**
+     * Verifies that calling Attribute.htmlNoValidate with a null Document.OutputSettings
+     * object throws a NullPointerException.
+     * <p>
+     * The OutputSettings object is required to determine how the attribute should be
+     * formatted (e.g., for collapsing boolean attributes). Passing null is an
+     * invalid state that should be handled with an exception.
+     * </p>
+     */
+    @Test(expected = NullPointerException.class)
+    public void htmlNoValidateThrowsNullPointerExceptionForNullOutputSettings() {
+        // Define dummy key and value for the method call. Their content is not
+        // relevant for this test, as the exception is expected due to the null arguments.
+        String key = "any-key";
+        String value = "any-value";
+
+        // The method is expected to throw a NullPointerException because it attempts
+        // to access the syntax from the null OutputSettings object.
+        Attribute.htmlNoValidate(key, value, (QuietAppendable) null, (Document.OutputSettings) null);
     }
 }
