@@ -1,28 +1,30 @@
 package org.jfree.chart.plot;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Paint;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.HistogramType;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class MeterInterval_ESTestTest21 extends MeterInterval_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        Range range0 = new Range((-229.41607020985958), (-229.41607020985958));
-        MeterInterval meterInterval0 = new MeterInterval("d|V&g", range0);
-        Paint paint0 = meterInterval0.getBackgroundPaint();
-        assertNull(paint0);
+/**
+ * Unit tests for the {@link MeterInterval} class.
+ */
+public class MeterIntervalTest {
+
+    /**
+     * Verifies that the constructor taking only a label and a range
+     * sets the background paint to null by default.
+     */
+    @Test
+    public void constructorWithLabelAndRange_ShouldSetDefaultBackgroundPaintToNull() {
+        // Arrange: Define the properties for a new interval.
+        // The specific values are not critical for this test.
+        String label = "Normal";
+        Range range = new Range(0.0, 50.0);
+
+        // Act: Create a MeterInterval using the two-argument constructor.
+        MeterInterval interval = new MeterInterval(label, range);
+
+        // Assert: Check that the background paint has been initialized to its default null value.
+        assertNull("The background paint should be null by default.", interval.getBackgroundPaint());
     }
 }
