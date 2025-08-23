@@ -1,74 +1,49 @@
 package org.apache.commons.lang3.stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Function;
+
 import java.util.stream.Collector;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.Test;
 
-public class LangCollectorsTestTest8 {
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-    private static final Long _1L = Long.valueOf(1);
+/**
+ * Tests for {@link LangCollectors#joining(CharSequence, CharSequence, CharSequence)}.
+ */
+class LangCollectorsTest {
 
-    private static final Long _2L = Long.valueOf(2);
-
-    private static final Long _3L = Long.valueOf(3);
-
-    private static final Function<Object, String> TO_STRING = Objects::toString;
-
-    private static final Collector<Object, ?, String> JOINING_0 = LangCollectors.joining();
-
-    private static final Collector<Object, ?, String> JOINING_1 = LangCollectors.joining("-");
-
-    private static final Collector<Object, ?, String> JOINING_3 = LangCollectors.joining("-", "<", ">");
-
-    private static final Collector<Object, ?, String> JOINING_4 = LangCollectors.joining("-", "<", ">", TO_STRING);
-
-    private static final Collector<Object, ?, String> JOINING_4_NUL = LangCollectors.joining("-", "<", ">", o -> Objects.toString(o, "NUL"));
-
-    private String join0(final Object... objects) {
-        return LangCollectors.collect(JOINING_0, objects);
+    /**
+     * Provides test cases for the joining collector with a delimiter, prefix, and suffix.
+     * Each argument set consists of the expected result string and the input elements to be joined.
+     *
+     * @return a stream of arguments for the parameterized test.
+     */
+    private static Stream<Arguments> joiningWithDelimiterPrefixAndSuffixCases() {
+        return Stream.of(
+            // Test case: No elements
+            Arguments.of("<>", new Object[]{}),
+            // Test case: Single element
+            Arguments.of("<1>", new Object[]{"1"}),
+            // Test case: Multiple elements
+            Arguments.of("<1-2-3>", new Object[]{"1", "2", "3"}),
+            // Test case: Elements including null
+            Arguments.of("<1-null-3>", new Object[]{"1", null, "3"})
+        );
     }
 
-    private String join1(final Object... objects) {
-        return LangCollectors.collect(JOINING_1, objects);
-    }
+    @ParameterizedTest
+    @MethodSource("joiningWithDelimiterPrefixAndSuffixCases")
+    void joiningWithDelimiterPrefixAndSuffix_shouldCorrectlyJoinElements(final String expectedResult, final Object... elements) {
+        // Arrange: Create a collector that joins objects with a hyphen,
+        // enclosed in angle brackets.
+        final Collector<Object, ?, String> collector = LangCollectors.joining("-", "<", ">");
 
-    private String join3(final Object... objects) {
-        return LangCollectors.collect(JOINING_3, objects);
-    }
+        // Act: Collect the elements into a string.
+        final String actualResult = LangCollectors.collect(collector, elements);
 
-    private String join4(final Object... objects) {
-        return LangCollectors.collect(JOINING_4, objects);
-    }
-
-    private String join4NullToString(final Object... objects) {
-        return LangCollectors.collect(JOINING_4_NUL, objects);
-    }
-
-    private static final class Fixture {
-
-        int value;
-
-        private Fixture(final int value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return Integer.toString(value);
-        }
-    }
-
-    @Test
-    void testJoinCollectStrings3Args() {
-        assertEquals("<>", join3());
-        assertEquals("<1>", join3("1"));
-        assertEquals("<1-2>", join3("1", "2"));
-        assertEquals("<1-2-3>", join3("1", "2", "3"));
-        assertEquals("<1-null-3>", join3("1", null, "3"));
+        // Assert: The resulting string should match the expected output.
+        assertEquals(expectedResult, actualResult);
     }
 }
