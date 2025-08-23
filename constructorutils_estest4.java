@@ -1,35 +1,35 @@
 package org.apache.commons.lang3.reflect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.Constructor;
+
+/**
+ * This test class contains tests for the {@link ConstructorUtils} class.
+ * This specific file focuses on the behavior of getAccessibleConstructor(Constructor).
+ */
+// The class name and inheritance are from the original EvoSuite generated test.
 public class ConstructorUtils_ESTestTest4 extends ConstructorUtils_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Class<Object> class0 = Object.class;
-        Class<Annotation>[] classArray0 = (Class<Annotation>[]) Array.newInstance(Class.class, 0);
-        Constructor<Object> constructor0 = ConstructorUtils.getAccessibleConstructor(class0, (Class<?>[]) classArray0);
-        AccessibleObject[] accessibleObjectArray0 = new AccessibleObject[8];
-        accessibleObjectArray0[0] = (AccessibleObject) constructor0;
-        accessibleObjectArray0[1] = (AccessibleObject) constructor0;
-        accessibleObjectArray0[2] = (AccessibleObject) constructor0;
-        accessibleObjectArray0[3] = (AccessibleObject) constructor0;
-        accessibleObjectArray0[4] = (AccessibleObject) constructor0;
-        accessibleObjectArray0[5] = (AccessibleObject) constructor0;
-        accessibleObjectArray0[6] = (AccessibleObject) constructor0;
-        accessibleObjectArray0[7] = (AccessibleObject) constructor0;
-        AccessibleObject.setAccessible(accessibleObjectArray0, true);
-        Constructor<Object> constructor1 = ConstructorUtils.getAccessibleConstructor(constructor0);
-        assertSame(constructor0, constructor1);
+    /**
+     * Tests that getAccessibleConstructor(Constructor) returns the same instance
+     * when the provided constructor is already accessible.
+     */
+    @Test
+    public void testGetAccessibleConstructorWithAlreadyAccessibleConstructorReturnsSameInstance() throws Exception {
+        // Arrange: Get a constructor that is already accessible.
+        // The public no-argument constructor for Object.class is a perfect example.
+        final Constructor<Object> accessibleConstructor = Object.class.getConstructor();
+        assertTrue("Precondition failed: The constructor should be accessible by default.", accessibleConstructor.isAccessible());
+
+        // Act: Call the method under test.
+        final Constructor<Object> result = ConstructorUtils.getAccessibleConstructor(accessibleConstructor);
+
+        // Assert: The method should return the exact same constructor instance.
+        assertSame("The returned constructor should be the same instance as the input",
+            accessibleConstructor, result);
+        assertTrue("The returned constructor should remain accessible", result.isAccessible());
     }
 }
