@@ -1,37 +1,44 @@
 package org.jsoup.parser;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.*;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Node;
+import org.jsoup.nodes.XmlDeclaration;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import static org.jsoup.nodes.Document.OutputSettings.Syntax;
-import static org.jsoup.parser.Parser.NamespaceHtml;
-import static org.jsoup.parser.Parser.NamespaceXml;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class XmlTreeBuilderTestTest12 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
-    private static void assertXmlNamespace(Element el) {
-        assertEquals(NamespaceXml, el.tag().namespace(), String.format("Element %s not in XML namespace", el.tagName()));
-    }
+/**
+ * Tests for the {@link XmlTreeBuilder}.
+ * This test focuses on parsing XML declarations.
+ */
+class XmlTreeBuilderTest {
 
     @Test
-    public void testParseDeclarationAttributes() {
-        String xml = "<?xml version='1' encoding='UTF-8' something='else'?><val>One</val>";
-        Document doc = Jsoup.parse(xml, "", Parser.xmlParser());
-        XmlDeclaration decl = (XmlDeclaration) doc.childNode(0);
-        assertEquals("1", decl.attr("version"));
-        assertEquals("UTF-8", decl.attr("encoding"));
-        assertEquals("else", decl.attr("something"));
-        assertEquals("version=\"1\" encoding=\"UTF-8\" something=\"else\"", decl.getWholeDeclaration());
-        assertEquals("<?xml version=\"1\" encoding=\"UTF-8\" something=\"else\"?>", decl.outerHtml());
+    @DisplayName("Parsing an XML declaration should correctly extract its attributes")
+    void parsesXmlDeclarationAttributesCorrectly() {
+        // Arrange: An XML string with a declaration containing multiple attributes.
+        String xmlWithDeclaration = "<?xml version='1' encoding='UTF-8' something='else'?><val>One</val>";
+
+        // Act: Parse the XML string using the XML parser.
+        Document doc = Jsoup.parse(xmlWithDeclaration, "", Parser.xmlParser());
+        Node firstChild = doc.childNode(0);
+
+        // Assert: The first node should be an XmlDeclaration with the correct attributes.
+        assertInstanceOf(XmlDeclaration.class, firstChild, "The first node should be an XmlDeclaration.");
+        XmlDeclaration declaration = (XmlDeclaration) firstChild;
+
+        // Verify individual attributes are parsed correctly
+        assertEquals("1", declaration.attr("version"), "The 'version' attribute should be '1'.");
+        assertEquals("UTF-8", declaration.attr("encoding"), "The 'encoding' attribute should be 'UTF-8'.");
+        assertEquals("else", declaration.attr("something"), "The 'something' attribute should be 'else'.");
+
+        // Verify the serialized output of the declaration
+        assertEquals("version=\"1\" encoding=\"UTF-8\" something=\"else\"", declaration.getWholeDeclaration(),
+            "The content of the declaration should be correctly serialized.");
+        assertEquals("<?xml version=\"1\" encoding=\"UTF-8\" something=\"else\"?>", declaration.outerHtml(),
+            "The outer HTML of the declaration should be correct.");
     }
 }
