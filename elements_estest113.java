@@ -1,36 +1,40 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest113 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test112() throws Throwable {
-        Document document0 = Parser.parseBodyFragment("Bb,Y6", "Bb,Y6");
-        Elements elements0 = document0.getAllElements();
-        boolean boolean0 = elements0.is("Bb,Y6");
-        assertFalse(boolean0);
+/**
+ * This test class is a refactored version of an auto-generated test.
+ * In a real-world project, this test case would be integrated into a comprehensive
+ * test suite for the Elements class, such as `ElementsTest.java`.
+ */
+public class Elements_ESTestTest113 {
+
+    /**
+     * Verifies that the is() method returns false when none of the elements
+     * in the collection match the given CSS selector.
+     */
+    @Test
+    public void isShouldReturnFalseWhenNoElementsMatchSelector() {
+        // Arrange
+        // Parsing this fragment creates a document with <html>, <head>, and <body> elements.
+        // The string "Bb,Y6" is treated as a simple text node inside the body.
+        Document doc = Parser.parseBodyFragment("Bb,Y6", "");
+        Elements elements = doc.getAllElements(); // This collection contains [<html>, <head>, <body>]
+
+        // The CSS selector looks for elements with a tag name of either "Bb" or "Y6".
+        String nonMatchingSelector = "Bb,Y6";
+
+        // Act
+        // Check if any element in the collection matches the selector.
+        boolean matches = elements.is(nonMatchingSelector);
+
+        // Assert
+        // Since none of the actual elements (html, head, body) match the selector,
+        // the result must be false.
+        assertFalse("Expected is() to return false for a non-matching selector.", matches);
     }
 }
