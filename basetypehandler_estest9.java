@@ -1,33 +1,28 @@
 package org.apache.ibatis.type;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
+
 import java.sql.ResultSet;
-import java.time.YearMonth;
-import org.apache.ibatis.session.Configuration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.sql.SQLException;
 
-public class BaseTypeHandler_ESTestTest9 extends BaseTypeHandler_ESTest_scaffolding {
+/**
+ * Test suite for BaseTypeHandler and its subclasses.
+ */
+public class BaseTypeHandlerTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        ObjectTypeHandler objectTypeHandler0 = new ObjectTypeHandler();
-        // Undeclared exception!
-        try {
-            objectTypeHandler0.getNullableResult((ResultSet) null, "Whv13V)Nc");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.ibatis.type.ObjectTypeHandler", e);
-        }
+    /**
+     * Verifies that getNullableResult(ResultSet, String) throws a NullPointerException
+     * when the provided ResultSet is null. The handler is not expected to handle a null ResultSet.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getNullableResultByColumnNameShouldThrowNpeForNullResultSet() throws SQLException {
+        // Arrange
+        // Using ObjectTypeHandler as a concrete implementation of the abstract BaseTypeHandler.
+        ObjectTypeHandler objectTypeHandler = new ObjectTypeHandler();
+        String anyColumnName = "anyColumn";
+
+        // Act & Assert
+        // This call is expected to throw a NullPointerException because the ResultSet is null.
+        objectTypeHandler.getNullableResult((ResultSet) null, anyColumnName);
     }
 }
