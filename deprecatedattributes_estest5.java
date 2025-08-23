@@ -1,19 +1,31 @@
 package org.apache.commons.cli;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class DeprecatedAttributes_ESTestTest5 extends DeprecatedAttributes_ESTest_scaffolding {
+/**
+ * Tests for the {@link DeprecatedAttributes} class.
+ */
+public class DeprecatedAttributesTest {
 
-    @Test(timeout = 4000)
-    public void test4() throws Throwable {
-        DeprecatedAttributes.Builder deprecatedAttributes_Builder0 = DeprecatedAttributes.builder();
-        deprecatedAttributes_Builder0.setForRemoval(true);
-        DeprecatedAttributes deprecatedAttributes0 = deprecatedAttributes_Builder0.get();
-        String string0 = deprecatedAttributes0.toString();
-        assertEquals("Deprecated for removal", string0);
+    /**
+     * Verifies that the toString() method returns the correct message
+     * when an attribute is marked "for removal".
+     */
+    @Test
+    public void toStringShouldIndicateForRemovalWhenSet() {
+        // Arrange: Create a DeprecatedAttributes instance with the 'forRemoval' flag set to true.
+        final DeprecatedAttributes attributes = DeprecatedAttributes.builder()
+            .setForRemoval(true)
+            .get();
+
+        final String expectedMessage = "Deprecated for removal";
+
+        // Act: Get the string representation of the object.
+        final String actualMessage = attributes.toString();
+
+        // Assert: Verify that the toString() output matches the expected message.
+        assertEquals("The toString() message should reflect the 'for removal' status.",
+                     expectedMessage, actualMessage);
     }
 }
