@@ -1,17 +1,26 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class PatternOptionBuilder_ESTestTest11 extends PatternOptionBuilder_ESTest_scaffolding {
+/**
+ * Tests for the {@link PatternOptionBuilder} class.
+ */
+public class PatternOptionBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        boolean boolean0 = PatternOptionBuilder.isValueCode('*');
-        assertTrue(boolean0);
+    /**
+     * Tests that the isValueCode() method correctly identifies the '*' character
+     * as a valid value code. In PatternOptionBuilder, the '*' character is used
+     * to specify an option that accepts an array of files (File[]).
+     */
+    @Test
+    public void testIsValueCodeRecognizesStarAsValueCode() {
+        // The '*' character is a code representing the File[] type.
+        final char filesArrayCode = '*';
+
+        // The isValueCode method should return true for this character.
+        final boolean isValue = PatternOptionBuilder.isValueCode(filesArrayCode);
+
+        assertTrue("The '*' character should be recognized as a value code.", isValue);
     }
 }
