@@ -1,23 +1,34 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class GregorianChronology_ESTestTest1 extends GregorianChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        GregorianChronology gregorianChronology0 = GregorianChronology.getInstanceUTC();
-        long long0 = gregorianChronology0.calculateFirstDayOfYearMillis(20);
-        assertEquals((-61536067200000L), long0);
+/**
+ * Unit tests for {@link GregorianChronology}.
+ */
+public class GregorianChronologyTest {
+
+    @Test
+    public void calculateFirstDayOfYearMillis_shouldReturnCorrectMillisForEarlyADYear() {
+        // Arrange
+        // Get an instance of the GregorianChronology in UTC.
+        GregorianChronology gregorianChronology = GregorianChronology.getInstanceUTC();
+        int year = 20;
+
+        // For verification, create a DateTime object representing the start of the given year (0020-01-01T00:00:00Z).
+        // This makes the expected value self-documenting and avoids "magic numbers".
+        DateTime startOfYear20 = new DateTime(year, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC);
+        long expectedMillis = startOfYear20.getMillis();
+
+        // Act
+        // Calculate the milliseconds for the first day of the year using the method under test.
+        long actualMillis = gregorianChronology.calculateFirstDayOfYearMillis(year);
+
+        // Assert
+        // The calculated millis should match the millis from the reference DateTime object.
+        assertEquals(expectedMillis, actualMillis);
     }
 }
