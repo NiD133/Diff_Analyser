@@ -1,17 +1,26 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class PatternOptionBuilder_ESTestTest26 extends PatternOptionBuilder_ESTest_scaffolding {
+/**
+ * Tests for {@link PatternOptionBuilder}.
+ */
+public class PatternOptionBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        boolean boolean0 = PatternOptionBuilder.isValueCode('>');
-        assertTrue(boolean0);
+    /**
+     * Tests that isValueCode() correctly identifies the character for a file type.
+     */
+    @Test
+    public void isValueCodeShouldReturnTrueForFileTypeCode() {
+        // In PatternOptionBuilder, special characters denote an option argument's type.
+        // The '>' character is the code for a file (e.g., "f>").
+        final char fileTypeCode = '>';
+
+        // Act: Check if the character is a recognized value code.
+        boolean isCode = PatternOptionBuilder.isValueCode(fileTypeCode);
+
+        // Assert: The method should return true for the file type code.
+        assertTrue("The character '>' should be recognized as a valid value code.", isCode);
     }
 }
