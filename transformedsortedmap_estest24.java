@@ -1,47 +1,38 @@
 package org.apache.commons.collections4.map;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.NoSuchElementException;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import org.junit.Test;
+
+/**
+ * This test suite focuses on the constructor behavior of TransformedSortedMap.
+ * The original test was auto-generated and has been rewritten for clarity.
+ */
+// The original test class name and inheritance are preserved for context.
+// In a real-world scenario, this might be renamed to e.g., TransformedSortedMapConstructorTest.
 public class TransformedSortedMap_ESTestTest24 extends TransformedSortedMap_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        TransformedSortedMap<Object, Integer> transformedSortedMap0 = null;
+    /**
+     * Tests that the TransformedSortedMap constructor throws a NullPointerException
+     * when the decorated map provided is null.
+     */
+    @Test
+    public void constructorShouldThrowNullPointerExceptionWhenMapIsNull() {
         try {
-            transformedSortedMap0 = new TransformedSortedMap<Object, Integer>((SortedMap<Object, Integer>) null, (Transformer<? super Object, ?>) null, (Transformer<? super Integer, ? extends Integer>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // map
-            //
-            verifyException("java.util.Objects", e);
+            // Attempt to create a TransformedSortedMap with a null map argument.
+            // The key and value transformers can be null, but the map itself cannot.
+            new TransformedSortedMap<Object, Object>(null, null, null);
+
+            // If the constructor does not throw an exception, this line will be reached,
+            // and the test should fail to indicate an issue.
+            fail("Expected a NullPointerException to be thrown for a null map.");
+        } catch (final NullPointerException e) {
+            // This block is expected to be executed.
+            // We verify that the exception message clearly indicates that the 'map' parameter was the cause.
+            // This behavior is inherited from the AbstractMapDecorator superclass, which uses
+            // Objects.requireNonNull(map, "map").
+            assertEquals("map", e.getMessage());
         }
     }
 }
