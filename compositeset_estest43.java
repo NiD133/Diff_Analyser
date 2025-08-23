@@ -1,279 +1,104 @@
 package org.apache.commons.collections4.set;
 
+import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
+
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Collections;
 import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class CompositeSet_ESTestTest43 extends CompositeSet_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        CompositeSet<Integer> compositeSet0 = new CompositeSet<Integer>();
-        assertNotNull(compositeSet0);
-        Set<Integer> set0 = compositeSet0.toSet();
-        assertNotNull(set0);
-        assertEquals(0, set0.size());
-        assertTrue(set0.isEmpty());
-        compositeSet0.hashCode();
-        Object[] objectArray0 = compositeSet0.toArray();
-        assertEquals(0, objectArray0.length);
-        assertNotNull(objectArray0);
-        boolean boolean0 = compositeSet0.isEmpty();
-        assertTrue(boolean0);
-        boolean boolean1 = compositeSet0.containsAll(set0);
-        assertEquals(0, set0.size());
-        assertTrue(set0.isEmpty());
-        assertTrue(boolean1 == boolean0);
-        assertTrue(boolean1);
-        Integer[] integerArray0 = new Integer[8];
-        int int0 = 0;
-        Integer integer0 = new Integer(0);
-        assertNotNull(integer0);
-        assertTrue(integer0.equals((Object) int0));
-        assertEquals(0, (int) integer0);
-        integerArray0[0] = integer0;
-        Integer integer1 = new Integer(0);
-        assertNotNull(integer1);
-        assertTrue(integer1.equals((Object) int0));
-        assertTrue(integer1.equals((Object) integer0));
-        assertEquals(0, (int) integer1);
-        integerArray0[1] = integer1;
-        Integer integer2 = new Integer(0);
-        assertNotNull(integer2);
-        assertTrue(integer2.equals((Object) int0));
-        assertTrue(integer2.equals((Object) integer0));
-        assertTrue(integer2.equals((Object) integer1));
-        assertEquals(0, (int) integer2);
-        integerArray0[2] = integer2;
-        Integer integer3 = new Integer(195);
-        assertNotNull(integer3);
-        assertFalse(integer3.equals((Object) integer1));
-        assertFalse(integer3.equals((Object) integer0));
-        assertFalse(integer3.equals((Object) integer2));
-        assertFalse(integer3.equals((Object) int0));
-        assertEquals(195, (int) integer3);
-        integerArray0[3] = integer3;
-        Integer integer4 = new Integer(int0);
-        assertNotNull(integer4);
-        assertFalse(integer4.equals((Object) integer3));
-        assertTrue(integer4.equals((Object) integer0));
-        assertTrue(integer4.equals((Object) integer1));
-        assertTrue(integer4.equals((Object) int0));
-        assertTrue(integer4.equals((Object) integer2));
-        assertEquals(0, (int) integer4);
-        integerArray0[4] = integer4;
-        Integer integer5 = new Integer(195);
-        assertNotNull(integer5);
-        assertFalse(integer5.equals((Object) integer1));
-        assertFalse(integer5.equals((Object) integer0));
-        assertFalse(integer5.equals((Object) integer4));
-        assertTrue(integer5.equals((Object) integer3));
-        assertFalse(integer5.equals((Object) int0));
-        assertFalse(integer5.equals((Object) integer2));
-        assertEquals(195, (int) integer5);
-        integerArray0[5] = integer5;
-        Integer integer6 = new Integer((int) integerArray0[5]);
-        assertEquals(8, integerArray0.length);
-        assertNotNull(integer6);
-        assertFalse(integer6.equals((Object) integer4));
-        assertFalse(integer6.equals((Object) integer2));
-        assertFalse(integer6.equals((Object) integer1));
-        assertTrue(integer6.equals((Object) integer3));
-        assertFalse(integer6.equals((Object) integer0));
-        assertTrue(integer6.equals((Object) integer5));
-        assertFalse(integer6.equals((Object) int0));
-        assertEquals(195, (int) integer6);
-        integerArray0[6] = integer6;
-        Integer integer7 = new Integer(int0);
-        assertNotNull(integer7);
-        assertFalse(integer7.equals((Object) integer6));
-        assertFalse(integer7.equals((Object) integer5));
-        assertTrue(integer7.equals((Object) integer4));
-        assertTrue(integer7.equals((Object) int0));
-        assertFalse(integer7.equals((Object) integer3));
-        assertTrue(integer7.equals((Object) integer1));
-        assertTrue(integer7.equals((Object) integer0));
-        assertTrue(integer7.equals((Object) integer2));
-        assertEquals(0, (int) integer7);
-        integerArray0[7] = integer7;
-        Integer[] integerArray1 = compositeSet0.toArray(integerArray0);
-        assertEquals(8, integerArray0.length);
-        assertEquals(8, integerArray1.length);
-        assertNotNull(integerArray1);
-        assertSame(integerArray0, integerArray1);
-        assertSame(integerArray1, integerArray0);
-        assertFalse(compositeSet0.contains(integer0));
-        boolean boolean2 = compositeSet0.removeAll(set0);
-        assertFalse(compositeSet0.contains(integer0));
-        assertFalse(set0.contains(integer0));
-        assertEquals(0, set0.size());
-        assertTrue(set0.isEmpty());
-        assertFalse(boolean2 == boolean0);
-        assertFalse(boolean2 == boolean1);
-        assertFalse(boolean2);
-        compositeSet0.addComposited(set0, (Set<Integer>) null);
-        assertFalse(compositeSet0.contains(integer0));
-        assertFalse(set0.contains(integer0));
-        assertEquals(0, set0.size());
-        assertTrue(set0.isEmpty());
-        CompositeSet<LinkedHashSet<Integer>> compositeSet1 = new CompositeSet<LinkedHashSet<Integer>>();
-        assertNotNull(compositeSet1);
-        Iterator<LinkedHashSet<Integer>> iterator0 = compositeSet1.iterator();
-        assertNotNull(iterator0);
-        Integer[] integerArray2 = new Integer[6];
-        assertFalse(integerArray2.equals((Object) integerArray0));
-        assertFalse(integerArray2.equals((Object) integerArray1));
-        Integer integer8 = new Integer(3309);
-        assertNotNull(integer8);
-        assertFalse(integer8.equals((Object) integer7));
-        assertFalse(integer8.equals((Object) integer2));
-        assertFalse(integer8.equals((Object) integer0));
-        assertFalse(integer8.equals((Object) integer4));
-        assertFalse(integer8.equals((Object) integer6));
-        assertFalse(integer8.equals((Object) integer1));
-        assertFalse(integer8.equals((Object) integer5));
-        assertFalse(integer8.equals((Object) integer3));
-        assertFalse(integer8.equals((Object) int0));
-        assertEquals(3309, (int) integer8);
-        integerArray2[0] = integer8;
-        Integer integer9 = new Integer((int) integerArray2[0]);
-        assertEquals(6, integerArray2.length);
-        assertNotNull(integer9);
-        assertFalse(integer9.equals((Object) integer5));
-        assertFalse(integer9.equals((Object) integer0));
-        assertFalse(integer9.equals((Object) integer4));
-        assertFalse(integer9.equals((Object) integer6));
-        assertFalse(integer9.equals((Object) integer1));
-        assertFalse(integer9.equals((Object) integer2));
-        assertFalse(integer9.equals((Object) int0));
-        assertFalse(integer9.equals((Object) integer3));
-        assertTrue(integer9.equals((Object) integer8));
-        assertFalse(integer9.equals((Object) integer7));
-        assertFalse(integerArray2.equals((Object) integerArray0));
-        assertFalse(integerArray2.equals((Object) integerArray1));
-        assertEquals(3309, (int) integer9);
-        integerArray2[1] = integer9;
-        Integer integer10 = new Integer(3392);
-        assertNotNull(integer10);
-        assertFalse(integer10.equals((Object) integer3));
-        assertFalse(integer10.equals((Object) integer9));
-        assertFalse(integer10.equals((Object) integer1));
-        assertFalse(integer10.equals((Object) int0));
-        assertFalse(integer10.equals((Object) integer5));
-        assertFalse(integer10.equals((Object) integer8));
-        assertFalse(integer10.equals((Object) integer4));
-        assertFalse(integer10.equals((Object) integer2));
-        assertFalse(integer10.equals((Object) integer6));
-        assertFalse(integer10.equals((Object) integer7));
-        assertFalse(integer10.equals((Object) integer0));
-        assertEquals(3392, (int) integer10);
-        integerArray2[2] = integer10;
-        Integer integer11 = new Integer(3309);
-        assertNotNull(integer11);
-        assertFalse(integer11.equals((Object) integer10));
-        assertTrue(integer11.equals((Object) integer8));
-        assertFalse(integer11.equals((Object) integer7));
-        assertFalse(integer11.equals((Object) integer4));
-        assertFalse(integer11.equals((Object) int0));
-        assertFalse(integer11.equals((Object) integer5));
-        assertFalse(integer11.equals((Object) integer6));
-        assertFalse(integer11.equals((Object) integer1));
-        assertFalse(integer11.equals((Object) integer0));
-        assertFalse(integer11.equals((Object) integer2));
-        assertFalse(integer11.equals((Object) integer3));
-        assertTrue(integer11.equals((Object) integer9));
-        assertEquals(3309, (int) integer11);
-        integerArray2[3] = integer11;
-        Integer integer12 = new Integer(883);
-        assertNotNull(integer12);
-        assertFalse(integer12.equals((Object) integer8));
-        assertFalse(integer12.equals((Object) integer5));
-        assertFalse(integer12.equals((Object) integer11));
-        assertFalse(integer12.equals((Object) integer3));
-        assertFalse(integer12.equals((Object) integer9));
-        assertFalse(integer12.equals((Object) integer2));
-        assertFalse(integer12.equals((Object) integer10));
-        assertFalse(integer12.equals((Object) int0));
-        assertFalse(integer12.equals((Object) integer1));
-        assertFalse(integer12.equals((Object) integer4));
-        assertFalse(integer12.equals((Object) integer7));
-        assertFalse(integer12.equals((Object) integer0));
-        assertFalse(integer12.equals((Object) integer6));
-        assertEquals(883, (int) integer12);
-        integerArray2[4] = integer12;
-        Integer integer13 = new Integer(1565);
-        assertNotNull(integer13);
-        assertFalse(integer13.equals((Object) integer3));
-        assertFalse(integer13.equals((Object) integer9));
-        assertFalse(integer13.equals((Object) integer11));
-        assertFalse(integer13.equals((Object) integer8));
-        assertFalse(integer13.equals((Object) integer6));
-        assertFalse(integer13.equals((Object) integer2));
-        assertFalse(integer13.equals((Object) integer10));
-        assertFalse(integer13.equals((Object) integer5));
-        assertFalse(integer13.equals((Object) int0));
-        assertFalse(integer13.equals((Object) integer12));
-        assertFalse(integer13.equals((Object) integer1));
-        assertFalse(integer13.equals((Object) integer4));
-        assertFalse(integer13.equals((Object) integer0));
-        assertFalse(integer13.equals((Object) integer7));
-        assertEquals(1565, (int) integer13);
-        integerArray2[5] = integer13;
-        Integer[] integerArray3 = compositeSet1.toArray(integerArray2);
-        assertEquals(6, integerArray3.length);
-        assertEquals(6, integerArray2.length);
-        assertNotNull(integerArray3);
-        assertSame(integerArray3, integerArray2);
-        assertNotSame(integerArray3, integerArray0);
-        assertNotSame(integerArray3, integerArray1);
-        assertSame(integerArray2, integerArray3);
-        assertNotSame(integerArray2, integerArray0);
-        assertNotSame(integerArray2, integerArray1);
-        assertFalse(integerArray3.equals((Object) integerArray0));
-        assertFalse(integerArray3.equals((Object) integerArray1));
-        assertFalse(integerArray2.equals((Object) integerArray0));
-        assertFalse(integerArray2.equals((Object) integerArray1));
-        int int1 = compositeSet1.hashCode();
-        assertTrue(int1 == int0);
+/**
+ * This test suite focuses on the behavior of an empty CompositeSet.
+ * It replaces a single, complex auto-generated test with a series of focused,
+ * easy-to-understand test cases.
+ */
+public class CompositeSetEmptySetBehaviorTest {
+
+    private CompositeSet<Integer> emptyCompositeSet;
+
+    @Before
+    public void setUp() {
+        // Arrange: Create a new, empty CompositeSet before each test.
+        emptyCompositeSet = new CompositeSet<>();
+    }
+
+
+
+    @Test
+    public void shouldBeEmptyAndHaveSizeZeroWhenCreated() {
+        // Assert: A newly created CompositeSet should be empty.
+        assertTrue("A new CompositeSet should be empty", emptyCompositeSet.isEmpty());
+        assertEquals("A new CompositeSet should have size 0", 0, emptyCompositeSet.size());
+    }
+
+    @Test
+    public void toSetOnEmptySetShouldReturnEmptySet() {
+        // Act: Convert the empty CompositeSet to a standard Set.
+        Set<Integer> resultSet = emptyCompositeSet.toSet();
+
+        // Assert: The resulting set should also be empty.
+        assertNotNull("toSet() should not return null", resultSet);
+        assertTrue("The returned set should be empty", resultSet.isEmpty());
+    }
+
+    @Test
+    public void toArrayOnEmptySetShouldReturnEmptyArray() {
+        // Act: Convert the empty CompositeSet to an object array.
+        Object[] resultArray = emptyCompositeSet.toArray();
+
+        // Assert: The resulting array should be empty.
+        assertNotNull("toArray() should not return null", resultArray);
+        assertEquals("The returned array should be empty", 0, resultArray.length);
+    }
+
+    @Test
+    public void toArrayWithSizedArgumentOnEmptySetShouldReturnSameArrayWithFirstElementNull() {
+        // Arrange: Create a pre-allocated array with existing elements.
+        Integer[] preallocatedArray = {1, 2, 3};
+
+        // Act: Call toArray with the pre-allocated array.
+        Integer[] resultArray = emptyCompositeSet.toArray(preallocatedArray);
+
+        // Assert: The method should return the same array instance, with the element
+        // at index 0 set to null, as per the Collection.toArray(T[]) contract.
+        assertSame("Should return the same array instance", preallocatedArray, resultArray);
+        assertNull("The element at index 0 should be set to null", resultArray[0]);
+        assertEquals("The element at index 1 should be unchanged", Integer.valueOf(2), resultArray[1]);
+        assertEquals("The element at index 2 should be unchanged", Integer.valueOf(3), resultArray[2]);
+    }
+
+    @Test
+    public void containsAllWithEmptyCollectionShouldReturnTrue() {
+        // Arrange: An empty collection to check against.
+        Collection<Integer> emptyCollection = Collections.emptyList();
+
+        // Act & Assert: An empty set is considered to contain all elements of another empty collection.
+        assertTrue("containsAll with an empty collection should return true",
+                   emptyCompositeSet.containsAll(emptyCollection));
+    }
+
+    @Test
+    public void removeAllWithEmptyCollectionShouldReturnFalse() {
+        // Arrange: An empty collection to remove.
+        Collection<Integer> emptyCollection = Collections.emptyList();
+
+        // Act: Attempt to remove the elements of the empty collection.
+        boolean wasModified = emptyCompositeSet.removeAll(emptyCollection);
+
+        // Assert: The set was not modified, so the method should return false.
+        assertFalse("removeAll with an empty collection should return false as the set is not modified", wasModified);
+    }
+
+    @Test
+    public void hashCodeOnEmptySetShouldReturnZero() {
+        // Act & Assert: The hashCode of an empty set is defined to be 0.
+        assertEquals("The hashCode of an empty CompositeSet should be 0", 0, emptyCompositeSet.hashCode());
     }
 }
