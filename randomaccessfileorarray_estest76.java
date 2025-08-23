@@ -1,39 +1,28 @@
 package com.itextpdf.text.pdf;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
 import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.io.IOException;
+
+/**
+ * This test class contains tests for the {@link RandomAccessFileOrArray} class.
+ * This specific test focuses on its behavior when initialized with a null source.
+ */
 public class RandomAccessFileOrArray_ESTestTest76 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test075() throws Throwable {
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray((RandomAccessSource) null);
-        // Undeclared exception!
-        try {
-            randomAccessFileOrArray0.readLong();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling readLong() on an instance created with a null RandomAccessSource
+     * throws a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class, timeout = 4000)
+    public void readLongThrowsNullPointerExceptionWhenSourceIsNull() throws IOException {
+        // Arrange: Create an instance of RandomAccessFileOrArray with a null underlying source.
+        // The cast is necessary to resolve constructor ambiguity.
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray((RandomAccessSource) null);
+
+        // Act & Assert: Attempting to read from the null source should immediately throw a NullPointerException.
+        // The @Test(expected=...) annotation handles the assertion.
+        fileOrArray.readLong();
     }
 }
