@@ -1,29 +1,38 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class LinkedTreeMap_ESTestTest31 extends LinkedTreeMap_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        Integer integer0 = new Integer((-2139));
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>();
-        LinkedTreeMap.Node<Integer, Integer> linkedTreeMap_Node0 = linkedTreeMap0.find(integer0, true);
-        LinkedTreeMap.EntrySet linkedTreeMap_EntrySet0 = linkedTreeMap0.new EntrySet();
-        boolean boolean0 = linkedTreeMap_EntrySet0.remove(linkedTreeMap_Node0);
-        assertEquals(0, linkedTreeMap_EntrySet0.size());
-        assertTrue(boolean0);
+    /**
+     * Tests that removing an existing entry via the EntrySet view succeeds.
+     *
+     * <p>When an entry that is present in the map is passed to {@code entrySet.remove()},
+     * the method should return true, and the entry should be removed from the map.
+     */
+    @Test
+    public void entrySetRemove_whenEntryExists_shouldRemoveEntryAndReturnTrue() {
+        // Arrange
+        LinkedTreeMap<Integer, Integer> map = new LinkedTreeMap<>();
+        map.put(1, 100); // Add an entry to the map.
+
+        // To test remove(Object), we must pass the exact Entry object from the map.
+        // The most reliable way to get it is from the entry set itself.
+        Map.Entry<Integer, Integer> entryToRemove = map.entrySet().iterator().next();
+        Set<Map.Entry<Integer, Integer>> entrySet = map.entrySet();
+
+        assertEquals("Precondition: map should contain one entry before removal.", 1, map.size());
+
+        // Act
+        boolean wasRemoved = entrySet.remove(entryToRemove);
+
+        // Assert
+        assertTrue("remove() should return true for an existing entry.", wasRemoved);
+        assertTrue("Map should be empty after removing its only entry.", map.isEmpty());
+        assertEquals("Entry set size should be 0 after removal.", 0, entrySet.size());
     }
 }
