@@ -1,25 +1,34 @@
 package org.apache.commons.io.file.attribute;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
+import static org.junit.Assert.assertEquals;
+
 import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FileTimes_ESTestTest8 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for {@link FileTimes}.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        Instant instant0 = MockInstant.ofEpochMilli((-1978L));
-        long long0 = FileTimes.toNtfsTime(instant0);
-        assertEquals(116444735980220000L, long0);
+    @Test
+    public void toNtfsTimeShouldCorrectlyConvertPreEpochInstant() {
+        // Arrange
+        // An Instant representing a time just before the Unix epoch (1970-01-01T00:00:00Z).
+        final long millisBeforeEpoch = -1978L;
+        final Instant preEpochInstant = Instant.ofEpochMilli(millisBeforeEpoch);
+
+        // The expected NTFS time is calculated by taking the NTFS time for the Unix epoch
+        // and subtracting the duration before the epoch, converted to 100-nanosecond intervals.
+        // Note: UNIX_TO_NTFS_OFFSET is negative, so we use its negation to get the epoch offset.
+        final long unixEpochAsNtfs = -FileTimes.UNIX_TO_NTFS_OFFSET;
+        final long offsetIn100Nanos = millisBeforeEpoch * FileTimes.HUNDRED_NANOS_PER_MILLISECOND;
+        final long expectedNtfsTime = unixEpochAsNtfs + offsetIn100Nanos;
+
+        // Act
+        final long actualNtfsTime = FileTimes.toNtfsTime(preEpochInstant);
+
+        // Assert
+        assertEquals("The NTFS time for an instant before the Unix epoch should be calculated correctly.",
+                     expectedNtfsTime, actualNtfsTime);
     }
 }
