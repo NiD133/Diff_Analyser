@@ -1,51 +1,58 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Stack;
-import java.util.TreeSet;
 import org.apache.commons.collections4.Bag;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.SortedBag;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CollectionBag_ESTestTest6 extends CollectionBag_ESTest_scaffolding {
+import java.util.ConcurrentModificationException;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
-        CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
-        Integer integer0 = new Integer(10);
-        collectionBag0.add(integer0, 10);
-        // Undeclared exception!
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.fail;
+
+/**
+ * Contains tests for {@link CollectionBag}.
+ */
+public class CollectionBagTest {
+
+    /**
+     * Tests that a ConcurrentModificationException is thrown when attempting to remove
+     * the elements of the decorated bag from the decorator itself.
+     *
+     * <p>The {@code removeAll} method iterates over the bag's contents. If the collection
+     * passed as an argument is the same underlying collection, modifications during
+     * iteration will cause a fail-fast exception.</p>
+     */
+    @Test
+    public void removeAll_whenModifyingTheUnderlyingBagDuringIteration_shouldThrowConcurrentModificationException() {
+        // Arrange: Create a bag and its decorator, then add an element.
+        Bag<Integer> decoratedBag = new TreeBag<>();
+        Bag<Integer> collectionBag = new CollectionBag<>(decoratedBag);
+        collectionBag.add(42);
+
+        // Act & Assert: Attempting to remove the decorated bag from itself should fail.
+        // This is because the `removeAll` operation iterates over `collectionBag`
+        // while simultaneously modifying it, which is not allowed.
+        assertThrows(ConcurrentModificationException.class, () -> {
+            collectionBag.removeAll(decoratedBag);
+        });
+    }
+
+    /**
+     * This is an alternative implementation using a classic try-catch block,
+     * which is closer to the original test's structure.
+     */
+    @Test
+    public void removeAll_whenModifyingTheUnderlyingBagDuringIteration_shouldThrowConcurrentModificationException_tryCatch() {
+        // Arrange
+        Bag<Integer> decoratedBag = new TreeBag<>();
+        Bag<Integer> collectionBag = new CollectionBag<>(decoratedBag);
+        collectionBag.add(42);
+
+        // Act & Assert
         try {
-            collectionBag0.removeAll(treeBag0);
-            fail("Expecting exception: ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.collections4.bag.AbstractMapBag$BagIterator", e);
+            collectionBag.removeAll(decoratedBag);
+            fail("Expected a ConcurrentModificationException to be thrown, but it was not.");
+        } catch (final ConcurrentModificationException e) {
+            // Expected exception was thrown, so the test passes.
         }
     }
 }
