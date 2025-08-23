@@ -1,34 +1,49 @@
 package org.jfree.chart.renderer.xy;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class StandardXYBarPainter_ESTestTest9 extends StandardXYBarPainter_ESTest_scaffolding {
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        StandardXYBarPainter standardXYBarPainter0 = new StandardXYBarPainter();
-        Arc2D.Float arc2D_Float0 = new Arc2D.Float(1);
-        BufferedImage bufferedImage0 = new BufferedImage(37, 1, 1);
-        Graphics2D graphics2D0 = bufferedImage0.createGraphics();
-        StackedXYBarRenderer stackedXYBarRenderer0 = new StackedXYBarRenderer(0.0F);
-        RectangleEdge rectangleEdge0 = RectangleEdge.TOP;
-        standardXYBarPainter0.paintBar(graphics2D0, stackedXYBarRenderer0, 1970, 0, arc2D_Float0, rectangleEdge0);
-        assertEquals(0.0F, arc2D_Float0.width, 0.01F);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Unit tests for the {@link StandardXYBarPainter} class.
+ */
+public class StandardXYBarPainterTest {
+
+    /**
+     * Verifies that the paintBar() method does not modify the dimensions of the
+     * bar shape it is given, particularly when the bar has zero size. This
+     * ensures the method has no unexpected side effects on its input parameters.
+     */
+    @Test
+    public void paintBarWithZeroSizedBarShouldNotAlterBarDimensions() {
+        // Arrange
+        StandardXYBarPainter painter = new StandardXYBarPainter();
+        XYBarRenderer renderer = new StackedXYBarRenderer();
+
+        // Create a mock graphics context for the painting operation
+        BufferedImage image = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = image.createGraphics();
+
+        // Create a bar with zero width and height
+        Rectangle2D.Double zeroSizedBar = new Rectangle2D.Double(0, 0, 0, 0);
+        RectangleEdge barBase = RectangleEdge.TOP;
+        
+        final int row = 0;
+        final int column = 0;
+
+        // Act
+        // Attempt to paint the zero-sized bar. The primary goal is to ensure this
+        // call completes without errors and doesn't change the bar's state.
+        painter.paintBar(graphics, renderer, row, column, zeroSizedBar, barBase);
+
+        // Assert
+        // Confirm that the dimensions of the bar object remain unchanged.
+        assertEquals("Bar width should not be modified after painting.", 0.0, zeroSizedBar.getWidth(), 0.0);
+        assertEquals("Bar height should not be modified after painting.", 0.0, zeroSizedBar.getHeight(), 0.0);
     }
 }
