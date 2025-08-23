@@ -1,78 +1,72 @@
 package org.apache.commons.io.function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import java.io.ByteArrayInputStream;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
-import org.apache.commons.io.input.BrokenInputStream;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class UncheckTestTest4 {
-
-    private static final byte[] BYTES = { 'a', 'b' };
-
-    private static final String CAUSE_MESSAGE = "CauseMessage";
-
-    private static final String CUSTOM_MESSAGE = "Custom message";
-
-    private AtomicInteger atomicInt;
-
-    private AtomicLong atomicLong;
-
-    private AtomicBoolean atomicBoolean;
+/**
+ * Tests for {@link Uncheck#accept(IOTriConsumer, Object, Object, Object)}.
+ */
+class UncheckAcceptTriConsumerTest {
 
     private AtomicReference<String> ref1;
-
     private AtomicReference<String> ref2;
-
     private AtomicReference<String> ref3;
 
-    private AtomicReference<String> ref4;
-
-    private void assertUncheckedIOException(final IOException expected, final UncheckedIOException e) {
-        assertEquals(CUSTOM_MESSAGE, e.getMessage());
-        final IOException cause = e.getCause();
-        assertEquals(expected.getClass(), cause.getClass());
-        assertEquals(CAUSE_MESSAGE, cause.getMessage());
-    }
-
     @BeforeEach
-    public void beforeEach() {
+    void setUp() {
         ref1 = new AtomicReference<>();
         ref2 = new AtomicReference<>();
         ref3 = new AtomicReference<>();
-        ref4 = new AtomicReference<>();
-        atomicInt = new AtomicInteger();
-        atomicLong = new AtomicLong();
-        atomicBoolean = new AtomicBoolean();
-    }
-
-    private ByteArrayInputStream newInputStream() {
-        return new ByteArrayInputStream(BYTES);
     }
 
     @Test
-    void testAcceptIOTriConsumerOfTUVTUV() {
-        assertThrows(UncheckedIOException.class, () -> Uncheck.accept((t, u, v) -> {
-            throw new IOException();
-        }, null, null, null));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.accept(TestConstants.THROWING_IO_TRI_CONSUMER, null, null, null));
+    @DisplayName("Should invoke the IOTriConsumer with the correct arguments when no exception is thrown")
+    void shouldInvokeConsumerWithCorrectArguments() {
+        // Arrange
+        final String arg1 = "value1";
+        final String arg2 = "value2";
+        final String arg3 = "value3";
+
+        // Act: Call Uncheck.accept with a consumer that captures its arguments.
         Uncheck.accept((t, u, v) -> {
-            TestUtils.compareAndSetThrowsIO(ref1, t);
-            TestUtils.compareAndSetThrowsIO(ref2, u);
-            TestUtils.compareAndSetThrowsIO(ref3, v);
-        }, "new1", "new2", "new3");
-        assertEquals("new1", ref1.get());
-        assertEquals("new2", ref2.get());
-        assertEquals("new3", ref3.get());
+            ref1.set(t);
+            ref2.set(u);
+            ref3.set(v);
+        }, arg1, arg2, arg3);
+
+        // Assert: Verify that the consumer was called with the expected arguments.
+        assertEquals(arg1, ref1.get());
+        assertEquals(arg2, ref2.get());
+        assertEquals(arg3, ref3.get());
+    }
+
+    @Test
+    @DisplayName("Should wrap a thrown IOException in an UncheckedIOException")
+    void shouldWrapIOExceptionInUncheckedIOException() {
+        // Arrange: A consumer that always throws a specific IOException.
+        final String exceptionMessage = "Test I/O failure";
+        final IOTriConsumer<Object, Object, Object> throwingConsumer = (t, u, v) -> {
+            throw new IOException(exceptionMessage);
+        };
+
+        // Act & Assert: Verify that UncheckedIOException is thrown.
+        final UncheckedIOException thrown = assertThrows(UncheckedIOException.class, () -> {
+            Uncheck.accept(throwingConsumer, "any", "any", "any");
+        });
+
+        // Assert: Verify the cause of the thrown exception is the original IOException.
+        final Throwable cause = thrown.getCause();
+        assertNotNull(cause, "The UncheckedIOException should have a cause.");
+        assertInstanceOf(IOException.class, cause);
+        assertEquals(exceptionMessage, cause.getMessage());
     }
 }
