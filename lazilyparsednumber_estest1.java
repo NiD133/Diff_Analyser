@@ -1,17 +1,26 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LazilyParsedNumber_ESTestTest1 extends LazilyParsedNumber_ESTest_scaffolding {
+/**
+ * Tests for {@link LazilyParsedNumber}.
+ */
+public class LazilyParsedNumberTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        LazilyParsedNumber lazilyParsedNumber0 = new LazilyParsedNumber("Deserialization is unsupported");
-        lazilyParsedNumber0.hashCode();
+    /**
+     * Verifies that hashCode() does not attempt to parse the underlying string value.
+     * Instead, it should simply delegate to the String's hashCode() method.
+     * This is tested with a string that is not a valid number to ensure
+     * no NumberFormatException is thrown and the behavior is correct.
+     */
+    @Test
+    public void hashCode_shouldDelegateToStringHashCode() {
+        String nonNumericValue = "this-is-not-a-number";
+        LazilyParsedNumber lazyNumber = new LazilyParsedNumber(nonNumericValue);
+
+        // The hashCode of the LazilyParsedNumber should be identical to the
+        // hashCode of the underlying string it was constructed with.
+        assertEquals(nonNumericValue.hashCode(), lazyNumber.hashCode());
     }
 }
