@@ -1,33 +1,47 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
 import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+// The test class name is kept for context, but in a real scenario,
+// it would be renamed to something like LinkedTreeMapTest.
 public class LinkedTreeMap_ESTestTest9 extends LinkedTreeMap_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>();
-        Comparator<Object> comparator0 = (Comparator<Object>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        doReturn(0).when(comparator0).compare(any(), any());
-        LinkedTreeMap<LinkedTreeMap<Integer, Object>, Object> linkedTreeMap1 = new LinkedTreeMap<LinkedTreeMap<Integer, Object>, Object>(comparator0, false);
-        LinkedTreeMap<Integer, Object> linkedTreeMap2 = new LinkedTreeMap<Integer, Object>();
-        Comparator<Object> comparator1 = (Comparator<Object>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        LinkedTreeMap<Object, Integer> linkedTreeMap3 = new LinkedTreeMap<Object, Integer>(comparator1, true);
-        BiFunction<Object, Object, Integer> biFunction0 = (BiFunction<Object, Object, Integer>) mock(BiFunction.class, new ViolatedAssumptionAnswer());
-        linkedTreeMap1.merge(linkedTreeMap2, linkedTreeMap3, biFunction0);
-        linkedTreeMap1.put(linkedTreeMap2, linkedTreeMap0);
-        assertEquals(1, linkedTreeMap1.size());
+    /**
+     * Tests that when a custom comparator considers two different key objects to be equal,
+     * a `put` operation for the second key overwrites the value of the first,
+     * rather than creating a new entry.
+     */
+    @Test
+    public void put_withKeysConsideredEqualByComparator_replacesExistingValue() {
+        // Arrange: Create a comparator that treats all keys as equal.
+        @SuppressWarnings("unchecked")
+        Comparator<Object> alwaysEqualComparator = mock(Comparator.class);
+        when(alwaysEqualComparator.compare(any(), any())).thenReturn(0);
+
+        // Arrange: Initialize the map with the custom comparator.
+        LinkedTreeMap<String, String> map = new LinkedTreeMap<>(alwaysEqualComparator, true);
+
+        String key1 = "first_key";
+        String value1 = "first_value";
+        String key2 = "second_key"; // A different object, but "equal" per the comparator.
+        String value2 = "second_value";
+
+        // Act: Insert the first entry, then insert a second entry whose key is
+        // considered a duplicate by the comparator.
+        map.put(key1, value1);
+        map.put(key2, value2);
+
+        // Assert: The map size should be 1 because the second put replaced the first.
+        assertEquals(1, map.size());
+
+        // Assert: The value in the map should be the one from the second put operation.
+        // We can use either key to retrieve it, as the comparator drives lookups.
+        assertEquals(value2, map.get(key1));
+        assertEquals(value2, map.get(key2));
     }
 }
