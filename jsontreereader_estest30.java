@@ -1,34 +1,26 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
+import org.junit.Test;
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeReader_ESTestTest30 extends JsonTreeReader_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonTreeReader}, focusing on its behavior with invalid or edge-case inputs.
+ */
+public class JsonTreeReaderTest {
 
-    @Test(timeout = 4000)
-    public void test029() throws Throwable {
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader((JsonElement) null);
-        // Undeclared exception!
-        try {
-            jsonTreeReader0.nextDouble();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that attempting to read a double from a {@code JsonTreeReader}
+     * initialized with a {@code null} {@link JsonElement} results in a {@link NullPointerException}.
+     * This tests the reader's handling of an invalid initial state where no element is provided.
+     */
+    @Test(expected = NullPointerException.class)
+    public void nextDouble_whenReaderInitializedWithNull_shouldThrowNullPointerException() throws IOException {
+        // Arrange: Create a reader with a null JsonElement, representing an invalid state.
+        JsonTreeReader reader = new JsonTreeReader(null);
+
+        // Act & Assert: Attempting to read a double should throw a NullPointerException.
+        // The assertion is handled by the `expected` parameter of the @Test annotation.
+        reader.nextDouble();
     }
 }
