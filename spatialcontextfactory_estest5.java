@@ -1,26 +1,40 @@
 package org.locationtech.spatial4j.context;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.util.HashMap;
 import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.io.PolyshapeReader;
-import org.locationtech.spatial4j.shape.ShapeFactory;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class SpatialContextFactory_ESTestTest5 extends SpatialContextFactory_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SpatialContextFactory} class.
+ */
+public class SpatialContextFactoryTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        HashMap<String, String> hashMap0 = new HashMap<String, String>();
-        spatialContextFactory0.init(hashMap0, (ClassLoader) null);
-        spatialContextFactory0.initFormats();
-        assertFalse(spatialContextFactory0.hasFormatConfig);
-        assertTrue(spatialContextFactory0.geo);
-        assertFalse(spatialContextFactory0.normWrapLongitude);
+    /**
+     * Verifies that calling {@link SpatialContextFactory#initFormats()} with an
+     * empty configuration does not set the {@code hasFormatConfig} flag.
+     */
+    @Test
+    public void initFormats_withEmptyConfiguration_shouldNotSetHasFormatConfigFlag() {
+        // Arrange: Create a factory and initialize it with an empty configuration map.
+        SpatialContextFactory factory = new SpatialContextFactory();
+        Map<String, String> emptyArgs = new HashMap<>();
+        factory.init(emptyArgs, null);
+
+        // Act: Call the method responsible for initializing shape formats.
+        factory.initFormats();
+
+        // Assert: Verify that the hasFormatConfig flag is false, as no format
+        // configuration (e.g., 'readers' or 'writers') was provided.
+        assertFalse(
+            "hasFormatConfig should be false when no format keys are in the arguments",
+            factory.hasFormatConfig
+        );
+
+        // Also, confirm that other properties retain their default values, ensuring
+        // that initFormats() has no unintended side effects.
+        assertTrue("The 'geo' property should retain its default value of true", factory.geo);
+        assertFalse("The 'normWrapLongitude' property should retain its default value of false", factory.normWrapLongitude);
     }
 }
