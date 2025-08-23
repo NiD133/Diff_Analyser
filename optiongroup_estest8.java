@@ -1,23 +1,37 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class OptionGroup_ESTestTest8 extends OptionGroup_ESTest_scaffolding {
+/**
+ * Tests for the {@link OptionGroup} class, focusing on its string representation.
+ */
+public class OptionGroupToStringTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        OptionGroup optionGroup0 = new OptionGroup();
-        Option option0 = new Option((String) null, (String) null);
-        OptionGroup optionGroup1 = optionGroup0.addOption(option0);
-        Option option1 = new Option("vN", "", false, "");
-        optionGroup1.addOption(option1);
-        String string0 = optionGroup0.toString();
-        assertEquals("[--null, -vN ]", string0);
+    /**
+     * Verifies that the toString() method correctly formats a string representation
+     * of all the options contained within the group.
+     */
+    @Test
+    public void toStringShouldReturnFormattedStringOfAllOptions() {
+        // Arrange
+        // An option with a null long name is represented as "--null".
+        Option optionWithNullLongName = new Option(null, "description for null option");
+
+        // An option with only a short name is represented as "-<shortName>".
+        Option optionWithOnlyShortName = new Option("vN", false, "description for short option");
+
+        OptionGroup optionGroup = new OptionGroup();
+        optionGroup.addOption(optionWithNullLongName);
+        optionGroup.addOption(optionWithOnlyShortName);
+
+        String expectedString = "[--null, -vN ]";
+
+        // Act
+        String actualString = optionGroup.toString();
+
+        // Assert
+        assertEquals("The string representation of the option group is incorrect.",
+                expectedString, actualString);
     }
 }
