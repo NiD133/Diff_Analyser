@@ -1,42 +1,28 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedOutputStream;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
+
 import java.nio.CharBuffer;
 import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class HexDump_ESTestTest6 extends HexDump_ESTest_scaffolding {
+/**
+ * Tests for the {@link HexDump} class, focusing on exception scenarios.
+ */
+public class HexDumpTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        byte[] byteArray0 = new byte[12];
-        CharBuffer charBuffer0 = CharBuffer.wrap((CharSequence) "\n");
-        // Undeclared exception!
-        try {
-            HexDump.dump(byteArray0, (long) 5, (Appendable) charBuffer0, 5, 6);
-            fail("Expecting exception: ReadOnlyBufferException");
-        } catch (ReadOnlyBufferException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.CharBuffer", e);
-        }
+    /**
+     * Tests that HexDump.dump() throws a ReadOnlyBufferException when attempting to write
+     * to an Appendable that is a read-only buffer.
+     */
+    @Test(expected = ReadOnlyBufferException.class)
+    public void testDumpThrowsExceptionWhenTargetBufferIsReadOnly() {
+        // Arrange: Create a sample byte array and a read-only buffer.
+        // CharBuffer.wrap(CharSequence) is documented to create a read-only buffer.
+        byte[] dataToDump = new byte[16];
+        Appendable readOnlyBuffer = CharBuffer.wrap("read-only");
+
+        // Act & Assert: Attempting to dump data into the read-only buffer
+        // should throw a ReadOnlyBufferException.
+        HexDump.dump(dataToDump, 0L, readOnlyBuffer, 0, dataToDump.length);
     }
 }
