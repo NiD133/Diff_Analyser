@@ -1,32 +1,35 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.Chunk;
-import com.itextpdf.text.GreekList;
-import com.itextpdf.text.TabSettings;
-import java.util.ArrayList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class DefaultSplitCharacter_ESTestTest8 extends DefaultSplitCharacter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultSplitCharacter} class.
+ */
+public class DefaultSplitCharacterTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        DefaultSplitCharacter defaultSplitCharacter0 = new DefaultSplitCharacter();
-        char[] charArray0 = new char[0];
-        PdfChunk[] pdfChunkArray0 = new PdfChunk[0];
-        // Undeclared exception!
-        try {
-            defaultSplitCharacter0.isSplitCharacter((-1743), (-1743), (-1743), charArray0, pdfChunkArray0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // -1743
-            //
-            verifyException("com.itextpdf.text.pdf.DefaultSplitCharacter", e);
-        }
+    /**
+     * Verifies that isSplitCharacter() throws an ArrayIndexOutOfBoundsException
+     * when the 'current' index parameter is negative.
+     * <p>
+     * The method internally attempts to access the character array at the 'current' index,
+     * which is an invalid operation for a negative value.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void isSplitCharacter_shouldThrowException_whenCurrentIndexIsNegative() {
+        // Arrange: Create an instance of the class under test and prepare arguments.
+        DefaultSplitCharacter splitCharacter = new DefaultSplitCharacter();
+        char[] emptyCharArray = new char[0];
+        PdfChunk[] emptyChunkArray = new PdfChunk[0];
+        
+        int negativeIndex = -1;
+        int anyStartIndex = 0;
+        int anyEndIndex = 0;
+
+        // Act: Call the method with a negative 'current' index.
+        // This is expected to throw the exception.
+        splitCharacter.isSplitCharacter(anyStartIndex, negativeIndex, anyEndIndex, emptyCharArray, emptyChunkArray);
+
+        // Assert: The @Test(expected) annotation handles the exception verification.
+        // If the expected exception is not thrown, the test will fail.
     }
 }
