@@ -1,26 +1,46 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+import java.util.Collections;
+import java.util.Set;
+
+import static org.junit.Assert.assertTrue;
+
+// The original class name and inheritance are kept to maintain potential test suite integrity.
 public class JsonIgnoreProperties_ESTestTest42 extends JsonIgnoreProperties_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        LinkedHashSet<String> linkedHashSet0 = new LinkedHashSet<String>();
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = new JsonIgnoreProperties.Value(linkedHashSet0, true, true, true, true);
-        jsonIgnoreProperties_Value0.findIgnoredForSerialization();
-        assertTrue(jsonIgnoreProperties_Value0.getAllowGetters());
-        assertTrue(jsonIgnoreProperties_Value0.getAllowSetters());
-        assertTrue(jsonIgnoreProperties_Value0.getMerge());
-        assertTrue(jsonIgnoreProperties_Value0.getIgnoreUnknown());
+    /**
+     * Tests that `findIgnoredForSerialization()` returns an empty set when `allowGetters` is true.
+     * This behavior is documented to effectively disable serialization-time ignores for the
+     * specified properties, which is useful for read-only properties.
+     */
+    @Test
+    public void findIgnoredForSerializationShouldReturnEmptySetWhenAllowGettersIsTrue() {
+        // Arrange
+        // According to its Javadoc, findIgnoredForSerialization() should return an empty set
+        // if getAllowGetters() is true, regardless of the actual ignored properties.
+        // We use a non-empty set here to ensure the logic correctly overrides the list.
+        Set<String> ignoredProperties = Collections.singleton("internalId");
+
+        // Create a Value instance with a property to ignore, but with allowGetters enabled.
+        // Constructor signature: Value(ignored, ignoreUnknown, allowGetters, allowSetters, merge)
+        JsonIgnoreProperties.Value value = new JsonIgnoreProperties.Value(
+                ignoredProperties,
+                false, // ignoreUnknown
+                true,  // allowGetters - this is the key flag for this test
+                false, // allowSetters
+                false  // merge
+        );
+
+        // Act
+        Set<String> result = value.findIgnoredForSerialization();
+
+        // Assert
+        // The returned set must be empty because allowGetters is true.
+        assertTrue(
+            "The set of properties ignored for serialization should be empty when allowGetters is true.",
+            result.isEmpty()
+        );
     }
 }
