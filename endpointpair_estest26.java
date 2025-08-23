@@ -1,21 +1,24 @@
 package com.google.common.graph;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.common.collect.UnmodifiableIterator;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class EndpointPair_ESTestTest26 extends EndpointPair_ESTest_scaffolding {
+/**
+ * Tests for {@link EndpointPair}.
+ */
+public class EndpointPairTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        Locale.Category locale_Category0 = Locale.Category.DISPLAY;
-        EndpointPair<Locale.Category> endpointPair0 = EndpointPair.unordered(locale_Category0, locale_Category0);
-        Locale.Category locale_Category1 = endpointPair0.adjacentNode(locale_Category0);
-        assertEquals(Locale.Category.DISPLAY, locale_Category1);
+    @Test
+    public void adjacentNode_onUnorderedSelfLoop_returnsNodeItself() {
+        // Arrange: Create an unordered endpoint pair representing a self-loop edge from "A" to "A".
+        String node = "A";
+        EndpointPair<String> selfLoopPair = EndpointPair.unordered(node, node);
+
+        // Act: Get the node adjacent to "A" in the self-loop.
+        String adjacentNode = selfLoopPair.adjacentNode(node);
+
+        // Assert: For a self-loop, the adjacent node should be the node itself.
+        assertEquals(node, adjacentNode);
     }
 }
