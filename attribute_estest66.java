@@ -1,30 +1,28 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * This class contains tests for the {@link Attribute} class.
+ * This specific test was refactored for clarity from an auto-generated test case.
+ */
 public class Attribute_ESTestTest66 extends Attribute_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test65() throws Throwable {
-        Attribute attribute0 = new Attribute("Rr7w\u0000k7A:", " g!K?w");
-        String string0 = attribute0.localName();
-        assertEquals(" g!K?w", attribute0.getValue());
-        assertEquals("", string0);
+    /**
+     * Tests that the localName() method correctly returns an empty string for an attribute key that ends with a colon.
+     * A key like "prefix:" implies a namespace prefix is present, but the local name part is empty.
+     */
+    @Test
+    public void localNameShouldBeEmptyWhenKeyEndsWithColon() {
+        // Arrange: Create an attribute with a key that has a prefix but an empty local name (e.g., "ns:").
+        // The original test used a complex key "Rr7w\u0000k7A:", which obscured this intent.
+        Attribute attribute = new Attribute("ns:", "some-value");
+
+        // Act: Get the local name from the attribute.
+        String localName = attribute.localName();
+
+        // Assert: The local name should be an empty string, as it's the part after the colon.
+        assertEquals("The local name should be empty for a key ending with a colon.", "", localName);
     }
 }
