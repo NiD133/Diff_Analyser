@@ -1,45 +1,60 @@
 package org.apache.commons.codec.net;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CharEncoding;
-import org.apache.commons.codec.CodecPolicy;
-import org.apache.commons.codec.DecoderException;
+
 import org.apache.commons.codec.EncoderException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class BCodecTestTest8 {
+/**
+ * Tests the {@code encode(Object)} method of the {@link BCodec} class.
+ */
+@DisplayName("BCodec encode(Object)")
+class BCodecObjectEncodingTest {
 
-    private static final String[] BASE64_IMPOSSIBLE_CASES = { // Require the RFC 1522 "encoded-word" header
-    "=?ASCII?B?ZE==?=", "=?ASCII?B?ZmC=?=", "=?ASCII?B?Zm9vYE==?=", "=?ASCII?B?Zm9vYmC=?=", "=?ASCII?B?AB==?=" };
+    private BCodec bCodec;
 
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
-
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
-
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
+    @BeforeEach
+    void setUp() {
+        bCodec = new BCodec();
     }
 
     @Test
-    void testEncodeObjects() throws Exception {
-        final BCodec bcodec = new BCodec();
-        final String plain = "what not";
-        final String encoded = (String) bcodec.encode((Object) plain);
-        assertEquals("=?UTF-8?B?d2hhdCBub3Q=?=", encoded, "Basic B encoding test");
-        final Object result = bcodec.encode((Object) null);
+    @DisplayName("should correctly B-encode a String object")
+    void testEncodeStringObject() throws EncoderException {
+        // Arrange
+        final String plainText = "what not";
+        final String expectedEncodedText = "=?UTF-8?B?d2hhdCBub3Q=?=";
+
+        // Act
+        final Object result = bCodec.encode((Object) plainText);
+
+        // Assert
+        assertEquals(expectedEncodedText, result);
+    }
+
+    @Test
+    @DisplayName("should return null when encoding a null object")
+    void testEncodeNullObject() throws EncoderException {
+        // Act
+        final Object result = bCodec.encode(null);
+
+        // Assert
         assertNull(result, "Encoding a null Object should return null");
-        assertThrows(EncoderException.class, () -> bcodec.encode(Double.valueOf(3.0d)), "Trying to url encode a Double object should cause an exception.");
+    }
+
+    @Test
+    @DisplayName("should throw EncoderException when encoding an unsupported object type")
+    void testEncodeUnsupportedObjectThrowsException() {
+        // Arrange
+        final Double unsupportedObject = 3.0d;
+
+        // Act & Assert
+        assertThrows(EncoderException.class, () -> {
+            bCodec.encode(unsupportedObject);
+        }, "Encoding an object of an unsupported type (e.g., Double) should fail.");
     }
 }
