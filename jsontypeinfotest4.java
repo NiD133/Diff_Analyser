@@ -1,32 +1,72 @@
 package com.fasterxml.jackson.annotation;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class JsonTypeInfoTestTest4 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, visible = true, defaultImpl = JsonTypeInfo.class, requireTypeIdForSubtypes = OptBoolean.TRUE)
-    private final static class Anno1 {
-    }
+/**
+ * Unit tests for the {@link JsonTypeInfo.Value} class, focusing on the
+ * {@code withRequireTypeIdForSubtypes} method and the class's immutability.
+ */
+@DisplayName("JsonTypeInfo.Value")
+class JsonTypeInfoValueTest {
 
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = As.EXTERNAL_PROPERTY, property = "ext", defaultImpl = Void.class, requireTypeIdForSubtypes = OptBoolean.FALSE)
-    private final static class Anno2 {
-    }
+    @Test
+    @DisplayName("EMPTY instance should have null for 'requireTypeIdForSubtypes'")
+    void emptyValueShouldHaveNullRequireTypeId() {
+        // Arrange
+        JsonTypeInfo.Value emptyValue = JsonTypeInfo.Value.EMPTY;
 
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = As.EXTERNAL_PROPERTY, property = "ext", defaultImpl = Void.class)
-    private final static class Anno3 {
+        // Act & Assert
+        assertNull(emptyValue.getRequireTypeIdForSubtypes(),
+                "The default EMPTY value should not have a 'requireTypeIdForSubtypes' setting.");
     }
 
     @Test
-    public void testWithRequireTypeIdForSubtypes() {
-        JsonTypeInfo.Value empty = JsonTypeInfo.Value.EMPTY;
-        assertNull(empty.getRequireTypeIdForSubtypes());
-        JsonTypeInfo.Value requireTypeIdTrue = empty.withRequireTypeIdForSubtypes(Boolean.TRUE);
-        assertEquals(Boolean.TRUE, requireTypeIdTrue.getRequireTypeIdForSubtypes());
-        JsonTypeInfo.Value requireTypeIdFalse = empty.withRequireTypeIdForSubtypes(Boolean.FALSE);
-        assertEquals(Boolean.FALSE, requireTypeIdFalse.getRequireTypeIdForSubtypes());
-        JsonTypeInfo.Value requireTypeIdDefault = empty.withRequireTypeIdForSubtypes(null);
-        assertNull(requireTypeIdDefault.getRequireTypeIdForSubtypes());
+    @DisplayName("withRequireTypeIdForSubtypes(TRUE) should create a new instance with the value set to TRUE")
+    void withRequireTypeIdForSubtypesShouldSetToTrue() {
+        // Arrange
+        JsonTypeInfo.Value originalValue = JsonTypeInfo.Value.EMPTY;
+
+        // Act
+        JsonTypeInfo.Value updatedValue = originalValue.withRequireTypeIdForSubtypes(Boolean.TRUE);
+
+        // Assert
+        assertNotSame(originalValue, updatedValue, "A new instance should be created (immutability).");
+        assertEquals(Boolean.TRUE, updatedValue.getRequireTypeIdForSubtypes());
+        assertNull(originalValue.getRequireTypeIdForSubtypes(), "The original instance should be unchanged.");
+    }
+
+    @Test
+    @DisplayName("withRequireTypeIdForSubtypes(FALSE) should create a new instance with the value set to FALSE")
+    void withRequireTypeIdForSubtypesShouldSetToFalse() {
+        // Arrange
+        JsonTypeInfo.Value originalValue = JsonTypeInfo.Value.EMPTY;
+
+        // Act
+        JsonTypeInfo.Value updatedValue = originalValue.withRequireTypeIdForSubtypes(Boolean.FALSE);
+
+        // Assert
+        assertNotSame(originalValue, updatedValue, "A new instance should be created (immutability).");
+        assertEquals(Boolean.FALSE, updatedValue.getRequireTypeIdForSubtypes());
+        assertNull(originalValue.getRequireTypeIdForSubtypes(), "The original instance should be unchanged.");
+    }
+
+    @Test
+    @DisplayName("withRequireTypeIdForSubtypes(null) should create a new instance with the value set to null")
+    void withRequireTypeIdForSubtypesShouldSetToNull() {
+        // Arrange: Start with a non-null value to ensure it can be reset.
+        JsonTypeInfo.Value originalValue = JsonTypeInfo.Value.EMPTY.withRequireTypeIdForSubtypes(Boolean.TRUE);
+
+        // Act
+        JsonTypeInfo.Value updatedValue = originalValue.withRequireTypeIdForSubtypes(null);
+
+        // Assert
+        assertNotSame(originalValue, updatedValue, "A new instance should be created (immutability).");
+        assertNull(updatedValue.getRequireTypeIdForSubtypes());
+        assertEquals(Boolean.TRUE, originalValue.getRequireTypeIdForSubtypes(), "The original instance should be unchanged.");
     }
 }
