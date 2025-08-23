@@ -1,29 +1,37 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class URLCodec_ESTestTest25 extends URLCodec_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        URLCodec uRLCodec0 = new URLCodec();
-        byte[] byteArray0 = new byte[2];
-        byteArray0[0] = (byte) 37;
+/**
+ * Tests for the URLCodec class, focusing on decoding error scenarios.
+ */
+public class URLCodecTest {
+
+    /**
+     * Tests that the decode method throws a DecoderException when it encounters a '%'
+     * character that is not followed by two valid hexadecimal digits.
+     * In this case, it's followed by a null byte.
+     */
+    @Test
+    public void decodeWithInvalidHexCharacterThrowsException() {
+        // Arrange
+        URLCodec urlCodec = new URLCodec();
+        // A URL-encoded escape sequence must be a '%' followed by two hex digits.
+        // Here, '%' is followed by a null byte (value 0), which is not a valid hex digit.
+        byte[] invalidUrlEncodedBytes = new byte[]{'%', 0};
+        String expectedMessage = "Invalid URL encoding: not a valid digit (radix 16): 0";
+
+        // Act & Assert
         try {
-            uRLCodec0.decode(byteArray0);
-            fail("Expecting exception: Exception");
-        } catch (Exception e) {
-            //
-            // Invalid URL encoding: not a valid digit (radix 16): 0
-            //
-            verifyException("org.apache.commons.codec.net.Utils", e);
+            urlCodec.decode(invalidUrlEncodedBytes);
+            fail("Expected a DecoderException to be thrown for an invalid escape sequence.");
+        } catch (DecoderException e) {
+            // Verify that the exception message correctly identifies the issue.
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
