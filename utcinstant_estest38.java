@@ -1,31 +1,22 @@
 package org.threeten.extra.scale;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
-import java.time.Duration;
+import static org.junit.Assert.assertThrows;
+
 import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class UtcInstant_ESTestTest38 extends UtcInstant_ESTest_scaffolding {
+/**
+ * Test class for {@link UtcInstant}.
+ */
+public class UtcInstantTest {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        // Undeclared exception!
-        try {
-            UtcInstant.of((Instant) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.evosuite.runtime.mock.java.time.MockInstant", e);
-        }
+    /**
+     * Tests that the factory method {@code UtcInstant.of(Instant)} throws
+     * a NullPointerException when given a null argument, as per its contract.
+     */
+    @Test
+    public void ofInstant_whenArgumentIsNull_thenThrowsNullPointerException() {
+        // The cast to Instant is necessary to resolve method overload ambiguity for the null literal.
+        assertThrows(NullPointerException.class, () -> UtcInstant.of((Instant) null));
     }
 }
