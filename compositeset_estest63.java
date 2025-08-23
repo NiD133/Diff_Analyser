@@ -1,57 +1,40 @@
 package org.apache.commons.collections4.set;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class CompositeSet_ESTestTest63 extends CompositeSet_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link CompositeSet} class.
+ */
+public class CompositeSetTest {
 
-    @Test(timeout = 4000)
-    public void test62() throws Throwable {
-        Set<Integer>[] setArray0 = (Set<Integer>[]) Array.newInstance(Set.class, 18);
-        Set<Integer>[] setArray1 = (Set<Integer>[]) Array.newInstance(Set.class, 18);
-        CompositeSet<Integer> compositeSet0 = new CompositeSet<Integer>(setArray1);
-        compositeSet0.removeComposited(setArray0[0]);
-        assertNotSame(setArray1, setArray0);
+    /**
+     * Tests that calling removeComposited with a null argument correctly removes
+     * the first null set from the composition, while leaving other sets untouched.
+     */
+    @Test
+    public void removeCompositedShouldRemoveFirstNullSetWhenPresent() {
+        // Arrange
+        final Set<Integer> nonNullSet = new HashSet<>();
+        nonNullSet.add(1);
+
+        // Create a CompositeSet containing a non-null set and two null sets.
+        // The varargs constructor is a clear way to add initial sets.
+        final CompositeSet<Integer> compositeSet = new CompositeSet<>(nonNullSet, null, null);
+
+        assertEquals("Pre-condition: CompositeSet should contain three sets", 3, compositeSet.getSets().size());
+
+        // Act
+        // Attempt to remove one of the null sets from the composition.
+        compositeSet.removeComposited(null);
+
+        // Assert
+        // The size should decrease by one, and the remaining sets should be the expected ones.
+        assertEquals("Post-condition: CompositeSet should contain two sets", 2, compositeSet.getSets().size());
+        assertTrue("The non-null set should remain in the composition", compositeSet.getSets().contains(nonNullSet));
+        assertTrue("One null set should still remain in the composition", compositeSet.getSets().contains(null));
     }
 }
