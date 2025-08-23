@@ -1,21 +1,27 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class LocaleUtils_ESTestTest30 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link LocaleUtils}.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        Locale locale0 = Locale.ROOT;
-        boolean boolean0 = LocaleUtils.isLanguageUndetermined(locale0);
-        assertTrue(boolean0);
+    /**
+     * Tests that {@link LocaleUtils#isLanguageUndetermined(Locale)} returns true for {@link Locale#ROOT}.
+     * The language tag for Locale.ROOT is "und" (undetermined) because its language component is an empty string.
+     */
+    @Test
+    public void testIsLanguageUndetermined_withRootLocale_returnsTrue() {
+        // Arrange: Locale.ROOT is a locale with an empty language, country, and variant.
+        final Locale rootLocale = Locale.ROOT;
+
+        // Act: Check if the language is undetermined.
+        final boolean result = LocaleUtils.isLanguageUndetermined(rootLocale);
+
+        // Assert: The result should be true.
+        assertTrue("Locale.ROOT should be considered as having an undetermined language.", result);
     }
 }
