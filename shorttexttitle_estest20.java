@@ -1,49 +1,46 @@
 package org.jfree.chart.title;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.JapaneseDate;
-import java.util.Calendar;
-import java.util.List;
-import javax.swing.JTable;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.evosuite.runtime.mock.java.util.MockCalendar;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.block.RectangleConstraint;
 import org.jfree.chart.block.Size2D;
-import org.jfree.chart.plot.CombinedDomainXYPlot;
-import org.jfree.chart.plot.SpiderWebPlot;
-import org.jfree.chart.plot.pie.PiePlot;
 import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ShortTextTitle_ESTestTest20 extends ShortTextTitle_ESTest_scaffolding {
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        ShortTextTitle shortTextTitle0 = new ShortTextTitle(".p.");
-        DefaultStatisticalCategoryDataset<JTable.PrintMode, JTable.PrintMode> defaultStatisticalCategoryDataset0 = new DefaultStatisticalCategoryDataset<JTable.PrintMode, JTable.PrintMode>();
-        SpiderWebPlot spiderWebPlot0 = new SpiderWebPlot(defaultStatisticalCategoryDataset0);
-        JFreeChart jFreeChart0 = new JFreeChart(".p.", spiderWebPlot0);
-        BufferedImage bufferedImage0 = jFreeChart0.createBufferedImage(10, 10, (ChartRenderingInfo) null);
-        Graphics2D graphics2D0 = bufferedImage0.createGraphics();
-        Range range0 = new Range((-1.0), 0.1);
-        Size2D size2D0 = shortTextTitle0.arrangeRN(graphics2D0, range0);
-        assertEquals("Size2D[width=0.0, height=0.0]", size2D0.toString());
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Unit tests for the {@link ShortTextTitle} class.
+ */
+public class ShortTextTitleTest {
+
+    /**
+     * Tests that the arrangeRN() method returns a size of (0, 0) when the provided
+     * width range is too small to accommodate the title's text. A ShortTextTitle
+     * is designed to not display at all if it cannot fit completely.
+     */
+    @Test
+    public void arrangeRNShouldReturnZeroSizeWhenWidthRangeIsTooSmall() {
+        // Arrange
+        ShortTextTitle title = new ShortTextTitle("This is a test title");
+
+        // A Graphics2D object is needed for font metrics calculations.
+        // We can create a minimal one from a temporary image.
+        BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics2D = image.createGraphics();
+
+        // Define a width range that is clearly too narrow for the text.
+        Range insufficientWidthRange = new Range(0.0, 10.0);
+
+        // Act
+        Size2D calculatedSize = title.arrangeRN(graphics2D, insufficientWidthRange);
+
+        // Assert
+        // The title should report a size of zero if it cannot fit.
+        assertEquals("Width should be 0.0 when text does not fit", 0.0, calculatedSize.getWidth(), 0.0);
+        assertEquals("Height should be 0.0 when text does not fit", 0.0, calculatedSize.getHeight(), 0.0);
+        
+        // Clean up graphics resources
+        graphics2D.dispose();
     }
 }
