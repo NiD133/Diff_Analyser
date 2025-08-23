@@ -1,18 +1,23 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class Minutes_ESTestTest48 extends Minutes_ESTest_scaffolding {
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        Minutes minutes0 = Minutes.MIN_VALUE;
-        boolean boolean0 = minutes0.isGreaterThan((Minutes) null);
-        assertFalse(boolean0);
+    @Test
+    public void isGreaterThan_shouldReturnFalse_whenComparingMinValueToNull() {
+        // The isGreaterThan method treats a null argument as a zero value.
+        // This test verifies that MIN_VALUE is correctly identified as not being
+        // greater than zero.
+
+        // Arrange
+        Minutes minValue = Minutes.MIN_VALUE;
+
+        // Act
+        boolean result = minValue.isGreaterThan(null);
+
+        // Assert
+        assertFalse("Minutes.MIN_VALUE should not be greater than null (which is treated as zero)", result);
     }
 }
