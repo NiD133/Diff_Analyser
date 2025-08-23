@@ -1,25 +1,19 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Soundex_ESTestTest8 extends Soundex_ESTest_scaffolding {
+/**
+ * Tests for the {@link Soundex} class, focusing on constructor behavior.
+ */
+public class SoundexTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        Soundex soundex0 = null;
-        try {
-            soundex0 = new Soundex((char[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.codec.language.Soundex", e);
-        }
+    /**
+     * Verifies that the Soundex constructor throws a NullPointerException
+     * when initialized with a null character array for the mapping.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructorShouldThrowNullPointerExceptionForNullMapping() {
+        // This call is expected to throw a NullPointerException because the mapping array is null.
+        new Soundex((char[]) null);
     }
 }
