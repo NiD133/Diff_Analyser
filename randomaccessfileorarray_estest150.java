@@ -1,35 +1,37 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest150 extends RandomAccessFileOrArray_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test149() throws Throwable {
-        byte[] byteArray0 = new byte[9];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.pushBack((byte) (-63));
-        boolean boolean0 = randomAccessFileOrArray0.readBoolean();
-        assertEquals(0L, randomAccessFileOrArray0.getFilePointer());
-        assertTrue(boolean0);
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
+
+    /**
+     * Verifies that readBoolean() correctly processes a byte from the pushback buffer.
+     * When a non-zero byte is pushed back, readBoolean() should return true, and crucially,
+     * the underlying file pointer should not advance.
+     */
+    @Test
+    public void readBooleanWithPushedBackByte_shouldReturnTrueAndNotAdvancePointer() throws IOException {
+        // Arrange: Create a reader and push a non-zero byte into its buffer.
+        // The initial content of the source data is irrelevant for this test.
+        byte[] sourceData = new byte[10];
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(sourceData);
+
+        final byte nonZeroByteToPushBack = (byte) -63;
+        reader.pushBack(nonZeroByteToPushBack);
+
+        // Act: Read a boolean value, which should come from the pushback buffer.
+        boolean result = reader.readBoolean();
+
+        // Assert: Verify the result and the state of the reader.
+        assertTrue("readBoolean should return true for a non-zero pushed-back byte.", result);
+        assertEquals("Reading a pushed-back byte should not advance the file pointer.", 0L, reader.getFilePointer());
     }
 }
