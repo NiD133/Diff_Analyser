@@ -1,17 +1,28 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JavaVersion_ESTestTest4 extends JavaVersion_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JavaVersion} utility class.
+ */
+public class JavaVersionTest {
 
-    @Test(timeout = 4000)
-    public void test3() throws Throwable {
-        int int0 = JavaVersion.parseMajorJavaVersion("");
-        assertEquals(6, int0);
+    /**
+     * Tests that parsing an empty version string results in a fallback version.
+     * The current implementation defaults to version 6 for any unparseable string,
+     * treating it as an old, unsupported Java version.
+     */
+    @Test
+    public void parseMajorJavaVersion_withEmptyString_returnsFallbackVersion() {
+        // Arrange: The expected fallback version for unparseable strings is 6.
+        int expectedFallbackVersion = 6;
+        String emptyVersionString = "";
+
+        // Act: Parse the empty string.
+        int actualVersion = JavaVersion.parseMajorJavaVersion(emptyVersionString);
+
+        // Assert: The result should be the fallback version.
+        assertEquals(expectedFallbackVersion, actualVersion);
     }
 }
