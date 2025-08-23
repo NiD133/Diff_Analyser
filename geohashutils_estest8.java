@@ -1,22 +1,29 @@
 package org.locationtech.spatial4j.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 
-public class GeohashUtils_ESTestTest8 extends GeohashUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link GeohashUtils} class.
+ */
+public class GeohashUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        // Undeclared exception!
-        GeohashUtils.encodeLatLon(740.519, 740.519, 11520);
+    /**
+     * Verifies that encodeLatLon() throws an IllegalArgumentException when the
+     * specified precision is greater than the maximum allowed value. The valid
+     * precision range is [1, GeohashUtils.MAX_PRECISION].
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void encodeLatLon_withPrecisionAboveMax_shouldThrowIllegalArgumentException() {
+        // Arrange: Define valid coordinates but a precision that is just outside the
+        // upper bound of the valid range. GeohashUtils.MAX_PRECISION is 24.
+        final double validLatitude = 40.7128;  // New York City
+        final double validLongitude = -74.0060;
+        final int invalidPrecision = GeohashUtils.MAX_PRECISION + 1;
+
+        // Act & Assert: This call is expected to throw an IllegalArgumentException
+        // because the precision is out of the allowed range. The invalid latitude
+        // and longitude from the original test are not relevant, as the precision
+        // is validated first.
+        GeohashUtils.encodeLatLon(validLatitude, validLongitude, invalidPrecision);
     }
 }
