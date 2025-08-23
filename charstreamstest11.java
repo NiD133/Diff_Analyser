@@ -1,91 +1,59 @@
 package com.google.common.io;
 
-import static org.junit.Assert.assertThrows;
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
-import java.io.EOFException;
-import java.io.FilterReader;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.nio.CharBuffer;
-import java.util.List;
-import org.jspecify.annotations.NullUnmarked;
 
-public class CharStreamsTestTest11 extends IoTestCase {
-
-    private static final String TEXT = "The quick brown fox jumped over the lazy dog.";
-
-    /**
-     * Returns a reader wrapping the given reader that only reads half of the maximum number of
-     * characters that it could read in read(char[], int, int).
-     */
-    private static Reader newNonBufferFillingReader(Reader reader) {
-        return new FilterReader(reader) {
-
-            @Override
-            public int read(char[] cbuf, int off, int len) throws IOException {
-                // if a buffer isn't being cleared correctly, this method will eventually start being called
-                // with a len of 0 forever
-                if (len <= 0) {
-                    fail("read called with a len of " + len);
-                }
-                // read fewer than the max number of chars to read
-                // shouldn't be a problem unless the buffer is shrinking each call
-                return in.read(cbuf, off, Math.max(len - 1024, 0));
-            }
-        };
-    }
+/**
+ * Tests for {@link CharStreams#copy(Readable, Appendable)}, specifically ensuring it works
+ * correctly when the source is a generic {@link Readable} instance. This forces the use of the
+ * non-optimized code path that handles any Readable, not just specific subtypes like
+ * {@link StringReader}.
+ */
+public class CharStreamsCopyFromGenericReadableTest extends IoTestCase {
 
     /**
-     * Wrap an appendable in an appendable to defeat any type specific optimizations.
+     * Wraps a Readable in a new anonymous class to prevent the code under test from using
+     * type-specific optimizations, forcing it to use the generic {@code Readable} logic.
      */
-    private static Appendable wrapAsGenericAppendable(Appendable a) {
-        return new Appendable() {
-
-            @Override
-            public Appendable append(CharSequence csq) throws IOException {
-                a.append(csq);
-                return this;
-            }
-
-            @Override
-            public Appendable append(CharSequence csq, int start, int end) throws IOException {
-                a.append(csq, start, end);
-                return this;
-            }
-
-            @Override
-            public Appendable append(char c) throws IOException {
-                a.append(c);
-                return this;
-            }
-        };
-    }
-
-    /**
-     * Wrap a readable in a readable to defeat any type specific optimizations.
-     */
-    private static Readable wrapAsGenericReadable(Readable a) {
+    private static Readable asGenericReadable(Readable readable) {
         return new Readable() {
-
             @Override
             public int read(CharBuffer cb) throws IOException {
-                return a.read(cb);
+                return readable.read(cb);
             }
         };
     }
 
-    public void testCopy_toWriter_fromReadable() throws IOException {
+    public void testCopy_fromGenericReadable_copiesAsciiCharacters() throws IOException {
+        // Arrange
+        StringReader reader = new StringReader(ASCII);
+        Readable genericReader = asGenericReadable(reader);
         StringWriter writer = new StringWriter();
-        long copied = CharStreams.copy(wrapAsGenericReadable(new StringReader(ASCII)), writer);
+
+        // Act
+        long copiedCharCount = CharStreams.copy(genericReader, writer);
+
+        // Assert
         assertEquals(ASCII, writer.toString());
-        assertEquals(ASCII.length(), copied);
-        StringWriter writer2 = new StringWriter();
-        copied = CharStreams.copy(wrapAsGenericReadable(new StringReader(I18N)), writer2);
-        assertEquals(I18N, writer2.toString());
-        assertEquals(I18N.length(), copied);
+        assertEquals(ASCII.length(), copiedCharCount);
+    }
+
+    public void testCopy_fromGenericReadable_copiesI18nCharacters() throws IOException {
+        // Arrange
+        StringReader reader = new StringReader(I18N);
+        Readable genericReader = asGenericReadable(reader);
+        StringWriter writer = new StringWriter();
+
+        // Act
+        long copiedCharCount = CharStreams.copy(genericReader, writer);
+
+        // Assert
+        assertEquals(I18N, writer.toString());
+        assertEquals(I18N.length(), copiedCharCount);
     }
 }
