@@ -1,44 +1,35 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest164 extends Elements_ESTest_scaffolding {
+/**
+ * This test case verifies the behavior of the {@link Elements#html()} method
+ * when the collection contains null elements.
+ */
+public class ElementsHtmlTest {
 
-    @Test(timeout = 4000)
-    public void test163() throws Throwable {
-        Element[] elementArray0 = new Element[8];
-        Elements elements0 = new Elements(elementArray0);
-        // Undeclared exception!
-        try {
-            elements0.html();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.stream.ReferencePipeline$3$1", e);
-        }
+    /**
+     * Verifies that calling {@link Elements#html()} on a collection that contains
+     * a {@code null} element correctly throws a {@code NullPointerException}.
+     * <p>
+     * The {@code html()} method iterates through its elements and calls the
+     * {@code .html()} method on each one. If an element is null, this operation
+     * will naturally result in a NullPointerException, which is the expected behavior
+     * for invalid input.
+     * </p>
+     */
+    @Test(expected = NullPointerException.class)
+    public void htmlShouldThrowNullPointerExceptionWhenListContainsNull() {
+        // Arrange: Create an Elements object containing a single null element.
+        // The varargs constructor `Elements(Element... elements)` is used here.
+        Elements elementsWithNull = new Elements((Element) null);
+
+        // Act: Attempt to get the combined HTML of the elements. This action is
+        // expected to trigger the NullPointerException.
+        elementsWithNull.html();
+
+        // Assert: The test framework asserts that a NullPointerException was thrown,
+        // as specified by the @Test(expected=...) annotation.
     }
 }
