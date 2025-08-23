@@ -1,44 +1,28 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahEra;
 import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
 
-public class Symmetry454Chronology_ESTestTest12 extends Symmetry454Chronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
-        ZoneOffset zoneOffset0 = ZoneOffset.MIN;
-        Symmetry454Date symmetry454Date0 = symmetry454Chronology0.dateNow((ZoneId) zoneOffset0);
-        assertEquals(IsoEra.CE, symmetry454Date0.getEra());
+/**
+ * Unit tests for {@link Symmetry454Chronology}.
+ */
+public class Symmetry454ChronologyTest {
+
+    @Test
+    public void dateNow_withZoneId_returnsDateInCorrectEra() {
+        // Arrange: Get the singleton instance of the chronology and a specific ZoneId.
+        Symmetry454Chronology chronology = Symmetry454Chronology.INSTANCE;
+        ZoneId zone = ZoneOffset.MIN;
+
+        // Act: Obtain the current date in the Symmetry454 calendar system for the given zone.
+        Symmetry454Date currentDate = chronology.dateNow(zone);
+
+        // Assert: Verify that the current date falls within the Common Era (CE).
+        // This is a basic sanity check for the dateNow() method.
+        assertEquals("The era of the current date should be CE", IsoEra.CE, currentDate.getEra());
     }
 }
