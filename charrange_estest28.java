@@ -1,24 +1,33 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class CharRange_ESTestTest28 extends CharRange_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CharRange} class.
+ */
+public class CharRangeTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        CharRange charRange0 = CharRange.isNot('*');
-        boolean boolean0 = charRange0.contains(charRange0);
-        assertTrue(charRange0.isNegated());
-        assertEquals('*', charRange0.getStart());
-        assertTrue(boolean0);
-        assertEquals('*', charRange0.getEnd());
+    /**
+     * Tests that a negated CharRange is considered to contain itself.
+     * For example, the range [^*] (representing all characters except '*')
+     * should contain itself.
+     */
+    @Test
+    public void negatedRangeShouldContainItself() {
+        // Arrange: Create a negated range that includes all characters except '*'.
+        CharRange negatedRange = CharRange.isNot('*');
+
+        // Sanity-check the setup to ensure the range is as expected.
+        assertTrue("The range should be negated.", negatedRange.isNegated());
+        assertEquals("The start character of the excluded range should be '*'.", '*', negatedRange.getStart());
+        assertEquals("The end character of the excluded range should be '*'.", '*', negatedRange.getEnd());
+
+        // Act: Check if the negated range contains itself.
+        boolean result = negatedRange.contains(negatedRange);
+
+        // Assert: The result should be true.
+        assertTrue("A negated range should always contain itself.", result);
     }
 }
