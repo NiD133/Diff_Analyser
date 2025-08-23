@@ -1,17 +1,27 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JavaVersion_ESTestTest1 extends JavaVersion_ESTest_scaffolding {
+/**
+ * Tests for {@link JavaVersion}.
+ */
+public class JavaVersionTest {
 
-    @Test(timeout = 4000)
-    public void test0() throws Throwable {
-        int int0 = JavaVersion.parseMajorJavaVersion("0Q?");
-        assertEquals(0, int0);
+    /**
+     * Verifies that `parseMajorJavaVersion` correctly handles strings that start with a '0'
+     * followed by non-numeric characters. The expected behavior is to parse the initial
+     * integer and ignore the rest of the string.
+     */
+    @Test
+    public void parseMajorJavaVersion_whenStringStartsWithZeroAndContainsText_returnsZero() {
+        // Arrange: A non-standard version string to test the parsing logic.
+        String versionString = "0Q?";
+
+        // Act: Call the method under test.
+        int majorVersion = JavaVersion.parseMajorJavaVersion(versionString);
+
+        // Assert: The parsed version should be 0.
+        assertEquals(0, majorVersion);
     }
 }
