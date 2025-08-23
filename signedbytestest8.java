@@ -1,60 +1,49 @@
 package com.google.common.primitives;
 
-import static com.google.common.primitives.ReflectionFreeAssertThrows.assertThrows;
-import static com.google.common.primitives.SignedBytes.max;
-import static com.google.common.primitives.SignedBytes.min;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
+
 import com.google.common.annotations.GwtCompatible;
-import com.google.common.annotations.GwtIncompatible;
-import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.collect.testing.Helpers;
-import com.google.common.testing.NullPointerTester;
-import com.google.common.testing.SerializableTester;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullMarked;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-public class SignedBytesTestTest8 extends TestCase {
+/**
+ * Tests for {@link SignedBytes#join(String, byte...)}.
+ *
+ * <p>This test class has been refactored from its original version to improve understandability.
+ * The original contained a single test method for multiple scenarios and included several unused
+ * helper methods and constants.
+ */
+@GwtCompatible
+@RunWith(JUnit4.class)
+public class SignedBytesTestTest8 {
 
-    private static final byte[] EMPTY = {};
+  private static final byte[] EMPTY_ARRAY = {};
+  private static final byte[] ARRAY_WITH_SINGLE_ELEMENT = {(byte) 1};
 
-    private static final byte[] ARRAY1 = { (byte) 1 };
+  @Test
+  public void join_withEmptyArray_returnsEmptyString() {
+    assertThat(SignedBytes.join(",", EMPTY_ARRAY)).isEmpty();
+  }
 
-    private static final byte LEAST = Byte.MIN_VALUE;
+  @Test
+  public void join_withSingleElementArray_returnsElementString() {
+    assertThat(SignedBytes.join(",", ARRAY_WITH_SINGLE_ELEMENT)).isEqualTo("1");
+  }
 
-    private static final byte GREATEST = Byte.MAX_VALUE;
+  @Test
+  public void join_withMultipleElements_returnsElementsJoinedBySeparator() {
+    assertThat(SignedBytes.join(",", (byte) 1, (byte) 2)).isEqualTo("1,2");
+  }
 
-    private static final byte[] VALUES = { LEAST, -1, 0, 1, GREATEST };
+  @Test
+  public void join_withEmptySeparator_returnsConcatenatedElements() {
+    assertThat(SignedBytes.join("", (byte) 1, (byte) 2, (byte) 3)).isEqualTo("123");
+  }
 
-    private static void assertCastFails(long value) {
-        try {
-            SignedBytes.checkedCast(value);
-            fail("Cast to byte should have failed: " + value);
-        } catch (IllegalArgumentException ex) {
-            assertWithMessage(value + " not found in exception text: " + ex.getMessage()).that(ex.getMessage().contains(String.valueOf(value))).isTrue();
-        }
-    }
-
-    private static void testSortDescending(byte[] input, byte[] expectedOutput) {
-        input = Arrays.copyOf(input, input.length);
-        SignedBytes.sortDescending(input);
-        assertThat(input).isEqualTo(expectedOutput);
-    }
-
-    private static void testSortDescending(byte[] input, int fromIndex, int toIndex, byte[] expectedOutput) {
-        input = Arrays.copyOf(input, input.length);
-        SignedBytes.sortDescending(input, fromIndex, toIndex);
-        assertThat(input).isEqualTo(expectedOutput);
-    }
-
-    public void testJoin() {
-        assertThat(SignedBytes.join(",", EMPTY)).isEmpty();
-        assertThat(SignedBytes.join(",", ARRAY1)).isEqualTo("1");
-        assertThat(SignedBytes.join(",", (byte) 1, (byte) 2)).isEqualTo("1,2");
-        assertThat(SignedBytes.join("", (byte) 1, (byte) 2, (byte) 3)).isEqualTo("123");
-        assertThat(SignedBytes.join(",", (byte) -128, (byte) -1)).isEqualTo("-128,-1");
-    }
+  @Test
+  public void join_withNegativeAndBoundaryValues_returnsJoinedString() {
+    // Verifies that negative values, including the minimum byte value, are handled correctly.
+    assertThat(SignedBytes.join(",", (byte) -128, (byte) -1)).isEqualTo("-128,-1");
+  }
 }
