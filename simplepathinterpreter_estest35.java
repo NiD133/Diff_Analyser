@@ -1,66 +1,75 @@
 package org.apache.commons.jxpath.ri.axes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.apache.commons.jxpath.BasicVariables;
-import org.apache.commons.jxpath.JXPathBasicBeanInfo;
-import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
 import org.apache.commons.jxpath.ri.QName;
 import org.apache.commons.jxpath.ri.compiler.Constant;
-import org.apache.commons.jxpath.ri.compiler.CoreFunction;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationAnd;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationGreaterThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationLessThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMod;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMultiply;
 import org.apache.commons.jxpath.ri.compiler.CoreOperationNegate;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNotEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationOr;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationSubtract;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationUnion;
 import org.apache.commons.jxpath.ri.compiler.Expression;
-import org.apache.commons.jxpath.ri.compiler.NameAttributeTest;
-import org.apache.commons.jxpath.ri.compiler.NodeNameTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTypeTest;
-import org.apache.commons.jxpath.ri.compiler.ProcessingInstructionTest;
 import org.apache.commons.jxpath.ri.compiler.Step;
-import org.apache.commons.jxpath.ri.compiler.VariableReference;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPropertyPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPropertyPointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SimplePathInterpreter_ESTestTest35 extends SimplePathInterpreter_ESTest_scaffolding {
+import java.util.Locale;
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        QName qName0 = new QName("#{WI2%=9byI>t{^<");
-        Locale locale0 = Locale.JAPAN;
-        NodePointer nodePointer0 = NodePointer.newNodePointer(qName0, locale0, locale0);
-        Step[] stepArray0 = new Step[1];
-        Expression[] expressionArray0 = new Expression[1];
-        Constant constant0 = new Constant(Integer.MIN_VALUE);
-        CoreOperationNegate coreOperationNegate0 = new CoreOperationNegate(constant0);
-        expressionArray0[0] = (Expression) coreOperationNegate0;
-        Step step0 = mock(Step.class, new ViolatedAssumptionAnswer());
-        doReturn(Integer.MIN_VALUE).when(step0).getAxis();
-        doReturn(expressionArray0).when(step0).getPredicates();
-        stepArray0[0] = step0;
-        NodePointer nodePointer1 = SimplePathInterpreter.interpretSimpleExpressionPath((EvalContext) null, nodePointer0, expressionArray0, stepArray0);
-        assertEquals(2147483646, nodePointer1.getIndex());
-        assertEquals(Integer.MIN_VALUE, nodePointer0.getIndex());
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+
+/**
+ * Contains tests for edge cases in {@link SimplePathInterpreter}.
+ */
+public class SimplePathInterpreterTest {
+
+    /**
+     * Tests that {@code interpretSimpleExpressionPath} correctly handles a predicate
+     * with an index derived from negating {@code Integer.MIN_VALUE}.
+     *
+     * <p>This test covers a specific edge case in index calculation. The expression
+     * {@code - (Integer.MIN_VALUE)} is evaluated using floating-point arithmetic,
+     * resulting in {@code 2.147483648E9}. When converted to an integer, this becomes
+     * {@code Integer.MAX_VALUE}. The path interpreter then subtracts 1 to convert
+     * the 1-based XPath index to a 0-based index, resulting in {@code Integer.MAX_VALUE - 1}.
+     *
+     * <p>This test verifies that the final NodePointer has this correctly calculated large index.
+     */
+    @Test
+    public void interpretPathWithLargeIndexFromNegatedMinValuePredicate() {
+        // ARRANGE
+        // 1. Create the predicate expression: - (Integer.MIN_VALUE)
+        final Constant minValueConstant = new Constant(Integer.MIN_VALUE);
+        final Expression largeIndexPredicate = new CoreOperationNegate(minValueConstant);
+        final Expression[] predicates = {largeIndexPredicate};
+
+        // 2. Mock a path step that uses this predicate. The axis value is arbitrary
+        // but necessary for the mock setup to test this specific execution path.
+        final Step mockStep = mock(Step.class);
+        doReturn(Integer.MIN_VALUE).when(mockStep).getAxis();
+        doReturn(predicates).when(mockStep).getPredicates();
+        final Step[] pathSteps = {mockStep};
+
+        // 3. Set up the root node for the path evaluation.
+        final QName rootQName = new QName("root");
+        final NodePointer rootPointer = NodePointer.newNodePointer(rootQName, "someBean", Locale.getDefault());
+        final int initialRootIndex = rootPointer.getIndex();
+
+        // A new NodePointer's index defaults to WHOLE_COLLECTION. This assertion
+        // confirms our starting state and makes the final assertion clearer.
+        assertEquals("Pre-condition: Root pointer index should be WHOLE_COLLECTION",
+                NodePointer.WHOLE_COLLECTION, initialRootIndex);
+
+        // ACT
+        // The method is called with the same expression array for both the top-level
+        // predicates and for the predicates within the mock step.
+        final NodePointer resultPointer = SimplePathInterpreter.interpretSimpleExpressionPath(
+                null, rootPointer, predicates, pathSteps);
+
+        // ASSERT
+        // The expected index is Integer.MAX_VALUE - 1. See test Javadoc for the calculation.
+        final int expectedIndex = Integer.MAX_VALUE - 1;
+        assertEquals("The resulting pointer should have an index calculated from the large value predicate.",
+                expectedIndex, resultPointer.getIndex());
+
+        // Also, verify that the original root pointer was not modified.
+        assertEquals("The root pointer's index should remain unchanged.",
+                initialRootIndex, rootPointer.getIndex());
     }
 }
