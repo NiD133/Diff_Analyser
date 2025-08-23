@@ -1,26 +1,74 @@
 package org.apache.ibatis.type;
 
+import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.time.YearMonth;
-import org.apache.ibatis.session.Configuration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
-public class BaseTypeHandler_ESTestTest1 extends BaseTypeHandler_ESTest_scaffolding {
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        StringTypeHandler stringTypeHandler0 = new StringTypeHandler();
-        PreparedStatement preparedStatement0 = mock(PreparedStatement.class, new ViolatedAssumptionAnswer());
-        JdbcType jdbcType0 = JdbcType.NUMERIC;
-        stringTypeHandler0.setParameter(preparedStatement0, 3693, "PARTIAL", jdbcType0);
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+
+/**
+ * Test suite for {@link BaseTypeHandler}.
+ *
+ * This test focuses on the generic parameter setting logic in the base class.
+ * We use a concrete implementation, {@link StringTypeHandler}, to test the abstract
+ * parent's behavior, specifically how it handles null and non-null parameters.
+ */
+@RunWith(MockitoJUnitRunner.class)
+public class BaseTypeHandlerTest {
+
+    @Mock
+    private PreparedStatement preparedStatementMock;
+
+    private StringTypeHandler stringTypeHandler;
+
+    @Before
+    public void setUp() {
+        stringTypeHandler = new StringTypeHandler();
+    }
+
+    @Test
+    public void shouldDelegateToSetNonNullParameterWhenParameterIsNotNull() throws SQLException {
+        // Arrange
+        final int parameterIndex = 1;
+        final String testValue = "Test";
+        // Use a JdbcType that is appropriate for the data being set.
+        final JdbcType jdbcType = JdbcType.VARCHAR;
+
+        // Act
+        stringTypeHandler.setParameter(preparedStatementMock, parameterIndex, testValue, jdbcType);
+
+        // Assert
+        // The primary responsibility of BaseTypeHandler.setParameter is to delegate to
+        // setNonNullParameter for non-null values. For StringTypeHandler, this
+        // results in a call to PreparedStatement.setString().
+        verify(preparedStatementMock).setString(parameterIndex, testValue);
+
+        // Verify that no other interactions with the mock occurred.
+        verifyNoMoreInteractions(preparedStatementMock);
+    }
+
+    @Test
+    public void shouldCallSetNullOnPreparedStatementWhenParameterIsNull() throws SQLException {
+        // Arrange
+        final int parameterIndex = 1;
+        final JdbcType jdbcType = JdbcType.VARCHAR;
+
+        // Act
+        // The method under test is BaseTypeHandler.setParameter.
+        stringTypeHandler.setParameter(preparedStatementMock, parameterIndex, null, jdbcType);
+
+        // Assert
+        // Verify that BaseTypeHandler correctly calls PreparedStatement.setNull
+        // with the appropriate type code when the parameter is null.
+        verify(preparedStatementMock).setNull(parameterIndex, jdbcType.TYPE_CODE);
+
+        // Verify that no other interactions with the mock occurred.
+        verifyNoMoreInteractions(preparedStatementMock);
     }
 }
