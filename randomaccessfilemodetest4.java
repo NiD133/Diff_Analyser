@@ -2,8 +2,8 @@ package org.apache.commons.io;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
@@ -11,86 +11,149 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-public class RandomAccessFileModeTestTest4 {
+/**
+ * Tests for the {@link RandomAccessFileMode} enum.
+ *
+ * <p>This test suite verifies that:
+ * <ul>
+ *   <li>File creation and access methods correctly open a readable file, regardless of the mode.</li>
+ *   <li>Static factory methods return the expected {@link RandomAccessFileMode} instances.</li>
+ * </ul>
+ */
+@DisplayName("Tests for RandomAccessFileMode")
+public class RandomAccessFileModeTest {
 
-    private static final byte[] BYTES_FIXTURE = "Foo".getBytes(StandardCharsets.US_ASCII);
-
-    private static final String FIXTURE = "test.txt";
+    private static final byte[] TEST_CONTENT_BYTES = "Foo".getBytes(StandardCharsets.US_ASCII);
+    private static final String TEST_FILE_NAME = "test.txt";
 
     /**
-     * Temporary directory.
+     * Temporary directory provided by JUnit.
      */
     @TempDir
     public Path tempDir;
 
-    private byte[] read(final RandomAccessFile randomAccessFile) throws IOException {
+    /**
+     * Creates a test file in the temporary directory with predefined content.
+     *
+     * @return The path to the newly created test file.
+     * @throws IOException if an I/O error occurs.
+     */
+    private Path createTestFile() throws IOException {
+        final Path testFilePath = tempDir.resolve(TEST_FILE_NAME);
+        return Files.write(testFilePath, TEST_CONTENT_BYTES, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+    }
+
+    /**
+     * Reads all bytes from a RandomAccessFile.
+     */
+    private byte[] readAllBytes(final RandomAccessFile randomAccessFile) throws IOException {
         return RandomAccessFiles.read(randomAccessFile, 0, (int) randomAccessFile.length());
     }
 
-    @ParameterizedTest
-    @EnumSource(RandomAccessFileMode.class)
-    void testCreateFile(final RandomAccessFileMode randomAccessFileMode) throws IOException {
-        final byte[] expected = BYTES_FIXTURE;
-        final Path fixture = writeFixture(expected);
-        try (RandomAccessFile randomAccessFile = randomAccessFileMode.create(fixture.toFile())) {
-            assertArrayEquals(expected, read(randomAccessFile));
+    /**
+     * Asserts that the content of the given RandomAccessFile matches the predefined test content.
+     */
+    private void assertFileContentIsReadable(final RandomAccessFile raf) throws IOException {
+        assertArrayEquals(TEST_CONTENT_BYTES, readAllBytes(raf));
+    }
+
+    /**
+     * Tests for methods that create or provide access to a RandomAccessFile.
+     * These tests ensure that for any given mode, an existing file can be opened and its contents read.
+     */
+    @Nested
+    @DisplayName("File Creation and Access Methods")
+    class CreationAndAccessTests {
+
+        @ParameterizedTest
+        @EnumSource(RandomAccessFileMode.class)
+        @DisplayName("create(File) should open a readable file for all modes")
+        void createWithFile_shouldOpenReadableFile(final RandomAccessFileMode mode) throws IOException {
+            final Path testFile = createTestFile();
+            try (RandomAccessFile randomAccessFile = mode.create(testFile.toFile())) {
+                assertFileContentIsReadable(randomAccessFile);
+            }
+        }
+
+        @ParameterizedTest
+        @EnumSource(RandomAccessFileMode.class)
+        @DisplayName("accept(Path, IOConsumer) should provide a readable file for all modes")
+        void acceptWithPath_shouldProvideReadableFile(final RandomAccessFileMode mode) throws IOException {
+            final Path testFile = createTestFile();
+            // The 'accept' method handles resource management, so no try-with-resources is needed.
+            mode.accept(testFile, RandomAccessFileModeTest.this::assertFileContentIsReadable);
+        }
+
+        @ParameterizedTest
+        @EnumSource(RandomAccessFileMode.class)
+        @DisplayName("create(String) should open a readable file for all modes")
+        void createWithStringPath_shouldOpenReadableFile(final RandomAccessFileMode mode) throws IOException {
+            final Path testFile = createTestFile();
+            try (RandomAccessFile randomAccessFile = mode.create(testFile.toString())) {
+                assertFileContentIsReadable(randomAccessFile);
+            }
+        }
+
+        @ParameterizedTest
+        @EnumSource(RandomAccessFileMode.class)
+        @DisplayName("io(String) should open a readable file for all modes")
+        void ioWithStringPath_shouldOpenReadableFile(final RandomAccessFileMode mode) throws IOException {
+            final Path testFile = createTestFile();
+            try (IORandomAccessFile randomAccessFile = mode.io(testFile.toString())) {
+                assertFileContentIsReadable(randomAccessFile);
+            }
         }
     }
 
-    @ParameterizedTest
-    @EnumSource(RandomAccessFileMode.class)
-    void testCreatePath(final RandomAccessFileMode randomAccessFileMode) throws IOException {
-        final byte[] expected = BYTES_FIXTURE;
-        final Path fixture = writeFixture(expected);
-        randomAccessFileMode.accept(fixture, raf -> assertArrayEquals(expected, read(raf)));
-    }
+    /**
+     * Tests for the static factory methods of RandomAccessFileMode.
+     */
+    @Nested
+    @DisplayName("Factory Methods")
+    class FactoryMethodTests {
 
-    @ParameterizedTest
-    @EnumSource(RandomAccessFileMode.class)
-    void testCreateString(final RandomAccessFileMode randomAccessFileMode) throws IOException {
-        final byte[] expected = BYTES_FIXTURE;
-        final Path fixture = writeFixture(expected);
-        try (RandomAccessFile randomAccessFile = randomAccessFileMode.create(fixture.toString())) {
-            assertArrayEquals(expected, read(randomAccessFile));
+        @Test
+        @DisplayName("valueOfMode() should return correct enum for valid mode strings")
+        void valueOfMode_shouldReturnCorrectEnumForValidStrings() {
+            assertEquals(RandomAccessFileMode.READ_ONLY, RandomAccessFileMode.valueOfMode("r"));
+            assertEquals(RandomAccessFileMode.READ_WRITE, RandomAccessFileMode.valueOfMode("rw"));
+            assertEquals(RandomAccessFileMode.READ_WRITE_SYNC_CONTENT, RandomAccessFileMode.valueOfMode("rwd"));
+            assertEquals(RandomAccessFileMode.READ_WRITE_SYNC_ALL, RandomAccessFileMode.valueOfMode("rws"));
         }
-    }
 
-    @ParameterizedTest
-    @EnumSource(RandomAccessFileMode.class)
-    void testIoString(final RandomAccessFileMode randomAccessFileMode) throws IOException {
-        final byte[] expected = BYTES_FIXTURE;
-        final Path fixture = writeFixture(expected);
-        try (IORandomAccessFile randomAccessFile = randomAccessFileMode.io(fixture.toString())) {
-            assertArrayEquals(expected, read(randomAccessFile));
+        /**
+         * Tests that valueOf(OpenOption...) returns a mode that at least allows reading.
+         * According to the Javadoc, the default returned mode is READ_ONLY, so all
+         * resulting modes should imply read access.
+         */
+        @ParameterizedTest
+        @EnumSource(StandardOpenOption.class)
+        @DisplayName("valueOf(StandardOpenOption) should return a mode with at least read access")
+        void valueOf_withStandardOpenOption_shouldImplyReadOnly(final StandardOpenOption option) {
+            final RandomAccessFileMode mode = RandomAccessFileMode.valueOf(option);
+            assertTrue(mode.implies(RandomAccessFileMode.READ_ONLY),
+                () -> "Mode " + mode + " for option " + option + " should imply READ_ONLY");
         }
-    }
 
-    @ParameterizedTest
-    @EnumSource(LinkOption.class)
-    void testValueOf(final LinkOption option) {
-        assertTrue(RandomAccessFileMode.valueOf(option).implies(RandomAccessFileMode.READ_ONLY));
-    }
-
-    @ParameterizedTest
-    @EnumSource(StandardOpenOption.class)
-    void testValueOf(final StandardOpenOption option) {
-        assertTrue(RandomAccessFileMode.valueOf(option).implies(RandomAccessFileMode.READ_ONLY));
-    }
-
-    private Path writeFixture(final byte[] bytes) throws IOException {
-        return Files.write(tempDir.resolve(FIXTURE), bytes, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-    }
-
-    @Test
-    void testValueOfMode() {
-        assertEquals(RandomAccessFileMode.READ_ONLY, RandomAccessFileMode.valueOfMode("r"));
-        assertEquals(RandomAccessFileMode.READ_WRITE, RandomAccessFileMode.valueOfMode("rw"));
-        assertEquals(RandomAccessFileMode.READ_WRITE_SYNC_CONTENT, RandomAccessFileMode.valueOfMode("rwd"));
-        assertEquals(RandomAccessFileMode.READ_WRITE_SYNC_ALL, RandomAccessFileMode.valueOfMode("rws"));
+        /**
+         * Tests that valueOf(OpenOption...) returns a mode that at least allows reading.
+         * According to the Javadoc, the default returned mode is READ_ONLY, so all
+         * resulting modes should imply read access.
+         */
+        @ParameterizedTest
+        @EnumSource(LinkOption.class)
+        @DisplayName("valueOf(LinkOption) should return a mode with at least read access")
+        void valueOf_withLinkOption_shouldImplyReadOnly(final LinkOption option) {
+            final RandomAccessFileMode mode = RandomAccessFileMode.valueOf(option);
+            assertTrue(mode.implies(RandomAccessFileMode.READ_ONLY),
+                () -> "Mode " + mode + " for option " + option + " should imply READ_ONLY");
+        }
     }
 }
