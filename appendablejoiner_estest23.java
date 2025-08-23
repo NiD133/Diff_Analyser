@@ -1,42 +1,33 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.io.PipedWriter;
 import java.nio.BufferOverflowException;
 import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.sql.SQLNonTransientConnectionException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.LinkedHashSet;
-import java.util.Locale;
-import org.apache.commons.lang3.function.FailableBiConsumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class AppendableJoiner_ESTestTest23 extends AppendableJoiner_ESTest_scaffolding {
+/**
+ * This test case focuses on the behavior of {@link AppendableJoiner} when used with
+ * an {@link Appendable} that has limited capacity.
+ */
+public class AppendableJoinerTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        AppendableJoiner.Builder<StringBuilder> appendableJoiner_Builder0 = new AppendableJoiner.Builder<StringBuilder>();
-        CharBuffer charBuffer0 = CharBuffer.allocate(0);
-        AppendableJoiner<StringBuilder> appendableJoiner0 = appendableJoiner_Builder0.get();
-        StringBuilder[] stringBuilderArray0 = new StringBuilder[6];
-        // Undeclared exception!
-        try {
-            appendableJoiner0.joinA((Appendable) charBuffer0, stringBuilderArray0);
-            fail("Expecting exception: BufferOverflowException");
-        } catch (BufferOverflowException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.CharBuffer", e);
-        }
+    /**
+     * Tests that calling joinA with a buffer that has zero capacity
+     * correctly throws a BufferOverflowException.
+     */
+    @Test(expected = BufferOverflowException.class)
+    public void testJoinToZeroCapacityBufferThrowsException() throws IOException {
+        // Arrange: Create a joiner and an Appendable with no available space.
+        final AppendableJoiner<String> joiner = AppendableJoiner.<String>builder().get();
+        final CharBuffer zeroCapacityBuffer = CharBuffer.allocate(0);
+        final String[] elementsToJoin = {"any-element"};
+
+        // Act: Attempt to join elements into the buffer that cannot hold any data.
+        // The joiner will try to append the first element, causing an overflow immediately.
+        joiner.joinA(zeroCapacityBuffer, elementsToJoin);
+
+        // Assert: The test expects a BufferOverflowException, which is verified by the
+        // @Test(expected=...) annotation. No further assertions are needed.
     }
 }
