@@ -1,49 +1,48 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
+import org.junit.Test;
+
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.Collections;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class TextRenderInfo_ESTestTest47 extends TextRenderInfo_ESTest_scaffolding {
 
+    /**
+     * Tests that getBaseline() throws an UnsupportedCharsetException when the underlying
+     * PdfString is initialized with an encoding that is not a valid Java charset name.
+     * The getBaseline() method triggers text decoding, which exposes the encoding issue.
+     */
     @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        LinkedHashSet<MarkedContentInfo> linkedHashSet0 = new LinkedHashSet<MarkedContentInfo>();
-        PdfString pdfString0 = new PdfString("Times-BoldItalic", "Times-Italic");
-        Matrix matrix0 = graphicsState0.ctm;
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfString0, graphicsState0, matrix0, linkedHashSet0);
-        // Undeclared exception!
+    public void getBaseline_whenPdfStringHasUnsupportedEncoding_throwsUnsupportedCharsetException() {
+        // Arrange: Set up a GraphicsState and a PdfString with an invalid encoding.
+        GraphicsState graphicsState = new GraphicsState();
+        graphicsState.font = new CMapAwareDocumentFont(new PdfGState());
+
+        // "Times-Italic" is a valid PDF encoding name but not a standard Java Charset name.
+        // This will cause an exception when iText tries to decode the string.
+        String invalidEncoding = "Times-Italic";
+        PdfString pdfStringWithInvalidEncoding = new PdfString("some text", invalidEncoding);
+
+        TextRenderInfo textRenderInfo = new TextRenderInfo(
+                pdfStringWithInvalidEncoding,
+                graphicsState,
+                graphicsState.ctm,
+                Collections.emptySet()
+        );
+
+        // Act & Assert: Verify that calling getBaseline() throws the expected exception.
         try {
-            textRenderInfo0.getBaseline();
-            fail("Expecting exception: UnsupportedCharsetException");
+            textRenderInfo.getBaseline();
+            fail("Expected an UnsupportedCharsetException to be thrown due to the invalid encoding.");
         } catch (UnsupportedCharsetException e) {
-            //
-            // Times-Italic
-            //
-            verifyException("java.nio.charset.Charset", e);
+            // The exception should correctly identify the problematic charset name.
+            assertEquals(invalidEncoding, e.getCharsetName());
         }
     }
 }
