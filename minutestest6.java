@@ -1,48 +1,62 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.jupiter.api.Test;
 
-public class MinutesTestTest6 extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Tests for the {@link Minutes} class, focusing on the {@code standardMinutesIn(ReadablePeriod)} factory method.
+ */
+class MinutesTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    void standardMinutesIn_givenNullPeriod_returnsZeroMinutes() {
+        assertEquals(0, Minutes.standardMinutesIn(null).getMinutes());
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestMinutes.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testFactory_standardMinutesIn_RPeriod() {
-        assertEquals(0, Minutes.standardMinutesIn((ReadablePeriod) null).getMinutes());
+    @Test
+    void standardMinutesIn_givenZeroPeriod_returnsZeroMinutes() {
         assertEquals(0, Minutes.standardMinutesIn(Period.ZERO).getMinutes());
-        assertEquals(1, Minutes.standardMinutesIn(new Period(0, 0, 0, 0, 0, 1, 0, 0)).getMinutes());
-        assertEquals(123, Minutes.standardMinutesIn(Period.minutes(123)).getMinutes());
-        assertEquals(-987, Minutes.standardMinutesIn(Period.minutes(-987)).getMinutes());
+    }
+
+    @Test
+    void standardMinutesIn_givenPeriodWithOnlyMinutes_returnsSameAmount() {
+        // Test with a positive value
+        Minutes positiveResult = Minutes.standardMinutesIn(Period.minutes(123));
+        assertEquals(123, positiveResult.getMinutes());
+
+        // Test with a negative value
+        Minutes negativeResult = Minutes.standardMinutesIn(Period.minutes(-987));
+        assertEquals(-987, negativeResult.getMinutes());
+    }
+
+    @Test
+    void standardMinutesIn_givenPeriodWithHours_convertsCorrectly() {
+        Period twoHours = Period.hours(2);
+        Minutes result = Minutes.standardMinutesIn(twoHours);
+        assertEquals(120, result.getMinutes(), "2 hours should be 120 minutes");
+    }
+
+    @Test
+    void standardMinutesIn_givenPeriodWithSeconds_truncatesToFullMinutes() {
+        // 119 seconds is 1 full minute and 59 seconds, should truncate to 1
         assertEquals(1, Minutes.standardMinutesIn(Period.seconds(119)).getMinutes());
+
+        // 120 seconds is exactly 2 minutes
         assertEquals(2, Minutes.standardMinutesIn(Period.seconds(120)).getMinutes());
+
+        // 121 seconds is 2 full minutes and 1 second, should truncate to 2
         assertEquals(2, Minutes.standardMinutesIn(Period.seconds(121)).getMinutes());
-        assertEquals(120, Minutes.standardMinutesIn(Period.hours(2)).getMinutes());
-        try {
-            Minutes.standardMinutesIn(Period.months(1));
-            fail();
-        } catch (IllegalArgumentException ex) {
-            // expected
-        }
+    }
+
+    @Test
+    void standardMinutesIn_givenPeriodWithImpreciseField_throwsIllegalArgumentException() {
+        // A period with months cannot be reliably converted to minutes
+        Period periodWithMonths = Period.months(1);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            Minutes.standardMinutesIn(periodWithMonths);
+        });
     }
 }
