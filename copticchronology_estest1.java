@@ -1,20 +1,31 @@
 package org.joda.time.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CopticChronology_ESTestTest1 extends CopticChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CopticChronology} class.
+ */
+public class CopticChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        CopticChronology copticChronology0 = CopticChronology.getInstanceUTC();
-        long long0 = copticChronology0.calculateFirstDayOfYearMillis(292272708);
-        assertEquals(9223371994233600000L, long0);
+    /**
+     * Tests that calculateFirstDayOfYearMillis() correctly computes the start
+     * of the maximum supported year. This is an important edge-case test.
+     */
+    @Test
+    public void calculateFirstDayOfYearMillis_forMaximumYear_returnsCorrectValue() {
+        // Arrange
+        CopticChronology copticChronology = CopticChronology.getInstanceUTC();
+        int maxYear = copticChronology.getMaxYear(); // The maximum year is 292272708
+
+        // This is the pre-calculated expected millisecond value for the start of the max year.
+        long expectedMillis = 9223371994233600000L;
+
+        // Act
+        long actualMillis = copticChronology.calculateFirstDayOfYearMillis(maxYear);
+
+        // Assert
+        assertEquals("First day of the maximum year should be calculated correctly",
+                     expectedMillis, actualMillis);
     }
 }
