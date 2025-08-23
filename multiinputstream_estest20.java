@@ -1,30 +1,31 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class MultiInputStream_ESTestTest20 extends MultiInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link MultiInputStream}.
+ */
+public class MultiInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        ByteSource byteSource0 = ByteSource.empty();
-        ArrayDeque<ByteSource> arrayDeque0 = new ArrayDeque<ByteSource>();
-        arrayDeque0.add(byteSource0);
-        Iterator<ByteSource> iterator0 = arrayDeque0.iterator();
-        MultiInputStream multiInputStream0 = new MultiInputStream(iterator0);
-        long long0 = multiInputStream0.skip(2173L);
-        assertEquals(0L, long0);
+    @Test
+    public void skip_onStreamWithSingleEmptySource_returnsZero() throws IOException {
+        // Arrange: Create a MultiInputStream from an iterator over a single, empty ByteSource.
+        ByteSource emptySource = ByteSource.empty();
+        Iterator<ByteSource> sourceIterator = Collections.singletonList(emptySource).iterator();
+        InputStream multiStream = new MultiInputStream(sourceIterator);
+
+        long arbitraryBytesToSkip = 2173L;
+
+        // Act: Attempt to skip bytes from the stream.
+        long bytesSkipped = multiStream.skip(arbitraryBytesToSkip);
+
+        // Assert: Verify that zero bytes were actually skipped because the underlying source is empty.
+        assertEquals("Should not be able to skip any bytes from an empty source.", 0L, bytesSkipped);
     }
 }
