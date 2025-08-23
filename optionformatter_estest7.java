@@ -1,24 +1,28 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
 import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class OptionFormatter_ESTestTest7 extends OptionFormatter_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Option option0 = new Option("?Wf", "?Wf", true, "?Wf");
-        option0.setRequired(true);
-        OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
-        boolean boolean0 = optionFormatter0.isRequired();
-        assertTrue(boolean0);
+/**
+ * Tests for the {@link OptionFormatter} class.
+ */
+public class OptionFormatterTest {
+
+    @Test
+    public void isRequired_ShouldReturnTrue_WhenOptionIsRequired() {
+        // Arrange: Create an option and explicitly mark it as required.
+        // Using meaningful names for the option's properties improves readability,
+        // even if they are not directly used in the assertion.
+        final Option requiredOption = new Option("r", "required-opt", false, "A required option");
+        requiredOption.setRequired(true);
+
+        // Act: Create a formatter from the option and check its required status.
+        final OptionFormatter formatter = OptionFormatter.from(requiredOption);
+        final boolean isRequired = formatter.isRequired();
+
+        // Assert: The formatter should correctly report that the option is required.
+        assertTrue("The formatter should reflect that the underlying option is required.", isRequired);
     }
 }
