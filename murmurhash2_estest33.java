@@ -1,18 +1,34 @@
 package org.apache.commons.codec.digest;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MurmurHash2_ESTestTest33 extends MurmurHash2_ESTest_scaffolding {
+/**
+ * Test suite for the MurmurHash2 class.
+ */
+public class MurmurHash2Test {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        byte[] byteArray0 = new byte[6];
-        long long0 = MurmurHash2.hash64(byteArray0, 0, (int) (byte) (-66));
-        assertEquals(2692789288766115115L, long0);
+    /**
+     * Tests that hash64 produces a known, pre-calculated hash for a zero-length input.
+     * The content of the input byte array should be ignored when the provided length is zero.
+     */
+    @Test
+    public void testHash64WithZeroLength() {
+        // Arrange
+        // A non-empty byte array is used to ensure that the method correctly
+        // processes only the specified length (0) and ignores the rest of the array.
+        final byte[] data = "some-irrelevant-data".getBytes();
+        final int length = 0;
+        final int seed = -66;
+
+        // This is the pre-calculated MurmurHash2 value for a zero-length input
+        // with a seed of -66.
+        final long expectedHash = 2692789288766115L;
+
+        // Act
+        final long actualHash = MurmurHash2.hash64(data, length, seed);
+
+        // Assert
+        assertEquals(expectedHash, actualHash);
     }
 }
