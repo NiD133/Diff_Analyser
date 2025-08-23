@@ -1,34 +1,32 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-public class SerializedString_ESTestTest26 extends SerializedString_ESTest_scaffolding {
+/**
+ * Contains tests for the constructor of the {@link SerializedString} class.
+ */
+public class SerializedStringConstructorTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        SerializedString serializedString0 = null;
-        try {
-            serializedString0 = new SerializedString((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // Null String illegal for SerializedString
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Verifies that the SerializedString constructor throws a NullPointerException
+     * when a null string is provided as input. This ensures that the class
+     * correctly handles invalid arguments according to its contract.
+     */
+    @Test
+    public void constructingWithNullStringShouldThrowNullPointerException() {
+        // Arrange: Define the expected exception message from the class contract.
+        String expectedMessage = "Null String illegal for SerializedString";
+
+        // Act & Assert: Execute the constructor with null input and verify that the
+        // correct exception is thrown.
+        NullPointerException thrownException = assertThrows(
+            NullPointerException.class,
+            () -> new SerializedString(null)
+        );
+
+        // Assert: Further verify that the exception message is as expected.
+        assertEquals(expectedMessage, thrownException.getMessage());
     }
 }
