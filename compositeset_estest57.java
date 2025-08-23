@@ -1,0 +1,91 @@
+package org.apache.commons.collections4.set;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+import static org.evosuite.shaded.org.mockito.Mockito.*;
+import static org.evosuite.runtime.EvoAssertions.*;
+import java.lang.reflect.Array;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+import org.apache.commons.collections4.Closure;
+import org.apache.commons.collections4.Equator;
+import org.apache.commons.collections4.Predicate;
+import org.apache.commons.collections4.Transformer;
+import org.apache.commons.collections4.functors.AnyPredicate;
+import org.apache.commons.collections4.functors.ChainedClosure;
+import org.apache.commons.collections4.functors.ConstantTransformer;
+import org.apache.commons.collections4.functors.DefaultEquator;
+import org.apache.commons.collections4.functors.EqualPredicate;
+import org.apache.commons.collections4.functors.ExceptionPredicate;
+import org.apache.commons.collections4.functors.FalsePredicate;
+import org.apache.commons.collections4.functors.IdentityPredicate;
+import org.apache.commons.collections4.functors.IfClosure;
+import org.apache.commons.collections4.functors.NonePredicate;
+import org.apache.commons.collections4.functors.NotNullPredicate;
+import org.apache.commons.collections4.functors.NotPredicate;
+import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
+import org.apache.commons.collections4.functors.NullIsTruePredicate;
+import org.apache.commons.collections4.functors.OnePredicate;
+import org.apache.commons.collections4.functors.OrPredicate;
+import org.apache.commons.collections4.functors.TransformerClosure;
+import org.apache.commons.collections4.functors.TruePredicate;
+import org.apache.commons.collections4.functors.UniquePredicate;
+import org.apache.commons.collections4.functors.WhileClosure;
+import org.apache.commons.collections4.iterators.IteratorChain;
+import org.evosuite.runtime.EvoRunner;
+import org.evosuite.runtime.EvoRunnerParameters;
+import org.evosuite.runtime.ViolatedAssumptionAnswer;
+import org.junit.runner.RunWith;
+
+public class CompositeSet_ESTestTest57 extends CompositeSet_ESTest_scaffolding {
+
+    @Test(timeout = 4000)
+    public void test56() throws Throwable {
+        CompositeSet<LinkedHashSet<Integer>> compositeSet0 = new CompositeSet<LinkedHashSet<Integer>>();
+        CompositeSet.SetMutator<LinkedHashSet<Integer>> compositeSet_SetMutator0 = (CompositeSet.SetMutator<LinkedHashSet<Integer>>) mock(CompositeSet.SetMutator.class, new ViolatedAssumptionAnswer());
+        compositeSet0.setMutator(compositeSet_SetMutator0);
+        Set<Integer>[] setArray0 = (Set<Integer>[]) Array.newInstance(Set.class, 8);
+        CompositeSet<Integer> compositeSet1 = new CompositeSet<Integer>();
+        CompositeSet<Integer> compositeSet2 = new CompositeSet<Integer>(compositeSet1);
+        setArray0[0] = (Set<Integer>) compositeSet2;
+        CompositeSet<Integer> compositeSet3 = new CompositeSet<Integer>();
+        setArray0[1] = (Set<Integer>) compositeSet3;
+        LinkedHashSet<Integer> linkedHashSet0 = new LinkedHashSet<Integer>();
+        setArray0[2] = (Set<Integer>) linkedHashSet0;
+        CompositeSet<Integer> compositeSet4 = new CompositeSet<Integer>(compositeSet1);
+        setArray0[3] = (Set<Integer>) compositeSet4;
+        CompositeSet<Integer> compositeSet5 = new CompositeSet<Integer>(setArray0);
+        setArray0[4] = (Set<Integer>) compositeSet5;
+        LinkedHashSet<Integer> linkedHashSet1 = new LinkedHashSet<Integer>();
+        setArray0[5] = (Set<Integer>) linkedHashSet1;
+        compositeSet5.addComposited(setArray0);
+        CompositeSet<Integer> compositeSet6 = new CompositeSet<Integer>(setArray0);
+        setArray0[6] = (Set<Integer>) compositeSet6;
+        CompositeSet<Integer> compositeSet7 = new CompositeSet<Integer>(setArray0);
+        Set<Predicate<Integer>>[] setArray1 = (Set<Predicate<Integer>>[]) Array.newInstance(Set.class, 1);
+        CompositeSet<Predicate<Integer>> compositeSet8 = new CompositeSet<Predicate<Integer>>(setArray1);
+        setArray1[0] = (Set<Predicate<Integer>>) compositeSet8;
+        CompositeSet<Predicate<Integer>> compositeSet9 = new CompositeSet<Predicate<Integer>>(setArray1);
+        Predicate<Integer> predicate0 = AnyPredicate.anyPredicate((Collection<? extends Predicate<? super Integer>>) compositeSet9);
+        compositeSet7.removeIf(predicate0);
+        setArray0[7] = (Set<Integer>) compositeSet7;
+        CompositeSet<Integer> compositeSet10 = new CompositeSet<Integer>(setArray0);
+        compositeSet10.clear();
+        compositeSet10.removeComposited(setArray0[2]);
+        int int0 = (-2970);
+        Integer integer0 = new Integer(int0);
+        compositeSet0.equals(integer0);
+        CompositeSet.SetMutator<LinkedHashSet<Integer>> compositeSet_SetMutator1 = (CompositeSet.SetMutator<LinkedHashSet<Integer>>) mock(CompositeSet.SetMutator.class, new ViolatedAssumptionAnswer());
+        doReturn(false).when(compositeSet_SetMutator1).addAll(any(org.apache.commons.collections4.set.CompositeSet.class), anyList(), anyCollection());
+        compositeSet0.setMutator(compositeSet_SetMutator1);
+        LinkedList<LinkedHashSet<Integer>> linkedList0 = new LinkedList<LinkedHashSet<Integer>>();
+        compositeSet0.addAll(linkedList0);
+    }
+}
