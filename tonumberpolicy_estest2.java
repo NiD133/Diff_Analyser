@@ -1,32 +1,40 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.stream.JsonReader;
+import org.junit.Test;
+
 import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ToNumberPolicy_ESTestTest2 extends ToNumberPolicy_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test1() throws Throwable {
-        StringReader stringReader0 = new StringReader("p(ppj%8[r\u0000>Md]");
-        JsonReader jsonReader0 = new JsonReader(stringReader0);
-        Strictness strictness0 = Strictness.LENIENT;
-        jsonReader0.setStrictness(strictness0);
-        ToNumberPolicy toNumberPolicy0 = ToNumberPolicy.BIG_DECIMAL;
-        // Undeclared exception!
-        try {
-            toNumberPolicy0.readNumber(jsonReader0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // Cannot parse p(ppj%8; at path $
-            //
-            verifyException("com.google.gson.ToNumberPolicy$4", e);
-        }
+/**
+ * Tests for {@link ToNumberPolicy}.
+ */
+public class ToNumberPolicyTest {
+
+    /**
+     * Verifies that the BIG_DECIMAL policy throws a JsonParseException when it encounters
+     * an unquoted string that is not a valid number, even in lenient mode.
+     */
+    @Test
+    public void bigDecimalPolicy_whenReadingInvalidStringInLenientMode_throwsJsonParseException() {
+        // Arrange
+        ToNumberStrategy bigDecimalPolicy = ToNumberPolicy.BIG_DECIMAL;
+        String invalidNumberJson = "not-a-number"; // A clear, non-numeric string
+        StringReader stringReader = new StringReader(invalidNumberJson);
+        JsonReader jsonReader = new JsonReader(stringReader);
+
+        // Lenient mode is required to allow the parser to read an unquoted string value.
+        jsonReader.setLenient(true);
+
+        // Act & Assert
+        JsonParseException exception = assertThrows(
+            JsonParseException.class,
+            () -> bigDecimalPolicy.readNumber(jsonReader)
+        );
+
+        // Verify the exception message to ensure it failed for the expected reason.
+        assertEquals("Cannot parse not-a-number; at path $", exception.getMessage());
     }
 }
