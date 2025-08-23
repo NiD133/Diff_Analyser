@@ -1,173 +1,38 @@
 package org.apache.commons.collections4.set;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
 import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
 import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CompositeSet_ESTestTest9 extends CompositeSet_ESTest_scaffolding {
+import java.util.HashSet;
+import java.util.Set;
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        Set<Integer>[] setArray0 = (Set<Integer>[]) Array.newInstance(Set.class, 7);
-        CompositeSet<Integer> compositeSet0 = new CompositeSet<Integer>();
-        assertNotNull(compositeSet0);
-        setArray0[0] = (Set<Integer>) compositeSet0;
-        Set<Integer>[] setArray1 = (Set<Integer>[]) Array.newInstance(Set.class, 1);
-        assertFalse(setArray1.equals((Object) setArray0));
-        setArray1[0] = (Set<Integer>) compositeSet0;
-        CompositeSet<Integer> compositeSet1 = new CompositeSet<Integer>(setArray1);
-        assertEquals(1, setArray1.length);
-        assertNotNull(compositeSet1);
-        assertFalse(setArray1.equals((Object) setArray0));
-        assertTrue(compositeSet1.equals((Object) compositeSet0));
-        setArray0[1] = (Set<Integer>) compositeSet1;
-        CompositeSet<Integer> compositeSet2 = new CompositeSet<Integer>(setArray0[1]);
-        assertEquals(7, setArray0.length);
-        assertNotNull(compositeSet2);
-        assertFalse(setArray0.equals((Object) setArray1));
-        assertTrue(compositeSet2.equals((Object) compositeSet0));
-        assertTrue(compositeSet2.equals((Object) compositeSet1));
-        setArray0[2] = (Set<Integer>) compositeSet2;
-        LinkedHashSet<Integer> linkedHashSet0 = new LinkedHashSet<Integer>();
-        assertNotNull(linkedHashSet0);
-        assertTrue(linkedHashSet0.isEmpty());
-        assertEquals(0, linkedHashSet0.size());
-        setArray0[3] = (Set<Integer>) linkedHashSet0;
-        CompositeSet<Integer> compositeSet3 = new CompositeSet<Integer>(setArray0);
-        assertEquals(7, setArray0.length);
-        assertNotNull(compositeSet3);
-        assertFalse(setArray0.equals((Object) setArray1));
-        assertTrue(compositeSet3.equals((Object) compositeSet0));
-        assertTrue(compositeSet3.equals((Object) compositeSet1));
-        assertTrue(compositeSet3.equals((Object) compositeSet2));
-        setArray0[4] = (Set<Integer>) compositeSet3;
-        CompositeSet<Integer> compositeSet4 = new CompositeSet<Integer>(setArray0[2]);
-        assertEquals(7, setArray0.length);
-        assertNotNull(compositeSet4);
-        assertFalse(setArray0.equals((Object) setArray1));
-        assertTrue(compositeSet4.equals((Object) compositeSet1));
-        assertTrue(compositeSet4.equals((Object) compositeSet2));
-        assertTrue(compositeSet4.equals((Object) compositeSet3));
-        assertTrue(compositeSet4.equals((Object) compositeSet0));
-        setArray0[5] = (Set<Integer>) compositeSet4;
-        LinkedHashSet<Integer> linkedHashSet1 = new LinkedHashSet<Integer>();
-        assertNotNull(linkedHashSet1);
-        assertTrue(linkedHashSet1.isEmpty());
-        assertEquals(0, linkedHashSet1.size());
-        assertTrue(linkedHashSet1.equals((Object) linkedHashSet0));
-        ConstantTransformer<Object, Object> constantTransformer0 = new ConstantTransformer<Object, Object>(compositeSet0);
-        assertNotNull(constantTransformer0);
-        assertTrue(compositeSet0.equals((Object) compositeSet1));
-        assertTrue(compositeSet0.equals((Object) compositeSet2));
-        assertTrue(compositeSet0.equals((Object) compositeSet3));
-        assertTrue(compositeSet0.equals((Object) compositeSet4));
-        Closure<Object> closure0 = TransformerClosure.transformerClosure((Transformer<? super Object, ?>) constantTransformer0);
-        assertNotNull(closure0);
-        assertNotSame(compositeSet0, compositeSet4);
-        assertNotSame(compositeSet0, compositeSet3);
-        assertNotSame(compositeSet0, compositeSet1);
-        assertNotSame(compositeSet0, compositeSet2);
-        assertTrue(compositeSet0.equals((Object) compositeSet1));
-        assertTrue(compositeSet0.equals((Object) compositeSet2));
-        assertTrue(compositeSet0.equals((Object) compositeSet3));
-        assertTrue(compositeSet0.equals((Object) compositeSet4));
-        compositeSet4.forEach(closure0);
-        assertEquals(7, setArray0.length);
-        assertNotSame(setArray0, setArray1);
-        assertNotSame(compositeSet0, compositeSet4);
-        assertNotSame(compositeSet0, compositeSet3);
-        assertNotSame(compositeSet0, compositeSet1);
-        assertNotSame(compositeSet0, compositeSet2);
-        assertNotSame(compositeSet4, compositeSet1);
-        assertNotSame(compositeSet4, compositeSet0);
-        assertNotSame(compositeSet4, compositeSet3);
-        assertNotSame(compositeSet4, compositeSet2);
-        assertFalse(setArray0.equals((Object) setArray1));
-        assertTrue(compositeSet0.equals((Object) compositeSet1));
-        assertTrue(compositeSet0.equals((Object) compositeSet2));
-        assertTrue(compositeSet0.equals((Object) compositeSet3));
-        assertTrue(compositeSet0.equals((Object) compositeSet4));
-        assertTrue(compositeSet4.equals((Object) compositeSet1));
-        assertTrue(compositeSet4.equals((Object) compositeSet2));
-        assertTrue(compositeSet4.equals((Object) compositeSet3));
-        assertTrue(compositeSet4.equals((Object) compositeSet0));
-        setArray0[6] = (Set<Integer>) linkedHashSet1;
-        CompositeSet<Integer> compositeSet5 = new CompositeSet<Integer>(setArray0);
-        assertEquals(7, setArray0.length);
-        assertNotNull(compositeSet5);
-        assertFalse(setArray0.equals((Object) setArray1));
-        assertTrue(compositeSet5.equals((Object) compositeSet3));
-        assertTrue(compositeSet5.equals((Object) compositeSet2));
-        assertTrue(compositeSet5.equals((Object) compositeSet0));
-        assertTrue(compositeSet5.equals((Object) compositeSet1));
-        assertTrue(compositeSet5.equals((Object) compositeSet4));
-        AnyPredicate<Integer> anyPredicate0 = new AnyPredicate<Integer>((Predicate<? super Integer>[]) null);
-        assertNotNull(anyPredicate0);
-        OnePredicate<Integer> onePredicate0 = new OnePredicate<Integer>((Predicate<? super Integer>[]) null);
-        assertNotNull(onePredicate0);
-        Integer integer0 = new Integer(0);
-        assertNotNull(integer0);
-        assertEquals(0, (int) integer0);
-        boolean boolean0 = linkedHashSet1.add(integer0);
-        assertNotSame(linkedHashSet1, linkedHashSet0);
-        assertTrue(linkedHashSet1.contains(0));
-        assertEquals(1, linkedHashSet1.size());
-        assertFalse(linkedHashSet1.isEmpty());
-        assertFalse(linkedHashSet1.equals((Object) linkedHashSet0));
-        assertTrue(boolean0);
-        Predicate<Integer> predicate0 = NullIsTruePredicate.nullIsTruePredicate((Predicate<? super Integer>) onePredicate0);
-        assertNotNull(predicate0);
-        java.util.function.Predicate<Integer> predicate1 = anyPredicate0.or(predicate0);
-        assertNotNull(predicate1);
-        // Undeclared exception!
-        try {
-            compositeSet5.removeIf(anyPredicate0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.collections4.functors.AnyPredicate", e);
-        }
+/**
+ * Improved, understandable tests for the {@link CompositeSet} class.
+ */
+public class CompositeSetImprovedTest {
+
+    /**
+     * Tests that calling removeIf() with an AnyPredicate constructed with a null
+     * predicate array throws a NullPointerException.
+     * <p>
+     * The exception originates from the predicate's internal logic when it attempts
+     * to iterate over the null array, not from the CompositeSet itself.
+     * </p>
+     */
+    @Test(expected = NullPointerException.class)
+    public void removeIfWithPredicateConstructedWithNullArrayThrowsNPE() {
+        // Arrange: Create a simple composite set. Its content is not critical for this test.
+        final Set<String> innerSet = new HashSet<>();
+        innerSet.add("element");
+        final CompositeSet<String> compositeSet = new CompositeSet<>(innerSet);
+
+        // Arrange: Create an AnyPredicate with a null array of predicates.
+        // This is an invalid state for this specific predicate implementation.
+        final Predicate<String> faultyPredicate = new AnyPredicate<>(null);
+
+        // Act: Attempt to use the faulty predicate with the set's removeIf method.
+        // This is expected to throw a NullPointerException.
+        compositeSet.removeIf(faultyPredicate);
     }
 }
