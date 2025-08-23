@@ -1,18 +1,27 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Metaphone_ESTestTest21 extends Metaphone_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Metaphone} class.
+ */
+public class MetaphoneTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        Metaphone metaphone0 = new Metaphone();
-        metaphone0.metaphone((String) null);
-        assertEquals(4, metaphone0.getMaxCodeLen());
+    /**
+     * Tests that the metaphone() method correctly handles null input
+     * by returning an empty string, which is the expected behavior for
+     * invalid or empty inputs.
+     */
+    @Test
+    public void metaphoneShouldReturnEmptyStringForNullInput() {
+        // Arrange: Create an instance of the class under test.
+        Metaphone metaphone = new Metaphone();
+
+        // Act: Call the method with null input.
+        String result = metaphone.metaphone(null);
+
+        // Assert: Verify that the result is an empty string.
+        assertEquals("Encoding a null string should result in an empty string.", "", result);
     }
 }
