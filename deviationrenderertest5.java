@@ -1,19 +1,27 @@
 package org.jfree.chart.renderer.xy;
 
 import org.jfree.chart.TestUtils;
-import org.jfree.chart.api.PublicCloneable;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class DeviationRendererTestTest5 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    /**
-     * Serialize an instance, restore it, and check for equality.
-     */
+/**
+ * Serialization tests for the {@link DeviationRenderer} class.
+ */
+@DisplayName("DeviationRenderer Serialization")
+class DeviationRendererSerializationTest {
+
     @Test
-    public void testSerialization() {
-        DeviationRenderer r1 = new DeviationRenderer();
-        DeviationRenderer r2 = TestUtils.serialised(r1);
-        assertEquals(r1, r2);
+    @DisplayName("A default instance should be serializable")
+    void defaultInstanceShouldBeSerializable() {
+        // Arrange
+        DeviationRenderer originalRenderer = new DeviationRenderer();
+
+        // Act
+        DeviationRenderer deserializedRenderer = TestUtils.serialised(originalRenderer);
+
+        // Assert
+        assertEquals(originalRenderer, deserializedRenderer, "A deserialized renderer should be equal to the original.");
     }
 }
