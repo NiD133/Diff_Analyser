@@ -1,22 +1,28 @@
 package com.google.gson;
 
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest73 extends JsonArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link JsonArray} class.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test72() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        jsonArray0.addAll(jsonArray0);
-        assertFalse(jsonArray0.isJsonPrimitive());
+    /**
+     * Verifies that calling addAll() on an empty JsonArray with itself as the argument
+     * results in the array remaining empty. This tests a specific edge case of
+     * self-modification.
+     */
+    @Test
+    public void addAll_onEmptyArrayWithSelfAsArgument_shouldRemainEmpty() {
+        // Arrange: Create an empty JsonArray.
+        JsonArray emptyArray = new JsonArray();
+
+        // Act: Add all elements of the array to itself.
+        emptyArray.addAll(emptyArray);
+
+        // Assert: The array should still be empty after the operation.
+        assertTrue("The array should remain empty after adding itself to it.", emptyArray.isEmpty());
     }
 }
