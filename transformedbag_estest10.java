@@ -1,64 +1,40 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
 import org.apache.commons.collections4.Bag;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.SortedBag;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AndPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantFactory;
 import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InstantiateFactory;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TransformedBag_ESTestTest10 extends TransformedBag_ESTest_scaffolding {
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        HashBag<Integer> hashBag0 = new HashBag<Integer>();
-        hashBag0.add((Integer) null);
-        Transformer<Object, Integer> transformer0 = ConstantTransformer.nullTransformer();
-        Bag<Integer> bag0 = UnmodifiableBag.unmodifiableBag((Bag<? extends Integer>) hashBag0);
-        // Undeclared exception!
+/**
+ * Contains tests for the static factory methods of {@link TransformedBag}.
+ */
+public class TransformedBagTest {
+
+    /**
+     * Tests that {@link TransformedBag#transformedBag(Bag, Transformer)} throws
+     * an UnsupportedOperationException when given an unmodifiable bag.
+     * <p>
+     * This factory method attempts to transform the elements already present in the
+     * source bag, which involves modification and is not allowed on an unmodifiable bag.
+     */
+    @Test
+    public void transformedBagWithUnmodifiableBagShouldThrowException() {
+        // Arrange: Create a non-empty, unmodifiable bag.
+        final Bag<Integer> sourceBag = new HashBag<>();
+        sourceBag.add(1); // The bag must be non-empty to trigger the transformation attempt.
+
+        final Bag<Integer> unmodifiableBag = UnmodifiableBag.unmodifiableBag(sourceBag);
+        final Transformer<Integer, Integer> transformer = ConstantTransformer.constantTransformer(null);
+
+        // Act & Assert: Attempting to create a transformed bag should fail.
         try {
-            TransformedBag.transformedBag(bag0, (Transformer<? super Integer, ? extends Integer>) transformer0);
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.collections4.bag.UnmodifiableBag", e);
+            TransformedBag.transformedBag(unmodifiableBag, transformer);
+            fail("Expected an UnsupportedOperationException because the decorated bag is unmodifiable.");
+        } catch (final UnsupportedOperationException e) {
+            // This is the expected behavior. The factory method correctly fails
+            // when it cannot modify the source bag to transform its elements.
         }
     }
 }
