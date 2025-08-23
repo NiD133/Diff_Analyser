@@ -1,33 +1,29 @@
 package org.joda.time.convert;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Hours;
-import org.joda.time.Interval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.Seconds;
-import org.joda.time.chrono.CopticChronology;
-import org.junit.runner.RunWith;
 
-public class ConverterSet_ESTestTest14 extends ConverterSet_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ConverterSet}.
+ */
+public class ConverterSetTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        Converter[] converterArray0 = new Converter[14];
-        ConverterSet converterSet0 = new ConverterSet(converterArray0);
-        // Undeclared exception!
-        try {
-            converterSet0.add(converterArray0[0], converterArray0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.joda.time.convert.ConverterSet", e);
-        }
+    /**
+     * The add() method is documented to throw a NullPointerException if the converter to be added is null.
+     * This test verifies that behavior.
+     */
+    @Test(expected = NullPointerException.class)
+    public void add_whenConverterIsNull_shouldThrowNullPointerException() {
+        // Arrange: Create an empty ConverterSet. The initial state of the set
+        // does not affect the outcome of adding a null converter.
+        Converter[] initialConverters = new Converter[0];
+        ConverterSet converterSet = new ConverterSet(initialConverters);
+
+        // This array is required by the method signature to hold any converter that might be replaced.
+        Converter[] removedConverterContainer = new Converter[1];
+
+        // Act: Attempt to add a null converter to the set.
+        // The @Test(expected) annotation will cause the test to pass only if this line
+        // throws a NullPointerException.
+        converterSet.add(null, removedConverterContainer);
     }
 }
