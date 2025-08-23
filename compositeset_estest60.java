@@ -1,64 +1,41 @@
 package org.apache.commons.collections4.set;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import java.util.Collections;
 import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CompositeSet_ESTestTest60 extends CompositeSet_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link CompositeSet} class.
+ * This improved test focuses on verifying the behavior of mutation methods
+ * when no SetMutator is configured.
+ */
+public class CompositeSetTest {
 
-    @Test(timeout = 4000)
-    public void test59() throws Throwable {
-        LinkedHashSet<LinkedHashSet<Object>> linkedHashSet0 = new LinkedHashSet<LinkedHashSet<Object>>();
-        CompositeSet<LinkedHashSet<Object>> compositeSet0 = new CompositeSet<LinkedHashSet<Object>>(linkedHashSet0);
-        // Undeclared exception!
+    /**
+     * Tests that calling addAll() on a CompositeSet without a configured
+     * SetMutator throws an UnsupportedOperationException.
+     *
+     * As per the class documentation, mutation operations like addAll() are
+     * disabled by default and require a SetMutator strategy to be enabled.
+     */
+    @Test
+    public void addAllShouldThrowUnsupportedOperationExceptionWhenNoMutatorIsSet() {
+        // Arrange: Create a CompositeSet without a mutator.
+        final CompositeSet<String> compositeSet = new CompositeSet<>();
+        final Set<String> collectionToAdd = Collections.emptySet();
+
+        // Act & Assert: Expect an UnsupportedOperationException with a specific message.
         try {
-            compositeSet0.addAll(linkedHashSet0);
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // addAll() is not supported on CompositeSet without a SetMutator strategy
-            //
-            verifyException("org.apache.commons.collections4.set.CompositeSet", e);
+            compositeSet.addAll(collectionToAdd);
+            fail("Expected an UnsupportedOperationException to be thrown because no SetMutator was provided.");
+        } catch (final UnsupportedOperationException e) {
+            // This is the expected behavior.
+            final String expectedMessage = "addAll() is not supported on CompositeSet without a SetMutator strategy";
+            assertEquals("The exception message should clearly state why the operation is not supported.",
+                         expectedMessage, e.getMessage());
         }
     }
 }
