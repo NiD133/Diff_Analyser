@@ -1,32 +1,58 @@
 package org.apache.commons.compress.compressors.gzip;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertArrayEquals;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FilterOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class GzipCompressorOutputStream_ESTestTest25 extends GzipCompressorOutputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link GzipCompressorOutputStream}.
+ */
+public class GzipCompressorOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        ByteArrayOutputStream byteArrayOutputStream0 = new ByteArrayOutputStream();
-        GzipCompressorOutputStream gzipCompressorOutputStream0 = new GzipCompressorOutputStream(byteArrayOutputStream0);
-        gzipCompressorOutputStream0.finish();
-        assertEquals(20, byteArrayOutputStream0.size());
-        assertEquals("\u001F\uFFFD\b\u0000\u0000\u0000\u0000\u0000\u0000\uFFFD\u0003\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000", byteArrayOutputStream0.toString());
+    /**
+     * Tests that calling finish() on a new GzipCompressorOutputStream, without writing any data,
+     * produces a valid, empty GZIP stream.
+     *
+     * A valid empty GZIP stream consists of a 10-byte header, a 2-byte empty
+     * DEFLATE block, and an 8-byte trailer.
+     */
+    @Test
+    public void finishOnEmptyStreamProducesValidGzipFile() throws IOException {
+        // Arrange: Create a GZIP output stream that writes to an in-memory buffer.
+        final ByteArrayOutputStream outputBuffer = new ByteArrayOutputStream();
+        final GzipCompressorOutputStream gzipOutputStream = new GzipCompressorOutputStream(outputBuffer);
+
+        // Act: Finish the stream to write out the GZIP header and trailer for an empty file.
+        gzipOutputStream.finish();
+        gzipOutputStream.close();
+
+        // Assert: Verify the output buffer contains the correct bytes for an empty GZIP file.
+        final byte[] actualBytes = outputBuffer.toByteArray();
+
+        // The GZIP format for an empty file consists of:
+        // - 10-byte header
+        // - 2-byte empty DEFLATE block
+        // - 8-byte trailer (CRC32 and input size, both zero)
+        // Total expected size is 20 bytes.
+        final byte[] expectedBytes = {
+            // --- GZIP Header (10 bytes) ---
+            (byte) 0x1f, (byte) 0x8b, // Magic number indicating GZIP
+            (byte) 0x08,             // Compression method: DEFLATE
+            (byte) 0x00,             // Flags
+            0, 0, 0, 0,              // Modification time (Unix epoch)
+            (byte) 0x00,             // Extra flags
+            (byte) 0xff,             // Operating System: unknown
+            // --- Compressed Data (2 bytes) ---
+            // An empty, non-final DEFLATE block, which is standard for empty GZIP.
+            (byte) 0x03, (byte) 0x00,
+            // --- GZIP Trailer (8 bytes) ---
+            0, 0, 0, 0,              // CRC-32 checksum of uncompressed data (0)
+            0, 0, 0, 0               // Size of uncompressed data (0)
+        };
+
+        assertArrayEquals("The output byte array does not match the expected empty GZIP format.",
+                          expectedBytes, actualBytes);
     }
 }
