@@ -1,19 +1,24 @@
 package com.google.common.net;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.text.ParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class HostSpecifier_ESTestTest12 extends HostSpecifier_ESTest_scaffolding {
+/**
+ * Unit tests for {@link HostSpecifier}.
+ */
+public class HostSpecifierTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        HostSpecifier hostSpecifier0 = HostSpecifier.from("127.0.0.1");
-        boolean boolean0 = hostSpecifier0.equals(hostSpecifier0);
-        assertTrue(boolean0);
+    /**
+     * Verifies the reflexive property of the equals() method,
+     * ensuring that an object is always equal to itself.
+     */
+    @Test
+    public void equals_givenSameInstance_returnsTrue() {
+        // Arrange: Create a HostSpecifier instance from a valid IP address.
+        // Using fromValid() is suitable here as the input is a known-valid constant.
+        HostSpecifier hostSpecifier = HostSpecifier.fromValid("127.0.0.1");
+
+        // Act & Assert: An object must be equal to itself.
+        assertEquals(hostSpecifier, hostSpecifier);
     }
 }
