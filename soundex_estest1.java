@@ -15,7 +15,7 @@ public class Soundex_ESTestTest1 extends Soundex_ESTest_scaffolding {
         Soundex soundex0 = new Soundex(charArray0);
         // Undeclared exception!
         try {
-            soundex0.difference("EF\"kniaAVspLJDz", "$I<`&-Dq*{");
+            soundex0.difference("EF\"kniaAVspLJDz", "$I<`&-Dq *{");
             fail("Expecting exception: IllegalArgumentException");
         } catch (IllegalArgumentException e) {
             //
