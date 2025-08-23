@@ -1,33 +1,29 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.ConcurrentModificationException;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.Collections;
 
-public class ZippingIterator_ESTestTest6 extends ZippingIterator_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ZippingIterator}.
+ */
+public class ZippingIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        Iterator<Integer>[] iteratorArray0 = (Iterator<Integer>[]) Array.newInstance(Iterator.class, 1);
-        ZippingIterator<Object> zippingIterator0 = null;
-        try {
-            zippingIterator0 = new ZippingIterator<Object>(iteratorArray0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // iterator
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Tests that the constructor throws a NullPointerException if the array of
+     * iterators passed to it contains a null element.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructorShouldThrowNullPointerExceptionWhenGivenNullIterator() {
+        // Arrange: Create an array of iterators that includes a null.
+        // The constructor's contract states that all provided iterators must be non-null.
+        final Iterator<?>[] iteratorsWithNull = {
+            Collections.emptyIterator(),
+            null
+        };
+
+        // Act & Assert: Instantiating ZippingIterator with this array should
+        // throw a NullPointerException, which is verified by the @Test annotation.
+        new ZippingIterator<>(iteratorsWithNull);
     }
 }
