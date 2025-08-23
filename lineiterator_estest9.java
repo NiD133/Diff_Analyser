@@ -1,24 +1,30 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.Reader;
+import static org.junit.Assert.assertFalse;
+
 import java.io.StringReader;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class LineIterator_ESTestTest9 extends LineIterator_ESTest_scaffolding {
+/**
+ * Tests for {@link LineIterator}.
+ */
+public class LineIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        StringReader stringReader0 = new StringReader("");
-        BufferedReader bufferedReader0 = new BufferedReader(stringReader0, 2302);
-        LineIterator lineIterator0 = new LineIterator(bufferedReader0);
-        boolean boolean0 = lineIterator0.hasNext();
-        assertFalse(boolean0);
+    /**
+     * Tests that hasNext() returns false when the underlying reader is empty.
+     */
+    @Test
+    public void hasNext_shouldReturnFalse_whenReaderIsEmpty() {
+        // Arrange: Create a LineIterator with an empty source.
+        // Using try-with-resources to ensure the iterator and underlying reader are closed.
+        try (final StringReader emptyReader = new StringReader("");
+             final LineIterator lineIterator = new LineIterator(emptyReader)) {
+
+            // Act: Check if there is a next line.
+            final boolean hasNext = lineIterator.hasNext();
+
+            // Assert: The iterator should report that it has no lines.
+            assertFalse("An iterator for an empty reader should not have a next line.", hasNext);
+        }
     }
 }
