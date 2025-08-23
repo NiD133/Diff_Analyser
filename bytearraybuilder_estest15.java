@@ -1,20 +1,34 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class ByteArrayBuilder_ESTestTest15 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Contains unit tests for the {@link ByteArrayBuilder} class.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder(bufferRecycler0, (-3320));
-        ByteArrayBuilder byteArrayBuilder1 = ByteArrayBuilder.fromInitial(byteArrayBuilder0.NO_BYTES, 6);
-        byteArrayBuilder1.getCurrentSegment();
-        assertEquals(6, byteArrayBuilder1.size());
+    /**
+     * Verifies that a ByteArrayBuilder created with the `fromInitial` factory method
+     * correctly reports its size based on the provided initial length. This is true
+     * even when the underlying initial byte array is smaller than the specified length.
+     */
+    @Test
+    public void fromInitial_shouldSetSizeToInitialLength() {
+        // Arrange
+        // The `fromInitial` method allows creating a builder that "wraps" an existing
+        // buffer, treating the first `initialLength` bytes as already written content.
+        final int expectedInitialSize = 6;
+
+        // Act
+        // Create a builder using an empty byte array but specifying an initial length.
+        // This simulates a scenario where the builder is initialized to a state
+        // where it believes it already contains `expectedInitialSize` bytes.
+        ByteArrayBuilder builder = ByteArrayBuilder.fromInitial(ByteArrayBuilder.NO_BYTES, expectedInitialSize);
+
+        // Assert
+        // The size() method should reflect the initial length provided, not the
+        // actual length of the underlying (and in this case, empty) byte array.
+        assertEquals(expectedInitialSize, builder.size());
     }
 }
