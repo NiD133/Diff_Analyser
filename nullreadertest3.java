@@ -3,58 +3,62 @@ package org.apache.commons.io.input;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import java.io.EOFException;
+
 import java.io.IOException;
 import java.io.Reader;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-public class NullReaderTestTest3 {
+/**
+ * Tests for {@link NullReader}.
+ */
+class NullReaderTest {
 
-    // Use the same message as in java.io.InputStream.reset() in OpenJDK 8.0.275-1.
-    private static final String MARK_RESET_NOT_SUPPORTED = "mark/reset not supported";
+    // This message is specified by java.io.Reader for unsupported mark/reset operations.
+    private static final String MARK_RESET_NOT_SUPPORTED_MSG = "mark/reset not supported";
 
-    private static final class TestNullReader extends NullReader {
+    @Nested
+    @DisplayName("when mark/reset is not supported")
+    class WhenMarkNotSupported {
 
-        TestNullReader(final int size) {
-            super(size);
+        private Reader reader;
+
+        @BeforeEach
+        void setUp() {
+            // Arrange: Create a reader configured to not support mark/reset.
+            // The size and EOF behavior are not relevant for these tests.
+            reader = new NullReader(100, false, false);
         }
 
-        TestNullReader(final int size, final boolean markSupported, final boolean throwEofException) {
-            super(size, markSupported, throwEofException);
+        @Test
+        @DisplayName("markSupported() should return false")
+        void markSupportedShouldReturnFalse() {
+            // Act & Assert
+            assertFalse(reader.markSupported());
         }
 
-        @Override
-        protected int processChar() {
-            return (int) getPosition() - 1;
+        @Test
+        @DisplayName("mark() should throw UnsupportedOperationException")
+        void markShouldThrowException() {
+            // Act & Assert
+            final UnsupportedOperationException e = assertThrows(
+                UnsupportedOperationException.class,
+                () -> reader.mark(5)
+            );
+            assertEquals(MARK_RESET_NOT_SUPPORTED_MSG, e.getMessage());
         }
 
-        @Override
-        protected void processChars(final char[] chars, final int offset, final int length) {
-            final int startPos = (int) getPosition() - length;
-            for (int i = offset; i < length; i++) {
-                chars[i] = (char) (startPos + i);
-            }
+        @Test
+        @DisplayName("reset() should throw UnsupportedOperationException")
+        void resetShouldThrowException() throws IOException {
+            // Act & Assert
+            final UnsupportedOperationException e = assertThrows(
+                UnsupportedOperationException.class,
+                () -> reader.reset()
+            );
+            assertEquals(MARK_RESET_NOT_SUPPORTED_MSG, e.getMessage());
         }
-    }
-
-    @Test
-    void testMarkNotSupported() throws Exception {
-        final Reader reader = new TestNullReader(100, false, true);
-        assertFalse(reader.markSupported(), "Mark Should NOT be Supported");
-        try {
-            reader.mark(5);
-            fail("mark() should throw UnsupportedOperationException");
-        } catch (final UnsupportedOperationException e) {
-            assertEquals(MARK_RESET_NOT_SUPPORTED, e.getMessage(), "mark() error message");
-        }
-        try {
-            reader.reset();
-            fail("reset() should throw UnsupportedOperationException");
-        } catch (final UnsupportedOperationException e) {
-            assertEquals(MARK_RESET_NOT_SUPPORTED, e.getMessage(), "reset() error message");
-        }
-        reader.close();
     }
 }
