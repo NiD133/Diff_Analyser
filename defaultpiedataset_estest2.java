@@ -2,31 +2,31 @@ package org.jfree.data.general;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.List;
-import java.util.Vector;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.SortOrder;
-import org.jfree.chart.api.TableOrder;
-import org.jfree.data.DefaultKeyedValues;
-import org.jfree.data.KeyedValues;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.CategoryToPieDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.category.SlidingCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
 
-public class DefaultPieDataset_ESTestTest2 extends DefaultPieDataset_ESTest_scaffolding {
+/**
+ * Tests for the {@link DefaultPieDataset} class, focusing on data insertion.
+ */
+public class DefaultPieDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        DefaultKeyedValuesDataset<Integer> defaultKeyedValuesDataset0 = new DefaultKeyedValuesDataset<Integer>();
-        Integer integer0 = JLayeredPane.DRAG_LAYER;
-        defaultKeyedValuesDataset0.insertValue(0, integer0, (Number) integer0);
-        assertTrue(defaultKeyedValuesDataset0.getNotify());
+    /**
+     * Verifies that insertValue() correctly adds a new key-value pair to an
+     * empty dataset at the specified position.
+     */
+    @Test
+    public void insertValue_shouldAddKeyValuePair_whenDatasetIsEmpty() {
+        // Arrange: Create an empty dataset and define the data to be inserted.
+        DefaultPieDataset<String> pieDataset = new DefaultPieDataset<>();
+        String key = "Category A";
+        double value = 10.5;
+        int insertPosition = 0;
+
+        // Act: Insert the new value into the dataset.
+        pieDataset.insertValue(insertPosition, key, value);
+
+        // Assert: Verify that the dataset now contains exactly one item
+        // with the correct key and value.
+        assertEquals("The dataset should contain one item after insertion.", 1, pieDataset.getItemCount());
+        assertEquals("The key at the specified position should match the inserted key.", key, pieDataset.getKey(insertPosition));
+        assertEquals("The value for the key should match the inserted value.", value, pieDataset.getValue(key).doubleValue(), 0.000001d);
     }
 }
