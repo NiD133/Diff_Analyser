@@ -1,26 +1,18 @@
 package com.google.common.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.text.ParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class HostSpecifier_ESTestTest2 extends HostSpecifier_ESTest_scaffolding {
+/**
+ * Unit tests for {@link HostSpecifier}.
+ */
+public class HostSpecifierTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        // Undeclared exception!
-        try {
-            HostSpecifier.isValid((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.base.Preconditions", e);
-        }
+    /**
+     * Verifies that the isValid() method adheres to the common Guava convention
+     * of throwing a NullPointerException when a null argument is provided.
+     */
+    @Test(expected = NullPointerException.class)
+    public void isValid_whenInputIsNull_throwsNullPointerException() {
+        HostSpecifier.isValid(null);
     }
 }
