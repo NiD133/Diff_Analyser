@@ -1,45 +1,57 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Calendar;
-import java.util.TimeZone;
-import javax.swing.DropMode;
-import javax.swing.JScrollPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
 import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.legend.PaintScaleLegend;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.ThermometerPlot;
-import org.jfree.chart.renderer.LookupPaintScale;
-import org.jfree.chart.renderer.PaintScale;
-import org.jfree.chart.renderer.xy.XYShapeRenderer;
 import org.jfree.data.Range;
-import org.jfree.data.general.DefaultValueDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.time.DateRange;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ModuloAxis_ESTestTest21 extends ModuloAxis_ESTest_scaffolding {
+import java.awt.Rectangle;
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
-        ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
-        moduloAxis0.resizeRange(1005.89236);
-        Rectangle rectangle0 = new Rectangle(500, 1);
-        RectangleEdge rectangleEdge0 = RectangleEdge.BOTTOM;
-        double double0 = moduloAxis0.lengthToJava2D((-2.147483648E9), rectangle0, rectangleEdge0);
-        assertFalse(moduloAxis0.isAutoRange());
-        assertEquals((-4.013087995539962E12), double0, 0.01);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+/**
+ * An improved and more understandable test for the {@link ModuloAxis} class.
+ */
+public class ModuloAxisTest {
+
+    /**
+     * This test verifies the behavior of the lengthToJava2D method when the axis
+     * range has been significantly resized and the input data length is a large
+     * negative number. The initial setup uses a ModuloAxis with a default display
+     * range (270-90) that is far outside its fixed range [0, 1], which represents
+     * a specific edge case.
+     */
+    @Test
+    public void testLengthToJava2DWithResizedRangeAndNegativeLength() {
+        // Arrange
+        final double plotWidth = 500.0;
+        final double plotHeight = 1.0;
+        final double dataLength = (double) Integer.MIN_VALUE; // -2.147483648E9
+        final double resizeFactor = 1005.89236;
+        final double expectedJava2dLength = -4.013087995539962E12;
+        final double delta = 0.01;
+
+        // A ModuloAxis with a fixed range of [0, 1]. The default display range
+        // is 270 to 90, which wraps around.
+        Range fixedRange = new Range(0.0, 1.0);
+        ModuloAxis axis = new ModuloAxis("Test Modulo Axis", fixedRange);
+
+        Rectangle plotArea = new Rectangle((int) plotWidth, (int) plotHeight);
+        RectangleEdge axisEdge = RectangleEdge.BOTTOM;
+
+        // Act
+        // Resizing the range updates the internal displayStart and displayEnd values,
+        // which affects the 'displayLength' used in the conversion. This also
+        // sets the auto-range flag to false.
+        axis.resizeRange(resizeFactor);
+        double actualJava2dLength = axis.lengthToJava2D(dataLength, plotArea, axisEdge);
+
+        // Assert
+        // The resizeRange method should disable auto-ranging.
+        assertFalse("Auto-range should be disabled after resizing.", axis.isAutoRange());
+        
+        // The primary assertion for the length conversion.
+        assertEquals("The calculated Java2D length should match the expected value.",
+                expectedJava2dLength, actualJava2dLength, delta);
     }
 }
