@@ -1,23 +1,35 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Separators_ESTestTest23 extends Separators_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        Separators.Spacing separators_Spacing0 = Separators.Spacing.NONE;
-        Separators separators0 = new Separators("", 'J', separators_Spacing0, 'J', separators_Spacing0, "", 'J', separators_Spacing0, "2U#AD9");
-        Separators separators1 = separators0.withArrayValueSeparator('J');
-        assertEquals('J', separators1.getObjectFieldValueSeparator());
-        assertSame(separators1, separators0);
-        assertEquals("", separators1.getRootSeparator());
-        assertEquals('J', separators1.getObjectEntrySeparator());
-        assertEquals("2U#AD9", separators1.getArrayEmptySeparator());
-        assertEquals("", separators1.getObjectEmptySeparator());
+/**
+ * Unit tests for the {@link Separators} class, focusing on its immutability and optimization.
+ */
+public class SeparatorsTest {
+
+    /**
+     * Tests that calling a 'with' method with the same value that is already set
+     * returns the original instance, avoiding unnecessary object creation.
+     */
+    @Test
+    public void withArrayValueSeparator_shouldReturnSameInstance_whenSeparatorIsUnchanged() {
+        // Arrange: Create a Separators instance with a specific array value separator.
+        final char arraySeparator = ',';
+        final Separators originalSeparators = new Separators()
+                .withArrayValueSeparator(arraySeparator);
+
+        // Act: Call the 'with' method using the exact same separator character.
+        Separators resultSeparators = originalSeparators.withArrayValueSeparator(arraySeparator);
+
+        // Assert: The method should return the identical instance, not a new one.
+        // This is an important optimization for immutable objects.
+        assertSame("Expected the same instance when the value is not changed",
+                originalSeparators, resultSeparators);
+        
+        // Verify that the property itself is correct, as a sanity check.
+        assertEquals(arraySeparator, resultSeparators.getArrayValueSeparator());
     }
 }
