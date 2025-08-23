@@ -1,32 +1,61 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
+
+import java.util.Collections;
 import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JsonIgnoreProperties_ESTestTest55 extends JsonIgnoreProperties_ESTest_scaffolding {
+import static org.junit.Assert.*;
 
-    @Test(timeout = 4000)
-    public void test54() throws Throwable {
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.EMPTY;
-        LinkedHashSet<String> linkedHashSet0 = new LinkedHashSet<String>();
-        JsonIgnoreProperties.Value[] jsonIgnoreProperties_ValueArray0 = new JsonIgnoreProperties.Value[8];
-        jsonIgnoreProperties_ValueArray0[0] = jsonIgnoreProperties_Value0;
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value1 = new JsonIgnoreProperties.Value(linkedHashSet0, false, true, true, true);
-        jsonIgnoreProperties_ValueArray0[5] = jsonIgnoreProperties_Value1;
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value2 = JsonIgnoreProperties.Value.mergeAll(jsonIgnoreProperties_ValueArray0);
-        assertTrue(jsonIgnoreProperties_Value2.getAllowSetters());
-        assertTrue(jsonIgnoreProperties_Value2.equals((Object) jsonIgnoreProperties_Value1));
-        assertFalse(jsonIgnoreProperties_Value2.getIgnoreUnknown());
-        assertTrue(jsonIgnoreProperties_Value2.getAllowGetters());
-        assertNotSame(jsonIgnoreProperties_Value2, jsonIgnoreProperties_Value1);
-        assertNotNull(jsonIgnoreProperties_Value2);
+/**
+ * Contains tests for the {@link JsonIgnoreProperties.Value} class, focusing on its merging logic.
+ */
+public class JsonIgnoreProperties_ESTestTest55 {
+
+    /**
+     * Tests that {@link JsonIgnoreProperties.Value#mergeAll(JsonIgnoreProperties.Value...)}
+     * correctly combines multiple {@code Value} instances, including EMPTY, null, and a
+     * custom-configured instance. The final merged result should adopt the settings from the
+     * most specific, non-empty configuration provided.
+     */
+    @Test
+    public void mergeAllShouldPrioritizeSpecificConfigurationOverEmptyAndNulls() {
+        // Arrange
+        // 1. An empty value, representing the default state.
+        JsonIgnoreProperties.Value defaultValue = JsonIgnoreProperties.Value.EMPTY;
+
+        // 2. A specific configuration that overrides the defaults.
+        // Here, we allow getters and setters but do not ignore unknown properties.
+        Set<String> noIgnoredProperties = Collections.emptySet();
+        JsonIgnoreProperties.Value specificConfig = new JsonIgnoreProperties.Value(
+                noIgnoredProperties,
+                /* ignoreUnknown= */ false,
+                /* allowGetters= */ true,
+                /* allowSetters= */ true,
+                /* merge= */ true
+        );
+
+        // 3. An array containing various values to be merged, including nulls.
+        JsonIgnoreProperties.Value[] valuesToMerge = {
+                defaultValue,
+                null,
+                specificConfig
+        };
+
+        // Act
+        JsonIgnoreProperties.Value mergedValue = JsonIgnoreProperties.Value.mergeAll(valuesToMerge);
+
+        // Assert
+        assertNotNull("The merged result should not be null", mergedValue);
+
+        // The merged value should have taken its properties from 'specificConfig'.
+        assertFalse("ignoreUnknown should be false", mergedValue.getIgnoreUnknown());
+        assertTrue("allowGetters should be true", mergedValue.getAllowGetters());
+        assertTrue("allowSetters should be true", mergedValue.getAllowSetters());
+
+        // The merged value should be logically equal to the specific configuration...
+        assertEquals("Merged value should be equal to the specific configuration", specificConfig, mergedValue);
+        // ...but it should be a new instance created by the merge process.
+        assertNotSame("Merged value should be a new instance", specificConfig, mergedValue);
     }
 }
