@@ -1,32 +1,30 @@
 package org.apache.commons.io.output;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import java.io.ByteArrayOutputStream;
+import static org.junit.Assert.assertEquals;
 
-public class XmlStreamWriter_ESTestTest2 extends XmlStreamWriter_ESTest_scaffolding {
+/**
+ * Tests for {@link XmlStreamWriter}.
+ */
+public class XmlStreamWriterTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        java.io.ByteArrayOutputStream byteArrayOutputStream0 = new java.io.ByteArrayOutputStream();
-        XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter(byteArrayOutputStream0, (String) null);
-        char[] charArray0 = new char[5];
-        xmlStreamWriter0.write(charArray0, 1, 1);
-        assertEquals("UTF-8", xmlStreamWriter0.getDefaultEncoding());
+    /**
+     * Tests that the constructor correctly defaults to UTF-8 when a null encoding
+     * is specified. This behavior is important for ensuring predictable output
+     * when an encoding is not explicitly provided.
+     */
+    @Test
+    public void shouldDefaultToUtf8WhenConstructedWithNullEncoding() {
+        // Arrange
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        String nullDefaultEncoding = null;
+
+        // Act
+        // Using the deprecated constructor to test its specific behavior.
+        XmlStreamWriter writer = new XmlStreamWriter(outputStream, nullDefaultEncoding);
+
+        // Assert
+        assertEquals("The default encoding should be UTF-8", "UTF-8", writer.getDefaultEncoding());
     }
 }
