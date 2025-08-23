@@ -1,51 +1,29 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TextHelpAppendable_ESTestTest48 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Tests for the {@link TextHelpAppendable} class, focusing on the {@code indexOfWrap} method.
+ */
+public class TextHelpAppendableTest {
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        CharBuffer charBuffer0 = CharBuffer.allocate(74);
-        // Undeclared exception!
-        try {
-            TextHelpAppendable.indexOfWrap(charBuffer0, 74, (-1));
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.Buffer", e);
-        }
+    /**
+     * Tests that indexOfWrap throws an IndexOutOfBoundsException when the starting position is negative.
+     * The method should reject invalid negative indices before any other processing.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void indexOfWrap_withNegativeStartPosition_throwsIndexOutOfBoundsException() {
+        // Arrange: Create a sample CharSequence and define an invalid negative start position.
+        // The actual content and width are irrelevant as the start position check should fail first.
+        final CharSequence text = CharBuffer.allocate(80);
+        final int width = 74;
+        final int negativeStartPosition = -1;
+
+        // Act: Call the method with the invalid start position.
+        // An IndexOutOfBoundsException is expected, which is handled by the @Test annotation.
+        TextHelpAppendable.indexOfWrap(text, width, negativeStartPosition);
+
+        // Assert: The test passes if the expected exception is thrown.
     }
 }
