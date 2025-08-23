@@ -155,16 +155,24 @@ public class BackgroundInitializerTestTest9 extends AbstractLangTest {
     }
 
     /**
-     * Tests the get() method if background processing causes a runtime
-     * exception.
+     * Tests that if the background initialization task throws a RuntimeException,
+     * a call to get() re-throws that same exception instance.
      */
     @Test
-    void testGetRuntimeException() {
-        final AbstractBackgroundInitializerTestImpl init = getBackgroundInitializerTestImpl();
-        final RuntimeException rex = new RuntimeException();
-        init.ex = rex;
-        init.start();
-        final Exception ex = assertThrows(Exception.class, init::get);
-        assertEquals(rex, ex, "Runtime exception not thrown");
+    void get_whenInitializationThrowsRuntimeException_rethrowsSameException() {
+        // Arrange: Create an initializer configured to throw a specific RuntimeException.
+        final AbstractBackgroundInitializerTestImpl initializer = getBackgroundInitializerTestImpl();
+        final RuntimeException originalException = new RuntimeException("Test exception");
+        initializer.ex = originalException; // The test-specific implementation allows injecting an exception.
+
+        initializer.start(); // Start the background task.
+
+        // Act & Assert: Call get() and verify that the original RuntimeException is re-thrown.
+        // The get() method is documented to re-throw runtime exceptions directly.
+        final RuntimeException thrownException = assertThrows(RuntimeException.class, initializer::get,
+            "Expected get() to throw a RuntimeException.");
+
+        assertSame(originalException, thrownException,
+            "The thrown exception should be the same instance as the one from the initialization task.");
     }
 }
