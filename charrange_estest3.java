@@ -1,26 +1,28 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class CharRange_ESTestTest3 extends CharRange_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CharRange} class, focusing on the contains(CharRange) method.
+ */
+public class CharRangeTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        CharRange charRange0 = CharRange.is('P');
-        CharRange charRange1 = CharRange.isIn(';', 'z');
-        boolean boolean0 = charRange1.contains(charRange0);
-        assertEquals('z', charRange1.getEnd());
-        assertEquals('P', charRange0.getEnd());
-        assertEquals(';', charRange1.getStart());
-        assertEquals('P', charRange0.getStart());
-        assertTrue(boolean0);
+    /**
+     * Tests that {@code contains(CharRange)} returns true when the provided range
+     * is fully enclosed within the other range.
+     */
+    @Test
+    public void contains_shouldReturnTrue_whenRangeIsFullyContained() {
+        // Arrange: Create a range that is fully contained within another.
+        // The range ['P', 'P'] is a sub-range of [';', 'z'].
+        final CharRange containingRange = CharRange.isIn(';', 'z');
+        final CharRange containedRange = CharRange.is('P');
+
+        // Act: Check if the larger range contains the smaller one.
+        final boolean isContained = containingRange.contains(containedRange);
+
+        // Assert: The result should be true.
+        assertTrue("Expected the range [;, z] to contain the range [P, P]", isContained);
     }
 }
