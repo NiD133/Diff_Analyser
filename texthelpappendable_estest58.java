@@ -1,57 +1,49 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
-import java.io.PipedWriter;
 import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.util.Set;
 
-public class TextHelpAppendable_ESTestTest58 extends TextHelpAppendable_ESTest_scaffolding {
+import org.junit.Test;
 
-    @Test(timeout = 4000)
-    public void test57() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        LinkedList<TextStyle> linkedList0 = new LinkedList<TextStyle>();
-        TextStyle textStyle0 = TextStyle.DEFAULT;
-        linkedList0.add(textStyle0);
-        Vector<String> vector0 = new Vector<String>();
-        HashSet<List<String>> hashSet0 = new HashSet<List<String>>();
-        TableDefinition tableDefinition0 = TableDefinition.from("Hi 2F$fWw", linkedList0, vector0, hashSet0);
-        // Undeclared exception!
+/**
+ * Tests for the {@link TextHelpAppendable} class, focusing on table rendering logic.
+ */
+public class TextHelpAppendableTest {
+
+    /**
+     * Verifies that appendTable throws an ArrayIndexOutOfBoundsException when the
+     * table definition provides more styles than it has columns. This scenario
+     * represents an invalid state where the formatting rules do not match the
+     * table structure.
+     *
+     * @throws IOException if an I/O error occurs (not expected in this test).
+     */
+    @Test
+    public void appendTableWithMoreStylesThanColumnsShouldThrowException() throws IOException {
+        // Arrange
+        // Use a StringWriter to prevent test output from polluting the console.
+        final TextHelpAppendable helpAppendable = new TextHelpAppendable(new StringWriter());
+
+        // Define a table with one style but zero columns (headers). This mismatch
+        // is expected to cause an error when the appendable tries to access the
+        // non-existent column header corresponding to the provided style.
+        final List<TextStyle> columnStyles = Collections.singletonList(TextStyle.DEFAULT);
+        final List<String> columnHeaders = Collections.emptyList();
+        final Set<List<String>> tableRows = Collections.emptySet();
+        final TableDefinition invalidTable = TableDefinition.from("Invalid Table", columnStyles, columnHeaders, tableRows);
+
+        // Act & Assert
         try {
-            textHelpAppendable0.appendTable(tableDefinition0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // Array index out of range: 0
-            //
-            verifyException("java.util.Vector", e);
+            helpAppendable.appendTable(invalidTable);
+            fail("Expected an ArrayIndexOutOfBoundsException due to the mismatch between styles and columns.");
+        } catch (final ArrayIndexOutOfBoundsException e) {
+            // This exception is expected. The test passes if this block is reached.
+            // The implementation attempts to access a column header that does not exist.
         }
     }
 }
