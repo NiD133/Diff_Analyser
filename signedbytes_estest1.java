@@ -1,18 +1,23 @@
 package com.google.common.primitives;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SignedBytes_ESTestTest1 extends SignedBytes_ESTest_scaffolding {
+/**
+ * Tests for {@link SignedBytes}.
+ */
+public class SignedBytesTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        byte byte0 = SignedBytes.saturatedCast((byte) (-128));
-        assertEquals((byte) (-128), byte0);
+    @Test
+    public void saturatedCast_withMinValue_shouldReturnMinValue() {
+        // Arrange: The input value is already the minimum possible byte value.
+        long inputValue = Byte.MIN_VALUE;
+        byte expectedValue = Byte.MIN_VALUE;
+
+        // Act: Perform the saturated cast.
+        byte actualValue = SignedBytes.saturatedCast(inputValue);
+
+        // Assert: The result should be the same as the input, as it's within the byte range.
+        assertEquals(expectedValue, actualValue);
     }
 }
