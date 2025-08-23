@@ -2,26 +2,30 @@ package org.jsoup.parser;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class contains the refactored test case from the original
+ * EvoSuite-generated TokenQueue_ESTestTest69.
+ */
 public class TokenQueue_ESTestTest69 extends TokenQueue_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test68() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("|;tj;PF%cdg`,");
-        tokenQueue0.consume();
-        tokenQueue0.consume();
-        tokenQueue0.advance();
-        tokenQueue0.advance();
-        tokenQueue0.advance();
-        char char0 = tokenQueue0.consume();
-        assertEquals('P', char0);
-        String[] stringArray0 = new String[4];
-        stringArray0[0] = "F";
-        String string0 = tokenQueue0.consumeToAny(stringArray0);
-        assertEquals("", string0);
+    /**
+     * Verifies that consumeToAny() returns an empty string when the delimiter
+     * is the first character in the remaining queue.
+     * It also confirms that the delimiter itself is not consumed.
+     */
+    @Test
+    public void consumeToAnyShouldReturnEmptyStringWhenDelimiterIsAtHead() {
+        // Arrange: Create a queue where the first character 'F' is a delimiter.
+        TokenQueue queue = new TokenQueue("F%cdg`,");
+        String[] delimiters = new String[]{"X", "Y", "F"};
+
+        // Act: Consume characters up to any of the specified delimiters.
+        // Since 'F' is at the start, no characters should be consumed.
+        String consumedData = queue.consumeToAny(delimiters);
+
+        // Assert: The result should be an empty string, and the queue should be unchanged.
+        assertEquals("Should consume nothing as the delimiter is at the start", "", consumedData);
+        assertEquals("The queue's remainder should be unchanged", "F%cdg`,", queue.remainder());
     }
 }
