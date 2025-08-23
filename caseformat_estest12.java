@@ -1,19 +1,24 @@
 package com.google.common.base;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CaseFormat_ESTestTest12 extends CaseFormat_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CaseFormat}.
+ */
+public class CaseFormatTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        CaseFormat caseFormat0 = CaseFormat.LOWER_HYPHEN;
-        CaseFormat caseFormat1 = CaseFormat.UPPER_CAMEL;
-        String string0 = caseFormat0.to(caseFormat1, "");
-        assertEquals("", string0);
+    @Test
+    public void to_convertingEmptyString_returnsEmptyString() {
+        // Arrange: Define the source and target formats for the conversion.
+        CaseFormat sourceFormat = CaseFormat.LOWER_HYPHEN;
+        CaseFormat targetFormat = CaseFormat.UPPER_CAMEL;
+        String emptyInput = "";
+
+        // Act: Convert the empty string from the source to the target format.
+        String result = sourceFormat.to(targetFormat, emptyInput);
+
+        // Assert: The result should also be an empty string.
+        assertEquals(emptyInput, result);
     }
 }
