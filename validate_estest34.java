@@ -1,23 +1,20 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Validate_ESTestTest34 extends Validate_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Validate} class.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        Validate.isTrue(true, "p:AGS");
+    /**
+     * Verifies that {@link Validate#isTrue(boolean, String)} does not throw an
+     * exception when the provided condition is true. This is the expected "happy path"
+     * behavior.
+     */
+    @Test
+    public void isTrueShouldNotThrowExceptionWhenConditionIsTrue() {
+        // This call is expected to succeed without throwing any exception.
+        Validate.isTrue(true, "This message should not be displayed.");
     }
 }
