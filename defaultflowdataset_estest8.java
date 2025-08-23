@@ -1,26 +1,29 @@
 package org.jfree.data.flow;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.HijrahEra;
-import java.util.List;
-import java.util.Set;
-import javax.swing.Icon;
-import javax.swing.JLayeredPane;
-import javax.swing.JRadioButtonMenuItem;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class DefaultFlowDataset_ESTestTest8 extends DefaultFlowDataset_ESTest_scaffolding {
+/**
+ * Tests for the {@link DefaultFlowDataset} class.
+ */
+public class DefaultFlowDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
-        Integer integer0 = JLayeredPane.POPUP_LAYER;
-        Integer integer1 = JLayeredPane.MODAL_LAYER;
-        Number number0 = defaultFlowDataset0.getFlow(87, integer1, integer0);
-        assertNull(number0);
+    /**
+     * Verifies that getFlow() returns null for a flow that does not exist
+     * in an empty dataset.
+     */
+    @Test
+    public void getFlow_forNonExistentFlow_shouldReturnNull() {
+        // Arrange: Create an empty dataset and define a flow to query.
+        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
+        int stage = 0;
+        Integer sourceNode = 100;
+        Integer destinationNode = 200;
+
+        // Act: Attempt to retrieve the flow from the empty dataset.
+        Number flowValue = dataset.getFlow(stage, sourceNode, destinationNode);
+
+        // Assert: The result should be null, as the flow was never added.
+        assertNull("Expected null for a flow that does not exist.", flowValue);
     }
 }
