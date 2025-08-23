@@ -1,40 +1,28 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
 import java.io.EOFException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest71 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test070() throws Throwable {
-        byte[] byteArray0 = new byte[2];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        try {
-            randomAccessFileOrArray0.readString(1504, "");
-            fail("Expecting exception: EOFException");
-        } catch (EOFException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.RandomAccessFileOrArray", e);
-        }
+    /**
+     * Verifies that readString() throws an EOFException when attempting to read
+     * more bytes than are available in the underlying data source.
+     */
+    @Test(expected = EOFException.class)
+    public void readString_whenLengthExceedsAvailableData_throwsEOFException() throws Exception {
+        // Arrange: Create a data source with a known, small size.
+        byte[] sourceData = new byte[10];
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray(sourceData);
+
+        // Act: Attempt to read more bytes than exist in the source data.
+        int bytesToRead = sourceData.length + 1;
+        fileOrArray.readString(bytesToRead, "UTF-8");
+
+        // Assert: The test expects an EOFException to be thrown.
+        // The @Test(expected) annotation handles the assertion.
     }
 }
