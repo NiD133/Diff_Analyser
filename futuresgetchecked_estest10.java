@@ -1,38 +1,52 @@
 package com.google.common.util.concurrent;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.SQLException;
-import java.sql.SQLInvalidAuthorizationSpecException;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Delayed;
-import java.util.concurrent.ForkJoinPool;
+
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.lang.MockThread;
-import org.junit.runner.RunWith;
+import java.util.concurrent.TimeoutException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class FuturesGetChecked_ESTestTest10 extends FuturesGetChecked_ESTest_scaffolding {
 
+    /**
+     * Tests that `getChecked` with a timeout throws the specified exception type
+     * when the future does not complete within the given time. The cause of the
+     * thrown exception should be a TimeoutException.
+     */
     @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        Class<Exception> class0 = Exception.class;
-        Thread thread0 = MockThread.currentThread();
-        MockThread mockThread0 = new MockThread(thread0, "KEY");
-        ForkJoinTask<Delayed> forkJoinTask0 = ForkJoinTask.adapt((Runnable) mockThread0, (Delayed) null);
-        TimeUnit timeUnit0 = TimeUnit.NANOSECONDS;
+    public void getCheckedWithTimeout_throwsSpecifiedExceptionWhenFutureTimesOut() {
+        // Arrange: Create a Future that will never complete to simulate a timeout.
+        // A ForkJoinTask adapted from a Runnable that is never executed serves this purpose.
+        Runnable nonCompletingRunnable = () -> { /* This will never run */ };
+        Future<Void> incompleteFuture = ForkJoinTask.adapt(nonCompletingRunnable, null);
+
+        Class<Exception> exceptionTypeToThrow = Exception.class;
+        long zeroTimeout = 0L;
+        TimeUnit timeoutUnit = TimeUnit.NANOSECONDS;
+
+        // Act & Assert
         try {
-            FuturesGetChecked.getChecked((Future<Delayed>) forkJoinTask0, class0, 0L, timeUnit0);
-            fail("Expecting exception: Exception");
-        } catch (Exception e) {
+            FuturesGetChecked.getChecked(incompleteFuture, exceptionTypeToThrow, zeroTimeout, timeoutUnit);
+            fail("Expected an Exception to be thrown due to timeout, but nothing was thrown.");
+        } catch (Exception thrownException) {
+            // Verify that the thrown exception is of the specified type.
+            assertEquals(
+                "The thrown exception should be of the specified type.",
+                exceptionTypeToThrow,
+                thrownException.getClass());
+
+            // Verify that the cause of the exception is a TimeoutException.
+            Throwable cause = thrownException.getCause();
+            assertNotNull("The cause of the thrown exception should not be null.", cause);
+            assertTrue(
+                "The cause should be an instance of TimeoutException.",
+                cause instanceof TimeoutException);
         }
     }
 }
