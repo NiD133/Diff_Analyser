@@ -1,33 +1,29 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class Validate_ESTestTest3 extends Validate_ESTest_scaffolding {
+/**
+ * Tests for the {@link Validate} helper class.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        Object[] objectArray0 = new Object[0];
-        // Undeclared exception!
+    @Test
+    public void failWithMessageShouldThrowIllegalArgumentException() {
+        // Arrange: Define a clear and descriptive error message.
+        final String expectedErrorMessage = "This is a specific failure message.";
+
         try {
-            Validate.fail("a<QA~>32", objectArray0);
-            fail("Expecting exception: IllegalArgumentException");
+            // Act: Call the method that is expected to fail.
+            // We use the varargs version with an empty array to match the original test's intent.
+            Validate.fail(expectedErrorMessage, new Object[]{});
+            
+            // This line should not be reached. If it is, the test fails.
+            fail("Expected an IllegalArgumentException to be thrown, but it was not.");
         } catch (IllegalArgumentException e) {
-            //
-            // a<QA~>32
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Assert: Verify that the exception was thrown and contains the correct message.
+            assertEquals(expectedErrorMessage, e.getMessage());
         }
     }
 }
