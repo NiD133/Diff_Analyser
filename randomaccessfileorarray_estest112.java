@@ -1,33 +1,29 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomAccessFileOrArray_ESTestTest112 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Test suite for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test111() throws Throwable {
-        byte[] byteArray0 = new byte[5];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        long long0 = randomAccessFileOrArray0.getFilePointer();
-        assertEquals(0L, long0);
+    /**
+     * Verifies that the file pointer is at the beginning (position 0)
+     * immediately after creating a RandomAccessFileOrArray instance from a byte array.
+     */
+    @Test
+    public void getFilePointer_shouldReturnZero_whenNewlyCreatedFromArray() throws IOException {
+        // Arrange: Create a RandomAccessFileOrArray from a non-empty byte array.
+        byte[] sourceData = new byte[5];
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray(sourceData);
+        long expectedPosition = 0L;
+
+        // Act: Get the current position of the file pointer.
+        long actualPosition = fileOrArray.getFilePointer();
+
+        // Assert: The position should be at the start of the data.
+        assertEquals("The initial file pointer should be at position 0.", expectedPosition, actualPosition);
     }
 }
