@@ -1,34 +1,24 @@
 package org.jfree.chart.plot.dial;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.plot.FastScatterPlot;
-import org.jfree.chart.plot.pie.PiePlot;
-import org.jfree.chart.util.GradientPaintTransformType;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.jfree.chart.util.StandardGradientPaintTransformer;
-import org.jfree.data.general.DefaultValueDataset;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DialBackground_ESTestTest8 extends DialBackground_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DialBackground} class.
+ */
+public class DialBackgroundTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        DialBackground dialBackground0 = new DialBackground();
-        boolean boolean0 = dialBackground0.equals(dialBackground0);
-        assertTrue(boolean0);
+    /**
+     * Verifies the reflexive property of the equals() method.
+     * An instance of DialBackground should always be equal to itself.
+     */
+    @Test
+    public void equals_onSameInstance_shouldReturnTrue() {
+        // Arrange
+        DialBackground dialBackground = new DialBackground();
+
+        // Act & Assert
+        // An object must be equal to itself. This is the reflexive property of equality.
+        assertEquals(dialBackground, dialBackground);
     }
 }
