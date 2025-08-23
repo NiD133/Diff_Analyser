@@ -1,53 +1,50 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.SortedBag;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CollectionSortedBag_ESTestTest40 extends CollectionSortedBag_ESTest_scaffolding {
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Locale;
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        PriorityQueue<Locale.Category> priorityQueue0 = new PriorityQueue<Locale.Category>();
-        Locale.Category locale_Category0 = Locale.Category.DISPLAY;
-        TreeBag<Locale.Category> treeBag0 = new TreeBag<Locale.Category>((Iterable<? extends Locale.Category>) priorityQueue0);
-        priorityQueue0.add(locale_Category0);
-        CollectionSortedBag<Locale.Category> collectionSortedBag0 = new CollectionSortedBag<Locale.Category>(treeBag0);
-        priorityQueue0.add(locale_Category0);
-        boolean boolean0 = collectionSortedBag0.addAll(priorityQueue0);
-        assertTrue(collectionSortedBag0.contains(locale_Category0));
-        assertTrue(boolean0);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * This test class focuses on verifying the behavior of the CollectionSortedBag.
+ * The original test was auto-generated and has been refactored for clarity.
+ */
+public class CollectionSortedBagTest {
+
+    /**
+     * Tests that addAll successfully adds all elements from a given collection,
+     * including duplicates, to an initially empty bag.
+     */
+    @Test
+    public void addAllShouldAddElementsWithDuplicatesToEmptyBag() {
+        // Arrange
+        // Create the SUT (System Under Test): an empty CollectionSortedBag decorating a TreeBag.
+        final SortedBag<Locale.Category> underlyingBag = new TreeBag<>();
+        final CollectionSortedBag<Locale.Category> collectionBag = new CollectionSortedBag<>(underlyingBag);
+
+        // Create a collection containing duplicate elements to be added to the bag.
+        final Locale.Category elementToAdd = Locale.Category.DISPLAY;
+        final Collection<Locale.Category> elementsToAdd = new ArrayList<>();
+        elementsToAdd.add(elementToAdd);
+        elementsToAdd.add(elementToAdd);
+
+        // Act
+        // Add all elements from the collection to the bag.
+        final boolean wasModified = collectionBag.addAll(elementsToAdd);
+
+        // Assert
+        // 1. The addAll operation should report that the bag was modified.
+        assertTrue("addAll should return true when new elements are added.", wasModified);
+
+        // 2. The bag's total size should reflect the number of elements added.
+        assertEquals("The bag size should be 2 after adding two elements.", 2, collectionBag.size());
+
+        // 3. The count for the specific element should be 2, confirming duplicates were added.
+        assertEquals("The count of the added element should be 2.", 2, collectionBag.getCount(elementToAdd));
     }
 }
