@@ -1,49 +1,40 @@
 package org.apache.commons.cli.help;
 
+import org.apache.commons.cli.help.TextHelpAppendable;
+import org.apache.commons.cli.help.TextStyle;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TextHelpAppendable_ESTestTest6 extends TextHelpAppendable_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        TextStyle.Builder textStyle_Builder0 = TextStyle.builder();
-        textStyle_Builder0.setScalable(false);
-        TextStyle.Builder textStyle_Builder1 = textHelpAppendable0.resize(textStyle_Builder0, 1);
-        assertEquals(1, textHelpAppendable0.getLeftPad());
-        assertEquals(0, textStyle_Builder1.getIndent());
-        assertEquals(74, textHelpAppendable0.getMaxWidth());
-        assertEquals(Integer.MAX_VALUE, textStyle_Builder1.getMaxWidth());
-        assertEquals(3, textHelpAppendable0.getIndent());
+/**
+ * Tests for the {@link TextHelpAppendable} class, focusing on text style manipulation.
+ */
+public class TextHelpAppendableTest {
+
+    /**
+     * Tests that resizing a TextStyle.Builder with a fraction of 1.0 returns a new builder
+     * with identical values and does not modify the original TextHelpAppendable instance.
+     */
+    @Test
+    public void resizeTextStyleBuilderWithFractionOfOneShouldReturnEquivalentBuilder() {
+        // Arrange
+        // A TextHelpAppendable with default settings.
+        final TextHelpAppendable helpAppendable = TextHelpAppendable.systemOut();
+        // A TextStyle.Builder with default values (indent=0, maxWidth=Integer.MAX_VALUE).
+        final TextStyle.Builder originalBuilder = TextStyle.builder();
+
+        // Act
+        // Resize the builder with a fraction of 1.0, which should result in no change.
+        final TextStyle.Builder resizedBuilder = helpAppendable.resize(originalBuilder, 1.0);
+
+        // Assert
+        // 1. Verify the new builder has the same values as the original default builder.
+        assertEquals("Indent should remain at its default value of 0", 0, resizedBuilder.getIndent());
+        assertEquals("Max width should remain at its default value", Integer.MAX_VALUE, resizedBuilder.getMaxWidth());
+
+        // 2. Verify the original TextHelpAppendable object was not mutated by the resize operation.
+        assertEquals("Left pad should be unchanged", TextHelpAppendable.DEFAULT_LEFT_PAD, helpAppendable.getLeftPad());
+        assertEquals("Max width should be unchanged", TextHelpAppendable.DEFAULT_WIDTH, helpAppendable.getMaxWidth());
+        assertEquals("Indent should be unchanged", TextHelpAppendable.DEFAULT_INDENT, helpAppendable.getIndent());
     }
 }
