@@ -2,17 +2,29 @@ package org.joda.time;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Seconds_ESTestTest69 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test68() throws Throwable {
-        Seconds seconds0 = Seconds.seconds(2);
-        seconds0.getFieldType();
-        assertEquals(2, seconds0.getSeconds());
+    /**
+     * Tests that a Seconds object created via the factory method
+     * holds the correct value and has the correct field type.
+     */
+    @Test
+    public void secondsFactory_shouldCreateInstanceWithCorrectState() {
+        // Arrange
+        final int expectedValue = 2;
+        Seconds twoSeconds = Seconds.seconds(expectedValue);
+
+        // Act & Assert
+        // Verify that getSeconds() returns the value used at creation.
+        assertEquals("The number of seconds should match the value provided at creation.",
+                expectedValue, twoSeconds.getSeconds());
+
+        // Verify that the field type is correctly identified as 'seconds'.
+        assertEquals("The field type should be 'seconds'.",
+                DurationFieldType.seconds(), twoSeconds.getFieldType());
     }
 }
