@@ -1,24 +1,29 @@
 package org.jfree.data.flow;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.HijrahEra;
 import java.util.List;
-import java.util.Set;
-import javax.swing.Icon;
-import javax.swing.JLayeredPane;
-import javax.swing.JRadioButtonMenuItem;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-public class DefaultFlowDataset_ESTestTest20 extends DefaultFlowDataset_ESTest_scaffolding {
+/**
+ * Tests for the {@link DefaultFlowDataset} class.
+ */
+public class DefaultFlowDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
-        List<Integer> list0 = defaultFlowDataset0.getSources(0);
-        assertFalse(list0.contains(0));
+    /**
+     * Verifies that getSources() for stage 0 on a newly created dataset
+     * returns an empty list, as no data has been added yet.
+     */
+    @Test
+    public void getSourcesForStageZeroOnNewDatasetShouldReturnEmptyList() {
+        // Arrange: Create a new, empty dataset.
+        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
+
+        // Act: Retrieve the list of source nodes for the first stage.
+        List<Integer> sources = dataset.getSources(0);
+
+        // Assert: The returned list should be non-null and empty.
+        assertNotNull("The sources list should never be null.", sources);
+        assertTrue("A new dataset should have no sources for stage 0.", sources.isEmpty());
     }
 }
