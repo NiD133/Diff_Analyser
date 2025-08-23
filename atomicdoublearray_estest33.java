@@ -1,30 +1,42 @@
 package com.google.common.util.concurrent;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.DoubleBinaryOperator;
-import java.util.function.DoubleUnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class AtomicDoubleArray_ESTestTest33 extends AtomicDoubleArray_ESTest_scaffolding {
+/**
+ * Test suite for {@link AtomicDoubleArray}.
+ * This class focuses on verifying boundary conditions and exception handling.
+ */
+public class AtomicDoubleArrayTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(2363);
-        // Undeclared exception!
+    /**
+     * Verifies that addAndGet() throws an IndexOutOfBoundsException when
+     * the specified index is outside the valid range of the array.
+     */
+    @Test
+    public void addAndGet_whenIndexIsOutOfBounds_shouldThrowException() {
+        // Arrange: Create an array and define an index that is out of bounds.
+        int arrayLength = 10;
+        AtomicDoubleArray array = new AtomicDoubleArray(arrayLength);
+        
+        // The first invalid index is equal to the array's length.
+        int invalidIndex = arrayLength;
+        double valueToAdd = 1.0;
+
+        // Act & Assert: Attempt the operation and verify the correct exception is thrown.
         try {
-            atomicDoubleArray0.addAndGet(2363, 2363);
-            fail("Expecting exception: IndexOutOfBoundsException");
+            array.addAndGet(invalidIndex, valueToAdd);
+            fail("Expected an IndexOutOfBoundsException to be thrown for index " + invalidIndex);
         } catch (IndexOutOfBoundsException e) {
-            //
-            // index 2363
-            //
-            verifyException("java.util.concurrent.atomic.AtomicLongArray", e);
+            // This is the expected outcome.
+            // For a more robust test, we can verify the exception message.
+            String expectedMessageFragment = "index " + invalidIndex;
+            assertTrue(
+                "The exception message should contain the invalid index.",
+                e.getMessage().contains(expectedMessageFragment)
+            );
         }
     }
 }
