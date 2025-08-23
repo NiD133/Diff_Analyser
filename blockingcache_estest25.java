@@ -1,23 +1,31 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.CountDownLatch;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BlockingCache_ESTestTest25 extends BlockingCache_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        PerpetualCache perpetualCache0 = new PerpetualCache("Detected an attempt at releasing unacquired lock. This should never happen.");
-        SoftCache softCache0 = new SoftCache(perpetualCache0);
-        BlockingCache blockingCache0 = new BlockingCache(softCache0);
-        String string0 = blockingCache0.getId();
-        assertEquals("Detected an attempt at releasing unacquired lock. This should never happen.", string0);
+/**
+ * Test suite for BlockingCache.
+ */
+public class BlockingCacheTest {
+
+    /**
+     * Verifies that the getId() method of BlockingCache correctly delegates the call
+     * to the underlying (decorated) cache instance and returns its ID.
+     */
+    @Test
+    public void shouldReturnIdOfDecoratedCache() {
+        // Arrange
+        String expectedId = "user-cache";
+        Cache delegateCache = new PerpetualCache(expectedId);
+        BlockingCache blockingCache = new BlockingCache(delegateCache);
+
+        // Act
+        String actualId = blockingCache.getId();
+
+        // Assert
+        assertEquals("The blocking cache should return the ID of its delegate.", expectedId, actualId);
     }
 }
