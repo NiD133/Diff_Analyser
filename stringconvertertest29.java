@@ -1,83 +1,69 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.BuddhistChronology;
 import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.JulianChronology;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class StringConverterTestTest29 extends TestCase {
+import java.util.Locale;
 
-    private static final DateTimeZone ONE_HOUR = DateTimeZone.forOffsetHours(1);
+import static org.junit.Assert.assertEquals;
 
-    private static final DateTimeZone SIX = DateTimeZone.forOffsetHours(6);
-
-    private static final DateTimeZone SEVEN = DateTimeZone.forOffsetHours(7);
-
-    private static final DateTimeZone EIGHT = DateTimeZone.forOffsetHours(8);
-
-    private static final DateTimeZone UTC = DateTimeZone.UTC;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Test class for {@link StringConverter}.
+ */
+public class StringConverterTest {
 
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
 
-    private static final Chronology ISO_EIGHT = ISOChronology.getInstance(EIGHT);
+    private DateTimeZone originalDefaultZone;
+    private Locale originalDefaultLocale;
 
-    private static final Chronology ISO_PARIS = ISOChronology.getInstance(PARIS);
+    @Before
+    public void setUp() {
+        // Save the original default zone and locale to restore them after the test.
+        originalDefaultZone = DateTimeZone.getDefault();
+        originalDefaultLocale = Locale.getDefault();
 
-    private static final Chronology ISO_LONDON = ISOChronology.getInstance(LONDON);
-
-    private static Chronology ISO;
-
-    private static Chronology JULIAN;
-
-    private DateTimeZone zone = null;
-
-    private Locale locale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestStringConverter.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        zone = DateTimeZone.getDefault();
-        locale = Locale.getDefault();
+        // Set a predictable default zone and locale for the test environment.
+        // The StringConverter may rely on these defaults when no explicit chronology is provided.
         DateTimeZone.setDefault(LONDON);
         Locale.setDefault(Locale.UK);
-        JULIAN = JulianChronology.getInstance();
-        ISO = ISOChronology.getInstance();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeZone.setDefault(zone);
-        Locale.setDefault(locale);
-        zone = null;
+    @After
+    public void tearDown() {
+        // Restore the original default zone and locale.
+        DateTimeZone.setDefault(originalDefaultZone);
+        Locale.setDefault(originalDefaultLocale);
     }
 
-    public void testSetIntoInterval_Object_Chronology1() throws Exception {
-        MutableInterval m = new MutableInterval(-1000L, 1000L);
-        StringConverter.INSTANCE.setInto(m, "2004-06-09/P1Y2M", null);
-        assertEquals(new DateTime(2004, 6, 9, 0, 0, 0, 0), m.getStart());
-        assertEquals(new DateTime(2005, 8, 9, 0, 0, 0, 0), m.getEnd());
-        assertEquals(ISOChronology.getInstance(), m.getChronology());
+    @Test
+    public void setInto_shouldParseIntervalStringWithStartDateAndPeriod() {
+        // GIVEN: An ISO 8601 string for an interval defined by a start date and a period.
+        String intervalString = "2004-06-09/P1Y2M";
+        MutableInterval intervalToUpdate = new MutableInterval();
+
+        // The test runs in the "Europe/London" timezone, as set in setUp().
+        // The converter should use the default ISO chronology for that zone.
+        Chronology expectedChronology = ISOChronology.getInstance(LONDON);
+
+        // Define the expected start and end DateTimes based on the input string.
+        DateTime expectedStart = new DateTime(2004, 6, 9, 0, 0, 0, 0, expectedChronology);
+        // The end is calculated by adding the period (P1Y2M: 1 year, 2 months) to the start.
+        DateTime expectedEnd = new DateTime(2005, 8, 9, 0, 0, 0, 0, expectedChronology);
+
+        // WHEN: The string is converted and set into the mutable interval.
+        // A null chronology is passed, so the converter should use the default.
+        StringConverter.INSTANCE.setInto(intervalToUpdate, intervalString, null);
+
+        // THEN: The interval's properties are correctly set.
+        assertEquals("Start of interval should be parsed correctly", expectedStart, intervalToUpdate.getStart());
+        assertEquals("End of interval should be calculated correctly", expectedEnd, intervalToUpdate.getEnd());
+        assertEquals("Chronology should be the default ISO chronology", expectedChronology, intervalToUpdate.getChronology());
     }
 }
