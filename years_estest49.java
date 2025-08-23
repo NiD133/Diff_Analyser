@@ -1,26 +1,32 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class Years_ESTestTest49 extends Years_ESTest_scaffolding {
+/**
+ * A test suite for the {@link Years} class, focusing on its arithmetic operations.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        Years years0 = Years.MAX_VALUE;
-        // Undeclared exception!
+    /**
+     * Verifies that multiplying a Years instance by a value that causes the
+     * underlying integer to overflow throws an ArithmeticException.
+     */
+    @Test
+    public void multipliedBy_whenResultOverflows_throwsArithmeticException() {
+        // Arrange: Start with the maximum possible value for Years.
+        final Years maxYears = Years.MAX_VALUE;
+        final int multiplier = 3;
+
+        // Act & Assert: Attempt the multiplication and expect an exception.
         try {
-            years0.multipliedBy(3);
-            fail("Expecting exception: ArithmeticException");
+            maxYears.multipliedBy(multiplier);
+            fail("Expected an ArithmeticException to be thrown due to integer overflow.");
         } catch (ArithmeticException e) {
-            //
-            // Multiplication overflows an int: 2147483647 * 3
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
+            // Verify that the exception message clearly indicates an overflow.
+            final String expectedMessage = "Multiplication overflows an int: 2147483647 * 3";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
