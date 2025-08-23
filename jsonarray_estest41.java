@@ -1,31 +1,29 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class JsonArray_ESTestTest41 extends JsonArray_ESTest_scaffolding {
+/**
+ * Test suite for {@link JsonArray}.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        jsonArray0.add("rs68C\"p!#b))3'caR4");
-        // Undeclared exception!
-        try {
-            jsonArray0.getAsByte();
-            fail("Expecting exception: NumberFormatException");
-        } catch (NumberFormatException e) {
-            //
-            // For input string: \"rs68C\"p!#b))3'caR4\"
-            //
-            verifyException("java.lang.NumberFormatException", e);
-        }
+    @Test
+    public void getAsByte_shouldThrowNumberFormatException_whenElementIsNotAValidByte() {
+        // Arrange: Create a JsonArray with a single element that is a non-numeric string.
+        JsonArray jsonArray = new JsonArray();
+        String nonNumericString = "not a byte";
+        jsonArray.add(nonNumericString);
+
+        // Act & Assert: Verify that calling getAsByte() throws NumberFormatException.
+        NumberFormatException exception = assertThrows(
+            NumberFormatException.class,
+            () -> jsonArray.getAsByte(),
+            "Expected getAsByte() to throw, but it did not"
+        );
+
+        // Assert on the exception message for more specific verification.
+        assertEquals("For input string: \"" + nonNumericString + "\"", exception.getMessage());
     }
 }
