@@ -1,33 +1,32 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
 import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Validate_ESTestTest12 extends Validate_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Validate} class.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        Object[] objectArray0 = new Object[0];
-        // Undeclared exception!
-        try {
-            Validate.ensureNotNull((Object) null, "The '%s' parameter must not be empty.", objectArray0);
-            fail("Expecting exception: MissingFormatArgumentException");
-        } catch (MissingFormatArgumentException e) {
-            //
-            // Format specifier '%s'
-            //
-            verifyException("java.util.Formatter", e);
-        }
+    /**
+     * Verifies that ensureNotNull throws a MissingFormatArgumentException when the object is null
+     * and the error message template requires arguments that are not provided.
+     *
+     * This scenario tests the exception handling of the message formatting itself, which occurs
+     * after the primary validation (the null check) fails.
+     */
+    @Test(expected = MissingFormatArgumentException.class)
+    public void ensureNotNullThrowsMissingFormatArgumentExceptionForMismatchedMessageArgs() {
+        // Arrange: A null object to trigger the validation failure, and a message template
+        // that requires one argument ('%s'), but with no arguments provided.
+        final Object objectToValidate = null;
+        final String errorMessageTemplate = "The '%s' parameter must not be empty.";
+        final Object[] noArguments = new Object[0];
+
+        // Act: Call the method under test. This is expected to throw.
+        Validate.ensureNotNull(objectToValidate, errorMessageTemplate, noArguments);
+
+        // Assert: The test will pass only if a MissingFormatArgumentException is thrown,
+        // as specified by the `expected` parameter in the @Test annotation.
     }
 }
