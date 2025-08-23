@@ -1,38 +1,38 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.util.List;
 
-public class BoundedIterator_ESTestTest4 extends BoundedIterator_ESTest_scaffolding {
+/**
+ * Unit tests for {@link BoundedIterator}.
+ */
+public class BoundedIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        Iterator<Object> iterator0 = linkedList0.descendingIterator();
-        BoundedIterator<Object> boundedIterator0 = new BoundedIterator<Object>(iterator0, 5L, 5L);
-        linkedList0.add((Object) iterator0);
-        // Undeclared exception!
-        try {
-            boundedIterator0.next();
-            fail("Expecting exception: ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.LinkedList$ListItr", e);
-        }
+    /**
+     * Tests that a BoundedIterator propagates a ConcurrentModificationException
+     * if the underlying collection is modified after the iterator is created.
+     */
+    @Test(expected = ConcurrentModificationException.class)
+    public void testNextThrowsExceptionWhenUnderlyingCollectionIsModified() {
+        // Arrange: Create a BoundedIterator for a list.
+        final List<String> sourceList = new LinkedList<>();
+        sourceList.add("element1");
+        final Iterator<String> sourceIterator = sourceList.iterator();
+
+        // The BoundedIterator wraps the source iterator.
+        final BoundedIterator<String> boundedIterator = new BoundedIterator<>(sourceIterator, 0L, 5L);
+
+        // Act: Structurally modify the source list after the iterator has been created.
+        // This action invalidates the sourceIterator.
+        sourceList.add("new element");
+
+        // Assert: Calling next() on the bounded iterator should attempt to call next() on the
+        // invalidated source iterator. This is expected to throw a
+        // ConcurrentModificationException, which is verified by the @Test annotation.
+        boundedIterator.next();
     }
 }
