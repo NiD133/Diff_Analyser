@@ -1,34 +1,39 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.ImgJBIG2;
-import com.itextpdf.text.ImgTemplate;
-import com.itextpdf.text.Rectangle;
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import java.io.OutputStream;
 
-public class PdfImage_ESTestTest3 extends PdfImage_ESTest_scaffolding {
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        byte[] byteArray0 = new byte[2];
-        ByteBuffer byteBuffer0 = new ByteBuffer();
-        ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
-        PdfImage.transferBytes(byteArrayInputStream0, byteBuffer0, (byte) 48);
-        assertEquals(0, byteArrayInputStream0.available());
-        assertEquals(2, byteBuffer0.size());
+/**
+ * Contains tests for the utility methods within the {@link PdfImage} class.
+ */
+public class PdfImageTest {
+
+    /**
+     * Verifies that transferBytes copies all available bytes from an input stream
+     * when the requested transfer length is greater than the number of bytes available.
+     */
+    @Test
+    public void transferBytes_shouldCopyAllAvailableBytes_whenRequestedLengthExceedsStreamSize() throws IOException {
+        // Arrange: Set up an input stream with a known, small amount of data.
+        byte[] inputData = { 10, 20 };
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(inputData);
+        ByteBuffer outputBuffer = new ByteBuffer(); // iText's ByteBuffer extends ByteArrayOutputStream
+
+        // Define a requested length that is deliberately larger than the input data.
+        int requestedLength = 1024;
+
+        // Act: Call the method to transfer bytes.
+        PdfImage.transferBytes(inputStream, outputBuffer, requestedLength);
+
+        // Assert: Confirm that only the available bytes were transferred and the stream is now empty.
+        assertEquals("The input stream should be fully consumed.", 0, inputStream.available());
+        assertEquals("The output buffer's size should match the actual amount of data read.", inputData.length, outputBuffer.size());
+        assertArrayEquals("The data in the output buffer should exactly match the input data.", inputData, outputBuffer.toByteArray());
     }
 }
