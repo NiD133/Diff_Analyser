@@ -1,34 +1,36 @@
 package org.apache.ibatis.type;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.Array;
+import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.sql.CallableStatement;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.Month;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.junit.runner.RunWith;
+import java.sql.SQLException;
+import org.junit.Test;
 
-public class ArrayTypeHandler_ESTestTest7 extends ArrayTypeHandler_ESTest_scaffolding {
+/**
+ * Tests for {@link ArrayTypeHandler}.
+ */
+public class ArrayTypeHandlerTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        ArrayTypeHandler arrayTypeHandler0 = new ArrayTypeHandler();
-        CallableStatement callableStatement0 = mock(CallableStatement.class, new ViolatedAssumptionAnswer());
-        doReturn((Array) null).when(callableStatement0).getArray(anyInt());
-        Object object0 = arrayTypeHandler0.getNullableResult(callableStatement0, 1577);
-        assertNull(object0);
+    @Test
+    public void shouldReturnNullForNullSqlArrayFromCallableStatement() throws SQLException {
+        // Arrange
+        ArrayTypeHandler typeHandler = new ArrayTypeHandler();
+        CallableStatement mockedStatement = mock(CallableStatement.class);
+
+        // Configure the mock to simulate the JDBC driver returning a null SQL Array.
+        // This represents a NULL value in the database column.
+        when(mockedStatement.getArray(anyInt())).thenReturn(null);
+
+        // Act
+        // Call the method under test with an arbitrary column index (e.g., 1).
+        // The specific index doesn't matter due to the anyInt() matcher.
+        Object result = typeHandler.getNullableResult(mockedStatement, 1);
+
+        // Assert
+        // The handler should correctly return null when the database value is null.
+        assertNull("The result should be null when the database array is null.", result);
     }
 }
