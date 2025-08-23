@@ -1,17 +1,28 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class PatternOptionBuilder_ESTestTest13 extends PatternOptionBuilder_ESTest_scaffolding {
+/**
+ * Tests for {@link PatternOptionBuilder}.
+ */
+public class PatternOptionBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        Class<?> class0 = PatternOptionBuilder.getValueType(',');
-        assertNull(class0);
+    /**
+     * Tests that getValueType() returns null when provided with a character
+     * that does not correspond to a known value type.
+     */
+    @Test
+    public void getValueTypeShouldReturnNullForUnrecognizedCharacter() {
+        // Arrange: The Javadoc for PatternOptionBuilder lists the valid value type
+        // characters (e.g., '@', '>', '%'). The comma character is not one of them.
+        final char unrecognizedChar = ',';
+
+        // Act: Call the method with the unrecognized character.
+        final Class<?> valueType = PatternOptionBuilder.getValueType(unrecognizedChar);
+
+        // Assert: The method should return null, as the character is not a valid
+        // type identifier.
+        assertNull("Expected null for an unrecognized value type character", valueType);
     }
 }
