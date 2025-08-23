@@ -2,23 +2,29 @@ package org.jfree.data.xy;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class XYInterval_ESTestTest16 extends XYInterval_ESTest_scaffolding {
+/**
+ * Contains tests for the equals() method of the {@link XYInterval} class.
+ */
+public class XYIntervalTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        XYInterval xYInterval0 = new XYInterval(0.0, 0.0, 0.0, 0.0, 0.0);
-        XYInterval xYInterval1 = new XYInterval(0.0, 0.0, 0.0, 0.0, (-482.4691016522));
-        boolean boolean0 = xYInterval0.equals(xYInterval1);
-        assertEquals(0.0, xYInterval1.getY(), 0.01);
-        assertEquals(0.0, xYInterval1.getYLow(), 0.01);
-        assertFalse(boolean0);
-        assertEquals(0.0, xYInterval1.getXLow(), 0.01);
-        assertEquals(0.0, xYInterval1.getXHigh(), 0.01);
-        assertEquals((-482.4691016522), xYInterval1.getYHigh(), 0.01);
-        assertFalse(xYInterval1.equals((Object) xYInterval0));
+    /**
+     * Verifies that two XYInterval objects are not considered equal if their
+     * yHigh values differ, while all other properties are the same.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenOnlyYHighIsDifferent() {
+        // Arrange: Create a base interval and another interval that is identical
+        // except for the yHigh value.
+        XYInterval baseInterval = new XYInterval(0.0, 0.0, 0.0, 0.0, 0.0);
+        XYInterval differentYHighInterval = new XYInterval(0.0, 0.0, 0.0, 0.0, -482.4691);
+
+        // Act & Assert: The intervals should not be equal.
+        // The comparison should also be symmetric, as required by the equals() contract.
+        assertFalse("Intervals with different yHigh values should not be equal.",
+                    baseInterval.equals(differentYHighInterval));
+        
+        assertFalse("The equals() method should be symmetric.",
+                    differentYHighInterval.equals(baseInterval));
     }
 }
