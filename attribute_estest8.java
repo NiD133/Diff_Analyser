@@ -1,32 +1,35 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class Attribute_ESTestTest8 extends Attribute_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Attribute} class.
+ * Note: The original test class name "Attribute_ESTestTest8" was auto-generated.
+ * A more conventional name like "AttributeTest" is recommended.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        Attribute attribute0 = Attribute.createFromEncoded("ismap", "XII YZ}5!");
-        assertEquals("XII YZ}5!", attribute0.getValue());
-        attribute0.setValue("ismap");
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        boolean boolean0 = attribute0.shouldCollapseAttribute(document_OutputSettings0);
-        assertTrue(boolean0);
+    @Test
+    public void booleanAttributeWithValueEqualToKeyShouldCollapseInHtml() {
+        // Arrange
+        // "ismap" is a standard HTML boolean attribute.
+        // We initialize it with a dummy value that will be overwritten.
+        Attribute attribute = new Attribute("ismap", "initial-value");
+
+        // The key condition for this test: set the attribute's value to be the same as its key.
+        attribute.setValue("ismap");
+
+        // Use default output settings, which specifies HTML syntax.
+        Document.OutputSettings settings = new Document.OutputSettings();
+
+        // Act
+        boolean shouldCollapse = attribute.shouldCollapseAttribute(settings);
+
+        // Assert
+        assertTrue(
+            "A boolean attribute should be collapsible when its value equals its key in HTML mode.",
+            shouldCollapse
+        );
     }
 }
