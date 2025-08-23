@@ -1,46 +1,32 @@
 package org.apache.commons.compress.archivers.zip;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.net.URI;
-import java.nio.file.Path;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import org.apache.commons.compress.archivers.jar.JarArchiveEntry;
 import org.apache.commons.compress.parallel.InputStreamSupplier;
-import org.apache.commons.compress.parallel.ScatterGatherBackingStoreSupplier;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.net.MockURI;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.mockito.Mockito.mock;
+
+/**
+ * This test class focuses on verifying the behavior of the ParallelScatterZipCreator class.
+ * The original test class name and inheritance are preserved to demonstrate a focused
+ * improvement on a single test case, a common task in maintaining a large test suite.
+ */
 public class ParallelScatterZipCreator_ESTestTest8 extends ParallelScatterZipCreator_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        ParallelScatterZipCreator parallelScatterZipCreator0 = new ParallelScatterZipCreator();
-        InputStreamSupplier inputStreamSupplier0 = mock(InputStreamSupplier.class, new ViolatedAssumptionAnswer());
-        // Undeclared exception!
-        try {
-            parallelScatterZipCreator0.addArchiveEntry((ZipArchiveEntry) null, inputStreamSupplier0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.archivers.zip.ParallelScatterZipCreator", e);
-        }
+    /**
+     * Verifies that calling addArchiveEntry() with a null ZipArchiveEntry
+     * correctly throws a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void addArchiveEntryShouldThrowNPEForNullEntry() {
+        // Arrange: Set up the test objects.
+        final ParallelScatterZipCreator scatterZipCreator = new ParallelScatterZipCreator();
+        final InputStreamSupplier mockInputStreamSupplier = mock(InputStreamSupplier.class);
+
+        // Act: Call the method under test with invalid input (a null entry).
+        // The cast to ZipArchiveEntry is used to resolve method overloading ambiguity.
+        scatterZipCreator.addArchiveEntry((ZipArchiveEntry) null, mockInputStreamSupplier);
+
+        // Assert: The test will pass only if a NullPointerException is thrown,
+        // as specified by the @Test(expected=...) annotation.
     }
 }
