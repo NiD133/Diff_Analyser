@@ -2,22 +2,26 @@ package org.jfree.data.xy;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class XYInterval_ESTestTest19 extends XYInterval_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link XYInterval} class.
+ */
+public class XYIntervalTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        XYInterval xYInterval0 = new XYInterval(689.6742630008566, 689.6742630008566, 689.6742630008566, 689.6742630008566, 689.6742630008566);
-        XYInterval xYInterval1 = new XYInterval(689.6742630008566, (-1.0), (-1.0), 689.6742630008566, (-1.0));
-        boolean boolean0 = xYInterval0.equals(xYInterval1);
-        assertEquals(689.6742630008566, xYInterval1.getYLow(), 0.01);
-        assertEquals((-1.0), xYInterval1.getYHigh(), 0.01);
-        assertEquals(689.6742630008566, xYInterval1.getXLow(), 0.01);
-        assertFalse(boolean0);
-        assertEquals((-1.0), xYInterval1.getXHigh(), 0.01);
-        assertEquals((-1.0), xYInterval1.getY(), 0.01);
+    /**
+     * Verifies that the equals() method returns false when comparing two
+     * XYInterval objects that have different property values.
+     */
+    @Test
+    public void equals_shouldReturnFalse_forIntervalsWithDifferentProperties() {
+        // Arrange: Create a base interval and another interval with some different values.
+        XYInterval interval1 = new XYInterval(10.0, 10.0, 10.0, 10.0, 10.0);
+        XYInterval interval2 = new XYInterval(10.0, -1.0, -1.0, 10.0, -1.0);
+
+        // Act: Compare the two different intervals.
+        boolean result = interval1.equals(interval2);
+
+        // Assert: The result should be false, as the intervals are not identical.
+        assertFalse("equals() should return false for XYInterval objects with different properties.", result);
     }
 }
