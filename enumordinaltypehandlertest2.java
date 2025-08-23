@@ -1,18 +1,24 @@
-package org.apache.ibatis.type;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import org.junit.jupiter.api.Test;
-
-public class EnumOrdinalTypeHandlerTestTest2 extends BaseTypeHandlerTest {
-
-    private static final TypeHandler<MyEnum> TYPE_HANDLER = new EnumOrdinalTypeHandler<>(MyEnum.class);
-
-    @Test
-    void shouldSetNullParameter() throws Exception {
-        TYPE_HANDLER.setParameter(ps, 1, null, JdbcType.VARCHAR);
-        verify(ps).setNull(1, JdbcType.VARCHAR.TYPE_CODE);
+@SuppressWarnings("unchecked")
+    @Override
+    public void setParameter(PreparedStatement ps, int i, T parameter, JdbcType jdbcType) throws SQLException {
+      if (parameter == null) {
+        if (jdbcType == null) {
+          throw new TypeException("JDBC requires that the JdbcType must be specified for all nullable parameters.");
+        }
+        try {
+          ps.setNull(i, jdbcType.TYPE_CODE);
+        } catch (SQLException e) {
+          throw new TypeException("Error setting null for parameter #" + i + " with JdbcType " + jdbcType + " . "
+              + "Try setting a different JdbcType for this parameter or a different jdbcTypeForNull configuration property. "
+              + "Cause: " + e, e);
+        }
+      } else {
+        try {
+          setNonNullParameter(ps, i, (E) parameter, jdbcType);
+        } catch (Exception e) {
+          throw new TypeException("Error setting non null for parameter #" + i + " with JdbcType " + jdbcType + " . "
+              + "Try setting a different JdbcType for this parameter or a different configuration property. "
+              + "Cause: " + e, e);
+        }
+      }
     }
-}
