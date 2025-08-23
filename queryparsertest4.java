@@ -1,44 +1,48 @@
 package org.jsoup.select;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.jsoup.select.EvaluatorDebug.asElement;
-import static org.jsoup.select.EvaluatorDebug.sexpr;
-import static org.jsoup.select.Selector.SelectorParseException;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class QueryParserTestTest4 {
+import static org.jsoup.select.EvaluatorDebug.sexpr;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+/**
+ * Tests the parsing logic of {@link QueryParser}, specifically verifying its
+ * S-expression debug output for complex queries.
+ */
+public class QueryParserTest {
 
     @Test
-    public void testParsesMultiCorrectly() {
+    @DisplayName("Should parse a query with multiple, comma-separated selectors into a corresponding 'Or' structure")
+    void parsesMultiSelectorQueryIntoCorrectStructure() {
+        // ARRANGE
+        // A complex query with two selectors joined by the 'or' (,) combinator:
+        // 1: .foo.qux[attr=bar] > ol.bar
+        // 2: ol > li + li
         String query = ".foo.qux[attr=bar] > ol.bar, ol > li + li";
-        String parsed = sexpr(query);
-        assertEquals("(Or (And (Tag 'li')(ImmediatePreviousSibling (ImmediateParentRun (Tag 'ol')(Tag 'li'))))(ImmediateParentRun (And (AttributeWithValue '[attr=bar]')(Class '.foo')(Class '.qux'))(And (Tag 'ol')(Class '.bar'))))", parsed);
-        /*
-        <Or css=".foo.qux[attr=bar] > ol.bar, ol > li + li" cost="31">
-          <And css="ol > li + li" cost="7">
-            <Tag css="li" cost="1"></Tag>
-            <ImmediatePreviousSibling css="ol > li + " cost="6">
-              <ImmediateParentRun css="ol > li" cost="4">
-                <Tag css="ol" cost="1"></Tag>
-                <Tag css="li" cost="1"></Tag>
-              </ImmediateParentRun>
-            </ImmediatePreviousSibling>
-          </And>
-          <ImmediateParentRun css=".foo.qux[attr=bar] > ol.bar" cost="24">
-            <And css=".foo.qux[attr=bar]" cost="15">
-              <AttributeWithValue css="[attr=bar]" cost="3"></AttributeWithValue>
-              <Class css=".foo" cost="6"></Class>
-              <Class css=".qux" cost="6"></Class>
-            </And>
-            <And css="ol.bar" cost="7">
-              <Tag css="ol" cost="1"></Tag>
-              <Class css=".bar" cost="6"></Class>
-            </And>
-          </ImmediateParentRun>
-        </Or>
-         */
+
+        // The expected S-expression represents the parsed evaluator tree.
+        // The parser creates a top-level 'Or' evaluator for the comma.
+        // Note: The parser processes selectors from right to left, so the second
+        // selector ("ol > li + li") appears first in the S-expression.
+        String expectedSExpression =
+            "(Or " +
+                // Corresponds to "ol > li + li"
+                "(And " +
+                    "(Tag 'li')" +
+                    "(ImmediatePreviousSibling (ImmediateParentRun (Tag 'ol')(Tag 'li')))" +
+                ")" +
+                // Corresponds to ".foo.qux[attr=bar] > ol.bar"
+                "(ImmediateParentRun " +
+                    "(And (AttributeWithValue '[attr=bar]')(Class '.foo')(Class '.qux'))" +
+                    "(And (Tag 'ol')(Class '.bar'))" +
+                ")" +
+            ")";
+
+        // ACT
+        String actualSExpression = sexpr(query);
+
+        // ASSERT
+        assertEquals(expectedSExpression, actualSExpression);
     }
 }
