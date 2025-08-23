@@ -1,112 +1,64 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.Chronology;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
 import org.joda.time.IllegalFieldValueException;
-import org.joda.time.Partial;
-import org.joda.time.TimeOfDay;
-import org.joda.time.YearMonthDay;
+import org.junit.Test;
 
-public class ISOChronologyTestTest11 extends TestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Tests for ISOChronology focusing on its behavior at the maximum supported year.
+ */
+public class ISOChronologyMaxYearTest {
 
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestISOChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    private void testAdd(String start, DurationFieldType type, int amt, String end) {
-        DateTime dtStart = new DateTime(start, ISOChronology.getInstanceUTC());
-        DateTime dtEnd = new DateTime(end, ISOChronology.getInstanceUTC());
-        assertEquals(dtEnd, dtStart.withFieldAdded(type, amt));
-        assertEquals(dtStart, dtEnd.withFieldAdded(type, -amt));
-        DurationField field = type.getField(ISOChronology.getInstanceUTC());
-        int diff = field.getDifference(dtEnd.getMillis(), dtStart.getMillis());
-        assertEquals(amt, diff);
-        if (type == DurationFieldType.years() || type == DurationFieldType.months() || type == DurationFieldType.days()) {
-            YearMonthDay ymdStart = new YearMonthDay(start, ISOChronology.getInstanceUTC());
-            YearMonthDay ymdEnd = new YearMonthDay(end, ISOChronology.getInstanceUTC());
-            assertEquals(ymdEnd, ymdStart.withFieldAdded(type, amt));
-            assertEquals(ymdStart, ymdEnd.withFieldAdded(type, -amt));
-        }
-    }
-
-    public void testMaxYear() {
-        final ISOChronology chrono = ISOChronology.getInstanceUTC();
+    @Test
+    public void testHandlingOfMaximumYear() {
+        // Arrange: Set up constants and dates for the maximum year in UTC.
+        final Chronology chrono = ISOChronology.getInstanceUTC();
         final int maxYear = chrono.year().getMaximumValue();
-        DateTime start = new DateTime(maxYear, 1, 1, 0, 0, 0, 0, chrono);
-        DateTime end = new DateTime(maxYear, 12, 31, 23, 59, 59, 999, chrono);
-        assertTrue(start.getMillis() > 0);
-        assertTrue(end.getMillis() > start.getMillis());
-        assertEquals(maxYear, start.getYear());
-        assertEquals(maxYear, end.getYear());
-        long delta = end.getMillis() - start.getMillis();
-        long expectedDelta = (start.year().isLeap() ? 366L : 365L) * DateTimeConstants.MILLIS_PER_DAY - 1;
-        assertEquals(expectedDelta, delta);
-        assertEquals(start, new DateTime(maxYear + "-01-01T00:00:00.000Z", chrono));
-        assertEquals(end, new DateTime(maxYear + "-12-31T23:59:59.999Z", chrono));
+
+        final DateTime startOfMaxYear = new DateTime(maxYear, 1, 1, 0, 0, 0, 0, chrono);
+        final DateTime endOfMaxYear = new DateTime(maxYear, 12, 31, 23, 59, 59, 999, chrono);
+
+        // Assert: Verify basic properties of the max year dates.
+        assertTrue("Millis for start of max year should be positive", startOfMaxYear.getMillis() > 0);
+        assertTrue("End of max year should be after the start", endOfMaxYear.getMillis() > startOfMaxYear.getMillis());
+        assertEquals("Year of the start date should be the max year", maxYear, startOfMaxYear.getYear());
+        assertEquals("Year of the end date should be the max year", maxYear, endOfMaxYear.getYear());
+
+        // Assert: Verify the duration of the maximum year.
+        long fullYearDuration = (startOfMaxYear.year().isLeap() ? 366L : 365L) * DateTimeConstants.MILLIS_PER_DAY;
+        // The duration is from the first millisecond of the year to the last, so it's one millisecond less than a full year.
+        long expectedDurationBetweenStartAndEnd = fullYearDuration - 1;
+        long actualDuration = endOfMaxYear.getMillis() - startOfMaxYear.getMillis();
+        assertEquals("Duration of the max year is incorrect", expectedDurationBetweenStartAndEnd, actualDuration);
+
+        // Assert: Verify that parsing ISO strings for the max year works correctly.
+        assertEquals("Parsing start of max year from string", startOfMaxYear, new DateTime(maxYear + "-01-01T00:00:00.000Z", chrono));
+        assertEquals("Parsing end of max year from string", endOfMaxYear, new DateTime(maxYear + "-12-31T23:59:59.999Z", chrono));
+
+        // Assert: Adding one year to a date in the maximum year should fail.
         try {
-            start.plusYears(1);
-            fail();
+            startOfMaxYear.plusYears(1);
+            fail("Adding a year to the start of the max year should have thrown an exception.");
         } catch (IllegalFieldValueException e) {
+            // Expected behavior
         }
+
         try {
-            end.plusYears(1);
-            fail();
+            endOfMaxYear.plusYears(1);
+            fail("Adding a year to the end of the max year should have thrown an exception.");
         } catch (IllegalFieldValueException e) {
+            // Expected behavior
         }
-        assertEquals(maxYear + 1, chrono.year().get(Long.MAX_VALUE));
+
+        // Assert: Check an implementation detail for handling instants beyond the max year.
+        // The year field should return maxYear + 1 for a millisecond value of Long.MAX_VALUE,
+        // which demonstrates how the chronology handles overflow.
+        assertEquals("Year for Long.MAX_VALUE should be maxYear + 1", maxYear + 1, chrono.year().get(Long.MAX_VALUE));
     }
 }
