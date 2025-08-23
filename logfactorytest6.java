@@ -1,38 +1,41 @@
 package org.apache.ibatis.logging;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import java.io.Reader;
-import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.logging.commons.JakartaCommonsLoggingImpl;
-import org.apache.ibatis.logging.jdk14.Jdk14LoggingImpl;
-import org.apache.ibatis.logging.log4j.Log4jImpl;
-import org.apache.ibatis.logging.log4j2.Log4j2Impl;
-import org.apache.ibatis.logging.nologging.NoLoggingImpl;
-import org.apache.ibatis.logging.slf4j.Slf4jImpl;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+
 import org.apache.ibatis.logging.stdout.StdOutImpl;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class LogFactoryTestTest6 {
+/**
+ * Verifies that the {@link LogFactory} can be explicitly configured to use
+ * standard output logging.
+ */
+@DisplayName("LogFactory - Standard Output Logging Configuration")
+class LogFactoryStdOutTest {
 
-    @AfterAll
-    static void restore() {
-        LogFactory.useSlf4jLogging();
-    }
+  /**
+   * The LogFactory maintains the logging implementation in a static field.
+   * To prevent side effects on other tests, we reset it to a known state
+   * after all tests in this class have run.
+   */
+  @AfterAll
+  static void resetLogFactory() {
+    // The default auto-detection mechanism prefers Slf4j, so we reset to that.
+    LogFactory.useSlf4jLogging();
+  }
 
-    private void logSomething(Log log) {
-        log.warn("Warning message.");
-        log.debug("Debug message.");
-        log.error("Error message.");
-        log.error("Error with Exception.", new Exception("Test exception."));
-    }
+  @Test
+  @DisplayName("Should provide a StdOutImpl logger when configured for standard output")
+  void shouldProvideStdOutLoggerWhenConfigured() {
+    // Arrange: Configure the factory to use the standard output logger.
+    LogFactory.useStdOutLogging();
 
-    @Test
-    void shouldUseStdOut() {
-        LogFactory.useStdOutLogging();
-        Log log = LogFactory.getLog(Object.class);
-        logSomething(log);
-        assertEquals(log.getClass().getName(), StdOutImpl.class.getName());
-    }
+    // Act: Request a logger instance from the factory.
+    Log log = LogFactory.getLog(LogFactoryStdOutTest.class);
+
+    // Assert: The factory should return an instance of the standard output logger implementation.
+    assertInstanceOf(StdOutImpl.class, log,
+        "LogFactory should provide a StdOutImpl instance after useStdOutLogging() is called.");
+  }
 }
