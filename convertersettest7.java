@@ -1,74 +1,68 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.ReadWritableDateTime;
-import org.joda.time.ReadWritableInstant;
-import org.joda.time.ReadableDateTime;
-import org.joda.time.ReadableInstant;
+import org.joda.time.convert.ConverterSet.Converter;
 
-public class ConverterSetTestTest7 extends TestCase {
+/**
+ * Unit tests for the ConverterSet class, focusing on the remove() method.
+ */
+public class ConverterSetTest extends TestCase {
 
-    private static final Converter c1 = new Converter() {
-
-        public Class getSupportedType() {
+    // A converter for Boolean types.
+    private static final Converter BOOLEAN_CONVERTER = new Converter() {
+        public Class<?> getSupportedType() {
             return Boolean.class;
         }
     };
 
-    private static final Converter c2 = new Converter() {
-
-        public Class getSupportedType() {
+    // A converter for Character types.
+    private static final Converter CHARACTER_CONVERTER = new Converter() {
+        public Class<?> getSupportedType() {
             return Character.class;
         }
     };
 
-    private static final Converter c3 = new Converter() {
-
-        public Class getSupportedType() {
+    // A converter for Byte types.
+    private static final Converter BYTE_CONVERTER = new Converter() {
+        public Class<?> getSupportedType() {
             return Byte.class;
         }
     };
 
-    private static final Converter c4 = new Converter() {
-
-        public Class getSupportedType() {
+    // A converter for Short types.
+    private static final Converter SHORT_CONVERTER = new Converter() {
+        public Class<?> getSupportedType() {
             return Short.class;
         }
     };
 
-    private static final Converter c4a = new Converter() {
-
-        public Class getSupportedType() {
-            return Short.class;
-        }
-    };
-
-    private static final Converter c5 = new Converter() {
-
-        public Class getSupportedType() {
+    // A converter for Integer types, used for removal attempts.
+    private static final Converter INTEGER_CONVERTER = new Converter() {
+        public Class<?> getSupportedType() {
             return Integer.class;
         }
     };
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+    /**
+     * Tests that calling remove() with a converter that is not in the set
+     * returns the original set instance, confirming immutability in this scenario.
+     */
+    public void testRemove_whenConverterIsNotInSet_returnsSameInstance() {
+        // Arrange: Create a set with a few converters.
+        Converter[] initialConverters = new Converter[]{
+                BOOLEAN_CONVERTER, CHARACTER_CONVERTER, BYTE_CONVERTER, SHORT_CONVERTER
+        };
+        ConverterSet initialSet = new ConverterSet(initialConverters);
 
-    public static TestSuite suite() {
-        return new TestSuite(TestConverterSet.class);
-    }
+        // The converter to be removed is intentionally not present in the initial set.
+        Converter converterToRemove = INTEGER_CONVERTER;
 
-    public void testRemoveNullRemoved2() {
-        Converter[] array = new Converter[] { c1, c2, c3, c4 };
-        ConverterSet set = new ConverterSet(array);
-        ConverterSet result = set.remove(c5, null);
-        assertSame(set, result);
+        // Act: Attempt to remove the non-existent converter.
+        ConverterSet resultSet = initialSet.remove(converterToRemove, null);
+
+        // Assert: The returned set should be the exact same instance as the original.
+        // This is because the set is immutable and no change was made.
+        assertSame("Expected the original set instance when removing a non-existent converter",
+                initialSet, resultSet);
     }
 }
