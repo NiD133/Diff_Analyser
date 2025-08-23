@@ -1,68 +1,69 @@
 package org.joda.time.chrono;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+
 import java.util.Locale;
 import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.YearMonthDay;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class GregorianChronologyTestTest2 extends TestCase {
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Tests the factory methods of {@link GregorianChronology}.
+ * This test focuses on the behavior of getInstance() with respect to the default system settings.
+ */
+public class GregorianChronologyTest {
 
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
 
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+    // A fixed date and time to ensure tests are deterministic.
+    // Using a DateTime object is much clearer than calculating millis manually.
+    private static final long TEST_TIME_NOW = new DateTime(2002, 6, 9, 0, 0, DateTimeZone.UTC).getMillis();
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
+    private DateTimeZone originalDateTimeZone;
+    private TimeZone originalTimeZone;
+    private Locale originalLocale;
 
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestGregorianChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() {
+        // Fix the current time to a known value for predictable test results.
         DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
+
+        // Save the original default settings to restore them after the test.
         originalDateTimeZone = DateTimeZone.getDefault();
         originalTimeZone = TimeZone.getDefault();
         originalLocale = Locale.getDefault();
+
+        // Set specific default settings for this test.
         DateTimeZone.setDefault(LONDON);
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
         Locale.setDefault(Locale.UK);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() {
+        // Restore the original settings to avoid side effects on other tests.
         DateTimeUtils.setCurrentMillisSystem();
         DateTimeZone.setDefault(originalDateTimeZone);
         TimeZone.setDefault(originalTimeZone);
         Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
     }
 
-    public void testFactory() {
-        assertEquals(LONDON, GregorianChronology.getInstance().getZone());
-        assertSame(GregorianChronology.class, GregorianChronology.getInstance().getClass());
+    @Test
+    public void getInstance_withoutArgs_usesDefaultTimeZone() {
+        // This test ensures that GregorianChronology.getInstance() correctly
+        // uses the system's default time zone, which is set to LONDON in setUp().
+
+        // Act: Get an instance of the chronology.
+        GregorianChronology chronology = GregorianChronology.getInstance();
+
+        // Assert: Verify the chronology has the expected time zone and class.
+        assertEquals("Chronology should use the default time zone", LONDON, chronology.getZone());
+        assertSame("getInstance() should return a GregorianChronology instance",
+                GregorianChronology.class, chronology.getClass());
     }
 }
