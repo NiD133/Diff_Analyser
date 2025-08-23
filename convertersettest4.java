@@ -1,74 +1,59 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.ReadWritableDateTime;
-import org.joda.time.ReadWritableInstant;
-import org.joda.time.ReadableDateTime;
-import org.joda.time.ReadableInstant;
+import org.junit.Test;
+import static org.junit.Assert.assertSame;
 
-public class ConverterSetTestTest4 extends TestCase {
+/**
+ * Test class for ConverterSet, focusing on the add() method.
+ */
+public class ConverterSetTest {
 
-    private static final Converter c1 = new Converter() {
+    // Descriptive constants for test data make the test's intent clear.
+    private static final Converter BOOLEAN_CONVERTER = new TestConverter(Boolean.class);
+    private static final Converter CHARACTER_CONVERTER = new TestConverter(Character.class);
+    private static final Converter BYTE_CONVERTER = new TestConverter(Byte.class);
+    private static final Converter SHORT_CONVERTER = new TestConverter(Short.class);
 
-        public Class getSupportedType() {
-            return Boolean.class;
-        }
-    };
+    /**
+     * Tests that adding a converter that is already present in the set
+     * returns the original set instance. This is an expected optimization for an
+     * immutable class.
+     */
+    @Test
+    public void add_whenConverterIsAlreadyPresent_shouldReturnSameInstance() {
+        // Arrange: Create a set containing a few converters, including the one we will try to add again.
+        Converter[] initialConverters = {
+            BOOLEAN_CONVERTER, CHARACTER_CONVERTER, BYTE_CONVERTER, SHORT_CONVERTER
+        };
+        ConverterSet initialSet = new ConverterSet(initialConverters);
 
-    private static final Converter c2 = new Converter() {
+        // Act: Attempt to add a converter that is already in the set.
+        // The 'removed' parameter is null because we are not interested in capturing
+        // any potentially replaced converter in this test scenario.
+        ConverterSet resultSet = initialSet.add(SHORT_CONVERTER, null);
 
-        public Class getSupportedType() {
-            return Character.class;
-        }
-    };
-
-    private static final Converter c3 = new Converter() {
-
-        public Class getSupportedType() {
-            return Byte.class;
-        }
-    };
-
-    private static final Converter c4 = new Converter() {
-
-        public Class getSupportedType() {
-            return Short.class;
-        }
-    };
-
-    private static final Converter c4a = new Converter() {
-
-        public Class getSupportedType() {
-            return Short.class;
-        }
-    };
-
-    private static final Converter c5 = new Converter() {
-
-        public Class getSupportedType() {
-            return Integer.class;
-        }
-    };
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // Assert: The returned set should be the exact same instance as the original.
+        // This verifies the optimization where no change results in no new object creation.
+        assertSame(
+            "Adding an existing converter should return the same set instance",
+            initialSet,
+            resultSet
+        );
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestConverterSet.class);
-    }
+    /**
+     * Helper class to reduce boilerplate when creating simple converters for tests.
+     */
+    private static class TestConverter implements Converter {
+        private final Class<?> supportedType;
 
-    public void testAddNullRemoved2() {
-        Converter[] array = new Converter[] { c1, c2, c3, c4 };
-        ConverterSet set = new ConverterSet(array);
-        ConverterSet result = set.add(c4, null);
-        assertSame(set, result);
+        TestConverter(Class<?> supportedType) {
+            this.supportedType = supportedType;
+        }
+
+        @Override
+        public Class<?> getSupportedType() {
+            return supportedType;
+        }
     }
 }
