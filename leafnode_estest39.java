@@ -1,21 +1,28 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LeafNode_ESTestTest39 extends LeafNode_ESTest_scaffolding {
+/**
+ * Tests for the {@link LeafNode} abstract class.
+ * Since LeafNode is abstract, a concrete subclass like {@link Comment} is used for instantiation.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        Comment comment0 = new Comment("QuR~!GB`!_");
-        String string0 = comment0.absUrl("QuR~!GB`!_");
-        assertEquals("", string0);
+    /**
+     * Verifies that calling absUrl() for an attribute that does not exist on a LeafNode
+     * returns an empty string.
+     */
+    @Test
+    public void absUrlOfNonExistentAttributeShouldReturnEmptyString() {
+        // Arrange: Create a LeafNode instance (a Comment) that has no attributes.
+        LeafNode leafNode = new Comment("This is a comment");
+        String nonExistentAttributeKey = "href";
+
+        // Act: Attempt to get the absolute URL of an attribute that isn't set.
+        String absoluteUrl = leafNode.absUrl(nonExistentAttributeKey);
+
+        // Assert: The result should be an empty string, as the attribute does not exist.
+        assertEquals("", absoluteUrl);
     }
 }
