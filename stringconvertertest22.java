@@ -46,6 +46,8 @@ public class StringConverterTestTest22 extends TestCase {
 
     private DateTimeZone zone = null;
 
+
+
     private Locale locale = null;
 
     public static void main(String[] args) {
