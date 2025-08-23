@@ -1,29 +1,36 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest12 extends BufferedLine_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
-        PointImpl pointImpl0 = new PointImpl(0.0, 0.0, spatialContext0);
-        BufferedLine bufferedLine0 = new BufferedLine(pointImpl0, pointImpl0, 1461.7, spatialContext0);
-        double double0 = bufferedLine0.getBuf();
-        assertEquals(1461.7, double0, 0.01);
+/**
+ * Unit tests for the {@link BufferedLine} class.
+ */
+public class BufferedLineTest {
+
+    /**
+     * Tests that the getBuf() method correctly returns the buffer value
+     * that was provided in the constructor.
+     */
+    @Test
+    public void getBufShouldReturnConstructorValue() {
+        // Arrange
+        final double EXPECTED_BUFFER = 1461.7;
+        final SpatialContext spatialContext = SpatialContext.GEO;
+
+        // A BufferedLine where the start and end points are the same is a valid
+        // use case, effectively representing a buffered point.
+        final Point point = new PointImpl(0.0, 0.0, spatialContext);
+        final BufferedLine bufferedLine = new BufferedLine(point, point, EXPECTED_BUFFER, spatialContext);
+
+        // Act
+        double actualBuffer = bufferedLine.getBuf();
+
+        // Assert
+        // The returned buffer should be exactly what was passed to the constructor.
+        assertEquals(EXPECTED_BUFFER, actualBuffer, 0.0);
     }
 }
