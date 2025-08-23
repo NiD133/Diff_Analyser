@@ -1,26 +1,45 @@
 package org.apache.ibatis.type;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
+
 import java.sql.ResultSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.sql.SQLException;
 
-public class EnumOrdinalTypeHandler_ESTestTest17 extends EnumOrdinalTypeHandler_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Class<JdbcType> class0 = JdbcType.class;
-        EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
-        ResultSet resultSet0 = mock(ResultSet.class, new ViolatedAssumptionAnswer());
-        doReturn(1).when(resultSet0).getInt(anyString());
-        JdbcType jdbcType0 = enumOrdinalTypeHandler0.getNullableResult(resultSet0, "Nv<W]59B0_y%8#{]L");
-        assertEquals(JdbcType.BIT, jdbcType0);
+/**
+ * Tests for {@link EnumOrdinalTypeHandler}.
+ */
+public class EnumOrdinalTypeHandlerTest {
+
+    /**
+     * Verifies that getNullableResult correctly converts an integer ordinal from a
+     * ResultSet into the corresponding enum constant when accessed by column name.
+     */
+    @Test
+    public void shouldReturnEnumConstantForGivenOrdinalFromResultSetByName() throws SQLException {
+        // Arrange
+        // 1. Define the target enum and its expected ordinal value.
+        //    In the JdbcType enum, BIT has an ordinal value of 1.
+        final JdbcType expectedEnum = JdbcType.BIT;
+        final int enumOrdinal = expectedEnum.ordinal();
+        final String columnName = "ENUM_COLUMN";
+
+        // 2. Create a mock ResultSet that returns the ordinal when getInt is called.
+        ResultSet mockResultSet = mock(ResultSet.class);
+        when(mockResultSet.getInt(columnName)).thenReturn(enumOrdinal);
+
+        // 3. Instantiate the handler for the JdbcType enum.
+        EnumOrdinalTypeHandler<JdbcType> handler = new EnumOrdinalTypeHandler<>(JdbcType.class);
+
+        // Act
+        // Call the method under test to convert the ordinal from the ResultSet to an enum.
+        JdbcType actualEnum = handler.getNullableResult(mockResultSet, columnName);
+
+        // Assert
+        // Verify that the handler returned the correct enum constant.
+        assertEquals(expectedEnum, actualEnum);
     }
 }
