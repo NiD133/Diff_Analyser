@@ -2,34 +2,41 @@ package com.itextpdf.text.pdf;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
 public class RandomAccessFileOrArray_ESTestTest40 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
+    /**
+     * Verifies that readInt() correctly incorporates a pushed-back byte.
+     * When a byte is pushed back using pushBack(), a subsequent call to readInt()
+     * should use that byte as the first (most significant) byte of the resulting integer,
+     * and the remaining three bytes should be read from the underlying data source.
+     */
     @Test(timeout = 4000)
-    public void test039() throws Throwable {
-        byte[] byteArray0 = new byte[5];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.pushBack((byte) 10);
-        int int0 = randomAccessFileOrArray0.readInt();
-        assertEquals(3L, randomAccessFileOrArray0.getFilePointer());
-        assertEquals(167772160, int0);
+    public void readIntAfterPushBack_usesPushedBackByteAsFirstByte() throws IOException {
+        // Arrange: Set up a data source of zeros and a reader.
+        byte[] sourceData = new byte[5]; // An array of {0, 0, 0, 0, 0}
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(sourceData);
+
+        // Push back a byte. This byte will be the next one read, before the underlying source.
+        byte pushedBackByte = 10; // 0x0A in hexadecimal
+        reader.pushBack(pushedBackByte);
+
+        // Act: Read a 4-byte integer.
+        // The reader should consume the pushed-back byte (10) and the next 3 bytes from the source (0, 0, 0).
+        // The resulting big-endian integer should be 0x0A000000.
+        int actualInt = reader.readInt();
+
+        // Assert: Verify the read value and the final position of the file pointer.
+        // The expected integer is 10 * 2^24 = 167,772,160. Using hex makes the byte layout clear.
+        int expectedInt = 0x0A000000;
+        assertEquals("The integer should be formed by the pushed-back byte and three subsequent zeros.",
+                expectedInt, actualInt);
+
+        // The file pointer should have advanced by 3 positions in the sourceData array,
+        // as only three bytes were read from it. The pushed-back byte doesn't affect the pointer.
+        long expectedFilePointer = 3L;
+        assertEquals("File pointer should advance by 3, reflecting reads from the source array only.",
+                expectedFilePointer, reader.getFilePointer());
     }
 }
