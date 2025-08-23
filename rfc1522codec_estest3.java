@@ -1,23 +1,30 @@
 package org.apache.commons.codec.net;
 
+import static org.junit.Assert.assertNull;
+
+import org.apache.commons.codec.EncoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class RFC1522Codec_ESTestTest3 extends RFC1522Codec_ESTest_scaffolding {
+/**
+ * Tests for the {@link BCodec} class, focusing on behaviors inherited from {@link RFC1522Codec}.
+ */
+public class BCodecTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        BCodec bCodec0 = new BCodec();
-        String string0 = bCodec0.encodeText((String) null, "RFC 1522 violation: malformed encoded content");
-        assertNull(string0);
+    /**
+     * Tests that encoding a null text string using {@link BCodec#encodeText(String, String)}
+     * returns null, as the method contract specifies that null input should result in null output.
+     */
+    @Test
+    public void testEncodeTextWithNullInputShouldReturnNull() throws EncoderException {
+        // Arrange: Create a BCodec instance. The charset is specified but will not be used
+        // because the method returns early when the input text is null.
+        final BCodec bCodec = new BCodec();
+        final String charsetName = "UTF-8";
+
+        // Act: Call the encodeText method with a null input string.
+        final String encodedText = bCodec.encodeText(null, charsetName);
+
+        // Assert: Verify that the result is null.
+        assertNull("Encoding a null string should return null.", encodedText);
     }
 }
