@@ -1,23 +1,38 @@
 package org.joda.time.tz;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
-import org.joda.time.LocalDateTime;
-import org.joda.time.chrono.GregorianChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CachedDateTimeZone_ESTestTest10 extends CachedDateTimeZone_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        DateTimeZone dateTimeZone0 = DateTimeZone.forID("WET");
-        int int0 = dateTimeZone0.getStandardOffset(999999992896684031L);
-        assertEquals(0, int0);
+/**
+ * Unit tests for {@link CachedDateTimeZone}.
+ */
+public class CachedDateTimeZoneTest {
+
+    /**
+     * Tests that getStandardOffset() returns the correct offset for a non-fixed zone
+     * at a very distant point in the future.
+     */
+    @Test
+    public void getStandardOffset_forWETZoneAtFarFutureInstant_returnsZero() {
+        // Arrange
+        // DateTimeZone.forID() wraps non-fixed zones like "WET" in a CachedDateTimeZone instance.
+        // The WET (Western European Time) zone has a standard offset of 0 from UTC.
+        DateTimeZone wetZone = DateTimeZone.forID("WET");
+
+        // This test uses a very large instant value to verify the caching behavior
+        // with timestamps that are far in the future. The value corresponds to a
+        // date in the approximate year +31,688,764.
+        final long FAR_FUTURE_INSTANT = 999999992896684031L;
+
+        // Act
+        // The getStandardOffset() method should return the zone's standard offset,
+        // ignoring any daylight saving adjustments for the given instant.
+        int standardOffset = wetZone.getStandardOffset(FAR_FUTURE_INSTANT);
+
+        // Assert
+        // The standard offset for WET should always be 0.
+        assertEquals("Standard offset for WET should be 0", 0, standardOffset);
     }
 }
