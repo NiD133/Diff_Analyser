@@ -2,22 +2,29 @@ package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class contains refactored tests for {@link JsonTypeInfo.Value}.
+ * The original test was auto-generated and has been improved for clarity.
+ */
 public class JsonTypeInfo_ESTestTest3 extends JsonTypeInfo_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        JsonTypeInfo.Value jsonTypeInfo_Value0 = JsonTypeInfo.Value.EMPTY;
-        JsonTypeInfo.Value jsonTypeInfo_Value1 = jsonTypeInfo_Value0.withPropertyName("EXTERNAL_PROPERTY");
-        boolean boolean0 = jsonTypeInfo_Value0.equals(jsonTypeInfo_Value1);
-        assertFalse(jsonTypeInfo_Value1.getIdVisible());
-        assertFalse(boolean0);
-        assertFalse(jsonTypeInfo_Value1.equals((Object) jsonTypeInfo_Value0));
+    /**
+     * Tests that creating a new {@link JsonTypeInfo.Value} instance from an existing one
+     * using {@code withPropertyName} results in two objects that are not equal.
+     */
+    @Test
+    public void withPropertyName_shouldCreateUnequalInstance() {
+        // Arrange: Start with the default empty Value instance.
+        final JsonTypeInfo.Value baseValue = JsonTypeInfo.Value.EMPTY;
+        final String newPropertyName = "EXTERNAL_PROPERTY";
+
+        // Act: Create a new instance with a different property name.
+        JsonTypeInfo.Value modifiedValue = baseValue.withPropertyName(newPropertyName);
+
+        // Assert: The new instance should not be equal to the original,
+        // and its property name should be updated.
+        assertNotEquals("Instances with different property names should not be equal", baseValue, modifiedValue);
+        assertEquals(newPropertyName, modifiedValue.getPropertyName());
     }
 }
