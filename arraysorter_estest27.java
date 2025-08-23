@@ -1,20 +1,24 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertNull;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class ArraySorter_ESTestTest27 extends ArraySorter_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ArraySorter}.
+ */
+public class ArraySorterTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        char[] charArray0 = ArraySorter.sort((char[]) null);
-        assertNull(charArray0);
+    /**
+     * Tests that sorting a null char array returns null,
+     * maintaining the null-safe behavior of the method.
+     */
+    @Test
+    public void sort_withNullCharArray_shouldReturnNull() {
+        // Act: Call the sort method with a null array.
+        // The explicit cast is necessary to resolve method overload ambiguity.
+        final char[] result = ArraySorter.sort((char[]) null);
+
+        // Assert: Verify that the result is null.
+        assertNull(result);
     }
 }
