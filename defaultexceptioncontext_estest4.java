@@ -1,22 +1,30 @@
 package org.apache.commons.lang3.exception;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Set;
-import org.apache.commons.lang3.tuple.Pair;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DefaultExceptionContext_ESTestTest4 extends DefaultExceptionContext_ESTest_scaffolding {
+/**
+ * Unit tests for {@link DefaultExceptionContext}.
+ */
+public class DefaultExceptionContextTest {
 
-    @Test(timeout = 4000)
-    public void test3() throws Throwable {
-        DefaultExceptionContext defaultExceptionContext0 = new DefaultExceptionContext();
-        DefaultExceptionContext defaultExceptionContext1 = defaultExceptionContext0.setContextValue((String) null, (Object) null);
-        String string0 = defaultExceptionContext1.getFormattedExceptionMessage((String) null);
-        assertEquals("Exception Context:\n\t[1:null=null]\n---------------------------------", string0);
+    /**
+     * Tests that the formatted exception message is generated correctly when the context
+     * contains a null label and a null value, and the base message is also null.
+     */
+    @Test
+    public void testGetFormattedExceptionMessageWithNullContextAndNullBaseMessage() {
+        // Arrange: Create a context and add an entry with a null label and null value.
+        final DefaultExceptionContext context = new DefaultExceptionContext();
+        context.setContextValue(null, null);
+
+        // Act: Generate the formatted exception message with a null base message.
+        final String formattedMessage = context.getFormattedExceptionMessage(null);
+
+        // Assert: Verify that the output string matches the expected format.
+        final String expectedMessage = "Exception Context:\n" +
+                                       "\t[1:null=null]\n" +
+                                       "---------------------------------";
+        assertEquals(expectedMessage, formattedMessage);
     }
 }
