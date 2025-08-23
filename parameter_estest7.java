@@ -1,31 +1,45 @@
 package com.google.common.reflect;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.lang.annotation.Annotation;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.lang.reflect.AnnotatedType;
+import org.junit.Test;
 
 public class Parameter_ESTestTest7 extends Parameter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Annotation[] annotationArray0 = new Annotation[0];
-        Object object0 = new Object();
-        Parameter parameter0 = new Parameter((Invokable<?, ?>) null, (-948), (TypeToken<?>) null, annotationArray0, object0);
-        // Undeclared exception!
+    /**
+     * Tests that getAnnotatedType() throws a ClassCastException if the Parameter
+     * was constructed with an object that is not an instance of AnnotatedType.
+     *
+     * <p>This is an important edge case because the package-private constructor accepts a plain
+     * {@code Object} for the annotatedType field to maintain Android compatibility. This test ensures
+     * that the public-facing getter correctly handles an invalid type being passed internally.
+     */
+    @Test
+    public void getAnnotatedType_whenConstructedWithInvalidAnnotatedTypeObject_throwsClassCastException() {
+        // Arrange: Create a Parameter using its package-private constructor, passing a plain
+        // Object where an AnnotatedType is expected.
+        Object invalidAnnotatedType = new Object();
+        Parameter parameter = new Parameter(
+                /* declaration= */ null,
+                /* position= */ 0,
+                /* type= */ null,
+                /* annotations= */ new Annotation[0],
+                /* annotatedType= */ invalidAnnotatedType);
+
+        // Act & Assert
         try {
-            parameter0.getAnnotatedType();
-            fail("Expecting exception: ClassCastException");
+            parameter.getAnnotatedType();
+            fail("Expected a ClassCastException because the internal annotatedType was not a "
+                    + "java.lang.reflect.AnnotatedType");
         } catch (ClassCastException e) {
-            //
-            // java.lang.Object cannot be cast to java.lang.reflect.AnnotatedType
-            //
-            verifyException("com.google.common.reflect.Parameter", e);
+            // The exception is expected. We can optionally assert on the message for more rigor.
+            String expectedMessageContent = "cannot be cast to java.lang.reflect.AnnotatedType";
+            assertTrue(
+                    "Exception message should indicate a failed cast to AnnotatedType",
+                    e.getMessage().contains(expectedMessageContent));
         }
     }
 }
