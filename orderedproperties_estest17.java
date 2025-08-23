@@ -1,60 +1,28 @@
 package org.apache.commons.collections4.properties;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.function.Function;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+/**
+ * Tests for the merge() method in {@link OrderedProperties}.
+ */
+// The class name and inheritance are preserved from the original test structure.
 public class OrderedProperties_ESTestTest17 extends OrderedProperties_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        OrderedProperties orderedProperties0 = new OrderedProperties();
-        Set<Object> set0 = orderedProperties0.keySet();
-        // Undeclared exception!
-        try {
-            orderedProperties0.merge(set0, set0, (BiFunction<? super Object, ? super Object, ?>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Tests that calling merge() with a null remapping function throws a NullPointerException,
+     * as specified by the java.util.Map interface contract.
+     */
+    @Test(expected = NullPointerException.class)
+    public void mergeWithNullRemappingFunctionShouldThrowNullPointerException() {
+        // Arrange: Create an instance of OrderedProperties and define test data.
+        final OrderedProperties properties = new OrderedProperties();
+        final String key = "anyKey";
+        final String value = "anyValue";
+        final BiFunction<Object, Object, Object> nullRemappingFunction = null;
+
+        // Act: Call the merge method with a null function.
+        // The @Test(expected) annotation will assert that a NullPointerException is thrown.
+        properties.merge(key, value, nullRemappingFunction);
     }
 }
