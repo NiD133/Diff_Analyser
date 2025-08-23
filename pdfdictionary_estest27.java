@@ -1,28 +1,27 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class PdfDictionary_ESTestTest27 extends PdfDictionary_ESTest_scaffolding {
+/**
+ * Contains unit tests for the {@link PdfDictionary} class.
+ */
+public class PdfDictionaryTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        PdfName pdfName0 = PdfWriter.PDF_VERSION_1_6;
-        PdfResources pdfResources0 = new PdfResources();
-        PdfObject pdfObject0 = pdfResources0.get(pdfName0);
-        assertNull(pdfObject0);
+    /**
+     * Verifies that the get() method returns null when called with a key
+     * that does not exist in the dictionary.
+     */
+    @Test
+    public void get_withNonExistentKey_shouldReturnNull() {
+        // Arrange: Create an empty dictionary and a key that is not present.
+        PdfDictionary dictionary = new PdfDictionary();
+        PdfName nonExistentKey = new PdfName("ThisKeyDoesNotExist");
+
+        // Act: Attempt to retrieve the value for the non-existent key.
+        PdfObject result = dictionary.get(nonExistentKey);
+
+        // Assert: The result should be null, as the key was never added.
+        assertNull("Expected get() to return null for a non-existent key.", result);
     }
 }
