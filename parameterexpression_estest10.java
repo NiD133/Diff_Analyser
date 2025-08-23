@@ -1,21 +1,25 @@
 package org.apache.ibatis.builder;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ParameterExpression_ESTestTest10 extends ParameterExpression_ESTest_scaffolding {
+/**
+ * Test suite for the {@link ParameterExpression} parser.
+ */
+public class ParameterExpressionTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        ParameterExpression parameterExpression0 = null;
-        try {
-            parameterExpression0 = new ParameterExpression("( :s>(R5C/J>,K1");
-            fail("Expecting exception: StringIndexOutOfBoundsException");
-        } catch (StringIndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that the constructor throws a StringIndexOutOfBoundsException
+     * when parsing a malformed expression with an unclosed opening parenthesis.
+     *
+     * The parser expects a matching ')' for every '('. When the closing
+     * parenthesis is missing, the parsing logic attempts to read past the end
+     * of the string, resulting in this exception. This test confirms that this
+     * specific syntax error is handled by throwing the expected exception.
+     */
+    @Test(expected = StringIndexOutOfBoundsException.class)
+    public void constructorShouldThrowExceptionForUnclosedParenthesis() {
+        // This input is the minimal case to trigger the error: an expression
+        // that starts with '(' but is never closed.
+        new ParameterExpression("(expression");
     }
 }
