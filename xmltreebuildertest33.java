@@ -1,41 +1,55 @@
 package org.jsoup.parser;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.*;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.junit.jupiter.api.Test;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import static org.jsoup.nodes.Document.OutputSettings.Syntax;
-import static org.jsoup.parser.Parser.NamespaceHtml;
+
 import static org.jsoup.parser.Parser.NamespaceXml;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class XmlTreeBuilderTestTest33 {
+/**
+ * Tests for the {@link XmlTreeBuilder}, focusing on namespace handling.
+ */
+class XmlTreeBuilderTest {
 
-    private static void assertXmlNamespace(Element el) {
-        assertEquals(NamespaceXml, el.tag().namespace(), String.format("Element %s not in XML namespace", el.tagName()));
+    /**
+     * Asserts that a given element is in the XML namespace.
+     * @param el The element to check.
+     */
+    private static void assertInXmlNamespace(Element el) {
+        assertEquals(NamespaceXml, el.tag().namespace(),
+            () -> "Element <" + el.tagName() + "> should be in the XML namespace");
     }
 
+    /**
+     * Verifies that the XmlParser correctly assigns the XML namespace to all parsed elements
+     * and that this namespace is preserved when the document is cloned.
+     */
     @Test
-    void xmlNamespace() {
+    void xmlParserAssignsCorrectNamespaceAndPreservesItOnClone() {
+        // Arrange: A string of XML with several nested tags.
+        // The unclosed tags are intentional to test the parser's handling.
         String xml = "<foo><bar><div><svg><math>Qux</bar></foo>";
-        Document doc = Jsoup.parse(xml, Parser.xmlParser());
-        assertXmlNamespace(doc);
-        Elements els = doc.select("*");
-        for (Element el : els) {
-            assertXmlNamespace(el);
+
+        // Act: Parse the XML string using the XML parser.
+        Document doc = Jsoup.parse(xml, "", Parser.xmlParser());
+
+        // Assert: Verify all elements in the original parsed document have the XML namespace.
+        assertInXmlNamespace(doc);
+        Elements allElements = doc.select("*");
+        for (Element element : allElements) {
+            assertInXmlNamespace(element);
         }
-        Document clone = doc.clone();
-        assertXmlNamespace(clone);
-        assertXmlNamespace(clone.expectFirst("bar"));
-        Document shallow = doc.shallowClone();
-        assertXmlNamespace(shallow);
+
+        // Act: Create both a deep and a shallow clone of the document.
+        Document deepClone = doc.clone();
+        Document shallowClone = doc.shallowClone();
+
+        // Assert: Verify that both deep and shallow clones preserve the XML namespace.
+        assertInXmlNamespace(deepClone);
+        assertInXmlNamespace(deepClone.expectFirst("bar")); // Check a child in the deep clone
+        assertInXmlNamespace(shallowClone); // The root element of the shallow clone
     }
 }
