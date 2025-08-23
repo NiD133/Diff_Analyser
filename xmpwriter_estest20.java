@@ -1,48 +1,40 @@
 package com.itextpdf.text.xml.xmp;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.awt.AsianFontMapper;
-import com.itextpdf.awt.DefaultFontMapper;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfDocument;
 import com.itextpdf.text.pdf.PdfName;
-import com.itextpdf.text.pdf.PdfObject;
-import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.xmp.XMPConst;
+import com.itextpdf.xmp.XMPException;
 import com.itextpdf.xmp.XMPMeta;
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-import javax.swing.DebugGraphics;
-import javax.swing.DropMode;
-import javax.swing.JTree;
-import javax.swing.tree.TreeModel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class XmpWriter_ESTestTest20 extends XmpWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        PdfAction pdfAction0 = PdfAction.gotoRemotePage("zhcsaI", "", true, false);
-        XmpWriter xmpWriter0 = new XmpWriter(pipedOutputStream0, pdfAction0);
-        xmpWriter0.addDocInfoProperty(pdfAction0.PAGES, "PDF");
-        assertEquals(2048, PdfAction.SUBMIT_EXCL_F_KEY);
+/**
+ * Contains tests for the {@link XmpWriter} class, focusing on document information properties.
+ */
+public class XmpWriterTest {
+
+    /**
+     * Verifies that calling addDocInfoProperty with the 'Title' key correctly sets
+     * the corresponding Dublin Core 'title' property in the XMP metadata.
+     */
+    @Test
+    public void addDocInfoProperty_withTitleKey_shouldSetDublinCoreTitle() throws IOException, XMPException {
+        // Arrange: Create an XmpWriter and define the property to be added.
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        XmpWriter xmpWriter = new XmpWriter(outputStream);
+        PdfName titleKey = PdfName.TITLE;
+        String expectedTitle = "The Adventures of iText";
+
+        // Act: Add the document title property.
+        xmpWriter.addDocInfoProperty(titleKey, expectedTitle);
+
+        // Assert: Verify that the correct XMP property was set.
+        XMPMeta xmpMeta = xmpWriter.getXmpMeta();
+        String actualTitle = xmpMeta.getPropertyString(XMPConst.NS_DC, "title");
+        
+        assertEquals("The XMP title property should match the provided value.", expectedTitle, actualTitle);
     }
 }
