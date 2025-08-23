@@ -1,64 +1,54 @@
 package org.locationtech.spatial4j.context;
 
-import org.locationtech.spatial4j.context.jts.DatelineRule;
-import org.locationtech.spatial4j.context.jts.JtsSpatialContext;
-import org.locationtech.spatial4j.context.jts.JtsSpatialContextFactory;
-import org.locationtech.spatial4j.context.jts.ValidationRule;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.io.ShapeIO;
-import org.locationtech.spatial4j.io.WKTReader;
-import org.locationtech.spatial4j.shape.impl.RectangleImpl;
 import org.junit.After;
 import org.junit.Test;
-import java.util.HashMap;
-import java.util.Map;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-public class SpatialContextFactoryTestTest5 {
+import java.util.Collections;
 
-    public static final String PROP = "SpatialContextFactory";
+import static org.junit.Assert.assertFalse;
 
-    @After
-    public void tearDown() {
-        System.getProperties().remove(PROP);
-    }
+/**
+ * Tests the ability of {@link SpatialContextFactory} to load a custom factory implementation
+ * specified via a Java system property.
+ */
+public class SpatialContextFactorySystemPropertyTest {
 
-    private SpatialContext call(String... argsStr) {
-        Map<String, String> args = new HashMap<>();
-        for (int i = 0; i < argsStr.length; i += 2) {
-            String key = argsStr[i];
-            String val = argsStr[i + 1];
-            args.put(key, val);
-        }
-        return SpatialContextFactory.makeSpatialContext(args, getClass().getClassLoader());
-    }
+    /** The name of the system property used by SpatialContextFactory to find a factory class. */
+    private static final String SPATIAL_CONTEXT_FACTORY_SYSPROP = "SpatialContextFactory";
 
-    public static class DSCF extends SpatialContextFactory {
-
+    /**
+     * A custom factory for testing that always creates a non-geographic (geo=false) SpatialContext.
+     * This allows the test to verify that this specific factory was used.
+     */
+    public static class NonGeoSpatialContextFactory extends SpatialContextFactory {
         @Override
         public SpatialContext newSpatialContext() {
-            geo = false;
+            this.geo = false; // Force the context to be non-geographic
             return new SpatialContext(this);
         }
     }
 
-    public static class CustomWktShapeParser extends WKTReader {
-
-        //cheap way to test it was created
-        static boolean once = false;
-
-        public CustomWktShapeParser(JtsSpatialContext ctx, JtsSpatialContextFactory factory) {
-            super(ctx, factory);
-            once = true;
-        }
+    /**
+     * Ensures the system property is cleared after each test to avoid side effects.
+     */
+    @After
+    public void tearDown() {
+        System.getProperties().remove(SPATIAL_CONTEXT_FACTORY_SYSPROP);
     }
 
     @Test
-    public void testSystemPropertyLookup() {
-        System.setProperty(PROP, DSCF.class.getName());
-        //DSCF returns this
-        assertTrue(!call().isGeo());
+    public void makeSpatialContext_usesFactoryFromSystemProperty_whenNotInArgs() {
+        // Arrange: Set a system property to specify our custom SpatialContextFactory.
+        // This factory is designed to always produce a non-geographic context.
+        System.setProperty(SPATIAL_CONTEXT_FACTORY_SYSPROP, NonGeoSpatialContextFactory.class.getName());
+
+        // Act: Create a SpatialContext without specifying a factory in the arguments map.
+        // The factory should be loaded based on the system property as a fallback.
+        SpatialContext ctx = SpatialContextFactory.makeSpatialContext(
+                Collections.emptyMap(), getClass().getClassLoader());
+
+        // Assert: The created context should be non-geographic, confirming that our
+        // custom factory was loaded and used.
+        assertFalse("Expected a non-geographic context from the custom factory", ctx.isGeo());
     }
 }
