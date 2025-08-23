@@ -1,7 +1,7 @@
 package com.google.common.hash;
 
-import static java.nio.charset.StandardCharsets.UTF_16LE;
 import static org.junit.Assert.assertThrows;
+
 import com.google.common.collect.Iterables;
 import com.google.common.hash.HashTestUtils.RandomHasherAction;
 import java.io.ByteArrayOutputStream;
@@ -17,16 +17,16 @@ import org.jspecify.annotations.NullUnmarked;
 
 public class AbstractStreamingHasherTestTest5 extends TestCase {
 
+    /**
+     * A test-specific implementation of AbstractStreamingHasher that captures the processed bytes and
+     * records method invocations.
+     */
     private static class Sink extends AbstractStreamingHasher {
 
         final int chunkSize;
-
         final int bufferSize;
-
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
-
         int processCalled = 0;
-
         boolean remainingCalled = false;
 
         Sink(int chunkSize, int bufferSize) {
@@ -50,7 +50,7 @@ public class AbstractStreamingHasherTestTest5 extends TestCase {
         protected void process(ByteBuffer bb) {
             processCalled++;
             assertEquals(ByteOrder.LITTLE_ENDIAN, bb.order());
-            assertTrue(bb.remaining() >= chunkSize);
+            assertTrue("Buffer remaining bytes should be at least a full chunk", bb.remaining() >= chunkSize);
             for (int i = 0; i < chunkSize; i++) {
                 out.write(bb.get());
             }
@@ -58,26 +58,37 @@ public class AbstractStreamingHasherTestTest5 extends TestCase {
 
         @Override
         protected void processRemaining(ByteBuffer bb) {
-            assertFalse(remainingCalled);
+            assertFalse("processRemaining should only be called once", remainingCalled);
             remainingCalled = true;
             assertEquals(ByteOrder.LITTLE_ENDIAN, bb.order());
-            assertTrue(bb.remaining() > 0);
-            assertTrue(bb.remaining() < bufferSize);
+            assertTrue("processRemaining should be called with non-empty buffer", bb.remaining() > 0);
+            assertTrue("processRemaining buffer should be smaller than bufferSize", bb.remaining() < bufferSize);
             int before = processCalled;
-            super.processRemaining(bb);
+            super.processRemaining(bb); // default implementation pads and calls process()
             int after = processCalled;
-            // default implementation pads and calls process()
-            assertEquals(before + 1, after);
-            // don't count the tail invocation (makes tests a bit more understandable)
+            assertEquals("super.processRemaining should invoke process() once", before + 1, after);
+            // Decrement to not count the final padded chunk as a "full" chunk,
+            // which simplifies invariant assertions.
             processCalled--;
         }
 
-        // ensures that the number of invocations looks sane
+        /**
+         * Asserts that the internal state is consistent with the total number of bytes hashed.
+         */
         void assertInvariants(int expectedBytes) {
-            // we should have seen as many bytes as the next multiple of chunk after expectedBytes - 1
-            assertEquals(out.toByteArray().length, ceilToMultiple(expectedBytes, chunkSize));
-            assertEquals(expectedBytes / chunkSize, processCalled);
-            assertEquals(expectedBytes % chunkSize != 0, remainingCalled);
+            // The total output bytes should be padded to the next multiple of the chunk size.
+            assertEquals(
+                "Total processed bytes should be padded to chunk size",
+                ceilToMultiple(expectedBytes, chunkSize),
+                out.toByteArray().length);
+            // Asserts the number of times process() was called for full chunks.
+            assertEquals(
+                "Number of full chunks processed", expectedBytes / chunkSize, processCalled);
+            // Asserts whether the final partial chunk was processed.
+            assertEquals(
+                "processRemaining should be called if there is a partial chunk",
+                expectedBytes % chunkSize != 0,
+                remainingCalled);
         }
 
         // returns the minimum x such as x >= a && (x % b) == 0
@@ -86,17 +97,20 @@ public class AbstractStreamingHasherTestTest5 extends TestCase {
             return remainder == 0 ? a : a + b - remainder;
         }
 
+        /**
+         * Asserts that the captured bytes match the expected byte array.
+         */
         void assertBytes(byte[] expected) {
-            byte[] got = out.toByteArray();
-            for (int i = 0; i < expected.length; i++) {
-                assertEquals(expected[i], got[i]);
-            }
+            byte[] actual = out.toByteArray();
+            // Using Arrays.toString provides a much more readable failure message
+            // than comparing elements in a loop.
+            assertEquals(Arrays.toString(expected), Arrays.toString(actual));
         }
     }
 
     // Assumes that AbstractNonStreamingHashFunction works properly (must be tested elsewhere!)
     private static class Control extends AbstractNonStreamingHashFunction {
-
+        // ... (Content unchanged as it's not used in the test case)
         @Override
         public HashCode hashBytes(byte[] input, int off, int len) {
             return HashCode.fromBytes(Arrays.copyOfRange(input, off, off + len));
@@ -108,12 +122,30 @@ public class AbstractStreamingHasherTestTest5 extends TestCase {
         }
     }
 
-    public void testChar() {
-        Sink sink = new Sink(4);
-        sink.putChar((char) 0x0201);
-        HashCode unused = sink.hash();
-        sink.assertInvariants(2);
-        // padded with zeros
-        sink.assertBytes(new byte[] { 1, 2, 0, 0 });
+    public void testPutChar_whenDataIsSmallerThanChunkSize_isPaddedWithZeros() {
+        // Arrange
+        final int chunkSize = 4;
+        // A char is 2 bytes. The test character 0x0201 is {0x01, 0x02} in little-endian byte order.
+        final char testChar = 0x0201;
+        final int inputByteCount = Character.BYTES; // 2 bytes
+        // The expected output is the char's bytes, padded with zeros to match the chunk size.
+        final byte[] expectedPaddedBytes = {0x01, 0x02, 0x00, 0x00};
+
+        Sink sink = new Sink(chunkSize);
+
+        // Act
+        sink.putChar(testChar);
+        sink.hash(); // Finalizes hashing, which triggers padding and processing of the last chunk.
+
+        // Assert
+        // 1. Verify the internal state of the hasher.
+        //    - 0 full chunks were processed.
+        //    - The "process remaining" logic was called for the partial data.
+        //    - The total output bytes match the padded chunk size.
+        sink.assertInvariants(inputByteCount);
+
+        // 2. Verify the actual bytes processed.
+        //    They should match the little-endian representation of the char, plus padding.
+        sink.assertBytes(expectedPaddedBytes);
     }
 }
