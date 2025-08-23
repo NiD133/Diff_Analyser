@@ -1,30 +1,44 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-public class TaiInstant_ESTestTest49 extends TaiInstant_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link TaiInstant} class.
+ */
+public class TaiInstantTest {
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        TaiInstant taiInstant0 = TaiInstant.ofTaiSeconds(50L, 50L);
-        TaiInstant taiInstant1 = TaiInstant.ofTaiSeconds((-1L), 1000000000L);
-        boolean boolean0 = taiInstant1.isAfter(taiInstant0);
-        assertEquals(50, taiInstant0.getNano());
-        assertEquals(0L, taiInstant1.getTaiSeconds());
-        assertFalse(boolean0);
-        assertEquals(0, taiInstant1.getNano());
+    /**
+     * Tests that isAfter() correctly returns false when comparing an earlier instant
+     * to a later one.
+     *
+     * This test also implicitly verifies the normalization logic of the
+     * ofTaiSeconds() factory method, where a nano-of-second adjustment equal
+     * to a full second is correctly carried over to the seconds part.
+     */
+    @Test
+    public void isAfter_shouldReturnFalse_whenComparingEarlierInstantToLaterOne() {
+        // Arrange
+        // An instant representing a point 50 seconds and 50 nanoseconds after the TAI epoch.
+        TaiInstant laterInstant = TaiInstant.ofTaiSeconds(50L, 50L);
+
+        // An instant that should normalize to the TAI epoch (0 seconds, 0 nanoseconds).
+        // The factory method handles the nano adjustment overflowing into the seconds part:
+        // -1 second + 1,000,000,000 nanoseconds results in 0 seconds.
+        TaiInstant earlierInstant = TaiInstant.ofTaiSeconds(-1L, 1_000_000_000L);
+
+        // To ensure the comparison is meaningful, first verify the state of our objects.
+        assertEquals("Normalized seconds of earlierInstant should be 0", 0L, earlierInstant.getTaiSeconds());
+        assertEquals("Normalized nanos of earlierInstant should be 0", 0, earlierInstant.getNano());
+        assertEquals("Seconds of laterInstant should be 50", 50L, laterInstant.getTaiSeconds());
+        assertEquals("Nanos of laterInstant should be 50", 50, laterInstant.getNano());
+
+        // Act
+        boolean isAfter = earlierInstant.isAfter(laterInstant);
+
+        // Assert
+        // The earlier instant (0s) should not be "after" the later instant (50.000000050s).
+        assertFalse("An earlier instant should not be considered after a later one.", isAfter);
     }
 }
