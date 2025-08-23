@@ -1,18 +1,28 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class IOCase_ESTestTest21 extends IOCase_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        IOCase iOCase0 = IOCase.INSENSITIVE;
-        boolean boolean0 = iOCase0.checkStartsWith("\"#s6?", "\"#s6?");
-        assertTrue(boolean0);
+    /**
+     * Tests that {@link IOCase#checkStartsWith(String, String)} returns true
+     * for identical strings when using case-insensitive comparison.
+     */
+    @Test
+    public void checkStartsWith_insensitive_returnsTrueForIdenticalStrings() {
+        // Arrange
+        final IOCase insensitiveCase = IOCase.INSENSITIVE;
+        final String text = "Apache Commons IO";
+        final String prefix = "Apache Commons IO";
+
+        // Act
+        final boolean result = insensitiveCase.checkStartsWith(text, prefix);
+
+        // Assert
+        assertTrue("Expected the string to be considered starting with itself.", result);
     }
 }
