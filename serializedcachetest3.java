@@ -1,73 +1,60 @@
 package org.apache.ibatis.cache;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.io.Serializable;
-import java.util.Objects;
+
 import org.apache.ibatis.cache.decorators.SerializedCache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class SerializedCacheTestTest3 {
+/**
+ * Tests for {@link SerializedCache} to ensure it correctly handles object serialization.
+ */
+class SerializedCacheTest {
 
-    static class CachingObject implements Serializable {
+    private Cache serializedCache;
 
-        private static final long serialVersionUID = 1L;
-
-        int x;
-
-        public CachingObject(int x) {
-            this.x = x;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            CachingObject obj = (CachingObject) o;
-            return x == obj.x;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(x);
-        }
+    @BeforeEach
+    void setUp() {
+        PerpetualCache delegate = new PerpetualCache("test-delegate");
+        serializedCache = new SerializedCache(delegate);
     }
 
-    static class CachingObjectWithoutSerializable {
+    /**
+     * A simple test-only object that does not implement the Serializable interface.
+     */
+    private static class NonSerializableObject {
+        private final int value;
 
-        int x;
-
-        public CachingObjectWithoutSerializable(int x) {
-            this.x = x;
+        NonSerializableObject(int value) {
+            this.value = value;
         }
 
+        // equals() and hashCode() are not needed for this specific test
+        // but are good practice for value objects.
         @Override
         public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            CachingObjectWithoutSerializable obj = (CachingObjectWithoutSerializable) o;
-            return x == obj.x;
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            NonSerializableObject that = (NonSerializableObject) o;
+            return value == that.value;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(x);
+            return value;
         }
     }
 
     @Test
-    void throwExceptionWhenTryingToCacheNonSerializableObject() {
-        SerializedCache cache = new SerializedCache(new PerpetualCache("default"));
-        assertThrows(CacheException.class, () -> cache.putObject(0, new CachingObjectWithoutSerializable(0)));
+    void shouldThrowCacheExceptionWhenPuttingNonSerializableObject() {
+        // Arrange
+        Object key = 1;
+        Object nonSerializableValue = new NonSerializableObject(123);
+
+        // Act & Assert
+        assertThrows(CacheException.class,
+            () -> serializedCache.putObject(key, nonSerializableValue),
+            "Should throw CacheException when the value is not serializable.");
     }
 }
