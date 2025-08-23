@@ -1,30 +1,33 @@
 package org.jfree.chart.plot;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import java.awt.geom.Rectangle2D;
+import static org.junit.Assert.assertEquals;
 
-public class PlotRenderingInfo_ESTestTest9 extends PlotRenderingInfo_ESTest_scaffolding {
+/**
+ * Tests for the {@link PlotRenderingInfo} class.
+ */
+public class PlotRenderingInfoTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
-        Rectangle rectangle0 = new Rectangle(0, 37, 4281, 0);
-        plotRenderingInfo0.setDataArea(rectangle0);
-        Rectangle2D rectangle2D0 = plotRenderingInfo0.getDataArea();
-        assertEquals(0.0, rectangle2D0.getHeight(), 0.01);
+    /**
+     * Verifies that getDataArea() correctly returns the rectangle
+     * that was previously set by setDataArea().
+     */
+    @Test
+    public void testSetAndGetDataArea() {
+        // Arrange: Create a PlotRenderingInfo instance and a test rectangle.
+        // The original test used a rectangle with zero height, which is an interesting
+        // edge case to preserve.
+        ChartRenderingInfo chartInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = chartInfo.getPlotInfo();
+        Rectangle2D expectedDataArea = new Rectangle2D.Double(10.0, 20.0, 300.0, 0.0);
+
+        // Act: Set the data area for the plot.
+        plotInfo.setDataArea(expectedDataArea);
+        Rectangle2D actualDataArea = plotInfo.getDataArea();
+
+        // Assert: The retrieved data area should be equal to the one that was set.
+        assertEquals(expectedDataArea, actualDataArea);
     }
 }
