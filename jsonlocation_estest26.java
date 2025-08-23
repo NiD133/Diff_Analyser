@@ -1,30 +1,42 @@
 package com.fasterxml.jackson.core;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import com.fasterxml.jackson.core.io.ErrorReportConfiguration;
+import org.junit.Test;
 
-public class JsonLocation_ESTestTest26 extends JsonLocation_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonLocation} class, focusing on its {@code toString()} method.
+ */
+public class JsonLocationToStringTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder(500);
-        ErrorReportConfiguration errorReportConfiguration0 = new ErrorReportConfiguration(500, (-1));
-        ContentReference contentReference0 = ContentReference.construct(true, (Object) stringBuilder0, errorReportConfiguration0);
-        JsonLocation jsonLocation0 = new JsonLocation(contentReference0, (long) 500, (long) 500, 1571, 500);
-        // Undeclared exception!
-        try {
-            jsonLocation0.toString();
-            fail("Expecting exception: StringIndexOutOfBoundsException");
-        } catch (StringIndexOutOfBoundsException e) {
-            //
-            // String index out of range: -1
-            //
-            verifyException("java.lang.AbstractStringBuilder", e);
-        }
+    /**
+     * Tests that {@link JsonLocation#toString()} throws a {@link StringIndexOutOfBoundsException}
+     * when the underlying {@link ContentReference} is constructed with an
+     * {@link ErrorReportConfiguration} that has a negative {@code maxErrorTokenLength}.
+     * <p>
+     * This scenario can lead to an invalid index calculation when {@code toString()} tries to generate a
+     * source snippet for the location's string representation.
+     */
+    @Test(expected = StringIndexOutOfBoundsException.class)
+    public void toStringShouldThrowExceptionWhenConfiguredWithNegativeMaxErrorTokenLength() {
+        // Arrange: Set up an ErrorReportConfiguration with an invalid negative value.
+        final int invalidMaxErrorTokenLength = -1;
+        final int maxRawContentLength = 500;
+        ErrorReportConfiguration invalidConfig = new ErrorReportConfiguration(
+                maxRawContentLength, invalidMaxErrorTokenLength);
+
+        // Create a ContentReference with this invalid configuration.
+        // The actual source object (an empty StringBuilder) is not the cause of the error.
+        Object source = new StringBuilder();
+        ContentReference contentRef = ContentReference.construct(true, source, invalidConfig);
+
+        // Create a JsonLocation instance using the configured ContentReference.
+        // The specific location offsets are not critical for triggering the exception.
+        JsonLocation location = new JsonLocation(contentRef, 500L, 500L, 1571, 500);
+
+        // Act: Call toString(), which will attempt to build a source description.
+        // This is expected to fail due to the invalid configuration.
+        // Assert: The @Test(expected) annotation asserts that a StringIndexOutOfBoundsException is thrown.
+        location.toString();
     }
 }
