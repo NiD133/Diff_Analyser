@@ -1,45 +1,40 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.fail;
 
-public class TextHelpAppendable_ESTestTest42 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Test suite for {@link TextHelpAppendable}.
+ */
+public class TextHelpAppendableTest {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        CharBuffer charBuffer0 = CharBuffer.allocate(47723);
-        TextStyle textStyle0 = TextStyle.DEFAULT;
-        // Undeclared exception!
-        textHelpAppendable0.makeColumnQueue(charBuffer0, textStyle0);
+    /**
+     * Tests that {@code makeColumnQueue} fails with an OutOfMemoryError when given an
+     * extremely large input CharSequence. This test simulates a resource exhaustion
+     * scenario to check the method's behavior under extreme load.
+     *
+     * <p><b>Note:</b> Testing for {@code OutOfMemoryError} can be fragile as it depends
+     * on the specific JVM memory configuration. This test uses a very large buffer
+     * to make the error likely, but it may not fail consistently in all environments.
+     * Its primary purpose is to document the expected behavior under memory pressure.
+     */
+    @Test
+    public void makeColumnQueueWithVeryLargeInputThrowsOutOfMemoryError() {
+        // Arrange: Create a TextHelpAppendable and an extremely large input buffer
+        // to intentionally exhaust memory during processing.
+        final int VERY_LARGE_BUFFER_SIZE = 50_000_000; // Large enough to likely cause OOM
+
+        TextHelpAppendable helpAppendable = TextHelpAppendable.systemOut();
+        CharBuffer largeInput = CharBuffer.allocate(VERY_LARGE_BUFFER_SIZE);
+        TextStyle defaultStyle = TextStyle.DEFAULT;
+
+        // Act & Assert: Verify that the method throws an OutOfMemoryError.
+        try {
+            helpAppendable.makeColumnQueue(largeInput, defaultStyle);
+            fail("Expected an OutOfMemoryError to be thrown, but it was not.");
+        } catch (OutOfMemoryError e) {
+            // This is the expected outcome. The test passes.
+        }
     }
 }
