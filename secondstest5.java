@@ -1,41 +1,50 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class SecondsTestTest5 extends TestCase {
+/**
+ * Test suite for the Seconds class, focusing on the secondsIn(ReadableInterval) factory method.
+ */
+public class SecondsTest {
 
-    // (before the late 90's they were all over the place)
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void secondsIn_givenNullInterval_returnsZero() {
+        // Act
+        Seconds result = Seconds.secondsIn(null);
+
+        // Assert
+        assertEquals(Seconds.ZERO, result);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestSeconds.class);
+    @Test
+    public void secondsIn_givenZeroDurationInterval_returnsZero() {
+        // Arrange
+        DateTime time = new DateTime(2006, 6, 9, 12, 0, 5, 0, PARIS);
+        ReadableInterval interval = new Interval(time, time);
+
+        // Act
+        Seconds result = Seconds.secondsIn(interval);
+
+        // Assert
+        assertEquals(Seconds.ZERO, result);
     }
 
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testFactory_secondsIn_RInterval() {
+    @Test
+    public void secondsIn_givenPositiveDurationInterval_calculatesDifference() {
+        // Arrange
         DateTime start = new DateTime(2006, 6, 9, 12, 0, 3, 0, PARIS);
-        DateTime end1 = new DateTime(2006, 6, 9, 12, 0, 6, 0, PARIS);
-        DateTime end2 = new DateTime(2006, 6, 9, 12, 0, 9, 0, PARIS);
-        assertEquals(0, Seconds.secondsIn((ReadableInterval) null).getSeconds());
-        assertEquals(3, Seconds.secondsIn(new Interval(start, end1)).getSeconds());
-        assertEquals(0, Seconds.secondsIn(new Interval(start, start)).getSeconds());
-        assertEquals(0, Seconds.secondsIn(new Interval(end1, end1)).getSeconds());
-        assertEquals(6, Seconds.secondsIn(new Interval(start, end2)).getSeconds());
+        DateTime end = new DateTime(2006, 6, 9, 12, 0, 9, 0, PARIS); // 6 seconds later
+        ReadableInterval interval = new Interval(start, end);
+        
+        Seconds expected = Seconds.seconds(6);
+
+        // Act
+        Seconds result = Seconds.secondsIn(interval);
+
+        // Assert
+        assertEquals(expected, result);
     }
 }
