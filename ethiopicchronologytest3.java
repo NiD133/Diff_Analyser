@@ -1,83 +1,78 @@
 package org.joda.time.chrono;
 
+import org.joda.time.DateTimeZone;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.util.Locale;
 import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.DateTime.Property;
 
-public class EthiopicChronologyTestTest3 extends TestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-    private static final int MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
-
-    private static long SKIP = 1 * MILLIS_PER_DAY;
+/**
+ * Tests for the factory methods of {@link EthiopicChronology}.
+ * This test class focuses on how the chronology is instantiated with different time zones.
+ */
+public class EthiopicChronologyFactoryTest {
 
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
     private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
 
-    private static final Chronology ETHIOPIC_UTC = EthiopicChronology.getInstanceUTC();
+    private DateTimeZone originalSystemDateTimeZone;
+    private TimeZone originalSystemTimeZone;
+    private Locale originalSystemLocale;
 
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
+    @Before
+    public void setUp() {
+        // The getInstance(null) factory method relies on the default zone.
+        // We must set it to a known value (LONDON) for a predictable test outcome.
+        originalSystemDateTimeZone = DateTimeZone.getDefault();
+        originalSystemTimeZone = TimeZone.getDefault();
+        originalSystemLocale = Locale.getDefault();
 
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        SKIP = 1 * MILLIS_PER_DAY;
-        return new TestSuite(TestEthiopicChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
         DateTimeZone.setDefault(LONDON);
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
         Locale.setDefault(Locale.UK);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
+    @After
+    public void tearDown() {
+        // Restore original system defaults to prevent side-effects on other tests.
+        DateTimeZone.setDefault(originalSystemDateTimeZone);
+        TimeZone.setDefault(originalSystemTimeZone);
+        Locale.setDefault(originalSystemLocale);
     }
 
-    public void testFactory_Zone() {
-        assertEquals(TOKYO, EthiopicChronology.getInstance(TOKYO).getZone());
-        assertEquals(PARIS, EthiopicChronology.getInstance(PARIS).getZone());
-        assertEquals(LONDON, EthiopicChronology.getInstance(null).getZone());
-        assertSame(EthiopicChronology.class, EthiopicChronology.getInstance(TOKYO).getClass());
+    @Test
+    public void getInstance_withSpecificZone_returnsChronologyInThatZone() {
+        // Act & Assert
+        assertEquals("Chronology should be created in the specified TOKYO zone",
+                TOKYO, EthiopicChronology.getInstance(TOKYO).getZone());
+        assertEquals("Chronology should be created in the specified PARIS zone",
+                PARIS, EthiopicChronology.getInstance(PARIS).getZone());
+    }
+
+    @Test
+    public void getInstance_withNullZone_returnsChronologyInDefaultZone() {
+        // The default zone is set to LONDON in the setUp() method.
+        // Act
+        EthiopicChronology chronology = EthiopicChronology.getInstance(null);
+
+        // Assert
+        assertEquals("A null zone should result in the default time zone",
+                LONDON, chronology.getZone());
+    }
+
+    @Test
+    public void getInstance_returnsCorrectClassType() {
+        // This test ensures the factory returns an instance of the correct class,
+        // not a subclass or other unexpected type.
+        
+        // Act & Assert
+        assertSame("The factory should return an instance of EthiopicChronology",
+                EthiopicChronology.class, EthiopicChronology.getInstance(TOKYO).getClass());
     }
 }
