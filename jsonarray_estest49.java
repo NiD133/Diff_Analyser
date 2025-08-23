@@ -1,29 +1,29 @@
 package com.google.gson;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest49 extends JsonArray_ESTest_scaffolding {
+/**
+ * Tests for the {@link JsonArray} class.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        JsonArray jsonArray0 = null;
+    /**
+     * Verifies that the constructor {@link JsonArray#JsonArray(int)} throws
+     * an IllegalArgumentException when provided with a negative capacity.
+     */
+    @Test
+    public void constructor_shouldThrowIllegalArgumentException_whenCapacityIsNegative() {
+        int negativeCapacity = -1;
         try {
-            jsonArray0 = new JsonArray((-1905));
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Illegal Capacity: -1905
-            //
-            verifyException("java.util.ArrayList", e);
+            new JsonArray(negativeCapacity);
+            fail("Expected an IllegalArgumentException to be thrown for negative capacity.");
+        } catch (IllegalArgumentException expected) {
+            // The constructor delegates to ArrayList, which throws this exception.
+            // We verify the message to ensure the failure is for the expected reason.
+            assertEquals("Illegal Capacity: " + negativeCapacity, expected.getMessage());
         }
     }
 }
