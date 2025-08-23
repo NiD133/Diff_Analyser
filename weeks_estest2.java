@@ -2,20 +2,27 @@ package org.joda.time;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Weeks_ESTestTest2 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        Minutes minutes0 = Minutes.THREE;
-        Seconds seconds0 = minutes0.toStandardSeconds();
-        Weeks weeks0 = seconds0.toStandardWeeks();
-        boolean boolean0 = weeks0.isLessThan((Weeks) null);
-        assertFalse(boolean0);
-        assertEquals(0, weeks0.getWeeks());
+    /**
+     * Tests that isLessThan() returns false when comparing a zero-week instance to null.
+     * According to the Javadoc, a null comparison is treated as comparing to zero.
+     */
+    @Test
+    public void isLessThan_comparingZeroWeeksToNull_shouldReturnFalse() {
+        // Arrange: The Javadoc for isLessThan() specifies that a null input
+        // is treated as a zero-value period. We create a zero-week instance
+        // to test the comparison of 0 < 0.
+        Weeks zeroWeeks = Weeks.ZERO;
+
+        // Act: Call the method under test with a null argument.
+        boolean result = zeroWeeks.isLessThan(null);
+
+        // Assert: Since 0 is not less than 0, the result should be false.
+        assertFalse("Weeks.ZERO should not be less than null (which is treated as zero)", result);
     }
 }
