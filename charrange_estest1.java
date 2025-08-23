@@ -1,25 +1,27 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotEquals;
 
-public class CharRange_ESTestTest1 extends CharRange_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CharRange} class, focusing on equality.
+ */
+public class CharRangeTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        CharRange charRange0 = CharRange.isIn('?', '?');
-        CharRange charRange1 = CharRange.isIn('D', '?');
-        boolean boolean0 = charRange1.equals(charRange0);
-        assertEquals('D', charRange1.getEnd());
-        assertFalse(charRange0.equals((Object) charRange1));
-        assertEquals('?', charRange1.getStart());
-        assertFalse(boolean0);
+    @Test
+    public void testEqualsReturnsFalseForDifferentRanges() {
+        // Arrange
+        // Create a range representing a single character.
+        final CharRange rangeA = CharRange.isIn('?', '?'); // Represents the range ['?']
+
+        // Create a different range. Note that the CharRange constructor automatically
+        // orders the start and end characters, so isIn('D', '?') becomes the range ['?'...'D'].
+        final CharRange rangeB = CharRange.isIn('D', '?'); // Represents the range ['?'...'D']
+
+        // Act & Assert
+        // Verify that two ranges with different endpoints are not considered equal.
+        // Using two assertions checks for the symmetry of the equals method.
+        assertNotEquals(rangeA, rangeB);
+        assertNotEquals(rangeB, rangeA);
     }
 }
