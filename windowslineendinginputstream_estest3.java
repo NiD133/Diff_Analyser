@@ -1,33 +1,28 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
-public class WindowsLineEndingInputStream_ESTestTest3 extends WindowsLineEndingInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link WindowsLineEndingInputStream}.
+ */
+public class WindowsLineEndingInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        WindowsLineEndingInputStream windowsLineEndingInputStream0 = new WindowsLineEndingInputStream((InputStream) null, true);
-        // Undeclared exception!
-        try {
-            windowsLineEndingInputStream0.read();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.input.WindowsLineEndingInputStream", e);
-        }
+    /**
+     * Tests that attempting to read from a stream constructed with a null input
+     * immediately throws a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void readThrowsExceptionForNullInputStream() throws IOException {
+        // Arrange: Create the stream with a null input, which is the invalid state under test.
+        final WindowsLineEndingInputStream stream = new WindowsLineEndingInputStream(null, true);
+
+        // Act: Attempting to read from the stream should trigger the exception.
+        stream.read();
+
+        // Assert: The test passes if a NullPointerException is thrown, as declared
+        // in the @Test(expected=...) annotation.
     }
 }
