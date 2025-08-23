@@ -1,44 +1,40 @@
 package com.google.common.io;
 
-import java.io.ByteArrayInputStream;
-import java.io.FilterInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import org.jspecify.annotations.NullUnmarked;
 
-public class MultiInputStreamTestTest5 extends IoTestCase {
+/**
+ * Tests for {@link MultiInputStream}, focusing on edge cases like handling a large number of
+ * underlying streams.
+ */
+@NullUnmarked
+public class MultiInputStreamTest extends IoTestCase {
 
-    private void joinHelper(Integer... spans) throws Exception {
-        List<ByteSource> sources = new ArrayList<>();
-        int start = 0;
-        for (Integer span : spans) {
-            sources.add(newByteSource(start, span));
-            start += span;
-        }
-        ByteSource joined = ByteSource.concat(sources);
-        assertTrue(newByteSource(0, start).contentEquals(joined));
-    }
+  private static final int MANY_EMPTY_SOURCES = 10_000_000;
 
-    private static MultiInputStream tenMillionEmptySources() throws IOException {
-        return new MultiInputStream(Collections.nCopies(10_000_000, ByteSource.empty()).iterator());
-    }
+  /**
+   * Tests that reading from a MultiInputStream composed of a huge number of empty sources does not
+   * cause a StackOverflowError. This can happen with a naive recursive implementation of advancing
+   * to the next stream.
+   *
+   * @see <a href="https://github.com/google/guava/issues/2996">Guava issue #2996</a>
+   */
+  public void testRead_withManyEmptySources_doesNotCauseStackOverflow() throws IOException {
+    // This test doesn't read any data. Its purpose is to ensure that the constructor
+    // and the first read() call can process a very large number of empty streams
+    // without throwing a StackOverflowError.
 
-    private static ByteSource newByteSource(int start, int size) {
-        return new ByteSource() {
+    // Arrange
+    MultiInputStream streamWithManyEmptySources =
+        new MultiInputStream(
+            Collections.nCopies(MANY_EMPTY_SOURCES, ByteSource.empty()).iterator());
 
-            @Override
-            public InputStream openStream() {
-                return new ByteArrayInputStream(newPreFilledByteArray(start, size));
-            }
-        };
-    }
+    // Act
+    int result = streamWithManyEmptySources.read();
 
-    public void testReadSingle_noStackOverflow() throws IOException {
-        // https://github.com/google/guava/issues/2996
-        // no data, just testing that there's no StackOverflowException
-        assertEquals(-1, tenMillionEmptySources().read());
-    }
+    // Assert
+    // The stream should correctly advance through all empty sources and return -1 for EOF.
+    assertEquals("Expected end of stream", -1, result);
+  }
 }
