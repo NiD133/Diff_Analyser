@@ -1,17 +1,33 @@
 package org.apache.commons.codec.digest;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MurmurHash2_ESTestTest35 extends MurmurHash2_ESTest_scaffolding {
+/**
+ * Tests for the {@link MurmurHash2} class.
+ */
+public class MurmurHash2Test {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        long long0 = MurmurHash2.hash64("ylLM~55", 1, 1);
-        assertEquals(4591197677584300775L, long0);
+    /**
+     * Tests that the hash64 method correctly computes the hash for a single-character
+     * substring of a given string. The expected value is a known constant to ensure
+     * the hashing algorithm remains consistent.
+     */
+    @Test
+    public void testHash64ForSingleCharacterSubstring() {
+        // Arrange
+        final String sourceText = "ylLM~55";
+        final int offset = 1; // Start at the second character 'l'
+        final int length = 1; // Hash only one character
+        
+        // This is the expected MurmurHash2 64-bit hash for the UTF-8 bytes of the string "l"
+        // using the default seed (0xe17a1465).
+        final long expectedHash = 4591197677584300775L;
+
+        // Act
+        final long actualHash = MurmurHash2.hash64(sourceText, offset, length);
+
+        // Assert
+        assertEquals(expectedHash, actualHash);
     }
 }
