@@ -1,25 +1,24 @@
 package org.apache.commons.compress.compressors.lzma;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LZMAUtils_ESTestTest18 extends LZMAUtils_ESTest_scaffolding {
+/**
+ * Tests for the {@link LZMAUtils} class.
+ */
+public class LZMAUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        // Undeclared exception!
-        try {
-            LZMAUtils.matches((byte[]) null, (byte) 93);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.compressors.lzma.LZMAUtils", e);
-        }
+    /**
+     * Verifies that the matches() method throws a NullPointerException
+     * when the input byte array (signature) is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void matchesShouldThrowNullPointerExceptionForNullSignature() {
+        // The 'length' parameter can be any integer for this test, as the
+        // null check on the byte array happens first.
+        final int arbitraryLength = 10;
+
+        // This call is expected to throw a NullPointerException.
+        // The @Test(expected=...) annotation handles the assertion.
+        LZMAUtils.matches(null, arbitraryLength);
     }
 }
