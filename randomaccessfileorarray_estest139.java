@@ -1,40 +1,29 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
 import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class.
+ */
+// The original test class name and inheritance are kept for context.
+// In a real-world scenario, the class might be renamed to RandomAccessFileOrArrayTest
+// and the scaffolding inheritance might be re-evaluated.
 public class RandomAccessFileOrArray_ESTestTest139 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test138() throws Throwable {
-        byte[] byteArray0 = new byte[1];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        try {
-            randomAccessFileOrArray0.readCharLE();
-            fail("Expecting exception: EOFException");
-        } catch (EOFException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.RandomAccessFileOrArray", e);
-        }
+    /**
+     * Verifies that readCharLE() throws an EOFException when the underlying data source
+     * contains fewer than the two bytes required to read a char.
+     */
+    @Test(expected = EOFException.class)
+    public void readCharLE_withInsufficientData_throwsEOFException() throws IOException {
+        // Arrange: Create a data source with only one byte. Reading a char requires two.
+        byte[] insufficientData = new byte[1];
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray(insufficientData);
+
+        // Act: Attempt to read a little-endian char from the insufficient data source.
+        // Assert: An EOFException is expected, as declared by the @Test annotation.
+        fileOrArray.readCharLE();
     }
 }
