@@ -1,41 +1,34 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.CDataNode;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.LeafNode;
-import org.jsoup.select.Elements;
-import org.junit.runner.RunWith;
 
-public class XmlTreeBuilder_ESTestTest45 extends XmlTreeBuilder_ESTest_scaffolding {
+/**
+ * Test suite for the {@link XmlTreeBuilder} class.
+ * This test case verifies the behavior of inserting a comment before parsing has started.
+ */
+public class XmlTreeBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        Token.Comment token_Comment0 = new Token.Comment();
-        // Undeclared exception!
-        try {
-            xmlTreeBuilder0.insertCommentFor(token_Comment0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.parser.TreeBuilder", e);
-        }
+    /**
+     * Verifies that calling insertCommentFor() on an uninitialized XmlTreeBuilder
+     * throws a NullPointerException.
+     * <p>
+     * An XmlTreeBuilder is only initialized with a root document when a parse
+     * operation begins. Calling insertion methods before that point is an invalid
+     * state, as there is no document to append nodes to.
+     * </p>
+     */
+    @Test(expected = NullPointerException.class)
+    public void insertCommentOnUninitializedBuilderThrowsNullPointerException() {
+        // Arrange: Create a builder that has not been initialized via a parse method.
+        // At this stage, its internal document object is null.
+        XmlTreeBuilder xmlTreeBuilder = new XmlTreeBuilder();
+        Token.Comment commentToken = new Token.Comment();
+
+        // Act: Attempt to insert a comment node. This should fail because there is no
+        // document or parent element to attach the comment to.
+        xmlTreeBuilder.insertCommentFor(commentToken);
+
+        // Assert: The test expects a NullPointerException, which is handled by the
+        // `expected` parameter in the @Test annotation.
     }
 }
