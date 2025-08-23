@@ -1,26 +1,51 @@
 package org.apache.commons.lang3;
 
-import static org.apache.commons.lang3.LangAssertions.assertNullPointerException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.lang.reflect.Modifier;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class CharRangeTestTest17 extends AbstractLangTest {
+/**
+ * Tests for the serialization of {@link CharRange}.
+ */
+class CharRangeSerializationTest extends AbstractLangTest {
 
     @Test
-    void testSerialization() {
-        CharRange range = CharRange.is('a');
-        assertEquals(range, SerializationUtils.clone(range));
-        range = CharRange.isIn('a', 'e');
-        assertEquals(range, SerializationUtils.clone(range));
-        range = CharRange.isNotIn('a', 'e');
-        assertEquals(range, SerializationUtils.clone(range));
+    @DisplayName("A single-character CharRange should be correctly restored after serialization")
+    void serializationOfSingleCharRangeShouldPreserveObject() {
+        // Arrange
+        final CharRange originalRange = CharRange.is('a');
+
+        // Act
+        final CharRange clonedRange = SerializationUtils.clone(originalRange);
+
+        // Assert
+        assertEquals(originalRange, clonedRange);
+    }
+
+    @Test
+    @DisplayName("An inclusive CharRange should be correctly restored after serialization")
+    void serializationOfInclusiveRangeShouldPreserveObject() {
+        // Arrange
+        final CharRange originalRange = CharRange.isIn('a', 'e');
+
+        // Act
+        final CharRange clonedRange = SerializationUtils.clone(originalRange);
+
+        // Assert
+        assertEquals(originalRange, clonedRange);
+    }
+
+    @Test
+    @DisplayName("A negated CharRange should be correctly restored after serialization")
+    void serializationOfNegatedRangeShouldPreserveObject() {
+        // Arrange
+        final CharRange originalRange = CharRange.isNotIn('a', 'e');
+
+        // Act
+        final CharRange clonedRange = SerializationUtils.clone(originalRange);
+
+        // Assert
+        assertEquals(originalRange, clonedRange);
     }
 }
