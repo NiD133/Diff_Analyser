@@ -1,46 +1,55 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedOutputStream;
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class UTF8Writer_ESTestTest8 extends UTF8Writer_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+/**
+ * Contains tests for the {@link UTF8Writer} class, focusing on its handling of invalid surrogate pairs.
+ */
+public class UTF8WriterTest {
+
+    /**
+     * Tests that writing a lone low surrogate character (the second part of a surrogate pair)
+     * without a preceding high surrogate correctly throws an IOException.
+     * In UTF-8 encoding, surrogate pairs must be complete to be valid.
+     */
     @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.redacted();
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, false);
-        ByteArrayOutputStream byteArrayOutputStream0 = new ByteArrayOutputStream(1633);
-        UTF8Writer uTF8Writer0 = new UTF8Writer(iOContext0, byteArrayOutputStream0);
+    public void write_whenGivenUnmatchedLowSurrogate_shouldThrowIOException() {
+        // Arrange: Set up the necessary IOContext and a UTF8Writer instance.
+        BufferRecycler bufferRecycler = new BufferRecycler();
+        IOContext ioContext = new IOContext(
+                StreamReadConstraints.defaults(),
+                StreamWriteConstraints.defaults(),
+                ErrorReportConfiguration.defaults(),
+                bufferRecycler,
+                ContentReference.redacted(),
+                false); // 'false' indicates this context is not for recycling.
+        OutputStream outputStream = new ByteArrayOutputStream();
+        UTF8Writer utf8Writer = new UTF8Writer(ioContext, outputStream);
+
+        // An invalid character: a low surrogate (0xDC00-0xDFFF) without a preceding high surrogate.
+        // We use the highest possible value for a low surrogate for this test.
+        int unmatchedLowSurrogate = UTF8Writer.SURR2_LAST; // This constant equals 57343 (0xDFFF).
+
         try {
-            uTF8Writer0.write(57343);
-            fail("Expecting exception: IOException");
+            // Act: Attempt to write the lone low surrogate character.
+            utf8Writer.write(unmatchedLowSurrogate);
+            // Assert: If no exception is thrown, the test should fail.
+            fail("Expected an IOException for writing an unmatched low surrogate, but none was thrown.");
         } catch (IOException e) {
-            //
-            // Unmatched second part of surrogate pair (0xdfff)
-            //
-            verifyException("com.fasterxml.jackson.core.io.UTF8Writer", e);
+            // Assert: Verify that the exception message is correct and informative.
+            String expectedMessage = "Unmatched second part of surrogate pair (0xdfff)";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
