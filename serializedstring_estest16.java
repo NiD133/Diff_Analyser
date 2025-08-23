@@ -1,28 +1,28 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SerializedString_ESTestTest16 extends SerializedString_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SerializedString} class.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("");
-        byte[] byteArray0 = new byte[9];
-        int int0 = serializedString0.appendQuotedUTF8(byteArray0, 1);
-        assertEquals(0, int0);
+    /**
+     * Verifies that attempting to append the quoted UTF-8 representation of an
+     * empty string to a buffer correctly results in zero bytes being appended.
+     */
+    @Test
+    public void appendQuotedUTF8_withEmptyString_shouldAppendZeroBytes() {
+        // Arrange: Create a SerializedString from an empty string.
+        SerializedString emptyString = new SerializedString("");
+        byte[] destinationBuffer = new byte[10];
+        int offset = 1;
+
+        // Act: Attempt to append the empty string's content to the buffer.
+        int bytesAppended = emptyString.appendQuotedUTF8(destinationBuffer, offset);
+
+        // Assert: The method should report that zero bytes were appended.
+        assertEquals("Appending an empty string should result in zero bytes written", 0, bytesAppended);
     }
 }
