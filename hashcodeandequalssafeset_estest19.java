@@ -1,35 +1,24 @@
 package org.mockito.internal.util.collections;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class HashCodeAndEqualsSafeSet_ESTestTest19 extends HashCodeAndEqualsSafeSet_ESTest_scaffolding {
+/**
+ * Unit tests for {@link HashCodeAndEqualsSafeSet}.
+ */
+public class HashCodeAndEqualsSafeSetTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-        // Undeclared exception!
-        try {
-            hashCodeAndEqualsSafeSet0.toArray((HashCodeAndEqualsMockWrapper[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.mockito.internal.util.collections.HashCodeAndEqualsSafeSet", e);
-        }
+    /**
+     * This test verifies that the toArray(T[] a) method correctly throws a
+     * NullPointerException when a null array is passed as an argument.
+     * This behavior is consistent with the contract of java.util.Collection.
+     */
+    @Test(expected = NullPointerException.class)
+    public void toArray_shouldThrowNullPointerException_whenGivenNullArray() {
+        // Arrange: Create an empty set.
+        HashCodeAndEqualsSafeSet emptySet = new HashCodeAndEqualsSafeSet();
+
+        // Act & Assert: Call toArray with a null argument.
+        // The @Test(expected=...) annotation asserts that a NullPointerException is thrown.
+        emptySet.toArray((Object[]) null);
     }
 }
