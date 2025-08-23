@@ -1,33 +1,45 @@
 package org.joda.time.convert;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
 import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import org.joda.time.chrono.GJChronology;
+import org.junit.Test;
+
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
+
+import static org.junit.Assert.*;
 
 public class CalendarConverter_ESTestTest10 extends CalendarConverter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        CalendarConverter calendarConverter0 = new CalendarConverter();
-        DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis(1963);
-        MockGregorianCalendar mockGregorianCalendar0 = new MockGregorianCalendar(0, 1963, 0, (-247581896), (-21), 3826);
-        ZonedDateTime zonedDateTime0 = mockGregorianCalendar0.toZonedDateTime();
-        GregorianCalendar gregorianCalendar0 = MockGregorianCalendar.from(zonedDateTime0);
-        Chronology chronology0 = calendarConverter0.getChronology((Object) gregorianCalendar0, dateTimeZone0);
-        assertNotNull(chronology0);
+    /**
+     * Tests that getChronology() returns a GJChronology when given a GregorianCalendar,
+     * and that it correctly uses the specified DateTimeZone, overriding the calendar's own zone.
+     */
+    @Test
+    public void getChronologyWithGregorianCalendarShouldReturnGJChronologyWithSpecifiedZone() {
+        // Arrange
+        CalendarConverter converter = new CalendarConverter();
+
+        // Create a calendar with a specific time zone (UTC) to ensure the converter
+        // correctly prioritizes the zone passed as a parameter later.
+        Calendar calendarInUTC = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+
+        // Define the time zone that we expect the resulting chronology to have.
+        DateTimeZone expectedZone = DateTimeZone.forID("America/New_York");
+
+        // Act
+        // Request the chronology for the calendar, but specify a different time zone.
+        Chronology resultChronology = converter.getChronology(calendarInUTC, expectedZone);
+
+        // Assert
+        // The converter should return a GJChronology for a standard GregorianCalendar.
+        assertNotNull("The resulting chronology should not be null.", resultChronology);
+        assertTrue("The chronology should be an instance of GJChronology.", resultChronology instanceof GJChronology);
+
+        // Crucially, the chronology's time zone should be the one we passed to the method,
+        // not the original time zone from the Calendar object.
+        assertEquals("The chronology's time zone should match the specified zone.", expectedZone, resultChronology.getZone());
     }
 }
