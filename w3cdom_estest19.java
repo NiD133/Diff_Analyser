@@ -1,44 +1,38 @@
 package org.jsoup.helper;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
-import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-public class W3CDom_ESTestTest19 extends W3CDom_ESTest_scaffolding {
+/**
+ * Test suite for the {@link W3CDom} class, focusing on conversion from Jsoup to W3C DOM.
+ */
+public class W3CDomTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        Document document0 = Document.createShell("=68QmV3%[sf)G~");
-        document0.prependElement("::/~/%3V}");
-        // Undeclared exception!
-        try {
-            w3CDom0.fromJsoup(document0);
-            fail("Expecting exception: DOMException");
-        } catch (DOMException e) {
-        }
+    /**
+     * Verifies that converting a Jsoup document with an invalid XML element tag name
+     * to a W3C Document throws a {@link DOMException}.
+     * <p>
+     * Jsoup's parser is more lenient and can create elements with tag names that are
+     * not compliant with the stricter W3C DOM specification. This test ensures that
+     * such non-compliance is correctly reported during the conversion process.
+     */
+    @Test(expected = DOMException.class)
+    public void fromJsoupThrowsExceptionForInvalidTagName() {
+        // Arrange: Create a Jsoup document and add an element with a tag name
+        // containing characters that are illegal in W3C DOM element names.
+        W3CDom w3cDomConverter = new W3CDom();
+        Document jsoupDocument = Document.createShell("");
+
+        // The tag name "::/~/%3V}" contains multiple invalid characters (:, /, ~, %, etc.).
+        String invalidTagName = "::/~/%3V}";
+        jsoupDocument.prependElement(invalidTagName);
+
+        // Act: Attempt to convert the Jsoup document to a W3C DOM.
+        // This action is expected to throw a DOMException due to the invalid tag name.
+        w3cDomConverter.fromJsoup(jsoupDocument);
+
+        // Assert: The test is successful if a DOMException is thrown, which is
+        // handled by the @Test(expected) annotation.
     }
 }
