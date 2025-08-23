@@ -1,23 +1,32 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
+import static org.junit.Assert.assertEquals;
+
 import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class OptionFormatter_ESTestTest27 extends OptionFormatter_ESTest_scaffolding {
+/**
+ * Tests for the {@link OptionFormatter} class.
+ */
+public class OptionFormatterTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        Option option0 = new Option("?Wf", "?Wf", true, "");
-        OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
-        String string0 = optionFormatter0.toSyntaxOption(true);
-        assertEquals("-?Wf <arg>", string0);
+    @Test
+    public void toSyntaxOptionShouldFormatRequiredShortOptionWithArgument() {
+        // Arrange
+        // Create an option that has a short name ("?Wf"), a long name, requires an argument,
+        // and has a description. The formatter should prioritize the short name.
+        Option optionWithArgument = new Option("?Wf", "long-name", true, "description");
+        OptionFormatter formatter = OptionFormatter.from(optionWithArgument);
+
+        // The default syntax for a required short option with an argument is "-<opt> <arg>"
+        String expectedSyntax = "-?Wf <arg>";
+
+        // Act
+        // Generate the syntax string, explicitly marking the option as required.
+        String actualSyntax = formatter.toSyntaxOption(true);
+
+        // Assert
+        assertEquals("The syntax for a required short option with an argument was not formatted as expected.",
+                     expectedSyntax, actualSyntax);
     }
 }
