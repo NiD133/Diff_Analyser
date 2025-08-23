@@ -1,30 +1,30 @@
 package org.jsoup.nodes;
 
+import org.jsoup.nodes.Document.OutputSettings.Syntax;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Attribute_ESTestTest4 extends Attribute_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Document.OutputSettings.Syntax document_OutputSettings_Syntax0 = Document.OutputSettings.Syntax.xml;
-        String string0 = Attribute.getValidKey("z>Su ", document_OutputSettings_Syntax0);
-        assertEquals("z_Su_", string0);
-        assertNotNull(string0);
+/**
+ * Tests for the static helper methods in the {@link Attribute} class.
+ */
+public class AttributeTest {
+
+    /**
+     * Verifies that getValidKey() correctly sanitizes an attribute key for XML syntax
+     * by replacing invalid characters (like '>') and trimming whitespace.
+     */
+    @Test
+    public void getValidKeyReplacesInvalidCharactersForXmlSyntax() {
+        // Arrange
+        String invalidKey = "z>Su ";
+        Syntax syntax = Syntax.xml;
+        String expectedSanitizedKey = "z_Su_";
+
+        // Act
+        String actualSanitizedKey = Attribute.getValidKey(invalidKey, syntax);
+
+        // Assert
+        assertEquals(expectedSanitizedKey, actualSanitizedKey);
     }
 }
