@@ -1,17 +1,31 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSetUtils_ESTestTest3 extends CharSetUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link org.apache.commons.lang3.CharSetUtils}.
+ */
+public class CharSetUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        String[] stringArray0 = new String[4];
-        String string0 = CharSetUtils.squeeze("", stringArray0);
-        assertEquals("", string0);
+    /**
+     * Tests that squeezing an empty string results in an empty string,
+     * regardless of the character set provided.
+     */
+    @Test
+    public void testSqueezeWithEmptyStringReturnsEmptyString() {
+        // Arrange
+        final String input = "";
+        
+        // The Javadoc for squeeze() specifies: CharSetUtils.squeeze("", *) = ""
+        // This test verifies that behavior, using an array of nulls as the set
+        // to confirm it holds even for unconventional inputs.
+        final String[] setWithNulls = new String[4];
+
+        // Act
+        final String result = CharSetUtils.squeeze(input, setWithNulls);
+
+        // Assert
+        assertEquals("Squeezing an empty string should always return an empty string.", "", result);
     }
 }
