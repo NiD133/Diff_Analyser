@@ -1,51 +1,29 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
+import static org.junit.Assert.assertThrows;
+
 import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TextHelpAppendable_ESTestTest44 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link TextHelpAppendable} class.
+ */
+public class TextHelpAppendableTest {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        TextStyle textStyle0 = TextStyle.DEFAULT;
-        // Undeclared exception!
-        try {
-            textHelpAppendable0.makeColumnQueue((CharSequence) null, textStyle0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that makeColumnQueue() throws a NullPointerException when the input
+     * CharSequence is null, as this is an invalid argument.
+     */
+    @Test
+    public void makeColumnQueueShouldThrowNullPointerExceptionWhenTextIsNull() {
+        // Arrange: Create a formatter instance and a default style.
+        // A StringWriter is used to prevent the test from writing to System.out.
+        TextHelpAppendable helpFormatter = new TextHelpAppendable(new StringWriter());
+        TextStyle defaultStyle = TextStyle.DEFAULT;
+
+        // Act & Assert: Expect a NullPointerException when calling the method with null text.
+        assertThrows(NullPointerException.class, () -> {
+            helpFormatter.makeColumnQueue(null, defaultStyle);
+        });
     }
 }
