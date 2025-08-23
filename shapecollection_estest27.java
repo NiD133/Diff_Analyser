@@ -1,32 +1,34 @@
 package org.locationtech.spatial4j.shape;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
-import org.locationtech.spatial4j.shape.jts.JtsPoint;
 
-public class ShapeCollection_ESTestTest27 extends ShapeCollection_ESTest_scaffolding {
+import java.util.ArrayList;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        Vector<JtsPoint> vector0 = new Vector<JtsPoint>();
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        ShapeCollection<JtsPoint> shapeCollection0 = new ShapeCollection<JtsPoint>(vector0, spatialContext0);
-        boolean boolean0 = shapeCollection0.equals(shapeCollection0);
-        assertTrue(boolean0);
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Test suite for the {@link ShapeCollection} class.
+ */
+public class ShapeCollectionTest {
+
+    /**
+     * Tests that the equals() method is reflexive.
+     * According to the contract of Object.equals(), an object must always be equal to itself.
+     */
+    @Test
+    public void testEquals_isReflexive() {
+        // Arrange: Create an empty ShapeCollection. The contents are not important
+        // for a reflexivity check.
+        List<Shape> shapes = new ArrayList<>();
+        SpatialContext spatialContext = SpatialContext.GEO;
+        ShapeCollection<Shape> shapeCollection = new ShapeCollection<>(shapes, spatialContext);
+
+        // Act & Assert: An object must be equal to itself.
+        assertTrue(
+            "A ShapeCollection instance should be equal to itself.",
+            shapeCollection.equals(shapeCollection)
+        );
     }
 }
