@@ -1,30 +1,28 @@
 package com.itextpdf.text.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GetBufferedRandomAccessSource_ESTestTest14 extends GetBufferedRandomAccessSource_ESTest_scaffolding {
+/**
+ * Tests for {@link GetBufferedRandomAccessSource}.
+ */
+public class GetBufferedRandomAccessSourceTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        WindowRandomAccessSource windowRandomAccessSource0 = new WindowRandomAccessSource((RandomAccessSource) null, (-685L), (-685L));
-        GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(windowRandomAccessSource0);
-        // Undeclared exception!
-        try {
-            getBufferedRandomAccessSource0.get((-960L));
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.io.WindowRandomAccessSource", e);
-        }
+    /**
+     * Verifies that the get() method correctly propagates a NullPointerException
+     * when the underlying data source is invalid. This ensures that the buffering
+     * layer properly handles exceptions from its delegate source.
+     */
+    @Test(expected = NullPointerException.class)
+    public void get_whenUnderlyingSourceIsInvalid_throwsNullPointerException() throws IOException {
+        // Arrange: Create a source that is guaranteed to throw a NullPointerException when accessed.
+        // A WindowRandomAccessSource wrapping a null source is used to simulate this failure condition.
+        RandomAccessSource faultyUnderlyingSource = new WindowRandomAccessSource(null, 100L, 50L);
+        GetBufferedRandomAccessSource bufferedSource = new GetBufferedRandomAccessSource(faultyUnderlyingSource);
+
+        // Act: Attempt to read from the buffered source. This should trigger the NPE
+        // in the underlying faulty source, which should be propagated up.
+        // The test will pass if a NullPointerException is thrown, as declared by the annotation.
+        bufferedSource.get(0L);
     }
 }
