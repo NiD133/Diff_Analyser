@@ -2,33 +2,47 @@ package org.jfree.chart.plot.compass;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import javax.swing.JScrollPane;
-import javax.swing.text.DefaultCaret;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MeterNeedle_ESTestTest18 extends MeterNeedle_ESTest_scaffolding {
+/**
+ * A test suite for the {@link MeterNeedle} class.
+ * <p>
+ * Since {@code MeterNeedle} is an abstract class, these tests use a concrete
+ * subclass, {@link PointerNeedle}, to instantiate and test the base class
+ * functionality.
+ */
+public class MeterNeedleTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        PointerNeedle pointerNeedle0 = new PointerNeedle();
-        pointerNeedle0.getOutlinePaint();
-        assertEquals(0.5, pointerNeedle0.getRotateY(), 0.01);
-        assertEquals(0.5, pointerNeedle0.getRotateX(), 0.01);
-        assertEquals(5, pointerNeedle0.getSize());
+    /**
+     * Verifies that the default constructor correctly initializes all properties
+     * to their expected default values.
+     */
+    @Test
+    public void defaultConstructorShouldSetDefaultValues() {
+        // Arrange: Create a new needle instance using the default constructor.
+        PointerNeedle needle = new PointerNeedle();
+
+        // Act: No action is necessary as we are testing the state immediately
+        // after construction.
+
+        // Assert: Confirm that all properties are set to their documented default values.
+        assertEquals("Default size should be 5", 5, needle.getSize());
+        assertEquals("Default rotateX should be 0.5", 0.5, needle.getRotateX(), 0.01);
+        assertEquals("Default rotateY should be 0.5", 0.5, needle.getRotateY(), 0.01);
+
+        // Assert default paint properties
+        assertEquals("Default outline paint should be black", Color.BLACK, needle.getOutlinePaint());
+        assertNull("Default fill paint should be null", needle.getFillPaint());
+        assertNull("Default highlight paint should be null", needle.getHighlightPaint());
+
+        // Assert default stroke properties
+        assertNotNull("Default outline stroke should not be null", needle.getOutlineStroke());
+        assertTrue("Default outline stroke should be an instance of BasicStroke",
+                needle.getOutlineStroke() instanceof BasicStroke);
+
+        BasicStroke stroke = (BasicStroke) needle.getOutlineStroke();
+        assertEquals("Default outline stroke width should be 2.0f", 2.0f, stroke.getLineWidth(), 0.0f);
     }
 }
