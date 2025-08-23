@@ -1,27 +1,26 @@
 package org.apache.commons.collections4.iterators;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.util.ArrayList;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class CartesianProductIteratorTestTest7 extends AbstractIteratorTest<List<Character>> {
+/**
+ * Tests for {@link CartesianProductIterator}.
+ * This class name has been improved from the original CartesianProductIteratorTestTest7.
+ */
+public class CartesianProductIteratorTest extends AbstractIteratorTest<List<Character>> {
 
     private List<Character> letters;
-
     private List<Character> numbers;
-
     private List<Character> symbols;
-
-    private List<Character> emptyList;
 
     @Override
     public CartesianProductIterator<Character> makeEmptyIterator() {
@@ -38,7 +37,7 @@ public class CartesianProductIteratorTestTest7 extends AbstractIteratorTest<List
         letters = Arrays.asList('A', 'B', 'C');
         numbers = Arrays.asList('1', '2', '3');
         symbols = Arrays.asList('!', '?');
-        emptyList = Collections.emptyList();
+        // The emptyList field was unused in the original test and has been removed.
     }
 
     @Override
@@ -47,25 +46,35 @@ public class CartesianProductIteratorTestTest7 extends AbstractIteratorTest<List
     }
 
     /**
-     * test checking that all tuples are returned when same list is passed multiple times
+     * Verifies that the iterator correctly produces the full Cartesian product
+     * when the same list is provided as input multiple times.
      */
     @Test
-    void testExhaustivityWithSameList() {
-        final List<Character[]> resultsList = new ArrayList<>();
-        final CartesianProductIterator<Character> it = new CartesianProductIterator<>(letters, letters, letters);
-        while (it.hasNext()) {
-            final List<Character> tuple = it.next();
-            resultsList.add(tuple.toArray(new Character[0]));
-        }
-        assertThrows(NoSuchElementException.class, it::next);
-        assertEquals(27, resultsList.size());
-        final Iterator<Character[]> itResults = resultsList.iterator();
-        for (final Character a : letters) {
-            for (final Character b : letters) {
-                for (final Character c : letters) {
-                    assertArrayEquals(new Character[] { a, b, c }, itResults.next());
+    void iteratorWithRepeatedListShouldProduceFullCartesianProduct() {
+        // Arrange
+        final CartesianProductIterator<Character> iterator = new CartesianProductIterator<>(letters, letters, letters);
+        final int expectedSize = (int) Math.pow(letters.size(), 3); // 3^3 = 27
+        int actualSize = 0;
+
+        // Act & Assert
+        // Generate the expected tuples on-the-fly and compare with the iterator's output.
+        // This avoids storing all results in memory.
+        for (final Character c1 : letters) {
+            for (final Character c2 : letters) {
+                for (final Character c3 : letters) {
+                    final List<Character> expectedTuple = Arrays.asList(c1, c2, c3);
+
+                    assertTrue(iterator.hasNext(), "Iterator should have more elements at this point.");
+                    assertEquals(expectedTuple, iterator.next());
+                    actualSize++;
                 }
             }
         }
+
+        // Final assertions to ensure the iterator is fully exhausted
+        assertEquals(expectedSize, actualSize, "The number of iterated elements should match the expected size.");
+        assertFalse(iterator.hasNext(), "Iterator should be exhausted after consuming all elements.");
+        assertThrows(NoSuchElementException.class, iterator::next,
+                "Calling next() on an exhausted iterator should throw an exception.");
     }
 }
