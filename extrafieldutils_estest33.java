@@ -1,19 +1,26 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.zip.ZipException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class ExtraFieldUtils_ESTestTest33 extends ExtraFieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ExtraFieldUtils} class.
+ */
+public class ExtraFieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        ZipExtraField[] zipExtraFieldArray0 = new ZipExtraField[0];
-        byte[] byteArray0 = ExtraFieldUtils.mergeCentralDirectoryData(zipExtraFieldArray0);
-        assertEquals(0, byteArray0.length);
+    /**
+     * Tests that merging an empty array of extra fields for the central directory
+     * results in an empty byte array.
+     */
+    @Test
+    public void mergeCentralDirectoryDataWithEmptyFieldsReturnsEmptyByteArray() {
+        // Arrange: Create an empty array of extra fields.
+        final ZipExtraField[] emptyExtraFields = new ZipExtraField[0];
+
+        // Act: Call the method under test.
+        final byte[] result = ExtraFieldUtils.mergeCentralDirectoryData(emptyExtraFields);
+
+        // Assert: The resulting byte array should be empty.
+        assertEquals("Merging zero fields should produce an empty byte array.", 0, result.length);
     }
 }
