@@ -1,27 +1,32 @@
 package org.apache.commons.compress.harmony.unpack200;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.rules.ExpectedException;
+
 import java.io.IOException;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ClassFileEntry;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ConstantPoolEntry;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SegmentConstantPool_ESTestTest28 extends SegmentConstantPool_ESTest_scaffolding {
+/**
+ * Tests for the static utility methods in {@link SegmentConstantPool}.
+ */
+public class SegmentConstantPoolTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        try {
-            SegmentConstantPool.toIndex((-1975L));
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Cannot have a negative index.
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-        }
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    /**
+     * Verifies that toIndex() throws an IOException when given a negative index,
+     * as indices must be non-negative.
+     */
+    @Test
+    public void toIndexShouldThrowIOExceptionForNegativeIndex() throws IOException {
+        // Arrange: We expect an IOException with a specific message.
+        thrown.expect(IOException.class);
+        thrown.expectMessage("Cannot have a negative index.");
+
+        // Act: Call the method with a negative value.
+        SegmentConstantPool.toIndex(-1975L);
+
+        // Assert: The ExpectedException rule handles the verification.
     }
 }
