@@ -1,34 +1,27 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeReader_ESTestTest35 extends JsonTreeReader_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonTreeReader} class.
+ */
+public class JsonTreeReaderTest {
 
-    @Test(timeout = 4000)
-    public void test034() throws Throwable {
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader((JsonElement) null);
-        // Undeclared exception!
-        try {
-            jsonTreeReader0.endObject();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that attempting to call {@code endObject()} on a reader initialized
+     * with a null {@code JsonElement} throws a {@code NullPointerException}.
+     * This scenario represents an invalid initial state for the reader, which should
+     * cause it to fail immediately on any operation.
+     */
+    @Test(expected = NullPointerException.class)
+    public void endObject_withNullInitialElement_throwsNullPointerException() throws IOException {
+        // Arrange: Create a reader with a null JsonElement, putting it in an invalid state.
+        JsonTreeReader reader = new JsonTreeReader((JsonElement) null);
+
+        // Act & Assert: Calling endObject() is expected to throw a NullPointerException
+        // because the reader's internal state is invalid.
+        reader.endObject();
     }
 }
