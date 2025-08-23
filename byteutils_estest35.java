@@ -1,43 +1,28 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
 
-public class ByteUtils_ESTestTest35 extends ByteUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteUtils} class, focusing on exception handling.
+ */
+public class ByteUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        byte[] byteArray0 = new byte[10];
-        // Undeclared exception!
-        try {
-            ByteUtils.fromLittleEndian(byteArray0, 8, 8);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 10
-            //
-            verifyException("org.apache.commons.compress.utils.ByteUtils", e);
-        }
+    /**
+     * Tests that {@link ByteUtils#fromLittleEndian(byte[], int, int)} throws an
+     * {@link ArrayIndexOutOfBoundsException} if the combination of offset and length
+     * would cause an access beyond the array's bounds.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void fromLittleEndianWithOffsetAndLengthShouldThrowExceptionWhenAccessIsOutOfBounds() {
+        // Arrange: Create a byte array and define an offset and length that will
+        // result in reading past the end of the array.
+        // Array size is 10. Reading 8 bytes from offset 8 would require indices up to 15.
+        byte[] buffer = new byte[10];
+        int offset = 8;
+        int length = 8;
+
+        // Act & Assert: This call is expected to throw an ArrayIndexOutOfBoundsException,
+        // which is declared by the @Test annotation.
+        ByteUtils.fromLittleEndian(buffer, offset, length);
     }
 }
