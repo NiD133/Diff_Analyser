@@ -1,19 +1,38 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RefinedSoundex_ESTestTest14 extends RefinedSoundex_ESTest_scaffolding {
+/**
+ * Tests for the {@link RefinedSoundex} class, focusing on custom mapping features.
+ */
+public class RefinedSoundexTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        RefinedSoundex refinedSoundex0 = new RefinedSoundex("org.apache.commons.codec.language.RefinedSoundex");
-        String string0 = refinedSoundex0.encode("org.apache.commons.codec.language.RefinedSoundex");
-        assertEquals("Omsaogcagmom.gm.agcomaoasaphma.mom.ac", string0);
-        assertNotNull(string0);
+    /**
+     * Tests that the encode method correctly uses a custom mapping provided as a String
+     * during instantiation. The custom mapping in this test assigns simple numeric codes
+     * to the first few letters of the alphabet.
+     */
+    @Test
+    public void encodeShouldUseCustomMappingProvidedAsString() {
+        // Arrange
+        // A custom mapping where A=1, B=2, C=3, and all other letters map to 0.
+        final String customMapping = "12300000000000000000000000";
+        final RefinedSoundex soundex = new RefinedSoundex(customMapping);
+        final String input = "cba";
+
+        // The expected encoding is derived as follows:
+        // 1. The first letter 'C' is kept.
+        // 2. The code for 'B' is '2' from our custom mapping.
+        // 3. The code for 'A' is '1' from our custom mapping.
+        // Result: "C21"
+        final String expectedEncoding = "C21";
+
+        // Act
+        final String actualEncoding = soundex.encode(input);
+
+        // Assert
+        assertEquals("The custom mapping should be correctly applied during encoding",
+                expectedEncoding, actualEncoding);
     }
 }
