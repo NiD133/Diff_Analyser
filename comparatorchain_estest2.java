@@ -1,34 +1,30 @@
 package org.apache.commons.collections4.comparators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
-import java.util.BitSet;
+import static org.junit.Assert.assertFalse;
+
 import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ComparatorChain_ESTestTest2 extends ComparatorChain_ESTest_scaffolding {
+/**
+ * Tests for {@link ComparatorChain}.
+ */
+public class ComparatorChainTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        ComparatorChain<Integer> comparatorChain0 = new ComparatorChain<Integer>();
-        comparatorChain0.addComparator((Comparator<Integer>) comparatorChain0, true);
-        comparatorChain0.addComparator((Comparator<Integer>) comparatorChain0, true);
-        assertFalse(comparatorChain0.isLocked());
+    /**
+     * Tests that adding comparators to the chain does not lock it.
+     * A ComparatorChain should only become locked after the compare() method is called for the first time.
+     */
+    @Test
+    public void testIsLocked_ReturnsFalse_AfterAddingComparators() {
+        // Arrange: Create an empty ComparatorChain
+        final ComparatorChain<String> comparatorChain = new ComparatorChain<>();
+        final Comparator<String> naturalOrderComparator = Comparator.naturalOrder();
+
+        // Act: Add two comparators to the chain
+        comparatorChain.addComparator(naturalOrderComparator, true); // descending
+        comparatorChain.addComparator(naturalOrderComparator, false); // ascending
+
+        // Assert: Verify that the chain is not yet locked
+        assertFalse("The chain should not be locked just by adding comparators.", comparatorChain.isLocked());
     }
 }
