@@ -1,39 +1,47 @@
 package org.jfree.chart.entity;
 
+import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.time.Clock;
-import java.time.LocalDate;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.JapaneseDate;
+
 import javax.swing.JLayeredPane;
 import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
-import org.junit.runner.RunWith;
+import java.awt.Polygon;
+import java.awt.Shape;
+
+import static org.junit.Assert.assertNotEquals;
 
 public class CategoryItemEntity_ESTestTest9 extends CategoryItemEntity_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        Polygon polygon0 = new Polygon();
-        DefaultCaret defaultCaret0 = new DefaultCaret();
-        DefaultMultiValueCategoryDataset<Integer, Integer> defaultMultiValueCategoryDataset0 = new DefaultMultiValueCategoryDataset<Integer, Integer>();
-        CategoryItemEntity<Integer, Integer> categoryItemEntity0 = new CategoryItemEntity<Integer, Integer>(defaultCaret0, "N`", "N`", defaultMultiValueCategoryDataset0, (Integer) 0, (Integer) 0);
-        Integer integer0 = JLayeredPane.POPUP_LAYER;
-        CategoryItemEntity<Integer, Integer> categoryItemEntity1 = new CategoryItemEntity<Integer, Integer>(polygon0, "N`", "", defaultMultiValueCategoryDataset0, integer0, (Integer) 0);
-        boolean boolean0 = categoryItemEntity0.equals(categoryItemEntity1);
-        assertFalse(boolean0);
+    /**
+     * Tests that the equals() method returns false when comparing two entities
+     * with different attributes.
+     *
+     * The entities are intentionally created with different areas, URL texts,
+     * and row keys to confirm that the equals() method correctly identifies them
+     * as non-equal.
+     */
+    @Test
+    public void equals_withDifferentAttributes_returnsFalse() {
+        // Arrange: Create two entities that differ in multiple properties.
+        DefaultMultiValueCategoryDataset<Integer, Integer> dataset = new DefaultMultiValueCategoryDataset<>();
+        String commonToolTipText = "Shared Tooltip";
+        Integer commonColumnKey = 0;
+
+        // First entity with its own distinct properties
+        Shape area1 = new DefaultCaret();
+        String urlText1 = "http://www.jfree.org/chart1";
+        Integer rowKey1 = 0;
+        CategoryItemEntity<Integer, Integer> entity1 = new CategoryItemEntity<>(
+                area1, commonToolTipText, urlText1, dataset, rowKey1, commonColumnKey);
+
+        // Second entity with different properties
+        Shape area2 = new Polygon();
+        String urlText2 = "http://www.jfree.org/chart2";
+        Integer rowKey2 = JLayeredPane.POPUP_LAYER; // A distinct integer value (300)
+        CategoryItemEntity<Integer, Integer> entity2 = new CategoryItemEntity<>(
+                area2, commonToolTipText, urlText2, dataset, rowKey2, commonColumnKey);
+
+        // Act & Assert: The two entities should not be considered equal.
+        assertNotEquals("Entities with different attributes should not be equal.", entity1, entity2);
     }
 }
