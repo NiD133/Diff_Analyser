@@ -1,34 +1,32 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomAccessFileOrArray_ESTestTest164 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray#readFloat()} method.
+ */
+public class RandomAccessFileOrArrayReadFloatTest {
 
-    @Test(timeout = 4000)
-    public void test163() throws Throwable {
-        byte[] byteArray0 = new byte[7];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        float float0 = randomAccessFileOrArray0.readFloat();
-        assertEquals(4L, randomAccessFileOrArray0.getFilePointer());
-        assertEquals(0.0F, float0, 0.01F);
+    /**
+     * Verifies that reading a float from a source of zero-bytes correctly returns 0.0f
+     * and advances the file pointer by the size of a float.
+     */
+    @Test
+    public void readFloat_fromZeroByteArray_returnsZeroAndAdvancesPointer() throws IOException {
+        // Arrange
+        // A byte array containing all zeros, which represents 0.0f in IEEE 754 format.
+        // The array is made longer than a float to ensure there's enough data to read.
+        byte[] sourceBytes = new byte[8];
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray(sourceBytes);
+
+        // Act
+        float actualFloat = fileOrArray.readFloat();
+        long finalFilePointer = fileOrArray.getFilePointer();
+
+        // Assert
+        assertEquals("Reading four zero-bytes should result in 0.0f.", 0.0f, actualFloat, 0.0f);
+        assertEquals("File pointer should advance by the size of a float.", (long) Float.BYTES, finalFilePointer);
     }
 }
