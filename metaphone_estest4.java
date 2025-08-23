@@ -1,20 +1,30 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Metaphone_ESTestTest4 extends Metaphone_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Metaphone} class.
+ */
+public class MetaphoneTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Metaphone metaphone0 = new Metaphone();
-        assertEquals(4, metaphone0.getMaxCodeLen());
-        metaphone0.setMaxCodeLen(0);
-        int int0 = metaphone0.getMaxCodeLen();
-        assertEquals(0, int0);
+    @Test
+    public void shouldAllowChangingMaxCodeLength() {
+        // Arrange
+        Metaphone metaphone = new Metaphone();
+        // The default max code length is 4, as specified by the algorithm.
+        final int expectedDefaultLength = 4;
+
+        // Assert: Verify the initial state
+        assertEquals("The default max code length should be " + expectedDefaultLength,
+                expectedDefaultLength, metaphone.getMaxCodeLen());
+
+        // Act: Set a new max code length
+        final int newLength = 0;
+        metaphone.setMaxCodeLen(newLength);
+
+        // Assert: Verify the value has been updated
+        assertEquals("The max code length should be updated to the new value",
+                newLength, metaphone.getMaxCodeLen());
     }
 }
