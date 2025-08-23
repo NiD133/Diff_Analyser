@@ -1,21 +1,33 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.zip.ZipException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ExtraFieldUtils_ESTestTest36 extends ExtraFieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ExtraFieldUtils} class.
+ */
+public class ExtraFieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        AsiExtraField asiExtraField0 = new AsiExtraField();
-        byte[] byteArray0 = asiExtraField0.getCentralDirectoryData();
-        ExtraFieldUtils.UnparseableExtraField extraFieldUtils_UnparseableExtraField0 = ExtraFieldUtils.UnparseableExtraField.SKIP;
-        ZipExtraField[] zipExtraFieldArray0 = ExtraFieldUtils.parse(byteArray0, false, extraFieldUtils_UnparseableExtraField0);
-        assertEquals(0, zipExtraFieldArray0.length);
+    /**
+     * Verifies that parsing an empty byte array of extra field data
+     * correctly results in an empty array of ZipExtraField objects.
+     */
+    @Test
+    public void parseWithEmptyByteArrayReturnsEmptyArray() throws ZipException {
+        // Arrange: Create an empty byte array to simulate empty extra field data.
+        final byte[] emptyExtraFieldData = new byte[0];
+        final boolean isLocalHeader = false; // Parsing central directory data
+        final ExtraFieldUtils.UnparseableExtraField skipOnUnparseable = ExtraFieldUtils.UnparseableExtraField.SKIP;
+
+        // Act: Parse the empty data.
+        final ZipExtraField[] parsedFields = ExtraFieldUtils.parse(
+                emptyExtraFieldData, isLocalHeader, skipOnUnparseable);
+
+        // Assert: The result should be a non-null, empty array.
+        assertNotNull("The parsed fields array should not be null.", parsedFields);
+        assertEquals("Parsing empty data should yield an empty array of extra fields.", 0, parsedFields.length);
     }
 }
