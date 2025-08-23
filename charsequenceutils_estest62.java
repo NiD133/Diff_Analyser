@@ -1,20 +1,31 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSequenceUtils_ESTestTest62 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CharSequenceUtils}.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test61() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder();
-        StringBuilder stringBuilder1 = stringBuilder0.appendCodePoint(0);
-        int int0 = CharSequenceUtils.indexOf(stringBuilder1, 0, 0);
-        assertEquals(0, int0);
+    /**
+     * Tests that {@link CharSequenceUtils#indexOf(CharSequence, int, int)}
+     * correctly finds a character located at the beginning of the sequence
+     * when the search starts at index 0.
+     */
+    @Test
+    public void indexOf_shouldFindCharacterAtBeginningOfCharSequence() {
+        // Arrange
+        // A String containing the null character is a simple and clear CharSequence.
+        final CharSequence text = "\0";
+        final int charToFind = '\0';
+        final int startIndex = 0;
+
+        // Act
+        final int foundIndex = CharSequenceUtils.indexOf(text, charToFind, startIndex);
+
+        // Assert
+        final int expectedIndex = 0;
+        assertEquals(expectedIndex, foundIndex);
     }
 }
