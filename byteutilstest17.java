@@ -1,28 +1,31 @@
 package org.apache.commons.compress.utils;
 
 import static org.apache.commons.compress.utils.ByteUtils.fromLittleEndian;
-import static org.apache.commons.compress.utils.ByteUtils.toLittleEndian;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
-import java.util.Arrays;
 import org.apache.commons.compress.utils.ByteUtils.InputStreamByteSupplier;
-import org.apache.commons.compress.utils.ByteUtils.OutputStreamByteConsumer;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class ByteUtilsTestTest17 {
+/**
+ * Tests for {@link ByteUtils}.
+ */
+class ByteUtilsTest {
 
     @Test
-    void testFromLittleEndianFromSupplierThrowsForPrematureEnd() {
-        final ByteArrayInputStream bin = new ByteArrayInputStream(new byte[] { 2, 3 });
-        assertThrows(IOException.class, () -> fromLittleEndian(new InputStreamByteSupplier(bin), 3));
+    @DisplayName("fromLittleEndian with a ByteSupplier should throw an IOException if the stream ends before providing the requested number of bytes.")
+    void fromLittleEndianWithSupplierThrowsIOExceptionOnPrematureEnd() {
+        // Arrange: An input stream with fewer bytes than we will request.
+        final byte[] sourceBytes = { 2, 3 }; // 2 bytes available
+        final ByteArrayInputStream inputStream = new ByteArrayInputStream(sourceBytes);
+        final InputStreamByteSupplier supplier = new InputStreamByteSupplier(inputStream);
+        final int requestedLength = 3; // 3 bytes requested
+
+        // Act & Assert: Attempting to read more bytes than available should throw an IOException.
+        assertThrows(IOException.class,
+            () -> fromLittleEndian(supplier, requestedLength),
+            "Should throw IOException when the supplier cannot provide enough bytes.");
     }
 }
