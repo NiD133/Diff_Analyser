@@ -1,25 +1,38 @@
 package org.locationtech.spatial4j.context;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.util.HashMap;
 import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.io.PolyshapeReader;
-import org.locationtech.spatial4j.shape.ShapeFactory;
 
-public class SpatialContextFactory_ESTestTest40 extends SpatialContextFactory_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        HashMap<String, String> hashMap0 = new HashMap<String, String>();
-        hashMap0.put("distCalculator", "haversine");
-        ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
-        SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
-        assertTrue(spatialContext0.isGeo());
-        assertFalse(spatialContext0.isNormWrapLongitude());
+/**
+ * Test suite for {@link SpatialContextFactory}.
+ * This class contains a more readable version of the original generated test.
+ */
+public class SpatialContextFactoryTest {
+
+    /**
+     * Verifies that creating a SpatialContext with the "haversine" distance calculator
+     * correctly configures a geographic context (isGeo=true) with default settings.
+     * The haversine formula is used for calculations on a sphere, implying a geographic context.
+     */
+    @Test
+    public void makeSpatialContext_withHaversineCalculator_shouldCreateGeographicContext() {
+        // Arrange: Define configuration arguments to specify the "haversine" distance calculator.
+        Map<String, String> args = new HashMap<>();
+        args.put("distCalculator", "haversine");
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+
+        // Act: Create the SpatialContext using the factory with the specified arguments.
+        SpatialContext spatialContext = SpatialContextFactory.makeSpatialContext(args, classLoader);
+
+        // Assert: Check that the resulting context is geographic and has the expected default properties.
+        assertTrue("The context should be geographic when using the haversine calculator.",
+                spatialContext.isGeo());
+        assertFalse("The 'normWrapLongitude' property should be false by default.",
+                spatialContext.isNormWrapLongitude());
     }
 }
