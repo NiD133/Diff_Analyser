@@ -1,30 +1,34 @@
 package org.apache.commons.compress.utils;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.SeekableByteChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SeekableInMemoryByteChannel_ESTestTest22 extends SeekableInMemoryByteChannel_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SeekableInMemoryByteChannel} class.
+ */
+public class SeekableInMemoryByteChannelTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel();
-        // Undeclared exception!
+    /**
+     * Tests that truncate() throws an IllegalArgumentException when the requested
+     * size is larger than Integer.MAX_VALUE. The channel's size is limited by the
+     * maximum size of a byte array.
+     */
+    @Test
+    public void truncateShouldThrowExceptionForSizeGreaterThanMaxInt() {
+        // Arrange
+        final SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel();
+        final long sizeTooLarge = (long) Integer.MAX_VALUE + 1;
+
+        // Act & Assert
         try {
-            seekableInMemoryByteChannel0.truncate(2147483648L);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Size must be range [0..2147483647]
-            //
-            verifyException("org.apache.commons.compress.utils.SeekableInMemoryByteChannel", e);
+            channel.truncate(sizeTooLarge);
+            fail("Expected an IllegalArgumentException to be thrown for a size greater than Integer.MAX_VALUE");
+        } catch (final IllegalArgumentException e) {
+            // Verify the exception message for correctness and clarity.
+            final String expectedMessage = "Size must be range [0.." + Integer.MAX_VALUE + "]";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
