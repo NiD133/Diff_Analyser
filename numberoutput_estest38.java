@@ -1,17 +1,30 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class NumberOutput_ESTestTest38 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        String string0 = NumberOutput.toString(2420);
-        assertEquals("2420", string0);
+    /**
+     * Verifies that {@code NumberOutput.toString(int)} correctly converts a 
+     * typical positive integer into its string representation.
+     *
+     * This test case covers a standard, multi-digit positive number to ensure
+     * the basic conversion logic is working as expected.
+     */
+    @Test
+    public void toString_shouldConvertPositiveInteger() {
+        // Arrange
+        int numberToConvert = 2420;
+        String expectedRepresentation = "2420";
+
+        // Act
+        String actualRepresentation = NumberOutput.toString(numberToConvert);
+
+        // Assert
+        assertEquals(expectedRepresentation, actualRepresentation);
     }
 }
