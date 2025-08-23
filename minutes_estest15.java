@@ -1,21 +1,36 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Minutes_ESTestTest15 extends Minutes_ESTest_scaffolding {
+/**
+ * A more understandable test suite for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        Seconds seconds0 = Seconds.MAX_VALUE;
-        Minutes minutes0 = seconds0.toStandardMinutes();
-        Minutes minutes1 = minutes0.MAX_VALUE.dividedBy((-82));
-        Minutes minutes2 = minutes1.plus(minutes1);
-        assertEquals((-26188824), minutes1.getMinutes());
-        assertEquals((-52377648), minutes2.getMinutes());
+    /**
+     * Tests that a sequence of arithmetic operations (division by a negative number
+     * followed by addition) produces the correct, predictable result.
+     */
+    @Test
+    public void dividedByNegativeNumberThenAddingToItselfShouldResultInDoubleTheValue() {
+        // Arrange: Set up the initial state and expected outcomes.
+        final int divisor = -82;
+        final Minutes maxMinutes = Minutes.MAX_VALUE;
+
+        // Calculate expected results dynamically to avoid magic numbers and make the test self-documenting.
+        final int expectedDivisionResult = Integer.MAX_VALUE / divisor;
+        final int expectedSumResult = expectedDivisionResult * 2;
+
+        // Act: Perform the operations under test.
+        Minutes divisionResult = maxMinutes.dividedBy(divisor);
+        Minutes sumResult = divisionResult.plus(divisionResult);
+
+        // Assert: Verify that the actual results match the expected results.
+        assertEquals("The result of dividing MAX_VALUE by the divisor should be correct.",
+                expectedDivisionResult, divisionResult.getMinutes());
+        
+        assertEquals("The sum of the division result with itself should be double the value.",
+                expectedSumResult, sumResult.getMinutes());
     }
 }
