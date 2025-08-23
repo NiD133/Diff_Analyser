@@ -1,51 +1,38 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
-import java.io.IOException;
+
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.io.StringWriter;
-import java.nio.CharBuffer;
-import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class ObservableInputStream_ESTestTest15 extends ObservableInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link ObservableInputStream}.
+ */
+public class ObservableInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        PipedInputStream pipedInputStream0 = new PipedInputStream(pipedOutputStream0);
-        ObservableInputStream observableInputStream0 = new ObservableInputStream(pipedInputStream0);
-        byte[] byteArray0 = new byte[0];
-        // Undeclared exception!
-        try {
-            observableInputStream0.read(byteArray0, 1665, 1665);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.io.PipedInputStream", e);
-        }
+    /**
+     * Tests that calling read(byte[], int, int) with parameters that are out of bounds
+     * for the buffer propagates the IndexOutOfBoundsException from the underlying stream.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testReadWithOutOfBoundsParametersPropagatesException() throws Exception {
+        // Arrange: Create an ObservableInputStream wrapping a PipedInputStream.
+        // The underlying PipedInputStream is expected to throw the exception, which
+        // the ObservableInputStream should propagate.
+        final PipedOutputStream pipedOutputStream = new PipedOutputStream();
+        final InputStream underlyingStream = new PipedInputStream(pipedOutputStream);
+        final ObservableInputStream observableInputStream = new ObservableInputStream(underlyingStream);
+
+        final byte[] emptyBuffer = new byte[0];
+        final int invalidOffset = 1; // Any offset > -1 is invalid for an empty buffer.
+        final int invalidLength = 1; // Any length > 0 is invalid for an empty buffer.
+
+        // Act: Attempt to read into the buffer with out-of-bounds parameters.
+        // This call is expected to throw an IndexOutOfBoundsException.
+        observableInputStream.read(emptyBuffer, invalidOffset, invalidLength);
+
+        // Assert: The @Test(expected=...) annotation handles the assertion that an
+        // IndexOutOfBoundsException is thrown.
     }
 }
