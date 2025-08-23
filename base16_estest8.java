@@ -1,31 +1,32 @@
 package org.apache.commons.codec.binary;
 
+import org.apache.commons.codec.binary.BaseNCodec.Context;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Base16_ESTestTest8 extends Base16_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link Base16} class, focusing on handling invalid
+ * arguments for the decode method.
+ */
+public class Base16Test {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        CodecPolicy codecPolicy0 = CodecPolicy.STRICT;
-        Base16 base16_0 = new Base16(false, codecPolicy0);
-        byte[] byteArray0 = new byte[3];
-        BaseNCodec.Context baseNCodec_Context0 = new BaseNCodec.Context();
-        baseNCodec_Context0.ibitWorkArea = (int) (byte) (-23);
-        // Undeclared exception!
-        try {
-            base16_0.decode(byteArray0, 4, 64, baseNCodec_Context0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 4
-            //
-            verifyException("org.apache.commons.codec.binary.Base16", e);
-        }
+    /**
+     * Tests that the decode method throws an {@link ArrayIndexOutOfBoundsException}
+     * when the provided offset is outside the bounds of the input data array.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void decodeShouldThrowArrayIndexOutOfBoundsExceptionForInvalidOffset() {
+        // Arrange: Create a Base16 codec and a small data array.
+        final Base16 base16 = new Base16();
+        final byte[] data = new byte[3];
+        final Context context = new Context();
+
+        // Define an offset that is clearly out of bounds for the data array.
+        final int invalidOffset = 4;
+        // The length is irrelevant as the array access at the invalid offset will fail first.
+        final int length = 1;
+
+        // Act: Attempt to decode with the invalid offset.
+        // The test will pass if this line throws the expected exception.
+        base16.decode(data, invalidOffset, length, context);
     }
 }
