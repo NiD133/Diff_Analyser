@@ -1,28 +1,53 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import java.util.IdentityHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SegmentConstantPoolArrayCache_ESTestTest1 extends SegmentConstantPoolArrayCache_ESTest_scaffolding {
+/**
+ * Unit tests for {@link SegmentConstantPoolArrayCache}.
+ */
+public class SegmentConstantPoolArrayCacheTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        SegmentConstantPoolArrayCache segmentConstantPoolArrayCache0 = new SegmentConstantPoolArrayCache();
-        String[] stringArray0 = new String[4];
-        String[] stringArray1 = new String[5];
-        IdentityHashMap<String[], SegmentConstantPoolArrayCache.CachedArray> identityHashMap0 = new IdentityHashMap<String[], SegmentConstantPoolArrayCache.CachedArray>();
-        segmentConstantPoolArrayCache0.knownArrays = identityHashMap0;
-        SegmentConstantPoolArrayCache.CachedArray segmentConstantPoolArrayCache_CachedArray0 = segmentConstantPoolArrayCache0.new CachedArray(stringArray1);
-        identityHashMap0.put(stringArray0, segmentConstantPoolArrayCache_CachedArray0);
-        assertEquals(5, segmentConstantPoolArrayCache_CachedArray0.lastKnownSize());
-        boolean boolean0 = segmentConstantPoolArrayCache0.arrayIsCached(stringArray0);
-        assertFalse(boolean0);
+    /**
+     * Tests that arrayIsCached() returns false if a cache entry exists for an array
+     * but its stored size does not match the actual size of the array being checked.
+     * This simulates a scenario where an array was modified (e.g., grew) after
+     * being cached, which should invalidate the cache entry.
+     */
+    @Test
+    public void arrayIsCachedShouldReturnFalseWhenCachedSizeMismatches() {
+        // --- Arrange ---
+        SegmentConstantPoolArrayCache cache = new SegmentConstantPoolArrayCache();
+
+        // The array we will query the cache for. It has a size of 4.
+        String[] arrayToQuery = new String[4];
+
+        // A different array with a different size (5). We will use this to create
+        // an outdated cache entry.
+        String[] sourceOfOutdatedCache = new String[5];
+
+        // This is a white-box test. We manually create an inconsistent state
+        // to test the method's robustness. We create a cache entry from one array...
+        SegmentConstantPoolArrayCache.CachedArray outdatedCachedArray = cache.new CachedArray(sourceOfOutdatedCache);
+
+        // ...and then manually insert it into the cache's internal map using a different
+        // array instance as the key.
+        IdentityHashMap<String[], SegmentConstantPoolArrayCache.CachedArray> knownArraysMap = new IdentityHashMap<>();
+        knownArraysMap.put(arrayToQuery, outdatedCachedArray);
+        cache.knownArrays = knownArraysMap;
+
+        // Sanity check: The cached object correctly reports the size of the array it was created from.
+        assertEquals(5, outdatedCachedArray.lastKnownSize());
+
+        // --- Act ---
+        // Check if the original array (size 4) is considered cached. The implementation
+        // should find the entry but then detect that arrayToQuery.length (4)
+        // does not equal the cached size (5).
+        boolean isCached = cache.arrayIsCached(arrayToQuery);
+
+        // --- Assert ---
+        assertFalse("Cache should be considered invalid due to size mismatch", isCached);
     }
 }
