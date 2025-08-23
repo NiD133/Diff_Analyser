@@ -1,26 +1,35 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class Weeks_ESTestTest68 extends Weeks_ESTest_scaffolding {
+/**
+ * Test suite for the Weeks class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test67() throws Throwable {
-        Weeks weeks0 = Weeks.MAX_VALUE;
-        // Undeclared exception!
+    /**
+     * Verifies that attempting to convert the maximum possible number of weeks
+     * to minutes throws an ArithmeticException due to an integer overflow.
+     */
+    @Test
+    public void toStandardMinutes_whenResultOverflows_throwsArithmeticException() {
+        // Arrange: Define the input that will cause the overflow.
+        // The number of minutes in one week is 7 (days) * 24 (hours) * 60 (minutes) = 10080.
+        // Multiplying Weeks.MAX_VALUE (which is Integer.MAX_VALUE) by 10080
+        // will exceed the capacity of a 32-bit integer.
+        Weeks maxWeeks = Weeks.MAX_VALUE;
+
+        // Act & Assert: Execute the method and verify the expected exception.
         try {
-            weeks0.toStandardMinutes();
-            fail("Expecting exception: ArithmeticException");
+            maxWeeks.toStandardMinutes();
+            fail("Expected an ArithmeticException to be thrown due to integer overflow, but it was not.");
         } catch (ArithmeticException e) {
-            //
-            // Multiplication overflows an int: 2147483647 * 10080
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
+            // Verify that the exception message clearly indicates an overflow,
+            // which confirms the cause of the failure.
+            String expectedMessage = "Multiplication overflows an int: 2147483647 * 10080";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
