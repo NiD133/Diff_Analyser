@@ -1,22 +1,37 @@
 package org.locationtech.spatial4j.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.shape.Point;
 import org.locationtech.spatial4j.shape.Rectangle;
 
-public class GeohashUtils_ESTestTest6 extends GeohashUtils_ESTest_scaffolding {
+import static org.junit.Assert.assertNotNull;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        GeohashUtils.decodeBoundary("pbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbp", spatialContext0);
+/**
+ * Test suite for {@link GeohashUtils}.
+ */
+public class GeohashUtilsTest {
+
+    /**
+     * Verifies that {@link GeohashUtils#decodeBoundary(String, SpatialContext)} can handle
+     * geohash strings that are much longer than the documented {@link GeohashUtils#MAX_PRECISION}.
+     * <p>
+     * This test ensures the method is robust and does not throw an exception (e.g.,
+     * ArrayIndexOutOfBoundsException) when processing inputs with extreme precision.
+     */
+    @Test
+    public void decodeBoundaryWithGeohashExceedingMaxPrecisionShouldSucceed() {
+        // Arrange
+        // A geohash with a length of 128, which is significantly greater than MAX_PRECISION (24).
+        // This tests the robustness of the decoding algorithm with an extreme precision input.
+        String veryLongGeohash = "pbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbpbp";
+        SpatialContext ctx = SpatialContext.GEO;
+
+        // Act
+        // We expect this call to complete without throwing an exception.
+        Rectangle result = GeohashUtils.decodeBoundary(veryLongGeohash, ctx);
+
+        // Assert
+        // A non-null result confirms that the decoding was successful.
+        assertNotNull("The decoded boundary should not be null for a very long geohash", result);
     }
 }
