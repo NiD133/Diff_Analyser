@@ -1,50 +1,24 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.BuddhistChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.JulianChronology;
 
-public class CalendarConverterTestTest2 extends TestCase {
+/**
+ * Unit tests for {@link CalendarConverter}.
+ */
+public class CalendarConverterTest extends TestCase {
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    /**
+     * Tests that getSupportedType() correctly returns Calendar.class.
+     */
+    public void testGetSupportedType_shouldReturnCalendarClass() {
+        // Arrange: Get the singleton instance of the converter.
+        CalendarConverter converter = CalendarConverter.INSTANCE;
 
-    private static final DateTimeZone MOSCOW = DateTimeZone.forID("Europe/Moscow");
+        // Act: Call the method under test.
+        Class<?> actualSupportedType = converter.getSupportedType();
 
-    private static Chronology JULIAN;
-
-    private static Chronology ISO;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestCalendarConverter.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        JULIAN = JulianChronology.getInstance();
-        ISO = ISOChronology.getInstance();
-    }
-
-    //-----------------------------------------------------------------------
-    public void testSupportedType() throws Exception {
-        assertEquals(Calendar.class, CalendarConverter.INSTANCE.getSupportedType());
+        // Assert: Verify that the returned type is Calendar.class.
+        assertEquals(Calendar.class, actualSupportedType);
     }
 }
