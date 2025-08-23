@@ -1,45 +1,21 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
-import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-public class W3CDom_ESTestTest14 extends W3CDom_ESTest_scaffolding {
+/**
+ * Tests for the {@link W3CDom} helper class.
+ */
+public class W3CDomTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        // Undeclared exception!
-        try {
-            W3CDom.propertiesFromMap((Map<String, String>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.Hashtable", e);
-        }
+    /**
+     * Verifies that the propertiesFromMap method throws a NullPointerException
+     * when given a null map as input, adhering to its contract.
+     */
+    @Test(expected = NullPointerException.class)
+    public void propertiesFromMapShouldThrowExceptionOnNullInput() {
+        // The method is expected to fail fast when the input map is null.
+        // The cast is necessary to resolve method ambiguity for the compiler.
+        W3CDom.propertiesFromMap((Map<String, String>) null);
     }
 }
