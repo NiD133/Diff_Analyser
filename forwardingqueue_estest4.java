@@ -1,23 +1,35 @@
 package com.google.common.collect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.Locale;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.Queue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class ForwardingQueue_ESTestTest4 extends ForwardingQueue_ESTest_scaffolding {
+/**
+ * Tests for {@link ForwardingQueue}.
+ * This test suite uses {@link EvictingQueue} as a concrete implementation of the abstract
+ * {@link ForwardingQueue} to verify its delegated behavior.
+ */
+public class ForwardingQueueTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        EvictingQueue<Locale.FilteringMode> evictingQueue0 = EvictingQueue.create(126);
-        Locale.FilteringMode locale_FilteringMode0 = Locale.FilteringMode.REJECT_EXTENDED_RANGES;
-        evictingQueue0.add(locale_FilteringMode0);
-        Locale.FilteringMode locale_FilteringMode1 = evictingQueue0.poll();
-        assertFalse(evictingQueue0.contains(locale_FilteringMode1));
+    @Test
+    public void poll_shouldRemoveAndReturnHeadOfQueue() {
+        // Arrange
+        // EvictingQueue extends ForwardingQueue, making it a suitable test subject.
+        Queue<String> queue = EvictingQueue.create(10);
+        String element = "head-of-queue";
+        queue.add(element);
+
+        // Act
+        String polledElement = queue.poll();
+
+        // Assert
+        // Verify that the correct element was returned.
+        assertEquals(element, polledElement);
+        
+        // Verify that the element is no longer in the queue.
+        assertTrue("The queue should be empty after polling the only element.", queue.isEmpty());
+        assertFalse("The queue should not contain the element after it has been polled.", queue.contains(element));
     }
 }
