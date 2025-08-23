@@ -1,18 +1,23 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class TokenQueue_ESTestTest52 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for the TokenQueue class.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test51() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("             ");
-        boolean boolean0 = tokenQueue0.consumeWhitespace();
-        assertTrue(boolean0);
+    @Test
+    public void consumeWhitespaceShouldSucceedWhenQueueContainsOnlySpaces() {
+        // Arrange: Create a TokenQueue containing only space characters.
+        TokenQueue queue = new TokenQueue("             ");
+
+        // Act: Consume the whitespace from the queue.
+        boolean wasWhitespaceConsumed = queue.consumeWhitespace();
+
+        // Assert: Verify that the method signaled success and that the queue is now empty.
+        assertTrue("Should return true when whitespace is consumed.", wasWhitespaceConsumed);
+        assertTrue("The queue should be empty after consuming all spaces.", queue.isEmpty());
     }
 }
