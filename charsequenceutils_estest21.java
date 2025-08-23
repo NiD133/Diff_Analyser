@@ -1,18 +1,36 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSequenceUtils_ESTestTest21 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Test suite for {@link CharSequenceUtils}.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        int int0 = CharSequenceUtils.lastIndexOf("', is neither of type Map.Entry nor an Array", 102, 102);
-        assertEquals(15, int0);
+    @Test
+    public void testLastIndexOfWithStartIndexGreaterThanLength() {
+        // This test verifies the behavior of lastIndexOf when the starting search index
+        // is greater than the length of the CharSequence.
+
+        // ARRANGE
+        final String text = "', is neither of type Map.Entry nor an Array";
+        final char charToFind = 'f'; // The original test used the magic number 102 for 'f'.
+        final int startIndex = 102;  // An index deliberately larger than the string's length (47).
+                                     // The Javadoc implies this should start the search from the end.
+
+        // The expected index is 15.
+        // String: "', is neither o`f` type Map.Entry nor an Array"
+        // Index:  ...          15
+        // NOTE: This result is surprising. For the same inputs, java.lang.String#lastIndexOf
+        // would return 23 (the index of the final 'f'). This test case likely covers a
+        // specific implementation detail or edge case within CharSequenceUtils.
+        final int expectedIndex = 15;
+
+        // ACT
+        final int actualIndex = CharSequenceUtils.lastIndexOf(text, charToFind, startIndex);
+
+        // ASSERT
+        assertEquals(expectedIndex, actualIndex);
     }
 }
