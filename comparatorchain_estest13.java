@@ -1,42 +1,35 @@
 package org.apache.commons.collections4.comparators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
+import static org.junit.Assert.assertThrows;
+
 import java.util.BitSet;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ComparatorChain_ESTestTest13 extends ComparatorChain_ESTest_scaffolding {
+/**
+ * Contains tests for exceptional behavior in the {@link ComparatorChain} class.
+ */
+public class ComparatorChainTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        BitSet bitSet0 = new BitSet(2075);
-        ComparatorChain<ComparatorChain<ByteBuffer>> comparatorChain0 = new ComparatorChain<ComparatorChain<ByteBuffer>>((List<Comparator<ComparatorChain<ByteBuffer>>>) null, bitSet0);
-        // Undeclared exception!
-        try {
-            comparatorChain0.setComparator(1270, (Comparator<ComparatorChain<ByteBuffer>>) comparatorChain0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.collections4.comparators.ComparatorChain", e);
-        }
+    /**
+     * Tests that calling setComparator() on a chain initialized with a null
+     * comparator list throws a NullPointerException.
+     *
+     * The constructor {@code ComparatorChain(List, BitSet)} accepts a null list,
+     * but any subsequent attempt to modify that list should fail, as the class
+     * does not create a defensive copy.
+     */
+    @Test
+    public void setComparatorOnChainWithNullListShouldThrowNullPointerException() {
+        // Arrange: Create a ComparatorChain, passing a null list to its constructor.
+        final List<Comparator<String>> nullComparatorList = null;
+        final ComparatorChain<String> chain = new ComparatorChain<>(nullComparatorList, new BitSet());
+
+        // Act & Assert: Verify that attempting to set a comparator on the null internal
+        // list results in a NullPointerException. The index and comparator are arbitrary.
+        assertThrows(NullPointerException.class, () -> {
+            chain.setComparator(0, Comparator.naturalOrder());
+        });
     }
 }
