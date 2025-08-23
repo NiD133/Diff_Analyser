@@ -1,55 +1,38 @@
 package org.threeten.extra.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+
 import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.MinguoEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BritishCutoverChronology_ESTestTest44 extends BritishCutoverChronology_ESTest_scaffolding {
+/**
+ * Unit tests for {@link BritishCutoverChronology}.
+ */
+public class BritishCutoverChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
-        // Undeclared exception!
-        try {
-            britishCutoverChronology0.dateYearDay(366, 366);
-            fail("Expecting exception: DateTimeException");
-        } catch (DateTimeException e) {
-            //
-            // Invalid date 'DayOfYear 366' as '366' is not a leap year
-            //
-            verifyException("org.threeten.extra.chrono.JulianDate", e);
-        }
+    /**
+     * Tests that creating a date with day-of-year 366 in a non-leap year throws an exception.
+     * The year 366 is before the 1752 cutover, so it follows Julian calendar rules.
+     * In the Julian calendar, a year is a leap year if it is divisible by 4.
+     * Since 366 is not divisible by 4, it is a common year with 365 days.
+     */
+    @Test
+    public void dateYearDay_forDay366InNonLeapYear_throwsException() {
+        // Arrange
+        BritishCutoverChronology chronology = BritishCutoverChronology.INSTANCE;
+        int nonLeapJulianYear = 366;
+        int invalidDayOfYear = 366;
+
+        // Act & Assert
+        DateTimeException exception = assertThrows(
+                "Creating a date for day 366 in a 365-day year should fail.",
+                DateTimeException.class,
+                () -> chronology.dateYearDay(nonLeapJulianYear, invalidDayOfYear));
+
+        // Verify the exception message provides a clear reason for the failure.
+        assertTrue(
+                "Exception message should explain that the year is not a leap year.",
+                exception.getMessage().contains("not a leap year"));
     }
 }
