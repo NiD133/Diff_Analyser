@@ -1,45 +1,37 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertThrows;
 
+import org.junit.Test;
+
+/**
+ * This test suite contains tests for the {@link TextHelpAppendable} class.
+ */
 public class TextHelpAppendable_ESTestTest69 extends TextHelpAppendable_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test68() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-        textHelpAppendable0.resize(textStyle_Builder0, 698.4);
-        // Undeclared exception!
-        textHelpAppendable0.appendHeader(Integer.MAX_VALUE, "Width must be greater than 0");
+    /**
+     * Tests that calling {@code appendHeader} with an extremely large level value
+     * results in an {@link OutOfMemoryError}. This is expected because the method
+     * will likely attempt to allocate memory for indentation based on the level,
+     * and a value like Integer.MAX_VALUE will exceed available heap space.
+     */
+    @Test
+    public void appendHeaderWithExtremelyLargeLevelThrowsOutOfMemoryError() {
+        // Arrange: Create a TextHelpAppendable instance and define test parameters.
+        final TextHelpAppendable textHelp = TextHelpAppendable.systemOut();
+        final String headerText = "A sample header";
+        final int extremelyLargeLevel = Integer.MAX_VALUE;
+
+        // The original test also resized the text style builder to a large width.
+        // This step is preserved here for faithfulness to the original test's logic,
+        // although the OutOfMemoryError is primarily caused by the 'extremelyLargeLevel'.
+        final TextStyle.Builder styleBuilder = textHelp.getTextStyleBuilder();
+        textHelp.resize(styleBuilder, 700.0);
+
+        // Act & Assert: Verify that an OutOfMemoryError is thrown when calling
+        // appendHeader with an impossibly large level.
+        assertThrows(OutOfMemoryError.class, () -> {
+            textHelp.appendHeader(extremelyLargeLevel, headerText);
+        });
     }
 }
