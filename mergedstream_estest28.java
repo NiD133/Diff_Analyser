@@ -1,47 +1,56 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FilterInputStream;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
-public class MergedStream_ESTestTest28 extends MergedStream_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        PipedInputStream pipedInputStream0 = new PipedInputStream();
-        byte[] byteArray0 = new byte[12];
-        MergedStream mergedStream0 = new MergedStream((IOContext) null, pipedInputStream0, byteArray0, 1, 1);
-        mergedStream0.read(byteArray0, 1, 1);
+/**
+ * Unit tests for the {@link MergedStream} class, focusing on its behavior
+ * when transitioning from its internal buffer to the underlying stream.
+ */
+public class MergedStreamTest {
+
+    /**
+     * Tests that after the prefixed buffer is fully read, the MergedStream
+     * correctly switches to reading from the underlying InputStream.
+     * It also verifies that if the underlying stream throws an IOException,
+     * that exception is propagated to the caller.
+     */
+    @Test
+    public void whenPrefixBufferIsExhausted_thenReadsFromUnderlyingStreamAndPropagatesException() throws IOException {
+        // Arrange
+        // 1. An underlying input stream that is guaranteed to fail upon reading.
+        //    An unconnected PipedInputStream is a simple way to achieve this.
+        InputStream underlyingFailingStream = new PipedInputStream();
+
+        // 2. A prefix buffer with a single byte of data to be read first.
+        byte[] prefixBuffer = new byte[]{(byte) 0xFF};
+        int prefixStart = 0;
+        int prefixEnd = 1; // Represents a buffer segment of length 1.
+
+        // 3. A minimal, valid IOContext.
+        IOContext ioContext = new IOContext(new BufferRecycler(), null, false);
+
+        MergedStream mergedStream = new MergedStream(ioContext, underlyingFailingStream, prefixBuffer, prefixStart, prefixEnd);
+
+        // Act & Assert: First read should succeed by consuming the single byte from the prefix buffer.
+        int firstByte = mergedStream.read();
+        assertEquals(0xFF, firstByte);
+
+        // Act & Assert: The prefix buffer is now exhausted. The next read should attempt to use the
+        // underlying stream, which will throw an IOException.
         try {
-            mergedStream0.read();
-            fail("Expecting exception: IOException");
+            mergedStream.read();
+            fail("Expected an IOException because the underlying stream should fail.");
         } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("java.io.PipedInputStream", e);
+            // Verify that the exception is the one we expect from the PipedInputStream.
+            assertEquals("Pipe not connected", e.getMessage());
         }
     }
 }
