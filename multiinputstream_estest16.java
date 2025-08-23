@@ -1,28 +1,34 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class MultiInputStream_ESTestTest16 extends MultiInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link MultiInputStream}.
+ */
+public class MultiInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        ArrayList<ByteSource> arrayList0 = new ArrayList<ByteSource>();
-        Iterator<ByteSource> iterator0 = arrayList0.iterator();
-        MultiInputStream multiInputStream0 = new MultiInputStream(iterator0);
-        long long0 = multiInputStream0.skip((-1293L));
-        assertEquals(0L, long0);
+    /**
+     * Verifies that calling skip() with a negative argument returns 0, as specified by the
+     * {@link InputStream#skip(long)} contract, which states that no bytes should be skipped.
+     */
+    @Test
+    public void skip_withNegativeArgument_shouldSkipZeroBytes() throws IOException {
+        // Arrange: Create a MultiInputStream from an empty iterator. The stream's content
+        // is not relevant for this test, as the check for a negative argument should
+        // occur before any data is processed.
+        Iterator<ByteSource> emptyIterator = Collections.emptyIterator();
+        MultiInputStream stream = new MultiInputStream(emptyIterator);
+
+        // Act: Attempt to skip a negative number of bytes.
+        long bytesSkipped = stream.skip(-1L);
+
+        // Assert: Verify that zero bytes were skipped.
+        assertEquals(0L, bytesSkipped);
     }
 }
