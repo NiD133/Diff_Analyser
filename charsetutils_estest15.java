@@ -1,18 +1,34 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSetUtils_ESTestTest15 extends CharSetUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CharSetUtils}.
+ */
+public class CharSetUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        String[] stringArray0 = new String[8];
-        stringArray0[0] = "A-Z";
-        String string0 = CharSetUtils.delete("A-Z", stringArray0);
-        assertEquals("-", string0);
+    /**
+     * Tests that CharSetUtils.delete() correctly removes all characters
+     * specified by a character range set (e.g., "A-Z").
+     */
+    @Test
+    public void testDeleteWithCharacterRangeSet() {
+        // Arrange
+        // The input string contains characters that are part of the range, plus a hyphen.
+        final String inputString = "A-Z";
+
+        // The set "A-Z" is a special syntax representing all uppercase letters from A to Z.
+        final String[] charsToDelete = {"A-Z"};
+
+        final String expectedResult = "-";
+
+        // Act
+        final String actualResult = CharSetUtils.delete(inputString, charsToDelete);
+
+        // Assert
+        // The method should delete 'A' and 'Z' from the input string because they
+        // fall within the "A-Z" range, leaving only the hyphen.
+        assertEquals(expectedResult, actualResult);
     }
 }
