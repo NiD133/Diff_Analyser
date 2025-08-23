@@ -1,30 +1,37 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextAnchor;
 import org.jfree.chart.text.TextBlockAnchor;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CategoryLabelPosition_ESTestTest11 extends CategoryLabelPosition_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        RectangleAnchor rectangleAnchor0 = RectangleAnchor.BOTTOM_LEFT;
-        CategoryLabelWidthType categoryLabelWidthType0 = CategoryLabelWidthType.RANGE;
-        CategoryLabelPosition categoryLabelPosition0 = null;
+/**
+ * Tests for the {@link CategoryLabelPosition} class, focusing on constructor argument validation.
+ */
+public class CategoryLabelPositionTest {
+
+    /**
+     * Verifies that the constructor throws an IllegalArgumentException when the
+     * 'labelAnchor' argument is null. This is a critical validation to ensure
+     * the object is always in a consistent state.
+     */
+    @Test
+    public void constructorShouldThrowExceptionForNullLabelAnchor() {
+        // Arrange: Define valid arguments for the constructor, except for the one under test.
+        RectangleAnchor categoryAnchor = RectangleAnchor.BOTTOM_LEFT;
+        CategoryLabelWidthType widthType = CategoryLabelWidthType.RANGE;
+        float widthRatio = 0.95f; // A typical value for the width ratio.
+        TextBlockAnchor nullLabelAnchor = null;
+
+        // Act & Assert: Attempt to create an instance with a null label anchor and verify the exception.
         try {
-            categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, (TextBlockAnchor) null, categoryLabelWidthType0, 2093.0F);
-            fail("Expecting exception: IllegalArgumentException");
+            new CategoryLabelPosition(categoryAnchor, nullLabelAnchor, widthType, widthRatio);
+            fail("Expected an IllegalArgumentException to be thrown, but it was not.");
         } catch (IllegalArgumentException e) {
-            //
-            // Null 'labelAnchor' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
+            // Verify that the exception message is correct, confirming the cause of the error.
+            assertEquals("Null 'labelAnchor' argument.", e.getMessage());
         }
     }
 }
