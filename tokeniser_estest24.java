@@ -1,27 +1,31 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.XmlDeclaration;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * This class contains tests for the Tokeniser.
+ * The original test was auto-generated and has been refactored for clarity.
+ */
 public class Tokeniser_ESTestTest24 extends Tokeniser_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        xmlTreeBuilder0.parse(":matchesWholeOwnText(%s)", ":matchesWholeOwnText(%s)");
-        Tokeniser tokeniser0 = new Tokeniser(xmlTreeBuilder0);
-        tokeniser0.appropriateEndTagSeq();
-        String string0 = tokeniser0.appropriateEndTagSeq();
-        assertEquals("</null", string0);
-        assertNotNull(string0);
+    /**
+     * Tests that appropriateEndTagSeq() returns a sequence based on a null tag name
+     * when no start tag has been processed by the tokeniser yet.
+     */
+    @Test
+    public void appropriateEndTagSeqReturnsNullSequenceWhenNoStartTagEncountered() {
+        // Arrange: Create a tokeniser that has not yet processed any tags.
+        // In this initial state, its internal 'lastStartTag' field is null.
+        XmlTreeBuilder treeBuilder = new XmlTreeBuilder();
+        Tokeniser tokeniser = new Tokeniser(treeBuilder);
+
+        // Act: Get the appropriate end tag sequence.
+        String endTagSeq = tokeniser.appropriateEndTagSeq();
+
+        // Assert: The method should construct the sequence from a null tag name.
+        // The expected result is from the string concatenation of "</" + null,
+        // which yields "</null".
+        assertEquals("</null", endTagSeq);
     }
 }
