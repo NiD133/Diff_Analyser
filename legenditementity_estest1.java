@@ -1,30 +1,31 @@
 package org.jfree.chart.entity;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
-import java.time.chrono.HijrahEra;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.general.Dataset;
-import org.jfree.data.xy.DefaultTableXYDataset;
-import org.jfree.data.xy.XIntervalSeriesCollection;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class LegendItemEntity_ESTestTest1 extends LegendItemEntity_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LegendItemEntity} class.
+ */
+public class LegendItemEntityTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
-        LegendItemEntity<HijrahEra> legendItemEntity0 = new LegendItemEntity<HijrahEra>(rectangle2D_Double0);
-        HijrahEra hijrahEra0 = HijrahEra.AH;
-        legendItemEntity0.setSeriesKey(hijrahEra0);
-        HijrahEra hijrahEra1 = legendItemEntity0.getSeriesKey();
-        assertSame(hijrahEra1, hijrahEra0);
+    /**
+     * Verifies that the getSeriesKey() method correctly returns the value
+     * that was previously set by the setSeriesKey() method.
+     */
+    @Test
+    public void testSeriesKeyGetterAndSetter() {
+        // Arrange: Create a LegendItemEntity and a sample series key.
+        Rectangle2D.Double area = new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0);
+        LegendItemEntity<String> entity = new LegendItemEntity<>(area);
+        String expectedKey = "Series 1";
+
+        // Act: Set the series key and then retrieve it.
+        entity.setSeriesKey(expectedKey);
+        String actualKey = entity.getSeriesKey();
+
+        // Assert: The retrieved key should be the same instance as the one set.
+        assertSame("The retrieved series key should be the same as the one that was set.",
+                expectedKey, actualKey);
     }
 }
