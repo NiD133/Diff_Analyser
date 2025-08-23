@@ -1,31 +1,65 @@
 package org.apache.commons.io.function;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.time.chrono.HijrahEra;
-import java.util.Comparator;
-import java.util.concurrent.ForkJoinTask;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.LongStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class Uncheck_ESTestTest41 extends Uncheck_ESTest_scaffolding {
+import java.io.IOException;
+import java.io.UncheckedIOException;
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        IOBooleanSupplier iOBooleanSupplier0 = mock(IOBooleanSupplier.class, new ViolatedAssumptionAnswer());
-        doReturn(false).when(iOBooleanSupplier0).getAsBoolean();
-        boolean boolean0 = Uncheck.getAsBoolean(iOBooleanSupplier0);
-        assertFalse(boolean0);
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+/**
+ * Tests for the {@link Uncheck#getAsBoolean(IOBooleanSupplier)} method.
+ */
+public class UncheckGetAsBooleanTest {
+
+    /**
+     * Tests that getAsBoolean returns true when the underlying supplier returns true.
+     */
+    @Test
+    public void testGetAsBooleanShouldReturnTrueWhenSupplierReturnsTrue() throws IOException {
+        // Arrange: Create a mock IOBooleanSupplier that returns true.
+        final IOBooleanSupplier mockSupplier = mock(IOBooleanSupplier.class);
+        when(mockSupplier.getAsBoolean()).thenReturn(true);
+
+        // Act: Call the method under test.
+        final boolean result = Uncheck.getAsBoolean(mockSupplier);
+
+        // Assert: The result should be true.
+        assertTrue(result);
+    }
+
+    /**
+     * Tests that getAsBoolean returns false when the underlying supplier returns false.
+     * This is the refactored version of the original test case.
+     */
+    @Test
+    public void testGetAsBooleanShouldReturnFalseWhenSupplierReturnsFalse() throws IOException {
+        // Arrange: Create a mock IOBooleanSupplier that returns false.
+        final IOBooleanSupplier mockSupplier = mock(IOBooleanSupplier.class);
+        when(mockSupplier.getAsBoolean()).thenReturn(false);
+
+        // Act: Call the method under test.
+        final boolean result = Uncheck.getAsBoolean(mockSupplier);
+
+        // Assert: The result should be false.
+        assertFalse(result);
+    }
+
+    /**
+     * Tests that getAsBoolean wraps an IOException from the supplier in an UncheckedIOException.
+     */
+    @Test
+    public void testGetAsBooleanShouldThrowUncheckedIOExceptionWhenSupplierThrowsIOException() throws IOException {
+        // Arrange: Create a mock IOBooleanSupplier that throws an IOException.
+        final IOBooleanSupplier mockSupplier = mock(IOBooleanSupplier.class);
+        final IOException ioException = new IOException("Test I/O failure");
+        when(mockSupplier.getAsBoolean()).thenThrow(ioException);
+
+        // Act & Assert: Verify that calling the method results in an UncheckedIOException.
+        assertThrows(UncheckedIOException.class, () -> Uncheck.getAsBoolean(mockSupplier));
     }
 }
