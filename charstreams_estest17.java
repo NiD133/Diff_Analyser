@@ -1,52 +1,41 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
-import java.io.EOFException;
-import java.io.FileDescriptor;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PipedInputStream;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.PushbackReader;
 import java.io.Reader;
-import java.io.StringReader;
-import java.io.Writer;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.MalformedInputException;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileReader;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+/**
+ * Tests for {@link CharStreams}.
+ * This is a subset of tests focusing on a specific case.
+ */
+// The class name and inheritance are preserved from the original to avoid breaking a potential
+// existing test suite structure. In a real-world scenario, these would also be cleaned up
+// (e.g., to `CharStreamsTest`).
 public class CharStreams_ESTestTest17 extends CharStreams_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        PipedInputStream pipedInputStream0 = new PipedInputStream();
-        InputStreamReader inputStreamReader0 = new InputStreamReader(pipedInputStream0);
+    /**
+     * Verifies that readLines() throws an IOException when given a reader that is backed by
+     * an unconnected PipedInputStream.
+     */
+    @Test
+    public void readLines_fromUnconnectedPipe_throwsIOException() {
+        // Arrange: Create a reader from a pipe that has no writer connected to it.
+        // Any attempt to read from this pipe is expected to fail immediately.
+        PipedInputStream unconnectedPipe = new PipedInputStream();
+        Reader reader = new InputStreamReader(unconnectedPipe);
+
+        // Act & Assert: Attempt to read lines and verify the expected exception is thrown.
         try {
-            CharStreams.readLines((Readable) inputStreamReader0);
-            fail("Expecting exception: IOException");
+            CharStreams.readLines(reader);
+            fail("Expected an IOException to be thrown for an unconnected pipe.");
         } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("java.io.PipedInputStream", e);
+            // The underlying PipedInputStream is responsible for this specific error.
+            assertEquals("Pipe not connected", e.getMessage());
         }
     }
 }
