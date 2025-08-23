@@ -1,22 +1,33 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotEquals;
 
-public class JacksonInject_ESTestTest14 extends JacksonInject_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JacksonInject.Value} class, focusing on its
+ * immutability and equality implementation.
+ */
+public class JacksonInjectValueTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        JacksonInject.Value jacksonInject_Value0 = JacksonInject.Value.EMPTY;
-        Boolean boolean0 = new Boolean("zH78ih{ZO&er");
-        JacksonInject.Value jacksonInject_Value1 = jacksonInject_Value0.withUseInput(boolean0);
-        boolean boolean1 = jacksonInject_Value1.equals(jacksonInject_Value0);
-        assertFalse(boolean1);
+    /**
+     * Verifies that modifying a property on a {@link JacksonInject.Value} instance
+     * using a "wither" method (e.g., {@code withUseInput()}) produces a new,
+     * non-equal instance.
+     * <p>
+     * This test confirms the immutability of the {@code Value} class and the
+     * correctness of its {@code equals()} implementation.
+     */
+    @Test
+    public void withUseInput_whenValueChanges_shouldReturnNewUnequalInstance() {
+        // Arrange: Start with the default EMPTY instance, where 'useInput' is null.
+        JacksonInject.Value originalValue = JacksonInject.Value.EMPTY;
+
+        // Act: Create a new instance by changing the 'useInput' property to false.
+        JacksonInject.Value modifiedValue = originalValue.withUseInput(Boolean.FALSE);
+
+        // Assert: The new instance with a different 'useInput' value should not be
+        // equal to the original instance.
+        assertNotEquals("A Value instance modified with a new 'useInput' should not be equal to the original.",
+                originalValue, modifiedValue);
     }
 }
