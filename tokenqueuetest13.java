@@ -1,87 +1,203 @@
 package org.jsoup.parser;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import java.util.regex.Pattern;
+
 import java.util.stream.Stream;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class TokenQueueTestTest13 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
+import org.junit.jupiter.api.Named;
 
-    @ParameterizedTest
-    @MethodSource("escapeCssIdentifier_WebPlatformTestParameters")
-    @MethodSource("escapeCssIdentifier_additionalParameters")
-    public void escapeCssIdentifier(String expected, String input) {
-        assertEquals(expected, TokenQueue.escapeCssIdentifier(input));
+/**
+ * Tests for CSS identifier parsing and escaping in TokenQueue.
+ * Includes tests from the Web Platform Tests (WPT) to ensure spec compliance.
+ */
+public class CssIdentifierTest {
+    private static final String REPLACEMENT_CHAR = "\uFFFD";
+
+    @Nested
+    @DisplayName("TokenQueue.escapeCssIdentifier()")
+    class EscapeCssIdentifierTests {
+
+        @ParameterizedTest(name = "[{index}] {0}")
+        @MethodSource("escapeTestCases")
+        void correctlyEscapesCssIdentifiers(Named<Arguments> namedArgs) {
+            Arguments args = namedArgs.getPayload();
+            String expected = (String) args.get()[0];
+            String input = (String) args.get()[1];
+            assertEquals(expected, TokenQueue.escapeCssIdentifier(input));
+        }
+
+        static Stream<Named<Arguments>> escapeTestCases() {
+            // Combines WPT tests with additional jsoup-specific tests.
+            return Stream.of(
+                webPlatformTests(),
+                additionalTests()
+            ).flatMap(s -> s);
+        }
+
+        // Source: https://github.com/web-platform-tests/wpt/blob/328fa1c67bf5dfa6f24571d4c41dd10224b6d247/css/cssom/escape.html
+        private static Stream<Named<Arguments>> webPlatformTests() {
+            return Stream.of(
+                // Basic cases
+                Named.of("Empty string", arguments("", "")),
+                Named.of("Handles simple identifiers", arguments("abcdefghijklmnopqrstuvwxyz", "abcdefghijklmnopqrstuvwxyz")),
+                Named.of("Handles uppercase identifiers", arguments("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ")),
+                Named.of("Handles mixed case identifiers with numbers", arguments("a0123456789b", "a0123456789b")),
+
+                // Null bytes are replaced
+                Named.of("Null byte -> replacement char", arguments(REPLACEMENT_CHAR, "\0")),
+                Named.of("Leading char + null byte", arguments("a" + REPLACEMENT_CHAR, "a\0")),
+                Named.of("Trailing char + null byte", arguments(REPLACEMENT_CHAR + "b", "\0b")),
+                Named.of("Char sandwiching null byte", arguments("a" + REPLACEMENT_CHAR + "b", "a\0b")),
+
+                // Replacement characters are passed through
+                Named.of("Replacement char", arguments(REPLACEMENT_CHAR, REPLACEMENT_CHAR)),
+                Named.of("Leading char + replacement char", arguments("a" + REPLACEMENT_CHAR, "a" + REPLACEMENT_CHAR)),
+
+                // Numeric prefixes are escaped
+                Named.of("Numeric prefix '0a'", arguments("\\30 a", "0a")),
+                Named.of("Numeric prefix '9a'", arguments("\\39 a", "9a")),
+
+                // Numbers after a letter are not escaped
+                Named.of("Letter followed by numbers", arguments("a0b", "a0b")),
+                Named.of("Letter followed by numbers", arguments("a9b", "a9b")),
+
+                // Dash followed by numeric prefix is escaped
+                Named.of("Dash + numeric prefix '-0a'", arguments("-\\30 a", "-0a")),
+                Named.of("Dash + numeric prefix '-9a'", arguments("-\\39 a", "-9a")),
+
+                // Double-dash prefix is not escaped
+                Named.of("Double-dash prefix", arguments("--a", "--a")),
+
+                // Control characters are escaped
+                Named.of("Control characters U+0001 to U+001F", arguments("\\1 \\2 \\1e \\1f ", "\u0001\u0002\u001E\u001F")),
+                Named.of("DEL char and non-ASCII control chars", arguments("\\7f \u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008A\u008B\u008C\u008D\u008E\u008F\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u0098\u0099\u009A\u009B\u009C\u009D\u009E\u009F", "\u007F\u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008A\u008B\u008C\u008D\u008E\u008F\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u0098\u0099\u009A\u009B\u009C\u009D\u009E\u009F")),
+
+                // High-codepoint characters are preserved
+                Named.of("Non-ASCII chars are preserved", arguments("\u0080\u002D\u005F\u00A9", "\u0080\u002D\u005F\u00A9")),
+                Named.of("Non-ASCII chars are preserved", arguments("\u00A0\u00A1\u00A2", "\u00A0\u00A1\u00A2")),
+                Named.of("High codepoint char is preserved", arguments("hello\u1234world", "hello\u1234world")),
+                Named.of("Astral symbol (surrogate pair) is preserved", arguments("\uD834\uDF06", "\uD834\uDF06")),
+                Named.of("Lone trailing surrogate is preserved", arguments("\uDF06", "\uDF06")),
+                Named.of("Lone leading surrogate is preserved", arguments("\uD834", "\uD834")),
+
+                // Special characters are escaped
+                Named.of("Backslashes are escaped", arguments("hello\\\\world", "hello\\world")),
+                Named.of("Single dash is escaped", arguments("\\-", "-")),
+                Named.of("Special ASCII chars are escaped", arguments("\\ \\!xy", "\u0020\u0021\u0078\u0079"))
+            );
+        }
+
+        private static Stream<Named<Arguments>> additionalTests() {
+            return Stream.of(
+                Named.of("Handles multiple special characters", arguments("one\\#two\\.three\\/four\\\\five", "one#two.three/four\\five")),
+                Named.of("Identifier starting with a dash is preserved", arguments("-a", "-a")),
+                Named.of("Double-dash is preserved", arguments("--", "--"))
+            );
+        }
     }
 
-    // https://github.com/web-platform-tests/wpt/blob/328fa1c67bf5dfa6f24571d4c41dd10224b6d247/css/cssom/escape.html
-    private static Stream<Arguments> escapeCssIdentifier_WebPlatformTestParameters() {
-        return Stream.of(Arguments.of("", ""), // Null bytes
-        Arguments.of("\uFFFD", "\0"), Arguments.of("a\uFFFD", "a\0"), Arguments.of("\uFFFDb", "\0b"), Arguments.of("a\uFFFDb", "a\0b"), // Replacement character
-        Arguments.of("\uFFFD", "\uFFFD"), Arguments.of("a\uFFFD", "a\uFFFD"), Arguments.of("\uFFFDb", "\uFFFDb"), Arguments.of("a\uFFFDb", "a\uFFFDb"), // Number prefix
-        Arguments.of("\\30 a", "0a"), Arguments.of("\\31 a", "1a"), Arguments.of("\\32 a", "2a"), Arguments.of("\\33 a", "3a"), Arguments.of("\\34 a", "4a"), Arguments.of("\\35 a", "5a"), Arguments.of("\\36 a", "6a"), Arguments.of("\\37 a", "7a"), Arguments.of("\\38 a", "8a"), Arguments.of("\\39 a", "9a"), // Letter number prefix
-        Arguments.of("a0b", "a0b"), Arguments.of("a1b", "a1b"), Arguments.of("a2b", "a2b"), Arguments.of("a3b", "a3b"), Arguments.of("a4b", "a4b"), Arguments.of("a5b", "a5b"), Arguments.of("a6b", "a6b"), Arguments.of("a7b", "a7b"), Arguments.of("a8b", "a8b"), Arguments.of("a9b", "a9b"), // Dash number prefix
-        Arguments.of("-\\30 a", "-0a"), Arguments.of("-\\31 a", "-1a"), Arguments.of("-\\32 a", "-2a"), Arguments.of("-\\33 a", "-3a"), Arguments.of("-\\34 a", "-4a"), Arguments.of("-\\35 a", "-5a"), Arguments.of("-\\36 a", "-6a"), Arguments.of("-\\37 a", "-7a"), Arguments.of("-\\38 a", "-8a"), Arguments.of("-\\39 a", "-9a"), // Double dash prefix
-        Arguments.of("--a", "--a"), // Various tests
-        Arguments.of("\\1 \\2 \\1e \\1f ", "\u0001\u0002\u001E\u001F"), Arguments.of("\u0080\u002D\u005F\u00A9", "\u0080\u002D\u005F\u00A9"), Arguments.of("\\7f \u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008A\u008B\u008C\u008D\u008E\u008F\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u0098\u0099\u009A\u009B\u009C\u009D\u009E\u009F", "\u007F\u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008A\u008B\u008C\u008D\u008E\u008F\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u0098\u0099\u009A\u009B\u009C\u009D\u009E\u009F"), Arguments.of("\u00A0\u00A1\u00A2", "\u00A0\u00A1\u00A2"), Arguments.of("a0123456789b", "a0123456789b"), Arguments.of("abcdefghijklmnopqrstuvwxyz", "abcdefghijklmnopqrstuvwxyz"), Arguments.of("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"), // Backslashes get backslash-escaped
-        Arguments.of("hello\\\\world", "hello\\world"), // Code points greater than U+0080 are preserved
-        Arguments.of("hello\u1234world", "hello\u1234world"), // CSS.escape: Single dash escaped
-        Arguments.of("\\-", "-"), Arguments.of("\\ \\!xy", "\u0020\u0021\u0078\u0079"), // astral symbol (U+1D306 TETRAGRAM FOR CENTRE)
-        Arguments.of("\uD834\uDF06", "\uD834\uDF06"), // lone surrogates
-        Arguments.of("\uDF06", "\uDF06"), Arguments.of("\uD834", "\uD834"));
-    }
+    @Nested
+    @DisplayName("TokenQueue.consumeCssIdentifier()")
+    class ConsumeCssIdentifierTests {
 
-    private static Stream<Arguments> escapeCssIdentifier_additionalParameters() {
-        return Stream.of(Arguments.of("one\\#two\\.three\\/four\\\\five", "one#two.three/four\\five"), Arguments.of("-a", "-a"), Arguments.of("--", "--"));
-    }
+        private void assertIdentifierConsumesTo(String expected, String input) {
+            TokenQueue tq = new TokenQueue(input);
+            String consumed = tq.consumeCssIdentifier();
+            assertEquals(expected, consumed);
+        }
 
-    private static void validateNestedQuotes(String html, String selector) {
-        assertEquals("#identifier", Jsoup.parse(html).select(selector).first().cssSelector());
-    }
+        @ParameterizedTest(name = "[{index}] {0}")
+        @MethodSource("consumeTestCases")
+        void correctlyConsumesCssIdentifiers(Named<Arguments> namedArgs) {
+            Arguments args = namedArgs.getPayload();
+            String expected = (String) args.get()[0];
+            String input = (String) args.get()[1];
+            assertIdentifierConsumesTo(expected, input);
+        }
 
-    @ParameterizedTest
-    @MethodSource("cssIdentifiers")
-    @MethodSource("cssAdditionalIdentifiers")
-    void consumeCssIdentifier_WebPlatformTests(String expected, String cssIdentifier) {
-        assertParsedCssIdentifierEquals(expected, cssIdentifier);
-    }
+        static Stream<Named<Arguments>> consumeTestCases() {
+            return Stream.of(
+                webPlatformTests(),
+                chromiumTests(),
+                additionalJsoupTests()
+            ).flatMap(s -> s);
+        }
 
-    private static Stream<Arguments> cssIdentifiers() {
-        return Stream.of(// https://github.com/web-platform-tests/wpt/blob/36036fb5212a3fc15fc5750cecb1923ba4071668/dom/nodes/ParentNode-querySelector-escapes.html
-        // - escape hex digit
-        Arguments.of("0nextIsWhiteSpace", "\\30 nextIsWhiteSpace"), Arguments.of("0nextIsNotHexLetters", "\\30nextIsNotHexLetters"), Arguments.of("0connectHexMoreThan6Hex", "\\000030connectHexMoreThan6Hex"), Arguments.of("0spaceMoreThan6Hex", "\\000030 spaceMoreThan6Hex"), // - hex digit special replacement
-        // 1. zero points
-        Arguments.of("zero\uFFFD", "zero\\0"), Arguments.of("zero\uFFFD", "zero\\000000"), // 2. surrogate points
-        Arguments.of("\uFFFDsurrogateFirst", "\\d83d surrogateFirst"), Arguments.of("surrogateSecond\uFFFd", "surrogateSecond\\dd11"), Arguments.of("surrogatePair\uFFFD\uFFFD", "surrogatePair\\d83d\\dd11"), // 3. out of range points
-        Arguments.of("outOfRange\uFFFD", "outOfRange\\110000"), Arguments.of("outOfRange\uFFFD", "outOfRange\\110030"), Arguments.of("outOfRange\uFFFD", "outOfRange\\555555"), Arguments.of("outOfRange\uFFFD", "outOfRange\\ffffff"), // - escape anything else
-        Arguments.of(".comma", "\\.comma"), Arguments.of("-minus", "\\-minus"), Arguments.of("g", "\\g"), // non edge cases
-        Arguments.of("aBMPRegular", "\\61 BMPRegular"), Arguments.of("\uD83D\uDD11nonBMP", "\\1f511 nonBMP"), Arguments.of("00continueEscapes", "\\30\\30 continueEscapes"), Arguments.of("00continueEscapes", "\\30 \\30 continueEscapes"), Arguments.of("continueEscapes00", "continueEscapes\\30 \\30 "), Arguments.of("continueEscapes00", "continueEscapes\\30 \\30"), Arguments.of("continueEscapes00", "continueEscapes\\30\\30 "), Arguments.of("continueEscapes00", "continueEscapes\\30\\30"), // ident tests case from CSS tests of chromium source: https://goo.gl/3Cxdov
-        Arguments.of("hello", "hel\\6Co"), Arguments.of("&B", "\\26 B"), Arguments.of("hello", "hel\\6C o"), Arguments.of("spaces", "spac\\65\r\ns"), Arguments.of("spaces", "sp\\61\tc\\65\fs"), Arguments.of("test\uD799", "test\\D799"), Arguments.of("\uE000", "\\E000"), Arguments.of("test", "te\\s\\t"), Arguments.of("spaces in\tident", "spaces\\ in\\\tident"), Arguments.of(".,:!", "\\.\\,\\:\\!"), Arguments.of("null\uFFFD", "null\\0"), Arguments.of("null\uFFFD", "null\\0000"), Arguments.of("large\uFFFD", "large\\110000"), Arguments.of("large\uFFFD", "large\\23456a"), Arguments.of("surrogate\uFFFD", "surrogate\\D800"), Arguments.of("surrogate\uFFFD", "surrogate\\0DBAC"), Arguments.of("\uFFFDsurrogate", "\\00DFFFsurrogate"), Arguments.of("\uDBFF\uDFFF", "\\10fFfF"), Arguments.of("\uDBFF\uDFFF0", "\\10fFfF0"), Arguments.of("\uDBC0\uDC0000", "\\10000000"), Arguments.of("eof\uFFFD", "eof\\"), Arguments.of("simple-ident", "simple-ident"), Arguments.of("testing123", "testing123"), Arguments.of("_underscore", "_underscore"), Arguments.of("-text", "-text"), Arguments.of("-m", "-\\6d"), Arguments.of("--abc", "--abc"), Arguments.of("--", "--"), Arguments.of("--11", "--11"), Arguments.of("---", "---"), Arguments.of("\u2003", "\u2003"), Arguments.of("\u00A0", "\u00A0"), Arguments.of("\u1234", "\u1234"), Arguments.of("\uD808\uDF45", "\uD808\uDF45"), Arguments.of("\uFFFD", "\u0000"), Arguments.of("ab\uFFFDc", "ab\u0000c"));
-    }
+        // Source: https://github.com/web-platform-tests/wpt/blob/36036fb5212a3fc15fc5750cecb1923ba4071668/dom/nodes/ParentNode-querySelector-escapes.html
+        private static Stream<Named<Arguments>> webPlatformTests() {
+            return Stream.of(
+                Named.of("Hex escape followed by space", arguments("0nextIsWhiteSpace", "\\30 nextIsWhiteSpace")),
+                Named.of("Hex escape followed by non-hex", arguments("0nextIsNotHexLetters", "\\30nextIsNotHexLetters")),
+                Named.of("6-digit hex escape", arguments("0connectHexMoreThan6Hex", "\\000030connectHexMoreThan6Hex")),
+                Named.of("6-digit hex escape with space", arguments("0spaceMoreThan6Hex", "\\000030 spaceMoreThan6Hex")),
+                Named.of("Zero escape sequence", arguments("zero" + REPLACEMENT_CHAR, "zero\\0")),
+                Named.of("6-digit zero escape sequence", arguments("zero" + REPLACEMENT_CHAR, "zero\\000000")),
+                Named.of("Escaped leading surrogate", arguments(REPLACEMENT_CHAR + "surrogateFirst", "\\d83d surrogateFirst")),
+                Named.of("Escaped trailing surrogate", arguments("surrogateSecond" + REPLACEMENT_CHAR, "surrogateSecond\\dd11")),
+                Named.of("Escaped surrogate pair", arguments("surrogatePair" + REPLACEMENT_CHAR + REPLACEMENT_CHAR, "surrogatePair\\d83d\\dd11")),
+                Named.of("Out of range escape sequence", arguments("outOfRange" + REPLACEMENT_CHAR, "outOfRange\\110000")),
+                Named.of("Simple escape", arguments(".comma", "\\.comma")),
+                Named.of("Escaped dash", arguments("-minus", "\\-minus")),
+                Named.of("Escaped letter", arguments("g", "\\g")),
+                Named.of("BMP char escape with space", arguments("aBMPRegular", "\\61 BMPRegular")),
+                Named.of("Non-BMP char escape with space", arguments("\uD83D\uDD11nonBMP", "\\1f511 nonBMP")),
+                Named.of("Multiple hex escapes", arguments("00continueEscapes", "\\30\\30 continueEscapes")),
+                Named.of("Multiple hex escapes with space", arguments("00continueEscapes", "\\30 \\30 continueEscapes"))
+            );
+        }
 
-    private static Stream<Arguments> cssAdditionalIdentifiers() {
-        return Stream.of(Arguments.of("1st", "\\31\r\nst"), Arguments.of("1", "\\31\r"), Arguments.of("1a", "\\31\ra"), Arguments.of("1", "\\031"), Arguments.of("1", "\\0031"), Arguments.of("1", "\\00031"), Arguments.of("1", "\\000031"), Arguments.of("1", "\\000031"), Arguments.of("a", "a\\\nb"));
-    }
+        // Source: Chromium CSS parser tests - https://goo.gl/3Cxdov
+        private static Stream<Named<Arguments>> chromiumTests() {
+            return Stream.of(
+                Named.of("Simple ident", arguments("simple-ident", "simple-ident")),
+                Named.of("Ident with numbers", arguments("testing123", "testing123")),
+                Named.of("Ident with underscore", arguments("_underscore", "_underscore")),
+                Named.of("Ident starting with dash", arguments("-text", "-text")),
+                Named.of("Ident with double-dash", arguments("--abc", "--abc")),
+                Named.of("Double-dash only", arguments("--", "--")),
+                Named.of("Double-dash with numbers", arguments("--11", "--11")),
+                Named.of("Triple-dash", "---", "---"),
+                Named.of("Escaped hex in middle", arguments("hello", "hel\\6Co")),
+                Named.of("Escaped special char with space", arguments("&B", "\\26 B")),
+                Named.of("Escaped hex with space in middle", arguments("hello", "hel\\6C o")),
+                Named.of("Escaped char with CR LF", arguments("spaces", "spac\\65\r\ns")),
+                Named.of("Escaped chars with tab and form-feed", arguments("spaces", "sp\\61\tc\\65\fs")),
+                Named.of("Escaped non-ascii", arguments("test\uD799", "test\\D799")),
+                Named.of("Escaped private use area char", arguments("\uE000", "\\E000")),
+                Named.of("Escaped backslash", arguments("test", "te\\s\\t")),
+                Named.of("Escaped space and tab", arguments("spaces in\tident", "spaces\\ in\\\tident")),
+                Named.of("Escaped punctuation", arguments(".,:!", "\\.\\,\\:\\!"))
+            );
+        }
 
-    private static String parseCssIdentifier(String text) {
-        TokenQueue q = new TokenQueue(text);
-        return q.consumeCssIdentifier();
-    }
+        private static Stream<Named<Arguments>> additionalJsoupTests() {
+            return Stream.of(
+                Named.of("Hex escape with CR LF", arguments("1st", "\\31\r\nst")),
+                Named.of("Hex escape with CR terminator", arguments("1", "\\31\r")),
+                Named.of("Hex escape with CR and trailing chars", arguments("1a", "\\31\ra")),
+                Named.of("Padded hex escape (3-digit)", arguments("1", "\\031")),
+                Named.of("Padded hex escape (4-digit)", arguments("1", "\\0031")),
+                Named.of("Padded hex escape (5-digit)", arguments("1", "\\00031")),
+                Named.of("Padded hex escape (6-digit)", arguments("1", "a\\\nb")),
+                Named.of("Escaped newline consumes only one char", arguments("a", "a\\\nb")),
+                Named.of("Null char becomes replacement char", arguments("ab" + REPLACEMENT_CHAR + "c", "ab\u0000c"))
+            );
+        }
 
-    private void assertParsedCssIdentifierEquals(String expected, String cssIdentifier) {
-        assertEquals(expected, parseCssIdentifier(cssIdentifier));
-    }
-
-    // Some of jsoup's tests depend on this behavior
-    @Test
-    public void consumeCssIdentifier_invalidButSupportedForBackwardsCompatibility() {
-        assertParsedCssIdentifierEquals("1", "1");
-        assertParsedCssIdentifierEquals("-", "-");
-        assertParsedCssIdentifierEquals("-1", "-1");
+        @Test
+        @DisplayName("Consumes non-compliant identifiers for backwards compatibility")
+        void consumesNonCompliantIdentifiersForBackwardsCompatibility() {
+            // These are not valid CSS identifiers, but jsoup supports them for legacy reasons.
+            assertIdentifierConsumesTo("1", "1");
+            assertIdentifierConsumesTo("-", "-");
+            assertIdentifierConsumesTo("-1", "-1");
+        }
     }
 }
