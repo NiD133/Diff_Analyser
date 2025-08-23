@@ -1,24 +1,29 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class UtcInstant_ESTestTest47 extends UtcInstant_ESTest_scaffolding {
+/**
+ * Tests for the string representation of {@link UtcInstant}.
+ */
+public class UtcInstantToStringTest {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        String string0 = utcInstant0.toString();
-        assertEquals("1858-11-17T00:00:00Z", string0);
+    @Test
+    public void toString_atModifiedJulianDayEpoch_returnsCorrectIsoFormattedString() {
+        // The documentation for UtcInstant specifies that a Modified Julian Day (MJD) of 0
+        // corresponds to the epoch date 1858-11-17. This test verifies the toString()
+        // representation for the exact start of that epoch day.
+
+        // Arrange
+        long modifiedJulianDay = 0L;
+        long nanoOfDay = 0L;
+        UtcInstant mjdEpochStart = UtcInstant.ofModifiedJulianDay(modifiedJulianDay, nanoOfDay);
+        String expectedIsoString = "1858-11-17T00:00:00Z";
+
+        // Act
+        String actualIsoString = mjdEpochStart.toString();
+
+        // Assert
+        assertEquals(expectedIsoString, actualIsoString);
     }
 }
