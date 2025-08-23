@@ -1,46 +1,31 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
-import org.joda.time.MonthDay;
-import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
 import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractPartial_ESTestTest56 extends AbstractPartial_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test55() throws Throwable {
-        YearMonth yearMonth0 = YearMonth.now();
-        DateTimeField[] dateTimeFieldArray0 = yearMonth0.getFields();
-        assertEquals(2, dateTimeFieldArray0.length);
+/**
+ * Unit tests for the {@link AbstractPartial} class, tested via its concrete subclass {@link YearMonth}.
+ */
+public class AbstractPartialTest {
+
+    /**
+     * Verifies that getFields() on a YearMonth instance returns an array
+     * containing exactly two fields, corresponding to 'year' and 'month'.
+     */
+    @Test
+    public void getFields_onYearMonth_returnsArrayWithTwoFields() {
+        // Arrange: A YearMonth is a partial date consisting of a year and a month.
+        YearMonth yearMonth = new YearMonth();
+
+        // Act: Call the getFields() method, which is implemented in the AbstractPartial hierarchy.
+        DateTimeField[] fields = yearMonth.getFields();
+
+        // Assert: We expect two fields for a YearMonth instance.
+        final int expectedFieldCount = 2;
+        assertEquals("A YearMonth should consist of exactly two fields (year and month).",
+                expectedFieldCount, fields.length);
     }
 }
