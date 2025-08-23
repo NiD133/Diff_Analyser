@@ -1,17 +1,33 @@
 package org.apache.commons.codec.digest;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class XXHash32_ESTestTest8 extends XXHash32_ESTest_scaffolding {
+/**
+ * Tests for the {@link XXHash32} class.
+ *
+ * Note: The original test class name 'XXHash32_ESTestTest8' suggests it was
+ * auto-generated. A more conventional name like 'XXHash32Test' is used here for clarity.
+ */
+public class XXHash32Test {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        XXHash32 xXHash32_0 = new XXHash32(97);
-        assertEquals(3659767818L, xXHash32_0.getValue());
+    /**
+     * Tests that creating an XXHash32 instance with a specific seed and without
+     * updating it with any data produces the correct, pre-calculated initial hash value.
+     */
+    @Test
+    public void shouldReturnInitialHashValueForGivenSeed() {
+        // Arrange
+        final int seed = 97;
+        // This is the known, pre-calculated xxHash32 value for an empty input with seed 97.
+        final long expectedHash = 3659767818L;
+        final XXHash32 xxHash = new XXHash32(seed);
+
+        // Act
+        final long actualHash = xxHash.getValue();
+
+        // Assert
+        assertEquals(expectedHash, actualHash);
     }
 }
