@@ -1,18 +1,24 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class Years_ESTestTest5 extends Years_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Years} class.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Years years0 = Years.THREE;
-        Years years1 = years0.plus((Years) null);
-        assertSame(years1, years0);
+    @Test
+    public void plus_givenNullYears_shouldReturnSameInstance() {
+        // Arrange
+        Years threeYears = Years.THREE;
+
+        // Act
+        // According to the Javadoc, adding a null period is a no-op.
+        Years result = threeYears.plus((Years) null);
+
+        // Assert
+        // The method should return the exact same instance, not just an equal one.
+        assertSame("Adding null should return the same instance", threeYears, result);
     }
 }
