@@ -1,25 +1,38 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.nio.charset.StandardCharsets;
+import static org.junit.Assert.assertArrayEquals;
 
-public class QuotedPrintableCodec_ESTestTest58 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * This test class contains improved tests for the QuotedPrintableCodec.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test57() throws Throwable {
-        byte[] byteArray0 = new byte[9];
-        byteArray0[6] = (byte) 9;
-        byte[] byteArray1 = QuotedPrintableCodec.encodeQuotedPrintable((BitSet) null, byteArray0, true);
-        assertNotNull(byteArray1);
-        assertEquals(25, byteArray1.length);
+    /**
+     * Tests that the strict encoding mode correctly escapes non-printable characters (like null bytes)
+     * and whitespace characters (like TAB). In strict mode, both are expected to be encoded
+     * into their "=HH" hexadecimal representation.
+     */
+    @Test
+    public void encodeQuotedPrintableInStrictModeShouldEscapeNonPrintableAndWhitespaceChars() {
+        // Arrange
+        // An input byte array containing non-printable null bytes and a TAB character.
+        final byte[] plainBytes = {0, 0, 0, 0, 0, 0, '\t', 0, 0};
+
+        // In strict Quoted-Printable encoding, non-printable characters and special whitespace
+        // like TAB are escaped with an '=' followed by their two-digit hex value.
+        // 0x00 -> "=00"
+        // 0x09 (TAB) -> "=09"
+        final byte[] expectedEncodedBytes = "=00=00=00=00=00=00=09=00=00".getBytes(StandardCharsets.US_ASCII);
+
+        // Act
+        // Encode the byte array using the strict Quoted-Printable rules.
+        // Passing null for the BitSet uses the default set of printable characters.
+        final byte[] actualEncodedBytes = QuotedPrintableCodec.encodeQuotedPrintable(null, plainBytes, true);
+
+        // Assert
+        // Verify that the actual encoded output matches the expected byte sequence exactly.
+        assertArrayEquals(expectedEncodedBytes, actualEncodedBytes);
     }
 }
