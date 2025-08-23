@@ -1,39 +1,42 @@
 package org.apache.commons.codec.net;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CharEncoding;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
 import org.junit.jupiter.api.Test;
 
-public class QuotedPrintableCodecTestTest6 {
+/**
+ * Tests for the QuotedPrintableCodec class.
+ */
+class QuotedPrintableCodecTest {
 
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
-
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
-
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
-    }
-
+    /**
+     * Tests that the {@link QuotedPrintableCodec#encode(String)} method correctly uses the
+     * default charset provided in the constructor.
+     * <p>
+     * This is verified by comparing its output to the result of the
+     * {@link QuotedPrintableCodec#encode(String, String)} method, where the same charset
+     * is passed explicitly.
+     * </p>
+     */
     @Test
-    void testDefaultEncoding() throws Exception {
-        final String plain = "Hello there!";
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec("UnicodeBig");
-        // To work around a weird quirk in Java 1.2.2
-        qpcodec.encode(plain);
-        final String encoded1 = qpcodec.encode(plain, "UnicodeBig");
-        final String encoded2 = qpcodec.encode(plain);
-        assertEquals(encoded1, encoded2);
+    void encodeShouldUseDefaultCharsetSpecifiedInConstructor() {
+        // Arrange
+        final String plainText = "Hello there!";
+        final String charsetName = StandardCharsets.UTF_16BE.name(); // "UnicodeBig"
+
+        // Instantiate the codec with a specific default charset.
+        final QuotedPrintableCodec codec = new QuotedPrintableCodec(charsetName);
+
+        // Act
+        // 1. Encode the string using the overload that relies on the codec's default charset.
+        final String encodedWithDefaultCharset = codec.encode(plainText);
+
+        // 2. Encode the same string, but explicitly provide the charset name.
+        final String encodedWithExplicitCharset = codec.encode(plainText, charsetName);
+
+        // Assert
+        // The results must be identical, confirming that the constructor correctly set the default charset.
+        assertEquals(encodedWithExplicitCharset, encodedWithDefaultCharset);
     }
 }
