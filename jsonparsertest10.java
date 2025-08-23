@@ -1,40 +1,56 @@
 package com.google.gson;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
-import com.google.gson.common.TestTypes.BagOfPrimitives;
-import com.google.gson.internal.Streams;
+
 import com.google.gson.stream.JsonReader;
-import java.io.CharArrayReader;
-import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import org.junit.Test;
 
-public class JsonParserTestTest10 {
+/**
+ * Tests for {@link JsonParser}.
+ */
+public class JsonParserTest {
+
+    private static final int DEEP_NESTING_DEPTH = 10_000;
+    private static final String NESTED_OBJECT_KEY = "a";
 
     /**
-     * Deeply nested JSON objects should not cause {@link StackOverflowError}
+     * Deeply nested JSON objects should not cause {@link StackOverflowError}.
      */
     @Test
-    public void testParseDeeplyNestedObjects() throws IOException {
-        int times = 10000;
-        // {"a":{"a": ... {"a":null} ... }}
-        String json = "{\"a\":".repeat(times) + "null" + "}".repeat(times);
+    public void parseReader_withDeeplyNestedObject_doesNotCauseStackOverflow() throws IOException {
+        // Arrange
+        // Create a deeply nested JSON string: {"a":{"a":...{"a":null}...}}
+        String json = "{\"" + NESTED_OBJECT_KEY + "\":".repeat(DEEP_NESTING_DEPTH)
+            + "null"
+            + "}".repeat(DEEP_NESTING_DEPTH);
+
         JsonReader jsonReader = new JsonReader(new StringReader(json));
+        // Increase the nesting limit to avoid a JsonIOException.
+        // The goal is to test for a potential StackOverflowError, not the nesting limit feature.
         jsonReader.setNestingLimit(Integer.MAX_VALUE);
-        int actualTimes = 0;
-        JsonObject current = JsonParser.parseReader(jsonReader).getAsJsonObject();
+
+        // Act
+        JsonElement rootElement = JsonParser.parseReader(jsonReader);
+
+        // Assert
+        // Traverse the parsed structure to verify its depth and integrity.
+        int actualNestingDepth = 0;
+        JsonObject currentObject = rootElement.getAsJsonObject();
+
         while (true) {
-            assertThat(current.size()).isEqualTo(1);
-            actualTimes++;
-            JsonElement next = current.get("a");
-            if (next.isJsonNull()) {
-                break;
+            assertThat(currentObject.size()).isEqualTo(1);
+            actualNestingDepth++;
+
+            JsonElement nextElement = currentObject.get(NESTED_OBJECT_KEY);
+            if (nextElement.isJsonNull()) {
+                break; // Reached the innermost value
             } else {
-                current = next.getAsJsonObject();
+                currentObject = nextElement.getAsJsonObject();
             }
         }
-        assertThat(actualTimes).isEqualTo(times);
+
+        assertThat(actualNestingDepth).isEqualTo(DEEP_NESTING_DEPTH);
     }
 }
