@@ -1,25 +1,32 @@
 package org.joda.time;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 
-public class Minutes_ESTestTest36 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        // Undeclared exception!
-        try {
-            Minutes.minutesBetween((ReadablePartial) null, (ReadablePartial) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // ReadablePartial objects must not be null
-            //
-            verifyException("org.joda.time.base.BaseSingleFieldPeriod", e);
-        }
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    /**
+     * Tests that minutesBetween() throws an exception when both start and end partials are null.
+     * The method must not accept null arguments.
+     */
+    @Test
+    public void minutesBetween_withNullReadablePartials_throwsIllegalArgumentException() {
+        // Arrange: Define the expected exception and its message.
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("ReadablePartial objects must not be null");
+
+        // Act: Call the method with null arguments, which should trigger the exception.
+        // The explicit cast is necessary to resolve ambiguity between method overloads.
+        Minutes.minutesBetween((ReadablePartial) null, (ReadablePartial) null);
+
+        // Assert: The ExpectedException rule handles the assertion. If the correct
+        // exception is not thrown, the test will fail automatically.
     }
 }
