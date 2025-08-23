@@ -1,29 +1,35 @@
 package org.apache.commons.compress.harmony.unpack200;
 
+import org.apache.commons.compress.harmony.pack200.Pack200Exception;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ClassFileEntry;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ConstantPoolEntry;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SegmentConstantPool_ESTestTest46 extends SegmentConstantPool_ESTest_scaffolding {
+/**
+ * Test suite for {@link SegmentConstantPool}.
+ */
+public class SegmentConstantPoolTest {
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-        // Undeclared exception!
-        try {
-            segmentConstantPool0.getInitMethodPoolEntry(11, 11, "o");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-        }
+    /**
+     * Verifies that calling getInitMethodPoolEntry on an instance of
+     * SegmentConstantPool created with a null CpBands dependency results
+     * in a NullPointerException.
+     *
+     * This test ensures that the method correctly handles an invalid state where
+     * its essential dependencies are not provided.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getInitMethodPoolEntryShouldThrowNPEWhenConstructedWithNullBands() throws Pack200Exception {
+        // Arrange: Create a SegmentConstantPool with a null CpBands dependency,
+        // which is an invalid state for this operation.
+        final SegmentConstantPool segmentConstantPool = new SegmentConstantPool(null);
+
+        // Act: Attempt to get an init method pool entry. This action is expected
+        // to fail immediately by throwing a NullPointerException when it tries to
+        // access the null 'bands' field.
+        final long arbitraryIndex = 11;
+        final String arbitraryClassName = "any/class/Name";
+        segmentConstantPool.getInitMethodPoolEntry(SegmentConstantPool.CP_METHOD, arbitraryIndex, arbitraryClassName);
+
+        // Assert: The test passes if a NullPointerException is thrown,
+        // which is handled by the @Test(expected=...) annotation.
     }
 }
