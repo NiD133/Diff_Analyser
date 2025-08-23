@@ -1,43 +1,35 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
+import org.w3c.dom.Document;
+
+import java.util.Collections;
 import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
-import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-public class W3CDom_ESTestTest51 extends W3CDom_ESTest_scaffolding {
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test50() throws Throwable {
-        HashMap<String, String> hashMap0 = W3CDom.OutputHtml();
-        hashMap0.put("jsoupSource", "javax.xml.xpath.XPathFactory:jsoup");
-        // Undeclared exception!
+/**
+ * Test suite for the {@link W3CDom} helper class, focusing on the asString method.
+ */
+public class W3CDomTest {
+
+    /**
+     * Verifies that W3CDom.asString() throws an IllegalArgumentException
+     * when the provided W3C Document is null.
+     */
+    @Test
+    public void asStringShouldThrowExceptionForNullDocument() {
+        // Arrange: Define the invalid input for the method under test.
+        Document nullDocument = null;
+        Map<String, String> properties = Collections.emptyMap(); // Properties are not relevant for this test.
+
+        // Act & Assert: Call the method and verify that it throws the expected exception.
         try {
-            W3CDom.asString((org.w3c.dom.Document) null, (Map<String, String>) hashMap0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
+            W3CDom.asString(nullDocument, properties);
+            fail("Expected an IllegalArgumentException to be thrown for a null document input.");
+        } catch (IllegalArgumentException expected) {
+            // This is the correct behavior, so the test passes.
+            // The exception is caught and the test completes successfully.
         }
     }
 }
