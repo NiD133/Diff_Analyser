@@ -1,38 +1,36 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class SecondsTestTest13 extends TestCase {
+/**
+ * Test cases for the {@link Seconds#toString()} method.
+ */
+public class SecondsTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    @Test
+    public void toString_shouldReturnISO8601FormatForPositiveValue() {
+        // Arrange
+        Seconds twentySeconds = Seconds.seconds(20);
+        String expected = "PT20S";
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // Act
+        String actual = twentySeconds.toString();
+
+        // Assert
+        assertEquals("The string format for positive seconds should be 'PTnS'.", expected, actual);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestSeconds.class);
-    }
+    @Test
+    public void toString_shouldReturnISO8601FormatForNegativeValue() {
+        // Arrange
+        Seconds negativeTwentySeconds = Seconds.seconds(-20);
+        String expected = "PT-20S";
 
-    @Override
-    protected void setUp() throws Exception {
-    }
+        // Act
+        String actual = negativeTwentySeconds.toString();
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    public void testToString() {
-        Seconds test = Seconds.seconds(20);
-        assertEquals("PT20S", test.toString());
-        test = Seconds.seconds(-20);
-        assertEquals("PT-20S", test.toString());
+        // Assert
+        assertEquals("The string format for negative seconds should be 'PT-nS'.", expected, actual);
     }
 }
