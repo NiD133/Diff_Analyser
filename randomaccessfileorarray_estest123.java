@@ -1,41 +1,34 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest123 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test122() throws Throwable {
-        byte[] byteArray0 = new byte[5];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.pushBack((byte) 127);
-        // Undeclared exception!
-        try {
-            randomAccessFileOrArray0.read(byteArray0, (int) (byte) 127, (int) (byte) 127);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that the read(byte[], int, int) method throws an ArrayIndexOutOfBoundsException
+     * when the provided offset is outside the bounds of the destination buffer.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void read_shouldThrowException_whenOffsetIsOutOfBounds() throws IOException {
+        // Arrange
+        // The content of the source data is irrelevant for this test.
+        byte[] sourceData = new byte[10];
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray(sourceData);
+
+        final int bufferSize = 5;
+        byte[] destinationBuffer = new byte[bufferSize];
+
+        // An offset that is clearly larger than the destination buffer's capacity.
+        final int invalidOffset = 100;
+        final int lengthToRead = 1;
+
+        // Act & Assert
+        // This call is expected to throw an ArrayIndexOutOfBoundsException because the offset
+        // is invalid for the destinationBuffer.
+        fileOrArray.read(destinationBuffer, invalidOffset, lengthToRead);
     }
 }
