@@ -1,69 +1,25 @@
 package org.apache.commons.io.input;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ObservableInputStream.Observer;
-import org.apache.commons.io.output.NullOutputStream;
-import org.apache.commons.io.test.CustomIOException;
+import org.apache.commons.io.test.MessageDigestInputStreamTest; // Assuming this utility is available
 import org.junit.jupiter.api.Test;
 
-public class ObservableInputStreamTestTest7 {
+/**
+ * Tests for {@link ObservableInputStream}, focusing on dynamic observer management.
+ */
+public class ObservableInputStreamTest {
 
-    private ObservableInputStream brokenObservableInputStream() {
-        return new ObservableInputStream(BrokenInputStream.INSTANCE);
-    }
-
-    private InputStream createInputStream() {
-        final byte[] buffer = MessageDigestInputStreamTest.generateRandomByteStream(IOUtils.DEFAULT_BUFFER_SIZE);
-        return createInputStream(new ByteArrayInputStream(buffer));
-    }
-
-    private ObservableInputStream createInputStream(final InputStream origin) {
-        return new ObservableInputStream(origin);
-    }
-
-    private void testNotificationCallbacks(final int bufferSize) throws IOException {
-        final byte[] buffer = IOUtils.byteArray();
-        final LengthObserver lengthObserver = new LengthObserver();
-        final MethodCountObserver methodCountObserver = new MethodCountObserver();
-        try (ObservableInputStream ois = new ObservableInputStream(new ByteArrayInputStream(buffer), lengthObserver, methodCountObserver)) {
-            assertEquals(IOUtils.DEFAULT_BUFFER_SIZE, IOUtils.copy(ois, NullOutputStream.INSTANCE, bufferSize));
-        }
-        assertEquals(IOUtils.DEFAULT_BUFFER_SIZE, lengthObserver.getTotal());
-        assertEquals(1, methodCountObserver.getClosedCount());
-        assertEquals(1, methodCountObserver.getFinishedCount());
-        assertEquals(0, methodCountObserver.getErrorCount());
-        assertEquals(0, methodCountObserver.getDataCount());
-        assertEquals(buffer.length / bufferSize, methodCountObserver.getDataBufferCount());
-    }
-
-    private static final class DataViewObserver extends MethodCountObserver {
-
-        private byte[] buffer;
-
+    /**
+     * A test-specific observer that counts method calls and captures the last
+     * data received from single-byte read notifications.
+     */
+    private static class DataViewObserver extends MethodCountObserver {
         private int lastValue = -1;
-
-        private int length = -1;
-
-        private int offset = -1;
-
-        @Override
-        public void data(final byte[] buffer, final int offset, final int length) throws IOException {
-            this.buffer = buffer;
-            this.offset = offset;
-            this.length = length;
-        }
 
         @Override
         public void data(final int value) throws IOException {
@@ -72,35 +28,15 @@ public class ObservableInputStreamTestTest7 {
         }
     }
 
-    private static final class LengthObserver extends Observer {
-
-        private long total;
-
-        @Override
-        public void data(final byte[] buffer, final int offset, final int length) throws IOException {
-            this.total += length;
-        }
-
-        @Override
-        public void data(final int value) throws IOException {
-            total++;
-        }
-
-        public long getTotal() {
-            return total;
-        }
-    }
-
+    /**
+     * A base observer for testing purposes that counts the number of times each
+     * callback method is invoked.
+     */
     private static class MethodCountObserver extends Observer {
-
         private long closedCount;
-
         private long dataBufferCount;
-
         private long dataCount;
-
         private long errorCount;
-
         private long finishedCount;
 
         @Override
@@ -132,51 +68,52 @@ public class ObservableInputStreamTestTest7 {
             return closedCount;
         }
 
-        public long getDataBufferCount() {
-            return dataBufferCount;
-        }
-
-        public long getDataCount() {
-            return dataCount;
-        }
-
-        public long getErrorCount() {
-            return errorCount;
-        }
-
         public long getFinishedCount() {
             return finishedCount;
         }
     }
 
     /**
-     * Tests that {@link Observer#data(int)} is called.
+     * Tests that an observer added after reading has started is only notified for
+     * subsequent reads.
      */
     @Test
-    void testDataByteCalled_add() throws Exception {
-        final byte[] buffer = MessageDigestInputStreamTest.generateRandomByteStream(IOUtils.DEFAULT_BUFFER_SIZE);
-        final DataViewObserver lko = new DataViewObserver();
-        try (ObservableInputStream ois = new ObservableInputStream(new ByteArrayInputStream(buffer))) {
-            assertEquals(-1, lko.lastValue);
+    void observerAddedMidStreamReceivesNotificationsForSubsequentReads() throws Exception {
+        // Arrange: Set up test data, an observer, and the observable stream.
+        final byte[] testData = MessageDigestInputStreamTest.generateRandomByteStream(IOUtils.DEFAULT_BUFFER_SIZE);
+        final DataViewObserver dataObserver = new DataViewObserver();
+
+        try (final ObservableInputStream ois = new ObservableInputStream(new ByteArrayInputStream(testData))) {
+            // Act & Assert: Read one byte before adding the observer to ensure it's not notified.
             ois.read();
-            assertEquals(-1, lko.lastValue);
-            assertEquals(0, lko.getFinishedCount());
-            assertEquals(0, lko.getClosedCount());
-            ois.add(lko);
-            for (int i = 1; i < buffer.length; i++) {
+            assertEquals(-1, dataObserver.lastValue, "Observer should not be notified before it is added.");
+
+            // Act: Add the observer mid-stream.
+            ois.add(dataObserver);
+
+            // Act & Assert: Read the rest of the stream byte by byte.
+            // Start from the second byte (index 1) since the first was already read.
+            for (int i = 1; i < testData.length; i++) {
                 final int result = ois.read();
-                assertEquals((byte) result, buffer[i]);
-                assertEquals(result, lko.lastValue);
-                assertEquals(0, lko.getFinishedCount());
-                assertEquals(0, lko.getClosedCount());
+
+                // Assert that the stream returns the correct byte.
+                assertEquals(testData[i], (byte) result, "Stream should return the correct byte.");
+                // Assert that the observer was notified with the same byte.
+                assertEquals(result, dataObserver.lastValue, "Observer should be notified with the value read.");
+                // Assert that the stream has not yet finished or closed.
+                assertEquals(0, dataObserver.getFinishedCount(), "finished() should not be called before EOF.");
+                assertEquals(0, dataObserver.getClosedCount(), "closed() should not be called before close().");
             }
-            final int result = ois.read();
-            assertEquals(-1, result);
-            assertEquals(1, lko.getFinishedCount());
-            assertEquals(0, lko.getClosedCount());
-            ois.close();
-            assertEquals(1, lko.getFinishedCount());
-            assertEquals(1, lko.getClosedCount());
-        }
+
+            // Act & Assert: Read at the end of the stream to trigger the 'finished' notification.
+            final int eofResult = ois.read();
+            assertEquals(-1, eofResult, "Stream should return EOF (-1) at the end.");
+            assertEquals(1, dataObserver.getFinishedCount(), "finished() should be called once at EOF.");
+            assertEquals(0, dataObserver.getClosedCount(), "closed() should not be called yet.");
+        } // The stream is automatically closed here by the try-with-resources block.
+
+        // Assert: Verify the 'closed' notification was sent after the stream was closed.
+        assertEquals(1, dataObserver.getFinishedCount(), "finished() count should remain 1 after close.");
+        assertEquals(1, dataObserver.getClosedCount(), "closed() should be called once after close().");
     }
 }
