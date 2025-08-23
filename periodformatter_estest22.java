@@ -1,43 +1,31 @@
 package org.joda.time.format;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.LinkedList;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Duration;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadablePeriod;
-import org.joda.time.Seconds;
-import org.joda.time.Weeks;
-import org.joda.time.Years;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class PeriodFormatter_ESTestTest22 extends PeriodFormatter_ESTest_scaffolding {
+/**
+ * Unit tests for {@link PeriodFormatter}.
+ */
+public class PeriodFormatterTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        PeriodFormatter periodFormatter0 = new PeriodFormatter((PeriodPrinter) null, (PeriodParser) null);
-        // Undeclared exception!
+    /**
+     * Tests that calling parsePeriod on a formatter without a parser
+     * throws an UnsupportedOperationException.
+     */
+    @Test
+    public void parsePeriod_shouldThrowUnsupportedOperationException_whenParsingIsNotSupported() {
+        // Arrange: Create a formatter that is configured without a parser.
+        // Such a formatter is not capable of parsing strings.
+        PeriodFormatter formatter = new PeriodFormatter(null, null);
+
+        // Act & Assert
         try {
-            periodFormatter0.parsePeriod("year");
-            fail("Expecting exception: UnsupportedOperationException");
+            formatter.parsePeriod("any string");
+            fail("Expected an UnsupportedOperationException to be thrown.");
         } catch (UnsupportedOperationException e) {
-            //
-            // Parsing not supported
-            //
-            verifyException("org.joda.time.format.PeriodFormatter", e);
+            // Verify that the correct exception was thrown with the expected message.
+            assertEquals("Parsing not supported", e.getMessage());
         }
     }
 }
