@@ -1,19 +1,24 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Seconds_ESTestTest27 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        Seconds seconds0 = Seconds.seconds(1804);
-        Seconds seconds1 = seconds0.dividedBy(1804);
-        assertEquals(1804, seconds0.getSeconds());
-        assertEquals(1, seconds1.getSeconds());
+    @Test
+    public void dividedBy_whenDividingByPositiveInteger_returnsCorrectQuotient() {
+        // Arrange: Create a Seconds object to act as the dividend.
+        Seconds initialSeconds = Seconds.seconds(1804);
+        int divisor = 1804;
+
+        // Act: Perform the division.
+        Seconds result = initialSeconds.dividedBy(divisor);
+
+        // Assert: Verify that the result is the expected quotient.
+        int expectedSeconds = 1;
+        assertEquals(expectedSeconds, result.getSeconds());
     }
 }
