@@ -1,35 +1,33 @@
 package org.apache.commons.collections4.comparators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
-import java.util.BitSet;
 import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class ComparatorChain_ESTestTest23 extends ComparatorChain_ESTest_scaffolding {
+/**
+ * Tests for {@link ComparatorChain}.
+ * This class focuses on improving the understandability of a specific test case.
+ */
+public class ComparatorChainTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        ComparatorChain<Object> comparatorChain0 = new ComparatorChain<Object>();
-        Comparator<ComparatorChain<Object>> comparator0 = Comparator.nullsFirst((Comparator<? super ComparatorChain<Object>>) comparatorChain0);
-        ComparatorChain<ComparatorChain<Object>> comparatorChain1 = new ComparatorChain<ComparatorChain<Object>>(comparator0);
-        comparatorChain1.setComparator(0, comparator0);
-        assertEquals(1, comparatorChain1.size());
+    /**
+     * Tests that setComparator() replaces an existing comparator at a given index
+     * without changing the size of the chain.
+     */
+    @Test
+    public void setComparatorShouldReplaceElementWithoutChangingChainSize() {
+        // Arrange: Create a ComparatorChain with a single, initial comparator.
+        final Comparator<String> initialComparator = Comparator.naturalOrder();
+        final ComparatorChain<String> chain = new ComparatorChain<>(initialComparator);
+        assertEquals("Pre-condition: chain should have one comparator", 1, chain.size());
+
+        // Define a new comparator to replace the initial one.
+        final Comparator<String> newComparator = Comparator.reverseOrder();
+
+        // Act: Replace the comparator at index 0.
+        chain.setComparator(0, newComparator);
+
+        // Assert: The size of the chain should remain unchanged after the replacement.
+        assertEquals("Post-condition: chain size should still be 1", 1, chain.size());
     }
 }
