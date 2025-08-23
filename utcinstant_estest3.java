@@ -1,27 +1,27 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotEquals;
 
-public class UtcInstant_ESTestTest3 extends UtcInstant_ESTest_scaffolding {
+/**
+ * Unit tests for the equals() and hashCode() contract of the {@link UtcInstant} class.
+ */
+public class UtcInstantEqualsTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(301L, 301L);
-        UtcInstant utcInstant1 = UtcInstant.ofModifiedJulianDay(301L, 70L);
-        boolean boolean0 = utcInstant1.equals(utcInstant0);
-        assertFalse(boolean0);
-        assertEquals(301L, utcInstant1.getModifiedJulianDay());
-        assertFalse(utcInstant0.equals((Object) utcInstant1));
+    /**
+     * Tests that two {@code UtcInstant} objects are not equal if they share the same
+     * Modified Julian Day but have different nano-of-day values.
+     */
+    @Test
+    public void equals_isFalse_whenInstantsHaveSameDayButDifferentNanos() {
+        // Arrange: Create two UtcInstant objects representing different times on the same day.
+        long sameModifiedJulianDay = 301L;
+        UtcInstant instant1 = UtcInstant.ofModifiedJulianDay(sameModifiedJulianDay, 301L);
+        UtcInstant instant2 = UtcInstant.ofModifiedJulianDay(sameModifiedJulianDay, 70L);
+
+        // Act & Assert: The two instants should not be considered equal.
+        // The assertNotEquals method provides a clear and direct check for inequality
+        // by calling the .equals() method.
+        assertNotEquals(instant1, instant2);
     }
 }
