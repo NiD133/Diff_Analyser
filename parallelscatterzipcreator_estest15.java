@@ -1,39 +1,54 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.net.URI;
-import java.nio.file.Path;
+
+import java.io.ByteArrayOutputStream;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import org.apache.commons.compress.archivers.jar.JarArchiveEntry;
-import org.apache.commons.compress.parallel.InputStreamSupplier;
-import org.apache.commons.compress.parallel.ScatterGatherBackingStoreSupplier;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.net.MockURI;
-import org.junit.runner.RunWith;
 
-public class ParallelScatterZipCreator_ESTestTest15 extends ParallelScatterZipCreator_ESTest_scaffolding {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        ForkJoinPool forkJoinPool0 = ForkJoinPool.commonPool();
-        ParallelScatterZipCreator parallelScatterZipCreator0 = new ParallelScatterZipCreator(forkJoinPool0);
-        parallelScatterZipCreator0.submit((Callable<?>) null);
-        ZipArchiveEntry zipArchiveEntry0 = new ZipArchiveEntry();
-        assertEquals((-1L), zipArchiveEntry0.getLocalHeaderOffset());
+/**
+ * Contains tests for {@link ParallelScatterZipCreator}.
+ */
+public class ParallelScatterZipCreatorTest {
+
+    /**
+     * Tests that calling writeTo() fails with an ExecutionException
+     * if a null Callable was previously submitted. The underlying cause
+     * of the failure should be a NullPointerException.
+     */
+    @Test
+    public void writeToShouldThrowExecutionExceptionWhenNullCallableWasSubmitted() {
+        // Arrange: Create a scatter creator with a dedicated executor service.
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        ParallelScatterZipCreator scatterZipCreator = new ParallelScatterZipCreator(executorService);
+
+        // Submit a null callable. The submit() method itself doesn't throw,
+        // as the task is executed asynchronously.
+        Callable<Object> nullCallable = null;
+        scatterZipCreator.submit(nullCallable);
+
+        // Act & Assert: Verify that writeTo() throws the expected exception.
+        // The exception from the background task should be wrapped in an ExecutionException.
+        ExecutionException thrown = assertThrows(ExecutionException.class, () -> {
+            // A dummy output stream is sufficient for this test.
+            try (ZipArchiveOutputStream zos = new ZipArchiveOutputStream(new ByteArrayOutputStream())) {
+                scatterZipCreator.writeTo(zos);
+            }
+        });
+
+        // Further Assert: Check the cause of the exception for correctness.
+        Throwable cause = thrown.getCause();
+        assertNotNull("ExecutionException should have a cause.", cause);
+        assertTrue("The cause of the ExecutionException should be a NullPointerException.",
+                cause instanceof NullPointerException);
+        
+        // No explicit executor shutdown is needed, as the writeTo() method
+        // guarantees it will be shut down, even if an exception occurs.
     }
 }
