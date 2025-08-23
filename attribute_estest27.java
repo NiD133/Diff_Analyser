@@ -1,36 +1,34 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Attribute_ESTestTest27 extends Attribute_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        // Undeclared exception!
-        try {
-            Attribute.createFromEncoded("", "");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // String must not be empty
-            //
-            verifyException("org.jsoup.helper.Validate", e);
-        }
+/**
+ * Test suite for the {@link Attribute} class.
+ */
+public class AttributeTest {
+
+    /**
+     * Verifies that creating an Attribute with an empty key string is disallowed.
+     * The {@link Attribute#createFromEncoded(String, String)} factory method should throw
+     * an {@link IllegalArgumentException} because attribute keys must be non-empty.
+     */
+    @Test
+    public void createFromEncodedShouldThrowExceptionForEmptyKey() {
+        // Arrange: Define an empty key, which is invalid. The value is arbitrary for this test.
+        String emptyKey = "";
+        String anyValue = "any-value";
+
+        // Act & Assert: Call the method and verify that it throws the expected exception.
+        // The `assertThrows` method is a modern, declarative way to test for exceptions.
+        IllegalArgumentException thrown = assertThrows(
+            IllegalArgumentException.class,
+            () -> Attribute.createFromEncoded(emptyKey, anyValue)
+        );
+
+        // Assert: Further verify that the exception message is correct, confirming the validation reason.
+        assertEquals("String must not be empty", thrown.getMessage());
     }
 }
