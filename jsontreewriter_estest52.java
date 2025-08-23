@@ -1,34 +1,35 @@
 package com.google.gson.internal.bind;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
+
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeWriter_ESTestTest52 extends JsonTreeWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test51() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.beginObject();
-        jsonTreeWriter0.name("");
-        // Undeclared exception!
+/**
+ * Unit tests for {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterTest {
+
+    /**
+     * Verifies that calling name() twice in a row within a JSON object is illegal.
+     * The writer expects a value to be written after a name is specified.
+     */
+    @Test
+    public void writingTwoConsecutiveNamesInObjectThrowsException() throws IOException {
+        // Arrange: Start writing a JSON object and add the first property name.
+        JsonTreeWriter jsonWriter = new JsonTreeWriter();
+        jsonWriter.beginObject();
+        jsonWriter.name("property1"); // This is a valid state.
+
+        // Act & Assert: Attempting to write a second name should fail.
         try {
-            jsonTreeWriter0.name("");
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // Did not expect a name
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+            jsonWriter.name("property2");
+            fail("Expected IllegalStateException was not thrown. A name must be followed by a value.");
+        } catch (IllegalStateException expected) {
+            // Assert that the correct exception with the expected message was thrown.
+            assertEquals("Did not expect a name", expected.getMessage());
         }
     }
 }
