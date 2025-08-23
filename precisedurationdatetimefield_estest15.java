@@ -1,41 +1,47 @@
 package org.joda.time.field;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Days;
 import org.joda.time.DurationField;
 import org.joda.time.DurationFieldType;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.Weeks;
-import org.joda.time.chrono.EthiopicChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.chrono.LenientChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.joda.time.DateTimeConstants.MILLIS_PER_DAY;
+import static org.junit.Assert.assertEquals;
+
+/**
+ * This test class focuses on the PreciseDurationDateTimeField class.
+ * The original test was auto-generated and has been refactored for clarity.
+ */
 public class PreciseDurationDateTimeField_ESTestTest15 extends PreciseDurationDateTimeField_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.dayOfWeek();
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
-        DateTimeZone dateTimeZone0 = DateTimeZone.forTimeZone((TimeZone) null);
-        ZonedChronology zonedChronology0 = ZonedChronology.getInstance(islamicChronology0, dateTimeZone0);
-        DurationField durationField0 = zonedChronology0.halfdays();
-        DurationField durationField1 = zonedChronology0.days();
-        PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, durationField0, durationField1);
-        int int0 = preciseDateTimeField0.getMinimumValue();
-        assertEquals(0, int0);
+    /**
+     * This test verifies that getMinimumValue() returns 0. This value is inherited
+     * from the parent BaseDateTimeField and is expected to be constant.
+     */
+    @Test
+    public void getMinimumValue_shouldReturnZero() {
+        // Arrange
+        // To test the inherited getMinimumValue() method, we need an instance of a concrete
+        // subclass of PreciseDurationDateTimeField. We use PreciseDateTimeField for this.
+        // Its constructor requires a type, a unit field, and a range field.
+        DateTimeFieldType fieldType = DateTimeFieldType.halfdayOfDay();
+
+        // Create a "unit" duration field representing half-days.
+        final long halfDayMillis = MILLIS_PER_DAY / 2;
+        DurationField unitField = new PreciseDurationField(DurationFieldType.halfdays(), halfDayMillis);
+
+        // Create a "range" duration field representing a full day.
+        DurationField rangeField = new PreciseDurationField(DurationFieldType.days(), MILLIS_PER_DAY);
+
+        // Instantiate the field. The specific fields chosen do not affect the outcome
+        // of getMinimumValue(), but are required for object construction.
+        PreciseDateTimeField halfdayField = new PreciseDateTimeField(fieldType, unitField, rangeField);
+
+        // Act
+        int actualMinimumValue = halfdayField.getMinimumValue();
+
+        // Assert
+        int expectedMinimumValue = 0;
+        assertEquals("The minimum value for the field should be 0.", expectedMinimumValue, actualMinimumValue);
     }
 }
