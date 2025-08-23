@@ -1,32 +1,36 @@
 package com.google.common.hash;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.fail;
 
+import java.nio.ByteBuffer;
+import org.junit.Test;
+
+// The test class name and inheritance are preserved from the original.
 public class AbstractStreamingHasher_ESTestTest4 extends AbstractStreamingHasher_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Crc32cHashFunction.Crc32cHasher crc32cHashFunction_Crc32cHasher0 = new Crc32cHashFunction.Crc32cHasher();
-        ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(2479);
-        Crc32cHashFunction.Crc32cHasher crc32cHashFunction_Crc32cHasher1 = (Crc32cHashFunction.Crc32cHasher) crc32cHashFunction_Crc32cHasher0.putBytes(byteBuffer0);
-        crc32cHashFunction_Crc32cHasher1.processRemaining(byteBuffer0);
-        // Undeclared exception!
+    /**
+     * Verifies that a hasher instance cannot be updated after its {@code hash()} method
+     * has been called. Attempting to add more data to a finalized hasher should
+     * result in an {@code IllegalStateException}.
+     */
+    @Test
+    public void updateAfterHashingThrowsIllegalStateException() {
+        // Arrange: Create a hasher and provide it with some initial data.
+        // We use Crc32cHasher as a concrete implementation of the abstract class under test.
+        Crc32cHashFunction.Crc32cHasher hasher = new Crc32cHashFunction.Crc32cHasher();
+        hasher.putBytes(ByteBuffer.allocate(16));
+
+        // Act: Compute the hash. This action finalizes the hasher's state,
+        // rendering it unusable for further updates.
+        hasher.hash();
+
+        // Assert: Verify that any subsequent attempt to add data throws an exception.
         try {
-            crc32cHashFunction_Crc32cHasher0.putShort((short) (-648));
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // The behavior of calling any method after calling hash() is undefined.
-            //
-            verifyException("com.google.common.hash.Crc32cHashFunction$Crc32cHasher", e);
+            hasher.putShort((short) 123);
+            fail("Expected an IllegalStateException because the hasher was already used.");
+        } catch (IllegalStateException expected) {
+            // This is the correct behavior. A hasher instance should not be reusable
+            // after the final hash has been computed.
         }
     }
 }
