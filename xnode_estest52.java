@@ -1,37 +1,37 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
+import java.util.Properties;
 
-public class XNode_ESTestTest52 extends XNode_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link XNode} class.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test051() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        // Undeclared exception!
-        try {
-            xNode0.getIntAttribute((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling getIntAttribute with a null attribute name
+     * throws a NullPointerException.
+     *
+     * This is the expected behavior because the underlying Properties object,
+     * which stores the node's attributes, does not permit null keys.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getIntAttributeShouldThrowNullPointerExceptionWhenNameIsNull() {
+        // Arrange: Create an XNode instance with a basic, empty DOM Node.
+        // An IIOMetadataNode is a concrete implementation of org.w3c.dom.Node.
+        Node emptyNode = new IIOMetadataNode();
+        Properties emptyVariables = new Properties();
+
+        // The XPathParser is not relevant for this specific method call, so it can be null.
+        XNode xNode = new XNode(null, emptyNode, emptyVariables);
+
+        // Act: Attempt to retrieve an integer attribute using a null name.
+        // This is expected to trigger the exception.
+        xNode.getIntAttribute(null);
+
+        // Assert: The @Test(expected) annotation asserts that a
+        // NullPointerException is thrown.
     }
 }
