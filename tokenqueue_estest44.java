@@ -1,18 +1,26 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class TokenQueue_ESTestTest44 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for the {@link TokenQueue} class.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("%>-8wJ/e4'{T9H");
-        boolean boolean0 = tokenQueue0.isEmpty();
-        assertFalse(boolean0);
+    /**
+     * Verifies that isEmpty() returns false when the queue is initialized
+     * with a non-empty string.
+     */
+    @Test
+    public void isEmptyShouldReturnFalseWhenQueueIsNotEmpty() {
+        // Arrange: Create a TokenQueue with some initial data.
+        TokenQueue queue = new TokenQueue("some data");
+
+        // Act: Check if the queue is empty.
+        boolean isEmpty = queue.isEmpty();
+
+        // Assert: The queue should not be empty.
+        assertFalse("A queue initialized with data should not be reported as empty.", isEmpty);
     }
 }
