@@ -1,17 +1,25 @@
 package org.apache.commons.lang3.math;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IEEE754rUtils_ESTestTest10 extends IEEE754rUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link IEEE754rUtils}.
+ */
+public class IEEE754rUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        double double0 = IEEE754rUtils.min(1660.66, (-567.84087), 4173.8887585);
-        assertEquals((-567.84087), double0, 0.01);
+    @Test
+    public void minWithThreeDoublesShouldReturnSmallestValue() {
+        // Arrange
+        final double a = 1660.66;
+        final double b = -567.84087; // The expected minimum
+        final double c = 4173.8887585;
+        final double expected = -567.84087;
+
+        // Act
+        final double actual = IEEE754rUtils.min(a, b, c);
+
+        // Assert
+        assertEquals(expected, actual, 0.01);
     }
 }
