@@ -1,27 +1,33 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.apache.commons.codec.EncoderException;
 
-public class RFC1522Codec_ESTestTest7 extends RFC1522Codec_ESTest_scaffolding {
+/**
+ * This test class verifies the behavior of the abstract RFC1522Codec class,
+ * specifically focusing on shared utility methods. It uses the concrete QCodec
+ * implementation to instantiate and test the abstract class's functionality.
+ */
+public class RFC1522CodecTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        QCodec qCodec0 = new QCodec();
-        // Undeclared exception!
-        try {
-            qCodec0.encodeText("{i", (Charset) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-        }
+    /**
+     * Tests that the encodeText method throws a NullPointerException when the
+     * provided Charset is null. The RFC 1522 encoding process requires a
+     * non-null character set to correctly encode the text.
+     *
+     * @throws EncoderException This is a declared exception for the encodeText method,
+     *                          but a NullPointerException is expected in this specific test case.
+     */
+    @Test(expected = NullPointerException.class)
+    public void encodeTextShouldThrowNullPointerExceptionForNullCharset() throws EncoderException {
+        // Arrange: Create an instance of a concrete RFC1522Codec implementation.
+        // The text content is irrelevant for this test.
+        final QCodec qCodec = new QCodec();
+        final String textToEncode = "any text";
+
+        // Act & Assert: Call the method with a null Charset.
+        // The @Test(expected) annotation asserts that a NullPointerException is thrown.
+        qCodec.encodeText(textToEncode, (Charset) null);
     }
 }
