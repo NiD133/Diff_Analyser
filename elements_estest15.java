@@ -1,36 +1,35 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest15 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test014() throws Throwable {
-        Document document0 = new Document("]RCd 5P[V");
-        Elements elements0 = document0.getAllElements();
-        Elements elements1 = elements0.select(" H-zp5");
-        assertEquals(0, elements1.size());
+/**
+ * Test suite for the {@link Elements} class, focusing on the select method.
+ */
+public class ElementsSelectTest {
+
+    /**
+     * Verifies that calling .select() on an Elements object with a query that matches nothing
+     * returns an empty Elements collection, rather than null or throwing an error.
+     */
+    @Test
+    public void selectWithNonMatchingQueryReturnsEmptyElements() {
+        // Arrange: Create a basic document and get a collection of its elements.
+        Document doc = Document.createShell(""); // Creates <html><head></head><body></body></html>
+        Elements elements = doc.getAllElements();
+        String nonExistentSelector = ".non-existent-class";
+
+        // Act: Perform a select operation with a CSS selector that is guaranteed not to match.
+        Elements result = elements.select(nonExistentSelector);
+
+        // Assert: The resulting collection should be empty but not null.
+        assertNotNull("The select method should not return null for a non-matching query.", result);
+        assertTrue(
+            "Expected an empty Elements collection for a non-matching selector, but it was not.",
+            result.isEmpty()
+        );
     }
 }
