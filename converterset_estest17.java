@@ -1,34 +1,38 @@
 package org.joda.time.convert;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Hours;
-import org.joda.time.Interval;
 import org.joda.time.MutablePeriod;
 import org.joda.time.PeriodType;
-import org.joda.time.Seconds;
-import org.joda.time.chrono.CopticChronology;
-import org.junit.runner.RunWith;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
-public class ConverterSet_ESTestTest17 extends ConverterSet_ESTest_scaffolding {
+import static org.hamcrest.CoreMatchers.is;
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Hours hours0 = Hours.ONE;
-        Seconds seconds0 = hours0.toStandardSeconds();
-        PeriodType periodType0 = seconds0.getPeriodType();
-        MutablePeriod mutablePeriod0 = null;
-        try {
-            mutablePeriod0 = new MutablePeriod(periodType0, periodType0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // No period converter found for type: org.joda.time.PeriodType
-            //
-            verifyException("org.joda.time.convert.ConverterManager", e);
-        }
+/**
+ * This test verifies the behavior of the period conversion system when an unsupported
+ * object type is used to construct a period.
+ */
+public class PeriodConverterTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    /**
+     * Tests that creating a MutablePeriod from a PeriodType object fails because
+     * there is no registered converter that can handle this conversion.
+     */
+    @Test
+    public void constructorShouldThrowExceptionForUnsupportedPeriodSourceType() {
+        // Arrange: A PeriodType object is not a supported source for creating a Period.
+        // The internal ConverterManager is expected to fail when searching for a suitable converter.
+        final PeriodType unsupportedSourceType = PeriodType.seconds();
+
+        // Assert: Configure the expected exception and its message.
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(is("No period converter found for type: org.joda.time.PeriodType"));
+
+        // Act: Attempt to create a MutablePeriod using the unsupported source type.
+        // This call is expected to throw the configured exception.
+        new MutablePeriod(unsupportedSourceType, PeriodType.standard());
     }
 }
