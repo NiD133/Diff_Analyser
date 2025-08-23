@@ -1,29 +1,29 @@
 package org.apache.ibatis.type;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import java.sql.Array;
-import java.sql.Connection;
+
+import java.sql.SQLException;
 import java.sql.Types;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 
-public class ArrayTypeHandlerTestTest3 extends BaseTypeHandlerTest {
+/**
+ * Tests for {@link ArrayTypeHandler}.
+ * This test focuses on the handling of null parameters.
+ */
+class ArrayTypeHandlerTest extends BaseTypeHandlerTest {
 
-    private static final TypeHandler<Object> TYPE_HANDLER = new ArrayTypeHandler();
+  private static final TypeHandler<Object> TYPE_HANDLER = new ArrayTypeHandler();
 
-    @Mock
-    Array mockArray;
+  @Test
+  void shouldSetNullOnPreparedStatementWhenParameterIsNull() throws SQLException {
+    // Arrange: The PreparedStatement 'ps' is a mock provided by the BaseTypeHandlerTest superclass.
+    // The parameter to be set is null, which is the scenario under test.
 
-    @Test
-    void shouldSetNullParameter() throws Exception {
-        TYPE_HANDLER.setParameter(ps, 1, null, JdbcType.ARRAY);
-        verify(ps).setNull(1, Types.ARRAY);
-    }
+    // Act: Call the setParameter method with a null value.
+    TYPE_HANDLER.setParameter(ps, 1, null, JdbcType.ARRAY);
+
+    // Assert: Verify that the type handler correctly calls setNull on the PreparedStatement.
+    // The call should use the correct parameter index and the expected JDBC type.
+    verify(ps).setNull(1, Types.ARRAY);
+  }
 }
