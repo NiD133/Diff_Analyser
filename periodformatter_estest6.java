@@ -2,38 +2,43 @@ package org.joda.time.format;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.LinkedList;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Duration;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
 import org.joda.time.MutablePeriod;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadablePeriod;
-import org.joda.time.Seconds;
 import org.joda.time.Weeks;
-import org.joda.time.Years;
-import org.junit.runner.RunWith;
 
 public class PeriodFormatter_ESTestTest6 extends PeriodFormatter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        PeriodFormatterBuilder.Literal periodFormatterBuilder_Literal0 = PeriodFormatterBuilder.Literal.EMPTY;
-        PeriodFormatter periodFormatter0 = new PeriodFormatter(periodFormatterBuilder_Literal0, periodFormatterBuilder_Literal0);
-        Weeks weeks0 = Weeks.weeks(1);
-        Minutes minutes0 = weeks0.toStandardMinutes();
-        MutablePeriod mutablePeriod0 = minutes0.toMutablePeriod();
-        int int0 = periodFormatter0.parseInto(mutablePeriod0, "/M:TICzBQXt^", 0);
-        assertEquals(0, int0);
+    /**
+     * Tests that parsing with a formatter that expects an empty string
+     * succeeds immediately without consuming any characters or modifying the period.
+     */
+    @Test
+    public void parseIntoWithEmptyFormatterShouldSucceedAndReturnInitialPosition() {
+        // Arrange
+        // An "empty" formatter is created using an empty literal. This formatter
+        // is expected to parse nothing and succeed immediately at any position.
+        PeriodFormatter emptyFormatter = new PeriodFormatter(
+                PeriodFormatterBuilder.Literal.EMPTY, 
+                PeriodFormatterBuilder.Literal.EMPTY
+        );
+
+        MutablePeriod period = new MutablePeriod(Weeks.ONE);
+        MutablePeriod originalPeriod = period.copy(); // Create a copy to verify it's not modified.
+
+        String anyText = "P1W";
+        int initialPosition = 0;
+
+        // Act
+        // Attempt to parse the string. Since the formatter is empty, it should "match"
+        // an empty string at the initial position and not advance.
+        int newPosition = emptyFormatter.parseInto(period, anyText, initialPosition);
+
+        // Assert
+        // The parse should succeed, returning the initial position as no characters were consumed.
+        assertEquals("The new position should be the same as the initial position", 
+                     initialPosition, newPosition);
+
+        // The period object should remain unchanged by the parse operation.
+        assertEquals("The period object should not be modified", 
+                     originalPeriod, period);
     }
 }
