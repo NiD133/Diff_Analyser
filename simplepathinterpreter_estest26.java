@@ -1,63 +1,53 @@
 package org.apache.commons.jxpath.ri.axes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.apache.commons.jxpath.BasicVariables;
-import org.apache.commons.jxpath.JXPathBasicBeanInfo;
-import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
+import org.apache.commons.jxpath.ri.Compiler;
 import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.compiler.Constant;
-import org.apache.commons.jxpath.ri.compiler.CoreFunction;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationAnd;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationGreaterThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationLessThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMod;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMultiply;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNegate;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNotEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationOr;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationSubtract;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationUnion;
-import org.apache.commons.jxpath.ri.compiler.Expression;
-import org.apache.commons.jxpath.ri.compiler.NameAttributeTest;
 import org.apache.commons.jxpath.ri.compiler.NodeNameTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTypeTest;
-import org.apache.commons.jxpath.ri.compiler.ProcessingInstructionTest;
 import org.apache.commons.jxpath.ri.compiler.Step;
-import org.apache.commons.jxpath.ri.compiler.VariableReference;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPropertyPointer;
 import org.apache.commons.jxpath.ri.model.beans.NullPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPropertyPointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.util.Locale;
+
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+
+/*
+ * Note: The original test class structure, including its name and parent class,
+ * has been preserved as it may be part of a larger, auto-generated test suite.
+ * The focus of the improvement is on the test case itself.
+ */
 public class SimplePathInterpreter_ESTestTest26 extends SimplePathInterpreter_ESTest_scaffolding {
 
+    /**
+     * Tests that interpretSimpleLocationPath returns null for a path containing a non-child axis.
+     * <p>
+     * The {@link SimplePathInterpreter} is an optimization for simple paths consisting
+     * exclusively of 'child::' axes. This test verifies that when it encounters a
+     * different axis, such as 'attribute::', it correctly abstains from processing
+     * by returning null, signaling that a more general interpreter should be used.
+     */
     @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        Locale locale0 = Locale.JAPANESE;
-        NullPointer nullPointer0 = new NullPointer(locale0, "");
-        QName qName0 = new QName("", "");
-        Step[] stepArray0 = new Step[2];
-        NodeNameTest nodeNameTest0 = new NodeNameTest(qName0, "<<unknown namespace>>");
-        Step step0 = mock(Step.class, new ViolatedAssumptionAnswer());
-        doReturn(5).when(step0).getAxis();
-        doReturn(nodeNameTest0).when(step0).getNodeTest();
-        doReturn((Expression[]) null).when(step0).getPredicates();
-        stepArray0[0] = step0;
-        NodePointer nodePointer0 = SimplePathInterpreter.interpretSimpleLocationPath((EvalContext) null, nullPointer0, stepArray0);
-        assertNull(nodePointer0);
+    public void interpretSimpleLocationPathShouldReturnNullForNonChildAxis() {
+        // ARRANGE
+        // Create a mock Step representing an 'attribute::' axis, which the simple
+        // interpreter is not designed to handle.
+        Step attributeStep = mock(Step.class);
+        doReturn(Compiler.AXIS_ATTRIBUTE).when(attributeStep).getAxis();
+        doReturn(new NodeNameTest(new QName(null, "anyAttribute"))).when(attributeStep).getNodeTest();
+        doReturn(null).when(attributeStep).getPredicates();
+
+        Step[] steps = {attributeStep};
+        NodePointer rootPointer = new NullPointer(Locale.JAPANESE, "root");
+
+        // ACT
+        // Attempt to interpret the path. The EvalContext is null because it's not
+        // needed for the interpreter to identify the unsupported axis.
+        NodePointer resultPointer = SimplePathInterpreter.interpretSimpleLocationPath(null, rootPointer, steps);
+
+        // ASSERT
+        assertNull("Interpreter should return null for paths with non-child axes.", resultPointer);
     }
 }
