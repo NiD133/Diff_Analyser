@@ -1,36 +1,35 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest14 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test013() throws Throwable {
-        Document document0 = new Document("b*LY=0yr*g]q30");
-        Elements elements0 = document0.getAllElements();
-        Element element0 = elements0.selectFirst("Bb,76");
-        assertNull(element0);
+/**
+ * Test suite for the {@link Elements} class.
+ */
+public class ElementsTest {
+
+    /**
+     * Verifies that {@link Elements#selectFirst(String)} returns null
+     * when the CSS selector does not match any element in the collection.
+     */
+    @Test
+    public void selectFirstShouldReturnNullForNonMatchingSelector() {
+        // Arrange: Create a collection of elements from a sample HTML structure.
+        String html = "<div><p>An element</p></div><span>Another element</span>";
+        Document doc = Jsoup.parse(html);
+        Elements elements = doc.getAllElements(); // Contains html, head, body, div, p, span
+
+        // A CSS selector that is guaranteed not to match anything in the HTML above.
+        String nonMatchingSelector = "a.non-existent-class";
+
+        // Act: Attempt to find an element using the non-matching selector.
+        Element foundElement = elements.selectFirst(nonMatchingSelector);
+
+        // Assert: Verify that no element was found.
+        assertNull("selectFirst should return null when no element matches the selector.", foundElement);
     }
 }
