@@ -1,39 +1,39 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class WeeksTestTest11 extends TestCase {
+import org.junit.Test;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Unit tests for the {@link Weeks#isGreaterThan(Weeks)} method.
+ */
+public class WeeksIsGreaterThanTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void isGreaterThan_shouldReturnTrue_whenThisInstanceIsLarger() {
+        assertTrue("3 weeks should be greater than 2 weeks", Weeks.THREE.isGreaterThan(Weeks.TWO));
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestWeeks.class);
+    @Test
+    public void isGreaterThan_shouldReturnFalse_whenThisInstanceIsSmaller() {
+        assertFalse("2 weeks should not be greater than 3 weeks", Weeks.TWO.isGreaterThan(Weeks.THREE));
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void isGreaterThan_shouldReturnFalse_whenInstancesAreEqual() {
+        assertFalse("3 weeks should not be greater than 3 weeks", Weeks.THREE.isGreaterThan(Weeks.THREE));
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @Test
+    public void isGreaterThan_shouldTreatNullAsZeroAndReturnTrueForPositive() {
+        // The isGreaterThan method treats a null input as a Weeks object with a value of zero.
+        assertTrue("1 week should be greater than null (0 weeks)", Weeks.ONE.isGreaterThan(null));
     }
 
-    //-----------------------------------------------------------------------
-    public void testIsGreaterThan() {
-        assertEquals(true, Weeks.THREE.isGreaterThan(Weeks.TWO));
-        assertEquals(false, Weeks.THREE.isGreaterThan(Weeks.THREE));
-        assertEquals(false, Weeks.TWO.isGreaterThan(Weeks.THREE));
-        assertEquals(true, Weeks.ONE.isGreaterThan(null));
-        assertEquals(false, Weeks.weeks(-1).isGreaterThan(null));
+    @Test
+    public void isGreaterThan_shouldTreatNullAsZeroAndReturnFalseForNegative() {
+        // The isGreaterThan method treats a null input as a Weeks object with a value of zero.
+        assertFalse("-1 weeks should not be greater than null (0 weeks)", Weeks.weeks(-1).isGreaterThan(null));
     }
 }
