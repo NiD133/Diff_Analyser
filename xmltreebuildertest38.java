@@ -1,50 +1,62 @@
 package org.jsoup.parser;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.*;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.DataNode;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.junit.jupiter.api.Test;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import static org.jsoup.nodes.Document.OutputSettings.Syntax;
-import static org.jsoup.parser.Parser.NamespaceHtml;
+
 import static org.jsoup.parser.Parser.NamespaceXml;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class XmlTreeBuilderTestTest38 {
-
-    private static void assertXmlNamespace(Element el) {
-        assertEquals(NamespaceXml, el.tag().namespace(), String.format("Element %s not in XML namespace", el.tagName()));
-    }
+/**
+ * Tests for the {@link XmlTreeBuilder}, focusing on custom tag configurations.
+ */
+public class XmlTreeBuilderTest {
 
     @Test
-    void canSetCustomDataTag() {
-        // no character refs, will be as-is
-        String inner = "Blah\nblah\n<foo></foo>&quot;";
-        String xml = "<x><y><z>" + inner + "</z></y></x><x><z id=2></z>";
-        TagSet custom = new TagSet();
-        Tag z = custom.valueOf("z", NamespaceXml, ParseSettings.preserveCase);
-        z.set(Tag.Data);
-        Document doc = Jsoup.parse(xml, Parser.xmlParser().tagSet(custom));
-        Element zEl = doc.expectFirst("z");
-        // not same because we copy the tagset
-        assertNotSame(z, zEl.tag());
-        assertEquals(z, zEl.tag());
-        assertEquals(1, zEl.childNodeSize());
-        Node child = zEl.childNode(0);
-        assertTrue(child instanceof DataNode);
-        assertEquals(inner, ((DataNode) child).getWholeData());
-        assertEquals(inner, zEl.data());
-        // test fragment context parse - should parse <foo> as data
-        Element z2 = doc.expectFirst("#2");
-        z2.html(inner);
-        assertEquals(inner, ((DataNode) child).getWholeData());
-        assertEquals(inner, zEl.data());
+    void customTagMarkedAsDataIsParsedAsRawText() {
+        // Arrange: Define content that includes characters that would normally be parsed as markup (<foo>)
+        // or entities (&quot;). When inside a data tag, this should be treated as literal text.
+        String contentWithUnescapedMarkup = "Blah\nblah\n<foo></foo>&quot;";
+        String xml = "<x><y><z>" + contentWithUnescapedMarkup + "</z></y></x><x><z id=2></z>";
+
+        // Create a custom tag set where 'z' is defined as a data tag.
+        TagSet customTagSet = new TagSet();
+        Tag customDataTag = customTagSet.valueOf("z", NamespaceXml, ParseSettings.preserveCase);
+        customDataTag.set(Tag.Data);
+
+        // Create a parser with this custom tag set.
+        Parser xmlParser = Parser.xmlParser().tagSet(customTagSet);
+
+        // Act: Parse the full XML string.
+        Document doc = Jsoup.parse(xml, xmlParser);
+        Element dataTagElement = doc.expectFirst("z");
+
+        // Assert: Verify the initial parse treated the 'z' tag's content as a single DataNode.
+        // The parser uses a copy of the tag, so it shouldn't be the same instance, but it should be equal.
+        assertNotSame(customDataTag, dataTagElement.tag(), "Parser should use a copy of the custom tag, not the same instance.");
+        assertEquals(customDataTag, dataTagElement.tag(), "The element's tag should be equal to the custom data tag definition.");
+        
+        assertEquals(1, dataTagElement.childNodeSize(), "Element should have exactly one child node.");
+        Node child = dataTagElement.childNode(0);
+        assertTrue(child instanceof DataNode, "The child node should be a DataNode.");
+        assertEquals(contentWithUnescapedMarkup, ((DataNode) child).getWholeData(), "DataNode content should be the raw, unparsed string.");
+        assertEquals(contentWithUnescapedMarkup, dataTagElement.data(), "The element's data() method should return the raw content.");
+
+        // Now, test that the data tag behavior is also applied during a fragment parse.
+        // Arrange: Get the second 'z' element, which should also be recognized as a data tag.
+        Element secondDataTagElement = doc.expectFirst("#2");
+
+        // Act: Set its content using html(), which triggers a fragment parse.
+        secondDataTagElement.html(contentWithUnescapedMarkup);
+
+        // Assert: Verify the fragment parse also created a DataNode.
+        assertEquals(1, secondDataTagElement.childNodeSize(), "Fragment parse should also result in one child node.");
+        Node secondChild = secondDataTagElement.childNode(0);
+        assertTrue(secondChild instanceof DataNode, "Child of fragment-parsed element should also be a DataNode.");
+        assertEquals(contentWithUnescapedMarkup, ((DataNode) secondChild).getWholeData(), "DataNode content from fragment parse should match.");
+        assertEquals(contentWithUnescapedMarkup, secondDataTagElement.data(), "Element's data() from fragment parse should match.");
     }
 }
