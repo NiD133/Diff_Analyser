@@ -1,21 +1,27 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.EncoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class URLCodec_ESTestTest44 extends URLCodec_ESTest_scaffolding {
+/**
+ * Tests for {@link URLCodec}.
+ */
+public class URLCodecTest {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        URLCodec uRLCodec0 = new URLCodec();
-        String string0 = uRLCodec0.encode("org.apache.commons.codec.DecoderException");
-        assertEquals("org.apache.commons.codec.DecoderException", string0);
-        assertNotNull(string0);
+    @Test
+    public void whenEncodingStringWithOnlyUrlSafeCharacters_thenStringRemainsUnchanged() throws EncoderException {
+        // Arrange
+        // The input string contains only alphanumeric characters and periods,
+        // which are considered safe for URL encoding and should not be modified.
+        final String safeString = "org.apache.commons.codec.DecoderException";
+        final URLCodec urlCodec = new URLCodec();
+
+        // Act
+        final String encodedString = urlCodec.encode(safeString);
+
+        // Assert
+        assertEquals("Encoding a string composed entirely of safe characters should not alter it.",
+                     safeString, encodedString);
     }
 }
