@@ -1,25 +1,25 @@
 package org.locationtech.spatial4j.shape;
 
 import com.carrotsearch.randomizedtesting.RandomizedTest;
-import com.carrotsearch.randomizedtesting.annotations.Repeat;
 import org.locationtech.spatial4j.TestLog;
 import org.locationtech.spatial4j.context.SpatialContext;
 import org.locationtech.spatial4j.context.SpatialContextFactory;
 import org.locationtech.spatial4j.shape.impl.BufferedLine;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
 import org.locationtech.spatial4j.shape.impl.RectangleImpl;
 import org.junit.Rule;
 import org.junit.Test;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
-public class BufferedLineTestTest4 extends RandomizedTest {
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * A randomized test that focuses on the spatial relationship between a
+ * {@link org.locationtech.spatial4j.shape.impl.BufferedLine} and a
+ * {@link Rectangle}. It uses a helper framework to test INTERSECTS, CONTAINS, etc.
+ */
+public class BufferedLineRectIntersectionTest extends RandomizedTest {
 
     private final SpatialContext ctx = new SpatialContextFactory() {
-
         {
             geo = false;
             worldBounds = new RectangleImpl(-100, 100, -50, 50, null);
@@ -29,80 +29,68 @@ public class BufferedLineTestTest4 extends RandomizedTest {
     @Rule
     public TestLog testLog = TestLog.instance;
 
-    public static void logShapes(final BufferedLine line, final Rectangle rect) {
-        String lineWKT = "LINESTRING(" + line.getA().getX() + " " + line.getA().getY() + "," + line.getB().getX() + " " + line.getB().getY() + ")";
-        System.out.println("GEOMETRYCOLLECTION(" + lineWKT + "," + rectToWkt(line.getBoundingBox()) + ")");
-        String rectWKT = rectToWkt(rect);
-        System.out.println(rectWKT);
-    }
-
-    static private String rectToWkt(Rectangle rect) {
-        return "POLYGON((" + rect.getMinX() + " " + rect.getMinY() + "," + rect.getMaxX() + " " + rect.getMinY() + "," + rect.getMaxX() + " " + rect.getMaxY() + "," + rect.getMinX() + " " + rect.getMaxY() + "," + rect.getMinX() + " " + rect.getMinY() + "))";
-    }
-
-    private void testDistToPoint(Point pA, Point pB, Point pC, double dist) {
-        if (dist > 0) {
-            assertFalse(new BufferedLine(pA, pB, dist * 0.999, ctx).contains(pC));
-        } else {
-            assert dist == 0;
-            assertTrue(new BufferedLine(pA, pB, 0, ctx).contains(pC));
-        }
-        assertTrue(new BufferedLine(pA, pB, dist * 1.001, ctx).contains(pC));
-    }
-
-    private BufferedLine newRandomLine() {
-        Point pA = new PointImpl(randomInt(9), randomInt(9), ctx);
-        Point pB = new PointImpl(randomInt(9), randomInt(9), ctx);
-        int buf = randomInt(5);
-        return new BufferedLine(pA, pB, buf, ctx);
-    }
-
-    private ArrayList<Point> quadrantCorners(Rectangle rect) {
-        ArrayList<Point> corners = new ArrayList<>(4);
-        corners.add(ctx.makePoint(rect.getMaxX(), rect.getMaxY()));
-        corners.add(ctx.makePoint(rect.getMinX(), rect.getMaxY()));
-        corners.add(ctx.makePoint(rect.getMinX(), rect.getMinY()));
-        corners.add(ctx.makePoint(rect.getMaxX(), rect.getMinY()));
-        return corners;
-    }
-
-    private BufferedLine newBufLine(int x1, int y1, int x2, int y2, int buf) {
-        Point pA = ctx.makePoint(x1, y1);
-        Point pB = ctx.makePoint(x2, y2);
-        if (randomBoolean()) {
-            return new BufferedLine(pB, pA, buf, ctx);
-        } else {
-            return new BufferedLine(pA, pB, buf, ctx);
-        }
-    }
-
+    /**
+     * This test uses a helper framework, {@link RectIntersectionTestHelper}, to perform
+     * numerous randomized checks of the `relate()` method between a {@link BufferedLine}
+     * and a {@link Rectangle}.
+     */
     @Test
-    public void testRectIntersect() {
+    public void testRelateWithRandomRectangles() {
         new RectIntersectionTestHelper<BufferedLine>(ctx) {
 
             @Override
             protected BufferedLine generateRandomShape(Point nearP) {
-                Rectangle nearR = randomRectangle(nearP);
-                ArrayList<Point> corners = quadrantCorners(nearR);
-                //0..3
-                int r4 = randomInt(3);
-                Point pA = corners.get(r4);
-                Point pB = corners.get((r4 + 2) % 4);
-                double maxBuf = Math.max(nearR.getWidth(), nearR.getHeight());
-                double buf = Math.abs(randomGaussian()) * maxBuf / 4;
-                buf = randomInt((int) divisible(buf));
-                return new BufferedLine(pA, pB, buf, ctx);
+                return createRandomDiagonalLine(nearP);
             }
 
+            @Override
             protected Point randomPointInEmptyShape(BufferedLine shape) {
-                int r = randomInt(1);
-                if (r == 0)
-                    return shape.getA();
-                //if (r == 1)
-                return shape.getB();
-                //        Point c = shape.getCenter();
-                //        if (shape.contains(c));
+                // The name of this method is defined by the abstract base class. It's
+                // meant to find a point within a shape that might otherwise have no area.
+                // For a BufferedLine, the endpoints of the original line segment (A and B)
+                // are guaranteed to be contained within the buffered shape, so we return one.
+                return randomBoolean() ? shape.getA() : shape.getB();
             }
         }.testRelateWithRectangle();
+    }
+
+    /**
+     * Creates a {@link BufferedLine} that runs diagonally across a randomly generated
+     * rectangle. This provides a good variety of angles and positions for testing.
+     *
+     * @param nearPoint A point to generate the rectangle near.
+     * @return A new BufferedLine for testing.
+     */
+    private BufferedLine createRandomDiagonalLine(Point nearPoint) {
+        // Generate a random rectangle to base the line on.
+        Rectangle rect = randomRectangle(nearPoint);
+        List<Point> corners = getRectangleCorners(rect);
+
+        // Create a line segment between two diagonally opposite corners of the rectangle.
+        int startCornerIdx = randomInt(3);
+        Point pA = corners.get(startCornerIdx);
+        Point pB = corners.get((startCornerIdx + 2) % 4); // The opposite corner
+
+        // The buffer is a random fraction of the rectangle's largest dimension.
+        double maxDim = Math.max(rect.getWidth(), rect.getHeight());
+        // Use a gaussian distribution for a more realistic spread of buffer sizes.
+        double buf = Math.abs(randomGaussian()) * maxDim / 4.0;
+        // The divisible() method from RandomizedTest can help produce rounder numbers,
+        // which might be useful for debugging or hitting specific edge cases.
+        int intBuf = randomInt((int) divisible(buf));
+
+        return new BufferedLine(pA, pB, intBuf, ctx);
+    }
+
+    /**
+     * Returns the four corners of a rectangle in a consistent order.
+     */
+    private List<Point> getRectangleCorners(Rectangle rect) {
+        List<Point> corners = new ArrayList<>(4);
+        corners.add(ctx.makePoint(rect.getMaxX(), rect.getMaxY())); // Top-right
+        corners.add(ctx.makePoint(rect.getMinX(), rect.getMaxY())); // Top-left
+        corners.add(ctx.makePoint(rect.getMinX(), rect.getMinY())); // Bottom-left
+        corners.add(ctx.makePoint(rect.getMaxX(), rect.getMinY())); // Bottom-right
+        return corners;
     }
 }
