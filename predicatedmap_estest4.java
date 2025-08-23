@@ -1,45 +1,39 @@
 package org.apache.commons.collections4.map;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
 import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.NonePredicate;
 import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PredicatedMap_ESTestTest4 extends PredicatedMap_ESTest_scaffolding {
+import java.util.HashMap;
+import java.util.Map;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        UniquePredicate<Object> uniquePredicate0 = new UniquePredicate<Object>();
-        HashMap<HashMap<Integer, Object>, Transformer<Integer, Integer>> hashMap0 = new HashMap<HashMap<Integer, Object>, Transformer<Integer, Integer>>();
-        PredicatedMap<HashMap<Integer, Object>, Transformer<Integer, Integer>> predicatedMap0 = new PredicatedMap<HashMap<Integer, Object>, Transformer<Integer, Integer>>(hashMap0, uniquePredicate0, uniquePredicate0);
-        boolean boolean0 = predicatedMap0.isSetValueChecking();
-        assertTrue(boolean0);
+import static org.junit.Assert.assertTrue;
+
+/**
+ * This test class contains improved tests for the PredicatedMap class.
+ * The original test was auto-generated and has been rewritten for clarity.
+ */
+public class PredicatedMap_ESTestTest4 { // Retaining original class name for context
+
+    /**
+     * Tests that isSetValueChecking() returns true when a value predicate is provided
+     * to the constructor.
+     */
+    @Test
+    public void isSetValueCheckingShouldReturnTrueWhenValuePredicateIsProvided() {
+        // Arrange: Create a PredicatedMap with a non-null value predicate.
+        // The specific types and predicates used are simplified to the bare minimum
+        // required to express the test's intent.
+        final Map<String, Integer> emptyMap = new HashMap<>();
+        final Predicate<Object> anyPredicate = NotNullPredicate.notNullPredicate();
+
+        final PredicatedMap<String, Integer> predicatedMap =
+                new PredicatedMap<>(emptyMap, anyPredicate, anyPredicate);
+
+        // Act: Call the method under test.
+        final boolean result = predicatedMap.isSetValueChecking();
+
+        // Assert: Verify that the result is true, as a value predicate was set.
+        assertTrue("isSetValueChecking() should return true when a value predicate is configured.", result);
     }
 }
