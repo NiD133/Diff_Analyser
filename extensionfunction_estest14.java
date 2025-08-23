@@ -1,43 +1,30 @@
 package org.apache.commons.jxpath.ri.compiler;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.apache.commons.jxpath.BasicNodeSet;
-import org.apache.commons.jxpath.Function;
-import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.commons.jxpath.ri.NamespaceResolver;
 import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.axes.InitialContext;
-import org.apache.commons.jxpath.ri.axes.NodeSetContext;
-import org.apache.commons.jxpath.ri.axes.RootContext;
-import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ExtensionFunction_ESTestTest14 extends ExtensionFunction_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ExtensionFunction} class.
+ */
+public class ExtensionFunctionTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        Expression[] expressionArray0 = new Expression[1];
-        ExtensionFunction extensionFunction0 = new ExtensionFunction((QName) null, expressionArray0);
-        // Undeclared exception!
-        try {
-            extensionFunction0.compute((EvalContext) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.jxpath.ri.compiler.ExtensionFunction", e);
-        }
+    /**
+     * Tests that calling compute() on an ExtensionFunction initialized with a null
+     * function name throws a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void computeShouldThrowNullPointerExceptionWhenFunctionNameIsNull() {
+        // Arrange: Create an ExtensionFunction with a null function name.
+        // The arguments array is required by the constructor but its content is irrelevant for this test.
+        Expression[] args = new Expression[1];
+        ExtensionFunction extensionFunction = new ExtensionFunction(null, args);
+
+        // Act: Attempt to compute the function's value.
+        // This is expected to throw a NullPointerException because the internal
+        // functionName field is null and is likely dereferenced within compute().
+        // The context can also be null as it's not relevant to this specific failure.
+        extensionFunction.compute(null);
+
+        // Assert: The @Test(expected) annotation handles the exception assertion.
     }
 }
