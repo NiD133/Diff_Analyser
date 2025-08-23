@@ -1,19 +1,30 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CharSequenceUtils_ESTestTest51 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * This class contains tests for the {@link CharSequenceUtils} class.
+ * This is a refactored version of a single, tool-generated test case.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test50() throws Throwable {
-        CharBuffer charBuffer0 = CharBuffer.allocate(3);
-        int int0 = CharSequenceUtils.lastIndexOf(charBuffer0, charBuffer0, 3);
-        assertEquals(0, int0);
+    @Test
+    public void testLastIndexOf_searchForSelfWithStartIndexAtLength_returnsZero() {
+        // Arrange
+        // Use a CharBuffer to test with a non-String CharSequence implementation.
+        // Using a readable string like "abc" makes the test's intent clearer than
+        // the original's use of a buffer filled with null characters.
+        final CharSequence sequence = CharBuffer.wrap("abc".toCharArray());
+        final int startIndex = sequence.length(); // Start search from the end of the sequence
+
+        // Act
+        final int foundIndex = CharSequenceUtils.lastIndexOf(sequence, sequence, startIndex);
+
+        // Assert
+        // When searching for a sequence within itself, it should be found at the beginning (index 0).
+        assertEquals(0, foundIndex);
     }
 }
