@@ -2,59 +2,42 @@ package org.jfree.chart.block;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
 
-public class GridArrangement_ESTestTest39 extends GridArrangement_ESTest_scaffolding {
+/**
+ * Tests for the {@link GridArrangement} class.
+ * This class contains a refactored version of an auto-generated test case.
+ */
+public class GridArrangementTest {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(2236, 2236);
-        assertNotNull(gridArrangement0);
-        BlockContainer blockContainer0 = new BlockContainer();
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertNotNull(blockContainer0);
-        blockContainer0.add((Block) blockContainer0);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertFalse(blockContainer0.isEmpty());
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        RectangleConstraint rectangleConstraint0 = new RectangleConstraint(1717.132829611028, 1717.132829611028);
-        assertEquals(LengthConstraintType.FIXED, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(1717.132829611028, rectangleConstraint0.getWidth(), 0.01);
-        assertEquals(1717.132829611028, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals(LengthConstraintType.FIXED, rectangleConstraint0.getHeightConstraintType());
-        assertNotNull(rectangleConstraint0);
-        // Undeclared exception!
+    /**
+     * Verifies that calling the arrangeRN() method throws a RuntimeException.
+     * This behavior is expected for versions of the class where this specific
+     * arrangement logic has not yet been implemented, often indicated by a
+     * placeholder implementation in a superclass.
+     */
+    @Test
+    public void arrangeRNShouldThrowRuntimeExceptionForUnimplementedMethod() {
+        // Arrange: Create a grid arrangement and a container with a single block.
+        GridArrangement arrangement = new GridArrangement(10, 10);
+        BlockContainer container = new BlockContainer();
+        container.add(new EmptyBlock(0, 0)); // Add a block to make the container non-empty.
+
+        // Create a constraint that matches the method under test:
+        // a fixed width with no constraint on the height.
+        RectangleConstraint fixedWidthConstraint = new RectangleConstraint(
+                100.0, null, LengthConstraintType.FIXED,
+                0.0, null, LengthConstraintType.NONE);
+
+        // Act & Assert: Expect a RuntimeException when calling the method.
         try {
-            gridArrangement0.arrangeRN(blockContainer0, (Graphics2D) null, rectangleConstraint0);
-            fail("Expecting exception: RuntimeException");
+            // The 'g2' parameter is not used in this scenario, so null is acceptable.
+            arrangement.arrangeRN(container, (Graphics2D) null, fixedWidthConstraint);
+            fail("A RuntimeException was expected, but was not thrown.");
         } catch (RuntimeException e) {
-            //
-            // Not implemented.
-            //
-            verifyException("org.jfree.chart.block.BorderArrangement", e);
+            // Verify that the exception has the expected message for an unimplemented method.
+            assertEquals("Not implemented.", e.getMessage());
         }
     }
 }
