@@ -1,29 +1,25 @@
 package org.apache.commons.jxpath;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class BasicNodeSet_ESTestTest8 extends BasicNodeSet_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link BasicNodeSet} class.
+ */
+public class BasicNodeSetTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        BasicNodeSet basicNodeSet0 = new BasicNodeSet();
-        // Undeclared exception!
-        try {
-            basicNodeSet0.add((NodeSet) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.jxpath.BasicNodeSet", e);
-        }
+    /**
+     * Verifies that calling add() with a null NodeSet argument
+     * throws a NullPointerException. This ensures the method correctly
+     * handles invalid input by failing fast.
+     */
+    @Test(expected = NullPointerException.class)
+    public void addShouldThrowNullPointerExceptionForNullNodeSet() {
+        // Given
+        BasicNodeSet basicNodeSet = new BasicNodeSet();
+
+        // When
+        basicNodeSet.add((NodeSet) null);
+
+        // Then: A NullPointerException is expected, as declared by the @Test annotation.
     }
 }
