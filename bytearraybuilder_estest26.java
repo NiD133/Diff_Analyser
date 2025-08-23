@@ -1,27 +1,33 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ByteArrayBuilder_ESTestTest26 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteArrayBuilder} class, focusing on edge cases.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder();
-        ByteArrayBuilder byteArrayBuilder1 = ByteArrayBuilder.fromInitial(byteArrayBuilder0.NO_BYTES, (-538));
-        // Undeclared exception!
-        try {
-            byteArrayBuilder1.toByteArray();
-            fail("Expecting exception: NegativeArraySizeException");
-        } catch (NegativeArraySizeException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.util.ByteArrayBuilder", e);
-        }
+    /**
+     * Verifies that calling {@link ByteArrayBuilder#toByteArray()} throws a
+     * {@link NegativeArraySizeException} if the builder was created with a negative
+     * initial length.
+     *
+     * The factory method {@code fromInitial} allows setting an initial length, which
+     * is used to calculate the total size. If this length is negative, the subsequent
+     * array allocation in {@code toByteArray} should fail.
+     */
+    @Test(expected = NegativeArraySizeException.class)
+    public void toByteArrayShouldThrowExceptionWhenInitializedWithNegativeLength() {
+        // Arrange: Create a ByteArrayBuilder instance using a factory method that allows
+        // setting a negative initial length.
+        final int negativeLength = -538;
+        ByteArrayBuilder builder = ByteArrayBuilder.fromInitial(ByteArrayBuilder.NO_BYTES, negativeLength);
+
+        // Act: Attempt to create the final byte array. This operation should fail
+        // because it will try to allocate an array with a negative size.
+        builder.toByteArray();
+
+        // Assert: The test succeeds if a NegativeArraySizeException is thrown,
+        // as declared in the @Test annotation.
     }
 }
