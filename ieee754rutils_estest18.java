@@ -1,17 +1,28 @@
 package org.apache.commons.lang3.math;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IEEE754rUtils_ESTestTest18 extends IEEE754rUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IEEE754rUtils} class.
+ */
+public class IEEE754rUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        float float0 = IEEE754rUtils.max((-659.8F), (-659.8F), (-659.8F));
-        assertEquals((-659.8F), float0, 0.01F);
+    /**
+     * Tests that the max() method correctly returns the input value when all
+     * three float arguments are identical.
+     */
+    @Test
+    public void testMaxWithThreeEqualFloats() {
+        // Arrange
+        final float value = -659.8F;
+        final float expectedResult = -659.8F;
+
+        // Act
+        final float actualResult = IEEE754rUtils.max(value, value, value);
+
+        // Assert
+        assertEquals("The maximum of three equal numbers should be the number itself.",
+                expectedResult, actualResult, 0.0f);
     }
 }
