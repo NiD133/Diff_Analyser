@@ -1,32 +1,31 @@
 package org.joda.time.convert;
 
+import org.joda.time.convert.Converter;
+import org.joda.time.convert.ConverterSet;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Hours;
-import org.joda.time.Interval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.Seconds;
-import org.joda.time.chrono.CopticChronology;
-import org.junit.runner.RunWith;
 
-public class ConverterSet_ESTestTest9 extends ConverterSet_ESTest_scaffolding {
+/**
+ * Tests for the {@link ConverterSet} class, focusing on its behavior when handling invalid states.
+ */
+public class ConverterSetTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        ConverterSet converterSet0 = new ConverterSet((Converter[]) null);
-        // Undeclared exception!
-        try {
-            converterSet0.remove(291, (Converter[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.joda.time.convert.ConverterSet", e);
-        }
+    /**
+     * Tests that calling remove() by index on a ConverterSet initialized with a null
+     * array of converters throws a NullPointerException.
+     *
+     * The package-private constructor for ConverterSet does not perform null checks,
+     * leading to a NullPointerException when methods attempt to access the internal array.
+     */
+    @Test(expected = NullPointerException.class)
+    public void removeByIndex_whenConstructedWithNullArray_throwsNullPointerException() {
+        // Arrange: Create a ConverterSet with a null internal array. This is an
+        // invalid state that the current implementation allows via its constructor.
+        ConverterSet converterSet = new ConverterSet(null);
+
+        // Act & Assert: Attempting to remove a converter by index should throw
+        // a NullPointerException because the internal converter array is null.
+        // The index (0) and the 'removed' array (null) are irrelevant, as the
+        // exception occurs when the method first tries to access the array's length.
+        converterSet.remove(0, null);
     }
 }
