@@ -1,18 +1,24 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class TokenQueue_ESTestTest76 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for the {@link TokenQueue} class.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test75() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("|;tj;PF%cdg`,");
-        boolean boolean0 = tokenQueue0.matches("|;tj;PF%cdg`,");
-        assertTrue(boolean0);
+    /**
+     * Verifies that the {@link TokenQueue#matches(String)} method returns true
+     * when the provided string is an exact match for the entire content of the queue.
+     */
+    @Test
+    public void matchesReturnsTrueForFullExactMatch() {
+        // Arrange: Create a TokenQueue with a specific string.
+        String content = "|;tj;PF%cdg`,";
+        TokenQueue queue = new TokenQueue(content);
+
+        // Act & Assert: Check if the queue matches the exact same string.
+        assertTrue("Expected matches() to return true for an identical string.", queue.matches(content));
     }
 }
