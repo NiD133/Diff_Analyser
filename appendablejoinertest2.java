@@ -2,59 +2,87 @@ package org.apache.commons.lang3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
-import java.io.IOException;
+
 import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.Objects;
 import org.apache.commons.lang3.AppendableJoiner.Builder;
 import org.apache.commons.lang3.text.StrBuilder;
 import org.apache.commons.text.TextStringBuilder;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-public class AppendableJoinerTestTest2 {
+/**
+ * Tests for {@link AppendableJoiner}.
+ */
+class AppendableJoinerTest {
 
-    // Test own StrBuilder
-    @SuppressWarnings("deprecation")
-    @ParameterizedTest
-    @ValueSource(classes = { StringBuilder.class, StringBuffer.class, StringWriter.class, StrBuilder.class, TextStringBuilder.class })
-    void testDelimiterAppendable(final Class<? extends Appendable> clazz) throws Exception {
+    /**
+     * Tests that the joiner correctly appends elements with a delimiter
+     * to various implementations of {@link Appendable}.
+     *
+     * @param clazz The Appendable implementation to test.
+     */
+    @DisplayName("Joining with a delimiter should work for various Appendable types")
+    @ParameterizedTest(name = "with {0}")
+    @ValueSource(classes = {StringBuilder.class, StringBuffer.class, StringWriter.class, StrBuilder.class, TextStringBuilder.class})
+    @SuppressWarnings("deprecation") // For StrBuilder
+    void joinWithDelimiterAppendsToVariousAppendableTypes(final Class<? extends Appendable> clazz) throws Exception {
+        // Arrange
         final AppendableJoiner<Object> joiner = AppendableJoiner.builder().setDelimiter(".").get();
-        final Appendable sbuilder = clazz.newInstance();
-        sbuilder.append("A");
-        // throws IOException
-        assertEquals("AB.C", joiner.joinA(sbuilder, "B", "C").toString());
-        sbuilder.append("1");
-        // throws IOException
-        assertEquals("AB.C1D.E", joiner.joinA(sbuilder, Arrays.asList("D", "E")).toString());
+        final Appendable appendable = clazz.newInstance();
+        appendable.append("A");
+
+        // Act & Assert: Test joining with a varargs array
+        joiner.joinA(appendable, "B", "C");
+        assertEquals("AB.C", appendable.toString(), "Should join elements with a delimiter.");
+
+        // Arrange for second join
+        appendable.append("1");
+
+        // Act & Assert: Test joining with a list to the same appendable
+        joiner.joinA(appendable, Arrays.asList("D", "E"));
+        assertEquals("AB.C1D.E", appendable.toString(), "Should continue joining to the same appendable.");
     }
 
-    static class Fixture {
-
-        private final String name;
-
-        Fixture(final String name) {
-            this.name = name;
-        }
-
-        /**
-         * Renders myself onto an Appendable to avoid creating intermediary strings.
-         */
-        void render(final Appendable appendable) throws IOException {
-            appendable.append(name);
-            appendable.append('!');
-        }
-    }
-
+    /**
+     * Verifies that the builder's get() method returns a new instance each time,
+     * ensuring that builders can be safely reused to create multiple, distinct joiners.
+     */
     @Test
-    void testBuildDefaultStringBuilder() {
+    void builderGetShouldCreateNewInstance() {
+        // Arrange
         final Builder<Object> builder = AppendableJoiner.builder();
+
+        // Act & Assert
+        // Each call to get() should produce a new, distinct AppendableJoiner instance.
         assertNotSame(builder.get(), builder.get());
-        final AppendableJoiner<Object> joiner = builder.get();
-        final StringBuilder sbuilder = new StringBuilder("A");
-        assertEquals("ABC", joiner.join(sbuilder, "B", "C").toString());
-        sbuilder.append("1");
-        assertEquals("ABC1DE", joiner.join(sbuilder, "D", "E").toString());
+    }
+
+    /**
+     * Tests that a joiner with default settings (no prefix, suffix, or delimiter)
+     * simply concatenates the string representation of elements.
+     */
+    @Test
+    void joinWithDefaultSettingsShouldConcatenateElements() {
+        // Arrange
+        final AppendableJoiner<Object> joiner = AppendableJoiner.builder().get();
+        final StringBuilder stringBuilder = new StringBuilder("A");
+
+        // Act: Join the first set of elements
+        joiner.join(stringBuilder, "B", "C");
+
+        // Assert
+        assertEquals("ABC", stringBuilder.toString());
+
+        // Arrange for second join
+        stringBuilder.append("1");
+
+        // Act: Join the second set of elements
+        joiner.join(stringBuilder, "D", "E");
+
+        // Assert
+        assertEquals("ABC1DE", stringBuilder.toString());
     }
 }
