@@ -1,36 +1,54 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+
 import java.io.IOException;
-import java.io.PipedWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.sql.SQLNonTransientConnectionException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.LinkedHashSet;
 import java.util.Locale;
 import org.apache.commons.lang3.function.FailableBiConsumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class AppendableJoiner_ESTestTest1 extends AppendableJoiner_ESTest_scaffolding {
+/**
+ * Tests for the static helper methods in {@link AppendableJoiner}.
+ */
+public class AppendableJoinerTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        StringBuffer stringBuffer0 = new StringBuffer();
-        StringBuilder stringBuilder0 = new StringBuilder(stringBuffer0);
-        StringBuffer stringBuffer1 = new StringBuffer(stringBuilder0);
-        FailableBiConsumer<Appendable, Locale.Category, IOException> failableBiConsumer0 = FailableBiConsumer.nop();
-        Class<Locale.Category> class0 = Locale.Category.class;
-        EnumSet<Locale.Category> enumSet0 = EnumSet.allOf(class0);
-        StringBuilder stringBuilder1 = AppendableJoiner.joinI(stringBuilder0, (CharSequence) stringBuilder0, (CharSequence) stringBuffer1, (CharSequence) stringBuffer0, failableBiConsumer0, (Iterable<Locale.Category>) enumSet0);
-        assertEquals("", stringBuilder1.toString());
+    /**
+     * Tests that the package-private {@code joinI} method does not modify the
+     * StringBuilder when provided with a "no-op" (no operation) appender,
+     * even if the collection of elements is not empty.
+     */
+    @Test
+    public void testJoinWithNopAppenderDoesNotAlterStringBuilder() {
+        // Arrange
+        final StringBuilder targetBuilder = new StringBuilder();
+        final CharSequence emptyPrefix = "";
+        final CharSequence emptySuffix = "";
+        final CharSequence emptyDelimiter = "";
+
+        // A non-empty collection of items to "join".
+        final Iterable<Locale.Category> elements = EnumSet.allOf(Locale.Category.class);
+
+        // A consumer that performs no action for each element.
+        final FailableBiConsumer<Appendable, Locale.Category, IOException> nopAppender = FailableBiConsumer.nop();
+
+        // Act
+        // The joinI method is a package-private static helper method.
+        final StringBuilder resultBuilder = AppendableJoiner.joinI(
+                targetBuilder,
+                emptyPrefix,
+                emptySuffix,
+                emptyDelimiter,
+                nopAppender,
+                elements);
+
+        // Assert
+        // 1. The method should return the same StringBuilder instance it was given.
+        assertSame("The returned StringBuilder should be the same instance as the input.", targetBuilder, resultBuilder);
+
+        // 2. The StringBuilder's content should be unchanged because all affixes were empty
+        //    and the appender performed no action on the elements.
+        assertEquals("StringBuilder content should be empty.", "", resultBuilder.toString());
     }
 }
