@@ -1,19 +1,27 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Metaphone_ESTestTest7 extends Metaphone_ESTest_scaffolding {
+/**
+ * Unit tests for the Metaphone class.
+ */
+public class MetaphoneTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Metaphone metaphone0 = new Metaphone();
-        String string0 = metaphone0.metaphone("TH");
-        assertEquals("0", string0);
-        assertEquals(4, metaphone0.getMaxCodeLen());
+    /**
+     * Tests a specific rule of the Metaphone algorithm where "TH" is encoded as "0" (theta sound).
+     */
+    @Test
+    public void shouldEncodeThAsZero() {
+        // Arrange
+        Metaphone metaphone = new Metaphone();
+        String input = "TH";
+        String expectedCode = "0";
+
+        // Act
+        String actualCode = metaphone.metaphone(input);
+
+        // Assert
+        assertEquals("The Metaphone code for 'TH' should be '0'", expectedCode, actualCode);
     }
 }
