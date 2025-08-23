@@ -1,43 +1,29 @@
 package org.locationtech.spatial4j.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.text.ChoiceFormat;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.Circle;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.ShapeCollection;
-import org.locationtech.spatial4j.shape.impl.BufferedLine;
-import org.locationtech.spatial4j.shape.impl.BufferedLineString;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
 
-public class WKTWriter_ESTestTest8 extends WKTWriter_ESTest_scaffolding {
+/**
+ * This test class contains the refactored test case.
+ * In a real-world scenario, the original EvoSuite-generated class and scaffolding
+ * would be replaced or integrated into a human-written test suite like this.
+ */
+public class WKTWriterTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        WKTWriter wKTWriter0 = new WKTWriter();
-        // Undeclared exception!
-        try {
-            wKTWriter0.toString((Shape) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.locationtech.spatial4j.io.LegacyShapeWriter", e);
-        }
+    /**
+     * Verifies that the toString() method throws a NullPointerException
+     * when the provided shape is null. This ensures the method correctly
+     * handles invalid input by failing fast.
+     */
+    @Test(expected = NullPointerException.class)
+    public void toString_withNullShape_shouldThrowNullPointerException() {
+        // Arrange: Create a WKTWriter instance to test.
+        WKTWriter wktWriter = new WKTWriter();
+        Shape nullShape = null;
+
+        // Act & Assert: Call the method with a null shape.
+        // The @Test(expected=...) annotation handles the assertion,
+        // failing the test if a NullPointerException is not thrown.
+        wktWriter.toString(nullShape);
     }
 }
