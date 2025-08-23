@@ -1,22 +1,31 @@
 package org.jfree.chart.renderer.category;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import org.jfree.chart.TestUtils;
 import org.jfree.chart.api.PublicCloneable;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class StandardBarPainterTestTest3 {
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+/**
+ * Tests for the {@link StandardBarPainter} class.
+ */
+@DisplayName("StandardBarPainter")
+class StandardBarPainterTest {
 
     /**
-     * Confirm that cloning isn't implemented (it isn't required, because
-     * instances of the class are immutable).
+     * Verifies that StandardBarPainter does not support cloning. This is the
+     * expected behavior because instances of the class are immutable, making
+     * cloning unnecessary.
      */
     @Test
-    public void testCloning() {
-        StandardBarPainter p1 = new StandardBarPainter();
-        assertFalse(p1 instanceof Cloneable);
-        assertFalse(p1 instanceof PublicCloneable);
+    @DisplayName("should not be cloneable")
+    void shouldNotBeCloneable() {
+        // Arrange
+        StandardBarPainter painter = new StandardBarPainter();
+
+        // Act & Assert
+        // The class is immutable, so it should not implement Cloneable or PublicCloneable.
+        assertFalse(painter instanceof Cloneable, "StandardBarPainter should not implement Cloneable.");
+        assertFalse(painter instanceof PublicCloneable, "StandardBarPainter should not implement PublicCloneable.");
     }
 }
