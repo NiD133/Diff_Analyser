@@ -1,36 +1,32 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
-import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeReader_ESTestTest38 extends JsonTreeReader_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test037() throws Throwable {
-        JsonNull jsonNull0 = JsonNull.INSTANCE;
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonNull0);
-        // Undeclared exception!
+/**
+ * Unit tests for {@link JsonTreeReader}.
+ */
+public class JsonTreeReaderTest {
+
+    /**
+     * Verifies that calling endArray() when the current token is JSON null
+     * results in an IllegalStateException. This tests the reader's state validation.
+     */
+    @Test
+    public void endArray_whenTokenIsNull_throwsIllegalStateException() {
+        // Arrange: Create a JsonTreeReader positioned at a JsonNull element.
+        JsonTreeReader reader = new JsonTreeReader(JsonNull.INSTANCE);
+        String expectedMessage = "Expected END_ARRAY but was NULL at path $";
+
+        // Act & Assert: Attempting to end an array should fail.
         try {
-            jsonTreeReader0.endArray();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // Expected END_ARRAY but was NULL at path $
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeReader", e);
+            reader.endArray();
+            fail("Expected an IllegalStateException to be thrown, but no exception was thrown.");
+        } catch (IllegalStateException actualException) {
+            assertEquals(expectedMessage, actualException.getMessage());
         }
     }
 }
