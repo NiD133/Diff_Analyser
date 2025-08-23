@@ -1,30 +1,26 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiConsumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.TextNode;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
 
-public class CookieUtil_ESTestTest14 extends CookieUtil_ESTest_scaffolding {
+/**
+ * Tests for the {@link CookieUtil} class.
+ */
+public class CookieUtilTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        CookieUtil cookieUtil0 = new CookieUtil();
+    /**
+     * Verifies that the CookieUtil utility class can be instantiated successfully.
+     * <p>
+     * Although {@link CookieUtil} is a utility class with static methods, this test
+     * ensures the default constructor is callable and provides basic code coverage.
+     * </p>
+     */
+    @Test
+    public void instantiationSucceeds() {
+        // Act: Attempt to create an instance of the utility class.
+        CookieUtil cookieUtil = new CookieUtil();
+
+        // Assert: The created instance should not be null.
+        assertNotNull("A new CookieUtil instance should be successfully created.", cookieUtil);
     }
 }
