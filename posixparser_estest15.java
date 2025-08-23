@@ -1,22 +1,30 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
 
-public class PosixParser_ESTestTest15 extends PosixParser_ESTest_scaffolding {
+/**
+ * Tests for the PosixParser class.
+ */
+public class PosixParserTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        Options options0 = new Options();
-        Options options1 = options0.addRequiredOption("j", "", true, "j");
-        PosixParser posixParser0 = new PosixParser();
-        String[] stringArray0 = Locale.getISOCountries();
-        posixParser0.flatten(options1, stringArray0, true);
-        posixParser0.burstToken("$--", true);
+    /**
+     * Tests that the flatten method treats a token that does not start with a
+     * hyphen as a regular argument, passing it through unchanged.
+     */
+    @Test
+    public void flattenShouldTreatTokenWithoutLeadingHyphenAsArgument() throws ParseException {
+        // Arrange
+        PosixParser parser = new PosixParser();
+        Options options = new Options();
+        // An argument that does not start with a hyphen should be treated as a plain argument.
+        String[] arguments = {"arg1", "$--", "arg2"};
+        String[] expected = {"arg1", "$--", "arg2"};
+
+        // Act
+        String[] result = parser.flatten(options, arguments, false);
+
+        // Assert
+        assertArrayEquals("The token should be treated as a regular argument", expected, result);
     }
 }
