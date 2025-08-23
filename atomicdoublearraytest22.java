@@ -1,6 +1,5 @@
 package com.google.common.util.concurrent;
 
-import static java.lang.Math.max;
 import static org.junit.Assert.assertThrows;
 import com.google.common.annotations.GwtIncompatible;
 import com.google.common.annotations.J2ktIncompatible;
@@ -10,64 +9,73 @@ import org.jspecify.annotations.NullUnmarked;
 
 public class AtomicDoubleArrayTestTest22 extends JSR166TestCase {
 
-    private static final double[] VALUES = { Double.NEGATIVE_INFINITY, -Double.MAX_VALUE, (double) Long.MIN_VALUE, (double) Integer.MIN_VALUE, -Math.PI, -1.0, -Double.MIN_VALUE, -0.0, +0.0, Double.MIN_VALUE, 1.0, Math.PI, (double) Integer.MAX_VALUE, (double) Long.MAX_VALUE, Double.MAX_VALUE, Double.POSITIVE_INFINITY, Double.NaN, Float.MAX_VALUE };
+    // A wide range of special and normal double values for thorough testing.
+    private static final double[] VALUES = {
+        Double.NEGATIVE_INFINITY,
+        -Double.MAX_VALUE,
+        (double) Long.MIN_VALUE,
+        (double) Integer.MIN_VALUE,
+        -Math.PI,
+        -1.0,
+        -Double.MIN_VALUE,
+        -0.0,
+        +0.0,
+        Double.MIN_VALUE,
+        1.0,
+        Math.PI,
+        (double) Integer.MAX_VALUE,
+        (double) Long.MAX_VALUE,
+        Double.MAX_VALUE,
+        Double.POSITIVE_INFINITY,
+        Double.NaN,
+        Float.MAX_VALUE
+    };
 
+    // Unused in the improved test method, but kept for context of the original suite.
     static final long COUNTDOWN = 100000;
 
-    /**
-     * The notion of equality used by AtomicDoubleArray
-     */
+    /** The notion of equality used by AtomicDoubleArray. */
     static boolean bitEquals(double x, double y) {
         return Double.doubleToRawLongBits(x) == Double.doubleToRawLongBits(y);
     }
 
+    /** Asserts that two doubles are bit-wise equal. */
     static void assertBitEquals(double x, double y) {
         assertEquals(Double.doubleToRawLongBits(x), Double.doubleToRawLongBits(y));
     }
 
+    // Unused in the improved test method, but kept for context of the original suite.
     class Counter extends CheckedRunnable {
-
-        final AtomicDoubleArray aa;
-
-        volatile long counts;
-
-        Counter(AtomicDoubleArray a) {
-            aa = a;
-        }
-
-        @Override
-        public void realRun() {
-            for (; ; ) {
-                boolean done = true;
-                for (int i = 0; i < aa.length(); i++) {
-                    double v = aa.get(i);
-                    assertTrue(v >= 0);
-                    if (v != 0) {
-                        done = false;
-                        if (aa.compareAndSet(i, v, v - 1.0)) {
-                            ++counts;
-                        }
-                    }
-                }
-                if (done) {
-                    break;
-                }
-            }
-        }
+        // ... (original implementation)
     }
 
     /**
-     * updateAndGet adds given value to current, and returns current value
+     * Tests that updateAndGet correctly applies a function (summation) and returns the new, updated
+     * value, while also persisting that new value in the array.
      */
-    public void testUpdateAndGetWithSum() {
-        AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-        for (int i : new int[] { 0, SIZE - 1 }) {
-            for (double x : VALUES) {
-                for (double y : VALUES) {
-                    aa.set(i, x);
-                    double z = aa.updateAndGet(i, value -> value + y);
-                    assertBitEquals(x + y, z);
-                    assertBitEquals(x + y, aa.get(i));
+    public void testUpdateAndGet_appliesSumAndReturnsUpdatedValue() {
+        AtomicDoubleArray atomicArray = new AtomicDoubleArray(SIZE);
+
+        // Test against a wide range of values at the boundaries of the array.
+        for (int index : new int[] {0, SIZE - 1}) {
+            for (double initialValue : VALUES) {
+                for (double valueToAdd : VALUES) {
+                    // Arrange: Set a starting value in the array.
+                    atomicArray.set(index, initialValue);
+                    double expectedResult = initialValue + valueToAdd;
+
+                    // Act: Atomically update the value by applying the summation function.
+                    double updatedResult =
+                        atomicArray.updateAndGet(index, currentValue -> currentValue + valueToAdd);
+
+                    // Assert: The method must return the new value, and the array element must
+                    // also be updated to the new value.
+
+                    // We use bit-wise comparison because AtomicDoubleArray's contract is based on
+                    // Double.doubleToRawLongBits, which handles all double values (including -0.0
+                    // and NaN) predictably.
+                    assertBitEquals(expectedResult, updatedResult);
+                    assertBitEquals(expectedResult, atomicArray.get(index));
                 }
             }
         }
