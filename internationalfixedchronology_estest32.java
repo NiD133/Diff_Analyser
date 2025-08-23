@@ -1,59 +1,50 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.time.Clock;
 import java.time.DateTimeException;
 import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Period;
-import java.time.Year;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
 
-public class InternationalFixedChronology_ESTestTest32 extends InternationalFixedChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+/**
+ * This class is part of a test suite for {@link InternationalFixedChronology}.
+ * This specific test file was automatically generated and has been refactored for clarity.
+ */
+public class InternationalFixedChronology_ESTestTest32 {
+
+    /**
+     * Tests that {@link InternationalFixedChronology#dateNow(Clock)} throws a DateTimeException
+     * when the provided clock returns an instant that is outside the supported range of {@link java.time.Instant}.
+     */
     @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        InternationalFixedChronology internationalFixedChronology0 = InternationalFixedChronology.INSTANCE;
-        Clock clock0 = MockClock.systemDefaultZone();
-        ChronoUnit chronoUnit0 = ChronoUnit.ERAS;
-        Duration duration0 = chronoUnit0.getDuration();
-        Clock clock1 = MockClock.offset(clock0, duration0);
-        // Undeclared exception!
+    public void dateNow_whenClockInstantIsTooLarge_throwsException() {
+        // Arrange
+        InternationalFixedChronology chronology = InternationalFixedChronology.INSTANCE;
+
+        // Create a clock that points to a time far in the future,
+        // beyond the range supported by java.time.Instant.
+        // The duration of an ERA is immense, making it suitable for this purpose.
+        Clock baseClock = Clock.system(ZoneOffset.UTC);
+        Duration immenseDuration = ChronoUnit.ERAS.getDuration();
+        Clock farFutureClock = Clock.offset(baseClock, immenseDuration);
+
+        // Act & Assert
         try {
-            internationalFixedChronology0.dateNow(clock1);
-            fail("Expecting exception: DateTimeException");
+            chronology.dateNow(farFutureClock);
+            fail("Expected DateTimeException was not thrown for an out-of-bounds instant.");
         } catch (DateTimeException e) {
-            //
-            // Instant exceeds minimum or maximum instant
-            //
-            verifyException("java.time.Instant", e);
+            // This is the expected behavior.
+            // The underlying java.time.Instant throws this exception when its value exceeds the supported range.
+            String expectedMessage = "Instant exceeds minimum or maximum instant";
+            assertTrue(
+                "Exception message should indicate the instant is out of bounds. Got: " + e.getMessage(),
+                e.getMessage().contains(expectedMessage)
+            );
         }
     }
 }
