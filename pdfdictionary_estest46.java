@@ -1,35 +1,32 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class PdfDictionary_ESTestTest46 extends PdfDictionary_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        PdfDictionary pdfDictionary0 = new PdfDictionary();
-        // Undeclared exception!
+/**
+ * Unit tests for the {@link PdfDictionary} class.
+ */
+public class PdfDictionaryTest {
+
+    /**
+     * Verifies that calling putEx() with a null key throws an IllegalArgumentException.
+     * The PDF specification requires dictionary keys to be non-null PdfName objects.
+     */
+    @Test
+    public void putEx_withNullKey_shouldThrowIllegalArgumentException() {
+        // Arrange
+        PdfDictionary dictionary = new PdfDictionary();
+        String expectedErrorMessage = "key is null.";
+
+        // Act & Assert
         try {
-            pdfDictionary0.putEx((PdfName) null, (PdfObject) null);
-            fail("Expecting exception: IllegalArgumentException");
+            dictionary.putEx(null, null); // The value is irrelevant, the key is being tested.
+            fail("Expected an IllegalArgumentException to be thrown, but no exception was caught.");
         } catch (IllegalArgumentException e) {
-            //
-            // key is null.
-            //
-            verifyException("com.itextpdf.text.pdf.PdfDictionary", e);
+            // Verify that the exception has the expected message.
+            assertEquals(expectedErrorMessage, e.getMessage());
         }
     }
 }
