@@ -1,25 +1,45 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-public class JsonTypeInfo_ESTestTest17 extends JsonTypeInfo_ESTest_scaffolding {
+/**
+ * This test suite focuses on the behavior of the {@link JsonTypeInfo.Value} class.
+ */
+public class JsonTypeInfoValueTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        JsonTypeInfo.Id jsonTypeInfo_Id0 = JsonTypeInfo.Id.MINIMAL_CLASS;
-        JsonTypeInfo.As jsonTypeInfo_As0 = JsonTypeInfo.As.WRAPPER_OBJECT;
-        Class<Object> class0 = Object.class;
-        Boolean boolean0 = Boolean.valueOf("@2LLQRbW9{J2*\"1GY");
-        JsonTypeInfo.Value jsonTypeInfo_Value0 = JsonTypeInfo.Value.construct(jsonTypeInfo_Id0, jsonTypeInfo_As0, "@2LLQRbW9{J2*\"1GY", class0, false, boolean0);
-        JsonTypeInfo.Value jsonTypeInfo_Value1 = jsonTypeInfo_Value0.withIdVisible(false);
-        assertSame(jsonTypeInfo_Value1, jsonTypeInfo_Value0);
-        assertEquals("@2LLQRbW9{J2*\"1GY", jsonTypeInfo_Value1.getPropertyName());
+    /**
+     * Tests that calling `withIdVisible()` with the same value that the object
+     * already possesses returns the original instance, not a new one.
+     * This is an important optimization for immutable "wither" methods.
+     */
+    @Test
+    public void withIdVisible_shouldReturnSameInstance_whenVisibilityIsUnchanged() {
+        // Arrange: Create a JsonTypeInfo.Value instance with idVisible set to false.
+        final boolean initialVisibility = false;
+        final String propertyName = "testProperty";
+
+        JsonTypeInfo.Value initialValue = JsonTypeInfo.Value.construct(
+                JsonTypeInfo.Id.MINIMAL_CLASS,
+                JsonTypeInfo.As.WRAPPER_OBJECT,
+                propertyName,
+                Object.class,
+                initialVisibility,
+                false // requireTypeIdForSubtypes
+        );
+
+        // Act: Call the wither method with the same visibility value.
+        JsonTypeInfo.Value resultValue = initialValue.withIdVisible(initialVisibility);
+
+        // Assert: The method should return the identical instance.
+        assertSame(
+            "Expected the same object instance when the visibility value is not changed.",
+            initialValue,
+            resultValue
+        );
+        
+        // Sanity check to ensure other properties remain intact.
+        assertEquals(propertyName, resultValue.getPropertyName());
     }
 }
