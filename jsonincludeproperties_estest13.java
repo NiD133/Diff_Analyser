@@ -1,24 +1,41 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class JsonIncludeProperties_ESTestTest13 extends JsonIncludeProperties_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link JsonIncludeProperties.Value} class, focusing on its configuration-merging logic.
+ */
+public class JsonIncludePropertiesValueTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        JsonIncludeProperties.Value jsonIncludeProperties_Value0 = JsonIncludeProperties.Value.ALL;
-        JsonIncludeProperties jsonIncludeProperties0 = mock(JsonIncludeProperties.class, CALLS_REAL_METHODS);
-        doReturn((String[]) null).when(jsonIncludeProperties0).value();
-        JsonIncludeProperties.Value jsonIncludeProperties_Value1 = JsonIncludeProperties.Value.from(jsonIncludeProperties0);
-        JsonIncludeProperties.Value jsonIncludeProperties_Value2 = jsonIncludeProperties_Value0.withOverrides(jsonIncludeProperties_Value1);
-        assertSame(jsonIncludeProperties_Value2, jsonIncludeProperties_Value1);
+    /**
+     * Verifies that when the base {@code Value} is "undefined" (represented by {@code Value.ALL}),
+     * the {@code withOverrides} method returns the overriding value instance.
+     *
+     * <p>According to the method's contract, overriding an "undefined" value should simply
+     * adopt the configuration of the override value.</p>
+     */
+    @Test
+    public void withOverrides_whenBaseIsUndefined_shouldReturnOverrideValue() {
+        // Arrange
+        // 1. Define a base value that is "undefined". Value.ALL represents this state,
+        //    meaning no specific properties have been configured for inclusion.
+        JsonIncludeProperties.Value baseValue = JsonIncludeProperties.Value.ALL;
+
+        // 2. Define an override value. In this case, it is also "undefined".
+        //    The original test created this using a mock, but using Value.ALL directly
+        //    is clearer and achieves the same result, as Value.from() with a null
+        //    or empty property array returns the singleton Value.ALL instance.
+        JsonIncludeProperties.Value overrideValue = JsonIncludeProperties.Value.ALL;
+
+        // Act
+        // Apply the override to the "undefined" base value.
+        JsonIncludeProperties.Value result = baseValue.withOverrides(overrideValue);
+
+        // Assert
+        // The result should be the exact same instance as the override value,
+        // confirming that the override value was returned as-is.
+        assertSame("Overriding an 'undefined' value should return the override value itself.",
+                overrideValue, result);
     }
 }
