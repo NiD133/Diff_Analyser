@@ -1,140 +1,38 @@
 package org.apache.commons.lang3.reflect;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import org.apache.commons.lang3.AbstractLangTest;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.mutable.MutableObject;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class ConstructorUtilsTestTest7 extends AbstractLangTest {
+/**
+ * Tests for {@link ConstructorUtils#getMatchingAccessibleConstructor(Class, Class...)}.
+ */
+class ConstructorUtilsTest {
 
-    private final Map<Class<?>, Class<?>[]> classCache;
-
-    private void expectMatchingAccessibleConstructorParameterTypes(final Class<?> cls, final Class<?>[] requestTypes, final Class<?>[] actualTypes) {
-        final Constructor<?> c = ConstructorUtils.getMatchingAccessibleConstructor(cls, requestTypes);
-        assertArrayEquals(actualTypes, c.getParameterTypes(), toString(c.getParameterTypes()) + " not equals " + toString(actualTypes));
-    }
-
-    @BeforeEach
-    public void setUp() {
-        classCache.clear();
-    }
-
-    private Class<?>[] singletonArray(final Class<?> c) {
-        Class<?>[] result = classCache.get(c);
-        if (result == null) {
-            result = new Class[] { c };
-            classCache.put(c, result);
-        }
-        return result;
-    }
-
-    private String toString(final Class<?>[] c) {
-        return Arrays.asList(c).toString();
-    }
-
-    private static class BaseClass {
-    }
-
-    static class PrivateClass {
-
-        @SuppressWarnings("unused")
-        public static class PublicInnerClass {
-
-            public PublicInnerClass() {
-            }
-        }
-
-        @SuppressWarnings("unused")
-        public PrivateClass() {
-        }
-    }
-
-    private static final class SubClass extends BaseClass {
-    }
-
-    public static class TestBean {
-
-        private final String toString;
-
-        final String[] varArgs;
-
-        public TestBean() {
-            toString = "()";
-            varArgs = null;
-        }
-
-        public TestBean(final BaseClass bc, final String... s) {
-            toString = "(BaseClass, String...)";
-            varArgs = s;
-        }
-
-        public TestBean(final double d) {
-            toString = "(double)";
-            varArgs = null;
-        }
-
-        public TestBean(final int i) {
-            toString = "(int)";
-            varArgs = null;
-        }
-
-        public TestBean(final Integer i) {
-            toString = "(Integer)";
-            varArgs = null;
-        }
-
-        public TestBean(final Integer first, final int... args) {
-            toString = "(Integer, String...)";
-            varArgs = new String[args.length];
-            for (int i = 0; i < args.length; ++i) {
-                varArgs[i] = Integer.toString(args[i]);
-            }
-        }
-
-        public TestBean(final Integer i, final String... s) {
-            toString = "(Integer, String...)";
-            varArgs = s;
-        }
-
-        public TestBean(final Object o) {
-            toString = "(Object)";
-            varArgs = null;
-        }
-
-        public TestBean(final String s) {
-            toString = "(String)";
-            varArgs = null;
-        }
-
-        public TestBean(final String... s) {
-            toString = "(String...)";
-            varArgs = s;
-        }
-
-        @Override
-        public String toString() {
-            return toString;
-        }
-
-        void verify(final String str, final String[] args) {
-            assertEquals(str, toString);
-            assertArrayEquals(args, varArgs);
-        }
-    }
-
+    /**
+     * Tests that getMatchingAccessibleConstructor treats a null parameter type as a
+     * wildcard that matches any reference type. For a single null parameter, this
+     * should resolve to a constructor taking a single Object.
+     */
     @Test
-    void testNullArgument() {
-        expectMatchingAccessibleConstructorParameterTypes(MutableObject.class, singletonArray(null), singletonArray(Object.class));
+    void getMatchingAccessibleConstructor_withNullParameterType_shouldMatchObjectConstructor() {
+        // Arrange
+        // The MutableObject class has a constructor `public MutableObject(T value)`,
+        // which due to type erasure, becomes `public MutableObject(Object value)`.
+        final Class<MutableObject> classToInspect = MutableObject.class;
+        final Class<?>[] requestedArgTypes = { null };
+        final Class<?>[] expectedParameterTypes = { Object.class };
+
+        // Act
+        final Constructor<MutableObject> foundConstructor =
+                ConstructorUtils.getMatchingAccessibleConstructor(classToInspect, requestedArgTypes);
+
+        // Assert
+        assertNotNull(foundConstructor, "A constructor should be found when using a null parameter type.");
+        assertArrayEquals(expectedParameterTypes, foundConstructor.getParameterTypes(),
+                "The constructor found should be the one that accepts a single Object.");
     }
 }
