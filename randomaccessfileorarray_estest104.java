@@ -1,39 +1,26 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest104 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the constructors of the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayConstructorTest {
 
-    @Test(timeout = 4000)
-    public void test103() throws Throwable {
-        RandomAccessFileOrArray randomAccessFileOrArray0 = null;
-        try {
-            randomAccessFileOrArray0 = new RandomAccessFileOrArray("", false, false);
-            fail("Expecting exception: IOException");
-        } catch (Throwable e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.evosuite.runtime.mock.java.io.NativeMockedIO", e);
-        }
+    /**
+     * Verifies that the constructor throws an IOException when an empty string is provided
+     * as a filename. An empty string is not a valid file path, so the constructor
+     * is expected to fail.
+     *
+     * This test covers the deprecated constructor:
+     * {@code RandomAccessFileOrArray(String filename, boolean forceRead, boolean plainRandomAccess)}
+     */
+    @Test(expected = IOException.class)
+    public void constructor_shouldThrowIOException_whenFilenameIsEmpty() throws IOException {
+        // Act & Assert
+        // Attempt to create an instance with an empty string for the filename.
+        // This is expected to throw an IOException because the path is invalid.
+        new RandomAccessFileOrArray("", false, false);
     }
 }
