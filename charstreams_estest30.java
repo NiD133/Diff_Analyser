@@ -1,44 +1,32 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
-import java.io.EOFException;
-import java.io.FileDescriptor;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.PushbackReader;
-import java.io.Reader;
-import java.io.StringReader;
+import static org.junit.Assert.assertSame;
+
 import java.io.Writer;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.MalformedInputException;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileReader;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharStreams_ESTestTest30 extends CharStreams_ESTest_scaffolding {
+/**
+ * Tests for {@link CharStreams}.
+ */
+public class CharStreamsTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        Writer writer0 = CharStreams.nullWriter();
-        Writer writer1 = CharStreams.asWriter(writer0);
-        assertSame(writer1, writer0);
+    /**
+     * Tests that {@link CharStreams#asWriter(Appendable)} returns the same instance
+     * when the provided {@link Appendable} is already a {@link Writer}.
+     * This is an optimization to avoid unnecessary wrapping.
+     */
+    @Test
+    public void asWriter_whenTargetIsAlreadyAWriter_returnsSameInstance() {
+        // Arrange: Create a Writer instance to use as the target.
+        // CharStreams.nullWriter() is a convenient way to get a simple Writer.
+        Writer targetWriter = CharStreams.nullWriter();
+
+        // Act: Call the asWriter method with the Writer instance.
+        Writer resultWriter = CharStreams.asWriter(targetWriter);
+
+        // Assert: The returned object should be the exact same instance as the input,
+        // not a new wrapper object.
+        assertSame("Expected asWriter to return the original Writer instance without wrapping",
+                targetWriter, resultWriter);
     }
 }
