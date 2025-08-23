@@ -1,55 +1,57 @@
 package org.jfree.chart.renderer.xy;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.text.DateFormatSymbols;
-import java.util.Date;
-import java.util.Locale;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.text.MockSimpleDateFormat;
 import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.plot.CategoryCrosshairState;
-import org.jfree.chart.plot.CombinedRangeXYPlot;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.plot.CrosshairState;
 import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.util.DirectionalGradientPaintTransformer;
-import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerXYDataset;
-import org.jfree.data.statistics.SimpleHistogramBin;
-import org.jfree.data.statistics.SimpleHistogramDataset;
-import org.jfree.data.time.TimeSeriesDataItem;
-import org.jfree.data.xy.CategoryTableXYDataset;
-import org.jfree.data.xy.DefaultOHLCDataset;
-import org.jfree.data.xy.DefaultWindDataset;
-import org.jfree.data.xy.DefaultXYZDataset;
-import org.jfree.data.xy.IntervalXYDataset;
-import org.jfree.data.xy.OHLCDataItem;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
+
+import static org.junit.Assert.fail;
+
+// The test class name is retained from the original to show its context.
 public class ClusteredXYBarRenderer_ESTestTest15 extends ClusteredXYBarRenderer_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        CombinedRangeXYPlot<Short> combinedRangeXYPlot0 = new CombinedRangeXYPlot<Short>();
-        Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
-        PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo((ChartRenderingInfo) null);
-        CategoryCrosshairState<Short, Short> categoryCrosshairState0 = new CategoryCrosshairState<Short, Short>();
-        ClusteredXYBarRenderer clusteredXYBarRenderer0 = new ClusteredXYBarRenderer(0, false);
-        CyclicNumberAxis cyclicNumberAxis0 = new CyclicNumberAxis(0, 0.0);
-        XYSeriesCollection<TimeSeriesDataItem> xYSeriesCollection0 = new XYSeriesCollection<TimeSeriesDataItem>();
-        // Undeclared exception!
-        try {
-            clusteredXYBarRenderer0.drawItem((Graphics2D) null, (XYItemRendererState) null, rectangle2D_Double0, plotRenderingInfo0, combinedRangeXYPlot0, cyclicNumberAxis0, cyclicNumberAxis0, xYSeriesCollection0, 1, 10, categoryCrosshairState0, (-3574));
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that drawItem() throws an IndexOutOfBoundsException when trying to
+     * render an item from an empty dataset.
+     * <p>
+     * The method should perform bounds checking before attempting to access data
+     * from the dataset.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void drawItem_withEmptyDataset_shouldThrowIndexOutOfBoundsException() {
+        // Arrange: Set up the renderer and all required plotting context.
+        // The key part of the setup is an empty dataset.
+        ClusteredXYBarRenderer renderer = new ClusteredXYBarRenderer();
+        XYDataset emptyDataset = new XYSeriesCollection();
+
+        // Mock the required arguments for the drawItem method. Most can be null or
+        // default objects because the exception is expected before they are used.
+        Graphics2D g2 = null;
+        XYItemRendererState rendererState = null;
+        Rectangle2D dataArea = new Rectangle2D.Double();
+        PlotRenderingInfo plotInfo = new PlotRenderingInfo(new ChartRenderingInfo());
+        XYPlot plot = new XYPlot();
+        ValueAxis domainAxis = new CyclicNumberAxis(0.0);
+        ValueAxis rangeAxis = new CyclicNumberAxis(0.0);
+        CrosshairState crosshairState = new CrosshairState();
+        
+        int invalidSeriesIndex = 1; // Any index is invalid for an empty dataset.
+        int invalidItemIndex = 10;  // Any index is invalid.
+        int pass = 1;               // The pass number is not relevant for this exception.
+
+        // Act: Call the method under test with invalid indices.
+        // The @Test(expected=...) annotation will automatically handle the assertion,
+        // causing the test to pass if an IndexOutOfBoundsException is thrown.
+        renderer.drawItem(g2, rendererState, dataArea, plotInfo, plot,
+                domainAxis, rangeAxis, emptyDataset, invalidSeriesIndex, invalidItemIndex,
+                crosshairState, pass);
     }
 }
