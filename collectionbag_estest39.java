@@ -1,43 +1,32 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Stack;
-import java.util.TreeSet;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Collections;
 import org.apache.commons.collections4.Bag;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.SortedBag;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CollectionBag_ESTestTest39 extends CollectionBag_ESTest_scaffolding {
+/**
+ * Test case for the {@link CollectionBag#removeAll(java.util.Collection)} method.
+ */
+public class CollectionBag_ESTestTest39 {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
-        CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
-        HashBag<ComparatorPredicate.Criterion> hashBag0 = new HashBag<ComparatorPredicate.Criterion>();
-        CollectionBag<ComparatorPredicate.Criterion> collectionBag1 = new CollectionBag<ComparatorPredicate.Criterion>(hashBag0);
-        boolean boolean0 = collectionBag1.removeAll(collectionBag0);
-        assertFalse(boolean0);
+    /**
+     * Tests that calling removeAll on an empty CollectionBag with an empty collection
+     * does not modify the bag and correctly returns false.
+     */
+    @Test
+    public void testRemoveAllOnEmptyBagWithEmptyCollectionShouldReturnFalse() {
+        // Arrange: Create an empty CollectionBag. The underlying bag implementation (HashBag)
+        // is chosen for simplicity.
+        final Bag<Object> bag = new CollectionBag<>(new HashBag<>());
+
+        // Act: Attempt to remove all elements from an empty collection.
+        final boolean wasModified = bag.removeAll(Collections.emptySet());
+
+        // Assert: The bag should not have been modified, so the method must return false.
+        assertFalse("removeAll should return false as the bag was not changed", wasModified);
+        assertTrue("The bag should remain empty after the operation", bag.isEmpty());
     }
 }
