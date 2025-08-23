@@ -1,47 +1,68 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class YearsTestTest17 extends TestCase {
+/**
+ * Test suite for the minus(Years) method of the {@link Years} class.
+ */
+public class YearsMinusTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    @Test
+    public void minus_whenSubtractingYears_thenReturnsCorrectResult() {
+        // Arrange
+        Years twoYears = Years.years(2);
+        Years threeYears = Years.years(3);
+        Years expected = Years.years(-1);
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // Act
+        Years actual = twoYears.minus(threeYears);
+
+        // Assert
+        assertEquals(expected, actual);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestYears.class);
+    @Test
+    public void minus_whenCalled_thenOriginalInstancesAreImmutable() {
+        // Arrange
+        Years initialTwoYears = Years.years(2);
+        Years threeYears = Years.years(3);
+
+        // Act
+        initialTwoYears.minus(threeYears);
+
+        // Assert
+        assertEquals("The original Years object should not be modified.", 2, initialTwoYears.getYears());
+        assertEquals("The Years object passed as an argument should not be modified.", 3, threeYears.getYears());
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void minus_whenSubtractingNull_thenTreatsNullAsZero() {
+        // Arrange
+        Years oneYear = Years.ONE;
+
+        // Act
+        Years result = oneYear.minus((Years) null);
+
+        // Assert
+        assertEquals("Subtracting null should be equivalent to subtracting zero.", oneYear, result);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @Test
+    public void minus_whenSubtractingZero_thenReturnsSameValue() {
+        // Arrange
+        Years oneYear = Years.ONE;
+
+        // Act
+        Years result = oneYear.minus(Years.ZERO);
+
+        // Assert
+        assertEquals("Subtracting zero should not change the value.", oneYear, result);
     }
 
-    public void testMinus_Years() {
-        Years test2 = Years.years(2);
-        Years test3 = Years.years(3);
-        Years result = test2.minus(test3);
-        assertEquals(2, test2.getYears());
-        assertEquals(3, test3.getYears());
-        assertEquals(-1, result.getYears());
-        assertEquals(1, Years.ONE.minus(Years.ZERO).getYears());
-        assertEquals(1, Years.ONE.minus((Years) null).getYears());
-        try {
-            Years.MIN_VALUE.minus(Years.ONE);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+    @Test(expected = ArithmeticException.class)
+    public void minus_whenResultUnderflows_thenThrowsArithmeticException() {
+        // Act: Attempt to subtract 1 from the minimum possible value, which will cause an underflow.
+        Years.MIN_VALUE.minus(Years.ONE);
     }
 }
