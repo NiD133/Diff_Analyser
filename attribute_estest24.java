@@ -1,39 +1,35 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
 import java.nio.BufferOverflowException;
 import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class contains tests for the {@link Attribute} class.
+ * Note: The original class name and inheritance from the auto-generated test
+ * suite have been preserved as requested. In a typical scenario, this class
+ * would be named {@code AttributeTest}.
+ */
 public class Attribute_ESTestTest24 extends Attribute_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        Attribute attribute0 = new Attribute("`ata-", "`ata-");
-        CharBuffer charBuffer0 = CharBuffer.allocate(0);
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        // Undeclared exception!
-        try {
-            attribute0.html((Appendable) charBuffer0, document_OutputSettings0);
-            fail("Expecting exception: BufferOverflowException");
-        } catch (BufferOverflowException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.CharBuffer", e);
-        }
+    /**
+     * Verifies that attempting to write an attribute's HTML to an Appendable
+     * with no remaining capacity throws a BufferOverflowException.
+     */
+    @Test(timeout = 4000, expected = BufferOverflowException.class)
+    public void htmlToAppendableThrowsExceptionWhenBufferIsFull() {
+        // Arrange: Create a standard attribute.
+        Attribute attribute = new Attribute("id", "test");
+        
+        // Arrange: Create an Appendable (a CharBuffer) with zero capacity, simulating a full buffer.
+        CharBuffer zeroCapacityBuffer = CharBuffer.allocate(0);
+        
+        // Arrange: Use default output settings.
+        Document.OutputSettings outputSettings = new Document.OutputSettings();
+
+        // Act: Attempt to write the attribute's HTML to the zero-capacity buffer.
+        // The method is expected to throw a BufferOverflowException, which is
+        // asserted by the 'expected' parameter of the @Test annotation.
+        attribute.html((Appendable) zeroCapacityBuffer, outputSettings);
     }
 }
