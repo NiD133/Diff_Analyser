@@ -1,47 +1,35 @@
 package com.itextpdf.text.xml.xmp;
 
+import com.itextpdf.xmp.XMPException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.awt.AsianFontMapper;
-import com.itextpdf.awt.DefaultFontMapper;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfDocument;
-import com.itextpdf.text.pdf.PdfName;
-import com.itextpdf.text.pdf.PdfObject;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.xmp.XMPMeta;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-import javax.swing.DebugGraphics;
-import javax.swing.DropMode;
-import javax.swing.JTree;
-import javax.swing.tree.TreeModel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class XmpWriter_ESTestTest36 extends XmpWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        XmpWriter xmpWriter0 = new XmpWriter((OutputStream) null);
-        MockPrintStream mockPrintStream0 = new MockPrintStream("UTF-16");
-        ObjectOutputStream objectOutputStream0 = new ObjectOutputStream(mockPrintStream0);
-        xmpWriter0.serialize(objectOutputStream0);
+/**
+ * Contains tests for the {@link XmpWriter} class.
+ */
+public class XmpWriterTest {
+
+    /**
+     * Verifies that the serialize method writes default XMP metadata to a given
+     * output stream without throwing an exception.
+     */
+    @Test
+    public void serialize_withValidOutputStream_writesDataSuccessfully() throws IOException, XMPException {
+        // Arrange: Create an XmpWriter. The constructor's OutputStream is not used by the
+        // serialize(OutputStream) method being tested, so passing null is acceptable here.
+        XmpWriter xmpWriter = new XmpWriter((OutputStream) null);
+        ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
+
+        // Act: Serialize the default XMP metadata to our byte stream.
+        xmpWriter.serialize(byteOutputStream);
+
+        // Assert: Verify that some data was actually written to the stream.
+        // This is a stronger check than just ensuring no exception was thrown.
+        assertTrue("The output stream should not be empty after serialization.", byteOutputStream.size() > 0);
     }
 }
