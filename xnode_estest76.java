@@ -1,31 +1,37 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest76 extends XNode_ESTest_scaffolding {
+import javax.imageio.metadata.IIOMetadataNode;
+import java.util.Properties;
 
-    @Test(timeout = 4000)
-    public void test075() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Boolean boolean0 = Boolean.TRUE;
-        Boolean boolean1 = xNode0.getBooleanAttribute("", boolean0);
-        assertTrue(boolean1);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Test suite for the XNode class.
+ */
+public class XNodeTest {
+
+    /**
+     * Verifies that getBooleanAttribute() returns the provided default value
+     * when the requested attribute does not exist on the node.
+     */
+    @Test
+    public void getBooleanAttributeShouldReturnDefaultValueWhenAttributeIsMissing() {
+        // Arrange
+        // Create a DOM node that has no attributes.
+        Node nodeWithoutAttributes = new IIOMetadataNode();
+        XNode xNode = new XNode(null, nodeWithoutAttributes, new Properties());
+
+        String nonExistentAttributeName = "someMissingAttribute";
+        Boolean defaultValue = true;
+
+        // Act
+        Boolean result = xNode.getBooleanAttribute(nonExistentAttributeName, defaultValue);
+
+        // Assert
+        // The method should return the default value because the attribute is not present.
+        assertEquals(defaultValue, result);
     }
 }
