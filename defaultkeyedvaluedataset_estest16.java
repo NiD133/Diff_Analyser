@@ -1,33 +1,33 @@
 package org.jfree.data.general;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigInteger;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.chart.date.SerialDate;
-import org.jfree.chart.date.SpreadsheetDate;
-import org.jfree.data.statistics.SimpleHistogramBin;
-import org.jfree.data.xy.OHLCDataItem;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class DefaultKeyedValueDataset_ESTestTest16 extends DefaultKeyedValueDataset_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultKeyedValueDataset} class.
+ */
+class DefaultKeyedValueDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        DefaultKeyedValueDataset defaultKeyedValueDataset0 = new DefaultKeyedValueDataset();
-        // Undeclared exception!
-        try {
-            defaultKeyedValueDataset0.updateValue((Number) null);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // updateValue: can't update null.
-            //
-            verifyException("org.jfree.data.general.DefaultKeyedValueDataset", e);
-        }
+    /**
+     * Verifies that calling updateValue() on a dataset that has not been
+     * initialized with a key-value pair throws a RuntimeException.
+     */
+    @Test
+    void updateValueOnEmptyDatasetShouldThrowRuntimeException() {
+        // Arrange: Create an empty dataset, which has no initial key or value.
+        DefaultKeyedValueDataset emptyDataset = new DefaultKeyedValueDataset();
+        String expectedErrorMessage = "updateValue: can't update null.";
+
+        // Act & Assert: Attempting to update the value should fail because the
+        // internal data object is null. We use assertThrows to verify this.
+        RuntimeException thrownException = assertThrows(RuntimeException.class, () -> {
+            // The value passed here (100.0) is irrelevant; the exception is due to
+            // the dataset's uninitialized state.
+            emptyDataset.updateValue(100.0);
+        });
+
+        // Verify that the exception has the expected message.
+        assertEquals(expectedErrorMessage, thrownException.getMessage());
     }
 }
