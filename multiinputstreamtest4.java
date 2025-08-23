@@ -1,61 +1,65 @@
 package com.google.common.io;
 
+import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import org.jspecify.annotations.NullUnmarked;
 
-public class MultiInputStreamTestTest4 extends IoTestCase {
+/**
+ * Tests for {@link MultiInputStream}.
+ * This file focuses on specific behaviors, such as handling uncooperative underlying streams.
+ */
+@NullUnmarked
+public class MultiInputStreamTest extends IoTestCase {
 
-    private void joinHelper(Integer... spans) throws Exception {
-        List<ByteSource> sources = new ArrayList<>();
-        int start = 0;
-        for (Integer span : spans) {
-            sources.add(newByteSource(start, span));
-            start += span;
+    /**
+     * An InputStream that simulates an underlying stream that doesn't support skipping efficiently.
+     * This is a valid, though non-performant, implementation of an InputStream, which should be
+     * handled gracefully by consumers like {@link MultiInputStream}.
+     */
+    private static class UncooperativeSkipInputStream extends ByteArrayInputStream {
+        UncooperativeSkipInputStream(byte[] buf) {
+            super(buf);
         }
-        ByteSource joined = ByteSource.concat(sources);
-        assertTrue(newByteSource(0, start).contentEquals(joined));
+
+        /** This stream is "uncooperative" and always reports that 0 bytes were skipped. */
+        @Override
+        public long skip(long n) {
+            return 0;
+        }
     }
 
-    private static MultiInputStream tenMillionEmptySources() throws IOException {
-        return new MultiInputStream(Collections.nCopies(10_000_000, ByteSource.empty()).iterator());
-    }
-
-    private static ByteSource newByteSource(int start, int size) {
-        return new ByteSource() {
-
+    /**
+     * Tests that {@code MultiInputStream} correctly skips bytes even when its underlying stream has an
+     * "uncooperative" {@code skip()} method that always returns 0. In this scenario, robust stream
+     * consumers are expected to fall back to reading and discarding bytes to perform the skip.
+     */
+    public void testSkip_whenUnderlyingStreamIsUncooperative() throws IOException {
+        // Arrange: Create a MultiInputStream from a source whose stream always returns 0 from skip().
+        // The stream contains 50 bytes with values 0, 1, ..., 49.
+        byte[] data = newPreFilledByteArray(0, 50);
+        ByteSource uncooperativeSource = new ByteSource() {
             @Override
             public InputStream openStream() {
-                return new ByteArrayInputStream(newPreFilledByteArray(start, size));
+                return new UncooperativeSkipInputStream(data);
             }
         };
-    }
+        MultiInputStream multiStream =
+                new MultiInputStream(Collections.singleton(uncooperativeSource).iterator());
 
-    // these calls to skip always return 0
-    @SuppressWarnings("CheckReturnValue")
-    public void testSkip() throws Exception {
-        MultiInputStream multi = new MultiInputStream(Collections.singleton(new ByteSource() {
+        // Assert behavior for edge cases before the main action.
+        assertThat(multiStream.skip(-1)).isEqualTo(0L); // Skipping a negative number should do nothing.
+        assertThat(multiStream.skip(0)).isEqualTo(0L); // Skipping zero bytes should do nothing.
 
-            @Override
-            public InputStream openStream() {
-                return new ByteArrayInputStream(newPreFilledByteArray(0, 50)) {
+        // Act: Use a utility that relies on the stream's skip() method to advance.
+        ByteStreams.skipFully(multiStream, 20);
 
-                    @Override
-                    public long skip(long n) {
-                        return 0;
-                    }
-                };
-            }
-        }).iterator());
-        assertEquals(0, multi.skip(-1));
-        assertEquals(0, multi.skip(-1));
-        assertEquals(0, multi.skip(0));
-        ByteStreams.skipFully(multi, 20);
-        assertEquals(20, multi.read());
+        // Assert: We should have skipped the first 20 bytes. The next byte read should be the 21st
+        // byte, which has a value of 20.
+        assertEquals(20, multiStream.read());
     }
 }
