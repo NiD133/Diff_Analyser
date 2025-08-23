@@ -1,23 +1,33 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.CountDownLatch;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BlockingCache_ESTestTest6 extends BlockingCache_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        PerpetualCache perpetualCache0 = new PerpetualCache("");
-        perpetualCache0.putObject("", "");
-        BlockingCache blockingCache0 = new BlockingCache(perpetualCache0);
-        int int0 = blockingCache0.getSize();
-        assertEquals(1, int0);
+/**
+ * Unit tests for the {@link BlockingCache} decorator.
+ */
+public class BlockingCacheTest {
+
+    /**
+     * Verifies that the getSize() method correctly delegates the call
+     * to the underlying cache and returns its size.
+     */
+    @Test
+    public void shouldDelegateGetSizeToUnderlyingCache() {
+        // Arrange: Create a delegate cache with one entry.
+        Cache delegateCache = new PerpetualCache("delegate-cache");
+        delegateCache.putObject("key1", "value1");
+
+        // Arrange: Decorate the delegate cache with BlockingCache.
+        BlockingCache blockingCache = new BlockingCache(delegateCache);
+
+        // Act: Get the size from the BlockingCache.
+        int actualSize = blockingCache.getSize();
+
+        // Assert: The size should be 1, matching the delegate cache.
+        assertEquals(1, actualSize);
     }
 }
