@@ -1,20 +1,35 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Soundex_ESTestTest18 extends Soundex_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Soundex} class.
+ */
+public class SoundexTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        Soundex soundex0 = new Soundex();
-        Object object0 = soundex0.encode((Object) "atW+2N,x7`1kf@");
-        assertNotNull(object0);
-        assertEquals(4, soundex0.getMaxLength());
-        assertEquals("A352", object0);
+    /**
+     * Tests that the encode method correctly handles a string containing non-alphabetic characters
+     * by ignoring them during the encoding process.
+     */
+    @Test
+    public void encodeShouldIgnoreNonAlphabeticCharacters() {
+        // Arrange
+        Soundex soundex = new Soundex();
+        // The input string contains letters, numbers, and symbols.
+        // The Soundex algorithm should ignore non-letters.
+        // Transformation for "atW+2N,x7`1kf@":
+        // 1. Retain first letter: 'A'
+        // 2. Map subsequent consonants: t -> 3, W -> ignored, N -> 5, x -> 2
+        // 3. Pad to 4 characters: A352
+        String inputWithNonLetters = "atW+2N,x7`1kf@";
+        String expectedEncoding = "A352";
+
+        // Act
+        String actualEncoding = soundex.encode(inputWithNonLetters);
+
+        // Assert
+        assertEquals("The Soundex encoding should ignore non-alphabetic characters",
+                expectedEncoding, actualEncoding);
     }
 }
