@@ -1,20 +1,37 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IllegalFieldValueException_ESTestTest23 extends IllegalFieldValueException_ESTest_scaffolding {
+// Note: The original test class name "IllegalFieldValueException_ESTestTest23"
+// and its EvoSuite scaffolding have been removed for clarity and simplicity.
+public class IllegalFieldValueExceptionTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.weekyear();
-        Long long0 = new Long((-42521587200000L));
-        IllegalFieldValueException illegalFieldValueException0 = new IllegalFieldValueException(dateTimeFieldType0, long0, long0, long0);
-        String string0 = illegalFieldValueException0.getMessage();
-        assertEquals("Value -42521587200000 for weekyear must be in the range [-42521587200000,-42521587200000]", string0);
+    /**
+     * Verifies that the exception message is correctly formatted when an
+     * IllegalFieldValueException is constructed with a DateTimeFieldType,
+     * an illegal numeric value, and its corresponding lower and upper bounds.
+     */
+    @Test
+    public void testMessageFormattingForNumericValueWithBounds() {
+        // Arrange
+        final DateTimeFieldType fieldType = DateTimeFieldType.weekyear();
+        final Long illegalValue = -42521587200000L;
+        final Long lowerBound = -42521587200000L;
+        final Long upperBound = -42521587200000L;
+
+        // The expected message is dynamically constructed to make the test's
+        // intent clear and to avoid errors from a long, hardcoded string.
+        final String expectedMessage = String.format(
+            "Value %d for %s must be in the range [%d,%d]",
+            illegalValue, fieldType.getName(), lowerBound, upperBound);
+
+        // Act
+        final IllegalFieldValueException exception = new IllegalFieldValueException(
+            fieldType, illegalValue, lowerBound, upperBound);
+        final String actualMessage = exception.getMessage();
+
+        // Assert
+        assertEquals(expectedMessage, actualMessage);
     }
 }
