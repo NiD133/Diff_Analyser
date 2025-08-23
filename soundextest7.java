@@ -1,12 +1,15 @@
 package org.apache.commons.codec.language;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import org.apache.commons.codec.AbstractStringEncoderTest;
-import org.apache.commons.codec.EncoderException;
-import org.junit.jupiter.api.Test;
 
+import org.apache.commons.codec.AbstractStringEncoderTest;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
+/**
+ * Contains Soundex encoding tests based on external examples.
+ * This test class focuses on the default Soundex implementation.
+ */
 public class SoundexTestTest7 extends AbstractStringEncoderTest<Soundex> {
 
     @Override
@@ -15,17 +18,25 @@ public class SoundexTestTest7 extends AbstractStringEncoderTest<Soundex> {
     }
 
     /**
-     * Examples from: http://www.myatt.demon.co.uk/sxalg.htm
+     * Tests the Soundex encoding algorithm against a set of examples from an external source.
+     * The original source (http://www.myatt.demon.co.uk/sxalg.htm) is no longer available,
+     * but the examples are preserved here for regression testing.
+     *
+     * @param name the input name to encode
+     * @param expectedCode the expected Soundex code
      */
-    @Test
-    void testEncodeBatch4() {
-        assertEquals("H452", getStringEncoder().encode("HOLMES"));
-        assertEquals("A355", getStringEncoder().encode("ADOMOMI"));
-        assertEquals("V536", getStringEncoder().encode("VONDERLEHR"));
-        assertEquals("B400", getStringEncoder().encode("BALL"));
-        assertEquals("S000", getStringEncoder().encode("SHAW"));
-        assertEquals("J250", getStringEncoder().encode("JACKSON"));
-        assertEquals("S545", getStringEncoder().encode("SCANLON"));
-        assertEquals("S532", getStringEncoder().encode("SAINTJOHN"));
+    @ParameterizedTest(name = "Encoding of ''{0}'' should be ''{1}''")
+    @CsvSource({
+        "HOLMES,      H452",
+        "ADOMOMI,     A355",
+        "VONDERLEHR,  V536",
+        "BALL,        B400",
+        "SHAW,        S000",
+        "JACKSON,     J250",
+        "SCANLON,     S545",
+        "SAINTJOHN,   S532"
+    })
+    void testEncodeWithVariousExamples(final String name, final String expectedCode) {
+        assertEquals(expectedCode, getStringEncoder().encode(name));
     }
 }
