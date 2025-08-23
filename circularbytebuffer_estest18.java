@@ -1,27 +1,30 @@
 package org.apache.commons.io.input.buffer;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CircularByteBuffer_ESTestTest18 extends CircularByteBuffer_ESTest_scaffolding {
+/**
+ * Tests for {@link CircularByteBuffer}.
+ */
+public class CircularByteBufferTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        byte[] byteArray0 = new byte[22];
-        CircularByteBuffer circularByteBuffer0 = new CircularByteBuffer();
-        // Undeclared exception!
-        try {
-            circularByteBuffer0.peek(byteArray0, 16, 16);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 22
-            //
-            verifyException("org.apache.commons.io.input.buffer.CircularByteBuffer", e);
-        }
+    /**
+     * Tests that peek() throws an ArrayIndexOutOfBoundsException when the provided
+     * offset and length would cause an out-of-bounds access on the source buffer.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void peekShouldThrowExceptionForOffsetAndLengthExceedingSourceBounds() {
+        // Arrange
+        final CircularByteBuffer buffer = new CircularByteBuffer();
+        final byte[] sourceBuffer = new byte[22];
+        final int offset = 16;
+        final int length = 16;
+
+        // The combination of offset and length (16 + 16 = 32) is out of bounds
+        // for the sourceBuffer, which has a size of 22.
+
+        // Act
+        buffer.peek(sourceBuffer, offset, length);
+
+        // Assert: The @Test(expected) annotation handles the exception assertion.
     }
 }
