@@ -1,20 +1,40 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class RandomUtils_ESTestTest1 extends RandomUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.RandomUtils}.
+ */
+public class RandomUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        RandomUtils randomUtils0 = RandomUtils.secure();
-        float float0 = randomUtils0.randomFloat(1.0F, 1797.5656F);
-        //  // Unstable assertion: assertEquals(102.1026F, float0, 0.01F);
+    /**
+     * Tests that {@code randomFloat(start, end)} returns a value within the specified range.
+     *
+     * <p>Because the output is random, this test cannot assert a specific value.
+     * Instead, it verifies that the generated float correctly falls within the expected bounds
+     * of [startInclusive, endExclusive).</p>
+     */
+    @Test
+    public void randomFloat_shouldReturnFloatWithinGivenRange() {
+        // Arrange
+        final float startInclusive = 1.0F;
+        final float endExclusive = 1797.5656F;
+        final RandomUtils randomUtils = RandomUtils.secure();
+
+        // Act
+        final float result = randomUtils.randomFloat(startInclusive, endExclusive);
+
+        // Assert
+        // The result must be greater than or equal to the start boundary.
+        assertTrue(
+            "The generated float " + result + " should be >= " + startInclusive,
+            result >= startInclusive
+        );
+        // The result must be less than the exclusive end boundary.
+        assertTrue(
+            "The generated float " + result + " should be < " + endExclusive,
+            result < endExclusive
+        );
     }
 }
