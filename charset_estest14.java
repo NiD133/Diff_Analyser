@@ -1,19 +1,28 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSet_ESTestTest14 extends CharSet_ESTest_scaffolding {
+/**
+ * This test case verifies the properties of the predefined `CharSet.EMPTY` constant.
+ * The original test was automatically generated and contained confusing, irrelevant code.
+ */
+public class CharSet_ESTestTest14 {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        String[] stringArray0 = new String[9];
-        CharSet charSet0 = CharSet.getInstance(stringArray0);
-        CharRange[] charRangeArray0 = charSet0.EMPTY.getCharRanges();
-        assertEquals(0, charRangeArray0.length);
+    /**
+     * Tests that the `getCharRanges()` method returns an empty array for the
+     * `CharSet.EMPTY` constant. This confirms that an empty set correctly
+     * contains no character ranges.
+     */
+    @Test
+    public void testGetCharlRanges_onEmptySet_returnsEmptyArray() {
+        // Arrange: The test focuses on the predefined EMPTY CharSet constant.
+        // No specific setup is needed.
+
+        // Act: Retrieve the character ranges from the EMPTY CharSet.
+        CharRange[] charRanges = CharSet.EMPTY.getCharRanges();
+
+        // Assert: The returned array of character ranges should be empty.
+        assertEquals("The CharSet.EMPTY constant should not contain any character ranges.", 0, charRanges.length);
     }
 }
