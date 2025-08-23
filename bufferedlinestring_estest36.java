@@ -1,31 +1,43 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.ShapeCollection;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLineString_ESTestTest36 extends BufferedLineString_ESTest_scaffolding {
+import java.util.Collections;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        LinkedList<Point> linkedList0 = new LinkedList<Point>();
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
-        BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, (-2877.398196062), true, spatialContext0);
-        double double0 = bufferedLineString0.getBuf();
-        assertEquals((-2877.398196062), double0, 0.01);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Unit tests for {@link BufferedLineString}.
+ */
+public class BufferedLineStringTest {
+
+    /**
+     * Tests that the getBuf() method correctly returns the buffer value
+     * provided in the constructor. This test specifically uses a negative buffer
+     * value and an empty list of points to ensure the getter is not
+     * dependent on these inputs.
+     */
+    @Test
+    public void getBufShouldReturnConstructorValue() {
+        // Arrange
+        final double expectedBuffer = -2877.398196062;
+        final List<Point> emptyPoints = Collections.emptyList();
+        final SpatialContext spatialContext = SpatialContext.GEO;
+
+        BufferedLineString lineString = new BufferedLineString(
+                emptyPoints,
+                expectedBuffer,
+                true, // expandBufForLongitudeSkew
+                spatialContext
+        );
+
+        // Act
+        double actualBuffer = lineString.getBuf();
+
+        // Assert
+        assertEquals(expectedBuffer, actualBuffer, 0.01);
     }
 }
