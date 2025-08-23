@@ -1,30 +1,33 @@
 package com.google.gson;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest78 extends JsonArray_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonArray} class.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test77() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        // Undeclared exception!
-        try {
-            jsonArray0.getAsFloat();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // Array must have size 1, but has size 0
-            //
-            verifyException("com.google.gson.JsonArray", e);
-        }
+    /**
+     * Verifies that calling getAsFloat() on an empty JsonArray throws an IllegalStateException.
+     * The method is designed to work only on arrays with exactly one element.
+     */
+    @Test
+    public void getAsFloat_whenArrayIsEmpty_throwsIllegalStateException() {
+        // Arrange: Create an empty JsonArray.
+        JsonArray emptyArray = new JsonArray();
+        String expectedMessage = "Array must have size 1, but has size 0";
+
+        // Act & Assert: Call getAsFloat() and verify the exception.
+        IllegalStateException thrownException = assertThrows(
+            "Calling getAsFloat() on an empty array should throw an IllegalStateException.",
+            IllegalStateException.class,
+            () -> emptyArray.getAsFloat()
+        );
+
+        // Assert: Verify the exception message is correct.
+        assertEquals(expectedMessage, thrownException.getMessage());
     }
 }
