@@ -1,31 +1,45 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
-public class WindowsLineEndingInputStream_ESTestTest7 extends WindowsLineEndingInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link WindowsLineEndingInputStream}.
+ * This class focuses on verifying the stream's line ending conversions.
+ */
+public class WindowsLineEndingInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        byte[] byteArray0 = new byte[6];
-        byteArray0[0] = (byte) 10;
-        ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
-        PushbackInputStream pushbackInputStream0 = new PushbackInputStream(byteArrayInputStream0);
-        DataInputStream dataInputStream0 = new DataInputStream(pushbackInputStream0);
-        WindowsLineEndingInputStream windowsLineEndingInputStream0 = new WindowsLineEndingInputStream(dataInputStream0, true);
-        int int0 = windowsLineEndingInputStream0.read(byteArray0);
-        assertArrayEquals(new byte[] { (byte) 13, (byte) 10, (byte) 13, (byte) 10, (byte) 13, (byte) 10 }, byteArray0);
-        assertEquals(6, int0);
+    /**
+     * Tests that a lone line feed ('\n') at the beginning of the stream
+     * is correctly converted to a carriage return and line feed ("\r\n")
+     * when reading a block of bytes.
+     */
+    @Test
+    public void readBlockWithLoneLineFeedAtStartIsConvertedToCRLF() throws IOException {
+        // Arrange
+        // The input data starts with a lone Line Feed ('\n').
+        final byte[] inputData = new byte[]{'\n', 'a', 'b', 'c', 'd', 'e'};
+        final InputStream sourceStream = new ByteArrayInputStream(inputData);
+
+        // The expected output should have a Carriage Return ('\r') prepended to the '\n'.
+        // The read will consume 6 bytes from the transformed stream.
+        final byte[] expectedData = new byte[]{'\r', '\n', 'a', 'b', 'c', 'd'};
+        final byte[] actualData = new byte[6];
+
+        // The 'ensureLineFeedAtEos' parameter is true, but it won't affect this specific
+        // read because we are not reaching the end of the stream.
+        try (final WindowsLineEndingInputStream windowsStream = new WindowsLineEndingInputStream(sourceStream, true)) {
+            // Act
+            final int bytesRead = windowsStream.read(actualData);
+
+            // Assert
+            assertEquals("Should read the requested number of bytes.", 6, bytesRead);
+            assertArrayEquals("A lone '\\n' should be converted to '\\r\\n'.", expectedData, actualData);
+        }
     }
 }
