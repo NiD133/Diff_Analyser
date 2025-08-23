@@ -1,59 +1,52 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.SortedBag;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.apache.commons.collections4.functors.FalsePredicate;
+import org.junit.Test;
 
-public class CollectionSortedBag_ESTestTest32 extends CollectionSortedBag_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        Comparator<Object> comparator0 = (Comparator<Object>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        TreeBag<Predicate<Object>> treeBag0 = new TreeBag<Predicate<Object>>(comparator0);
-        IdentityPredicate<Object> identityPredicate0 = new IdentityPredicate<Object>(treeBag0);
-        PredicatedSortedBag<Predicate<Object>> predicatedSortedBag0 = PredicatedSortedBag.predicatedSortedBag((SortedBag<Predicate<Object>>) treeBag0, (Predicate<? super Predicate<Object>>) identityPredicate0);
-        CollectionSortedBag<Predicate<Object>> collectionSortedBag0 = new CollectionSortedBag<Predicate<Object>>(predicatedSortedBag0);
-        // Undeclared exception!
+/**
+ * This test class verifies the behavior of the CollectionSortedBag decorator,
+ * specifically focusing on how it handles decorated bags that reject elements.
+ */
+public class CollectionSortedBagTest {
+
+    /**
+     * Tests that CollectionSortedBag.add() throws an IllegalArgumentException
+     * if the underlying decorated bag rejects the element being added.
+     */
+    @Test
+    public void addShouldThrowExceptionWhenDecoratedBagRejectsElement() {
+        // Arrange
+        // 1. Create a base sorted bag. TreeBag is a standard implementation.
+        final SortedBag<String> baseBag = new TreeBag<>();
+
+        // 2. Create a predicate that always rejects any element.
+        final Predicate<String> rejectingPredicate = FalsePredicate.falsePredicate();
+
+        // 3. Decorate the base bag with a PredicatedSortedBag. This bag will use the
+        //    rejectingPredicate to throw an exception for any element we try to add.
+        final SortedBag<String> predicatedBag =
+                PredicatedSortedBag.predicatedSortedBag(baseBag, rejectingPredicate);
+
+        // 4. Decorate the predicatedBag with CollectionSortedBag, the class under test.
+        final SortedBag<String> collectionBag = new CollectionSortedBag<>(predicatedBag);
+
+        final String elementToAdd = "any-element";
+
+        // Act & Assert
         try {
-            collectionSortedBag0.add((Predicate<Object>) identityPredicate0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Cannot add Object 'org.apache.commons.collections4.functors.IdentityPredicate@2' - Predicate 'org.apache.commons.collections4.functors.IdentityPredicate@2' rejected it
-            //
-            verifyException("org.apache.commons.collections4.collection.PredicatedCollection", e);
+            collectionBag.add(elementToAdd);
+            fail("Expected an IllegalArgumentException to be thrown because the predicate rejects the element.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception is the one thrown by PredicatedCollection
+            // and that its message clearly indicates the reason for failure.
+            final String expectedMessage =
+                    "Cannot add Object '" + elementToAdd + "' - Predicate rejected it";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
