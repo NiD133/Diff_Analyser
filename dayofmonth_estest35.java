@@ -1,52 +1,39 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Month;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.Chronology;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.MinguoDate;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
 import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockMinguoDate;
-import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+/**
+ * This test class contains the refactored test case.
+ * While the original class name "DayOfMonth_ESTestTest35" is kept to match the input,
+ * in a real-world scenario, it would be renamed to something more meaningful, like "DayOfMonthTest".
+ */
 public class DayOfMonth_ESTestTest35 extends DayOfMonth_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        DayOfMonth dayOfMonth0 = DayOfMonth.now();
-        ChronoField chronoField0 = ChronoField.INSTANT_SECONDS;
-        // Undeclared exception!
+    /**
+     * Tests that calling getLong() with a field not supported by DayOfMonth
+     * throws an UnsupportedTemporalTypeException.
+     */
+    @Test
+    public void getLong_whenFieldIsUnsupported_throwsException() {
+        // Arrange: Create a DayOfMonth instance and an unsupported field.
+        // DayOfMonth is a simple value object, so any specific day will suffice.
+        DayOfMonth dayOfMonth = DayOfMonth.of(15);
+        TemporalField unsupportedField = ChronoField.INSTANT_SECONDS;
+
+        // Act & Assert: Attempt to get the value for the unsupported field
+        // and verify that the correct exception is thrown with the expected message.
         try {
-            dayOfMonth0.getLong(chronoField0);
-            fail("Expecting exception: UnsupportedTemporalTypeException");
+            dayOfMonth.getLong(unsupportedField);
+            fail("Expected an UnsupportedTemporalTypeException to be thrown.");
         } catch (UnsupportedTemporalTypeException e) {
-            //
-            // Unsupported field: InstantSeconds
-            //
-            verifyException("org.threeten.extra.DayOfMonth", e);
+            // Verify the exception message is informative and correct.
+            assertEquals("Unsupported field: InstantSeconds", e.getMessage());
         }
     }
 }
