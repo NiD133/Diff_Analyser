@@ -1,20 +1,40 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSequenceUtils_ESTestTest23 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CharSequenceUtils}.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder("', is neither of type Map.Entry nor an Array");
-        stringBuilder0.appendCodePoint(1114111);
-        int int0 = CharSequenceUtils.indexOf(stringBuilder0, 1114111, (-897));
-        assertEquals(44, int0);
+    /**
+     * Tests that {@code indexOf} correctly finds a supplementary Unicode character
+     * when the search starts from a negative index.
+     *
+     * <p>According to the Javadoc, a negative start index is treated as 0,
+     * meaning the entire CharSequence should be searched from the beginning.</p>
+     *
+     * <p>A supplementary character is a Unicode character that is represented by
+     * two {@code char} values (a surrogate pair) in Java.</p>
+     */
+    @Test
+    public void testIndexOfFindsSupplementaryCharWithNegativeStartIndex() {
+        // Arrange
+        // U+10FFFF is the maximum valid Unicode code point and serves as a supplementary character.
+        final int supplementaryCodePoint = 0x10FFFF;
+        final String prefix = "search-prefix";
+        
+        final StringBuilder text = new StringBuilder(prefix);
+        text.appendCodePoint(supplementaryCodePoint);
+
+        final int expectedIndex = prefix.length(); // The character is appended after the prefix.
+        final int negativeStartIndex = -1;
+
+        // Act
+        final int actualIndex = CharSequenceUtils.indexOf(text, supplementaryCodePoint, negativeStartIndex);
+
+        // Assert
+        assertEquals(expectedIndex, actualIndex);
     }
 }
