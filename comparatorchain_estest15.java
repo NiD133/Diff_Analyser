@@ -1,46 +1,45 @@
 package org.apache.commons.collections4.comparators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
-import java.util.BitSet;
 import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class ComparatorChain_ESTestTest15 extends ComparatorChain_ESTest_scaffolding {
+/**
+ * Contains tests for {@link ComparatorChain}, focusing on its behavior when
+ * dealing with comparators that throw exceptions.
+ */
+public class ComparatorChainExceptionTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        LinkedList<Comparator<Object>> linkedList0 = new LinkedList<Comparator<Object>>();
-        ComparatorChain<Object> comparatorChain0 = new ComparatorChain<Object>(linkedList0);
-        Closure<Object> closure0 = ExceptionClosure.exceptionClosure();
-        ClosureTransformer<Object> closureTransformer0 = new ClosureTransformer<Object>(closure0);
-        Comparator<ComparatorChain<Object>> comparator0 = Comparator.comparing((Function<? super ComparatorChain<Object>, ?>) closureTransformer0, (Comparator<? super Object>) comparatorChain0);
-        ComparatorChain<ComparatorChain<Object>> comparatorChain1 = new ComparatorChain<ComparatorChain<Object>>(comparator0);
-        // Undeclared exception!
+    /**
+     * Tests that a RuntimeException thrown by a contained comparator is correctly
+     * propagated by the ComparatorChain's compare() method.
+     */
+    @Test
+    public void compareShouldPropagateRuntimeExceptionFromWrappedComparator() {
+        // Arrange
+        final String expectedExceptionMessage = "Exception from a wrapped comparator";
+
+        // Create a simple comparator that always throws a RuntimeException.
+        // This simulates a scenario where a comparator in the chain fails during execution.
+        final Comparator<Object> failingComparator = (obj1, obj2) -> {
+            throw new RuntimeException(expectedExceptionMessage);
+        };
+
+        // Create the ComparatorChain under test, containing only the failing comparator.
+        final ComparatorChain<Object> chainWithFailingComparator = new ComparatorChain<>(failingComparator);
+
+        // The actual objects to be compared are irrelevant since the comparator will fail immediately.
+        final Object dummyObject1 = new Object();
+        final Object dummyObject2 = new Object();
+
+        // Act & Assert
         try {
-            comparatorChain1.compare(comparatorChain0, comparatorChain0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // ExceptionClosure invoked
-            //
-            verifyException("org.apache.commons.collections4.functors.ExceptionClosure", e);
+            chainWithFailingComparator.compare(dummyObject1, dummyObject2);
+            fail("A RuntimeException was expected to be thrown and propagated.");
+        } catch (final RuntimeException e) {
+            // Verify that the exception from the wrapped comparator was caught.
+            assertEquals(expectedExceptionMessage, e.getMessage());
         }
     }
 }
