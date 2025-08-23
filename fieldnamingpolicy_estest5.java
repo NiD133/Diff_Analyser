@@ -1,18 +1,27 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Field;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class FieldNamingPolicy_ESTestTest5 extends FieldNamingPolicy_ESTest_scaffolding {
+/**
+ * Tests for the static helper methods in {@link FieldNamingPolicy}.
+ */
+public class FieldNamingPolicyTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        String string0 = FieldNamingPolicy.upperCaseFirstLetter("cA:[IY:hB?-NT@IV/y");
-        assertEquals("CA:[IY:hB?-NT@IV/y", string0);
+    /**
+     * Verifies that {@code upperCaseFirstLetter} correctly capitalizes the first letter
+     * of a given string, while leaving the remainder of the string unchanged.
+     */
+    @Test
+    public void upperCaseFirstLetter_withLowerCaseStart_shouldCapitalizeFirstLetterOnly() {
+        // Arrange
+        String inputString = "someFieldNameInCamelCase";
+        String expectedString = "SomeFieldNameInCamelCase";
+
+        // Act
+        String actualString = FieldNamingPolicy.upperCaseFirstLetter(inputString);
+
+        // Assert
+        assertEquals(expectedString, actualString);
     }
 }
