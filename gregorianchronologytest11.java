@@ -1,89 +1,54 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.joda.time.Chronology;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.joda.time.YearMonthDay;
+import org.junit.Before;
+import org.junit.Test;
 
-public class GregorianChronologyTestTest11 extends TestCase {
+/**
+ * Unit tests for the time-related fields of GregorianChronology.
+ * This test focuses on verifying the names and support status of fields
+ * like hourOfDay, minuteOfHour, etc.
+ */
+public class GregorianChronologyTimeFieldsTest {
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    private Chronology gregorianChronology;
 
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Before
+    public void setUp() {
+        // Using the UTC instance ensures tests are deterministic and not affected by the default time zone.
+        gregorianChronology = GregorianChronology.getInstanceUTC();
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestGregorianChronology.class);
+    @Test
+    public void testTimeFieldNamesAreCorrect() {
+        assertEquals("halfdayOfDay", gregorianChronology.halfdayOfDay().getName());
+        assertEquals("clockhourOfHalfday", gregorianChronology.clockhourOfHalfday().getName());
+        assertEquals("hourOfHalfday", gregorianChronology.hourOfHalfday().getName());
+        assertEquals("clockhourOfDay", gregorianChronology.clockhourOfDay().getName());
+        assertEquals("hourOfDay", gregorianChronology.hourOfDay().getName());
+        assertEquals("minuteOfDay", gregorianChronology.minuteOfDay().getName());
+        assertEquals("minuteOfHour", gregorianChronology.minuteOfHour().getName());
+        assertEquals("secondOfDay", gregorianChronology.secondOfDay().getName());
+        assertEquals("secondOfMinute", gregorianChronology.secondOfMinute().getName());
+        assertEquals("millisOfDay", gregorianChronology.millisOfDay().getName());
+        assertEquals("millisOfSecond", gregorianChronology.millisOfSecond().getName());
     }
 
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    public void testTimeFields() {
-        final GregorianChronology greg = GregorianChronology.getInstance();
-        assertEquals("halfdayOfDay", greg.halfdayOfDay().getName());
-        assertEquals("clockhourOfHalfday", greg.clockhourOfHalfday().getName());
-        assertEquals("hourOfHalfday", greg.hourOfHalfday().getName());
-        assertEquals("clockhourOfDay", greg.clockhourOfDay().getName());
-        assertEquals("hourOfDay", greg.hourOfDay().getName());
-        assertEquals("minuteOfDay", greg.minuteOfDay().getName());
-        assertEquals("minuteOfHour", greg.minuteOfHour().getName());
-        assertEquals("secondOfDay", greg.secondOfDay().getName());
-        assertEquals("secondOfMinute", greg.secondOfMinute().getName());
-        assertEquals("millisOfDay", greg.millisOfDay().getName());
-        assertEquals("millisOfSecond", greg.millisOfSecond().getName());
-        assertEquals(true, greg.halfdayOfDay().isSupported());
-        assertEquals(true, greg.clockhourOfHalfday().isSupported());
-        assertEquals(true, greg.hourOfHalfday().isSupported());
-        assertEquals(true, greg.clockhourOfDay().isSupported());
-        assertEquals(true, greg.hourOfDay().isSupported());
-        assertEquals(true, greg.minuteOfDay().isSupported());
-        assertEquals(true, greg.minuteOfHour().isSupported());
-        assertEquals(true, greg.secondOfDay().isSupported());
-        assertEquals(true, greg.secondOfMinute().isSupported());
-        assertEquals(true, greg.millisOfDay().isSupported());
-        assertEquals(true, greg.millisOfSecond().isSupported());
+    @Test
+    public void testTimeFieldsAreSupported() {
+        assertTrue(gregorianChronology.halfdayOfDay().isSupported());
+        assertTrue(gregorianChronology.clockhourOfHalfday().isSupported());
+        assertTrue(gregorianChronology.hourOfHalfday().isSupported());
+        assertTrue(gregorianChronology.clockhourOfDay().isSupported());
+        assertTrue(gregorianChronology.hourOfDay().isSupported());
+        assertTrue(gregorianChronology.minuteOfDay().isSupported());
+        assertTrue(gregorianChronology.minuteOfHour().isSupported());
+        assertTrue(gregorianChronology.secondOfDay().isSupported());
+        assertTrue(gregorianChronology.secondOfMinute().isSupported());
+        assertTrue(gregorianChronology.millisOfDay().isSupported());
+        assertTrue(gregorianChronology.millisOfSecond().isSupported());
     }
 }
