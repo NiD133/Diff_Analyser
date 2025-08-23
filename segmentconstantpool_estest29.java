@@ -1,28 +1,20 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ClassFileEntry;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ConstantPoolEntry;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SegmentConstantPool_ESTestTest29 extends SegmentConstantPool_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SegmentConstantPool} class.
+ */
+public class SegmentConstantPoolTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        // Undeclared exception!
-        try {
-            SegmentConstantPool.regexMatches("^<init>.*", (String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-        }
+    /**
+     * Verifies that the {@code regexMatches} method throws a NullPointerException
+     * when the string to be compared against the regex is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void regexMatchesShouldThrowNPEForNullInputString() {
+        // The method under test is expected to throw a NullPointerException
+        // because the second argument, the string to be matched, is null.
+        SegmentConstantPool.regexMatches("^<init>.*", null);
     }
 }
