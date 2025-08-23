@@ -1,20 +1,29 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class URLCodec_ESTestTest34 extends URLCodec_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link URLCodec} class.
+ */
+public class URLCodecTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        URLCodec uRLCodec0 = new URLCodec();
-        String string0 = uRLCodec0.encode((String) null, (String) null);
-        assertNull(string0);
+    /**
+     * Tests that the encode(String, String) method returns null when the input string is null.
+     * The behavior of encoders on null input is a critical edge case to verify.
+     */
+    @Test
+    public void testEncodeStringWithCharsetGivenNullStringReturnsNull() {
+        // Arrange
+        URLCodec urlCodec = new URLCodec();
+        String inputStringToEncode = null;
+
+        // Act
+        // The charset argument is irrelevant when the input string is null,
+        // but we pass null to match the original test's behavior.
+        String encodedResult = urlCodec.encode(inputStringToEncode, null);
+
+        // Assert
+        assertNull("Encoding a null string should return null.", encodedResult);
     }
 }
