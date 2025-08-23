@@ -1,26 +1,20 @@
 package com.google.common.primitives;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+/**
+ * Tests for {@link SignedBytes}.
+ */
+// The original test class name and inheritance are kept for context,
+// but in a real-world scenario, they would likely be simplified to:
+// public class SignedBytesTest {
 public class SignedBytes_ESTestTest13 extends SignedBytes_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        // Undeclared exception!
-        try {
-            SignedBytes.sortDescending((byte[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.base.Preconditions", e);
-        }
+    /**
+     * Verifies that sortDescending throws a NullPointerException when the input array is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void sortDescending_shouldThrowNullPointerException_whenArrayIsNull() {
+        SignedBytes.sortDescending(null);
     }
 }
