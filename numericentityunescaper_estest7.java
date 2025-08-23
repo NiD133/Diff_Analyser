@@ -1,31 +1,29 @@
 package org.apache.commons.lang3.text.translate;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.StringWriter;
 import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NumericEntityUnescaper_ESTestTest7 extends NumericEntityUnescaper_ESTest_scaffolding {
+/**
+ * Tests for {@link NumericEntityUnescaper}.
+ */
+public class NumericEntityUnescaperTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        NumericEntityUnescaper.OPTION[] numericEntityUnescaper_OPTIONArray0 = new NumericEntityUnescaper.OPTION[0];
-        StringWriter stringWriter0 = new StringWriter();
-        NumericEntityUnescaper numericEntityUnescaper0 = new NumericEntityUnescaper(numericEntityUnescaper_OPTIONArray0);
-        // Undeclared exception!
-        try {
-            numericEntityUnescaper0.translate((CharSequence) null, Integer.MAX_VALUE, (Writer) stringWriter0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.lang3.text.translate.NumericEntityUnescaper", e);
-        }
+    /**
+     * Tests that the translate method throws a NullPointerException
+     * when the input CharSequence is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void translateShouldThrowNullPointerExceptionForNullInput() {
+        // Arrange
+        // The specific unescaping options do not affect the outcome of a null-input check.
+        final NumericEntityUnescaper unescaper = new NumericEntityUnescaper();
+        final Writer writer = new StringWriter();
+        final int anyIndex = 0; // The index is irrelevant when the input is null.
+
+        // Act & Assert
+        // This call is expected to throw a NullPointerException.
+        unescaper.translate(null, anyIndex, writer);
     }
 }
