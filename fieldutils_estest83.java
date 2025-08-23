@@ -1,31 +1,28 @@
 package org.joda.time.field;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
 
-public class FieldUtils_ESTestTest83 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test82() throws Throwable {
-        // Undeclared exception!
+    @Test
+    public void safeAdd_int_throwsExceptionOnOverflow() {
+        // Verifies that safeAdd(int, int) throws an ArithmeticException
+        // when the addition results in an integer overflow.
         try {
+            // Act: Attempt to add two integers that will cause an overflow.
             FieldUtils.safeAdd(Integer.MAX_VALUE, Integer.MAX_VALUE);
-            fail("Expecting exception: ArithmeticException");
+            fail("Expected an ArithmeticException to be thrown due to overflow");
         } catch (ArithmeticException e) {
-            //
-            // The calculation caused an overflow: 2147483647 + 2147483647
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
+            // Assert: Check that the correct exception was thrown with the expected message.
+            assertEquals(
+                "The calculation caused an overflow: 2147483647 + 2147483647",
+                e.getMessage());
         }
     }
 }
