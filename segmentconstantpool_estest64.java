@@ -1,23 +1,47 @@
 package org.apache.commons.compress.harmony.unpack200;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ClassFileEntry;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ConstantPoolEntry;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SegmentConstantPool_ESTestTest64 extends SegmentConstantPool_ESTest_scaffolding {
+/**
+ * Unit tests for {@link SegmentConstantPool}.
+ */
+public class SegmentConstantPoolTest {
 
-    @Test(timeout = 4000)
-    public void test63() throws Throwable {
-        String[] stringArray0 = new String[11];
-        stringArray0[2] = "^]LzTC)tW7*]J5tWdvD$";
-        SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-        int int0 = segmentConstantPool0.matchSpecificPoolEntryIndex(stringArray0, stringArray0, "^]LzTC)tW7*]J5tWdvD$", "^<init>.*", (-1311));
-        assertEquals((-1), int0);
+    /**
+     * Tests that {@code matchSpecificPoolEntryIndex} returns -1 when a negative desired index is provided.
+     * A negative index is an invalid search parameter, so no match should be found.
+     */
+    @Test
+    public void matchSpecificPoolEntryIndexShouldReturnNegativeOneForNegativeDesiredIndex() {
+        // Arrange
+        // The method under test does not rely on the state of the SegmentConstantPool instance,
+        // so we can pass null to its constructor.
+        SegmentConstantPool segmentConstantPool = new SegmentConstantPool(null);
+
+        // Set up arrays that would yield a match if the desired index were valid (e.g., 0).
+        // This isolates the negative index as the reason for the test's outcome.
+        String[] classNames = {"java/lang/String", "java/lang/Object"};
+        String[] methodNames = {"toString", "<init>"};
+
+        String classToMatch = "java/lang/Object";
+        // This regex matches constructor methods like "<init>".
+        String methodRegexToMatch = "^<init>.*";
+        int invalidDesiredIndex = -1;
+
+        // Act
+        // Attempt to find the -1th match, which is logically impossible.
+        int foundIndex = segmentConstantPool.matchSpecificPoolEntryIndex(
+                classNames,
+                methodNames,
+                classToMatch,
+                methodRegexToMatch,
+                invalidDesiredIndex
+        );
+
+        // Assert
+        // The method should return -1 to indicate that no match was found.
+        assertEquals(-1, foundIndex);
     }
 }
