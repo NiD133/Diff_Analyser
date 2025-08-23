@@ -1,17 +1,28 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class ByteArrayBuilder_ESTestTest61 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteArrayBuilder} class, focusing on its initial state.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test60() throws Throwable {
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder(131087);
-        assertEquals(0, byteArrayBuilder0.size());
+    /**
+     * Verifies that a new ByteArrayBuilder instance, created with a specific
+     * initial buffer capacity, correctly reports its initial size as zero.
+     * The size represents the number of bytes written, not the allocated capacity.
+     */
+    @Test
+    public void newBuilderWithInitialCapacityShouldHaveZeroSize() {
+        // Arrange: Create a ByteArrayBuilder with a non-default initial capacity.
+        int initialCapacity = 512;
+        ByteArrayBuilder builder = new ByteArrayBuilder(initialCapacity);
+
+        // Act: Get the current size of the builder.
+        int currentSize = builder.size();
+
+        // Assert: The size should be 0, as no bytes have been written yet.
+        assertEquals("A new ByteArrayBuilder should have a size of 0, regardless of its initial capacity.", 0, currentSize);
     }
 }
