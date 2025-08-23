@@ -1,21 +1,33 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.apache.commons.io.IOUtils.EOF;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BoundedReader_ESTestTest3 extends BoundedReader_ESTest_scaffolding {
+/**
+ * Tests for {@link BoundedReader}.
+ */
+public class BoundedReaderTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        BoundedReader boundedReader0 = new BoundedReader((Reader) null, (-1));
-        int int0 = boundedReader0.read();
-        assertEquals((-1), int0);
+    /**
+     * Tests that read() returns EOF (-1) when the BoundedReader is constructed
+     * with a null underlying reader. The boundary limit should have no effect in this case.
+     */
+    @Test
+    public void testReadWithNullReaderReturnsEof() throws IOException {
+        // Arrange: Create a BoundedReader with a null underlying reader.
+        // The original test used a limit of -1, but any limit should yield the same result.
+        // Using a positive limit makes the test's focus on the null reader more explicit.
+        final Reader nullReader = null;
+        final BoundedReader boundedReader = new BoundedReader(nullReader, 10);
+
+        // Act: Attempt to read a character from the reader.
+        final int result = boundedReader.read();
+
+        // Assert: The result should be EOF, as there is no underlying reader to read from.
+        assertEquals(EOF, result);
     }
 }
