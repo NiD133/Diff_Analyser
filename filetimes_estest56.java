@@ -1,25 +1,32 @@
 package org.apache.commons.io.file.attribute;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
 import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FileTimes_ESTestTest56 extends FileTimes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FileTimes} utility class.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test55() throws Throwable {
-        FileTime fileTime0 = FileTimes.ntfsTimeToFileTime(369L);
-        FileTime fileTime1 = FileTimes.plusMillis(fileTime0, 369L);
-        assertFalse(fileTime1.equals((Object) fileTime0));
+    /**
+     * Tests that {@link FileTimes#plusMillis(FileTime, long)} returns a new, later FileTime
+     * when a positive duration is added.
+     */
+    @Test
+    public void testPlusMillisWithPositiveDurationReturnsLaterFileTime() {
+        // Arrange: Set up a known starting point and a duration to add.
+        final FileTime originalFileTime = FileTime.from(Instant.EPOCH);
+        final long millisToAdd = 1000L;
+
+        // Act: Call the method under test.
+        final FileTime newFileTime = FileTimes.plusMillis(originalFileTime, millisToAdd);
+
+        // Assert: Verify the result is a new, distinct, and later time.
+        assertNotEquals("The returned FileTime should be a new instance.", originalFileTime, newFileTime);
+        assertTrue("The new FileTime should be later than the original.", newFileTime.compareTo(originalFileTime) > 0);
     }
 }
