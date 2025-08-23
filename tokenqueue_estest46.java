@@ -1,18 +1,22 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TokenQueue_ESTestTest46 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Tests for the {@link TokenQueue#consumeElementSelector()} method.
+ */
+public class TokenQueueConsumeElementSelectorTest {
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("b");
-        String string0 = tokenQueue0.consumeElementSelector();
-        assertEquals("b", string0);
+    @Test
+    public void shouldConsumeSimpleSingleCharacterTagName() {
+        // Arrange: Create a queue with a simple, valid element selector (a tag name).
+        TokenQueue queue = new TokenQueue("b");
+
+        // Act: Consume the element selector from the queue.
+        String selector = queue.consumeElementSelector();
+
+        // Assert: The consumed selector should be the single character tag name.
+        assertEquals("b", selector);
     }
 }
