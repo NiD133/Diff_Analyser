@@ -1,26 +1,32 @@
 package org.apache.commons.codec.digest;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MurmurHash2_ESTestTest21 extends MurmurHash2_ESTest_scaffolding {
+/**
+ * Tests for the {@link MurmurHash2} class, focusing on edge cases and invalid inputs.
+ */
+public class MurmurHash2Test {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        byte[] byteArray0 = new byte[6];
-        // Undeclared exception!
-        try {
-            MurmurHash2.hash64(byteArray0, (int) (byte) (-14), (int) (byte) 110);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // -15
-            //
-            verifyException("org.apache.commons.codec.digest.MurmurHash2", e);
-        }
+    /**
+     * Tests that {@link MurmurHash2#hash64(byte[], int, int)} throws an
+     * {@link ArrayIndexOutOfBoundsException} when provided with a negative length.
+     * The hashing algorithm should not attempt to process a negative number of bytes,
+     * and a negative length is an invalid argument.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void hash64ShouldThrowExceptionForNegativeLength() {
+        // Arrange: Define the input data and invalid parameters.
+        // The actual content and size of the data array do not matter for this test,
+        // as the validation for the length parameter should fail before data access.
+        final byte[] data = new byte[8];
+        final int negativeLength = -14;
+        final int seed = 110; // The seed value is arbitrary for this test.
+
+        // Act: Call the method with a negative length.
+        // This action is expected to throw an ArrayIndexOutOfBoundsException.
+        MurmurHash2.hash64(data, negativeLength, seed);
+
+        // Assert: The test succeeds if the expected exception is thrown,
+        // as specified by the @Test(expected=...) annotation.
     }
 }
