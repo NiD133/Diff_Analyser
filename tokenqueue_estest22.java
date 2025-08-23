@@ -1,26 +1,27 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TokenQueue_ESTestTest22 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for the {@link TokenQueue} class.
+ * This test focuses on the behavior of a TokenQueue after it has been closed.
+ */
+public class TokenQueue_ESTestTest22 {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue(">'9sOEbGPT9N3{HK5");
-        tokenQueue0.close();
-        // Undeclared exception!
-        try {
-            tokenQueue0.toString();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling toString() on a closed TokenQueue throws a NullPointerException.
+     * The close() method is expected to release internal resources, making subsequent
+     * operations on the queue invalid. This test ensures that such invalid operations fail as expected.
+     */
+    @Test(expected = NullPointerException.class)
+    public void toStringOnClosedQueueThrowsNullPointerException() {
+        // Arrange: Create a TokenQueue and then close it to invalidate its state.
+        // The initial content of the queue is irrelevant for this test.
+        TokenQueue queue = new TokenQueue(">'9sOEbGPT9N3{HK5");
+        queue.close();
+
+        // Act & Assert: Attempt to call toString() on the closed queue.
+        // The @Test(expected = ...) annotation asserts that a NullPointerException is thrown.
+        queue.toString();
     }
 }
