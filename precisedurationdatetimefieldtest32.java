@@ -1,88 +1,57 @@
 package org.joda.time.field;
 
-import java.util.Arrays;
-import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.DurationField;
 import org.joda.time.DurationFieldType;
-import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.ISOChronology;
+import org.junit.Test;
 
-public class PreciseDurationDateTimeFieldTestTest32 extends TestCase {
+/**
+ * Unit tests for {@link PreciseDurationDateTimeField}.
+ */
+public class PreciseDurationDateTimeFieldTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+    /**
+     * A concrete implementation of PreciseDurationDateTimeField for testing purposes.
+     * The SUT (System Under Test) is abstract, so we need a minimal concrete
+     * class to instantiate and test its non-abstract methods.
+     */
+    private static class TestPreciseDurationDateTimeField extends PreciseDurationDateTimeField {
 
-    public static TestSuite suite() {
-        return new TestSuite(TestPreciseDurationDateTimeField.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockPreciseDurationDateTimeField extends PreciseDurationDateTimeField {
-
-        protected MockPreciseDurationDateTimeField() {
-            super(DateTimeFieldType.secondOfMinute(), new MockCountingDurationField(DurationFieldType.seconds()));
+        TestPreciseDurationDateTimeField() {
+            // The super constructor requires a precise duration field.
+            super(DateTimeFieldType.secondOfMinute(), new StubPreciseDurationField());
         }
 
-        protected MockPreciseDurationDateTimeField(DateTimeFieldType type, DurationField dur) {
-            super(type, dur);
-        }
+        // --- Methods required to make the class concrete ---
 
         @Override
         public int get(long instant) {
-            return (int) (instant / 60L);
+            // Not used in the test, can return a dummy value.
+            return 0;
         }
 
         @Override
         public DurationField getRangeDurationField() {
-            return new MockCountingDurationField(DurationFieldType.minutes());
+            // Not used in the test, can return null.
+            return null;
         }
 
         @Override
         public int getMaximumValue() {
+            // Not used in the test, can return a dummy value.
             return 59;
         }
     }
 
-    static class MockStandardBaseDateTimeField extends MockPreciseDurationDateTimeField {
+    /**
+     * A minimal, precise DurationField required by the SUT's constructor.
+     */
+    private static class StubPreciseDurationField extends BaseDurationField {
 
-        protected MockStandardBaseDateTimeField() {
-            super();
-        }
-
-        @Override
-        public DurationField getDurationField() {
-            return ISOChronology.getInstanceUTC().seconds();
-        }
-
-        @Override
-        public DurationField getRangeDurationField() {
-            return ISOChronology.getInstanceUTC().minutes();
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockCountingDurationField extends BaseDurationField {
-
-        static int add_int = 0;
-
-        static int add_long = 0;
-
-        static int difference_long = 0;
-
-        protected MockCountingDurationField(DurationFieldType type) {
-            super(type);
+        protected StubPreciseDurationField() {
+            super(DurationFieldType.seconds());
         }
 
         @Override
@@ -92,143 +61,40 @@ public class PreciseDurationDateTimeFieldTestTest32 extends TestCase {
 
         @Override
         public long getUnitMillis() {
-            return 60;
+            // Must be >= 1 to satisfy the SUT's constructor.
+            return 1000L;
         }
 
+        // --- Unused methods that must be implemented ---
         @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
+        public long getValueAsLong(long duration, long instant) { return 0; }
         @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
+        public long getMillis(int value, long instant) { return 0; }
         @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
+        public long getMillis(long value, long instant) { return 0; }
         @Override
-        public long add(long instant, int value) {
-            add_int++;
-            return instant + (value * 60L);
-        }
-
+        public long add(long instant, int value) { return 0; }
         @Override
-        public long add(long instant, long value) {
-            add_long++;
-            return instant + (value * 60L);
-        }
-
+        public long add(long instant, long value) { return 0; }
         @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            difference_long++;
-            return 30;
-        }
+        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) { return 0; }
     }
 
     //-----------------------------------------------------------------------
-    static class MockZeroDurationField extends BaseDurationField {
 
-        protected MockZeroDurationField(DurationFieldType type) {
-            super(type);
-        }
+    @Test
+    public void getLeapAmount_shouldAlwaysReturnZero() {
+        // A "precise" duration field has a fixed-length unit (e.g., a second is always 1000ms).
+        // Therefore, it can never have a leap amount. This test verifies this invariant.
 
-        @Override
-        public boolean isPrecise() {
-            return true;
-        }
+        // Arrange
+        BaseDateTimeField field = new TestPreciseDurationDateTimeField();
+        long anyInstant = 123456789L; // The result should be independent of the instant.
 
-        @Override
-        public long getUnitMillis() {
-            // this is zero
-            return 0;
-        }
+        // Act
+        int leapAmount = field.getLeapAmount(anyInstant);
 
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            return 0;
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            return 0;
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockImpreciseDurationField extends BaseDurationField {
-
-        protected MockImpreciseDurationField(DurationFieldType type) {
-            super(type);
-        }
-
-        @Override
-        public boolean isPrecise() {
-            // this is false
-            return false;
-        }
-
-        @Override
-        public long getUnitMillis() {
-            return 0;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            return 0;
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            return 0;
-        }
-    }
-
-    public void test_getLeapAmount_long() {
-        BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(0, field.getLeapAmount(0L));
+        // Assert
+        assertEquals("A precise field should not have a leap amount", 0, leapAmount);
     }
 }
