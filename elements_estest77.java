@@ -1,43 +1,30 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+// Note: The class name and inheritance are preserved from the original test suite.
 public class Elements_ESTestTest77 extends Elements_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test076() throws Throwable {
-        Elements elements0 = new Elements();
-        // Undeclared exception!
+    /**
+     * Verifies that the {@link Elements#not(String)} method throws an
+     * {@link IllegalArgumentException} when passed a null query string.
+     * This ensures that input validation is correctly handled before processing.
+     */
+    @Test
+    public void notWithNullQueryThrowsIllegalArgumentException() {
+        // Arrange: Create an empty Elements collection. The state of the collection
+        // is irrelevant for this test, as input validation should occur first.
+        Elements elements = new Elements();
+
+        // Act & Assert
         try {
-            elements0.not((String) null);
-            fail("Expecting exception: IllegalArgumentException");
+            elements.not(null);
+            fail("Expected an IllegalArgumentException for a null query, but none was thrown.");
         } catch (IllegalArgumentException e) {
-            //
-            // String must not be empty
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Assert that the exception message is as expected, confirming the validation logic.
+            assertEquals("String must not be empty", e.getMessage());
         }
     }
 }
