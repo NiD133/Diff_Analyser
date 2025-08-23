@@ -1,30 +1,27 @@
 package com.google.gson;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest74 extends JsonArray_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonArray} class, focusing on its convenience getter methods.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test73() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        // Undeclared exception!
+    @Test
+    public void getAsBoolean_whenArrayIsEmpty_throwsIllegalStateException() {
+        // Arrange: Create an empty JsonArray.
+        JsonArray emptyArray = new JsonArray();
+
+        // Act & Assert: Verify that calling getAsBoolean() throws the expected exception.
         try {
-            jsonArray0.getAsBoolean();
-            fail("Expecting exception: IllegalStateException");
+            emptyArray.getAsBoolean();
+            fail("Expected an IllegalStateException to be thrown, but no exception was thrown.");
         } catch (IllegalStateException e) {
-            //
-            // Array must have size 1, but has size 0
-            //
-            verifyException("com.google.gson.JsonArray", e);
+            // Verify that the exception message correctly states the reason for the failure.
+            assertEquals("Array must have size 1, but has size 0", e.getMessage());
         }
     }
 }
