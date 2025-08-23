@@ -1,21 +1,34 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
 import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertNotSame;
 
-public class URLCodec_ESTestTest9 extends URLCodec_ESTest_scaffolding {
+/**
+ * Tests for the static methods in {@link URLCodec}.
+ */
+public class URLCodecStaticTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        byte[] byteArray0 = new byte[0];
-        BitSet bitSet0 = BitSet.valueOf(byteArray0);
-        byte[] byteArray1 = URLCodec.encodeUrl(bitSet0, byteArray0);
-        assertNotSame(byteArray1, byteArray0);
+    /**
+     * Tests that encoding an empty byte array returns a new, empty byte array instance,
+     * rather than returning the original array reference.
+     */
+    @Test
+    public void encodeUrlWithEmptyByteArrayShouldReturnNewEmptyArray() {
+        // Arrange
+        final byte[] emptyBytes = new byte[0];
+        // Use an empty BitSet, meaning no characters are considered "safe" for encoding.
+        final BitSet safeCharacters = new BitSet();
+
+        // Act
+        final byte[] encodedBytes = URLCodec.encodeUrl(safeCharacters, emptyBytes);
+
+        // Assert
+        // The result should be a new, distinct array instance.
+        assertNotSame("Encoding an empty array should produce a new array instance.", emptyBytes, encodedBytes);
+        
+        // The new array should also be empty.
+        assertArrayEquals("Encoding an empty array should result in an empty array.", new byte[0], encodedBytes);
     }
 }
