@@ -1,35 +1,47 @@
 package org.apache.commons.lang3.concurrent;
 
+import org.apache.commons.lang3.concurrent.MultiBackgroundInitializer.MultiBackgroundInitializerResults;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.lang.MockException;
-import org.junit.runner.RunWith;
 
-public class MultiBackgroundInitializer_ESTestTest10 extends MultiBackgroundInitializer_ESTest_scaffolding {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        ForkJoinPool forkJoinPool0 = ForkJoinPool.commonPool();
-        forkJoinPool0.getActiveThreadCount();
-        forkJoinPool0.getAsyncMode();
-        MultiBackgroundInitializer multiBackgroundInitializer0 = new MultiBackgroundInitializer();
-        multiBackgroundInitializer0.isInitialized();
-        BackgroundInitializer<MultiBackgroundInitializer.MultiBackgroundInitializerResults> backgroundInitializer0 = new BackgroundInitializer<MultiBackgroundInitializer.MultiBackgroundInitializerResults>();
-        multiBackgroundInitializer0.addInitializer("org.apache.commons.lang3.concurrent.MultiBackgroundInitializer$1", backgroundInitializer0);
-        multiBackgroundInitializer0.initialize();
-        multiBackgroundInitializer0.close();
+/**
+ * Test suite for {@link MultiBackgroundInitializer}.
+ */
+public class MultiBackgroundInitializerTest {
+
+    /**
+     * Tests that the MultiBackgroundInitializer can successfully initialize a child task,
+     * report a successful result, and be closed without errors.
+     */
+    @Test
+    public void shouldInitializeAndCloseSuccessfullyWithOneChild() throws Exception {
+        // Arrange: Create a MultiBackgroundInitializer and a simple child initializer to run.
+        final MultiBackgroundInitializer multiInitializer = new MultiBackgroundInitializer();
+        final String childTaskName = "childTask1";
+
+        // This child initializer simply returns a string upon successful completion.
+        final BackgroundInitializer<String> childInitializer = new BackgroundInitializer<String>() {
+            @Override
+            protected String initialize() {
+                return "Child task complete";
+            }
+        };
+
+        multiInitializer.addInitializer(childTaskName, childInitializer);
+
+        // Act: Start the background initialization process.
+        final MultiBackgroundInitializerResults results = multiInitializer.initialize();
+
+        // Assert: Verify that the initialization completed successfully and the state is correct.
+        assertNotNull("The results object should not be null.", results);
+        assertTrue("The overall initialization should be successful.", results.isSuccessful());
+        assertTrue("The multi-initializer should be marked as initialized after completion.", multiInitializer.isInitialized());
+        assertNotNull("The result from the child task should be available.", results.getResultObject(childTaskName));
+
+        // Act & Assert: Closing the initializer should not throw an exception.
+        // The test method will fail if close() throws an unexpected exception.
+        multiInitializer.close();
     }
 }
