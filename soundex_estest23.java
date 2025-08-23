@@ -1,18 +1,30 @@
 package org.apache.commons.codec.language;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Soundex_ESTestTest23 extends Soundex_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Soundex} class.
+ */
+public class SoundexTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        Soundex soundex0 = new Soundex();
-        int int0 = soundex0.getMaxLength();
-        assertEquals(4, int0);
+    /**
+     * Tests that a Soundex instance created with the default constructor
+     * has a maximum length of 4, as per the standard definition.
+     *
+     * Note: The {@code getMaxLength()} method is deprecated, but this test
+     * ensures its behavior remains consistent for backward compatibility.
+     */
+    @Test
+    public void defaultMaxLengthShouldBeFour() {
+        // Arrange
+        final Soundex soundex = new Soundex();
+        final int expectedLength = 4;
+
+        // Act
+        final int actualLength = soundex.getMaxLength();
+
+        // Assert
+        assertEquals("The default max length should be 4", expectedLength, actualLength);
     }
 }
