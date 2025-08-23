@@ -19,7 +19,16 @@ import org.apache.commons.lang3.AbstractLangTest;
 import org.apache.commons.lang3.ThreadUtils;
 import org.junit.jupiter.api.Test;
 
-public class BackgroundInitializerTestTest14 extends AbstractLangTest {
+/**
+ * Tests the state management of BackgroundInitializer, specifically focusing on the 'started' state.
+ *
+ * Note: The original class name was BackgroundInitializerTestTest14. It has been renamed for clarity.
+ */
+public class BackgroundInitializerStateTest extends AbstractLangTest {
+
+    // NOTE: The helper methods and inner classes below are part of a test fixture
+    // used across multiple tests for BackgroundInitializer. They are left unchanged
+    // as they are well-suited for testing complex concurrent behaviors.
 
     /**
      * Helper method for checking whether the initialize() method was correctly
@@ -154,12 +163,20 @@ public class BackgroundInitializerTestTest14 extends AbstractLangTest {
         }
     }
 
+    // --- IMPROVED TEST CASE ---
+
     /**
-     * Tests isStarted() before start() was called.
+     * Tests that isStarted() returns false for a newly created initializer
+     * before the start() method has been invoked.
      */
     @Test
-    void testIsStartedFalse() {
-        final AbstractBackgroundInitializerTestImpl init = getBackgroundInitializerTestImpl();
-        assertFalse(init.isStarted(), "Already started");
+    void isStartedShouldReturnFalseBeforeStartIsCalled() {
+        // Arrange: Create a new BackgroundInitializer instance.
+        final BackgroundInitializer<?> initializer = getBackgroundInitializerTestImpl();
+
+        // Act: The state is checked directly via isStarted().
+
+        // Assert: The initializer should not be in a 'started' state.
+        assertFalse(initializer.isStarted(), "isStarted() should return false before start() is called.");
     }
 }
