@@ -1,213 +1,140 @@
 package org.apache.commons.compress.archivers.zip;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
+
 import org.apache.commons.compress.AbstractTempDirTest;
 import org.apache.commons.compress.AbstractTest;
 import org.apache.commons.compress.parallel.FileBasedScatterGatherBackingStore;
 import org.apache.commons.compress.parallel.InputStreamSupplier;
 import org.apache.commons.compress.parallel.ScatterGatherBackingStoreSupplier;
 import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class ParallelScatterZipCreatorTestTest4 extends AbstractTempDirTest {
 
-    // 1MB
-    private static final long EXPECTED_FILE_SIZE = 1024 * 1024;
+    // The test will not read files larger than 1MB
+    private static final long MAX_FILE_SIZE_BYTES = 1024 * 1024;
 
-    private static final int EXPECTED_FILES_NUMBER = 50;
+    // The test will not compress more than 50 files
+    private static final int MAX_FILES_TO_COMPRESS = 50;
 
-    private final int NUMITEMS = 5000;
+    /**
+     * Tests that ParallelScatterZipCreator can correctly create a ZIP archive
+     * using the createCallable() and submitStreamAwareCallable() methods with the highest compression level.
+     */
+    @Test
+    void shouldCreateZipUsingCallablesAndBestCompression() throws Exception {
+        // Arrange
+        final File outputZipFile = createTempFile("parallelScatterGather", ".zip");
+        final ExecutorService executorService = Executors.newFixedThreadPool(1);
+        final ScatterGatherBackingStoreSupplier backingStoreSupplier =
+            () -> new FileBasedScatterGatherBackingStore(createTempFile("parallelscatter-backing", ""));
 
-    private void callableApi(final CallableConsumerSupplier consumerSupplier, final File result) throws Exception {
-        callableApi(consumerSupplier, Deflater.DEFAULT_COMPRESSION, result);
-    }
+        final ParallelScatterZipCreator zipCreator = new ParallelScatterZipCreator(
+            executorService, backingStoreSupplier, Deflater.BEST_COMPRESSION);
 
-    private void callableApi(final CallableConsumerSupplier consumerSupplier, final int compressionLevel, final File result) throws Exception {
-        final Map<String, byte[]> entries;
-        final ParallelScatterZipCreator zipCreator;
-        try (ZipArchiveOutputStream zos = new ZipArchiveOutputStream(result)) {
+        // Submit files from the test resources directory for compression
+        final Map<String, byte[]> expectedEntries = submitTestFilesToCreator(zipCreator);
+
+        // Act
+        try (ZipArchiveOutputStream zos = new ZipArchiveOutputStream(outputZipFile)) {
             zos.setEncoding(StandardCharsets.UTF_8.name());
-            final ExecutorService es = Executors.newFixedThreadPool(1);
-            final ScatterGatherBackingStoreSupplier supp = () -> new FileBasedScatterGatherBackingStore(createTempFile("parallelscatter", "n1"));
-            zipCreator = new ParallelScatterZipCreator(es, supp, compressionLevel);
-            entries = writeEntriesAsCallable(zipCreator, consumerSupplier.apply(zipCreator));
             zipCreator.writeTo(zos);
         }
-        removeEntriesFoundInZipFile(result, entries);
-        assertTrue(entries.isEmpty());
-        assertNotNull(zipCreator.getStatisticsMessage());
-    }
 
-    private void callableApiWithTestFiles(final CallableConsumerSupplier consumerSupplier, final int compressionLevel, final File result) throws Exception {
-        final ParallelScatterZipCreator zipCreator;
-        final Map<String, byte[]> entries;
-        try (ZipArchiveOutputStream zos = new ZipArchiveOutputStream(result)) {
-            zos.setEncoding(StandardCharsets.UTF_8.name());
-            final ExecutorService es = Executors.newFixedThreadPool(1);
-            final ScatterGatherBackingStoreSupplier supp = () -> new FileBasedScatterGatherBackingStore(createTempFile("parallelscatter", "n1"));
-            zipCreator = new ParallelScatterZipCreator(es, supp, compressionLevel);
-            entries = writeTestFilesAsCallable(zipCreator, consumerSupplier.apply(zipCreator));
-            zipCreator.writeTo(zos);
-        }
-        // validate the content of the compressed files
-        try (ZipFile zf = ZipFile.builder().setFile(result).get()) {
-            final Enumeration<ZipArchiveEntry> entriesInPhysicalOrder = zf.getEntriesInPhysicalOrder();
-            while (entriesInPhysicalOrder.hasMoreElements()) {
-                final ZipArchiveEntry zipArchiveEntry = entriesInPhysicalOrder.nextElement();
-                try (InputStream inputStream = zf.getInputStream(zipArchiveEntry)) {
-                    final byte[] actual = IOUtils.toByteArray(inputStream);
-                    final byte[] expected = entries.remove(zipArchiveEntry.getName());
-                    assertArrayEquals(expected, actual, "For " + zipArchiveEntry.getName());
-                }
-            }
-        }
-        assertNotNull(zipCreator.getStatisticsMessage());
-    }
-
-    private ZipArchiveEntry createZipArchiveEntry(final Map<String, byte[]> entries, final int i, final byte[] payloadBytes) {
-        final ZipArchiveEntry za = new ZipArchiveEntry("file" + i);
-        entries.put(za.getName(), payloadBytes);
-        za.setMethod(ZipEntry.DEFLATED);
-        za.setSize(payloadBytes.length);
-        za.setUnixMode(UnixStat.FILE_FLAG | 0664);
-        return za;
-    }
-
-    private void removeEntriesFoundInZipFile(final File result, final Map<String, byte[]> entries) throws IOException {
-        try (ZipFile zf = ZipFile.builder().setFile(result).get()) {
-            final Enumeration<ZipArchiveEntry> entriesInPhysicalOrder = zf.getEntriesInPhysicalOrder();
-            int i = 0;
-            while (entriesInPhysicalOrder.hasMoreElements()) {
-                final ZipArchiveEntry zipArchiveEntry = entriesInPhysicalOrder.nextElement();
-                try (InputStream inputStream = zf.getInputStream(zipArchiveEntry)) {
-                    final byte[] actual = IOUtils.toByteArray(inputStream);
-                    final byte[] expected = entries.remove(zipArchiveEntry.getName());
-                    assertArrayEquals(expected, actual, "For " + zipArchiveEntry.getName());
-                }
-                // check order of ZIP entries vs order of addition to the parallel ZIP creator
-                assertEquals("file" + i++, zipArchiveEntry.getName(), "For " + zipArchiveEntry.getName());
-            }
-        }
-    }
-
-    private Map<String, byte[]> writeEntries(final ParallelScatterZipCreator zipCreator) {
-        final Map<String, byte[]> entries = new HashMap<>();
-        for (int i = 0; i < NUMITEMS; i++) {
-            final byte[] payloadBytes = ("content" + i).getBytes();
-            final ZipArchiveEntry za = createZipArchiveEntry(entries, i, payloadBytes);
-            final InputStreamSupplier iss = () -> new ByteArrayInputStream(payloadBytes);
-            if (i % 2 == 0) {
-                zipCreator.addArchiveEntry(za, iss);
-            } else {
-                final ZipArchiveEntryRequestSupplier zaSupplier = () -> ZipArchiveEntryRequest.createZipArchiveEntryRequest(za, iss);
-                zipCreator.addArchiveEntry(zaSupplier);
-            }
-        }
-        return entries;
-    }
-
-    private Map<String, byte[]> writeEntriesAsCallable(final ParallelScatterZipCreator zipCreator, final CallableConsumer consumer) {
-        final Map<String, byte[]> entries = new HashMap<>();
-        for (int i = 0; i < NUMITEMS; i++) {
-            final byte[] payloadBytes = ("content" + i).getBytes();
-            final ZipArchiveEntry za = createZipArchiveEntry(entries, i, payloadBytes);
-            final InputStreamSupplier iss = () -> new ByteArrayInputStream(payloadBytes);
-            final Callable<ScatterZipOutputStream> callable;
-            if (i % 2 == 0) {
-                callable = zipCreator.createCallable(za, iss);
-            } else {
-                final ZipArchiveEntryRequestSupplier zaSupplier = () -> ZipArchiveEntryRequest.createZipArchiveEntryRequest(za, iss);
-                callable = zipCreator.createCallable(zaSupplier);
-            }
-            consumer.accept(callable);
-        }
-        return entries;
+        // Assert
+        assertNotNull(zipCreator.getStatisticsMessage(), "Statistics message should not be null");
+        assertZipFileContainsEntries(outputZipFile, expectedEntries);
     }
 
     /**
-     * Try to compress the files in src/test/resources with size no bigger than {@value #EXPECTED_FILES_NUMBER} and with a mount of files no bigger than
-     * {@value #EXPECTED_FILES_NUMBER}
+     * Scans the test resources directory, creates compression tasks for the files,
+     * and submits them to the ParallelScatterZipCreator.
      *
-     * @param zipCreator The ParallelScatterZipCreator
-     * @param consumer   The parallel consumer
-     * @return A map using file name as key and file content as value
-     * @throws IOException if exceptions occur when opening files
+     * @param zipCreator The creator instance to submit tasks to.
+     * @return A map of expected entry names to their file content.
+     * @throws IOException if an I/O error occurs reading the files.
      */
-    private Map<String, byte[]> writeTestFilesAsCallable(final ParallelScatterZipCreator zipCreator, final CallableConsumer consumer) throws IOException {
-        final Map<String, byte[]> entries = new HashMap<>();
-        final File baseDir = AbstractTest.getFile("");
+    private Map<String, byte[]> submitTestFilesToCreator(final ParallelScatterZipCreator zipCreator) throws IOException {
+        final Map<String, byte[]> expectedEntries = new HashMap<>();
+        final File testResourceDir = AbstractTest.getFile("");
         int filesCount = 0;
-        for (final File file : baseDir.listFiles()) {
-            // do not compress too many files
-            if (filesCount >= EXPECTED_FILES_NUMBER) {
+
+        for (final File file : testResourceDir.listFiles()) {
+            if (filesCount >= MAX_FILES_TO_COMPRESS) {
                 break;
             }
-            // skip files that are too large
-            if (file.isDirectory() || file.length() > EXPECTED_FILE_SIZE) {
+            if (file.isDirectory() || file.length() > MAX_FILE_SIZE_BYTES) {
                 continue;
             }
-            entries.put(file.getName(), Files.readAllBytes(file.toPath()));
-            final ZipArchiveEntry zipArchiveEntry = new ZipArchiveEntry(file.getName());
+
+            final String entryName = file.getName();
+            final byte[] fileContent = Files.readAllBytes(file.toPath());
+            expectedEntries.put(entryName, fileContent);
+
+            final ZipArchiveEntry zipArchiveEntry = new ZipArchiveEntry(entryName);
             zipArchiveEntry.setMethod(ZipEntry.DEFLATED);
             zipArchiveEntry.setSize(file.length());
             zipArchiveEntry.setUnixMode(UnixStat.FILE_FLAG | 0664);
-            final InputStreamSupplier iss = () -> {
-                try {
-                    return Files.newInputStream(file.toPath());
-                } catch (final IOException e) {
-                    return null;
-                }
-            };
+
+            final InputStreamSupplier inputStreamSupplier = () -> Files.newInputStream(file.toPath());
+
+            // To test both overloads of createCallable(), we alternate between them.
             final Callable<ScatterZipOutputStream> callable;
             if (filesCount % 2 == 0) {
-                callable = zipCreator.createCallable(zipArchiveEntry, iss);
+                callable = zipCreator.createCallable(zipArchiveEntry, inputStreamSupplier);
             } else {
-                final ZipArchiveEntryRequestSupplier zaSupplier = () -> ZipArchiveEntryRequest.createZipArchiveEntryRequest(zipArchiveEntry, iss);
-                callable = zipCreator.createCallable(zaSupplier);
+                final ZipArchiveEntryRequestSupplier requestSupplier =
+                    () -> ZipArchiveEntryRequest.createZipArchiveEntryRequest(zipArchiveEntry, inputStreamSupplier);
+                callable = zipCreator.createCallable(requestSupplier);
             }
-            consumer.accept(callable);
+
+            zipCreator.submitStreamAwareCallable(callable);
             filesCount++;
         }
-        return entries;
+        return expectedEntries;
     }
 
-    private interface CallableConsumer extends Consumer<Callable<? extends ScatterZipOutputStream>> {
-        // empty
-    }
+    /**
+     * Asserts that the created ZIP file contains exactly the expected entries with matching content.
+     *
+     * @param zipFile         The ZIP file to verify.
+     * @param expectedEntries A map of expected entry names to their content.
+     * @throws IOException if an I/O error occurs reading the ZIP file.
+     */
+    private void assertZipFileContainsEntries(final File zipFile, final Map<String, byte[]> expectedEntries) throws IOException {
+        final Map<String, byte[]> remainingEntries = new HashMap<>(expectedEntries);
+        try (ZipFile zf = ZipFile.builder().setFile(zipFile).get()) {
+            final Enumeration<ZipArchiveEntry> entries = zf.getEntries();
+            while (entries.hasMoreElements()) {
+                final ZipArchiveEntry entry = entries.nextElement();
+                final String entryName = entry.getName();
 
-    private interface CallableConsumerSupplier extends Function<ParallelScatterZipCreator, CallableConsumer> {
-        // empty
-    }
+                assertTrue(remainingEntries.containsKey(entryName), "Found unexpected entry in ZIP: " + entryName);
 
-    @Test
-    void testCallableApiWithHighestLevelUsingSubmitStreamAwareCallable() throws Exception {
-        final File result = createTempFile("parallelScatterGather5", "");
-        callableApiWithTestFiles(zipCreator -> zipCreator::submitStreamAwareCallable, Deflater.BEST_COMPRESSION, result);
+                try (InputStream inputStream = zf.getInputStream(entry)) {
+                    final byte[] actualContent = IOUtils.toByteArray(inputStream);
+                    final byte[] expectedContent = remainingEntries.remove(entryName);
+                    assertArrayEquals(expectedContent, actualContent, "Content mismatch for entry: " + entryName);
+                }
+            }
+        }
+        assertTrue(remainingEntries.isEmpty(), "Some expected entries were not found in the ZIP: " + remainingEntries.keySet());
     }
 }
