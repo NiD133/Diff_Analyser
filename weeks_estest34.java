@@ -1,26 +1,30 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-public class Weeks_ESTestTest34 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class, focusing on arithmetic operations.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        Weeks weeks0 = Weeks.TWO;
-        // Undeclared exception!
-        try {
-            weeks0.dividedBy(0);
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // / by zero
-            //
-            verifyException("org.joda.time.Weeks", e);
-        }
+    /**
+     * Verifies that calling dividedBy() with a zero divisor throws an ArithmeticException.
+     */
+    @Test
+    public void dividedBy_whenDivisorIsZero_throwsArithmeticException() {
+        // Arrange: Create an instance of Weeks to test.
+        Weeks twoWeeks = Weeks.TWO;
+
+        // Act & Assert: Use assertThrows to verify that the expected exception is thrown.
+        // This is the modern, preferred way to test exceptions in JUnit 4.13+.
+        ArithmeticException exception = assertThrows(
+                ArithmeticException.class,
+                () -> twoWeeks.dividedBy(0)
+        );
+
+        // Assert (optional but recommended): Verify the exception message for more specific testing.
+        assertEquals("/ by zero", exception.getMessage());
     }
 }
