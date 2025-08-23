@@ -2,61 +2,41 @@ package org.apache.commons.codec.binary;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.nio.charset.Charset;
+
 import java.nio.charset.StandardCharsets;
-import java.util.Random;
 import org.apache.commons.codec.CodecPolicy;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
-import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.Test;
 
-public class Base16TestTest19 {
-
-    private static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
-
-    private final Random random = new Random();
+/**
+ * Tests for the {@link Base16} class, focusing on its decoding behavior.
+ */
+public class Base16Test {
 
     /**
-     * @return the random.
+     * Tests that decoding with a lenient policy on an input string with an odd number of
+     * characters will ignore the final, incomplete character.
+     *
+     * <p>According to the Base16 specification, two hexadecimal characters are required to form a
+     * single byte. A lenient decoder should process as many full pairs as possible and
+     * discard the trailing single character without throwing an error.</p>
      */
-    public Random getRandom() {
-        return this.random;
-    }
-
-    private void testBase16InBuffer(final int startPasSize, final int endPadSize) {
-        final String content = "Hello World";
-        final String encodedContent;
-        final byte[] bytesUtf8 = StringUtils.getBytesUtf8(content);
-        byte[] buffer = ArrayUtils.addAll(bytesUtf8, new byte[endPadSize]);
-        buffer = ArrayUtils.addAll(new byte[startPasSize], buffer);
-        final byte[] encodedBytes = new Base16().encode(buffer, startPasSize, bytesUtf8.length);
-        encodedContent = StringUtils.newStringUtf8(encodedBytes);
-        assertEquals("48656C6C6F20576F726C64", encodedContent, "encoding hello world");
-    }
-
-    private String toString(final byte[] data) {
-        final StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < data.length; i++) {
-            buf.append(data[i]);
-            if (i != data.length - 1) {
-                buf.append(",");
-            }
-        }
-        return buf.toString();
-    }
-
     @Test
-    void testLenientDecoding() {
-        // Note the trailing `e` which does not make up a hex-pair and so is only 1/2 byte
-        final String encoded = "aabbccdde";
-        final Base16 b16 = new Base16(true, CodecPolicy.LENIENT);
-        assertEquals(CodecPolicy.LENIENT, b16.getCodecPolicy());
-        final byte[] decoded = b16.decode(StringUtils.getBytesUtf8(encoded));
-        assertArrayEquals(new byte[] { (byte) 0xaa, (byte) 0xbb, (byte) 0xcc, (byte) 0xdd }, decoded);
+    public void testLenientDecodingWithOddLengthStringShouldIgnoreLastCharacter() {
+        // Arrange
+        // The input string "aabbccdde" has an odd length (9). The last character 'e'
+        // does not form a complete hex pair and should be ignored by a lenient decoder.
+        final String encodedStringWithOddLength = "aabbccdde";
+        final byte[] expectedDecodedBytes = {(byte) 0xaa, (byte) 0xbb, (byte) 0xcc, (byte) 0xdd};
+
+        // The Base16 instance is configured to use a lower-case alphabet and a lenient decoding policy.
+        final Base16 base16 = new Base16(true, CodecPolicy.LENIENT);
+        assertEquals(CodecPolicy.LENIENT, base16.getCodecPolicy(), "Precondition: Codec policy should be LENIENT.");
+
+        // Act
+        final byte[] actualDecodedBytes = base16.decode(encodedStringWithOddLength.getBytes(StandardCharsets.UTF_8));
+
+        // Assert
+        assertArrayEquals(expectedDecodedBytes, actualDecodedBytes,
+            "Decoding should ignore the trailing character of an odd-length string.");
     }
 }
