@@ -1,30 +1,27 @@
 package org.apache.commons.io.function;
 
+import static org.junit.Assert.assertNull;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.time.chrono.HijrahEra;
-import java.util.Comparator;
-import java.util.concurrent.ForkJoinTask;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.LongStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class Uncheck_ESTestTest22 extends Uncheck_ESTest_scaffolding {
+/**
+ * Tests for the {@link Uncheck} utility class.
+ */
+public class UncheckTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        IOFunction<String, String> iOFunction0 = IOFunction.identity();
-        String string0 = Uncheck.apply(iOFunction0, (String) null);
-        assertNull(string0);
+    /**
+     * Tests that Uncheck.apply() correctly handles a null input when using
+     * an identity function, which should simply return the null input.
+     */
+    @Test
+    public void testApplyWithIdentityFunctionShouldReturnNullForNullInput() {
+        // Arrange: Create an identity function that returns its input.
+        final IOFunction<String, String> identityFunction = IOFunction.identity();
+        final String input = null;
+
+        // Act: Apply the function to the null input using the Uncheck utility.
+        final String result = Uncheck.apply(identityFunction, input);
+
+        // Assert: The result should be null, as that was the input.
+        assertNull("The result of applying the identity function to null should be null.", result);
     }
 }
