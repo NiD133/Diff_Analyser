@@ -1,48 +1,31 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Period;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.UnsupportedTemporalTypeException;
 import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
 
-public class InternationalFixedChronology_ESTestTest49 extends InternationalFixedChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        InternationalFixedChronology internationalFixedChronology0 = new InternationalFixedChronology();
-        ChronoField chronoField0 = ChronoField.YEAR;
-        ValueRange valueRange0 = internationalFixedChronology0.range(chronoField0);
-        assertNotNull(valueRange0);
+/**
+ * Unit tests for the {@link InternationalFixedChronology} class.
+ */
+public class InternationalFixedChronologyTest {
+
+    /**
+     * Tests that the range() method returns the correct, documented value range for the YEAR field.
+     * The International Fixed Chronology is defined to support years from 1 to 1,000,000.
+     */
+    @Test
+    public void range_forYearField_returnsCorrectSupportedRange() {
+        // Arrange
+        InternationalFixedChronology chronology = InternationalFixedChronology.INSTANCE;
+        ValueRange expectedYearRange = ValueRange.of(1, 1_000_000L);
+
+        // Act
+        ValueRange actualYearRange = chronology.range(ChronoField.YEAR);
+
+        // Assert
+        assertEquals("The range for the YEAR field should match the documented supported range.",
+                expectedYearRange, actualYearRange);
     }
 }
