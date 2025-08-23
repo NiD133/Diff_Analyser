@@ -1,30 +1,30 @@
 package org.jfree.chart;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.jfree.chart.plot.CombinedRangeCategoryPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.data.xy.XYDatasetTableModel;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
-public class ChartRenderingInfo_ESTestTest15 extends ChartRenderingInfo_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ChartRenderingInfo} class, focusing on its cloning capabilities.
+ */
+public class ChartRenderingInfoCloningTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        Object object0 = chartRenderingInfo0.clone();
-        boolean boolean0 = chartRenderingInfo0.equals(object0);
-        assertNotSame(object0, chartRenderingInfo0);
-        assertTrue(boolean0);
+    /**
+     * Verifies that cloning a ChartRenderingInfo object creates a new instance
+     * that is equal in value to the original. This test confirms adherence to the
+     * general contract of Object.clone().
+     */
+    @Test
+    public void clone_shouldProduceEqualButNotSameInstance() throws CloneNotSupportedException {
+        // Arrange: Create an original ChartRenderingInfo instance.
+        ChartRenderingInfo originalInfo = new ChartRenderingInfo();
+
+        // Act: Create a clone of the original instance.
+        // Note: The clone() method in ChartRenderingInfo returns an Object, so a cast is necessary.
+        ChartRenderingInfo clonedInfo = (ChartRenderingInfo) originalInfo.clone();
+
+        // Assert: The clone should be a different object in memory, but its contents should be equal.
+        assertNotSame("A clone must not be the same instance as the original.", originalInfo, clonedInfo);
+        assertEquals("A clone must be equal in value to the original.", originalInfo, clonedInfo);
     }
 }
