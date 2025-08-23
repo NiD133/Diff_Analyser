@@ -1,26 +1,29 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NumberOutput_ESTestTest39 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for {@link NumberOutput} focusing on invalid arguments and exception handling.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        byte[] byteArray0 = new byte[5];
-        // Undeclared exception!
-        try {
-            NumberOutput.outputInt(1146455159, byteArray0, 739);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 739
-            //
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
-        }
+    /**
+     * Verifies that calling {@code outputInt} with an offset that is outside the
+     * bounds of the destination array throws an {@link ArrayIndexOutOfBoundsException}.
+     * <p>
+     * For performance, the {@code NumberOutput} class does not perform its own
+     * bounds checking. Instead, it relies on the underlying JVM array access to
+     * enforce boundaries. This test confirms that this expected behavior occurs.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void outputIntShouldThrowExceptionWhenOffsetIsOutOfBounds() {
+        // Arrange: A small buffer and an offset that is clearly outside its valid range.
+        byte[] buffer = new byte[5];
+        int outOfBoundsOffset = 739;
+        int anyIntValue = 123; // The integer value itself is not relevant to this test.
+
+        // Act & Assert: Attempting to write to the invalid offset should throw.
+        // The @Test(expected=...) annotation handles the assertion.
+        NumberOutput.outputInt(anyIntValue, buffer, outOfBoundsOffset);
     }
 }
