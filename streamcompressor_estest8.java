@@ -1,40 +1,41 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
+import static org.junit.Assert.assertEquals;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
-import java.nio.channels.SeekableByteChannel;
-import java.util.Enumeration;
-import java.util.zip.Deflater;
-import org.apache.commons.compress.parallel.ScatterGatherBackingStore;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
+import java.util.zip.CRC32;
+import java.util.zip.ZipEntry;
 
-public class StreamCompressor_ESTestTest8 extends StreamCompressor_ESTest_scaffolding {
+/**
+ * Test for {@link StreamCompressor}.
+ */
+public class StreamCompressorTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        PipedInputStream pipedInputStream0 = new PipedInputStream(pipedOutputStream0);
-        StreamCompressor streamCompressor0 = StreamCompressor.create((OutputStream) pipedOutputStream0);
-        byte[] byteArray0 = new byte[2];
-        streamCompressor0.write(byteArray0, 1, (byte) 1, 4);
-        long long0 = streamCompressor0.getCrc32();
-        assertEquals(3523407757L, long0);
+    @Test
+    public void getCrc32ShouldReturnCorrectValueAfterWritingOneByte() throws IOException {
+        // Arrange
+        // The single byte of data we will write to the compressor.
+        byte[] dataToWrite = { 0 };
+
+        // Calculate the expected CRC32 value for the data programmatically.
+        // This is much clearer than asserting against a "magic number".
+        CRC32 expectedCrcCalculator = new CRC32();
+        expectedCrcCalculator.update(dataToWrite);
+        long expectedCrc = expectedCrcCalculator.getValue();
+
+        // Use a simple ByteArrayOutputStream as a sink for the compressor's output.
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        StreamCompressor compressor = StreamCompressor.create(outputStream);
+
+        // Act
+        // Write the data using the STORED method (no compression).
+        compressor.write(dataToWrite, 0, dataToWrite.length, ZipEntry.STORED);
+        long actualCrc = compressor.getCrc32();
+
+        // Assert
+        assertEquals("The calculated CRC32 should match the expected value for the written data.",
+                expectedCrc, actualCrc);
     }
 }
