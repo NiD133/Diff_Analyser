@@ -1,28 +1,38 @@
 package org.apache.commons.lang3;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-public class LocaleUtils_ESTestTest2 extends LocaleUtils_ESTest_scaffolding {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        // Undeclared exception!
-        try {
-            LocaleUtils.toLocale("uiTN-0029");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Invalid locale format: uiTN-0029
-            //
-            verifyException("org.apache.commons.lang3.LocaleUtils", e);
-        }
+/**
+ * A test suite for the {@link LocaleUtils} class.
+ */
+class LocaleUtilsTest {
+
+    /**
+     * Tests that {@code toLocale(String)} correctly throws an {@link IllegalArgumentException}
+     * when given a string that does not conform to the expected format.
+     * <p>
+     * According to the documentation, the method strictly validates the format, requiring
+     * a lowercase language code. The input "uiTN-0029" is invalid because the initial
+     * segment "uiTN" violates this rule due to its length and mixed case.
+     */
+    @Test
+    @DisplayName("toLocale() should throw IllegalArgumentException for an invalidly formatted string")
+    void toLocale_withInvalidFormatString_throwsIllegalArgumentException() {
+        // Arrange: Define the invalid input and the expected error message.
+        final String invalidLocaleString = "uiTN-0029";
+        final String expectedErrorMessage = "Invalid locale format: " + invalidLocaleString;
+
+        // Act & Assert: Verify that calling the method with invalid input throws the correct exception.
+        IllegalArgumentException thrown = assertThrows(
+            IllegalArgumentException.class,
+            () -> LocaleUtils.toLocale(invalidLocaleString)
+        );
+
+        // Assert: Verify the exception message is as expected.
+        assertEquals(expectedErrorMessage, thrown.getMessage());
     }
 }
