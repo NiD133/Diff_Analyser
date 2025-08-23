@@ -1,44 +1,26 @@
 package org.jsoup.helper;
 
+import org.jsoup.helper.HttpConnection;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiConsumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.TextNode;
-import org.junit.runner.RunWith;
 
-public class CookieUtil_ESTestTest13 extends CookieUtil_ESTest_scaffolding {
+import java.io.IOException;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        HttpConnection.Request httpConnection_Request0 = new HttpConnection.Request();
-        HttpConnection.Response httpConnection_Response0 = new HttpConnection.Response();
-        Map<String, String> map0 = httpConnection_Request0.cookies;
-        httpConnection_Response0.cookies = map0;
-        CookieUtil.parseCookie("wToM>AI", httpConnection_Response0);
-        // Undeclared exception!
-        try {
-            CookieUtil.applyCookiesToRequest(httpConnection_Request0, (BiConsumer<String, String>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.helper.CookieUtil", e);
-        }
+/**
+ * Test suite for {@link CookieUtil}.
+ */
+public class CookieUtilTest {
+
+    /**
+     * Verifies that applyCookiesToRequest throws a NullPointerException
+     * when the provided BiConsumer for setting headers is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void applyCookiesToRequestThrowsNullPointerExceptionForNullSetter() throws IOException {
+        // Arrange: Create a request object. The state of its cookies is irrelevant for this test.
+        HttpConnection.Request request = new HttpConnection.Request();
+
+        // Act: Call the method under test with a null setter.
+        // Assert: The test expects a NullPointerException, as declared by the @Test annotation.
+        CookieUtil.applyCookiesToRequest(request, null);
     }
 }
