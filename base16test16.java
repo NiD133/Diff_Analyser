@@ -1,97 +1,110 @@
 package org.apache.commons.codec.binary;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Random;
-import org.apache.commons.codec.CodecPolicy;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
-import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-public class Base16TestTest16 {
+/**
+ * Tests the isInAlphabet(byte) method of the Base16 class.
+ */
+@DisplayName("Base16.isInAlphabet")
+class Base16IsInAlphabetTest {
 
-    private static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
+    @Nested
+    @DisplayName("when configured for lower-case")
+    class WhenLowerCase {
 
-    private final Random random = new Random();
+        private final Base16 base16 = new Base16(true); // lower-case alphabet
 
-    /**
-     * @return the random.
-     */
-    public Random getRandom() {
-        return this.random;
-    }
-
-    private void testBase16InBuffer(final int startPasSize, final int endPadSize) {
-        final String content = "Hello World";
-        final String encodedContent;
-        final byte[] bytesUtf8 = StringUtils.getBytesUtf8(content);
-        byte[] buffer = ArrayUtils.addAll(bytesUtf8, new byte[endPadSize]);
-        buffer = ArrayUtils.addAll(new byte[startPasSize], buffer);
-        final byte[] encodedBytes = new Base16().encode(buffer, startPasSize, bytesUtf8.length);
-        encodedContent = StringUtils.newStringUtf8(encodedBytes);
-        assertEquals("48656C6C6F20576F726C64", encodedContent, "encoding hello world");
-    }
-
-    private String toString(final byte[] data) {
-        final StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < data.length; i++) {
-            buf.append(data[i]);
-            if (i != data.length - 1) {
-                buf.append(",");
+        @Test
+        void shouldReturnTrueForDigits() {
+            for (char c = '0'; c <= '9'; c++) {
+                assertTrue(base16.isInAlphabet((byte) c), () -> "Digit '" + c + "' should be in the alphabet");
             }
         }
-        return buf.toString();
+
+        @Test
+        void shouldReturnTrueForLowerCaseHexLetters() {
+            for (char c = 'a'; c <= 'f'; c++) {
+                assertTrue(base16.isInAlphabet((byte) c), () -> "Lower-case letter '" + c + "' should be in the alphabet");
+            }
+        }
+
+        @Test
+        void shouldReturnFalseForUpperCaseHexLetters() {
+            for (char c = 'A'; c <= 'F'; c++) {
+                assertFalse(base16.isInAlphabet((byte) c), () -> "Upper-case letter '" + c + "' should not be in the lower-case alphabet");
+            }
+        }
+
+        @Test
+        void shouldReturnFalseForCharactersAdjacentToValidRanges() {
+            assertFalse(base16.isInAlphabet((byte) ('0' - 1)), "Character before '0' should be invalid");
+            assertFalse(base16.isInAlphabet((byte) ('9' + 1)), "Character after '9' should be invalid");
+            assertFalse(base16.isInAlphabet((byte) ('a' - 1)), "Character before 'a' should be invalid");
+            assertFalse(base16.isInAlphabet((byte) ('f' + 1)), "Character after 'f' should be invalid");
+        }
     }
 
-    @Test
-    void testIsInAlphabet() {
-        // invalid bounds
-        Base16 b16 = new Base16(true);
-        assertFalse(b16.isInAlphabet((byte) 0));
-        assertFalse(b16.isInAlphabet((byte) 1));
-        assertFalse(b16.isInAlphabet((byte) -1));
-        assertFalse(b16.isInAlphabet((byte) -15));
-        assertFalse(b16.isInAlphabet((byte) -16));
-        assertFalse(b16.isInAlphabet((byte) 128));
-        assertFalse(b16.isInAlphabet((byte) 255));
-        // lower-case
-        b16 = new Base16(true);
-        for (char c = '0'; c <= '9'; c++) {
-            assertTrue(b16.isInAlphabet((byte) c));
+    @Nested
+    @DisplayName("when configured for upper-case")
+    class WhenUpperCase {
+
+        private final Base16 base16 = new Base16(false); // upper-case alphabet
+
+        @Test
+        void shouldReturnTrueForDigits() {
+            for (char c = '0'; c <= '9'; c++) {
+                assertTrue(base16.isInAlphabet((byte) c), () -> "Digit '" + c + "' should be in the alphabet");
+            }
         }
-        for (char c = 'a'; c <= 'f'; c++) {
-            assertTrue(b16.isInAlphabet((byte) c));
+
+        @Test
+        void shouldReturnTrueForUpperCaseHexLetters() {
+            for (char c = 'A'; c <= 'F'; c++) {
+                assertTrue(base16.isInAlphabet((byte) c), () -> "Upper-case letter '" + c + "' should be in the alphabet");
+            }
         }
-        for (char c = 'A'; c <= 'F'; c++) {
-            assertFalse(b16.isInAlphabet((byte) c));
+
+        @Test
+        void shouldReturnFalseForLowerCaseHexLetters() {
+            for (char c = 'a'; c <= 'f'; c++) {
+                assertFalse(base16.isInAlphabet((byte) c), () -> "Lower-case letter '" + c + "' should not be in the upper-case alphabet");
+            }
         }
-        assertFalse(b16.isInAlphabet((byte) ('0' - 1)));
-        assertFalse(b16.isInAlphabet((byte) ('9' + 1)));
-        assertFalse(b16.isInAlphabet((byte) ('a' - 1)));
-        assertFalse(b16.isInAlphabet((byte) ('f' + 1)));
-        assertFalse(b16.isInAlphabet((byte) ('z' + 1)));
-        // upper-case
-        b16 = new Base16(false);
-        for (char c = '0'; c <= '9'; c++) {
-            assertTrue(b16.isInAlphabet((byte) c));
+
+        @Test
+        void shouldReturnFalseForCharactersAdjacentToValidRanges() {
+            assertFalse(base16.isInAlphabet((byte) ('0' - 1)), "Character before '0' should be invalid");
+            assertFalse(base16.isInAlphabet((byte) ('9' + 1)), "Character after '9' should be invalid");
+            assertFalse(base16.isInAlphabet((byte) ('A' - 1)), "Character before 'A' should be invalid");
+            assertFalse(base16.isInAlphabet((byte) ('F' + 1)), "Character after 'F' should be invalid");
         }
-        for (char c = 'a'; c <= 'f'; c++) {
-            assertFalse(b16.isInAlphabet((byte) c));
-        }
-        for (char c = 'A'; c <= 'F'; c++) {
-            assertTrue(b16.isInAlphabet((byte) c));
-        }
-        assertFalse(b16.isInAlphabet((byte) ('0' - 1)));
-        assertFalse(b16.isInAlphabet((byte) ('9' + 1)));
-        assertFalse(b16.isInAlphabet((byte) ('A' - 1)));
-        assertFalse(b16.isInAlphabet((byte) ('F' + 1)));
-        assertFalse(b16.isInAlphabet((byte) ('Z' + 1)));
+    }
+
+    /**
+     * Provides Base16 instances (lower-case and upper-case) for the parameterized test.
+     */
+    static Stream<Base16> base16Instances() {
+        return Stream.of(new Base16(true), new Base16(false));
+    }
+
+    @DisplayName("should return false for values outside the hex character set")
+    @ParameterizedTest
+    @MethodSource("base16Instances")
+    void shouldReturnFalseForNonHexValues(final Base16 base16) {
+        // Test byte values that are never part of the Base16 alphabet
+        assertFalse(base16.isInAlphabet((byte) -128), "Min byte value should be invalid");
+        assertFalse(base16.isInAlphabet((byte) -1), "Byte value -1 should be invalid");
+        assertFalse(base16.isInAlphabet((byte) 0), "NUL character should be invalid");
+        assertFalse(base16.isInAlphabet((byte) 'G'), "Character 'G' should be invalid");
+        assertFalse(base16.isInAlphabet((byte) 'g'), "Character 'g' should be invalid");
+        assertFalse(base16.isInAlphabet((byte) 127), "DEL character should be invalid");
     }
 }
