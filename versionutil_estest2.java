@@ -1,19 +1,30 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.Version;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class VersionUtil_ESTestTest2 extends VersionUtil_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link VersionUtil} class, focusing on version string parsing.
+ */
+public class VersionUtilTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        int int0 = VersionUtil.parseVersionPart("9c*fdp6?ec}ur$$");
-        assertEquals(9, int0);
+    /**
+     * Tests that {@code parseVersionPart} correctly extracts an integer from the beginning
+     * of a string, stopping at the first non-digit character. This is a common scenario
+     * when parsing version components like "2.8-SNAPSHOT".
+     */
+    @Test
+    public void parseVersionPartShouldStopAtFirstNonDigit() {
+        // Arrange
+        // A typical version-like string where a number is followed by a non-digit suffix.
+        String versionStringWithSuffix = "9-SNAPSHOT";
+        int expectedVersionPart = 9;
+
+        // Act
+        int actualVersionPart = VersionUtil.parseVersionPart(versionStringWithSuffix);
+
+        // Assert
+        assertEquals("Should parse the leading integer '9' and ignore the '-SNAPSHOT' suffix.",
+                expectedVersionPart, actualVersionPart);
     }
 }
