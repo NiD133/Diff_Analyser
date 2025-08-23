@@ -1,54 +1,70 @@
 package com.google.common.collect;
 
-import static com.google.common.collect.ReflectionFreeAssertThrows.assertThrows;
-import static com.google.common.collect.SneakyThrows.sneakyThrow;
-import com.google.common.annotations.GwtCompatible;
-import com.google.common.annotations.GwtIncompatible;
-import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.collect.TestExceptions.SomeCheckedException;
-import com.google.common.collect.TestExceptions.SomeUncheckedException;
-import com.google.common.testing.GcFinalization;
-import java.lang.ref.WeakReference;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-public class AbstractIteratorTestTest1 extends TestCase {
+/**
+ * Tests for {@link AbstractIterator}.
+ */
+public class AbstractIteratorTest {
 
-    public void testDefaultBehaviorOfNextAndHasNext() {
-        // This sample AbstractIterator returns 0 on the first call, 1 on the
-        // second, then signals that it's reached the end of the data
-        Iterator<Integer> iter = new AbstractIterator<Integer>() {
-
-            private int rep;
+    @Test
+    @DisplayName("Iterator should correctly advance, cache values, and terminate")
+    void testStandardIterationLifecycle() {
+        // ARRANGE: Create an iterator that produces 0, then 1, and then signals it's done.
+        // The implementation includes a check to ensure computeNext() is not called again
+        // after the iterator is exhausted.
+        Iterator<Integer> iterator = new AbstractIterator<Integer>() {
+            private int calls = 0;
 
             @Override
             @Nullable
-            public Integer computeNext() {
-                switch(rep++) {
+            protected Integer computeNext() {
+                switch (calls++) {
                     case 0:
-                        return 0;
+                        return 0; // First element
                     case 1:
-                        return 1;
+                        return 1; // Second element
                     case 2:
-                        return endOfData();
+                        return endOfData(); // Signal end of iteration
                     default:
-                        throw new AssertionError("Should not have been invoked again");
+                        // This proves that computeNext() is not called after it has
+                        // signaled the end of the data, a key contract of AbstractIterator.
+                        throw new AssertionError("computeNext() was called unexpectedly");
                 }
             }
         };
-        assertTrue(iter.hasNext());
-        assertEquals(0, (int) iter.next());
-        // verify idempotence of hasNext()
-        assertTrue(iter.hasNext());
-        assertTrue(iter.hasNext());
-        assertTrue(iter.hasNext());
-        assertEquals(1, (int) iter.next());
-        assertFalse(iter.hasNext());
-        // Make sure computeNext() doesn't get invoked again
-        assertFalse(iter.hasNext());
-        assertThrows(NoSuchElementException.class, iter::next);
+
+        // ACT & ASSERT
+
+        // 1. First element: hasNext() computes and caches the value.
+        assertTrue(iterator.hasNext(), "Iterator should have an element at the start");
+        assertEquals(0, iterator.next(), "next() should return the first element");
+
+        // 2. Idempotency of hasNext(): Calling it multiple times should not change the state.
+        // The first call to hasNext() here will compute and cache the next value (1).
+        assertTrue(iterator.hasNext(), "hasNext() should be true before the second element");
+        assertTrue(iterator.hasNext(), "Subsequent hasNext() calls should be idempotent");
+
+        // 3. Second element: Retrieve the cached value.
+        assertEquals(1, iterator.next(), "next() should return the second element");
+
+        // 4. End of iteration: hasNext() should now return false.
+        assertFalse(iterator.hasNext(), "Iterator should be exhausted after the last element");
+
+        // 5. Behavior after exhaustion: hasNext() remains false, and next() throws.
+        assertFalse(iterator.hasNext(), "hasNext() should remain false after exhaustion");
+        assertThrows(
+            NoSuchElementException.class,
+            iterator::next,
+            "Calling next() on an exhausted iterator should throw NoSuchElementException");
     }
 }
