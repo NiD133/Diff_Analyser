@@ -1,30 +1,24 @@
 package org.locationtech.spatial4j.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 
-public class GeohashUtils_ESTestTest14 extends GeohashUtils_ESTest_scaffolding {
+/**
+ * Test suite for {@link GeohashUtils}.
+ */
+public class GeohashUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        // Undeclared exception!
-        try {
-            GeohashUtils.decode("A0D", (SpatialContext) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.locationtech.spatial4j.io.GeohashUtils", e);
-        }
+    /**
+     * Verifies that decode() throws a NullPointerException when the provided
+     * SpatialContext is null, as it is a required argument for creating shapes.
+     */
+    @Test(expected = NullPointerException.class)
+    public void decode_withNullContext_shouldThrowNullPointerException() {
+        // Given a valid geohash string
+        String geohash = "A0D";
+
+        // When the decode method is called with a null SpatialContext
+        // Then a NullPointerException is expected
+        GeohashUtils.decode(geohash, (SpatialContext) null);
     }
 }
