@@ -1,92 +1,149 @@
 package org.apache.commons.cli.help;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
+
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class TextHelpAppendableTestTest12 {
+/**
+ * Tests for the text wrapping and formatting capabilities of {@link TextHelpAppendable}.
+ */
+@DisplayName("TextHelpAppendable Tests")
+class TextHelpAppendableTest {
+
+    private static final String LIPSUM = "The quick brown fox jumps over the lazy dog";
 
     private StringBuilder sb;
-
     private TextHelpAppendable underTest;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         sb = new StringBuilder();
         underTest = new TextHelpAppendable(sb);
     }
 
-    @ParameterizedTest
+    @Test
+    @DisplayName("Default constructor should set default formatting values")
+    void constructor_ShouldSetDefaultValues() {
+        assertEquals(TextHelpAppendable.DEFAULT_WIDTH, underTest.getMaxWidth(), "Default width should be set correctly");
+        assertEquals(TextHelpAppendable.DEFAULT_LEFT_PAD, underTest.getLeftPad(), "Default left pad should be set correctly");
+        assertEquals(TextHelpAppendable.DEFAULT_INDENT, underTest.getIndent(), "Default indent should be set correctly");
+    }
+
+    @ParameterizedTest(name = "For char ''{0}'', whitespace={1}")
     @MethodSource("org.apache.commons.cli.help.UtilTest#charArgs")
-    void testindexOfWrapPosWithWhitespace(final Character c, final boolean isWhitespace) {
+    @DisplayName("indexOfWrap() should find correct wrap position")
+    void indexOfWrap_ShouldFindCorrectPosition_ForWhitespaceAndNonWhitespace(final Character c, final boolean isWhitespace) {
         final String text = String.format("Hello%cWorld", c);
-        assertEquals(isWhitespace ? 5 : 6, TextHelpAppendable.indexOfWrap(text, 7, 0));
+        // If the character is whitespace, the wrap should occur at its position (5).
+        // Otherwise, it should occur at the next character's position (6).
+        final int expectedWrapPos = isWhitespace ? 5 : 6;
+        assertEquals(expectedWrapPos, TextHelpAppendable.indexOfWrap(text, 7, 0));
     }
 
     @Test
-    void testPrintWrapped() throws IOException {
-        String text = "The quick brown fox jumps over the lazy dog";
-        final TextStyle.Builder styleBuilder = TextStyle.builder().setMaxWidth(10).setIndent(0).setLeftPad(0);
-        final List<String> expected = new ArrayList<>();
-        expected.add("The quick");
-        expected.add("brown fox");
-        expected.add("jumps over");
-        expected.add("the lazy");
-        expected.add("dog");
-        underTest.printWrapped(text, styleBuilder.get());
-        List<String> actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(expected, actual, "left aligned failed");
-        sb.setLength(0);
-        expected.clear();
-        expected.add(" The quick");
-        expected.add(" brown fox");
-        expected.add("jumps over");
-        expected.add("  the lazy");
-        expected.add("       dog");
-        styleBuilder.setAlignment(TextStyle.Alignment.RIGHT);
-        underTest.printWrapped(text, styleBuilder.get());
-        actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(expected, actual, "right aligned failed");
-        sb.setLength(0);
-        expected.clear();
-        expected.add("The quick");
-        expected.add("brown fox");
-        expected.add("jumps over");
-        expected.add(" the lazy");
-        expected.add("   dog");
-        styleBuilder.setAlignment(TextStyle.Alignment.CENTER);
-        underTest.printWrapped(text, styleBuilder.get());
-        actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(expected, actual, "center aligned failed");
-        sb.setLength(0);
-        expected.clear();
-        expected.add(" The quick brown fox jumps over the lazy dog");
-        assertEquals(1, underTest.getLeftPad(), "unexpected page left pad");
-        assertEquals(3, underTest.getIndent(), "unexpected page indent");
-        assertEquals(74, underTest.getMaxWidth(), "unexpected page width");
-        underTest.printWrapped(text);
-        actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(expected, actual, "default format aligned failed");
-        sb.setLength(0);
-        text += ".\nNow is the time for all good people to come to the aid of their country.";
-        expected.clear();
-        expected.add(" The quick brown fox jumps over the lazy dog.");
-        expected.add("    Now is the time for all good people to come to the aid of their");
-        expected.add("    country.");
-        underTest.printWrapped(text);
-        actual = IOUtils.readLines(new StringReader(sb.toString()));
-        assertEquals(expected, actual, "default format aligned failed");
+    @DisplayName("printWrapped() should wrap and align text to the left")
+    void printWrapped_WithLeftAlignment_ShouldWrapAndAlignTextLeft() throws IOException {
+        // Arrange
+        final TextStyle style = TextStyle.builder().setMaxWidth(10).build();
+        final List<String> expected = List.of(
+            "The quick",
+            "brown fox",
+            "jumps over",
+            "the lazy",
+            "dog"
+        );
+
+        // Act
+        underTest.printWrapped(LIPSUM, style);
+        final List<String> actual = IOUtils.readLines(new StringReader(sb.toString()));
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("printWrapped() should wrap and align text to the right")
+    void printWrapped_WithRightAlignment_ShouldWrapAndAlignTextRight() throws IOException {
+        // Arrange
+        final TextStyle style = TextStyle.builder().setMaxWidth(10).setAlignment(TextStyle.Alignment.RIGHT).build();
+        final List<String> expected = List.of(
+            " The quick",
+            " brown fox",
+            "jumps over",
+            "  the lazy",
+            "       dog"
+        );
+
+        // Act
+        underTest.printWrapped(LIPSUM, style);
+        final List<String> actual = IOUtils.readLines(new StringReader(sb.toString()));
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("printWrapped() should wrap and align text to the center")
+    void printWrapped_WithCenterAlignment_ShouldWrapAndAlignCenter() throws IOException {
+        // Arrange
+        final TextStyle style = TextStyle.builder().setMaxWidth(10).setAlignment(TextStyle.Alignment.CENTER).build();
+        final List<String> expected = List.of(
+            "The quick",
+            "brown fox",
+            "jumps over",
+            " the lazy",
+            "   dog"
+        );
+
+        // Act
+        underTest.printWrapped(LIPSUM, style);
+        final List<String> actual = IOUtils.readLines(new StringReader(sb.toString()));
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("printWrapped() without style should use default formatting")
+    void printWrapped_WithDefaultStyle_ShouldUseDefaultFormatting() throws IOException {
+        // Arrange
+        final List<String> expected = List.of(
+            " The quick brown fox jumps over the lazy dog"
+        );
+
+        // Act
+        underTest.printWrapped(LIPSUM);
+        final List<String> actual = IOUtils.readLines(new StringReader(sb.toString()));
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("printWrapped() with default style should handle newlines correctly")
+    void printWrapped_WithDefaultStyleAndNewlines_ShouldWrapAndIndentCorrectly() throws IOException {
+        // Arrange
+        final String textWithNewline = LIPSUM + ".\nNow is the time for all good people to come to the aid of their country.";
+        final List<String> expected = List.of(
+            " The quick brown fox jumps over the lazy dog.",
+            "    Now is the time for all good people to come to the aid of their",
+            "    country."
+        );
+
+        // Act
+        underTest.printWrapped(textWithNewline);
+        final List<String> actual = IOUtils.readLines(new StringReader(sb.toString()));
+
+        // Assert
+        assertEquals(expected, actual);
     }
 }
