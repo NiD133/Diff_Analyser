@@ -1,33 +1,45 @@
 package org.apache.commons.compress.harmony.pack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class CodecEncoding_ESTestTest18 extends CodecEncoding_ESTest_scaffolding {
+/**
+ * This class contains tests for the {@link CodecEncoding} class, focusing on specifier generation.
+ */
+public class CodecEncodingTest {
 
+    /**
+     * Tests that {@link CodecEncoding#getSpecifier(Codec, Codec)} generates the correct
+     * integer array representation for a {@link RunCodec} with a large K-value.
+     */
     @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        BHSDCodec bHSDCodec0 = Codec.UDELTA5;
-        RunCodec runCodec0 = new RunCodec(Integer.MAX_VALUE, bHSDCodec0, bHSDCodec0);
-        PopulationCodec populationCodec0 = new PopulationCodec(runCodec0, runCodec0, runCodec0);
-        int[] intArray0 = CodecEncoding.getSpecifier(runCodec0, populationCodec0);
-        assertNotNull(intArray0);
-        assertArrayEquals(new int[] { 124, 524286, 41, 41 }, intArray0);
+    public void getSpecifierForRunCodecWithLargeKValueShouldReturnCorrectEncoding() {
+        // ARRANGE
+        // A specifier is an integer array that represents a codec's encoding format.
+        // This test verifies the specifier for a RunCodec, which encodes a sequence of values.
+
+        // The RunCodec is defined by a count (K) and two sub-codecs (A and B).
+        // We use the maximum integer value for K and the UDELTA5 codec for A and B.
+        final BHSDCodec udelta5Codec = Codec.UDELTA5;
+        final RunCodec runCodec = new RunCodec(Integer.MAX_VALUE, udelta5Codec, udelta5Codec);
+
+        // The default codec for the band can affect the final specifier.
+        // This test uses a complex PopulationCodec as the default.
+        final PopulationCodec defaultCodec = new PopulationCodec(runCodec, runCodec, runCodec);
+
+        // The expected specifier consists of four parts:
+        // 1. A token identifying it as a RunCodec (124).
+        // 2. The encoded representation of the K-value (524286 for Integer.MAX_VALUE).
+        // 3. The specifier for the 'A' codec (41 for UDELTA5).
+        // 4. The specifier for the 'B' codec (41 for UDELTA5).
+        final int[] expectedSpecifier = {124, 524286, 41, 41};
+
+        // ACT
+        final int[] actualSpecifier = CodecEncoding.getSpecifier(runCodec, defaultCodec);
+
+        // ASSERT
+        assertNotNull(actualSpecifier);
+        assertArrayEquals(expectedSpecifier, actualSpecifier);
     }
 }
