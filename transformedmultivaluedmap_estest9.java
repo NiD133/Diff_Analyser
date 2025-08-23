@@ -1,59 +1,51 @@
 package org.apache.commons.collections4.multimap;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.AbstractMap;
-import java.util.ArrayDeque;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.PriorityQueue;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Factory;
 import org.apache.commons.collections4.MultiValuedMap;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionFactory;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
 import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * This test class contains an improved version of a test for TransformedMultiValuedMap.
+ * The original test was auto-generated and lacked clarity.
+ */
 public class TransformedMultiValuedMap_ESTestTest9 extends TransformedMultiValuedMap_ESTest_scaffolding {
 
+    /**
+     * Tests that the put() method's return value correctly reflects whether the underlying
+     * collection was modified.
+     * <p>
+     * When decorating a map that uses a Set for its values (like HashSetValuedHashMap),
+     * the first put of a key-value pair should return true. A subsequent put of the
+     * same pair should return false, as adding a duplicate element does not modify a Set.
+     */
     @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        LinkedHashSetValuedLinkedHashMap<Integer, Integer> linkedHashSetValuedLinkedHashMap0 = new LinkedHashSetValuedLinkedHashMap<Integer, Integer>();
-        HashSetValuedHashMap<Integer, Integer> hashSetValuedHashMap0 = new HashSetValuedHashMap<Integer, Integer>(linkedHashSetValuedLinkedHashMap0);
-        HashMap<Predicate<Object>, Transformer<Integer, Integer>> hashMap0 = new HashMap<Predicate<Object>, Transformer<Integer, Integer>>();
-        Transformer<Integer, Integer> transformer0 = SwitchTransformer.switchTransformer((Map<? extends Predicate<? super Integer>, ? extends Transformer<? super Integer, ? extends Integer>>) hashMap0);
-        TransformedMultiValuedMap<Integer, Integer> transformedMultiValuedMap0 = TransformedMultiValuedMap.transformingMap((MultiValuedMap<Integer, Integer>) hashSetValuedHashMap0, (Transformer<? super Integer, ? extends Integer>) transformer0, (Transformer<? super Integer, ? extends Integer>) transformer0);
-        Integer integer0 = new Integer((-1));
-        boolean boolean0 = transformedMultiValuedMap0.put(integer0, integer0);
-        boolean boolean1 = transformedMultiValuedMap0.put(integer0, integer0);
-        assertFalse(boolean1 == boolean0);
+    public void putShouldReturnTrueForNewElementAndFalseForDuplicateWhenUsingSetValuedMap() {
+        // Arrange
+        // The underlying map uses a HashSet to store values for each key.
+        final MultiValuedMap<Integer, Integer> underlyingMap = new HashSetValuedHashMap<>();
+
+        // Use a no-op transformer, as the transformation logic is not the focus of this test.
+        final Transformer<Integer, Integer> nopTransformer = NOPTransformer.nopTransformer();
+        final TransformedMultiValuedMap<Integer, Integer> transformedMap =
+                TransformedMultiValuedMap.transformingMap(underlyingMap, nopTransformer, nopTransformer);
+
+        final Integer key = -1;
+        final Integer value = -1;
+
+        // Act
+        // First put: adds a new value. The underlying HashSet is modified.
+        final boolean firstPutResult = transformedMap.put(key, value);
+
+        // Second put: attempts to add the same value again. The HashSet already contains it,
+        // so no modification occurs.
+        final boolean secondPutResult = transformedMap.put(key, value);
+
+        // Assert
+        assertTrue("The first put of a new element should modify the map and return true.", firstPutResult);
+        assertFalse("The second put of a duplicate element should not modify the map and return false.", secondPutResult);
     }
 }
