@@ -2,21 +2,27 @@ package org.jfree.data;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class ComparableObjectItem_ESTestTest12 extends ComparableObjectItem_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ComparableObjectItem} class.
+ */
+public class ComparableObjectItemTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        Object object0 = new Object();
-        ComparableObjectItem comparableObjectItem0 = new ComparableObjectItem("^VA/-a*$;'d", object0);
-        ComparableObjectItem comparableObjectItem1 = new ComparableObjectItem("^VA/-a*$;'d", comparableObjectItem0);
-        boolean boolean0 = comparableObjectItem0.equals(comparableObjectItem1);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false when two items
+     * have the same 'comparable' key but different 'object' payloads.
+     */
+    @Test
+    public void equals_withSameComparableButDifferentObjects_shouldReturnFalse() {
+        // Arrange: Create two items with the same key but distinct object payloads.
+        String key = "ID-1";
+        Object payload1 = "Payload A";
+        ComparableObjectItem item1 = new ComparableObjectItem(key, payload1);
+
+        Object payload2 = "Payload B";
+        ComparableObjectItem item2 = new ComparableObjectItem(key, payload2);
+
+        // Act & Assert: The equals method should return false because the payloads differ.
+        assertFalse("Items with different object payloads should not be equal.", item1.equals(item2));
     }
 }
