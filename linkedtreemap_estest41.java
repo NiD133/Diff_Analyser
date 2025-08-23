@@ -1,27 +1,32 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class LinkedTreeMap_ESTestTest41 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link LinkedTreeMap.Node#equals(Object)} method.
+ */
+public class LinkedTreeMapNodeEqualsTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        Integer integer0 = new Integer((-1));
-        LinkedTreeMap.Node<Integer, Integer> linkedTreeMap_Node0 = new LinkedTreeMap.Node<Integer, Integer>(true);
-        LinkedTreeMap.Node<Integer, Integer> linkedTreeMap_Node1 = new LinkedTreeMap.Node<Integer, Integer>(true, linkedTreeMap_Node0, integer0, linkedTreeMap_Node0, linkedTreeMap_Node0);
-        boolean boolean0 = linkedTreeMap_Node1.equals(linkedTreeMap_Node0);
-        assertFalse(boolean0);
+    /**
+     * Tests that a regular node (with a non-null key) is not considered equal
+     * to a special "header" node (which has a null key).
+     */
+    @Test
+    public void nodeEquals_withRegularNodeAndHeaderNode_shouldReturnFalse() {
+        // Arrange: Create a header node and a regular node.
+        // A header node is a special node used internally by LinkedTreeMap, with a null key.
+        LinkedTreeMap.Node<Integer, Integer> headerNode = new LinkedTreeMap.Node<>(true);
+
+        // A regular node represents a map entry and has a key.
+        Integer key = -1;
+        LinkedTreeMap.Node<Integer, Integer> regularNode = new LinkedTreeMap.Node<>(
+                true, headerNode, key, headerNode, headerNode);
+
+        // Act: Compare the regular node with the header node.
+        boolean areEqual = regularNode.equals(headerNode);
+
+        // Assert: The nodes should not be equal because their keys are different (one is -1, the other is null).
+        assertFalse("A regular node should not be equal to a header node", areEqual);
     }
 }
