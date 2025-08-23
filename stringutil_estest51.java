@@ -1,28 +1,22 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class StringUtil_ESTestTest51 extends StringUtil_ESTest_scaffolding {
+/**
+ * Tests for the {@link StringUtil#isDigit(char)} method.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test50() throws Throwable {
-        boolean boolean0 = StringUtil.isDigit('%');
-        assertFalse(boolean0);
+    @Test
+    public void isDigit_shouldReturnFalse_forNonDigitCharacter() {
+        // Arrange: A character that is not a numerical digit.
+        char nonDigitChar = '%';
+
+        // Act: Check if the character is a digit.
+        boolean result = StringUtil.isDigit(nonDigitChar);
+
+        // Assert: The method should return false.
+        assertFalse("Expected isDigit('%') to be false, as '%' is not a digit.", result);
     }
 }
