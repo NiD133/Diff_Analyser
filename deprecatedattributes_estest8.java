@@ -1,17 +1,28 @@
 package org.apache.commons.cli;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class DeprecatedAttributes_ESTestTest8 extends DeprecatedAttributes_ESTest_scaffolding {
+/**
+ * Tests for the {@link DeprecatedAttributes} class.
+ */
+public class DeprecatedAttributesTest {
 
-    @Test(timeout = 4000)
-    public void test7() throws Throwable {
-        DeprecatedAttributes deprecatedAttributes0 = DeprecatedAttributes.DEFAULT;
-        String string0 = deprecatedAttributes0.getSince();
-        assertEquals("", string0);
+    /**
+     * Verifies that the 'since' attribute of the default DeprecatedAttributes instance
+     * is an empty string, confirming its correct default initialization.
+     */
+    @Test
+    public void getSinceShouldReturnEmptyStringForDefaultInstance() {
+        // Arrange: The DeprecatedAttributes.DEFAULT constant is the subject under test.
+        final DeprecatedAttributes defaultAttributes = DeprecatedAttributes.DEFAULT;
+        final String expectedSince = "";
+
+        // Act: Retrieve the 'since' value from the default instance.
+        final String actualSince = defaultAttributes.getSince();
+
+        // Assert: The retrieved value should match the expected empty string.
+        assertEquals("The 'since' attribute for the default instance should be an empty string.",
+                     expectedSince, actualSince);
     }
 }
