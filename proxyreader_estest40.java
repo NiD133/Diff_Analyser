@@ -1,25 +1,34 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
-import java.io.IOException;
+import static org.junit.Assert.assertFalse;
+
 import java.io.PipedReader;
-import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import java.io.Reader;
+import org.junit.Test;
 
-public class ProxyReader_ESTestTest40 extends ProxyReader_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ProxyReader}.
+ */
+public class ProxyReaderTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        PipedReader pipedReader0 = new PipedReader();
-        TaggedReader taggedReader0 = new TaggedReader(pipedReader0);
-        boolean boolean0 = taggedReader0.markSupported();
-        assertFalse(boolean0);
+    /**
+     * Tests that {@link ProxyReader#markSupported()} correctly delegates the call
+     * to the underlying reader, returning false when the underlying reader does
+     * not support marking.
+     */
+    @Test
+    public void markSupportedShouldReturnFalseWhenUnderlyingReaderDoesNotSupportIt() {
+        // Arrange: Create a ProxyReader with an underlying reader (PipedReader)
+        // that is known *not* to support the mark() operation.
+        final Reader underlyingReader = new PipedReader();
+        // We use TaggedReader as a concrete subclass of the abstract ProxyReader for this test.
+        final ProxyReader proxyReader = new TaggedReader(underlyingReader);
+
+        // Act: Call the markSupported() method on the proxy.
+        final boolean isMarkSupported = proxyReader.markSupported();
+
+        // Assert: The call should be delegated to the underlying reader,
+        // which returns false.
+        assertFalse("ProxyReader should report mark is not supported when the delegate does not.", isMarkSupported);
     }
 }
