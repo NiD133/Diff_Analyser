@@ -1,34 +1,43 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 
-public class BBoxCalculator_ESTestTest26 extends BBoxCalculator_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
-        bBoxCalculator0.expandXRange(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-        // Undeclared exception!
-        try {
-            bBoxCalculator0.getBoundary();
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // maxY must be >= minY: Infinity to -Infinity
-            //
-            verifyException("org.locationtech.spatial4j.shape.impl.ShapeFactoryImpl", e);
-        }
+/**
+ * Test suite for {@link BBoxCalculator}.
+ */
+public class BBoxCalculatorTest {
+
+    /**
+     * Tests that calling getBoundary() throws a RuntimeException if the Y-axis range
+     * has not been initialized.
+     *
+     * The BBoxCalculator starts with an invalid Y-range (minY=+Infinity, maxY=-Infinity).
+     * If only the X-range is expanded, the Y-range remains invalid. This test ensures
+     * that attempting to create a boundary rectangle in this state fails with a clear
+     * error message.
+     */
+    @Test
+    public void getBoundaryShouldThrowExceptionWhenYRangeIsUninitialized() {
+        // Arrange: Create a BBoxCalculator and expand only the X-range.
+        // This leaves the Y-range in its initial, invalid state where minY > maxY.
+        SpatialContext geoContext = SpatialContext.GEO;
+        BBoxCalculator bboxCalculator = new BBoxCalculator(geoContext);
+        bboxCalculator.expandXRange(0, 10); // Expand X, but not Y.
+
+        // Act & Assert: Verify that getBoundary() throws a RuntimeException because the
+        // Y-range is invalid (minY > maxY).
+        RuntimeException exception = assertThrows(
+            "Expected an exception due to uninitialized Y-range",
+            RuntimeException.class,
+            bboxCalculator::getBoundary
+        );
+
+        // Verify the exception message to confirm the cause of the failure.
+        String expectedMessage = "maxY must be >= minY: Infinity to -Infinity";
+        assertEquals(expectedMessage, exception.getMessage());
     }
 }
