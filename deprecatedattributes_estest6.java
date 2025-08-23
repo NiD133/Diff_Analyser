@@ -1,17 +1,24 @@
 package org.apache.commons.cli;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-public class DeprecatedAttributes_ESTestTest6 extends DeprecatedAttributes_ESTest_scaffolding {
+/**
+ * Tests for the {@link DeprecatedAttributes} class.
+ */
+class DeprecatedAttributesTest {
 
-    @Test(timeout = 4000)
-    public void test5() throws Throwable {
-        DeprecatedAttributes deprecatedAttributes0 = DeprecatedAttributes.DEFAULT;
-        String string0 = deprecatedAttributes0.getDescription();
-        assertEquals("", string0);
+    @Test
+    @DisplayName("The default DeprecatedAttributes instance should have an empty description")
+    void defaultInstanceShouldHaveEmptyDescription() {
+        // Arrange: The DeprecatedAttributes.DEFAULT constant is a pre-existing fixture.
+        DeprecatedAttributes defaultAttributes = DeprecatedAttributes.DEFAULT;
+
+        // Act: Retrieve the description from the default instance.
+        String description = defaultAttributes.getDescription();
+
+        // Assert: Verify that the description is an empty string.
+        assertEquals("", description);
     }
 }
