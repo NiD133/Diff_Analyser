@@ -1,3 +1,39 @@
+/* ======================================================
+ * JFreeChart : a chart library for the Java(tm) platform
+ * ======================================================
+ *
+ * (C) Copyright 2000-present, by David Gilbert and Contributors.
+ *
+ * Project Info:  https://www.jfree.org/jfreechart/index.html
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ *
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
+ *
+ * -------------------------------------------
+ * IntervalCategoryItemLabelGeneratorTest.java
+ * -------------------------------------------
+ * (C) Copyright 2003-present, by David Gilbert and Contributors.
+ *
+ * Original Author:  David Gilbert;
+ * Contributor(s):   -;
+ *
+ */
+
 package org.jfree.chart.labels;
 
 import java.text.DateFormat;
@@ -12,74 +48,84 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for the {@link IntervalCategoryItemLabelGenerator} class.
+ * Tests for the {@link IntervalCategoryItemLabelGenerator} class.
  */
 public class IntervalCategoryItemLabelGeneratorTest {
 
     /**
-     * Tests the equals() method for various scenarios.
+     * Tests the equals() method.
      */
     @Test
-    public void testEqualsMethod() {
-        // Test default constructor
-        IntervalCategoryItemLabelGenerator generator1 = new IntervalCategoryItemLabelGenerator();
-        IntervalCategoryItemLabelGenerator generator2 = new IntervalCategoryItemLabelGenerator();
-        assertEquals(generator1, generator2, "Default generators should be equal");
+    public void testEquals() {
+        IntervalCategoryItemLabelGenerator g1
+                = new IntervalCategoryItemLabelGenerator();
+        IntervalCategoryItemLabelGenerator g2
+                = new IntervalCategoryItemLabelGenerator();
+        assertEquals(g1, g2);
+        assertEquals(g2, g1);
 
-        // Test with DecimalFormat
-        generator1 = new IntervalCategoryItemLabelGenerator("{3} - {4}", new DecimalFormat("0.000"));
-        assertNotEquals(generator1, generator2, "Generators with different formats should not be equal");
+        g1 = new IntervalCategoryItemLabelGenerator("{3} - {4}",
+                new DecimalFormat("0.000"));
+        assertNotEquals(g1, g2);
+        g2 = new IntervalCategoryItemLabelGenerator("{3} - {4}",
+                new DecimalFormat("0.000"));
+        assertEquals(g1, g2);
 
-        generator2 = new IntervalCategoryItemLabelGenerator("{3} - {4}", new DecimalFormat("0.000"));
-        assertEquals(generator1, generator2, "Generators with same DecimalFormat should be equal");
-
-        // Test with SimpleDateFormat
-        generator1 = new IntervalCategoryItemLabelGenerator("{3} - {4}", new SimpleDateFormat("d-MMM"));
-        assertNotEquals(generator1, generator2, "Generators with different formats should not be equal");
-
-        generator2 = new IntervalCategoryItemLabelGenerator("{3} - {4}", new SimpleDateFormat("d-MMM"));
-        assertEquals(generator1, generator2, "Generators with same SimpleDateFormat should be equal");
+        g1 = new IntervalCategoryItemLabelGenerator("{3} - {4}",
+                new SimpleDateFormat("d-MMM"));
+        assertNotEquals(g1, g2);
+        g2 = new IntervalCategoryItemLabelGenerator("{3} - {4}",
+                new SimpleDateFormat("d-MMM"));
+        assertEquals(g1, g2);
     }
 
     /**
-     * Verifies that the hashCode method is consistent with equals.
+     * Simple check that hashCode is implemented.
      */
     @Test
-    public void testHashCodeConsistency() {
-        IntervalCategoryItemLabelGenerator generator1 = new IntervalCategoryItemLabelGenerator();
-        IntervalCategoryItemLabelGenerator generator2 = new IntervalCategoryItemLabelGenerator();
-        assertEquals(generator1, generator2, "Generators should be equal");
-        assertEquals(generator1.hashCode(), generator2.hashCode(), "Hash codes should be equal for equal objects");
+    public void testHashCode() {
+        IntervalCategoryItemLabelGenerator g1
+                = new IntervalCategoryItemLabelGenerator();
+        IntervalCategoryItemLabelGenerator g2
+                = new IntervalCategoryItemLabelGenerator();
+        assertEquals(g1, g2);
+        assertEquals(g1.hashCode(), g2.hashCode());
     }
 
     /**
-     * Tests the cloning functionality.
+     * Confirm that cloning works.
      */
     @Test
-    public void testCloningFunctionality() throws CloneNotSupportedException {
-        IntervalCategoryItemLabelGenerator original = new IntervalCategoryItemLabelGenerator();
-        IntervalCategoryItemLabelGenerator clone = (IntervalCategoryItemLabelGenerator) original.clone();
-        assertNotSame(original, clone, "Clone should be a different instance");
-        assertSame(original.getClass(), clone.getClass(), "Clone should be of the same class");
-        assertEquals(original, clone, "Clone should be equal to the original");
+    public void testCloning() throws CloneNotSupportedException {
+        IntervalCategoryItemLabelGenerator g1
+                = new IntervalCategoryItemLabelGenerator();
+        IntervalCategoryItemLabelGenerator g2 
+                = (IntervalCategoryItemLabelGenerator) g1.clone();
+        assertNotSame(g1, g2);
+        assertSame(g1.getClass(), g2.getClass());
+        assertEquals(g1, g2);
     }
 
     /**
-     * Ensures that the class implements PublicCloneable.
+     * Check to ensure that this class implements PublicCloneable.
      */
     @Test
-    public void testImplementsPublicCloneable() {
-        IntervalCategoryItemLabelGenerator generator = new IntervalCategoryItemLabelGenerator();
-        assertTrue(generator instanceof PublicCloneable, "Generator should implement PublicCloneable");
+    public void testPublicCloneable() {
+        IntervalCategoryItemLabelGenerator g1
+                = new IntervalCategoryItemLabelGenerator();
+        assertTrue(g1 instanceof PublicCloneable);
     }
 
     /**
-     * Tests serialization and deserialization for equality.
+     * Serialize an instance, restore it, and check for equality.
      */
     @Test
-    public void testSerializationDeserialization() {
-        IntervalCategoryItemLabelGenerator original = new IntervalCategoryItemLabelGenerator("{3} - {4}", DateFormat.getInstance());
-        IntervalCategoryItemLabelGenerator deserialized = TestUtils.serialised(original);
-        assertEquals(original, deserialized, "Deserialized object should be equal to the original");
+    public void testSerialization() {
+        IntervalCategoryItemLabelGenerator g1
+                = new IntervalCategoryItemLabelGenerator("{3} - {4}",
+                DateFormat.getInstance());
+        IntervalCategoryItemLabelGenerator g2 = TestUtils.serialised(g1);
+        assertEquals(g1, g2);
     }
+
 }
