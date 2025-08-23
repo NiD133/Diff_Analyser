@@ -1,47 +1,38 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
-import java.time.YearMonth;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.ThaiBuddhistDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockThaiBuddhistDate;
-import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertEquals;
+
+// The original test class name and inheritance are kept to match the provided context.
 public class DayOfYear_ESTestTest41 extends DayOfYear_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        ZoneOffset zoneOffset0 = ZoneOffset.MAX;
-        DayOfYear dayOfYear0 = DayOfYear.now((ZoneId) zoneOffset0);
-        int int0 = dayOfYear0.getValue();
-        assertEquals(46, int0);
+    /**
+     * Tests that the current DayOfYear is correctly determined using a fixed clock and a specific time zone.
+     */
+    @Test
+    public void now_withFixedClockAndMaxOffsetZone_returnsCorrectDayOfYear() {
+        // Arrange: Create a clock fixed to a specific instant in time.
+        // Using Clock.fixed() makes the test deterministic and self-contained,
+        // which is a significant improvement over relying on an implicit mock clock.
+        Instant fixedInstant = Instant.parse("2014-02-14T20:21:21.320Z");
+        ZoneId zoneWithMaxOffset = ZoneOffset.MAX; // +18:00
+        Clock clock = Clock.fixed(fixedInstant, zoneWithMaxOffset);
+
+        // Act: Get the "current" DayOfYear using the fixed clock.
+        // The now(Clock) method is the preferred, testable way to handle time-dependent logic.
+        DayOfYear dayOfYear = DayOfYear.now(clock);
+
+        // Assert: Verify the day of the year is correct.
+        // The instant 20:21Z on Feb 14, when viewed in a +18:00 timezone,
+        // becomes 14:21 on Feb 15 of the next day.
+        // The day of the year for Feb 15 is 31 (Jan) + 15 = 46.
+        int expectedDayOfYear = 46;
+        assertEquals(expectedDayOfYear, dayOfYear.getValue());
     }
 }
