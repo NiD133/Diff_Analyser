@@ -1,23 +1,29 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
 import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class OptionFormatter_ESTestTest9 extends OptionFormatter_ESTest_scaffolding {
+/**
+ * Tests for the {@link OptionFormatter} class.
+ */
+public class OptionFormatterTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        Option option0 = new Option((String) null, (String) null);
-        OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
-        String string0 = optionFormatter0.getDescription();
-        assertEquals("", string0);
+    /**
+     * Verifies that getDescription() returns an empty string when the Option
+     * it formats was created without a description.
+     */
+    @Test
+    public void testGetDescriptionForOptionWithNoDescription() {
+        // Arrange: Create an Option with a null description.
+        // The Option(String opt, String description) constructor is used here.
+        Option optionWithNoDescription = new Option(null, null);
+        OptionFormatter formatter = OptionFormatter.from(optionWithNoDescription);
+
+        // Act: Retrieve the description from the formatter.
+        String description = formatter.getDescription();
+
+        // Assert: The description should be an empty string, not null.
+        assertEquals("Description should be an empty string for an option with no description text.", "", description);
     }
 }
