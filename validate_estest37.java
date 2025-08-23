@@ -1,32 +1,32 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Validate_ESTestTest37 extends Validate_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        // Undeclared exception!
+/**
+ * Test suite for the {@link Validate} utility class.
+ */
+public class ValidateTest {
+
+    /**
+     * Tests that {@link Validate#ensureNotNull(Object, String, Object...)} throws an
+     * {@link IllegalArgumentException} when the input object is null.
+     * It also verifies that the exception message is correctly propagated from the arguments.
+     */
+    @Test
+    public void ensureNotNullThrowsIllegalArgumentExceptionWhenObjectIsNull() {
+        // Arrange
+        final String expectedMessage = "Object must not be null";
+
         try {
-            Validate.ensureNotNull((Object) null, "1WS}t~\"$s?(X!g,(jF!", (Object[]) null);
-            fail("Expecting exception: IllegalArgumentException");
+            // Act
+            Validate.ensureNotNull(null, expectedMessage, (Object[]) null);
+            fail("Expected an IllegalArgumentException to be thrown, but it was not.");
         } catch (IllegalArgumentException e) {
-            //
-            // 1WS}t~\"$s?(X!g,(jF!
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Assert
+            assertEquals("The exception message should match the one provided.", expectedMessage, e.getMessage());
         }
     }
 }
