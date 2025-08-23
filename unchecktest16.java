@@ -2,71 +2,48 @@ package org.apache.commons.io.function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import java.io.ByteArrayInputStream;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
-import org.apache.commons.io.input.BrokenInputStream;
-import org.junit.jupiter.api.BeforeEach;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class UncheckTestTest16 {
+/**
+ * Tests for {@link Uncheck#getAsLong(IOLongSupplier)}.
+ */
+@DisplayName("Uncheck.getAsLong")
+class UncheckGetAsLongTest {
 
-    private static final byte[] BYTES = { 'a', 'b' };
+    @Test
+    @DisplayName("should return the value from the supplier on success")
+    void shouldReturnSuppliedValueOnSuccess() {
+        // Arrange: A simple supplier that returns a known value.
+        final long expectedValue = 42L;
+        final IOLongSupplier supplier = () -> expectedValue;
 
-    private static final String CAUSE_MESSAGE = "CauseMessage";
+        // Act: Call the method under test.
+        final long actualValue = Uncheck.getAsLong(supplier);
 
-    private static final String CUSTOM_MESSAGE = "Custom message";
-
-    private AtomicInteger atomicInt;
-
-    private AtomicLong atomicLong;
-
-    private AtomicBoolean atomicBoolean;
-
-    private AtomicReference<String> ref1;
-
-    private AtomicReference<String> ref2;
-
-    private AtomicReference<String> ref3;
-
-    private AtomicReference<String> ref4;
-
-    private void assertUncheckedIOException(final IOException expected, final UncheckedIOException e) {
-        assertEquals(CUSTOM_MESSAGE, e.getMessage());
-        final IOException cause = e.getCause();
-        assertEquals(expected.getClass(), cause.getClass());
-        assertEquals(CAUSE_MESSAGE, cause.getMessage());
-    }
-
-    @BeforeEach
-    public void beforeEach() {
-        ref1 = new AtomicReference<>();
-        ref2 = new AtomicReference<>();
-        ref3 = new AtomicReference<>();
-        ref4 = new AtomicReference<>();
-        atomicInt = new AtomicInteger();
-        atomicLong = new AtomicLong();
-        atomicBoolean = new AtomicBoolean();
-    }
-
-    private ByteArrayInputStream newInputStream() {
-        return new ByteArrayInputStream(BYTES);
+        // Assert: The returned value matches the expected value.
+        assertEquals(expectedValue, actualValue);
     }
 
     @Test
-    void testGetAsLong() {
-        assertThrows(UncheckedIOException.class, () -> Uncheck.getAsLong(() -> {
-            throw new IOException();
-        }));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.getAsLong(TestConstants.THROWING_IO_LONG_SUPPLIER));
-        assertEquals(1L, Uncheck.getAsLong(() -> TestUtils.compareAndSetThrowsIO(atomicLong, 1L)));
-        assertEquals(1L, atomicLong.get());
+    @DisplayName("should throw UncheckedIOException when the supplier throws an IOException")
+    void shouldWrapIOExceptionInUncheckedIOException() {
+        // Arrange: A supplier that is guaranteed to throw an IOException.
+        final IOException cause = new IOException("test failure");
+        final IOLongSupplier throwingSupplier = () -> {
+            throw cause;
+        };
+
+        // Act & Assert: Call the method and verify that it throws the expected wrapper exception.
+        final UncheckedIOException thrown = assertThrows(UncheckedIOException.class, () -> {
+            Uncheck.getAsLong(throwingSupplier);
+        });
+
+        // Assert: Verify that the cause of the thrown exception is the original IOException.
+        assertEquals(cause, thrown.getCause(), "The original IOException should be the cause of the UncheckedIOException.");
     }
 }
