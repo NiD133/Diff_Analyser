@@ -1,28 +1,48 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TypeAdapter_ESTestTest1 extends TypeAdapter_ESTest_scaffolding {
+/**
+ * Tests for the {@link TypeAdapter} class, focusing on its helper methods.
+ */
+public class TypeAdapterTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Gson.FutureTypeAdapter<Object> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Object>();
-        TypeAdapter<Object> typeAdapter0 = gson_FutureTypeAdapter0.nullSafe();
-        StringWriter stringWriter0 = new StringWriter();
-        typeAdapter0.toJson((Writer) stringWriter0, (Object) null);
-        assertEquals("null", stringWriter0.toString());
+    @Test
+    public void nullSafe_whenToJsonIsCalledWithNull_writesNullLiteral() throws IOException {
+        // Arrange
+        // Create a delegate TypeAdapter that fails if its write method is ever called.
+        // This ensures that the nullSafe() wrapper handles the null case itself
+        // without delegating to the original adapter.
+        TypeAdapter<Object> delegateAdapter = new TypeAdapter<Object>() {
+            @Override
+            public void write(JsonWriter out, Object value) {
+                fail("The delegate adapter's write method should not be called when writing a null value.");
+            }
+
+            @Override
+            public Object read(JsonReader in) {
+                // This method is not used in this test.
+                throw new AssertionError("The delegate adapter's read method should not be called.");
+            }
+        };
+
+        TypeAdapter<Object> nullSafeAdapter = delegateAdapter.nullSafe();
+        StringWriter writer = new StringWriter();
+
+        // Act
+        // Call the toJson method with a null value on the null-safe adapter.
+        nullSafeAdapter.toJson(writer, null);
+
+        // Assert
+        // Verify that the output is the JSON literal "null".
+        String expectedJson = "null";
+        assertEquals(expectedJson, writer.toString());
     }
 }
