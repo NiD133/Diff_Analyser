@@ -1,35 +1,34 @@
 package org.apache.commons.lang3.concurrent;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.Delayed;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.lang.MockException;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Contains tests for the {@link BackgroundInitializer} class.
+ * This class was improved from an auto-generated test suite.
+ */
 public class BackgroundInitializer_ESTestTest5 extends BackgroundInitializer_ESTest_scaffolding {
 
+    /**
+     * Tests that the start() method returns true on its first invocation,
+     * indicating that the background initialization has been successfully started.
+     */
     @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        BackgroundInitializer<Delayed> backgroundInitializer0 = new BackgroundInitializer<Delayed>();
-        ForkJoinPool forkJoinPool0 = ForkJoinPool.commonPool();
-        backgroundInitializer0.setExternalExecutor(forkJoinPool0);
-        boolean boolean0 = backgroundInitializer0.start();
-        assertTrue(boolean0);
-        boolean boolean1 = FileSystemHandling.shouldAllThrowIOExceptions();
-        assertTrue(boolean1 == boolean0);
+    public void startShouldReturnTrueOnFirstCall() {
+        // Arrange: Create a BackgroundInitializer and provide it with an external executor.
+        // The specific generic type <Object> is not relevant for this test's logic.
+        BackgroundInitializer<Object> initializer = new BackgroundInitializer<>();
+        ExecutorService externalExecutor = ForkJoinPool.commonPool();
+        initializer.setExternalExecutor(externalExecutor);
+
+        // Act: Start the background initialization.
+        boolean wasStarted = initializer.start();
+
+        // Assert: The start() method should return true for the first time it is called.
+        assertTrue("Expected start() to return true on the first call.", wasStarted);
     }
 }
