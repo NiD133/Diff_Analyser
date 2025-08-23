@@ -1,39 +1,59 @@
 package org.apache.commons.collections4.sequence;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SequencesComparator_ESTestTest5 extends SequencesComparator_ESTest_scaffolding {
+/**
+ * Test suite for {@link SequencesComparator}.
+ * This class demonstrates how to test for exceptions when list preconditions are violated.
+ */
+public class SequencesComparatorUnderstandabilityTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        LinkedList<Object> linkedList1 = new LinkedList<Object>(linkedList0);
-        List<Object> list0 = linkedList0.subList(0, 0);
-        linkedList0.add((Object) linkedList1);
-        linkedList1.add((Object) list0);
-        SequencesComparator<Object> sequencesComparator0 = new SequencesComparator<Object>(linkedList1, linkedList0);
-        // Undeclared exception!
-        try {
-            sequencesComparator0.getScript();
-            fail("Expecting exception: ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.SubList", e);
-        }
+    /**
+     * Tests that getScript() throws a ConcurrentModificationException if one of the
+     * sequences contains a sublist whose backing list was structurally modified
+     * after the sublist was created.
+     *
+     * The {@link SequencesComparator} iterates over the provided lists to compare them.
+     * If an element in one list is a sublist view, any attempt to access it (e.g., via
+     * its equals() method) after its backing list has been modified will result in a
+     * ConcurrentModificationException.
+     */
+    @Test(expected = ConcurrentModificationException.class)
+    public void getScriptShouldThrowCMEWhenBackingListIsModified() {
+        // --- Arrange ---
+
+        // 1. Create a list that will serve as the backing list for a sublist.
+        List<Object> backingList = new LinkedList<>();
+
+        // 2. Create a sublist view of the backing list. At this point, the view is valid.
+        List<Object> sublistView = backingList.subList(0, 0);
+
+        // 3. Create the first sequence to be compared. This list contains the sublist
+        //    view as one of its elements.
+        List<Object> sequence1 = new LinkedList<>();
+        sequence1.add(sublistView);
+
+        // 4. Perform a structural modification on the original backing list.
+        //    This action invalidates the 'sublistView'.
+        backingList.add("structural modification");
+
+        // 5. The second sequence for the comparator is the now-modified backing list.
+        List<Object> sequence2 = backingList;
+
+        // 6. Instantiate the comparator with the two sequences.
+        SequencesComparator<Object> comparator = new SequencesComparator<>(sequence1, sequence2);
+
+        // --- Act ---
+        // Attempt to generate the edit script. This will require the comparator to
+        // access the elements of both sequences, including the now-invalid sublistView.
+        // This access is what triggers the expected ConcurrentModificationException.
+        comparator.getScript();
+
+        // --- Assert ---
+        // The exception is expected and verified by the @Test(expected=...) annotation.
     }
 }
