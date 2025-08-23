@@ -1,21 +1,32 @@
 package org.apache.commons.lang3.exception;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.util.List;
-import java.util.Set;
-import org.apache.commons.lang3.tuple.Pair;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class DefaultExceptionContext_ESTestTest8 extends DefaultExceptionContext_ESTest_scaffolding {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test7() throws Throwable {
-        DefaultExceptionContext defaultExceptionContext0 = new DefaultExceptionContext();
-        List<Object> list0 = defaultExceptionContext0.getContextValues("tnJ_{Nixtyk");
-        assertFalse(list0.contains("tnJ_{Nixtyk"));
+/**
+ * Tests for {@link DefaultExceptionContext}.
+ */
+public class DefaultExceptionContextTest {
+
+    /**
+     * Tests that getContextValues() returns a non-null, empty list
+     * when queried with a label that does not exist in the context.
+     */
+    @Test
+    public void getContextValues_forNonExistentLabel_shouldReturnEmptyList() {
+        // Arrange: Create an empty context and define a label that has not been added.
+        final DefaultExceptionContext context = new DefaultExceptionContext();
+        final String nonExistentLabel = "com.example.NonExistentLabel";
+
+        // Act: Request the values associated with the non-existent label.
+        final List<Object> values = context.getContextValues(nonExistentLabel);
+
+        // Assert: Verify that the returned list is empty, not null.
+        assertNotNull("The returned list should never be null.", values);
+        assertTrue("The list of values for a non-existent label should be empty.", values.isEmpty());
     }
 }
