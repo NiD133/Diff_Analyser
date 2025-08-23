@@ -1,60 +1,47 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TextHelpAppendable_ESTestTest86 extends TextHelpAppendable_ESTest_scaffolding {
+import org.junit.Test;
 
-    @Test(timeout = 4000)
-    public void test85() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-        textHelpAppendable0.resize(textStyle_Builder0, (-1555.93743));
-        ArrayList<TextStyle> arrayList0 = new ArrayList<TextStyle>();
-        TextStyle textStyle0 = TextStyle.DEFAULT;
-        arrayList0.add(textStyle0);
-        ArrayList<String> arrayList1 = new ArrayList<String>();
-        arrayList1.add("|iq2*P~/");
-        PriorityQueue<List<String>> priorityQueue0 = new PriorityQueue<List<String>>();
-        TableDefinition tableDefinition0 = TableDefinition.from("|iq2*P~/", arrayList0, arrayList1, priorityQueue0);
-        // Undeclared exception!
+/**
+ * Tests for {@link TextHelpAppendable} focusing on table rendering behavior.
+ */
+public class TextHelpAppendableTableTest {
+
+    /**
+     * Verifies that appendTable() throws an IllegalArgumentException if the configured
+     * width is negative. A negative width can be achieved by resizing the help
+     * appendable's style with a negative fraction.
+     */
+    @Test
+    public void testAppendTableWithNegativeWidthThrowsIllegalArgumentException() throws IOException {
+        // Arrange: Create a help appendable and set its width to a negative value.
+        TextHelpAppendable helpAppendable = TextHelpAppendable.systemOut();
+        TextStyle.Builder styleBuilder = helpAppendable.getTextStyleBuilder();
+
+        // The internal resize logic is (int)(originalWidth * fraction).
+        // Using a negative fraction results in a negative width for the style.
+        helpAppendable.resize(styleBuilder, -1.0);
+
+        // Create a minimal table definition required to call the method under test.
+        List<TextStyle> columnStyles = Collections.singletonList(TextStyle.DEFAULT);
+        List<String> columnHeaders = Collections.singletonList("Header");
+        Collection<List<String>> tableData = Collections.emptyList();
+        TableDefinition tableDefinition = TableDefinition.from("Title", columnStyles, columnHeaders, tableData);
+
+        // Act & Assert: Expect an IllegalArgumentException with a specific message.
         try {
-            textHelpAppendable0.appendTable(tableDefinition0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Width must be greater than 0
-            //
-            verifyException("org.apache.commons.cli.help.TextHelpAppendable", e);
+            helpAppendable.appendTable(tableDefinition);
+            fail("Expected an IllegalArgumentException because the width is negative.");
+        } catch (final IllegalArgumentException e) {
+            assertEquals("Width must be greater than 0", e.getMessage());
         }
     }
 }
