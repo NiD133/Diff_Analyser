@@ -1,20 +1,26 @@
 package org.joda.time.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class EthiopicChronology_ESTestTest3 extends EthiopicChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the EthiopicChronology class.
+ */
+public class EthiopicChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstanceUTC();
-        int int0 = ethiopicChronology0.getMaxYear();
-        assertEquals(292272984, int0);
+    // The expected maximum year value, based on the private constant MAX_YEAR in EthiopicChronology.
+    private static final int EXPECTED_MAX_YEAR = 292272984;
+
+    @Test
+    public void getMaxYear_shouldReturnConstantMaximumSupportedYear() {
+        // Arrange: Get an instance of the chronology. The time zone does not affect this value.
+        EthiopicChronology ethiopicChronology = EthiopicChronology.getInstanceUTC();
+
+        // Act: Call the method under test.
+        int actualMaxYear = ethiopicChronology.getMaxYear();
+
+        // Assert: Verify that the method returns the expected constant value for the maximum year.
+        assertEquals("The maximum supported year should be the expected constant value.",
+                     EXPECTED_MAX_YEAR, actualMaxYear);
     }
 }
