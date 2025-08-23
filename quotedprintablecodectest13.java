@@ -1,33 +1,28 @@
 package org.apache.commons.codec.net;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.nio.charset.StandardCharsets;
+
 import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CharEncoding;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
 import org.junit.jupiter.api.Test;
 
-public class QuotedPrintableCodecTestTest13 {
+/**
+ * Tests for the {@link QuotedPrintableCodec} class.
+ */
+class QuotedPrintableCodecTest {
 
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
-
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
-
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
-    }
-
+    /**
+     * Tests that the constructor throws an UnsupportedCharsetException when an invalid
+     * charset name is provided. This ensures the codec cannot be instantiated with a
+     * non-existent character encoding.
+     */
     @Test
-    void testInvalidEncoding() {
-        assertThrows(UnsupportedCharsetException.class, () -> new QuotedPrintableCodec("NONSENSE"));
+    void constructorWithInvalidCharsetNameShouldThrowException() {
+        final String invalidCharsetName = "NONSENSE";
+
+        // The constructor that accepts a charset name is expected to throw
+        // an UnsupportedCharsetException if the charset is not supported.
+        assertThrows(UnsupportedCharsetException.class,
+            () -> new QuotedPrintableCodec(invalidCharsetName),
+            "Constructor should fail for an invalid charset name.");
     }
 }
