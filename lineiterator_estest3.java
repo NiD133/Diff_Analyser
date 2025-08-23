@@ -1,23 +1,31 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.Reader;
+import static org.junit.Assert.assertTrue;
 import java.io.StringReader;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LineIterator_ESTestTest3 extends LineIterator_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link LineIterator} class.
+ */
+public class LineIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        StringReader stringReader0 = new StringReader("w*N4EtL4abL*9i`");
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        boolean boolean0 = lineIterator0.isValidLine("w*N4EtL4abL*9i`");
-        assertTrue(boolean0);
+    /**
+     * Tests that the default implementation of isValidLine() returns true for any given string.
+     * The method is designed to be overridden, but its base behavior should always be to
+     * consider any line as valid.
+     */
+    @Test
+    public void isValidLine_shouldReturnTrueByDefault() {
+        // Arrange: Create a LineIterator instance. The reader's content is not
+        // relevant for this test, as we are calling isValidLine() directly.
+        StringReader reader = new StringReader("irrelevant content");
+        LineIterator lineIterator = new LineIterator(reader);
+        String anyLine = "w*N4EtL4abL*9i`"; // An arbitrary string to validate
+
+        // Act: Call the method under test.
+        boolean isLineValid = lineIterator.isValidLine(anyLine);
+
+        // Assert: Verify that the method returns true as expected.
+        assertTrue("isValidLine() should return true for any string by default.", isLineValid);
     }
 }
