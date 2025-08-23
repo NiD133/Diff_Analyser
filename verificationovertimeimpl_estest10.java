@@ -1,31 +1,30 @@
 package org.mockito.internal.verification;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.mockito.internal.creation.MockSettingsImpl;
-import org.mockito.internal.invocation.InvocationMatcher;
-import org.mockito.internal.stubbing.InvocationContainerImpl;
-import org.mockito.internal.util.Timer;
-import org.mockito.internal.verification.api.VerificationData;
-import org.mockito.verification.After;
-import org.mockito.verification.Timeout;
+import org.mockito.exceptions.base.MockitoException;
 import org.mockito.verification.VerificationMode;
 
-public class VerificationOverTimeImpl_ESTestTest10 extends VerificationOverTimeImpl_ESTest_scaffolding {
+import static org.mockito.Mockito.mock;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(0L, 0L, (VerificationMode) null, false);
-        VerificationOverTimeImpl verificationOverTimeImpl1 = null;
-        try {
-            verificationOverTimeImpl1 = new VerificationOverTimeImpl((-720L), (-720L), verificationOverTimeImpl0, false);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-        }
+/**
+ * Tests for the {@link VerificationOverTimeImpl} class.
+ */
+public class VerificationOverTimeImplTest {
+
+    /**
+     * Verifies that the constructor throws an exception if a negative duration is provided.
+     * The constructor relies on an internal Timer, which cannot be initialized with a
+     * negative duration. This test ensures that such invalid input is properly rejected.
+     */
+    @Test(expected = MockitoException.class)
+    public void constructorShouldThrowExceptionForNegativeDuration() {
+        // Arrange: A dummy delegate is required by the constructor, but its behavior is irrelevant.
+        VerificationMode dummyDelegate = mock(VerificationMode.class);
+        long negativeDuration = -720L;
+        long anyPollingPeriod = -720L; // Value is not critical, as the duration check happens first.
+
+        // Act & Assert: Attempting to create an instance with a negative duration
+        // should immediately throw a MockitoException.
+        new VerificationOverTimeImpl(anyPollingPeriod, negativeDuration, dummyDelegate, false);
     }
 }
