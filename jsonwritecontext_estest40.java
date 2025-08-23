@@ -1,35 +1,42 @@
 package com.fasterxml.jackson.core.json;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonWriteContext_ESTestTest40 extends JsonWriteContext_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        DupDetector dupDetector0 = DupDetector.rootDetector((JsonGenerator) null);
-        JsonWriteContext jsonWriteContext0 = JsonWriteContext.createRootContext(dupDetector0);
-        JsonWriteContext jsonWriteContext1 = jsonWriteContext0.createChildArrayContext((Object) dupDetector0);
-        assertEquals(1, jsonWriteContext1.getNestingDepth());
-        assertEquals(0, jsonWriteContext0.getEntryCount());
-        assertEquals(0, jsonWriteContext1.getEntryCount());
-        assertNotNull(jsonWriteContext1);
-        assertTrue(jsonWriteContext0.inRoot());
-        assertEquals("ARRAY", jsonWriteContext1.getTypeDesc());
+/**
+ * Unit tests for the {@link JsonWriteContext} class, focusing on the
+ * creation and initialization of child contexts.
+ */
+public class JsonWriteContextTest {
+
+    /**
+     * Verifies that creating a child array context from a root context
+     * correctly initializes the state of both the root and the new child context.
+     */
+    @Test
+    public void whenChildArrayContextCreated_thenStateIsCorrectlyInitialized() {
+        // Arrange: Create a root context.
+        DupDetector dupDetector = DupDetector.rootDetector((JsonGenerator) null);
+        JsonWriteContext rootContext = JsonWriteContext.createRootContext(dupDetector);
+
+        // Act: Create a child array context from the root.
+        // The original test used the DupDetector instance as the "current value" for the child context.
+        JsonWriteContext childArrayContext = rootContext.createChildArrayContext(dupDetector);
+
+        // Assert: Verify the state of both contexts.
+        assertNotNull("The child array context should be successfully created.", childArrayContext);
+
+        // 1. Verify the state of the parent (root) context is unchanged.
+        assertTrue("The parent context should remain the root.", rootContext.inRoot());
+        assertEquals("The parent context's entry count should still be 0.", 0, rootContext.getEntryCount());
+
+        // 2. Verify the state of the new child context is correctly initialized.
+        assertEquals("The child context's type should be 'ARRAY'.", "ARRAY", childArrayContext.getTypeDesc());
+        assertEquals("The nesting depth should be 1 for a direct child.", 1, childArrayContext.getNestingDepth());
+        assertEquals("The new child context should have an entry count of 0.", 0, childArrayContext.getEntryCount());
     }
 }
