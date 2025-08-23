@@ -2,22 +2,29 @@ package com.google.gson;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest60 extends JsonArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link JsonArray} class.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test59() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        jsonArray0.add((String) null);
-        JsonElement jsonElement0 = jsonArray0.remove(0);
-        assertFalse(jsonElement0.isJsonArray());
+    /**
+     * Tests that adding a null string to a JsonArray results in a JsonNull element,
+     * and that removing this element returns the expected JsonNull instance.
+     */
+    @Test
+    public void remove_returnsJsonNull_whenNullStringWasAdded() {
+        // Arrange: Create a JsonArray and add a null string.
+        // Per JsonArray's contract, this should be stored as a JsonNull object.
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add((String) null);
+
+        // Act: Remove the element at the first position.
+        JsonElement removedElement = jsonArray.remove(0);
+
+        // Assert: The removed element should be the singleton instance of JsonNull.
+        // This is a more specific and informative assertion than the original,
+        // which only checked that the element was not a JsonArray.
+        assertEquals(JsonNull.INSTANCE, removedElement);
     }
 }
