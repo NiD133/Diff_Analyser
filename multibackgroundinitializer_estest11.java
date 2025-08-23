@@ -1,46 +1,40 @@
 package org.apache.commons.lang3.concurrent;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.lang.MockException;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import java.util.NoSuchElementException;
+import org.junit.Test;
+
+/**
+ * Test suite for {@link MultiBackgroundInitializer}.
+ * This specific test focuses on the behavior of the MultiBackgroundInitializerResults class.
+ */
+// Note: The original test class name and inheritance are kept to match the provided context.
 public class MultiBackgroundInitializer_ESTestTest11 extends MultiBackgroundInitializer_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        ForkJoinPool forkJoinPool0 = ForkJoinPool.commonPool();
-        forkJoinPool0.getActiveThreadCount();
-        forkJoinPool0.getAsyncMode();
-        MultiBackgroundInitializer multiBackgroundInitializer0 = new MultiBackgroundInitializer();
-        multiBackgroundInitializer0.isInitialized();
-        BackgroundInitializer<MultiBackgroundInitializer.MultiBackgroundInitializerResults> backgroundInitializer0 = new BackgroundInitializer<MultiBackgroundInitializer.MultiBackgroundInitializerResults>();
-        multiBackgroundInitializer0.addInitializer("org.apache.commons.lang3.concurrent.MultiBackgroundInitializer$1", backgroundInitializer0);
-        MultiBackgroundInitializer.MultiBackgroundInitializerResults multiBackgroundInitializer_MultiBackgroundInitializerResults0 = multiBackgroundInitializer0.initialize();
-        String string0 = null;
-        forkJoinPool0.shutdownNow();
-        // Undeclared exception!
+    /**
+     * Verifies that calling getException() with a null name on the results object
+     * throws a NoSuchElementException.
+     */
+    @Test
+    public void getExceptionShouldThrowNoSuchElementExceptionWhenNameIsNull() throws Exception {
+        // Arrange
+        final MultiBackgroundInitializer multiInitializer = new MultiBackgroundInitializer();
+        // Add a dummy child initializer; this is required to get a valid results object.
+        multiInitializer.addInitializer("childInitializer", new BackgroundInitializer<>());
+
+        // Act
+        // The initialize() method must be called to produce the results object.
+        final MultiBackgroundInitializer.MultiBackgroundInitializerResults results = multiInitializer.initialize();
+
+        // Assert
         try {
-            multiBackgroundInitializer_MultiBackgroundInitializerResults0.getException((String) null);
-            fail("Expecting exception: NoSuchElementException");
-        } catch (NoSuchElementException e) {
-            //
-            // No child initializer with name null
-            //
-            verifyException("org.apache.commons.lang3.concurrent.MultiBackgroundInitializer$MultiBackgroundInitializerResults", e);
+            results.getException(null);
+            fail("Expected a NoSuchElementException to be thrown for a null initializer name.");
+        } catch (final NoSuchElementException e) {
+            // Verify that the correct exception with the expected message is thrown.
+            assertEquals("No child initializer with name null", e.getMessage());
         }
     }
 }
