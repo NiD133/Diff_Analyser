@@ -1,36 +1,37 @@
 package org.mockito.internal.creation.instance;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.fail;
+
 import org.junit.Test;
+import org.mockito.creation.instance.Instantiator;
 import org.mockitoutil.TestBase;
 
-public class ConstructorInstantiatorTestTest3 extends TestBase {
+public class ConstructorInstantiatorTest extends TestBase {
 
-    static class SomeClass {
-    }
-
-    class SomeInnerClass {
-    }
-
-    class ChildOfThis extends ConstructorInstantiatorTest {
-    }
-
-    static class SomeClass2 {
-
-        SomeClass2(String x) {
-        }
-    }
-
-    static class SomeClass3 {
-
-        SomeClass3(int i) {
+    // A helper class with a specific constructor signature for the test.
+    private static class ClassWithSingleStringConstructor {
+        ClassWithSingleStringConstructor(String text) {
+            // This constructor is used to verify that the instantiator can find
+            // and invoke a constructor with matching argument types.
         }
     }
 
     @Test
-    public void creates_instances_with_arguments() {
-        assertThat(new ConstructorInstantiator(false, "someString").newInstance(SomeClass2.class).getClass()).isEqualTo(SomeClass2.class);
+    public void shouldInstantiateClassUsingConstructorWithMatchingArguments() {
+        // Arrange
+        // The class to be instantiated requires a single String argument for its constructor.
+        Object[] constructorArgs = {"a-string-argument"};
+
+        // The 'false' flag indicates that the target class is not an inner class
+        // and does not require an outer instance for instantiation.
+        Instantiator instantiator = new ConstructorInstantiator(false, constructorArgs);
+
+        // Act
+        ClassWithSingleStringConstructor instance =
+                instantiator.newInstance(ClassWithSingleStringConstructor.class);
+
+        // Assert
+        // The instantiator should successfully create an object of the correct type.
+        assertThat(instance).isInstanceOf(ClassWithSingleStringConstructor.class);
     }
 }
