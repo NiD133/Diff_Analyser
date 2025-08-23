@@ -1,31 +1,33 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class Attribute_ESTestTest45 extends Attribute_ESTest_scaffolding {
+/**
+ * Tests for the static helper methods in the {@link Attribute} class.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        Document.OutputSettings.Syntax document_OutputSettings_Syntax0 = Document.OutputSettings.Syntax.xml;
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        Document.OutputSettings document_OutputSettings1 = document_OutputSettings0.syntax(document_OutputSettings_Syntax0);
-        boolean boolean0 = Attribute.shouldCollapseAttribute("", "/icwoq", document_OutputSettings1);
-        assertFalse(boolean0);
+    /**
+     * Verifies that attributes are never collapsed when the document syntax is set to XML.
+     * Attribute collapsing (e.g., rendering `<input disabled>` instead of `<input disabled="">`)
+     * is a feature specific to HTML syntax.
+     */
+    @Test
+    public void shouldCollapseAttributeReturnsFalseWhenSyntaxIsXml() {
+        // Arrange: Configure output settings for XML syntax.
+        // The specific attribute key and value are not relevant for this test,
+        // as the XML syntax setting is the deciding factor.
+        Document.OutputSettings outputSettings = new Document.OutputSettings();
+        outputSettings.syntax(Document.OutputSettings.Syntax.xml);
+
+        String attributeKey = "some-attribute";
+        String attributeValue = "some-value";
+
+        // Act: Call the method under test.
+        boolean shouldCollapse = Attribute.shouldCollapseAttribute(attributeKey, attributeValue, outputSettings);
+
+        // Assert: The result must be false because the syntax is XML.
+        assertFalse("Attributes should not be collapsed in XML mode.", shouldCollapse);
     }
 }
