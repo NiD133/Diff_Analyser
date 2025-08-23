@@ -1,30 +1,30 @@
 package org.apache.commons.lang3.concurrent;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.lang.MockException;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
+/**
+ * This test class contains tests for the MultiBackgroundInitializer.
+ * This specific test case was improved for clarity.
+ */
 public class MultiBackgroundInitializer_ESTestTest26 extends MultiBackgroundInitializer_ESTest_scaffolding {
 
+    /**
+     * Tests that the isStarted() flag remains false if the public start() method is never called,
+     * even if initialize() and close() are invoked directly.
+     */
     @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        MultiBackgroundInitializer multiBackgroundInitializer0 = new MultiBackgroundInitializer();
-        multiBackgroundInitializer0.initialize();
-        multiBackgroundInitializer0.close();
-        assertFalse(multiBackgroundInitializer0.isStarted());
+    public void testIsStartedReturnsFalseWhenStartMethodIsNotCalled() throws Exception {
+        // Arrange: Create a new MultiBackgroundInitializer instance.
+        MultiBackgroundInitializer multiInitializer = new MultiBackgroundInitializer();
+
+        // Act: Directly call the internal initialize() and close() methods.
+        // The public start() method, which sets the 'started' state, is deliberately not called.
+        multiInitializer.initialize();
+        multiInitializer.close();
+
+        // Assert: Verify that the initializer is not considered "started".
+        assertFalse("The isStarted() flag should be false because start() was never invoked.",
+                multiInitializer.isStarted());
     }
 }
