@@ -1,29 +1,27 @@
 package org.apache.commons.io.input;
 
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class BoundedReader_ESTestTest8 extends BoundedReader_ESTest_scaffolding {
+/**
+ * Tests for {@link BoundedReader}.
+ */
+public class BoundedReaderTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        BoundedReader boundedReader0 = new BoundedReader((Reader) null, 1);
-        // Undeclared exception!
-        try {
-            boundedReader0.reset();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.input.BoundedReader", e);
-        }
+    /**
+     * Tests that calling reset() on a BoundedReader initialized with a null
+     * underlying reader throws a NullPointerException. This occurs because the method
+     * attempts to delegate the reset() call to the null reader instance.
+     */
+    @Test
+    public void resetWithNullReaderThrowsNullPointerException() {
+        // Arrange: Create a BoundedReader with a null target reader.
+        // The max size is arbitrary as it does not affect this test's outcome.
+        final BoundedReader boundedReader = new BoundedReader(null, 10);
+
+        // Act & Assert: Verify that calling reset() on the bounded reader
+        // throws a NullPointerException.
+        assertThrows(NullPointerException.class, boundedReader::reset);
     }
 }
