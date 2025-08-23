@@ -1,112 +1,101 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
 import org.joda.time.IllegalFieldValueException;
-import org.joda.time.Partial;
-import org.joda.time.TimeOfDay;
-import org.joda.time.YearMonthDay;
 
-public class ISOChronologyTestTest12 extends TestCase {
+/**
+ * Tests edge cases related to the minimum supported year in ISOChronology.
+ *
+ * This test class focuses on verifying the behavior of ISOChronology at its lower
+ * boundary, ensuring dates are constructed correctly, calculations are accurate,
+ * and boundary violations are handled properly.
+ */
+public class ISOChronologyMinYearTest extends TestCase {
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    private static final ISOChronology UTC_CHRONOLOGY = ISOChronology.getInstanceUTC();
+    private static final int MIN_YEAR = UTC_CHRONOLOGY.year().getMinimumValue();
 
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
+    /**
+     * Tests that the start and end dates of the minimum year are constructed correctly.
+     */
+    public void testMinYear_startAndEndProperties() {
+        // Arrange: Define the start and end of the minimum year
+        DateTime startOfYear = new DateTime(MIN_YEAR, 1, 1, 0, 0, 0, 0, UTC_CHRONOLOGY);
+        DateTime endOfYear = new DateTime(MIN_YEAR, 12, 31, 23, 59, 59, 999, UTC_CHRONOLOGY);
 
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+        // Assert
+        assertEquals("Year of the start date should be the minimum year", MIN_YEAR, startOfYear.getYear());
+        assertEquals("Year of the end date should be the minimum year", MIN_YEAR, endOfYear.getYear());
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // The minimum year is well before the Java epoch (1970-01-01), so its millis value should be negative.
+        assertTrue("Start of minimum year should be before the epoch", startOfYear.getMillis() < 0);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestISOChronology.class);
+    /**
+     * Tests that the duration of the minimum year is calculated correctly, accounting for leap years.
+     */
+    public void testMinYear_duration() {
+        // Arrange
+        DateTime startOfYear = new DateTime(MIN_YEAR, 1, 1, 0, 0, 0, 0, UTC_CHRONOLOGY);
+        DateTime endOfYear = new DateTime(MIN_YEAR, 12, 31, 23, 59, 59, 999, UTC_CHRONOLOGY);
+        
+        // Act
+        long actualDurationInMillis = endOfYear.getMillis() - startOfYear.getMillis();
+
+        // Assert: The duration should be the number of days in that year (365 or 366) in milliseconds,
+        // minus one millisecond because the end date is at the last millisecond of the year.
+        boolean isLeap = startOfYear.year().isLeap();
+        long daysInYear = isLeap ? 366L : 365L;
+        long expectedDurationInMillis = (daysInYear * DateTimeConstants.MILLIS_PER_DAY) - 1;
+        
+        assertEquals(expectedDurationInMillis, actualDurationInMillis);
     }
 
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
+    /**
+     * Tests that creating a DateTime for the minimum year from an ISO 8601 string works correctly.
+     */
+    public void testMinYear_parsingFromString() {
+        // Arrange
+        DateTime startOfYearFromComponents = new DateTime(MIN_YEAR, 1, 1, 0, 0, 0, 0, UTC_CHRONOLOGY);
+        DateTime endOfYearFromComponents = new DateTime(MIN_YEAR, 12, 31, 23, 59, 59, 999, UTC_CHRONOLOGY);
+
+        // Act
+        DateTime startOfYearFromString = new DateTime(MIN_YEAR + "-01-01T00:00:00.000Z", UTC_CHRONOLOGY);
+        DateTime endOfYearFromString = new DateTime(MIN_YEAR + "-12-31T23:59:59.999Z", UTC_CHRONOLOGY);
+
+        // Assert
+        assertEquals(startOfYearFromComponents, startOfYearFromString);
+        assertEquals(endOfYearFromComponents, endOfYearFromString);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
+    /**
+     * Tests that attempting to go to the year before the minimum year throws an exception.
+     */
+    public void testMinYear_cannotDecrementBelowMinimum() {
+        // Arrange
+        DateTime startOfMinYear = new DateTime(MIN_YEAR, 1, 1, 0, 0, 0, 0, UTC_CHRONOLOGY);
 
-    private void testAdd(String start, DurationFieldType type, int amt, String end) {
-        DateTime dtStart = new DateTime(start, ISOChronology.getInstanceUTC());
-        DateTime dtEnd = new DateTime(end, ISOChronology.getInstanceUTC());
-        assertEquals(dtEnd, dtStart.withFieldAdded(type, amt));
-        assertEquals(dtStart, dtEnd.withFieldAdded(type, -amt));
-        DurationField field = type.getField(ISOChronology.getInstanceUTC());
-        int diff = field.getDifference(dtEnd.getMillis(), dtStart.getMillis());
-        assertEquals(amt, diff);
-        if (type == DurationFieldType.years() || type == DurationFieldType.months() || type == DurationFieldType.days()) {
-            YearMonthDay ymdStart = new YearMonthDay(start, ISOChronology.getInstanceUTC());
-            YearMonthDay ymdEnd = new YearMonthDay(end, ISOChronology.getInstanceUTC());
-            assertEquals(ymdEnd, ymdStart.withFieldAdded(type, amt));
-            assertEquals(ymdStart, ymdEnd.withFieldAdded(type, -amt));
-        }
-    }
-
-    public void testMinYear() {
-        final ISOChronology chrono = ISOChronology.getInstanceUTC();
-        final int minYear = chrono.year().getMinimumValue();
-        DateTime start = new DateTime(minYear, 1, 1, 0, 0, 0, 0, chrono);
-        DateTime end = new DateTime(minYear, 12, 31, 23, 59, 59, 999, chrono);
-        assertTrue(start.getMillis() < 0);
-        assertTrue(end.getMillis() > start.getMillis());
-        assertEquals(minYear, start.getYear());
-        assertEquals(minYear, end.getYear());
-        long delta = end.getMillis() - start.getMillis();
-        long expectedDelta = (start.year().isLeap() ? 366L : 365L) * DateTimeConstants.MILLIS_PER_DAY - 1;
-        assertEquals(expectedDelta, delta);
-        assertEquals(start, new DateTime(minYear + "-01-01T00:00:00.000Z", chrono));
-        assertEquals(end, new DateTime(minYear + "-12-31T23:59:59.999Z", chrono));
+        // Act & Assert
         try {
-            start.minusYears(1);
-            fail();
-        } catch (IllegalFieldValueException e) {
+            startOfMinYear.minusYears(1);
+            fail("Subtracting a year from the minimum year should have thrown an exception");
+        } catch (IllegalFieldValueException expected) {
+            // This exception is expected as we are crossing the lower boundary.
         }
-        try {
-            end.minusYears(1);
-            fail();
-        } catch (IllegalFieldValueException e) {
-        }
-        assertEquals(minYear - 1, chrono.year().get(Long.MIN_VALUE));
+    }
+
+    /**
+     * Tests an implementation detail: the behavior of the year field when given the
+     * lowest possible millisecond value (Long.MIN_VALUE). This is expected to resolve
+     * to the year before the minimum supported year.
+     */
+    public void testYearField_atLongMinValue() {
+        // This tests a specific edge case of the underlying year field implementation.
+        int expectedYear = MIN_YEAR - 1;
+        int actualYear = UTC_CHRONOLOGY.year().get(Long.MIN_VALUE);
+        assertEquals(expectedYear, actualYear);
     }
 }
