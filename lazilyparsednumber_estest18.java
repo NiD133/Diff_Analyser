@@ -1,22 +1,23 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LazilyParsedNumber_ESTestTest18 extends LazilyParsedNumber_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LazilyParsedNumber} class.
+ */
+public class LazilyParsedNumberTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        LazilyParsedNumber lazilyParsedNumber0 = new LazilyParsedNumber("...");
-        // Undeclared exception!
-        try {
-            lazilyParsedNumber0.doubleValue();
-            fail("Expecting exception: NumberFormatException");
-        } catch (NumberFormatException e) {
-        }
+    /**
+     * Verifies that calling {@code doubleValue()} on an instance created with a
+     * non-numeric string throws a {@link NumberFormatException}.
+     */
+    @Test(expected = NumberFormatException.class)
+    public void doubleValueShouldThrowNumberFormatExceptionForInvalidString() {
+        // Given a LazilyParsedNumber initialized with a string that is not a valid number
+        LazilyParsedNumber invalidNumber = new LazilyParsedNumber("...");
+
+        // When doubleValue() is called, a NumberFormatException is expected.
+        // The @Test(expected=...) annotation handles the assertion.
+        invalidNumber.doubleValue();
     }
 }
