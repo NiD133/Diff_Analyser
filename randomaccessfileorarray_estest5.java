@@ -1,37 +1,52 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class, focusing on sequential read operations.
+ */
 public class RandomAccessFileOrArray_ESTestTest5 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test004() throws Throwable {
-        byte[] byteArray0 = new byte[8];
-        byteArray0[2] = (byte) (-9);
-        byteArray0[3] = (byte) 52;
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        short short0 = randomAccessFileOrArray0.readShortLE();
-        assertEquals((short) 0, short0);
-        long long0 = randomAccessFileOrArray0.readUnsignedInt();
-        assertEquals(4147380224L, long0);
+    /**
+     * Verifies that calling readShortLE() followed by readUnsignedInt() reads the correct
+     * values and correctly advances the internal file pointer.
+     */
+    @Test
+    public void readShortLEThenReadUnsignedInt_advancesPositionAndReadsCorrectValues() throws IOException {
+        // Arrange
+        // This test verifies a sequence of reads:
+        // 1. A 2-byte little-endian short.
+        // 2. A 4-byte big-endian unsigned int.
+        //
+        // Byte layout:
+        // Index 0-1: Little-endian short (0x0000 -> 0)
+        // Index 2-5: Big-endian unsigned int (0xF7340000 -> 4147380224L)
+        // Index 6-7: Padding bytes, not used in this test.
+        byte[] inputData = new byte[]{
+                // Bytes for the short value 0 (LE: 0x00, 0x00)
+                0x00, 0x00,
+                // Bytes for the unsigned int value 4147380224 (BE: 0xF7, 0x34, 0x00, 0x00)
+                (byte) 0xF7, (byte) 0x34, 0x00, 0x00,
+                // Padding
+                0x00, 0x00
+        };
+
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(inputData);
+
+        final short expectedShort = 0;
+        final long expectedUnsignedInt = 4147380224L; // Hex: 0xF7340000L
+
+        // Act
+        // Read the 2-byte little-endian short, which should advance the position to index 2.
+        short actualShort = reader.readShortLE();
+
+        // From the new position, read the 4-byte big-endian unsigned int.
+        long actualUnsignedInt = reader.readUnsignedInt();
+
+        // Assert
+        assertEquals("The little-endian short should be read correctly.", expectedShort, actualShort);
+        assertEquals("The big-endian unsigned int should be read correctly after the first read.", expectedUnsignedInt, actualUnsignedInt);
     }
 }
