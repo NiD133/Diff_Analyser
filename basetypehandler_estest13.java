@@ -1,34 +1,44 @@
 package org.apache.ibatis.type;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.CallableStatement;
+import org.junit.jupiter.api.Test;
+
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.time.YearMonth;
-import org.apache.ibatis.session.Configuration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class BaseTypeHandler_ESTestTest13 extends BaseTypeHandler_ESTest_scaffolding {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        ClobTypeHandler clobTypeHandler0 = new ClobTypeHandler();
-        PreparedStatement preparedStatement0 = mock(PreparedStatement.class, new ViolatedAssumptionAnswer());
-        // Undeclared exception!
-        try {
-            clobTypeHandler0.setParameter(preparedStatement0, (-3), (String) null, (JdbcType) null);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // JDBC requires that the JdbcType must be specified for all nullable parameters.
-            //
-            verifyException("org.apache.ibatis.type.BaseTypeHandler", e);
-        }
-    }
+/**
+ * Test suite for the {@link BaseTypeHandler}.
+ * This class focuses on the generic behavior implemented in the abstract base class.
+ */
+class BaseTypeHandlerTest {
+
+  // We use a concrete subclass (ClobTypeHandler) to test the functionality
+  // of the abstract BaseTypeHandler.
+  private final BaseTypeHandler<String> typeHandler = new ClobTypeHandler();
+
+  /**
+   * Verifies that setParameter throws a TypeException when the parameter value is null
+   * and the JDBC type is not specified. This is a requirement from the JDBC specification,
+   * as the driver needs a type hint to handle SQL NULL correctly.
+   */
+  @Test
+  void shouldThrowExceptionWhenSettingNullParameterWithoutJdbcType() {
+    // Arrange
+    PreparedStatement preparedStatement = mock(PreparedStatement.class);
+    int anyColumnIndex = 1;
+    String nullParameter = null;
+    JdbcType nullJdbcType = null;
+
+    // Act & Assert
+    // Expect a TypeException because a null parameter requires a non-null JdbcType.
+    TypeException thrown = assertThrows(
+        TypeException.class,
+        () -> typeHandler.setParameter(preparedStatement, anyColumnIndex, nullParameter, nullJdbcType)
+    );
+
+    // Verify the exception message is clear and accurate.
+    assertEquals("JDBC requires that the JdbcType must be specified for all nullable parameters.", thrown.getMessage());
+  }
 }
