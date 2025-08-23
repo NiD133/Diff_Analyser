@@ -1,33 +1,34 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertNull;
+
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class SerializationUtils_ESTestTest6 extends SerializationUtils_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SerializationUtils} class.
+ * This version has been refactored for improved understandability.
+ */
+public class SerializationUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        byte[] byteArray0 = SerializationUtils.serialize((Serializable) null);
-        ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
-        SequenceInputStream sequenceInputStream0 = new SequenceInputStream(byteArrayInputStream0, byteArrayInputStream0);
-        Object object0 = SerializationUtils.deserialize((InputStream) sequenceInputStream0);
-        assertNull(object0);
+    /**
+     * Tests that deserializing a stream, which was created by serializing a null object,
+     * correctly returns null. This verifies the round-trip serialization of null values.
+     */
+    @Test
+    public void deserialize_givenStreamOfSerializedNull_returnsNull() {
+        // Arrange: Serialize a null object to create the input for deserialization.
+        // The cast to Serializable is technically not needed for a null value,
+        // but it clarifies that we are intentionally passing a serializable null.
+        final byte[] serializedNull = SerializationUtils.serialize((Serializable) null);
+        final InputStream inputStream = new ByteArrayInputStream(serializedNull);
+
+        // Act: Deserialize the byte stream back into an object.
+        final Object deserializedObject = SerializationUtils.deserialize(inputStream);
+
+        // Assert: The resulting object should be null, completing the round-trip.
+        assertNull("Deserializing a serialized null should result in null.", deserializedObject);
     }
 }
