@@ -1,41 +1,47 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.io.StringWriter;
-import java.nio.CharBuffer;
-import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class ObservableInputStream_ESTestTest45 extends ObservableInputStream_ESTest_scaffolding {
+/**
+ * Contains an improved test for the {@link ObservableInputStream.Builder}.
+ *
+ * Note: The original class name "ObservableInputStream_ESTestTest45" is kept,
+ * but a more descriptive name like "ObservableInputStreamBuilderTest" would be
+ * standard practice.
+ */
+public class ObservableInputStream_ESTestTest45 {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        ObservableInputStream.Builder observableInputStream_Builder0 = new ObservableInputStream.Builder();
-        LinkedList<ObservableInputStream.Observer> linkedList0 = new LinkedList<ObservableInputStream.Observer>();
-        observableInputStream_Builder0.setObservers(linkedList0);
-        assertEquals(0, linkedList0.size());
+    /**
+     * Tests that the {@link ObservableInputStream.Builder#setObservers(List)} method
+     * correctly configures the observers for the resulting {@link ObservableInputStream}.
+     * This test verifies the behavior when an empty list of observers is provided.
+     */
+    @Test
+    public void builderSetObserversShouldCorrectlyInitializeStreamWithEmptyList() throws IOException {
+        // Arrange: Create a builder and the necessary components.
+        // A dummy input stream is required for the builder to construct the final object.
+        final InputStream dummyInputStream = new ByteArrayInputStream(new byte[0]);
+        final List<ObservableInputStream.Observer> emptyObserverList = Collections.emptyList();
+        final ObservableInputStream.Builder builder = new ObservableInputStream.Builder();
+
+        // Act: Configure the builder with the input stream and observers, then build the object.
+        builder.setInputStream(dummyInputStream);
+        builder.setObservers(emptyObserverList);
+        final ObservableInputStream observableInputStream = builder.get();
+
+        // Assert: Verify that the created stream has the correct (empty) list of observers.
+        // This improved assertion checks the state of the constructed object, which is the
+        // correct way to test the builder's functionality.
+        final List<ObservableInputStream.Observer> actualObservers = observableInputStream.getObservers();
+        assertNotNull("The list of observers should not be null.", actualObservers);
+        assertTrue("The list of observers should be empty.", actualObservers.isEmpty());
     }
 }
