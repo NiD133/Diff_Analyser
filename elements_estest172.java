@@ -1,36 +1,36 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest172 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test171() throws Throwable {
-        Document document0 = Parser.parseBodyFragment("Only http & https protocols supported", "Only http & https protocols supported");
-        Elements elements0 = document0.getAllElements();
-        Elements elements1 = elements0.next("o");
-        assertEquals(0, elements1.size());
+/**
+ * Contains tests for the {@link Elements} class, focusing on sibling traversal methods.
+ */
+public class ElementsTest {
+
+    /**
+     * Verifies that calling {@link Elements#next(String)} with a CSS query
+     * returns an empty collection if the immediate next sibling element does not match the query.
+     */
+    @Test
+    public void nextWithQueryShouldReturnEmptyWhenNoSiblingMatches() {
+        // Arrange: Create a simple HTML structure with two adjacent sibling elements, <p> and <span>.
+        String html = "<div><p>First sibling</p><span>Second sibling</span></div>";
+        Document doc = Jsoup.parse(html);
+
+        // Select the <p> element. Its direct next sibling is the <span>.
+        Elements pElement = doc.select("p");
+
+        // Act: Attempt to find the next sibling using a query ("b") that does not match the <span> tag.
+        Elements result = pElement.next("b");
+
+        // Assert: The method should return an empty collection because no matching sibling was found.
+        assertTrue(
+            "The resulting collection should be empty as the next sibling does not match the query.",
+            result.isEmpty()
+        );
     }
 }
