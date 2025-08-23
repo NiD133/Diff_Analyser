@@ -1,44 +1,31 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TextHelpAppendable_ESTestTest19 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Tests for {@link TextHelpAppendable}.
+ * This class contains tests for setting and getting text style properties.
+ */
+public class TextHelpAppendableTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        textHelpAppendable0.setIndent((-84));
-        textHelpAppendable0.getTextStyleBuilder();
-        assertEquals((-84), textHelpAppendable0.getIndent());
+    /**
+     * Verifies that the setIndent() method correctly updates the indent value,
+     * including when a negative value is provided.
+     */
+    @Test
+    public void setIndentShouldUpdateIndentValue() {
+        // Arrange
+        // The systemOut() factory method is a convenient way to get an instance for testing.
+        final TextHelpAppendable helpAppendable = TextHelpAppendable.systemOut();
+        final int expectedIndent = -84;
+
+        // Act
+        helpAppendable.setIndent(expectedIndent);
+        final int actualIndent = helpAppendable.getIndent();
+
+        // Assert
+        assertEquals("The indent value should be updated to the set value.",
+                expectedIndent, actualIndent);
     }
 }
