@@ -1,31 +1,44 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest69 extends XNode_ESTest_scaffolding {
+import javax.imageio.metadata.IIOMetadataNode;
+import java.util.List;
+import java.util.Properties;
 
-    @Test(timeout = 4000)
-    public void test068() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XPathParser xPathParser0 = new XPathParser((Document) null, false);
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        List<XNode> list0 = xNode0.getChildren();
-        assertTrue(list0.isEmpty());
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Test suite for the XNode class.
+ * This class contains the refactored test case.
+ */
+public class XNodeTest {
+
+    /**
+     * Verifies that getChildren() returns an empty list when the underlying XML node
+     * has no child elements.
+     */
+    @Test
+    public void shouldReturnEmptyListWhenNodeHasNoChildren() {
+        // Arrange: Set up the test objects and preconditions.
+        // 1. Create a DOM Node that has no children. IIOMetadataNode is a convenient
+        //    standard library implementation of org.w3c.dom.Node.
+        Node nodeWithoutChildren = new IIOMetadataNode();
+
+        // 2. The XNode constructor requires an XPathParser and Properties.
+        //    They are not used by the getChildren() method, so we can use simple instances.
+        Properties variables = new Properties();
+        XPathParser xPathParser = new XPathParser((Document) null, false, variables, null);
+
+        // 3. Create the XNode instance to be tested.
+        XNode xNode = new XNode(xPathParser, nodeWithoutChildren, variables);
+
+        // Act: Call the method under test.
+        List<XNode> children = xNode.getChildren();
+
+        // Assert: Verify the outcome.
+        assertTrue("Expected getChildren() to return an empty list for a node with no children.", children.isEmpty());
     }
 }
