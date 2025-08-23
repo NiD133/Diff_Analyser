@@ -1,17 +1,27 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class PatternOptionBuilder_ESTestTest4 extends PatternOptionBuilder_ESTest_scaffolding {
+/**
+ * Tests for the {@link PatternOptionBuilder} class.
+ */
+public class PatternOptionBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        boolean boolean0 = PatternOptionBuilder.isValueCode(':');
-        assertTrue(boolean0);
+    /**
+     * Tests that the character representing a String value type (':') is correctly
+     * identified as a value code by the isValueCode method.
+     */
+    @Test
+    public void isValueCode_shouldReturnTrue_forStringValueCode() {
+        // Arrange: According to the PatternOptionBuilder documentation, the ':'
+        // character is the value code for an option requiring a String argument.
+        final char stringValueCode = ':';
+
+        // Act: Call the method under test.
+        final boolean isValue = PatternOptionBuilder.isValueCode(stringValueCode);
+
+        // Assert: The method should correctly identify ':' as a value code.
+        assertTrue("The colon character ':' should be recognized as a value code.", isValue);
     }
 }
