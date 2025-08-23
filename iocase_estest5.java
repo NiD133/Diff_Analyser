@@ -1,17 +1,28 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
 
-public class IOCase_ESTestTest5 extends IOCase_ESTest_scaffolding {
+/**
+ * Tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        IOCase[] iOCaseArray0 = IOCase.values();
-        assertEquals(3, iOCaseArray0.length);
+    /**
+     * Tests that IOCase.values() returns all defined enum constants in the correct
+     * declaration order. This ensures that no constants are accidentally added or
+     * removed without updating the tests.
+     */
+    @Test
+    public void values_shouldReturnAllConstantsInDeclarationOrder() {
+        // Arrange
+        final IOCase[] expectedCases = {IOCase.SENSITIVE, IOCase.INSENSITIVE, IOCase.SYSTEM};
+
+        // Act
+        final IOCase[] actualCases = IOCase.values();
+
+        // Assert
+        assertArrayEquals("The values() method should return all IOCase constants in their declaration order.",
+                          expectedCases, actualCases);
     }
 }
