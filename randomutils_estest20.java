@@ -1,28 +1,35 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class RandomUtils_ESTestTest20 extends RandomUtils_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        RandomUtils randomUtils0 = RandomUtils.insecure();
-        // Undeclared exception!
-        try {
-            randomUtils0.randomFloat(3.3724796E38F, 1.0F);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Start value must be smaller or equal to end value.
-            //
-            verifyException("org.apache.commons.lang3.Validate", e);
-        }
+/**
+ * Unit tests for {@link org.apache.commons.lang3.RandomUtils}.
+ */
+public class RandomUtilsTest {
+
+    /**
+     * Tests that randomFloat() throws an IllegalArgumentException
+     * when the start value is greater than the end value.
+     */
+    @Test
+    public void randomFloatShouldThrowExceptionWhenStartIsGreaterThanEnd() {
+        // Arrange
+        final RandomUtils randomUtils = RandomUtils.insecure();
+        final float startValue = 10.0F;
+        final float endValue = 1.0F;
+        final String expectedErrorMessage = "Start value must be smaller or equal to end value.";
+
+        // Act & Assert
+        // Call the method with an invalid range and verify that the correct exception is thrown.
+        final IllegalArgumentException thrown = assertThrows(
+            IllegalArgumentException.class,
+            () -> randomUtils.randomFloat(startValue, endValue)
+        );
+
+        // Verify that the exception message is as expected.
+        assertEquals(expectedErrorMessage, thrown.getMessage());
     }
 }
