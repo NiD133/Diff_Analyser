@@ -1,87 +1,40 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Locale;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.MutableInterval;
 import org.joda.time.MutablePeriod;
 import org.joda.time.PeriodType;
-import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.BuddhistChronology;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.JulianChronology;
 
-public class StringConverterTestTest20 extends TestCase {
+/**
+ * Tests for {@link StringConverter#setInto(org.joda.time.ReadWritablePeriod, Object, org.joda.time.Chronology)}.
+ */
+public class StringConverter_SetIntoPeriodTest extends TestCase {
 
-    private static final DateTimeZone ONE_HOUR = DateTimeZone.forOffsetHours(1);
+    /**
+     * Tests that a standard ISO 8601 period string correctly populates all the fields
+     * of a MutablePeriod object.
+     */
+    public void testSetInto_forPeriod_givenCompleteISOString_populatesAllFieldsCorrectly() {
+        // Arrange
+        final String periodString = "P2Y6M9DT12H24M48S";
+        final PeriodType periodType = PeriodType.yearMonthDayTime();
 
-    private static final DateTimeZone SIX = DateTimeZone.forOffsetHours(6);
+        // The object to be populated by the converter
+        MutablePeriod actualPeriod = new MutablePeriod(periodType);
 
-    private static final DateTimeZone SEVEN = DateTimeZone.forOffsetHours(7);
+        // The expected state of the object after the conversion
+        MutablePeriod expectedPeriod = new MutablePeriod(periodType);
+        expectedPeriod.setYears(2);
+        expectedPeriod.setMonths(6);
+        expectedPeriod.setDays(9);
+        expectedPeriod.setHours(12);
+        expectedPeriod.setMinutes(24);
+        expectedPeriod.setSeconds(48);
+        expectedPeriod.setMillis(0);
 
-    private static final DateTimeZone EIGHT = DateTimeZone.forOffsetHours(8);
+        // Act
+        StringConverter.INSTANCE.setInto(actualPeriod, periodString, null);
 
-    private static final DateTimeZone UTC = DateTimeZone.UTC;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final Chronology ISO_EIGHT = ISOChronology.getInstance(EIGHT);
-
-    private static final Chronology ISO_PARIS = ISOChronology.getInstance(PARIS);
-
-    private static final Chronology ISO_LONDON = ISOChronology.getInstance(LONDON);
-
-    private static Chronology ISO;
-
-    private static Chronology JULIAN;
-
-    private DateTimeZone zone = null;
-
-    private Locale locale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestStringConverter.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        zone = DateTimeZone.getDefault();
-        locale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        Locale.setDefault(Locale.UK);
-        JULIAN = JulianChronology.getInstance();
-        ISO = ISOChronology.getInstance();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeZone.setDefault(zone);
-        Locale.setDefault(locale);
-        zone = null;
-    }
-
-    public void testSetIntoPeriod_Object1() throws Exception {
-        MutablePeriod m = new MutablePeriod(PeriodType.yearMonthDayTime());
-        StringConverter.INSTANCE.setInto(m, "P2Y6M9DT12H24M48S", null);
-        assertEquals(2, m.getYears());
-        assertEquals(6, m.getMonths());
-        assertEquals(9, m.getDays());
-        assertEquals(12, m.getHours());
-        assertEquals(24, m.getMinutes());
-        assertEquals(48, m.getSeconds());
-        assertEquals(0, m.getMillis());
+        // Assert
+        assertEquals(expectedPeriod, actualPeriod);
     }
 }
