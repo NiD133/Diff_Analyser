@@ -1,63 +1,100 @@
 package org.joda.time;
 
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.field.FieldUtils;
-import org.joda.time.field.SkipDateTimeField;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
-public class IllegalFieldValueExceptionTestTest7 extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+/**
+ * Tests for {@link IllegalFieldValueException}.
+ * This test class verifies that when a Joda-Time class like {@link YearMonthDay}
+ * is constructed with invalid field values, it throws an {@link IllegalFieldValueException}
+ * with the correct details.
+ */
+@SuppressWarnings("deprecation") // YearMonthDay is deprecated, but used here to trigger the exception.
+class IllegalFieldValueExceptionTest {
 
-    public static TestSuite suite() {
-        return new TestSuite(TestIllegalFieldValueException.class);
-    }
+    @Nested
+    @DisplayName("When creating a YearMonthDay")
+    class YearMonthDayCreation {
 
-    @SuppressWarnings("deprecation")
-    public void testReadablePartialValidate() {
-        try {
-            new YearMonthDay(1970, -5, 1);
-            fail();
-        } catch (IllegalFieldValueException e) {
-            assertEquals(DateTimeFieldType.monthOfYear(), e.getDateTimeFieldType());
-            assertEquals(null, e.getDurationFieldType());
-            assertEquals("monthOfYear", e.getFieldName());
-            assertEquals(new Integer(-5), e.getIllegalNumberValue());
-            assertEquals(null, e.getIllegalStringValue());
-            assertEquals("-5", e.getIllegalValueAsString());
-            assertEquals(new Integer(1), e.getLowerBound());
-            assertEquals(null, e.getUpperBound());
+        @Test
+        @DisplayName("throws exception with correct details for a month value that is too low")
+        void throwsExceptionForMonthTooLow() {
+            // Arrange: Define an invalid negative month value
+            int invalidMonth = -5;
+
+            // Act: Attempt to create a YearMonthDay with the invalid month
+            IllegalFieldValueException exception = assertThrows(
+                    IllegalFieldValueException.class,
+                    () -> new YearMonthDay(1970, invalidMonth, 1)
+            );
+
+            // Assert: Verify the exception contains the correct details about the error
+            assertAll("Exception properties",
+                    () -> assertEquals(DateTimeFieldType.monthOfYear(), exception.getDateTimeFieldType(), "Field type should be monthOfYear"),
+                    () -> assertNull(exception.getDurationFieldType(), "Duration field type should be null"),
+                    () -> assertEquals("monthOfYear", exception.getFieldName(), "Field name should be 'monthOfYear'"),
+                    () -> assertEquals(invalidMonth, exception.getIllegalNumberValue(), "Illegal value should be the one provided"),
+                    () -> assertNull(exception.getIllegalStringValue(), "Illegal string value should be null for a number-based error"),
+                    () -> assertEquals(String.valueOf(invalidMonth), exception.getIllegalValueAsString(), "Illegal value as string should match"),
+                    () -> assertEquals(1, exception.getLowerBound(), "Lower bound for month should be 1"),
+                    () -> assertNull(exception.getUpperBound(), "Upper bound should be null as the value was below the lower bound")
+            );
         }
-        try {
-            new YearMonthDay(1970, 500, 1);
-            fail();
-        } catch (IllegalFieldValueException e) {
-            assertEquals(DateTimeFieldType.monthOfYear(), e.getDateTimeFieldType());
-            assertEquals(null, e.getDurationFieldType());
-            assertEquals("monthOfYear", e.getFieldName());
-            assertEquals(new Integer(500), e.getIllegalNumberValue());
-            assertEquals(null, e.getIllegalStringValue());
-            assertEquals("500", e.getIllegalValueAsString());
-            assertEquals(null, e.getLowerBound());
-            assertEquals(new Integer(12), e.getUpperBound());
+
+        @Test
+        @DisplayName("throws exception with correct details for a month value that is too high")
+        void throwsExceptionForMonthTooHigh() {
+            // Arrange: Define a month value greater than 12
+            int invalidMonth = 500;
+
+            // Act: Attempt to create a YearMonthDay with the invalid month
+            IllegalFieldValueException exception = assertThrows(
+                    IllegalFieldValueException.class,
+                    () -> new YearMonthDay(1970, invalidMonth, 1)
+            );
+
+            // Assert: Verify the exception details
+            assertAll("Exception properties",
+                    () -> assertEquals(DateTimeFieldType.monthOfYear(), exception.getDateTimeFieldType()),
+                    () -> assertNull(exception.getDurationFieldType()),
+                    () -> assertEquals("monthOfYear", exception.getFieldName()),
+                    () -> assertEquals(invalidMonth, exception.getIllegalNumberValue()),
+                    () -> assertNull(exception.getIllegalStringValue()),
+                    () -> assertEquals(String.valueOf(invalidMonth), exception.getIllegalValueAsString()),
+                    () -> assertNull(exception.getLowerBound(), "Lower bound should be null as the value was above the upper bound"),
+                    () -> assertEquals(12, exception.getUpperBound(), "Upper bound for month should be 12")
+            );
         }
-        try {
-            new YearMonthDay(1970, 2, 30);
-            fail();
-        } catch (IllegalFieldValueException e) {
-            assertEquals(DateTimeFieldType.dayOfMonth(), e.getDateTimeFieldType());
-            assertEquals(null, e.getDurationFieldType());
-            assertEquals("dayOfMonth", e.getFieldName());
-            assertEquals(new Integer(30), e.getIllegalNumberValue());
-            assertEquals(null, e.getIllegalStringValue());
-            assertEquals("30", e.getIllegalValueAsString());
-            assertEquals(null, e.getLowerBound());
-            assertEquals(new Integer(28), e.getUpperBound());
+
+        @Test
+        @DisplayName("throws exception with correct details for a day value that is invalid for the given month")
+        void throwsExceptionForInvalidDayOfMonth() {
+            // Arrange: Day 30 is invalid for February 1970, which had 28 days.
+            int invalidDay = 30;
+
+            // Act: Attempt to create a YearMonthDay with the invalid day
+            IllegalFieldValueException exception = assertThrows(
+                    IllegalFieldValueException.class,
+                    () -> new YearMonthDay(1970, 2, invalidDay)
+            );
+
+            // Assert: Verify the exception details
+            assertAll("Exception properties",
+                    () -> assertEquals(DateTimeFieldType.dayOfMonth(), exception.getDateTimeFieldType()),
+                    () -> assertNull(exception.getDurationFieldType()),
+                    () -> assertEquals("dayOfMonth", exception.getFieldName()),
+                    () -> assertEquals(invalidDay, exception.getIllegalNumberValue()),
+                    () -> assertNull(exception.getIllegalStringValue()),
+                    () -> assertEquals(String.valueOf(invalidDay), exception.getIllegalValueAsString()),
+                    () -> assertNull(exception.getLowerBound()),
+                    () -> assertEquals(28, exception.getUpperBound(), "Upper bound for day in Feb 1970 should be 28")
+            );
         }
     }
 }
