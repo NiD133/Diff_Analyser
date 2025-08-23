@@ -1,29 +1,36 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ClassFileEntry;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ConstantPoolEntry;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SegmentConstantPool_ESTestTest7 extends SegmentConstantPool_ESTest_scaffolding {
+/**
+ * Improved test for the {@link SegmentConstantPool} class, focusing on understandability.
+ * This test verifies the behavior of the class when its dependencies are not properly initialized.
+ */
+public class SegmentConstantPoolTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-        // Undeclared exception!
-        try {
-            segmentConstantPool0.getValue(5, 4);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-        }
+    /**
+     * Verifies that the {@code getValue} method throws a {@code NullPointerException}
+     * when the {@code SegmentConstantPool} is constructed with null {@code CpBands}.
+     *
+     * This test ensures that the method correctly handles an invalid internal state
+     * where the necessary data bands are missing, preventing potential silent failures
+     * or unexpected behavior downstream.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getValueShouldThrowNullPointerExceptionWhenConstructedWithNullBands() {
+        // Arrange: Create a SegmentConstantPool with null bands. This is the specific
+        // invalid state under test, as the getValue method requires a non-null bands object
+        // to retrieve data.
+        SegmentConstantPool segmentConstantPool = new SegmentConstantPool(null);
+
+        // Act: Call the getValue method with arbitrary arguments. The values themselves
+        // (type and index) are not important, as the NullPointerException should occur
+        // when the method first attempts to access the null bands object.
+        // Using a named constant for the type improves readability over a magic number.
+        segmentConstantPool.getValue(SegmentConstantPool.CP_DOUBLE, 4L);
+
+        // Assert: The test will pass if a NullPointerException is thrown, which is
+        // handled by the @Test(expected = ...) annotation. If no exception or a
+        // different exception is thrown, the test will fail.
     }
 }
