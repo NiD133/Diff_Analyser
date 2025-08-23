@@ -1,23 +1,34 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.Reader;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.StringReader;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class LineIterator_ESTestTest2 extends LineIterator_ESTest_scaffolding {
+/**
+ * Tests for {@link LineIterator}.
+ */
+public class LineIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        StringReader stringReader0 = new StringReader("p)");
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        String string0 = lineIterator0.next();
-        assertEquals("p)", string0);
+    /**
+     * Tests that calling next() on a reader with a single line returns that line.
+     */
+    @Test
+    public void testNext_whenReaderHasOneLine_returnsThatLine() {
+        // Arrange
+        final String singleLine = "The quick brown fox";
+        final StringReader reader = new StringReader(singleLine);
+
+        try (final LineIterator lineIterator = new LineIterator(reader)) {
+            // Act & Assert
+            assertTrue("Iterator should have a next line", lineIterator.hasNext());
+            
+            final String actualLine = lineIterator.next();
+            assertEquals("The returned line should match the input", singleLine, actualLine);
+            
+            assertFalse("Iterator should have no more lines", lineIterator.hasNext());
+        }
     }
 }
