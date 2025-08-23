@@ -1,37 +1,38 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LoopingListIterator_ESTestTest6 extends LoopingListIterator_ESTest_scaffolding {
+/**
+ * Tests for {@link LoopingListIterator} focusing on concurrent modification scenarios.
+ */
+public class LoopingListIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        List<Integer> list0 = linkedList0.subList(0, 0);
-        LoopingListIterator<Integer> loopingListIterator0 = new LoopingListIterator<Integer>(list0);
-        Integer integer0 = new Integer(0);
-        linkedList0.add(integer0);
-        // Undeclared exception!
-        try {
-            loopingListIterator0.reset();
-            fail("Expecting exception: ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.SubList", e);
-        }
+    /**
+     * Tests that the iterator fails fast with a ConcurrentModificationException
+     * if the underlying list is modified externally.
+     * <p>
+     * This scenario is demonstrated by creating an iterator over a {@link List#subList(int, int)} view.
+     * When the backing list of the sublist is modified, any subsequent operation on the
+     * iterator (like {@link LoopingListIterator#reset()}) is expected to throw a
+     * {@link ConcurrentModificationException}.
+     */
+    @Test(expected = ConcurrentModificationException.class)
+    public void testResetThrowsCMEWhenBackingListIsModified() {
+        // Arrange: Create an iterator from a sublist view of a backing list.
+        final LinkedList<Integer> backingList = new LinkedList<>();
+        final List<Integer> sublistView = backingList.subList(0, 0);
+        final LoopingListIterator<Integer> iterator = new LoopingListIterator<>(sublistView);
+
+        // Act: Modify the backing list directly. This invalidates the sublist view
+        // and, by extension, the iterator that depends on it.
+        backingList.add(42);
+
+        // Assert: Calling reset() on the iterator should now throw a
+        // ConcurrentModificationException because the underlying collection was modified.
+        iterator.reset();
     }
 }
