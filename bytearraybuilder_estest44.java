@@ -1,26 +1,30 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ByteArrayBuilder_ESTestTest44 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Contains tests for the constructor of {@link ByteArrayBuilder}.
+ */
+public class ByteArrayBuilderConstructorTest {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        BufferRecycler bufferRecycler0 = new BufferRecycler(0, 0);
-        ByteArrayBuilder byteArrayBuilder0 = null;
-        try {
-            byteArrayBuilder0 = new ByteArrayBuilder(bufferRecycler0, 0);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // index 2
-            //
-            verifyException("java.util.concurrent.atomic.AtomicReferenceArray", e);
-        }
+    /**
+     * Verifies that the constructor propagates an {@link IndexOutOfBoundsException}
+     * when given a {@link BufferRecycler} that is improperly configured.
+     * <p>
+     * The {@link ByteArrayBuilder} constructor attempts to allocate a buffer from the
+     * provided recycler. If the recycler is initialized with parameters that prevent
+     * this allocation (for example, by having internal arrays that are too small),
+     * the constructor should fail by propagating the underlying exception.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void constructorWithMisconfiguredRecyclerShouldThrowException() {
+        // GIVEN a BufferRecycler initialized with non-standard, zero-sized buffers.
+        // This specific configuration is known to cause an internal IndexOutOfBoundsException
+        // when ByteArrayBuilder requests its standard "write concatenation buffer".
+        BufferRecycler misconfiguredRecycler = new BufferRecycler(0, 0);
+
+        // WHEN a new ByteArrayBuilder is created with this faulty recycler
+        // THEN an IndexOutOfBoundsException is expected to be thrown and propagated.
+        new ByteArrayBuilder(misconfiguredRecycler, 0);
     }
 }
