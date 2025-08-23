@@ -1,33 +1,41 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
 import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class Validate_ESTestTest4 extends Validate_ESTest_scaffolding {
+/**
+ * Test suite for {@link Validate}.
+ * This class contains an improved version of a test that was originally auto-generated.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Object[] objectArray0 = new Object[0];
-        // Undeclared exception!
+    /**
+     * Tests that {@link Validate#fail(String, Object...)} throws an
+     * {@link UnknownFormatConversionException} when provided with a message
+     * string containing an invalid format specifier.
+     *
+     * This test ensures that the underlying exception from Java's string formatting
+     * is correctly propagated to the caller.
+     */
+    @Test
+    public void failWithInvalidFormatStringThrowsException() {
+        // Arrange: A format string with an invalid conversion specifier '%m'.
+        // The rest of the string is arbitrary but was part of the original generated test.
+        String invalidFormatString = "w%(7ml:";
+        Object[] noArguments = new Object[0];
+
+        // Act & Assert
         try {
-            Validate.fail("w%(7ml:", objectArray0);
-            fail("Expecting exception: UnknownFormatConversionException");
+            Validate.fail(invalidFormatString, noArguments);
+            fail("Expected an UnknownFormatConversionException to be thrown, but no exception was thrown.");
         } catch (UnknownFormatConversionException e) {
-            //
-            // Conversion = 'm'
-            //
-            verifyException("java.util.Formatter$FormatSpecifier", e);
+            // Verify that the exception is the one we expect, with the correct message.
+            assertEquals("Conversion = 'm'", e.getMessage());
+        } catch (Exception e) {
+            // Fail the test if a different, unexpected exception is thrown.
+            fail("Expected an UnknownFormatConversionException, but caught " + e.getClass().getName());
         }
     }
 }
