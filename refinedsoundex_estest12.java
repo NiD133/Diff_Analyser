@@ -1,18 +1,30 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RefinedSoundex_ESTestTest12 extends RefinedSoundex_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link RefinedSoundex} class.
+ */
+public class RefinedSoundexTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        RefinedSoundex refinedSoundex0 = new RefinedSoundex("org.apache.commons.codec.language.RefinedSoundex");
-        char char0 = refinedSoundex0.getMappingCode('+');
-        assertEquals('\u0000', char0);
+    /**
+     * Tests that getMappingCode() returns a null character for an input that is not an
+     * English letter. The Refined Soundex mapping is only defined for characters A-Z.
+     */
+    @Test
+    public void getMappingCodeShouldReturnNullCharForNonAlphabeticCharacter() {
+        // Arrange
+        // Using the default US English mapping. The behavior for non-letters is the same
+        // regardless of the specific character-to-code mapping.
+        RefinedSoundex soundex = new RefinedSoundex();
+        char nonAlphabeticChar = '+';
+
+        // Act
+        char mappingCode = soundex.getMappingCode(nonAlphabeticChar);
+
+        // Assert
+        // Non-alphabetic characters should map to the null character ('\u0000'), which has a value of 0.
+        assertEquals('\u0000', mappingCode);
     }
 }
