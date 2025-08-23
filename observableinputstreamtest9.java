@@ -1,190 +1,144 @@
 package org.apache.commons.io.input;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertSame;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.io.IOUtils;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+
 import org.apache.commons.io.input.ObservableInputStream.Observer;
-import org.apache.commons.io.output.NullOutputStream;
-import org.apache.commons.io.test.CustomIOException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class ObservableInputStreamTestTest9 {
+/**
+ * Tests the data notification functionality of {@link ObservableInputStream}.
+ *
+ * This refactoring focuses on splitting a single, complex test case into multiple,
+ * focused tests that are easier to read, understand, and maintain.
+ */
+public class ObservableInputStreamDataNotificationTest {
 
-    private ObservableInputStream brokenObservableInputStream() {
-        return new ObservableInputStream(BrokenInputStream.INSTANCE);
+    private static final byte[] TEST_DATA = "0123456789".getBytes(StandardCharsets.UTF_8);
+
+    private ByteArrayInputStream inputStream;
+    private DataViewObserver observer;
+
+    @BeforeEach
+    void setUp() {
+        inputStream = new ByteArrayInputStream(TEST_DATA);
+        observer = new DataViewObserver();
     }
 
-    private InputStream createInputStream() {
-        final byte[] buffer = MessageDigestInputStreamTest.generateRandomByteStream(IOUtils.DEFAULT_BUFFER_SIZE);
-        return createInputStream(new ByteArrayInputStream(buffer));
-    }
-
-    private ObservableInputStream createInputStream(final InputStream origin) {
-        return new ObservableInputStream(origin);
-    }
-
-    private void testNotificationCallbacks(final int bufferSize) throws IOException {
-        final byte[] buffer = IOUtils.byteArray();
-        final LengthObserver lengthObserver = new LengthObserver();
-        final MethodCountObserver methodCountObserver = new MethodCountObserver();
-        try (ObservableInputStream ois = new ObservableInputStream(new ByteArrayInputStream(buffer), lengthObserver, methodCountObserver)) {
-            assertEquals(IOUtils.DEFAULT_BUFFER_SIZE, IOUtils.copy(ois, NullOutputStream.INSTANCE, bufferSize));
-        }
-        assertEquals(IOUtils.DEFAULT_BUFFER_SIZE, lengthObserver.getTotal());
-        assertEquals(1, methodCountObserver.getClosedCount());
-        assertEquals(1, methodCountObserver.getFinishedCount());
-        assertEquals(0, methodCountObserver.getErrorCount());
-        assertEquals(0, methodCountObserver.getDataCount());
-        assertEquals(buffer.length / bufferSize, methodCountObserver.getDataBufferCount());
-    }
-
-    private static final class DataViewObserver extends MethodCountObserver {
+    /**
+     * A test-specific observer that captures the arguments passed to the
+     * data notification callbacks.
+     */
+    private static class DataViewObserver extends Observer {
 
         private byte[] buffer;
-
+        private int offset = -1;
+        private int length = -1;
         private int lastValue = -1;
 
-        private int length = -1;
-
-        private int offset = -1;
-
         @Override
-        public void data(final byte[] buffer, final int offset, final int length) throws IOException {
+        public void data(final byte[] buffer, final int offset, final int length) {
             this.buffer = buffer;
             this.offset = offset;
             this.length = length;
         }
 
         @Override
-        public void data(final int value) throws IOException {
-            super.data(value);
+        public void data(final int value) {
             lastValue = value;
         }
-    }
 
-    private static final class LengthObserver extends Observer {
-
-        private long total;
-
-        @Override
-        public void data(final byte[] buffer, final int offset, final int length) throws IOException {
-            this.total += length;
+        public byte[] getBuffer() {
+            return buffer;
         }
 
-        @Override
-        public void data(final int value) throws IOException {
-            total++;
+        public int getOffset() {
+            return offset;
         }
 
-        public long getTotal() {
-            return total;
+        public int getLength() {
+            return length;
         }
     }
 
-    private static class MethodCountObserver extends Observer {
-
-        private long closedCount;
-
-        private long dataBufferCount;
-
-        private long dataCount;
-
-        private long errorCount;
-
-        private long finishedCount;
-
-        @Override
-        public void closed() throws IOException {
-            closedCount++;
-        }
-
-        @Override
-        public void data(final byte[] buffer, final int offset, final int length) throws IOException {
-            dataBufferCount++;
-        }
-
-        @Override
-        public void data(final int value) throws IOException {
-            dataCount++;
-        }
-
-        @Override
-        public void error(final IOException exception) throws IOException {
-            errorCount++;
-        }
-
-        @Override
-        public void finished() throws IOException {
-            finishedCount++;
-        }
-
-        public long getClosedCount() {
-            return closedCount;
-        }
-
-        public long getDataBufferCount() {
-            return dataBufferCount;
-        }
-
-        public long getDataCount() {
-            return dataCount;
-        }
-
-        public long getErrorCount() {
-            return errorCount;
-        }
-
-        public long getFinishedCount() {
-            return finishedCount;
-        }
-    }
-
-    /**
-     * Tests that {@link Observer#data(byte[],int,int)} is called.
-     */
     @Test
-    void testDataBytesCalled() throws Exception {
-        final byte[] buffer = MessageDigestInputStreamTest.generateRandomByteStream(IOUtils.DEFAULT_BUFFER_SIZE);
-        try (ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
-            ObservableInputStream ois = createInputStream(bais)) {
-            final DataViewObserver observer = new DataViewObserver();
-            final byte[] readBuffer = new byte[23];
-            assertNull(observer.buffer);
-            ois.read(readBuffer);
-            assertNull(observer.buffer);
+    @DisplayName("Reading from stream before adding an observer should not trigger notifications")
+    void testReadBeforeAddingObserverDoesNotNotify() throws IOException {
+        try (ObservableInputStream ois = new ObservableInputStream(inputStream)) {
+            // Act: Read some data before the observer is attached
+            final byte[] tempBuffer = new byte[2];
+            ois.read(tempBuffer);
+
+            // Assert: Observer state is still initial (null)
+            assertNull(observer.getBuffer(), "Observer should not have been notified yet.");
+
+            // Act: Add the observer and read more data
             ois.add(observer);
-            for (; ; ) {
-                if (bais.available() >= 2048) {
-                    final int result = ois.read(readBuffer);
-                    if (result == -1) {
-                        ois.close();
-                        break;
-                    }
-                    assertEquals(readBuffer, observer.buffer);
-                    assertEquals(0, observer.offset);
-                    assertEquals(readBuffer.length, observer.length);
-                } else {
-                    final int res = Math.min(11, bais.available());
-                    final int result = ois.read(readBuffer, 1, 11);
-                    if (result == -1) {
-                        ois.close();
-                        break;
-                    }
-                    assertEquals(readBuffer, observer.buffer);
-                    assertEquals(1, observer.offset);
-                    assertEquals(res, observer.length);
-                }
-            }
+            final byte[] readBuffer = new byte[5];
+            final int bytesRead = ois.read(readBuffer);
+
+            // Assert: Observer is now notified with data from the second read
+            assertEquals(5, bytesRead);
+            assertSame(readBuffer, observer.getBuffer(), "Observer should be notified with the correct buffer instance.");
+            assertEquals(0, observer.getOffset(), "Observer should be notified with the correct offset.");
+            assertEquals(bytesRead, observer.getLength(), "Observer should be notified with the correct length.");
+        }
+    }
+
+    @Test
+    @DisplayName("read(byte[]) should notify observer with the correct buffer, offset, and length")
+    void testReadWithBufferNotifiesObserver() throws IOException {
+        // Arrange
+        try (ObservableInputStream ois = new ObservableInputStream(inputStream, observer)) {
+            final byte[] readBuffer = new byte[TEST_DATA.length];
+
+            // Act
+            final int bytesRead = ois.read(readBuffer);
+
+            // Assert
+            assertEquals(TEST_DATA.length, bytesRead);
+            assertArrayEquals(TEST_DATA, readBuffer);
+
+            // Assert observer notifications
+            assertSame(readBuffer, observer.getBuffer(), "Observer should be notified with the correct buffer instance.");
+            assertEquals(0, observer.getOffset(), "Observer should be notified with an offset of 0.");
+            assertEquals(bytesRead, observer.getLength(), "Observer should be notified with the number of bytes read.");
+        }
+    }
+
+    @Test
+    @DisplayName("read(byte[], int, int) should notify observer with the correct buffer, offset, and length")
+    void testReadWithBufferOffsetAndLengthNotifiesObserver() throws IOException {
+        // Arrange
+        try (ObservableInputStream ois = new ObservableInputStream(inputStream, observer)) {
+            final byte[] readBuffer = new byte[TEST_DATA.length];
+            final int offset = 2;
+            final int lengthToRead = 5;
+
+            // Act
+            final int bytesRead = ois.read(readBuffer, offset, lengthToRead);
+
+            // Assert
+            assertEquals(lengthToRead, bytesRead);
+            // Verify that the correct data was read into the correct part of the buffer
+            final byte[] expectedDataInSlice = Arrays.copyOfRange(TEST_DATA, 0, lengthToRead);
+            final byte[] actualDataInSlice = Arrays.copyOfRange(readBuffer, offset, offset + bytesRead);
+            assertArrayEquals(expectedDataInSlice, actualDataInSlice);
+
+            // Assert observer notifications
+            assertSame(readBuffer, observer.getBuffer(), "Observer should be notified with the correct buffer instance.");
+            assertEquals(offset, observer.getOffset(), "Observer should be notified with the correct offset.");
+            assertEquals(bytesRead, observer.getLength(), "Observer should be notified with the number of bytes read.");
         }
     }
 }
