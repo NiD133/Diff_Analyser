@@ -1,27 +1,34 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class PdfDictionary_ESTestTest53 extends PdfDictionary_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link PdfDictionary} class.
+ */
+public class PdfDictionaryTest {
 
-    @Test(timeout = 4000)
-    public void test52() throws Throwable {
-        PdfResources pdfResources0 = new PdfResources();
-        pdfResources0.clear();
-        assertFalse(pdfResources0.isName());
+    /**
+     * Verifies that the clear() method removes all key-value pairs from the dictionary,
+     * resulting in an empty dictionary.
+     */
+    @Test
+    public void clear_shouldRemoveAllEntriesFromDictionary() {
+        // Arrange: Create a dictionary and add a few entries to it.
+        PdfDictionary dictionary = new PdfDictionary();
+        dictionary.put(PdfName.TYPE, PdfName.PAGE);
+        dictionary.put(PdfName.KIDS, new PdfArray());
+        
+        // Pre-condition check: Ensure the dictionary is not empty before the action.
+        assertFalse("The dictionary should contain entries before being cleared.", dictionary.getKeys().isEmpty());
+
+        // Act: Call the method under test.
+        dictionary.clear();
+
+        // Assert: Verify that the dictionary is now empty.
+        assertTrue("The dictionary should be empty after calling clear().", dictionary.getKeys().isEmpty());
+        assertEquals("The dictionary size should be 0 after calling clear().", 0, dictionary.size());
     }
 }
