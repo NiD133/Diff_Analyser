@@ -1,64 +1,30 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
 import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.OffsetDateTime;
-import java.time.Period;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.JapaneseDate;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.junit.runner.RunWith;
 
-public class JulianChronology_ESTestTest2 extends JulianChronology_ESTest_scaffolding {
+/**
+ * Unit tests for {@link JulianChronology}.
+ */
+public class JulianChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        JulianChronology julianChronology0 = JulianChronology.INSTANCE;
-        JulianEra julianEra0 = JulianEra.BC;
-        // Undeclared exception!
-        try {
-            julianChronology0.dateYearDay((Era) julianEra0, 2493, 1461);
-            fail("Expecting exception: DateTimeException");
-        } catch (DateTimeException e) {
-            //
-            // Invalid value for DayOfYear (valid values 1 - 365/366): 1461
-            //
-            verifyException("java.time.temporal.ValueRange", e);
-        }
+    /**
+     * Tests that creating a date with a day-of-year value outside the valid range
+     * of 1-366 throws a DateTimeException.
+     */
+    @Test(expected = DateTimeException.class)
+    public void dateYearDay_throwsExceptionForInvalidDayOfYear() {
+        // Arrange: Set up inputs for the method call.
+        // The day of year 1461 is intentionally chosen as it's far outside the valid range.
+        JulianChronology julianChronology = JulianChronology.INSTANCE;
+        JulianEra era = JulianEra.BC;
+        int year = 2493;
+        int invalidDayOfYear = 1461;
+
+        // Act: Call the method under test.
+        // This call is expected to throw a DateTimeException due to the invalid dayOfYear.
+        julianChronology.dateYearDay(era, year, invalidDayOfYear);
+
+        // Assert: The @Test(expected) annotation handles the exception assertion.
     }
 }
