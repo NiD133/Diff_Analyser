@@ -1,28 +1,31 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest36 extends JsonArray_ESTest_scaffolding {
+/**
+ * This test suite focuses on the behavior of the {@link JsonArray} class.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        Character character0 = Character.valueOf('|');
-        jsonArray0.add(character0);
-        // Undeclared exception!
-        try {
-            jsonArray0.getAsFloat();
-            fail("Expecting exception: NumberFormatException");
-        } catch (NumberFormatException e) {
-        }
+    /**
+     * Tests that calling {@code getAsFloat()} on a JsonArray containing a single, non-numeric
+     * character element throws a {@link NumberFormatException}.
+     *
+     * <p>The {@code getAsFloat()} method on a {@code JsonArray} is a convenience method that
+     * should only succeed if the array contains exactly one element that can be converted to a float.
+     * In this case, the character '|' cannot be parsed as a float, so an exception is expected.
+     */
+    @Test(expected = NumberFormatException.class)
+    public void getAsFloat_whenArrayContainsSingleNonNumericCharacter_throwsNumberFormatException() {
+        // Arrange: Create a JsonArray and add a single character that is not a number.
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add('|');
+
+        // Act: Attempt to get the contents of the array as a float.
+        // This line is expected to throw the NumberFormatException.
+        jsonArray.getAsFloat();
+
+        // Assert: The test passes if the expected exception is thrown, as declared
+        // in the @Test annotation. No further assertions are needed.
     }
 }
