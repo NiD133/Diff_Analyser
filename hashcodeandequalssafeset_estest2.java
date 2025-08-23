@@ -1,28 +1,34 @@
 package org.mockito.internal.util.collections;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class HashCodeAndEqualsSafeSet_ESTestTest2 extends HashCodeAndEqualsSafeSet_ESTest_scaffolding {
+/**
+ * Tests for {@link HashCodeAndEqualsSafeSet}.
+ */
+public class HashCodeAndEqualsSafeSetTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-        Object[] objectArray0 = new Object[0];
-        Object[] objectArray1 = hashCodeAndEqualsSafeSet0.toArray(objectArray0);
-        assertSame(objectArray1, objectArray0);
+    /**
+     * Verifies that calling {@code toArray(T[])} on an empty set returns the
+     * provided array instance, as specified by the {@link java.util.Collection} contract.
+     * When the destination array is large enough to hold the collection's elements
+     * (which any array is for an empty collection), the collection should use it
+     * directly instead of allocating a new one.
+     */
+    @Test
+    public void toArray_whenSetIsEmpty_shouldReturnTheProvidedArray() {
+        // Arrange
+        HashCodeAndEqualsSafeSet emptySet = new HashCodeAndEqualsSafeSet();
+        Object[] destinationArray = new Object[0];
+
+        // Act
+        Object[] resultArray = emptySet.toArray(destinationArray);
+
+        // Assert
+        assertSame(
+            "For an empty set, toArray(T[]) should return the same instance of the provided array.",
+            destinationArray,
+            resultArray
+        );
     }
 }
